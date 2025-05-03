@@ -7,11 +7,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { User, Emotion } from '@/types';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
 
-// Import our new components
+// Import our components
 import EmojiSelector from '@/components/scan/EmojiSelector';
 import EmotionTextInput from '@/components/scan/EmotionTextInput';
 import AudioRecorder from '@/components/scan/AudioRecorder';
 import EmotionFeedback from '@/components/scan/EmotionFeedback';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 const ScanDetailPage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -105,7 +107,7 @@ const ScanDetailPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <LoadingAnimation text="Chargement de vos données..." />
       </div>
     );
   }
@@ -164,19 +166,30 @@ const ScanDetailPage = () => {
             className="w-full max-w-md gap-2"
             size="lg"
           >
-            {analyzing ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Analyse en cours...
-              </>
-            ) : (
-              <>Analyser mon état</>
-            )}
+            {analyzing ? "Analyse en cours..." : "Analyser mon état"}
           </Button>
         </div>
         
         <EmotionFeedback emotion={latestEmotion} />
       </div>
+
+      {/* Dialog d'analyse avec animation */}
+      <Dialog open={analyzing} onOpenChange={(open) => !open && setAnalyzing(false)}>
+        <DialogContent className="sm:max-w-md" hideCloseButton>
+          <div className="flex flex-col items-center justify-center py-8">
+            <LoadingAnimation 
+              text="Notre IA analyse votre état émotionnel..." 
+              className="mb-4"
+              iconClassName="h-12 w-12"
+            />
+            <div className="text-center max-w-sm">
+              <p className="text-sm text-muted-foreground mt-4">
+                Nous utilisons l'intelligence artificielle pour analyser vos émotions et vous offrir un retour personnalisé.
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
