@@ -1,13 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { User, Emotion } from '@/types';
 import { Smile, Mic, CircleStop, ArrowRight } from 'lucide-react';
+import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
+import { supabase } from '@/integrations/supabase/client';
 
 const ScanDetailPage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -29,16 +29,7 @@ const ScanDetailPage = () => {
     const fetchUserAndLatestEmotion = async () => {
       setLoading(true);
       try {
-        // Fetch user details
-        const { data: userData, error: userError } = await supabase
-          .from('emotions')
-          .select('*')
-          .eq('user_id', userId)
-          .maybeSingle();
-        
-        if (userError) throw userError;
-        
-        // For this demo, we'll simulate user data since we don't have a users table
+        // Pour cette démo, nous simulons les données utilisateur
         const simulatedUserData: User = {
           id: userId,
           name: `User ${userId.substring(0, 4)}`,
@@ -48,27 +39,18 @@ const ScanDetailPage = () => {
         
         setUserDetail(simulatedUserData);
         
-        // Fetch latest emotion for this user
-        const { data: emotionData, error: emotionError } = await supabase
-          .from('emotions')
-          .select('*')
-          .eq('user_id', userId)
-          .order('date', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-        
-        if (!emotionError && emotionData) {
-          setLatestEmotion(emotionData as Emotion);
+        // Récupérer la dernière émotion pour cet utilisateur
+        const emotionData = await fetchLatestEmotion(userId);
+        if (emotionData) {
+          setLatestEmotion(emotionData);
         }
       } catch (error: any) {
         console.error('Error fetching data:', error);
-        if (error.code !== 'PGRST116') { // No rows found error
-          toast({
-            title: "Erreur",
-            description: `${error.message}`,
-            variant: "destructive"
-          });
-        }
+        toast({
+          title: "Erreur",
+          description: `${error.message}`,
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
@@ -122,46 +104,23 @@ const ScanDetailPage = () => {
     
     setAnalyzing(true);
     try {
-      // Create a new emotion record
-      const { data: emotionData, error: emotionError } = await supabase
-        .from('emotions')
-        .insert({
-          user_id: userId,
-          emojis,
-          text,
-          audio_url: audioUrl,
-        })
-        .select()
-        .single();
+      // Utiliser notre nouveau service pour créer et analyser l'entrée d'émotion
+      const emotionEntry = await createEmotionEntry({
+        user_id: userId,
+        emojis,
+        text,
+        audio_url: audioUrl || undefined
+      });
       
-      if (emotionError) throw emotionError;
-      
-      // For this demo, we'll simulate an AI analysis with a simple algorithm
-      const score = Math.floor(Math.random() * 100); // Random score from 0-100
-      const feedback = generateFakeFeedback(score);
-      
-      // Update the emotion record with AI feedback and score
-      const { data: updatedEmotion, error: updateError } = await supabase
-        .from('emotions')
-        .update({
-          ai_feedback: feedback,
-          score: score,
-        })
-        .eq('id', emotionData.id)
-        .select()
-        .single();
-      
-      if (updateError) throw updateError;
-      
-      // Set the latest emotion
-      setLatestEmotion(updatedEmotion as Emotion);
+      // Mettre à jour la dernière émotion
+      setLatestEmotion(emotionEntry);
       
       toast({
         title: "Analyse terminée",
         description: "Votre état émotionnel a été analysé avec succès",
       });
       
-      // Reset form
+      // Réinitialiser le formulaire
       setEmojis("");
       setText("");
       setAudioUrl(null);
@@ -175,19 +134,6 @@ const ScanDetailPage = () => {
       });
     } finally {
       setAnalyzing(false);
-    }
-  };
-
-  // Simple function to generate fake AI feedback based on score
-  const generateFakeFeedback = (score: number) => {
-    if (score >= 80) {
-      return "Vous semblez être dans un excellent état émotionnel aujourd'hui ! Votre langage est positif et énergique. Continuez à cultiver cette énergie positive dans vos interactions quotidiennes.";
-    } else if (score >= 60) {
-      return "Votre état émotionnel est bon. Je perçois un équilibre, mais aussi quelques traces de stress. Pensez à prendre une petite pause relaxante aujourd'hui.";
-    } else if (score >= 40) {
-      return "Vous semblez être dans un état émotionnel mitigé aujourd'hui. Je détecte des signes de tension et de fatigue. Une micro-pause VR pourrait vous aider à vous ressourcer.";
-    } else {
-      return "Votre état émotionnel semble fragile aujourd'hui. Je perçois de la fatigue et potentiellement de l'anxiété. Je recommande vivement une session de relaxation guidée ou un échange avec un collègue de confiance.";
     }
   };
 
