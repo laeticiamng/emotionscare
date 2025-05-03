@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
-import type { Emotion, User } from '@/types';
+import type { Emotion } from '@/types/scan';
+import type { User } from '@/types';
 
 export const useEmotionScan = (userId: string | undefined) => {
   const [emojis, setEmojis] = useState("");
@@ -46,7 +47,7 @@ export const useEmotionScan = (userId: string | undefined) => {
       setUserDetail(simulatedUserData);
       
       // Récupérer la dernière émotion pour cet utilisateur
-      const emotionData = await fetchLatestEmotion(validUserId);
+      const emotionData = await fetchLatestEmotion();
       if (emotionData) {
         setLatestEmotion(emotionData);
       }
