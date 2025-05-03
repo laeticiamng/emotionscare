@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -26,15 +25,30 @@ const ScanDetailPage = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const { toast } = useToast();
 
+  // Assurer que l'ID est un UUID valide pour Supabase
+  const getValidUserId = () => {
+    if (!userId) return crypto.randomUUID();
+    
+    // Vérifier si c'est déjà un UUID valide
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
+      return userId;
+    }
+    
+    // Sinon, générer un UUID basé sur une valeur constante pour garantir la cohérence
+    return `00000000-0000-0000-0000-${userId.padStart(12, '0').substring(0, 12)}`;
+  };
+
   useEffect(() => {
     if (!userId) return;
 
     const fetchUserAndLatestEmotion = async () => {
       setLoading(true);
       try {
+        const validUserId = getValidUserId();
+        
         // Pour cette démo, nous simulons les données utilisateur
         const simulatedUserData: User = {
-          id: userId,
+          id: validUserId,
           name: `User ${userId.substring(0, 4)}`,
           email: `user-${userId.substring(0, 4)}@example.com`,
           anonymity_code: `Anon-${userId.substring(0, 4)}`,
@@ -43,7 +57,7 @@ const ScanDetailPage = () => {
         setUserDetail(simulatedUserData);
         
         // Récupérer la dernière émotion pour cet utilisateur
-        const emotionData = await fetchLatestEmotion(userId);
+        const emotionData = await fetchLatestEmotion(validUserId);
         if (emotionData) {
           setLatestEmotion(emotionData);
         }
@@ -71,9 +85,11 @@ const ScanDetailPage = () => {
     
     setAnalyzing(true);
     try {
+      const validUserId = getValidUserId();
+      
       // Utiliser notre service pour créer et analyser l'entrée d'émotion
       const emotionEntry = await createEmotionEntry({
-        user_id: userId,
+        user_id: validUserId,
         emojis,
         text,
         audio_url: audioUrl || undefined
