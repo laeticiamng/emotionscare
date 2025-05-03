@@ -40,45 +40,32 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
   }
 }
 
-export async function createJournalEntry(user_id: string, content: string): Promise<JournalEntry> {
+export async function createJournalEntry(
+  user_id: string, 
+  content: string,
+  mood?: JournalEntry['mood'],
+  keywords?: string[]
+): Promise<JournalEntry> {
   try {
     const validUserId = ensureValidUUID(user_id);
     
-    // 1) Créer l'entrée de journal initiale sans feedback
-    const { data, error: insertErr } = await supabase
+    const entryData: Partial<JournalEntry> = {
+      user_id: validUserId,
+      content,
+      date: new Date().toISOString()
+    };
+    
+    if (mood) entryData.mood = mood;
+    if (keywords) entryData.keywords = keywords;
+    
+    const { data, error } = await supabase
       .from('journal_entries')
-      .insert({
-        user_id: validUserId,
-        content,
-      })
+      .insert(entryData)
       .select()
       .single();
 
-    if (insertErr || !data) throw insertErr || new Error('Insert failed');
-
-    // 2) Appel à l'Edge Function pour analyser le journal avec OpenAI
-    const { data: analysisData, error } = await supabase.functions.invoke('analyze-journal', {
-      body: { content, journal_id: data.id }
-    });
-
-    if (error) {
-      console.error('Error calling analyze-journal function:', error);
-      throw new Error('Failed to analyze journal');
-    }
-
-    const { ai_feedback } = analysisData;
-
-    // 3) Mettre à jour l'entrée avec le feedback
-    const { data: updated, error: updateErr } = await supabase
-      .from('journal_entries')
-      .update({ ai_feedback })
-      .eq('id', data.id)
-      .select()
-      .single();
-
-    if (updateErr || !updated) throw updateErr || new Error('Update failed');
-
-    return updated as JournalEntry;
+    if (error || !data) throw error || new Error('Insert failed');
+    return data as JournalEntry;
   } catch (error) {
     console.error('Error in createJournalEntry:', error);
     throw error;

@@ -1,4 +1,3 @@
-
 export type UserRole = 'Interne' | 'Infirmier' | 'Aide-soignant' | 'Médecin' | 'Autre';
 
 export interface User {
@@ -37,7 +36,10 @@ export interface JournalEntry {
   id: string;
   user_id: string;
   date: string;
-  content: string;
+  mood?: '😃' | '🙂' | '😐' | '🙁' | '😢';
+  text?: string;
+  keywords?: string[];
+  content?: string;
   ai_feedback?: string;
 }
 
