@@ -1,4 +1,3 @@
-
 import { supabase } from './supabase-client';
 import type { VRSession } from '@/types';
 

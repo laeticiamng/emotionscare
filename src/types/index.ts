@@ -1,3 +1,4 @@
+
 export type UserRole = 'Interne' | 'Infirmier' | 'Aide-soignant' | 'Médecin' | 'Autre';
 
 export interface User {
@@ -57,40 +58,8 @@ export interface VRSession {
   heart_rate_after?: number;
 }
 
-export interface Post {
-  id: string;
-  user_id: string;
-  date: string;
-  content: string;
-  media_url?: string;
-  image_url?: string;
-  reactions: number;
-  comments?: Comment[];
-}
-
-export interface Comment {
-  id: string;
-  post_id: string;
-  user_id: string;
-  date: string;
-  content: string;
-}
-
-export interface Group {
-  id: string;
-  name: string;
-  topic: string;
-  description?: string;
-  members: string[];
-}
-
-export interface Buddy {
-  id: string;
-  user_id: string;
-  buddy_user_id: string;
-  matched_on: string;
-  date: string; // Adding the missing date field
-}
+// Re-export community types
+export * from './community';
 
 export interface LibraryItem {
   id: string;
