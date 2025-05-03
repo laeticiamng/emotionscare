@@ -13,6 +13,9 @@ import OnboardingPage from "./pages/OnboardingPage";
 import DashboardPage from "./pages/DashboardPage";
 import ScanPage from "./pages/ScanPage";
 import ScanDetailPage from "./pages/ScanDetailPage";
+import JournalPage from "./pages/JournalPage";
+import JournalNewPage from "./pages/JournalNewPage";
+import JournalEntryPage from "./pages/JournalEntryPage";
 import NotImplementedPage from "./pages/NotImplementedPage";
 import NotFound from "./pages/NotFound";
 
@@ -40,11 +43,17 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              
+              {/* Scan routes */}
               <Route path="/scan" element={<ProtectedRoute><ScanPage /></ProtectedRoute>} />
               <Route path="/scan/:userId" element={<ProtectedRoute><ScanDetailPage /></ProtectedRoute>} />
               
+              {/* Journal routes */}
+              <Route path="/journal" element={<ProtectedRoute><JournalPage /></ProtectedRoute>} />
+              <Route path="/journal/new" element={<ProtectedRoute><JournalNewPage /></ProtectedRoute>} />
+              <Route path="/journal/:entryId" element={<ProtectedRoute><JournalEntryPage /></ProtectedRoute>} />
+              
               {/* Not implemented routes */}
-              <Route path="/journal" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
               <Route path="/community" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
               <Route path="/vr" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
               <Route path="/library" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />

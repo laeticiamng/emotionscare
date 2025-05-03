@@ -81,6 +81,33 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          awarded_at: string
+          description: string
+          id: string
+          image_url: string | null
+          name: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          description: string
+          id?: string
+          image_url?: string | null
+          name: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       biovida_analyses: {
         Row: {
           analysis_result: string | null
@@ -110,6 +137,59 @@ export type Database = {
           person_name?: string
         }
         Relationships: []
+      }
+      buddies: {
+        Row: {
+          buddy_user_id: string
+          date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          buddy_user_id: string
+          date?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          buddy_user_id?: string
+          date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          content: string
+          date: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          date?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          date?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       "Digital Medicine": {
         Row: {
@@ -222,6 +302,60 @@ export type Database = {
         }
         Relationships: []
       }
+      emotions: {
+        Row: {
+          ai_feedback: string | null
+          audio_url: string | null
+          date: string
+          emojis: string | null
+          id: string
+          score: number | null
+          text: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          audio_url?: string | null
+          date?: string
+          emojis?: string | null
+          id?: string
+          score?: number | null
+          text?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          audio_url?: string | null
+          date?: string
+          emojis?: string | null
+          id?: string
+          score?: number | null
+          text?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      groups: {
+        Row: {
+          id: string
+          members: string[] | null
+          name: string
+          topic: string
+        }
+        Insert: {
+          id?: string
+          members?: string[] | null
+          name: string
+          topic: string
+        }
+        Update: {
+          id?: string
+          members?: string[] | null
+          name?: string
+          topic?: string
+        }
+        Relationships: []
+      }
       item_situation_relations: {
         Row: {
           created_at: string | null
@@ -293,6 +427,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      journal_entries: {
+        Row: {
+          ai_feedback: string | null
+          content: string
+          date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          content: string
+          date?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          content?: string
+          date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       medilinko_consultations: {
         Row: {
@@ -372,6 +530,57 @@ export type Database = {
           identifier?: string
           identifier_type?: string | null
           title?: string | null
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          content: string
+          date: string
+          id: string
+          image_url: string | null
+          reactions: number | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          date?: string
+          id?: string
+          image_url?: string | null
+          reactions?: number | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          date?: string
+          id?: string
+          image_url?: string | null
+          reactions?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rituals: {
+        Row: {
+          description: string
+          frequency: string
+          id: string
+          is_completed: boolean | null
+          name: string
+        }
+        Insert: {
+          description: string
+          frequency: string
+          id?: string
+          is_completed?: boolean | null
+          name: string
+        }
+        Update: {
+          description?: string
+          frequency?: string
+          id?: string
+          is_completed?: boolean | null
+          name?: string
         }
         Relationships: []
       }

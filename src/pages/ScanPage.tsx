@@ -1,92 +1,103 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockUsers } from '@/data/mockData';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Scan, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { User } from '@/types';
+import { Badge } from '@/components/ui/badge';
 
 const ScanPage = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const [search, setSearch] = React.useState('');
-  
-  // Filter users based on search
-  const filteredUsers = mockUsers.filter(user => 
-    user.name.toLowerCase().includes(search.toLowerCase()) ||
-    user.anonymity_code?.toLowerCase().includes(search.toLowerCase()) ||
-    user.role?.toLowerCase().includes(search.toLowerCase())
-  );
-  
-  // Function to get color based on emotional score
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('users')
+          .select('id, name, avatar, anonymity_code, emotional_score, role');
+        
+        if (error) throw error;
+        setUsers(data || []);
+      } catch (error: any) {
+        toast({
+          title: "Erreur",
+          description: `Impossible de charger les utilisateurs: ${error.message}`,
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [toast]);
+
   const getScoreColor = (score?: number) => {
     if (!score) return 'bg-gray-200';
-    if (score >= 80) return 'bg-emerald-500';
-    if (score >= 60) return 'bg-green-500';
-    if (score >= 40) return 'bg-yellow-500';
-    if (score >= 20) return 'bg-orange-500';
+    if (score >= 70) return 'bg-green-500';
+    if (score >= 40) return 'bg-amber-500';
     return 'bg-red-500';
   };
-  
+
+  const handleUserClick = (userId: string) => {
+    navigate(`/scan/${userId}`);
+  };
+
   return (
-    <div className="cocoon-page">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center">
-            <Scan className="mr-2 text-primary" />
-            Scan émotionnel
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Visualisez l'état émotionnel de votre équipe
-          </p>
-        </div>
-      </div>
+    <div className="container max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Scan émotionnel</h1>
       
-      <div className="mb-6 flex">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-          <Input
-            className="pl-10"
-            placeholder="Rechercher par nom, code ou rôle..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {loading ? (
+        <div className="flex justify-center my-12">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredUsers.map((user) => (
-          <Card 
-            key={user.id}
-            className="cursor-pointer transition-all duration-300 hover:shadow-md hover:border-primary/30"
-            onClick={() => navigate(`/scan/${user.id}`)}
-          >
-            <CardContent className="p-6 flex items-center">
-              <Avatar className="h-14 w-14 border-2 border-muted">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              
-              <div className="ml-4 flex-1">
-                <div className="font-medium">{user.name}</div>
-                <div className="text-sm text-muted-foreground">{user.role}</div>
-                <div className="flex items-center mt-1">
-                  <div className="flex-1 bg-secondary h-2 rounded-full overflow-hidden">
-                    <div 
-                      className={`h-full ${getScoreColor(user.emotional_score)}`} 
-                      style={{ width: `${user.emotional_score}%` }}
-                    ></div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {users.map((userData) => (
+            <Card 
+              key={userData.id}
+              className="cursor-pointer transition-all hover:shadow-md hover:bg-accent"
+              onClick={() => handleUserClick(userData.id)}
+            >
+              <CardContent className="flex items-center p-4">
+                <Avatar className="h-12 w-12 mr-4">
+                  <AvatarImage src={userData.avatar} />
+                  <AvatarFallback>{(userData.name?.substring(0, 2) || 'UN').toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="font-medium">
+                    {user?.id === userData.id ? 
+                      userData.name : 
+                      userData.anonymity_code || `Anonyme ${userData.id.substring(0, 4)}`
+                    }
                   </div>
-                  <span className="ml-2 text-sm font-medium">{user.emotional_score}/100</span>
+                  <div className="text-sm text-muted-foreground">{userData.role || 'Pas de rôle'}</div>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Code: {user.anonymity_code}
+                <div className="flex items-center gap-2">
+                  <Badge variant={userData.emotional_score ? "default" : "outline"}>
+                    Score: {userData.emotional_score || 'N/A'}
+                  </Badge>
+                  <div className={`w-3 h-3 rounded-full ${getScoreColor(userData.emotional_score)}`}></div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+          
+          {users.length === 0 && (
+            <div className="col-span-2 text-center p-8 text-muted-foreground">
+              Aucun utilisateur trouvé
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

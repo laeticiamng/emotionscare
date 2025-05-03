@@ -1,270 +1,353 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { mockEmotions, mockUsers } from '@/data/mockData';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from "@/components/ui/input";
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Brain, Mic, MonitorPlay } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { User, Emotion } from '@/types';
+import { Smile, Mic, Stop, ArrowRight } from 'lucide-react';
 
 const ScanDetailPage = () => {
   const { userId } = useParams<{ userId: string }>();
-  const navigate = useNavigate();
+  const [userDetail, setUserDetail] = useState<User | null>(null);
+  const [emojis, setEmojis] = useState("");
+  const [text, setText] = useState("");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [latestEmotion, setLatestEmotion] = useState<Emotion | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const { toast } = useToast();
-  
-  const [emojis, setEmojis] = useState('😊');
-  const [text, setText] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [aiResult, setAiResult] = useState<string | null>(null);
-  
-  // Find user
-  const user = mockUsers.find(u => u.id === userId);
-  
-  // Previous emotions for this user
-  const userEmotions = mockEmotions.filter(e => e.user_id === userId);
-  const latestEmotion = userEmotions.length > 0 ? userEmotions[0] : null;
-  
-  // Common emoji sets
-  const emojiSets = [
-    '😊 😌 🙂 😃 😄',
-    '😐 😑 😶 🙄 😒',
-    '😔 😓 😢 😞 😥',
-    '😠 😡 😤 😠 🤬',
-    '😰 😨 😱 😳 😬',
-  ];
-  
-  // Toggle recording (mock)
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    
-    if (!isRecording) {
-      toast({
-        title: "Enregistrement démarré",
-        description: "Parlez de votre journée...",
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchUserAndLatestEmotion = async () => {
+      setLoading(true);
+      try {
+        // Fetch user details
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        
+        if (userError) throw userError;
+        setUserDetail(userData);
+        
+        // Fetch latest emotion for this user
+        const { data: emotionData, error: emotionError } = await supabase
+          .from('emotions')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (!emotionError) {
+          setLatestEmotion(emotionData);
+        }
+      } catch (error: any) {
+        console.error('Error fetching data:', error);
+        if (error.code !== 'PGRST116') { // No rows found error
+          toast({
+            title: "Erreur",
+            description: `${error.message}`,
+            variant: "destructive"
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAndLatestEmotion();
+  }, [userId, toast]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const audioChunks: BlobPart[] = [];
+      
+      recorder.addEventListener('dataavailable', (event) => {
+        audioChunks.push(event.data);
       });
-    } else {
+      
+      recorder.addEventListener('stop', () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
+      });
+      
+      recorder.start();
+      setRecording(true);
+      setMediaRecorder(recorder);
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
       toast({
-        title: "Enregistrement terminé",
-        description: "Audio capturé avec succès.",
+        title: "Erreur",
+        description: "Impossible d'accéder au microphone",
+        variant: "destructive"
       });
     }
   };
-  
-  // Handle analysis
-  const handleAnalyze = () => {
-    if (!text && !emojis) {
-      toast({
-        title: "Entrée requise",
-        description: "Veuillez saisir du texte ou des émojis avant d'analyser.",
-        variant: "destructive"
-      });
-      return;
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      setRecording(false);
     }
+  };
+
+  const handleEmojiClick = (emoji: string) => {
+    setEmojis(prev => prev + emoji);
+  };
+
+  const analyzeEmotion = async () => {
+    if (!userId) return;
     
-    setIsAnalyzing(true);
-    
-    // Simulate AI analysis
-    setTimeout(() => {
-      // Mock AI result
-      if (emojis.includes('😊') || text.toLowerCase().includes('bien')) {
-        setAiResult("Votre état émotionnel semble positif. Je détecte des signes de bien-être et d'optimisme. Continuez à maintenir cette attitude positive et envisagez une courte session de méditation pour renforcer cet état.");
-      } else if (emojis.includes('😔') || text.toLowerCase().includes('fatigué') || text.toLowerCase().includes('stress')) {
-        setAiResult("Je détecte des signes de fatigue et de stress dans votre expression. Je vous suggère une micro-pause VR de 5 minutes pour vous ressourcer et une séance de respiration guidée.");
-      } else {
-        setAiResult("Votre état émotionnel semble neutre avec quelques variations. Une courte pause VR pourrait vous aider à maintenir votre équilibre émotionnel.");
-      }
+    setAnalyzing(true);
+    try {
+      // Create a new emotion record
+      const { data: emotionData, error: emotionError } = await supabase
+        .from('emotions')
+        .insert({
+          user_id: userId,
+          emojis,
+          text,
+          audio_url: audioUrl,
+        })
+        .select()
+        .single();
       
-      setIsAnalyzing(false);
+      if (emotionError) throw emotionError;
+      
+      // For this demo, we'll simulate an AI analysis with a simple algorithm
+      const score = Math.floor(Math.random() * 100); // Random score from 0-100
+      const feedback = generateFakeFeedback(score);
+      
+      // Update the emotion record with AI feedback and score
+      const { data: updatedEmotion, error: updateError } = await supabase
+        .from('emotions')
+        .update({
+          ai_feedback: feedback,
+          score: score,
+        })
+        .eq('id', emotionData.id)
+        .select()
+        .single();
+      
+      if (updateError) throw updateError;
+      
+      // Update user's emotional score
+      await supabase
+        .from('users')
+        .update({
+          emotional_score: score,
+        })
+        .eq('id', userId);
+      
+      // Set the latest emotion
+      setLatestEmotion(updatedEmotion);
       
       toast({
         title: "Analyse terminée",
-        description: "Résultats disponibles",
+        description: "Votre état émotionnel a été analysé avec succès",
       });
-    }, 2000);
-  };
-  
-  if (!user) {
-    return <div>Utilisateur non trouvé</div>;
-  }
-  
-  return (
-    <div className="cocoon-page">
-      <Button variant="ghost" onClick={() => navigate('/scan')} className="mb-6">
-        <ArrowLeft size={16} className="mr-2" /> Retour à la liste
-      </Button>
       
-      <div className="flex items-center mb-8">
-        <Avatar className="h-16 w-16 mr-4 border-2 border-muted">
-          <AvatarImage src={user.avatar} />
-          <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="text-3xl font-bold">{user.name}</h1>
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">{user.role}</span>
-            <span className="text-xs bg-secondary px-2 py-1 rounded-full">
-              {user.anonymity_code}
-            </span>
-          </div>
-        </div>
-      </div>
+      // Reset form
+      setEmojis("");
+      setText("");
+      setAudioUrl(null);
+      
+    } catch (error: any) {
+      console.error('Error analyzing emotion:', error);
+      toast({
+        title: "Erreur",
+        description: `${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center">
-                Nouveau scan émotionnel
-              </CardTitle>
-              <CardDescription>
-                Comment vous sentez-vous aujourd'hui?
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="cocoon-label">Émojis d'humeur</label>
-                <div className="grid grid-cols-1 gap-2">
-                  <div className="flex overflow-x-auto pb-2 gap-2 cocoon-input">
-                    <input
-                      type="text"
-                      value={emojis}
-                      onChange={(e) => setEmojis(e.target.value)}
-                      className="flex-1 outline-none bg-transparent"
-                      placeholder="Exprimez votre humeur avec des emojis..."
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {emojiSets.map((set, idx) => (
-                      <Button 
-                        key={idx}
-                        type="button" 
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEmojis(set)}
-                        className="text-lg"
-                      >
-                        {set}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <label className="cocoon-label">Comment ça va?</label>
-                <Textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Exprimez votre état émotionnel en quelques mots..."
-                  rows={3}
-                />
-              </div>
-              
-              <div>
-                <label className="cocoon-label">Audio (optionnel)</label>
-                <Button 
-                  onClick={toggleRecording} 
-                  variant={isRecording ? "destructive" : "outline"}
-                  className="w-full justify-center"
+  // Simple function to generate fake AI feedback based on score
+  const generateFakeFeedback = (score: number) => {
+    if (score >= 80) {
+      return "Vous semblez être dans un excellent état émotionnel aujourd'hui ! Votre langage est positif et énergique. Continuez à cultiver cette énergie positive dans vos interactions quotidiennes.";
+    } else if (score >= 60) {
+      return "Votre état émotionnel est bon. Je perçois un équilibre, mais aussi quelques traces de stress. Pensez à prendre une petite pause relaxante aujourd'hui.";
+    } else if (score >= 40) {
+      return "Vous semblez être dans un état émotionnel mitigé aujourd'hui. Je détecte des signes de tension et de fatigue. Une micro-pause VR pourrait vous aider à vous ressourcer.";
+    } else {
+      return "Votre état émotionnel semble fragile aujourd'hui. Je perçois de la fatigue et potentiellement de l'anxiété. Je recommande vivement une session de relaxation guidée ou un échange avec un collègue de confiance.";
+    }
+  };
+
+  const commonEmojis = ["😊", "😃", "😄", "🙂", "😐", "😕", "😢", "😡", "😴", "🤔", "😌", "🥺"];
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">
+        Scan émotionnel {userDetail ? `de ${userDetail.name}` : ''}
+      </h1>
+      
+      <div className="space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Comment vous sentez-vous aujourd'hui ?</CardTitle>
+            <CardDescription>Utilisez des emojis pour exprimer votre humeur</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2 mb-4">
+              {commonEmojis.map((emoji) => (
+                <Button
+                  key={emoji}
+                  variant="outline"
+                  className="text-xl"
+                  onClick={() => handleEmojiClick(emoji)}
                 >
-                  <Mic size={16} className={`mr-2 ${isRecording ? 'animate-pulse' : ''}`} />
-                  {isRecording ? 'Arrêter l\'enregistrement' : 'Enregistrer un message vocal'}
+                  {emoji}
+                </Button>
+              ))}
+            </div>
+            
+            <div className="flex items-center p-2 border rounded-md">
+              <div className="text-xl mr-2">
+                <Smile className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="min-h-[40px] flex-1 text-xl">
+                {emojis || <span className="text-muted-foreground">Sélectionnez des emojis...</span>}
+              </div>
+              {emojis && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEmojis('')}
+                >
+                  Effacer
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Décrivez votre état</CardTitle>
+            <CardDescription>Partagez vos ressentis en quelques mots</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Comment vous sentez-vous aujourd'hui ?"
+              className="min-h-[100px]"
+            />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Audio</CardTitle>
+            <CardDescription>Enregistrez un message vocal pour exprimer votre ressenti</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex justify-center">
+              {!recording ? (
+                <Button 
+                  onClick={startRecording}
+                  disabled={!!audioUrl}
+                  className="gap-2"
+                >
+                  <Mic className="h-4 w-4" />
+                  Commencer l'enregistrement
+                </Button>
+              ) : (
+                <Button 
+                  onClick={stopRecording}
+                  variant="destructive"
+                  className="gap-2"
+                >
+                  <Stop className="h-4 w-4" />
+                  Arrêter l'enregistrement
+                </Button>
+              )}
+            </div>
+            
+            {audioUrl && (
+              <div className="border rounded-md p-4 mt-2">
+                <audio src={audioUrl} controls className="w-full" />
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => setAudioUrl(null)}
+                >
+                  Supprimer l'audio
                 </Button>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                onClick={handleAnalyze}
-                disabled={isAnalyzing || (!text && !emojis)}
-                className="w-full"
-              >
-                <Brain size={16} className="mr-2" />
-                {isAnalyzing ? 'Analyse en cours...' : 'Analyser'}
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          {aiResult && (
-            <Card className="border-primary/30">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center">
-                  <Brain size={18} className="mr-2 text-primary" />
-                  Résultat de l'analyse IA
-                </CardTitle>
-                <CardDescription>
-                  Basé sur votre expression actuelle
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{aiResult}</p>
-              </CardContent>
-              <CardFooter>
+            )}
+          </CardContent>
+        </Card>
+        
+        <div className="flex justify-center">
+          <Button 
+            onClick={analyzeEmotion}
+            disabled={analyzing || (!emojis && !text && !audioUrl)}
+            className="w-full max-w-md gap-2"
+            size="lg"
+          >
+            {analyzing ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Analyse en cours...
+              </>
+            ) : (
+              <>Analyser mon état</>
+            )}
+          </Button>
+        </div>
+        
+        {latestEmotion?.ai_feedback && (
+          <Card className="mt-8 bg-gradient-to-r from-indigo-50 to-indigo-100 border-indigo-200">
+            <CardHeader>
+              <CardTitle className="flex items-center text-indigo-800">
+                Résultat de l'analyse IA
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-indigo-700">
+                {latestEmotion.ai_feedback}
+              </div>
+              
+              <div className="mt-6">
                 <Button 
                   onClick={() => navigate('/vr')}
                   variant="outline"
-                  className="w-full"
+                  className="gap-2 border-indigo-300 hover:bg-indigo-100"
                 >
-                  <MonitorPlay size={16} className="mr-2" />
-                  Planifier micro-pause VR
+                  Planifier une micro-pause VR
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
-              </CardFooter>
-            </Card>
-          )}
-        </div>
-        
-        <div className="space-y-6">
-          {latestEmotion && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Scan précédent</CardTitle>
-                <CardDescription>
-                  {new Date(latestEmotion.date).toLocaleDateString('fr-FR')} - Score: {latestEmotion.score}/100
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {latestEmotion.emojis && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Émojis:</span>
-                    <div className="text-2xl">{latestEmotion.emojis}</div>
-                  </div>
-                )}
-                
-                {latestEmotion.text && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Expression:</span>
-                    <p className="text-sm mt-1 p-3 bg-muted rounded-md">{latestEmotion.text}</p>
-                  </div>
-                )}
-                
-                {latestEmotion.ai_feedback && (
-                  <div>
-                    <span className="text-sm text-muted-foreground">Feedback IA:</span>
-                    <p className="text-sm mt-1 p-3 bg-secondary rounded-md">{latestEmotion.ai_feedback}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Évolution émotionnelle</CardTitle>
-              <CardDescription>
-                Les 7 derniers jours
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 flex items-center justify-center">
-                <p className="text-muted-foreground text-center">
-                  Graphique d'évolution émotionnelle à venir...
-                </p>
               </div>
             </CardContent>
           </Card>
-        </div>
+        )}
       </div>
     </div>
   );
