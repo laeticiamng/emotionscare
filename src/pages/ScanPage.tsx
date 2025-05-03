@@ -25,7 +25,7 @@ const ScanPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<EmotionalScan[]>([]);
-  const [mood, setMood] = useState(75);
+  const [mood, setMood] = useState<number>(75);
   const [notes, setNotes] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
@@ -136,16 +136,16 @@ const ScanPage = () => {
       
       setLoading(true);
       
-      // Save to emotions table (we're reusing the existing table structure)
+      // Map our UI fields to database fields (score instead of mood, text instead of notes)
       const { data, error } = await supabase
         .from('emotions')
         .upsert({
           user_id: user.id,
           date: new Date().toISOString(),
           score: mood,
-          text: notes.trim() || undefined
+          text: notes.trim() || null // Use null instead of undefined for empty strings
         }, {
-          onConflict: ['user_id', 'date'],
+          onConflict: 'user_id,date',
           returning: 'representation'
         })
         .select()

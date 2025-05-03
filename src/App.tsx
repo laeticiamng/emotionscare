@@ -21,6 +21,7 @@ import CommunityFeed from "./pages/CommunityFeed";
 import GroupList from "./pages/GroupList";
 import BuddyPage from "./pages/BuddyPage";
 import VRSessionPage from "./pages/VRSessionPage";
+import GamificationPage from "./pages/GamificationPage";
 import NotImplementedPage from "./pages/NotImplementedPage";
 import NotFound from "./pages/NotFound";
 
@@ -66,9 +67,11 @@ const App = () => (
               {/* VR Route */}
               <Route path="/vr" element={<ProtectedRoute><VRSessionPage /></ProtectedRoute>} />
               
+              {/* Gamification Route */}
+              <Route path="/gamification" element={<ProtectedRoute><GamificationPage /></ProtectedRoute>} />
+              
               {/* Not implemented routes */}
               <Route path="/library" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
-              <Route path="/gamification" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
               <Route path="/reports" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
               
