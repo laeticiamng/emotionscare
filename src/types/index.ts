@@ -51,9 +51,11 @@ export interface VRSessionTemplate {
 export interface VRSession {
   id: string;
   user_id: string;
-  template_id: string;
   date: string;
-  feedback_score?: number;
+  duration_seconds: number;
+  location_url: string;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
 }
 
 export interface Post {
