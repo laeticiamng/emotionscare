@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -56,7 +55,7 @@ const GroupList: React.FC = () => {
       toast({
         title: "Informations manquantes",
         description: "Le nom et la thématique sont requis",
-        variant: "warning"
+        variant: "destructive"
       });
       return;
     }

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -74,7 +73,7 @@ const CommunityFeed: React.FC = () => {
       toast({
         title: "Contenu vide",
         description: "Veuillez écrire quelque chose avant de publier",
-        variant: "warning"
+        variant: "destructive"
       });
       return;
     }
@@ -141,7 +140,7 @@ const CommunityFeed: React.FC = () => {
       toast({
         title: "Commentaire vide",
         description: "Veuillez écrire quelque chose avant de commenter",
-        variant: "warning"
+        variant: "destructive"
       });
       return;
     }
