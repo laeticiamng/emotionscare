@@ -1,12 +1,29 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import Layout from "./components/Layout";
+
+// Pages
+import LoginPage from "./pages/LoginPage";
+import OnboardingPage from "./pages/OnboardingPage";
+import DashboardPage from "./pages/DashboardPage";
+import ScanPage from "./pages/ScanPage";
+import ScanDetailPage from "./pages/ScanDetailPage";
+import NotImplementedPage from "./pages/NotImplementedPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Protected Route wrapper component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  // In a real app we would check if the user is authenticated using the auth context
+  // For now, we'll just render the children
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -14,11 +31,35 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<LoginPage />} />
+            
+            {/* Protected routes inside layout */}
+            <Route element={<Layout />}>
+              <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/scan" element={<ProtectedRoute><ScanPage /></ProtectedRoute>} />
+              <Route path="/scan/:userId" element={<ProtectedRoute><ScanDetailPage /></ProtectedRoute>} />
+              
+              {/* Not implemented routes */}
+              <Route path="/journal" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              <Route path="/community" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              <Route path="/vr" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              <Route path="/library" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              <Route path="/gamification" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              <Route path="/reports" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><NotImplementedPage /></ProtectedRoute>} />
+              
+              {/* Redirect root to dashboard if authenticated, login otherwise */}
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            </Route>
+            
+            {/* Catch all for 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
