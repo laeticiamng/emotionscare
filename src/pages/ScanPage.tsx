@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,11 +10,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { saveEmotionScan, fetchEmotionHistory } from '@/lib/scanService';
+import type { Emotion } from '@/types/scan';
 
 // Define the EmotionalScan interface within the file
 interface EmotionalScan {
   id: string;
-  user_id: string;
   date: string;         // ISO timestamp
   mood: number;         // de 0 (très mal) à 100 (au top)
   notes?: string;       // commentaire optionnel
@@ -81,24 +81,18 @@ const ScanPage = () => {
         setUsers(simulatedUsers);
         
         // Fetch emotional scans history
-        if (user) {
-          const { data, error } = await supabase
-            .from('emotions')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('date', { ascending: false });
-            
-          if (error) throw error;
+        try {
+          const emotions = await fetchEmotionHistory();
           
-          if (data) {
+          if (emotions) {
             // Convert emotions data to EmotionalScan format
-            const scans: EmotionalScan[] = data.map(emotion => ({
+            const scans: EmotionalScan[] = emotions.map(emotion => ({
               id: emotion.id,
-              user_id: emotion.user_id,
               date: emotion.date,
               mood: emotion.score || 50,
               notes: emotion.text
             }));
+            
             setHistory(scans);
             
             // Pre-fill the slider if there's a scan for today
@@ -108,6 +102,8 @@ const ScanPage = () => {
               setNotes(todayScan.notes || '');
             }
           }
+        } catch (err) {
+          console.error("Error fetching emotions:", err);
         }
       } catch (error: any) {
         toast({
@@ -121,45 +117,27 @@ const ScanPage = () => {
     };
 
     fetchUsers();
-  }, [toast, user, today]);
+  }, [toast, today]);
 
   const handleSave = async () => {
     try {
-      if (!user) {
-        toast({
-          title: "Erreur",
-          description: "Vous devez être connecté pour enregistrer un scan émotionnel",
-          variant: "destructive"
-        });
-        return;
-      }
-      
       setLoading(true);
       
-      // Map our UI fields to database fields (score instead of mood, text instead of notes)
-      const { data, error } = await supabase
-        .from('emotions')
-        .upsert({
-          user_id: user.id,
-          date: new Date().toISOString(),
-          score: mood,
-          text: notes.trim() || null // Use null instead of undefined for empty strings
-        }, {
-          onConflict: 'user_id,date',
-          returning: 'representation'
-        })
-        .select()
-        .single();
-        
-      if (error || !data) throw error || new Error('Enregistrement du scan échoué');
+      // Create new emotion entry without user_id
+      const newScan: Omit<Emotion,'id'> = {
+        date: new Date().toISOString(),
+        score: mood,
+        text: notes.trim() || null // Use null instead of undefined for empty strings
+      };
+      
+      const savedEmotion = await saveEmotionScan(newScan);
       
       // Convert to EmotionalScan format
       const scan: EmotionalScan = {
-        id: data.id,
-        user_id: data.user_id,
-        date: data.date,
-        mood: data.score || 50,
-        notes: data.text
+        id: savedEmotion.id,
+        date: savedEmotion.date,
+        mood: savedEmotion.score || 50,
+        notes: savedEmotion.text
       };
       
       // Update the history
