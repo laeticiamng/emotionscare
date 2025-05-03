@@ -1,5 +1,6 @@
+
 import { supabase } from './supabase-client';
-import type { Post, Comment, Group, Buddy, User } from '@/types/community';
+import type { Post, Comment, Group, Buddy } from '@/types/community';
 import type { User } from '@/types';
 
 // --- POSTS ---
