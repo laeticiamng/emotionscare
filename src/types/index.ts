@@ -1,4 +1,3 @@
-
 export type UserRole = 'Interne' | 'Infirmier' | 'Aide-soignant' | 'Médecin' | 'Autre';
 
 export interface User {
@@ -90,7 +89,7 @@ export interface Buddy {
   user_id: string;
   buddy_user_id: string;
   matched_on: string;
-  date: string;
+  date: string; // Adding the missing date field
 }
 
 export interface LibraryItem {
