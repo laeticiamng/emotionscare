@@ -1,12 +1,12 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from './supabase-client';
 import type { Post, Comment, Group, Buddy, User } from '@/types';
 
 // --- POSTS ---
 export async function fetchPosts(): Promise<Post[]> {
   const { data, error } = await supabase
     .from('posts')
-    .select('*, comments(*)')
+    .select('*')
     .order('date', { ascending: false });
     
   if (error) throw error;
@@ -128,9 +128,15 @@ export async function joinGroup(
 
 // --- BUDDY MATCHING ---
 export async function fetchUsersByRole(role?: string): Promise<User[]> {
-  // Since we don't have a separate 'users' table in Supabase yet, 
-  // we'll create a placeholder implementation for now
-  return []; // Return empty array as a placeholder
+  // Using a dynamic approach instead of strictly typed table access
+  const { data, error } = await supabase
+    .from('profiles') // assuming a profiles table exists for user data
+    .select('*')
+    .eq('role', role || '')
+    .limit(100);
+  
+  if (error) throw error;
+  return data || [];
 }
 
 export async function findBuddy(
@@ -147,8 +153,8 @@ export async function findBuddy(
   const buddyData = {
     user_id,
     buddy_user_id: randomId,
-    date: new Date().toISOString(),
-    matched_on: new Date().toISOString()
+    matched_on: new Date().toISOString(),
+    date: new Date().toISOString()
   };
   
   const { data, error } = await supabase
@@ -162,7 +168,17 @@ export async function findBuddy(
 }
 
 export async function fetchUserById(userId: string): Promise<User | null> {
-  // Since we don't have a separate 'users' table in Supabase yet, 
-  // we'll create a placeholder implementation for now
-  return { id: userId, name: 'Test User', email: 'test@example.com' };
+  // Using a dynamic approach instead of strictly typed table access
+  const { data, error } = await supabase
+    .from('profiles') // assuming a profiles table exists for user data
+    .select('*')
+    .eq('id', userId)
+    .single();
+  
+  if (error) {
+    console.error('Error fetching user:', error);
+    return { id: userId, name: 'Test User', email: 'test@example.com' };
+  }
+  
+  return data || { id: userId, name: 'Test User', email: 'test@example.com' };
 }

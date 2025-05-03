@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from './supabase-client';
 import type { VRSession } from '@/types';
 
 // Crée une session VR
@@ -24,7 +24,7 @@ export async function createVRSession(
     .single();
     
   if (error || !data) throw error || new Error('Failed to log VR session');
-  return data;
+  return data as VRSession; // Cast to ensure type compatibility
 }
 
 // Récupère le nombre de sessions ce mois
