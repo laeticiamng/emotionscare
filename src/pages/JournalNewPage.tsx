@@ -1,144 +1,141 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/input";
-import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from '@/integrations/supabase/client';
-import { Save, ArrowLeft } from 'lucide-react';
 
 const JournalNewPage = () => {
   const [content, setContent] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleSave = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!content.trim()) {
       toast({
-        title: "Entrée vide",
-        description: "Veuillez écrire quelque chose avant de sauvegarder.",
-        variant: "destructive"
+        title: "Erreur",
+        description: "Le contenu du journal ne peut pas être vide",
+        variant: "destructive",
       });
       return;
     }
 
     if (!user) {
       toast({
-        title: "Non connecté",
-        description: "Vous devez être connecté pour enregistrer une entrée de journal.",
-        variant: "destructive"
+        title: "Erreur",
+        description: "Vous devez être connecté pour créer une entrée de journal",
+        variant: "destructive",
       });
       return;
     }
 
-    setSaving(true);
+    setSubmitting(true);
+
     try {
-      // Create journal entry
-      const { data: entryData, error: entryError } = await supabase
+      // Create a new journal entry
+      const { data, error } = await supabase
         .from('journal_entries')
         .insert({
           user_id: user.id,
-          content: content.trim()
+          content,
         })
         .select()
         .single();
 
-      if (entryError) throw entryError;
+      if (error) throw error;
 
-      // Generate AI feedback (simulated)
-      const feedback = generateFakeAIFeedback(content);
-      
-      // Update entry with AI feedback
-      const { error: updateError } = await supabase
+      // Generate simulated AI feedback
+      const aiFeedback = generateAIFeedback();
+
+      // Update the journal entry with AI feedback
+      await supabase
         .from('journal_entries')
-        .update({ ai_feedback: feedback })
-        .eq('id', entryData.id);
-      
-      if (updateError) throw updateError;
+        .update({
+          ai_feedback: aiFeedback,
+        })
+        .eq('id', data.id);
 
       toast({
-        title: "Entrée sauvegardée",
-        description: "Votre entrée de journal a été enregistrée avec succès."
+        description: "Entrée de journal créée avec succès",
       });
 
       navigate('/journal');
     } catch (error: any) {
-      console.error('Error saving journal entry:', error);
+      console.error("Error creating journal entry:", error);
       toast({
         title: "Erreur",
-        description: `Impossible de sauvegarder l'entrée: ${error.message}`,
-        variant: "destructive"
+        description: `Échec de la création de l'entrée de journal: ${error.message}`,
+        variant: "destructive",
       });
     } finally {
-      setSaving(false);
+      setSubmitting(false);
     }
   };
 
-  // Fake AI feedback generator
-  const generateFakeAIFeedback = (text: string) => {
-    const templates = [
-      "Votre journal reflète un état d'esprit plutôt positif. Je perçois une résilience et une détermination dans vos mots. Continuez à cultiver cette attitude constructive face aux défis quotidiens.",
-      "Je détecte des signes de fatigue dans votre entrée. Accordez-vous du repos et priorisez votre bien-être ces prochains jours. Une micro-pause VR pourrait vous aider à vous ressourcer.",
-      "Votre journal évoque des questionnements profonds. Ces réflexions sont précieuses pour votre développement personnel. Prenez le temps d'explorer ces pensées à travers des exercices de pleine conscience.",
-      "Je perçois un sentiment d'accomplissement dans votre entrée. Célébrez ces petites victoires et reconnaissez vos efforts. Ces moments positifs contribuent grandement à votre équilibre émotionnel.",
-      "Votre journal semble refléter une période de transition. Ces moments peuvent être déstabilisants mais aussi riches en opportunités de croissance. Soyez bienveillant envers vous-même pendant cette phase."
+  // Function to generate fake AI feedback
+  const generateAIFeedback = () => {
+    const feedbackOptions = [
+      "Je remarque une tonalité positive dans votre texte, c'est encourageant de voir que vous progressez dans votre bien-être.",
+      "Votre entrée révèle une certaine introspection. Continuez à explorer vos pensées de manière constructive.",
+      "Je détecte des signes de stress dans votre texte. Pensez à prendre quelques moments pour vous détendre aujourd'hui.",
+      "Votre réflexion montre une belle capacité d'analyse. Continuez à cultiver cette conscience de soi.",
+      "Je perçois des émotions mêlées dans votre texte. Rappelez-vous que c'est normal et que cela fait partie du processus de croissance personnelle."
     ];
     
-    // Randomly select a feedback template
-    return templates[Math.floor(Math.random() * templates.length)];
+    return feedbackOptions[Math.floor(Math.random() * feedbackOptions.length)];
   };
 
   return (
     <div className="container max-w-3xl mx-auto">
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate('/journal')}
-        className="mb-4 gap-2"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Retour au journal
-      </Button>
-      
       <h1 className="text-3xl font-bold mb-6">Nouvelle entrée de journal</h1>
-      
+
       <Card>
         <CardHeader>
-          <CardTitle>Exprimez-vous librement</CardTitle>
+          <CardTitle>Exprimez vos pensées</CardTitle>
           <CardDescription>
-            Écrivez vos pensées, émotions et réflexions du jour. Notre IA vous proposera un feedback personnalisé.
+            Écrivez librement pour partager ce que vous ressentez aujourd'hui
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Comment s'est passée votre journée ? Quelles émotions avez-vous ressenties ? Y a-t-il des moments dont vous souhaitez vous souvenir ?"
-            className="min-h-[300px]"
-          />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Comment s'est passée votre journée ? Quelles émotions avez-vous ressenties ?"
+              className="min-h-[250px]"
+            />
+            
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button" 
+                variant="outline"
+                onClick={() => navigate('/journal')}
+              >
+                Annuler
+              </Button>
+              <Button 
+                type="submit"
+                disabled={submitting || !content.trim()}
+              >
+                {submitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Enregistrement...
+                  </>
+                ) : (
+                  "Enregistrer"
+                )}
+              </Button>
+            </div>
+          </form>
         </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button 
-            onClick={handleSave} 
-            disabled={saving || !content.trim()}
-            className="gap-2"
-          >
-            {saving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                Enregistrement...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4" />
-                Sauvegarder
-              </>
-            )}
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { User, Emotion } from '@/types';
-import { Smile, Mic, Stop, ArrowRight } from 'lucide-react';
+import { Smile, Mic, CircleStop, ArrowRight } from 'lucide-react';
 
 const ScanDetailPage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -31,13 +31,22 @@ const ScanDetailPage = () => {
       try {
         // Fetch user details
         const { data: userData, error: userError } = await supabase
-          .from('users')
+          .from('emotions')
           .select('*')
-          .eq('id', userId)
-          .single();
+          .eq('user_id', userId)
+          .maybeSingle();
         
         if (userError) throw userError;
-        setUserDetail(userData);
+        
+        // For this demo, we'll simulate user data since we don't have a users table
+        const simulatedUserData: User = {
+          id: userId,
+          name: `User ${userId.substring(0, 4)}`,
+          email: `user-${userId.substring(0, 4)}@example.com`,
+          anonymity_code: `Anon-${userId.substring(0, 4)}`,
+        };
+        
+        setUserDetail(simulatedUserData);
         
         // Fetch latest emotion for this user
         const { data: emotionData, error: emotionError } = await supabase
@@ -46,10 +55,10 @@ const ScanDetailPage = () => {
           .eq('user_id', userId)
           .order('date', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
         
-        if (!emotionError) {
-          setLatestEmotion(emotionData);
+        if (!emotionError && emotionData) {
+          setLatestEmotion(emotionData as Emotion);
         }
       } catch (error: any) {
         console.error('Error fetching data:', error);
@@ -144,16 +153,8 @@ const ScanDetailPage = () => {
       
       if (updateError) throw updateError;
       
-      // Update user's emotional score
-      await supabase
-        .from('users')
-        .update({
-          emotional_score: score,
-        })
-        .eq('id', userId);
-      
       // Set the latest emotion
-      setLatestEmotion(updatedEmotion);
+      setLatestEmotion(updatedEmotion as Emotion);
       
       toast({
         title: "Analyse terminée",
@@ -283,7 +284,7 @@ const ScanDetailPage = () => {
                   variant="destructive"
                   className="gap-2"
                 >
-                  <Stop className="h-4 w-4" />
+                  <CircleStop className="h-4 w-4" />
                   Arrêter l'enregistrement
                 </Button>
               )}

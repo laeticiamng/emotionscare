@@ -20,12 +20,50 @@ const ScanPage = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('users')
-          .select('id, name, avatar, anonymity_code, emotional_score, role');
         
-        if (error) throw error;
-        setUsers(data || []);
+        // Since we don't have a real users table in Supabase,
+        // let's simulate some users with emotional scores
+        const simulatedUsers: User[] = [
+          {
+            id: '1',
+            name: 'Jean Dupont',
+            email: 'jean.dupont@example.com',
+            avatar: '',
+            anonymity_code: 'Anon-5678',
+            emotional_score: 85,
+            role: 'Médecin'
+          },
+          {
+            id: '2',
+            name: 'Marie Martin',
+            email: 'marie.martin@example.com',
+            avatar: '',
+            anonymity_code: 'Anon-9012',
+            emotional_score: 65,
+            role: 'Infirmier'
+          },
+          {
+            id: '3',
+            name: 'Pierre Bernard',
+            email: 'pierre.bernard@example.com',
+            avatar: '',
+            anonymity_code: 'Anon-3456',
+            emotional_score: 32,
+            role: 'Aide-soignant'
+          },
+          {
+            id: '4',
+            name: 'Sophie Petit',
+            email: 'sophie.petit@example.com',
+            avatar: '',
+            anonymity_code: 'Anon-7890',
+            emotional_score: 50,
+            role: 'Interne'
+          },
+        ];
+        
+        setUsers(simulatedUsers);
+        
       } catch (error: any) {
         toast({
           title: "Erreur",
