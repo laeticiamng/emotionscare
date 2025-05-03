@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -89,7 +88,7 @@ const JournalNewPage = () => {
   };
   
   return (
-    <div className="container max-w-3xl mx-auto py-6">
+    <div className="container max-w-3xl mx-auto">
       <Button
         variant="ghost"
         onClick={() => navigate('/journal')}
