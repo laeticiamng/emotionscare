@@ -175,7 +175,7 @@ const ScanDetailPage = () => {
 
       {/* Dialog d'analyse avec animation */}
       <Dialog open={analyzing} onOpenChange={(open) => !open && setAnalyzing(false)}>
-        <DialogContent className="sm:max-w-md" hideCloseButton>
+        <DialogContent className="sm:max-w-md">
           <div className="flex flex-col items-center justify-center py-8">
             <LoadingAnimation 
               text="Notre IA analyse votre état émotionnel..." 
