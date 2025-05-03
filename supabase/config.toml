@@ -1,1 +1,5 @@
+
 project_id = "yaincoxihiqdksxgrsrk"
+
+[functions.generate-vr-benefit]
+verify_jwt = false
