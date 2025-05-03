@@ -1,5 +1,5 @@
 
-import { mockReports } from '@/data/mockData';
+import { mockReports } from '@/data/mockReports';
 
 // Format date for charts
 export const formatDate = (dateString: string) => {
