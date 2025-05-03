@@ -11,9 +11,9 @@ interface TrendChartsProps {
 
 const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivityData }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <Card className="transition-all duration-300 hover:shadow-md">
-        <CardHeader>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <Card className="apple-card">
+        <CardHeader className="pb-2">
           <CardTitle className="text-lg">Tendance Absentéisme</CardTitle>
           <CardDescription>7 derniers jours</CardDescription>
         </CardHeader>
@@ -26,7 +26,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
             >
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={absenteeismData}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="date" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -45,8 +45,8 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
         </CardContent>
       </Card>
 
-      <Card className="transition-all duration-300 hover:shadow-md">
-        <CardHeader>
+      <Card className="apple-card">
+        <CardHeader className="pb-2">
           <CardTitle className="text-lg">Tendance Productivité</CardTitle>
           <CardDescription>7 derniers jours</CardDescription>
         </CardHeader>
@@ -59,7 +59,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
             >
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={productivityData}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="date" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
@@ -67,6 +67,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
                     dataKey="value" 
                     name="value"
                     fill="#4A90E2" 
+                    radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>

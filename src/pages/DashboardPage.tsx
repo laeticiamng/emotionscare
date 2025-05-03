@@ -6,6 +6,7 @@ import KpiCards from '@/components/dashboard/KpiCards';
 import TrendCharts from '@/components/dashboard/TrendCharts';
 import VrPromptBanner from '@/components/dashboard/VrPromptBanner';
 import QuickNavGrid from '@/components/dashboard/QuickNavGrid';
+import { Separator } from '@/components/ui/separator';
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -25,8 +26,10 @@ const DashboardPage = () => {
     <div className="cocoon-page">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">EmotionsCare</h1>
-        <h2 className="text-xl text-muted-foreground">par ResiMax™ 4.0</h2>
+        <h2 className="text-lg text-muted-foreground">par ResiMax™ 4.0</h2>
       </div>
+      
+      <Separator className="mb-8" />
       
       <KpiCards 
         vrSessionsThisMonth={vrSessionsThisMonth}

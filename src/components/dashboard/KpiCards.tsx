@@ -20,11 +20,11 @@ const KpiCards: React.FC<KpiCardsProps> = ({
   const avgEmotionalScore = mockUsers.reduce((sum, user) => sum + (user.emotional_score || 0), 0) / mockUsers.length;
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <Card className="transition-all duration-300 hover:shadow-md">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <Card className="apple-card">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
-            <Brain size={18} className="mr-2 text-primary" />
+            <Brain size={18} className="mr-2 text-wellness-blue" />
             Score émotionnel moyen
           </CardTitle>
           <CardDescription>Tous les collaborateurs</CardDescription>
@@ -33,14 +33,14 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           <div className="text-3xl font-bold mb-2">
             {avgEmotionalScore.toFixed(1)}/100
           </div>
-          <Progress value={avgEmotionalScore} className="h-2" />
+          <Progress value={avgEmotionalScore} className="h-2 bg-gray-100" />
         </CardContent>
       </Card>
 
-      <Card className="transition-all duration-300 hover:shadow-md">
+      <Card className="apple-card">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
-            <CalendarDays size={18} className="mr-2 text-primary" />
+            <CalendarDays size={18} className="mr-2 text-wellness-blue" />
             Sessions VR ce mois
           </CardTitle>
           <CardDescription>Toute l'équipe</CardDescription>
@@ -53,10 +53,10 @@ const KpiCards: React.FC<KpiCardsProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="transition-all duration-300 hover:shadow-md">
+      <Card className="apple-card">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
-            <Trophy size={18} className="mr-2 text-primary" />
+            <Trophy size={18} className="mr-2 text-wellness-blue" />
             Badges gagnés
           </CardTitle>
           <CardDescription>Vos accomplissements</CardDescription>

@@ -14,5 +14,15 @@ export const prepareReportData = (metric: 'absenteeism' | 'productivity') => {
     .map(report => ({
       date: formatDate(report.period_end),
       value: report.value
-    }));
+    }))
+    .sort((a, b) => {
+      const [dayA, monthA] = a.date.split('/').map(Number);
+      const [dayB, monthB] = b.date.split('/').map(Number);
+      
+      // Sort by month, then by day
+      if (monthA !== monthB) {
+        return monthA - monthB;
+      }
+      return dayA - dayB;
+    });
 };
