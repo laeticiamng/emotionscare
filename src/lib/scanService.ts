@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Emotion } from '@/types';
 
@@ -23,9 +22,21 @@ export async function createEmotionEntry(payload: {
 
     if (insertErr || !data) throw insertErr || new Error('Insert failed');
 
-    // 2) Simuler une analyse IA (dans une application réelle, ceci serait un appel à un service IA)
-    const score = Math.floor(Math.random() * 100); // Score entre 0 et 100
-    const ai_feedback = generateFakeFeedback(score);
+    // 2) Appel à l'Edge Function pour analyser l'émotion avec OpenAI
+    const { data: analysisData, error } = await supabase.functions.invoke('analyze-emotion', {
+      body: {
+        emojis: payload.emojis,
+        text: payload.text,
+        audio_url: payload.audio_url
+      }
+    });
+
+    if (error) {
+      console.error('Error calling analyze-emotion function:', error);
+      throw new Error('Failed to analyze emotion');
+    }
+
+    const { score, ai_feedback } = analysisData;
 
     // 3) Mettre à jour l'entrée avec score & feedback
     const { data: updated, error: updateErr } = await supabase
@@ -59,18 +70,5 @@ export async function fetchLatestEmotion(user_id: string): Promise<Emotion | nul
   } catch (error) {
     console.error('Error in fetchLatestEmotion:', error);
     throw error;
-  }
-}
-
-// Fonction utilitaire pour générer un feedback basé sur le score (simulation)
-function generateFakeFeedback(score: number): string {
-  if (score >= 80) {
-    return "Vous semblez être dans un excellent état émotionnel aujourd'hui ! Votre langage est positif et énergique. Continuez à cultiver cette énergie positive dans vos interactions quotidiennes.";
-  } else if (score >= 60) {
-    return "Votre état émotionnel est bon. Je perçois un équilibre, mais aussi quelques traces de stress. Pensez à prendre une petite pause relaxante aujourd'hui.";
-  } else if (score >= 40) {
-    return "Vous semblez être dans un état émotionnel mitigé aujourd'hui. Je détecte des signes de tension et de fatigue. Une micro-pause VR pourrait vous aider à vous ressourcer.";
-  } else {
-    return "Votre état émotionnel semble fragile aujourd'hui. Je perçois de la fatigue et potentiellement de l'anxiété. Je recommande vivement une session de relaxation guidée ou un échange avec un collègue de confiance.";
   }
 }

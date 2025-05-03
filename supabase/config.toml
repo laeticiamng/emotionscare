@@ -3,3 +3,6 @@ project_id = "yaincoxihiqdksxgrsrk"
 
 [functions.generate-vr-benefit]
 verify_jwt = false
+
+[functions.analyze-emotion]
+verify_jwt = false
