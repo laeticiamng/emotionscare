@@ -1,121 +1,129 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { JournalEntry } from '@/types';
-import { PlusCircle, Edit, Calendar } from 'lucide-react';
+import { fetchJournalEntries, deleteJournalEntry } from '@/lib/journalService';
+import type { JournalEntry } from '@/types';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Trash2, FileEdit, Plus } from 'lucide-react';
+import { format } from 'date-fns';
+import { useToast } from '@/components/ui/use-toast';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const JournalPage = () => {
-  const [entries, setEntries] = useState<JournalEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
-    if (!user) return;
+    if (user) {
+      loadEntries();
+    }
+  }, [user]);
 
-    const fetchJournalEntries = async () => {
+  const loadEntries = async () => {
+    setIsLoading(true);
+    try {
+      const data = await fetchJournalEntries(user?.id || '');
+      setEntries(data);
+    } catch (error) {
+      console.error('Failed to load journal entries:', error);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger vos entrées de journal.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette entrée de journal?')) {
       try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('journal_entries')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('date', { ascending: false });
-        
-        if (error) throw error;
-        setEntries(data || []);
-      } catch (error: any) {
-        console.error('Error fetching journal entries:', error);
+        await deleteJournalEntry(id);
+        setEntries(entries.filter(entry => entry.id !== id));
         toast({
-          title: "Erreur",
-          description: `Impossible de charger votre journal: ${error.message}`,
+          title: "Suppression réussie",
+          description: "L'entrée de journal a été supprimée avec succès."
+        });
+      } catch (error) {
+        console.error('Failed to delete journal entry:', error);
+        toast({
+          title: "Erreur de suppression",
+          description: "Impossible de supprimer l'entrée de journal.",
           variant: "destructive"
         });
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchJournalEntries();
-  }, [user, toast]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('fr-FR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
+    }
   };
 
-  const getContentPreview = (content: string) => {
-    if (content.length <= 100) return content;
-    return `${content.substring(0, 100)}...`;
+  const truncateContent = (content: string, maxLength = 100) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '...';
   };
+
+  if (isLoading) {
+    return <LoadingAnimation text="Chargement des entrées de journal..." />;
+  }
 
   return (
-    <div className="container max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container max-w-4xl mx-auto py-6">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Journal guidé</h1>
-        <Button onClick={() => navigate('/journal/new')} className="gap-2">
-          <PlusCircle className="h-4 w-4" />
-          Nouvelle entrée
+        <Button onClick={() => navigate('/journal/new')} className="flex items-center gap-2">
+          <Plus size={18} /> Nouvelle entrée
         </Button>
       </div>
-      
-      {loading ? (
-        <div className="flex justify-center my-12">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+
+      {entries.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-lg text-muted-foreground mb-6">
+            Vous n'avez pas encore d'entrées dans votre journal.
+          </p>
+          <Button onClick={() => navigate('/journal/new')} variant="outline" className="flex items-center gap-2">
+            <FileEdit size={18} /> Créer votre première entrée
+          </Button>
         </div>
-      ) : entries.length > 0 ? (
-        <div className="space-y-4">
-          {entries.map((entry) => (
+      ) : (
+        <div className="grid gap-4 md:grid-cols-1">
+          {entries.map(entry => (
             <Card 
-              key={entry.id}
-              className="cursor-pointer hover:shadow-md transition-all"
+              key={entry.id} 
+              className="cursor-pointer transition-all hover:shadow-md"
               onClick={() => navigate(`/journal/${entry.id}`)}
             >
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center text-lg font-medium">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  {formatDate(entry.date)}
-                </CardTitle>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-lg">
+                    {format(new Date(entry.date), 'dd MMMM yyyy')}
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-destructive hover:bg-destructive/10"
+                    onClick={(e) => handleDelete(entry.id, e)}
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  {getContentPreview(entry.content)}
-                </p>
+                <p className="text-muted-foreground">{truncateContent(entry.content)}</p>
               </CardContent>
-              <CardFooter>
-                <Button variant="ghost" size="sm" className="ml-auto gap-2">
-                  <Edit className="h-4 w-4" />
-                  Voir détails
-                </Button>
+              <CardFooter className="pt-0">
+                <div className="text-sm text-primary flex items-center gap-1">
+                  <FileEdit size={16} /> Voir le détail
+                </div>
               </CardFooter>
             </Card>
           ))}
         </div>
-      ) : (
-        <Card className="text-center p-8">
-          <CardContent className="py-12">
-            <h3 className="text-xl font-medium mb-2">Votre journal est vide</h3>
-            <p className="text-muted-foreground mb-6">
-              Commencez à écrire vos pensées et recevez des conseils personnalisés
-            </p>
-            <Button onClick={() => navigate('/journal/new')} className="gap-2">
-              <PlusCircle className="h-4 w-4" />
-              Créer ma première entrée
-            </Button>
-          </CardContent>
-        </Card>
       )}
     </div>
   );
