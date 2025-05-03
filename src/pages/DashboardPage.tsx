@@ -1,26 +1,54 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { prepareReportData } from '@/utils/chartUtils';
 import KpiCards from '@/components/dashboard/KpiCards';
 import TrendCharts from '@/components/dashboard/TrendCharts';
 import VrPromptBanner from '@/components/dashboard/VrPromptBanner';
 import QuickNavGrid from '@/components/dashboard/QuickNavGrid';
 import { Separator } from '@/components/ui/separator';
+import { fetchUsersAvgScore, fetchVRCount, fetchBadgesCount, fetchReports } from '@/lib/dashboardService';
 
 const DashboardPage = () => {
   const { user } = useAuth();
   
-  // Prepare chart data
-  const absenteeismData = prepareReportData('absenteeism');
-  const productivityData = prepareReportData('productivity');
+  // State pour les données du tableau de bord
+  const [avgScore, setAvgScore] = useState<number>(0);
+  const [vrSessionsThisMonth, setVrSessionsThisMonth] = useState<number>(0);
+  const [vrSessionsLastMonth, setVrSessionsLastMonth] = useState<number>(0);
+  const [userBadgesCount, setUserBadgesCount] = useState<number>(0);
+  const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
+  const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
-  // Count VR sessions in the last 30 days (mock data)
-  const vrSessionsThisMonth = 8; // This would come from real data
-  const vrSessionsLastMonth = 6; // This would come from real data
-  
-  // Count badges for current user (mock data)
-  const userBadgesCount = user?.id === '1' ? 2 : 0; // This would come from real data
+  // Récupérer les données au chargement du composant
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        setIsLoading(true);
+        
+        // Charger les données en parallèle
+        const [avgScoreData, vrCountData, badgesCount, reportsData] = await Promise.all([
+          fetchUsersAvgScore(),
+          fetchVRCount(),
+          fetchBadgesCount(user?.id || ''),
+          fetchReports(['absenteeism', 'productivity'], 7)
+        ]);
+        
+        setAvgScore(avgScoreData);
+        setVrSessionsThisMonth(vrCountData);
+        setVrSessionsLastMonth(vrCountData - 2); // Pour exemple, dans une vraie app on récupérerait cette valeur
+        setUserBadgesCount(badgesCount);
+        setAbsenteeismData(reportsData.absenteeism || []);
+        setProductivityData(reportsData.productivity || []);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données du tableau de bord:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    loadDashboardData();
+  }, [user]);
   
   return (
     <div className="cocoon-page">
@@ -35,11 +63,14 @@ const DashboardPage = () => {
         vrSessionsThisMonth={vrSessionsThisMonth}
         vrSessionsLastMonth={vrSessionsLastMonth}
         userBadgesCount={userBadgesCount}
+        avgEmotionalScore={avgScore}
+        isLoading={isLoading}
       />
 
       <TrendCharts 
         absenteeismData={absenteeismData}
         productivityData={productivityData}
+        isLoading={isLoading}
       />
 
       <VrPromptBanner userName={user?.name || 'utilisateur'} />
