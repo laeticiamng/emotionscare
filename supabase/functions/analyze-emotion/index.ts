@@ -33,6 +33,16 @@ serve(async (req) => {
       prompt += `Un message audio a également été enregistré (non accessible pour analyse directe).\n\n`;
     }
     
+    // Si aucun input substantiel n'est fourni, générer un feedback par défaut
+    if ((!emojis || emojis.length === 0) && (!text || text.length === 0) && !audio_url) {
+      return new Response(JSON.stringify({
+        score: 50,
+        ai_feedback: "Nous n'avons pas assez d'informations pour analyser votre état émotionnel. Essayez d'ajouter des emojis ou du texte pour obtenir un feedback personnalisé."
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
     prompt += "Fournir une analyse de l'état émotionnel sous ce format:\n";
     prompt += "1. Un score numérique entre 0 et 100 (0 étant un état très négatif, 100 étant excellent)\n";
     prompt += "2. Un feedback bienveillant et professionnel de 2-3 phrases, adapté aux professionnels de santé\n";
@@ -66,7 +76,17 @@ serve(async (req) => {
     }
 
     // Parse the JSON string from the response content
-    const analysisResult = JSON.parse(data.choices[0].message.content);
+    let analysisResult;
+    try {
+      analysisResult = JSON.parse(data.choices[0].message.content);
+    } catch (e) {
+      console.error('Failed to parse OpenAI response:', e);
+      // Fallback response
+      analysisResult = {
+        score: 50,
+        ai_feedback: "Notre système n'a pas pu analyser votre état émotionnel avec précision. Voici un conseil général: prenez un moment pour respirer profondément et recentrez-vous sur vos priorités."
+      };
+    }
 
     return new Response(JSON.stringify(analysisResult), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

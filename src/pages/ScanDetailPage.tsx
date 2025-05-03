@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -12,7 +13,7 @@ import EmotionTextInput from '@/components/scan/EmotionTextInput';
 import AudioRecorder from '@/components/scan/AudioRecorder';
 import EmotionFeedback from '@/components/scan/EmotionFeedback';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const ScanDetailPage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -27,7 +28,7 @@ const ScanDetailPage = () => {
 
   // Assurer que l'ID est un UUID valide pour Supabase
   const getValidUserId = () => {
-    if (!userId) return crypto.randomUUID();
+    if (!userId) return "00000000-0000-0000-0000-000000000000"; // UUID par défaut
     
     // Vérifier si c'est déjà un UUID valide
     if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) {
@@ -35,7 +36,8 @@ const ScanDetailPage = () => {
     }
     
     // Sinon, générer un UUID basé sur une valeur constante pour garantir la cohérence
-    return `00000000-0000-0000-0000-${userId.padStart(12, '0').substring(0, 12)}`;
+    const paddedId = userId.padStart(12, '0').substring(0, 12);
+    return `00000000-0000-0000-0000-${paddedId}`;
   };
 
   useEffect(() => {
@@ -192,6 +194,8 @@ const ScanDetailPage = () => {
       {/* Dialog d'analyse avec animation */}
       <Dialog open={analyzing} onOpenChange={(open) => !open && setAnalyzing(false)}>
         <DialogContent className="sm:max-w-md">
+          <DialogTitle>Analyse en cours</DialogTitle>
+          <DialogDescription>Veuillez patienter pendant que nous analysons votre état émotionnel</DialogDescription>
           <div className="flex flex-col items-center justify-center py-8">
             <LoadingAnimation 
               text="Notre IA analyse votre état émotionnel..." 
