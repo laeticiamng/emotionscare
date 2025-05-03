@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Emotion } from '@/types';
 
 // Fonction utilitaire pour générer un UUID valide à partir d'un identifiant quelconque
-function ensureValidUUID(id: string): string {
+export function ensureValidUUID(id: string): string {
   // Vérifier si c'est déjà un UUID valide
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
     return id;
