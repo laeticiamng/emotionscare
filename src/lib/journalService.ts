@@ -7,7 +7,20 @@ export async function fetchJournalEntries(userId: string): Promise<JournalEntry[
   try {
     const { data, error } = await supabase
       .from('journal_entries')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        date,
+        title,
+        content,
+        emotions,
+        is_private,
+        created_at,
+        updated_at,
+        ai_feedback,
+        mood,
+        keywords
+      `)
       .eq('user_id', userId)
       .order('date', { ascending: false });
 
@@ -43,7 +56,20 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
   try {
     const { data, error } = await supabase
       .from('journal_entries')
-      .select('*')
+      .select(`
+        id,
+        user_id,
+        date,
+        title,
+        content,
+        emotions,
+        is_private,
+        created_at,
+        updated_at,
+        ai_feedback,
+        mood,
+        keywords
+      `)
       .eq('id', entryId)
       .single();
 
@@ -80,6 +106,7 @@ export async function createJournalEntry(userId: string, content: string, mood?:
       date: new Date().toISOString(),
       title: "Journal Entry",
       content: content,
+      emotions: [],
       is_private: true,
       mood: mood || "",
       keywords: keywords || [],
@@ -88,7 +115,20 @@ export async function createJournalEntry(userId: string, content: string, mood?:
     const { data, error } = await supabase
       .from('journal_entries')
       .insert([entry])
-      .select()
+      .select(`
+        id,
+        user_id,
+        date,
+        title,
+        content,
+        emotions,
+        is_private,
+        created_at,
+        updated_at,
+        ai_feedback,
+        mood,
+        keywords
+      `)
       .single();
 
     if (error) throw error;
@@ -122,7 +162,20 @@ export async function updateJournalEntry(entryId: string, updates: Partial<Journ
       .from('journal_entries')
       .update(updates)
       .eq('id', entryId)
-      .select()
+      .select(`
+        id,
+        user_id,
+        date,
+        title,
+        content,
+        emotions,
+        is_private,
+        created_at,
+        updated_at,
+        ai_feedback,
+        mood,
+        keywords
+      `)
       .single();
 
     if (error) throw error;
