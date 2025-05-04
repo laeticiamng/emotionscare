@@ -1,10 +1,9 @@
-
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar?: string;
-  role?: string;
+  role?: UserRole;
   onboarded?: boolean;
   created_at?: string;
   metadata?: any;
@@ -59,6 +58,7 @@ export interface Badge {
   threshold?: number;    // Pour la compatibilité avec BadgeGrid
   icon_url?: string;     // Pour la compatibilité avec BadgeGrid
   awarded_at?: string;   // Pour la compatibilité avec les données existantes
+  user_id?: string;      // Pour la compatibilité avec mockBadges
 }
 
 export interface Report {
