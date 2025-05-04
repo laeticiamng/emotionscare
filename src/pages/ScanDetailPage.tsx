@@ -20,7 +20,7 @@ const ScanDetailPage = () => {
     setEmojis,
     setText,
     setAudioUrl,
-    setAnalyzing, // Add this destructured property
+    setAnalyzing,
     handleEmojiClick,
     analyzeEmotion,
     fetchUserAndLatestEmotion

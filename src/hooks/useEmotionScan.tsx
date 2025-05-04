@@ -118,7 +118,7 @@ export const useEmotionScan = (userId: string | undefined) => {
     setEmojis,
     setText,
     setAudioUrl,
-    setAnalyzing,  // Export the setAnalyzing function
+    setAnalyzing,
     handleEmojiClick,
     analyzeEmotion,
     fetchUserAndLatestEmotion

@@ -8,7 +8,7 @@ export async function saveEmotionScan(entry: Omit<Emotion,'id'>): Promise<Emotio
 
   const { data, error } = await supabase
     .from('emotions')
-    .insert({ date, score, text })  // ← objet direct, pas de champ en trop
+    .insert({ date, score, text, user_id: '00000000-0000-0000-0000-000000000000' })  // Add a default user_id
     .select()                       // récupère le record inséré
     .single();                      // un seul résultat
 
