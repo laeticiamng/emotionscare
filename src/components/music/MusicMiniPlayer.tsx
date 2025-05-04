@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Music, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
+// Import the Track type that matches musicService.ts definition
+import { Track } from '@/lib/musicService';
 
 export function MusicMiniPlayer() {
   const { 

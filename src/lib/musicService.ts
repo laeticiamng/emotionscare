@@ -1,6 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { MusicTrack, MusicPlaylist, Track } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // TopMedia API key
 const API_KEY = '1e4228c100304c658ab1eab4333f54be';
@@ -162,14 +161,15 @@ export async function getUserListeningHistory(userId: string): Promise<MusicTrac
   }
 }
 
-// Track and Playlist interface definitions to ensure type compatibility
+// Define the interfaces needed for the music service here
+// These will be used internally by the service
 export interface Track {
   id: string;
   title: string;
   artist: string;
   duration: number;
-  url: string; // Renamed to audioUrl in MusicTrack
-  cover?: string; // Renamed to coverUrl in MusicTrack
+  url: string;
+  cover?: string;
 }
 
 export interface Playlist {
@@ -179,7 +179,7 @@ export interface Playlist {
   tracks: Track[];
 }
 
-// Helper function to convert between Track and MusicTrack
+// Helper function to convert between MusicTrack and Track
 export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
   return {
     id: musicTrack.id,
@@ -191,7 +191,7 @@ export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
   };
 };
 
-// Helper function to convert between MusicTrack and Track
+// Helper function to convert between Track and MusicTrack
 export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
   return {
     id: track.id,

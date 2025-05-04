@@ -3,10 +3,13 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { getPlaylist, convertMusicTrackToTrack } from '@/lib/musicService';
 import { MusicTrack, MusicPlaylist } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { Track, Playlist } from '@/lib/musicService';
+import { Track } from '@/types/music';
+
+// Import the Track type that matches musicService.ts definition
+import { Track as ServiceTrack, Playlist } from '@/lib/musicService';
 
 interface MusicContextType {
-  currentTrack: Track | null;
+  currentTrack: ServiceTrack | null;
   isPlaying: boolean;
   volume: number;
   playlist: Playlist | null;
@@ -14,7 +17,7 @@ interface MusicContextType {
   isDrawerOpen: boolean;
   repeat: boolean;
   shuffle: boolean;
-  playTrack: (track: Track) => void;
+  playTrack: (track: ServiceTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
@@ -29,7 +32,7 @@ interface MusicContextType {
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<ServiceTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7); // 0 to 1
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
@@ -135,7 +138,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const playTrack = (track: Track) => {
+  const playTrack = (track: ServiceTrack) => {
     setCurrentTrack(track);
     setIsPlaying(true);
   };

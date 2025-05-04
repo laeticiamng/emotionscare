@@ -18,6 +18,8 @@ import {
   X
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
+// Import the Track type that matches musicService.ts definition
+import { Track } from '@/lib/musicService';
 
 export function MusicDrawer() {
   const { 

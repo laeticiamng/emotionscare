@@ -4,8 +4,8 @@ export interface Track {
   title: string;
   artist: string;
   duration: number;
-  audioUrl: string;        // URL du fichier audio
-  coverUrl: string;        // URL de l'image de couverture
+  url: string;         // URL du fichier audio
+  cover?: string;      // URL de l'image de couverture
 }
 
 export interface MusicTrack {
