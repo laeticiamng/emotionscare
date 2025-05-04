@@ -14,7 +14,7 @@ export async function fetchJournalEntries(user_id: string): Promise<JournalEntry
     
     if (error) throw error;
     
-    // Map data to match JournalEntry type
+    // Map data to match JournalEntry type with proper data mapping
     const journalEntries = (data || []).map(entry => ({
       id: entry.id,
       user_id: entry.user_id,
@@ -24,7 +24,7 @@ export async function fetchJournalEntries(user_id: string): Promise<JournalEntry
       emotions: entry.emotions || [],
       is_private: entry.is_private || false,
       created_at: entry.created_at || entry.date,
-      updated_at: entry.updated_at,
+      updated_at: entry.updated_at || entry.date,
       ai_feedback: entry.ai_feedback,
       text: entry.content // Pour compatibilité
     })) as JournalEntry[];
@@ -51,7 +51,7 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
     
     if (!data) return null;
     
-    // Map data to match JournalEntry type
+    // Map data to match JournalEntry type with proper data mapping
     const journalEntry: JournalEntry = {
       id: data.id,
       user_id: data.user_id,
@@ -61,7 +61,7 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
       emotions: data.emotions || [],
       is_private: data.is_private || false,
       created_at: data.created_at || data.date,
-      updated_at: data.updated_at,
+      updated_at: data.updated_at || data.date,
       ai_feedback: data.ai_feedback,
       text: data.content // Pour compatibilité
     };
@@ -101,7 +101,7 @@ export async function createJournalEntry(
 
     if (error || !data) throw error || new Error('Insert failed');
     
-    // Map data to match JournalEntry type
+    // Map data to match JournalEntry type with proper data mapping
     const journalEntry: JournalEntry = {
       id: data.id,
       user_id: data.user_id,
@@ -111,7 +111,7 @@ export async function createJournalEntry(
       emotions: data.emotions || [],
       is_private: data.is_private || false,
       created_at: data.created_at || data.date,
-      updated_at: data.updated_at,
+      updated_at: data.updated_at || data.date,
       ai_feedback: data.ai_feedback,
       text: data.content // Pour compatibilité
     };

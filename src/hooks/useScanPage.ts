@@ -4,7 +4,7 @@ import { fetchEmotionHistory } from '@/lib/scanService';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Emotion } from '@/types';
-import type { User, UserRole } from '@/types';
+import { User, UserRole } from '@/types';
 
 export const useScanPage = () => {
   const [users, setUsers] = useState<User[]>([]);
