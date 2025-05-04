@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import YoutubeEmbed from './YoutubeEmbed';
 import { VRSessionTemplate } from '@/types';
-import { extractYoutubeID } from '@/utils/vrUtils';
 
 interface VRTemplateDetailProps {
   template: VRSessionTemplate;
@@ -27,7 +26,11 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
         <Card>
           <CardContent className="p-0">
             <AspectRatio ratio={16/9}>
-              <YoutubeEmbed embedId={extractYoutubeID(template.preview_url)} />
+              <YoutubeEmbed 
+                videoUrl={template.preview_url}
+                controls={true}
+                showInfo={false}
+              />
             </AspectRatio>
             <div className="p-6">
               <h2 className="text-xl font-semibold">{template.theme}</h2>

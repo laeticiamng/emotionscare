@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import YoutubeEmbed from './YoutubeEmbed';
 import { VRSessionTemplate } from '@/types';
-import { extractYoutubeID } from '@/utils/vrUtils';
 
 interface VRSessionViewProps {
   template: VRSessionTemplate;
@@ -20,8 +19,14 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({ template, onCompleteSessi
           <h2 className="text-xl font-semibold">{template.theme}</h2>
           
           <div className="relative rounded-xl overflow-hidden border border-muted">
-            <AspectRatio ratio={16/9}>
-              <YoutubeEmbed embedId={extractYoutubeID(template.preview_url || '')} />
+            <AspectRatio ratio={16/9} className="max-w-4xl mx-auto">
+              <YoutubeEmbed 
+                videoUrl={template.preview_url}
+                autoplay={true}
+                controls={true}
+                showInfo={false}
+                loop={true}
+              />
             </AspectRatio>
           </div>
           

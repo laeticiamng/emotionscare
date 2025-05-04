@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import YoutubeEmbed from './YoutubeEmbed';
 import { VRSessionTemplate } from '@/types';
-import { extractYoutubeID } from '@/utils/vrUtils';
 
 interface VRTemplateCardProps {
   template: VRSessionTemplate;
@@ -15,12 +14,17 @@ interface VRTemplateCardProps {
 const VRTemplateCard: React.FC<VRTemplateCardProps> = ({ template, onClick }) => {
   return (
     <Card 
-      className="cursor-pointer hover:shadow-md transition-shadow"
+      className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
       onClick={() => onClick(template)}
     >
       <CardContent className="p-0">
         <AspectRatio ratio={16/9}>
-          <YoutubeEmbed embedId={extractYoutubeID(template.preview_url)} />
+          <YoutubeEmbed 
+            videoUrl={template.preview_url} 
+            controls={true}
+            mute={true}
+            showInfo={false}
+          />
         </AspectRatio>
         <div className="p-4">
           <h3 className="font-medium">{template.theme}</h3>
