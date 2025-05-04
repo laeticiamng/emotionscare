@@ -7,13 +7,14 @@ import { User as UserIcon } from 'lucide-react';
 interface UserAvatarProps {
   user: User | null;
   size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ user, size = 'md' }) => {
+const UserAvatar: React.FC<UserAvatarProps> = ({ user, size = 'md', className = '' }) => {
   const sizeClasses = {
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
-    lg: 'h-12 w-12'
+    lg: 'h-16 w-16'
   };
   
   const getInitials = (name: string): string => {
@@ -27,11 +28,18 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ user, size = 'md' }) => {
   };
 
   return (
-    <Avatar className={sizeClasses[size]}>
-      {/* If we had AvatarImage we could add it here */}
-      <AvatarFallback className="bg-primary/10">
-        {user && user.name ? getInitials(user.name) : <UserIcon className="h-4 w-4" />}
-      </AvatarFallback>
+    <Avatar className={`${sizeClasses[size]} ${className}`}>
+      {user?.avatar ? (
+        <img 
+          src={user.avatar} 
+          alt={user.name || "Avatar utilisateur"} 
+          className="object-cover w-full h-full"
+        />
+      ) : (
+        <AvatarFallback className="bg-primary/10">
+          {user && user.name ? getInitials(user.name) : <UserIcon className="h-4 w-4" />}
+        </AvatarFallback>
+      )}
     </Avatar>
   );
 };
