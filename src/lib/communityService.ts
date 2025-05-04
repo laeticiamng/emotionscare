@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { Post, Comment, Group, Buddy, User } from '@/types';
+import type { Post, Comment, Group, Buddy, User, UserRole } from '@/types';
 
 // --- POSTS ---
 export async function fetchPosts(): Promise<Post[]> {
@@ -19,7 +19,6 @@ export async function fetchPosts(): Promise<Post[]> {
     date: post.date,
     reactions: post.reactions || 0,
     image_url: post.image_url || undefined,
-    image: post.image || undefined,
     created_at: post.date, // Alias for compatibility
     comments: []
   }));
@@ -31,7 +30,7 @@ export async function createPost(
   user_id: string,
   content: string,
   media_url?: string,
-  image?: string
+  image_url?: string
 ): Promise<Post> {
   const now = new Date().toISOString();
   
@@ -39,8 +38,7 @@ export async function createPost(
     user_id,
     content,
     date: now,
-    image_url: media_url || null,
-    image: image || null,
+    image_url: image_url || media_url || null,
     reactions: 0
   };
   
@@ -60,7 +58,6 @@ export async function createPost(
     date: data.date,
     reactions: data.reactions || 0,
     image_url: data.image_url || undefined,
-    image: data.image || undefined,
     created_at: data.date, // Alias for compatibility
     comments: []
   };
@@ -265,32 +262,38 @@ export async function leaveGroup(
 
 // --- USER MANAGEMENT ---
 export async function fetchUsersByRole(role?: string): Promise<User[]> {
-  const query = supabase
-    .from('posts') // Using posts as a fallback - mock data
-    .select('user_id')
-    .limit(10);
-  
-  if (role) {
-    // If role filtering was possible, we would add it here
-    // This is just for mock functionality
-  }
-  
-  const { data, error } = await query;
-  
-  if (error) throw error;
-  
   // For demo purposes, create mock users
-  const users: User[] = (data || []).map((item, index) => ({
-    id: item.user_id || `mock-user-${index}`,
-    name: `User ${index + 1}`,
-    email: `user${index + 1}@example.com`,
-    role: role as UserRole || UserRole.EMPLOYEE,
-    alias: `user${index + 1}`,
-    bio: `Bio for user ${index + 1}`,
-    joined_at: new Date().toISOString()
-  }));
+  const mockUsers: User[] = [
+    {
+      id: 'user-1',
+      name: 'User 1',
+      email: 'user1@example.com',
+      role: role as UserRole || UserRole.EMPLOYEE,
+      alias: 'user1',
+      bio: 'Bio for user 1',
+      joined_at: new Date().toISOString()
+    },
+    {
+      id: 'user-2',
+      name: 'User 2',
+      email: 'user2@example.com',
+      role: role as UserRole || UserRole.EMPLOYEE,
+      alias: 'user2',
+      bio: 'Bio for user 2',
+      joined_at: new Date().toISOString()
+    },
+    {
+      id: 'user-3',
+      name: 'User 3',
+      email: 'user3@example.com',
+      role: role as UserRole || UserRole.EMPLOYEE,
+      alias: 'user3',
+      bio: 'Bio for user 3',
+      joined_at: new Date().toISOString()
+    }
+  ];
   
-  return users;
+  return mockUsers;
 }
 
 export async function fetchUserById(userId: string): Promise<User | null> {

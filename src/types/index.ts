@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -143,4 +144,22 @@ export enum UserRole {
   AIDE_SOIGNANT = 'Aide-soignant',
   MEDECIN = 'Médecin',
   AUTRE = 'Autre'
+}
+
+// Music-related interfaces
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number; // in seconds
+  audioUrl: string;
+  coverUrl?: string;
+  emotion?: string; // Associated emotion
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  emotion: string;
+  tracks: MusicTrack[];
 }

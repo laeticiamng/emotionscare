@@ -6,7 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { MusicProvider } from "./contexts/MusicContext";
 import Layout from "./components/Layout";
+import MusicDrawer from "./components/music/MusicDrawer";
 import { AnimatePresence, motion } from "framer-motion";
 
 // Pages
@@ -102,7 +104,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <AnimatedRoutes />
+          <MusicProvider>
+            <MusicDrawer />
+            <AnimatedRoutes />
+          </MusicProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { 
   LayoutDashboard, 
   Eye,
@@ -11,7 +12,8 @@ import {
   Headset,
   Menu, 
   X,
-  LogOut
+  LogOut,
+  Music
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,6 +39,7 @@ const mainNavItems = [
 const GlobalNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { openDrawer } = useMusic();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -80,9 +83,21 @@ const GlobalNav = () => {
           </NavigationMenu>
         </nav>
         
-        {/* User Profile */}
+        {/* User Profile and Music Button */}
         {user && (
           <div className="hidden md:flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={openDrawer} 
+              title="Soundtrack du bien-être"
+              aria-label="Ouvrir le lecteur de musique"
+              className="relative"
+            >
+              <Music className="h-5 w-5" />
+              <span className="absolute top-0 right-0 flex h-2 w-2 rounded-full bg-primary"></span>
+            </Button>
+            
             <div className="text-sm text-right mr-2">
               <p className="font-medium">{user.name}</p>
               <p className="text-xs text-muted-foreground">{user.role}</p>
@@ -163,6 +178,17 @@ const GlobalNav = () => {
                     </NavLink>
                   );
                 })}
+                
+                <button 
+                  className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
+                  onClick={() => {
+                    openDrawer();
+                    setIsOpen(false);
+                  }}
+                >
+                  <Music className="w-5 h-5 mr-2" />
+                  <span>Soundtrack du bien-être</span>
+                </button>
                 
                 <Button 
                   variant="ghost" 

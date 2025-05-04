@@ -5,6 +5,7 @@ import KpiCards from '@/components/dashboard/KpiCards';
 import TrendCharts from '@/components/dashboard/TrendCharts';
 import VrPromptBanner from '@/components/dashboard/VrPromptBanner';
 import QuickNavGrid from '@/components/dashboard/QuickNavGrid';
+import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
 import { Separator } from '@/components/ui/separator';
 import { fetchUsersAvgScore, fetchVRCount, fetchBadgesCount, fetchReports } from '@/lib/dashboardService';
 
@@ -66,6 +67,9 @@ const DashboardPage = () => {
         avgEmotionalScore={avgScore}
         isLoading={isLoading}
       />
+
+      {/* Music Mini Player */}
+      <MusicMiniPlayer />
 
       <TrendCharts 
         absenteeismData={absenteeismData}
