@@ -11,4 +11,4 @@ export {
   convertMusicPlaylistToPlaylist,
   convertPlaylistToMusicPlaylist
 } from '@/services/music/converters';
-export { Track, Playlist } from '@/services/music/types';
+export type { Track, Playlist } from '@/services/music/types';
