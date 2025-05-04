@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import VRTemplateGrid from '@/components/vr/VRTemplateGrid';
 import VRTemplateDetail from '@/components/vr/VRTemplateDetail';
 import VRSessionView from '@/components/vr/VRSessionView';
 import VRSessionHistory from '@/components/vr/VRSessionHistory';
+import { supabase } from '@/lib/supabase-client';
 
 const VRSessionPage = () => {
   const navigate = useNavigate();
@@ -19,9 +20,39 @@ const VRSessionPage = () => {
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState(0);
   const [heartRate, setHeartRate] = useState({ before: 82, after: null as number | null });
   const [recentSessions, setRecentSessions] = useState<VRSession[]>([]);
+  const [templates, setTemplates] = useState<VRSessionTemplate[]>([]);
   
-  // Load templates from mock data
-  const availableTemplates = mockVRTemplates;
+  // Load templates with progress tracking
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        // In a real app, we would fetch from Supabase
+        // For now, we'll enhance the mock data with completion rates
+        const enhancedTemplates = mockVRTemplates.map(template => {
+          // Get random completion rate for demo purposes
+          const completionRate = Math.floor(Math.random() * 100);
+          return {
+            ...template,
+            completion_rate: completionRate,
+            is_audio_only: template.template_id === '3', // Mark meditation as audio-only for demo
+            audio_url: template.template_id === '3' ? 
+              'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3' : undefined
+          };
+        });
+        
+        setTemplates(enhancedTemplates);
+      } catch (error) {
+        console.error('Error loading VR templates:', error);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les sessions VR.",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    loadTemplates();
+  }, [toast]);
 
   // Handle template selection
   const handleSelectTemplate = (template: VRSessionTemplate) => {
@@ -36,20 +67,22 @@ const VRSessionPage = () => {
     if (!selectedTemplate) return;
     
     toast({
-      title: "Session VR démarrée",
+      title: "Session démarrée",
       description: `Profitez de votre session de ${selectedTemplate.duration} minutes.`,
     });
     
     setIsSessionActive(true);
     
-    // Simulate session completion after duration
-    setTimeout(() => {
-      handleCompleteSession();
-    }, 5000); // Shortened for demo purposes (normally would be template.duration * 60 * 1000)
+    // For demo purposes only - in production this would be template.duration * 60 * 1000
+    if (!selectedTemplate.is_audio_only) {
+      setTimeout(() => {
+        handleCompleteSession();
+      }, 30000); // 30 seconds for demo 
+    }
   };
   
   // Handle session completion
-  const handleCompleteSession = () => {
+  const handleCompleteSession = async () => {
     if (!selectedTemplate) return;
     
     // Simulate heart rate decrease after relaxation
@@ -64,18 +97,44 @@ const VRSessionPage = () => {
       duration_seconds: selectedTemplate.duration * 60,
       location_url: selectedTemplate.preview_url,
       heart_rate_before: heartRate.before,
-      heart_rate_after: afterHeartRate
+      heart_rate_after: afterHeartRate,
+      is_audio_only: selectedTemplate.is_audio_only || false
     };
     
-    // Update recent sessions
-    setRecentSessions([newSession, ...recentSessions]);
-    
-    setIsSessionActive(false);
-    
-    toast({
-      title: "Session VR terminée",
-      description: `Votre rythme cardiaque a diminué de ${heartRate.before - afterHeartRate} bpm.`,
-    });
+    // In a real app, we would save to Supabase
+    try {
+      // Simulating API call
+      console.log('Saving session to database:', newSession);
+      
+      // Update recent sessions
+      setRecentSessions([newSession, ...recentSessions]);
+      
+      // Update template completion rate (in a real app, this would be calculated server-side)
+      setTemplates(prev => 
+        prev.map(t => 
+          t.template_id === selectedTemplate.template_id 
+            ? { 
+                ...t, 
+                completion_rate: t.completion_rate ? Math.min(t.completion_rate + 10, 100) : 10 
+              } 
+            : t
+        )
+      );
+      
+      setIsSessionActive(false);
+      
+      toast({
+        title: "Session terminée",
+        description: `Votre rythme cardiaque a diminué de ${heartRate.before - afterHeartRate} bpm.`,
+      });
+    } catch (error) {
+      console.error('Error saving session:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer la session.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -115,7 +174,7 @@ const VRSessionPage = () => {
       ) : (
         /* Template Selection View */
         <VRTemplateGrid
-          templates={availableTemplates}
+          templates={templates}
           onSelectTemplate={handleSelectTemplate}
         />
       )}

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, Play, CheckCircle, Heart } from 'lucide-react';
+import { Clock, Play, CheckCircle, Heart, Headphones } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -25,19 +25,40 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
       <div className="md:col-span-2">
         <Card>
           <CardContent className="p-0">
-            <AspectRatio ratio={16/9}>
-              <YoutubeEmbed 
-                videoUrl={template.preview_url}
-                controls={true}
-                showInfo={false}
-              />
-            </AspectRatio>
+            {template.is_audio_only ? (
+              <div className="aspect-video bg-gradient-to-br from-purple-900 to-indigo-600 flex items-center justify-center">
+                <Headphones className="h-16 w-16 text-white opacity-75" />
+              </div>
+            ) : (
+              <AspectRatio ratio={16/9}>
+                <YoutubeEmbed 
+                  videoUrl={template.preview_url}
+                  controls={true}
+                  showInfo={false}
+                />
+              </AspectRatio>
+            )}
+            
             <div className="p-6">
               <h2 className="text-xl font-semibold">{template.theme}</h2>
               <div className="flex items-center mt-2 text-muted-foreground">
                 <Clock className="h-4 w-4 mr-1" />
                 <span>{template.duration} minutes</span>
+                
+                {template.is_audio_only && (
+                  <span className="ml-3 flex items-center">
+                    <Headphones className="h-4 w-4 mr-1" />
+                    <span>Audio uniquement</span>
+                  </span>
+                )}
               </div>
+              
+              {template.completion_rate !== undefined && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Vous avez complété {template.completion_rate}% de ce type de session
+                </div>
+              )}
+              
               <Button 
                 className="mt-4 flex items-center" 
                 onClick={onStartSession}
@@ -66,6 +87,12 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
                 <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
                 <span>Récupération mentale</span>
               </li>
+              {template.is_audio_only && (
+                <li className="flex items-start">
+                  <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
+                  <span>Pratique de pleine conscience</span>
+                </li>
+              )}
             </ul>
             
             <div className="mt-6">

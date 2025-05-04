@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -17,6 +16,9 @@ export interface VRSessionTemplate {
   theme: string;
   duration: number;  // in minutes
   preview_url: string;
+  is_audio_only?: boolean;
+  audio_url?: string;
+  completion_rate?: number;
 }
 
 export interface VRSession {
@@ -27,6 +29,7 @@ export interface VRSession {
   location_url: string;
   heart_rate_before: number;
   heart_rate_after: number | null;
+  is_audio_only?: boolean;
 }
 
 // Add missing type definitions to fix build errors
