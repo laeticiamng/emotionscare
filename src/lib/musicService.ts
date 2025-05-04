@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack, MusicPlaylist } from '@/types';
 
@@ -160,4 +159,21 @@ export async function getUserListeningHistory(userId: string): Promise<MusicTrac
     console.error('Error fetching user listening history:', error);
     throw error;
   }
+}
+
+// Add these types for the music service
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url: string;
+  cover?: string;
+}
+
+export interface Playlist {
+  id: string;
+  name: string;
+  emotion?: string;
+  tracks: Track[];
 }

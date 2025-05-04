@@ -1,56 +1,30 @@
-
 import React from 'react';
-import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { User } from 'lucide-react';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { MessageCircle } from 'lucide-react';
+import type { User } from '@/types';
 
-interface BuddyCardProps {
-  alias: string;
-  role?: string;
-  joinDate?: string;
-  description?: string;
-  isMatched?: boolean;
+export interface BuddyCardProps {
+  buddy: User | any; // Make the buddy prop accept any to be compatible with both formats
 }
 
-const BuddyCard: React.FC<BuddyCardProps> = ({ 
-  alias, 
-  role, 
-  joinDate,
-  description,
-  isMatched = false
-}) => {
-  // Get first letter of alias for avatar fallback
-  const firstLetter = alias.charAt(0).toUpperCase();
-
+const BuddyCard: React.FC<BuddyCardProps> = ({ buddy }) => {
   return (
-    <Card className={`transition-all duration-300 ${isMatched ? 'border-primary shadow-md' : ''}`}>
-      <CardHeader className="flex flex-row items-center gap-4">
-        <Avatar className="h-12 w-12 border-2 border-primary/20">
-          <AvatarFallback className="bg-primary/10 text-primary">
-            {firstLetter}
-          </AvatarFallback>
+    <Card>
+      <CardContent className="flex flex-col items-center text-center">
+        <Avatar className="w-24 h-24 mb-4">
+          <AvatarImage src={buddy.avatar} alt={buddy.name} />
+          <AvatarFallback>{buddy.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
-        
-        <div className="flex flex-col">
-          <h3 className="font-medium">{alias}</h3>
-          {role && (
-            <Badge variant="outline" className="mt-1 bg-secondary/20">
-              {role}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-
-      {description && (
-        <CardContent>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </CardContent>
-      )}
-
-      <CardFooter className="text-xs text-muted-foreground flex justify-between">
-        {joinDate && <span>Membre depuis {joinDate}</span>}
-        {isMatched && <Badge variant="secondary">Connecté</Badge>}
+        <h3 className="text-lg font-semibold">{buddy.name}</h3>
+        <p className="text-sm text-muted-foreground">{buddy.role}</p>
+      </CardContent>
+      <CardFooter className="justify-center">
+        <Button variant="outline">
+          <MessageCircle className="mr-2 h-4 w-4" />
+          Contacter
+        </Button>
       </CardFooter>
     </Card>
   );
