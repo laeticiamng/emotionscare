@@ -7,6 +7,7 @@ import VrPromptBanner from '@/components/dashboard/VrPromptBanner';
 import QuickNavGrid from '@/components/dashboard/QuickNavGrid';
 import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
 import CoachAssistant from '@/components/dashboard/CoachAssistant';
+import CoachRecommendations from '@/components/dashboard/CoachRecommendations';
 import { Separator } from '@/components/ui/separator';
 import { fetchUsersAvgScore, fetchVRCount, fetchBadgesCount, fetchReports } from '@/lib/dashboardService';
 
@@ -73,6 +74,11 @@ const DashboardPage = () => {
         <div className="md:col-span-2">
           {/* Music Mini Player */}
           <MusicMiniPlayer />
+          
+          {/* Coach Recommendations - Nouveau composant */}
+          <div className="mt-6">
+            <CoachRecommendations />
+          </div>
         </div>
         
         <div>

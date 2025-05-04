@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BrainCircuit, CalendarCheck, RefreshCw } from 'lucide-react';
+import { BrainCircuit, CalendarCheck, RefreshCw, Trophy, Headset, BookOpen } from 'lucide-react';
 import { useCoach } from '@/hooks/useCoach';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import UserAvatar from '@/components/community/UserAvatar';
 
 interface CoachAssistantProps {
   className?: string;
@@ -15,6 +18,34 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const { triggerDailyReminder, triggerAfterScan, triggerAlert, isProcessing } = useCoach();
+  const [lastRecommendation, setLastRecommendation] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  // Simuler une recommandation basée sur l'heure de la journée
+  useEffect(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    let recommendation = '';
+    if (hour < 10) {
+      recommendation = 'Bonjour ! Commencez votre journée avec un scan émotionnel pour calibrer votre bien-être.';
+    } else if (hour < 14) {
+      recommendation = 'Une courte session VR de 5 minutes pourrait vous aider à vous recentrer avant l\'après-midi.';
+    } else if (hour < 18) {
+      recommendation = 'Avez-vous fait votre scan émotionnel aujourd\'hui ? C\'est un bon moment pour une pause bien-être.';
+    } else {
+      recommendation = 'Avant de terminer votre journée, prenez un moment pour noter vos pensées dans votre journal.';
+    }
+    
+    setLastRecommendation(recommendation);
+    
+    // Masquer le message de bienvenue après 5 secondes
+    const timer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 5000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleDailyReminder = () => {
     if (!user?.id) return;
@@ -23,46 +54,98 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
       title: "Coach IA activé",
       description: "Rappel quotidien envoyé",
     });
+    setLastRecommendation("N'oubliez pas de faire votre scan émotionnel quotidien pour suivre votre bien-être.");
   };
 
   const handleScanTest = () => {
     if (!user?.id) return;
     triggerAfterScan('tristesse', 0.85);
     toast({
-      title: "Test déclenché",
-      description: "Simulation d'un scan émotionnel négatif",
+      title: "Coach IA",
+      description: "Une routine adaptée à votre émotion actuelle a été activée",
     });
+    setLastRecommendation("J'ai détecté que vous pourriez avoir besoin de soutien. Une session de méditation guidée pourrait vous aider à vous recentrer.");
+    setShowWelcome(false);
   };
 
   const handleAlertTest = () => {
     if (!user?.id) return;
     triggerAlert('negative_trend');
     toast({
-      title: "Test déclenché",
-      description: "Simulation d'une alerte préventive",
+      title: "Coach IA",
+      description: "Alerte préventive activée",
     });
+    setLastRecommendation("J'ai analysé vos données récentes et préparé une routine de bien-être personnalisée pour prévenir le stress.");
+    setShowWelcome(false);
   };
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <BrainCircuit className="mr-2 h-4 w-4" />
-          Coach IA
-        </CardTitle>
-        <CardDescription>
-          Orchestrateur de routines bien-être personnalisées
-        </CardDescription>
+    <Card className={`${className} overflow-hidden`}>
+      <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="flex items-center">
+              <BrainCircuit className="mr-2 h-5 w-5 text-primary" />
+              Coach IA
+            </CardTitle>
+            <CardDescription>
+              Votre accompagnateur personnalisé
+            </CardDescription>
+          </div>
+          {user && (
+            <UserAvatar user={user} size="sm" />
+          )}
+        </div>
       </CardHeader>
       
-      <CardContent className="text-sm">
-        <p>
-          Le Coach IA orchestre vos rituels bien-être en se basant sur vos scans émotionnels
-          et vous propose des sessions VR, de la musique adaptée et du support quand nécessaire.
-        </p>
+      <CardContent className="pt-4 space-y-4">
+        {showWelcome ? (
+          <div className="flex items-center p-3 bg-primary/10 rounded-lg animate-pulse">
+            <div className="flex-1">
+              <p className="text-sm font-medium">
+                Bonjour{user?.name ? ` ${user.name}` : ''} ! Je suis votre Coach IA personnel.
+              </p>
+            </div>
+          </div>
+        ) : lastRecommendation ? (
+          <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
+            <p className="text-sm">
+              {lastRecommendation}
+            </p>
+          </div>
+        ) : null}
+        
+        <div className="space-y-2">
+          <Badge variant="outline" className="bg-primary/10 hover:bg-primary/20">
+            Bien-être
+          </Badge>
+          <Badge variant="outline" className="bg-primary/10 hover:bg-primary/20">
+            Personnalisation
+          </Badge>
+          <Badge variant="outline" className="bg-primary/10 hover:bg-primary/20">
+            Routines adaptatives
+          </Badge>
+        </div>
+
+        <div className="space-y-2 text-xs text-muted-foreground">
+          <div className="flex items-center">
+            <Headset className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+            <span>Sessions VR recommandées selon vos émotions</span>
+          </div>
+          <div className="flex items-center">
+            <BookOpen className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+            <span>Journal guidé pour réflexion personnelle</span>
+          </div>
+          <div className="flex items-center">
+            <Trophy className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+            <span>Suivi de progression et défis adaptés</span>
+          </div>
+        </div>
       </CardContent>
       
-      <CardFooter className="flex flex-col gap-2">
+      <Separator />
+      
+      <CardFooter className="pt-3 pb-3 px-4">
         <div className="grid grid-cols-3 gap-2 w-full">
           <Button 
             variant="outline" 
@@ -83,7 +166,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
             disabled={isProcessing}
           >
             <RefreshCw className="mr-1 h-3 w-3" />
-            Test Scan
+            Scan
           </Button>
           
           <Button 
@@ -93,8 +176,8 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
             size="sm"
             disabled={isProcessing}
           >
-            <RefreshCw className="mr-1 h-3 w-3" />
-            Test Alerte
+            <BrainCircuit className="mr-1 h-3 w-3" />
+            Alerte
           </Button>
         </div>
       </CardFooter>
