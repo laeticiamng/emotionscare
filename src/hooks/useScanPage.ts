@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { fetchEmotionHistory } from '@/lib/scanService';
 import { useToast } from '@/components/ui/use-toast';
-import type { Emotion } from '@/types/scan';
+import { useAuth } from '@/contexts/AuthContext';
+import type { Emotion } from '@/types';
 import type { User } from '@/types';
 
 export const useScanPage = () => {
@@ -10,6 +11,7 @@ export const useScanPage = () => {
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<Emotion[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +61,7 @@ export const useScanPage = () => {
         
         setUsers(simulatedUsers);
         
-        // Fetch emotional scans history
+        // Récupérer la dernière émotion pour cet utilisateur
         try {
           const emotions = await fetchEmotionHistory();
           setHistory(emotions);
@@ -83,6 +85,12 @@ export const useScanPage = () => {
   const handleScanSaved = (newScan: Emotion) => {
     // Update the history with the new scan
     setHistory(prev => [newScan, ...prev.filter(s => s.id !== newScan.id)]);
+    
+    // Afficher un toast de confirmation
+    toast({
+      title: "Scan émotionnel enregistré",
+      description: "Votre scan a été enregistré avec succès"
+    });
   };
 
   return {

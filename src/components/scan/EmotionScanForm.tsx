@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from '@/components/ui/use-toast';
 import { saveEmotionScan } from '@/lib/scanService';
-import type { Emotion } from '@/types/scan';
+import { useAuth } from '@/contexts/AuthContext';
+import type { Emotion } from '@/types';
 
 interface EmotionScanFormProps {
   onScanSaved: (scan: Emotion) => void;
@@ -17,6 +18,7 @@ const EmotionScanForm = ({ onScanSaved }: EmotionScanFormProps) => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSave = async () => {
     try {
@@ -26,7 +28,8 @@ const EmotionScanForm = ({ onScanSaved }: EmotionScanFormProps) => {
       const newScan: Omit<Emotion,'id'> = {
         date: new Date().toISOString(),
         score: mood,
-        text: notes.trim() || ''
+        text: notes.trim() || '',
+        user_id: user?.id || '00000000-0000-0000-0000-000000000000' // Utiliser l'ID utilisateur actuel ou un ID par défaut
       };
       
       const savedEmotion = await saveEmotionScan(newScan);

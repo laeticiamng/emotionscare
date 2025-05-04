@@ -3,6 +3,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navigation from './Navigation';
 import TopNav from './TopNav';
+import GlobalNav from './GlobalNav';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LayoutProps {
@@ -21,6 +22,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div className="flex h-screen">
       <Navigation />
       <div className="flex-1 overflow-auto bg-background">
+        <GlobalNav /> {/* Nouvelle barre de navigation globale */}
         <TopNav />
         <main className="p-6 mt-14">
           {children || <Outlet />}

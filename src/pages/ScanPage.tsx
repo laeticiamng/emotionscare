@@ -1,33 +1,56 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useScanPage } from '@/hooks/useScanPage';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import EmotionHistory from '@/components/scan/EmotionHistory';
 import TeamOverview from '@/components/scan/TeamOverview';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import type { Emotion } from '@/types';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const ScanPage = () => {
   const { users, loading, history, handleScanSaved } = useScanPage();
+  const [activeTab, setActiveTab] = useState("personnel");
+
+  if (loading) {
+    return (
+      <div className="container max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Scan émotionnel</h1>
+        <div className="flex justify-center my-12">
+          <LoadingAnimation text="Chargement des données..." />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Scan émotionnel</h1>
       
-      {loading ? (
-        <div className="flex justify-center my-12">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      ) : (
-        <>
-          {/* Personal scan form */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="personnel">Personnel</TabsTrigger>
+          <TabsTrigger value="historique">Historique</TabsTrigger>
+          <TabsTrigger value="equipe">Équipe</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="personnel" className="mt-6">
           <EmotionScanForm onScanSaved={handleScanSaved} />
-          
-          {/* History */}
+        </TabsContent>
+        
+        <TabsContent value="historique" className="mt-6">
           <EmotionHistory history={history} />
-          
-          {/* Team overview */}
-          <TeamOverview users={users} />
-        </>
-      )}
+        </TabsContent>
+        
+        <TabsContent value="equipe" className="mt-6">
+          <Card>
+            <CardContent className="pt-6">
+              <TeamOverview users={users} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
