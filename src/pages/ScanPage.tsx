@@ -4,6 +4,7 @@ import { useScanPage } from '@/hooks/useScanPage';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import EmotionHistory from '@/components/scan/EmotionHistory';
 import TeamOverview from '@/components/scan/TeamOverview';
+import EmotionScanLive from '@/components/scan/EmotionScanLive';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Emotion } from '@/types';
@@ -29,14 +30,19 @@ const ScanPage = () => {
       <h1 className="text-3xl font-bold mb-6">Scan émotionnel</h1>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personnel">Personnel</TabsTrigger>
+          <TabsTrigger value="live">Live</TabsTrigger>
           <TabsTrigger value="historique">Historique</TabsTrigger>
           <TabsTrigger value="equipe">Équipe</TabsTrigger>
         </TabsList>
         
         <TabsContent value="personnel" className="mt-6">
           <EmotionScanForm onScanSaved={handleScanSaved} />
+        </TabsContent>
+
+        <TabsContent value="live" className="mt-6">
+          <EmotionScanLive onResultSaved={handleScanSaved} />
         </TabsContent>
         
         <TabsContent value="historique" className="mt-6">
