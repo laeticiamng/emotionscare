@@ -30,7 +30,7 @@ export async function fetchJournalEntries(userId: string): Promise<JournalEntry[
         ai_feedback: entry.ai_feedback || "",
         mood: entry.mood || "",
         keywords: entry.keywords || []
-      } as JournalEntry;
+      };
     });
   } catch (error) {
     console.error('Error in fetchJournalEntries:', error);
@@ -65,7 +65,7 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
       ai_feedback: data.ai_feedback || "",
       mood: data.mood || "",
       keywords: data.keywords || []
-    } as JournalEntry;
+    };
   } catch (error) {
     console.error('Error in fetchJournalEntry:', error);
     throw error;
@@ -108,7 +108,7 @@ export async function createJournalEntry(userId: string, content: string, mood?:
       ai_feedback: data.ai_feedback || "",
       mood: data.mood || "",
       keywords: data.keywords || []
-    } as JournalEntry;
+    };
   } catch (error) {
     console.error('Error in createJournalEntry:', error);
     throw error;
