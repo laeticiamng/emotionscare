@@ -1,322 +1,188 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { toast } from "@/components/ui/sonner";
-import {
-  fetchChallenges,
-  fetchUserChallenges,
-  completeChallenge,
-  fetchBadges,
-  awardBadge
-} from '@/lib/gamificationService';
-import type { Challenge, UserChallenge, Badge, UserBadge } from '@/types/gamification';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Trophy, Star, Award, Check } from "lucide-react";
-import confetti from 'canvas-confetti';
+import { useQuery } from '@tanstack/react-query';
+import { fetchChallenges, fetchUserChallenges, completeChallenge, fetchBadges } from '@/lib/gamificationService';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Challenge, UserChallenge, Badge as BadgeType } from '@/types/gamification';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/use-toast';
+import ChallengeItem from '@/components/gamification/ChallengeItem';
+import BadgeGrid from '@/components/gamification/BadgeGrid';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Award, CheckCircle2, Loader2 } from 'lucide-react';
 
-const GamificationPage: React.FC = () => {
+const GamificationPage = () => {
   const { user } = useAuth();
-  const { toast: uiToast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [earnedBadges, setEarnedBadges] = useState<UserBadge[]>([]);
-  const [showNewBadge, setShowNewBadge] = useState<Badge | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("challenges");
+  const [completingChallengeId, setCompletingChallengeId] = useState<string | null>(null);
 
-  // Load data on mount
-  useEffect(() => {
-    if (!user) return;
-    
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const [allChallenges, userProgress, badgeData] = await Promise.all([
-          fetchChallenges(),
-          fetchUserChallenges(user.id),
-          fetchBadges(user.id)
-        ]);
-        
-        setChallenges(allChallenges);
-        setUserChallenges(userProgress);
-        setBadges(badgeData.all);
-        setEarnedBadges(badgeData.earned);
-      } catch (error: any) {
-        uiToast({
-          title: "Erreur",
-          description: `Impossible de charger les données: ${error.message}`,
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadData();
-  }, [user, uiToast]);
+  // Fetch all available challenges
+  const {
+    data: challenges = [],
+    isLoading: isLoadingChallenges,
+  } = useQuery({
+    queryKey: ['challenges'],
+    queryFn: fetchChallenges,
+  });
 
-  // Calculate total points earned today
-  const todayPoints = userChallenges
-    .filter(uc => uc.completed)
-    .reduce((sum, uc) => {
-      const c = challenges.find(ch => ch.id === uc.challenge_id);
-      return sum + (c?.points || 0);
-    }, 0);
+  // Fetch user's progress on challenges for today
+  const {
+    data: userChallenges = [],
+    isLoading: isLoadingUserProgress,
+    refetch: refetchUserChallenges
+  } = useQuery({
+    queryKey: ['userChallenges', user?.id],
+    queryFn: () => user?.id ? fetchUserChallenges(user.id) : Promise.resolve([]),
+    enabled: !!user?.id,
+  });
 
-  // Check and award badges if threshold reached
-  useEffect(() => {
-    const checkForNewBadges = async () => {
-      if (!user || !badges.length || !todayPoints) return;
-      
-      for (const badge of badges) {
-        if (todayPoints >= badge.threshold && 
-            !earnedBadges.some(eb => eb.badge_id === badge.id)) {
-          try {
-            const newBadge = await awardBadge({
-              user_id: user.id,
-              badge_id: badge.id,
-              awarded_on: new Date().toISOString()
-            });
-            
-            setEarnedBadges(prev => [...prev, newBadge]);
-            setShowNewBadge(badge);
-            
-            // Trigger confetti
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 }
-            });
-            
-            // Utiliser Sonner toast pour les notifications visibles
-            toast.success(
-              `Félicitations ! Vous avez obtenu le badge "${badge.name}" !`,
-              {
-                position: "top-center",
-                duration: 5000,
-                icon: <Award className="h-5 w-5 text-primary" />
-              }
-            );
-          } catch (error) {
-            console.error("Error awarding badge:", error);
-          }
-        }
-      }
-    };
-    
-    checkForNewBadges();
-  }, [todayPoints, badges, earnedBadges, user]);
+  // Fetch user's badges
+  const {
+    data: badgeData,
+    isLoading: isLoadingBadges,
+  } = useQuery({
+    queryKey: ['badges', user?.id],
+    queryFn: () => user?.id ? fetchBadges(user.id) : Promise.resolve({ all: [], earned: [] }),
+    enabled: !!user?.id,
+  });
 
-  const toggleComplete = async (ch: Challenge) => {
-    if (!user) return;
-    
+  // Handle challenge completion
+  const handleCompleteChallenge = async (challengeId: string) => {
+    if (!user?.id) return;
+
     try {
-      const isCompleted = userChallenges.some(
-        uc => uc.challenge_id === ch.id && uc.completed
-      );
+      setCompletingChallengeId(challengeId);
       
-      const today = new Date().toISOString();
+      // Create challenge completion record
       await completeChallenge({
         user_id: user.id,
-        challenge_id: ch.id,
-        date: today,
-        completed: !isCompleted
+        challenge_id: challengeId,
+        date: new Date().toISOString(),
+        completed: true
       });
       
-      // Refresh user challenges
-      const updatedChallenges = await fetchUserChallenges(user.id);
-      setUserChallenges(updatedChallenges);
+      // Refetch user challenges
+      await refetchUserChallenges();
       
-      if (!isCompleted) {
-        toast.success(
-          `Défi complété ! +${ch.points} points`,
-          {
-            position: "bottom-right",
-            duration: 3000,
-          }
-        );
-      } else {
-        toast.info(
-          "Défi marqué comme non complété",
-          {
-            position: "bottom-right",
-            duration: 3000,
-          }
-        );
-      }
-    } catch (error: any) {
-      uiToast({
+      toast({
+        title: "Défi complété !",
+        description: "Félicitations ! Vous avez gagné des points pour votre bien-être.",
+      });
+    } catch (error) {
+      console.error('Error completing challenge:', error);
+      toast({
         title: "Erreur",
-        description: `Impossible de mettre à jour le défi: ${error.message}`,
-        variant: "destructive"
+        description: "Impossible de compléter le défi. Veuillez réessayer.",
+        variant: "destructive",
       });
+    } finally {
+      setCompletingChallengeId(null);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  // Check if a challenge is already completed
+  const isChallengeCompleted = (challengeId: string): boolean => {
+    return userChallenges.some(uc => uc.challenge_id === challengeId && uc.completed);
+  };
+
+  // Calculate total points earned today
+  const calculateTodayPoints = (): number => {
+    return userChallenges.reduce((sum, uc) => {
+      if (uc.completed) {
+        const challenge = challenges.find(c => c.id === uc.challenge_id);
+        return sum + (challenge?.points || 0);
+      }
+      return sum;
+    }, 0);
+  };
+
+  // Get badge progress percentage
+  const getBadgeProgress = (threshold: number): number => {
+    const points = calculateTodayPoints();
+    return Math.min((points / threshold) * 100, 100);
+  };
 
   return (
-    <div className="container max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Gamification</h1>
-      
-      {/* Points and Badges Summary */}
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center mb-4 md:mb-0">
-              <div className="bg-amber-100 p-3 rounded-full mr-4">
-                <Trophy className="h-8 w-8 text-amber-600" />
-              </div>
-              <div>
-                <div className="text-lg font-medium text-gray-600">Points aujourd'hui</div>
-                <div className="text-3xl font-bold">{todayPoints}</div>
-              </div>
+    <div className="container max-w-4xl mx-auto py-6 space-y-8">
+      <div className="flex flex-col space-y-2">
+        <h1 className="text-3xl font-bold">Défis et Badges</h1>
+        <p className="text-muted-foreground">
+          Complétez des défis quotidiens pour gagner des points et débloquez des badges.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center">
+            <Award className="mr-2 h-5 w-5 text-primary" />
+            Votre progression
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+            <div className="flex flex-col space-y-1">
+              <span className="text-sm font-medium">Points aujourd'hui</span>
+              <span className="text-3xl font-bold text-primary">{calculateTodayPoints()}</span>
             </div>
-            
-            <div>
-              <h3 className="text-lg font-medium mb-2 text-center md:text-right">Badges débloqués</h3>
-              <div className="flex flex-wrap justify-center md:justify-end gap-2">
-                {earnedBadges.length > 0 ? (
-                  earnedBadges.map(eb => {
-                    const badge = badges.find(b => b.id === eb.badge_id);
-                    return badge ? (
-                      <div key={eb.id} className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                          <Award className="h-8 w-8 text-primary" />
-                        </div>
-                        <span className="text-xs mt-1">{badge.name}</span>
-                      </div>
-                    ) : null;
-                  })
-                ) : (
-                  <div className="text-sm text-gray-500">Complétez des défis pour gagner des badges</div>
-                )}
-              </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-sm font-medium">Défis complétés</span>
+              <span className="text-3xl font-bold text-primary">
+                {userChallenges.filter(uc => uc.completed).length}/{challenges.length}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-sm font-medium">Badges gagnés</span>
+              <span className="text-3xl font-bold text-primary">
+                {badgeData?.earned.length || 0}/{badgeData?.all.length || 0}
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
-      
-      {/* Daily Challenges */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Défis quotidiens</h2>
-        {challenges.length > 0 ? (
-          <div className="space-y-4">
-            {challenges.map(ch => {
-              const isCompleted = userChallenges.some(
-                uc => uc.challenge_id === ch.id && uc.completed
-              );
-              
-              return (
-                <Card 
-                  key={ch.id} 
-                  className={`transition-all duration-300 ${isCompleted ? "border-green-500" : ""}`}
-                >
-                  <CardContent className="flex justify-between items-center p-4">
-                    <div className="flex items-center">
-                      <div className={`p-2 rounded-full mr-3 ${
-                        isCompleted ? "bg-green-100" : "bg-gray-100"
-                      }`}>
-                        {isCompleted ? (
-                          <Check className="h-5 w-5 text-green-600" />
-                        ) : (
-                          <Star className="h-5 w-5 text-gray-400" />
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-medium">{ch.title}</h3>
-                        <p className="text-sm text-muted-foreground">{ch.description}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <div className="text-sm font-semibold bg-primary/10 text-primary px-2 py-1 rounded mr-3">
-                        {ch.points} pts
-                      </div>
-                      <Button
-                        variant={isCompleted ? "outline" : "default"}
-                        size="sm"
-                        onClick={() => toggleComplete(ch)}
-                        aria-label={isCompleted ? "Annuler le défi" : "Valider le défi"}
-                      >
-                        {isCompleted ? "Annuler" : "Valider"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="p-6 text-center text-muted-foreground">
-              Aucun défi disponible pour le moment
-            </CardContent>
-          </Card>
-        )}
-      </div>
-      
-      {/* Badges to Earn */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Badges à débloquer</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {badges.map(badge => {
-            const isEarned = earnedBadges.some(eb => eb.badge_id === badge.id);
-            
-            return (
-              <Card 
-                key={badge.id}
-                className={`transition-all duration-300 ${isEarned ? "bg-primary/5 border-primary/30" : ""}`}
-              >
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center">
-                    <Award className="mr-2 h-5 w-5" />
-                    {badge.name}
-                    {isEarned && <div className="ml-2 text-xs bg-primary/20 text-primary px-2 py-1 rounded">Obtenu</div>}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">{badge.description}</p>
-                  <div className="mt-2 text-sm font-medium">
-                    Seuil: {badge.threshold} points
-                  </div>
-                  {!isEarned && todayPoints > 0 && (
-                    <div className="mt-2 bg-gray-100 h-2 rounded-full">
-                      <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-1000" 
-                        style={{ width: `${Math.min(100, (todayPoints / badge.threshold) * 100)}%` }}
-                        aria-label={`Progression: ${Math.min(100, Math.floor((todayPoints / badge.threshold) * 100))}%`}
-                      ></div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-      
-      {/* New Badge Modal */}
-      {showNewBadge && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in" aria-modal="true" role="dialog">
-          <div className="bg-white p-6 rounded-lg max-w-sm w-full text-center animate-scale-in">
-            <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4 animate-bounce">
-              <Award className="h-12 w-12 text-primary" />
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="challenges">Défis quotidiens</TabsTrigger>
+          <TabsTrigger value="badges">Badges</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="challenges" className="space-y-4 mt-6">
+          {isLoadingChallenges || isLoadingUserProgress ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-            <h3 className="text-xl font-bold mb-2">Nouveau Badge Débloqué!</h3>
-            <p className="text-lg font-medium mb-1">{showNewBadge.name}</p>
-            <p className="text-gray-600 mb-6">{showNewBadge.description}</p>
-            <Button onClick={() => setShowNewBadge(null)}>Continuer</Button>
-          </div>
-        </div>
-      )}
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {challenges.map((challenge) => (
+                <ChallengeItem
+                  key={challenge.id}
+                  title={challenge.title}
+                  description={challenge.description}
+                  points={challenge.points}
+                  isCompleted={isChallengeCompleted(challenge.id)}
+                  onComplete={() => handleCompleteChallenge(challenge.id)}
+                  isLoading={completingChallengeId === challenge.id}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="badges" className="mt-6">
+          {isLoadingBadges ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <BadgeGrid 
+              badges={badgeData?.all || []} 
+              earnedBadgeIds={badgeData?.earned.map(eb => eb.badge_id) || []}
+              progressFunction={getBadgeProgress}
+            />
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
