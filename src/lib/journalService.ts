@@ -24,7 +24,7 @@ export async function fetchJournalEntries(userId: string): Promise<JournalEntry[
         content: entry.content || "",
         text: entry.content || "", // For compatibility
         emotions: entry.emotions || [],
-        is_private: entry.is_private !== undefined ? entry.is_private : true,
+        is_private: typeof entry.is_private !== 'undefined' ? entry.is_private : true,
         created_at: entry.created_at || entry.date || new Date().toISOString(),
         updated_at: entry.updated_at || entry.date || new Date().toISOString(),
         ai_feedback: entry.ai_feedback || "",
@@ -59,7 +59,7 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
       content: data.content || "",
       text: data.content || "", // For compatibility
       emotions: data.emotions || [],
-      is_private: data.is_private !== undefined ? data.is_private : true,
+      is_private: typeof data.is_private !== 'undefined' ? data.is_private : true,
       created_at: data.created_at || data.date || new Date().toISOString(),
       updated_at: data.updated_at || data.date || new Date().toISOString(),
       ai_feedback: data.ai_feedback || "",
@@ -102,7 +102,7 @@ export async function createJournalEntry(userId: string, content: string, mood?:
       content: data.content || "",
       text: data.content || "", // For compatibility
       emotions: data.emotions || [],
-      is_private: data.is_private !== undefined ? data.is_private : true,
+      is_private: typeof data.is_private !== 'undefined' ? data.is_private : true,
       created_at: data.created_at || data.date || new Date().toISOString(),
       updated_at: data.updated_at || data.date || new Date().toISOString(),
       ai_feedback: data.ai_feedback || "",
