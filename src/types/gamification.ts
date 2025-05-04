@@ -21,6 +21,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
+  image_url?: string;    // for compatibility with the existing Badge type
   icon_url: string;
   threshold: number;     // nombre de points ou défis pour débloquer
 }

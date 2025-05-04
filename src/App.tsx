@@ -10,6 +10,7 @@ import BuddyPage from '@/pages/BuddyPage';
 import JournalPage from '@/pages/JournalPage';
 import JournalEntryPage from '@/pages/JournalEntryPage';
 import JournalNewPage from '@/pages/JournalNewPage';
+import GamificationPage from '@/pages/GamificationPage';
 import MusicDrawer from '@/components/music/MusicDrawer';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -31,6 +32,7 @@ function App() {
             <Route path="/journal" element={<JournalPage />} />
             <Route path="/journal/:entryId" element={<JournalEntryPage />} />
             <Route path="/journal/new" element={<JournalNewPage />} />
+            <Route path="/gamification" element={<GamificationPage />} />
           </Routes>
         </Layout>
         <MusicDrawer />
