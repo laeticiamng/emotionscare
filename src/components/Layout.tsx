@@ -1,10 +1,8 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Navigation from './Navigation';
-import TopNav from './TopNav';
-import GlobalNav from './GlobalNav';
 import { useAuth } from '@/contexts/AuthContext';
+import GlobalNav from './GlobalNav';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -19,12 +17,10 @@ const Layout = ({ children }: LayoutProps) => {
   }
   
   return (
-    <div className="flex h-screen">
-      <Navigation />
-      <div className="flex-1 overflow-auto bg-background">
-        <GlobalNav /> {/* Nouvelle barre de navigation globale */}
-        <TopNav />
-        <main className="p-6 mt-14">
+    <div className="flex flex-col h-screen">
+      <GlobalNav />
+      <div className="flex-1 overflow-auto bg-background pt-16">
+        <main className="container mx-auto p-6">
           {children || <Outlet />}
         </main>
       </div>
