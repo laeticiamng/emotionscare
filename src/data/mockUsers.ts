@@ -1,5 +1,4 @@
-
-import { User } from '../types';
+import { User, UserRole } from '../types';
 
 // Mock Users
 export const mockUsers: User[] = [
@@ -7,7 +6,7 @@ export const mockUsers: User[] = [
     id: '1',
     name: 'Sophie Martin',
     email: 'sophie@example.com',
-    role: 'Infirmier',
+    role: UserRole.INFIRMIER,
     anonymity_code: 'SM472931',
     emotional_score: 82,
     avatar: 'https://i.pravatar.cc/150?img=1',
@@ -16,7 +15,7 @@ export const mockUsers: User[] = [
     id: '2',
     name: 'Thomas Dubois',
     email: 'thomas@example.com',
-    role: 'Médecin',
+    role: UserRole.MEDECIN,
     anonymity_code: 'TD659812',
     emotional_score: 65,
     avatar: 'https://i.pravatar.cc/150?img=2',
@@ -25,7 +24,7 @@ export const mockUsers: User[] = [
     id: '3',
     name: 'Emma Petit',
     email: 'emma@example.com',
-    role: 'Aide-soignant',
+    role: UserRole.AIDE_SOIGNANT,
     anonymity_code: 'EP847103',
     emotional_score: 78,
     avatar: 'https://i.pravatar.cc/150?img=3',

@@ -4,7 +4,7 @@ import { fetchEmotionHistory } from '@/lib/scanService';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Emotion } from '@/types';
-import type { User } from '@/types';
+import type { User, UserRole } from '@/types';
 
 export const useScanPage = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -28,7 +28,7 @@ export const useScanPage = () => {
             avatar: '',
             anonymity_code: 'Anon-5678',
             emotional_score: 85,
-            role: 'Médecin'
+            role: UserRole.MEDECIN
           },
           {
             id: '2',
@@ -37,7 +37,7 @@ export const useScanPage = () => {
             avatar: '',
             anonymity_code: 'Anon-9012',
             emotional_score: 65,
-            role: 'Infirmier'
+            role: UserRole.INFIRMIER
           },
           {
             id: '3',
@@ -46,7 +46,7 @@ export const useScanPage = () => {
             avatar: '',
             anonymity_code: 'Anon-3456',
             emotional_score: 32,
-            role: 'Aide-soignant'
+            role: UserRole.AIDE_SOIGNANT
           },
           {
             id: '4',
@@ -55,7 +55,7 @@ export const useScanPage = () => {
             avatar: '',
             anonymity_code: 'Anon-7890',
             emotional_score: 50,
-            role: 'Interne'
+            role: UserRole.INTERNE
           },
         ];
         
