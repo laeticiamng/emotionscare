@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -94,15 +93,15 @@ export interface Post {
   id: string;
   user_id: string;
   content: string;
-  created_at: string;
-  likes: number;
-  comments: Comment[];
-  author: User;
-  date?: string;        // For compatibility
-  reactions?: number;   // For backward compatibility
-  media_url?: string;   // For compatibility
-  image_url?: string;   // For compatibility
-  image?: string;       // Added for new community features
+  date: string;
+  reactions: number;
+  image_url?: string;   // Field from database
+  author?: User;        // For the UI, not in DB
+  likes?: number;       // For backward compatibility
+  comments?: Comment[]; // For the UI, not in DB
+  created_at?: string;  // Alias for date
+  media_url?: string;   // For backward compatibility
+  image?: string;       // Field for new image uploads
 }
 
 export interface Comment {
@@ -110,30 +109,29 @@ export interface Comment {
   post_id: string;
   user_id: string;
   content: string;
-  created_at: string;
-  author: User;
-  date?: string;        // For compatibility
+  date: string;
+  author?: User;        // For the UI, not in DB
+  created_at?: string;  // Alias for date
 }
 
 export interface Group {
   id: string;
   name: string;
-  description: string;
-  members_count: number;
-  image_url?: string;
-  is_private: boolean;
-  created_at: string;
-  joined: boolean;
-  topic?: string;       // Added for new community features
-  members?: string[];   // For compatibility
+  topic: string;
+  description?: string;
+  members?: string[];   // Array of user IDs
+  members_count?: number;
+  is_private?: boolean;
+  created_at?: string;
+  joined?: boolean;     // For the UI, not in DB
 }
 
 export interface Buddy {
   id: string;
   user_id: string;
   buddy_user_id: string;
-  matched_on: string;
-  date?: string;        // For backward compatibility
+  matched_on?: string;   // For compatibility with newer code
+  date: string;          // From the database
 }
 
 export enum UserRole {
