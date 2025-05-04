@@ -10,6 +10,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { mockVRTemplates } from '@/data/mockData';
 import type { VRSessionTemplate, VRSession } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import YoutubeEmbed from '@/components/vr/YoutubeEmbed';
 
 const VRSessionPage = () => {
   const navigate = useNavigate();
@@ -102,17 +103,7 @@ const VRSessionPage = () => {
               
               <div className="relative rounded-xl overflow-hidden border border-muted">
                 <AspectRatio ratio={16/9}>
-                  <img 
-                    src={selectedTemplate?.preview_url} 
-                    alt={selectedTemplate?.theme}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white">
-                    <div className="text-center">
-                      <div className="text-6xl font-semibold tracking-wider mb-4">5:00</div>
-                      <p className="text-white/80">Session en cours...</p>
-                    </div>
-                  </div>
+                  <YoutubeEmbed embedId={extractYoutubeID(selectedTemplate?.preview_url || '')} />
                 </AspectRatio>
               </div>
               
@@ -133,11 +124,7 @@ const VRSessionPage = () => {
               <Card>
                 <CardContent className="p-0">
                   <AspectRatio ratio={16/9}>
-                    <img 
-                      src={selectedTemplate.preview_url} 
-                      alt={selectedTemplate.theme}
-                      className="w-full h-full object-cover rounded-t-xl"
-                    />
+                    <YoutubeEmbed embedId={extractYoutubeID(selectedTemplate.preview_url)} />
                   </AspectRatio>
                   <div className="p-6">
                     <h2 className="text-xl font-semibold">{selectedTemplate.theme}</h2>
@@ -243,11 +230,7 @@ const VRSessionPage = () => {
               >
                 <CardContent className="p-0">
                   <AspectRatio ratio={16/9}>
-                    <img 
-                      src={template.preview_url}
-                      alt={template.theme}
-                      className="w-full h-full object-cover rounded-t-xl"
-                    />
+                    <YoutubeEmbed embedId={extractYoutubeID(template.preview_url)} />
                   </AspectRatio>
                   <div className="p-4">
                     <h3 className="font-medium">{template.theme}</h3>
@@ -264,6 +247,20 @@ const VRSessionPage = () => {
       )}
     </div>
   );
+};
+
+// Helper function to extract YouTube video ID from URL
+const extractYoutubeID = (url: string): string => {
+  // Handle URLs like https://www.youtube.com/embed/BHACKCNDMW8
+  if (url.includes('/embed/')) {
+    return url.split('/embed/')[1];
+  }
+  
+  // Handle standard YouTube URLs
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+  
+  return (match && match[2].length === 11) ? match[2] : '';
 };
 
 export default VRSessionPage;
