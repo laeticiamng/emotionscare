@@ -29,7 +29,7 @@ const EmotionScanForm = ({ onScanSaved }: EmotionScanFormProps) => {
         date: new Date().toISOString(),
         score: mood,
         text: notes.trim() || '',
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000' // Utiliser l'ID utilisateur actuel ou un ID par défaut
+        user_id: user?.id || '00000000-0000-0000-0000-000000000000' // Use current user ID or a default ID
       };
       
       const savedEmotion = await saveEmotionScan(newScan);
