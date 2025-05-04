@@ -1,4 +1,3 @@
-
 import './lib/setupTestUser';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -19,7 +18,7 @@ import JournalPage from "./pages/JournalPage";
 import JournalNewPage from "./pages/JournalNewPage";
 import JournalEntryPage from "./pages/JournalEntryPage";
 import CommunityFeed from "./pages/CommunityFeed";
-import GroupList from "./pages/GroupList";
+import GroupListPage from "./pages/GroupList";
 import BuddyPage from "./pages/BuddyPage";
 import VRSessionPage from "./pages/VRSessionPage";
 import GamificationPage from "./pages/GamificationPage";
@@ -70,11 +69,10 @@ const AnimatedRoutes = () => {
           
           {/* Community routes */}
           <Route path="/community" element={<PageTransition><CommunityFeed /></PageTransition>} />
-          <Route path="/community/groups" element={<PageTransition><GroupList /></PageTransition>} />
+          <Route path="/community/groups" element={<PageTransition><GroupListPage /></PageTransition>} />
           <Route path="/community/buddy" element={<PageTransition><BuddyPage /></PageTransition>} />
           
           {/* VR Route */}
-          <Route path="/vr" element={<PageTransition><VRSessionPage /></PageTransition>} />
           
           {/* Gamification Route */}
           <Route path="/gamification" element={<PageTransition><GamificationPage /></PageTransition>} />
