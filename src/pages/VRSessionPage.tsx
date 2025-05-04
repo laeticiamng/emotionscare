@@ -1,16 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, Clock, Heart, CheckCircle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { mockVRTemplates } from '@/data/mockData';
 import type { VRSessionTemplate, VRSession } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import YoutubeEmbed from '@/components/vr/YoutubeEmbed';
+import VRTemplateGrid from '@/components/vr/VRTemplateGrid';
+import VRTemplateDetail from '@/components/vr/VRTemplateDetail';
+import VRSessionView from '@/components/vr/VRSessionView';
+import VRSessionHistory from '@/components/vr/VRSessionHistory';
 
 const VRSessionPage = () => {
   const navigate = useNavigate();
@@ -94,173 +93,34 @@ const VRSessionPage = () => {
         </Button>
       </div>
       
+      {/* Content */}
       {isSessionActive ? (
         /* Active Session View */
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="p-6 space-y-4 text-center">
-              <h2 className="text-xl font-semibold">{selectedTemplate?.theme}</h2>
-              
-              <div className="relative rounded-xl overflow-hidden border border-muted">
-                <AspectRatio ratio={16/9}>
-                  <YoutubeEmbed embedId={extractYoutubeID(selectedTemplate?.preview_url || '')} />
-                </AspectRatio>
-              </div>
-              
-              <Button 
-                onClick={handleCompleteSession}
-                className="mt-4"
-              >
-                Terminer la session
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+        <VRSessionView
+          template={selectedTemplate!}
+          onCompleteSession={handleCompleteSession}
+        />
       ) : selectedTemplate ? (
         /* Template Details View */
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
-              <Card>
-                <CardContent className="p-0">
-                  <AspectRatio ratio={16/9}>
-                    <YoutubeEmbed embedId={extractYoutubeID(selectedTemplate.preview_url)} />
-                  </AspectRatio>
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold">{selectedTemplate.theme}</h2>
-                    <div className="flex items-center mt-2 text-muted-foreground">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>{selectedTemplate.duration} minutes</span>
-                    </div>
-                    <Button 
-                      className="mt-4 flex items-center" 
-                      onClick={handleStartSession}
-                    >
-                      <Play className="h-4 w-4 mr-2" /> Démarrer la session
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            
-            <div>
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-medium mb-2">Bénéfices</h3>
-                  <ul className="space-y-2">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                      <span>Réduction du stress</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                      <span>Amélioration de la concentration</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                      <span>Récupération mentale</span>
-                    </li>
-                  </ul>
-                  
-                  <div className="mt-6">
-                    <h3 className="text-lg font-medium mb-2">Suivi santé</h3>
-                    <div className="flex items-center space-x-2">
-                      <Heart className="h-5 w-5 text-red-500" />
-                      <span>Rythme cardiaque: {heartRate.before} bpm</span>
-                    </div>
-                  </div>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-4" 
-                    onClick={() => setSelectedTemplate(null)}
-                  >
-                    Retour aux templates
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          <VRTemplateDetail
+            template={selectedTemplate}
+            heartRate={heartRate.before}
+            onStartSession={handleStartSession}
+            onBack={() => setSelectedTemplate(null)}
+          />
           
-          {recentSessions.length > 0 && (
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="text-lg font-medium mb-4">Impact de vos sessions précédentes</h3>
-                <div className="space-y-4">
-                  {recentSessions.map((session) => (
-                    <div key={session.id} className="border-b pb-4 last:border-b-0 last:pb-0">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium">Session du {new Date(session.date).toLocaleDateString('fr-FR')}</p>
-                          <p className="text-sm text-muted-foreground">{session.duration_seconds / 60} minutes</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm">Rythme cardiaque</div>
-                          <div className="flex items-center justify-end gap-2">
-                            <span className="text-red-500">{session.heart_rate_before} bpm</span>
-                            <span className="text-muted-foreground">→</span>
-                            <span className="text-green-500">{session.heart_rate_after} bpm</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <VRSessionHistory sessions={recentSessions} />
         </div>
       ) : (
         /* Template Selection View */
-        <>
-          <Alert>
-            <AlertTitle>Réduisez votre stress en 5 minutes</AlertTitle>
-            <AlertDescription>
-              Une pause VR peut diminuer votre niveau de stress de 20% et améliorer votre humeur.
-              Choisissez un environnement ci-dessous pour commencer.
-            </AlertDescription>
-          </Alert>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {availableTemplates.map((template) => (
-              <Card 
-                key={template.template_id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => handleSelectTemplate(template)}
-              >
-                <CardContent className="p-0">
-                  <AspectRatio ratio={16/9}>
-                    <YoutubeEmbed embedId={extractYoutubeID(template.preview_url)} />
-                  </AspectRatio>
-                  <div className="p-4">
-                    <h3 className="font-medium">{template.theme}</h3>
-                    <div className="flex items-center mt-2 text-muted-foreground">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>{template.duration} minutes</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </>
+        <VRTemplateGrid
+          templates={availableTemplates}
+          onSelectTemplate={handleSelectTemplate}
+        />
       )}
     </div>
   );
-};
-
-// Helper function to extract YouTube video ID from URL
-const extractYoutubeID = (url: string): string => {
-  // Handle URLs like https://www.youtube.com/embed/BHACKCNDMW8
-  if (url.includes('/embed/')) {
-    return url.split('/embed/')[1];
-  }
-  
-  // Handle standard YouTube URLs
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  
-  return (match && match[2].length === 11) ? match[2] : '';
 };
 
 export default VRSessionPage;
