@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { formatTime } from '@/lib/utils';
@@ -18,8 +17,8 @@ import {
   X
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
-// Import the Track type that matches musicService.ts definition
-import { Track } from '@/lib/musicService';
+// Import the Track type from our new location
+import { Track } from '@/services/music/types';
 
 export function MusicDrawer() {
   const { 

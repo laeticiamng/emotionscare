@@ -1,12 +1,11 @@
-
 import React, { useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Music, Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { formatTime } from '@/lib/utils';
-// Import the Track type that matches the one used in MusicContext
-import { Track } from '@/lib/musicService';
+// Import the Track type from our new location
+import { Track } from '@/services/music/types';
 
 export function MusicMiniPlayer() {
   const { 

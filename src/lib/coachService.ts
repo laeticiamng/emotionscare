@@ -1,7 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { getPlaylist } from '@/lib/musicService';
+// Update import path for getPlaylist
+import { getPlaylist } from '@/services/music/playlist-service';
 import type { Emotion, User } from '@/types';
 
 // Types pour le service Coach

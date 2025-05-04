@@ -1,11 +1,10 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { getPlaylist, convertMusicTrackToTrack } from '@/lib/musicService';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
-// Import the Track type that matches musicService.ts definition
-import { Track, Playlist } from '@/lib/musicService';
+// Import the Track type from our new structure
+import { Track, Playlist } from '@/services/music/types';
 
 interface MusicContextType {
   currentTrack: Track | null;
@@ -101,7 +100,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     try {
       const musicPlaylist = await getPlaylist(emotion);
       
-      // Convert MusicPlaylist to Playlist
+      // Convert MusicPlaylist to Playlist using our new converter logic
       const convertedPlaylist: Playlist = {
         id: musicPlaylist.id,
         name: musicPlaylist.name,
