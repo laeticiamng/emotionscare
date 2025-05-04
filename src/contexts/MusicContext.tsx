@@ -1,9 +1,8 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getPlaylist, convertMusicTrackToTrack } from '@/lib/musicService';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { useToast } from '@/hooks/use-toast';
 
-// Import the Track type from our new structure
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { usePlaylistManager } from '@/hooks/usePlaylistManager';
+import { useDrawerState } from '@/hooks/useDrawerState';
 import { Track, Playlist } from '@/services/music/types';
 
 interface MusicContextType {
@@ -30,167 +29,61 @@ interface MusicContextType {
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7); // 0 to 1
-  const [playlist, setPlaylist] = useState<Playlist | null>(null);
-  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [repeat, setRepeat] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
-  const [audio] = useState<HTMLAudioElement | null>(
-    typeof window !== 'undefined' ? new Audio() : null
-  );
-  const { toast } = useToast();
+  // Use our custom hooks to manage different aspects of the music player
+  const {
+    currentTrack,
+    isPlaying,
+    volume,
+    repeat,
+    shuffle,
+    playTrack,
+    pauseTrack,
+    setVolume,
+    toggleRepeat,
+    toggleShuffle,
+    setCurrentTrack
+  } = useAudioPlayer();
+
+  const {
+    playlist,
+    currentEmotion,
+    loadPlaylistForEmotion: loadPlaylist,
+    getNextTrack,
+    getPreviousTrack
+  } = usePlaylistManager();
+
+  const {
+    isDrawerOpen,
+    openDrawer,
+    closeDrawer
+  } = useDrawerState();
 
   // Load initial playlist
   useEffect(() => {
-    loadPlaylistForEmotion('neutral');
+    loadPlaylist('neutral');
   }, []);
 
-  // Handle audio playback
-  useEffect(() => {
-    if (!audio) return;
-
-    // Set volume
-    audio.volume = volume;
-
-    // Set up audio event listeners
-    const handleEnded = () => {
-      nextTrack();
-    };
-
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('ended', handleEnded);
-      audio.pause();
-    };
-  }, [audio, volume]);
-
-  // Update audio source when current track changes
-  useEffect(() => {
-    if (!audio || !currentTrack) return;
-
-    audio.src = currentTrack.url;
-    
-    if (isPlaying) {
-      audio.play().catch(error => {
-        console.error('Error playing audio:', error);
-        setIsPlaying(false);
-      });
-    }
-  }, [audio, currentTrack]);
-
-  // Toggle play/pause when isPlaying changes
-  useEffect(() => {
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.play().catch(error => {
-        console.error('Error playing audio:', error);
-        setIsPlaying(false);
-      });
-    } else {
-      audio.pause();
-    }
-  }, [audio, isPlaying]);
-
+  // Handle loading of playlist and set first track
   const loadPlaylistForEmotion = async (emotion: string) => {
-    try {
-      const musicPlaylist = await getPlaylist(emotion);
-      
-      // Convert MusicPlaylist to Playlist using our new converter logic
-      const convertedPlaylist: Playlist = {
-        id: musicPlaylist.id,
-        name: musicPlaylist.name,
-        emotion: musicPlaylist.emotion,
-        tracks: musicPlaylist.tracks.map(track => ({
-          id: track.id,
-          title: track.title,
-          artist: track.artist,
-          duration: track.duration,
-          url: track.audioUrl,
-          cover: track.coverUrl,
-        }))
-      };
-      
-      setPlaylist(convertedPlaylist);
-      setCurrentEmotion(emotion);
-      
-      if (convertedPlaylist.tracks.length > 0) {
-        setCurrentTrack(convertedPlaylist.tracks[0]);
-      }
-
-      toast({
-        title: "Playlist chargée",
-        description: `Ambiance "${convertedPlaylist.name}" prête à être écoutée`,
-      });
-    } catch (error) {
-      console.error('Error loading playlist:', error);
-      toast({
-        title: "Erreur de chargement",
-        description: "Impossible de charger la playlist",
-        variant: "destructive"
-      });
+    const newPlaylist = await loadPlaylist(emotion);
+    if (newPlaylist && newPlaylist.tracks.length > 0) {
+      setCurrentTrack(newPlaylist.tracks[0]);
     }
   };
 
-  const playTrack = (track: Track) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-  };
-
-  const pauseTrack = () => {
-    setIsPlaying(false);
-  };
-
+  // Navigation functions
   const nextTrack = () => {
-    if (!playlist || !currentTrack) return;
+    if (!currentTrack || !playlist) return;
     
-    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
-    let nextIndex;
-    
-    if (shuffle) {
-      nextIndex = Math.floor(Math.random() * playlist.tracks.length);
-    } else {
-      nextIndex = (currentIndex + 1) % playlist.tracks.length;
-    }
-    
-    setCurrentTrack(playlist.tracks[nextIndex]);
-    setIsPlaying(true);
+    const nextTrackItem = getNextTrack(currentTrack, shuffle);
+    playTrack(nextTrackItem);
   };
-
+  
   const previousTrack = () => {
-    if (!playlist || !currentTrack) return;
+    if (!currentTrack || !playlist) return;
     
-    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
-    let prevIndex;
-    
-    if (shuffle) {
-      prevIndex = Math.floor(Math.random() * playlist.tracks.length);
-    } else {
-      prevIndex = (currentIndex - 1 + playlist.tracks.length) % playlist.tracks.length;
-    }
-    
-    setCurrentTrack(playlist.tracks[prevIndex]);
-    setIsPlaying(true);
-  };
-
-  const toggleRepeat = () => {
-    setRepeat(prev => !prev);
-  };
-
-  const toggleShuffle = () => {
-    setShuffle(prev => !prev);
-  };
-
-  const openDrawer = () => {
-    setIsDrawerOpen(true);
-  };
-
-  const closeDrawer = () => {
-    setIsDrawerOpen(false);
+    const prevTrackItem = getPreviousTrack(currentTrack, shuffle);
+    playTrack(prevTrackItem);
   };
 
   return (
