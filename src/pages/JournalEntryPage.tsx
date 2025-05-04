@@ -108,17 +108,6 @@ const JournalEntryPage = () => {
         </Button>
       </div>
       
-      {entry.mood && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Humeur</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl">{entry.mood}</div>
-          </CardContent>
-        </Card>
-      )}
-      
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Votre texte</CardTitle>
@@ -127,26 +116,6 @@ const JournalEntryPage = () => {
           <p className="whitespace-pre-line">{entry.content || entry.text}</p>
         </CardContent>
       </Card>
-      
-      {entry.keywords && entry.keywords.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Mots-clés</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {entry.keywords.map((keyword, index) => (
-                <span 
-                  key={index} 
-                  className="px-4 py-1 bg-primary/10 text-primary rounded-full"
-                >
-                  {keyword}
-                </span>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
       
       {entry.ai_feedback && (
         <Card className="bg-muted/50 border-primary/20">

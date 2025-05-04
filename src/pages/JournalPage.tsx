@@ -115,22 +115,9 @@ const JournalPage = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                {entry.mood && <div className="text-2xl mb-2">{entry.mood}</div>}
                 <p className="text-muted-foreground">
                   {truncateContent(entry.content || entry.text || '')}
                 </p>
-                {entry.keywords && entry.keywords.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {entry.keywords.map((keyword, i) => (
-                      <span 
-                        key={i} 
-                        className="px-2 py-1 bg-muted rounded-full text-xs text-muted-foreground"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </CardContent>
               <CardFooter className="pt-0">
                 <div className="text-sm text-primary flex items-center gap-1">

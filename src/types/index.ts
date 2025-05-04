@@ -1,6 +1,3 @@
-
-
-
 export interface User {
   id: string;
   name: string;
@@ -83,17 +80,10 @@ export interface Report {
 export interface JournalEntry {
   id: string;
   user_id: string;
-  date: string;
-  title: string;
   content: string;
-  emotions: string[];
-  is_private: boolean;
-  created_at: string;
-  updated_at?: string;
-  mood?: string;         // Pour la compatibilité avec journalService
-  keywords?: string[];   // Pour la compatibilité avec journalService
-  ai_feedback?: string;  // Pour la compatibilité avec la base de données existante
-  text?: string;         // Pour la compatibilité avec certains composants
+  date: string;
+  ai_feedback: string | null;
+  text?: string;  // For compatibility with existing components
 }
 
 export interface Post {
@@ -104,10 +94,10 @@ export interface Post {
   likes: number;
   comments: Comment[];
   author: User;
-  date?: string;        // Pour la compatibilité avec types/community
-  reactions?: number;   // Pour la compatibilité avec types/community
-  media_url?: string;   // Pour la compatibilité avec types/community
-  image_url?: string;   // Pour la compatibilité avec types/community
+  date?: string;        // For compatibility with types/community
+  reactions?: number;   // For compatibility with types/community
+  media_url?: string;   // For compatibility with types/community
+  image_url?: string;   // For compatibility with types/community
 }
 
 export interface Comment {
@@ -117,7 +107,7 @@ export interface Comment {
   content: string;
   created_at: string;
   author: User;
-  date?: string;        // Pour la compatibilité avec types/community
+  date?: string;        // For compatibility with types/community
 }
 
 export interface Group {
@@ -129,8 +119,8 @@ export interface Group {
   is_private: boolean;
   created_at: string;
   joined: boolean;
-  topic?: string;       // Pour la compatibilité avec types/community
-  members?: string[];   // Pour la compatibilité avec types/community
+  topic?: string;       // For compatibility with types/community
+  members?: string[];   // For compatibility with types/community
 }
 
 export enum UserRole {
@@ -143,4 +133,3 @@ export enum UserRole {
   MEDECIN = 'Médecin',
   AUTRE = 'Autre'
 }
-
