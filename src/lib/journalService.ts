@@ -27,9 +27,9 @@ export async function fetchJournalEntries(user_id: string): Promise<JournalEntry
       updated_at: entry.updated_at || entry.date,
       ai_feedback: entry.ai_feedback,
       text: entry.content // Pour compatibilité
-    })) as JournalEntry[];
+    }));
     
-    return journalEntries;
+    return journalEntries as JournalEntry[];
   } catch (error) {
     console.error('Error in fetchJournalEntries:', error);
     throw error;
