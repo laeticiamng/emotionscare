@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { Post, Comment, Group, Buddy, User, UserRole } from '@/types';
+import type { Post, Comment, Group, Buddy, User } from '@/types';
+import { UserRole } from '@/types';
 
 // --- POSTS ---
 export async function fetchPosts(): Promise<Post[]> {
@@ -261,14 +262,14 @@ export async function leaveGroup(
 }
 
 // --- USER MANAGEMENT ---
-export async function fetchUsersByRole(role?: string): Promise<User[]> {
+export async function fetchUsersByRole(role?: UserRole): Promise<User[]> {
   // For demo purposes, create mock users
   const mockUsers: User[] = [
     {
       id: 'user-1',
       name: 'User 1',
       email: 'user1@example.com',
-      role: role as UserRole || UserRole.EMPLOYEE,
+      role: role || UserRole.EMPLOYEE,
       alias: 'user1',
       bio: 'Bio for user 1',
       joined_at: new Date().toISOString()
@@ -277,7 +278,7 @@ export async function fetchUsersByRole(role?: string): Promise<User[]> {
       id: 'user-2',
       name: 'User 2',
       email: 'user2@example.com',
-      role: role as UserRole || UserRole.EMPLOYEE,
+      role: role || UserRole.EMPLOYEE,
       alias: 'user2',
       bio: 'Bio for user 2',
       joined_at: new Date().toISOString()
@@ -286,7 +287,7 @@ export async function fetchUsersByRole(role?: string): Promise<User[]> {
       id: 'user-3',
       name: 'User 3',
       email: 'user3@example.com',
-      role: role as UserRole || UserRole.EMPLOYEE,
+      role: role || UserRole.EMPLOYEE,
       alias: 'user3',
       bio: 'Bio for user 3',
       joined_at: new Date().toISOString()
@@ -313,7 +314,7 @@ export async function fetchUserById(userId: string): Promise<User | null> {
 // --- BUDDY MATCHING ---
 export async function findBuddy(
   user_id: string,
-  role?: string
+  role?: UserRole
 ): Promise<Buddy> {
   // For demo purposes, create a buddy match with another user
   const buddyUserId = `buddy-${Date.now()}`;

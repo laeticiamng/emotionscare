@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -96,13 +95,12 @@ export interface Post {
   content: string;
   date: string;
   reactions: number;
-  image_url?: string;   // Field from database
+  image_url?: string;   // Changed from image to image_url
   author?: User;        // For the UI, not in DB
   likes?: number;       // For backward compatibility
   comments?: Comment[]; // For the UI, not in DB
   created_at?: string;  // Alias for date
   media_url?: string;   // For backward compatibility
-  image?: string;       // Field for new image uploads
 }
 
 export interface Comment {
