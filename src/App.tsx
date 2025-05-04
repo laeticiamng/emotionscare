@@ -74,6 +74,7 @@ const AnimatedRoutes = () => {
           <Route path="/community/buddy" element={<PageTransition><BuddyPage /></PageTransition>} />
           
           {/* VR Route */}
+          <Route path="/vr" element={<PageTransition><VRSessionPage /></PageTransition>} />
           
           {/* Gamification Route */}
           <Route path="/gamification" element={<PageTransition><GamificationPage /></PageTransition>} />
