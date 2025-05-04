@@ -4,6 +4,7 @@ import { Brain, CalendarDays, Trophy } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import CountUp from 'react-countup';
 
 interface KpiCardsProps {
   vrSessionsThisMonth: number;
@@ -22,7 +23,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <Card className="apple-card">
+      <Card className="apple-card transition-all duration-300 hover:shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
             <Brain size={18} className="mr-2 text-wellness-blue" />
@@ -39,7 +40,14 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           ) : (
             <>
               <div className="text-3xl font-bold mb-2">
-                {avgEmotionalScore.toFixed(1)}/100
+                <CountUp 
+                  end={avgEmotionalScore} 
+                  duration={2} 
+                  decimals={1} 
+                  suffix="/100" 
+                  enableScrollSpy 
+                  scrollSpyOnce
+                />
               </div>
               <Progress value={avgEmotionalScore} className="h-2 bg-gray-100" />
             </>
@@ -47,7 +55,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
         </CardContent>
       </Card>
 
-      <Card className="apple-card">
+      <Card className="apple-card transition-all duration-300 hover:shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
             <CalendarDays size={18} className="mr-2 text-wellness-blue" />
@@ -63,16 +71,28 @@ const KpiCards: React.FC<KpiCardsProps> = ({
             </>
           ) : (
             <>
-              <div className="text-3xl font-bold">{vrSessionsThisMonth}</div>
+              <div className="text-3xl font-bold">
+                <CountUp 
+                  end={vrSessionsThisMonth} 
+                  duration={2} 
+                  enableScrollSpy 
+                  scrollSpyOnce
+                />
+              </div>
               <div className="text-sm text-muted-foreground">
-                +{vrSessionsThisMonth - vrSessionsLastMonth} depuis le mois dernier
+                +<CountUp 
+                  end={vrSessionsThisMonth - vrSessionsLastMonth} 
+                  duration={1.5}
+                  enableScrollSpy 
+                  scrollSpyOnce
+                /> depuis le mois dernier
               </div>
             </>
           )}
         </CardContent>
       </Card>
 
-      <Card className="apple-card">
+      <Card className="apple-card transition-all duration-300 hover:shadow-md">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center">
             <Trophy size={18} className="mr-2 text-wellness-blue" />
@@ -88,7 +108,14 @@ const KpiCards: React.FC<KpiCardsProps> = ({
             </>
           ) : (
             <>
-              <div className="text-3xl font-bold">{userBadgesCount}</div>
+              <div className="text-3xl font-bold">
+                <CountUp 
+                  end={userBadgesCount} 
+                  duration={2}
+                  enableScrollSpy 
+                  scrollSpyOnce
+                />
+              </div>
               <div className="text-sm text-muted-foreground">Félicitations!</div>
             </>
           )}

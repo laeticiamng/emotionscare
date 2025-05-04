@@ -7,6 +7,17 @@ import { fr } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Emotion } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Timeline,
+  TimelineItem,
+  TimelineHeader,
+  TimelineIcon,
+  TimelineTitle,
+  TimelineBody,
+  TimelineContent,
+} from "@/components/ui/timeline";
+import { Badge } from '@/components/ui/badge';
+import { Sparkles, Frown, Smile, Meh } from 'lucide-react';
 
 interface EmotionHistoryProps {
   history: Emotion[];
@@ -40,6 +51,20 @@ const EmotionHistory = ({ history }: EmotionHistoryProps) => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   ).slice(0, 5);
 
+  // Helper pour déterminer l'icône en fonction du score
+  const getEmotionIcon = (score: number) => {
+    if (score >= 70) return <Smile className="h-5 w-5 text-green-500" />;
+    if (score >= 40) return <Meh className="h-5 w-5 text-amber-500" />;
+    return <Frown className="h-5 w-5 text-red-500" />;
+  };
+
+  // Helper pour déterminer la couleur du badge en fonction du score
+  const getEmotionColor = (score: number) => {
+    if (score >= 70) return "bg-green-500/10 text-green-600 border-green-500/20";
+    if (score >= 40) return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+    return "bg-red-500/10 text-red-600 border-red-500/20";
+  };
+
   return (
     <Card className="mb-8">
       <CardHeader>
@@ -47,7 +72,7 @@ const EmotionHistory = ({ history }: EmotionHistoryProps) => {
       </CardHeader>
       <CardContent>
         {/* Graphique d'évolution du score émotionnel */}
-        <div className="h-[250px] mb-8">
+        <div className="h-[250px] mb-8" aria-label="Graphique d'évolution du score émotionnel">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -59,31 +84,42 @@ const EmotionHistory = ({ history }: EmotionHistoryProps) => {
           </ResponsiveContainer>
         </div>
         
-        {/* Liste des derniers scans */}
-        <h3 className="text-lg font-medium mb-4">Derniers scans</h3>
-        <div className="space-y-3">
+        {/* Timeline des derniers scans */}
+        <h3 className="text-lg font-medium mb-4">Dernières analyses</h3>
+        <Timeline>
           {listData.map((entry) => (
-            <div 
-              key={entry.id}
-              onClick={() => navigate(`/scan/${user?.id || '0'}`)}
-              className="flex items-center justify-between p-3 bg-background hover:bg-accent/50 rounded-lg cursor-pointer"
-            >
-              <div>
-                <div className="font-medium">
-                  Score: <span className="text-primary">{entry.score}/100</span>
+            <TimelineItem key={entry.id}>
+              <TimelineHeader>
+                <TimelineIcon>
+                  {getEmotionIcon(entry.score)}
+                </TimelineIcon>
+                <TimelineTitle className="flex items-center justify-between">
+                  <span>
+                    {format(new Date(entry.date), 'EEEE d MMMM', { locale: fr })}
+                  </span>
+                  <Badge className={getEmotionColor(entry.score)}>
+                    {entry.score}/100
+                  </Badge>
+                </TimelineTitle>
+              </TimelineHeader>
+              <TimelineContent>
+                <TimelineBody className="text-sm text-muted-foreground">
+                  {entry.text || "Aucune note pour ce scan."}
+                </TimelineBody>
+                <div className="mt-2 flex justify-end">
+                  <button
+                    onClick={() => navigate(`/scan/${user?.id || '0'}`)}
+                    className="text-xs flex items-center gap-1 text-primary hover:underline transition-all"
+                    aria-label="Voir le détail du scan"
+                  >
+                    <span>Voir le détail</span>
+                    <Sparkles className="h-3 w-3" />
+                  </button>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {format(new Date(entry.date), 'PPPP à HH:mm', { locale: fr })}
-                </div>
-              </div>
-              <div className="text-sm">
-                {entry.text && entry.text.length > 30 
-                  ? `${entry.text.substring(0, 30)}...` 
-                  : entry.text}
-              </div>
-            </div>
+              </TimelineContent>
+            </TimelineItem>
           ))}
-        </div>
+        </Timeline>
       </CardContent>
     </Card>
   );

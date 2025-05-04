@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { toast } from "@/components/ui/sonner";
 import {
   fetchChallenges,
   fetchUserChallenges,
@@ -17,7 +18,7 @@ import confetti from 'canvas-confetti';
 
 const GamificationPage: React.FC = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [userChallenges, setUserChallenges] = useState<UserChallenge[]>([]);
@@ -43,7 +44,7 @@ const GamificationPage: React.FC = () => {
         setBadges(badgeData.all);
         setEarnedBadges(badgeData.earned);
       } catch (error: any) {
-        toast({
+        uiToast({
           title: "Erreur",
           description: `Impossible de charger les données: ${error.message}`,
           variant: "destructive"
@@ -54,7 +55,7 @@ const GamificationPage: React.FC = () => {
     };
     
     loadData();
-  }, [user, toast]);
+  }, [user, uiToast]);
 
   // Calculate total points earned today
   const todayPoints = userChallenges
@@ -89,11 +90,15 @@ const GamificationPage: React.FC = () => {
               origin: { y: 0.6 }
             });
             
-            toast({
-              title: "Nouveau badge débloqué !",
-              description: `Félicitations ! Vous avez obtenu le badge "${badge.name}" !`,
-              variant: "default"
-            });
+            // Utiliser Sonner toast pour les notifications visibles
+            toast.success(
+              `Félicitations ! Vous avez obtenu le badge "${badge.name}" !`,
+              {
+                position: "top-center",
+                duration: 5000,
+                icon: <Award className="h-5 w-5 text-primary" />
+              }
+            );
           } catch (error) {
             console.error("Error awarding badge:", error);
           }
@@ -102,7 +107,7 @@ const GamificationPage: React.FC = () => {
     };
     
     checkForNewBadges();
-  }, [todayPoints, badges, earnedBadges, user, toast]);
+  }, [todayPoints, badges, earnedBadges, user]);
 
   const toggleComplete = async (ch: Challenge) => {
     if (!user) return;
@@ -124,15 +129,25 @@ const GamificationPage: React.FC = () => {
       const updatedChallenges = await fetchUserChallenges(user.id);
       setUserChallenges(updatedChallenges);
       
-      toast({
-        title: !isCompleted ? "Défi complété !" : "Défi marqué comme non complété",
-        description: !isCompleted 
-          ? `Vous avez gagné ${ch.points} points !` 
-          : "Vous pouvez toujours le compléter plus tard.",
-        variant: "default"
-      });
+      if (!isCompleted) {
+        toast.success(
+          `Défi complété ! +${ch.points} points`,
+          {
+            position: "bottom-right",
+            duration: 3000,
+          }
+        );
+      } else {
+        toast.info(
+          "Défi marqué comme non complété",
+          {
+            position: "bottom-right",
+            duration: 3000,
+          }
+        );
+      }
     } catch (error: any) {
-      toast({
+      uiToast({
         title: "Erreur",
         description: `Impossible de mettre à jour le défi: ${error.message}`,
         variant: "destructive"
@@ -201,7 +216,10 @@ const GamificationPage: React.FC = () => {
               );
               
               return (
-                <Card key={ch.id} className={isCompleted ? "border-green-500" : ""}>
+                <Card 
+                  key={ch.id} 
+                  className={`transition-all duration-300 ${isCompleted ? "border-green-500" : ""}`}
+                >
                   <CardContent className="flex justify-between items-center p-4">
                     <div className="flex items-center">
                       <div className={`p-2 rounded-full mr-3 ${
@@ -226,6 +244,7 @@ const GamificationPage: React.FC = () => {
                         variant={isCompleted ? "outline" : "default"}
                         size="sm"
                         onClick={() => toggleComplete(ch)}
+                        aria-label={isCompleted ? "Annuler le défi" : "Valider le défi"}
                       >
                         {isCompleted ? "Annuler" : "Valider"}
                       </Button>
@@ -254,7 +273,7 @@ const GamificationPage: React.FC = () => {
             return (
               <Card 
                 key={badge.id}
-                className={`${isEarned ? "bg-primary/5 border-primary/30" : ""}`}
+                className={`transition-all duration-300 ${isEarned ? "bg-primary/5 border-primary/30" : ""}`}
               >
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg flex items-center">
@@ -271,8 +290,9 @@ const GamificationPage: React.FC = () => {
                   {!isEarned && todayPoints > 0 && (
                     <div className="mt-2 bg-gray-100 h-2 rounded-full">
                       <div 
-                        className="bg-primary h-2 rounded-full" 
+                        className="bg-primary h-2 rounded-full transition-all duration-1000" 
                         style={{ width: `${Math.min(100, (todayPoints / badge.threshold) * 100)}%` }}
+                        aria-label={`Progression: ${Math.min(100, Math.floor((todayPoints / badge.threshold) * 100))}%`}
                       ></div>
                     </div>
                   )}
@@ -285,9 +305,9 @@ const GamificationPage: React.FC = () => {
       
       {/* New Badge Modal */}
       {showNewBadge && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-sm w-full text-center">
-            <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fade-in" aria-modal="true" role="dialog">
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full text-center animate-scale-in">
+            <div className="mx-auto w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-4 animate-bounce">
               <Award className="h-12 w-12 text-primary" />
             </div>
             <h3 className="text-xl font-bold mb-2">Nouveau Badge Débloqué!</h3>

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   LayoutDashboard, 
@@ -8,7 +8,7 @@ import {
   BookOpen, 
   Users, 
   Award, 
-  Headset, // Remplacé VrCardboard par Headset qui existe dans lucide-react
+  Headset,
   Menu, 
   X,
   LogOut
@@ -31,13 +31,14 @@ const mainNavItems = [
   { path: '/journal', label: 'Journal', icon: <BookOpen className="w-5 h-5 mr-2" /> },
   { path: '/community', label: 'Communauté', icon: <Users className="w-5 h-5 mr-2" /> },
   { path: '/gamification', label: 'Gamification', icon: <Award className="w-5 h-5 mr-2" /> },
-  { path: '/vr', label: 'VR Session', icon: <Headset className="w-5 h-5 mr-2" /> } // Utilisé Headset au lieu de VrCardboard
+  { path: '/vr', label: 'VR Session', icon: <Headset className="w-5 h-5 mr-2" /> }
 ];
 
 const GlobalNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -47,7 +48,7 @@ const GlobalNav = () => {
   return (
     <header className="fixed top-0 z-50 w-full bg-background border-b shadow-sm">
       <div className="container flex h-16 items-center justify-between">
-        {/* Logo */}
+        {/* Logo - cliquable pour revenir au dashboard */}
         <NavLink to="/dashboard" className="flex items-center space-x-2">
           <span className="font-bold text-lg text-primary">EmotionsCare</span>
           <span className="text-xs text-muted-foreground">par ResiMax™ 4.0</span>
@@ -64,8 +65,8 @@ const GlobalNav = () => {
                       <NavigationMenuLink 
                         className={cn(
                           navigationMenuTriggerStyle(),
-                          isActive && "bg-accent text-accent-foreground",
-                          "flex items-center"
+                          isActive ? "bg-primary text-primary-foreground font-medium border-b-2 border-primary" : "hover:bg-accent hover:text-accent-foreground",
+                          "flex items-center transition-all duration-200"
                         )}
                       >
                         {item.icon}
@@ -90,7 +91,13 @@ const GlobalNav = () => {
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <Button variant="ghost" size="icon" onClick={handleLogout} title="Déconnexion">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleLogout} 
+              title="Déconnexion"
+              aria-label="Déconnexion"
+            >
               <LogOut className="h-5 w-5" />
             </Button>
           </div>
@@ -99,7 +106,11 @@ const GlobalNav = () => {
         {/* Mobile Navigation */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              aria-label="Menu"
+            >
               <Menu className="h-6 w-6" />
             </Button>
           </SheetTrigger>
@@ -109,7 +120,12 @@ const GlobalNav = () => {
                 <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
                   <span className="font-bold text-xl text-primary">EmotionsCare</span>
                 </NavLink>
-                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Fermer le menu"
+                >
                   <X className="h-5 w-5" />
                 </Button>
               </div>
@@ -128,22 +144,25 @@ const GlobalNav = () => {
               )}
               
               <nav className="flex flex-col space-y-3">
-                {mainNavItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) => cn(
-                      "flex items-center py-2 px-3 rounded-md transition-colors",
-                      isActive
-                        ? "bg-accent text-accent-foreground"
-                        : "hover:bg-accent/50"
-                    )}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </NavLink>
-                ))}
+                {mainNavItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "flex items-center py-2 px-3 rounded-md transition-colors",
+                        isActive
+                          ? "bg-primary text-primary-foreground font-medium border-l-4 border-primary"
+                          : "hover:bg-accent/50"
+                      )}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </NavLink>
+                  );
+                })}
                 
                 <Button 
                   variant="ghost" 
@@ -152,6 +171,7 @@ const GlobalNav = () => {
                     handleLogout();
                     setIsOpen(false);
                   }}
+                  aria-label="Déconnexion"
                 >
                   <LogOut size={18} className="mr-2" />
                   <span>Déconnexion</span>
