@@ -68,9 +68,9 @@ export function MusicMiniPlayer() {
         
         <div className="flex items-center mt-4 space-x-3">
           <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center shrink-0 overflow-hidden">
-            {currentTrack.coverUrl ? (
+            {currentTrack.cover ? (
               <img 
-                src={currentTrack.coverUrl} 
+                src={currentTrack.cover} 
                 alt={`${currentTrack.title} cover`} 
                 className="w-full h-full object-cover"
               />

@@ -67,9 +67,9 @@ export function MusicDrawer() {
                 <h3 className="text-sm uppercase font-semibold text-muted-foreground mb-2">En cours de lecture</h3>
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
-                    {currentTrack.coverUrl ? (
+                    {currentTrack.cover ? (
                       <img 
-                        src={currentTrack.coverUrl} 
+                        src={currentTrack.cover} 
                         alt={`${currentTrack.title} cover`} 
                         className="w-full h-full object-cover"
                       />
@@ -195,9 +195,9 @@ export function MusicDrawer() {
                     onClick={() => playTrack(track)}
                   >
                     <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center mr-3 overflow-hidden">
-                      {track.coverUrl ? (
+                      {track.cover ? (
                         <img 
-                          src={track.coverUrl} 
+                          src={track.cover} 
                           alt={`${track.title} cover`} 
                           className="w-full h-full object-cover"
                         />

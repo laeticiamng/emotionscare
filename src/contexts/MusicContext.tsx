@@ -1,7 +1,9 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Track, Playlist, getPlaylist } from '@/lib/musicService';
+import { getPlaylist, convertMusicTrackToTrack } from '@/lib/musicService';
+import { MusicTrack, MusicPlaylist } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { Track, Playlist } from '@/lib/musicService';
 
 interface MusicContextType {
   currentTrack: Track | null;
@@ -69,7 +71,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!audio || !currentTrack) return;
 
-    audio.src = currentTrack.audioUrl;
+    audio.src = currentTrack.url;
     
     if (isPlaying) {
       audio.play().catch(error => {
@@ -95,17 +97,33 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
 
   const loadPlaylistForEmotion = async (emotion: string) => {
     try {
-      const newPlaylist = await getPlaylist(emotion);
-      setPlaylist(newPlaylist);
+      const musicPlaylist = await getPlaylist(emotion);
+      
+      // Convert MusicPlaylist to Playlist
+      const convertedPlaylist: Playlist = {
+        id: musicPlaylist.id,
+        name: musicPlaylist.name,
+        emotion: musicPlaylist.emotion,
+        tracks: musicPlaylist.tracks.map(track => ({
+          id: track.id,
+          title: track.title,
+          artist: track.artist,
+          duration: track.duration,
+          url: track.audioUrl,
+          cover: track.coverUrl,
+        }))
+      };
+      
+      setPlaylist(convertedPlaylist);
       setCurrentEmotion(emotion);
       
-      if (newPlaylist.tracks.length > 0) {
-        setCurrentTrack(newPlaylist.tracks[0]);
+      if (convertedPlaylist.tracks.length > 0) {
+        setCurrentTrack(convertedPlaylist.tracks[0]);
       }
 
       toast({
         title: "Playlist chargée",
-        description: `Ambiance "${newPlaylist.name}" prête à être écoutée`,
+        description: `Ambiance "${convertedPlaylist.name}" prête à être écoutée`,
       });
     } catch (error) {
       console.error('Error loading playlist:', error);

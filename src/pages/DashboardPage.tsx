@@ -6,6 +6,7 @@ import TrendCharts from '@/components/dashboard/TrendCharts';
 import VrPromptBanner from '@/components/dashboard/VrPromptBanner';
 import QuickNavGrid from '@/components/dashboard/QuickNavGrid';
 import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
+import CoachAssistant from '@/components/dashboard/CoachAssistant';
 import { Separator } from '@/components/ui/separator';
 import { fetchUsersAvgScore, fetchVRCount, fetchBadgesCount, fetchReports } from '@/lib/dashboardService';
 
@@ -68,8 +69,17 @@ const DashboardPage = () => {
         isLoading={isLoading}
       />
 
-      {/* Music Mini Player */}
-      <MusicMiniPlayer />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="md:col-span-2">
+          {/* Music Mini Player */}
+          <MusicMiniPlayer />
+        </div>
+        
+        <div>
+          {/* Coach IA Component */}
+          <CoachAssistant />
+        </div>
+      </div>
 
       <TrendCharts 
         absenteeismData={absenteeismData}

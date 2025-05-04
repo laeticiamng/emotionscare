@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack, MusicPlaylist } from '@/types';
 
@@ -161,14 +162,14 @@ export async function getUserListeningHistory(userId: string): Promise<MusicTrac
   }
 }
 
-// Add these types for the music service
+// Track and Playlist interface definitions to ensure type compatibility
 export interface Track {
   id: string;
   title: string;
   artist: string;
   duration: number;
-  url: string;
-  cover?: string;
+  url: string; // Renamed to audioUrl in MusicTrack
+  cover?: string; // Renamed to coverUrl in MusicTrack
 }
 
 export interface Playlist {
@@ -177,3 +178,27 @@ export interface Playlist {
   emotion?: string;
   tracks: Track[];
 }
+
+// Helper function to convert between Track and MusicTrack
+export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
+  return {
+    id: musicTrack.id,
+    title: musicTrack.title,
+    artist: musicTrack.artist,
+    duration: musicTrack.duration,
+    url: musicTrack.audioUrl,
+    cover: musicTrack.coverUrl,
+  };
+};
+
+// Helper function to convert between MusicTrack and Track
+export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
+  return {
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
+    duration: track.duration,
+    audioUrl: track.url,
+    coverUrl: track.cover,
+  };
+};
