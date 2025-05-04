@@ -22,7 +22,7 @@ export async function fetchJournalEntries(userId: string): Promise<JournalEntry[
         date: entry.date,
         title: entry.title || "Untitled Entry",
         content: entry.content || "",
-        text: entry.content || entry.text || "", // For compatibility
+        text: entry.content || "", // For compatibility
         emotions: entry.emotions || [],
         is_private: entry.is_private !== undefined ? entry.is_private : true,
         created_at: entry.created_at || entry.date || new Date().toISOString(),
@@ -55,7 +55,7 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
       date: data.date,
       title: data.title || "Untitled Entry",
       content: data.content || "",
-      text: data.content || data.text || "", // For compatibility
+      text: data.content || "", // For compatibility
       emotions: data.emotions || [],
       is_private: data.is_private !== undefined ? data.is_private : true,
       created_at: data.created_at || data.date || new Date().toISOString(),
@@ -69,8 +69,18 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
 }
 
 // Create a new journal entry
-export async function createJournalEntry(entry: Omit<JournalEntry, 'id'>): Promise<JournalEntry> {
+export async function createJournalEntry(userId: string, content: string, mood?: string, keywords?: string[]): Promise<JournalEntry> {
   try {
+    const entry = {
+      user_id: userId,
+      date: new Date().toISOString(),
+      title: "Journal Entry",
+      content: content,
+      is_private: true,
+      mood: mood, // Store mood if provided
+      keywords: keywords, // Store keywords if provided
+    };
+
     const { data, error } = await supabase
       .from('journal_entries')
       .insert([entry])
@@ -86,12 +96,14 @@ export async function createJournalEntry(entry: Omit<JournalEntry, 'id'>): Promi
       date: data.date,
       title: data.title || "Untitled Entry",
       content: data.content || "",
-      text: data.content || data.text || "", // For compatibility
+      text: data.content || "", // For compatibility
       emotions: data.emotions || [],
       is_private: data.is_private !== undefined ? data.is_private : true,
       created_at: data.created_at || data.date || new Date().toISOString(),
       updated_at: data.updated_at || data.date || new Date().toISOString(),
       ai_feedback: data.ai_feedback || "",
+      mood: data.mood,
+      keywords: data.keywords
     } as JournalEntry;
   } catch (error) {
     console.error('Error in createJournalEntry:', error);

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,7 +27,7 @@ const JournalEntryPage = () => {
   const loadEntry = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchJournalEntry(entryId || '', user?.id || '');
+      const data = await fetchJournalEntry(entryId || '');
       if (!data) {
         toast({
           title: "Entrée introuvable",

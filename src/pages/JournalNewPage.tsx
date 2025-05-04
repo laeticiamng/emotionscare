@@ -66,7 +66,7 @@ const JournalNewPage = () => {
       await createJournalEntry(
         user?.id || '',
         content,
-        mood as any,
+        mood,
         keywords.length > 0 ? keywords : undefined
       );
       
