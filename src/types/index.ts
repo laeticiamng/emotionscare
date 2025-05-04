@@ -1,5 +1,6 @@
 
 
+
 export interface User {
   id: string;
   name: string;
@@ -142,3 +143,4 @@ export enum UserRole {
   MEDECIN = 'Médecin',
   AUTRE = 'Autre'
 }
+
