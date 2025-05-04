@@ -11,7 +11,6 @@ export const mockBadges: Badge[] = [
     category: 'achievement',
     unlocked: true,
     awarded_at: '2023-04-15T14:30:00Z',
-    user_id: '1',
   },
   {
     id: '2',
@@ -21,6 +20,5 @@ export const mockBadges: Badge[] = [
     category: 'consistency',
     unlocked: true,
     awarded_at: '2023-04-18T09:15:00Z',
-    user_id: '1',
   },
 ];

@@ -25,7 +25,8 @@ export async function fetchJournalEntries(user_id: string): Promise<JournalEntry
       is_private: entry.is_private || false,
       created_at: entry.created_at || entry.date,
       updated_at: entry.updated_at,
-      ai_feedback: entry.ai_feedback
+      ai_feedback: entry.ai_feedback,
+      text: entry.content // Pour compatibilité
     })) as JournalEntry[];
     
     return journalEntries;
@@ -61,7 +62,8 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
       is_private: data.is_private || false,
       created_at: data.created_at || data.date,
       updated_at: data.updated_at,
-      ai_feedback: data.ai_feedback
+      ai_feedback: data.ai_feedback,
+      text: data.content // Pour compatibilité
     };
     
     return journalEntry;
@@ -110,7 +112,8 @@ export async function createJournalEntry(
       is_private: data.is_private || false,
       created_at: data.created_at || data.date,
       updated_at: data.updated_at,
-      ai_feedback: data.ai_feedback
+      ai_feedback: data.ai_feedback,
+      text: data.content // Pour compatibilité
     };
     
     return journalEntry;

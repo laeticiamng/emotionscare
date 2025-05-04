@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { fetchPosts, fetchUserById } from '@/lib/communityService';
-import type { Post, User } from '@/types';
+import type { User } from '@/types';
+import type { Post } from '@/types/community';
 import PostForm from '@/components/community/PostForm';
 import PostItem from '@/components/community/PostItem';
 import LoadingAnimation from '@/components/ui/loading-animation';
@@ -21,7 +22,7 @@ const CommunityFeed: React.FC = () => {
     try {
       setLoadingPosts(true);
       const fetchedPosts = await fetchPosts();
-      setPosts(fetchedPosts);
+      setPosts(fetchedPosts as Post[]);
       
       // Load user details for each post
       const userIds = fetchedPosts.map(post => post.user_id);

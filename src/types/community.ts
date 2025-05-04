@@ -1,5 +1,7 @@
 
-export interface Post {
+import { Post as BasePost, Comment as BaseComment, Group as BaseGroup } from './index';
+
+export interface Post extends Partial<BasePost> {
   id: string;
   user_id: string;
   date: string;
@@ -10,7 +12,7 @@ export interface Post {
   comments?: Comment[];
 }
 
-export interface Comment {
+export interface Comment extends Partial<BaseComment> {
   id: string;
   post_id: string;
   user_id: string;
@@ -18,7 +20,7 @@ export interface Comment {
   content: string;
 }
 
-export interface Group {
+export interface Group extends Partial<BaseGroup> {
   id: string;
   name: string;
   topic: string;

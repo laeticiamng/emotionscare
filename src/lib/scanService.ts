@@ -4,7 +4,7 @@ import type { Emotion } from '@/types';
 
 /** Sauvegarde un scan émotionnel */
 export async function saveEmotionScan(entry: Omit<Emotion,'id'>): Promise<Emotion> {
-  const { date, emotion, intensity, user_id, text, score, emojis, ai_feedback } = entry;
+  const { date, emotion, intensity, user_id, text, score, emojis, ai_feedback, audio_url } = entry;
 
   const { data, error } = await supabase
     .from('emotions')
@@ -16,13 +16,14 @@ export async function saveEmotionScan(entry: Omit<Emotion,'id'>): Promise<Emotio
       text, 
       score,
       emojis,
-      ai_feedback
+      ai_feedback,
+      audio_url
     })
     .select()
     .single();
 
   if (error || !data) throw error || new Error('Failed to save emotion scan');
-  return data as Emotion;
+  return data as unknown as Emotion;
 }
 
 /** Récupère l'historique des scans */
@@ -33,7 +34,7 @@ export async function fetchEmotionHistory(): Promise<Emotion[]> {
     .order('date', { ascending: false });
     
   if (error) throw error;
-  return data as Emotion[] || [];
+  return data as unknown as Emotion[] || [];
 }
 
 // These functions can be kept for backward compatibility, but they should be updated
@@ -86,7 +87,7 @@ export async function fetchLatestEmotion(): Promise<Emotion | null> {
       .maybeSingle();
 
     if (error) throw error;
-    return data as Emotion | null;
+    return data as unknown as Emotion | null;
   } catch (error) {
     console.error('Error in fetchLatestEmotion:', error);
     throw error;

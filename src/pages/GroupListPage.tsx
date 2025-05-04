@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { fetchGroups, joinGroup } from '@/lib/communityService';
-import type { Group } from '@/types';
+import type { Group } from '@/types/community';
 import GroupForm from '@/components/community/GroupForm';
 import GroupListComponent from '@/components/community/GroupList';
 import { Loader2, Users } from 'lucide-react';
@@ -22,7 +22,7 @@ const GroupListPage: React.FC = () => {
       try {
         setLoading(true);
         const fetchedGroups = await fetchGroups();
-        setGroups(fetchedGroups);
+        setGroups(fetchedGroups as unknown as Group[]);
       } catch (error) {
         console.error('Error loading groups:', error);
         toast({

@@ -51,7 +51,9 @@ const EmotionScanForm = ({ onScanSaved }: EmotionScanFormProps) => {
         date: new Date().toISOString(),
         score: mood,
         text: notes.trim() || '',
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000' // Résolution de l'erreur TS2741
+        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
+        emotion: mood >= 70 ? 'happy' : mood >= 40 ? 'neutral' : 'sad', // Convertir le score en émotion
+        intensity: Math.ceil(mood / 10) // Convertir le score en intensité (1-10)
       };
       
       const savedEmotion = await saveEmotionScan(newScan);

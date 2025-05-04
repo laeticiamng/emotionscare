@@ -43,6 +43,7 @@ export interface Emotion {
   text?: string;        // feedback IA
   ai_feedback?: string; // dans EmotionFeedback
   emojis?: string;      // pour la compatibilité avec les données existantes
+  audio_url?: string;   // pour les enregistrements audio
 }
 
 export interface Badge {
@@ -89,6 +90,7 @@ export interface JournalEntry {
   mood?: string;         // Pour la compatibilité avec journalService
   keywords?: string[];   // Pour la compatibilité avec journalService
   ai_feedback?: string;  // Pour la compatibilité avec la base de données existante
+  text?: string;         // Pour la compatibilité avec certains composants
 }
 
 export interface Post {
@@ -99,6 +101,10 @@ export interface Post {
   likes: number;
   comments: Comment[];
   author: User;
+  date?: string;        // Pour la compatibilité avec types/community
+  reactions?: number;   // Pour la compatibilité avec types/community
+  media_url?: string;   // Pour la compatibilité avec types/community
+  image_url?: string;   // Pour la compatibilité avec types/community
 }
 
 export interface Comment {
@@ -108,6 +114,7 @@ export interface Comment {
   content: string;
   created_at: string;
   author: User;
+  date?: string;        // Pour la compatibilité avec types/community
 }
 
 export interface Group {
@@ -119,10 +126,17 @@ export interface Group {
   is_private: boolean;
   created_at: string;
   joined: boolean;
+  topic?: string;       // Pour la compatibilité avec types/community
+  members?: string[];   // Pour la compatibilité avec types/community
 }
 
 export enum UserRole {
   EMPLOYEE = 'employee',
   MANAGER = 'manager',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
+  INTERNE = 'Interne',
+  INFIRMIER = 'Infirmier',
+  AIDE_SOIGNANT = 'Aide-soignant',
+  MEDECIN = 'Médecin',
+  AUTRE = 'Autre'
 }

@@ -54,7 +54,13 @@ const BuddyPage: React.FC = () => {
   };
 
   // Role options
-  const roleOptions: UserRole[] = ['Interne', 'Infirmier', 'Aide-soignant', 'Médecin', 'Autre'];
+  const roleOptions: UserRole[] = [
+    UserRole.INTERNE,
+    UserRole.INFIRMIER,
+    UserRole.AIDE_SOIGNANT, 
+    UserRole.MEDECIN, 
+    UserRole.AUTRE
+  ];
 
   return (
     <div className="container max-w-4xl mx-auto py-6 space-y-8">
