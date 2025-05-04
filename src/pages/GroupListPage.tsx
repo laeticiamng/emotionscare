@@ -6,6 +6,8 @@ import { fetchGroups, joinGroup } from '@/lib/communityService';
 import type { Group } from '@/types';
 import GroupForm from '@/components/community/GroupForm';
 import GroupListComponent from '@/components/community/GroupList';
+import { Loader2, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const GroupListPage: React.FC = () => {
   const { user } = useAuth();
@@ -13,6 +15,7 @@ const GroupListPage: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     async function loadGroups() {
@@ -37,6 +40,11 @@ const GroupListPage: React.FC = () => {
 
   const handleGroupCreated = (newGroup: Group) => {
     setGroups([newGroup, ...groups]);
+    setShowCreateForm(false);
+    toast({
+      title: "Groupe créé",
+      description: "Votre groupe a été créé avec succès"
+    });
   };
 
   const handleJoin = async (groupId: string) => {
@@ -85,17 +93,41 @@ const GroupListPage: React.FC = () => {
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-3xl font-semibold mb-6">👥 Groupes de parole</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
+        <div>
+          <h1 className="text-3xl font-semibold flex items-center">
+            <Users className="h-6 w-6 mr-2" />
+            Groupes de parole
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Rejoignez un groupe existant ou créez le vôtre pour partager vos expériences
+          </p>
+        </div>
+        <Button 
+          onClick={() => setShowCreateForm(!showCreateForm)} 
+          className="mt-4 sm:mt-0"
+        >
+          {showCreateForm ? "Annuler" : "Créer un groupe"}
+        </Button>
+      </div>
 
-      <GroupForm onGroupCreated={handleGroupCreated} />
+      {showCreateForm && (
+        <GroupForm onGroupCreated={handleGroupCreated} />
+      )}
 
-      <GroupListComponent 
-        groups={groups}
-        userHasJoined={userHasJoined}
-        handleJoin={handleJoin}
-        joining={joining}
-        loading={loading}
-      />
+      {loading ? (
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <GroupListComponent 
+          groups={groups}
+          userHasJoined={userHasJoined}
+          handleJoin={handleJoin}
+          joining={joining}
+          loading={loading}
+        />
+      )}
     </div>
   );
 };

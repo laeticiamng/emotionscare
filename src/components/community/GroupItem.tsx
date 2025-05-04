@@ -3,7 +3,8 @@ import React from 'react';
 import { Group } from '@/types/community';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Loader2, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface GroupItemProps {
   group: Group;
@@ -22,7 +23,12 @@ const GroupItem: React.FC<GroupItemProps> = ({
     <Card className="hover:shadow-md transition-shadow duration-300">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <h3 className="font-medium text-lg">{group.name}</h3>
+          <div className="space-y-1">
+            <h3 className="font-medium text-lg">{group.name}</h3>
+            <Badge variant="outline" className="bg-secondary/20">
+              {group.topic}
+            </Badge>
+          </div>
           <div className="flex items-center text-sm text-gray-500">
             <Users className="h-4 w-4 mr-1" />
             <span>{group.members?.length || 0} membres</span>
@@ -30,16 +36,16 @@ const GroupItem: React.FC<GroupItemProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-gray-600 font-medium">Thème: {group.topic}</p>
         {group.description && (
-          <p className="mt-2 text-gray-500">{group.description}</p>
+          <p className="text-gray-500">{group.description}</p>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex justify-between items-center">
         {userHasJoined ? (
-          <Button variant="outline" disabled className="w-full sm:w-auto">
+          <Badge variant="secondary" className="py-1 px-3">
+            <Users className="h-3 w-3 mr-1 inline" />
             Membre
-          </Button>
+          </Badge>
         ) : (
           <Button
             variant="default"
@@ -47,7 +53,14 @@ const GroupItem: React.FC<GroupItemProps> = ({
             disabled={isJoining}
             className="w-full sm:w-auto"
           >
-            {isJoining ? 'En cours...' : 'Rejoindre'}
+            {isJoining ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Traitement...
+              </>
+            ) : (
+              "Rejoindre"
+            )}
           </Button>
         )}
       </CardFooter>
