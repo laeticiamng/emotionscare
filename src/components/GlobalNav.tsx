@@ -8,7 +8,7 @@ import {
   BookOpen, 
   Users, 
   Award, 
-  VrCardboard, 
+  Headset, // Remplacé VrCardboard par Headset qui existe dans lucide-react
   Menu, 
   X,
   LogOut
@@ -31,7 +31,7 @@ const mainNavItems = [
   { path: '/journal', label: 'Journal', icon: <BookOpen className="w-5 h-5 mr-2" /> },
   { path: '/community', label: 'Communauté', icon: <Users className="w-5 h-5 mr-2" /> },
   { path: '/gamification', label: 'Gamification', icon: <Award className="w-5 h-5 mr-2" /> },
-  { path: '/vr', label: 'VR Session', icon: <VrCardboard className="w-5 h-5 mr-2" /> }
+  { path: '/vr', label: 'VR Session', icon: <Headset className="w-5 h-5 mr-2" /> } // Utilisé Headset au lieu de VrCardboard
 ];
 
 const GlobalNav = () => {
