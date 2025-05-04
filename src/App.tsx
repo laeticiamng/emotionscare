@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import DashboardPage from '@/pages/DashboardPage';
 import ScanPage from '@/pages/ScanPage';
@@ -13,18 +13,16 @@ function App() {
   return (
     <AuthProvider>
       <MusicProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/scan" element={<ScanPage />} />
-              <Route path="/vr-session" element={<VRSessionPage />} />
-            </Routes>
-          </Layout>
-          <MusicDrawer />
-          <Toaster />
-        </Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/scan" element={<ScanPage />} />
+            <Route path="/vr-session" element={<VRSessionPage />} />
+          </Routes>
+        </Layout>
+        <MusicDrawer />
+        <Toaster />
       </MusicProvider>
     </AuthProvider>
   );
