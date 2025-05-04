@@ -81,8 +81,8 @@ export async function createJournalEntry(userId: string, content: string, mood?:
       title: "Journal Entry",
       content: content,
       is_private: true,
-      mood: mood, // Store mood if provided
-      keywords: keywords, // Store keywords if provided
+      mood: mood || "",
+      keywords: keywords || [],
     };
 
     const { data, error } = await supabase
