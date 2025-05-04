@@ -2,8 +2,7 @@
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
-import type { Emotion } from '@/types/scan';
-import type { User } from '@/types';
+import type { Emotion, User } from '@/types';
 
 export const useEmotionScan = (userId: string | undefined) => {
   const [emojis, setEmojis] = useState("");

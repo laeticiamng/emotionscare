@@ -1,16 +1,16 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import type { Emotion } from '@/types/scan';
+import type { Emotion } from '@/types';
 
 /** Sauvegarde un scan émotionnel */
 export async function saveEmotionScan(entry: Omit<Emotion,'id'>): Promise<Emotion> {
-  const { date, score, text } = entry;
+  const { date, score, text, user_id } = entry;
 
   const { data, error } = await supabase
     .from('emotions')
-    .insert({ date, score, text, user_id: '00000000-0000-0000-0000-000000000000' })  // Add a default user_id
-    .select()                       // récupère le record inséré
-    .single();                      // un seul résultat
+    .insert({ date, score, text, user_id })
+    .select()
+    .single();
 
   if (error || !data) throw error || new Error('Failed to save emotion scan');
   return data as Emotion;
@@ -43,7 +43,7 @@ export function ensureValidUUID(id: string): string {
 }
 
 export async function createEmotionEntry(payload: {
-  user_id?: string; // Making this optional since it doesn't exist in DB
+  user_id?: string;
   emojis?: string;
   text?: string;
   audio_url?: string;
@@ -52,7 +52,8 @@ export async function createEmotionEntry(payload: {
     const entry: Omit<Emotion, 'id'> = {
       date: new Date().toISOString(),
       score: 50, // Default score
-      text: payload.text || ''
+      text: payload.text || '',
+      user_id: payload.user_id || '00000000-0000-0000-0000-000000000000' // Default user_id if not provided
     };
     
     return await saveEmotionScan(entry);

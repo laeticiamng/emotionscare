@@ -6,6 +6,7 @@ import EmotionInputForm from '@/components/scan/EmotionInputForm';
 import EmotionFeedback from '@/components/scan/EmotionFeedback';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import AnalysisDialog from '@/components/scan/AnalysisDialog';
+import type { Emotion } from '@/types'; // Import from index.ts
 
 const ScanDetailPage = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -58,7 +59,7 @@ const ScanDetailPage = () => {
         analyzing={analyzing}
       />
       
-      <EmotionFeedback emotion={latestEmotion} />
+      <EmotionFeedback emotion={latestEmotion as Emotion} />
 
       <AnalysisDialog 
         open={analyzing} 
