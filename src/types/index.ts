@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -9,6 +10,9 @@ export interface User {
   metadata?: any;
   emotional_score?: number;
   anonymity_code?: string;
+  alias?: string;            // Added for community features
+  bio?: string;              // Added for community features
+  joined_at?: string;        // Added for community features
 }
 
 export interface VRSessionTemplate {
@@ -83,7 +87,7 @@ export interface JournalEntry {
   content: string;
   date: string;
   ai_feedback: string | null;
-  text?: string;  // For compatibility with existing components
+  text?: string;  // For compatibility
 }
 
 export interface Post {
@@ -94,10 +98,11 @@ export interface Post {
   likes: number;
   comments: Comment[];
   author: User;
-  date?: string;        // For compatibility with types/community
-  reactions?: number;   // For compatibility with types/community
-  media_url?: string;   // For compatibility with types/community
-  image_url?: string;   // For compatibility with types/community
+  date?: string;        // For compatibility
+  reactions?: number;   // For backward compatibility
+  media_url?: string;   // For compatibility
+  image_url?: string;   // For compatibility
+  image?: string;       // Added for new community features
 }
 
 export interface Comment {
@@ -107,7 +112,7 @@ export interface Comment {
   content: string;
   created_at: string;
   author: User;
-  date?: string;        // For compatibility with types/community
+  date?: string;        // For compatibility
 }
 
 export interface Group {
@@ -119,8 +124,16 @@ export interface Group {
   is_private: boolean;
   created_at: string;
   joined: boolean;
-  topic?: string;       // For compatibility with types/community
-  members?: string[];   // For compatibility with types/community
+  topic?: string;       // Added for new community features
+  members?: string[];   // For compatibility
+}
+
+export interface Buddy {
+  id: string;
+  user_id: string;
+  buddy_user_id: string;
+  matched_on: string;
+  date?: string;        // For backward compatibility
 }
 
 export enum UserRole {

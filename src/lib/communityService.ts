@@ -1,14 +1,14 @@
 
-import { supabase } from './supabase-client';
-import type { Post, Comment, Group, Buddy } from '@/types/community';
+import { supabase } from '@/integrations/supabase/client';
+import type { Post, Comment, Group, Buddy } from '@/types';
 import type { User } from '@/types';
 
 // --- POSTS ---
 export async function fetchPosts(): Promise<Post[]> {
   const { data, error } = await supabase
     .from('posts')
-    .select('*')
-    .order('date', { ascending: false });
+    .select('*, user_id')
+    .order('created_at', { ascending: false });
     
   if (error) throw error;
   return data || [];
@@ -17,11 +17,19 @@ export async function fetchPosts(): Promise<Post[]> {
 export async function createPost(
   user_id: string,
   content: string,
-  media_url?: string
+  media_url?: string,
+  image?: string
 ): Promise<Post> {
   const { data, error } = await supabase
     .from('posts')
-    .insert({ user_id, date: new Date().toISOString(), content, media_url, reactions: 0 })
+    .insert({ 
+      user_id, 
+      created_at: new Date().toISOString(), 
+      content, 
+      media_url, 
+      image,
+      reactions: 0 
+    })
     .select()
     .single();
   
@@ -54,7 +62,7 @@ export async function fetchComments(post_id: string): Promise<Comment[]> {
     .from('comments')
     .select('*')
     .eq('post_id', post_id)
-    .order('date', { ascending: true });
+    .order('created_at', { ascending: true });
     
   if (error) throw error;
   return data || [];
@@ -67,7 +75,12 @@ export async function createComment(
 ): Promise<Comment> {
   const { data, error } = await supabase
     .from('comments')
-    .insert({ post_id, user_id, date: new Date().toISOString(), content })
+    .insert({ 
+      post_id, 
+      user_id, 
+      created_at: new Date().toISOString(), 
+      content 
+    })
     .select()
     .single();
     
@@ -92,7 +105,15 @@ export async function createGroup(
 ): Promise<Group> {
   const { data, error } = await supabase
     .from('groups')
-    .insert({ name, topic, description, members: [] })
+    .insert({ 
+      name, 
+      topic, 
+      description, 
+      members: [], 
+      members_count: 0,
+      is_private: false,
+      created_at: new Date().toISOString() 
+    })
     .select()
     .single();
     
@@ -107,7 +128,7 @@ export async function joinGroup(
   // First get the current group to check members
   const { data, error } = await supabase
     .from('groups')
-    .select('members')
+    .select('members, members_count')
     .eq('id', group_id)
     .single();
     
@@ -117,10 +138,45 @@ export async function joinGroup(
   const currentMembers = data?.members || [];
   if (!currentMembers.includes(user_id)) {
     const updatedMembers = [...currentMembers, user_id];
+    const updatedCount = (data?.members_count || 0) + 1;
     
     const { error: updateError } = await supabase
       .from('groups')
-      .update({ members: updatedMembers })
+      .update({ 
+        members: updatedMembers,
+        members_count: updatedCount
+      })
+      .eq('id', group_id);
+      
+    if (updateError) throw updateError;
+  }
+}
+
+export async function leaveGroup(
+  group_id: string,
+  user_id: string
+): Promise<void> {
+  // Get the current group to check members
+  const { data, error } = await supabase
+    .from('groups')
+    .select('members, members_count')
+    .eq('id', group_id)
+    .single();
+    
+  if (error) throw error;
+  
+  // Remove user from members if included
+  const currentMembers = data?.members || [];
+  if (currentMembers.includes(user_id)) {
+    const updatedMembers = currentMembers.filter(id => id !== user_id);
+    const updatedCount = Math.max(0, (data?.members_count || 1) - 1);
+    
+    const { error: updateError } = await supabase
+      .from('groups')
+      .update({ 
+        members: updatedMembers,
+        members_count: updatedCount
+      })
       .eq('id', group_id);
       
     if (updateError) throw updateError;
@@ -147,15 +203,25 @@ export async function findBuddy(
   // Get current user
   const userData = await fetchUserById(user_id); // This will throw if user not found
   
-  // For demo purposes, create a buddy match with a placeholder
-  const randomId = "placeholder-user-id";
+  // For demo purposes, create a buddy match with another user of the same role
+  const { data: potentialBuddies, error: buddyError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('role', userData?.role || role || '')
+    .neq('id', user_id)
+    .limit(10);
+    
+  if (buddyError) throw buddyError;
+  
+  // Select a random buddy from the list or use a placeholder
+  const randomIndex = Math.floor(Math.random() * (potentialBuddies?.length || 1));
+  const buddyUserId = potentialBuddies?.[randomIndex]?.id || "placeholder-user-id";
   
   // Create buddy match
   const buddyData = {
     user_id,
-    buddy_user_id: randomId,
-    matched_on: new Date().toISOString(),
-    date: new Date().toISOString()
+    buddy_user_id: buddyUserId,
+    matched_on: new Date().toISOString()
   };
   
   const { data, error } = await supabase
@@ -168,6 +234,17 @@ export async function findBuddy(
   return data;
 }
 
+export async function fetchUserBuddies(userId: string): Promise<Buddy[]> {
+  const { data, error } = await supabase
+    .from('buddies')
+    .select('*')
+    .eq('user_id', userId)
+    .order('matched_on', { ascending: false });
+    
+  if (error) throw error;
+  return data || [];
+}
+
 export async function fetchUserById(userId: string): Promise<User | null> {
   // Using a dynamic approach instead of strictly typed table access
   const { data, error } = await supabase
@@ -178,8 +255,9 @@ export async function fetchUserById(userId: string): Promise<User | null> {
   
   if (error) {
     console.error('Error fetching user:', error);
-    return { id: userId, name: 'Test User', email: 'test@example.com' };
+    // Return a mock user for testing
+    return { id: userId, name: 'Test User', email: 'test@example.com', alias: 'TestUser' };
   }
   
-  return data || { id: userId, name: 'Test User', email: 'test@example.com' };
+  return data || { id: userId, name: 'Test User', email: 'test@example.com', alias: 'TestUser' };
 }
