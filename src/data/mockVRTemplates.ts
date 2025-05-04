@@ -1,8 +1,8 @@
 
-import { VRSessionTemplate } from '../types';
+import { VRSessionTemplate } from '@/types';
 
 // Mock VR Session Templates
-export const mockVRTemplates: VRSessionTemplate[] = [
+export const mockVRTemplatesData: VRSessionTemplate[] = [
   {
     template_id: '1',
     theme: 'Forêt apaisante',
@@ -20,5 +20,15 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     theme: 'Méditation guidée',
     duration: 10,
     preview_url: 'https://www.youtube.com/embed/O-6f5wQXSu8',
+    is_audio_only: true,
+    audio_url: 'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3'
+  },
+  {
+    template_id: '4',
+    theme: 'Respiration profonde',
+    duration: 3,
+    preview_url: '',
+    is_audio_only: true,
+    audio_url: 'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3'
   },
 ];

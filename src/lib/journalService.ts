@@ -13,7 +13,22 @@ export async function fetchJournalEntries(user_id: string): Promise<JournalEntry
       .order('date', { ascending: false });
     
     if (error) throw error;
-    return data as JournalEntry[] || [];
+    
+    // Map data to match JournalEntry type
+    const journalEntries = (data || []).map(entry => ({
+      id: entry.id,
+      user_id: entry.user_id,
+      title: entry.title || 'Sans titre',
+      content: entry.content,
+      date: entry.date,
+      emotions: entry.emotions || [],
+      is_private: entry.is_private || false,
+      created_at: entry.created_at || entry.date,
+      updated_at: entry.updated_at,
+      ai_feedback: entry.ai_feedback
+    })) as JournalEntry[];
+    
+    return journalEntries;
   } catch (error) {
     console.error('Error in fetchJournalEntries:', error);
     throw error;
@@ -32,7 +47,24 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
       .maybeSingle();
     
     if (error) throw error;
-    return data as JournalEntry | null;
+    
+    if (!data) return null;
+    
+    // Map data to match JournalEntry type
+    const journalEntry: JournalEntry = {
+      id: data.id,
+      user_id: data.user_id,
+      title: data.title || 'Sans titre',
+      content: data.content,
+      date: data.date,
+      emotions: data.emotions || [],
+      is_private: data.is_private || false,
+      created_at: data.created_at || data.date,
+      updated_at: data.updated_at,
+      ai_feedback: data.ai_feedback
+    };
+    
+    return journalEntry;
   } catch (error) {
     console.error('Error in fetchJournalEntry:', error);
     throw error;
@@ -42,8 +74,9 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
 export async function createJournalEntry(
   user_id: string, 
   content: string,
-  mood?: JournalEntry['mood'],
-  keywords?: string[]
+  title?: string,
+  emotions?: string[],
+  is_private?: boolean
 ): Promise<JournalEntry> {
   try {
     const validUserId = user_id;
@@ -51,11 +84,12 @@ export async function createJournalEntry(
     const entryData = {
       user_id: validUserId,
       content,
-      date: new Date().toISOString()
+      title: title || 'Sans titre',
+      emotions: emotions || [],
+      is_private: is_private !== undefined ? is_private : false,
+      date: new Date().toISOString(),
+      created_at: new Date().toISOString()
     };
-    
-    if (mood) entryData['mood'] = mood;
-    if (keywords) entryData['keywords'] = keywords;
     
     const { data, error } = await supabase
       .from('journal_entries')
@@ -64,7 +98,22 @@ export async function createJournalEntry(
       .single();
 
     if (error || !data) throw error || new Error('Insert failed');
-    return data as JournalEntry;
+    
+    // Map data to match JournalEntry type
+    const journalEntry: JournalEntry = {
+      id: data.id,
+      user_id: data.user_id,
+      title: data.title || 'Sans titre',
+      content: data.content,
+      date: data.date,
+      emotions: data.emotions || [],
+      is_private: data.is_private || false,
+      created_at: data.created_at || data.date,
+      updated_at: data.updated_at,
+      ai_feedback: data.ai_feedback
+    };
+    
+    return journalEntry;
   } catch (error) {
     console.error('Error in createJournalEntry:', error);
     throw error;

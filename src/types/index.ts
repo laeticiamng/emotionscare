@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -32,15 +33,16 @@ export interface VRSession {
   is_audio_only?: boolean;
 }
 
-// Add missing type definitions to fix build errors
 export interface Emotion {
   id: string;
   user_id: string;
   date: string;
-  emotion: string;
-  intensity: number;
-  note?: string;
-  created_at?: string;
+  emotion: string;      // ex. "stress", "joie"
+  intensity: number;    // de 1 à 10
+  score?: number;       // pour l'historique
+  text?: string;        // feedback IA
+  ai_feedback?: string; // dans EmotionFeedback
+  emojis?: string;      // pour la compatibilité avec les données existantes
 }
 
 export interface Badge {
@@ -53,6 +55,9 @@ export interface Badge {
   unlocked_date?: string;
   progress?: number;
   total?: number;
+  threshold?: number;    // Pour la compatibilité avec BadgeGrid
+  icon_url?: string;     // Pour la compatibilité avec BadgeGrid
+  awarded_at?: string;   // Pour la compatibilité avec les données existantes
 }
 
 export interface Report {
@@ -64,6 +69,11 @@ export interface Report {
   mood_score: number;
   categories: string[];
   recommendations: string[];
+  metric?: string;        // Pour la compatibilité avec les données existantes
+  period_start?: string;  // Pour la compatibilité avec les données existantes
+  period_end?: string;    // Pour la compatibilité avec les données existantes
+  value?: number;         // Pour la compatibilité avec les données existantes
+  change_pct?: number;    // Pour la compatibilité avec les données existantes
 }
 
 export interface JournalEntry {
@@ -76,6 +86,9 @@ export interface JournalEntry {
   is_private: boolean;
   created_at: string;
   updated_at?: string;
+  mood?: string;         // Pour la compatibilité avec journalService
+  keywords?: string[];   // Pour la compatibilité avec journalService
+  ai_feedback?: string;  // Pour la compatibilité avec la base de données existante
 }
 
 export interface Post {

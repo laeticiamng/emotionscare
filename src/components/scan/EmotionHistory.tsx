@@ -43,7 +43,7 @@ const EmotionHistory = ({ history }: EmotionHistoryProps) => {
   // Préparer les données pour le graphique
   const chartData = history.slice(0, 7).map(entry => ({
     date: format(new Date(entry.date), 'dd/MM'),
-    score: entry.score
+    score: entry.score || calculateScoreFromIntensity(entry.emotion, entry.intensity)
   })).reverse();
   
   // Préparer les données pour la liste
@@ -51,15 +51,27 @@ const EmotionHistory = ({ history }: EmotionHistoryProps) => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   ).slice(0, 5);
 
+  // Helper pour calculer un score à partir de l'émotion et de l'intensité si le score n'existe pas
+  function calculateScoreFromIntensity(emotion: string, intensity: number): number {
+    const positiveEmotions = ['happy', 'joy', 'calm', 'relaxed'];
+    if (positiveEmotions.includes(emotion.toLowerCase())) {
+      return 50 + (intensity * 5); // Score entre 55-100 pour émotions positives
+    } else {
+      return 50 - (intensity * 5); // Score entre 0-45 pour émotions négatives
+    }
+  }
+
   // Helper pour déterminer l'icône en fonction du score
-  const getEmotionIcon = (score: number) => {
+  const getEmotionIcon = (emotion: Emotion) => {
+    const score = emotion.score || calculateScoreFromIntensity(emotion.emotion, emotion.intensity);
     if (score >= 70) return <Smile className="h-5 w-5 text-green-500" />;
     if (score >= 40) return <Meh className="h-5 w-5 text-amber-500" />;
     return <Frown className="h-5 w-5 text-red-500" />;
   };
 
   // Helper pour déterminer la couleur du badge en fonction du score
-  const getEmotionColor = (score: number) => {
+  const getEmotionColor = (emotion: Emotion) => {
+    const score = emotion.score || calculateScoreFromIntensity(emotion.emotion, emotion.intensity);
     if (score >= 70) return "bg-green-500/10 text-green-600 border-green-500/20";
     if (score >= 40) return "bg-amber-500/10 text-amber-600 border-amber-500/20";
     return "bg-red-500/10 text-red-600 border-red-500/20";
@@ -91,14 +103,14 @@ const EmotionHistory = ({ history }: EmotionHistoryProps) => {
             <TimelineItem key={entry.id}>
               <TimelineHeader>
                 <TimelineIcon>
-                  {getEmotionIcon(entry.score)}
+                  {getEmotionIcon(entry)}
                 </TimelineIcon>
                 <TimelineTitle className="flex items-center justify-between">
                   <span>
                     {format(new Date(entry.date), 'EEEE d MMMM', { locale: fr })}
                   </span>
-                  <Badge className={getEmotionColor(entry.score)}>
-                    {entry.score}/100
+                  <Badge className={getEmotionColor(entry)}>
+                    {entry.score || calculateScoreFromIntensity(entry.emotion, entry.intensity)}/100
                   </Badge>
                 </TimelineTitle>
               </TimelineHeader>

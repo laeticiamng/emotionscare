@@ -4,11 +4,20 @@ import type { Emotion } from '@/types';
 
 /** Sauvegarde un scan émotionnel */
 export async function saveEmotionScan(entry: Omit<Emotion,'id'>): Promise<Emotion> {
-  const { date, score, text, user_id } = entry;
+  const { date, emotion, intensity, user_id, text, score, emojis, ai_feedback } = entry;
 
   const { data, error } = await supabase
     .from('emotions')
-    .insert({ date, score, text, user_id })
+    .insert({ 
+      date, 
+      emotion, 
+      intensity, 
+      user_id, 
+      text, 
+      score,
+      emojis,
+      ai_feedback
+    })
     .select()
     .single();
 
@@ -51,8 +60,12 @@ export async function createEmotionEntry(payload: {
   try {
     const entry: Omit<Emotion, 'id'> = {
       date: new Date().toISOString(),
-      score: 50, // Default score
+      emotion: 'neutral',  // Default emotion
+      intensity: 5,        // Default intensity
+      score: 50,           // Default score
       text: payload.text || '',
+      emojis: payload.emojis,
+      audio_url: payload.audio_url,
       user_id: payload.user_id || '00000000-0000-0000-0000-000000000000' // Default user_id if not provided
     };
     
