@@ -55,11 +55,11 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
       <CardContent className="p-0">
         <div className="bg-gradient-to-r from-wellness-blue to-[#5AAFF2] text-white p-6 rounded-xl">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
+            <div className="mb-4 md:mb-0 max-w-[700px]">
               <h3 className="text-xl font-bold mb-2">
                 Bonjour {userName}, pense à ta micro-pause VR !
               </h3>
-              <p className="opacity-90 flex items-center">
+              <p className="opacity-90 flex items-center flex-wrap">
                 {isLoading ? (
                   <span className="flex items-center">
                     <RefreshCw size={16} className="animate-spin mr-2" /> 
@@ -67,11 +67,11 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
                   </span>
                 ) : (
                   <>
-                    {aiMessage}
+                    <span className="mr-2">{aiMessage}</span>
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="ml-2 text-white hover:bg-white/20" 
+                      className="ml-1 text-white hover:bg-white/20" 
                       onClick={fetchAiMessage}
                       disabled={isLoading}
                     >
@@ -83,7 +83,7 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
             </div>
             <Button 
               onClick={() => navigate('/vr')}
-              className="bg-white text-wellness-blue hover:bg-wellness-blue hover:text-white border-2 border-white rounded-full transition-colors duration-150"
+              className="bg-white text-wellness-blue hover:bg-wellness-blue hover:text-white border-2 border-white rounded-full transition-colors duration-150 whitespace-nowrap"
             >
               Lancer VR <ArrowRight size={16} className="ml-2" />
             </Button>

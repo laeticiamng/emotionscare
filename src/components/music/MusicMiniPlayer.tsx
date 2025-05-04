@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,41 @@ export function MusicMiniPlayer() {
     pauseTrack,
     nextTrack,
     previousTrack,
-    openDrawer
+    openDrawer,
+    loadPlaylistForEmotion
   } = useMusic();
 
+  // Initialize player with default playlist if none loaded
+  useEffect(() => {
+    if (!playlist || !currentTrack) {
+      loadPlaylistForEmotion('neutral');
+    }
+  }, [playlist, currentTrack, loadPlaylistForEmotion]);
+
   if (!playlist || !currentTrack) {
-    return null;
+    return (
+      <Card className="mb-6 overflow-hidden cursor-pointer" onClick={() => loadPlaylistForEmotion('neutral')}>
+        <CardContent className="p-4">
+          <div className="flex items-center">
+            <h3 className="text-md font-medium flex items-center">
+              <Music className="h-4 w-4 mr-2" />
+              Soundtrack du jour
+            </h3>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="ml-auto"
+              onClick={(e) => {
+                e.stopPropagation();
+                loadPlaylistForEmotion('neutral');
+              }}
+            >
+              Charger la musique
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
