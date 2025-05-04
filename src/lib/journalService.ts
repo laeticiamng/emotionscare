@@ -14,22 +14,26 @@ export async function fetchJournalEntries(user_id: string): Promise<JournalEntry
     
     if (error) throw error;
     
-    // Map data to match JournalEntry type with proper data mapping
-    const journalEntries = (data || []).map(entry => ({
-      id: entry.id,
-      user_id: entry.user_id,
-      title: entry.title || 'Sans titre',
-      content: entry.content,
-      date: entry.date,
-      emotions: entry.emotions || [],
-      is_private: entry.is_private || false,
-      created_at: entry.created_at || entry.date,
-      updated_at: entry.updated_at || entry.date,
-      ai_feedback: entry.ai_feedback,
-      text: entry.content // Pour compatibilité
-    }));
+    // Create properly typed JournalEntry objects with default values for missing fields
+    const journalEntries = (data || []).map(entry => {
+      // Create a properly typed JournalEntry with all required fields
+      const journalEntry: JournalEntry = {
+        id: entry.id,
+        user_id: entry.user_id,
+        title: entry.title || 'Sans titre',
+        content: entry.content,
+        date: entry.date,
+        emotions: entry.emotions || [],
+        is_private: entry.is_private !== undefined ? entry.is_private : false,
+        created_at: entry.created_at || entry.date,
+        updated_at: entry.updated_at || entry.date,
+        ai_feedback: entry.ai_feedback,
+        text: entry.content // For compatibility
+      };
+      return journalEntry;
+    });
     
-    return journalEntries as JournalEntry[];
+    return journalEntries;
   } catch (error) {
     console.error('Error in fetchJournalEntries:', error);
     throw error;
@@ -51,7 +55,7 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
     
     if (!data) return null;
     
-    // Map data to match JournalEntry type with proper data mapping
+    // Create a properly typed JournalEntry with all required fields
     const journalEntry: JournalEntry = {
       id: data.id,
       user_id: data.user_id,
@@ -59,11 +63,11 @@ export async function fetchJournalEntry(id: string, user_id: string): Promise<Jo
       content: data.content,
       date: data.date,
       emotions: data.emotions || [],
-      is_private: data.is_private || false,
+      is_private: data.is_private !== undefined ? data.is_private : false,
       created_at: data.created_at || data.date,
       updated_at: data.updated_at || data.date,
       ai_feedback: data.ai_feedback,
-      text: data.content // Pour compatibilité
+      text: data.content // For compatibility
     };
     
     return journalEntry;
@@ -101,7 +105,7 @@ export async function createJournalEntry(
 
     if (error || !data) throw error || new Error('Insert failed');
     
-    // Map data to match JournalEntry type with proper data mapping
+    // Create a properly typed JournalEntry with all required fields
     const journalEntry: JournalEntry = {
       id: data.id,
       user_id: data.user_id,
@@ -109,11 +113,11 @@ export async function createJournalEntry(
       content: data.content,
       date: data.date,
       emotions: data.emotions || [],
-      is_private: data.is_private || false,
+      is_private: data.is_private !== undefined ? data.is_private : false,
       created_at: data.created_at || data.date,
       updated_at: data.updated_at || data.date,
       ai_feedback: data.ai_feedback,
-      text: data.content // Pour compatibilité
+      text: data.content // For compatibility
     };
     
     return journalEntry;
