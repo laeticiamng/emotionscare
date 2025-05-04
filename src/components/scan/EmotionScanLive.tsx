@@ -6,10 +6,11 @@ import { Mic, MicOff, Wand2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { initVad } from '@/lib/audioVad';
-import { analyzeAudioStream, saveRealtimeEmotionScan, type EmotionResult } from '@/lib/scanService';
+import { analyzeAudioStream, saveRealtimeEmotionScan, emotionResultToEmotion, type EmotionResult } from '@/lib/scanService';
+import type { Emotion } from '@/types';
 
 interface EmotionScanLiveProps {
-  onResultSaved?: (result: EmotionResult) => void;
+  onResultSaved?: (result: Emotion) => void;
 }
 
 const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
@@ -65,7 +66,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
                 
                 // Notify parent component if callback provided
                 if (onResultSaved) {
-                  onResultSaved(result);
+                  onResultSaved(savedEmotion);
                 }
                 
                 toast({

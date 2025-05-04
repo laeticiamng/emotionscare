@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { Emotion } from '@/types';
 
@@ -99,6 +100,11 @@ export type EmotionResult = {
   emotion: string;
   confidence: number;
   transcript?: string;
+  id?: string;
+  user_id?: string;
+  date?: string;
+  intensity?: number;
+  score?: number;
 };
 
 // For keeping track of speech segments
@@ -129,11 +135,16 @@ export async function analyzeAudioStream(
     await new Promise(resolve => setTimeout(resolve, 300));
   }
   
-  return {
+  const result: EmotionResult = {
     emotion: randomEmotion,
     confidence: 0.7 + Math.random() * 0.3, // Random confidence between 0.7 and 1.0
-    transcript: "This is a simulated transcript of the user's speech."
+    transcript: "This is a simulated transcript of the user's speech.",
+    date: new Date().toISOString(),
+    intensity: Math.floor(Math.random() * 10) + 1, // Random intensity between 1-10
+    score: Math.floor(Math.random() * 100) // Random score between 0-100
   };
+  
+  return result;
 }
 
 // Save a real-time emotion analysis result to the database
@@ -142,14 +153,28 @@ export async function saveRealtimeEmotionScan(
   userId: string
 ): Promise<Emotion> {
   const entry: Omit<Emotion, 'id'> = {
-    date: new Date().toISOString(),
+    date: result.date || new Date().toISOString(),
     emotion: result.emotion,
-    intensity: Math.round(result.confidence * 10), // Convert confidence to 1-10 scale
-    score: Math.round(result.confidence * 100), // Convert confidence to percentage
+    intensity: result.intensity || Math.round(result.confidence * 10), // Convert confidence to 1-10 scale
+    score: result.score || Math.round(result.confidence * 100), // Convert confidence to percentage
     text: result.transcript || '',
     user_id: userId || '00000000-0000-0000-0000-000000000000',
     ai_feedback: `You're feeling ${result.emotion} with ${Math.round(result.confidence * 100)}% confidence.`
   };
   
   return await saveEmotionScan(entry);
+}
+
+// Convert Emotion Result to Emotion type
+export function emotionResultToEmotion(result: EmotionResult, userId: string): Emotion {
+  return {
+    id: result.id || '00000000-0000-0000-0000-000000000000',
+    date: result.date || new Date().toISOString(),
+    emotion: result.emotion,
+    intensity: result.intensity || Math.round(result.confidence * 10),
+    score: result.score || Math.round(result.confidence * 100),
+    text: result.transcript || '',
+    user_id: userId,
+    ai_feedback: `You're feeling ${result.emotion} with ${Math.round(result.confidence * 100)}% confidence.`
+  };
 }
