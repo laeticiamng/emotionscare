@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User as UserIcon } from 'lucide-react';
 
 interface UserAvatarProps {
-  user: User | null;
+  user: Partial<User> | null;  // Changed from User to Partial<User>
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }

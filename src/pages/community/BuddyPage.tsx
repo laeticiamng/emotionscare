@@ -9,7 +9,9 @@ import { findBuddy, fetchUserBuddies, fetchUserById } from '@/lib/communityServi
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole, User } from '@/types';
-import { Buddy } from '@/types/community';
+
+// Import the Buddy type from index.ts rather than community.ts to ensure consistent types
+import { Buddy } from '@/types';
 import { ArrowLeft, User as UserIcon, Heart, MessageSquare, Calendar } from 'lucide-react';
 
 const BuddyPage = () => {
@@ -30,7 +32,8 @@ const BuddyPage = () => {
       try {
         setIsBuddiesLoading(true);
         const userBuddies = await fetchUserBuddies(user.id);
-        setBuddies(userBuddies);
+        // Ensure the buddies have the correct type structure
+        setBuddies(userBuddies as Buddy[]);
         
         // Load buddy user details
         const buddyUserIds = userBuddies.map(b => b.buddy_user_id);
@@ -76,8 +79,8 @@ const BuddyPage = () => {
         [buddy.buddy_user_id]: buddyUser
       }));
       
-      setMatchedBuddy(buddy);
-      setBuddies(prev => [buddy, ...prev]);
+      setMatchedBuddy(buddy as Buddy);
+      setBuddies(prev => [buddy as Buddy, ...prev]);
       
       toast({
         title: "Nouveau buddy trouvé !",
