@@ -1,11 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BrainCircuit, CalendarCheck, RefreshCw } from 'lucide-react';
-import { triggerCoachEvent } from '@/lib/coachService';
+import { useCoach } from '@/hooks/useCoach';
 
 interface CoachAssistantProps {
   className?: string;
@@ -14,11 +14,11 @@ interface CoachAssistantProps {
 export function CoachAssistant({ className }: CoachAssistantProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { triggerDailyReminder, triggerAfterScan, triggerAlert, isProcessing } = useCoach();
 
   const handleDailyReminder = () => {
     if (!user?.id) return;
-    
-    triggerCoachEvent('daily_reminder', user.id);
+    triggerDailyReminder();
     toast({
       title: "Coach IA activé",
       description: "Rappel quotidien envoyé",
@@ -27,13 +27,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
 
   const handleScanTest = () => {
     if (!user?.id) return;
-    
-    // Simuler un événement de scan complété
-    triggerCoachEvent('scan_completed', user.id, {
-      emotion: 'tristesse',
-      confidence: 0.85
-    });
-    
+    triggerAfterScan('tristesse', 0.85);
     toast({
       title: "Test déclenché",
       description: "Simulation d'un scan émotionnel négatif",
@@ -42,12 +36,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
 
   const handleAlertTest = () => {
     if (!user?.id) return;
-    
-    // Simuler une alerte préventive
-    triggerCoachEvent('predictive_alert', user.id, {
-      alertType: 'negative_trend'
-    });
-    
+    triggerAlert('negative_trend');
     toast({
       title: "Test déclenché",
       description: "Simulation d'une alerte préventive",
@@ -80,6 +69,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
             className="w-full text-xs" 
             onClick={handleDailyReminder}
             size="sm"
+            disabled={isProcessing}
           >
             <CalendarCheck className="mr-1 h-3 w-3" />
             Rappel
@@ -90,6 +80,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
             className="w-full text-xs" 
             onClick={handleScanTest}
             size="sm"
+            disabled={isProcessing}
           >
             <RefreshCw className="mr-1 h-3 w-3" />
             Test Scan
@@ -100,6 +91,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
             className="w-full text-xs" 
             onClick={handleAlertTest}
             size="sm"
+            disabled={isProcessing}
           >
             <RefreshCw className="mr-1 h-3 w-3" />
             Test Alerte

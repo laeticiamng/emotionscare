@@ -41,7 +41,7 @@ class CoachService {
     },
     {
       name: 'Alerte Préventive',
-      description: 'Routine déclenchée lors d'une alerte préventive',
+      description: "Routine déclenchée lors d'une alerte préventive",
       trigger: 'predictive_alert',
       actions: [
         { type: 'send_dashboard_alert', payload: { message: 'Tendance négative détectée.' } },

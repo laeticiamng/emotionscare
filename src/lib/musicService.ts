@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist, Track } from '@/types/music';
 
 // TopMedia API key
 const API_KEY = '1e4228c100304c658ab1eab4333f54be';
@@ -199,6 +199,6 @@ export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
     artist: track.artist,
     duration: track.duration,
     audioUrl: track.url,
-    coverUrl: track.cover,
+    coverUrl: track.cover || '',
   };
 };

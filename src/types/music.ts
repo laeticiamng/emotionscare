@@ -1,0 +1,26 @@
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  audioUrl: string;        // URL du fichier audio
+  coverUrl: string;        // URL de l'image de couverture
+}
+
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  audioUrl: string;
+  coverUrl: string;
+  emotion?: string;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  emotion: string;
+  tracks: MusicTrack[];
+}
