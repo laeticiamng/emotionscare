@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from "@/components/ui/toaster";
 import Layout from './components/Layout';
@@ -27,40 +27,38 @@ import AccountSettings from './pages/AccountSettings';
 
 function App() {
   return (
-    <Router>
-      <ThemeProvider>
-        <AuthProvider>
-          <MusicProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/admin-login" element={<AdminLoginPage />} />
-              <Route path="/onboarding" element={<OnboardingPage />} />
-              
-              <Route path="/" element={<Layout />}>
-                <Route path="dashboard" element={<DashboardPage />} />
-                <Route path="scan" element={<ScanPage />} />
-                <Route path="scan/:id" element={<ScanDetailPage />} />
-                <Route path="journal" element={<JournalPage />} />
-                <Route path="journal/new" element={<JournalNewPage />} />
-                <Route path="journal/:id" element={<JournalEntryPage />} />
-                <Route path="buddy" element={<BuddyPage />} />
-                <Route path="community" element={<CommunityFeed />} />
-                <Route path="groups" element={<GroupListPage />} />
-                <Route path="vr-sessions" element={<VRSessionPage />} />
-                <Route path="gamification" element={<GamificationPage />} />
-                <Route path="preferences" element={<UserPreferences />} />
-                <Route path="account-settings" element={<AccountSettings />} />
-                <Route path="*" element={<NotImplementedPage />} />
-              </Route>
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </MusicProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </Router>
+    <ThemeProvider>
+      <AuthProvider>
+        <MusicProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin-login" element={<AdminLoginPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
+            
+            <Route path="/" element={<Layout />}>
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="scan" element={<ScanPage />} />
+              <Route path="scan/:id" element={<ScanDetailPage />} />
+              <Route path="journal" element={<JournalPage />} />
+              <Route path="journal/new" element={<JournalNewPage />} />
+              <Route path="journal/:id" element={<JournalEntryPage />} />
+              <Route path="buddy" element={<BuddyPage />} />
+              <Route path="community" element={<CommunityFeed />} />
+              <Route path="groups" element={<GroupListPage />} />
+              <Route path="vr-sessions" element={<VRSessionPage />} />
+              <Route path="gamification" element={<GamificationPage />} />
+              <Route path="preferences" element={<UserPreferences />} />
+              <Route path="account-settings" element={<AccountSettings />} />
+              <Route path="*" element={<NotImplementedPage />} />
+            </Route>
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </MusicProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
