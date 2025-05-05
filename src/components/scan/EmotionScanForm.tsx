@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { analyzeEmotion } from "@/lib/scanService";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import EmojiSelector from './EmojiSelector';
 import EmotionTextInput from './EmotionTextInput';
 import AudioRecorder from './AudioRecorder';
@@ -27,9 +27,20 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   const [text, setText] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState<boolean>(false);
+  const [isConfidential, setIsConfidential] = useState<boolean>(false);
+  const [shareWithCoach, setShareWithCoach] = useState<boolean>(true);
+  const [charCount, setCharCount] = useState<number>(0);
+  const MAX_CHARS = 500;
 
   const handleEmojiClick = (emoji: string) => {
     setEmojis(prev => prev + emoji);
+  };
+
+  const handleTextChange = (value: string) => {
+    if (value.length <= MAX_CHARS) {
+      setText(value);
+      setCharCount(value.length);
+    }
   };
 
   const handleSubmit = async () => {
@@ -45,12 +56,14 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     try {
       setAnalyzing(true);
       
-      // Dans une vraie application, nous enverrions l'audio au serveur
+      // Dans une implémentation réelle, nous enverrions ces données à l'API
       const result = await analyzeEmotion({
         user_id: user?.id || '',
         emojis,
         text,
-        audio_url: audioUrl
+        audio_url: audioUrl,
+        is_confidential: isConfidential,
+        share_with_coach: shareWithCoach
       });
       
       toast({
@@ -93,8 +106,12 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         <TabsContent value="text" className="space-y-4 pt-4">
           <EmotionTextInput 
             value={text} 
-            onChange={setText} 
+            onChange={handleTextChange}
+            maxChars={MAX_CHARS} 
           />
+          <div className="text-right text-sm text-muted-foreground">
+            {charCount}/{MAX_CHARS} caractères
+          </div>
         </TabsContent>
         
         <TabsContent value="emoji" className="space-y-4 pt-4">
@@ -113,13 +130,42 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         </TabsContent>
       </Tabs>
 
+      <div className="space-y-4 mt-6 border-t pt-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="confidential"
+              checked={isConfidential}
+              onChange={() => setIsConfidential(!isConfidential)}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="confidential" className="text-sm">Confidentiel</label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="shareWithCoach"
+              checked={shareWithCoach}
+              onChange={() => setShareWithCoach(!shareWithCoach)}
+              className="rounded border-gray-300"
+            />
+            <label htmlFor="shareWithCoach" className="text-sm">Partager avec Coach</label>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-end space-x-2 pt-4">
         {onClose && (
           <Button variant="outline" onClick={onClose}>
             Annuler
           </Button>
         )}
-        <Button onClick={handleSubmit} disabled={analyzing}>
+        <Button 
+          onClick={handleSubmit} 
+          disabled={analyzing} 
+          className="bg-wellness-coral hover:bg-wellness-coral/90 text-white"
+        >
           {analyzing ? "Analyse en cours..." : "Analyser mon état"}
         </Button>
       </div>

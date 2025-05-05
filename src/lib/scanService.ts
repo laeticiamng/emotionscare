@@ -141,13 +141,17 @@ export async function analyzeEmotion(payload: {
   emojis?: string;
   text?: string;
   audio_url?: string | null;
+  is_confidential?: boolean;
+  share_with_coach?: boolean;
 }): Promise<EmotionResult> {
   try {
+    console.log("Analyzing emotion with payload:", payload);
+    
     // For demo purposes, let's create a simulated emotion analysis result
     await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
     
     // Create a simple emotion result based on input
-    const emotions = ['calm', 'happy', 'stressed', 'anxious', 'focused', 'tired'];
+    const emotions = ['calme', 'heureux', 'stressé', 'anxieux', 'concentré', 'fatigué'];
     const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
     
     const result: EmotionResult = {
@@ -159,9 +163,15 @@ export async function analyzeEmotion(payload: {
       score: Math.floor(Math.random() * 100) // Random score between 0-100
     };
     
-    // In a real application, this would call an OpenAI or other AI service
-    // and save the result to the database
-    const entry = await createEmotionEntry(payload);
+    // Only store data if not confidential
+    if (!payload.is_confidential) {
+      // In a real application, this would call an OpenAI or other AI service
+      // and save the result to the database
+      const entry = await createEmotionEntry(payload);
+      console.log("Emotion entry created:", entry);
+    } else {
+      console.log("Confidential mode - not saving data");
+    }
     
     return result;
   } catch (error) {

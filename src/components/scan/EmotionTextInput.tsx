@@ -5,15 +5,17 @@ import { Textarea } from "@/components/ui/textarea";
 interface EmotionTextInputProps {
   value: string;
   onChange: (value: string) => void;
+  maxChars?: number;
 }
 
-const EmotionTextInput = ({ value, onChange }: EmotionTextInputProps) => {
+const EmotionTextInput = ({ value, onChange, maxChars }: EmotionTextInputProps) => {
   return (
     <Textarea
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder="Comment vous sentez-vous aujourd'hui ?"
-      className="min-h-[100px]"
+      placeholder="Racontez-nous votre ressenti..."
+      className="min-h-[120px] rounded-xl border-gray-300 focus:border-primary focus:ring-primary"
+      maxLength={maxChars}
     />
   );
 };
