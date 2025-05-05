@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -72,10 +71,15 @@ export interface Emotion {
 
 // EmotionResult type
 export interface EmotionResult {
-  emotion?: string;
-  confidence?: number;
+  emotion: string;
+  confidence: number;
   transcript?: string;
+  feedback?: string;
   id?: string;
+  user_id?: string;
+  date?: string;
+  intensity?: number;
+  score?: number;
 }
 
 // Badge related types

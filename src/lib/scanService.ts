@@ -2,7 +2,12 @@
 // Update or create the scanService.ts to include the proper function signatures
 
 import { Emotion } from '@/types';
-import { analyzeEmotion as analyzeEmotionService, analyzeAudioStream as analyzeAudioStreamService, saveRealtimeEmotionScan as saveRealtimeEmotionScanService } from '@/lib/scan/analyzeService';
+import { 
+  analyzeEmotion, 
+  analyzeEmotions, 
+  analyzeAudioStream, 
+  saveRealtimeEmotionScan 
+} from '@/lib/scan/analyzeService';
 import { createEmotionEntry as createEmotionEntryService, fetchLatestEmotion as fetchLatestEmotionService, fetchEmotionHistory as fetchEmotionHistoryService } from '@/lib/scan/emotionService';
 
 // Export the EmotionResult type so it can be imported elsewhere
@@ -10,6 +15,7 @@ export interface EmotionResult {
   emotion: string;  // Make this required since it's expected to be present
   confidence: number; // Make this required to match the type in analyzeService.ts
   transcript?: string;
+  feedback?: string; // Added feedback field that was missing
   id?: string;
   user_id?: string;
   date?: string;
@@ -20,13 +26,14 @@ export interface EmotionResult {
 // Function to analyze audio stream
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
   try {
-    return await analyzeAudioStreamService([new Uint8Array(await audioBlob.arrayBuffer())]);
+    return await analyzeAudioStream([new Uint8Array(await audioBlob.arrayBuffer())]);
   } catch (error) {
     console.error('Error analyzing audio stream:', error);
     return {
       emotion: 'neutral', // Provide a default value for the required field
       confidence: 0.5,
-      transcript: 'Erreur d\'analyse'
+      transcript: 'Erreur d\'analyse',
+      feedback: 'Une erreur est survenue lors de l\'analyse'
     };
   }
 };
@@ -39,6 +46,7 @@ export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string):
       emotion: emotion.emotion || 'neutral',
       confidence: emotion.confidence || 0.5, // Ensure confidence is always provided
       transcript: emotion.text,
+      feedback: emotion.ai_feedback,
       id: emotion.id,
       user_id: emotion.user_id,
       date: emotion.date,
@@ -47,7 +55,7 @@ export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string):
     };
     
     // Now emotion has all required properties for the analyzeService's EmotionResult type
-    await saveRealtimeEmotionScanService(emotionWithDefault, userId);
+    await saveRealtimeEmotionScan(emotionWithDefault, userId);
   } catch (error) {
     console.error('Error saving emotion scan:', error);
     throw error;
@@ -64,7 +72,7 @@ export const analyzeEmotion = async (payload: {
   share_with_coach?: boolean;
 }): Promise<EmotionResult> => {
   try {
-    return await analyzeEmotionService(payload);
+    return await analyzeEmotion(payload);
   } catch (error) {
     console.error('Error analyzing emotion:', error);
     throw error;

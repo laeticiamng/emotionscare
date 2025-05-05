@@ -93,3 +93,108 @@ export async function analyzeEmotions(
     return createFallbackEmotion(userId, text, emojis, audioUrl);
   }
 }
+
+/**
+ * Fonction analyzeEmotion qui utilise analyzeEmotions sous le capot
+ * Cette fonction est nécessaire pour maintenir la compatibilité avec les composants existants
+ */
+export async function analyzeEmotion(payload: {
+  user_id: string;
+  emojis?: string;
+  text?: string;
+  audio_url?: string | null;
+  is_confidential?: boolean;
+  share_with_coach?: boolean;
+}): Promise<EmotionResult> {
+  try {
+    const emotion = await analyzeEmotions(
+      payload.user_id,
+      payload.text,
+      payload.emojis,
+      payload.audio_url || undefined
+    );
+    
+    return {
+      emotion: emotion.emotion,
+      confidence: emotion.confidence,
+      feedback: emotion.ai_feedback,
+      transcript: emotion.text
+    };
+  } catch (error) {
+    console.error('Error in analyzeEmotion:', error);
+    
+    // Return a default emotion result in case of error
+    return {
+      emotion: 'neutral',
+      confidence: 0.5,
+      feedback: 'Impossible d\'analyser l\'émotion pour le moment.',
+      transcript: payload.text
+    };
+  }
+}
+
+/**
+ * Analyse d'un flux audio pour détecter l'émotion
+ */
+export async function analyzeAudioStream(audioData: Uint8Array[]): Promise<EmotionResult> {
+  // Implémentation fictive pour l'analyse d'audio
+  console.log("Analyse du flux audio...", audioData.length, "fragments");
+  
+  // Dans une version réelle, on enverrait les données audio à une API d'analyse
+  // Pour l'instant, on utilise un mock
+  return {
+    emotion: 'calm',
+    confidence: 0.7,
+    transcript: "Transcription audio simulée",
+    feedback: "Vous semblez calme et posé."
+  };
+}
+
+/**
+ * Sauvegarde des analyses d'émotions en temps réel
+ */
+export async function saveRealtimeEmotionScan(
+  emotion: EmotionResult,
+  userId: string
+): Promise<void> {
+  try {
+    const newEmotion: Partial<Emotion> = {
+      user_id: userId,
+      date: new Date().toISOString(),
+      emotion: emotion.emotion,
+      score: calculateScoreFromEmotion(emotion.emotion),
+      text: emotion.transcript,
+      ai_feedback: emotion.feedback,
+      confidence: emotion.confidence,
+      source: 'realtime'
+    };
+
+    const { error } = await supabase
+      .from('emotions')
+      .insert(newEmotion);
+
+    if (error) {
+      console.error("Erreur lors de l'enregistrement de l'analyse en temps réel:", error);
+    }
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde du scan en temps réel:", error);
+  }
+}
+
+/**
+ * Calculer un score basé sur l'émotion
+ */
+function calculateScoreFromEmotion(emotion: string): number {
+  switch (emotion.toLowerCase()) {
+    case 'happy': return 75;
+    case 'excited': return 85;
+    case 'joy': return 80;
+    case 'calm': return 65;
+    case 'neutral': return 50;
+    case 'anxious': return 35;
+    case 'sad': return 25;
+    case 'angry': return 20;
+    case 'frustrated': return 30;
+    default: return 50;
+  }
+}
