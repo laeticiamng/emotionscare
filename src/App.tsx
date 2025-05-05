@@ -20,9 +20,7 @@ const VRAnalyticsPage = lazy(() => import('./pages/VRAnalyticsPage'));
 const SocialCocoonPage = lazy(() => import('./pages/SocialCocoonPage'));
 const CommunityFeed = lazy(() => import('./pages/CommunityFeed'));
 const GroupsPage = lazy(() => import('./pages/GroupsPage'));
-const GroupListPage = lazy(() => import('./pages/GroupListPage'));
 const BuddyPage = lazy(() => import('./pages/BuddyPage'));
-const CommunityAdminPage = lazy(() => import('./pages/CommunityAdminPage'));
 const CoachPage = lazy(() => import('./pages/CoachPage'));
 const AccountSettings = lazy(() => import('./pages/AccountSettings'));
 const UserPreferences = lazy(() => import('./pages/UserPreferences'));
@@ -35,8 +33,6 @@ const NotImplementedPage = lazy(() => import('./pages/NotImplementedPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Index = lazy(() => import('./pages/Index'));
 const MusicWellbeingPage = lazy(() => import('./pages/MusicWellbeingPage'));
-
-// Nouvelles pages
 const MyDataPage = lazy(() => import('./pages/MyDataPage'));
 
 // Fallback loading component
@@ -49,7 +45,7 @@ function App() {
         <Routes>
           {/* Auth routes (no navigation) */}
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           
           {/* Landing page */}
@@ -69,20 +65,18 @@ function App() {
             <Route path="/scan/:id" element={<ScanDetailPage />} />
             
             {/* VR */}
-            <Route path="/vr" element={<VRSessionsPage />} />
-            <Route path="/vr/:id" element={<VRSessionPage />} />
-            <Route path="/vr/analytics" element={<VRAnalyticsPage />} />
+            <Route path="/vr-sessions" element={<VRSessionsPage />} />
+            <Route path="/vr-sessions/:id" element={<VRSessionPage />} />
+            <Route path="/vr-analytics" element={<VRAnalyticsPage />} />
             
             {/* Community */}
-            <Route path="/community" element={<SocialCocoonPage />} />
+            <Route path="/social-cocoon" element={<SocialCocoonPage />} />
             <Route path="/community/feed" element={<CommunityFeed />} />
-            <Route path="/community/groups" element={<GroupsPage />} />
-            <Route path="/community/groups/list" element={<GroupListPage />} />
-            <Route path="/community/buddy" element={<BuddyPage />} />
-            <Route path="/community/admin" element={<CommunityAdminPage />} />
+            <Route path="/groups" element={<GroupsPage />} />
+            <Route path="/buddy" element={<BuddyPage />} />
             
             {/* Music */}
-            <Route path="/music" element={<MusicWellbeingPage />} />
+            <Route path="/music-wellbeing" element={<MusicWellbeingPage />} />
             
             {/* Coach */}
             <Route path="/coach" element={<CoachPage />} />

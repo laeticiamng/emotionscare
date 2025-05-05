@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard, 
   Heart, 
@@ -86,49 +87,49 @@ export const adminNavItems = [
   },
   {
     title: "Scan émotionnel - Équipe",
-    href: "/admin/scan-team",
+    href: "/scan",
     icon: <Heart className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Journal - Tendances",
-    href: "/admin/journal-trends",
+    href: "/journal",
     icon: <LineChart className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Social Cocoon - Pilotage",
-    href: "/admin/social-cocoon",
+    href: "/social-cocoon",
     icon: <Users className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Gamification - Synthèse",
-    href: "/admin/gamification",
+    href: "/gamification",
     icon: <Trophy className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Actions & Solutions RH",
-    href: "/admin/hr-actions",
+    href: "/not-implemented/hr-actions",
     icon: <Sparkles className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Events & Calendrier",
-    href: "/admin/events",
+    href: "/not-implemented/events",
     icon: <CalendarDays className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Conformité & Sécurité",
-    href: "/admin/compliance",
+    href: "/compliance",
     icon: <ShieldCheck className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },
   {
     title: "Paramètres Admin",
-    href: "/admin/settings",
+    href: "/account",
     icon: <Settings className="h-5 w-5" />,
     showRoles: ["admin", "Admin"],
   },

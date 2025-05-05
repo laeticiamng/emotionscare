@@ -45,22 +45,16 @@ const MainNavigation: React.FC = () => {
         active={pathname === '/dashboard'}
       />
       <NavItem
-        icon={<Compass className="h-6 w-6" />}
-        label="Découvrir"
-        to="/discover"
-        active={pathname === '/discover'}
-      />
-      <NavItem
         icon={<Book className="h-6 w-6" />}
         label="Journal"
         to="/journal"
-        active={pathname === '/journal'}
+        active={pathname === '/journal' || pathname.startsWith('/journal/')}
       />
       <NavItem
         icon={<LineChart className="h-6 w-6" />}
-        label="Suivi"
-        to="/tracking"
-        active={pathname === '/tracking'}
+        label="Scan Émotionnel"
+        to="/scan"
+        active={pathname === '/scan' || pathname.startsWith('/scan/')}
       />
       <NavItem
         icon={<MessageSquare className="h-6 w-6" />}
