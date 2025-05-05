@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext } from './contexts/AuthContext';
@@ -17,6 +18,8 @@ import { Onboarding } from './pages/Onboarding';
 import { CoachDashboard } from './pages/CoachDashboard';
 import { MusicPlayer } from './pages/MusicPlayer';
 import { NotificationCenter } from './pages/NotificationCenter';
+import SocialCocoonPage from './pages/SocialCocoonPage';
+import CommunityAdminPage from './pages/CommunityAdminPage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -54,7 +57,17 @@ function App() {
         } />
         <Route path="/social-cocoon" element={
           <ProtectedLayout>
-            <SocialCocoon />
+            <SocialCocoonPage />
+          </ProtectedLayout>
+        } />
+        <Route path="/community" element={
+          <ProtectedLayout>
+            <SocialCocoonPage />
+          </ProtectedLayout>
+        } />
+        <Route path="/community/admin" element={
+          <ProtectedLayout requireRole="admin">
+            <CommunityAdminPage />
           </ProtectedLayout>
         } />
         <Route path="/admin-dashboard" element={
