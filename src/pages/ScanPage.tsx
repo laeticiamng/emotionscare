@@ -25,7 +25,7 @@ const ScanPage = () => {
   // Récupère la dernière émotion de l'historique au chargement
   React.useEffect(() => {
     if (history && history.length > 0) {
-      setLatestEmotion(history[0].emotion);
+      setLatestEmotion(history[0]);
     }
   }, [history]);
 

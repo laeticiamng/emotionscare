@@ -36,7 +36,9 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
   }
 
   // Déterminer le type de musique recommandé en fonction de l'émotion
-  const musicType = EMOTION_TO_MUSIC[emotion.name.toLowerCase()] || 'neutral';
+  // Use emotion.emotion instead of emotion.name
+  const emotionName = emotion.emotion?.toLowerCase() || 'neutral';
+  const musicType = EMOTION_TO_MUSIC[emotionName] || 'neutral';
   
   // Descriptions des effets musicaux selon l'émotion
   const musicDescription = {
@@ -58,7 +60,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
   };
 
   return (
-    <Card className="mt-6 border-t-4" style={{ borderTopColor: emotion.color || '#6366F1' }}>
+    <Card className="mt-6 border-t-4" style={{ borderTopColor: '#6366F1' }}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-lg">
           <Music className="mr-2 h-5 w-5" />
@@ -67,7 +69,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
       </CardHeader>
       <CardContent>
         <div className="mb-3">
-          <h4 className="font-medium mb-1">Basé sur votre état émotionnel: <span className="text-primary">{emotion.name}</span></h4>
+          <h4 className="font-medium mb-1">Basé sur votre état émotionnel: <span className="text-primary">{emotion.emotion}</span></h4>
           <p className="text-sm text-muted-foreground">{musicDescription[musicType] || "Une sélection musicale adaptée à votre état émotionnel"}</p>
         </div>
         
