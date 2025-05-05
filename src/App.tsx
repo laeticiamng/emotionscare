@@ -16,6 +16,7 @@ import JournalPage from './pages/JournalPage';
 import GamificationPage from './pages/GamificationPage';
 import MusicWellbeingPage from './pages/MusicWellbeingPage';
 import BuddyPage from './pages/BuddyPage';
+import GroupsPage from './pages/GroupsPage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -64,6 +65,13 @@ function App() {
         <Route path="/community" element={
           <ProtectedLayout>
             <SocialCocoonPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Groups Route */}
+        <Route path="/groups" element={
+          <ProtectedLayout>
+            <GroupsPage />
           </ProtectedLayout>
         } />
         
