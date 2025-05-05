@@ -1,23 +1,12 @@
 
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthContext } from './contexts/AuthContext';
-import { Layout } from './components/Layout';
-import { ProtectedLayout } from './components/ProtectedLayout';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { Dashboard } from './pages/Dashboard';
-import { Profile } from './pages/Profile';
-import { EmotionTracker } from './pages/EmotionTracker';
-import { SocialCocoon } from './pages/SocialCocoon';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { Journal } from './pages/Journal';
-import { Settings } from './pages/Settings';
-import { NotFound } from './pages/NotFound';
-import { Onboarding } from './pages/Onboarding';
-import { CoachDashboard } from './pages/CoachDashboard';
-import { MusicPlayer } from './pages/MusicPlayer';
-import { NotificationCenter } from './pages/NotificationCenter';
+import { useAuth } from './contexts/AuthContext';
+import ProtectedLayout from './components/ProtectedLayout';
+import LoginPage from './pages/LoginPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import Index from './pages/Index';
+import NotFoundPage from './pages/NotFound';
 import SocialCocoonPage from './pages/SocialCocoonPage';
 import CommunityAdminPage from './pages/CommunityAdminPage';
 
@@ -27,95 +16,61 @@ import VRSessionPage from './pages/VRSessionPage';
 import VRAnalyticsPage from './pages/VRAnalyticsPage';
 
 function App() {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/onboarding" element={
-          <ProtectedLayout>
-            <Onboarding />
-          </ProtectedLayout>
-        } />
+        {/* Public Routes */}
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin-login" element={<AdminLoginPage />} />
+
+        {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedLayout>
-            <Dashboard />
+            <div>Dashboard Page</div>
           </ProtectedLayout>
         } />
-        <Route path="/profile" element={
-          <ProtectedLayout>
-            <Profile />
-          </ProtectedLayout>
-        } />
-        <Route path="/emotion-tracker" element={
-          <ProtectedLayout>
-            <EmotionTracker />
-          </ProtectedLayout>
-        } />
+        
         <Route path="/social-cocoon" element={
           <ProtectedLayout>
             <SocialCocoonPage />
           </ProtectedLayout>
         } />
+        
         <Route path="/community" element={
           <ProtectedLayout>
             <SocialCocoonPage />
           </ProtectedLayout>
         } />
+        
         <Route path="/community/admin" element={
           <ProtectedLayout requireRole="admin">
             <CommunityAdminPage />
           </ProtectedLayout>
         } />
-        <Route path="/admin-dashboard" element={
-          <ProtectedLayout requireRole="admin">
-            <AdminDashboard />
-          </ProtectedLayout>
-        } />
-        <Route path="/coach-dashboard" element={
-          <ProtectedLayout requireRole="coach">
-            <CoachDashboard />
-          </ProtectedLayout>
-        } />
-        <Route path="/journal" element={
-          <ProtectedLayout>
-            <Journal />
-          </ProtectedLayout>
-        } />
-        <Route path="/settings" element={
-          <ProtectedLayout>
-            <Settings />
-          </ProtectedLayout>
-        } />
-        <Route path="/music-player" element={
-          <ProtectedLayout>
-            <MusicPlayer />
-          </ProtectedLayout>
-        } />
-        <Route path="/notifications" element={
-          <ProtectedLayout>
-            <NotificationCenter />
-          </ProtectedLayout>
-        } />
+        
         <Route path="/vr-sessions" element={
           <ProtectedLayout>
             <VRSessionsPage />
           </ProtectedLayout>
         } />
+        
         <Route path="/vr-sessions/:id" element={
           <ProtectedLayout>
             <VRSessionPage />
           </ProtectedLayout>
         } />
+        
         <Route path="/vr-analytics" element={
           <ProtectedLayout>
             <VRAnalyticsPage />
           </ProtectedLayout>
         } />
-        <Route path="*" element={<NotFound />} />
+
+        {/* Catch-all route for 404 */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </div>
   );
