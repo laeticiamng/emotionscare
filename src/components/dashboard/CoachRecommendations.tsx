@@ -38,7 +38,7 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ className }
   ];
 
   return (
-    <Card className={`${className}`}>
+    <Card className={`${className} h-full`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
           <BrainCircuit size={18} className="mr-2 text-primary" />
@@ -66,8 +66,8 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ className }
             ) : (
               defaultRecommendations.map((item, index) => (
                 <div key={index} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="space-y-1 flex-1">
                       <h4 className="font-medium text-sm">{item.title}</h4>
                       <p className="text-xs text-muted-foreground">{item.description}</p>
                     </div>
@@ -75,7 +75,7 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ className }
                       variant="ghost" 
                       size="sm" 
                       onClick={item.action}
-                      className="ml-4"
+                      className="ml-auto"
                     >
                       {item.actionText} <ArrowRight className="ml-1 h-3 w-3" />
                     </Button>

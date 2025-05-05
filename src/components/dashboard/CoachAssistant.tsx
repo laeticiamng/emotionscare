@@ -80,7 +80,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
   };
 
   return (
-    <Card className={`${className} overflow-hidden`}>
+    <Card className={`${className} h-full flex flex-col`}>
       <CardHeader className="pb-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30">
         <div className="flex items-start justify-between">
           <div>
@@ -98,7 +98,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="pt-4 space-y-4">
+      <CardContent className="pt-4 flex-1 overflow-auto space-y-4">
         {showWelcome ? (
           <div className="flex items-center p-3 bg-primary/10 rounded-lg animate-pulse">
             <div className="flex-1">
@@ -115,7 +115,7 @@ export function CoachAssistant({ className }: CoachAssistantProps) {
           </div>
         ) : null}
         
-        <div className="space-y-2">
+        <div className="space-y-2 flex flex-wrap gap-1">
           <Badge variant="outline" className="bg-primary/10 hover:bg-primary/20">
             Bien-être
           </Badge>

@@ -73,17 +73,15 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="md:col-span-2">
           {/* Music Mini Player */}
-          <MusicMiniPlayer />
+          <MusicMiniPlayer className="mb-6" />
           
-          {/* Coach Recommendations - Nouveau composant */}
-          <div className="mt-6">
-            <CoachRecommendations />
-          </div>
+          {/* Coach Recommendations - Aligné avec la hauteur du Coach Assistant */}
+          <CoachRecommendations />
         </div>
         
-        <div>
+        <div className="flex flex-col">
           {/* Coach IA Component */}
-          <CoachAssistant />
+          <CoachAssistant className="h-full" />
         </div>
       </div>
 
