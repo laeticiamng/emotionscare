@@ -121,15 +121,16 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         throw new Error('Résultat d\'analyse invalide');
       }
       
-      // Create emotion object from result
+      // Create emotion object from result with required confidence value
       const emotion: Emotion = {
         id: Date.now().toString(),
         user_id: userId,
         emotion: result.emotion,
-        confidence: result.confidence,
+        confidence: result.confidence, // Ensure confidence is passed
         score: Math.round((result.confidence || 0.5) * 10),
         date: new Date().toISOString(), // Use date instead of timestamp
         source: 'audio',
+        text: result.transcript,
         ai_feedback: result.transcript || '',
         is_confidential: isConfidential
       };

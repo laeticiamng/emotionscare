@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { createProcessor } from '@/lib/audioVad';
 import { useToast } from '@/hooks/use-toast';
@@ -132,6 +133,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         user_id: userId,
         date: new Date().toISOString(),
         emotion: result.emotion,
+        confidence: result.confidence, // Ensure confidence is passed
         text: result.transcript,
         audio_url: isConfidential ? undefined : 'mock-url-to-audio-file',
       };
