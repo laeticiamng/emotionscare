@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +15,7 @@ import { Emotion } from '@/types';
 import EmotionTrendChart from '@/components/scan/EmotionTrendChart';
 
 const ScanPage: React.FC = () => {
+  console.log("ScanPage component rendering");
   const { user } = useAuth();
   const { filteredUsers, selectedFilter, filterUsers } = useScanPage();
   const [activeTab, setActiveTab] = useState<string>('scan');
@@ -26,15 +26,17 @@ const ScanPage: React.FC = () => {
   const [serviceFilter, setServiceFilter] = useState<string>('all');
 
   // Cast Role to ensure we can compare correctly
-  const isAdmin = user?.role === 'Admin';
+  const isAdmin = user?.role === 'Admin' || user?.role === 'admin';
 
   useEffect(() => {
     const loadEmotionHistory = async () => {
       if (user?.id) {
         try {
           setLoading(true);
+          console.log("Fetching emotion history for user:", user.id);
           const history = await fetchEmotionHistory();
           setEmotions(history);
+          console.log("Emotion history loaded:", history.length, "entries");
         } catch (error) {
           console.error("Error loading emotion history:", error);
         } finally {
@@ -51,6 +53,8 @@ const ScanPage: React.FC = () => {
     // Refresh data after saving
     fetchEmotionHistory().then(setEmotions);
   };
+
+  console.log("ScanPage rendering with user:", user, "isAdmin:", isAdmin);
 
   return (
     <div className="container py-8 px-4">

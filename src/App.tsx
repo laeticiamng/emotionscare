@@ -11,6 +11,10 @@ import SocialCocoonPage from './pages/SocialCocoonPage';
 import CommunityAdminPage from './pages/CommunityAdminPage';
 import CompliancePage from './pages/CompliancePage';
 import DashboardPage from './pages/DashboardPage';
+import ScanPage from './pages/ScanPage';
+import JournalPage from './pages/JournalPage';
+import GamificationPage from './pages/GamificationPage';
+import MusicWellbeingPage from './pages/MusicWellbeingPage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -35,6 +39,21 @@ function App() {
           </ProtectedLayout>
         } />
         
+        {/* Scan Route */}
+        <Route path="/scan" element={
+          <ProtectedLayout>
+            <ScanPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Journal Route */}
+        <Route path="/journal" element={
+          <ProtectedLayout>
+            <JournalPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Social Cocoon Routes */}
         <Route path="/social-cocoon" element={
           <ProtectedLayout>
             <SocialCocoonPage />
@@ -53,6 +72,7 @@ function App() {
           </ProtectedLayout>
         } />
         
+        {/* VR Session Routes */}
         <Route path="/vr-sessions" element={
           <ProtectedLayout>
             <VRSessionsPage />
@@ -66,8 +86,22 @@ function App() {
         } />
         
         <Route path="/vr-analytics" element={
-          <ProtectedLayout>
+          <ProtectedLayout requireRole="admin">
             <VRAnalyticsPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Gamification Route */}
+        <Route path="/gamification" element={
+          <ProtectedLayout>
+            <GamificationPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Music Wellbeing Route */}
+        <Route path="/music-wellbeing" element={
+          <ProtectedLayout>
+            <MusicWellbeingPage />
           </ProtectedLayout>
         } />
         

@@ -38,7 +38,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   }
   
   // Check for role requirements
-  if (requireRole && user?.role !== requireRole) {
+  if (requireRole && user?.role !== requireRole && user?.role !== 'Admin' && user?.role !== 'admin') {
     console.log(`ProtectedLayout - Role check failed: user role ${user?.role} vs required ${requireRole}`);
     return (
       <Layout>

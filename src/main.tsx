@@ -7,6 +7,8 @@ import { MusicProvider } from './contexts/MusicContext';
 import App from './App.tsx';
 import './index.css';
 
+console.log("Starting application initialization");
+
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,3 +30,5 @@ createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
   </QueryClientProvider>
 );
+
+console.log("Application initialization completed");

@@ -21,7 +21,7 @@ export const isAdminRole = (role?: string): boolean => {
  */
 export const isUserRole = (role?: string): boolean => {
   if (!role) return false;
-  const userRoles = ['user', 'employee', 'Utilisateur'];
+  const userRoles = ['user', 'employee', 'Utilisateur', 'User'];
   return userRoles.includes(role) || !isAdminRole(role); // Si ce n'est pas admin, c'est user par défaut
 };
 

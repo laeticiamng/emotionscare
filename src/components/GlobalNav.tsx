@@ -12,6 +12,8 @@ import MobileNavigation from './navigation/MobileNavigation';
 import { navItems } from './navigation/navConfig';
 
 const GlobalNav = () => {
+  console.log("GlobalNav rendering with navItems:", navItems);
+  
   return (
     <header className="fixed top-0 z-50 w-full bg-background border-b shadow-sm">
       <div className="container flex h-16 items-center justify-between">

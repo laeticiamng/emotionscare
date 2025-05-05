@@ -12,7 +12,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated } = useAuth();
-  console.log("Layout - isAuthenticated:", isAuthenticated);
+  console.log("Layout - isAuthenticated:", isAuthenticated, "Children:", !!children);
   
   // If not authenticated, only render the children (login/register pages)
   if (!isAuthenticated) {

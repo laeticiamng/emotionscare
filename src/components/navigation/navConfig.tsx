@@ -13,6 +13,8 @@ import {
   Video
 } from "lucide-react";
 
+console.log("Loading navConfig");
+
 // This array is used by both GlobalNav and MobileNavigation components
 export const navItems = [
   {
@@ -36,7 +38,7 @@ export const navItems = [
     icon: <UserIcon className="h-5 w-5 mr-2" />,
   },
   {
-    path: "/community",
+    path: "/social-cocoon",
     label: "Communauté",
     icon: <Users className="h-5 w-5 mr-2" />,
   },
@@ -62,60 +64,61 @@ export const navItems = [
   },
 ];
 
+// Réparer les définitions pour les objets de navigation
 export const mainNavItems = [
   {
     title: "Tableau de bord",
     href: "/dashboard",
     icon: <LayoutDashboard className="h-5 w-5" />,
-    showRoles: ["user", "admin"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Scan émotionnel",
     href: "/scan",
     icon: <Heart className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Journal",
     href: "/journal",
     icon: <BookText className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Buddy",
     href: "/buddy",
     icon: <UserIcon className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Communauté",
-    href: "/community",
+    href: "/social-cocoon",
     icon: <Users className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Groupes",
     href: "/groups",
     icon: <MessageSquare className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Micro-pauses VR",
     href: "/vr-sessions",
     icon: <Video className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Musicothérapie",
     href: "/music-wellbeing",
     icon: <HeadphonesIcon className="h-5 w-5" />,
-    showRoles: ["user"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     title: "Récompenses",
     href: "/gamification",
     icon: <Trophy className="h-5 w-5" />,
-    showRoles: ["user", "admin"],
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
 ];
 
