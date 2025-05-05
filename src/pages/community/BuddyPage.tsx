@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -144,11 +145,11 @@ const BuddyPage = () => {
             <h3 className="text-xl font-semibold">Demandes de Buddy</h3>
             {buddyRequests.length > 0 ? (
               buddyRequests.map((request) => (
-                <Card key={request.id} className="shadow-sm">
+                <Card key={request.id || `request-${Math.random()}`} className="shadow-sm">
                   <CardContent className="flex items-center justify-between">
                     <div>
                       <p>
-                        <strong>{request.user?.name}</strong> ({request.user?.email})
+                        <strong>{request.user?.name || "Utilisateur inconnu"}</strong> ({request.user?.email || "Email non disponible"})
                       </p>
                       <p>Statut: {request.status}</p>
                     </div>

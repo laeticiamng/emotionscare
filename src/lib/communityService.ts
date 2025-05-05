@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Post, Comment, Group, Buddy, User } from '@/types';
 import { UserRole } from '@/types';
@@ -258,6 +257,95 @@ export async function leaveGroup(
       
     if (updateError) throw updateError;
   }
+}
+
+// --- BUDDY SYSTEM ---
+export async function getBuddyRequests(userId: string): Promise<Buddy[]> {
+  // For demo purposes, create mock buddy requests
+  const mockRequests: Buddy[] = [
+    {
+      id: 'request-1',
+      user_id: 'user-request-1',
+      buddy_id: userId,
+      status: 'pending',
+      user: {
+        id: 'user-request-1',
+        name: 'Maria Lopez',
+        email: 'maria@example.com',
+        role: UserRole.INFIRMIER,
+        avatar: 'https://i.pravatar.cc/150?img=5',
+        alias: 'maria',
+        bio: 'Infirmière aux urgences depuis 5 ans',
+        joined_at: new Date().toISOString()
+      }
+    },
+    {
+      id: 'request-2',
+      user_id: 'user-request-2',
+      buddy_id: userId,
+      status: 'accepted',
+      user: {
+        id: 'user-request-2',
+        name: 'Alex Dubois',
+        email: 'alex@example.com',
+        role: UserRole.MEDECIN,
+        avatar: 'https://i.pravatar.cc/150?img=8',
+        alias: 'alexd',
+        bio: 'Médecin urgentiste',
+        joined_at: new Date().toISOString()
+      }
+    }
+  ];
+  
+  return mockRequests;
+}
+
+export async function sendBuddyRequest(
+  userId: string,
+  buddyEmail: string
+): Promise<Buddy> {
+  // In a real implementation, this would verify the email exists and create a record
+  console.log(`Sending buddy request from ${userId} to ${buddyEmail}`);
+  
+  const mockBuddy: Buddy = {
+    id: `request-${Date.now()}`,
+    user_id: userId,
+    buddy_id: `buddy-${Date.now()}`,
+    status: 'pending',
+    date: new Date().toISOString()
+  };
+  
+  return mockBuddy;
+}
+
+export async function acceptBuddyRequest(requestId: string): Promise<Buddy> {
+  // In a real implementation, this would update the status in the database
+  console.log(`Accepting buddy request ${requestId}`);
+  
+  const mockBuddy: Buddy = {
+    id: requestId,
+    user_id: 'user-request-1',
+    buddy_id: 'current-user',
+    status: 'accepted',
+    date: new Date().toISOString()
+  };
+  
+  return mockBuddy;
+}
+
+export async function rejectBuddyRequest(requestId: string): Promise<Buddy> {
+  // In a real implementation, this would update the status in the database
+  console.log(`Rejecting buddy request ${requestId}`);
+  
+  const mockBuddy: Buddy = {
+    id: requestId,
+    user_id: 'user-request-1',
+    buddy_id: 'current-user',
+    status: 'rejected',
+    date: new Date().toISOString()
+  };
+  
+  return mockBuddy;
 }
 
 // --- USER MANAGEMENT ---

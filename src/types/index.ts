@@ -18,6 +18,8 @@ export interface User {
   onboarded?: boolean;
   alias?: string;
   bio?: string;
+  joined_at?: string;
+  location_url?: string;
 }
 
 // UserRole enum for role-based access
@@ -123,8 +125,8 @@ export interface VRSession {
   heart_rate_before?: number;
   heart_rate_after?: number;
   is_audio_only?: boolean;
+  location_url?: string;
 }
 
 // Community types - importing from community.ts to centralize types
 export * from './community';
-

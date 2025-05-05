@@ -18,7 +18,7 @@ export interface UserChallenge {
 
 // Import Badge from index.ts for compatibility
 import { Badge } from './index';
-export { Badge };
+export type { Badge };
 
 /** L'attribution d'un badge à un utilisateur */
 export interface UserBadge {
