@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
@@ -91,9 +90,8 @@ const SecurityFooter: React.FC<SecurityFooterProps> = ({ className }) => {
               </div>
             </div>
             
-            <p className="mb-2">
-              Données chiffrées AES-256 avec BYOK, authentification multi-facteur,
-              conformité GDPR et certification ISO 27001. Audits de sécurité semestriels.
+            <p className="text-xs text-muted-foreground mt-1">
+              ÉmotionCare™ ne remplace pas un avis médical ou psychologique.
             </p>
             <p>
               © 2025 EmotionsCare par ResiMax™. Tous droits réservés.
