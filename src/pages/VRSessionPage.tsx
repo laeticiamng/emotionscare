@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -11,6 +10,7 @@ import VRTemplateDetail from '@/components/vr/VRTemplateDetail';
 import VRSessionView from '@/components/vr/VRSessionView';
 import VRSessionHistory from '@/components/vr/VRSessionHistory';
 import { supabase } from '@/lib/supabase-client';
+import { ChatInterface } from '@/components/chat/ChatInterface';
 
 const VRSessionPage = () => {
   const navigate = useNavigate();
@@ -173,10 +173,15 @@ const VRSessionPage = () => {
         </div>
       ) : (
         /* Template Selection View */
-        <VRTemplateGrid
-          templates={templates}
-          onSelectTemplate={handleSelectTemplate}
-        />
+        <div className="space-y-6">
+          <VRTemplateGrid
+            templates={templates}
+            onSelectTemplate={handleSelectTemplate}
+          />
+          
+          {/* Assistant Chat Interface */}
+          <ChatInterface />
+        </div>
       )}
     </div>
   );

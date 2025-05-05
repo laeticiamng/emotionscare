@@ -45,11 +45,6 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
     }
   };
   
-  useEffect(() => {
-    // Don't automatically fetch on first render to avoid hitting API limits
-    // User can click refresh button to get a new message
-  }, []);
-  
   return (
     <Card className="mb-8 overflow-hidden apple-card">
       <CardContent className="p-0">
@@ -82,7 +77,7 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
               </p>
             </div>
             <Button 
-              onClick={() => navigate('/vr')}
+              onClick={() => navigate('/vr-session')}
               className="bg-white text-wellness-blue hover:bg-wellness-blue hover:text-white border-2 border-white rounded-full transition-colors duration-150 whitespace-nowrap shrink-0"
             >
               Lancer VR <ArrowRight size={16} className="ml-2" />
