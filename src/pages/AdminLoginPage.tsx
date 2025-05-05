@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Shield } from 'lucide-react';
+import { isAdminRole } from '@/utils/roleUtils';
 
-const LoginPage = () => {
+const AdminLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,8 +33,19 @@ const LoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      await login(email, password);
-      // Navigation is handled in the auth context
+      const user = await login(email, password);
+      
+      // Check if the user has admin privileges
+      if (!isAdminRole(user?.role)) {
+        toast({
+          title: "Accès refusé",
+          description: "Vous n'avez pas les droits d'administration nécessaires",
+          variant: "destructive"
+        });
+        navigate('/'); // Redirect to home if not admin
+      }
+      // If admin, navigation is handled in the auth context
+      
     } catch (error) {
       // Error is handled in the auth context
     } finally {
@@ -55,16 +67,20 @@ const LoginPage = () => {
           </Button>
           
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary mb-1">ResiMax™</h1>
-            <p className="text-muted-foreground">Espace Collaborateur</p>
+            <h1 className="text-3xl font-bold mb-1">
+              ResiMax<span className="text-[#4DD0E1]">™</span>
+            </h1>
+            <p className="text-muted-foreground flex items-center justify-center">
+              <Shield size={16} className="mr-1 text-[#4DD0E1]" /> Espace Direction
+            </p>
           </div>
         </div>
 
-        <Card className="shadow-lg border-[#E8DAFF]/50">
+        <Card className="shadow-lg border-[#FFF5E6]/70">
           <CardHeader>
-            <CardTitle>Connexion</CardTitle>
+            <CardTitle>Administration</CardTitle>
             <CardDescription>
-              Entrez vos identifiants pour accéder à votre espace
+              Identifiez-vous pour accéder aux indicateurs de bien-être
             </CardDescription>
           </CardHeader>
 
@@ -75,7 +91,7 @@ const LoginPage = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="votre@email.com"
+                  placeholder="admin@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -98,14 +114,14 @@ const LoginPage = () => {
             <CardFooter className="flex flex-col space-y-2">
               <Button 
                 type="submit" 
-                className="w-full bg-[#FF8C94] hover:bg-[#FF8C94]/90 text-white hover:shadow-[0_0_10px_rgba(255,140,148,0.3)]"
+                className="w-full bg-[#4DD0E1] hover:bg-[#4DD0E1]/90 text-white hover:shadow-[0_0_10px_rgba(77,208,225,0.3)]"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? 'Connexion...' : 'Se connecter'}
+                {isSubmitting ? 'Connexion...' : 'Connexion Admin'}
               </Button>
               
               <p className="text-sm text-center text-muted-foreground mt-4">
-                * Pour la démo, utilisez: sophie@example.com (sans mot de passe)
+                * Pour la démo, utilisez: admin@example.com (sans mot de passe)
               </p>
             </CardFooter>
           </form>
@@ -115,4 +131,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default AdminLoginPage;

@@ -4,12 +4,13 @@ import { User } from '../types';
 import { getCurrentUser, loginUser, logoutUser, updateUser } from '../data/mockData';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import { isAdminRole } from '@/utils/roleUtils';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   updateUserProfile: (userData: Partial<User>) => Promise<void>;
 }
@@ -38,23 +39,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
     try {
       const loggedInUser = await loginUser(email, password);
       setUser(loggedInUser);
       
-      // Check if user needs to complete onboarding
+      // Determine where to navigate based on user role
       if (!loggedInUser.role || !loggedInUser.avatar) {
         navigate('/onboarding');
+      } else if (isAdminRole(loggedInUser.role)) {
+        navigate('/dashboard'); // Admin dashboard
+        toast({
+          title: "Connexion réussie",
+          description: `Bienvenue dans l'espace administration, ${loggedInUser.name}!`,
+        });
       } else {
-        navigate('/dashboard');
+        navigate('/dashboard'); // User dashboard
+        toast({
+          title: "Connexion réussie",
+          description: `Bienvenue ${loggedInUser.name}!`,
+        });
       }
       
-      toast({
-        title: "Connexion réussie",
-        description: `Bienvenue, ${loggedInUser.name}!`,
-      });
+      return loggedInUser;
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
@@ -72,7 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await logoutUser();
       setUser(null);
-      navigate('/login');
+      navigate('/');
       toast({
         title: "Déconnexion réussie",
         description: "À bientôt!",
