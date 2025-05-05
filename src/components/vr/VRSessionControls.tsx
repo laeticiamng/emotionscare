@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Music, Headphones } from 'lucide-react';
+import { Play, Pause, Music, Music2, Check } from 'lucide-react';
 
 interface VRSessionControlsProps {
-  isAudioOnly: boolean;
   isPaused: boolean;
+  isAudioOnly: boolean;
   isMusicPlaying: boolean;
   onTogglePause: () => void;
   onToggleMusic: () => void;
@@ -13,8 +13,8 @@ interface VRSessionControlsProps {
 }
 
 const VRSessionControls: React.FC<VRSessionControlsProps> = ({
-  isAudioOnly,
   isPaused,
+  isAudioOnly,
   isMusicPlaying,
   onTogglePause,
   onToggleMusic,
@@ -26,6 +26,7 @@ const VRSessionControls: React.FC<VRSessionControlsProps> = ({
         <Button 
           onClick={onTogglePause}
           variant="outline"
+          className="flex items-center"
         >
           {isPaused ? (
             <>
@@ -44,25 +45,27 @@ const VRSessionControls: React.FC<VRSessionControlsProps> = ({
       <Button 
         onClick={onToggleMusic}
         variant="outline"
-        className={isMusicPlaying ? "bg-primary/10" : ""}
+        className="flex items-center"
       >
         {isMusicPlaying ? (
           <>
             <Music className="h-4 w-4 mr-2" />
-            Arrêter la musique
+            Désactiver musique
           </>
         ) : (
           <>
-            <Headphones className="h-4 w-4 mr-2" />
-            Ajouter musique
+            <Music2 className="h-4 w-4 mr-2" />
+            Ajouter musique d'ambiance
           </>
         )}
       </Button>
       
       <Button 
         onClick={onComplete}
-        variant={isAudioOnly ? "outline" : "default"}
+        variant="default"
+        className="flex items-center"
       >
+        <Check className="h-4 w-4 mr-2" />
         Terminer la session
       </Button>
     </div>

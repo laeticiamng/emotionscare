@@ -47,14 +47,17 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onCom
       });
     } else {
       // Map VR template themes to music playlists
-      const musicTypeMap = {
+      const musicTypeMap: Record<string, string> = {
         'Forêt apaisante': 'calm',
         'Plage relaxante': 'calm',
         'Méditation guidée': 'focused',
-        'Respiration profonde': 'focused'
+        'Respiration profonde': 'focused',
+        'Montagne': 'calm',
+        'Espace': 'focused',
+        'Urbain Zen': 'calm'
       };
       
-      const musicType = musicTypeMap[template.theme as keyof typeof musicTypeMap] || 'calm';
+      const musicType = musicTypeMap[template.theme] || 'calm';
       
       loadPlaylistForEmotion(musicType);
       setIsMusicPlaying(true);
@@ -107,7 +110,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onCom
               onComplete={onCompleteSession}
             />
             
-            {isMusicPlaying && (
+            {isMusicPlaying && currentTrack && (
               <VRMusicTrackInfo currentTrack={currentTrack} />
             )}
           </div>

@@ -7,7 +7,7 @@ import type { Emotion } from '@/types';
 interface AudioProcessorProps {
   isListening: boolean;
   userId?: string;
-  isConfidential: boolean; // Add this missing prop
+  isConfidential: boolean; // Make sure this prop is defined in the interface
   onProcessingChange: (isProcessing: boolean) => void;
   onProgressUpdate: (text: string) => void;
   onAnalysisComplete: (emotion: Emotion, result: EmotionResult) => void;

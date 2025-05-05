@@ -1,93 +1,226 @@
-
-import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  LayoutDashboard, Scan, BookOpen, Users, 
-  MonitorPlay, Library, Award, Settings, LogOut,
-  BarChart
+import {
+  BarChart,
+  Book,
+  CheckSquare,
+  Cog6Tooth,
+  Compass,
+  HelpCircle,
+  Home,
+  LineChart,
+  Lock,
+  LockKeyhole,
+  MessageSquare,
+  PlayCircle,
+  Plus,
+  Settings,
+  User,
+  User2,
 } from 'lucide-react';
-import { Separator } from "@/components/ui/separator";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useUser } from '@/hooks/useUser';
+import { useEffect, useState } from 'react';
+import { fetchBadgesCount } from '@/lib/dashboardService';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 
-const Navigation = () => {
-  const { user, logout } = useAuth();
-  const location = useLocation();
-  
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-  
-  const navItems = [
-    { path: '/dashboard', icon: <LayoutDashboard size={20} />, label: 'Tableau de bord' },
-    { path: '/scan', icon: <Scan size={20} />, label: 'Scan émotionnel' },
-    { path: '/journal', icon: <BookOpen size={20} />, label: 'Journal' },
-    { path: '/community', icon: <Users size={20} />, label: 'Communauté' },
-    { path: '/vr', icon: <MonitorPlay size={20} />, label: 'VR' },
-    { path: '/library', icon: <Library size={20} />, label: 'Bibliothèque' },
-    { path: '/gamification', icon: <Award size={20} />, label: 'Badges' },
-    { path: '/reports', icon: <BarChart size={20} />, label: 'Rapports' },
-    { path: '/settings', icon: <Settings size={20} />, label: 'Paramètres' },
-  ];
-  
+interface NavItemProps {
+  icon: React.ReactNode;
+  label: string;
+  to: string;
+  active: boolean;
+}
+
+const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
+  const navigate = useNavigate();
+
   return (
-    <div className="h-screen flex flex-col bg-sidebar border-r border-sidebar-border">
-      <div className="flex items-center justify-center p-6 border-b border-sidebar-border">
-        <h1 className="text-xl font-bold text-wellness-blue">EmotionsCare</h1>
-      </div>
-      
-      {user && (
-        <div className="flex flex-col items-center p-6 border-b border-sidebar-border">
-          <Avatar className="w-16 h-16 mb-4 border-2 border-wellness-blue/20">
-            <AvatarImage src={user.avatar} />
-            <AvatarFallback className="bg-wellness-blue/10 text-wellness-blue font-medium">{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <h3 className="font-medium">{user.name}</h3>
-          <span className="text-xs text-muted-foreground">{user.role}</span>
-          <div className="mt-2 text-xs px-3 py-1 bg-wellness-green/20 rounded-full text-emerald-800">
-            Score: {user.emotional_score}/100
-          </div>
-        </div>
-      )}
-      
-      <nav className="flex-1 overflow-y-auto p-4">
-        <ul className="space-y-1">
-          {navItems.map((item) => (
-            <li key={item.path}>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex items-center px-3 py-2.5 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-wellness-blue/10 text-wellness-blue font-medium'
-                      : 'text-sidebar-foreground hover:bg-gray-50'
-                  }`
-                }
-              >
-                <span className="mr-3">{item.icon}</span>
-                <span>{item.label}</span>
-                {location.pathname === item.path && (
-                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-wellness-blue"></span>
-                )}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      
-      <div className="p-4 border-t border-sidebar-border">
-        <Button 
-          variant="ghost" 
-          className="w-full justify-start text-muted-foreground hover:text-destructive" 
-          onClick={logout}
-        >
-          <LogOut size={18} className="mr-2" />
-          <span>Déconnexion</span>
-        </Button>
-      </div>
-    </div>
+    <button
+      className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary ${
+        active ? 'bg-secondary text-foreground' : 'text-muted-foreground'
+      }`}
+      onClick={() => navigate(to)}
+    >
+      {icon}
+      {label}
+    </button>
   );
 };
 
-export default Navigation;
+export const Navigation = () => {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user, isLoading, signOut } = useUser();
+	const [badgesCount, setBadgesCount] = useState<number>(0);
+
+	useEffect(() => {
+		const loadBadgesCount = async () => {
+			if (user?.id) {
+				const count = await fetchBadgesCount(user.id);
+				setBadgesCount(count);
+			}
+		};
+
+		loadBadgesCount();
+	}, [user?.id]);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <NavItem
+        icon={<Home className="h-6 w-6" />}
+        label="Tableau de bord"
+        to="/dashboard"
+        active={pathname === '/dashboard'}
+      />
+      <NavItem
+        icon={<Compass className="h-6 w-6" />}
+        label="Découvrir"
+        to="/discover"
+        active={pathname === '/discover'}
+      />
+      <NavItem
+        icon={<Book className="h-6 w-6" />}
+        label="Journal"
+        to="/journal"
+        active={pathname === '/journal'}
+      />
+      <NavItem
+        icon={<LineChart className="h-6 w-6" />}
+        label="Suivi"
+        to="/tracking"
+        active={pathname === '/tracking'}
+      />
+      <NavItem
+        icon={<MessageSquare className="h-6 w-6" />}
+        label="Communauté"
+        to="/social-cocoon"
+        active={pathname === '/social-cocoon'}
+      />
+      <NavItem
+        icon={<CheckSquare className="h-6 w-6" />}
+        label="Défis"
+        to="/gamification"
+        active={pathname === '/gamification'}
+      />
+      
+      <NavItem
+        icon={<PlayCircle className="h-6 w-6" />}
+        label="Micro-pauses VR"
+        to="/vr-sessions"
+        active={pathname.includes('/vr-sessions')}
+      />
+      
+      {/* Show admin VR analytics only for users with role === 'admin' */}
+      {user?.role === 'admin' && (
+        <NavItem
+          icon={<BarChart className="h-6 w-6" />}
+          label="Statistiques VR"
+          to="/vr-analytics"
+          active={pathname === '/vr-analytics'}
+        />
+      )}
+      
+      <Separator className="my-2" />
+
+      {user ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="group flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={user?.image} alt={user?.name || 'Profile'} />
+                <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
+              </Avatar>
+              <span className="text-left">
+                {user?.name}
+                {badgesCount > 0 && (
+                  <Badge className="ml-1">{badgesCount}</Badge>
+                )}
+              </span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-80" align="end" forceMount>
+            <DropdownMenuItem onClick={() => navigate('/profile')}>
+              <User2 className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                signOut();
+                toast({
+                  title: 'Déconnexion réussie',
+                  description: 'Vous avez été déconnecté de votre compte.',
+                });
+                navigate('/');
+              }}
+            >
+              <LockKeyhole className="mr-2 h-4 w-4" />
+              <span>Se déconnecter</span>
+              <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1.5 rounded border bg-muted px-2 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-3 w-3"
+                >
+                  <path d="M3 3h18v18H3z" />
+                  <path d="m9.17 14.83 5.66-5.66" />
+                </svg>
+                Ctrl+Shift+Q
+              </kbd>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <>
+          <NavItem
+            icon={<Lock className="h-6 w-6" />}
+            label="Se connecter"
+            to="/login"
+            active={pathname === '/login'}
+          />
+          <NavItem
+            icon={<Plus className="h-6 w-6" />}
+            label="S'inscrire"
+            to="/register"
+            active={pathname === '/register'}
+          />
+        </>
+      )}
+
+      <Separator className="my-2" />
+
+      <NavItem
+        icon={<Cog6Tooth className="h-6 w-6" />}
+        label="Paramètres"
+        to="/settings"
+        active={pathname === '/settings'}
+      />
+      <NavItem
+        icon={<HelpCircle className="h-6 w-6" />}
+        label="Aide"
+        to="/help"
+        active={pathname === '/help'}
+      />
+    </div>
+  );
+};

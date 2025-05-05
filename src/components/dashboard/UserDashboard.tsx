@@ -1,28 +1,51 @@
-
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Separator } from '@/components/ui/separator';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import EmotionScanSection from '@/components/dashboard/EmotionScanSection';
-import UserSidePanel from '@/components/dashboard/UserSidePanel';
-import ModulesSection from '@/components/dashboard/ModulesSection';
-import DashboardFooter from '@/components/dashboard/DashboardFooter';
+import { DashboardHeader } from './DashboardHeader';
+import { UserSidePanel } from './UserSidePanel';
+import { ModulesSection } from './ModulesSection';
+import { EmotionScanSection } from './EmotionScanSection';
+import { SocialCocoonWidget } from './SocialCocoonWidget';
+import { GamificationWidget } from './GamificationWidget';
+import { DashboardFooter } from './DashboardFooter';
+import type { User } from '@/types';
+import VRPromptWidget from '../vr/VRPromptWidget';
 
-const UserDashboard: React.FC = () => {
-  const { user } = useAuth();
+interface UserDashboardProps {
+  user: User | null;
+  latestEmotion?: {
+    emotion: string;
+    score: number;
+  };
+}
+
+const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) => {
   
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Hero Section */}
+    <div className="space-y-6">
       <DashboardHeader user={user} />
       
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <EmotionScanSection />
-        <UserSidePanel />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main Content Area */}
+        <div className="col-span-1 lg:col-span-8 space-y-6">
+          
+          <ModulesSection />
+          <EmotionScanSection />
+          
+        </div>
+        
+        {/* Side Panel */}
+        <div className="col-span-1 lg:col-span-4 space-y-6">
+          <UserSidePanel user={user} />
+          
+          {/* Add VR Prompt Widget */}
+          <VRPromptWidget 
+            userId={user?.id || '00000000-0000-0000-0000-000000000000'} 
+            latestEmotion={latestEmotion}
+          />
+          
+          <SocialCocoonWidget />
+          <GamificationWidget />
+        </div>
       </div>
-
-      <ModulesSection className="animate-slide-up" style={{ animationDelay: '0.5s' }} />
       
       <DashboardFooter />
     </div>

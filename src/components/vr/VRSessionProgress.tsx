@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { Timer } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Timer } from 'lucide-react';
 
 interface VRSessionProgressProps {
   percentageComplete: number;
   timeRemaining: string;
 }
 
-const VRSessionProgress: React.FC<VRSessionProgressProps> = ({
+const VRSessionProgress: React.FC<VRSessionProgressProps> = ({ 
   percentageComplete,
   timeRemaining
 }) => {

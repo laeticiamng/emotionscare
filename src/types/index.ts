@@ -101,9 +101,9 @@ export interface VRSessionTemplate {
   theme: string;
   duration: number;
   preview_url: string;
+  completion_rate?: number;
   is_audio_only?: boolean;
   audio_url?: string;
-  completion_rate?: number;
 }
 
 export interface VRSession {
@@ -112,14 +112,12 @@ export interface VRSession {
   template_id: string;
   date: string;
   duration: number;
-  duration_seconds?: number;
+  duration_seconds: number;
   completed: boolean;
-  mood_before?: number;
-  mood_after?: number;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
-  is_audio_only?: boolean;
-  location_url?: string;
+  location_url: string;
+  heart_rate_before?: number | null;
+  heart_rate_after?: number | null;
+  is_audio_only: boolean;
 }
 
 // Community types - importing from community.ts to centralize types
