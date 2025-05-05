@@ -1,446 +1,399 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import type { Post, Comment, Group, Buddy, BuddyRequest } from '@/types/community';
+import { faker } from '@faker-js/faker';
+import { Post, Comment, Group, GroupMember, CommunityStats } from '@/types/community';
 import { User, UserRole } from '@/types';
 import { mockUsers } from '@/data/mockUsers';
 
-// --- POSTS ---
-export async function fetchPosts(): Promise<Post[]> {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*, user_id')
-    .order('date', { ascending: false });
-    
-  if (error) throw error;
-  
-  // Map the database fields to our Post interface
-  const posts: Post[] = (data || []).map(post => ({
-    id: post.id,
-    user_id: post.user_id,
-    content: post.content,
-    likes: 0, // Set default likes value
-    date: post.date,
-    reactions: post.reactions || 0,
-    image_url: post.image_url || undefined,
-    created_at: post.date, // Alias for compatibility
-    comments: []
-  }));
-  
-  return posts;
-}
+// Mock posts for community
+export const mockPosts: Post[] = Array.from({ length: 20 }, (_, i) => ({
+  id: `post-${i + 1}`,
+  user_id: mockUsers[Math.floor(Math.random() * mockUsers.length)].id,
+  content: faker.lorem.paragraphs(Math.floor(Math.random() * 2) + 1),
+  created_at: faker.date.recent({ days: 5 }).toISOString(),
+  likes_count: Math.floor(Math.random() * 50),
+  comments_count: Math.floor(Math.random() * 10),
+  tags: Array.from({ length: Math.floor(Math.random() * 3) }, () => 
+    faker.helpers.arrayElement(['travail', 'bien-être', 'stress', 'équilibre', 'santé', 'méditation'])
+  ),
+  is_anonymous: Math.random() > 0.7,
+})).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-export async function createPost(
-  user_id: string,
-  content: string,
-  media_url?: string,
-  image_url?: string
-): Promise<Post> {
-  const now = new Date().toISOString();
+// Mock comments
+const mockComments: Comment[] = [];
+mockPosts.forEach(post => {
+  const commentCount = post.comments_count || 0;
   
-  const postData = {
-    user_id,
-    content,
-    date: now,
-    image_url: image_url || media_url || null,
-    reactions: 0
-  };
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .insert(postData)
-    .select()
-    .single();
-  
-  if (error || !data) throw error || new Error('Insert post failed');
-  
-  // Map the returned data to our Post interface
-  const post: Post = {
-    id: data.id,
-    user_id: data.user_id,
-    content: data.content,
-    likes: 0, // Set default likes value
-    date: data.date,
-    reactions: data.reactions || 0,
-    image_url: data.image_url || undefined,
-    created_at: data.date, // Alias for compatibility
-    comments: []
-  };
-  
-  return post;
-}
+  // Generate comments for this post
+  Array.from({ length: commentCount }).forEach((_, i) => {
+    mockComments.push({
+      id: `comment-${post.id}-${i}`,
+      post_id: post.id,
+      user_id: mockUsers[Math.floor(Math.random() * mockUsers.length)].id,
+      content: faker.lorem.sentences(Math.floor(Math.random() * 2) + 1),
+      created_at: faker.date.recent({ days: 2 }).toISOString(),
+      likes_count: Math.floor(Math.random() * 10),
+      is_anonymous: Math.random() > 0.8,
+    });
+  });
+});
 
-export async function reactToPost(post_id: string): Promise<void> {
-  const { data, error } = await supabase
-    .from('posts')
-    .select('reactions')
-    .eq('id', post_id)
-    .single();
-  
-  if (error) throw error;
-  
-  const newReactions = (data?.reactions || 0) + 1;
-  
-  const { error: updateError } = await supabase
-    .from('posts')
-    .update({ reactions: newReactions })
-    .eq('id', post_id);
-    
-  if (updateError) throw updateError;
-}
-
-// --- COMMENTS ---
-export async function fetchComments(post_id: string): Promise<Comment[]> {
-  const { data, error } = await supabase
-    .from('comments')
-    .select('*')
-    .eq('post_id', post_id)
-    .order('date', { ascending: true });
-    
-  if (error) throw error;
-  
-  // Map the database fields to our Comment interface
-  const comments: Comment[] = (data || []).map(comment => ({
-    id: comment.id,
-    post_id: comment.post_id,
-    user_id: comment.user_id,
-    content: comment.content,
-    likes: 0, // Set default likes value
-    date: comment.date,
-    created_at: comment.date // Alias for compatibility
-  }));
-  
-  return comments;
-}
-
-export async function createComment(
-  post_id: string,
-  user_id: string,
-  content: string
-): Promise<Comment> {
-  const now = new Date().toISOString();
-  
-  const commentData = {
-    post_id,
-    user_id,
-    content,
-    date: now
-  };
-  
-  const { data, error } = await supabase
-    .from('comments')
-    .insert(commentData)
-    .select()
-    .single();
-    
-  if (error || !data) throw error || new Error('Insert comment failed');
-  
-  // Map the returned data to our Comment interface
-  const comment: Comment = {
-    id: data.id,
-    post_id: data.post_id,
-    user_id: data.user_id,
-    content: data.content,
-    likes: 0, // Set default likes value
-    date: data.date,
-    created_at: data.date // Alias for compatibility
-  };
-  
-  return comment;
-}
-
-// --- GROUPS ---
-export async function fetchGroups(): Promise<Group[]> {
-  const { data, error } = await supabase
-    .from('groups')
-    .select('*');
-    
-  if (error) throw error;
-  
-  // Map the database fields to our Group interface
-  const groups: Group[] = (data || []).map(group => ({
-    id: group.id,
-    name: group.name,
-    topic: group.topic,
-    description: '', // Default empty string for compatibility
-    members: group.members || [], // This will be string[] from database
-    members_count: group.members ? group.members.length : 0,
-    is_private: false, // Default value
-    created_at: new Date().toISOString(), // Default to now
-    joined: false // Default not joined
-  }));
-  
-  return groups;
-}
-
-export async function createGroup(
-  name: string,
-  topic: string,
-  description?: string
-): Promise<Group> {
-  const groupData = { 
-    name, 
-    topic, 
-    members: []
-  };
-  
-  const { data, error } = await supabase
-    .from('groups')
-    .insert(groupData)
-    .select()
-    .single();
-    
-  if (error || !data) throw error || new Error('Insert group failed');
-  
-  // Map the returned data to our Group interface
-  const group: Group = {
-    id: data.id,
-    name: data.name,
-    topic: data.topic,
-    description: '', // Default empty string for compatibility
-    members: data.members || [], // This will be string[] initially
-    members_count: data.members ? data.members.length : 0,
+// Mock groups
+export const mockGroups: Group[] = [
+  {
+    id: 'group-1',
+    name: 'Bien-être au travail',
+    description: 'Discussions et astuces pour améliorer le bien-être quotidien',
+    created_at: faker.date.past().toISOString(),
+    member_count: 28,
     is_private: false,
-    created_at: new Date().toISOString(),
-    joined: false
-  };
-  
-  return group;
-}
+    image_url: faker.image.urlPicsumPhotos()
+  },
+  {
+    id: 'group-2',
+    name: 'Gestion du stress',
+    description: 'Partagez vos techniques pour gérer le stress professionnel',
+    created_at: faker.date.past().toISOString(),
+    member_count: 17,
+    is_private: false,
+    image_url: faker.image.urlPicsumPhotos()
+  },
+  {
+    id: 'group-3',
+    name: 'Soutien équipe de nuit',
+    description: 'Groupe dédié aux professionnels travaillant de nuit',
+    created_at: faker.date.past().toISOString(),
+    member_count: 12,
+    is_private: true,
+    image_url: faker.image.urlPicsumPhotos()
+  },
+];
 
-export async function joinGroup(
-  group_id: string,
-  user_id: string
-): Promise<void> {
-  // First get the current group to check members
-  const { data, error } = await supabase
-    .from('groups')
-    .select('*')
-    .eq('id', group_id)
-    .single();
-    
-  if (error) throw error;
+// Mock group members
+export const mockGroupMembers: GroupMember[] = [
+  // Group 1 members
+  { group_id: 'group-1', user_id: '1', role: 'admin', joined_at: faker.date.past().toISOString() },
+  { group_id: 'group-1', user_id: '2', role: 'member', joined_at: faker.date.past().toISOString() },
+  { group_id: 'group-1', user_id: '3', role: 'member', joined_at: faker.date.past().toISOString() },
   
-  // Add user to members if not already included
-  const currentMembers = data?.members || [];
-  if (!currentMembers.includes(user_id)) {
-    const updatedMembers = [...currentMembers, user_id];
-    
-    const { error: updateError } = await supabase
-      .from('groups')
-      .update({ 
-        members: updatedMembers
-      })
-      .eq('id', group_id);
+  // Group 2 members
+  { group_id: 'group-2', user_id: '2', role: 'admin', joined_at: faker.date.past().toISOString() },
+  { group_id: 'group-2', user_id: '1', role: 'member', joined_at: faker.date.past().toISOString() },
+  
+  // Group 3 members
+  { group_id: 'group-3', user_id: '3', role: 'admin', joined_at: faker.date.past().toISOString() },
+  { group_id: 'group-3', user_id: '4', role: 'member', joined_at: faker.date.past().toISOString() },
+];
+
+// Community stats
+export const mockCommunityStats: CommunityStats = {
+  total_users: mockUsers.length,
+  active_users_today: Math.floor(mockUsers.length * 0.7),
+  posts_today: 5,
+  comments_today: 12,
+  top_tags: [
+    { name: 'bien-être', count: 32 },
+    { name: 'stress', count: 28 },
+    { name: 'équilibre', count: 15 },
+    { name: 'santé', count: 12 },
+  ]
+};
+
+// Get all posts with user information
+export const getCommunityPosts = async (limit = 10): Promise<Post[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const posts = mockPosts.slice(0, limit).map(post => {
+        const user = mockUsers.find(u => u.id === post.user_id);
+        return {
+          ...post,
+          user: post.is_anonymous ? 
+            { name: 'Anonyme', avatar: '' } : 
+            { name: user?.name || 'Utilisateur', avatar: user?.avatar || '' }
+        };
+      });
+      resolve(posts);
+    }, 500);
+  });
+};
+
+// Get comments for a post
+export const getPostComments = async (postId: string): Promise<Comment[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const comments = mockComments
+        .filter(comment => comment.post_id === postId)
+        .map(comment => {
+          const user = mockUsers.find(u => u.id === comment.user_id);
+          return {
+            ...comment,
+            user: comment.is_anonymous ? 
+              { name: 'Anonyme', avatar: '' } : 
+              { name: user?.name || 'Utilisateur', avatar: user?.avatar || '' }
+          };
+        })
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        
+      resolve(comments);
+    }, 300);
+  });
+};
+
+// Create a new post
+export const createPost = async (userId: string, content: string, isAnonymous: boolean, tags?: string[]): Promise<Post> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const newPost: Post = {
+        id: `post-${Date.now()}`,
+        user_id: userId,
+        content,
+        created_at: new Date().toISOString(),
+        likes_count: 0,
+        comments_count: 0,
+        tags: tags || [],
+        is_anonymous: isAnonymous,
+        // Add user info directly
+        user: isAnonymous ? 
+          { name: 'Anonyme', avatar: '' } : 
+          { 
+            name: mockUsers.find(u => u.id === userId)?.name || 'Utilisateur', 
+            avatar: mockUsers.find(u => u.id === userId)?.avatar || '' 
+          }
+      };
       
-    if (updateError) throw updateError;
-  }
-}
-
-export async function leaveGroup(
-  group_id: string,
-  user_id: string
-): Promise<void> {
-  // Get the current group to check members
-  const { data, error } = await supabase
-    .from('groups')
-    .select('*')
-    .eq('id', group_id)
-    .single();
-    
-  if (error) throw error;
-  
-  // Remove user from members if included
-  const currentMembers = data?.members || [];
-  if (currentMembers.includes(user_id)) {
-    const updatedMembers = currentMembers.filter(id => id !== user_id);
-    
-    const { error: updateError } = await supabase
-      .from('groups')
-      .update({ 
-        members: updatedMembers
-      })
-      .eq('id', group_id);
+      // Add to mock posts
+      mockPosts.unshift(newPost);
       
-    if (updateError) throw updateError;
-  }
-}
+      resolve(newPost);
+    }, 500);
+  });
+};
 
-// --- BUDDY SYSTEM ---
-export async function getBuddyRequests(userId: string): Promise<BuddyRequest[]> {
-  // For demo purposes, create mock buddy requests
-  const mockRequests: BuddyRequest[] = [
-    {
-      id: 'request-1',
-      user_id: 'user-request-1',
-      buddy_id: userId,
-      status: 'pending',
-      user: {
-        id: 'user-request-1',
-        name: 'Maria Lopez',
-        email: 'maria@example.com',
-        role: UserRole.INFIRMIER,
-        avatar: 'https://i.pravatar.cc/150?img=5',
+// Create a comment
+export const createComment = async (
+  postId: string, 
+  userId: string, 
+  content: string,
+  isAnonymous: boolean
+): Promise<Comment> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Create comment
+      const newComment: Comment = {
+        id: `comment-${Date.now()}`,
+        post_id: postId,
+        user_id: userId,
+        content,
+        created_at: new Date().toISOString(),
+        likes_count: 0,
+        is_anonymous: isAnonymous,
+        // Add user info directly
+        user: isAnonymous ? 
+          { name: 'Anonyme', avatar: '' } : 
+          { 
+            name: mockUsers.find(u => u.id === userId)?.name || 'Utilisateur', 
+            avatar: mockUsers.find(u => u.id === userId)?.avatar || '' 
+          }
+      };
+      
+      // Add to mock comments
+      mockComments.push(newComment);
+      
+      // Update the post's comment count
+      const post = mockPosts.find(p => p.id === postId);
+      if (post) {
+        post.comments_count = (post.comments_count || 0) + 1;
       }
-    },
-    {
-      id: 'request-2',
-      user_id: 'user-request-2',
-      buddy_id: userId,
-      status: 'accepted',
-      user: {
-        id: 'user-request-2',
-        name: 'Alex Dubois',
-        email: 'alex@example.com',
-        role: UserRole.MEDECIN,
-        avatar: 'https://i.pravatar.cc/150?img=8',
-      }
-    }
-  ];
-  
-  return mockRequests;
-}
+      
+      resolve(newComment);
+    }, 300);
+  });
+};
 
-export async function sendBuddyRequest(
+// Like a post
+export const likePost = async (postId: string): Promise<void> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const post = mockPosts.find(p => p.id === postId);
+      if (post) {
+        post.likes_count = (post.likes_count || 0) + 1;
+      }
+      resolve();
+    }, 200);
+  });
+};
+
+// Get recommended buddies
+export const getRecommendedBuddies = async (userId: string): Promise<User[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Filter out the current user and get 3 random users
+      const filteredUsers = mockUsers.filter(u => u.id !== userId);
+      const randomUsers = [...filteredUsers]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
+      
+      resolve(randomUsers);
+    }, 400);
+  });
+};
+
+// Get user's groups
+export const getUserGroups = async (userId: string): Promise<Group[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const userMemberships = mockGroupMembers.filter(m => m.user_id === userId);
+      const userGroups = mockGroups.filter(g => 
+        userMemberships.some(m => m.group_id === g.id)
+      );
+      resolve(userGroups);
+    }, 300);
+  });
+};
+
+// Create new group
+export const createGroup = async (
   userId: string,
-  buddyEmail: string
-): Promise<Buddy> {
-  // In a real implementation, this would verify the email exists and create a record
-  console.log(`Sending buddy request from ${userId} to ${buddyEmail}`);
-  
-  const mockBuddy: Buddy = {
-    id: `request-${Date.now()}`,
-    user_id: userId,
-    buddy_id: `buddy-${Date.now()}`,
-    status: 'pending',
-    date: new Date().toISOString()
-  };
-  
-  return mockBuddy;
-}
+  name: string,
+  description: string,
+  isPrivate: boolean
+): Promise<Group> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const newGroup: Group = {
+        id: `group-${Date.now()}`,
+        name,
+        description,
+        created_at: new Date().toISOString(),
+        member_count: 1,
+        is_private: isPrivate,
+        image_url: faker.image.urlPicsumPhotos()
+      };
+      
+      // Add to mock groups
+      mockGroups.push(newGroup);
+      
+      // Add creator as admin
+      mockGroupMembers.push({
+        group_id: newGroup.id,
+        user_id: userId,
+        role: 'admin',
+        joined_at: new Date().toISOString()
+      });
+      
+      resolve(newGroup);
+    }, 500);
+  });
+};
 
-export async function acceptBuddyRequest(requestId: string): Promise<Buddy> {
-  // In a real implementation, this would update the status in the database
-  console.log(`Accepting buddy request ${requestId}`);
-  
-  const mockBuddy: Buddy = {
-    id: requestId,
-    user_id: 'user-request-1',
-    buddy_id: 'current-user',
-    status: 'accepted',
-    date: new Date().toISOString()
-  };
-  
-  return mockBuddy;
-}
+// Get group details
+export const getGroupDetails = async (groupId: string): Promise<Group | null> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const group = mockGroups.find(g => g.id === groupId) || null;
+      resolve(group);
+    }, 200);
+  });
+};
 
-export async function rejectBuddyRequest(requestId: string): Promise<Buddy> {
-  // In a real implementation, this would update the status in the database
-  console.log(`Rejecting buddy request ${requestId}`);
-  
-  const mockBuddy: Buddy = {
-    id: requestId,
-    user_id: 'user-request-1',
-    buddy_id: 'current-user',
-    status: 'rejected',
-    date: new Date().toISOString()
-  };
-  
-  return mockBuddy;
-}
+// Get group members
+export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const members = mockGroupMembers
+        .filter(m => m.group_id === groupId)
+        .map(member => {
+          const user = mockUsers.find(u => u.id === member.user_id);
+          return {
+            ...member,
+            user: {
+              id: user?.id || '',
+              name: user?.name || 'Utilisateur',
+              role: user?.role || UserRole.USER,
+              avatar: user?.avatar || ''
+            }
+          };
+        });
+      resolve(members);
+    }, 300);
+  });
+};
 
-// --- USER MANAGEMENT ---
-export async function fetchUsersByRole(role?: UserRole): Promise<User[]> {
-  // For demo purposes, create mock users
-  const mockUsersList: User[] = [
-    {
-      id: 'user-1',
-      name: 'User 1',
-      email: 'user1@example.com',
-      role: role || UserRole.EMPLOYEE,
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      alias: 'user1',
-      bio: 'Bio for user 1',
-      joined_at: new Date().toISOString()
-    },
-    {
-      id: 'user-2',
-      name: 'User 2',
-      email: 'user2@example.com',
-      role: role || UserRole.EMPLOYEE,
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      alias: 'user2',
-      bio: 'Bio for user 2',
-      joined_at: new Date().toISOString()
-    },
-    {
-      id: 'user-3',
-      name: 'User 3',
-      email: 'user3@example.com',
-      role: role || UserRole.EMPLOYEE,
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      alias: 'user3',
-      bio: 'Bio for user 3',
-      joined_at: new Date().toISOString()
-    }
+// Join a group
+export const joinGroup = async (groupId: string, userId: string): Promise<void> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Check if already a member
+      const existingMembership = mockGroupMembers.find(
+        m => m.group_id === groupId && m.user_id === userId
+      );
+      
+      if (!existingMembership) {
+        // Add as member
+        mockGroupMembers.push({
+          group_id: groupId,
+          user_id: userId,
+          role: 'member',
+          joined_at: new Date().toISOString()
+        });
+        
+        // Update member count
+        const group = mockGroups.find(g => g.id === groupId);
+        if (group) {
+          group.member_count = (group.member_count || 0) + 1;
+        }
+      }
+      
+      resolve();
+    }, 300);
+  });
+};
+
+// Leave a group
+export const leaveGroup = async (groupId: string, userId: string): Promise<void> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // Find membership index
+      const membershipIndex = mockGroupMembers.findIndex(
+        m => m.group_id === groupId && m.user_id === userId
+      );
+      
+      if (membershipIndex !== -1) {
+        // Remove membership
+        mockGroupMembers.splice(membershipIndex, 1);
+        
+        // Update member count
+        const group = mockGroups.find(g => g.id === groupId);
+        if (group && group.member_count > 0) {
+          group.member_count -= 1;
+        }
+      }
+      
+      resolve();
+    }, 300);
+  });
+};
+
+// Get community stats
+export const getCommunityStats = async (): Promise<CommunityStats> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(mockCommunityStats);
+    }, 200);
+  });
+};
+
+// Generate mock tags for post creation
+export const getRecommendedTags = (): string[] => {
+  return [
+    'bien-être', 
+    'stress', 
+    'équilibre', 
+    'santé', 
+    'méditation', 
+    'sommeil', 
+    'nutrition', 
+    'exercice', 
+    'travail', 
+    'vie personnelle'
   ];
-  
-  return mockUsersList;
-}
-
-export async function fetchUserById(userId: string): Promise<User | null> {
-  // For demo purposes, create a mock user
-  const mockUser: User = {
-    id: userId,
-    name: 'Test User',
-    email: 'test@example.com',
-    role: UserRole.EMPLOYEE, // Set a default role
-    avatar: 'https://i.pravatar.cc/150?img=4',
-    alias: 'TestUser',
-    bio: 'This is a test user bio',
-    joined_at: new Date().toISOString()
-  };
-  
-  return mockUser;
-}
-
-// --- BUDDY MATCHING ---
-export async function findBuddy(
-  user_id: string,
-  role?: UserRole
-): Promise<Buddy> {
-  // For demo purposes, create a buddy match with another user
-  const buddyUserId = `buddy-${Date.now()}`;
-  
-  const now = new Date().toISOString();
-  
-  const buddy: Buddy = {
-    id: `buddy-match-${Date.now()}`,
-    user_id: user_id,
-    buddy_user_id: buddyUserId,
-    buddy_id: buddyUserId, // Adding the required property
-    status: 'pending', // Adding the required property
-    date: now, // Using date for backward compatibility
-    matched_on: now // For newer code compatibility
-  };
-  
-  return buddy;
-}
-
-export async function fetchUserBuddies(userId: string): Promise<Buddy[]> {
-  // For demo purposes, return a mock buddy
-  const now = new Date().toISOString();
-  
-  const buddies: Buddy[] = [
-    {
-      id: `buddy-match-demo`,
-      user_id: userId,
-      buddy_user_id: 'buddy-demo-1',
-      buddy_id: 'buddy-demo-1', // Adding the required property
-      status: 'accepted', // Adding the required property
-      date: now,
-      matched_on: now
-    }
-  ];
-  
-  return buddies;
-}
+};
