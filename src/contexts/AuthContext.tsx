@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const currentUser = getCurrentUser();
         setUser(currentUser);
+        console.log("Auth checked, current user:", currentUser);
       } catch (error) {
         console.error('Authentication error:', error);
       } finally {
@@ -51,6 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
     try {
+      console.log(`Attempting login for email: ${email}`);
       // Pour Sophie, on accepte le mot de passe "sophie" ou pas de mot de passe du tout
       let loggedInUser;
       if (email === 'sophie@example.com') {
@@ -64,6 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       setUser(loggedInUser);
+      console.log("Login successful, user:", loggedInUser);
       
       // Afficher un message de bienvenue
       toast({
@@ -73,13 +76,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       // Rediriger selon le rôle
       if (isAdminRole(loggedInUser.role)) {
+        console.log("Admin user detected, redirecting to dashboard");
         navigate('/dashboard');
       } else {
+        console.log("Regular user detected, redirecting to dashboard");
         navigate('/dashboard');
       }
       
       return loggedInUser;
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Erreur de connexion",
         description: error.message || "Identifiants incorrects",
@@ -102,6 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "À bientôt!",
       });
     } catch (error: any) {
+      console.error("Logout error:", error);
       toast({
         title: "Erreur de déconnexion",
         description: error.message,

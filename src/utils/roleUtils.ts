@@ -9,7 +9,9 @@
  * @returns boolean indicating if the user has admin privileges
  */
 export const isAdminRole = (role?: string): boolean => {
-  return role === 'admin' || role === 'direction' || role === 'Admin';
+  if (!role) return false;
+  const adminRoles = ['admin', 'direction', 'Admin', 'Direction'];
+  return adminRoles.includes(role);
 };
 
 /**
@@ -18,7 +20,9 @@ export const isAdminRole = (role?: string): boolean => {
  * @returns boolean indicating if the user is a standard user
  */
 export const isUserRole = (role?: string): boolean => {
-  return role === 'user' || role === 'employee' || role === 'Utilisateur';
+  if (!role) return false;
+  const userRoles = ['user', 'employee', 'Utilisateur'];
+  return userRoles.includes(role) || !isAdminRole(role); // Si ce n'est pas admin, c'est user par défaut
 };
 
 /**

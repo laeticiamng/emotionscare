@@ -12,16 +12,17 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated } = useAuth();
+  console.log("Layout - isAuthenticated:", isAuthenticated);
   
   // If not authenticated, only render the children (login/register pages)
   if (!isAuthenticated) {
+    console.log("Layout - Not authenticated, rendering without navigation");
     return <>{children || <Outlet />}</>;
   }
   
   return (
     <div className="flex flex-col min-h-screen">
       <GlobalNav />
-      {/* Add SessionTimeoutAlert for authenticated users */}
       <SessionTimeoutAlert />
       <div className="flex-1 overflow-auto bg-background pt-16">
         <main className="container mx-auto p-6">

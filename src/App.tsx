@@ -1,3 +1,4 @@
+
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
@@ -9,6 +10,7 @@ import NotFoundPage from './pages/NotFound';
 import SocialCocoonPage from './pages/SocialCocoonPage';
 import CommunityAdminPage from './pages/CommunityAdminPage';
 import CompliancePage from './pages/CompliancePage';
+import DashboardPage from './pages/DashboardPage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -29,7 +31,7 @@ function App() {
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedLayout>
-            <div>Dashboard Page</div>
+            <DashboardPage />
           </ProtectedLayout>
         } />
         

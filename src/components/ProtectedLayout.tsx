@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import Layout from './Layout';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -14,13 +15,17 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   requireRole
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
+  const location = useLocation();
+  
+  console.log("ProtectedLayout - Auth state:", { isAuthenticated, user, isLoading, path: location.pathname });
   
   // Show loading state
   if (isLoading) {
+    console.log("ProtectedLayout - Loading...");
     return (
       <Layout>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <LoadingAnimation />
         </div>
       </Layout>
     );
@@ -28,11 +33,13 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    console.log("ProtectedLayout - Not authenticated, redirecting to login");
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
   // Check for role requirements
   if (requireRole && user?.role !== requireRole) {
+    console.log(`ProtectedLayout - Role check failed: user role ${user?.role} vs required ${requireRole}`);
     return (
       <Layout>
         <div className="container mx-auto py-6">
@@ -44,6 +51,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   }
   
   // Return the children if all checks pass
+  console.log("ProtectedLayout - All checks passed, rendering content");
   return <Layout>{children}</Layout>;
 };
 

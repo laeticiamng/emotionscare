@@ -16,9 +16,12 @@ const DashboardPage: React.FC = () => {
   const { toast } = useToast();
   const [sessionContinued, setSessionContinued] = useState(false);
   
+  console.log("DashboardPage - Auth state:", { user, isAuthenticated, isLoading });
+  
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
+      console.log("DashboardPage - Not authenticated, redirecting to login");
       toast({
         title: "Accès refusé",
         description: "Veuillez vous connecter pour accéder à cette page",
@@ -29,6 +32,7 @@ const DashboardPage: React.FC = () => {
   }, [isLoading, isAuthenticated, navigate, toast]);
   
   if (isLoading) {
+    console.log("DashboardPage - Loading...");
     return <LoadingAnimation />;
   }
   
@@ -36,11 +40,15 @@ const DashboardPage: React.FC = () => {
   const isAdmin = isAdminRole(user?.role);
   const isUser = isUserRole(user?.role);
   
+  console.log(`DashboardPage - Determining dashboard type: isAdmin=${isAdmin}, isUser=${isUser}, role=${user?.role}`);
+  
   // Default to UserDashboard if role is not explicitly admin/direction
   const renderDashboard = () => {
     if (isAdmin) {
+      console.log("DashboardPage - Rendering AdminDashboard");
       return <AdminDashboard />;
     } else if (isUser || !user?.role) {
+      console.log("DashboardPage - Rendering UserDashboard");
       return <UserDashboard user={user} />;
     } else {
       console.warn(`Unknown user role: ${user?.role}, defaulting to UserDashboard`);
