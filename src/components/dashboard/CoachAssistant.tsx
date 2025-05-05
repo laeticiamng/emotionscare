@@ -11,10 +11,10 @@ interface CoachAssistantProps {
 
 const CoachAssistant: React.FC<CoachAssistantProps> = ({ className }) => {
   return (
-    <Card className={cn("h-full flex flex-col", className)}>
+    <Card className={cn("flex flex-col bg-gradient-to-br from-cocoon-50 to-white border-cocoon-100", className)}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-xl">
-          <Sparkles className="h-5 w-5 text-primary" />
+          <Sparkles className="h-5 w-5 text-cocoon-600" />
           Coach IA
         </CardTitle>
       </CardHeader>
