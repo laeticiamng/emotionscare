@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { fetchPosts, fetchUserById } from '@/lib/communityService';
+import { getPosts, fetchUserById } from '@/lib/communityService';
 import type { User } from '@/types';
 import type { Post } from '@/types/community';
 import PostForm from '@/components/community/PostForm';
@@ -24,7 +24,7 @@ const CommunityFeed: React.FC = () => {
   const loadPosts = async () => {
     try {
       setLoadingPosts(true);
-      const fetchedPosts = await fetchPosts();
+      const fetchedPosts = await getPosts();
       setPosts(fetchedPosts as Post[]);
       
       // Load user details for each post
@@ -40,7 +40,9 @@ const CommunityFeed: React.FC = () => {
       const newUserCache: Record<string, User | null> = { ...userCache };
       
       userDetails.forEach(({ id, user }) => {
-        newUserCache[id] = user;
+        if (id && typeof id === 'string') {
+          newUserCache[id] = user;
+        }
       });
       
       setUserCache(newUserCache);

@@ -2,19 +2,18 @@ import {
   BarChart,
   Book,
   CheckSquare,
-  Cog6Tooth,
   Compass,
   HelpCircle,
   Home,
   LineChart,
   Lock,
-  LockKeyhole,
   MessageSquare,
   PlayCircle,
   Plus,
   Settings,
   User,
   User2,
+  Cog,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -26,11 +25,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useUser } from '@/hooks/useUser';
 import { useEffect, useState } from 'react';
 import { fetchBadgesCount } from '@/lib/dashboardService';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -59,19 +58,19 @@ export const Navigation = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isLoading, signOut } = useUser();
-	const [badgesCount, setBadgesCount] = useState<number>(0);
+  const { user, isLoading, signOut } = useAuth();
+  const [badgesCount, setBadgesCount] = useState<number>(0);
 
-	useEffect(() => {
-		const loadBadgesCount = async () => {
-			if (user?.id) {
-				const count = await fetchBadgesCount(user.id);
-				setBadgesCount(count);
-			}
-		};
+  useEffect(() => {
+    const loadBadgesCount = async () => {
+      if (user?.id) {
+        const count = await fetchBadgesCount(user.id);
+        setBadgesCount(count);
+      }
+    };
 
-		loadBadgesCount();
-	}, [user?.id]);
+    loadBadgesCount();
+  }, [user?.id]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -167,7 +166,7 @@ export const Navigation = () => {
                 navigate('/');
               }}
             >
-              <LockKeyhole className="mr-2 h-4 w-4" />
+              <Lock className="mr-2 h-4 w-4" />
               <span>Se déconnecter</span>
               <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1.5 rounded border bg-muted px-2 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                 <svg
@@ -210,7 +209,7 @@ export const Navigation = () => {
       <Separator className="my-2" />
 
       <NavItem
-        icon={<Cog6Tooth className="h-6 w-6" />}
+        icon={<Cog className="h-6 w-6" />}
         label="Paramètres"
         to="/settings"
         active={pathname === '/settings'}

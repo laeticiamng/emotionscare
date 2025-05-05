@@ -1,6 +1,6 @@
 
 import { supabase } from '@/lib/supabase-client';
-import { Post, Comment, Group } from '@/types/community';
+import { Post, Comment, Group, BuddyRequest } from '@/types/community';
 import { User } from '@/types/index';
 
 // Posts
@@ -17,6 +17,9 @@ export const getPosts = async (): Promise<Post[]> => {
   
   return data || [];
 };
+
+// Alias for getPosts for compatibility with existing code
+export const fetchPosts = getPosts;
 
 export const getPostById = async (postId: string): Promise<Post | null> => {
   const { data, error } = await supabase
@@ -105,6 +108,9 @@ export const getGroups = async (): Promise<Group[]> => {
   return data || [];
 };
 
+// Alias for getGroups for compatibility
+export const fetchGroups = getGroups;
+
 export const joinGroup = async (groupId: string, userId: string): Promise<boolean> => {
   // This would typically be handled via a join table, but for simplicity we're just updating an array
   const { error } = await supabase.rpc('join_group', {
@@ -114,6 +120,120 @@ export const joinGroup = async (groupId: string, userId: string): Promise<boolea
   
   if (error) {
     console.error('Error joining group:', error);
+    return false;
+  }
+  
+  return true;
+};
+
+// Added missing function
+export const createGroup = async (name: string, description: string, ownerId: string): Promise<Group | null> => {
+  const { data, error } = await supabase
+    .from('groups')
+    .insert([{
+      name,
+      description,
+      owner_id: ownerId,
+      created_at: new Date().toISOString(),
+      members_count: 1
+    }])
+    .select()
+    .single();
+    
+  if (error) {
+    console.error('Error creating group:', error);
+    return null;
+  }
+  
+  return data;
+};
+
+// User functions
+export const fetchUserById = async (userId: string): Promise<User | null> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+    
+  if (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
+  
+  return data as unknown as User;
+};
+
+// Buddy system functions
+export const getBuddyRequests = async (userId: string): Promise<BuddyRequest[]> => {
+  const { data, error } = await supabase
+    .from('buddy_requests')
+    .select('*, user:from_user_id(*)')
+    .eq('to_user_id', userId);
+    
+  if (error) {
+    console.error('Error fetching buddy requests:', error);
+    return [];
+  }
+  
+  return data || [];
+};
+
+export const sendBuddyRequest = async (fromUserId: string, toUserEmail: string): Promise<boolean> => {
+  // First, get the user ID from the email
+  const { data: userData, error: userError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('email', toUserEmail)
+    .single();
+    
+  if (userError || !userData) {
+    console.error('Error finding user by email:', userError);
+    return false;
+  }
+  
+  const toUserId = userData.id;
+  
+  // Then create the buddy request
+  const { error } = await supabase
+    .from('buddy_requests')
+    .insert([{
+      from_user_id: fromUserId,
+      to_user_id: toUserId,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    }]);
+    
+  if (error) {
+    console.error('Error sending buddy request:', error);
+    return false;
+  }
+  
+  return true;
+};
+
+export const acceptBuddyRequest = async (requestId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('buddy_requests')
+    .update({ status: 'accepted', updated_at: new Date().toISOString() })
+    .eq('id', requestId);
+    
+  if (error) {
+    console.error('Error accepting buddy request:', error);
+    return false;
+  }
+  
+  return true;
+};
+
+export const rejectBuddyRequest = async (requestId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('buddy_requests')
+    .update({ status: 'rejected', updated_at: new Date().toISOString() })
+    .eq('id', requestId);
+    
+  if (error) {
+    console.error('Error rejecting buddy request:', error);
     return false;
   }
   

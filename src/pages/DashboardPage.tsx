@@ -38,10 +38,10 @@ const DashboardPage: React.FC = () => {
     if (isAdmin) {
       return <AdminDashboard />;
     } else if (isUser || !user?.role) {
-      return <UserDashboard />;
+      return <UserDashboard user={user} />;
     } else {
       console.warn(`Unknown user role: ${user?.role}, defaulting to UserDashboard`);
-      return <UserDashboard />;
+      return <UserDashboard user={user} />;
     }
   };
   

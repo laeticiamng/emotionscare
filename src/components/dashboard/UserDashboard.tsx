@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { DashboardHeader } from './DashboardHeader';
-import { UserSidePanel } from './UserSidePanel';
-import { ModulesSection } from './ModulesSection';
-import { EmotionScanSection } from './EmotionScanSection';
-import { SocialCocoonWidget } from './SocialCocoonWidget';
-import { GamificationWidget } from './GamificationWidget';
-import { DashboardFooter } from './DashboardFooter';
+import DashboardHeader from './DashboardHeader';
+import UserSidePanel from './UserSidePanel';
+import ModulesSection from './ModulesSection';
+import EmotionScanSection from './EmotionScanSection';
+import SocialCocoonWidget from './SocialCocoonWidget';
+import GamificationWidget from './GamificationWidget';
+import DashboardFooter from './DashboardFooter';
 import type { User } from '@/types';
 import VRPromptWidget from '../vr/VRPromptWidget';
 
@@ -35,7 +35,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         
         {/* Side Panel */}
         <div className="col-span-1 lg:col-span-4 space-y-6">
-          <UserSidePanel user={user} />
+          <UserSidePanel />
           
           {/* Add VR Prompt Widget */}
           <VRPromptWidget 
