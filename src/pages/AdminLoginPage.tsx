@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -68,7 +67,7 @@ const AdminLoginPage = () => {
           
           <div className="text-center">
             <h1 className="text-3xl font-semibold mb-1 text-[#1B365D]">
-              ÉmotionCare<span className="text-xs align-super">™</span>
+              EmotionsCare<span className="text-xs align-super">™</span>
             </h1>
             <p className="text-slate-600 flex items-center justify-center">
               par ResiMax<span className="text-xs align-super">™</span> - <Shield size={16} className="mx-1 text-[#1B365D]" /> Espace Direction

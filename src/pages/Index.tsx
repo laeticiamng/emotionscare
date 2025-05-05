@@ -11,7 +11,7 @@ const Index = () => {
       {/* Header & Branding */}
       <header className="w-full pt-12 pb-8 text-center animate-fade-in">
         <h1 className="text-4xl md:text-5xl font-semibold text-[#1B365D] mb-2">
-          ÉmotionCare<span className="text-sm align-super">™</span>
+          EmotionsCare<span className="text-sm align-super">™</span>
         </h1>
         <h2 className="text-lg md:text-xl text-slate-600 mb-1">
           par ResiMax<span className="text-xs align-super">™</span>
