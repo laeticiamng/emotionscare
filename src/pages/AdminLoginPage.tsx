@@ -54,7 +54,7 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-emerald-50">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#FAFBFC] to-[#E8F1FA]">
       <div className="w-full max-w-md animate-fade-in">
         <div className="mb-8">
           <Button
@@ -67,16 +67,16 @@ const AdminLoginPage = () => {
           </Button>
           
           <div className="text-center">
-            <h1 className="text-3xl font-bold mb-1">
-              ResiMax<span className="text-[#4DD0E1]">™</span>
+            <h1 className="text-3xl font-semibold mb-1 text-[#1B365D]">
+              ÉmotionCare<span className="text-xs align-super">™</span>
             </h1>
-            <p className="text-muted-foreground flex items-center justify-center">
-              <Shield size={16} className="mr-1 text-[#4DD0E1]" /> Espace Direction
+            <p className="text-slate-600 flex items-center justify-center">
+              par ResiMax<span className="text-xs align-super">™</span> - <Shield size={16} className="mx-1 text-[#1B365D]" /> Espace Direction
             </p>
           </div>
         </div>
 
-        <Card className="shadow-lg border-[#FFF5E6]/70">
+        <Card className="shadow-lg border-[#E8F1FA]">
           <CardHeader>
             <CardTitle>Administration</CardTitle>
             <CardDescription>
@@ -114,7 +114,7 @@ const AdminLoginPage = () => {
             <CardFooter className="flex flex-col space-y-2">
               <Button 
                 type="submit" 
-                className="w-full bg-[#4DD0E1] hover:bg-[#4DD0E1]/90 text-white hover:shadow-[0_0_10px_rgba(77,208,225,0.3)]"
+                className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white hover:shadow-[0_0_15px_rgba(168,230,207,0.3)]"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Connexion...' : 'Connexion Admin'}

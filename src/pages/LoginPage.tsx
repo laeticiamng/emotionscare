@@ -42,7 +42,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-emerald-50">
+    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#FAFBFC] to-[#E8F1FA]">
       <div className="w-full max-w-md animate-fade-in">
         <div className="mb-8">
           <Button
@@ -55,12 +55,14 @@ const LoginPage = () => {
           </Button>
           
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-primary mb-1">ResiMax™</h1>
-            <p className="text-muted-foreground">Espace Collaborateur</p>
+            <h1 className="text-3xl font-semibold text-[#1B365D] mb-1">
+              ÉmotionCare<span className="text-xs align-super">™</span>
+            </h1>
+            <p className="text-slate-600">par ResiMax<span className="text-xs align-super">™</span> - Espace Collaborateur</p>
           </div>
         </div>
 
-        <Card className="shadow-lg border-[#E8DAFF]/50">
+        <Card className="shadow-lg border-[#E8F1FA]">
           <CardHeader>
             <CardTitle>Connexion</CardTitle>
             <CardDescription>
@@ -98,7 +100,7 @@ const LoginPage = () => {
             <CardFooter className="flex flex-col space-y-2">
               <Button 
                 type="submit" 
-                className="w-full bg-[#FF8C94] hover:bg-[#FF8C94]/90 text-white hover:shadow-[0_0_10px_rgba(255,140,148,0.3)]"
+                className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white hover:shadow-[0_0_15px_rgba(168,230,207,0.3)]"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Connexion...' : 'Se connecter'}

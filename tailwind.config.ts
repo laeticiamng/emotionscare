@@ -19,6 +19,9 @@ export default {
       }
     },
     extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -81,8 +84,8 @@ export default {
           orange: '#F5A623',
           blue: '#4A90E2',
           violet: '#6B5B95',
-          mint: '#96DEC8',
-          coral: '#FF7F7F',
+          mint: '#A8E6CF',
+          coral: '#FF6F61',
           lavender: '#D8BFD8',
           apricot: '#FBCEB1',
           skyblue: '#87CEEB',
