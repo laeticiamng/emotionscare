@@ -3,18 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
-import AudioProcessor from './AudioProcessor';
+import AudioProcessor from './live/AudioProcessor';
 import EmotionResult from './live/EmotionResult';
 import { useToast } from '@/hooks/use-toast';
 import type { Emotion, EmotionResult as EmotionResultType } from '@/types';
 import { saveRealtimeEmotionScan } from '@/lib/scanService';
 
 interface EmotionScanLiveProps {
-  userId: string;
+  userId?: string;
   onComplete?: (emotion: Emotion) => void;
+  onResultSaved?: () => Promise<void>;
 }
 
-const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId, onComplete }) => {
+const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComplete, onResultSaved }) => {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState('');
@@ -63,6 +64,10 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId, onComplete })
         
         if (onComplete) {
           onComplete(emotionData);
+        }
+        
+        if (onResultSaved) {
+          onResultSaved();
         }
       })
       .catch((error) => {

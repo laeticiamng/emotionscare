@@ -16,12 +16,16 @@ interface PostItemProps {
   post: any;
   showComments?: boolean;
   onReactionAdded?: () => void;
+  getUserName?: (userId: string) => string;
+  onPostUpdated?: () => Promise<void>;
 }
 
 const PostItem: React.FC<PostItemProps> = ({ 
   post, 
   showComments = false,
-  onReactionAdded
+  onReactionAdded,
+  getUserName,
+  onPostUpdated
 }) => {
   const [showCommentsSection, setShowCommentsSection] = React.useState(showComments);
   const { user } = useAuth();
@@ -38,9 +42,12 @@ const PostItem: React.FC<PostItemProps> = ({
     }
     
     try {
-      await reactToPost(post.id);
+      await reactToPost(post.id, user.id); // Fixed: Added second argument user.id
       if (onReactionAdded) {
         onReactionAdded();
+      }
+      if (onPostUpdated) {
+        await onPostUpdated();
       }
     } catch (error) {
       console.error('Error reacting to post:', error);
@@ -108,7 +115,7 @@ const PostItem: React.FC<PostItemProps> = ({
       {showCommentsSection && (
         <div className="px-6 pb-3">
           {post.comments && post.comments.length > 0 && (
-            <CommentList comments={post.comments} />
+            <CommentList comments={post.comments} getUserName={getUserName} />
           )}
           <CommentForm postId={post.id} />
         </div>

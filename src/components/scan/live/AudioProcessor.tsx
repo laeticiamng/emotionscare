@@ -1,17 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { createProcessor } from "@/lib/audioVad";
 import { analyzeAudioStream, saveRealtimeEmotionScan } from "@/lib/scanService";
 import { useToast } from "@/hooks/use-toast";
-import type { Emotion } from '@/types';
+import type { Emotion, EmotionResult } from '@/types';
 import StatusIndicator from "./StatusIndicator";
 import TranscriptDisplay from "./TranscriptDisplay";
-
-// Define EmotionResult type if it doesn't exist
-interface EmotionResult {
-  emotion?: string;
-  confidence?: number;
-  transcript?: string;
-}
 
 interface AudioProcessorProps {
   isListening: boolean;

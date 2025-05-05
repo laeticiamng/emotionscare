@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -89,7 +89,10 @@ const ScanPage: React.FC = () => {
               />
             </Card>
           ) : (
-            <EmotionScanLive onResultSaved={() => fetchEmotionHistory().then(setEmotions)} />
+            <EmotionScanLive 
+              userId={user?.id || ''} 
+              onResultSaved={() => fetchEmotionHistory().then(setEmotions)} 
+            />
           )}
         </TabsContent>
 

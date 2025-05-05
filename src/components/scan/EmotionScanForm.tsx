@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -7,7 +8,7 @@ import EmojiSelector from './EmojiSelector';
 import EmotionTextInput from './EmotionTextInput';
 import AudioRecorder from './AudioRecorder';
 import AnalysisDialog from './AnalysisDialog';
-import { analyzeEmotion } from '@/lib/scanService';
+import { analyzeEmotion } from '@/lib/scan/analyzeService';
 
 export interface EmotionScanFormProps {
   onScanSaved: () => void;
@@ -56,7 +57,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     try {
       setAnalyzing(true);
       
-      // Dans une implémentation réelle, nous enverrions ces données à l'API
+      // Fixed type issue: pass object to analyzeEmotion
       const result = await analyzeEmotion({
         user_id: user?.id || '',
         emojis,

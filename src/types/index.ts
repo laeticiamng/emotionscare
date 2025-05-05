@@ -65,6 +65,16 @@ export interface Emotion {
   ai_feedback?: string;
   score?: number;
   created_at?: string;
+  source?: string;  // Add source property
+  is_confidential?: boolean;  // Add is_confidential property
+}
+
+// EmotionResult type
+export interface EmotionResult {
+  emotion?: string;
+  confidence?: number;
+  transcript?: string;
+  id?: string;
 }
 
 // Badge related types
