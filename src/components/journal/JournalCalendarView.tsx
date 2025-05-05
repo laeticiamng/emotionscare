@@ -47,11 +47,14 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
   [entries]);
   
   // Custom caption component for the calendar
-  const CustomCaption = ({ displayMonth, ...props }: CaptionProps) => (
-    <div {...props} className={`flex justify-center py-2 font-medium text-lg ${props.className || ''}`}>
-      {format(displayMonth, 'MMMM yyyy', { locale: fr })}
-    </div>
-  );
+  const CustomCaption = (props: CaptionProps) => {
+    const { displayMonth } = props;
+    return (
+      <div className="flex justify-center py-2 font-medium text-lg">
+        {format(displayMonth, 'MMMM yyyy', { locale: fr })}
+      </div>
+    );
+  };
 
   // Custom day component for the calendar
   const CustomDay = (props: DayContentProps) => {
