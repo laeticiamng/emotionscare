@@ -6,11 +6,11 @@ import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Emotion } from '@/types';
-import type { EmotionResult } from '@/lib/scanService';
+import type { EmotionResult as EmotionResultType } from '@/lib/scanService';
 
-// Import our new components
+// Import our components
 import AudioProcessor from './live/AudioProcessor';
-import EmotionResult from './live/EmotionResult';
+import EmotionResultDisplay from './live/EmotionResult';
 import StatusIndicator from './live/StatusIndicator';
 import TranscriptDisplay from './live/TranscriptDisplay';
 import EmptyState from './live/EmptyState';
@@ -28,7 +28,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
+  const [emotionResult, setEmotionResult] = useState<EmotionResultType | null>(null);
   const [progressText, setProgressText] = useState('');
   
   // Start/stop listening
@@ -41,7 +41,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
   };
   
   // Handle audio processing completion
-  const handleAnalysisComplete = (emotion: Emotion, result: EmotionResult) => {
+  const handleAnalysisComplete = (emotion: Emotion, result: EmotionResultType) => {
     setEmotionResult(result);
     setTranscript(result.transcript || '');
     
@@ -115,7 +115,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
         
         {/* Emotion Result */}
         {emotionResult && (
-          <EmotionResult 
+          <EmotionResultDisplay 
             result={emotionResult} 
             onPlayMusic={() => handlePlayMusic(emotionResult)}
           />
