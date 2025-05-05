@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { JournalEntry } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, isSameDay } from 'date-fns';
+import { DayPickerDayProps } from 'react-day-picker';
 
 interface JournalCalendarViewProps {
   entries: JournalEntry[];
@@ -44,7 +45,7 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
             selected: { fontWeight: "bold" }
           }}
           components={{
-            Day: ({ date, ...props }) => (
+            Day: ({ date, ...props }: DayPickerDayProps) => (
               <button {...props} className={`${props.className} ${dayClassName(date) || ''}`}>
                 {date.getDate()}
               </button>
