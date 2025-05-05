@@ -1,26 +1,34 @@
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { mockVRTemplates } from '@/data/mockData';
-import type { VRSessionTemplate, VRSession } from '@/types';
+import { mockVRTemplates } from '@/data/mockVRTemplates';
+import type { VRSessionTemplate, VRSession, Emotion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import VRTemplateGrid from '@/components/vr/VRTemplateGrid';
 import VRTemplateDetail from '@/components/vr/VRTemplateDetail';
-import VRSessionView from '@/components/vr/VRSessionView';
+import VRSessionWithMusic from '@/components/vr/VRSessionWithMusic';
 import VRSessionHistory from '@/components/vr/VRSessionHistory';
 import { supabase } from '@/lib/supabase-client';
 import { ChatInterface } from '@/components/chat/ChatInterface';
+import { extractYoutubeID } from '@/utils/vrUtils';
+import { createVRSession } from '@/lib/vrService';
+import { useAuth } from '@/contexts/AuthContext';
 
 const VRSessionPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
-  const [selectedTemplate, setSelectedTemplate] = useState<VRSessionTemplate | null>(null);
+  const { user } = useAuth();
+  const recommendedTemplate = location.state?.recommendedTemplate as VRSessionTemplate | undefined;
+  const [selectedTemplate, setSelectedTemplate] = useState<VRSessionTemplate | null>(recommendedTemplate || null);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState(0);
   const [heartRate, setHeartRate] = useState({ before: 82, after: null as number | null });
   const [recentSessions, setRecentSessions] = useState<VRSession[]>([]);
   const [templates, setTemplates] = useState<VRSessionTemplate[]>([]);
+  const [latestEmotion, setLatestEmotion] = useState<Emotion | null>(null);
   
   // Load templates with progress tracking
   useEffect(() => {
@@ -34,13 +42,31 @@ const VRSessionPage = () => {
           return {
             ...template,
             completion_rate: completionRate,
-            is_audio_only: template.template_id === '3', // Mark meditation as audio-only for demo
-            audio_url: template.template_id === '3' ? 
-              'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3' : undefined
+            is_audio_only: template.template_id === '3' || template.template_id === '4', 
+            audio_url: template.audio_url || 
+              (template.template_id === '3' || template.template_id === '4' ? 
+              'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3' : undefined)
           };
         });
         
         setTemplates(enhancedTemplates);
+        
+        // If we have a recommended template from state navigation, find and select it
+        if (recommendedTemplate) {
+          const matchingTemplate = enhancedTemplates.find(
+            t => t.template_id === recommendedTemplate.template_id
+          );
+          if (matchingTemplate) {
+            setSelectedTemplate(matchingTemplate);
+            setSessionTimeRemaining(matchingTemplate.duration);
+            setHeartRate({ before: Math.floor(75 + Math.random() * 15), after: null });
+          }
+        }
+        
+        // Load recent sessions
+        if (user) {
+          loadUserSessions(user.id);
+        }
       } catch (error) {
         console.error('Error loading VR templates:', error);
         toast({
@@ -52,7 +78,47 @@ const VRSessionPage = () => {
     };
     
     loadTemplates();
-  }, [toast]);
+  }, [toast, recommendedTemplate, user]);
+
+  // Load user's recent VR sessions
+  const loadUserSessions = async (userId: string) => {
+    try {
+      // In a real app, this would fetch from Supabase
+      // For now we'll use mock data
+      const mockSessions: VRSession[] = [
+        {
+          id: 'session-1',
+          user_id: userId,
+          template_id: '1',
+          date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          duration: 5,
+          duration_seconds: 300,
+          completed: true,
+          location_url: mockVRTemplates[0].preview_url,
+          heart_rate_before: 84,
+          heart_rate_after: 72,
+          is_audio_only: false
+        },
+        {
+          id: 'session-2',
+          user_id: userId,
+          template_id: '2',
+          date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          duration: 7,
+          duration_seconds: 420,
+          completed: true,
+          location_url: mockVRTemplates[1].preview_url,
+          heart_rate_before: 88,
+          heart_rate_after: 75,
+          is_audio_only: false
+        }
+      ];
+      
+      setRecentSessions(mockSessions);
+    } catch (error) {
+      console.error('Error loading user VR sessions:', error);
+    }
+  };
 
   // Handle template selection
   const handleSelectTemplate = (template: VRSessionTemplate) => {
@@ -83,31 +149,36 @@ const VRSessionPage = () => {
   
   // Handle session completion
   const handleCompleteSession = async () => {
-    if (!selectedTemplate) return;
+    if (!selectedTemplate || !user) return;
     
     // Simulate heart rate decrease after relaxation
     const afterHeartRate = Math.max(60, heartRate.before - Math.floor(5 + Math.random() * 10));
     setHeartRate({ ...heartRate, after: afterHeartRate });
     
     // Create a new session record
-    const newSession: VRSession = {
-      id: `session-${Date.now()}`,
-      user_id: 'current-user',
-      template_id: selectedTemplate.template_id,
-      date: new Date().toISOString(),
-      duration: selectedTemplate.duration,
-      duration_seconds: selectedTemplate.duration * 60,
-      completed: true,
-      location_url: selectedTemplate.preview_url,
-      heart_rate_before: heartRate.before,
-      heart_rate_after: afterHeartRate,
-      is_audio_only: selectedTemplate.is_audio_only || false
-    };
-    
-    // In a real app, we would save to Supabase
     try {
-      // Simulating API call
-      console.log('Saving session to database:', newSession);
+      // In a real app, we would save to Supabase using createVRSession
+      console.log('Creating VR session:', {
+        user_id: user.id,
+        duration_seconds: selectedTemplate.duration * 60,
+        location_url: selectedTemplate.preview_url,
+        hr_before: heartRate.before,
+        hr_after: afterHeartRate
+      });
+      
+      const newSession: VRSession = {
+        id: `session-${Date.now()}`,
+        user_id: user.id,
+        template_id: selectedTemplate.template_id,
+        date: new Date().toISOString(),
+        duration: selectedTemplate.duration,
+        duration_seconds: selectedTemplate.duration * 60,
+        completed: true,
+        location_url: selectedTemplate.preview_url,
+        heart_rate_before: heartRate.before,
+        heart_rate_after: afterHeartRate,
+        is_audio_only: selectedTemplate.is_audio_only || false
+      };
       
       // Update recent sessions
       setRecentSessions([newSession, ...recentSessions]);
@@ -137,6 +208,7 @@ const VRSessionPage = () => {
         description: "Impossible d'enregistrer la session.",
         variant: "destructive"
       });
+      setIsSessionActive(false);
     }
   };
 
@@ -158,7 +230,7 @@ const VRSessionPage = () => {
       {/* Content */}
       {isSessionActive ? (
         /* Active Session View */
-        <VRSessionView
+        <VRSessionWithMusic
           template={selectedTemplate!}
           onCompleteSession={handleCompleteSession}
         />

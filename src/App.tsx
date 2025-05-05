@@ -16,6 +16,7 @@ import BuddyPage from './pages/BuddyPage';
 import CommunityFeed from './pages/CommunityFeed';
 import GroupListPage from './pages/GroupListPage';
 import VRSessionPage from './pages/VRSessionPage';
+import MusicWellbeingPage from './pages/MusicWellbeingPage';
 import GamificationPage from './pages/GamificationPage';
 import OnboardingPage from './pages/OnboardingPage';
 import NotFound from './pages/NotFound';
@@ -47,6 +48,7 @@ function App() {
               <Route path="community" element={<CommunityFeed />} />
               <Route path="groups" element={<GroupListPage />} />
               <Route path="vr-sessions" element={<VRSessionPage />} />
+              <Route path="music-wellbeing" element={<MusicWellbeingPage />} />
               <Route path="gamification" element={<GamificationPage />} />
               <Route path="preferences" element={<UserPreferences />} />
               <Route path="account-settings" element={<AccountSettings />} />
