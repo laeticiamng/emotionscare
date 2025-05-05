@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Eye, BookOpen, Users, Star, HeartPulse, Brain, ArrowRight } from 'lucide-react';
+import { Eye, BookOpen, Users, Star, HeartPulse, Brain, ArrowRight, UserIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 
@@ -20,9 +20,17 @@ const UserModulesGrid: React.FC = () => {
       title: 'Social Cocoon',
       description: 'Échangez anonymement',
       icon: Users,
-      path: '/community',
+      path: '/social-cocoon',
       bgClass: 'bg-pastel-purple/30',
       indicator: 'Nouveaux messages: 2'
+    },
+    {
+      title: 'Buddy',
+      description: 'Connexions de confiance',
+      icon: UserIcon,
+      path: '/buddy',
+      bgClass: 'bg-pastel-orange/30', 
+      indicator: 'Connexions: 3'
     },
     {
       title: 'Coach IA',

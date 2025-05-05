@@ -16,7 +16,11 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
   console.log(`NavItem render: ${label}, to: ${to}, current path: ${location.pathname}`);
   
   // If active is not explicitly provided, determine from current location
-  const isActive = active !== undefined ? active : location.pathname === to;
+  // For more precise matching, check if the path starts with the route
+  // This helps with nested routes like /buddy/123
+  const isActive = active !== undefined 
+    ? active 
+    : location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -30,6 +34,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
         isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground'
       }`}
       onClick={handleClick}
+      data-active={isActive}
     >
       {icon}
       {label}

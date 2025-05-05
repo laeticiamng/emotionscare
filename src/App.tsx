@@ -15,6 +15,7 @@ import ScanPage from './pages/ScanPage';
 import JournalPage from './pages/JournalPage';
 import GamificationPage from './pages/GamificationPage';
 import MusicWellbeingPage from './pages/MusicWellbeingPage';
+import BuddyPage from './pages/BuddyPage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -69,6 +70,13 @@ function App() {
         <Route path="/community/admin" element={
           <ProtectedLayout requireRole="admin">
             <CommunityAdminPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Buddy Route */}
+        <Route path="/buddy" element={
+          <ProtectedLayout>
+            <BuddyPage />
           </ProtectedLayout>
         } />
         
