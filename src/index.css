@@ -11,7 +11,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --primary: 265 89% 78%;
     --primary-foreground: 0 0% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -24,7 +24,7 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -55,7 +55,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -108,16 +108,81 @@
   @apply text-gray-600 dark:text-gray-300;
 }
 
-/* Apple-like styling for cards */
+/* Glass morphism effects */
+.glass-card {
+  @apply bg-white/80 backdrop-blur-sm rounded-3xl border border-white/20 shadow-soft transition-all duration-300;
+}
+
+.glass-card:hover {
+  @apply shadow-medium border-white/30;
+}
+
+/* Neon effects */
+.neon-glow {
+  @apply shadow-glow transition-all duration-300;
+}
+
+.neon-glow:hover {
+  @apply shadow-glow-light;
+}
+
+/* Card variations by type */
+.card-journal {
+  @apply bg-pastel-purple/50 hover:bg-pastel-purple/70;
+}
+
+.card-vr {
+  @apply bg-pastel-green/50 hover:bg-pastel-green/70;
+}
+
+.card-social {
+  @apply bg-pastel-yellow/50 hover:bg-pastel-yellow/70;
+}
+
+.card-coach {
+  @apply bg-pastel-blue/50 hover:bg-pastel-blue/70;
+}
+
+.card-analytics {
+  @apply bg-gray-50/80 hover:bg-gray-50;
+}
+
+/* Timeline styling */
+.timeline-connector {
+  @apply absolute h-full w-px bg-border left-3 top-6 -translate-x-1/2;
+}
+
+/* Card styling */
 .apple-card {
-  @apply rounded-xl shadow-sm border border-gray-200/80 transition-all duration-300;
+  @apply rounded-2xl shadow-sm border border-gray-200/80 transition-all duration-300;
 }
 
 .apple-card:hover {
   @apply shadow-md;
 }
 
-/* Timeline styling */
-.timeline-connector {
-  @apply absolute h-full w-px bg-border left-3 top-6 -translate-x-1/2;
+/* Button styling */
+.btn-floating {
+  @apply rounded-full shadow-soft transition-all duration-200 hover:shadow-medium hover:-translate-y-1;
+}
+
+.btn-primary {
+  @apply bg-wellness-coral text-white hover:bg-wellness-coral/90 btn-floating;
+}
+
+.btn-ghost {
+  @apply bg-transparent border-2 hover:bg-gray-50/80 btn-floating;
+}
+
+.btn-action {
+  @apply text-sm font-medium rounded-full px-4 py-2 transition-all duration-200;
+}
+
+/* Module cards */
+.module-card {
+  @apply rounded-3xl p-6 border border-gray-100/80 shadow-soft transition-all duration-300;
+}
+
+.module-card:hover {
+  @apply shadow-medium -translate-y-1;
 }

@@ -81,13 +81,34 @@ export default {
           orange: '#F5A623',
           blue: '#4A90E2',
           violet: '#6B5B95',
-        }
+          mint: '#96DEC8',
+          coral: '#FF7F7F',
+          lavender: '#D8BFD8',
+          apricot: '#FBCEB1',
+          skyblue: '#87CEEB',
+        },
+        pastel: {
+          blue: '#E6F2FF',
+          green: '#E8F5E9',
+          pink: '#FCE4EC',
+          yellow: '#FFF9C4',
+          purple: '#F3E5F5',
+        },
+        neon: {
+          pink: '#FF1493',
+          blue: '#00BFFF',
+          green: '#39FF14',
+          orange: '#FF4500',
+          purple: '#9D00FF',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
         xl: '16px',
+        '2xl': '24px',
+        '3xl': '32px',
       },
       keyframes: {
         'accordion-down': {
@@ -109,6 +130,14 @@ export default {
         'hover-lift': {
           '0%': { transform: 'translateY(0)' },
           '100%': { transform: 'translateY(-4px)' }
+        },
+        'slide-up': {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' }
+        },
+        'glow': {
+          '0%, 100%': { boxShadow: '0 0 5px rgba(160, 89, 255, 0.2)' },
+          '50%': { boxShadow: '0 0 20px rgba(160, 89, 255, 0.6)' }
         }
       },
       animation: {
@@ -117,6 +146,8 @@ export default {
         'fade-in': 'fade-in 0.5s ease-out',
         'pulse-subtle': 'pulse-subtle 3s infinite',
         'hover-lift': 'hover-lift 0.2s ease-out forwards',
+        'slide-up': 'slide-up 0.3s ease-out',
+        'glow': 'glow 2s infinite'
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -126,6 +157,8 @@ export default {
         'medium': '0 6px 16px rgba(0, 0, 0, 0.1)',
         'apple': '0 4px 12px rgba(0, 0, 0, 0.1)',
         'apple-hover': '0 6px 16px rgba(0, 0, 0, 0.15)',
+        'glow': '0 0 15px rgba(124, 58, 237, 0.5)',
+        'glow-light': '0 0 8px rgba(124, 58, 237, 0.3)',
       }
     }
   },

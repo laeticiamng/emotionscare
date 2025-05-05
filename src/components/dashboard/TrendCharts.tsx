@@ -40,14 +40,38 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <Card className="apple-card">
+      <Card className="glass-card overflow-hidden">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg">Tendance Absentéisme</CardTitle>
-            <ToggleGroup type="single" value={timeRange} onValueChange={(value) => value && setTimeRange(value)} aria-label="Période">
-              <ToggleGroupItem value="7j" aria-label="7 jours">7j</ToggleGroupItem>
-              <ToggleGroupItem value="30j" aria-label="30 jours">30j</ToggleGroupItem>
-              <ToggleGroupItem value="90j" aria-label="90 jours">90j</ToggleGroupItem>
+            <ToggleGroup 
+              type="single" 
+              value={timeRange} 
+              onValueChange={(value) => value && setTimeRange(value)} 
+              aria-label="Période"
+              className="border rounded-full p-1"
+            >
+              <ToggleGroupItem 
+                value="7j" 
+                aria-label="7 jours"
+                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
+              >
+                7j
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="30j" 
+                aria-label="30 jours"
+                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
+              >
+                30j
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="90j" 
+                aria-label="90 jours"
+                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
+              >
+                90j
+              </ToggleGroupItem>
             </ToggleGroup>
           </div>
           <CardDescription>{timeRange === "7j" ? "7 derniers jours" : timeRange === "30j" ? "30 derniers jours" : "90 derniers jours"}</CardDescription>
@@ -66,6 +90,12 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={filteredAbsenteeismData}>
+                    <defs>
+                      <linearGradient id="wellnessGreenGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#7ED321" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#7ED321" stopOpacity={0.05}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="date" />
                     <YAxis />
@@ -75,8 +105,9 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
                       dataKey="value" 
                       name="value"
                       stroke="#7ED321" 
-                      fill="#7ED321" 
-                      fillOpacity={0.2} 
+                      fill="url(#wellnessGreenGradient)" 
+                      strokeWidth={2}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -86,14 +117,38 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
         </CardContent>
       </Card>
 
-      <Card className="apple-card">
+      <Card className="glass-card overflow-hidden">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
             <CardTitle className="text-lg">Tendance Productivité</CardTitle>
-            <ToggleGroup type="single" value={timeRange} onValueChange={(value) => value && setTimeRange(value)} aria-label="Période">
-              <ToggleGroupItem value="7j" aria-label="7 jours">7j</ToggleGroupItem>
-              <ToggleGroupItem value="30j" aria-label="30 jours">30j</ToggleGroupItem>
-              <ToggleGroupItem value="90j" aria-label="90 jours">90j</ToggleGroupItem>
+            <ToggleGroup 
+              type="single" 
+              value={timeRange} 
+              onValueChange={(value) => value && setTimeRange(value)} 
+              aria-label="Période"
+              className="border rounded-full p-1"
+            >
+              <ToggleGroupItem 
+                value="7j" 
+                aria-label="7 jours"
+                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
+              >
+                7j
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="30j" 
+                aria-label="30 jours"
+                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
+              >
+                30j
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="90j" 
+                aria-label="90 jours"
+                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
+              >
+                90j
+              </ToggleGroupItem>
             </ToggleGroup>
           </div>
           <CardDescription>{timeRange === "7j" ? "7 derniers jours" : timeRange === "30j" ? "30 derniers jours" : "90 derniers jours"}</CardDescription>
@@ -112,6 +167,12 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
               >
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={filteredProductivityData}>
+                    <defs>
+                      <linearGradient id="wellnessBlueGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#4A90E2" stopOpacity={1}/>
+                        <stop offset="95%" stopColor="#4A90E2" stopOpacity={0.7}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="date" />
                     <YAxis />
@@ -119,8 +180,8 @@ const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivity
                     <Bar 
                       dataKey="value" 
                       name="value"
-                      fill="#4A90E2" 
-                      radius={[4, 4, 0, 0]}
+                      fill="url(#wellnessBlueGradient)" 
+                      radius={[8, 8, 0, 0]}
                     />
                   </BarChart>
                 </ResponsiveContainer>

@@ -20,6 +20,8 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         apple: "bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white",
+        coral: "bg-wellness-coral text-white hover:bg-wellness-coral/90 shadow-soft hover:shadow-medium hover:-translate-y-0.5",
+        mint: "bg-wellness-mint text-slate-800 hover:bg-wellness-mint/90 shadow-soft hover:shadow-medium hover:-translate-y-0.5",
       },
       size: {
         default: "h-10 px-5 py-2",
