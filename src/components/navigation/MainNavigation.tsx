@@ -1,29 +1,23 @@
 
-import React from 'react';
-import { 
-  Home, 
-  Compass, 
-  Book, 
-  LineChart, 
-  MessageSquare, 
-  CheckSquare, 
-  PlayCircle, 
-  BarChart
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import NavItem from './NavItem';
 import UserMenu from './UserMenu';
 import GuestMenu from './GuestMenu';
-import FooterLinks from './FooterLinks';
-import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect, useState } from 'react';
+import { navItems, adminNavItems } from './navConfig';
+import { isAdminRole } from '@/utils/roleUtils';
 import { fetchBadgesCount } from '@/lib/dashboardService';
 
 const MainNavigation: React.FC = () => {
   const { pathname } = useLocation();
   const { user } = useAuth();
   const [badgesCount, setBadgesCount] = useState<number>(0);
+  const isAdmin = user ? isAdminRole(user.role) : false;
+  
+  // Sélectionner les bons éléments de navigation en fonction du rôle
+  const navigationItems = isAdmin ? adminNavItems : navItems;
 
   useEffect(() => {
     const loadBadgesCount = async () => {
@@ -37,57 +31,19 @@ const MainNavigation: React.FC = () => {
   }, [user?.id]);
 
   return (
-    <div className="flex flex-col gap-1">
-      <NavItem
-        icon={<Home className="h-6 w-6" />}
-        label="Tableau de bord"
-        to="/dashboard"
-        active={pathname === '/dashboard'}
-      />
-      <NavItem
-        icon={<Book className="h-6 w-6" />}
-        label="Journal"
-        to="/journal"
-        active={pathname === '/journal' || pathname.startsWith('/journal/')}
-      />
-      <NavItem
-        icon={<LineChart className="h-6 w-6" />}
-        label="Scan Émotionnel"
-        to="/scan"
-        active={pathname === '/scan' || pathname.startsWith('/scan/')}
-      />
-      <NavItem
-        icon={<MessageSquare className="h-6 w-6" />}
-        label="Communauté"
-        to="/social-cocoon"
-        active={pathname === '/social-cocoon'}
-      />
-      <NavItem
-        icon={<CheckSquare className="h-6 w-6" />}
-        label="Défis"
-        to="/gamification"
-        active={pathname === '/gamification'}
-      />
-      
-      <NavItem
-        icon={<PlayCircle className="h-6 w-6" />}
-        label="Micro-pauses VR"
-        to="/vr-sessions"
-        active={pathname.includes('/vr-sessions')}
-      />
-      
-      {/* Show admin VR analytics only for users with role === 'admin' */}
-      {user?.role === 'admin' && (
+    <div className="flex flex-col gap-2 py-2">
+      {navigationItems.map((item) => (
         <NavItem
-          icon={<BarChart className="h-6 w-6" />}
-          label="Statistiques VR"
-          to="/vr-analytics"
-          active={pathname === '/vr-analytics'}
+          key={item.path}
+          icon={item.icon}
+          label={item.label}
+          to={item.path}
+          active={pathname === item.path || pathname.startsWith(`${item.path}/`)}
         />
-      )}
+      ))}
       
       <Separator className="my-2" />
-
+      
       {user ? (
         <UserMenu badgesCount={badgesCount} />
       ) : (
@@ -95,8 +51,6 @@ const MainNavigation: React.FC = () => {
       )}
 
       <Separator className="my-2" />
-
-      <FooterLinks />
     </div>
   );
 };

@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { navItems, adminNavItems } from '@/components/navigation/navConfig';
+import { navItems, adminNavItems, footerNavItems } from '@/components/navigation/navConfig';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Bell, Settings } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 import NotificationBar from '@/components/notifications/NotificationBar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -15,7 +16,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const isAdmin = isAdminRole(user?.role);
   
-  // Choose navigation items based on user role
+  // Choisir les éléments de navigation en fonction du rôle
   const items = isAdmin ? adminNavItems : navItems;
   
   const handleNavigation = (path: string) => {
@@ -27,64 +28,123 @@ const Sidebar = () => {
   };
 
   return (
-    <div 
-      className={`bg-secondary/10 border-r border-border transition-all duration-300 flex flex-col h-full fixed left-0 top-16 bottom-0 z-40 ${
+    <aside 
+      className={`bg-background/80 backdrop-blur-sm border-r border-border transition-all duration-300 flex flex-col h-full fixed left-0 top-16 bottom-0 z-40 ${
         collapsed ? 'w-16' : 'w-64'
       }`}
+      aria-label="Sidebar navigation"
     >
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto py-4 px-2">
         <div className="space-y-1">
           {items.map((item) => (
-            <Button
-              key={item.href}
-              variant={isActive(item.href) ? "secondary" : "ghost"}
-              className={`w-full justify-start ${collapsed ? 'px-2' : 'px-3'}`}
-              onClick={() => handleNavigation(item.href)}
-            >
-              {item.icon}
-              {!collapsed && <span className="ml-3">{item.title}</span>}
-            </Button>
-          ))}
-
-          {!isAdmin && (
-            <>
-              <div className="my-2 border-t border-border"></div>
+            collapsed ? (
+              <TooltipProvider key={item.path}>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={isActive(item.path) ? "secondary" : "ghost"}
+                      size="icon"
+                      className="w-full h-10"
+                      onClick={() => handleNavigation(item.path)}
+                    >
+                      {React.cloneElement(item.icon, { className: "h-5 w-5" })}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    {item.label}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
               <Button
-                variant={isActive("/my-data") ? "secondary" : "ghost"}
-                className={`w-full justify-start ${collapsed ? 'px-2' : 'px-3'}`}
-                onClick={() => handleNavigation('/my-data')}
+                key={item.path}
+                variant={isActive(item.path) ? "secondary" : "ghost"}
+                className="w-full justify-start px-3"
+                onClick={() => handleNavigation(item.path)}
               >
-                <Settings size={18} />
-                {!collapsed && <span className="ml-3">Mes Données</span>}
+                {item.icon}
+                <span className="ml-2">{item.label}</span>
               </Button>
-            </>
+            )
+          ))}
+        </div>
+
+        {!isAdmin && footerNavItems.length > 0 && (
+          <>
+            <div className="my-2 border-t border-border"></div>
+            <div className="space-y-1">
+              {footerNavItems.map((item) => (
+                collapsed ? (
+                  <TooltipProvider key={item.path}>
+                    <Tooltip delayDuration={300}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant={isActive(item.path) ? "secondary" : "ghost"}
+                          size="icon"
+                          className="w-full h-10"
+                          onClick={() => handleNavigation(item.path)}
+                        >
+                          {React.cloneElement(item.icon, { className: "h-5 w-5" })}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        {item.label}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <Button
+                    key={item.path}
+                    variant={isActive(item.path) ? "secondary" : "ghost"}
+                    className="w-full justify-start px-3"
+                    onClick={() => handleNavigation(item.path)}
+                  >
+                    {item.icon}
+                    <span className="ml-2">{item.label}</span>
+                  </Button>
+                )
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      
+      {/* Notification et contrôle d'affichage */}
+      <div className="p-2 border-t border-border">
+        <div className="flex items-center justify-between mb-2 px-2">
+          {!collapsed && (
+            <span className="text-xs text-muted-foreground">Notifications</span>
+          )}
+          
+          {collapsed ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex justify-center py-2">
+                    <NotificationBar userId={user?.id} unreadCount={3} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  Notifications
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <NotificationBar userId={user?.id} unreadCount={3} />
           )}
         </div>
+        
+        <Button 
+          variant="outline" 
+          size={collapsed ? "icon" : "sm"}
+          className={`${collapsed ? '' : 'w-full justify-between'}`}
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {!collapsed && <span className="text-xs">Réduire</span>}
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </Button>
       </div>
-      
-      <div className="p-2 border-t border-border">
-        {!collapsed && (
-          <div className="flex items-center justify-between mb-2 px-2">
-            <span className="text-xs text-muted-foreground">Notifications</span>
-            <NotificationBar userId={user?.id} unreadCount={3} />
-          </div>
-        )}
-        {collapsed && (
-          <div className="flex justify-center py-2">
-            <NotificationBar userId={user?.id} unreadCount={3} />
-          </div>
-        )}
-      </div>
-      
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="self-end m-2"
-        onClick={() => setCollapsed(!collapsed)}
-      >
-        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-      </Button>
-    </div>
+    </aside>
   );
 };
 

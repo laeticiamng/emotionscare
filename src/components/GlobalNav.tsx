@@ -18,16 +18,10 @@ const GlobalNav = () => {
   const isAdmin = user ? isAdminRole(user.role) : false;
   
   // Sélectionner les bons éléments de navigation en fonction du rôle
-  const navigationItems = isAdmin ? adminNavItems.map(item => ({
-    path: item.href,
-    label: item.title,
-    icon: item.icon
-  })) : navItems;
-  
-  console.log("GlobalNav rendering with items:", navigationItems);
+  const navigationItems = isAdmin ? adminNavItems : navItems;
   
   return (
-    <header className="fixed top-0 z-50 w-full bg-background border-b shadow-sm">
+    <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur-sm border-b shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo - cliquable pour revenir au dashboard */}
         <NavLink to="/dashboard" className="flex items-center space-x-2">
@@ -39,7 +33,7 @@ const GlobalNav = () => {
         <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
           <NavigationMenu>
             <NavigationMenuList>
-              {navigationItems.map((item) => (
+              {navigationItems.slice(0, 6).map((item) => (
                 <NavigationMenuItem key={item.path}>
                   <NavItem 
                     icon={item.icon} 
@@ -52,7 +46,7 @@ const GlobalNav = () => {
           </NavigationMenu>
         </nav>
         
-        {/* User Profile and Music Button - Desktop */}
+        {/* User Profile - Desktop */}
         <UserMenu badgesCount={0} />
         
         {/* Mobile Navigation */}

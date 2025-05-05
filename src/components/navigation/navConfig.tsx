@@ -13,188 +13,134 @@ import {
   Video,
   Brain,
   BarChart2,
-  FileText,
-  LineChart,
   ShieldCheck,
   CalendarDays,
   Gauge,
   Sparkles
 } from "lucide-react";
 
-console.log("Loading navConfig");
-
-// Cette liste est utilisée pour la navigation globale et mobile pour les utilisateurs normaux
+// Configuration unifiée de navigation pour tout type d'utilisateur
 export const navItems = [
   {
     path: "/dashboard",
     label: "Tableau de bord",
     icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/scan",
     label: "Scan émotionnel",
     icon: <Heart className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/journal",
     label: "Journal",
     icon: <BookText className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/buddy",
     label: "Buddy",
     icon: <UserIcon className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/social-cocoon",
     label: "Communauté",
     icon: <Users className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/groups",
     label: "Groupes",
     icon: <MessageSquare className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/coach",
     label: "Coach IA",
     icon: <Brain className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/vr-sessions",
     label: "Micro-pauses VR",
     icon: <Video className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/music-wellbeing",
     label: "Musicothérapie",
     icon: <HeadphonesIcon className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {
     path: "/gamification",
     label: "Récompenses",
     icon: <Trophy className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
   },
 ];
 
-// Nouvelle configuration pour les éléments de navigation d'administration
+// Configuration spécifique pour les administrateurs
 export const adminNavItems = [
   {
-    title: "Tableau de bord global",
-    href: "/dashboard",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/dashboard",
+    label: "Tableau de bord global",
+    icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Scan émotionnel - Équipe",
-    href: "/scan",
-    icon: <Heart className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/scan",
+    label: "Scan émotionnel - Équipe",
+    icon: <Heart className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Journal - Tendances",
-    href: "/journal",
-    icon: <LineChart className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/journal",
+    label: "Journal - Tendances",
+    icon: <BookText className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Social Cocoon - Pilotage",
-    href: "/social-cocoon",
-    icon: <Users className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/social-cocoon",
+    label: "Social Cocoon - Pilotage",
+    icon: <Users className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Gamification - Synthèse",
-    href: "/gamification",
-    icon: <Trophy className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/gamification",
+    label: "Gamification - Synthèse",
+    icon: <Trophy className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Actions & Solutions RH",
-    href: "/not-implemented/hr-actions",
-    icon: <Sparkles className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/vr-analytics",
+    label: "Statistiques VR",
+    icon: <BarChart2 className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Events & Calendrier",
-    href: "/not-implemented/events",
-    icon: <CalendarDays className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/compliance",
+    label: "Conformité & Sécurité",
+    icon: <ShieldCheck className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
   {
-    title: "Conformité & Sécurité",
-    href: "/compliance",
-    icon: <ShieldCheck className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
-  },
-  {
-    title: "Paramètres Admin",
-    href: "/account",
-    icon: <Settings className="h-5 w-5" />,
-    showRoles: ["admin", "Admin"],
+    path: "/account",
+    label: "Paramètres Admin",
+    icon: <Settings className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
   },
 ];
 
-// Maintenir cette version pour la rétrocompatibilité avec d'autres composants
-export const mainNavItems = [
+// Éléments de pied de page communs
+export const footerNavItems = [
   {
-    title: "Tableau de bord",
-    href: "/dashboard",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Scan émotionnel",
-    href: "/scan",
-    icon: <Heart className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Journal",
-    href: "/journal",
-    icon: <BookText className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Buddy",
-    href: "/buddy",
-    icon: <UserIcon className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Communauté",
-    href: "/social-cocoon",
-    icon: <Users className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Groupes",
-    href: "/groups",
-    icon: <MessageSquare className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Coach IA",
-    href: "/coach",
-    icon: <Brain className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Micro-pauses VR",
-    href: "/vr-sessions",
-    icon: <Video className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Musicothérapie",
-    href: "/music-wellbeing",
-    icon: <HeadphonesIcon className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-  {
-    title: "Récompenses",
-    href: "/gamification",
-    icon: <Trophy className="h-5 w-5" />,
-    showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
+    path: "/my-data",
+    label: "Mes Données",
+    icon: <Settings className="h-5 w-5 mr-2" />,
+    roles: ["user", "admin", "Admin", "Utilisateur"],
+  }
 ];

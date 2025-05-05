@@ -20,11 +20,7 @@ const MobileNavigation = () => {
   const isAdmin = user ? isAdminRole(user.role) : false;
 
   // Sélectionner les bons éléments de navigation en fonction du rôle
-  const navigationItems = isAdmin ? adminNavItems.map(item => ({
-    path: item.href,
-    label: item.title,
-    icon: item.icon
-  })) : navItems;
+  const navigationItems = isAdmin ? adminNavItems : navItems;
 
   const handleLogout = () => {
     logout();
@@ -38,15 +34,16 @@ const MobileNavigation = () => {
           variant="ghost" 
           size="icon" 
           aria-label="Menu"
+          className="focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-        <div className="px-2">
-          <div className="flex items-center justify-between mb-6">
+      <SheetContent side="left" className="w-[280px] sm:w-[350px] p-0">
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between p-4 border-b">
             <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-              <span className="font-bold text-xl text-primary">{isAdmin ? "EmotionsCare Admin" : "EmotionsCare"}</span>
+              <span className="font-bold text-lg text-primary">{isAdmin ? "EC Admin" : "EmotionsCare"}</span>
             </NavLink>
             <Button 
               variant="ghost" 
@@ -58,66 +55,69 @@ const MobileNavigation = () => {
             </Button>
           </div>
           
-          {user && (
-            <div className="flex items-center gap-3 p-4 mb-4 bg-muted/50 rounded-lg">
-              <Avatar>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.role}</p>
+          <div className="flex-1 overflow-y-auto py-2">
+            {user && (
+              <div className="flex items-center gap-3 p-4 mb-2 mx-2 bg-muted/50 rounded-lg">
+                <Avatar>
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback>{user.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.role}</p>
+                </div>
               </div>
-            </div>
-          )}
-          
-          <nav className="flex flex-col space-y-3">
-            {navigationItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={cn(
-                    "flex items-center py-2 px-3 rounded-md transition-colors",
-                    isActive
-                      ? "bg-primary text-primary-foreground font-medium border-l-4 border-primary"
-                      : "hover:bg-accent/50"
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                </NavLink>
-              );
-            })}
-            
-            {!isAdmin && (
-              <button 
-                className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
-                onClick={() => {
-                  openDrawer();
-                  setIsOpen(false);
-                }}
-              >
-                <Music className="w-5 h-5 mr-2" />
-                <span>Soundtrack du bien-être</span>
-              </button>
             )}
             
+            <nav className="flex flex-col space-y-1 px-2">
+              {navigationItems.map((item) => {
+                const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center py-2 px-3 rounded-md transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "hover:bg-accent/50"
+                    )}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.icon}
+                    <span className="ml-2">{item.label}</span>
+                  </NavLink>
+                );
+              })}
+              
+              {!isAdmin && (
+                <button 
+                  className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
+                  onClick={() => {
+                    openDrawer();
+                    setIsOpen(false);
+                  }}
+                >
+                  <Music className="w-5 h-5 mr-2" />
+                  <span>Soundtrack du bien-être</span>
+                </button>
+              )}
+            </nav>
+          </div>
+          
+          <div className="p-4 border-t">
             <Button 
-              variant="ghost" 
-              className="w-full justify-start text-muted-foreground hover:text-destructive mt-4" 
+              variant="outline" 
+              className="w-full justify-start text-muted-foreground hover:text-destructive" 
               onClick={() => {
                 handleLogout();
                 setIsOpen(false);
               }}
-              aria-label="Déconnexion"
             >
               <LogOut size={18} className="mr-2" />
               <span>Déconnexion</span>
             </Button>
-          </nav>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
