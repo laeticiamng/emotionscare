@@ -1,11 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { fr } from 'date-fns/locale';
 import { JournalEntry } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { format, isSameDay } from 'date-fns';
-import { DayContentProps } from 'react-day-picker';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format, isSameDay, isToday } from 'date-fns';
+import { DayContentProps, CaptionProps } from 'react-day-picker';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { ArrowRight, Calendar as CalendarIcon, BookOpen } from 'lucide-react';
 
 interface JournalCalendarViewProps {
   entries: JournalEntry[];
@@ -15,85 +18,162 @@ interface JournalCalendarViewProps {
 const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEntryClick }) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   
-  // Trouve les entrées pour la date sélectionnée
-  const entriesForSelectedDate = selectedDate 
-    ? entries.filter(entry => isSameDay(new Date(entry.date), selectedDate))
-    : [];
+  // Create a map of dates to entries for faster lookup
+  const entryDateMap = useMemo(() => {
+    const map = new Map<string, JournalEntry[]>();
+    
+    entries.forEach(entry => {
+      const dateKey = format(new Date(entry.date), 'yyyy-MM-dd');
+      if (!map.has(dateKey)) {
+        map.set(dateKey, []);
+      }
+      map.get(dateKey)?.push(entry);
+    });
+    
+    return map;
+  }, [entries]);
   
-  // Fonction pour construire un tableau de dates avec des entrées
-  const entryDates = entries.map(entry => new Date(entry.date));
+  // Find entries for the selected date
+  const entriesForSelectedDate = useMemo(() => {
+    if (!selectedDate) return [];
+    
+    const dateKey = format(selectedDate, 'yyyy-MM-dd');
+    return entryDateMap.get(dateKey) || [];
+  }, [selectedDate, entryDateMap]);
+
+  // Array of dates with entries
+  const datesWithEntries = useMemo(() => 
+    entries.map(entry => new Date(entry.date)),
+  [entries]);
   
-  // Personnalisation du rendu des jours du calendrier
-  const dayClassName = (date: Date) => {
-    const hasEntry = entryDates.some(entryDate => isSameDay(entryDate, date));
-    return hasEntry ? "bg-cocoon-100 text-cocoon-800 rounded-full font-bold" : undefined;
+  // Custom caption component for the calendar
+  const CustomCaption = ({ displayMonth, ...props }: CaptionProps) => (
+    <div {...props} className={`flex justify-center py-2 font-medium text-lg ${props.className || ''}`}>
+      {format(displayMonth, 'MMMM yyyy', { locale: fr })}
+    </div>
+  );
+
+  // Custom day component for the calendar
+  const CustomDay = (props: DayContentProps) => {
+    const { date } = props;
+    const hasEntry = datesWithEntries.some(entryDate => isSameDay(entryDate, date));
+    const isSelectedDay = selectedDate && isSameDay(date, selectedDate);
+    const isCurrentDay = isToday(date);
+    
+    let classNames = "flex h-8 w-8 items-center justify-center rounded-full p-0";
+    
+    if (hasEntry) {
+      classNames += " bg-cocoon-100 text-cocoon-800 font-medium";
+    }
+    if (isSelectedDay) {
+      classNames += " bg-cocoon-600 text-white hover:bg-cocoon-600 hover:text-white";
+    }
+    if (isCurrentDay && !isSelectedDay) {
+      classNames += " border border-cocoon-400";
+    }
+    
+    return (
+      <div className={classNames}>
+        {date.getDate()}
+      </div>
+    );
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="overflow-hidden p-4">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          locale={fr}
-          className="rounded-md border"
-          modifiersClassNames={{
-            selected: "bg-cocoon-600 text-white hover:bg-cocoon-600 hover:text-white focus:bg-cocoon-600 focus:text-white",
-          }}
-          modifiersStyles={{
-            selected: { fontWeight: "bold" }
-          }}
-          components={{
-            Day: ({ date, ...props }: DayContentProps) => {
-              // Utilisation correcte du type DayContentProps
-              const customClassName = dayClassName(date);
-              return (
-                <div 
-                  {...props}
-                  className={customClassName}
-                >
-                  {date.getDate()}
-                </div>
-              );
-            }
-          }}
-        />
+      <Card className="overflow-hidden border-cocoon-100">
+        <CardHeader className="pb-2 bg-cocoon-50/50">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <CalendarIcon className="h-5 w-5" /> Calendrier de votre journal
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <div className="flex justify-center">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              locale={fr}
+              className="rounded-md border-none"
+              modifiersClassNames={{
+                selected: "bg-cocoon-600 text-white hover:bg-cocoon-600 hover:text-white focus:bg-cocoon-600 focus:text-white",
+              }}
+              components={{
+                Day: CustomDay,
+                Caption: CustomCaption
+              }}
+              showOutsideDays={true}
+            />
+          </div>
+          <div className="mt-4 flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1">
+              <div className="h-3 w-3 rounded-full bg-cocoon-100 border border-cocoon-200"></div>
+              <span>Entrée présente</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="h-3 w-3 rounded-full border border-cocoon-400"></div>
+              <span>Aujourd'hui</span>
+            </div>
+          </div>
+        </CardContent>
       </Card>
       
-      <Card className="h-full">
-        <CardContent className="p-6">
-          {selectedDate && (
-            <div className="mb-4">
-              <h3 className="text-lg font-medium mb-1">
-                {format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
-              </h3>
-              <div className="h-px bg-slate-200 w-full mt-2 mb-4" />
-            </div>
-          )}
-          
+      <Card className="h-full border-cocoon-100">
+        <CardHeader className="pb-2 bg-cocoon-50/50">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <BookOpen className="h-5 w-5" /> 
+              {selectedDate && format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })}
+            </CardTitle>
+            <Badge variant="outline" className="bg-cocoon-50 text-cocoon-700 border-cocoon-200">
+              {entriesForSelectedDate.length} {entriesForSelectedDate.length > 1 ? 'entrées' : 'entrée'}
+            </Badge>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-0">
           {entriesForSelectedDate.length > 0 ? (
-            <div className="space-y-4">
-              {entriesForSelectedDate.map(entry => (
+            <div className="divide-y divide-gray-100">
+              {entriesForSelectedDate.map((entry, index) => (
                 <div 
                   key={entry.id}
-                  className="p-4 border rounded-lg cursor-pointer hover:bg-slate-50 transition-colors"
+                  className="p-4 cursor-pointer transition-all hover:bg-cocoon-50/50"
                   onClick={() => onEntryClick(entry.id)}
                 >
-                  <p className="text-sm text-muted-foreground line-clamp-5">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="text-sm text-muted-foreground">
+                      {format(new Date(entry.date), 'HH:mm', { locale: fr })}
+                    </div>
+                    {entry.ai_feedback && (
+                      <Badge variant="secondary" className="bg-cocoon-100 text-cocoon-800 text-xs">
+                        Analysé
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <p className="text-sm line-clamp-3 text-foreground mb-2">
                     {entry.content || entry.text || ''}
                   </p>
-                  <div className="flex justify-end mt-2">
-                    <span className="text-xs text-primary">Cliquer pour voir le détail</span>
+                  
+                  <div className="flex justify-end items-center text-xs text-primary gap-1 hover:underline">
+                    Voir le détail <ArrowRight className="h-3 w-3" />
                   </div>
+                  
+                  {index < entriesForSelectedDate.length - 1 && (
+                    <Separator className="mt-2" />
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center py-10">
-              <div className="text-muted-foreground mb-2">
+            <div className="flex flex-col items-center justify-center h-[300px] text-center py-10 px-6">
+              <BookOpen className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <div className="text-muted-foreground space-y-1">
                 {selectedDate ? (
-                  <p>Aucune entrée pour cette date</p>
+                  <>
+                    <p className="font-medium">Aucune entrée pour cette date</p>
+                    <p className="text-sm">Sélectionnez une autre date ou créez une nouvelle entrée</p>
+                  </>
                 ) : (
                   <p>Sélectionnez une date pour voir vos entrées</p>
                 )}
