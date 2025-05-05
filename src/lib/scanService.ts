@@ -3,10 +3,10 @@
 
 import { Emotion } from '@/types';
 import { 
-  analyzeEmotion, 
-  analyzeEmotions, 
-  analyzeAudioStream, 
-  saveRealtimeEmotionScan 
+  analyzeEmotion as analyzeEmotionService, 
+  analyzeEmotions as analyzeEmotionsService, 
+  analyzeAudioStream as analyzeAudioStreamService, 
+  saveRealtimeEmotionScan as saveRealtimeEmotionScanService 
 } from '@/lib/scan/analyzeService';
 import { createEmotionEntry as createEmotionEntryService, fetchLatestEmotion as fetchLatestEmotionService, fetchEmotionHistory as fetchEmotionHistoryService } from '@/lib/scan/emotionService';
 
@@ -26,7 +26,11 @@ export interface EmotionResult {
 // Function to analyze audio stream
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
   try {
-    return await analyzeAudioStream([new Uint8Array(await audioBlob.arrayBuffer())]);
+    // Convert Blob to Uint8Array for the service function
+    const arrayBuffer = await audioBlob.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
+    return await analyzeAudioStreamService([uint8Array]);
   } catch (error) {
     console.error('Error analyzing audio stream:', error);
     return {
@@ -42,20 +46,15 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
 export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string): Promise<void> => {
   try {
     // Make sure emotion has a defined 'emotion' property and confidence property before passing it
-    const emotionWithDefault: EmotionResult = {
+    const emotionWithDefaults: Emotion = {
+      ...emotion,
       emotion: emotion.emotion || 'neutral',
       confidence: emotion.confidence || 0.5, // Ensure confidence is always provided
-      transcript: emotion.text,
-      feedback: emotion.ai_feedback,
-      id: emotion.id,
-      user_id: emotion.user_id,
-      date: emotion.date,
-      intensity: emotion.intensity,
-      score: emotion.score
+      user_id: emotion.user_id || userId // Ensure user_id is always provided and required
     };
     
     // Now emotion has all required properties for the analyzeService's EmotionResult type
-    await saveRealtimeEmotionScan(emotionWithDefault, userId);
+    await saveRealtimeEmotionScanService(emotionWithDefaults as any, userId);
   } catch (error) {
     console.error('Error saving emotion scan:', error);
     throw error;
@@ -72,7 +71,7 @@ export const analyzeEmotion = async (payload: {
   share_with_coach?: boolean;
 }): Promise<EmotionResult> => {
   try {
-    return await analyzeEmotion(payload);
+    return await analyzeEmotionService(payload);
   } catch (error) {
     console.error('Error analyzing emotion:', error);
     throw error;

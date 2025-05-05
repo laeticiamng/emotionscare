@@ -1,4 +1,3 @@
-
 import { Emotion, EmotionResult } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { createFallbackEmotion, getFallbackEmotionAnalysis } from '@/mocks/aiFallback';
@@ -158,8 +157,8 @@ export async function saveRealtimeEmotionScan(
   userId: string
 ): Promise<void> {
   try {
-    const newEmotion: Partial<Emotion> = {
-      user_id: userId,
+    const newEmotion = {
+      user_id: userId, // Ensure this is always provided
       date: new Date().toISOString(),
       emotion: emotion.emotion,
       score: calculateScoreFromEmotion(emotion.emotion),
