@@ -9,7 +9,7 @@
  * @returns boolean indicating if the user has admin privileges
  */
 export const isAdminRole = (role?: string): boolean => {
-  return role === 'admin' || role === 'direction';
+  return role === 'admin' || role === 'direction' || role === 'Admin';
 };
 
 /**
@@ -18,8 +18,7 @@ export const isAdminRole = (role?: string): boolean => {
  * @returns boolean indicating if the user is a standard user
  */
 export const isUserRole = (role?: string): boolean => {
-  return role === 'user' || role === 'employee' || role === 'Médecin' || 
-         role === 'Infirmier' || role === 'Aide-soignant' || role === 'Interne';
+  return role === 'user' || role === 'employee' || role === 'Utilisateur';
 };
 
 /**
@@ -29,6 +28,6 @@ export const isUserRole = (role?: string): boolean => {
  */
 export const getRoleDisplayName = (role?: string): string => {
   if (isAdminRole(role)) return 'Direction';
-  if (role) return role;
+  if (role === 'Manager') return 'Manager';
   return 'Utilisateur';
 };

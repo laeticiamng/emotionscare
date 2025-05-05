@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -22,16 +21,11 @@ export interface User {
   location_url?: string;
 }
 
-// UserRole enum for role-based access
+// UserRole enum pour l'accès générique
 export enum UserRole {
-  MEDECIN = 'Médecin',
-  INFIRMIER = 'Infirmier',
-  AIDE_SOIGNANT = 'Aide-soignant',
-  INTERNE = 'Interne',
-  EMPLOYEE = 'Employé',
+  USER = 'Utilisateur',
   MANAGER = 'Manager',
-  ADMIN = 'Admin',
-  AUTRE = 'Autre'
+  ADMIN = 'Admin'
 }
 
 // Journal related types

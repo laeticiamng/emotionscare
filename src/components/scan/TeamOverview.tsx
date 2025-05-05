@@ -29,7 +29,7 @@ const TeamOverview = ({ users }: TeamOverviewProps) => {
   return (
     <>
       <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-4">Équipe médicale</h2>
+        <h2 className="text-xl font-semibold mb-4">Équipe</h2>
         <p className="text-gray-600 mb-4">Consultez l'état émotionnel de votre équipe</p>
       </div>
       
@@ -52,7 +52,7 @@ const TeamOverview = ({ users }: TeamOverviewProps) => {
                     userData.anonymity_code || `Anonyme ${userData.id.substring(0, 4)}`
                   }
                 </div>
-                <div className="text-sm text-muted-foreground">{userData.role || 'Pas de rôle'}</div>
+                <div className="text-sm text-muted-foreground">Utilisateur</div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant={userData.emotional_score ? "default" : "outline"}>

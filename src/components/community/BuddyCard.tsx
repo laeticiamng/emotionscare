@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,7 @@ const BuddyCard: React.FC<BuddyCardProps> = ({ buddy }) => {
           <AvatarFallback>{buddy.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
         </Avatar>
         <h3 className="text-lg font-semibold">{buddy.name}</h3>
-        <p className="text-sm text-muted-foreground">{buddy.role}</p>
+        <p className="text-sm text-muted-foreground">Utilisateur</p>
       </CardContent>
       <CardFooter className="justify-center">
         <Button variant="outline">
