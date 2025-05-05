@@ -42,7 +42,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     }
     
     try {
-      await createComment(postId, user.id, commentText);
+      await createComment(postId, user.id, commentText, false);
       setCommentText('');
       onCommentAdded();
       toast({

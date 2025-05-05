@@ -1,60 +1,87 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { VRSessionTemplate, VRSession, Emotion } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { ChatInterface } from '@/components/chat/ChatInterface';
-import VRTemplateGrid from '@/components/vr/VRTemplateGrid';
-import VRSessionHistory from '@/components/vr/VRSessionHistory';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useVRSession } from '@/hooks/useVRSession';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft } from 'lucide-react';
+import VRActiveSession from '@/components/vr/VRActiveSession';
+import VRTemplateDetailView from '@/components/vr/VRTemplateDetailView';
+import VRSelectionView from '@/components/vr/VRSelectionView';
+import VRPageHeader from '@/components/vr/VRPageHeader';
 
 const VRSessionPage = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useAuth();
-  const recommendedTemplate = location.state?.recommendedTemplate as VRSessionTemplate | undefined;
   
   const { 
-    selectedTemplate,
-    isSessionActive,
-    recentSessions,
-    heartRate,
-    handleSelectTemplate,
-    handleStartSession,
-    handleCompleteSession,
-    templates
-  } = useVRSession(user?.id, recommendedTemplate);
+    templates, 
+    session, 
+    activeTemplate, 
+    completedSession, 
+    handleStartSession, 
+    handleCompleteSession
+  } = useVRSession(id);
 
+  // View states
+  const [view, setView] = useState<'selection' | 'detail' | 'session'>('selection');
+
+  useEffect(() => {
+    // If we have an ID but no activeTemplate yet, set to detail view
+    if (id && !activeTemplate) {
+      setView('detail');
+      return;
+    }
+
+    // If we have a session, show session view
+    if (session) {
+      setView('session');
+      return;
+    }
+
+    // Default to selection
+    setView('selection');
+  }, [id, activeTemplate, session]);
+  
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <VRPageHeader onNavigateBack={() => navigate('/dashboard')} />
-      
-      {/* Content */}
-      {isSessionActive ? (
-        // Active Session View
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      <VRPageHeader />
+
+      {view === 'session' && session && (
         <VRActiveSession
-          template={selectedTemplate!}
-          onCompleteSession={handleCompleteSession}
+          session={session}
+          template={activeTemplate!}
+          onComplete={handleCompleteSession} 
         />
-      ) : selectedTemplate ? (
-        // Template Details View
+      )}
+
+      {view === 'detail' && activeTemplate && (
         <VRTemplateDetailView 
-          template={selectedTemplate} 
-          heartRate={heartRate.before} 
-          onStartSession={handleStartSession}
-          onBack={() => handleSelectTemplate(null)}
-          recentSessions={recentSessions}
+          template={activeTemplate} 
+          onStart={() => handleStartSession(activeTemplate.template_id)} 
+          onBack={() => {
+            navigate('/vr');
+          }}
         />
-      ) : (
-        // Template Selection View
-        <VRSelectionView 
+      )}
+
+      {view === 'selection' && (
+        <VRSelectionView
           templates={templates}
-          onSelectTemplate={handleSelectTemplate}
+          completedSession={completedSession}
+          onSelectTemplate={(template) => {
+            navigate(`/vr/${template.template_id}`);
+          }}
         />
+      )}
+
+      {/* Back button - show on all views except selection */}
+      {view !== 'selection' && (
+        <div className="mt-8">
+          <Button variant="ghost" onClick={() => navigate('/vr')} className="flex items-center gap-2">
+            <ChevronLeft size={16} />
+            Retour à la sélection
+          </Button>
+        </div>
       )}
     </div>
   );

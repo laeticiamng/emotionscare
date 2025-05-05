@@ -58,7 +58,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ onGroupCreated }) => {
     
     try {
       setCreating(true);
-      const group = await createGroup(data.name, data.topic, data.description || undefined);
+      const group = await createGroup(user.id, data.name, data.topic, data.description);
       onGroupCreated(group);
       form.reset();
     } catch (error) {

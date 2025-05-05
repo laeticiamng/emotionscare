@@ -1,6 +1,6 @@
 
 import { faker } from '@faker-js/faker';
-import { Post, Comment, Group, GroupMember, CommunityStats } from '@/types/community';
+import { Post, Comment, Group, GroupMember, CommunityStats, BuddyRequest } from '@/types/community';
 import { User, UserRole } from '@/types';
 import { mockUsers } from '@/data/mockUsers';
 
@@ -10,13 +10,14 @@ export const mockPosts: Post[] = Array.from({ length: 20 }, (_, i) => ({
   user_id: mockUsers[Math.floor(Math.random() * mockUsers.length)].id,
   content: faker.lorem.paragraphs(Math.floor(Math.random() * 2) + 1),
   created_at: faker.date.recent({ days: 5 }).toISOString(),
-  likes_count: Math.floor(Math.random() * 50),
+  likes: Math.floor(Math.random() * 50),
   comments_count: Math.floor(Math.random() * 10),
   tags: Array.from({ length: Math.floor(Math.random() * 3) }, () => 
     faker.helpers.arrayElement(['travail', 'bien-être', 'stress', 'équilibre', 'santé', 'méditation'])
   ),
   is_anonymous: Math.random() > 0.7,
-})).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  date: faker.date.recent({ days: 5 }).toISOString(),
+})).sort((a, b) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime());
 
 // Mock comments
 const mockComments: Comment[] = [];
@@ -31,8 +32,9 @@ mockPosts.forEach(post => {
       user_id: mockUsers[Math.floor(Math.random() * mockUsers.length)].id,
       content: faker.lorem.sentences(Math.floor(Math.random() * 2) + 1),
       created_at: faker.date.recent({ days: 2 }).toISOString(),
-      likes_count: Math.floor(Math.random() * 10),
+      likes: Math.floor(Math.random() * 10),
       is_anonymous: Math.random() > 0.8,
+      date: faker.date.recent({ days: 2 }).toISOString(),
     });
   });
 });
@@ -44,27 +46,33 @@ export const mockGroups: Group[] = [
     name: 'Bien-être au travail',
     description: 'Discussions et astuces pour améliorer le bien-être quotidien',
     created_at: faker.date.past().toISOString(),
+    members_count: 28,
     member_count: 28,
     is_private: false,
-    image_url: faker.image.urlPicsumPhotos()
+    image_url: faker.image.urlPicsumPhotos(),
+    topic: 'Bien-être'
   },
   {
     id: 'group-2',
     name: 'Gestion du stress',
     description: 'Partagez vos techniques pour gérer le stress professionnel',
     created_at: faker.date.past().toISOString(),
+    members_count: 17,
     member_count: 17,
     is_private: false,
-    image_url: faker.image.urlPicsumPhotos()
+    image_url: faker.image.urlPicsumPhotos(),
+    topic: 'Stress'
   },
   {
     id: 'group-3',
     name: 'Soutien équipe de nuit',
     description: 'Groupe dédié aux professionnels travaillant de nuit',
     created_at: faker.date.past().toISOString(),
+    members_count: 12,
     member_count: 12,
     is_private: true,
-    image_url: faker.image.urlPicsumPhotos()
+    image_url: faker.image.urlPicsumPhotos(),
+    topic: 'Organisation'
   },
 ];
 
@@ -131,7 +139,7 @@ export const getPostComments = async (postId: string): Promise<Comment[]> => {
               { name: user?.name || 'Utilisateur', avatar: user?.avatar || '' }
           };
         })
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        .sort((a, b) => new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime());
         
       resolve(comments);
     }, 300);
@@ -139,7 +147,12 @@ export const getPostComments = async (postId: string): Promise<Comment[]> => {
 };
 
 // Create a new post
-export const createPost = async (userId: string, content: string, isAnonymous: boolean, tags?: string[]): Promise<Post> => {
+export const createPost = async (
+  userId: string, 
+  content: string, 
+  isAnonymous: boolean, 
+  tags?: string[]
+): Promise<Post> => {
   return new Promise(resolve => {
     setTimeout(() => {
       const newPost: Post = {
@@ -147,10 +160,11 @@ export const createPost = async (userId: string, content: string, isAnonymous: b
         user_id: userId,
         content,
         created_at: new Date().toISOString(),
-        likes_count: 0,
+        likes: 0,
         comments_count: 0,
         tags: tags || [],
         is_anonymous: isAnonymous,
+        date: new Date().toISOString(),
         // Add user info directly
         user: isAnonymous ? 
           { name: 'Anonyme', avatar: '' } : 
@@ -173,7 +187,7 @@ export const createComment = async (
   postId: string, 
   userId: string, 
   content: string,
-  isAnonymous: boolean
+  isAnonymous: boolean = false
 ): Promise<Comment> => {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -184,8 +198,9 @@ export const createComment = async (
         user_id: userId,
         content,
         created_at: new Date().toISOString(),
-        likes_count: 0,
+        likes: 0,
         is_anonymous: isAnonymous,
+        date: new Date().toISOString(),
         // Add user info directly
         user: isAnonymous ? 
           { name: 'Anonyme', avatar: '' } : 
@@ -209,13 +224,13 @@ export const createComment = async (
   });
 };
 
-// Like a post
-export const likePost = async (postId: string): Promise<void> => {
+// Like a post (react to post)
+export const reactToPost = async (postId: string): Promise<void> => {
   return new Promise(resolve => {
     setTimeout(() => {
       const post = mockPosts.find(p => p.id === postId);
       if (post) {
-        post.likes_count = (post.likes_count || 0) + 1;
+        post.likes = (post.likes || 0) + 1;
       }
       resolve();
     }, 200);
@@ -254,19 +269,21 @@ export const getUserGroups = async (userId: string): Promise<Group[]> => {
 export const createGroup = async (
   userId: string,
   name: string,
-  description: string,
-  isPrivate: boolean
+  topic: string,
+  description?: string
 ): Promise<Group> => {
   return new Promise(resolve => {
     setTimeout(() => {
       const newGroup: Group = {
         id: `group-${Date.now()}`,
         name,
-        description,
+        description: description || '',
         created_at: new Date().toISOString(),
+        members_count: 1,
         member_count: 1,
-        is_private: isPrivate,
-        image_url: faker.image.urlPicsumPhotos()
+        is_private: false,
+        image_url: faker.image.urlPicsumPhotos(),
+        topic: topic
       };
       
       // Add to mock groups
@@ -339,6 +356,7 @@ export const joinGroup = async (groupId: string, userId: string): Promise<void> 
         // Update member count
         const group = mockGroups.find(g => g.id === groupId);
         if (group) {
+          group.members_count = (group.members_count || 0) + 1;
           group.member_count = (group.member_count || 0) + 1;
         }
       }
@@ -363,8 +381,13 @@ export const leaveGroup = async (groupId: string, userId: string): Promise<void>
         
         // Update member count
         const group = mockGroups.find(g => g.id === groupId);
-        if (group && group.member_count > 0) {
-          group.member_count -= 1;
+        if (group) {
+          if (group.members_count && group.members_count > 0) {
+            group.members_count -= 1;
+          }
+          if (group.member_count && group.member_count > 0) {
+            group.member_count -= 1;
+          }
         }
       }
       
@@ -382,6 +405,108 @@ export const getCommunityStats = async (): Promise<CommunityStats> => {
   });
 };
 
+// Mock BuddyRequests
+const mockBuddyRequests: BuddyRequest[] = [
+  {
+    id: 'req-1',
+    user_id: '2',
+    buddy_id: '1',
+    status: 'pending',
+    user: {
+      id: '2',
+      name: 'Thomas Dubois',
+      email: 'thomas@example.com',
+      role: UserRole.USER,
+      avatar: 'https://i.pravatar.cc/150?img=2'
+    }
+  },
+  {
+    id: 'req-2',
+    user_id: '3',
+    buddy_id: '1',
+    status: 'accepted',
+    user: {
+      id: '3',
+      name: 'Emma Petit',
+      email: 'emma@example.com',
+      role: UserRole.USER,
+      avatar: 'https://i.pravatar.cc/150?img=3'
+    }
+  }
+];
+
+// Get buddy requests
+export const getBuddyRequests = async (userId: string): Promise<BuddyRequest[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const requests = mockBuddyRequests.filter(req => req.buddy_id === userId);
+      resolve(requests);
+    }, 300);
+  });
+};
+
+// Send buddy request
+export const sendBuddyRequest = async (userId: string, email: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const targetUser = mockUsers.find(u => u.email === email);
+      
+      if (!targetUser) {
+        reject(new Error('Utilisateur non trouvé'));
+        return;
+      }
+      
+      // Check if request already exists
+      const existingRequest = mockBuddyRequests.find(
+        req => req.user_id === userId && req.buddy_id === targetUser.id
+      );
+      
+      if (existingRequest) {
+        reject(new Error('Une demande existe déjà'));
+        return;
+      }
+      
+      // Add new request
+      const newRequest: BuddyRequest = {
+        id: `req-${Date.now()}`,
+        user_id: userId,
+        buddy_id: targetUser.id,
+        status: 'pending',
+        user: mockUsers.find(u => u.id === userId)
+      };
+      
+      mockBuddyRequests.push(newRequest);
+      resolve();
+    }, 500);
+  });
+};
+
+// Accept buddy request
+export const acceptBuddyRequest = async (requestId: string): Promise<void> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const request = mockBuddyRequests.find(req => req.id === requestId);
+      if (request) {
+        request.status = 'accepted';
+      }
+      resolve();
+    }, 300);
+  });
+};
+
+// Reject buddy request
+export const rejectBuddyRequest = async (requestId: string): Promise<void> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const request = mockBuddyRequests.find(req => req.id === requestId);
+      if (request) {
+        request.status = 'rejected';
+      }
+      resolve();
+    }, 300);
+  });
+};
+
 // Generate mock tags for post creation
 export const getRecommendedTags = (): string[] => {
   return [
@@ -396,4 +521,27 @@ export const getRecommendedTags = (): string[] => {
     'travail', 
     'vie personnelle'
   ];
+};
+
+// Mock API for CommunityFeed.tsx
+export const fetchPosts = async (): Promise<Post[]> => {
+  return getCommunityPosts(20);
+};
+
+export const fetchUserById = async (id: string): Promise<User | null> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const user = mockUsers.find(u => u.id === id) || null;
+      resolve(user);
+    }, 100);
+  });
+};
+
+// Mock API for GroupListPage.tsx
+export const fetchGroups = async (): Promise<Group[]> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(mockGroups);
+    }, 300);
+  });
 };
