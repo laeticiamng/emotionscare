@@ -1,9 +1,11 @@
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: string;
   avatar: string;
+  image?: string; // Add image property
   streak?: number;
   dailyGoal?: number;
   weeklyGoal?: number;

@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Emotion } from '@/types';
-import { EmotionResult } from './live/EmotionResult';
+import type { EmotionResult } from './live/EmotionResult'; // Fixed import
 
 export interface AudioProcessorProps {
   isListening: boolean;
   userId: string;
-  isConfidential?: boolean; // Ajout de la propriété manquante
+  isConfidential?: boolean; // This property was already defined correctly
   onProcessingChange: React.Dispatch<React.SetStateAction<boolean>>;
   onProgressUpdate: React.Dispatch<React.SetStateAction<string>>;
   onAnalysisComplete: (emotion: Emotion, result: EmotionResult) => void;

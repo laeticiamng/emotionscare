@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { createGroup } from '@/lib/communityService';
+import { createGroup, joinGroup } from '@/lib/communityService';
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -30,9 +29,10 @@ type FormValues = z.infer<typeof groupSchema>;
 
 interface GroupFormProps {
   onGroupCreated: (newGroup: any) => void;
+  joinAfterCreation: boolean;
 }
 
-const GroupForm: React.FC<GroupFormProps> = ({ onGroupCreated }) => {
+const GroupForm: React.FC<GroupFormProps> = ({ onGroupCreated, joinAfterCreation }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [creating, setCreating] = useState(false);
@@ -61,6 +61,10 @@ const GroupForm: React.FC<GroupFormProps> = ({ onGroupCreated }) => {
       const group = await createGroup(user.id, data.name, data.topic, data.description);
       onGroupCreated(group);
       form.reset();
+      
+      if (joinAfterCreation) {
+        await joinGroup(res.id, user.id, user.name); // Removed the 4th argument
+      }
     } catch (error) {
       console.error('Error creating group:', error);
       toast({

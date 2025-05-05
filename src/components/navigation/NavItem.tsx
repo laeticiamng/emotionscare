@@ -1,35 +1,31 @@
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { cn } from "@/lib/utils";
-import { LucideIcon } from 'lucide-react';
-import {
-  NavigationMenuLink,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+import { useLocation, useNavigate } from 'react-router-dom';
 
-export interface NavItemProps {
-  path: string;
+interface NavItemProps {
   icon: React.ReactNode;
   label: string;
+  to: string;
+  active?: boolean;
 }
 
-const NavItem = ({ path, icon, label }: NavItemProps) => {
+const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // If active is not explicitly provided, determine from current location
+  const isActive = active !== undefined ? active : location.pathname === to;
+
   return (
-    <NavLink to={path}>
-      {({isActive}) => (
-        <NavigationMenuLink 
-          className={cn(
-            navigationMenuTriggerStyle(),
-            isActive ? "bg-primary text-primary-foreground font-medium border-b-2 border-primary" : "hover:bg-accent hover:text-accent-foreground",
-            "flex items-center transition-all duration-200"
-          )}
-        >
-          {icon}
-          {label}
-        </NavigationMenuLink>
-      )}
-    </NavLink>
+    <button
+      className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary ${
+        isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground'
+      }`}
+      onClick={() => navigate(to)}
+    >
+      {icon}
+      {label}
+    </button>
   );
 };
 

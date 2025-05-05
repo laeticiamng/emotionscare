@@ -1,92 +1,93 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Music, User, Moon, Sun, Settings, Mail } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from '@/contexts/AuthContext';
-import { useMusic } from '@/contexts/MusicContext';
-import { 
+import { Lock, User as UserIcon, Settings } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTheme } from '@/contexts/ThemeContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
 
-const UserMenu = () => {
-  const { user, logout } = useAuth();
-  const { openDrawer } = useMusic();
+interface UserMenuProps {
+  badgesCount: number;
+}
+
+const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
+  const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  
   if (!user) return null;
 
+  const handleLogout = () => {
+    signOut();
+    toast({
+      title: 'Déconnexion réussie',
+      description: 'Vous avez été déconnecté de votre compte.',
+    });
+    navigate('/');
+  };
+
+  const getAvatarFallback = () => {
+    return user?.name?.charAt(0).toUpperCase() || '?';
+  };
+
   return (
-    <div className="hidden md:flex items-center gap-4">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={openDrawer} 
-        title="Soundtrack du bien-être"
-        aria-label="Ouvrir le lecteur de musique"
-        className="relative"
-      >
-        <Music className="h-5 w-5" />
-        <span className="absolute top-0 right-0 flex h-2 w-2 rounded-full bg-primary"></span>
-      </Button>
-      
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="text-sm text-right mr-2">
-              <p className="font-medium">{user.name}</p>
-              <p className="text-xs text-muted-foreground">{user.role}</p>
-            </div>
-            <Avatar className="h-9 w-9 transition-all duration-200 hover:scale-105 hover:shadow-[0_0_8px_rgba(168,230,207,0.5)]">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-            </Avatar>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 bg-white/95 backdrop-blur-md border border-slate-200">
-          <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => navigate('/preferences')} className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Mon compte</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">
-            {theme === 'dark' ? (
-              <>
-                <Sun className="mr-2 h-4 w-4" />
-                <span>Mode Clair</span>
-              </>
-            ) : (
-              <>
-                <Moon className="mr-2 h-4 w-4" />
-                <span>Mode Sombre</span>
-              </>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="group flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={user?.image || user?.avatar} alt={user?.name || 'Profile'} />
+            <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
+          </Avatar>
+          <span className="text-left">
+            {user?.name}
+            {badgesCount > 0 && (
+              <Badge className="ml-1">{badgesCount}</Badge>
             )}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/account-settings')} className="cursor-pointer">
-            <Mail className="mr-2 h-4 w-4" />
-            <span>Modifier email & mot de passe</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Se déconnecter</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+          </span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80" align="end" forceMount>
+        <DropdownMenuItem onClick={() => navigate('/profile')}>
+          <UserIcon className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/settings')}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout}>
+          <Lock className="mr-2 h-4 w-4" />
+          <span>Se déconnecter</span>
+          <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1.5 rounded border bg-muted px-2 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3 w-3"
+            >
+              <path d="M3 3h18v18H3z" />
+              <path d="m9.17 14.83 5.66-5.66" />
+            </svg>
+            Ctrl+Shift+Q
+          </kbd>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

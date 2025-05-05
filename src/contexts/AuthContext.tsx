@@ -12,6 +12,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
+  signOut: () => Promise<void>; // Add signOut method as alias for logout
   updateUserProfile: (userData: Partial<User>) => Promise<void>;
 }
 
@@ -21,6 +22,7 @@ export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   login: async () => null,
   logout: async () => {},
+  signOut: async () => {}, // Add signOut as alias
   updateUserProfile: async () => {},
 });
 
@@ -110,6 +112,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Add signOut as an alias for logout
+  const signOut = logout;
+
   const updateUserProfile = async (userData: Partial<User>) => {
     setIsLoading(true);
     try {
@@ -137,6 +142,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated: !!user,
     login,
     logout,
+    signOut, // Include signOut in the context value
     updateUserProfile,
   };
 
