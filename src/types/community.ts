@@ -6,14 +6,14 @@ export interface Post {
   user_id: string;
   content: string;
   likes: number;
+  reactions?: number;
   date?: string;
   created_at?: string;
   user?: User;
   comments_count?: number;
   image_url?: string;
   media_url?: string;
-  reactions?: number;
-  comments?: any[];
+  comments?: Comment[];
 }
 
 export interface Comment {
@@ -32,7 +32,7 @@ export interface Group {
   name: string;
   description: string;
   image_url?: string;
-  members?: User[];
+  members?: string[] | User[];
   members_count?: number;
   is_member?: boolean;
   topic?: string;
@@ -44,11 +44,26 @@ export interface Group {
 export interface Buddy {
   id: string;
   user_id: string;
-  buddy_id: string;
+  buddy_id?: string;
   status: 'pending' | 'accepted' | 'rejected';
   user?: User;
   buddy?: User;
   date?: string;
   matched_on?: string;
   buddy_user_id?: string;
+}
+
+// Define BuddyRequest interface for BuddyPage to use
+export interface BuddyRequest {
+  id: string;
+  user_id: string;
+  buddy_id: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    avatar: string;
+  };
 }

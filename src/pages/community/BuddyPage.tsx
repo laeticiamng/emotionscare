@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -12,23 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { UserRole } from '@/types';
-// Importer Buddy directement depuis les types
-import { Buddy } from '@/types/community';
+// Import BuddyRequest type from community types
+import { BuddyRequest } from '@/types/community';
 import { getBuddyRequests, sendBuddyRequest, acceptBuddyRequest, rejectBuddyRequest } from '@/lib/communityService';
-
-interface BuddyRequest {
-  id: string;
-  user_id: string;
-  buddy_id: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-    avatar: string;
-  };
-}
 
 const BuddyPage = () => {
   const { user } = useAuth();

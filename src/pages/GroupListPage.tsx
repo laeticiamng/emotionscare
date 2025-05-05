@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +22,7 @@ const GroupListPage: React.FC = () => {
       try {
         setLoading(true);
         const fetchedGroups = await fetchGroups();
-        setGroups(fetchedGroups as unknown as Group[]);
+        setGroups(fetchedGroups);
       } catch (error) {
         console.error('Error loading groups:', error);
         toast({
@@ -64,8 +63,18 @@ const GroupListPage: React.FC = () => {
       
       // Update the local state
       const updatedGroups = groups.map(g => {
-        if (g.id === groupId && g.members && !g.members.includes(user.id)) {
-          return { ...g, members: [...g.members, user.id] };
+        if (g.id === groupId && g.members) {
+          // Handle both string[] and User[] types
+          const memberIds = Array.isArray(g.members) ? 
+            [...g.members.map(m => typeof m === 'string' ? m : m.id)] : 
+            [];
+            
+          if (!memberIds.includes(user.id)) {
+            return { 
+              ...g, 
+              members: [...memberIds, user.id]
+            };
+          }
         }
         return g;
       });
@@ -89,7 +98,14 @@ const GroupListPage: React.FC = () => {
   };
 
   const userHasJoined = (group: Group): boolean => {
-    return user ? group.members?.includes(user.id) || false : false;
+    if (!user || !group.members) return false;
+    
+    // Handle both string[] and User[] types
+    const memberIds = Array.isArray(group.members) ?
+      group.members.map(m => typeof m === 'string' ? m : m.id) :
+      [];
+      
+    return memberIds.includes(user.id);
   };
 
   return (

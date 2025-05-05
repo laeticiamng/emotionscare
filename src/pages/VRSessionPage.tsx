@@ -93,8 +93,11 @@ const VRSessionPage = () => {
     const newSession: VRSession = {
       id: `session-${Date.now()}`,
       user_id: 'current-user',
+      template_id: selectedTemplate.template_id,
       date: new Date().toISOString(),
+      duration: selectedTemplate.duration,
       duration_seconds: selectedTemplate.duration * 60,
+      completed: true,
       location_url: selectedTemplate.preview_url,
       heart_rate_before: heartRate.before,
       heart_rate_after: afterHeartRate,

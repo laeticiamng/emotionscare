@@ -1,6 +1,8 @@
+
 import { supabase } from '@/integrations/supabase/client';
-import type { Post, Comment, Group, Buddy, User } from '@/types';
-import { UserRole } from '@/types';
+import type { Post, Comment, Group, Buddy, BuddyRequest } from '@/types/community';
+import { User, UserRole } from '@/types';
+import { mockUsers } from '@/data/mockUsers';
 
 // --- POSTS ---
 export async function fetchPosts(): Promise<Post[]> {
@@ -16,6 +18,7 @@ export async function fetchPosts(): Promise<Post[]> {
     id: post.id,
     user_id: post.user_id,
     content: post.content,
+    likes: 0, // Set default likes value
     date: post.date,
     reactions: post.reactions || 0,
     image_url: post.image_url || undefined,
@@ -55,6 +58,7 @@ export async function createPost(
     id: data.id,
     user_id: data.user_id,
     content: data.content,
+    likes: 0, // Set default likes value
     date: data.date,
     reactions: data.reactions || 0,
     image_url: data.image_url || undefined,
@@ -100,6 +104,7 @@ export async function fetchComments(post_id: string): Promise<Comment[]> {
     post_id: comment.post_id,
     user_id: comment.user_id,
     content: comment.content,
+    likes: 0, // Set default likes value
     date: comment.date,
     created_at: comment.date // Alias for compatibility
   }));
@@ -135,6 +140,7 @@ export async function createComment(
     post_id: data.post_id,
     user_id: data.user_id,
     content: data.content,
+    likes: 0, // Set default likes value
     date: data.date,
     created_at: data.date // Alias for compatibility
   };
@@ -156,7 +162,7 @@ export async function fetchGroups(): Promise<Group[]> {
     name: group.name,
     topic: group.topic,
     description: '', // Default empty string for compatibility
-    members: group.members || [],
+    members: group.members || [], // This will be string[] from database
     members_count: group.members ? group.members.length : 0,
     is_private: false, // Default value
     created_at: new Date().toISOString(), // Default to now
@@ -191,7 +197,7 @@ export async function createGroup(
     name: data.name,
     topic: data.topic,
     description: '', // Default empty string for compatibility
-    members: data.members || [],
+    members: data.members || [], // This will be string[] initially
     members_count: data.members ? data.members.length : 0,
     is_private: false,
     created_at: new Date().toISOString(),
@@ -260,9 +266,9 @@ export async function leaveGroup(
 }
 
 // --- BUDDY SYSTEM ---
-export async function getBuddyRequests(userId: string): Promise<Buddy[]> {
+export async function getBuddyRequests(userId: string): Promise<BuddyRequest[]> {
   // For demo purposes, create mock buddy requests
-  const mockRequests: Buddy[] = [
+  const mockRequests: BuddyRequest[] = [
     {
       id: 'request-1',
       user_id: 'user-request-1',
@@ -274,9 +280,6 @@ export async function getBuddyRequests(userId: string): Promise<Buddy[]> {
         email: 'maria@example.com',
         role: UserRole.INFIRMIER,
         avatar: 'https://i.pravatar.cc/150?img=5',
-        alias: 'maria',
-        bio: 'Infirmière aux urgences depuis 5 ans',
-        joined_at: new Date().toISOString()
       }
     },
     {
@@ -290,9 +293,6 @@ export async function getBuddyRequests(userId: string): Promise<Buddy[]> {
         email: 'alex@example.com',
         role: UserRole.MEDECIN,
         avatar: 'https://i.pravatar.cc/150?img=8',
-        alias: 'alexd',
-        bio: 'Médecin urgentiste',
-        joined_at: new Date().toISOString()
       }
     }
   ];
@@ -351,12 +351,13 @@ export async function rejectBuddyRequest(requestId: string): Promise<Buddy> {
 // --- USER MANAGEMENT ---
 export async function fetchUsersByRole(role?: UserRole): Promise<User[]> {
   // For demo purposes, create mock users
-  const mockUsers: User[] = [
+  const mockUsersList: User[] = [
     {
       id: 'user-1',
       name: 'User 1',
       email: 'user1@example.com',
       role: role || UserRole.EMPLOYEE,
+      avatar: 'https://i.pravatar.cc/150?img=1',
       alias: 'user1',
       bio: 'Bio for user 1',
       joined_at: new Date().toISOString()
@@ -366,6 +367,7 @@ export async function fetchUsersByRole(role?: UserRole): Promise<User[]> {
       name: 'User 2',
       email: 'user2@example.com',
       role: role || UserRole.EMPLOYEE,
+      avatar: 'https://i.pravatar.cc/150?img=2',
       alias: 'user2',
       bio: 'Bio for user 2',
       joined_at: new Date().toISOString()
@@ -375,13 +377,14 @@ export async function fetchUsersByRole(role?: UserRole): Promise<User[]> {
       name: 'User 3',
       email: 'user3@example.com',
       role: role || UserRole.EMPLOYEE,
+      avatar: 'https://i.pravatar.cc/150?img=3',
       alias: 'user3',
       bio: 'Bio for user 3',
       joined_at: new Date().toISOString()
     }
   ];
   
-  return mockUsers;
+  return mockUsersList;
 }
 
 export async function fetchUserById(userId: string): Promise<User | null> {
@@ -390,6 +393,8 @@ export async function fetchUserById(userId: string): Promise<User | null> {
     id: userId,
     name: 'Test User',
     email: 'test@example.com',
+    role: UserRole.EMPLOYEE, // Set a default role
+    avatar: 'https://i.pravatar.cc/150?img=4',
     alias: 'TestUser',
     bio: 'This is a test user bio',
     joined_at: new Date().toISOString()
@@ -412,6 +417,8 @@ export async function findBuddy(
     id: `buddy-match-${Date.now()}`,
     user_id: user_id,
     buddy_user_id: buddyUserId,
+    buddy_id: buddyUserId, // Adding the required property
+    status: 'pending', // Adding the required property
     date: now, // Using date for backward compatibility
     matched_on: now // For newer code compatibility
   };
@@ -428,6 +435,8 @@ export async function fetchUserBuddies(userId: string): Promise<Buddy[]> {
       id: `buddy-match-demo`,
       user_id: userId,
       buddy_user_id: 'buddy-demo-1',
+      buddy_id: 'buddy-demo-1', // Adding the required property
+      status: 'accepted', // Adding the required property
       date: now,
       matched_on: now
     }
