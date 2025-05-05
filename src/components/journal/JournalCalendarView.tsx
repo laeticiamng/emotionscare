@@ -45,14 +45,16 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
             selected: { fontWeight: "bold" }
           }}
           components={{
-            Day: (props: DayContentProps) => {
-              // Utiliser le bon type DayContentProps de react-day-picker
+            Day: ({ date, ...props }: DayContentProps) => {
+              // Utilisation correcte du type DayContentProps en destructurant la propriété date explicitement
+              const customClassName = dayClassName(date);
               return (
                 <div 
                   {...props}
-                  className={`${props.className || ''} ${dayClassName(props.date) || ''}`}
+                  style={{...props.style}}
+                  className={`${customClassName || ''}`}
                 >
-                  {props.date.getDate()}
+                  {date.getDate()}
                 </div>
               );
             }
