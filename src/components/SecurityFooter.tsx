@@ -1,7 +1,21 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { Link } from 'react-router-dom';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription, 
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 // Security certification badges
 const securityBadges = [
@@ -39,6 +53,11 @@ const securityBadges = [
     name: 'HIPAA',
     description: 'Architecturée selon les principes HIPAA - Protection des données de santé',
     icon: '🏥'
+  },
+  {
+    name: 'HDS',
+    description: 'Hébergeur de Données de Santé certifié - Conformité aux exigences légales françaises',
+    icon: '🏨'
   }
 ];
 
@@ -47,6 +66,21 @@ interface SecurityFooterProps {
 }
 
 const SecurityFooter: React.FC<SecurityFooterProps> = ({ className }) => {
+  const [dataConsents, setDataConsents] = useState({
+    analytics: true,
+    improvement: true,
+    personalization: true,
+    research: false
+  });
+
+  const updateConsent = (key: string, value: boolean) => {
+    setDataConsents(prev => ({
+      ...prev,
+      [key]: value
+    }));
+    // Dans une implémentation réelle, nous sauvegarderions ce paramètre dans le profil utilisateur
+  };
+
   return (
     <footer className={`mt-8 pt-6 pb-8 ${className}`}>
       <Separator className="mb-6" />
@@ -60,10 +94,23 @@ const SecurityFooter: React.FC<SecurityFooterProps> = ({ className }) => {
               {securityBadges.map((badge) => (
                 <Tooltip key={badge.name} delayDuration={300}>
                   <TooltipTrigger asChild>
-                    <Link to="/compliance" className="flex items-center justify-center h-10 w-10 bg-muted rounded-md hover:bg-muted/80 cursor-help transition-colors">
-                      <span className="text-xl" aria-hidden="true">{badge.icon}</span>
-                      <span className="sr-only">{badge.name}</span>
-                    </Link>
+                    {badge.name === 'HDS' ? (
+                      <a 
+                        href="https://esante.gouv.fr/labels-certifications/hds/liste-des-herbergeurs-certifies" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center h-10 w-10 bg-muted rounded-md hover:bg-muted/80 cursor-help transition-colors"
+                        aria-label={`Certification ${badge.name}`}
+                      >
+                        <span className="text-xl" aria-hidden="true">{badge.icon}</span>
+                        <span className="sr-only">{badge.name}</span>
+                      </a>
+                    ) : (
+                      <Link to="/compliance" className="flex items-center justify-center h-10 w-10 bg-muted rounded-md hover:bg-muted/80 cursor-help transition-colors">
+                        <span className="text-xl" aria-hidden="true">{badge.icon}</span>
+                        <span className="sr-only">{badge.name}</span>
+                      </Link>
+                    )}
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
                     <p className="font-medium">{badge.name}</p>
@@ -93,6 +140,93 @@ const SecurityFooter: React.FC<SecurityFooterProps> = ({ className }) => {
             <p className="text-xs text-muted-foreground mt-1">
               ÉmotionCare™ ne remplace pas un avis médical ou psychologique.
             </p>
+            
+            {/* Nouveau lien d'utilisation des données */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="text-xs text-primary hover:underline mt-2">
+                  Vos données sont utilisées pour...
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Utilisation de vos données</DialogTitle>
+                  <DialogDescription>
+                    Vos données personnelles sont traitées avec le plus grand soin et uniquement selon les objectifs ci-dessous. 
+                    Vous pouvez ajuster vos préférences à tout moment.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="analytics">Analyses d'utilisation</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Nous collectons des données sur votre utilisation de l'application pour améliorer sa performance
+                      </p>
+                    </div>
+                    <Switch 
+                      id="analytics" 
+                      checked={dataConsents.analytics}
+                      onCheckedChange={(checked) => updateConsent('analytics', checked)}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="improvement">Amélioration du service</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Vos données contribuent à améliorer nos algorithmes et fonctionnalités
+                      </p>
+                    </div>
+                    <Switch 
+                      id="improvement" 
+                      checked={dataConsents.improvement}
+                      onCheckedChange={(checked) => updateConsent('improvement', checked)}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="personalization">Personnalisation</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Nous utilisons vos données pour personnaliser votre expérience
+                      </p>
+                    </div>
+                    <Switch 
+                      id="personalization" 
+                      checked={dataConsents.personalization}
+                      onCheckedChange={(checked) => updateConsent('personalization', checked)}
+                    />
+                  </div>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="research">Recherche anonymisée</Label>
+                      <p className="text-xs text-muted-foreground">
+                        Vos données anonymisées peuvent être utilisées pour des recherches en santé mentale
+                      </p>
+                    </div>
+                    <Switch 
+                      id="research" 
+                      checked={dataConsents.research}
+                      onCheckedChange={(checked) => updateConsent('research', checked)}
+                    />
+                  </div>
+                </div>
+                <DialogFooter className="sm:justify-between">
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    Ces paramètres sont sauvegardés automatiquement
+                  </div>
+                  <Link to="/my-data">
+                    <Button type="button" variant="outline" size="sm">
+                      Gérer mes données
+                    </Button>
+                  </Link>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            
             <p>
               © 2025 EmotionsCare par ResiMax™. Tous droits réservés.
             </p>

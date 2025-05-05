@@ -4,8 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { navItems, adminNavItems } from '@/components/navigation/navConfig';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Settings } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
+import NotificationBar from '@/components/notifications/NotificationBar';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -44,7 +45,35 @@ const Sidebar = () => {
               {!collapsed && <span className="ml-3">{item.title}</span>}
             </Button>
           ))}
+
+          {!isAdmin && (
+            <>
+              <div className="my-2 border-t border-border"></div>
+              <Button
+                variant={isActive("/my-data") ? "secondary" : "ghost"}
+                className={`w-full justify-start ${collapsed ? 'px-2' : 'px-3'}`}
+                onClick={() => handleNavigation('/my-data')}
+              >
+                <Settings size={18} />
+                {!collapsed && <span className="ml-3">Mes Données</span>}
+              </Button>
+            </>
+          )}
         </div>
+      </div>
+      
+      <div className="p-2 border-t border-border">
+        {!collapsed && (
+          <div className="flex items-center justify-between mb-2 px-2">
+            <span className="text-xs text-muted-foreground">Notifications</span>
+            <NotificationBar userId={user?.id} unreadCount={3} />
+          </div>
+        )}
+        {collapsed && (
+          <div className="flex justify-center py-2">
+            <NotificationBar userId={user?.id} unreadCount={3} />
+          </div>
+        )}
       </div>
       
       <Button 

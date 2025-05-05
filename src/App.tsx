@@ -1,140 +1,113 @@
 
-import React, { useContext } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './contexts/AuthContext';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './App.css';
+import { Toaster } from './components/ui/toaster';
+import Layout from './components/Layout';
 import ProtectedLayout from './components/ProtectedLayout';
-import LoginPage from './pages/LoginPage';
-import AdminLoginPage from './pages/AdminLoginPage';
-import Index from './pages/Index';
-import NotFoundPage from './pages/NotFound';
-import SocialCocoonPage from './pages/SocialCocoonPage';
-import CommunityAdminPage from './pages/CommunityAdminPage';
-import CompliancePage from './pages/CompliancePage';
-import DashboardPage from './pages/DashboardPage';
-import ScanPage from './pages/ScanPage';
-import JournalPage from './pages/JournalPage';
-import GamificationPage from './pages/GamificationPage';
-import MusicWellbeingPage from './pages/MusicWellbeingPage';
-import BuddyPage from './pages/BuddyPage';
-import GroupsPage from './pages/GroupsPage';
-import CoachPage from './pages/CoachPage';
+import LoadingAnimation from './components/ui/loading-animation';
 
-// Import VR pages
-import VRSessionsPage from './pages/VRSessionsPage';
-import VRSessionPage from './pages/VRSessionPage';
-import VRAnalyticsPage from './pages/VRAnalyticsPage';
+// Lazy-loaded pages for better performance
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const JournalPage = lazy(() => import('./pages/JournalPage'));
+const JournalEntryPage = lazy(() => import('./pages/JournalEntryPage'));
+const JournalNewPage = lazy(() => import('./pages/JournalNewPage'));
+const ScanPage = lazy(() => import('./pages/ScanPage'));
+const ScanDetailPage = lazy(() => import('./pages/ScanDetailPage'));
+const VRSessionsPage = lazy(() => import('./pages/VRSessionsPage'));
+const VRSessionPage = lazy(() => import('./pages/VRSessionPage'));
+const VRAnalyticsPage = lazy(() => import('./pages/VRAnalyticsPage'));
+const SocialCocoonPage = lazy(() => import('./pages/SocialCocoonPage'));
+const CommunityFeed = lazy(() => import('./pages/CommunityFeed'));
+const GroupsPage = lazy(() => import('./pages/GroupsPage'));
+const GroupListPage = lazy(() => import('./pages/GroupListPage'));
+const BuddyPage = lazy(() => import('./pages/BuddyPage'));
+const CommunityAdminPage = lazy(() => import('./pages/CommunityAdminPage'));
+const CoachPage = lazy(() => import('./pages/CoachPage'));
+const AccountSettings = lazy(() => import('./pages/AccountSettings'));
+const UserPreferences = lazy(() => import('./pages/UserPreferences'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
+const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
+const GamificationPage = lazy(() => import('./pages/GamificationPage'));
+const CompliancePage = lazy(() => import('./pages/CompliancePage'));
+const NotImplementedPage = lazy(() => import('./pages/NotImplementedPage'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Index = lazy(() => import('./pages/Index'));
+const MusicWellbeingPage = lazy(() => import('./pages/MusicWellbeingPage'));
+
+// Nouvelles pages
+const MyDataPage = lazy(() => import('./pages/MyDataPage'));
+
+// Fallback loading component
+const Loading = () => <LoadingAnimation />;
 
 function App() {
-  const { user } = useAuth();
-  
   return (
-    <div className="App">
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Index />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin-login" element={<AdminLoginPage />} />
-
-        {/* Protected Routes */}
-        <Route path="/dashboard" element={
-          <ProtectedLayout>
-            <DashboardPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Scan Route */}
-        <Route path="/scan" element={
-          <ProtectedLayout>
-            <ScanPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Journal Route */}
-        <Route path="/journal" element={
-          <ProtectedLayout>
-            <JournalPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Coach Route */}
-        <Route path="/coach" element={
-          <ProtectedLayout>
-            <CoachPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Social Cocoon Routes */}
-        <Route path="/social-cocoon" element={
-          <ProtectedLayout>
-            <SocialCocoonPage />
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/community" element={
-          <ProtectedLayout>
-            <SocialCocoonPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Groups Route */}
-        <Route path="/groups" element={
-          <ProtectedLayout>
-            <GroupsPage />
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/community/admin" element={
-          <ProtectedLayout requireRole="admin">
-            <CommunityAdminPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Buddy Route */}
-        <Route path="/buddy" element={
-          <ProtectedLayout>
-            <BuddyPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* VR Session Routes */}
-        <Route path="/vr-sessions" element={
-          <ProtectedLayout>
-            <VRSessionsPage />
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/vr-sessions/:id" element={
-          <ProtectedLayout>
-            <VRSessionPage />
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/vr-analytics" element={
-          <ProtectedLayout requireRole="admin">
-            <VRAnalyticsPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Gamification Route */}
-        <Route path="/gamification" element={
-          <ProtectedLayout>
-            <GamificationPage />
-          </ProtectedLayout>
-        } />
-        
-        {/* Music Wellbeing Route */}
-        <Route path="/music-wellbeing" element={
-          <ProtectedLayout>
-            <MusicWellbeingPage />
-          </ProtectedLayout>
-        } />
-        
-        <Route path="/compliance" element={<CompliancePage />} />
-
-        {/* Catch-all route for 404 */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </div>
+    <Router>
+      <Suspense fallback={<Loading />}>
+        <Routes>
+          {/* Auth routes (no navigation) */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          
+          {/* Landing page */}
+          <Route path="/" element={<Layout><Index /></Layout>} />
+          
+          {/* Protected routes (require authentication) */}
+          <Route element={<ProtectedLayout><Layout /></ProtectedLayout>}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            
+            {/* Journal */}
+            <Route path="/journal" element={<JournalPage />} />
+            <Route path="/journal/new" element={<JournalNewPage />} />
+            <Route path="/journal/:id" element={<JournalEntryPage />} />
+            
+            {/* Emotion Scan */}
+            <Route path="/scan" element={<ScanPage />} />
+            <Route path="/scan/:id" element={<ScanDetailPage />} />
+            
+            {/* VR */}
+            <Route path="/vr" element={<VRSessionsPage />} />
+            <Route path="/vr/:id" element={<VRSessionPage />} />
+            <Route path="/vr/analytics" element={<VRAnalyticsPage />} />
+            
+            {/* Community */}
+            <Route path="/community" element={<SocialCocoonPage />} />
+            <Route path="/community/feed" element={<CommunityFeed />} />
+            <Route path="/community/groups" element={<GroupsPage />} />
+            <Route path="/community/groups/list" element={<GroupListPage />} />
+            <Route path="/community/buddy" element={<BuddyPage />} />
+            <Route path="/community/admin" element={<CommunityAdminPage />} />
+            
+            {/* Music */}
+            <Route path="/music" element={<MusicWellbeingPage />} />
+            
+            {/* Coach */}
+            <Route path="/coach" element={<CoachPage />} />
+            
+            {/* Gamification */}
+            <Route path="/gamification" element={<GamificationPage />} />
+            
+            {/* Account & Settings */}
+            <Route path="/account" element={<AccountSettings />} />
+            <Route path="/preferences" element={<UserPreferences />} />
+            <Route path="/my-data" element={<MyDataPage />} />
+            
+            {/* Compliance */}
+            <Route path="/compliance" element={<CompliancePage />} />
+            
+            {/* Placeholder for not implemented pages */}
+            <Route path="/not-implemented/:feature" element={<NotImplementedPage />} />
+          </Route>
+          
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+      <Toaster />
+    </Router>
   );
 }
 
