@@ -1,10 +1,9 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import ChartCard from './charts/ChartCard';
+import AbsenteeismChart from './charts/AbsenteeismChart';
+import ProductivityChart from './charts/ProductivityChart';
+import { getFilteredData } from '@/utils/chartHelpers';
 
 interface TrendChartsProps {
   absenteeismData: Array<{ date: string; value: number }>;
@@ -12,184 +11,37 @@ interface TrendChartsProps {
   isLoading?: boolean;
 }
 
-const TrendCharts: React.FC<TrendChartsProps> = ({ absenteeismData, productivityData, isLoading = false }) => {
+const TrendCharts: React.FC<TrendChartsProps> = ({ 
+  absenteeismData, 
+  productivityData, 
+  isLoading = false 
+}) => {
   const [timeRange, setTimeRange] = useState<string>("7j");
   
-  // Dans un vrai scénario, vous feriez une requête avec le nouveau timeRange
-  // Pour ce prototype, on simule simplement un changement de données
-  const getFilteredData = (data: Array<{ date: string; value: number }>, range: string) => {
-    if (range === "7j") return data;
-    // Simulons plus de données pour les périodes plus longues
-    if (range === "30j") {
-      return [...data, ...data.map(item => ({
-        date: item.date + "*",
-        value: Math.min(100, item.value * (1 + Math.random() * 0.4))
-      }))];
-    }
-    if (range === "90j") {
-      return [...data, ...data.map(item => ({
-        date: item.date + "**",
-        value: Math.min(100, item.value * (1 + Math.random() * 0.8))
-      }))];
-    }
-    return data;
-  };
-
   const filteredAbsenteeismData = getFilteredData(absenteeismData, timeRange);
   const filteredProductivityData = getFilteredData(productivityData, timeRange);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <Card className="glass-card overflow-hidden">
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">Tendance Absentéisme</CardTitle>
-            <ToggleGroup 
-              type="single" 
-              value={timeRange} 
-              onValueChange={(value) => value && setTimeRange(value)} 
-              aria-label="Période"
-              className="border rounded-full p-1"
-            >
-              <ToggleGroupItem 
-                value="7j" 
-                aria-label="7 jours"
-                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
-              >
-                7j
-              </ToggleGroupItem>
-              <ToggleGroupItem 
-                value="30j" 
-                aria-label="30 jours"
-                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
-              >
-                30j
-              </ToggleGroupItem>
-              <ToggleGroupItem 
-                value="90j" 
-                aria-label="90 jours"
-                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
-              >
-                90j
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-          <CardDescription>{timeRange === "7j" ? "7 derniers jours" : timeRange === "30j" ? "30 derniers jours" : "90 derniers jours"}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64" aria-label="Graphique d'absentéisme">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <Skeleton className="h-full w-full" />
-              </div>
-            ) : (
-              <ChartContainer
-                config={{
-                  value: { theme: { light: '#7ED321', dark: '#7ED321' } },
-                }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={filteredAbsenteeismData}>
-                    <defs>
-                      <linearGradient id="wellnessGreenGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#7ED321" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#7ED321" stopOpacity={0.05}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Area 
-                      type="monotone" 
-                      dataKey="value" 
-                      name="value"
-                      stroke="#7ED321" 
-                      fill="url(#wellnessGreenGradient)" 
-                      strokeWidth={2}
-                      activeDot={{ r: 6, strokeWidth: 0 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <ChartCard 
+        title="Tendance Absentéisme" 
+        description={timeRange === "7j" ? "7 derniers jours" : timeRange === "30j" ? "30 derniers jours" : "90 derniers jours"}
+        timeRange={timeRange}
+        setTimeRange={setTimeRange}
+        isLoading={isLoading}
+      >
+        <AbsenteeismChart data={filteredAbsenteeismData} />
+      </ChartCard>
 
-      <Card className="glass-card overflow-hidden">
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">Tendance Productivité</CardTitle>
-            <ToggleGroup 
-              type="single" 
-              value={timeRange} 
-              onValueChange={(value) => value && setTimeRange(value)} 
-              aria-label="Période"
-              className="border rounded-full p-1"
-            >
-              <ToggleGroupItem 
-                value="7j" 
-                aria-label="7 jours"
-                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
-              >
-                7j
-              </ToggleGroupItem>
-              <ToggleGroupItem 
-                value="30j" 
-                aria-label="30 jours"
-                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
-              >
-                30j
-              </ToggleGroupItem>
-              <ToggleGroupItem 
-                value="90j" 
-                aria-label="90 jours"
-                className="rounded-full text-xs data-[state=on]:bg-cocoon-100 data-[state=on]:text-cocoon-800"
-              >
-                90j
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-          <CardDescription>{timeRange === "7j" ? "7 derniers jours" : timeRange === "30j" ? "30 derniers jours" : "90 derniers jours"}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64" aria-label="Graphique de productivité">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <Skeleton className="h-full w-full" />
-              </div>
-            ) : (
-              <ChartContainer
-                config={{
-                  value: { theme: { light: '#4A90E2', dark: '#4A90E2' } },
-                }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={filteredProductivityData}>
-                    <defs>
-                      <linearGradient id="wellnessBlueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#4A90E2" stopOpacity={1}/>
-                        <stop offset="95%" stopColor="#4A90E2" stopOpacity={0.7}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar 
-                      dataKey="value" 
-                      name="value"
-                      fill="url(#wellnessBlueGradient)" 
-                      radius={[8, 8, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <ChartCard 
+        title="Tendance Productivité" 
+        description={timeRange === "7j" ? "7 derniers jours" : timeRange === "30j" ? "30 derniers jours" : "90 derniers jours"}
+        timeRange={timeRange}
+        setTimeRange={setTimeRange}
+        isLoading={isLoading}
+      >
+        <ProductivityChart data={filteredProductivityData} />
+      </ChartCard>
     </div>
   );
 };
