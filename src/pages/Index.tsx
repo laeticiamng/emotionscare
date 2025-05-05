@@ -88,13 +88,13 @@ const Index = () => {
           {/* Presentation & Values Section */}
           <div className="w-full bg-[#EFF6FF] rounded-t-3xl p-8 mb-12">
             <h2 className="text-3xl font-semibold text-[#1B365D] text-center mb-4">
-              Pourquoi ÉmotionCare<span className="text-xs align-super">™</span> ?
+              Pourquoi EmotionsCare<span className="text-xs align-super">™</span> ?
             </h2>
             
             <p className="text-center text-slate-600 mb-8 max-w-4xl mx-auto">
               Parce que chaque collaborateur mérite d'être entendu, compris et soutenu.<br/>
-              Notre plateforme conjugue IA empathique, réseau social 100 % positif et gamification pour créer<br className="hidden md:block" />
-              une expérience addictive, sécurisée et bienveillante, aussi bien pour l'utilisateur que pour la direction.
+              Notre plateforme conjugue IA émotionnelle, empathique, réseau social 100 % positif et gamification pour créer<br className="hidden md:block" />
+              une expérience personnalisée, sécurisée et bienveillante, aussi bien pour l'utilisateur que pour la direction.
             </p>
             
             {/* Features List */}
