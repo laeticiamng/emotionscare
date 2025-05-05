@@ -46,13 +46,12 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
           }}
           components={{
             Day: ({ date, ...props }: DayContentProps) => {
-              // Utilisation correcte du type DayContentProps en destructurant la propriété date explicitement
+              // Utilisation correcte du type DayContentProps
               const customClassName = dayClassName(date);
               return (
                 <div 
                   {...props}
-                  style={{...props.style}}
-                  className={`${customClassName || ''}`}
+                  className={customClassName}
                 >
                   {date.getDate()}
                 </div>
