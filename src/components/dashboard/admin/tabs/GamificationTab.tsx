@@ -1,0 +1,73 @@
+
+import React from 'react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Trophy } from 'lucide-react';
+import GamificationSummaryCard from '../GamificationSummaryCard';
+
+interface GamificationTabProps {
+  gamificationData: {
+    activeUsersPercent: number;
+    totalBadges: number;
+    badgeLevels: Array<{ level: string; count: number }>;
+    topChallenges: Array<{ name: string; completions: number }>;
+  };
+}
+
+const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <GamificationSummaryCard gamificationStats={gamificationData} />
+      
+      <Card className="glass-card">
+        <CardHeader>
+          <CardTitle>Top Défis</CardTitle>
+          <CardDescription>Les défis les plus réussis</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {gamificationData.topChallenges.map((challenge, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="bg-pastel-green/30 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                    {i + 1}
+                  </div>
+                  <span>{challenge.name}</span>
+                </div>
+                <span className="font-medium">{challenge.completions} complétions</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="col-span-1 md:col-span-2 glass-card">
+        <CardHeader>
+          <CardTitle>Distribution des badges</CardTitle>
+          <CardDescription>Répartition des niveaux de badges obtenus</CardDescription>
+        </CardHeader>
+        <CardContent className="h-60 flex items-center justify-center">
+          <div className="bg-white/80 rounded-xl p-6 w-full h-full flex items-center justify-around">
+            {gamificationData.badgeLevels.map((level, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div 
+                  className={`w-24 h-24 rounded-full flex items-center justify-center mb-3 ${
+                    i === 0 ? 'bg-amber-100 text-amber-800' :
+                    i === 1 ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800'
+                  }`}
+                >
+                  <Trophy size={48} />
+                </div>
+                <div className="text-center">
+                  <p className="font-medium">{level.level}</p>
+                  <p className="text-2xl font-bold">{level.count}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default GamificationTab;

@@ -8,7 +8,6 @@ import AdminDashboard from '@/components/dashboard/admin/AdminDashboard';
 import { isAdminRole, isUserRole } from '@/utils/roleUtils';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import SessionTimeoutAlert from '@/components/SessionTimeoutAlert';
-import DashboardFooter from '@/components/dashboard/DashboardFooter';
 
 const DashboardPage: React.FC = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -60,7 +59,6 @@ const DashboardPage: React.FC = () => {
     <div className="container mx-auto py-6">
       {renderDashboard()}
       <SessionTimeoutAlert />
-      <DashboardFooter isAdmin={isAdmin} />
     </div>
   );
 };
