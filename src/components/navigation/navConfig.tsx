@@ -10,7 +10,8 @@ import {
   Settings,
   UserIcon, 
   HeadphonesIcon,
-  Video
+  Video,
+  Brain
 } from "lucide-react";
 
 console.log("Loading navConfig");
@@ -46,6 +47,11 @@ export const navItems = [
     path: "/groups",
     label: "Groupes",
     icon: <MessageSquare className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/coach",
+    label: "Coach IA",
+    icon: <Brain className="h-5 w-5 mr-2" />,
   },
   {
     path: "/vr-sessions",
@@ -100,6 +106,12 @@ export const mainNavItems = [
     title: "Groupes",
     href: "/groups",
     icon: <MessageSquare className="h-5 w-5" />,
+    showRoles: ["user", "admin", "Admin", "Utilisateur"],
+  },
+  {
+    title: "Coach IA",
+    href: "/coach",
+    icon: <Brain className="h-5 w-5" />,
     showRoles: ["user", "admin", "Admin", "Utilisateur"],
   },
   {

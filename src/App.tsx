@@ -17,6 +17,7 @@ import GamificationPage from './pages/GamificationPage';
 import MusicWellbeingPage from './pages/MusicWellbeingPage';
 import BuddyPage from './pages/BuddyPage';
 import GroupsPage from './pages/GroupsPage';
+import CoachPage from './pages/CoachPage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -52,6 +53,13 @@ function App() {
         <Route path="/journal" element={
           <ProtectedLayout>
             <JournalPage />
+          </ProtectedLayout>
+        } />
+        
+        {/* Coach Route */}
+        <Route path="/coach" element={
+          <ProtectedLayout>
+            <CoachPage />
           </ProtectedLayout>
         } />
         

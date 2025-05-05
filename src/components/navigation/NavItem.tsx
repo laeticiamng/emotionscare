@@ -35,6 +35,8 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
       }`}
       onClick={handleClick}
       data-active={isActive}
+      aria-current={isActive ? 'page' : undefined}
+      data-testid={`nav-item-${label.toLowerCase().replace(/\s+/g, '-')}`}
     >
       {icon}
       {label}
