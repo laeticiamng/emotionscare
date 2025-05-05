@@ -89,6 +89,14 @@ export interface JournalEntry {
   text?: string;  // For compatibility
 }
 
+export interface MoodData {
+  date: string;
+  originalDate: Date;
+  sentiment: number;
+  anxiety: number;
+  energy: number;
+}
+
 export interface Post {
   id: string;
   user_id: string;
