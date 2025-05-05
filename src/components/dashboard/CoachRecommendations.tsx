@@ -9,9 +9,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface CoachRecommendationsProps {
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ className }) => {
+const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ className, style }) => {
   const navigate = useNavigate();
   const { recommendations, isProcessing } = useCoach();
   

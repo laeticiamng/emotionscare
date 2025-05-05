@@ -7,11 +7,12 @@ import { ChatInterface } from '@/components/chat/ChatInterface';
 
 interface CoachAssistantProps {
   className?: string;
+  style?: React.CSSProperties;
 }
 
-const CoachAssistant: React.FC<CoachAssistantProps> = ({ className }) => {
+const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => {
   return (
-    <Card className={cn("flex flex-col bg-gradient-to-br from-cocoon-50 to-white border-cocoon-100", className)}>
+    <Card className={cn("flex flex-col bg-gradient-to-br from-cocoon-50 to-white border-cocoon-100", className)} style={style}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-xl">
           <Sparkles className="h-5 w-5 text-cocoon-600" />
