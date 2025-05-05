@@ -5,6 +5,7 @@ import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import EmotionHistory from '@/components/scan/EmotionHistory';
 import TeamOverview from '@/components/scan/TeamOverview';
 import EmotionScanLive from '@/components/scan/EmotionScanLive';
+import MusicRecommendation from '@/components/scan/MusicRecommendation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Emotion } from '@/types';
@@ -16,9 +17,23 @@ const ScanPage = () => {
   const { users, loading, history, handleScanSaved } = useScanPage();
   const [activeTab, setActiveTab] = useState("personnel");
   const { user } = useAuth();
+  const [latestEmotion, setLatestEmotion] = useState<Emotion | null>(null);
   
   // Check if user has admin privileges
   const isAdmin = isAdminRole(user?.role);
+  
+  // Récupère la dernière émotion de l'historique au chargement
+  React.useEffect(() => {
+    if (history && history.length > 0) {
+      setLatestEmotion(history[0].emotion);
+    }
+  }, [history]);
+
+  // Handler mis à jour pour capturer l'émotion la plus récente
+  const handleEmotionSaved = (emotion: Emotion) => {
+    setLatestEmotion(emotion);
+    handleScanSaved(emotion);
+  };
 
   if (loading) {
     return (
@@ -44,11 +59,13 @@ const ScanPage = () => {
         </TabsList>
         
         <TabsContent value="personnel" className="mt-6">
-          <EmotionScanForm onScanSaved={handleScanSaved} />
+          <EmotionScanForm onScanSaved={handleEmotionSaved} />
+          <MusicRecommendation emotion={latestEmotion} />
         </TabsContent>
 
         <TabsContent value="live" className="mt-6">
-          <EmotionScanLive onResultSaved={handleScanSaved} />
+          <EmotionScanLive onResultSaved={handleEmotionSaved} />
+          <MusicRecommendation emotion={latestEmotion} />
         </TabsContent>
         
         <TabsContent value="historique" className="mt-6">

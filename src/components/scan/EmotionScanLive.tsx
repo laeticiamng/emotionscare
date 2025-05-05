@@ -2,9 +2,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mic, MicOff, Wand2 } from 'lucide-react';
+import { Mic, MicOff, Wand2, Music } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMusic } from '@/contexts/MusicContext';
 import { initVad } from '@/lib/audioVad';
 import { analyzeAudioStream, saveRealtimeEmotionScan, emotionResultToEmotion, type EmotionResult } from '@/lib/scanService';
 import type { Emotion } from '@/types';
@@ -13,15 +14,31 @@ interface EmotionScanLiveProps {
   onResultSaved?: (result: Emotion) => void;
 }
 
+// Map des émotions vers les types de musique
+const EMOTION_TO_MUSIC: Record<string, string> = {
+  happy: 'happy',
+  sad: 'calm',
+  angry: 'calm',
+  anxious: 'calm',
+  calm: 'neutral',
+  excited: 'energetic',
+  stressed: 'calm',
+  tired: 'calm',
+  neutral: 'neutral',
+  focused: 'focused'
+};
+
 const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { loadPlaylistForEmotion, openDrawer } = useMusic();
   
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
   const [progressText, setProgressText] = useState('');
+  const [playMusic, setPlayMusic] = useState(false);
   
   const vadRef = useRef<any>(null);
   
@@ -32,6 +49,21 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
       vadRef.current = null;
     }
   }, []);
+  
+  // Handler pour activer la musique adaptée à l'émotion
+  const handlePlayMusic = useCallback(() => {
+    if (!emotionResult) return;
+    
+    const musicType = EMOTION_TO_MUSIC[emotionResult.emotion.toLowerCase()] || 'neutral';
+    
+    loadPlaylistForEmotion(musicType);
+    openDrawer();
+    
+    toast({
+      title: "Playlist activée",
+      description: `Votre ambiance musicale "${musicType}" est prête à être écoutée`,
+    });
+  }, [emotionResult, loadPlaylistForEmotion, openDrawer, toast]);
   
   // Initialize or stop VAD when listening state changes
   useEffect(() => {
@@ -124,6 +156,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
     if (isListening) {
       setEmotionResult(null);
       setTranscript('');
+      setPlayMusic(false);
     }
   };
   
@@ -189,7 +222,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
         )}
         
         {emotionResult && (
-          <div>
+          <div className="mb-4">
             <h3 className="text-sm font-semibold text-muted-foreground mb-1">Analyse émotionnelle</h3>
             <div className="p-4 bg-secondary/20 rounded-md">
               <div className="flex items-center justify-between">
@@ -198,6 +231,16 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
                   {Math.round(emotionResult.confidence * 100)}%
                 </span>
               </div>
+              
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-4 w-full flex items-center justify-center gap-2"
+                onClick={handlePlayMusic}
+              >
+                <Music className="h-4 w-4" />
+                Écouter une playlist adaptée
+              </Button>
             </div>
           </div>
         )}
