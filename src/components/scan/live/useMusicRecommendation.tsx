@@ -24,7 +24,7 @@ export function useMusicRecommendation() {
   
   // Handler pour activer la musique adaptée à l'émotion
   const handlePlayMusic = useCallback((emotionResult?: EmotionResult | null) => {
-    if (!emotionResult) return;
+    if (!emotionResult || !emotionResult.emotion) return;
     
     const musicType = EMOTION_TO_MUSIC[emotionResult.emotion.toLowerCase()] || 'neutral';
     

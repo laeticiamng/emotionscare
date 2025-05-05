@@ -7,7 +7,7 @@ import { createEmotionEntry as createEmotionEntryService, fetchLatestEmotion as 
 
 // Export the EmotionResult type so it can be imported elsewhere
 export interface EmotionResult {
-  emotion?: string;
+  emotion: string;  // Make this required since it's expected to be present
   confidence?: number;
   transcript?: string;
   id?: string;
@@ -24,7 +24,7 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
   } catch (error) {
     console.error('Error analyzing audio stream:', error);
     return {
-      emotion: 'neutral',
+      emotion: 'neutral', // Provide a default value for the required field
       confidence: 0.5,
       transcript: 'Erreur d\'analyse'
     };
@@ -34,7 +34,19 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
 // Function to save realtime emotion scan
 export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string): Promise<void> => {
   try {
-    await saveRealtimeEmotionScanService(emotion, userId);
+    // Make sure emotion has a defined 'emotion' property before passing it
+    const emotionWithDefault: EmotionResult = {
+      emotion: emotion.emotion || 'neutral',
+      confidence: emotion.confidence || 0.5,
+      transcript: emotion.text,
+      id: emotion.id,
+      user_id: emotion.user_id,
+      date: emotion.date,
+      intensity: emotion.intensity,
+      score: emotion.score
+    };
+    
+    await saveRealtimeEmotionScanService(emotionWithDefault, userId);
   } catch (error) {
     console.error('Error saving emotion scan:', error);
     throw error;

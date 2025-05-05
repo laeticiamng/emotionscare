@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createProcessor } from "@/lib/audioVad";
-import { analyzeAudioStream, saveRealtimeEmotionScan } from "@/lib/scanService";
+import { analyzeAudioStream, saveRealtimeEmotionScan, EmotionResult } from "@/lib/scanService";
 import { useToast } from "@/hooks/use-toast";
-import type { Emotion, EmotionResult } from '@/types';
+import type { Emotion } from '@/types';
 import StatusIndicator from "./StatusIndicator";
 import TranscriptDisplay from "./TranscriptDisplay";
 
@@ -125,7 +125,8 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       const emotion: Emotion = {
         id: Date.now().toString(),
         user_id: userId,
-        emotion: result.emotion || 'neutral',
+        emotion: result.emotion,
+        confidence: result.confidence,
         score: Math.round((result.confidence || 0.5) * 10),
         date: new Date().toISOString(), // Use date instead of timestamp
         source: 'audio',

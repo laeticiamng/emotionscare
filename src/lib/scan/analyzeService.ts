@@ -1,10 +1,11 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { Emotion } from '@/types';
 import { saveEmotionScan, createEmotionEntry } from './emotionService';
 
 export type AudioChunk = Uint8Array;
 export type EmotionResult = {
-  emotion: string;
+  emotion: string; // This is required to match the interface in scanService.ts
   confidence: number;
   transcript?: string;
   id?: string;
@@ -106,7 +107,7 @@ export async function saveRealtimeEmotionScan(
 ): Promise<Emotion> {
   const entry: Omit<Emotion, 'id'> = {
     date: result.date || new Date().toISOString(),
-    emotion: result.emotion,
+    emotion: result.emotion || 'neutral',
     intensity: result.intensity || Math.round(result.confidence * 10), // Convert confidence to 1-10 scale
     score: result.score || Math.round(result.confidence * 100), // Convert confidence to percentage
     text: result.transcript || '',
