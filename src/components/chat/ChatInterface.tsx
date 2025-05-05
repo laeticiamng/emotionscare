@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { SendHorizontal, Robot, Play, PlayCircle, Music } from 'lucide-react';
+import { SendHorizontal, Bot, Play, PlayCircle, Music } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -177,7 +177,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
       <Card className={`w-full flex flex-col ${className}`}>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2">
-            <Robot className="h-5 w-5" />
+            <Bot className="h-5 w-5" />
             Assistant EmotionsCare
           </CardTitle>
         </CardHeader>
