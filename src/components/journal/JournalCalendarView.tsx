@@ -45,12 +45,12 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
             selected: { fontWeight: "bold" }
           }}
           components={{
-            Day: (props: DayProps) => (
+            Day: ({ date, ...props }: React.ComponentProps<"button">) => (
               <button 
-                {...props} 
-                className={`${props.className} ${dayClassName(props.date) || ''}`}
+                {...props}
+                className={`${props.className || ''} ${dayClassName(date) || ''}`}
               >
-                {props.date.getDate()}
+                {date.getDate()}
               </button>
             )
           }}
