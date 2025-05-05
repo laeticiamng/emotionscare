@@ -1,8 +1,7 @@
-
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { coachService, CoachEvent } from '@/lib/coachService';
+import { coachService, CoachEvent, triggerCoachEvent } from '@/lib/coachService';
 import { useMusic } from '@/contexts/MusicContext';
 import { useNavigate } from 'react-router-dom';
 
