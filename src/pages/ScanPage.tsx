@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Separator } from '@/components/ui/separator';
 import { useScanPage } from '@/hooks/useScanPage';
-import { PlusCircle, Filter } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import EmotionScanLive from '@/components/scan/EmotionScanLive';
 import EmotionHistory from '@/components/scan/EmotionHistory';
@@ -65,7 +65,7 @@ const ScanPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="history">
-          <EmotionHistory userId={user?.id} />
+          <EmotionHistory />
         </TabsContent>
 
         {isAdmin && (

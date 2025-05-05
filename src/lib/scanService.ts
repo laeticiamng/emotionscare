@@ -135,6 +135,41 @@ export async function getUserEmotions(userId: string): Promise<Emotion[]> {
   }
 }
 
+// Add the missing analyzeEmotion function
+export async function analyzeEmotion(payload: {
+  user_id: string;
+  emojis?: string;
+  text?: string;
+  audio_url?: string | null;
+}): Promise<EmotionResult> {
+  try {
+    // For demo purposes, let's create a simulated emotion analysis result
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+    
+    // Create a simple emotion result based on input
+    const emotions = ['calm', 'happy', 'stressed', 'anxious', 'focused', 'tired'];
+    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    
+    const result: EmotionResult = {
+      emotion: randomEmotion,
+      confidence: 0.7 + Math.random() * 0.3, // Random confidence between 0.7 and 1.0
+      transcript: payload.text || "No text provided",
+      date: new Date().toISOString(),
+      intensity: Math.floor(Math.random() * 10) + 1, // Random intensity between 1-10
+      score: Math.floor(Math.random() * 100) // Random score between 0-100
+    };
+    
+    // In a real application, this would call an OpenAI or other AI service
+    // and save the result to the database
+    const entry = await createEmotionEntry(payload);
+    
+    return result;
+  } catch (error) {
+    console.error('Error in analyzeEmotion:', error);
+    throw new Error('Failed to analyze emotion');
+  }
+}
+
 // Real-time voice analysis utilities
 export type AudioChunk = Uint8Array;
 export type EmotionResult = {

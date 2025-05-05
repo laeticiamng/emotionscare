@@ -1,14 +1,16 @@
+
 import { faker } from '@faker-js/faker';
-import { UserRole } from '@/types';
+import { User, UserRole } from '@/types';
+import { Post, Comment, Group, GroupMember, BuddyRequest, CommunityStats } from '@/types/community';
 import { mockUsers } from '@/data/mockUsers';
 
-// Type pour GroupMember
-interface GroupMember {
+// Type for GroupMember
+interface GroupMemberData {
   group_id: string;
   user_id: string;
   role: 'admin' | 'member';
   joined_at: string;
-  user: {
+  user?: {
     id: string;
     name: string;
     email: string;
@@ -89,20 +91,71 @@ export const mockGroups: Group[] = [
   },
 ];
 
+// Create a default user for group members
+const defaultUser = {
+  id: '',
+  name: 'Utilisateur',
+  email: 'user@example.com',
+  role: UserRole.USER,
+  avatar: ''
+};
+
 // Mock group members
 export const mockGroupMembers: GroupMember[] = [
   // Group 1 members
-  { group_id: 'group-1', user_id: '1', role: 'admin', joined_at: faker.date.past().toISOString() },
-  { group_id: 'group-1', user_id: '2', role: 'member', joined_at: faker.date.past().toISOString() },
-  { group_id: 'group-1', user_id: '3', role: 'member', joined_at: faker.date.past().toISOString() },
+  { 
+    group_id: 'group-1', 
+    user_id: '1', 
+    role: 'admin', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '1', name: 'Admin User'}
+  },
+  { 
+    group_id: 'group-1', 
+    user_id: '2', 
+    role: 'member', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '2', name: 'Member 2'}
+  },
+  { 
+    group_id: 'group-1', 
+    user_id: '3', 
+    role: 'member', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '3', name: 'Member 3'}
+  },
   
   // Group 2 members
-  { group_id: 'group-2', user_id: '2', role: 'admin', joined_at: faker.date.past().toISOString() },
-  { group_id: 'group-2', user_id: '1', role: 'member', joined_at: faker.date.past().toISOString() },
+  { 
+    group_id: 'group-2', 
+    user_id: '2', 
+    role: 'admin', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '2', name: 'Admin User'}
+  },
+  { 
+    group_id: 'group-2', 
+    user_id: '1', 
+    role: 'member', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '1', name: 'Member 1'}
+  },
   
   // Group 3 members
-  { group_id: 'group-3', user_id: '3', role: 'admin', joined_at: faker.date.past().toISOString() },
-  { group_id: 'group-3', user_id: '4', role: 'member', joined_at: faker.date.past().toISOString() },
+  { 
+    group_id: 'group-3', 
+    user_id: '3', 
+    role: 'admin', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '3', name: 'Admin User'}
+  },
+  { 
+    group_id: 'group-3', 
+    user_id: '4', 
+    role: 'member', 
+    joined_at: faker.date.past().toISOString(),
+    user: {...defaultUser, id: '4', name: 'Member 4'}
+  },
 ];
 
 // Community stats
@@ -307,7 +360,8 @@ export const createGroup = async (
         group_id: newGroup.id,
         user_id: userId,
         role: 'admin',
-        joined_at: new Date().toISOString()
+        joined_at: new Date().toISOString(),
+        user: {...defaultUser, id: userId, name: mockUsers.find(u => u.id === userId)?.name || 'Nouvel Admin'}
       });
       
       resolve(newGroup);
@@ -327,12 +381,12 @@ export const getGroupDetails = async (groupId: string): Promise<Group | null> =>
 
 // Get group members - fixed typing issue
 export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       const members = mockGroupMembers
-        .filter((m) => m.group_id === groupId)
-        .map((member) => {
-          const user = mockUsers.find((u) => u.id === member.user_id);
+        .filter(m => m.group_id === groupId)
+        .map(member => {
+          const user = mockUsers.find(u => u.id === member.user_id);
           return {
             group_id: member.group_id,
             user_id: member.user_id,
@@ -363,12 +417,20 @@ export const joinGroup = async (groupId: string, userId: string): Promise<void> 
       );
       
       if (!existingMembership) {
+        const user = mockUsers.find(u => u.id === userId);
         // Add as member
         mockGroupMembers.push({
           group_id: groupId,
           user_id: userId,
           role: 'member',
-          joined_at: new Date().toISOString()
+          joined_at: new Date().toISOString(),
+          user: {
+            id: user?.id || '',
+            name: user?.name || 'Utilisateur',
+            email: user?.email || '',
+            role: user?.role || UserRole.USER,
+            avatar: user?.avatar || ''
+          }
         });
         
         // Update member count
@@ -490,7 +552,7 @@ export const sendBuddyRequest = async (userId: string, email: string): Promise<v
         user_id: userId,
         buddy_id: targetUser.id,
         status: 'pending',
-        user: mockUsers.find(u => u.id === userId)
+        user: mockUsers.find(u => u.id === userId) as User
       };
       
       mockBuddyRequests.push(newRequest);

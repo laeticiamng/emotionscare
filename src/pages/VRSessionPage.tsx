@@ -79,7 +79,7 @@ const VRSessionPage = () => {
 
       {view === 'session' && activeTemplate && (
         <VRActiveSession
-          template={activeTemplate}
+          template={activeTemplate} 
           onComplete={completeVRSession} 
         />
       )}

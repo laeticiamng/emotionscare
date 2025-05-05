@@ -1,7 +1,6 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { analyzeEmotion } from "@/lib/scanService";
@@ -13,9 +12,14 @@ import AnalysisDialog from './AnalysisDialog';
 export interface EmotionScanFormProps {
   onScanSaved: () => void;
   onClose?: () => void;
+  onSaveComplete?: () => void; // Added for ScanPage.tsx compatibility
 }
 
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onScanSaved, onClose }) => {
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ 
+  onScanSaved, 
+  onClose, 
+  onSaveComplete 
+}) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('text');
@@ -55,6 +59,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onScanSaved, onClose 
       });
       
       onScanSaved();
+      if (onSaveComplete) onSaveComplete();
     } catch (error) {
       console.error('Error analyzing emotion:', error);
       toast({
