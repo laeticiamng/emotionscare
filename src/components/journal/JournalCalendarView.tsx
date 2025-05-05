@@ -44,14 +44,14 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
             selected: { fontWeight: "bold" }
           }}
           components={{
-            Day: (props: any) => {
-              const { date } = props;
+            Day: ({ day, ...props }: any) => {
+              // Using any type to avoid the type conflict
               return (
                 <button 
                   {...props}
-                  className={`${props.className || ''} ${dayClassName(date) || ''}`}
+                  className={`${props.className || ''} ${dayClassName(day.date) || ''}`}
                 >
-                  {date.getDate()}
+                  {day.date.getDate()}
                 </button>
               );
             }
