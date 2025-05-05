@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -8,6 +7,7 @@ import EmojiSelector from './EmojiSelector';
 import EmotionTextInput from './EmotionTextInput';
 import AudioRecorder from './AudioRecorder';
 import AnalysisDialog from './AnalysisDialog';
+import { analyzeEmotion } from '@/lib/scanService';
 
 export interface EmotionScanFormProps {
   onScanSaved: () => void;
