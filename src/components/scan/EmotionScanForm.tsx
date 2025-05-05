@@ -12,9 +12,11 @@ import type { Emotion } from '@/types';
 
 interface EmotionScanFormProps {
   onScanSaved: (scan: Emotion) => void;
+  onClose?: () => void;  // Added to match ScanPage usage
+  onSaveComplete?: () => void;  // Added to match ScanPage usage
 }
 
-const EmotionScanForm = ({ onScanSaved }: EmotionScanFormProps) => {
+const EmotionScanForm = ({ onScanSaved, onClose, onSaveComplete }: EmotionScanFormProps) => {
   const [mood, setMood] = useState<number>(75);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -63,6 +65,10 @@ const EmotionScanForm = ({ onScanSaved }: EmotionScanFormProps) => {
       clearInterval(progressInterval);
       
       onScanSaved(savedEmotion);
+      
+      // Call additional callbacks if they exist
+      if (onSaveComplete) onSaveComplete();
+      if (onClose) onClose();
       
       toast({
         title: "Scan enregistré",

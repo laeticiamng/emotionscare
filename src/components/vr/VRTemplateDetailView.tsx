@@ -6,18 +6,18 @@ import VRSessionHistory from './VRSessionHistory';
 
 interface VRTemplateDetailViewProps {
   template: VRSessionTemplate;
-  heartRate: number;
-  onStartSession: () => void;
-  onBack: () => void;
-  recentSessions: VRSession[];
+  heartRate?: number;
+  onStartSession?: () => void;
+  onBack?: () => void;
+  recentSessions?: VRSession[];
 }
 
 const VRTemplateDetailView: React.FC<VRTemplateDetailViewProps> = ({
   template,
-  heartRate,
-  onStartSession,
-  onBack,
-  recentSessions
+  heartRate = 75,
+  onStartSession = () => {},
+  onBack = () => {},
+  recentSessions = []
 }) => {
   return (
     <div className="space-y-6">

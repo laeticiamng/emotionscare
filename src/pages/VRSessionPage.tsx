@@ -14,53 +14,85 @@ const VRSessionPage = () => {
   const navigate = useNavigate();
   
   const { 
+    selectedTemplate, 
+    recentSessions, 
     templates, 
-    session, 
-    activeTemplate, 
-    completedSession, 
+    heartRate,
+    handleSelectTemplate,
     handleStartSession, 
     handleCompleteSession
   } = useVRSession(id);
 
   // View states
   const [view, setView] = useState<'selection' | 'detail' | 'session'>('selection');
+  const [currentSession, setCurrentSession] = useState<any>(null);
+  const [activeTemplate, setActiveTemplate] = useState(selectedTemplate);
+  const [completedSession, setCompletedSession] = useState<any>(null);
 
   useEffect(() => {
     // If we have an ID but no activeTemplate yet, set to detail view
-    if (id && !activeTemplate) {
-      setView('detail');
-      return;
+    if (id) {
+      const matchingTemplate = templates.find(t => t.template_id === id);
+      if (matchingTemplate) {
+        setActiveTemplate(matchingTemplate);
+        setView('detail');
+        return;
+      }
     }
 
     // If we have a session, show session view
-    if (session) {
+    if (currentSession) {
       setView('session');
       return;
     }
 
     // Default to selection
     setView('selection');
-  }, [id, activeTemplate, session]);
+  }, [id, templates, currentSession]);
+
+  const startVRSession = () => {
+    if (activeTemplate) {
+      handleStartSession();
+      setCurrentSession({
+        id: `session-${Date.now()}`,
+        template_id: activeTemplate.template_id,
+        started_at: new Date().toISOString()
+      });
+      setView('session');
+    }
+  };
+  
+  const completeVRSession = async () => {
+    await handleCompleteSession();
+    setCompletedSession(currentSession);
+    setCurrentSession(null);
+    navigate('/vr');
+  };
+
+  const handleNavigateBack = () => {
+    navigate('/dashboard');
+  };
   
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <VRPageHeader />
+      <VRPageHeader onNavigateBack={handleNavigateBack} />
 
-      {view === 'session' && session && (
+      {view === 'session' && activeTemplate && (
         <VRActiveSession
-          session={session}
-          template={activeTemplate!}
-          onComplete={handleCompleteSession} 
+          template={activeTemplate}
+          onComplete={completeVRSession} 
         />
       )}
 
       {view === 'detail' && activeTemplate && (
         <VRTemplateDetailView 
           template={activeTemplate} 
-          onStart={() => handleStartSession(activeTemplate.template_id)} 
+          heartRate={heartRate.before}
+          onStartSession={startVRSession}
           onBack={() => {
             navigate('/vr');
           }}
+          recentSessions={recentSessions}
         />
       )}
 

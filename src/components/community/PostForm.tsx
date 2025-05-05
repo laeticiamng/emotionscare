@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -66,7 +65,7 @@ const PostForm: React.FC = () => {
       const post = await createPost(
         user.id, 
         newContent, 
-        newMedia || undefined, 
+        false, // Fix: Changed from string to boolean for isAnonymous parameter
         image || undefined
       );
       

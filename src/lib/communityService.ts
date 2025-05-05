@@ -1,4 +1,3 @@
-
 import { faker } from '@faker-js/faker';
 import { Post, Comment, Group, GroupMember, CommunityStats, BuddyRequest } from '@/types/community';
 import { User, UserRole } from '@/types';
@@ -269,7 +268,7 @@ export const getUserGroups = async (userId: string): Promise<Group[]> => {
 export const createGroup = async (
   userId: string,
   name: string,
-  topic: string,
+  topic: string, // Changed from description to match the component
   description?: string
 ): Promise<Group> => {
   return new Promise(resolve => {
@@ -325,9 +324,10 @@ export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> =
             user: {
               id: user?.id || '',
               name: user?.name || 'Utilisateur',
+              email: user?.email || '', // Added email which is required by User type
               role: user?.role || UserRole.USER,
               avatar: user?.avatar || ''
-            }
+            } as GroupMember // Added type assertion to fix TypeScript error
           };
         });
       resolve(members);
