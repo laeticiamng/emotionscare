@@ -11,8 +11,8 @@ import { ArrowLeft, Shield } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 
 const AdminLoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@example.com'); // Préremplit avec l'email de démo
+  const [password, setPassword] = useState(''); // Pas de préremplissage du mot de passe pour la sécurité
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const AdminLoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
+    // Validation basique
     if (!email || !password) {
       toast({
         title: "Erreur",
@@ -35,13 +35,13 @@ const AdminLoginPage = () => {
     try {
       const user = await login(email, password);
       
-      // Check if the user has admin privileges
+      // Vérifie si l'utilisateur a des privilèges d'administration
       if (user && isAdminRole(user.role)) {
         toast({
           title: "Connexion réussie",
           description: `Bienvenue dans l'espace administration, ${user.name}!`,
         });
-        // Explicitly navigate to dashboard after successful admin login
+        // Navigation explicite vers le tableau de bord après connexion admin réussie
         navigate('/dashboard');
       } else {
         toast({
@@ -49,11 +49,11 @@ const AdminLoginPage = () => {
           description: "Vous n'avez pas les droits d'administration nécessaires",
           variant: "destructive"
         });
-        navigate('/'); // Redirect to home if not admin
+        navigate('/'); // Redirection vers l'accueil si pas admin
       }
       
     } catch (error: any) {
-      // Error handling is already in auth context, but we'll add an extra toast here for clarity
+      // Gestion des erreurs déjà dans le contexte d'authentification
       console.error("Erreur de connexion admin:", error);
       toast({
         title: "Erreur de connexion",

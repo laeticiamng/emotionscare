@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check if user is already logged in
+  // Vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -45,11 +45,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const loggedInUser = await loginUser(email, password);
       setUser(loggedInUser);
       
-      // Navigation will be handled in the specific login components
-      // (AdminLoginPage or LoginPage) to ensure proper redirection
+      // La navigation sera gérée dans les composants de connexion spécifiques
+      // (AdminLoginPage ou LoginPage) pour assurer une redirection correcte
       
       if (!loggedInUser.role || !loggedInUser.avatar) {
-        // If user has no role or avatar, they need to complete onboarding
+        // Si l'utilisateur n'a pas de rôle ou d'avatar, ils doivent compléter l'onboarding
         toast({
           title: "Bienvenue",
           description: "Veuillez compléter votre profil pour continuer",
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return loggedInUser;
       }
       
-      // Success toast is handled in the login components
+      // Le toast de succès est géré dans les composants de connexion
       
       return loggedInUser;
     } catch (error: any) {

@@ -29,6 +29,15 @@ export const mockUsers: User[] = [
     emotional_score: 78,
     avatar: 'https://i.pravatar.cc/150?img=3',
   },
+  {
+    id: '4',
+    name: 'Admin Direction',
+    email: 'admin@example.com',
+    role: 'admin',  // Role admin pour l'accès direction
+    anonymity_code: 'AD123456',
+    emotional_score: 95,
+    avatar: 'https://i.pravatar.cc/150?img=12',
+  },
 ];
 
 // Current user state (simulating auth)
@@ -38,15 +47,25 @@ export let currentUser: User | null = null;
 export const loginUser = (email: string, password: string): Promise<User> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
+      // Pour la démo, accepter "admin" comme mot de passe pour l'utilisateur admin@example.com
+      if (email === 'admin@example.com' && password === 'admin') {
+        const adminUser = mockUsers.find(u => u.email === 'admin@example.com');
+        if (adminUser) {
+          currentUser = adminUser;
+          resolve(adminUser);
+          return;
+        }
+      }
+      
       const user = mockUsers.find(u => u.email === email);
       if (user) {
-        // In a real app, we would check the password here
+        // Dans une vraie application, on vérifierait le mot de passe ici
         currentUser = user;
         resolve(user);
       } else {
         reject(new Error('Invalid email or password'));
       }
-    }, 800); // Simulate network delay
+    }, 800); // Simuler un délai réseau
   });
 };
 
