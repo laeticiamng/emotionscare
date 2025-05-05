@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, LineChart, MessageSquare, Trophy, Sparkles } from 'lucide-react';
+import { ArrowRight, BarChart2, MessageSquare, Trophy, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import KpiCards from '@/components/dashboard/KpiCards';
 import TrendCharts from '@/components/dashboard/TrendCharts';
@@ -121,7 +122,7 @@ const AdminDashboard: React.FC = () => {
       <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
         <TabsList className="mb-4 bg-white/50 backdrop-blur-sm">
           <TabsTrigger value="vue-globale" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
-            <LineChart className="mr-2 h-4 w-4" />
+            <BarChart2 className="mr-2 h-4 w-4" />
             Vue Globale
           </TabsTrigger>
           <TabsTrigger value="social-cocoon" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
