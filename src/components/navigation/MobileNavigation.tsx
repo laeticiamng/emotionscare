@@ -58,7 +58,7 @@ const MobileNavigation = () => {
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[280px] sm:w-[350px] p-0">
+      <SheetContent side="left" className="w-[85vw] sm:w-[350px] p-0">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b">
             <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
@@ -97,7 +97,7 @@ const MobileNavigation = () => {
                     <NavLink
                       to={item.path}
                       className={cn(
-                        "flex items-center py-2 px-3 rounded-md transition-colors",
+                        "flex items-center py-3 px-3 rounded-md transition-colors",
                         isActive
                           ? "bg-primary text-primary-foreground font-medium"
                           : "hover:bg-accent/50"
@@ -117,7 +117,7 @@ const MobileNavigation = () => {
                     Extras
                   </div>
                   <button 
-                    className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
+                    className="flex items-center py-3 px-3 rounded-md transition-colors hover:bg-accent/50"
                     onClick={() => {
                       openDrawer();
                       setIsOpen(false);
