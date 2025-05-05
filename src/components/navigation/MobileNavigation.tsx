@@ -38,7 +38,7 @@ const MobileNavigation = () => {
     const prevItem = index > 0 ? allNavigationItems[index - 1] : null;
     if (index === 0 || (prevItem && prevItem.section !== section)) {
       return (
-        <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+        <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
           {section === 'principal' ? 'Navigation principale' : 'Outils complémentaires'}
         </div>
       );
@@ -58,7 +58,7 @@ const MobileNavigation = () => {
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[85vw] sm:w-[350px] p-0">
+      <SheetContent side="left" className="w-[90vw] sm:w-[350px] p-0">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b">
             <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
@@ -113,11 +113,11 @@ const MobileNavigation = () => {
               
               {!isAdmin && (
                 <>
-                  <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+                  <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
                     Extras
                   </div>
                   <button 
-                    className="flex items-center py-3 px-3 rounded-md transition-colors hover:bg-accent/50"
+                    className="flex items-center py-3 px-3 rounded-md transition-colors hover:bg-accent/50 w-full text-left"
                     onClick={() => {
                       openDrawer();
                       setIsOpen(false);

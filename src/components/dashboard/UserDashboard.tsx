@@ -25,9 +25,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   const [minimalView, setMinimalView] = useState(false);
   const isMobile = useIsMobile();
   const [collapsedSections, setCollapsedSections] = useState({
-    modules: isMobile, // Collapsed by default on mobile
-    emotionScan: isMobile, // Collapsed by default on mobile
-    sidePanel: isMobile, // Collapsed by default on mobile
+    modules: isMobile,
+    emotionScan: isMobile,
+    sidePanel: isMobile,
     social: false,
     gamification: false,
     vr: false
@@ -41,7 +41,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   };
   
   return (
-    <div className="space-y-4">
+    <div className={`${isMobile ? 'px-1' : 'space-y-4'}`}>
       <div className="flex justify-between items-center flex-wrap gap-2">
         <DashboardHeader user={user} />
         {!isMobile && (
@@ -55,9 +55,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         )}
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-4 mt-2">
         {/* Main Content Area */}
-        <div className="col-span-1 lg:col-span-8 space-y-4">
+        <div className="col-span-1 lg:col-span-8 space-y-2 lg:space-y-4">
           {/* Modules Section */}
           <div className="bg-card rounded-lg shadow-sm border p-3">
             <div 
@@ -119,7 +119,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         </div>
         
         {/* Side Panel */}
-        <div className="col-span-1 lg:col-span-4 space-y-4">
+        <div className="col-span-1 lg:col-span-4 space-y-2 lg:space-y-4">
           {/* User Side Panel */}
           <div className="bg-card rounded-lg shadow-sm border p-3">
             <div 

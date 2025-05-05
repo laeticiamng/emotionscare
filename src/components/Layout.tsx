@@ -28,8 +28,8 @@ const Layout = ({ children }: LayoutProps) => {
       <SessionTimeoutAlert />
       <div className="flex flex-1 overflow-hidden pt-16">
         <Sidebar />
-        <div className={`flex-1 overflow-auto bg-background ${isMobile ? 'w-full px-0' : ''}`}>
-          <main className={`mx-auto ${isMobile ? 'p-2' : 'container p-6'}`}>
+        <div className="flex-1 overflow-auto bg-background w-full">
+          <main className={`${isMobile ? 'w-full p-0' : 'container mx-auto p-6'}`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />
