@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { navItems, adminNavItems, footerNavItems } from '@/components/navigation/navConfig';
+import { sidebarItems, adminSidebarItems, footerNavItems } from '@/components/navigation/navConfig';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Bell, Settings } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
@@ -16,8 +16,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const isAdmin = isAdminRole(user?.role);
   
-  // Choisir les éléments de navigation en fonction du rôle
-  const items = isAdmin ? adminNavItems : navItems;
+  // Choisir les éléments de navigation en fonction du rôle (fonctionnalités complémentaires uniquement)
+  const items = isAdmin ? adminSidebarItems : sidebarItems;
   
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -35,6 +35,12 @@ const Sidebar = () => {
       aria-label="Sidebar navigation"
     >
       <div className="flex-1 overflow-y-auto py-4 px-2">
+        <div className="mb-4 px-3">
+          <h2 className={`text-sm font-medium text-muted-foreground ${collapsed ? 'sr-only' : ''}`}>
+            {isAdmin ? 'Outils Administrateur' : 'Outils Complémentaires'}
+          </h2>
+        </div>
+        
         <div className="space-y-1">
           {items.map((item) => (
             collapsed ? (
@@ -72,6 +78,11 @@ const Sidebar = () => {
         {!isAdmin && footerNavItems.length > 0 && (
           <>
             <div className="my-2 border-t border-border"></div>
+            <div className="px-3 mb-2">
+              <h2 className={`text-sm font-medium text-muted-foreground ${collapsed ? 'sr-only' : ''}`}>
+                Préférences
+              </h2>
+            </div>
             <div className="space-y-1">
               {footerNavItems.map((item) => (
                 collapsed ? (

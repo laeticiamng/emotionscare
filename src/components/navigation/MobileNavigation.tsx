@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { navItems, adminNavItems } from './navConfig';
+import { topNavItems, sidebarItems, adminTopNavItems, adminSidebarItems } from './navConfig';
 import { isAdminRole } from '@/utils/roleUtils';
 
 const MobileNavigation = () => {
@@ -19,12 +19,31 @@ const MobileNavigation = () => {
   const location = useLocation();
   const isAdmin = user ? isAdminRole(user.role) : false;
 
-  // Sélectionner les bons éléments de navigation en fonction du rôle
-  const navigationItems = isAdmin ? adminNavItems : navItems;
+  // Regrouper les items de navigation
+  const topItems = isAdmin ? adminTopNavItems : topNavItems;
+  const sideItems = isAdmin ? adminSidebarItems : sidebarItems;
+  
+  // Combiner les deux pour le menu mobile, avec des séparateurs visuels
+  const allNavigationItems = [
+    ...topItems.map(item => ({ ...item, section: 'principal' })),
+    ...sideItems.map(item => ({ ...item, section: 'outils' }))
+  ];
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const renderSectionHeader = (section: string, index: number) => {
+    const prevItem = index > 0 ? allNavigationItems[index - 1] : null;
+    if (index === 0 || (prevItem && prevItem.section !== section)) {
+      return (
+        <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+          {section === 'principal' ? 'Navigation principale' : 'Outils complémentaires'}
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
@@ -70,37 +89,44 @@ const MobileNavigation = () => {
             )}
             
             <nav className="flex flex-col space-y-1 px-2">
-              {navigationItems.map((item) => {
+              {allNavigationItems.map((item, index) => {
                 const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
                 return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "flex items-center py-2 px-3 rounded-md transition-colors",
-                      isActive
-                        ? "bg-primary text-primary-foreground font-medium"
-                        : "hover:bg-accent/50"
-                    )}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.icon}
-                    <span className="ml-2">{item.label}</span>
-                  </NavLink>
+                  <React.Fragment key={item.path}>
+                    {renderSectionHeader(item.section, index)}
+                    <NavLink
+                      to={item.path}
+                      className={cn(
+                        "flex items-center py-2 px-3 rounded-md transition-colors",
+                        isActive
+                          ? "bg-primary text-primary-foreground font-medium"
+                          : "hover:bg-accent/50"
+                      )}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {item.icon}
+                      <span className="ml-2">{item.label}</span>
+                    </NavLink>
+                  </React.Fragment>
                 );
               })}
               
               {!isAdmin && (
-                <button 
-                  className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
-                  onClick={() => {
-                    openDrawer();
-                    setIsOpen(false);
-                  }}
-                >
-                  <Music className="w-5 h-5 mr-2" />
-                  <span>Soundtrack du bien-être</span>
-                </button>
+                <>
+                  <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+                    Extras
+                  </div>
+                  <button 
+                    className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
+                    onClick={() => {
+                      openDrawer();
+                      setIsOpen(false);
+                    }}
+                  >
+                    <Music className="w-5 h-5 mr-2" />
+                    <span>Soundtrack du bien-être</span>
+                  </button>
+                </>
               )}
             </nav>
           </div>

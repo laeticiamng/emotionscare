@@ -6,7 +6,7 @@ import NavItem from './NavItem';
 import UserMenu from './UserMenu';
 import GuestMenu from './GuestMenu';
 import { useAuth } from '@/contexts/AuthContext';
-import { navItems, adminNavItems } from './navConfig';
+import { sidebarItems, adminSidebarItems } from './navConfig';
 import { isAdminRole } from '@/utils/roleUtils';
 import { fetchBadgesCount } from '@/lib/dashboardService';
 
@@ -16,8 +16,9 @@ const MainNavigation: React.FC = () => {
   const [badgesCount, setBadgesCount] = useState<number>(0);
   const isAdmin = user ? isAdminRole(user.role) : false;
   
-  // Sélectionner les bons éléments de navigation en fonction du rôle
-  const navigationItems = isAdmin ? adminNavItems : navItems;
+  // Note: Cette composante n'est plus utilisée dans l'interface principale,
+  // mais nous gardons le code mis à jour au cas où
+  const navigationItems = isAdmin ? adminSidebarItems : sidebarItems;
 
   useEffect(() => {
     const loadBadgesCount = async () => {

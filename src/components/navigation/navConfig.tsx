@@ -19,8 +19,8 @@ import {
   Sparkles
 } from "lucide-react";
 
-// Configuration unifiée de navigation pour tout type d'utilisateur
-export const navItems = [
+// Items pour la barre du haut (navbar) - fonctionnalités principales
+export const topNavItems = [
   {
     path: "/dashboard",
     label: "Tableau de bord",
@@ -45,6 +45,10 @@ export const navItems = [
     icon: <UserIcon className="h-5 w-5 mr-2" />,
     roles: ["user", "admin", "Admin", "Utilisateur"],
   },
+];
+
+// Configuration pour la sidebar utilisateur - fonctionnalités complémentaires
+export const sidebarItems = [
   {
     path: "/social-cocoon",
     label: "Communauté",
@@ -83,8 +87,30 @@ export const navItems = [
   },
 ];
 
-// Configuration spécifique pour les administrateurs
-export const adminNavItems = [
+// Configuration spécifique pour la sidebar admin - fonctionnalités analytiques
+export const adminSidebarItems = [
+  {
+    path: "/vr-analytics",
+    label: "Statistiques VR",
+    icon: <BarChart2 className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
+  },
+  {
+    path: "/compliance",
+    label: "Conformité & Sécurité",
+    icon: <ShieldCheck className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
+  },
+  {
+    path: "/account",
+    label: "Paramètres Admin",
+    icon: <Settings className="h-5 w-5 mr-2" />,
+    roles: ["admin", "Admin"],
+  },
+];
+
+// Items de navbar spécifiques pour les admin (remplace topNavItems pour les admins)
+export const adminTopNavItems = [
   {
     path: "/dashboard",
     label: "Tableau de bord global",
@@ -107,30 +133,6 @@ export const adminNavItems = [
     path: "/social-cocoon",
     label: "Social Cocoon - Pilotage",
     icon: <Users className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/gamification",
-    label: "Gamification - Synthèse",
-    icon: <Trophy className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/vr-analytics",
-    label: "Statistiques VR",
-    icon: <BarChart2 className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/compliance",
-    label: "Conformité & Sécurité",
-    icon: <ShieldCheck className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/account",
-    label: "Paramètres Admin",
-    icon: <Settings className="h-5 w-5 mr-2" />,
     roles: ["admin", "Admin"],
   },
 ];

@@ -9,7 +9,7 @@ import {
 import NavItem from './navigation/NavItem';
 import UserMenu from './navigation/UserMenu';
 import MobileNavigation from './navigation/MobileNavigation';
-import { navItems, adminNavItems } from './navigation/navConfig';
+import { topNavItems, adminTopNavItems } from './navigation/navConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
 
@@ -18,7 +18,7 @@ const GlobalNav = () => {
   const isAdmin = user ? isAdminRole(user.role) : false;
   
   // Sélectionner les bons éléments de navigation en fonction du rôle
-  const navigationItems = isAdmin ? adminNavItems : navItems;
+  const navigationItems = isAdmin ? adminTopNavItems : topNavItems;
   
   return (
     <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur-sm border-b shadow-sm">
@@ -33,7 +33,7 @@ const GlobalNav = () => {
         <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
           <NavigationMenu>
             <NavigationMenuList>
-              {navigationItems.slice(0, 6).map((item) => (
+              {navigationItems.map((item) => (
                 <NavigationMenuItem key={item.path}>
                   <NavItem 
                     icon={item.icon} 
