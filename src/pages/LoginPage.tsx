@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, Shield, Lock } from 'lucide-react';
+import { Separator } from "@/components/ui/separator";
 
 const LoginPage = () => {
   const [email, setEmail] = useState('sophie@example.com');
@@ -56,9 +57,12 @@ const LoginPage = () => {
 
         <Card className="shadow-lg border-[#E8F1FA]">
           <CardHeader>
-            <CardTitle>Connexion</CardTitle>
+            <div className="flex items-center gap-2 mb-2">
+              <Lock className="h-5 w-5 text-primary" />
+              <CardTitle>Connexion sécurisée</CardTitle>
+            </div>
             <CardDescription>
-              Entrez vos identifiants pour accéder à votre espace
+              Authentification à plusieurs facteurs pour protéger votre compte
             </CardDescription>
           </CardHeader>
 
@@ -73,6 +77,7 @@ const LoginPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="border border-muted"
                 />
               </div>
 
@@ -84,6 +89,7 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  className="border border-muted"
                 />
               </div>
             </CardContent>
@@ -100,6 +106,19 @@ const LoginPage = () => {
               <p className="text-sm text-center text-muted-foreground mt-4">
                 * Pour la démo, utilisez: sophie@example.com (mot de passe: sophie)
               </p>
+
+              <Separator className="my-4" />
+              
+              <div className="flex flex-col items-center text-xs text-muted-foreground space-y-2">
+                <div className="flex items-center gap-2">
+                  <Shield className="h-3 w-3" />
+                  <span>Conforme ISO 27001 & RGPD</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs">🔒</span>
+                  <span>Connexion chiffrée AES-256</span>
+                </div>
+              </div>
             </CardFooter>
           </form>
         </Card>

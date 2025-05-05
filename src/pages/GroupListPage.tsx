@@ -1,164 +1,169 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { fetchGroups, joinGroup } from '@/lib/communityService';
-import type { Group } from '@/types/community';
-import GroupForm from '@/components/community/GroupForm';
-import GroupListComponent from '@/components/community/GroupList';
-import { Loader2, Users, ArrowLeft } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Search } from 'lucide-react';
+import { Group } from '@/types/community';
+import { fetchGroups } from '@/lib/communityService';
+import { useToast } from '@/hooks/use-toast';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import GroupList from '@/components/community/GroupList';
+import GroupForm from '@/components/community/GroupForm';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const GroupListPage: React.FC = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
+const GroupListPage = () => {
   const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [joining, setJoining] = useState<string | null>(null);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [filteredGroups, setFilteredGroups] = useState<Group[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('all');
+  const { toast } = useToast();
 
+  // Fetch groups on component mount
   useEffect(() => {
-    async function loadGroups() {
+    const loadGroups = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         const fetchedGroups = await fetchGroups();
         setGroups(fetchedGroups);
+        setFilteredGroups(fetchedGroups);
       } catch (error) {
-        console.error('Error loading groups:', error);
+        console.error('Error fetching groups:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger les groupes",
           variant: "destructive"
         });
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
-    }
-    
+    };
+
     loadGroups();
   }, [toast]);
 
+  // Filter groups based on search term
+  useEffect(() => {
+    if (searchTerm === '') {
+      setFilteredGroups(groups);
+    } else {
+      const filtered = groups.filter(group => 
+        group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        group.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (group.tags && group.tags.some(tag => 
+          tag.toLowerCase().includes(searchTerm.toLowerCase())
+        ))
+      );
+      setFilteredGroups(filtered);
+    }
+  }, [searchTerm, groups]);
+
+  // Filter based on tab
+  useEffect(() => {
+    if (activeTab === 'all') {
+      // Apply only search filter
+      if (searchTerm === '') {
+        setFilteredGroups(groups);
+      } else {
+        const filtered = groups.filter(group => 
+          group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          group.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (group.tags && group.tags.some(tag => 
+            tag.toLowerCase().includes(searchTerm.toLowerCase())
+          ))
+        );
+        setFilteredGroups(filtered);
+      }
+    } else if (activeTab === 'my') {
+      // Show only joined groups
+      const myGroups = groups.filter(group => {
+        // Check if the user is a member
+        // This is a placeholder - implement proper membership check
+        return group.members_count > 0;
+      });
+      setFilteredGroups(myGroups);
+    } else if (activeTab === 'popular') {
+      // Sort by member count
+      const popularGroups = [...groups].sort((a, b) => b.members_count - a.members_count);
+      setFilteredGroups(popularGroups);
+    }
+  }, [activeTab, groups, searchTerm]);
+
   const handleGroupCreated = (newGroup: Group) => {
-    setGroups([newGroup, ...groups]);
-    setShowCreateForm(false);
+    setGroups(prevGroups => [...prevGroups, newGroup]);
+    setFilteredGroups(prevGroups => [...prevGroups, newGroup]);
     toast({
-      title: "Groupe créé",
-      description: "Votre groupe a été créé avec succès"
+      title: "Groupe créé avec succès",
+      description: `Vous avez créé le groupe "${newGroup.name}"`,
     });
   };
 
-  const handleJoin = async (groupId: string) => {
-    if (!user) {
-      toast({
-        title: "Non connecté",
-        description: "Vous devez être connecté pour rejoindre un groupe",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    try {
-      setJoining(groupId);
-      await joinGroup(groupId, user.id);
-      
-      // Update the local state
-      const updatedGroups = groups.map(g => {
-        if (g.id === groupId && g.members) {
-          // Handle both string[] and User[] types
-          const memberIds = Array.isArray(g.members) ? 
-            [...g.members.map(m => typeof m === 'string' ? m : m.id)] : 
-            [];
-            
-          if (!memberIds.includes(user.id)) {
-            return { 
-              ...g, 
-              members: [...memberIds, user.id]
-            };
-          }
-        }
-        return g;
-      });
-      
-      setGroups(updatedGroups);
-      
-      toast({
-        title: "Groupe rejoint",
-        description: "Vous avez rejoint le groupe avec succès"
-      });
-    } catch (error) {
-      console.error('Error joining group:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de rejoindre le groupe",
-        variant: "destructive"
-      });
-    } finally {
-      setJoining(null);
-    }
-  };
-
-  const userHasJoined = (group: Group): boolean => {
-    if (!user || !group.members) return false;
-    
-    // Handle both string[] and User[] types
-    const memberIds = Array.isArray(group.members) ?
-      group.members.map(m => typeof m === 'string' ? m : m.id) :
-      [];
-      
-    return memberIds.includes(user.id);
-  };
-
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-6 flex items-center">
-        <Link to="/community" className="mr-4">
-          <Button variant="ghost" size="sm" className="gap-1">
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-semibold flex items-center">
-          <Users className="h-6 w-6 mr-2" />
-          Groupes de parole
-        </h1>
-      </div>
-      
-      <p className="text-muted-foreground mb-8">
-        Rejoignez un groupe existant ou créez le vôtre pour partager vos expériences avec d'autres professionnels de santé.
-      </p>
-
-      <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
+    <div className="container mx-auto p-4 space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-xl font-medium">Groupes disponibles</h2>
-          <p className="text-muted-foreground mt-1">
-            Explorez les groupes thématiques et engagez la discussion
+          <h1 className="text-3xl font-bold">Groupes</h1>
+          <p className="text-muted-foreground">
+            Rejoignez des groupes pour discuter de sujets qui vous intéressent
           </p>
         </div>
-        <Button 
-          onClick={() => setShowCreateForm(!showCreateForm)} 
-          className="mt-4 sm:mt-0"
-        >
-          {showCreateForm ? "Annuler" : "Créer un groupe"}
-        </Button>
+
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Créer un groupe
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Créer un nouveau groupe</SheetTitle>
+            </SheetHeader>
+            <div className="mt-6">
+              <GroupForm 
+                onGroupCreated={handleGroupCreated} 
+                joinAfterCreation={true}
+              />
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
-      {showCreateForm && (
-        <GroupForm onGroupCreated={handleGroupCreated} />
-      )}
-
-      {loading ? (
-        <div className="flex justify-center p-12">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <GroupListComponent 
-          groups={groups}
-          userHasJoined={userHasJoined}
-          handleJoin={handleJoin}
-          joining={joining}
-          loading={loading}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          className="pl-10"
+          placeholder="Rechercher un groupe..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-      )}
+      </div>
+
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="all">Tous</TabsTrigger>
+          <TabsTrigger value="my">Mes groupes</TabsTrigger>
+          <TabsTrigger value="popular">Populaires</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="py-4">
+          <GroupList groups={filteredGroups} isLoading={isLoading} />
+        </TabsContent>
+        
+        <TabsContent value="my" className="py-4">
+          <GroupList groups={filteredGroups} isLoading={isLoading} />
+        </TabsContent>
+        
+        <TabsContent value="popular" className="py-4">
+          <GroupList groups={filteredGroups} isLoading={isLoading} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

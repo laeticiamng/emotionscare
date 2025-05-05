@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -7,11 +7,14 @@ import UserDashboard from '@/components/dashboard/UserDashboard';
 import AdminDashboard from '@/components/dashboard/admin/AdminDashboard';
 import { isAdminRole, isUserRole } from '@/utils/roleUtils';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import SessionTimeoutAlert from '@/components/SessionTimeoutAlert';
+import DashboardFooter from '@/components/dashboard/DashboardFooter';
 
 const DashboardPage: React.FC = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [sessionContinued, setSessionContinued] = useState(false);
   
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -48,6 +51,8 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="container mx-auto py-6">
       {renderDashboard()}
+      <SessionTimeoutAlert onContinue={() => setSessionContinued(true)} />
+      <DashboardFooter isAdmin={isAdmin} />
     </div>
   );
 };

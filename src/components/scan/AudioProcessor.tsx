@@ -1,26 +1,28 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createProcessor } from '@/lib/audioVad';
 import { Emotion } from '@/types';
-import type { EmotionResult } from './live/EmotionResult'; // Fixed import
+import EmotionResult from './live/EmotionResult';
+import { StatusIndicator } from './live/StatusIndicator';
+import { TranscriptDisplay } from './live/TranscriptDisplay';
 
 export interface AudioProcessorProps {
   isListening: boolean;
   userId: string;
-  isConfidential?: boolean; // This property was already defined correctly
   onProcessingChange: React.Dispatch<React.SetStateAction<boolean>>;
   onProgressUpdate: React.Dispatch<React.SetStateAction<string>>;
   onAnalysisComplete: (emotion: Emotion, result: EmotionResult) => void;
   onError: (message: string) => void;
+  isConfidential?: boolean;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
   isListening,
   userId,
-  isConfidential = false,
   onProcessingChange,
   onProgressUpdate,
   onAnalysisComplete,
-  onError
+  onError,
+  isConfidential = false
 }) => {
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -130,7 +132,12 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
     }
   };
 
-  return null; // Ce composant ne rend rien visuellement
+  return (
+    <div className="space-y-4">
+      <StatusIndicator isProcessing={false} isListening={isListening} />
+      <TranscriptDisplay transcript="" isConfidential={isConfidential} />
+    </div>
+  );
 };
 
 export default AudioProcessor;

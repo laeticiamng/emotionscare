@@ -27,7 +27,11 @@ const GlobalNav = () => {
             <NavigationMenuList>
               {navItems.map((item) => (
                 <NavigationMenuItem key={item.path}>
-                  <NavItem path={item.path} icon={item.icon} label={item.label} />
+                  <NavItem 
+                    icon={item.icon} 
+                    label={item.label} 
+                    to={item.path} 
+                  />
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>
@@ -35,7 +39,7 @@ const GlobalNav = () => {
         </nav>
         
         {/* User Profile and Music Button - Desktop */}
-        <UserMenu />
+        <UserMenu badgesCount={0} />
         
         {/* Mobile Navigation */}
         <MobileNavigation />

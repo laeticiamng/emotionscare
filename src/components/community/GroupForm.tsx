@@ -1,158 +1,123 @@
+
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { createGroup, joinGroup } from '@/lib/communityService';
-import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Plus } from 'lucide-react';
-import { 
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Group } from '@/types/community';
+import { createGroup } from '@/lib/communityService';
+import TagSelector from './TagSelector';
+import { useToast } from '@/hooks/use-toast';
 
-const groupSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
-  topic: z.string().min(2, { message: 'La thématique doit contenir au moins 2 caractères' }),
-  description: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof groupSchema>;
-
-interface GroupFormProps {
-  onGroupCreated: (newGroup: any) => void;
-  joinAfterCreation: boolean;
+export interface GroupFormProps {
+  onGroupCreated: (newGroup: Group) => void;
+  joinAfterCreation?: boolean;
 }
 
-const GroupForm: React.FC<GroupFormProps> = ({ onGroupCreated, joinAfterCreation }) => {
-  const { user } = useAuth();
+const GroupForm: React.FC<GroupFormProps> = ({ 
+  onGroupCreated,
+  joinAfterCreation = false 
+}) => {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const [creating, setCreating] = useState(false);
-  
-  const form = useForm<FormValues>({
-    resolver: zodResolver(groupSchema),
-    defaultValues: {
-      name: '',
-      topic: '',
-      description: '',
-    },
-  });
 
-  const onSubmit = async (data: FormValues) => {
-    if (!user) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!name.trim()) {
       toast({
-        title: "Non connecté",
-        description: "Vous devez être connecté pour créer un groupe",
+        title: "Erreur",
+        description: "Le nom du groupe ne peut pas être vide",
         variant: "destructive"
       });
       return;
     }
     
+    setIsSubmitting(true);
+    
     try {
-      setCreating(true);
-      const group = await createGroup(user.id, data.name, data.topic, data.description);
-      onGroupCreated(group);
-      form.reset();
+      // Create a new group with the form data
+      const groupData = {
+        name,
+        description,
+        tags: selectedTags
+      };
       
-      if (joinAfterCreation) {
-        await joinGroup(res.id, user.id, user.name); // Removed the 4th argument
-      }
+      const newGroup = await createGroup(groupData);
+      
+      toast({
+        title: "Groupe créé !",
+        description: `Le groupe "${name}" a été créé avec succès.`
+      });
+      
+      // Reset the form
+      setName('');
+      setDescription('');
+      setSelectedTags([]);
+      
+      // Notify parent component
+      onGroupCreated(newGroup);
     } catch (error) {
-      console.error('Error creating group:', error);
+      console.error("Error creating group:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de créer le groupe",
+        description: "Une erreur est survenue lors de la création du groupe.",
         variant: "destructive"
       });
     } finally {
-      setCreating(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Card className="mb-8 border-2 border-primary/20">
-      <CardHeader>
-        <h2 className="text-xl font-medium">Créer un nouveau groupe</h2>
-      </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom du groupe</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Gestion du stress" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="topic"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Thématique</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Méditation, Anxiété..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description (optionnel)</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Décrivez l'objectif de votre groupe..." 
-                      rows={3} 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
-          <CardFooter>
-            <Button 
-              type="submit" 
-              disabled={creating}
-              className="flex items-center gap-2"
-            >
-              {creating ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Création...
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  Créer un groupe
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </form>
-      </Form>
-    </Card>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium mb-1">
+          Nom du groupe
+        </label>
+        <Input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Donnez un nom à votre groupe"
+          required
+        />
+      </div>
+      
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium mb-1">
+          Description
+        </label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Décrivez l'objectif du groupe"
+          rows={3}
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          Tags (jusqu'à 5)
+        </label>
+        <TagSelector 
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+          maxTags={5}
+        />
+      </div>
+      
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Création en cours...' : 'Créer le groupe'}
+      </Button>
+    </form>
   );
 };
 
