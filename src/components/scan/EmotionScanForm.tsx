@@ -1,154 +1,129 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from '@/components/ui/use-toast';
-import { saveEmotionScan } from '@/lib/scanService';
-import { useAuth } from '@/contexts/AuthContext';
-import { Progress } from "@/components/ui/progress";
-import type { Emotion } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { analyzeEmotion } from "@/lib/scanService";
+import EmojiSelector from './EmojiSelector';
+import EmotionTextInput from './EmotionTextInput';
+import AudioRecorder from './AudioRecorder';
+import AnalysisDialog from './AnalysisDialog';
 
-interface EmotionScanFormProps {
-  onScanSaved: (scan: Emotion) => void;
-  onClose?: () => void;  // Added to match ScanPage usage
-  onSaveComplete?: () => void;  // Added to match ScanPage usage
+export interface EmotionScanFormProps {
+  onScanSaved: () => void;
+  onClose?: () => void;
 }
 
-const EmotionScanForm = ({ onScanSaved, onClose, onSaveComplete }: EmotionScanFormProps) => {
-  const [mood, setMood] = useState<number>(75);
-  const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const { toast } = useToast();
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onScanSaved, onClose }) => {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<string>('text');
+  const [emojis, setEmojis] = useState<string>('');
+  const [text, setText] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [analyzing, setAnalyzing] = useState<boolean>(false);
 
-  const handleSave = async () => {
-    if (!user) {
+  const handleEmojiClick = (emoji: string) => {
+    setEmojis(prev => prev + emoji);
+  };
+
+  const handleSubmit = async () => {
+    if (!emojis && !text && !audioUrl) {
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour enregistrer un scan",
+        title: "Formulaire incomplet",
+        description: "Veuillez ajouter au moins un emoji, du texte ou un enregistrement audio.",
         variant: "destructive"
       });
       return;
     }
-    
+
     try {
-      setLoading(true);
+      setAnalyzing(true);
       
-      // Simulation d'analyse progressive
-      const progressInterval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 300);
-      
-      // Create new emotion entry
-      const newScan = {
-        date: new Date().toISOString(),
-        score: mood,
-        text: notes.trim() || '',
-        user_id: user?.id || '00000000-0000-0000-0000-000000000000',
-        emotion: mood >= 70 ? 'happy' : mood >= 40 ? 'neutral' : 'sad', // Convertir le score en émotion
-        intensity: Math.ceil(mood / 10) // Convertir le score en intensité (1-10)
-      };
-      
-      const savedEmotion = await saveEmotionScan(newScan);
-      
-      // Finaliser la progression
-      setProgress(100);
-      clearInterval(progressInterval);
-      
-      onScanSaved(savedEmotion);
-      
-      // Call additional callbacks if they exist
-      if (onSaveComplete) onSaveComplete();
-      if (onClose) onClose();
-      
-      toast({
-        title: "Scan enregistré",
-        description: "Votre scan émotionnel a été enregistré avec succès"
+      // Dans une vraie application, nous enverrions l'audio au serveur
+      const result = await analyzeEmotion({
+        user_id: user?.id || '',
+        emojis,
+        text,
+        audio_url: audioUrl
       });
       
-      // Reset the notes field after saving
-      setNotes('');
-      setProgress(0);
-    } catch (error: any) {
       toast({
-        title: "Erreur",
-        description: `Impossible d'enregistrer le scan: ${error.message}`,
+        title: "Analyse complétée",
+        description: `Votre état émotionnel: ${result.emotion}`,
+      });
+      
+      onScanSaved();
+    } catch (error) {
+      console.error('Error analyzing emotion:', error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Impossible d'analyser votre état émotionnel. Veuillez réessayer.",
         variant: "destructive"
       });
-      setProgress(0);
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 500); // Petit délai pour que l'utilisateur voie la progression à 100%
+      setAnalyzing(false);
     }
   };
 
   return (
-    <Card className="mb-8">
-      <CardContent className="pt-6">
-        <h2 className="text-xl font-semibold mb-4">🧠 Votre scan du jour</h2>
-        
-        <div className="mb-6">
-          <label className="block mb-2 font-medium">Comment vous sentez-vous aujourd'hui ?</label>
-          <Slider
-            min={0}
-            max={100}
-            step={1}
-            value={[mood]}
-            onValueChange={(values) => setMood(values[0])}
-            className="w-full mb-2"
-            aria-label="Niveau d'humeur"
-          />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>0</span>
-            <span className="font-medium">{mood}/100</span>
-            <span>100</span>
-          </div>
-        </div>
-        
-        <div className="mb-6">
-          <label htmlFor="emotion-notes" className="block mb-2 font-medium">
-            Quelques notes (optionnel)
-          </label>
-          <Textarea
-            id="emotion-notes"
-            rows={3}
-            placeholder="Écrivez quelques mots sur votre état..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            aria-label="Notes sur votre état émotionnel"
-          />
-        </div>
-        
-        {loading && (
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Analyse en cours...</span>
-              <span className="text-sm">{progress}%</span>
-            </div>
-            <Progress value={progress} className="h-2" aria-label="Progression de l'analyse" />
-          </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Nouveau scan émotionnel</h2>
+        {onClose && (
+          <Button variant="ghost" onClick={onClose}>
+            Annuler
+          </Button>
         )}
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-3">
+          <TabsTrigger value="text">Texte</TabsTrigger>
+          <TabsTrigger value="emoji">Emoji</TabsTrigger>
+          <TabsTrigger value="audio">Audio</TabsTrigger>
+        </TabsList>
         
-        <Button 
-          onClick={handleSave} 
-          className="w-full"
-          disabled={loading}
-          aria-label="Sauvegarder le scan émotionnel"
-        >
-          {loading ? 'Analyse en cours...' : 'Sauvegarder'}
+        <TabsContent value="text" className="space-y-4 pt-4">
+          <EmotionTextInput 
+            value={text} 
+            onChange={setText} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="emoji" className="space-y-4 pt-4">
+          <EmojiSelector 
+            emojis={emojis} 
+            onEmojiClick={handleEmojiClick} 
+            onClear={() => setEmojis('')}
+          />
+        </TabsContent>
+        
+        <TabsContent value="audio" className="space-y-4 pt-4">
+          <AudioRecorder 
+            audioUrl={audioUrl} 
+            setAudioUrl={setAudioUrl} 
+          />
+        </TabsContent>
+      </Tabs>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        {onClose && (
+          <Button variant="outline" onClick={onClose}>
+            Annuler
+          </Button>
+        )}
+        <Button onClick={handleSubmit} disabled={analyzing}>
+          {analyzing ? "Analyse en cours..." : "Analyser mon état"}
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+
+      <AnalysisDialog 
+        open={analyzing} 
+        onOpenChange={(open) => !open && setAnalyzing(false)} 
+      />
+    </div>
   );
 };
 

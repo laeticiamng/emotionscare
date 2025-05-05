@@ -66,7 +66,7 @@ const VRSessionPage = () => {
     await handleCompleteSession();
     setCompletedSession(currentSession);
     setCurrentSession(null);
-    navigate('/vr');
+    navigate('/vr-sessions');
   };
 
   const handleNavigateBack = () => {
@@ -90,7 +90,7 @@ const VRSessionPage = () => {
           heartRate={heartRate.before}
           onStartSession={startVRSession}
           onBack={() => {
-            navigate('/vr');
+            navigate('/vr-sessions');
           }}
           recentSessions={recentSessions}
         />
@@ -99,9 +99,8 @@ const VRSessionPage = () => {
       {view === 'selection' && (
         <VRSelectionView
           templates={templates}
-          completedSession={completedSession}
           onSelectTemplate={(template) => {
-            navigate(`/vr/${template.template_id}`);
+            navigate(`/vr-sessions/${template.template_id}`);
           }}
         />
       )}
@@ -109,7 +108,7 @@ const VRSessionPage = () => {
       {/* Back button - show on all views except selection */}
       {view !== 'selection' && (
         <div className="mt-8">
-          <Button variant="ghost" onClick={() => navigate('/vr')} className="flex items-center gap-2">
+          <Button variant="ghost" onClick={() => navigate('/vr-sessions')} className="flex items-center gap-2">
             <ChevronLeft size={16} />
             Retour à la sélection
           </Button>

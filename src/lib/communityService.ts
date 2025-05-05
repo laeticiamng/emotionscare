@@ -1,7 +1,21 @@
 import { faker } from '@faker-js/faker';
-import { Post, Comment, Group, GroupMember, CommunityStats, BuddyRequest } from '@/types/community';
-import { User, UserRole } from '@/types';
+import { UserRole } from '@/types';
 import { mockUsers } from '@/data/mockUsers';
+
+// Type pour GroupMember
+interface GroupMember {
+  group_id: string;
+  user_id: string;
+  role: 'admin' | 'member';
+  joined_at: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    avatar: string;
+  };
+}
 
 // Mock posts for community
 export const mockPosts: Post[] = Array.from({ length: 20 }, (_, i) => ({
@@ -311,26 +325,30 @@ export const getGroupDetails = async (groupId: string): Promise<Group | null> =>
   });
 };
 
-// Get group members
+// Get group members - fixed typing issue
 export const getGroupMembers = async (groupId: string): Promise<GroupMember[]> => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       const members = mockGroupMembers
-        .filter(m => m.group_id === groupId)
-        .map(member => {
-          const user = mockUsers.find(u => u.id === member.user_id);
+        .filter((m) => m.group_id === groupId)
+        .map((member) => {
+          const user = mockUsers.find((u) => u.id === member.user_id);
           return {
-            ...member,
+            group_id: member.group_id,
+            user_id: member.user_id,
+            role: member.role as 'admin' | 'member',
+            joined_at: member.joined_at,
             user: {
               id: user?.id || '',
               name: user?.name || 'Utilisateur',
-              email: user?.email || '', // Added email which is required by User type
+              email: user?.email || '',
               role: user?.role || UserRole.USER,
               avatar: user?.avatar || ''
-            } as GroupMember // Added type assertion to fix TypeScript error
+            }
           };
         });
-      resolve(members);
+      
+      resolve(members as GroupMember[]);
     }, 300);
   });
 };

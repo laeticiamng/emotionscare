@@ -21,6 +21,11 @@ const ScanPage: React.FC = () => {
   // Cast Role to ensure we can compare correctly
   const isAdmin = user?.role === 'Admin';
 
+  const handleScanSaved = () => {
+    setShowScanForm(false);
+    // Refresh data or update UI as needed
+  };
+
   return (
     <div className="container py-8 px-4">
       <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
@@ -50,10 +55,8 @@ const ScanPage: React.FC = () => {
           {showScanForm ? (
             <Card className="p-6">
               <EmotionScanForm
+                onScanSaved={handleScanSaved}
                 onClose={() => setShowScanForm(false)}
-                onSaveComplete={() => {
-                  setShowScanForm(false);
-                }}
               />
             </Card>
           ) : (
