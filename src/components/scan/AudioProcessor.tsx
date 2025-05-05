@@ -1,16 +1,17 @@
+
 import React, { useState, useEffect, useRef } from 'react';
-import { createProcessor } from '@/lib/audioVad';
+import { initVad } from '@/lib/audioVad';
 import { Emotion } from '@/types';
-import EmotionResult from './live/EmotionResult';
-import { StatusIndicator } from './live/StatusIndicator';
-import { TranscriptDisplay } from './live/TranscriptDisplay';
+import { EmotionResult as EmotionResultType } from '@/lib/scanService';
+import StatusIndicator from './live/StatusIndicator';
+import TranscriptDisplay from './live/TranscriptDisplay';
 
 export interface AudioProcessorProps {
   isListening: boolean;
   userId: string;
   onProcessingChange: React.Dispatch<React.SetStateAction<boolean>>;
   onProgressUpdate: React.Dispatch<React.SetStateAction<string>>;
-  onAnalysisComplete: (emotion: Emotion, result: EmotionResult) => void;
+  onAnalysisComplete: (emotion: Emotion, result: EmotionResultType) => void;
   onError: (message: string) => void;
   isConfidential?: boolean;
 }
@@ -105,7 +106,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
             ai_feedback: "Vous semblez calme et posé. Votre rythme vocal est régulier."
           };
           
-          const mockResult: EmotionResult = {
+          const mockResult: EmotionResultType = {
             emotionName: "Calme",
             confidence: 0.85,
             emotions: {

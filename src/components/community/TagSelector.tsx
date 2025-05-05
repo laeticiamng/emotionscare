@@ -6,20 +6,21 @@ import { X } from 'lucide-react';
 
 interface TagSelectorProps {
   selectedTags: string[];
-  setSelectedTags: (tags: string[]) => void;
+  onTagsChange: (tags: string[]) => void;
+  maxTags: number;
 }
 
-const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, setSelectedTags }) => {
+const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagsChange, maxTags }) => {
   const recommendedTags = getRecommendedTags();
 
   const handleSelectTag = (tag: string) => {
-    if (!selectedTags.includes(tag)) {
-      setSelectedTags([...selectedTags, tag]);
+    if (!selectedTags.includes(tag) && selectedTags.length < maxTags) {
+      onTagsChange([...selectedTags, tag]);
     }
   };
 
   const handleRemoveTag = (tag: string) => {
-    setSelectedTags(selectedTags.filter(t => t !== tag));
+    onTagsChange(selectedTags.filter(t => t !== tag));
   };
 
   return (

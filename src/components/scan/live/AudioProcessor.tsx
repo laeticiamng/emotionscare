@@ -11,6 +11,7 @@ interface AudioProcessorProps {
   onProgressUpdate: (text: string) => void;
   onAnalysisComplete: (emotion: Emotion, result: EmotionResult) => void;
   onError: (message: string) => void;
+  isConfidential?: boolean;
 }
 
 const AudioProcessor = ({ 
@@ -19,7 +20,8 @@ const AudioProcessor = ({
   onProcessingChange, 
   onProgressUpdate, 
   onAnalysisComplete, 
-  onError 
+  onError,
+  isConfidential = false
 }: AudioProcessorProps) => {
   const vadRef = useRef<any>(null);
 
@@ -53,13 +55,28 @@ const AudioProcessor = ({
                 onProgressUpdate(progress);
               });
               
-              // Save result to database if user is logged in
-              if (userId) {
+              // Save result to database if user is logged in and not confidential
+              if (userId && !isConfidential) {
                 const savedEmotion = await saveRealtimeEmotionScan(result, userId);
                 console.log('Saved emotion analysis:', savedEmotion);
                 
                 // Notify parent component
                 onAnalysisComplete(savedEmotion, result);
+              } else if (userId) {
+                // Create a temporary emotion object without saving to DB
+                const tempEmotion: Emotion = {
+                  id: 'temp-' + Date.now().toString(),
+                  user_id: userId,
+                  date: new Date().toISOString(),
+                  emotion: result.emotion,
+                  intensity: Math.round(result.confidence * 10),
+                  score: Math.round(result.confidence * 100),
+                  text: result.transcript || '',
+                  ai_feedback: `Mode confidentiel: Analyse non sauvegardée`
+                };
+                
+                onAnalysisComplete(tempEmotion, result);
+                console.log('Confidential mode - no data saved');
               }
             } catch (error) {
               console.error('Error analyzing audio:', error);
@@ -91,7 +108,7 @@ const AudioProcessor = ({
     return () => {
       stopVad();
     };
-  }, [isListening, userId, onProgressUpdate, onProcessingChange, onAnalysisComplete, onError, stopVad]);
+  }, [isListening, userId, onProgressUpdate, onProcessingChange, onAnalysisComplete, onError, stopVad, isConfidential]);
 
   return null; // This is a non-visual component
 };

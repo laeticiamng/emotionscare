@@ -7,18 +7,30 @@ import { Users } from 'lucide-react';
 
 interface GroupListComponentProps {
   groups: Group[];
-  userHasJoined: (group: Group) => boolean;
-  handleJoin: (groupId: string) => void;
-  joining: string | null;
+  userHasJoined?: (group: Group) => boolean;
+  handleJoin?: (groupId: string) => void;
+  joining?: string | null;
   loading: boolean;
 }
 
 const GroupListComponent: React.FC<GroupListComponentProps> = ({ 
   groups, 
-  userHasJoined, 
-  handleJoin, 
-  joining
+  userHasJoined = () => false, 
+  handleJoin = () => {}, 
+  joining = null,
+  loading = false
 }) => {
+  if (loading) {
+    return (
+      <Card className="p-6 text-center">
+        <div className="flex flex-col items-center gap-2 py-8">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+          <p className="text-muted-foreground">Chargement des groupes...</p>
+        </div>
+      </Card>
+    );
+  }
+
   if (groups.length === 0) {
     return (
       <Card className="p-6 text-center">

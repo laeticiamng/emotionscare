@@ -153,15 +153,15 @@ const GroupListPage = () => {
         </TabsList>
 
         <TabsContent value="all" className="py-4">
-          <GroupList groups={filteredGroups} isLoading={isLoading} />
+          <GroupList groups={filteredGroups} loading={isLoading} />
         </TabsContent>
         
         <TabsContent value="my" className="py-4">
-          <GroupList groups={filteredGroups} isLoading={isLoading} />
+          <GroupList groups={filteredGroups} loading={isLoading} />
         </TabsContent>
         
         <TabsContent value="popular" className="py-4">
-          <GroupList groups={filteredGroups} isLoading={isLoading} />
+          <GroupList groups={filteredGroups} loading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>

@@ -52,7 +52,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
     
     toast({
       title: "Analyse émotionnelle terminée",
-      description: `Vous semblez ${result.emotion} (${Math.round(result.confidence * 100)}% de confiance)`,
+      description: `Vous semblez ${result.emotion || result.emotionName} (${Math.round((result.confidence || 0.5) * 100)}% de confiance)`,
     });
   };
   
@@ -108,7 +108,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
           {/* Audio Processor (non-visual component) */}
           <AudioProcessor 
             isListening={isListening}
-            userId={user?.id}
+            userId={user?.id || ''}
             isConfidential={isConfidential}
             onProcessingChange={setIsProcessing}
             onProgressUpdate={setProgressText}
@@ -124,7 +124,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
           />
           
           {/* Transcript Display */}
-          <TranscriptDisplay transcript={transcript} />
+          <TranscriptDisplay transcript={transcript} isConfidential={isConfidential} />
           
           {/* Emotion Result */}
           {emotionResult && (
