@@ -1,518 +1,375 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetchReports, fetchUsersAvgScore, fetchUsersWithStatus, fetchJournalStats, fetchSocialActivityStats, fetchGamificationStats } from '@/lib/dashboardService';
+import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Timeline, TimelineItem, TimelineHeader, TimelineIcon, TimelineTitle, TimelineContent, TimelineBody } from "@/components/ui/timeline";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, CalendarDays, MessageSquare, Trophy, Users, Plus, Bell, ChartBar, Activity, Award } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DashboardFooter from '@/components/dashboard/DashboardFooter';
-import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
+import { ArrowRight, LineChart, MessageSquare, Trophy, Sparkles } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import KpiCards from '@/components/dashboard/KpiCards';
+import TrendCharts from '@/components/dashboard/TrendCharts';
 import AdminChartSection from '@/components/dashboard/admin/AdminChartSection';
 import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateCard';
+import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
 import SocialCocoonCard from '@/components/dashboard/admin/SocialCocoonCard';
 import GamificationSummaryCard from '@/components/dashboard/admin/GamificationSummaryCard';
-import LoadingAnimation from '@/components/ui/loading-animation';
-import CountUp from 'react-countup';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
-  const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
-  const [emotionalScoreTrend, setEmotionalScoreTrend] = useState<Array<{ date: string; value: number }>>([]);
-  const [journalStats, setJournalStats] = useState<Array<{ date: string; score: number; count: number }>>([]);
-  const [socialStats, setSocialStats] = useState<{
-    totalPosts: number;
-    moderationRate: number;
-    topHashtags: Array<{ tag: string; count: number }>
-  }>({
-    totalPosts: 126,
-    moderationRate: 5,
-    topHashtags: [
-      { tag: "#bienetre", count: 28 },
-      { tag: "#teamspirit", count: 21 },
-      { tag: "#détente", count: 18 },
-      { tag: "#santé", count: 14 },
-      { tag: "#équipe", count: 12 },
-      { tag: "#motivation", count: 10 }
-    ]
-  });
-  const [gamificationStats, setGamificationStats] = useState<{
-    activeUsersPercent: number;
-    totalBadges: number;
-  }>({
-    activeUsersPercent: 68,
-    totalBadges: 24
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [timePeriod, setTimePeriod] = useState<string>('7');
-  const [activeTab, setActiveTab] = useState<string>("global");
+  const [activeTab, setActiveTab] = useState("vue-globale");
+  const [selectedPeriod, setSelectedPeriod] = useState("30");
 
-  useEffect(() => {
-    async function loadDashboardData() {
-      try {
-        setIsLoading(true);
-        
-        // Load reports data
-        const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod));
-        setAbsenteeismData(reportsData.absenteeism || []);
-        setProductivityData(reportsData.productivity || []);
-        
-        // Load emotional score trend
-        const avgScoreData = await fetchUsersAvgScore(parseInt(timePeriod));
-        setEmotionalScoreTrend(avgScoreData);
-        
-        // Load journal stats
-        const journalData = await fetchJournalStats(parseInt(timePeriod));
-        setJournalStats(journalData);
-        
-        // Load social stats
-        const socialData = await fetchSocialActivityStats();
-        setSocialStats(socialData);
-        
-        // Load gamification stats
-        const gamificationData = await fetchGamificationStats();
-        setGamificationStats(gamificationData);
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-      } finally {
-        setIsLoading(false);
-      }
+  // Mock data for the dashboard
+  const dashboardStats = {
+    absenteeism: {
+      current: 5.2,
+      previous: 7.8,
+      trend: -2.6,
+      data: [4, 5, 7, 5, 6, 5, 4, 5, 3, 4, 5, 6, 5, 4, 3]
+    },
+    emotionalScore: {
+      current: 78,
+      previous: 72,
+      trend: 6,
+      data: [72, 71, 73, 74, 76, 77, 75, 78, 79, 78, 77, 78, 79, 80, 78]
+    },
+    productivity: {
+      current: 92,
+      previous: 87,
+      trend: 5,
+      data: [85, 86, 88, 87, 89, 90, 91, 92, 93, 92, 91, 92, 92, 93, 92]
+    },
+    journalEntries: [
+      { date: '2024-05-01', avgScore: 76, checkIns: 42 },
+      { date: '2024-05-02', avgScore: 78, checkIns: 38 },
+      { date: '2024-05-03', avgScore: 75, checkIns: 45 },
+      { date: '2024-05-04', avgScore: 79, checkIns: 40 },
+      { date: '2024-05-05', avgScore: 80, checkIns: 37 }
+    ]
+  };
+
+  // Mock data for social cocoon section
+  const socialCocoonData = {
+    totalPosts: 248,
+    blockedPercentage: 3.2,
+    activeUsers: 87,
+    topHashtags: [
+      { tag: '#bienetre', count: 42 },
+      { tag: '#entraide', count: 36 },
+      { tag: '#motivation', count: 31 },
+      { tag: '#teamspirit', count: 28 },
+      { tag: '#pausecafe', count: 22 }
+    ]
+  };
+
+  // Mock data for gamification section
+  const gamificationData = {
+    activeUsersPercent: 68,
+    totalBadges: 24,
+    badgeLevels: [
+      { level: 'Bronze', count: 14 },
+      { level: 'Argent', count: 7 },
+      { level: 'Or', count: 3 }
+    ],
+    topChallenges: [
+      { name: 'Check-in quotidien', completions: 156 },
+      { name: 'Partage d\'expérience', completions: 87 },
+      { name: 'Lecture bien-être', completions: 63 }
+    ]
+  };
+
+  // Mock RH action suggestions
+  const rhSuggestions = [
+    {
+      title: "Atelier Respiration",
+      description: "Session de 30 minutes sur techniques de respiration anti-stress.",
+      icon: "🧘"
+    },
+    {
+      title: "Pause café virtuelle",
+      description: "Encourager les échanges entre services via breaks virtuels.",
+      icon: "☕"
+    },
+    {
+      title: "Challenge bien-être",
+      description: "Lancer un défi quotidien de micro-pauses actives.",
+      icon: "🏆"
     }
-    
-    loadDashboardData();
-  }, [timePeriod]);
-  
+  ];
+
   return (
     <div className="max-w-7xl mx-auto animate-fade-in">
-      {/* Hero Section with Period Selector */}
-      <div className="mb-6">
-        <div className="flex flex-col md:flex-row items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold mb-1 text-[#1B365D]">Dashboard Direction</h1>
-            <h2 className="text-xl text-muted-foreground mt-2 italic font-light">
-              Pilotage & Bien-être Collectif
-            </h2>
-          </div>
-          <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
-        </div>
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-semibold text-[#1B365D]">Dashboard Direction</h1>
+        <p className="text-slate-600 italic">Pilotage & Bien-être Collectif</p>
       </div>
-      
-      {/* Tab Navigation */}
-      <Tabs defaultValue="global" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-        <TabsList className="grid grid-cols-4 mb-6">
-          <TabsTrigger value="global" className="data-[state=active]:bg-[#1B365D] data-[state=active]:text-white">
-            <Activity className="mr-2 h-4 w-4" />
+
+      {/* Tabs Navigation */}
+      <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
+        <TabsList className="mb-4 bg-white/50 backdrop-blur-sm">
+          <TabsTrigger value="vue-globale" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+            <LineChart className="mr-2 h-4 w-4" />
             Vue Globale
           </TabsTrigger>
-          <TabsTrigger value="social" className="data-[state=active]:bg-[#1B365D] data-[state=active]:text-white">
+          <TabsTrigger value="social-cocoon" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
             <MessageSquare className="mr-2 h-4 w-4" />
             Social Cocoon
           </TabsTrigger>
-          <TabsTrigger value="gamification" className="data-[state=active]:bg-[#1B365D] data-[state=active]:text-white">
+          <TabsTrigger value="gamification" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
             <Trophy className="mr-2 h-4 w-4" />
             Synthèse Gamification
           </TabsTrigger>
-          <TabsTrigger value="actions" className="data-[state=active]:bg-[#1B365D] data-[state=active]:text-white">
-            <Users className="mr-2 h-4 w-4" />
+          <TabsTrigger value="actions-rh" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+            <Sparkles className="mr-2 h-4 w-4" />
             Actions & Solutions RH
           </TabsTrigger>
         </TabsList>
+
+        <PeriodSelector value={selectedPeriod} onChange={setSelectedPeriod} />
         
-        {isLoading ? (
-          <LoadingAnimation text="Chargement des données anonymisées..." />
-        ) : (
-          <>
-            {/* Vue Globale Tab */}
-            <TabsContent value="global" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Charts Section */}
-                <AdminChartSection 
-                  absenteeismData={absenteeismData} 
-                  productivityData={productivityData}
-                />
-                
-                {/* Emotional Climate Overview */}
-                <EmotionalClimateCard emotionalScoreTrend={emotionalScoreTrend} />
-                
-                {/* Journal de bord global */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300 col-span-1 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CalendarDays className="text-[#1B365D]" />
-                      Journal de bord global
-                    </CardTitle>
-                    <CardDescription>
-                      Timeline anonymisée des check-ins
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="max-h-96 overflow-y-auto pr-2">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Score moyen</TableHead>
-                            <TableHead>Nombre de check-ins</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {journalStats.map((entry, index) => (
-                            <TableRow key={index} className="hover:bg-muted/30">
-                              <TableCell>{entry.date}</TableCell>
-                              <TableCell>{entry.score.toFixed(1)}/100</TableCell>
-                              <TableCell>{entry.count}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {/* RGPD Note */}
-                <div className="col-span-1 lg:col-span-2 text-center text-sm text-muted-foreground">
-                  <p>Données agrégées et anonymisées. Aucune information personnelle identifiable (PII) n'est affichée.</p>
+        {/* Vue Globale Tab Content */}
+        <TabsContent value="vue-globale" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AdminChartSection 
+              title="Taux d'absentéisme"
+              chartData={dashboardStats.absenteeism}
+              period={selectedPeriod}
+            />
+            <EmotionalClimateCard 
+              title="Score émotionnel moyen"
+              emotionalData={dashboardStats.emotionalScore}
+              period={selectedPeriod}
+            />
+            
+            <Card className="col-span-1 md:col-span-2 glass-card">
+              <CardHeader>
+                <CardTitle>Journal de bord global</CardTitle>
+                <CardDescription>Données anonymisées des check-ins</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-3 px-4">Date</th>
+                        <th className="text-left py-3 px-4">Score moyen</th>
+                        <th className="text-left py-3 px-4">Check-ins</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboardStats.journalEntries.map((entry, i) => (
+                        <tr key={i} className="border-b border-gray-100">
+                          <td className="py-3 px-4">{new Date(entry.date).toLocaleDateString('fr-FR')}</td>
+                          <td className="py-3 px-4">{entry.avgScore}/100</td>
+                          <td className="py-3 px-4">{entry.checkIns}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              </div>
-            </TabsContent>
+              </CardContent>
+            </Card>
             
-            {/* Social Cocoon Tab */}
-            <TabsContent value="social" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Social Cocoon Analytics */}
-                <SocialCocoonCard socialStats={socialStats} />
-                
-                {/* Word Cloud Card */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="text-[#1B365D]" />
-                      Tendances Hashtags
-                    </CardTitle>
-                    <CardDescription>
-                      Nuage de tags populaires (anonymisé)
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64 flex items-center justify-center">
-                      <div className="flex flex-wrap gap-3 justify-center">
-                        {socialStats.topHashtags.map((tag, index) => (
-                          <div 
-                            key={index}
-                            className="px-4 py-2 rounded-full"
-                            style={{
-                              fontSize: `${Math.max(0.8, 0.8 + (tag.count / 10) * 0.3)}rem`,
-                              backgroundColor: `rgba(${255 - index * 20}, ${111 + index * 10}, ${97 + index * 15}, ${0.1 + index * 0.05})`,
-                              color: `rgb(${70 + index * 10}, ${90 + index * 5}, ${110 - index * 5})`,
-                              transform: `rotate(${Math.random() * 10 - 5}deg)`
-                            }}
-                          >
-                            {tag.tag} <span className="opacity-60">({tag.count})</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Widget "Publier" */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300 col-span-1 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <MessageSquare className="text-[#1B365D]" />
-                      Publier une annonce
-                    </CardTitle>
-                    <CardDescription>
-                      Message accessible à tous les collaborateurs
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col gap-4">
-                      <textarea 
-                        className="w-full h-32 p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none"
-                        placeholder="Rédigez votre annonce pour l'équipe..."
-                      ></textarea>
-                      <div className="flex justify-between">
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Template Reconnaissance</Button>
-                          <Button variant="outline" size="sm">Template Humour</Button>
-                        </div>
-                        <Button variant="coral">
-                          <MessageSquare className="mr-2 h-4 w-4" />
-                          Envoyer l'annonce
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+            <div className="col-span-1 md:col-span-2 p-4 bg-gray-50 rounded-xl text-sm text-muted-foreground">
+              <p>Note RGPD: Données agrégées et anonymisées. Aucune information personnellement identifiable (PII) n'est utilisée.</p>
+            </div>
+          </div>
+        </TabsContent>
+        
+        {/* Social Cocoon Tab Content */}
+        <TabsContent value="social-cocoon" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SocialCocoonCard socialStats={socialCocoonData} />
             
-            {/* Gamification Tab */}
-            <TabsContent value="gamification" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Gamification Summary */}
-                <GamificationSummaryCard gamificationStats={gamificationStats} />
-                
-                {/* Top Challenges */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Trophy className="text-[#1B365D]" />
-                      Top Défis Complétés
-                    </CardTitle>
-                    <CardDescription>
-                      Les défis les plus populaires parmi les collaborateurs
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">1</div>
-                          <span className="font-medium">Check-in quotidien</span>
-                        </div>
-                        <span className="text-muted-foreground">68%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">2</div>
-                          <span className="font-medium">Journal de bord</span>
-                        </div>
-                        <span className="text-muted-foreground">42%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full bg-amber-50 flex items-center justify-center text-amber-700">3</div>
-                          <span className="font-medium">Respiration guidée</span>
-                        </div>
-                        <span className="text-muted-foreground">37%</span>
-                      </div>
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle>Word Cloud des Hashtags</CardTitle>
+                <CardDescription>Tendances des conversations anonymisées</CardDescription>
+              </CardHeader>
+              <CardContent className="h-64 flex items-center justify-center">
+                <div className="bg-white/80 p-6 rounded-xl w-full h-full flex flex-wrap items-center justify-center gap-3">
+                  {socialCocoonData.topHashtags.map((tag, i) => (
+                    <div 
+                      key={i}
+                      className="px-3 py-1 rounded-full bg-cocoon-100 text-cocoon-800"
+                      style={{ 
+                        fontSize: `${Math.max(14, Math.min(24, 14 + tag.count / 4))}px`,
+                        opacity: 0.6 + (tag.count / 100)
+                      }}
+                    >
+                      {tag.tag}
                     </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Badge Distribution */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300 col-span-1 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Award className="text-[#1B365D]" />
-                      Distribution des Badges
-                    </CardTitle>
-                    <CardDescription>
-                      Répartition des niveaux de badges obtenus
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64 flex items-center justify-center">
-                      <div className="relative h-48 w-48">
-                        <div className="absolute inset-0 rounded-full border-8 border-gray-100"></div>
-                        <div className="absolute inset-0 rounded-full border-8 border-amber-300 border-r-transparent" style={{ transform: 'rotate(45deg)' }}></div>
-                        <div className="absolute inset-0 rounded-full border-8 border-blue-300 border-r-transparent border-b-transparent" style={{ transform: 'rotate(45deg)' }}></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="text-3xl font-bold">{gamificationStats.totalBadges}</div>
-                            <div className="text-sm text-muted-foreground">badges totaux</div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="ml-8 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-full bg-amber-300"></div>
-                          <span>Niveau bronze (62%)</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-full bg-gray-300"></div>
-                          <span>Niveau argent (28%)</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="h-3 w-3 rounded-full bg-blue-300"></div>
-                          <span>Niveau or (10%)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
             
-            {/* Actions & Solutions RH Tab */}
-            <TabsContent value="actions" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Bloc "Propositions IA" */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300 col-span-1 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="text-[#1B365D]" />
-                      Propositions IA
-                    </CardTitle>
-                    <CardDescription>
-                      Suggestions basées sur les données anonymisées
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-base">Atelier Respiration</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0 text-sm">
-                          <p className="mb-4">Un atelier de 30 minutes pour réduire le stress et favoriser la concentration.</p>
-                          <Button size="sm" variant="coral" className="w-full">Mettre en place</Button>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-base">Challenge Team Building</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0 text-sm">
-                          <p className="mb-4">Créer des équipes mixtes pour un défi collaboratif hebdomadaire.</p>
-                          <Button size="sm" variant="coral" className="w-full">Mettre en place</Button>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="p-4">
-                          <CardTitle className="text-base">Pause Collective</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-4 pt-0 text-sm">
-                          <p className="mb-4">Instaurer 15 min de pause synchronisée à 15h30 pour tous les services.</p>
-                          <Button size="sm" variant="coral" className="w-full">Mettre en place</Button>
-                        </CardContent>
-                      </Card>
+            <Card className="col-span-1 md:col-span-2 glass-card">
+              <CardHeader>
+                <CardTitle>Publier une annonce</CardTitle>
+                <CardDescription>Communiquer avec toutes les équipes</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col space-y-4">
+                  <div className="flex space-x-4">
+                    <Button variant="outline" className="flex-1 h-auto py-3">
+                      Template: Message de reconnaissance
+                    </Button>
+                    <Button variant="outline" className="flex-1 h-auto py-3">
+                      Template: Annonce bien-être
+                    </Button>
+                    <Button variant="outline" className="flex-1 h-auto py-3">
+                      Template: Note d'humour
+                    </Button>
+                  </div>
+                  <Button className="bg-cocoon-500 hover:bg-cocoon-600 text-white">
+                    Envoyer une annonce
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Gamification Tab Content */}
+        <TabsContent value="gamification" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GamificationSummaryCard gamificationStats={gamificationData} />
+            
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle>Top Défis</CardTitle>
+                <CardDescription>Les défis les plus réussis</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {gamificationData.topChallenges.map((challenge, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="bg-pastel-green/30 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                          {i + 1}
+                        </div>
+                        <span>{challenge.name}</span>
+                      </div>
+                      <span className="font-medium">{challenge.completions} complétions</span>
                     </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Formulaire "Proposer un Atelier" */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Plus className="text-[#1B365D]" />
-                      Proposer un Atelier
-                    </CardTitle>
-                    <CardDescription>
-                      Créer un nouvel événement bien-être
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <label htmlFor="title" className="block text-sm font-medium mb-1">Titre</label>
-                        <input 
-                          type="text" 
-                          id="title" 
-                          className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                          placeholder="Ex: Atelier Yoga"
-                        />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="col-span-1 md:col-span-2 glass-card">
+              <CardHeader>
+                <CardTitle>Distribution des badges</CardTitle>
+                <CardDescription>Répartition des niveaux de badges obtenus</CardDescription>
+              </CardHeader>
+              <CardContent className="h-60 flex items-center justify-center">
+                <div className="bg-white/80 rounded-xl p-6 w-full h-full flex items-center justify-around">
+                  {gamificationData.badgeLevels.map((level, i) => (
+                    <div key={i} className="flex flex-col items-center">
+                      <div 
+                        className={`w-24 h-24 rounded-full flex items-center justify-center mb-3 ${
+                          i === 0 ? 'bg-amber-100 text-amber-800' :
+                          i === 1 ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                      >
+                        <Trophy size={48} />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="date" className="block text-sm font-medium mb-1">Date</label>
-                          <input 
-                            type="date" 
-                            id="date" 
-                            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="budget" className="block text-sm font-medium mb-1">Budget max</label>
-                          <input 
-                            type="number" 
-                            id="budget" 
-                            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                            placeholder="€"
-                          />
-                        </div>
+                      <div className="text-center">
+                        <p className="font-medium">{level.level}</p>
+                        <p className="text-2xl font-bold">{level.count}</p>
                       </div>
-                      <div>
-                        <label htmlFor="description" className="block text-sm font-medium mb-1">Description</label>
-                        <textarea 
-                          id="description" 
-                          className="w-full h-24 p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                          placeholder="Détaillez l'atelier..."
-                        />
-                      </div>
-                      <Button variant="coral" className="w-full">Soumettre l'atelier</Button>
                     </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Formulaire "Planifier Réunion Bien-Être" */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="text-[#1B365D]" />
-                      Planifier Réunion Bien-Être
-                    </CardTitle>
-                    <CardDescription>
-                      Organiser une rencontre avec l'équipe
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="meeting-date" className="block text-sm font-medium mb-1">Date</label>
-                          <input 
-                            type="date" 
-                            id="meeting-date" 
-                            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="meeting-time" className="block text-sm font-medium mb-1">Heure</label>
-                          <input 
-                            type="time" 
-                            id="meeting-time" 
-                            className="w-full p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label htmlFor="meeting-invite" className="block text-sm font-medium mb-1">Message d'invitation</label>
-                        <textarea 
-                          id="meeting-invite" 
-                          className="w-full h-24 p-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1B365D] focus:outline-none" 
-                          placeholder="Votre message d'invitation..."
-                        />
-                      </div>
-                      <Button variant="coral" className="w-full">Planifier la réunion</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                {/* Sondage Express */}
-                <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300 col-span-1 lg:col-span-2">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <ChartBar className="text-[#1B365D]" />
-                      Sondage Express
-                    </CardTitle>
-                    <CardDescription>
-                      Recueillir le feedback des collaborateurs
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center">
-                      <p className="mb-6">Lancez rapidement un sondage pour mesurer le ressenti de vos équipes sur un sujet précis.</p>
-                      <Button variant="coral" className="px-8">
-                        <Bell className="mr-2 h-4 w-4" />
-                        Lancer un sondage
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Actions & Solutions RH Tab Content */}
+        <TabsContent value="actions-rh" className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="col-span-1 md:col-span-2 glass-card">
+              <CardHeader>
+                <CardTitle>Propositions IA</CardTitle>
+                <CardDescription>Suggestions basées sur l'analyse des données</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {rhSuggestions.map((suggestion, i) => (
+                    <div key={i} className="bg-white/80 rounded-xl p-5 hover:shadow-md transition-all">
+                      <div className="text-3xl mb-2">{suggestion.icon}</div>
+                      <h3 className="font-semibold mb-2">{suggestion.title}</h3>
+                      <p className="text-sm text-gray-600 mb-4">{suggestion.description}</p>
+                      <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
+                        Mettre en place
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </>
-        )}
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle>Proposer un Atelier</CardTitle>
+                <CardDescription>Planifier une activité pour les équipes</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Titre</label>
+                    <input type="text" className="w-full p-2 rounded border" placeholder="Nom de l'activité" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Date</label>
+                    <input type="date" className="w-full p-2 rounded border" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Description</label>
+                    <textarea className="w-full p-2 rounded border h-24" placeholder="Décrivez l'activité..."></textarea>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Budget max</label>
+                    <input type="number" className="w-full p-2 rounded border" placeholder="€" />
+                  </div>
+                  <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
+                    Proposer l'atelier
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle>Sondage Express</CardTitle>
+                <CardDescription>Recueillir les avis de l'équipe</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="bg-white/80 p-4 rounded-xl">
+                    <p className="mb-4">Créez un sondage rapide pour prendre le pouls de vos équipes sur des sujets spécifiques.</p>
+                    <div className="flex gap-2 mb-4">
+                      <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Simple</div>
+                      <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Anonyme</div>
+                      <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Rapide</div>
+                    </div>
+                  </div>
+                  <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
+                    Lancer un sondage
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
       </Tabs>
       
-      <DashboardFooter isAdmin={true} />
+      <div className="mt-8 text-center text-xs text-muted-foreground">
+        <p>Données sécurisées avec chiffrement AES-256 • Conforme RGPD</p>
+      </div>
     </div>
   );
 };

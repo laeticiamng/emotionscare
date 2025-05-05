@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft } from 'lucide-react';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('sophie@example.com');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
@@ -19,22 +20,14 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!email || !password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive"
-      });
-      return;
-    }
-
     setIsSubmitting(true);
     try {
+      // Pour Sophie, le mot de passe est maintenant "sophie" ou vide
       await login(email, password);
-      // Navigation is handled in the auth context
+      // La navigation et les toasts sont gérés dans le contexte d'authentification
     } catch (error) {
-      // Error is handled in the auth context
+      // Les erreurs sont gérées dans le contexte d'authentification
+      console.error("Erreur de connexion:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +84,6 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  required
                 />
               </div>
             </CardContent>
@@ -106,7 +98,7 @@ const LoginPage = () => {
               </Button>
               
               <p className="text-sm text-center text-muted-foreground mt-4">
-                * Pour la démo, utilisez: sophie@example.com (sans mot de passe)
+                * Pour la démo, utilisez: sophie@example.com (mot de passe: sophie)
               </p>
             </CardFooter>
           </form>

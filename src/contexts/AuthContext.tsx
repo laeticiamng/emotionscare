@@ -42,22 +42,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
     try {
-      const loggedInUser = await loginUser(email, password);
-      setUser(loggedInUser);
-      
-      // La navigation sera gérée dans les composants de connexion spécifiques
-      // (AdminLoginPage ou LoginPage) pour assurer une redirection correcte
-      
-      if (!loggedInUser.role || !loggedInUser.avatar) {
-        // Si l'utilisateur n'a pas de rôle ou d'avatar, ils doivent compléter l'onboarding
-        toast({
-          title: "Bienvenue",
-          description: "Veuillez compléter votre profil pour continuer",
-        });
-        return loggedInUser;
+      // Pour Sophie, on accepte le mot de passe "sophie" ou pas de mot de passe du tout
+      let loggedInUser;
+      if (email === 'sophie@example.com') {
+        if (!password || password === 'sophie') {
+          loggedInUser = await loginUser(email, password);
+        } else {
+          throw new Error("Mot de passe incorrect pour Sophie");
+        }
+      } else {
+        loggedInUser = await loginUser(email, password);
       }
       
-      // Le toast de succès est géré dans les composants de connexion
+      setUser(loggedInUser);
+      
+      // Afficher un message de bienvenue
+      toast({
+        title: `Bienvenue, ${loggedInUser.name}`,
+        description: "Vous êtes maintenant connecté(e)",
+      });
+      
+      // Rediriger selon le rôle
+      if (isAdminRole(loggedInUser.role)) {
+        navigate('/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
       
       return loggedInUser;
     } catch (error: any) {

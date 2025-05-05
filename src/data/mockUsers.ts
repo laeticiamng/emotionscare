@@ -1,3 +1,4 @@
+
 import { User, UserRole } from '../types';
 
 // Mock Users
@@ -47,6 +48,16 @@ export let currentUser: User | null = null;
 export const loginUser = (email: string, password: string): Promise<User> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
+      // Pour l'utilisateur Sophie, accepter le mot de passe "sophie" ou pas de mot de passe
+      if (email === 'sophie@example.com' && (!password || password === 'sophie')) {
+        const sophieUser = mockUsers.find(u => u.email === 'sophie@example.com');
+        if (sophieUser) {
+          currentUser = sophieUser;
+          resolve(sophieUser);
+          return;
+        }
+      }
+      
       // Pour la démo, accepter "admin" comme mot de passe pour l'utilisateur admin@example.com
       if (email === 'admin@example.com' && password === 'admin') {
         const adminUser = mockUsers.find(u => u.email === 'admin@example.com');
@@ -63,7 +74,7 @@ export const loginUser = (email: string, password: string): Promise<User> => {
         currentUser = user;
         resolve(user);
       } else {
-        reject(new Error('Invalid email or password'));
+        reject(new Error('Email ou mot de passe invalide'));
       }
     }, 800); // Simuler un délai réseau
   });
