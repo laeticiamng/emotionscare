@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -25,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
+import { Sun, Moon } from 'lucide-react';
 
 const formSchema = z.object({
   fontSize: z.enum(['small', 'medium', 'large']),

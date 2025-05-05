@@ -16,15 +16,7 @@ export interface UserChallenge {
   completed: boolean;
 }
 
-/** Un badge débloqué */
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image_url?: string;    // for compatibility with the existing Badge type
-  icon_url: string;
-  threshold: number;     // nombre de points ou défis pour débloquer
-}
+// Note: Badge is now defined in index.ts with combined properties for compatibility
 
 /** L'attribution d'un badge à un utilisateur */
 export interface UserBadge {

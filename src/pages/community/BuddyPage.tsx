@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,11 +7,11 @@ import UserAvatar from '@/components/community/UserAvatar';
 import { findBuddy, fetchUserBuddies, fetchUserById } from '@/lib/communityService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { UserRole, User } from '@/types';
+import { UserRole, User, Buddy } from '@/types';
+import { ArrowLeft, User as UserIcon, Heart, MessageSquare, Calendar } from 'lucide-react';
 
 // Import the Buddy type from index.ts rather than community.ts to ensure consistent types
 import { Buddy } from '@/types';
-import { ArrowLeft, User as UserIcon, Heart, MessageSquare, Calendar } from 'lucide-react';
 
 const BuddyPage = () => {
   const { user } = useAuth();
@@ -100,6 +99,38 @@ const BuddyPage = () => {
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role === selectedRole ? undefined : role);
+  };
+
+  const renderBuddies = () => {
+    return buddies.map((buddy) => (
+      <Card key={buddy.id as React.Key} className="hover:shadow-md transition-all duration-200">
+        <CardContent className="p-6">
+          <div className="flex items-center space-x-4">
+            <UserAvatar user={buddyUsers[buddy.buddy_user_id]} size="md" />
+            <div>
+              <h3 className="font-semibold">
+                {(buddyUsers[buddy.buddy_user_id]?.name || "Buddy") as React.ReactNode}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {(buddyUsers[buddy.buddy_user_id]?.role || "Professionnel de santé") as React.ReactNode}
+              </p>
+              <div className="flex items-center mt-1 text-xs text-muted-foreground">
+                <Calendar className="h-3 w-3 mr-1" />
+                <span>
+                  Depuis le {new Date(buddy.date).toLocaleDateString('fr-FR')}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t flex justify-end">
+            <Button variant="outline" size="sm">
+              <MessageSquare className="h-3 w-3 mr-1" />
+              Message
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    ));
   };
 
   return (
@@ -225,35 +256,7 @@ const BuddyPage = () => {
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
-              {buddies.map((buddy) => (
-                <Card key={buddy.id} className="hover:shadow-md transition-all duration-200">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-4">
-                      <UserAvatar user={buddyUsers[buddy.buddy_user_id]} size="md" />
-                      <div>
-                        <h3 className="font-semibold">
-                          {buddyUsers[buddy.buddy_user_id]?.name || "Buddy"}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {buddyUsers[buddy.buddy_user_id]?.role || "Professionnel de santé"}
-                        </p>
-                        <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          <span>
-                            Depuis le {new Date(buddy.date).toLocaleDateString('fr-FR')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t flex justify-end">
-                      <Button variant="outline" size="sm">
-                        <MessageSquare className="h-3 w-3 mr-1" />
-                        Message
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {renderBuddies()}
             </div>
           )}
         </TabsContent>
