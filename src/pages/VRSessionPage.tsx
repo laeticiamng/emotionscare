@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -93,7 +94,7 @@ const VRSessionPage = () => {
           duration: 5,
           duration_seconds: 300,
           completed: true,
-          location_url: mockVRTemplates[0].preview_url,
+          location_url: mockVRTemplatesData[0].preview_url,
           heart_rate_before: 84,
           heart_rate_after: 72,
           is_audio_only: false
@@ -106,7 +107,7 @@ const VRSessionPage = () => {
           duration: 7,
           duration_seconds: 420,
           completed: true,
-          location_url: mockVRTemplates[1].preview_url,
+          location_url: mockVRTemplatesData[1].preview_url,
           heart_rate_before: 88,
           heart_rate_after: 75,
           is_audio_only: false
