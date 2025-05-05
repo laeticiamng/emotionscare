@@ -1,142 +1,164 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { initVad } from '@/lib/audioVad';
-import { Emotion } from '@/types';
-import { EmotionResult as EmotionResultType } from '@/lib/scanService';
-import StatusIndicator from './live/StatusIndicator';
-import TranscriptDisplay from './live/TranscriptDisplay';
+import { createProcessor } from "@/lib/audioVad";
+import { analyzeAudioStream, saveRealtimeEmotionScan } from "@/lib/scanService";
+import { useToast } from "@/hooks/use-toast";
+import StatusIndicator from "./live/StatusIndicator";
+import TranscriptDisplay from "./live/TranscriptDisplay";
+import type { Emotion } from '@/types';
+import type { EmotionResult } from '@/lib/scanService';
 
-export interface AudioProcessorProps {
+interface AudioProcessorProps {
   isListening: boolean;
   userId: string;
-  onProcessingChange: React.Dispatch<React.SetStateAction<boolean>>;
-  onProgressUpdate: React.Dispatch<React.SetStateAction<string>>;
-  onAnalysisComplete: (emotion: Emotion, result: EmotionResultType) => void;
+  isConfidential: boolean;
+  onProcessingChange: (isProcessing: boolean) => void;
+  onProgressUpdate: (text: string) => void;
+  onAnalysisComplete: (emotion: Emotion, result: EmotionResult) => void;
   onError: (message: string) => void;
-  isConfidential?: boolean;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
   isListening,
   userId,
+  isConfidential,
   onProcessingChange,
   onProgressUpdate,
   onAnalysisComplete,
-  onError,
-  isConfidential = false
+  onError
 }) => {
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [progressText, setProgressText] = useState('');
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const processorRef = useRef<any>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const recordingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  const { toast } = useToast();
+  
+  // Update the parent component with processing status
+  useEffect(() => {
+    onProcessingChange(isProcessing);
+  }, [isProcessing, onProcessingChange]);
+  
+  // Update the parent component with progress text
+  useEffect(() => {
+    onProgressUpdate(progressText);
+  }, [progressText, onProgressUpdate]);
 
+  // Handle recording start/stop based on isListening prop
   useEffect(() => {
     if (isListening) {
       startRecording();
-    } else if (mediaRecorder) {
+    } else {
       stopRecording();
     }
-    // Cleanup function
+    
     return () => {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-      }
+      // Cleanup on component unmount
+      stopRecording();
     };
   }, [isListening]);
-
+  
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      recordedChunksRef.current = [];
       
-      setAudioChunks([]);
-      setMediaRecorder(recorder);
+      // Request microphone permissions
+      streamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      recorder.ondataavailable = (e) => {
-        setAudioChunks(currentChunks => [...currentChunks, e.data]);
-      };
+      // Setup audio context
+      audioContextRef.current = new AudioContext();
+      const source = audioContextRef.current.createMediaStreamSource(streamRef.current);
       
-      recorder.onstop = processAudio;
-      recorder.start();
-      onProgressUpdate("Écoute en cours...");
+      // Initialize processor
+      processorRef.current = createProcessor(audioContextRef.current);
+      source.connect(processorRef.current);
       
-    } catch (err) {
-      console.error("Erreur d'accès au microphone:", err);
-      onError("Impossible d'accéder au microphone. Vérifiez les permissions.");
+      setProgressText('Enregistrement en cours...');
+      
+      // Set timeout to automatically stop recording after 60 seconds
+      recordingTimeoutRef.current = setTimeout(() => {
+        stopRecording();
+      }, 60000); // 60 seconds max
+      
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      onError('Impossible d\'accéder au microphone. Veuillez vérifier les permissions.');
     }
   };
-
-  const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-      onProgressUpdate("Traitement de l'audio...");
+  
+  const stopRecording = async () => {
+    if (recordingTimeoutRef.current) {
+      clearTimeout(recordingTimeoutRef.current);
+      recordingTimeoutRef.current = null;
     }
-  };
-
-  const processAudio = async () => {
-    if (audioChunks.length === 0) {
-      onError("Aucun audio enregistré");
+    
+    if (!streamRef.current || recordedChunksRef.current.length === 0) {
       return;
     }
     
     try {
-      onProcessingChange(true);
+      // Stop all media tracks
+      streamRef.current.getTracks().forEach(track => track.stop());
       
-      // Créer un blob audio à partir des chunks
-      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      // Disconnect processor if exists
+      if (processorRef.current) {
+        processorRef.current.disconnect();
+        processorRef.current = null;
+      }
       
-      // Convertir en base64
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
+      setIsProcessing(true);
+      setProgressText('Analyse de votre émotion...');
       
-      reader.onloadend = async () => {
-        const base64Audio = reader.result as string;
-        
-        // Simuler un appel API - dans une vraie application, ceci serait un appel API
-        onProgressUpdate("Analyse de votre état émotionnel...");
-        
-        setTimeout(() => {
-          // Simulation de traitement - remplacer par un vrai appel API
-          const mockEmotion: Emotion = {
-            id: crypto.randomUUID(),
-            user_id: userId,
-            date: new Date().toISOString(),
-            emotion: "Calme",
-            score: 7.5,
-            intensity: 6,
-            text: "Analyse audio automatique",
-            ai_feedback: "Vous semblez calme et posé. Votre rythme vocal est régulier."
-          };
-          
-          const mockResult: EmotionResultType = {
-            emotionName: "Calme",
-            confidence: 0.85,
-            emotions: {
-              calm: 0.85,
-              stress: 0.1,
-              happy: 0.05
-            }
-          };
-          
-          onAnalysisComplete(mockEmotion, mockResult);
-          onProcessingChange(false);
-        }, 2000);
+      // Process recorded audio
+      const audioBlob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+      const result = await analyzeAudioStream(audioBlob);
+      
+      // Check if we got a valid result
+      if (!result || !result.emotion) {
+        throw new Error('Résultat d\'analyse invalide');
+      }
+      
+      // Create emotion object from result
+      const emotion: Emotion = {
+        id: Date.now().toString(),
+        user_id: userId,
+        emotion: result.emotion || 'neutral',
+        score: Math.round((result.confidence || 0.5) * 10),
+        timestamp: new Date().toISOString(),
+        source: 'audio',
+        ai_feedback: result.transcript || '',
+        is_confidential: isConfidential
       };
       
-    } catch (error) {
-      console.error("Erreur de traitement audio:", error);
-      onError("Une erreur s'est produite lors du traitement de l'audio");
-      onProcessingChange(false);
-    } finally {
-      // Arrêter toutes les pistes du stream
-      if (mediaRecorder) {
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      // Save emotion scan if not confidential
+      if (!isConfidential) {
+        await saveRealtimeEmotionScan(emotion);
       }
+      
+      setIsProcessing(false);
+      onAnalysisComplete(emotion, result);
+    } catch (error) {
+      console.error('Error analyzing audio:', error);
+      setIsProcessing(false);
+      onError('Erreur lors de l\'analyse audio. Veuillez réessayer.');
+    } finally {
+      // Reset state
+      streamRef.current = null;
+      recordedChunksRef.current = [];
     }
   };
 
+  // Visual rendering only when needed
   return (
-    <div className="space-y-4">
-      <StatusIndicator isProcessing={false} isListening={isListening} />
-      <TranscriptDisplay transcript="" isConfidential={isConfidential} />
+    <div className="hidden">
+      <StatusIndicator 
+        isListening={isListening}
+        isProcessing={isProcessing}
+        progressText={progressText}
+      />
     </div>
   );
 };
