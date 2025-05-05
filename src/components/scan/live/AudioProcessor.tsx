@@ -1,10 +1,17 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { createProcessor } from "@/lib/audioVad";
 import { analyzeAudioStream, saveRealtimeEmotionScan } from "@/lib/scanService";
 import { useToast } from "@/hooks/use-toast";
 import type { Emotion } from '@/types';
-import type { EmotionResult } from '@/lib/scanService';
+import StatusIndicator from "./StatusIndicator";
+import TranscriptDisplay from "./TranscriptDisplay";
+
+// Define EmotionResult type if it doesn't exist
+interface EmotionResult {
+  emotion?: string;
+  confidence?: number;
+  transcript?: string;
+}
 
 interface AudioProcessorProps {
   isListening: boolean;
@@ -110,8 +117,9 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       setIsProcessing(true);
       setProgressText('Analyse de votre émotion...');
       
-      // Process recorded audio
+      // Process recorded audio - Convert Blob to expected format
       const audioBlob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
+      // Pass audioBlob directly as analyzeAudioStream should handle Blob type
       const result = await analyzeAudioStream(audioBlob);
       
       // Check if we got a valid result
@@ -125,7 +133,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         user_id: userId,
         emotion: result.emotion || 'neutral',
         score: Math.round((result.confidence || 0.5) * 10),
-        timestamp: new Date().toISOString(),
+        date: new Date().toISOString(), // Use date instead of timestamp
         source: 'audio',
         ai_feedback: result.transcript || '',
         is_confidential: isConfidential
@@ -133,7 +141,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       
       // Save emotion scan if not confidential
       if (!isConfidential) {
-        await saveRealtimeEmotionScan(emotion);
+        await saveRealtimeEmotionScan(emotion, userId);
       }
       
       setIsProcessing(false);

@@ -2,28 +2,44 @@
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
+import { Link } from 'react-router-dom';
 
 // Security certification badges
 const securityBadges = [
   {
     name: 'ISO 27001',
-    description: 'Certifié ISO 27001 - Management de la sécurité de l\'information',
-    icon: '🔐' // Using emojis as placeholder, replace with actual badge images
+    description: 'Architecturée selon les principes ISO 27001 - Management de la sécurité de l\'information',
+    icon: '🔐'
   },
   {
-    name: 'SOC 2 Type II',
-    description: 'Certifié SOC 2 Type II - Contrôles de sécurité, disponibilité et confidentialité',
+    name: 'ISO 27701',
+    description: 'Architecturée selon les principes ISO 27701 - Management des informations de confidentialité',
     icon: '🛡️'
   },
   {
-    name: 'GDPR Compliant',
-    description: 'Conforme au RGPD - Protection des données personnelles',
+    name: 'RGPD',
+    description: 'Architecturée selon les principes RGPD - Protection des données personnelles',
     icon: '🇪🇺'
   },
   {
-    name: 'Penetration Tested',
-    description: 'Système testé régulièrement par des tests d\'intrusion indépendants',
+    name: 'SOC 2 Type II',
+    description: 'Architecturée selon les principes SOC 2 Type II - Contrôles de sécurité, disponibilité et confidentialité',
     icon: '🔍'
+  },
+  {
+    name: 'ISO 22301',
+    description: 'Architecturée selon les principes ISO 22301 - Continuité d\'activité',
+    icon: '🔄'
+  },
+  {
+    name: 'ISO 9001', 
+    description: 'Architecturée selon les principes ISO 9001 - Management de la qualité',
+    icon: '✓'
+  },
+  {
+    name: 'HIPAA',
+    description: 'Architecturée selon les principes HIPAA - Protection des données de santé',
+    icon: '🏥'
   }
 ];
 
@@ -40,15 +56,15 @@ const SecurityFooter: React.FC<SecurityFooterProps> = ({ className }) => {
         <div className="flex flex-col items-center justify-center">
           <h4 className="text-sm font-medium text-muted-foreground mb-4">Certifications de Sécurité & Conformité</h4>
           
-          <div className="flex flex-wrap justify-center gap-6 mb-4">
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
             <TooltipProvider>
               {securityBadges.map((badge) => (
                 <Tooltip key={badge.name} delayDuration={300}>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center justify-center h-12 w-12 bg-muted rounded-md hover:bg-muted/80 cursor-help transition-colors">
-                      <span className="text-2xl" aria-hidden="true">{badge.icon}</span>
+                    <Link to="/compliance" className="flex items-center justify-center h-10 w-10 bg-muted rounded-md hover:bg-muted/80 cursor-help transition-colors">
+                      <span className="text-xl" aria-hidden="true">{badge.icon}</span>
                       <span className="sr-only">{badge.name}</span>
-                    </div>
+                    </Link>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
                     <p className="font-medium">{badge.name}</p>
@@ -60,6 +76,21 @@ const SecurityFooter: React.FC<SecurityFooterProps> = ({ className }) => {
           </div>
           
           <div className="text-xs text-center text-muted-foreground max-w-3xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+              <div className="text-center">
+                <p className="font-semibold mb-1">Confidentialité & Sécurité</p>
+                <p>chiffrement AES-256, RGPD compliant</p>
+              </div>
+              <div className="text-center">
+                <p className="font-semibold mb-1">Ludique</p>
+                <p>notifications douces, Daily Streak, badges</p>
+              </div>
+              <div className="text-center">
+                <p className="font-semibold mb-1">Actionnable</p>
+                <p>alertes prédictives, suggestions d'ateliers, reporting</p>
+              </div>
+            </div>
+            
             <p className="mb-2">
               Données chiffrées AES-256 avec BYOK, authentification multi-facteur,
               conformité GDPR et certification ISO 27001. Audits de sécurité semestriels.

@@ -1,66 +1,38 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSessionSecurity } from '@/hooks/use-session-security';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-interface SessionTimeoutAlertProps {
-  onContinue: () => void;
-}
-
-const SessionTimeoutAlert: React.FC<SessionTimeoutAlertProps> = ({ onContinue }) => {
-  const { timeoutWarning, resetActivity } = useSessionSecurity();
-  const [countdown, setCountdown] = useState(60);
+const SessionTimeoutAlert: React.FC = () => {
+  const { timeoutWarning, resetActivity, sessionTimeoutMinutes } = useSessionSecurity();
+  const { toast } = useToast();
   
-  // Handle countdown when warning is displayed
   useEffect(() => {
     if (timeoutWarning) {
-      setCountdown(60);
-      const timer = setInterval(() => {
-        setCountdown(prev => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      
-      return () => clearInterval(timer);
+      toast({
+        title: "Alerte de sécurité",
+        description: 
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center text-destructive">
+              <AlertCircle className="w-4 h-4 mr-1" />
+              <span>Votre session va expirer dans moins d'une minute.</span>
+            </div>
+            <Button 
+              size="sm" 
+              onClick={resetActivity} 
+              variant="outline"
+            >
+              Prolonger la session
+            </Button>
+          </div>,
+        duration: 60000
+      });
     }
-  }, [timeoutWarning]);
+  }, [timeoutWarning, toast, resetActivity]);
   
-  // Handle continue session
-  const handleContinue = () => {
-    resetActivity();
-    onContinue();
-  };
-  
-  return (
-    <AlertDialog open={timeoutWarning}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Session sur le point d'expirer</AlertDialogTitle>
-          <AlertDialogDescription>
-            Votre session va expirer dans {countdown} secondes pour des raisons de sécurité.
-            Souhaitez-vous rester connecté?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={handleContinue}>
-            Continuer la session
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
+  return null; // This is a non-visual component
 };
 
 export default SessionTimeoutAlert;

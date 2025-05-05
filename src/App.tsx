@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
@@ -9,6 +8,7 @@ import Index from './pages/Index';
 import NotFoundPage from './pages/NotFound';
 import SocialCocoonPage from './pages/SocialCocoonPage';
 import CommunityAdminPage from './pages/CommunityAdminPage';
+import CompliancePage from './pages/CompliancePage';
 
 // Import VR pages
 import VRSessionsPage from './pages/VRSessionsPage';
@@ -68,6 +68,8 @@ function App() {
             <VRAnalyticsPage />
           </ProtectedLayout>
         } />
+        
+        <Route path="/compliance" element={<CompliancePage />} />
 
         {/* Catch-all route for 404 */}
         <Route path="*" element={<NotFoundPage />} />
