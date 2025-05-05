@@ -1,6 +1,6 @@
 
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import { Toaster } from './components/ui/toaster';
 import Layout from './components/Layout';
@@ -44,7 +44,7 @@ const Loading = () => <LoadingAnimation />;
 
 function App() {
   return (
-    <Router>
+    <>
       <Suspense fallback={<Loading />}>
         <Routes>
           {/* Auth routes (no navigation) */}
@@ -107,7 +107,7 @@ function App() {
         </Routes>
       </Suspense>
       <Toaster />
-    </Router>
+    </>
   );
 }
 
