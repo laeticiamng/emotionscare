@@ -1,266 +1,185 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import UserAvatar from '@/components/community/UserAvatar';
-import { findBuddy, fetchUserBuddies, fetchUserById } from '@/lib/communityService';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { UserRole, User, Buddy } from '@/types';
-import { ArrowLeft, User as UserIcon, Heart, MessageSquare, Calendar } from 'lucide-react';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import { UserRole } from '@/types';
+// Importer Buddy directement depuis les types
+import { Buddy } from '@/types/community';
+import { getBuddyRequests, sendBuddyRequest, acceptBuddyRequest, rejectBuddyRequest } from '@/lib/communityService';
 
-// Import the Buddy type from index.ts rather than community.ts to ensure consistent types
-import { Buddy } from '@/types';
+interface BuddyRequest {
+  id: string;
+  user_id: string;
+  buddy_id: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: UserRole;
+    avatar: string;
+  };
+}
 
 const BuddyPage = () => {
   const { user } = useAuth();
+  const [buddyRequests, setBuddyRequests] = useState<BuddyRequest[]>([]);
+  const [email, setEmail] = useState('');
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isBuddiesLoading, setIsBuddiesLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole | undefined>(undefined);
-  const [matchedBuddy, setMatchedBuddy] = useState<Buddy | null>(null);
-  const [buddies, setBuddies] = useState<Buddy[]>([]);
-  const [buddyUsers, setBuddyUsers] = useState<Record<string, User | null>>({});
-  
-  // Fetch existing buddies
+
   useEffect(() => {
-    if (!user) return;
-    
-    const loadBuddies = async () => {
-      try {
-        setIsBuddiesLoading(true);
-        const userBuddies = await fetchUserBuddies(user.id);
-        // Ensure the buddies have the correct type structure
-        setBuddies(userBuddies as Buddy[]);
-        
-        // Load buddy user details
-        const buddyUserIds = userBuddies.map(b => b.buddy_user_id);
-        const userDetailsPromises = buddyUserIds.map(async id => {
-          const userData = await fetchUserById(id);
-          return { id, user: userData };
-        });
-        
-        const userDetails = await Promise.all(userDetailsPromises);
-        const newBuddyUsers: Record<string, User | null> = {};
-        
-        userDetails.forEach(({ id, user }) => {
-          newBuddyUsers[id] = user;
-        });
-        
-        setBuddyUsers(newBuddyUsers);
-      } catch (error) {
-        console.error("Erreur lors du chargement des buddies:", error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger vos buddies existants",
-          variant: "destructive"
-        });
-      } finally {
-        setIsBuddiesLoading(false);
+    const fetchBuddyRequests = async () => {
+      if (user) {
+        try {
+          const requests = await getBuddyRequests(user.id);
+          setBuddyRequests(requests);
+        } catch (error) {
+          toast({
+            title: "Erreur",
+            description: "Impossible de charger les demandes de buddy.",
+            variant: "destructive"
+          });
+        }
       }
     };
-    
-    loadBuddies();
+
+    fetchBuddyRequests();
   }, [user, toast]);
 
-  const handleFindBuddy = async () => {
-    if (!user) return;
-    
-    setIsLoading(true);
-    try {
-      const buddy = await findBuddy(user.id, selectedRole);
-      
-      // Fetch buddy user details
-      const buddyUser = await fetchUserById(buddy.buddy_user_id);
-      setBuddyUsers(prev => ({
-        ...prev,
-        [buddy.buddy_user_id]: buddyUser
-      }));
-      
-      setMatchedBuddy(buddy as Buddy);
-      setBuddies(prev => [buddy as Buddy, ...prev]);
-      
-      toast({
-        title: "Nouveau buddy trouvé !",
-        description: "Vous avez été mis en relation avec un nouveau collègue."
-      });
-    } catch (error) {
-      console.error("Erreur lors de la recherche d'un buddy:", error);
+  const handleSendBuddyRequest = async () => {
+    if (!user) {
       toast({
         title: "Erreur",
-        description: "Impossible de trouver un buddy pour le moment.",
+        description: "Vous devez être connecté pour envoyer une demande de buddy.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await sendBuddyRequest(user.id, email);
+      toast({
+        title: "Demande envoyée",
+        description: `Une demande de buddy a été envoyée à ${email}.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer la demande de buddy.",
+        variant: "destructive"
+      });
     }
   };
 
-  const handleRoleSelect = (role: UserRole) => {
-    setSelectedRole(role === selectedRole ? undefined : role);
+  const handleAcceptBuddyRequest = async (requestId: string) => {
+    try {
+      await acceptBuddyRequest(requestId);
+      // Update the buddy requests list
+      setBuddyRequests(buddyRequests.map(req =>
+        req.id === requestId ? { ...req, status: 'accepted' } : req
+      ));
+      toast({
+        title: "Demande acceptée",
+        description: "Vous avez accepté la demande de buddy.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'accepter la demande de buddy.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const renderBuddies = () => {
-    return buddies.map((buddy) => (
-      <Card key={buddy.id as React.Key} className="hover:shadow-md transition-all duration-200">
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <UserAvatar user={buddyUsers[buddy.buddy_user_id]} size="md" />
-            <div>
-              <h3 className="font-semibold">
-                {(buddyUsers[buddy.buddy_user_id]?.name || "Buddy") as React.ReactNode}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {(buddyUsers[buddy.buddy_user_id]?.role || "Professionnel de santé") as React.ReactNode}
-              </p>
-              <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3 mr-1" />
-                <span>
-                  Depuis le {new Date(buddy.date).toLocaleDateString('fr-FR')}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t flex justify-end">
-            <Button variant="outline" size="sm">
-              <MessageSquare className="h-3 w-3 mr-1" />
-              Message
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    ));
+  const handleRejectBuddyRequest = async (requestId: string) => {
+    try {
+      await rejectBuddyRequest(requestId);
+      // Update the buddy requests list
+      setBuddyRequests(buddyRequests.map(req =>
+        req.id === requestId ? { ...req, status: 'rejected' } : req
+      ));
+      toast({
+        title: "Demande rejetée",
+        description: "Vous avez rejeté la demande de buddy.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de rejeter la demande de buddy.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-6 flex items-center">
-        <Link to="/community" className="mr-4">
-          <Button variant="ghost" size="sm" className="gap-1">
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-semibold flex items-center">
-          <UserIcon className="h-6 w-6 mr-2" />
-          Programme Buddy
-        </h1>
-      </div>
-      
-      <p className="text-muted-foreground mb-8">
-        Trouvez un collègue avec qui échanger sur votre bien-être et vous soutenir mutuellement.
-      </p>
-      
-      <Tabs defaultValue="find" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-8">
-          <TabsTrigger value="find">Trouver un buddy</TabsTrigger>
-          <TabsTrigger value="my-buddies">Mes buddies</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="find">
-          <Card>
-            <CardHeader>
-              <CardTitle>Trouvez votre partenaire de bien-être</CardTitle>
-              <p className="text-muted-foreground">
-                Nous vous mettons en relation avec un professionnel qui partage vos défis quotidiens.
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-2">Filtrer par rôle :</h3>
-                <div className="flex flex-wrap gap-2">
-                  {Object.values(UserRole).map((role) => (
-                    <Button
-                      key={role}
-                      variant={selectedRole === role ? "default" : "outline"}
-                      onClick={() => handleRoleSelect(role)}
-                      className="mb-2"
-                    >
-                      {role}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="bg-muted/50 p-4 rounded-md">
-                <h4 className="font-medium mb-2 flex items-center">
-                  <Heart className="h-4 w-4 mr-2 text-rose-500" />
-                  Pourquoi trouver un buddy ?
-                </h4>
-                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                  <li>Partagez vos expériences et défis quotidiens</li>
-                  <li>Bénéficiez d'un soutien émotionnel</li>
-                  <li>Échangez des conseils pratiques pour votre bien-être</li>
-                  <li>Créez des liens durables avec vos pairs</li>
-                </ul>
-              </div>
-              
-              <Button 
-                onClick={handleFindBuddy} 
-                disabled={isLoading}
-                className="w-full mt-4"
-              >
-                {isLoading ? "Recherche en cours..." : "Trouver un buddy"}
-              </Button>
-            </CardContent>
-          </Card>
-          
-          {matchedBuddy && (
-            <div className="mt-8 space-y-4">
-              <h2 className="text-xl font-semibold">Votre nouveau buddy :</h2>
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <UserAvatar user={buddyUsers[matchedBuddy.buddy_user_id]} size="lg" />
+    <div className="container max-w-3xl py-10">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Mes Buddies</CardTitle>
+          <CardDescription>
+            Connectez-vous avec vos collègues pour un soutien mutuel
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Input
+              type="email"
+              placeholder="Email de votre collègue"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Button onClick={handleSendBuddyRequest}>Envoyer une demande</Button>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Demandes de Buddy</h3>
+            {buddyRequests.length > 0 ? (
+              buddyRequests.map((request) => (
+                <Card key={request.id} className="shadow-sm">
+                  <CardContent className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-semibold">
-                        {buddyUsers[matchedBuddy.buddy_user_id]?.name || "Nouveau buddy"}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {buddyUsers[matchedBuddy.buddy_user_id]?.role || "Professionnel de santé"}
+                      <p>
+                        <strong>{request.user?.name}</strong> ({request.user?.email})
                       </p>
-                      <div className="flex items-center mt-2 text-sm text-muted-foreground">
-                        <Calendar className="h-3 w-3 mr-1" />
-                        <span>
-                          Match créé le {new Date(matchedBuddy.date).toLocaleDateString('fr-FR')}
-                        </span>
-                      </div>
+                      <p>Statut: {request.status}</p>
                     </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t flex justify-between">
-                    <Button variant="outline" className="w-1/2 mr-2">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Envoyer un message
-                    </Button>
-                    <Button variant="secondary" className="w-1/2 ml-2">
-                      Voir le profil
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="my-buddies">
-          <h2 className="text-xl font-semibold mb-4">Vos buddies actuels</h2>
-          
-          {isBuddiesLoading ? (
-            <Card className="p-6 text-center">
-              <p className="text-muted-foreground">Chargement de vos buddies...</p>
-            </Card>
-          ) : buddies.length === 0 ? (
-            <Card className="p-6 text-center">
-              <p className="text-muted-foreground">Vous n'avez pas encore de buddies. Essayez d'en trouver un !</p>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {renderBuddies()}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+                    <div>
+                      {request.status === 'pending' && (
+                        <>
+                          <Button 
+                            variant="secondary"
+                            onClick={() => handleAcceptBuddyRequest(request.id)}
+                            className="mr-2"
+                          >
+                            Accepter
+                          </Button>
+                          <Button 
+                            variant="destructive"
+                            onClick={() => handleRejectBuddyRequest(request.id)}
+                          >
+                            Rejeter
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <p>Aucune demande de buddy pour le moment.</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

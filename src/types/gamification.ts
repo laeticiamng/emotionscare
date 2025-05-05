@@ -16,7 +16,9 @@ export interface UserChallenge {
   completed: boolean;
 }
 
-// Note: Badge is now defined in index.ts with combined properties for compatibility
+// Import Badge from index.ts for compatibility
+import { Badge } from './index';
+export { Badge };
 
 /** L'attribution d'un badge à un utilisateur */
 export interface UserBadge {

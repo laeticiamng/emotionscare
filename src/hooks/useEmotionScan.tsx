@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
@@ -36,14 +35,17 @@ export const useEmotionScan = (userId: string | undefined) => {
       const validUserId = getValidUserId();
       
       // Pour cette démo, nous simulons les données utilisateur
-      const simulatedUserData: User = {
-        id: validUserId,
-        name: `User ${userId.substring(0, 4)}`,
-        email: `user-${userId.substring(0, 4)}@example.com`,
-        anonymity_code: `Anon-${userId.substring(0, 4)}`,
+      const mockUser = {
+        id: '1',
+        name: 'Anonymous User',
+        email: 'anonymous@example.com',
+        anonymity_code: 'ANON' + Math.random().toString(36).substring(2, 7).toUpperCase(),
+        role: 'EMPLOYEE',
+        avatar: 'https://i.pravatar.cc/150?img=5',
+        emotional_score: 75
       };
       
-      setUserDetail(simulatedUserData);
+      setUserDetail(mockUser);
       
       // Récupérer la dernière émotion pour cet utilisateur
       const emotionData = await fetchLatestEmotion();

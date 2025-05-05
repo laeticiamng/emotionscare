@@ -17,6 +17,7 @@ export interface User {
   emotional_score?: number;
   onboarded?: boolean;
   alias?: string;
+  bio?: string;
 }
 
 // UserRole enum for role-based access
@@ -42,6 +43,7 @@ export interface JournalEntry {
   mood?: number;
   tags?: string[];
   ai_feedback?: string;
+  created_at?: string;
 }
 
 export interface MoodData {
@@ -64,6 +66,7 @@ export interface Emotion {
   audio_url?: string;
   ai_feedback?: string;
   score?: number;
+  created_at?: string;
 }
 
 // Badge related types
@@ -104,6 +107,7 @@ export interface VRSessionTemplate {
   preview_url: string;
   is_audio_only?: boolean;
   audio_url?: string;
+  completion_rate?: number;
 }
 
 export interface VRSession {
@@ -112,10 +116,15 @@ export interface VRSession {
   template_id: string;
   date: string;
   duration: number;
+  duration_seconds?: number;
   completed: boolean;
   mood_before?: number;
   mood_after?: number;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  is_audio_only?: boolean;
 }
 
 // Community types - importing from community.ts to centralize types
 export * from './community';
+
