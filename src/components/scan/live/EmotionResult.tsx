@@ -1,44 +1,70 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { PlayCircle } from 'lucide-react';
-import type { EmotionResult } from '@/lib/scanService';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
-interface EmotionResultDisplayProps {
-  result: EmotionResult;
-  onPlayMusic: () => void;
+interface EmotionResultProps {
+  emotion: string;
+  confidence: number;
+  transcript?: string;
+  className?: string;
 }
 
-const EmotionResultDisplay: React.FC<EmotionResultDisplayProps> = ({ result, onPlayMusic }) => {
-  const confidence = Math.round(result.confidence * 100);
-  
+const EmotionResult: React.FC<EmotionResultProps> = ({
+  emotion,
+  confidence,
+  transcript,
+  className = ''
+}) => {
+  // Map emotion to French
+  const emotionMap: Record<string, string> = {
+    happy: 'Joie',
+    sad: 'Tristesse',
+    angry: 'Colère',
+    fearful: 'Peur',
+    surprised: 'Surprise',
+    disgusted: 'Dégoût',
+    neutral: 'Neutre'
+  };
+
+  // Map emotion to emoji
+  const emojiMap: Record<string, string> = {
+    happy: '😊',
+    sad: '😔',
+    angry: '😠',
+    fearful: '😨',
+    surprised: '😮',
+    disgusted: '🤢',
+    neutral: '😐'
+  };
+
+  const displayEmotion = emotionMap[emotion.toLowerCase()] || emotion;
+  const emoji = emojiMap[emotion.toLowerCase()] || '❓';
+  const confidencePercent = Math.round(confidence * 100);
+
   return (
-    <div className="my-4 space-y-3">
-      <h3 className="text-sm font-semibold text-muted-foreground mb-1">Résultat d'analyse</h3>
-      
-      <div className="p-4 border rounded-lg bg-muted/30 space-y-2">
-        <div className="flex justify-between items-center">
-          <div className="space-y-1">
-            <div className="font-medium">Émotion détectée:</div>
-            <div className="text-xl font-bold">{result.emotion}</div>
-          </div>
-          <div className="text-right">
-            <div className="font-medium">Confiance:</div>
-            <div className="text-xl font-bold">{confidence}%</div>
-          </div>
-        </div>
+    <Card className={`w-full ${className}`}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center">
+          <span className="text-2xl mr-2">{emoji}</span>
+          <span>{displayEmotion}</span>
+        </CardTitle>
+        <CardDescription>
+          Niveau de confiance: {confidencePercent}%
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Progress value={confidencePercent} className="h-2 mb-4" />
         
-        <Button 
-          variant="outline" 
-          className="w-full mt-2"
-          onClick={onPlayMusic}
-        >
-          <PlayCircle className="mr-2 h-4 w-4" />
-          Écouter une playlist adaptée
-        </Button>
-      </div>
-    </div>
+        {transcript && (
+          <>
+            <h4 className="text-sm font-medium mb-1">Transcription:</h4>
+            <p className="text-sm text-muted-foreground italic">"{transcript}"</p>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
-export default EmotionResultDisplay;
+export default EmotionResult;

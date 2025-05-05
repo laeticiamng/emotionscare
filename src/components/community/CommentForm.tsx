@@ -1,80 +1,93 @@
 
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { createComment } from '@/lib/communityService';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { createComment } from '@/lib/communityService';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface CommentFormProps {
   postId: string;
-  commentText: string;
-  setCommentText: (text: string) => void;
-  onCommentAdded: () => void;
+  onCommentAdded?: () => void;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ 
-  postId, 
-  commentText, 
-  setCommentText,
-  onCommentAdded 
-}) => {
+const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => {
+  const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const handleComment = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     if (!user) {
       toast({
-        title: "Non connecté",
+        title: "Erreur",
         description: "Vous devez être connecté pour commenter",
         variant: "destructive"
       });
       return;
     }
-    
-    if (!commentText?.trim()) {
+
+    if (!content.trim()) {
       toast({
-        title: "Commentaire vide",
-        description: "Veuillez écrire quelque chose avant de commenter",
+        title: "Erreur",
+        description: "Le commentaire ne peut pas être vide",
         variant: "destructive"
       });
       return;
     }
-    
+
+    setIsSubmitting(true);
+
     try {
-      await createComment(postId, user.id, commentText, false);
-      setCommentText('');
-      onCommentAdded();
+      await createComment({
+        content: content.trim(),
+        postId,
+        userId: user.id
+      });
+
       toast({
         title: "Succès",
-        description: "Votre commentaire a été publié"
+        description: "Votre commentaire a été ajouté"
       });
+
+      setContent('');
+      
+      if (onCommentAdded) {
+        onCommentAdded();
+      }
     } catch (error) {
-      console.error('Error commenting on post:', error);
+      console.error('Error posting comment:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de publier votre commentaire",
+        description: "Impossible de poster votre commentaire",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="w-full flex space-x-2">
+    <form onSubmit={handleSubmit} className="mt-4">
       <Textarea
-        rows={1}
-        placeholder="Écrivez un commentaire positif…"
-        value={commentText}
-        onChange={(e) => setCommentText(e.target.value)}
-        className="text-sm resize-none"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Partagez votre réaction..."
+        className="mb-2 min-h-[80px]"
+        disabled={isSubmitting || !user}
       />
-      <Button
-        onClick={handleComment}
-        size="sm"
-      >
-        Commenter
-      </Button>
-    </div>
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={isSubmitting || !content.trim() || !user}
+          size="sm"
+        >
+          {isSubmitting ? 'Envoi...' : 'Commenter'}
+        </Button>
+      </div>
+    </form>
   );
 };
 

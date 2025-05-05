@@ -51,7 +51,7 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="container mx-auto py-6">
       {renderDashboard()}
-      <SessionTimeoutAlert onContinue={() => setSessionContinued(true)} />
+      <SessionTimeoutAlert />
       <DashboardFooter isAdmin={isAdmin} />
     </div>
   );

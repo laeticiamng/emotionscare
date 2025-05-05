@@ -1,196 +1,139 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mic, MicOff, Music } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Mic, MicOff, Loader2 } from 'lucide-react';
+import AudioProcessor from './AudioProcessor';
+import EmotionResult from './live/EmotionResult';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import type { Emotion } from '@/types';
-import type { EmotionResult as EmotionResultType } from '@/lib/scanService';
-
-// Import our components
-import AudioProcessor from './live/AudioProcessor';
-import EmotionResultDisplay from './live/EmotionResult';
-import StatusIndicator from './live/StatusIndicator';
-import TranscriptDisplay from './live/TranscriptDisplay';
-import EmptyState from './live/EmptyState';
-import { useMusicRecommendation } from './live/useMusicRecommendation';
+import type { Emotion, EmotionResult as EmotionResultType } from '@/types';
+import { saveRealtimeEmotionScan } from '@/lib/scanService';
 
 interface EmotionScanLiveProps {
-  onResultSaved?: (result: Emotion) => void;
+  userId: string;
+  onComplete?: (emotion: Emotion) => void;
 }
 
-const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ onResultSaved }) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const { handlePlayMusic } = useMusicRecommendation();
-  
+const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId, onComplete }) => {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [emotionResult, setEmotionResult] = useState<EmotionResultType | null>(null);
-  const [progressText, setProgressText] = useState('');
-  const [isConfidential, setIsConfidential] = useState(false);
-  
-  // Start/stop listening
-  const toggleListening = () => {
+  const [progress, setProgress] = useState('');
+  const [emotion, setEmotion] = useState<Emotion | null>(null);
+  const [result, setResult] = useState<EmotionResultType | null>(null);
+  const [isConfidential, setIsConfidential] = useState(true);
+  const { toast } = useToast();
+
+  const handleToggleListen = () => {
     setIsListening(!isListening);
     if (isListening) {
-      setEmotionResult(null);
-      setTranscript('');
+      setProgress('');
+      setEmotion(null);
+      setResult(null);
+    } else {
+      toast({
+        title: 'Scan en direct activé',
+        description: 'Parlez normalement, votre voix est analysée en temps réel.'
+      });
     }
   };
-  
-  // Handle audio processing completion
-  const handleAnalysisComplete = (emotion: Emotion, result: EmotionResultType) => {
-    setEmotionResult(result);
-    setTranscript(result.transcript || '');
-    
-    if (onResultSaved) {
-      onResultSaved(emotion);
-    }
-    
+
+  const handleError = (message: string) => {
     toast({
-      title: "Analyse émotionnelle terminée",
-      description: `Vous semblez ${result.emotion || result.emotionName} (${Math.round((result.confidence || 0.5) * 100)}% de confiance)`,
-    });
-  };
-  
-  // Handle errors from audio processor
-  const handleProcessorError = (message: string) => {
-    toast({
-      title: "Erreur d'analyse",
+      title: 'Erreur lors du scan',
       description: message,
-      variant: "destructive",
+      variant: 'destructive'
     });
     setIsListening(false);
+    setIsProcessing(false);
   };
-  
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-      <Card className="md:col-span-7 rounded-3xl shadow-md">
-        <CardHeader className="border-b bg-blue-50/50 rounded-t-3xl">
-          <CardTitle className="flex items-center justify-between">
-            <span>Analyse émotionnelle en direct</span>
-            <Button 
-              size="sm"
-              variant={isListening ? "destructive" : "default"}
-              className="flex items-center gap-2 rounded-full"
-              onClick={toggleListening}
-              disabled={isProcessing}
-            >
-              {isListening ? (
-                <>
-                  <MicOff size={16} />
-                  Arrêter
-                </>
-              ) : (
-                <>
-                  <Mic size={16} />
-                  Commencer
-                </>
-              )}
-            </Button>
-          </CardTitle>
-          <div className="flex items-center mt-2">
-            <input
-              type="checkbox"
-              id="confidentialLive"
-              checked={isConfidential}
-              onChange={() => setIsConfidential(!isConfidential)}
-              className="mr-2"
-            />
-            <label htmlFor="confidentialLive" className="text-sm text-muted-foreground">Mode confidentiel</label>
-          </div>
-        </CardHeader>
+
+  const handleAnalysisComplete = (emotionData: Emotion, resultData: EmotionResultType) => {
+    setEmotion(emotionData);
+    setResult(resultData);
+    setIsListening(false);
+    setIsProcessing(false);
+    
+    // Save the emotion scan
+    saveRealtimeEmotionScan(emotionData, userId)
+      .then(() => {
+        toast({
+          title: 'Scan sauvegardé',
+          description: 'Votre scan émotionnel a été enregistré.'
+        });
         
-        <CardContent className="p-6">
-          {/* Audio Processor (non-visual component) */}
-          <AudioProcessor 
-            isListening={isListening}
-            userId={user?.id || ''}
-            isConfidential={isConfidential}
-            onProcessingChange={setIsProcessing}
-            onProgressUpdate={setProgressText}
-            onAnalysisComplete={handleAnalysisComplete}
-            onError={handleProcessorError}
+        if (onComplete) {
+          onComplete(emotionData);
+        }
+      })
+      .catch((error) => {
+        console.error('Error saving emotion scan:', error);
+        toast({
+          title: 'Erreur de sauvegarde',
+          description: 'Impossible de sauvegarder le scan.',
+          variant: 'destructive'
+        });
+      });
+  };
+
+  return (
+    <Card className="p-6 shadow-md">
+      <div className="flex flex-col items-center space-y-6">
+        <h3 className="text-xl font-semibold">Scan émotionnel en direct</h3>
+        
+        <div className="flex items-center space-x-4">
+          <Button
+            onClick={handleToggleListen}
+            variant={isListening ? "destructive" : "default"}
+            disabled={isProcessing}
+            className="relative h-14 w-14 rounded-full p-0"
+          >
+            {isListening ? 
+              <MicOff className="h-6 w-6" /> : 
+              <Mic className="h-6 w-6" />
+            }
+          </Button>
+          <div>
+            <p className="text-sm text-muted-foreground">
+              {isListening ? 'Cliquez pour arrêter...' : 'Cliquez pour démarrer'}
+            </p>
+            <p className="text-xs text-muted-foreground">{progress}</p>
+          </div>
+        </div>
+        
+        {isProcessing && (
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">Analyse en cours...</span>
+          </div>
+        )}
+        
+        <label className="flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isConfidential}
+            onChange={() => setIsConfidential(!isConfidential)}
+            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2"
           />
-          
-          {/* Status Indicator */}
-          <StatusIndicator 
-            isListening={isListening} 
-            isProcessing={isProcessing} 
-            progressText={progressText} 
-          />
-          
-          {/* Transcript Display */}
-          <TranscriptDisplay transcript={transcript} isConfidential={isConfidential} />
-          
-          {/* Emotion Result */}
-          {emotionResult && (
-            <EmotionResultDisplay 
-              result={emotionResult} 
-              onPlayMusic={() => handlePlayMusic(emotionResult)}
-            />
-          )}
-          
-          {/* Empty State */}
-          {!isListening && !emotionResult && <EmptyState />}
-        </CardContent>
-      </Card>
+          <span className="text-sm text-muted-foreground">Mode confidentiel (pas de stockage de l'audio)</span>
+        </label>
+        
+        {result && emotion && (
+          <EmotionResult emotion={result.emotion || ''} confidence={result.confidence || 0} transcript={result.transcript || ''} />
+        )}
+      </div>
       
-      <Card className="md:col-span-5 rounded-3xl shadow-md">
-        <CardHeader className="border-b bg-blue-50/50 rounded-t-3xl">
-          <CardTitle>Actions recommandées</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 space-y-4">
-          {emotionResult ? (
-            <>
-              <Button 
-                variant="default" 
-                className="w-full justify-start rounded-xl text-left p-4 bg-wellness-mint text-slate-800 hover:bg-wellness-mint/90 hover:shadow-md transition-all"
-              >
-                <Music className="mr-3 h-5 w-5" />
-                <div>
-                  <div className="font-medium">Écouter une playlist</div>
-                  <div className="text-xs opacity-90">Musiques adaptées à votre état émotionnel</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="default" 
-                className="w-full justify-start rounded-xl text-left p-4 bg-wellness-purple text-white hover:bg-wellness-darkPurple hover:shadow-md transition-all"
-              >
-                <svg className="mr-3 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M13 17.05v-10.1c0-.55-.45-1-1-1s-1 .45-1 1v10.1c-2.3.33-4 2.32-4 4.7 0 .55.45 1 1 1h8c.55 0 1-.45 1-1 0-2.38-1.7-4.37-4-4.7z" />
-                </svg>
-                <div>
-                  <div className="font-medium">Démarrer une micro-pause VR</div>
-                  <div className="text-xs opacity-90">Session de relaxation de 5 minutes</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="default" 
-                className="w-full justify-start rounded-xl text-left p-4 bg-wellness-coral text-white hover:bg-wellness-coral/90 hover:shadow-md transition-all"
-              >
-                <svg className="mr-3 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
-                </svg>
-                <div>
-                  <div className="font-medium">Parler au Coach IA</div>
-                  <div className="text-xs opacity-90">Discussion personnalisée avec votre assistant</div>
-                </div>
-              </Button>
-            </>
-          ) : (
-            <div className="text-center p-6">
-              <p className="text-muted-foreground">Commencez une analyse pour découvrir les actions recommandées en fonction de votre état émotionnel.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+      {isListening && (
+        <AudioProcessor
+          isListening={isListening}
+          userId={userId}
+          isConfidential={isConfidential}
+          onProcessingChange={setIsProcessing}
+          onProgressUpdate={setProgress}
+          onAnalysisComplete={handleAnalysisComplete}
+          onError={handleError}
+        />
+      )}
+    </Card>
   );
 };
 

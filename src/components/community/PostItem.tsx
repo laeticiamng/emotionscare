@@ -1,32 +1,36 @@
 
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { reactToPost } from '@/lib/communityService';
-import { Post } from '@/types/community';
+import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ThumbsUp, MessageSquare } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { MessageSquare, Heart } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import CommentList from './CommentList';
 import CommentForm from './CommentForm';
-import UserAvatar from './UserAvatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { reactToPost } from '@/lib/communityService';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostItemProps {
-  post: Post;
-  getUserName: (userId: string) => string;
-  onPostUpdated: () => void;
+  post: any;
+  showComments?: boolean;
+  onReactionAdded?: () => void;
 }
 
-const PostItem: React.FC<PostItemProps> = ({ post, getUserName, onPostUpdated }) => {
+const PostItem: React.FC<PostItemProps> = ({ 
+  post, 
+  showComments = false,
+  onReactionAdded
+}) => {
+  const [showCommentsSection, setShowCommentsSection] = React.useState(showComments);
   const { user } = useAuth();
   const { toast } = useToast();
-  const [commentText, setCommentText] = useState('');
-  const [showComments, setShowComments] = useState(false);
-
-  const handleReact = async () => {
+  
+  const handleReaction = async () => {
     if (!user) {
       toast({
-        title: "Non connecté",
+        title: "Erreur",
         description: "Vous devez être connecté pour réagir",
         variant: "destructive"
       });
@@ -35,11 +39,9 @@ const PostItem: React.FC<PostItemProps> = ({ post, getUserName, onPostUpdated })
     
     try {
       await reactToPost(post.id);
-      onPostUpdated();
-      toast({
-        title: "Merci !",
-        description: "Votre réaction a été enregistrée"
-      });
+      if (onReactionAdded) {
+        onReactionAdded();
+      }
     } catch (error) {
       console.error('Error reacting to post:', error);
       toast({
@@ -49,95 +51,68 @@ const PostItem: React.FC<PostItemProps> = ({ post, getUserName, onPostUpdated })
       });
     }
   };
-
-  const toggleComments = () => {
-    setShowComments(!showComments);
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-      return "Aujourd'hui, " + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffDays === 1) {
-      return "Hier, " + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffDays < 7) {
-      return `Il y a ${diffDays} jours`;
-    } else {
-      return date.toLocaleDateString('fr-FR', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      });
-    }
-  };
-
+  
+  // Format the date to "il y a X minutes/heures/jours"
+  const formattedDate = post.date ? formatDistanceToNow(new Date(post.date), { 
+    addSuffix: true,
+    locale: fr 
+  }) : '';
+  
   return (
-    <Card className="mb-6 hover:shadow-md transition-all duration-200">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <UserAvatar user={{ id: post.user_id, name: getUserName(post.user_id) }} />
-            <div>
-              <span className="font-medium">{getUserName(post.user_id)}</span>
-              <p className="text-xs text-muted-foreground">
-                {formatDate(post.date)}
-              </p>
-            </div>
+    <Card className="mb-4">
+      <CardHeader className="pb-2">
+        <div className="flex space-x-2">
+          <Avatar>
+            <AvatarImage src={post.user?.avatar || ''} />
+            <AvatarFallback>
+              {post.user?.name?.charAt(0) || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <p className="font-medium text-sm">{post.user?.name || 'Anonyme'}</p>
+            <p className="text-xs text-muted-foreground">{formattedDate}</p>
           </div>
         </div>
       </CardHeader>
       
       <CardContent>
-        <p className="mb-4 leading-relaxed text-lg whitespace-pre-wrap">{post.content}</p>
-        {(post.media_url || post.image_url) && (
-          <div className="rounded-lg overflow-hidden">
-            <img
-              src={post.media_url || post.image_url}
-              className="w-full max-h-80 object-cover"
-              alt="Media"
-            />
-          </div>
+        <p className="whitespace-pre-line">{post.content}</p>
+        
+        {post.image_url && (
+          <img 
+            src={post.image_url}
+            alt="Post attachment"
+            className="mt-3 rounded-md max-h-72 object-contain"
+          />
         )}
       </CardContent>
-
-      <CardFooter className="flex flex-col border-t pt-4">
-        <div className="flex items-center space-x-4 w-full mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleReact}
-            className="flex items-center space-x-2"
-          >
-            <ThumbsUp className="h-4 w-4" />
-            <span>{post.reactions}</span>
+      
+      <CardFooter className="pt-1 pb-2 flex justify-between">
+        <div className="flex space-x-2">
+          <Button variant="ghost" size="sm" onClick={handleReaction} className="text-xs">
+            <Heart size={16} className="mr-1" />
+            {post.reactions || 0}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleComments}
-            className="flex items-center space-x-2"
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowCommentsSection(!showCommentsSection)}
+            className="text-xs"
           >
-            <MessageSquare className="h-4 w-4" />
-            <span>{post.comments?.length || 0}</span>
+            <MessageSquare size={16} className="mr-1" />
+            {post.comments?.length || 0}
           </Button>
         </div>
-
-        {showComments && (
-          <>
-            <CommentList comments={post.comments || []} getUserName={getUserName} />
-            <CommentForm 
-              postId={post.id} 
-              commentText={commentText} 
-              setCommentText={setCommentText} 
-              onCommentAdded={onPostUpdated}
-            />
-          </>
-        )}
       </CardFooter>
+      
+      {showCommentsSection && (
+        <div className="px-6 pb-3">
+          {post.comments && post.comments.length > 0 && (
+            <CommentList comments={post.comments} />
+          )}
+          <CommentForm postId={post.id} />
+        </div>
+      )}
     </Card>
   );
 };

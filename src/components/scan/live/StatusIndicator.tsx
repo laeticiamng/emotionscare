@@ -1,32 +1,49 @@
 
 import React from 'react';
-import { Mic, Wand2 } from 'lucide-react';
+import { Mic, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+
+type StatusType = 'idle' | 'recording' | 'processing' | 'success' | 'error';
 
 interface StatusIndicatorProps {
-  isListening: boolean;
-  isProcessing: boolean;
-  progressText: string;
+  status: StatusType;
+  className?: string;
 }
 
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({ isListening, isProcessing, progressText }) => {
-  if (!isListening && !isProcessing && !progressText) return null;
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status, className = '' }) => {
+  const getIcon = () => {
+    switch (status) {
+      case 'recording':
+        return <Mic className="h-5 w-5 text-red-500 animate-pulse" />;
+      case 'processing':
+        return <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />;
+      case 'success':
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'error':
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      default:
+        return <Mic className="h-5 w-5 text-gray-400" />;
+    }
+  };
+
+  const getLabel = () => {
+    switch (status) {
+      case 'recording':
+        return 'Enregistrement en cours...';
+      case 'processing':
+        return 'Traitement audio...';
+      case 'success':
+        return 'Analyse complétée';
+      case 'error':
+        return 'Erreur de traitement';
+      default:
+        return 'Prêt à enregistrer';
+    }
+  };
 
   return (
-    <div className="mb-4 p-3 bg-muted rounded-md flex items-center gap-3">
-      {isProcessing ? (
-        <div className="animate-pulse flex items-center">
-          <Wand2 className="mr-2 h-5 w-5 text-primary" />
-          <span>{progressText || "Traitement en cours..."}</span>
-        </div>
-      ) : (
-        <div className="flex items-center">
-          <div className="relative mr-3">
-            <div className="absolute -inset-1 rounded-full bg-primary opacity-30 animate-ping"></div>
-            <Mic className="relative h-5 w-5 text-primary" />
-          </div>
-          <span>{progressText || "Écoute active..."}</span>
-        </div>
-      )}
+    <div className={`flex items-center ${className}`}>
+      {getIcon()}
+      <span className="ml-2 text-sm">{getLabel()}</span>
     </div>
   );
 };

@@ -25,3 +25,42 @@ export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string):
   // Mock implementation for saving emotion scan
   console.log('Saving emotion scan for user:', userId, emotion);
 };
+
+// Add missing functions that are being imported elsewhere
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  console.log('Analyzing emotion from text:', text);
+  return {
+    emotion: 'neutral',
+    confidence: 0.7,
+    transcript: text
+  };
+};
+
+export const fetchEmotionHistory = async (userId?: string): Promise<Emotion[]> => {
+  console.log('Fetching emotion history for user:', userId);
+  return []; // Return empty array for now
+};
+
+export const createEmotionEntry = async (data: {
+  user_id: string;
+  emotion?: string;
+  text?: string;
+  emojis?: string;
+  audio_url?: string;
+}): Promise<Emotion> => {
+  console.log('Creating emotion entry:', data);
+  return {
+    id: `temp-${Date.now()}`,
+    user_id: data.user_id,
+    date: new Date().toISOString(),
+    emotion: data.emotion || 'neutral',
+    text: data.text || '',
+    emojis: data.emojis || '😐',
+    audio_url: data.audio_url
+  };
+};
+
+export const fetchLatestEmotion = async (userId?: string): Promise<Emotion | null> => {
+  console.log('Fetching latest emotion for user:', userId);
+  return null; // Return null for now
+};

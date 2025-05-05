@@ -69,3 +69,34 @@ export const rejectBuddyRequest = async (requestId: string): Promise<void> => {
   // Mock implementation for now
   console.log(`Rejecting buddy request ${requestId}`);
 };
+
+// Add missing functions
+export const createGroup = async (groupData: {
+  name: string;
+  topic: string;
+  members?: string[];
+}): Promise<any> => {
+  console.log('Creating group:', groupData);
+  return {
+    id: `group-${Date.now()}`,
+    ...groupData,
+    members: groupData.members || []
+  };
+};
+
+export const fetchGroups = async (): Promise<any[]> => {
+  console.log('Fetching groups');
+  return []; // Return empty array for now
+};
+
+export const getRecommendedTags = async (): Promise<string[]> => {
+  return [
+    'Bien-être',
+    'Stress',
+    'Relaxation',
+    'Méditation',
+    'Sommeil',
+    'Nutrition',
+    'Activité physique'
+  ];
+};

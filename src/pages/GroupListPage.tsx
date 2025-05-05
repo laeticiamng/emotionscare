@@ -2,43 +2,91 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
-import { Group } from '@/types/community';
-import { fetchGroups } from '@/lib/communityService';
-import { useToast } from '@/hooks/use-toast';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
-import GroupList from '@/components/community/GroupList';
-import GroupForm from '@/components/community/GroupForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Plus, Users, BarChart, BookOpen } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchGroups } from '@/lib/communityService';
+import GroupForm from '@/components/community/GroupForm';
 
-const GroupListPage = () => {
+// Mock data for now
+interface Group {
+  id: string;
+  name: string;
+  topic: string;
+  members: string[];
+}
+
+interface GroupListComponentProps {
+  groups: Group[];
+  loading?: boolean;
+}
+
+const GroupListComponent: React.FC<GroupListComponentProps> = ({ groups, loading }) => {
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (groups.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <Users className="mx-auto h-12 w-12 text-muted-foreground" />
+        <h3 className="mt-4 text-lg font-medium">Aucun groupe trouvé</h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Soyez le premier à créer un groupe pour échanger !
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {groups.map(group => (
+        <div
+          key={group.id}
+          className="border rounded-lg p-4 hover:border-primary cursor-pointer transition-all"
+        >
+          <h3 className="font-medium">{group.name}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+            {group.topic}
+          </p>
+          <div className="flex items-center mt-3 text-xs text-muted-foreground">
+            <Users className="h-4 w-4 mr-1" />
+            <span>{group.members.length} membres</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const GroupListPage: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [filteredGroups, setFilteredGroups] = useState<Group[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all');
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  
+  const { user } = useAuth();
   const { toast } = useToast();
 
-  // Fetch groups on component mount
   useEffect(() => {
     const loadGroups = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
         const fetchedGroups = await fetchGroups();
-        setGroups(fetchedGroups);
-        setFilteredGroups(fetchedGroups);
+        setGroups(fetchedGroups || []);
+        setFilteredGroups(fetchedGroups || []);
       } catch (error) {
-        console.error('Error fetching groups:', error);
+        console.error('Error loading groups:', error);
         toast({
-          title: "Erreur",
-          description: "Impossible de charger les groupes",
-          variant: "destructive"
+          title: 'Erreur',
+          description: 'Impossible de charger les groupes',
+          variant: 'destructive',
         });
       } finally {
         setIsLoading(false);
@@ -48,120 +96,94 @@ const GroupListPage = () => {
     loadGroups();
   }, [toast]);
 
-  // Filter groups based on search term
   useEffect(() => {
-    if (searchTerm === '') {
+    if (!searchQuery) {
       setFilteredGroups(groups);
-    } else {
-      const filtered = groups.filter(group => 
-        group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        group.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (group.tags && group.tags.some(tag => 
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        ))
-      );
-      setFilteredGroups(filtered);
+      return;
     }
-  }, [searchTerm, groups]);
 
-  // Filter based on tab
-  useEffect(() => {
-    if (activeTab === 'all') {
-      // Apply only search filter
-      if (searchTerm === '') {
-        setFilteredGroups(groups);
-      } else {
-        const filtered = groups.filter(group => 
-          group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          group.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (group.tags && group.tags.some(tag => 
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-          ))
-        );
-        setFilteredGroups(filtered);
-      }
-    } else if (activeTab === 'my') {
-      // Show only joined groups
-      const myGroups = groups.filter(group => {
-        // Check if the user is a member
-        // This is a placeholder - implement proper membership check
-        return group.members_count > 0;
-      });
-      setFilteredGroups(myGroups);
-    } else if (activeTab === 'popular') {
-      // Sort by member count
-      const popularGroups = [...groups].sort((a, b) => b.members_count - a.members_count);
-      setFilteredGroups(popularGroups);
-    }
-  }, [activeTab, groups, searchTerm]);
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    const filtered = groups.filter(
+      group =>
+        group.name.toLowerCase().includes(lowerCaseQuery) ||
+        group.topic.toLowerCase().includes(lowerCaseQuery)
+    );
+    setFilteredGroups(filtered);
+  }, [searchQuery, groups]);
 
-  const handleGroupCreated = (newGroup: Group) => {
-    setGroups(prevGroups => [...prevGroups, newGroup]);
-    setFilteredGroups(prevGroups => [...prevGroups, newGroup]);
+  const handleCreateGroupSuccess = (newGroup: Group) => {
+    setGroups(prev => [newGroup, ...prev]);
+    setShowCreateForm(false);
     toast({
-      title: "Groupe créé avec succès",
-      description: `Vous avez créé le groupe "${newGroup.name}"`,
+      title: 'Groupe créé',
+      description: `Le groupe "${newGroup.name}" a été créé avec succès`,
     });
   };
 
+  const myGroups = groups.filter(
+    group => user && group.members.includes(user.id)
+  );
+
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="container mx-auto py-8 px-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Groupes</h1>
-          <p className="text-muted-foreground">
-            Rejoignez des groupes pour discuter de sujets qui vous intéressent
+          <h1 className="text-3xl font-bold">Groupes de discussion</h1>
+          <p className="text-muted-foreground mt-1">
+            Rejoignez des groupes pour échanger sur des thèmes qui vous intéressent
           </p>
         </div>
-
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Créer un groupe
-            </Button>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Créer un nouveau groupe</SheetTitle>
-            </SheetHeader>
-            <div className="mt-6">
-              <GroupForm 
-                onGroupCreated={handleGroupCreated} 
-                joinAfterCreation={true}
-              />
-            </div>
-          </SheetContent>
-        </Sheet>
+        <Button onClick={() => setShowCreateForm(!showCreateForm)} className="self-end md:self-auto">
+          <Plus className="mr-2 h-4 w-4" />
+          {showCreateForm ? 'Annuler' : 'Créer un groupe'}
+        </Button>
       </div>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          className="pl-10"
-          placeholder="Rechercher un groupe..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      {showCreateForm && (
+        <div className="mb-8">
+          <GroupForm
+            onSuccess={handleCreateGroupSuccess}
+            onCancel={() => setShowCreateForm(false)}
+          />
+        </div>
+      )}
+
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un groupe..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
       </div>
 
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">Tous</TabsTrigger>
-          <TabsTrigger value="my">Mes groupes</TabsTrigger>
-          <TabsTrigger value="popular">Populaires</TabsTrigger>
+      <Tabs defaultValue="all">
+        <TabsList className="mb-4">
+          <TabsTrigger value="all" className="flex items-center">
+            <BarChart className="mr-2 h-4 w-4" />
+            <span>Tous les groupes</span>
+          </TabsTrigger>
+          <TabsTrigger value="my" className="flex items-center">
+            <Users className="mr-2 h-4 w-4" />
+            <span>Mes groupes</span>
+          </TabsTrigger>
+          <TabsTrigger value="recommended" className="flex items-center">
+            <BookOpen className="mr-2 h-4 w-4" />
+            <span>Recommandés</span>
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="py-4">
-          <GroupList groups={filteredGroups} loading={isLoading} />
+        <TabsContent value="all">
+          <GroupListComponent groups={filteredGroups} loading={isLoading} />
         </TabsContent>
-        
-        <TabsContent value="my" className="py-4">
-          <GroupList groups={filteredGroups} loading={isLoading} />
+        <TabsContent value="my">
+          <GroupListComponent groups={myGroups} loading={isLoading} />
         </TabsContent>
-        
-        <TabsContent value="popular" className="py-4">
-          <GroupList groups={filteredGroups} loading={isLoading} />
+        <TabsContent value="recommended">
+          <GroupListComponent groups={filteredGroups.slice(0, 6)} loading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>
