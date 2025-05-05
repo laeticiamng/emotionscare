@@ -36,7 +36,14 @@ const AdminLoginPage = () => {
       const user = await login(email, password);
       
       // Check if the user has admin privileges
-      if (!isAdminRole(user?.role)) {
+      if (user && isAdminRole(user.role)) {
+        toast({
+          title: "Connexion réussie",
+          description: `Bienvenue dans l'espace administration, ${user.name}!`,
+        });
+        // Explicitly navigate to dashboard after successful admin login
+        navigate('/dashboard');
+      } else {
         toast({
           title: "Accès refusé",
           description: "Vous n'avez pas les droits d'administration nécessaires",
@@ -44,10 +51,15 @@ const AdminLoginPage = () => {
         });
         navigate('/'); // Redirect to home if not admin
       }
-      // If admin, navigation is handled in the auth context
       
-    } catch (error) {
-      // Error is handled in the auth context
+    } catch (error: any) {
+      // Error handling is already in auth context, but we'll add an extra toast here for clarity
+      console.error("Erreur de connexion admin:", error);
+      toast({
+        title: "Erreur de connexion",
+        description: error.message || "Impossible de se connecter. Veuillez vérifier vos identifiants.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }

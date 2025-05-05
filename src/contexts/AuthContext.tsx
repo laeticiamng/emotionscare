@@ -45,28 +45,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const loggedInUser = await loginUser(email, password);
       setUser(loggedInUser);
       
-      // Determine where to navigate based on user role
+      // Navigation will be handled in the specific login components
+      // (AdminLoginPage or LoginPage) to ensure proper redirection
+      
       if (!loggedInUser.role || !loggedInUser.avatar) {
-        navigate('/onboarding');
-      } else if (isAdminRole(loggedInUser.role)) {
-        navigate('/dashboard'); // Admin dashboard
+        // If user has no role or avatar, they need to complete onboarding
         toast({
-          title: "Connexion réussie",
-          description: `Bienvenue dans l'espace administration, ${loggedInUser.name}!`,
+          title: "Bienvenue",
+          description: "Veuillez compléter votre profil pour continuer",
         });
-      } else {
-        navigate('/dashboard'); // User dashboard
-        toast({
-          title: "Connexion réussie",
-          description: `Bienvenue ${loggedInUser.name}!`,
-        });
+        return loggedInUser;
       }
+      
+      // Success toast is handled in the login components
       
       return loggedInUser;
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
-        description: error.message,
+        description: error.message || "Identifiants incorrects",
         variant: "destructive"
       });
       throw error;
