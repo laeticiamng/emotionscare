@@ -93,7 +93,7 @@ const Index = () => {
             
             <p className="text-center text-slate-600 mb-8 max-w-4xl mx-auto">
               Parce que chaque collaborateur mérite d'être entendu, compris et soutenu.<br/>
-              Notre plateforme conjugue IA émotionnelle, empathique, réseau social 100 % positif et gamification pour créer<br className="hidden md:block" />
+              Notre plateforme conjugue IA émotionnelle, empathie, réseau social 100 % positif et gamification pour créer<br className="hidden md:block" />
               une expérience personnalisée, sécurisée et bienveillante, aussi bien pour l'utilisateur que pour la direction.
             </p>
             
@@ -105,7 +105,7 @@ const Index = () => {
               </div>
               
               <div className="text-center p-4">
-                <h3 className="font-semibold text-[#1B365D] mb-2">Addictive & Ludique</h3>
+                <h3 className="font-semibold text-[#1B365D] mb-2">Ludique</h3>
                 <p className="text-slate-600 text-sm">notifications douces, Daily Streak, badges</p>
               </div>
               
