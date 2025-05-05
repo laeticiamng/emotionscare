@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { mockVRTemplates } from '@/data/mockVRTemplates';
+import { mockVRTemplatesData } from '@/data/mockVRTemplates';
 import type { VRSessionTemplate, VRSession, Emotion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import VRTemplateGrid from '@/components/vr/VRTemplateGrid';
@@ -36,7 +35,7 @@ const VRSessionPage = () => {
       try {
         // In a real app, we would fetch from Supabase
         // For now, we'll enhance the mock data with completion rates
-        const enhancedTemplates = mockVRTemplates.map(template => {
+        const enhancedTemplates = mockVRTemplatesData.map(template => {
           // Get random completion rate for demo purposes
           const completionRate = Math.floor(Math.random() * 100);
           return {

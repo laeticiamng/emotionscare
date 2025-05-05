@@ -13,6 +13,55 @@ import {
   Video
 } from "lucide-react";
 
+// This array is used by both GlobalNav and MobileNavigation components
+export const navItems = [
+  {
+    path: "/dashboard",
+    label: "Tableau de bord",
+    icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/scan",
+    label: "Scan émotionnel",
+    icon: <Heart className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/journal",
+    label: "Journal",
+    icon: <BookText className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/buddy",
+    label: "Buddy",
+    icon: <UserIcon className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/community",
+    label: "Communauté",
+    icon: <Users className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/groups",
+    label: "Groupes",
+    icon: <MessageSquare className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/vr-sessions",
+    label: "Micro-pauses VR",
+    icon: <Video className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/music-wellbeing",
+    label: "Musicothérapie",
+    icon: <HeadphonesIcon className="h-5 w-5 mr-2" />,
+  },
+  {
+    path: "/gamification",
+    label: "Récompenses",
+    icon: <Trophy className="h-5 w-5 mr-2" />,
+  },
+];
+
 export const mainNavItems = [
   {
     title: "Tableau de bord",

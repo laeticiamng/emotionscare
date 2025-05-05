@@ -1,0 +1,3 @@
+
+// This is a placeholder for the image file. In a real project, you would upload an actual JPG file here.
+// Since we can't upload binary files directly, let's modify the VrPromptBanner component to use a default background:

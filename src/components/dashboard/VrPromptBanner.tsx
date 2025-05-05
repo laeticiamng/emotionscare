@@ -15,7 +15,8 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
   return (
     <Card className="mb-8 overflow-hidden rounded-3xl border-0 relative p-0">
       <div className="absolute inset-0 bg-gradient-to-r from-cocoon-600/90 to-cocoon-400/80 backdrop-blur-sm -z-10" />
-      <div className="bg-[url('/images/vr-banner-bg.jpg')] bg-cover bg-center absolute inset-0 opacity-15 -z-20" />
+      {/* Using a pattern background instead of an image that might not exist */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 to-purple-800/20 opacity-15 -z-20" />
       
       <div className="p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="text-white">
@@ -39,7 +40,7 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
         
         <div className="flex flex-col sm:flex-row gap-3">
           <Button 
-            onClick={() => navigate('/vr-session')}
+            onClick={() => navigate('/vr-sessions')}
             variant="default" 
             size="lg"
             className="bg-white text-cocoon-800 hover:bg-white/90 hover:text-cocoon-900 transition-all duration-200 shadow-md"
@@ -49,7 +50,7 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
           </Button>
           
           <Button 
-            onClick={() => navigate('/vr-session')}
+            onClick={() => navigate('/vr-sessions')}
             variant="outline" 
             size="lg"
             className="bg-transparent border-white text-white hover:bg-white/20 hover:text-white transition-all duration-200"
