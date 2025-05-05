@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +12,8 @@ import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateC
 import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
 import SocialCocoonCard from '@/components/dashboard/admin/SocialCocoonCard';
 import GamificationSummaryCard from '@/components/dashboard/admin/GamificationSummaryCard';
+import { Activity } from 'lucide-react';
+import { LineChart, ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -51,7 +52,7 @@ const AdminDashboard: React.FC = () => {
   // Mock data for social cocoon section
   const socialCocoonData = {
     totalPosts: 248,
-    blockedPercentage: 3.2,
+    moderationRate: 3.2,  // Changed to match the expected prop
     activeUsers: 87,
     topHashtags: [
       { tag: '#bienetre', count: 42 },
@@ -97,6 +98,17 @@ const AdminDashboard: React.FC = () => {
     }
   ];
 
+  // Convert dashboard data to the format expected by components
+  const absenteeismChartData = dashboardStats.absenteeism.data.map((value, index) => ({
+    date: `${index+1}/5`,
+    value
+  }));
+  
+  const emotionalScoreTrend = dashboardStats.emotionalScore.data.map((value, index) => ({
+    date: `${index+1}/5`,
+    value
+  }));
+
   return (
     <div className="max-w-7xl mx-auto animate-fade-in">
       {/* Header Section */}
@@ -126,21 +138,43 @@ const AdminDashboard: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        <PeriodSelector value={selectedPeriod} onChange={setSelectedPeriod} />
+        <PeriodSelector timePeriod={selectedPeriod} setTimePeriod={setSelectedPeriod} />
         
         {/* Vue Globale Tab Content */}
         <TabsContent value="vue-globale" className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AdminChartSection 
-              title="Taux d'absentéisme"
-              chartData={dashboardStats.absenteeism}
-              period={selectedPeriod}
-            />
-            <EmotionalClimateCard 
-              title="Score émotionnel moyen"
-              emotionalData={dashboardStats.emotionalScore}
-              period={selectedPeriod}
-            />
+            {/* Use updated props format based on component definitions */}
+            <Card className="glass-card overflow-hidden">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="text-[#1B365D]" />
+                  Taux d'absentéisme
+                </CardTitle>
+                <CardDescription>
+                  Évolution du taux d'absence
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={absenteeismChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line 
+                        type="monotone" 
+                        dataKey="value" 
+                        stroke="#8884d8" 
+                        strokeWidth={2}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <EmotionalClimateCard emotionalScoreTrend={emotionalScoreTrend} />
             
             <Card className="col-span-1 md:col-span-2 glass-card">
               <CardHeader>

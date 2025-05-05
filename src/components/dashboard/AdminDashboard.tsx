@@ -18,6 +18,35 @@ const AdminDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [timePeriod, setTimePeriod] = useState<string>('7');
 
+  // Mock data for Social Cocoon section
+  const socialCocoonData = {
+    totalPosts: 248,
+    moderationRate: 3.2, // Changed from blockedPercentage to moderationRate
+    topHashtags: [
+      { tag: '#bienetre', count: 42 },
+      { tag: '#entraide', count: 36 },
+      { tag: '#motivation', count: 31 },
+      { tag: '#teamspirit', count: 28 },
+      { tag: '#pausecafe', count: 22 }
+    ]
+  };
+
+  // Mock data for gamification section
+  const gamificationData = {
+    activeUsersPercent: 68,
+    totalBadges: 24,
+    badgeLevels: [
+      { level: 'Bronze', count: 14 },
+      { level: 'Argent', count: 7 },
+      { level: 'Or', count: 3 }
+    ],
+    topChallenges: [
+      { name: 'Check-in quotidien', completions: 156 },
+      { name: 'Partage d\'expérience', completions: 87 },
+      { name: 'Lecture bien-être', completions: 63 }
+    ]
+  };
+
   useEffect(() => {
     async function loadDashboardData() {
       try {
@@ -62,13 +91,18 @@ const AdminDashboard: React.FC = () => {
         />
         
         {/* Emotional Climate Overview */}
-        <EmotionalClimateCard />
+        <EmotionalClimateCard emotionalScoreTrend={[
+          { date: '1/5', value: 72 },
+          { date: '2/5', value: 75 },
+          { date: '3/5', value: 78 },
+          { date: '4/5', value: 80 }
+        ]} />
         
         {/* Social Cocoon Analytics */}
-        <SocialCocoonCard />
+        <SocialCocoonCard socialStats={socialCocoonData} />
         
         {/* Gamification Summary */}
-        <GamificationSummaryCard />
+        <GamificationSummaryCard gamificationStats={gamificationData} />
       </div>
       
       <DashboardFooter isAdmin={true} />

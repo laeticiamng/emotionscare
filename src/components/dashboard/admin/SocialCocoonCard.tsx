@@ -8,7 +8,7 @@ import CountUp from 'react-countup';
 interface SocialCocoonCardProps {
   socialStats: {
     totalPosts: number;
-    moderationRate: number;
+    moderationRate: number; // Updated from blockedPercentage
     topHashtags: Array<{ tag: string; count: number }>;
   };
 }
