@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Separator } from '@/components/ui/separator';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Users, MessageSquare, Award, Activity } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchReports } from '@/lib/dashboardService';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import DashboardFooter from '@/components/dashboard/DashboardFooter';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -37,7 +37,7 @@ const AdminDashboard: React.FC = () => {
   
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Hero Section */}
+      {/* Hero Section with Period Selector */}
       <div className="mb-10 animate-fade-in">
         <div className="flex flex-col md:flex-row items-start justify-between">
           <div>
@@ -57,8 +57,6 @@ const AdminDashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <Separator className="mb-8" />
       
       {/* Main Content */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -212,9 +210,7 @@ const AdminDashboard: React.FC = () => {
         </Card>
       </div>
       
-      <div className="mt-12 py-6 border-t text-center text-sm text-muted-foreground">
-        <p>Données chiffrées AES-256, anonymisées et agrégées, conformité GDPR et loi RGPD</p>
-      </div>
+      <DashboardFooter isAdmin={true} />
     </div>
   );
 };
