@@ -1,5 +1,6 @@
-
 import { CoachAction, CoachEvent } from './types';
+import { actionHandlerRegistry } from './action-handlers/action-handler-registry';
+// Keep the legacy handlers for now for backward compatibility
 import * as handlers from './action-handlers';
 
 /**
@@ -15,6 +16,21 @@ export class ActionExecutor {
     const { user_id } = event;
     const payload = action.payload || {};
 
+    // Try to use the handler from the registry first
+    const handler = actionHandlerRegistry.getHandler(action.type);
+    
+    if (handler) {
+      // If we have a handler in the registry, use it
+      try {
+        await handler.execute(user_id, action.payload || event.data || {});
+        return;
+      } catch (error) {
+        console.error(`Error executing handler for action ${action.type}:`, error);
+        // Fall back to legacy handlers if registry handler fails
+      }
+    }
+    
+    // Fall back to legacy switch-case for backward compatibility
     switch (action.type) {
       case 'check_emotion_alert':
         handlers.handleCheckEmotionAlert(user_id, event.data);
