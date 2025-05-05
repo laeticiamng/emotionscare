@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -120,7 +121,7 @@ const AdminLoginPage = () => {
               </Button>
               
               <p className="text-sm text-center text-muted-foreground mt-4">
-                * Pour la démo, utilisez: admin@example.com (sans mot de passe)
+                * Pour la démo, utilisez: admin@example.com (mot de passe : admin)
               </p>
             </CardFooter>
           </form>
