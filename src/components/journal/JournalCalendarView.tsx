@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale';
 import { JournalEntry } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, isSameDay } from 'date-fns';
+import { DayContentProps } from 'react-day-picker';
 
 interface JournalCalendarViewProps {
   entries: JournalEntry[];
@@ -44,15 +45,15 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
             selected: { fontWeight: "bold" }
           }}
           components={{
-            Day: ({ day, ...props }: any) => {
-              // Using any type to avoid the type conflict
+            Day: (props: DayContentProps) => {
+              // Utiliser le bon type DayContentProps de react-day-picker
               return (
-                <button 
+                <div 
                   {...props}
-                  className={`${props.className || ''} ${dayClassName(day.date) || ''}`}
+                  className={`${props.className || ''} ${dayClassName(props.date) || ''}`}
                 >
-                  {day.date.getDate()}
-                </button>
+                  {props.date.getDate()}
+                </div>
               );
             }
           }}
