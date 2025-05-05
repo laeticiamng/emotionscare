@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -12,20 +14,30 @@ interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const isAdmin = isAdminRole(user?.role);
   
-  console.log(`NavItem render: ${label}, to: ${to}, current path: ${location.pathname}`);
+  console.log(`NavItem render: ${label}, to: ${to}, current path: ${location.pathname}, isAdmin: ${isAdmin}`);
   
-  // If active is not explicitly provided, determine from current location
-  // For more precise matching, check if the path starts with the route
-  // This helps with nested routes like /buddy/123
+  // Si active n'est pas explicitement fourni, déterminer à partir de l'emplacement actuel
+  // Pour une correspondance plus précise, vérifiez si le chemin commence par la route
+  // Cela aide avec les routes imbriquées comme /buddy/123
   const isActive = active !== undefined 
     ? active 
     : location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log(`NavItem clicked: ${label}, navigating to ${to}`);
-    navigate(to);
+    
+    // Pour les utilisateurs admin, rediriger vers la version admin de certaines pages
+    let targetPath = to;
+    if (isAdmin && to === '/dashboard') {
+      // L'admin reste sur /dashboard qui contient déjà la vue admin
+      targetPath = '/dashboard';
+    }
+    
+    console.log(`NavItem clicked: ${label}, navigating to ${targetPath}`);
+    navigate(targetPath);
   };
 
   return (

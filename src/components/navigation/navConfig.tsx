@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, 
   Heart, 
@@ -11,12 +10,19 @@ import {
   UserIcon, 
   HeadphonesIcon,
   Video,
-  Brain
+  Brain,
+  BarChart2,
+  FileText,
+  LineChart,
+  ShieldCheck,
+  CalendarDays,
+  Gauge,
+  Sparkles
 } from "lucide-react";
 
 console.log("Loading navConfig");
 
-// This array is used by both GlobalNav and MobileNavigation components
+// Cette liste est utilisée pour la navigation globale et mobile pour les utilisateurs normaux
 export const navItems = [
   {
     path: "/dashboard",
@@ -70,7 +76,65 @@ export const navItems = [
   },
 ];
 
-// Réparer les définitions pour les objets de navigation
+// Nouvelle configuration pour les éléments de navigation d'administration
+export const adminNavItems = [
+  {
+    title: "Tableau de bord global",
+    href: "/dashboard",
+    icon: <LayoutDashboard className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Scan émotionnel - Équipe",
+    href: "/admin/scan-team",
+    icon: <Heart className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Journal - Tendances",
+    href: "/admin/journal-trends",
+    icon: <LineChart className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Social Cocoon - Pilotage",
+    href: "/admin/social-cocoon",
+    icon: <Users className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Gamification - Synthèse",
+    href: "/admin/gamification",
+    icon: <Trophy className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Actions & Solutions RH",
+    href: "/admin/hr-actions",
+    icon: <Sparkles className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Events & Calendrier",
+    href: "/admin/events",
+    icon: <CalendarDays className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Conformité & Sécurité",
+    href: "/admin/compliance",
+    icon: <ShieldCheck className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+  {
+    title: "Paramètres Admin",
+    href: "/admin/settings",
+    icon: <Settings className="h-5 w-5" />,
+    showRoles: ["admin", "Admin"],
+  },
+];
+
+// Maintenir cette version pour la rétrocompatibilité avec d'autres composants
 export const mainNavItems = [
   {
     title: "Tableau de bord",
@@ -131,23 +195,5 @@ export const mainNavItems = [
     href: "/gamification",
     icon: <Trophy className="h-5 w-5" />,
     showRoles: ["user", "admin", "Admin", "Utilisateur"],
-  },
-];
-
-export const adminNavItems = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    title: "Team Management",
-    href: "/team",
-    icon: <Users className="h-5 w-5" />,
-  },
-  {
-    title: "Settings",
-    href: "/settings",
-    icon: <Settings className="h-5 w-5" />,
   },
 ];

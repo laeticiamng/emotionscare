@@ -8,7 +8,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
-import { navItems } from './navConfig';
+import { navItems, adminNavItems } from './navConfig';
+import { isAdminRole } from '@/utils/roleUtils';
 
 const MobileNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +17,14 @@ const MobileNavigation = () => {
   const { openDrawer } = useMusic();
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdmin = user ? isAdminRole(user.role) : false;
+
+  // Sélectionner les bons éléments de navigation en fonction du rôle
+  const navigationItems = isAdmin ? adminNavItems.map(item => ({
+    path: item.href,
+    label: item.title,
+    icon: item.icon
+  })) : navItems;
 
   const handleLogout = () => {
     logout();
@@ -37,7 +46,7 @@ const MobileNavigation = () => {
         <div className="px-2">
           <div className="flex items-center justify-between mb-6">
             <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-              <span className="font-bold text-xl text-primary">EmotionsCare</span>
+              <span className="font-bold text-xl text-primary">{isAdmin ? "EmotionsCare Admin" : "EmotionsCare"}</span>
             </NavLink>
             <Button 
               variant="ghost" 
@@ -63,7 +72,7 @@ const MobileNavigation = () => {
           )}
           
           <nav className="flex flex-col space-y-3">
-            {navItems.map((item) => {
+            {navigationItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <NavLink
@@ -83,16 +92,18 @@ const MobileNavigation = () => {
               );
             })}
             
-            <button 
-              className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
-              onClick={() => {
-                openDrawer();
-                setIsOpen(false);
-              }}
-            >
-              <Music className="w-5 h-5 mr-2" />
-              <span>Soundtrack du bien-être</span>
-            </button>
+            {!isAdmin && (
+              <button 
+                className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50"
+                onClick={() => {
+                  openDrawer();
+                  setIsOpen(false);
+                }}
+              >
+                <Music className="w-5 h-5 mr-2" />
+                <span>Soundtrack du bien-être</span>
+              </button>
+            )}
             
             <Button 
               variant="ghost" 

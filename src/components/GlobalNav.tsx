@@ -9,17 +9,29 @@ import {
 import NavItem from './navigation/NavItem';
 import UserMenu from './navigation/UserMenu';
 import MobileNavigation from './navigation/MobileNavigation';
-import { navItems } from './navigation/navConfig';
+import { navItems, adminNavItems } from './navigation/navConfig';
+import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 
 const GlobalNav = () => {
-  console.log("GlobalNav rendering with navItems:", navItems);
+  const { user } = useAuth();
+  const isAdmin = user ? isAdminRole(user.role) : false;
+  
+  // Sélectionner les bons éléments de navigation en fonction du rôle
+  const navigationItems = isAdmin ? adminNavItems.map(item => ({
+    path: item.href,
+    label: item.title,
+    icon: item.icon
+  })) : navItems;
+  
+  console.log("GlobalNav rendering with items:", navigationItems);
   
   return (
     <header className="fixed top-0 z-50 w-full bg-background border-b shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo - cliquable pour revenir au dashboard */}
         <NavLink to="/dashboard" className="flex items-center space-x-2">
-          <span className="font-bold text-lg text-primary">EmotionsCare</span>
+          <span className="font-bold text-lg text-primary">{isAdmin ? "EmotionsCare Admin" : "EmotionsCare"}</span>
           <span className="text-xs text-muted-foreground">par ResiMax™ 4.0</span>
         </NavLink>
         
@@ -27,7 +39,7 @@ const GlobalNav = () => {
         <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
           <NavigationMenu>
             <NavigationMenuList>
-              {navItems.map((item) => (
+              {navigationItems.map((item) => (
                 <NavigationMenuItem key={item.path}>
                   <NavItem 
                     icon={item.icon} 
