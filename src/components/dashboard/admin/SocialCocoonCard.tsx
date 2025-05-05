@@ -1,42 +1,83 @@
 
 import React from 'react';
-import { MessageSquare } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { MessageSquare } from 'lucide-react';
+import CountUp from 'react-countup';
 
-const SocialCocoonCard: React.FC = () => {
+interface SocialCocoonCardProps {
+  socialStats: {
+    totalPosts: number;
+    moderationRate: number;
+    topHashtags: Array<{ tag: string; count: number }>;
+  };
+}
+
+const SocialCocoonCard: React.FC<SocialCocoonCardProps> = ({ 
+  socialStats = {
+    totalPosts: 126, 
+    moderationRate: 5, 
+    topHashtags: [
+      { tag: "#bienetre", count: 28 },
+      { tag: "#teamspirit", count: 21 },
+      { tag: "#détente", count: 18 },
+      { tag: "#santé", count: 14 }
+    ]
+  } 
+}) => {
   return (
-    <Card className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
+    <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5 text-primary" />
-          Social Cocoon Agressif
+          <MessageSquare className="text-[#1B365D]" />
+          Social Cocoon anonymisé
         </CardTitle>
-        <CardDescription>Statistiques du réseau social interne</CardDescription>
+        <CardDescription>
+          Activité et tendances
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-slate-50 rounded-xl p-4 text-center">
-            <p className="text-sm text-muted-foreground">Publications totales</p>
-            <p className="text-3xl font-bold text-primary">87</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div className="mb-6">
+              <div className="text-3xl font-semibold">
+                <CountUp 
+                  end={socialStats.totalPosts} 
+                  duration={2} 
+                  enableScrollSpy 
+                  scrollSpyOnce
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">Messages publiés</p>
+            </div>
+            
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm font-medium">Taux de modération</span>
+                <span className="text-sm font-semibold">{socialStats.moderationRate}%</span>
+              </div>
+              <Progress value={socialStats.moderationRate} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-1">Posts bloqués par l'IA</p>
+            </div>
           </div>
-          <div className="bg-slate-50 rounded-xl p-4 text-center">
-            <p className="text-sm text-muted-foreground">Taux de modération</p>
-            <p className="text-3xl font-bold text-orange-500">5<span className="text-base">%</span></p>
-          </div>
-        </div>
-        <div className="bg-slate-50 rounded-xl p-4">
-          <p className="text-sm font-medium mb-2">Tags les plus utilisés</p>
-          <div className="flex flex-wrap gap-2">
-            {['#bienetre', '#entraide', '#pause', '#conseil', '#equipe', '#relaxation', '#motivation']
-              .map((tag, index) => (
-                <span 
-                  key={index} 
-                  className="bg-white px-3 py-1 rounded-full text-sm" 
-                  style={{ fontSize: `${Math.max(0.8, Math.random() * 0.3 + 0.8)}rem` }}
+          
+          <div>
+            <h4 className="text-sm font-medium mb-3">Hashtags populaires</h4>
+            <div className="flex flex-wrap gap-2">
+              {socialStats.topHashtags.map((tag, index) => (
+                <div 
+                  key={index}
+                  className="px-3 py-1.5 rounded-full text-xs font-medium"
+                  style={{
+                    fontSize: `${Math.max(0.75, 0.75 + (tag.count / 10) * 0.25)}rem`,
+                    backgroundColor: `rgba(${255 - index * 20}, ${111 + index * 10}, ${97 + index * 15}, ${0.1 + index * 0.05})`,
+                    color: `rgb(${70 + index * 10}, ${90 + index * 5}, ${110 - index * 5})`,
+                  }}
                 >
-                  {tag}
-                </span>
-            ))}
+                  {tag.tag} <span className="opacity-60">({tag.count})</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </CardContent>

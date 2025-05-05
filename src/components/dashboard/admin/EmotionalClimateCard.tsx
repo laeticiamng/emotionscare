@@ -1,35 +1,64 @@
 
 import React from 'react';
-import { Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Brain } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import CountUp from 'react-countup';
 
-const EmotionalClimateCard: React.FC = () => {
+interface EmotionalClimateCardProps {
+  emotionalScoreTrend?: Array<{ date: string; value: number }>;
+}
+
+const EmotionalClimateCard: React.FC<EmotionalClimateCardProps> = ({ emotionalScoreTrend = [] }) => {
+  // Calculate current average score
+  const currentScore = emotionalScoreTrend.length > 0 
+    ? emotionalScoreTrend[emotionalScoreTrend.length - 1].value 
+    : 75.5; // Default fallback value
+  
   return (
-    <Card className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
+    <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          Ambiance Générale
+          <Brain className="text-[#1B365D]" />
+          Score émotionnel moyen
         </CardTitle>
-        <CardDescription>Score émotionnel moyen et volume de check-ins</CardDescription>
+        <CardDescription>
+          Évolution du bien-être collectif
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-slate-50 rounded-xl p-4 text-center">
-            <p className="text-sm text-muted-foreground">Score moyen</p>
-            <p className="text-3xl font-bold text-primary">78<span className="text-base">/100</span></p>
+        <div className="mb-4">
+          <div className="text-3xl font-semibold mb-2">
+            <CountUp 
+              end={currentScore} 
+              duration={2} 
+              decimals={1} 
+              suffix="/100" 
+              enableScrollSpy 
+              scrollSpyOnce
+            />
           </div>
-          <div className="bg-slate-50 rounded-xl p-4 text-center">
-            <p className="text-sm text-muted-foreground">Check-ins total</p>
-            <p className="text-3xl font-bold text-primary">143</p>
-          </div>
+          <Progress value={currentScore} className="h-2 bg-gray-100" />
         </div>
-        <div className="border rounded-xl p-4">
-          <p className="text-sm font-medium mb-2">Notes et observations</p>
-          <textarea 
-            className="w-full h-[120px] border rounded-lg p-2 text-sm" 
-            placeholder="Ajoutez vos observations sur l'ambiance générale ici..."
-          />
+        
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={emotionalScoreTrend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="date" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Line 
+                type="monotone" 
+                dataKey="value" 
+                stroke="#FF6F61" 
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6, stroke: '#FF6F61', strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>

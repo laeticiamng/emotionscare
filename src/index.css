@@ -2,187 +2,121 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+ 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 265 89% 78%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 1rem;
-  }
+    --foreground: 222.2 84% 4.9%;
 
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+ 
+    --radius: 0.5rem;
+    
+    /* Wellness theme colors */
+    --wellness-blue: 210 67% 59%;
+    --wellness-mint: 160 79% 85%;
+    --wellness-coral: 11 100% 69%;
+    --wellness-peach: 25 100% 94%;
+    --wellness-lavender: 240 67% 94%;
+  }
+ 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
-
+ 
 @layer base {
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground;
   }
 }
 
-@layer utilities {
-  /* Animations */
-  @keyframes fade-in {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fade-out {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(10px); }
-  }
-
-  @keyframes scale-in {
-    0% { transform: scale(0.95); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes scale-out {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0; }
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
-  }
-
-  .animate-fade-out {
-    animation: fade-out 0.3s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scale-in 0.3s ease-out;
-  }
-
-  .animate-scale-out {
-    animation: scale-out 0.3s ease-out;
-  }
-}
-
-/* Accessibilité - contrastes améliorés */
-.text-primary {
-  @apply text-blue-700 dark:text-blue-300;
-}
-
-.text-muted-foreground {
-  @apply text-gray-600 dark:text-gray-300;
-}
-
-/* Glass morphism effects */
+/* Custom classes */
 .glass-card {
-  @apply bg-white/80 backdrop-blur-sm rounded-3xl border border-white/20 shadow-soft transition-all duration-300;
+  @apply rounded-2xl border border-[#E8F1FA]/80 bg-white/90 shadow-sm hover:shadow-lg transition-all duration-300;
+  backdrop-filter: blur(8px);
 }
 
-.glass-card:hover {
-  @apply shadow-medium border-white/30;
-}
-
-/* Neon effects */
-.neon-glow {
-  @apply shadow-glow transition-all duration-300;
-}
-
-.neon-glow:hover {
-  @apply shadow-glow-light;
-}
-
-/* Card variations by type */
-.card-journal {
-  @apply bg-pastel-purple/50 hover:bg-pastel-purple/70;
-}
-
-.card-vr {
-  @apply bg-pastel-green/50 hover:bg-pastel-green/70;
-}
-
-.card-social {
-  @apply bg-pastel-yellow/50 hover:bg-pastel-yellow/70;
-}
-
-.card-coach {
-  @apply bg-pastel-blue/50 hover:bg-pastel-blue/70;
-}
-
-.card-analytics {
-  @apply bg-gray-50/80 hover:bg-gray-50;
-}
-
-/* Timeline styling */
-.timeline-connector {
-  @apply absolute h-full w-px bg-border left-3 top-6 -translate-x-1/2;
-}
-
-/* Card styling */
 .apple-card {
-  @apply rounded-2xl shadow-sm border border-gray-200/80 transition-all duration-300;
+  @apply rounded-2xl border border-[#E8F1FA] bg-white shadow-sm;
 }
 
-.apple-card:hover {
-  @apply shadow-md;
+/* Animation classes */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Button styling */
-.btn-floating {
-  @apply rounded-full shadow-soft transition-all duration-200 hover:shadow-medium hover:-translate-y-1;
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
 }
 
-.btn-primary {
-  @apply bg-wellness-coral text-white hover:bg-wellness-coral/90 btn-floating;
+.dashboard-card {
+  animation: fade-in 0.5s ease-out forwards;
+  animation-fill-mode: both;
 }
 
-.btn-ghost {
-  @apply bg-transparent border-2 hover:bg-gray-50/80 btn-floating;
-}
-
-.btn-action {
-  @apply text-sm font-medium rounded-full px-4 py-2 transition-all duration-200;
-}
-
-/* Module cards */
-.module-card {
-  @apply rounded-3xl p-6 border border-gray-100/80 shadow-soft transition-all duration-300;
-}
-
-.module-card:hover {
-  @apply shadow-medium -translate-y-1;
-}
+.dashboard-card:nth-child(1) { animation-delay: 0ms; }
+.dashboard-card:nth-child(2) { animation-delay: 200ms; }
+.dashboard-card:nth-child(3) { animation-delay: 400ms; }
+.dashboard-card:nth-child(4) { animation-delay: 600ms; }
+.dashboard-card:nth-child(5) { animation-delay: 800ms; }
+.dashboard-card:nth-child(6) { animation-delay: 1000ms; }
