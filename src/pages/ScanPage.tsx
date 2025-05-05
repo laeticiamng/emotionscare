@@ -9,10 +9,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Emotion } from '@/types';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 
 const ScanPage = () => {
   const { users, loading, history, handleScanSaved } = useScanPage();
   const [activeTab, setActiveTab] = useState("personnel");
+  const { user } = useAuth();
+  
+  // Check if user has admin privileges
+  const isAdmin = isAdminRole(user?.role);
 
   if (loading) {
     return (
@@ -30,11 +36,11 @@ const ScanPage = () => {
       <h1 className="text-3xl font-bold mb-6">Scan émotionnel</h1>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className={`grid w-full ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'}`}>
           <TabsTrigger value="personnel">Personnel</TabsTrigger>
           <TabsTrigger value="live">Live</TabsTrigger>
           <TabsTrigger value="historique">Historique</TabsTrigger>
-          <TabsTrigger value="equipe">Équipe</TabsTrigger>
+          {isAdmin && <TabsTrigger value="equipe">Équipe</TabsTrigger>}
         </TabsList>
         
         <TabsContent value="personnel" className="mt-6">
@@ -49,13 +55,15 @@ const ScanPage = () => {
           <EmotionHistory history={history} />
         </TabsContent>
         
-        <TabsContent value="equipe" className="mt-6">
-          <Card>
-            <CardContent className="pt-6">
-              <TeamOverview users={users} />
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {isAdmin && (
+          <TabsContent value="equipe" className="mt-6">
+            <Card>
+              <CardContent className="pt-6">
+                <TeamOverview users={users} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
