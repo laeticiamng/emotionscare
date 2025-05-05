@@ -54,8 +54,8 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
     <Card className="mb-8 overflow-hidden apple-card">
       <CardContent className="p-0">
         <div className="bg-gradient-to-r from-wellness-blue to-[#5AAFF2] text-white p-6 rounded-xl">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0 max-w-[700px]">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="w-full md:max-w-[70%]">
               <h3 className="text-xl font-bold mb-2">
                 Bonjour {userName}, pense à ta micro-pause VR !
               </h3>
@@ -66,24 +66,24 @@ const VrPromptBanner: React.FC<VrPromptBannerProps> = ({ userName }) => {
                     Génération d'un conseil personnalisé...
                   </span>
                 ) : (
-                  <>
-                    <span className="mr-2">{aiMessage}</span>
+                  <span className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-block">{aiMessage}</span>
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="ml-1 text-white hover:bg-white/20" 
+                      className="ml-1 text-white hover:bg-white/20 inline-flex shrink-0" 
                       onClick={fetchAiMessage}
                       disabled={isLoading}
                     >
                       <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
                     </Button>
-                  </>
+                  </span>
                 )}
               </p>
             </div>
             <Button 
               onClick={() => navigate('/vr')}
-              className="bg-white text-wellness-blue hover:bg-wellness-blue hover:text-white border-2 border-white rounded-full transition-colors duration-150 whitespace-nowrap"
+              className="bg-white text-wellness-blue hover:bg-wellness-blue hover:text-white border-2 border-white rounded-full transition-colors duration-150 whitespace-nowrap shrink-0"
             >
               Lancer VR <ArrowRight size={16} className="ml-2" />
             </Button>

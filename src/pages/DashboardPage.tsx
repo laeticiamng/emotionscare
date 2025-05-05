@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import KpiCards from '@/components/dashboard/KpiCards';
@@ -73,7 +72,9 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="md:col-span-2">
           {/* Music Mini Player */}
-          <MusicMiniPlayer className="mb-6" />
+          <div className="mb-6">
+            <MusicMiniPlayer />
+          </div>
           
           {/* Coach Recommendations - Aligné avec la hauteur du Coach Assistant */}
           <CoachRecommendations />
