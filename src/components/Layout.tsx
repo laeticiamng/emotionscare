@@ -6,6 +6,7 @@ import GlobalNav from './GlobalNav';
 import SecurityFooter from './SecurityFooter';
 import SessionTimeoutAlert from './SessionTimeoutAlert';
 import Sidebar from './ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -13,7 +14,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated } = useAuth();
-  console.log("Layout - isAuthenticated:", isAuthenticated, "Children:", !!children);
+  const isMobile = useIsMobile();
   
   // If not authenticated, only render the children (login/register pages)
   if (!isAuthenticated) {
@@ -27,7 +28,7 @@ const Layout = ({ children }: LayoutProps) => {
       <SessionTimeoutAlert />
       <div className="flex flex-1 overflow-hidden pt-16">
         <Sidebar />
-        <div className="flex-1 overflow-auto bg-background">
+        <div className={`flex-1 overflow-auto bg-background ${isMobile ? 'w-full' : ''}`}>
           <main className="container mx-auto p-6">
             {children || <Outlet />}
           </main>

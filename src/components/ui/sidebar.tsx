@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Bell, Settings } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 import NotificationBar from '@/components/notifications/NotificationBar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -15,6 +16,12 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = isAdminRole(user?.role);
+  const isMobile = useIsMobile();
+  
+  // Si on est sur mobile, on ne rend pas du tout le sidebar
+  if (isMobile) {
+    return null;
+  }
   
   // Choisir les éléments de navigation en fonction du rôle (fonctionnalités complémentaires uniquement)
   const items = isAdmin ? adminSidebarItems : sidebarItems;
