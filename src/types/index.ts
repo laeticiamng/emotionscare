@@ -67,6 +67,7 @@ export interface Emotion {
   created_at?: string;
   source?: string;  // Add source property
   is_confidential?: boolean;  // Add is_confidential property
+  confidence?: number;  // Add confidence property to make it compatible with EmotionResult
 }
 
 // EmotionResult type

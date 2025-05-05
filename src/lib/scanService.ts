@@ -1,9 +1,21 @@
 
 // Update or create the scanService.ts to include the proper function signatures
 
-import { Emotion, EmotionResult } from '@/types';
+import { Emotion } from '@/types';
 import { analyzeEmotion as analyzeEmotionService, analyzeAudioStream as analyzeAudioStreamService, saveRealtimeEmotionScan as saveRealtimeEmotionScanService } from '@/lib/scan/analyzeService';
 import { createEmotionEntry as createEmotionEntryService, fetchLatestEmotion as fetchLatestEmotionService, fetchEmotionHistory as fetchEmotionHistoryService } from '@/lib/scan/emotionService';
+
+// Export the EmotionResult type so it can be imported elsewhere
+export interface EmotionResult {
+  emotion?: string;
+  confidence?: number;
+  transcript?: string;
+  id?: string;
+  user_id?: string;
+  date?: string;
+  intensity?: number;
+  score?: number;
+}
 
 // Function to analyze audio stream
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {

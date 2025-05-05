@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { createProcessor } from '@/lib/audioVad';
 import { useToast } from '@/hooks/use-toast';
-import { analyzeAudioStream } from '@/lib/scanService';
+import { analyzeAudioStream, EmotionResult } from '@/lib/scanService';
 import StatusIndicator from './live/StatusIndicator';
 import TranscriptDisplay from './live/TranscriptDisplay';
 import type { Emotion } from '@/types';
-import type { EmotionResult } from '@/lib/scanService';
 
 interface AudioProcessorProps {
   isListening: boolean;
