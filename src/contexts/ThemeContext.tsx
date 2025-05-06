@@ -1,14 +1,13 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { ThemeName, themes } from '@/themes/theme';
 
-type ThemeType = 'light' | 'dark' | 'pastel';
-type ThemePreference = ThemeType | 'system';
+type ThemePreference = ThemeName | 'system';
 
 interface ThemeContextType {
-  theme: ThemeType;
+  theme: ThemeName;
   themePreference: ThemePreference;
   toggleTheme: () => void;
-  setTheme: (theme: ThemeType) => void;
+  setTheme: (theme: ThemeName) => void;
   setThemePreference: (preference: ThemePreference) => void;
   isDark: boolean;
   isPastel: boolean;
@@ -27,13 +26,13 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     return 'system';
   });
   
-  const [theme, setTheme] = useState<ThemeType>(() => {
+  const [theme, setTheme] = useState<ThemeName>(() => {
     // If preference is system, use browser preference
     if (themePreference === 'system') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     // Otherwise use the explicit preference
-    return themePreference as ThemeType;
+    return themePreference as ThemeName;
   });
 
   // Listen for changes in system theme if preference is 'system'
@@ -59,7 +58,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       setTheme(systemTheme);
     } else {
-      setTheme(themePreference as ThemeType);
+      setTheme(themePreference as ThemeName);
     }
     
     // Store the preference
