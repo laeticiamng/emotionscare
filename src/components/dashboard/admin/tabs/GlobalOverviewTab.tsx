@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import GdprDisclaimer from './overview/GdprDisclaimer';
 import DraggableKpiCardsGrid from '../DraggableKpiCardsGrid';
@@ -88,13 +87,6 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
     );
   }
 
-  // Ensure dashboardStats has the required properties even if they're not provided
-  const completeStats = {
-    ...dashboardStats,
-    productivity: dashboardStats.productivity || { current: 0, trend: 0 },
-    emotionalScore: dashboardStats.emotionalScore || { current: 0, trend: 0 }
-  };
-
   return (
     <div>
       {/* Settings Button */}
@@ -152,7 +144,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
           {/* KPI Summary Cards - conditionally rendered */}
           {enabledWidgets.includes('kpiCards') && (
             <DraggableKpiCardsGrid 
-              dashboardStats={completeStats}
+              dashboardStats={dashboardStats}
               gamificationData={gamificationData}
             />
           )}

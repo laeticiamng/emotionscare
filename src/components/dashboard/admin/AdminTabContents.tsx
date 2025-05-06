@@ -12,26 +12,13 @@ import ComplianceTab from './tabs/ComplianceTab';
 import WeatherActivitiesTab from './tabs/weather/WeatherActivitiesTab';
 import AdminSettingsTab from './tabs/AdminSettingsTab';
 import UsersListTab from './tabs/UsersListTab';
+import { DashboardStats } from './tabs/overview/types';
 
 interface AdminTabContentsProps {
   activeTab: string;
   absenteeismData: Array<{ date: string; value: number }>;
   emotionalScoreTrend: Array<{ date: string; value: number }>;
-  dashboardStats: {
-    totalUsers: number;
-    activeToday: number;
-    averageScore: number;
-    criticalAlerts: number;
-    completion: number;
-    productivity?: {
-      current: number;
-      trend: number;
-    };
-    emotionalScore?: {
-      current: number;
-      trend: number;
-    };
-  };
+  dashboardStats: DashboardStats; // Using the imported DashboardStats type directly
   isLoading?: boolean;
 }
 
@@ -136,7 +123,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       </TabsContent>
       
       <TabsContent value="weather-activities" className="mt-0">
-        <WeatherActivitiesTab isLoading={isLoading} />
+        <WeatherActivitiesTab />
       </TabsContent>
       
       <TabsContent value="users-list" className="mt-0">
