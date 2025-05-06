@@ -198,10 +198,12 @@ export const ZoomableChart: React.FC<ZoomableChartProps> = ({
         onTouchStart={handleTouchStart}
       >
         <ChartContainer config={config}>
-          {/* Clone the chart component and add startIndex/endIndex props */}
+          {/* Pass the filtered data to the child chart components */}
           {React.Children.map(children, child => {
             if (React.isValidElement(child)) {
-              return React.cloneElement(child, {
+              // Type check for components that accept data prop
+              // This requires a type assertion since TypeScript can't know the props of the element
+              return React.cloneElement(child as React.ReactElement<any>, {
                 data: visibleData,
               });
             }

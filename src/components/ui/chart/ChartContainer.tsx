@@ -10,7 +10,6 @@ const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     config: ChartConfig;
-    // Update the children type to accept ReactNode
     children: React.ReactNode;
   }
 >(({ id, className, children, config, ...props }, ref) => {
