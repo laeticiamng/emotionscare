@@ -36,7 +36,7 @@ const Layout = ({ children }: LayoutProps) => {
   const getBgClasses = () => {
     if (theme === 'dark') return 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]';
     if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-blue-100/70';
-    return 'bg-gradient-to-br from-white to-gray-100';
+    return 'bg-gradient-to-br from-white to-gray-50';
   };
   
   return (
@@ -51,7 +51,7 @@ const Layout = ({ children }: LayoutProps) => {
         {!isMobile && isAuthenticated && <Sidebar />}
         
         <div className={`flex-1 overflow-auto bg-background/80 backdrop-blur-sm transition-all ${isMobile ? 'w-full' : isAuthenticated ? 'w-full pl-16' : 'w-full'}`}>
-          <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : isHomePage && !isAuthenticated ? 'w-full p-0' : 'premium-container py-8 md:px-8 lg:px-12'}`}>
+          <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : isHomePage && !isAuthenticated ? 'w-full p-0' : 'container max-w-7xl mx-auto py-8 px-4 md:px-6 lg:px-8'}`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />

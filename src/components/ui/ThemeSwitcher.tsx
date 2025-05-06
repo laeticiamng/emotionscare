@@ -60,7 +60,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           <Sun className="mr-3 h-5 w-5 text-amber-500" />
           <span className="font-medium">Mode clair</span>
           {theme === 'light' && (
-            <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
               Actif
             </span>
           )}
@@ -72,7 +72,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           <Moon className="mr-3 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
           <span className="font-medium">Mode sombre</span>
           {theme === 'dark' && (
-            <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
               Actif
             </span>
           )}
@@ -84,7 +84,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           <Palette className="mr-3 h-5 w-5 text-blue-500" />
           <span className="font-medium">Mode pastel</span>
           {theme === 'pastel' && (
-            <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
               Actif
             </span>
           )}

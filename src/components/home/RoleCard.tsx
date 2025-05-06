@@ -13,9 +13,9 @@ interface RoleCardProps {
 
 const RoleCard: React.FC<RoleCardProps> = ({ title, icon: Icon, features, type }) => {
   return (
-    <div className="card-premium hover:transform hover:scale-[1.01] transition-all duration-300 shadow-premium h-full">
+    <div className="card-premium hover:transform hover:scale-[1.01] transition-all duration-300 shadow-premium h-full group">
       <div className="flex flex-col items-center p-8 md:p-10 h-full">
-        <div className="p-6 rounded-full bg-primary/10 mb-7 shadow-sm">
+        <div className="p-6 rounded-full bg-primary/15 mb-7 shadow-sm group-hover:bg-primary/20 transition-colors">
           <Icon size={56} className="text-primary" />
         </div>
         

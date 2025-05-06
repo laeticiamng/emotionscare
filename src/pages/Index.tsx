@@ -39,7 +39,7 @@ const Index = () => {
         <div className={`w-full h-full ${
           theme === 'dark' ? 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]' :
           theme === 'pastel' ? 'bg-gradient-to-br from-blue-50 to-blue-100/70' :
-          'bg-gradient-to-br from-white to-gray-100'
+          'bg-gradient-to-br from-white to-gray-50'
         }`}></div>
       </div>
       

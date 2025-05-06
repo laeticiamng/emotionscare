@@ -46,7 +46,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
             {/* Navigation pour visiteurs non authentifiés */}
             <div className="flex-1 flex justify-center">
               <nav className="hidden md:flex items-center gap-6">
-                <Link to="/" className="text-foreground/90 hover:text-foreground font-medium text-sm flex items-center gap-1.5">
+                <Link to="/" className="text-foreground/90 hover:text-foreground font-medium text-sm flex items-center gap-1.5 hover:translate-y-[-2px] transition-transform">
                   <HomeIcon size={18} />
                   <span>Accueil</span>
                 </Link>

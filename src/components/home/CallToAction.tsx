@@ -28,7 +28,7 @@ const CallToAction: React.FC<CallToActionProps> = ({ type, className = '' }) => 
       variant={type === 'admin' ? 'outline' : 'default'}
     >
       <span className="mr-2.5">{type === 'user' ? 'Me connecter' : 'Connexion Admin'}</span>
-      <ArrowRight size={18} />
+      <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
     </Button>
   );
 };

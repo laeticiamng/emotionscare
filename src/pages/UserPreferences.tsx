@@ -16,10 +16,10 @@ const UserPreferences = () => {
   return (
     <div className="container max-w-4xl py-10 animate-fade-in">
       <Card className="card-premium shadow-premium overflow-hidden">
-        <div className={`h-2 w-full ${
-          theme === 'dark' ? 'bg-primary/20' :
+        <div className={`h-2.5 w-full ${
+          theme === 'dark' ? 'bg-primary/25' :
           theme === 'pastel' ? 'bg-blue-200' :
-          'bg-primary/10'
+          'bg-primary/15'
         }`}></div>
         
         <CardHeader className="pt-8 pb-2">

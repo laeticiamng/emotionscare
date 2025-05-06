@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Moon, Sun, CloudSun } from 'lucide-react';
+import { Moon, Sun, Palette } from 'lucide-react';
 
 interface ThemeButtonProps {
   collapsed: boolean;
@@ -18,9 +18,9 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
       case 'light':
         return <Moon className="h-[1.3rem] w-[1.3rem]" />;
       case 'dark':
-        return <Sun className="h-[1.3rem] w-[1.3rem]" />;
+        return <Palette className="h-[1.3rem] w-[1.3rem]" />;
       case 'pastel':
-        return <CloudSun className="h-[1.3rem] w-[1.3rem]" />;
+        return <Sun className="h-[1.3rem] w-[1.3rem]" />;
       default:
         return <Moon className="h-[1.3rem] w-[1.3rem]" />;
     }
