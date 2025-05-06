@@ -178,8 +178,6 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           )}
         </div>
       </div>
-      
-      {/* Completely remove the DashboardFooter since SecurityFooter is already in Layout */}
     </div>
   );
 };

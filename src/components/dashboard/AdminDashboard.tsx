@@ -104,7 +104,7 @@ const AdminDashboard: React.FC = () => {
         <GamificationSummaryCard gamificationStats={gamificationData} />
       </div>
       
-      {/* Remove DashboardFooter here as well */}
+      {/* Completely removed DashboardFooter */}
     </div>
   );
 };

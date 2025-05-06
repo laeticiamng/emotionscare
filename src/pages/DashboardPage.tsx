@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import UserDashboard from '@/components/dashboard/UserDashboard';
-import AdminDashboard from '@/components/dashboard/admin/AdminDashboard';
+import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import { isAdminRole, isUserRole } from '@/utils/roleUtils';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { useIsMobile } from '@/hooks/use-mobile';

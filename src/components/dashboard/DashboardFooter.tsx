@@ -7,7 +7,9 @@ interface DashboardFooterProps {
 
 /**
  * Simple footer component for dashboard-specific information
- * Does not include SecurityFooter content as that's handled separately
+ * Note: This component is no longer used in the application
+ * as SecurityFooter in Layout handles all footer content
+ * @deprecated Use SecurityFooter from Layout instead
  */
 const DashboardFooter: React.FC<DashboardFooterProps> = ({ isAdmin = false }) => {
   return (
