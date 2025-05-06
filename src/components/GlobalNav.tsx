@@ -10,6 +10,7 @@ import UserMenu from './navigation/UserMenu';
 import MobileNavigation from './navigation/MobileNavigation';
 import ThemeSwitcher from './ui/ThemeSwitcher';
 import GlobalSearch from './search/GlobalSearch';
+import NotificationsPanel from './notifications/NotificationsPanel';
 import { Button } from './ui/button';
 import { HomeIcon, LogIn } from 'lucide-react';
 
@@ -43,6 +44,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
             
             {/* User Profile - Desktop */}
             <div className="flex items-center gap-4">
+              {/* Add NotificationsPanel */}
+              {isAuthenticated && <NotificationsPanel />}
               <ThemeSwitcher variant="outline" size="sm" showLabel={false} />
               <UserMenu badgesCount={0} />
             </div>
