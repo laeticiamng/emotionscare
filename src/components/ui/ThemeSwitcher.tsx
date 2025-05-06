@@ -52,39 +52,39 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           <span className="sr-only">Changer de thème</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[200px] shadow-premium">
+      <DropdownMenuContent align="end" className="min-w-[220px] shadow-premium">
         <DropdownMenuItem 
           onClick={() => handleThemeChange('light')}
-          className="cursor-pointer py-2.5"
+          className="cursor-pointer py-3"
         >
-          <Sun className="mr-2.5 h-5 w-5 text-amber-500" />
+          <Sun className="mr-3 h-5 w-5 text-amber-500" />
           <span className="font-medium">Mode clair</span>
           {theme === 'light' && (
-            <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+            <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               Actif
             </span>
           )}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('dark')}
-          className="cursor-pointer py-2.5"
+          className="cursor-pointer py-3"
         >
-          <Moon className="mr-2.5 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          <Moon className="mr-3 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
           <span className="font-medium">Mode sombre</span>
           {theme === 'dark' && (
-            <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+            <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               Actif
             </span>
           )}
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('pastel')}
-          className="cursor-pointer py-2.5"
+          className="cursor-pointer py-3"
         >
-          <Palette className="mr-2.5 h-5 w-5 text-blue-500" />
+          <Palette className="mr-3 h-5 w-5 text-blue-500" />
           <span className="font-medium">Mode pastel</span>
           {theme === 'pastel' && (
-            <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+            <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               Actif
             </span>
           )}

@@ -19,16 +19,16 @@ const features = [
 
 const ValueProposition: React.FC = () => {
   return (
-    <div className="glassmorphism p-8 md:p-10 mb-12 rounded-2xl shadow-premium">
-      <h2 className="text-3xl font-semibold text-center mb-8 heading-elegant">
+    <div className="glassmorphism p-10 md:p-14 mb-12 rounded-3xl shadow-premium">
+      <h2 className="text-3xl font-semibold text-center mb-10 heading-elegant">
         Pourquoi EmotionsCare<span className="text-xs align-super">™</span> ?
       </h2>
       
-      <p className="text-center text-lg mb-10 max-w-4xl mx-auto text-balance text-[1.05rem] leading-relaxed">
+      <p className="text-center text-lg mb-12 max-w-4xl mx-auto text-balance text-[1.05rem] leading-relaxed">
         Parce que chaque collaborateur mérite d'être entendu, compris et soutenu dans son quotidien professionnel.
       </p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-7 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {features.map((feature, index) => (
           <FeatureCard 
             key={index}

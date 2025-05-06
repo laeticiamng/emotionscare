@@ -24,10 +24,10 @@ const CallToAction: React.FC<CallToActionProps> = ({ type, className = '' }) => 
     <Button 
       onClick={handleNavigate}
       size="lg"
-      className={`w-full max-w-xs hover-lift shadow-premium ${className}`}
+      className={`w-full hover-lift shadow-premium transition-all duration-300 ${className}`}
       variant={type === 'admin' ? 'outline' : 'default'}
     >
-      <span className="mr-1.5">{type === 'user' ? 'Me connecter' : 'Connexion Admin'}</span>
+      <span className="mr-2.5">{type === 'user' ? 'Me connecter' : 'Connexion Admin'}</span>
       <ArrowRight size={18} />
     </Button>
   );

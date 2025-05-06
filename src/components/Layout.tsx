@@ -23,8 +23,8 @@ const Layout = ({ children }: LayoutProps) => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
   const isHomePage = location.pathname === '/';
   
-  // If on auth page or not authenticated, display only the children (pages login/register)
-  if (isAuthPage || !isAuthenticated) {
+  // If on auth page or not authenticated and not on home page, display only the children (pages login/register)
+  if (isAuthPage || (!isAuthenticated && !isHomePage)) {
     return (
       <div className="animate-fade-in min-h-screen">
         {children || <Outlet />}
@@ -41,13 +41,17 @@ const Layout = ({ children }: LayoutProps) => {
   
   return (
     <div className={`flex flex-col min-h-screen ${getBgClasses()}`}>
-      <GlobalNav />
-      <SessionTimeoutAlert />
+      {/* GlobalNav inclut maintenant toute la navigation supérieure en un seul composant */}
+      <GlobalNav isAuthenticated={isAuthenticated} />
+      
+      {isAuthenticated && <SessionTimeoutAlert />}
+      
       <div className="flex flex-1 overflow-hidden pt-16">
         {/* La sidebar n'apparaît que sur desktop et pour les utilisateurs authentifiés */}
-        {!isMobile && <Sidebar />}
-        <div className={`flex-1 overflow-auto bg-background/80 backdrop-blur-sm transition-all ${isMobile ? 'w-full' : 'w-full pl-16'}`}>
-          <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : 'premium-container py-8 md:px-8 lg:px-12'}`}>
+        {!isMobile && isAuthenticated && <Sidebar />}
+        
+        <div className={`flex-1 overflow-auto bg-background/80 backdrop-blur-sm transition-all ${isMobile ? 'w-full' : isAuthenticated ? 'w-full pl-16' : 'w-full'}`}>
+          <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : isHomePage && !isAuthenticated ? 'w-full p-0' : 'premium-container py-8 md:px-8 lg:px-12'}`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />

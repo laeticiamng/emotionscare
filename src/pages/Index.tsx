@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Shield, User } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import RoleCard from '@/components/home/RoleCard';
@@ -8,6 +8,15 @@ import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 
 const Index = () => {
   const { theme } = useTheme();
+  
+  // Effet pour définir la classe sur l'élément body pour retirer les marges par défaut
+  useEffect(() => {
+    document.body.classList.add('home-page');
+    
+    return () => {
+      document.body.classList.remove('home-page');
+    };
+  }, []);
   
   const userFeatures = [
     "Check-in émotionnel individuel",
@@ -24,30 +33,39 @@ const Index = () => {
   ];
   
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header & Branding */}
-      <header className="w-full pt-16 pb-10 text-center animate-fade-in">
-        <h1 className="text-4xl md:text-6xl font-semibold mb-4 tracking-tight heading-elegant">
+    <div className="min-h-screen flex flex-col w-full">
+      {/* Fond avec gradient subtil */}
+      <div className="absolute inset-0 -z-10">
+        <div className={`w-full h-full ${
+          theme === 'dark' ? 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]' :
+          theme === 'pastel' ? 'bg-gradient-to-br from-blue-50 to-blue-100/70' :
+          'bg-gradient-to-br from-white to-gray-100'
+        }`}></div>
+      </div>
+      
+      {/* Header & Branding - Plus d'impact visuel */}
+      <header className="w-full pt-24 pb-16 text-center animate-fade-in">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-semibold mb-6 tracking-tight heading-elegant">
           Emotions<span className="text-primary">Care</span>
           <span className="text-sm align-super">™</span>
         </h1>
-        <h2 className="text-lg md:text-2xl text-muted-foreground mb-3">
+        <h2 className="text-lg md:text-2xl lg:text-3xl text-muted-foreground mb-5 max-w-3xl mx-auto">
           par ResiMax<span className="text-xs align-super">™</span> 4.0
         </h2>
-        <p className="text-base md:text-xl italic font-light max-w-2xl mx-auto text-muted-foreground text-balance">
+        <p className="text-base md:text-xl lg:text-2xl italic font-light max-w-3xl mx-auto text-muted-foreground text-balance">
           Votre bien-être au cœur de votre journée professionnelle
         </p>
         
-        <div className="mt-6">
+        <div className="mt-8">
           <ThemeSwitcher variant="outline" size="default" showLabel={true} />
         </div>
       </header>
       
-      {/* Main Content */}
+      {/* Main Content - Meilleure utilisation de l'espace */}
       <main className="flex-grow flex flex-col items-center justify-center p-6 md:p-10">
-        <div className="premium-container">
-          {/* Cards Container */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-16">
+        <div className="container max-w-7xl mx-auto">
+          {/* Cards Container - Espacement optimisé */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 mb-20">
             {/* User Card */}
             <RoleCard
               title="Espace Collaborateur"
@@ -65,15 +83,15 @@ const Index = () => {
             />
           </div>
           
-          {/* Value Proposition Section */}
+          {/* Value Proposition Section - Plus d'impact */}
           <ValueProposition />
         </div>
       </main>
       
-      {/* Footer */}
-      <footer className="w-full bg-primary text-primary-foreground py-8 px-4">
-        <div className="premium-container flex flex-col md:flex-row items-center justify-between">
-          <p className="mb-4 md:mb-0">© {new Date().getFullYear()} ResiMax™ – GDPR compliant</p>
+      {/* Footer - Style premium */}
+      <footer className="w-full bg-primary text-primary-foreground py-8 px-4 mt-12">
+        <div className="container max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
+          <p className="mb-4 md:mb-0 font-medium">© {new Date().getFullYear()} ResiMax™ – GDPR compliant</p>
           <div className="flex space-x-8">
             <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground hover:underline transition-colors">Mentions légales</a>
             <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground hover:underline transition-colors">Support</a>
