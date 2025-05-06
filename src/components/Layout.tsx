@@ -32,7 +32,7 @@ const Layout = ({ children }: LayoutProps) => {
     );
   }
   
-  // Déterminer les classes de fond en fonction du thème
+  // Determine background classes based on theme
   const getBgClasses = () => {
     if (theme === 'dark') return 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]';
     if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-blue-100/70';
@@ -41,13 +41,13 @@ const Layout = ({ children }: LayoutProps) => {
   
   return (
     <div className={`flex flex-col min-h-screen ${getBgClasses()}`}>
-      {/* GlobalNav inclut maintenant toute la navigation supérieure en un seul composant */}
+      {/* GlobalNav includes all top navigation in a single component */}
       <GlobalNav isAuthenticated={isAuthenticated} />
       
       {isAuthenticated && <SessionTimeoutAlert />}
       
       <div className="flex flex-1 overflow-hidden pt-16">
-        {/* La sidebar n'apparaît que sur desktop et pour les utilisateurs authentifiés */}
+        {/* Sidebar only appears on desktop for authenticated users */}
         {!isMobile && isAuthenticated && <Sidebar />}
         
         <div className={`flex-1 overflow-auto transition-all ${

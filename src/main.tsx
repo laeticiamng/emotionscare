@@ -1,3 +1,4 @@
+
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -6,6 +7,8 @@ import { MusicProvider } from './contexts/MusicContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import App from './App.tsx';
 import './styles/index.css';
+import './styles/premium.css';
+import './styles/components.css';
 import './App.css';
 
 console.log("Starting application initialization");
