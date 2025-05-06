@@ -22,7 +22,7 @@ const VRPageHeader: React.FC<VRPageHeaderProps> = ({ onNavigateBack }) => {
   return (
     <div className="flex items-center justify-between mb-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Micro-pauses VR</h1>
+        <h1>Micro-pauses VR</h1>
         <p className="text-muted-foreground">
           Accordez-vous un moment de détente immersive
         </p>

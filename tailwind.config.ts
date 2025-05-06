@@ -1,4 +1,3 @@
-
 import { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import anim from "tailwindcss-animate";
@@ -15,6 +14,12 @@ const config = {
       },
     },
     extend: {
+      fontSize: {
+        'h1': ['32px', { lineHeight: '40px', fontWeight: '700' }],
+        'h2': ['24px', { lineHeight: '32px', fontWeight: '600' }],
+        'h3': ['20px', { lineHeight: '28px', fontWeight: '600' }],
+        'h4': ['18px', { lineHeight: '24px', fontWeight: '500' }],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -32,7 +32,7 @@ const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className, isLoading
 
   if (isLoading) {
     return (
-      <div className={cn("mt-1 flex items-center", className)}>
+      <div className={cn("mt-2 flex items-center", className)}>
         <Skeleton className="h-6 w-16" />
         {delta.label && <Skeleton className="h-4 w-24 ml-2" />}
       </div>
@@ -40,7 +40,7 @@ const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className, isLoading
   }
 
   return (
-    <div className={cn("mt-1 flex items-center", className)}>
+    <div className={cn("mt-2 flex items-center", className)}>
       <Badge 
         variant={getBadgeVariant(delta.trend)}
         className="text-sm font-medium px-2 py-1"

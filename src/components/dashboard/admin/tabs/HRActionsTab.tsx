@@ -36,7 +36,7 @@ const HRActionsTab: React.FC<HRActionsTabProps> = ({ rhSuggestions, isLoading = 
             {rhSuggestions.map((suggestion, i) => (
               <div key={i} className="bg-white/80 rounded-xl p-5 hover:shadow-md transition-all">
                 <div className="text-3xl mb-2">{suggestion.icon}</div>
-                <h3 className="font-semibold mb-2">{suggestion.title}</h3>
+                <h3 className="text-h4 font-semibold mb-2">{suggestion.title}</h3>
                 <p className="text-sm text-gray-600 mb-4">{suggestion.description}</p>
                 <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
                   Mettre en place

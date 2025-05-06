@@ -21,8 +21,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     <div className="mb-8 animate-fade-in">
       <div className="flex flex-col md:flex-row items-start justify-between">
         <div>
-          <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>
-          <h2 className="text-xl text-muted-foreground mt-2">
+          <h1>Tableau de bord <span className="font-semibold">Direction</span></h1>
+          <h2 className="text-muted-foreground mt-2">
             Métriques globales et anonymisées
           </h2>
           {activeDimension && activeOption && (
