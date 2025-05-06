@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import ChartSwitcher from './charts/ChartSwitcher';
 import { getFilteredData } from '@/utils/chartHelpers';
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface TrendChartsProps {
   absenteeismData: Array<{ date: string; value: number }>;
@@ -45,25 +46,38 @@ const TrendCharts: React.FC<TrendChartsProps> = ({
       />
       
       {/* Time range selector in a separate card */}
-      <Card className="col-span-1 lg:col-span-2 p-4 flex flex-wrap gap-4 justify-center">
+      <Card className={cn(
+        "col-span-1 lg:col-span-2 p-4 flex flex-wrap gap-4 justify-center transition-opacity duration-200",
+        isLoading && "opacity-70 pointer-events-none"
+      )}>
         <button
           className={`px-4 py-2 rounded-md ${timeRange === "7j" ? "bg-primary text-white" : "bg-gray-100"}`}
           onClick={() => handleTimeRangeChange("7j")}
+          disabled={isLoading}
         >
           7 jours
         </button>
         <button
           className={`px-4 py-2 rounded-md ${timeRange === "30j" ? "bg-primary text-white" : "bg-gray-100"}`}
           onClick={() => handleTimeRangeChange("30j")}
+          disabled={isLoading}
         >
           30 jours
         </button>
         <button
           className={`px-4 py-2 rounded-md ${timeRange === "90j" ? "bg-primary text-white" : "bg-gray-100"}`}
           onClick={() => handleTimeRangeChange("90j")}
+          disabled={isLoading}
         >
           90 jours
         </button>
+        
+        {isLoading && (
+          <span className="text-xs text-muted-foreground flex items-center">
+            <span className="inline-block mr-1 w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></span>
+            Chargement...
+          </span>
+        )}
       </Card>
     </div>
   );

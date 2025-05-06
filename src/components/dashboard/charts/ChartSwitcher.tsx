@@ -4,6 +4,8 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ChartLine, BarChart2, BarChartHorizontal } from 'lucide-react';
 import AbsenteeismChart from './AbsenteeismChart';
 import ProductivityChart from './ProductivityChart';
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export type ChartType = "line" | "bar" | "area";
 
@@ -61,7 +63,11 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   // Render the appropriate chart based on current view
   const renderChart = () => {
     if (isLoading) {
-      return <div className="h-48 w-full flex items-center justify-center">Chargement...</div>;
+      return (
+        <div className="h-48 w-full flex items-center justify-center">
+          <Skeleton className="h-36 w-full rounded-md animate-pulse" />
+        </div>
+      );
     }
     
     switch (view) {
@@ -91,21 +97,38 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   };
 
   return (
-    <div className="card-premium p-4 rounded-2xl shadow-sm">
+    <div className={cn(
+      "card-premium p-4 rounded-2xl shadow-sm transition-opacity duration-300",
+      isLoading && "opacity-90"
+    )}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
         <div>
-          <h3 className="text-xl font-semibold">{title}</h3>
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+          <h3 className="text-xl font-semibold">
+            {isLoading ? <Skeleton className="h-6 w-36" /> : title}
+          </h3>
+          {description && (
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? <Skeleton className="h-4 w-24 mt-1" /> : description}
+            </p>
+          )}
         </div>
         
         <div className="mt-2 sm:mt-0">
-          <ToggleGroup type="single" value={view} onValueChange={handleViewChange} aria-label="Sélection du type de graphique">
+          <ToggleGroup 
+            type="single" 
+            value={view} 
+            onValueChange={handleViewChange} 
+            aria-label="Sélection du type de graphique"
+            disabled={isLoading}
+            className={isLoading ? "opacity-50 pointer-events-none" : ""}
+          >
             {availableViews.map((chartType) => (
               <ToggleGroupItem 
                 key={chartType}
                 value={chartType}
                 aria-label={chartLabels[chartType]}
                 aria-pressed={view === chartType}
+                disabled={isLoading}
               >
                 {chartIcons[chartType]}
               </ToggleGroupItem>
@@ -114,7 +137,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
         </div>
       </div>
       
-      <div className="h-48 w-full">
+      <div className="h-48 w-full" aria-busy={isLoading}>
         {renderChart()}
       </div>
     </div>

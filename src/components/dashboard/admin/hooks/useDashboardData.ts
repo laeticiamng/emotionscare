@@ -26,7 +26,9 @@ export const useDashboardData = (timePeriod: string): DashboardData => {
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
       } finally {
-        setIsLoading(false);
+        // Add a small delay to ensure users see the loading state
+        // This is optional and can be removed in production if data loads very quickly
+        setTimeout(() => setIsLoading(false), 600);
       }
     }
     

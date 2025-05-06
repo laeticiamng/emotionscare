@@ -14,6 +14,7 @@ interface TeamTabContentProps {
   filterUsers: (filter: string) => void;
   periodFilter: '7' | '30' | '90';
   setPeriodFilter: (period: '7' | '30' | '90') => void;
+  isLoading?: boolean;
 }
 
 const TeamTabContent: React.FC<TeamTabContentProps> = ({
@@ -21,7 +22,8 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({
   selectedFilter,
   filterUsers,
   periodFilter,
-  setPeriodFilter
+  setPeriodFilter,
+  isLoading = false
 }) => {
   return (
     <Card className="p-6 shadow-md rounded-3xl">
@@ -32,14 +34,15 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({
           setPeriodFilter={setPeriodFilter}
           selectedFilter={selectedFilter}
           filterUsers={filterUsers}
+          isLoading={isLoading}
         />
       </div>
       
       <Separator className="my-6" />
       
-      <TeamStatCards />
+      <TeamStatCards isLoading={isLoading} />
       
-      <TeamOverview users={filteredUsers} />
+      <TeamOverview users={filteredUsers} isLoading={isLoading} />
 
       <AISuggestions />
     </Card>

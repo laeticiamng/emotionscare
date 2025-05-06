@@ -21,11 +21,15 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Hero Section with Period Selector */}
-      <DashboardHeader timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+      <DashboardHeader 
+        timePeriod={timePeriod} 
+        setTimePeriod={setTimePeriod} 
+        isLoading={isLoading}
+      />
       
       {/* Tabs Navigation */}
       <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
-        <AdminTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        <AdminTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} disabled={isLoading} />
         
         {/* Tab Contents */}
         <AdminTabContents 
@@ -33,6 +37,7 @@ const AdminDashboard: React.FC = () => {
           absenteeismData={absenteeismData}
           emotionalScoreTrend={emotionalScoreTrend}
           dashboardStats={dashboardStats}
+          isLoading={isLoading}
         />
       </Tabs>
       

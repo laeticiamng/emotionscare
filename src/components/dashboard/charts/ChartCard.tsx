@@ -25,17 +25,23 @@ const ChartCard: React.FC<ChartCardProps> = ({
     <Card className="glass-card overflow-hidden">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">{title}</CardTitle>
-          <ChartTimeToggle timeRange={timeRange} setTimeRange={setTimeRange} />
+          <CardTitle className="text-lg">
+            {isLoading ? <Skeleton className="h-6 w-40" /> : title}
+          </CardTitle>
+          <ChartTimeToggle timeRange={timeRange} setTimeRange={setTimeRange} disabled={isLoading} />
         </div>
         <CardDescription>
-          {timeRange === "7j" ? "7 derniers jours" : 
-           timeRange === "30j" ? "30 derniers jours" : 
-           "90 derniers jours"}
+          {isLoading ? (
+            <Skeleton className="h-4 w-32" />
+          ) : (
+            timeRange === "7j" ? "7 derniers jours" : 
+            timeRange === "30j" ? "30 derniers jours" : 
+            "90 derniers jours"
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-64" aria-label={`Graphique de ${title.toLowerCase()}`}>
+        <div className="h-64" aria-label={`Graphique de ${title.toLowerCase()}`} aria-busy={isLoading}>
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <Skeleton className="h-full w-full" />

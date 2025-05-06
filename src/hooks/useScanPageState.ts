@@ -25,13 +25,14 @@ export function useScanPageState(userId?: string) {
         } catch (error) {
           console.error("Error loading emotion history:", error);
         } finally {
-          setLoading(false);
+          // Add a small delay to ensure loading state is visible
+          setTimeout(() => setLoading(false), 600); 
         }
       }
     };
 
     loadEmotionHistory();
-  }, [userId]);
+  }, [userId, periodFilter, serviceFilter]); // Add filter dependencies to reload data when they change
 
   const handleScanSaved = () => {
     setShowScanForm(false);
@@ -40,7 +41,17 @@ export function useScanPageState(userId?: string) {
   };
 
   const refreshEmotionHistory = async () => {
-    return fetchEmotionHistory().then(setEmotions);
+    setLoading(true);
+    try {
+      const data = await fetchEmotionHistory();
+      setEmotions(data);
+      return data;
+    } catch (error) {
+      console.error("Error refreshing emotion history:", error);
+      throw error;
+    } finally {
+      setTimeout(() => setLoading(false), 600);
+    }
   };
 
   return {

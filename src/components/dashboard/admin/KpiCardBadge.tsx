@@ -2,6 +2,7 @@
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface KpiCardBadgeProps {
   delta: {
@@ -10,12 +11,13 @@ interface KpiCardBadgeProps {
     trend: 'up' | 'down' | 'neutral';
   };
   className?: string;
+  isLoading?: boolean;
 }
 
 /**
  * Displays a trend badge with appropriate styling based on trend direction
  */
-const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className }) => {
+const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className, isLoading = false }) => {
   // Determine badge color based on trend
   const getBadgeClasses = (trend: 'up' | 'down' | 'neutral') => {
     switch(trend) {
@@ -27,6 +29,15 @@ const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className }) => {
         return 'bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-400';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className={cn("mt-1 flex items-center", className)}>
+        <Skeleton className="h-6 w-16" />
+        {delta.label && <Skeleton className="h-4 w-24 ml-2" />}
+      </div>
+    );
+  }
 
   return (
     <div className={cn("mt-1 flex items-center", className)}>
