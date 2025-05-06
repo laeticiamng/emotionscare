@@ -7,20 +7,40 @@ import { Music, PlayCircle } from 'lucide-react';
 import type { Emotion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
-// Map des émotions vers les types de musique
-const EMOTION_TO_MUSIC: Record<string, string> = {
-  happy: 'happy',
-  sad: 'calm',
-  angry: 'calm',
-  anxious: 'calm',
-  calm: 'neutral',
-  excited: 'energetic',
-  stressed: 'calm',
-  tired: 'calm',
-  neutral: 'neutral',
-  focused: 'focused',
-  energetic: 'energetic',
-  relaxed: 'calm'
+// Map des émojis vers les types de musique
+const EMOJI_TO_MUSIC: Record<string, string> = {
+  '😊': 'happy',
+  '😄': 'happy',
+  '😢': 'calm',
+  '😭': 'calm',
+  '😡': 'calm',
+  '😠': 'calm',
+  '😰': 'calm',
+  '😨': 'calm',
+  '😌': 'neutral',
+  '😎': 'energetic',
+  '😓': 'calm',
+  '😴': 'calm',
+  '😐': 'neutral',
+  '🧠': 'focused',
+  '⚡': 'energetic',
+  '🧘': 'calm'
+};
+
+// Backup mapping if we need to derive from text or other sources
+const TEXT_MOOD_MAP: Record<string, string> = {
+  'happy': 'happy',
+  'sad': 'calm',
+  'angry': 'calm',
+  'anxious': 'calm',
+  'calm': 'neutral',
+  'excited': 'energetic',
+  'stressed': 'calm',
+  'tired': 'calm',
+  'neutral': 'neutral',
+  'focused': 'focused',
+  'energetic': 'energetic',
+  'relaxed': 'calm'
 };
 
 interface MusicRecommendationProps {
@@ -35,10 +55,27 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
     return null;
   }
 
-  // Déterminer le type de musique recommandé en fonction de l'émotion
-  // Use emotion.emotion instead of emotion.name
-  const emotionName = emotion.emotion?.toLowerCase() || 'neutral';
-  const musicType = EMOTION_TO_MUSIC[emotionName] || 'neutral';
+  // Determine music type from emojis, fallback to score
+  let musicType = 'neutral';
+  
+  if (emotion.emojis) {
+    // Try to find a matching emoji
+    const firstEmoji = [...emotion.emojis][0]; // Get first character
+    musicType = EMOJI_TO_MUSIC[firstEmoji] || 'neutral';
+  } else if (emotion.text) {
+    // Try to derive from text
+    const text = emotion.text.toLowerCase();
+    Object.entries(TEXT_MOOD_MAP).forEach(([keyword, mood]) => {
+      if (text.includes(keyword)) {
+        musicType = mood;
+      }
+    });
+  } else if (emotion.score !== undefined) {
+    // Derive from score
+    if (emotion.score > 75) musicType = 'happy';
+    else if (emotion.score < 40) musicType = 'calm';
+    else musicType = 'neutral';
+  }
   
   // Descriptions des effets musicaux selon l'émotion
   const musicDescription = {
@@ -69,8 +106,13 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
       </CardHeader>
       <CardContent>
         <div className="mb-3">
-          <h4 className="font-medium mb-1">Basé sur votre état émotionnel: <span className="text-primary">{emotion.emotion}</span></h4>
-          <p className="text-sm text-muted-foreground">{musicDescription[musicType] || "Une sélection musicale adaptée à votre état émotionnel"}</p>
+          <h4 className="font-medium mb-1">
+            Basé sur votre état émotionnel:
+            <span className="text-primary"> {emotion.emojis || musicType}</span>
+          </h4>
+          <p className="text-sm text-muted-foreground">
+            {musicDescription[musicType] || "Une sélection musicale adaptée à votre état émotionnel"}
+          </p>
         </div>
         
         <Button 

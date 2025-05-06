@@ -40,17 +40,18 @@ export function useCoach() {
       setLastTrigger(new Date());
       
       // Actions supplémentaires selon le type d'événement
-      if (eventType === 'scan_completed' && data?.emotion) {
+      if (eventType === 'scan_completed' && data?.emojis) {
+        // Fix: Use emojis or another available property instead of emotion
         // Charger une playlist adaptée à l'émotion
-        loadPlaylistForEmotion(data.emotion);
+        loadPlaylistForEmotion(data.emojis);
         
         // Ajouter une recommandation basée sur l'émotion via l'API OpenAI
         try {
           const { data: aiResponse, error } = await supabase.functions.invoke('chat-with-ai', {
             body: {
-              message: `Propose une activité simple de bien-être adaptée à quelqu'un qui ressent de la ${data.emotion}. Réponds en une phrase courte.`,
+              message: `Propose une activité simple de bien-être adaptée à quelqu'un qui ressent ${data.emojis}. Réponds en une phrase courte.`,
               userContext: {
-                recentEmotions: data.emotion,
+                recentEmotions: data.emojis,
                 currentScore: data.score || 50
               }
             }
@@ -63,21 +64,19 @@ export function useCoach() {
           console.error('Error getting AI recommendation:', error);
           // Fallback recommendations en cas d'erreur
           let recommendation = '';
-          switch(data.emotion.toLowerCase()) {
-            case 'tristesse':
-              recommendation = 'Une session VR de méditation pourrait vous aider à retrouver votre équilibre.';
-              break;
-            case 'colère':
-              recommendation = 'Je vous suggère une séance de relaxation guidée pour canaliser votre énergie.';
-              break;
-            case 'anxiété':
-              recommendation = 'Des exercices de respiration profonde pourraient vous aider à vous recentrer.';
-              break;
-            case 'stress':
-              recommendation = 'Prenez un moment pour vous détendre avec notre playlist apaisante.';
-              break;
-            default:
-              recommendation = 'Continuez à prendre soin de vous avec nos routines bien-être.';
+          
+          // Use emoji data to determine recommendation
+          const emoji = data.emojis.toLowerCase();
+          if (emoji.includes('😢') || emoji.includes('😭')) {
+            recommendation = 'Une session VR de méditation pourrait vous aider à retrouver votre équilibre.';
+          } else if (emoji.includes('😡') || emoji.includes('😠')) {
+            recommendation = 'Je vous suggère une séance de relaxation guidée pour canaliser votre énergie.';
+          } else if (emoji.includes('😰') || emoji.includes('😨')) {
+            recommendation = 'Des exercices de respiration profonde pourraient vous aider à vous recentrer.';
+          } else if (emoji.includes('😓') || emoji.includes('😖')) {
+            recommendation = 'Prenez un moment pour vous détendre avec notre playlist apaisante.';
+          } else {
+            recommendation = 'Continuez à prendre soin de vous avec nos routines bien-être.';
           }
           
           setRecommendations(prev => [recommendation, ...prev].slice(0, 5));
@@ -101,8 +100,8 @@ export function useCoach() {
   }, [user, toast, loadPlaylistForEmotion]);
 
   // Pour déclencher un événement après un scan émotionnel
-  const triggerAfterScan = useCallback((emotion: string, confidence: number = 0.8) => {
-    return triggerEvent('scan_completed', { emotion, confidence });
+  const triggerAfterScan = useCallback((emojis: string, confidence: number = 0.8) => {
+    return triggerEvent('scan_completed', { emojis, confidence });
   }, [triggerEvent]);
 
   // Pour déclencher une alerte préventive
@@ -116,8 +115,8 @@ export function useCoach() {
   }, [triggerEvent]);
 
   // Suggérer une session VR basée sur l'émotion
-  const suggestVRSession = useCallback((emotion: string) => {
-    // Suggestion basée sur l'émotion
+  const suggestVRSession = useCallback((emojis: string) => {
+    // Suggestion basée sur l'émoji
     toast({
       title: "Coach IA",
       description: `Une session VR adaptée à votre état émotionnel est disponible.`,

@@ -11,10 +11,13 @@ interface EmotionScanResultProps {
 }
 
 const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ emotion }) => {
+  // Derive an emotion label from available properties
+  const emotionLabel = getEmotionLabel(emotion);
+  
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Votre résultat émotionnel: {emotion.emotion}</CardTitle>
+        <CardTitle>Votre résultat émotionnel: {emotionLabel}</CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="recommendations" className="w-full">
@@ -38,8 +41,15 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ emotion }) => {
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium mb-1">Émotion détectée</h3>
-                <p className="text-2xl font-bold">{emotion.emotion}</p>
+                <p className="text-2xl font-bold">{emotionLabel}</p>
               </div>
+              
+              {emotion.emojis && (
+                <div>
+                  <h3 className="font-medium mb-1">Émojis</h3>
+                  <p className="text-2xl">{emotion.emojis}</p>
+                </div>
+              )}
               
               {emotion.score && (
                 <div>
@@ -61,5 +71,38 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ emotion }) => {
     </Card>
   );
 };
+
+// Helper function to derive an emotion label
+function getEmotionLabel(emotion: Emotion): string {
+  // Try to derive emotion from emojis
+  if (emotion.emojis) {
+    if (emotion.emojis.includes('😊') || emotion.emojis.includes('😄')) return 'Heureux';
+    if (emotion.emojis.includes('😢') || emotion.emojis.includes('😭')) return 'Triste';
+    if (emotion.emojis.includes('😡') || emotion.emojis.includes('😠')) return 'En colère';
+    if (emotion.emojis.includes('😰') || emotion.emojis.includes('😨')) return 'Anxieux';
+    if (emotion.emojis.includes('😌') || emotion.emojis.includes('🧘')) return 'Calme';
+  }
+  
+  // Try to derive from text
+  if (emotion.text) {
+    const text = emotion.text.toLowerCase();
+    if (text.includes('heureux') || text.includes('joie')) return 'Heureux';
+    if (text.includes('triste') || text.includes('peine')) return 'Triste';
+    if (text.includes('colère') || text.includes('frustré')) return 'En colère';
+    if (text.includes('anxieux') || text.includes('stress')) return 'Anxieux';
+    if (text.includes('calme') || text.includes('apaisé')) return 'Calme';
+  }
+  
+  // Fallback to score-based label
+  if (emotion.score !== undefined) {
+    if (emotion.score > 80) return 'Très positif';
+    if (emotion.score > 60) return 'Positif';
+    if (emotion.score > 40) return 'Neutre';
+    if (emotion.score > 20) return 'Négatif';
+    return 'Très négatif';
+  }
+  
+  return 'État émotionnel';
+}
 
 export default EmotionScanResult;

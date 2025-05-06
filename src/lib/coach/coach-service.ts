@@ -113,7 +113,8 @@ class CoachService {
       let userContext = null;
       
       if (emotions && emotions.length > 0) {
-        const recentEmotions = emotions.map(e => e.emojis || e.emotion).join(', ');
+        // Fix: Use emojis field instead of emotion, or derive the emotion from other fields
+        const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
         const avgScore = emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length;
         
         userContext = {
