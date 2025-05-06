@@ -1,17 +1,18 @@
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: string;
   avatar: string;
-  image?: string; // Add image property
+  image?: string;
   streak?: number;
   dailyGoal?: number;
   weeklyGoal?: number;
   preferences?: {
     fontSize?: 'small' | 'medium' | 'large';
     backgroundColor?: 'default' | 'blue' | 'mint' | 'coral';
-    theme?: 'light' | 'dark';
+    theme?: 'light' | 'dark' | 'system';
   };
   anonymity_code?: string;
   emotional_score?: number;

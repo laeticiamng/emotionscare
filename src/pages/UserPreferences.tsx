@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   Card, 
@@ -38,7 +37,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const UserPreferences = () => {
   const { user, updateUserProfile } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { themePreference, setThemePreference } = useTheme();
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -50,19 +49,14 @@ const UserPreferences = () => {
     defaultValues: {
       fontSize: preferences.fontSize || 'medium',
       backgroundColor: preferences.backgroundColor || 'default',
-      theme: preferences.theme || (theme === 'dark' ? 'dark' : 'light'),
+      theme: preferences.theme || themePreference || 'system',
     }
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
       // Apply theme immediately
-      if (data.theme === 'system') {
-        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        setTheme(systemTheme);
-      } else {
-        setTheme(data.theme as 'light' | 'dark');
-      }
+      setThemePreference(data.theme);
       
       // Save preferences to user profile
       await updateUserProfile({
