@@ -1,90 +1,106 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrainCircuit, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useCoach } from '@/hooks/useCoach';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Brain, Loader2 } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-interface CoachRecommendationsProps {
-  className?: string;
-  style?: React.CSSProperties;
-}
+const CoachRecommendations: React.FC = () => {
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
-const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ className, style }) => {
-  const navigate = useNavigate();
-  const { recommendations, isProcessing } = useCoach();
-  
-  // Recommandations par défaut si aucune n'est disponible
-  const defaultRecommendations = [
-    {
-      title: "Scan quotidien",
-      description: "Évaluez votre état émotionnel du jour pour des recommandations personnalisées.",
-      action: () => navigate('/scan'),
-      actionText: "Scanner"
-    },
-    {
-      title: "Session VR guidée",
-      description: "Une session de réalité virtuelle pour vous aider à vous recentrer.",
-      action: () => navigate('/vr-session'),
-      actionText: "Commencer"
-    },
-    {
-      title: "Journal émotionnel",
-      description: "Exprimez vos pensées pour un meilleur équilibre mental.",
-      action: () => navigate('/journal/new'),
-      actionText: "Rédiger"
+  useEffect(() => {
+    // Charger les recommandations initiales
+    generateRecommendations();
+  }, []);
+
+  const generateRecommendations = async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Récupérer les données émotionnelles récentes si disponibles
+      const { data: emotions } = await supabase
+        .from('emotions')
+        .select('emotion, score')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(3);
+      
+      const recentEmotions = emotions?.map(e => e.emotion).join(', ') || '';
+      const avgScore = emotions?.length ? 
+        Math.round(emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length) : 
+        50;
+      
+      // Générer des recommandations avec l'API OpenAI
+      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+        body: {
+          message: "Propose 3 conseils très courts et pratiques pour améliorer mon bien-être au travail aujourd'hui. Format: liste à puces courte.",
+          userContext: {
+            recentEmotions,
+            currentScore: avgScore
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Transformer la réponse en liste
+      const response = data.response;
+      const recommendationList = response
+        .split('\n')
+        .filter((line: string) => line.trim().startsWith('-') || line.trim().startsWith('•'))
+        .map((line: string) => line.trim().replace(/^[•-]\s*/, ''));
+      
+      setRecommendations(recommendationList.length > 0 ? recommendationList : [response]);
+      
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      // Fallback recommendations
+      setRecommendations([
+        "Prendre une pause de 5 minutes toutes les heures pour vous étirer",
+        "Pratiquer la respiration profonde pendant 2 minutes en cas de stress",
+        "Boire suffisamment d'eau tout au long de la journée"
+      ]);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
   return (
-    <Card className={`${className} h-full`}>
+    <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center">
-          <BrainCircuit size={18} className="mr-2 text-primary" />
-          Recommandations Coach IA
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Brain className="h-5 w-5" />
+          Recommandations IA
         </CardTitle>
-        <CardDescription>
-          Suggestions personnalisées pour votre bien-être
-        </CardDescription>
       </CardHeader>
-      
       <CardContent>
-        {isProcessing ? (
-          <div className="space-y-4">
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-20 w-full" />
+        {isLoading ? (
+          <div className="flex justify-center py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="space-y-4">
-            {recommendations && recommendations.length > 0 ? (
-              recommendations.map((recommendation, index) => (
-                <div key={index} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
-                  <p className="text-sm">{recommendation}</p>
-                </div>
-              ))
-            ) : (
-              defaultRecommendations.map((item, index) => (
-                <div key={index} className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="space-y-1 flex-1">
-                      <h4 className="font-medium text-sm">{item.title}</h4>
-                      <p className="text-xs text-muted-foreground">{item.description}</p>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={item.action}
-                      className="ml-auto"
-                    >
-                      {item.actionText} <ArrowRight className="ml-1 h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          <>
+            <ul className="space-y-2 mb-4">
+              {recommendations.map((rec, index) => (
+                <li key={index} className="p-2 bg-muted/30 rounded-md text-sm">
+                  {rec}
+                </li>
+              ))}
+            </ul>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full"
+              onClick={generateRecommendations}
+            >
+              Actualiser
+            </Button>
+          </>
         )}
       </CardContent>
     </Card>

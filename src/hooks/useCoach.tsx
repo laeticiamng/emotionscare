@@ -1,9 +1,11 @@
+
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { coachService, CoachEvent, triggerCoachEvent } from '@/lib/coachService';
 import { useMusic } from '@/contexts/MusicContext';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Hook pour interagir avec le service Coach IA et recevoir des notifications
@@ -42,26 +44,44 @@ export function useCoach() {
         // Charger une playlist adaptée à l'émotion
         loadPlaylistForEmotion(data.emotion);
         
-        // Ajouter une recommandation basée sur l'émotion
-        let recommendation = '';
-        switch(data.emotion.toLowerCase()) {
-          case 'tristesse':
-            recommendation = 'Une session VR de méditation pourrait vous aider à retrouver votre équilibre.';
-            break;
-          case 'colère':
-            recommendation = 'Je vous suggère une séance de relaxation guidée pour canaliser votre énergie.';
-            break;
-          case 'anxiété':
-            recommendation = 'Des exercices de respiration profonde pourraient vous aider à vous recentrer.';
-            break;
-          case 'stress':
-            recommendation = 'Prenez un moment pour vous détendre avec notre playlist apaisante.';
-            break;
-          default:
-            recommendation = 'Continuez à prendre soin de vous avec nos routines bien-être.';
+        // Ajouter une recommandation basée sur l'émotion via l'API OpenAI
+        try {
+          const { data: aiResponse, error } = await supabase.functions.invoke('chat-with-ai', {
+            body: {
+              message: `Propose une activité simple de bien-être adaptée à quelqu'un qui ressent de la ${data.emotion}. Réponds en une phrase courte.`,
+              userContext: {
+                recentEmotions: data.emotion,
+                currentScore: data.score || 50
+              }
+            }
+          });
+          
+          if (!error && aiResponse.response) {
+            setRecommendations(prev => [aiResponse.response, ...prev].slice(0, 5));
+          }
+        } catch (error) {
+          console.error('Error getting AI recommendation:', error);
+          // Fallback recommendations en cas d'erreur
+          let recommendation = '';
+          switch(data.emotion.toLowerCase()) {
+            case 'tristesse':
+              recommendation = 'Une session VR de méditation pourrait vous aider à retrouver votre équilibre.';
+              break;
+            case 'colère':
+              recommendation = 'Je vous suggère une séance de relaxation guidée pour canaliser votre énergie.';
+              break;
+            case 'anxiété':
+              recommendation = 'Des exercices de respiration profonde pourraient vous aider à vous recentrer.';
+              break;
+            case 'stress':
+              recommendation = 'Prenez un moment pour vous détendre avec notre playlist apaisante.';
+              break;
+            default:
+              recommendation = 'Continuez à prendre soin de vous avec nos routines bien-être.';
+          }
+          
+          setRecommendations(prev => [recommendation, ...prev].slice(0, 5));
         }
-        
-        setRecommendations(prev => [recommendation, ...prev].slice(0, 5));
       }
       
       toast({
@@ -109,11 +129,24 @@ export function useCoach() {
     }, 2000);
   }, [toast, navigate]);
 
+  // Pour poser une question directe au coach IA
+  const askQuestion = useCallback(async (question: string): Promise<string> => {
+    if (!user?.id) return "Veuillez vous connecter pour utiliser le coach IA.";
+    
+    try {
+      return await coachService.askCoachQuestion(user.id, question);
+    } catch (error) {
+      console.error('Error asking coach question:', error);
+      return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question.";
+    }
+  }, [user]);
+
   return {
     triggerAfterScan,
     triggerAlert,
     triggerDailyReminder,
     suggestVRSession,
+    askQuestion,
     isProcessing,
     lastTrigger,
     recommendations

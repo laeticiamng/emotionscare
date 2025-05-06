@@ -6,3 +6,10 @@ verify_jwt = false
 
 [functions.analyze-emotion]
 verify_jwt = false
+
+[functions.chat-with-ai]
+verify_jwt = false
+
+[functions.analyze-journal]
+verify_jwt = false
+

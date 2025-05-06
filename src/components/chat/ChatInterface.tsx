@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { SendHorizontal, Bot, Play, PlayCircle, Music } from 'lucide-react';
+import { SendHorizontal, Bot, Play, PlayCircle, Music, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,7 +35,7 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standalone = true }) => {
-  const { messages, addUserMessage, addBotMessage, processMessage } = useChat();
+  const { messages, isLoading, addUserMessage, addBotMessage, processMessage } = useChat();
   const [input, setInput] = useState('');
   const navigate = useNavigate();
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
@@ -49,19 +49,33 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
     }
   }, [messages]);
 
-  const handleSend = () => {
-    if (input.trim() === '') return;
+  const handleSend = async () => {
+    if (input.trim() === '' || isLoading) return;
 
     // Add user message
     addUserMessage(input);
     const userInput = input;
     setInput('');
 
-    // Process the message with a small delay to feel more natural
-    setTimeout(() => {
-      const { response, intent } = processMessage(userInput);
+    try {
+      // Process the message with OpenAI
+      const { response, intent } = await processMessage(userInput);
       addBotMessage(response);
-    }, 500);
+
+      // Handle specific intents
+      if (intent === 'vr_session') {
+        // We don't trigger navigation automatically, buttons will appear
+      } else if (intent === 'music_playlist') {
+        // We don't load music automatically, buttons will appear
+      }
+    } catch (error) {
+      console.error('Error in chat:', error);
+      toast({
+        title: "Erreur",
+        description: "Un problème est survenu lors du traitement de votre message.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleStartVRSession = () => {
@@ -107,7 +121,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
 
             {/* Command buttons that appear after certain bot responses */}
             {messages.length > 0 && messages[messages.length - 1].sender === 'bot' && 
-             messages[messages.length - 1].text.includes("session VR") && (
+             messages[messages.length - 1].text.toLowerCase().includes("session vr") && (
               <div className="flex gap-2 mt-2 justify-center">
                 <CommandButton 
                   label="Lancer une session VR" 
@@ -119,7 +133,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
             )}
 
             {messages.length > 0 && messages[messages.length - 1].sender === 'bot' && 
-             messages[messages.length - 1].text.includes("ambiance musicale") && (
+             messages[messages.length - 1].text.toLowerCase().includes("playlist") && (
               <div className="flex gap-2 mt-2 flex-wrap justify-center">
                 <CommandButton 
                   label="Calme" 
@@ -162,9 +176,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-grow"
+            disabled={isLoading}
           />
-          <Button type="submit" size="icon" variant="default">
-            <SendHorizontal className="h-4 w-4" />
+          <Button type="submit" size="icon" variant="default" disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <SendHorizontal className="h-4 w-4" />
+            )}
           </Button>
         </form>
       </CardFooter>

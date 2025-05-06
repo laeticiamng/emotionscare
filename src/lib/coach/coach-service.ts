@@ -4,6 +4,7 @@ import { coachRoutines } from './routines';
 import { notificationService } from './notification-service';
 import { emotionalDataService } from './emotional-data';
 import { actionExecutor } from './action-executor';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Main service for orchestrating coach routines and actions
@@ -67,6 +68,33 @@ export class CoachService {
    */
   getUserEmotionalData(userId: string) {
     return emotionalDataService.getUserEmotionalData(userId);
+  }
+  
+  /**
+   * Sends a query to the OpenAI API through the Edge Function
+   */
+  async askCoachQuestion(userId: string, question: string): Promise<string> {
+    try {
+      // Récupérer le contexte émotionnel pour enrichir la requête
+      const userEmotionalData = await this.getUserEmotionalData(userId);
+      
+      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+        body: {
+          message: question,
+          userContext: {
+            recentEmotions: userEmotionalData.recentEmotions.map(e => e.emotion).join(', '),
+            currentScore: userEmotionalData.averageScore
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      return data.response;
+    } catch (error) {
+      console.error('Error asking coach question:', error);
+      return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question. Veuillez réessayer plus tard.";
+    }
   }
 }
 
