@@ -33,10 +33,13 @@ const ChartContainer = React.forwardRef<
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {React.Children.map(children, (child) => {
-            if (!React.isValidElement(child)) return null;
-            return child;
-          })}
+          {/* Ensure we only pass a single child to ResponsiveContainer */}
+          {React.Children.count(children) === 1
+            ? children
+            : React.Children.map(children, (child) => {
+                if (!React.isValidElement(child)) return null;
+                return child;
+              })[0] || null}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
