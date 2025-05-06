@@ -38,9 +38,9 @@ const DashboardPage: React.FC = () => {
       setTimeout(() => {
         notificationService.addNotification(user.id, {
           id: `welcome-${Date.now()}`,
-          type: 'info',
           title: 'Bienvenue dans votre dashboard',
           message: 'Découvrez les nouvelles fonctionnalités disponibles',
+          type: 'info',
           timestamp: new Date(),
           read: false
         });
@@ -49,9 +49,9 @@ const DashboardPage: React.FC = () => {
         setTimeout(() => {
           notificationService.addNotification(user.id, {
             id: `reminder-${Date.now()}`,
-            type: 'reminder',
             title: 'Rappel: Scan émotionnel',
             message: 'N\'oubliez pas de compléter votre scan émotionnel quotidien',
+            type: 'reminder',
             timestamp: new Date(),
             read: false
           });

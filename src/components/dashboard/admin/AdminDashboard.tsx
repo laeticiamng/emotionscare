@@ -14,7 +14,7 @@ import {
   Activity, TrendingUp, UserCheck, AlertTriangle 
 } from 'lucide-react';
 
-const AdminDashboard: React.FC = () => {
+const AdminDashboardContent: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("vue-globale");
   const [timePeriod, setTimePeriod] = useState<string>("30");
@@ -89,38 +89,45 @@ const AdminDashboard: React.FC = () => {
   }, [refetchAll, refetchEmotionalTrend, refetchDashboardStats]);
   
   return (
+    <div className="max-w-7xl mx-auto">
+      {/* Admin Hero Section */}
+      <AdminHero 
+        kpis={adminKpis} 
+        actions={adminActions}
+        isLoading={isLoading} 
+      />
+      
+      {/* Hero Section with Period Selector */}
+      <DashboardHeader 
+        timePeriod={timePeriod} 
+        setTimePeriod={setTimePeriod} 
+        isLoading={isLoading}
+        onRefresh={refreshAllData}
+      />
+      
+      {/* Tabs Navigation */}
+      <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
+        <AdminTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} disabled={isLoading} />
+        
+        {/* Tab Contents */}
+        <AdminTabContents 
+          activeTab={activeTab}
+          absenteeismData={absenteeismData}
+          emotionalScoreTrend={emotionalScoreTrend}
+          dashboardStats={formattedDashboardStats}
+        />
+      </Tabs>
+      
+      <AdminFooter />
+    </div>
+  );
+};
+
+// Create wrapper component that provides the SegmentContext
+const AdminDashboard: React.FC = () => {
+  return (
     <SegmentProvider>
-      <div className="max-w-7xl mx-auto">
-        {/* Admin Hero Section */}
-        <AdminHero 
-          kpis={adminKpis} 
-          actions={adminActions}
-          isLoading={isLoading} 
-        />
-        
-        {/* Hero Section with Period Selector */}
-        <DashboardHeader 
-          timePeriod={timePeriod} 
-          setTimePeriod={setTimePeriod} 
-          isLoading={isLoading}
-          onRefresh={refreshAllData}
-        />
-        
-        {/* Tabs Navigation */}
-        <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
-          <AdminTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} disabled={isLoading} />
-          
-          {/* Tab Contents */}
-          <AdminTabContents 
-            activeTab={activeTab}
-            absenteeismData={absenteeismData}
-            emotionalScoreTrend={emotionalScoreTrend}
-            dashboardStats={formattedDashboardStats}
-          />
-        </Tabs>
-        
-        <AdminFooter />
-      </div>
+      <AdminDashboardContent />
     </SegmentProvider>
   );
 };
