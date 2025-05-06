@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -14,6 +13,7 @@ import AdminSettingsTab from './tabs/AdminSettingsTab';
 import UsersListTab from './tabs/UsersListTab';
 import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
+import InvitationsTab from './tabs/invitations/InvitationsTab';
 
 interface AdminTabContentsProps {
   activeTab: string;
@@ -137,6 +137,10 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       
       <TabsContent value="admin-settings" className="mt-0">
         <AdminSettingsTab />
+      </TabsContent>
+      
+      <TabsContent value="invitations">
+        <InvitationsTab />
       </TabsContent>
     </>
   );

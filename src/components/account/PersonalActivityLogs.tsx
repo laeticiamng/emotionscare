@@ -1,290 +1,226 @@
-
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase-client';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, Filter } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { ActivityLog } from '@/components/admin/UserActivityTimeline';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import Pagination from '@/components/ui/data-table/Pagination';
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale';
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ActivityFiltersState, AnonymousActivity } from '../dashboard/admin/tabs/activity-logs/types';
+import { applyFilters, getActivityLabel } from '../dashboard/admin/tabs/activity-logs/activityUtils';
 import { useToast } from '@/hooks/use-toast';
-import UserActivityTimeline from '@/components/admin/UserActivityTimeline';
+import { supabase } from '@/lib/supabase-client';
+import Pagination from '@/components/ui/data-table/Pagination';
 
 const PersonalActivityLogs: React.FC = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  const [activities, setActivities] = useState<AnonymousActivity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<AnonymousActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Filters
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activityType, setActivityType] = useState('all');
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalLogs, setTotalLogs] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const { toast } = useToast();
+  
+  const [filters, setFilters] = useState<ActivityFiltersState>({
+    searchTerm: '',
+    activityType: '',
+    startDate: undefined,
+    endDate: undefined,
+  });
+  
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
   
   useEffect(() => {
-    if (!user?.id) return;
-    fetchPersonalLogs();
-  }, [user?.id, currentPage, pageSize, activityType, startDate, endDate]);
-  
-  // Debounced search
-  useEffect(() => {
-    if (!user?.id) return;
-    
-    const timer = setTimeout(() => {
-      fetchPersonalLogs();
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-  
-  const fetchPersonalLogs = async () => {
-    if (!user?.id) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      let query = supabase
-        .from('user_activity_logs')
-        .select('*', { count: 'exact' })
-        .eq('user_id', user.id);
-      
-      // Apply filters
-      if (searchTerm) {
-        query = query.textSearch('activity_details', searchTerm, { 
-          type: 'websearch',
-          config: 'english' 
-        });
-      }
-      
-      if (activityType !== 'all') {
-        query = query.eq('activity_type', activityType);
-      }
-      
-      if (startDate) {
-        query = query.gte('timestamp', startDate.toISOString());
-      }
-      
-      if (endDate) {
-        // Set time to end of day for end date
-        const endOfDay = new Date(endDate);
-        endOfDay.setHours(23, 59, 59, 999);
-        query = query.lte('timestamp', endOfDay.toISOString());
-      }
-      
-      // Calculate pagination
-      const from = (currentPage - 1) * pageSize;
-      const to = from + pageSize - 1;
-      
-      // Execute query with pagination
-      const { data, error: fetchError, count } = await query
-        .order('timestamp', { ascending: false })
-        .range(from, to);
-        
-      if (fetchError) throw new Error(fetchError.message);
-      
-      setActivityLogs(data || []);
-      setTotalLogs(count || 0);
-      setTotalPages(Math.ceil((count || 0) / pageSize));
-    } catch (err) {
-      console.error('Error fetching personal activity logs:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch activity logs');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleExportPersonalData = async () => {
-    if (!user?.id) return;
-    
-    try {
+    const fetchActivities = async () => {
       setIsLoading(true);
-      // Get all logs for the user (no pagination)
-      const { data, error: exportError } = await supabase
-        .from('user_activity_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('timestamp', { ascending: false });
-      
-      if (exportError) throw new Error(exportError.message);
-      
-      if (!data || data.length === 0) {
-        toast({
-          title: "Information",
-          description: "Aucune activité à exporter.",
-        });
-        return;
+      try {
+        // Fetch all activities for the current user
+        const { data, error } = await supabase
+          .from('user_activity_logs')
+          .select('*')
+          .eq('user_id', supabase.auth.user()?.id)
+          .order('timestamp_day', { ascending: false });
+        
+        if (error) {
+          console.error("Error fetching activities:", error);
+          toast({
+            title: "Erreur",
+            description: "Impossible de charger l'historique des activités",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        if (data) {
+          const anonymousData = data.map(item => ({
+            id: item.id,
+            activity_type: item.activity_type,
+            category: item.activity_details?.category || 'general',
+            count: 1,
+            timestamp_day: item.timestamp_day,
+          }));
+          setActivities(anonymousData);
+        }
+      } finally {
+        setIsLoading(false);
       }
-      
-      // Convert data to CSV format
-      const headers = ['Type d\'activité', 'Date et heure', 'Détails', 'IP'];
-      const csvContent = data.map(log => {
-        return [
-          log.activity_type,
-          new Date(log.timestamp).toLocaleString('fr-FR'),
-          JSON.stringify(log.activity_details || {}),
-          log.user_ip || 'N/A'
-        ].join(',');
-      });
-      
-      const csv = [headers.join(','), ...csvContent].join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      
-      // Create download link
-      const link = document.createElement('a');
-      const filename = `mes_activites_${format(new Date(), 'yyyy-MM-dd')}.csv`;
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast({
-        title: "Téléchargement réussi",
-        description: "Votre historique personnel a été téléchargé.",
-      });
-    } catch (err) {
-      console.error('Error exporting personal data:', err);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'exporter vos données. Veuillez réessayer.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+    };
+    
+    fetchActivities();
+  }, [toast]);
+  
+  useEffect(() => {
+    // Apply filters and pagination
+    const filteredData = applyFilters(activities, filters);
+    setFilteredActivities(filteredData);
+    
+    // Calculate total pages
+    setTotalPages(Math.ceil(filteredData.length / pageSize));
+    
+    // Ensure current page is within bounds
+    if (currentPage > Math.ceil(filteredData.length / pageSize)) {
+      setCurrentPage(1);
     }
+  }, [activities, filters, currentPage, pageSize]);
+  
+  const paginatedActivities = React.useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredActivities.slice(startIndex, endIndex);
+  }, [filteredActivities, currentPage, pageSize]);
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilters({ ...filters, searchTerm: e.target.value });
   };
   
-  const clearFilters = () => {
-    setSearchTerm('');
-    setActivityType('all');
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setCurrentPage(1);
+  const handleActivityTypeChange = (value: string) => {
+    setFilters({ ...filters, activityType: value });
   };
   
-  if (!user?.id) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          Veuillez vous connecter pour voir votre historique d'activité.
-        </CardContent>
-      </Card>
-    );
-  }
+  const handleDateChange = (date: Date | undefined) => {
+    setDate(date);
+    setFilters({ 
+      ...filters, 
+      startDate: date, 
+      endDate: date 
+    });
+  };
   
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mon historique d'activité</CardTitle>
-        <CardDescription>
-          Consultez votre historique personnel d'utilisation de la plateforme. Ces données sont strictement confidentielles et accessibles uniquement par vous-même.
-        </CardDescription>
-        
-        <div className="space-y-4 mt-4">
-          <div className="flex flex-col gap-4 md:flex-row">
-            <Input
-              placeholder="Rechercher dans votre historique..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1"
-            />
-            
-            <Select value={activityType} onValueChange={setActivityType}>
-              <SelectTrigger className="w-full md:w-[180px]">
-                <SelectValue placeholder="Type d'activité" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                <SelectItem value="connexion">Connexion</SelectItem>
-                <SelectItem value="consultation">Consultation</SelectItem>
-                <SelectItem value="inscription_event">Inscription</SelectItem>
-                <SelectItem value="modification_profil">Modification profil</SelectItem>
-                <SelectItem value="questionnaire_reponse">Questionnaire</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <div className="flex gap-2">
-              <DatePicker
-                date={startDate}
-                onSelect={setStartDate}
-                placeholder="Date début"
-              />
-              <DatePicker
-                date={endDate}
-                onSelect={setEndDate}
-                placeholder="Date fin"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-muted-foreground">
-              {totalLogs} activité{totalLogs !== 1 ? 's' : ''}
-            </div>
-            
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={clearFilters}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Réinitialiser
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleExportPersonalData}
-                disabled={isLoading || totalLogs === 0}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Télécharger mon historique
-              </Button>
-            </div>
-          </div>
-        </div>
+        <CardTitle>Historique de vos activités</CardTitle>
+        <CardDescription>Suivez votre parcours bien-être</CardDescription>
       </CardHeader>
       
-      <CardContent>
-        <UserActivityTimeline logs={activityLogs} isLoading={isLoading} />
-        
-        {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-center">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              pageSize={pageSize}
-              onPageSizeChange={setPageSize}
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search Input */}
+          <div>
+            <Label htmlFor="search">Rechercher</Label>
+            <Input
+              type="search"
+              id="search"
+              placeholder="Rechercher par type d'activité"
+              onChange={handleSearchChange}
             />
           </div>
+          
+          {/* Activity Type Filter */}
+          <div>
+            <Label htmlFor="activityType">Type d'activité</Label>
+            <Select onValueChange={handleActivityTypeChange}>
+              <SelectTrigger id="activityType">
+                <SelectValue placeholder="Tous les types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Tous les types</SelectItem>
+                <SelectItem value="scan_emotion">Scan émotionnel</SelectItem>
+                <SelectItem value="journal_entry">Journal</SelectItem>
+                <SelectItem value="music_play">Écoute musicale</SelectItem>
+                <SelectItem value="vr_session">Session VR</SelectItem>
+                <SelectItem value="profile_update">Mise à jour profil</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Date Picker */}
+          <div>
+            <Label>Date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP", { locale: enUS }) : <span>Choisir une date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={handleDateChange}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date('2023-01-01')
+                  }
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+        
+        {/* Activity List */}
+        {isLoading ? (
+          <div className="text-center">Chargement...</div>
+        ) : paginatedActivities.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type d'activité
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedActivities.map((activity) => (
+                  <tr key={activity.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getActivityLabel(activity.activity_type)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {format(new Date(activity.timestamp_day), 'PPP', { locale: enUS })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center">Aucune activité trouvée.</div>
         )}
         
-        <div className="mt-6 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm">
-          <p className="font-medium">Confidentialité de vos données</p>
-          <p className="mt-1">
-            Conformément au RGPD, votre historique d'activité est strictement personnel 
-            et confidentiel. Seul vous y avez accès. Les administrateurs et membres des RH 
-            ne peuvent consulter que des données anonymisées et agrégées sans possibilité 
-            d'identification individuelle.
-          </p>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          pageSize={pageSize}
+          onPageSizeChange={setPageSize}
+          totalItems={filteredActivities.length} // Add this line
+        />
       </CardContent>
     </Card>
   );

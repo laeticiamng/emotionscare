@@ -1,163 +1,49 @@
 import React from 'react';
-import { 
-  BarChart, Calendar, Cloud, 
-  FileText, Globe, Settings, 
-  Shield, Users, Zap,
-  Activity
-} from 'lucide-react';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Activity, BarChart3, Settings, Users, UserPlus } from 'lucide-react';
 
 interface AdminTabsNavigationProps {
-  activeTab: string;
-  onTabChange?: (tab: string) => void; // Make optional to support both patterns
-  setActiveTab?: (tab: string) => void; // Support prop from AdminDashboard
-  disabled?: boolean;
+  value: string;
+  onValueChange: (value: string) => void;
 }
 
-const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({
-  activeTab,
-  onTabChange,
-  setActiveTab,
-  disabled = false
-}) => {
-  // Handler that works with both prop patterns
-  const handleTabClick = (tab: string) => {
-    if (onTabChange) onTabChange(tab);
-    if (setActiveTab) setActiveTab(tab);
-  };
-
+const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({ value, onValueChange }) => {
+  const tabs = [
+    {
+      value: "users",
+      label: "Utilisateurs",
+      icon: <Users className="h-4 w-4" />,
+    },
+    {
+      value: "activity-logs",
+      label: "Logs d'activité",
+      icon: <Activity className="h-4 w-4" />,
+    },
+    {
+      value: "weather-activities",
+      label: "Météo & Activités",
+      icon: <BarChart3 className="h-4 w-4" />,
+    },
+    {
+      value: "settings",
+      label: "Paramètres",
+      icon: <Settings className="h-4 w-4" />,
+    },
+    {
+      value: "invitations",
+      label: "Invitations",
+      icon: <UserPlus className="h-4 w-4" />,
+    }
+  ];
+  
   return (
-    <TabsList className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 w-full">
-      <TabsTrigger 
-        value="vue-globale"
-        onClick={() => handleTabClick('vue-globale')}
-        className="w-full"
-        data-state={activeTab === 'vue-globale' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Globe className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Vue globale</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="scan-equipe"
-        onClick={() => handleTabClick('scan-equipe')}
-        className="w-full"
-        data-state={activeTab === 'scan-equipe' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <BarChart className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Scan équipe</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="social-cocoon"
-        onClick={() => handleTabClick('social-cocoon')}
-        className="w-full"
-        data-state={activeTab === 'social-cocoon' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Zap className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Social Cocoon</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="gamification"
-        onClick={() => handleTabClick('gamification')}
-        className="w-full"
-        data-state={activeTab === 'gamification' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Zap className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Gamification</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="evenements"
-        onClick={() => handleTabClick('evenements')}
-        className="w-full"
-        data-state={activeTab === 'evenements' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Calendar className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Événements</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="journal-trends"
-        onClick={() => handleTabClick('journal-trends')}
-        className="w-full"
-        data-state={activeTab === 'journal-trends' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <FileText className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Journal</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="actions-rh"
-        onClick={() => handleTabClick('actions-rh')}
-        className="w-full"
-        data-state={activeTab === 'actions-rh' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <FileText className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Actions RH</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="compliance"
-        onClick={() => handleTabClick('compliance')}
-        className="w-full"
-        data-state={activeTab === 'compliance' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Shield className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Compliance</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="weather-activities"
-        onClick={() => handleTabClick('weather-activities')}
-        className="w-full"
-        data-state={activeTab === 'weather-activities' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Cloud className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Weather</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="users-list"
-        onClick={() => handleTabClick('users-list')}
-        className="w-full"
-        data-state={activeTab === 'users-list' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Users className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Utilisateurs</span>
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="activity-logs"
-        onClick={() => onTabChange('activity-logs')}
-        disabled={disabled}
-        className="flex items-center"
-      >
-        <Activity className="mr-2 h-4 w-4" />
-        Activités (anonymes)
-      </TabsTrigger>
-      
-      <TabsTrigger 
-        value="admin-settings"
-        onClick={() => handleTabClick('admin-settings')}
-        className="w-full"
-        data-state={activeTab === 'admin-settings' ? 'active' : ''}
-        disabled={disabled}
-      >
-        <Settings className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Paramètres</span>
-      </TabsTrigger>
+    <TabsList className="w-full">
+      {tabs.map((tab) => (
+        <TabsTrigger key={tab.value} value={tab.value} onClick={() => onValueChange(tab.value)} className="h-12">
+          {tab.icon}
+          <span className="ml-2">{tab.label}</span>
+        </TabsTrigger>
+      ))}
     </TabsList>
   );
 };

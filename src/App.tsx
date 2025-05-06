@@ -1,108 +1,160 @@
+import React, { useEffect } from 'react';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from "@/hooks/use-toast"
+import { Shell } from "@/components/Shell"
+import { Home } from "@/pages/Home"
+import { Docs } from "@/pages/Docs"
+import { Pricing } from "@/pages/Pricing"
+import { Contact } from "@/pages/Contact"
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import DashboardPage from '@/pages/DashboardPage';
+import SettingsPage from '@/pages/SettingsPage';
+import AdminLoginPage from '@/pages/AdminLoginPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/ResetPasswordPage';
+import { getCurrentUser } from '@/data/mockUsers';
+import { updateUser } from '@/lib/userService';
+import { User } from '@/types';
+import InvitePage from './pages/InvitePage';
 
-import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import './App.css';
-import { Toaster } from './components/ui/toaster';
-import Layout from './components/Layout';
-import ProtectedLayout from './components/ProtectedLayout';
-import LoadingAnimation from './components/ui/loading-animation';
+const App: React.FC = () => {
+  const { setUser, isAuthenticated, setIsAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const storedUser = getCurrentUser();
+      if (storedUser) {
+        setUser(storedUser);
+        setIsAuthenticated(true);
+        
+        // Check if the user needs to be onboarded
+        if (!storedUser.onboarded) {
+          toast({
+            title: "Bienvenue !",
+            description: "Veuillez compléter votre profil pour une expérience optimale.",
+          });
+          navigate('/settings');
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+    
+    checkAuthentication();
+  }, [setUser, setIsAuthenticated, navigate, toast]);
+  
+  // Onboarding flow simulation
+  useEffect(() => {
+    const completeOnboarding = async () => {
+      // Check if the user is authenticated and has just registered
+      const urlParams = new URLSearchParams(window.location.search);
+      const justRegistered = urlParams.get('registered') === 'true';
+      
+      if (isAuthenticated && justRegistered) {
+        // Simulate completing the onboarding process
+        const user = getCurrentUser();
+        if (user) {
+          const updatedUser: Partial<User> = { ...user, onboarded: true };
+          try {
+            const newUser = await updateUser(updatedUser);
+            setUser(newUser);
+            
+            toast({
+              title: "Profil complété !",
+              description: "Votre compte est maintenant configuré.",
+            });
+            navigate('/dashboard');
+          } catch (error) {
+            console.error("Error updating user:", error);
+            toast({
+              title: "Erreur",
+              description: "Impossible de mettre à jour votre profil. Veuillez réessayer.",
+              variant: "destructive"
+            });
+          }
+        }
+      }
+    };
+    
+    completeOnboarding();
+  }, [isAuthenticated, setUser, navigate, toast]);
+  
+  return null;
+};
 
-// Lazy-loaded pages for better performance
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
-const JournalPage = lazy(() => import('./pages/JournalPage'));
-const JournalEntryPage = lazy(() => import('./pages/JournalEntryPage'));
-const JournalNewPage = lazy(() => import('./pages/JournalNewPage'));
-const ScanPage = lazy(() => import('./pages/ScanPage'));
-const ScanDetailPage = lazy(() => import('./pages/ScanDetailPage'));
-const VRSessionsPage = lazy(() => import('./pages/VRSessionsPage'));
-const VRSessionPage = lazy(() => import('./pages/VRSessionPage'));
-const VRAnalyticsPage = lazy(() => import('./pages/VRAnalyticsPage'));
-const SocialCocoonPage = lazy(() => import('./pages/SocialCocoonPage'));
-const CommunityFeed = lazy(() => import('./pages/CommunityFeed'));
-const GroupsPage = lazy(() => import('./pages/GroupsPage'));
-const BuddyPage = lazy(() => import('./pages/BuddyPage'));
-const CoachPage = lazy(() => import('./pages/CoachPage'));
-const AccountSettings = lazy(() => import('./pages/AccountSettings'));
-const UserPreferences = lazy(() => import('./pages/UserPreferences'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
-const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
-const GamificationPage = lazy(() => import('./pages/GamificationPage'));
-const CompliancePage = lazy(() => import('./pages/CompliancePage'));
-const NotImplementedPage = lazy(() => import('./pages/NotImplementedPage'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Index = lazy(() => import('./pages/Index'));
-const MusicWellbeingPage = lazy(() => import('./pages/MusicWellbeingPage'));
-const MyDataPage = lazy(() => import('./pages/MyDataPage'));
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Shell />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/docs",
+        element: <Docs />,
+      },
+      {
+        path: "/pricing",
+        element: <Pricing />,
+      },
+      {
+        path: "/contact",
+        element: <Contact />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardPage />,
+  },
+  {
+    path: "/settings",
+    element: <SettingsPage />,
+  },
+  {
+    path: "/admin/login",
+    element: <AdminLoginPage />,
+  },
+   {
+    path: "/forgot-password",
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
+  },
+  {
+    path: "/invite",
+    element: <InvitePage />,
+  }
+]);
 
-// Fallback loading component
-const Loading = () => <LoadingAnimation />;
-
-function App() {
+function AppWrapper() {
   return (
-    <>
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          {/* Landing page - this is now first in the routes order */}
-          <Route path="/" element={<Layout><Index /></Layout>} />
-          
-          {/* Auth routes (no navigation) */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/admin-login" element={<AdminLoginPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
-          
-          {/* Protected routes (require authentication) */}
-          <Route element={<ProtectedLayout><Layout /></ProtectedLayout>}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            
-            {/* Journal */}
-            <Route path="/journal" element={<JournalPage />} />
-            <Route path="/journal/new" element={<JournalNewPage />} />
-            <Route path="/journal/:id" element={<JournalEntryPage />} />
-            
-            {/* Emotion Scan */}
-            <Route path="/scan" element={<ScanPage />} />
-            <Route path="/scan/:id" element={<ScanDetailPage />} />
-            
-            {/* VR */}
-            <Route path="/vr-sessions" element={<VRSessionsPage />} />
-            <Route path="/vr-sessions/:id" element={<VRSessionPage />} />
-            <Route path="/vr-analytics" element={<VRAnalyticsPage />} />
-            
-            {/* Community */}
-            <Route path="/social-cocoon" element={<SocialCocoonPage />} />
-            <Route path="/community/feed" element={<CommunityFeed />} />
-            <Route path="/groups" element={<GroupsPage />} />
-            <Route path="/buddy" element={<BuddyPage />} />
-            
-            {/* Music */}
-            <Route path="/music-wellbeing" element={<MusicWellbeingPage />} />
-            
-            {/* Coach */}
-            <Route path="/coach" element={<CoachPage />} />
-            
-            {/* Gamification */}
-            <Route path="/gamification" element={<GamificationPage />} />
-            
-            {/* Account & Settings */}
-            <Route path="/account" element={<AccountSettings />} />
-            <Route path="/preferences" element={<UserPreferences />} />
-            <Route path="/my-data" element={<MyDataPage />} />
-            
-            {/* Compliance */}
-            <Route path="/compliance" element={<CompliancePage />} />
-            
-            {/* Placeholder for not implemented pages */}
-            <Route path="/not-implemented/:feature" element={<NotImplementedPage />} />
-          </Route>
-          
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-      <Toaster />
-    </>
+    <AuthContext.AuthProvider>
+      <App />
+      <RouterProvider router={router} />
+    </AuthContext.AuthProvider>
   );
 }
 
-export default App;
+export default AppWrapper;
+import { AuthContext } from './contexts/AuthContext';

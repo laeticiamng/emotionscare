@@ -1,15 +1,33 @@
 
 project_id = "yaincoxihiqdksxgrsrk"
 
-[functions.generate-vr-benefit]
-verify_jwt = false
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
 
-[functions.analyze-emotion]
-verify_jwt = false
+[db]
+port = 54322
 
-[functions.chat-with-ai]
-verify_jwt = false
+[studio]
+enabled = true
+port = 54323
+api_url = "http://localhost"
 
-[functions.analyze-journal]
-verify_jwt = false
+[inbucket]
+enabled = true
+port = 54324
 
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+
+[storage]
+enabled = true
+
+[realtime]
+enabled = true
+
+[functions]
+[functions.send-invitation]
+verify_jwt = false

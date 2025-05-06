@@ -1,73 +1,74 @@
 
-/**
- * Get a human-readable label for an activity type
- */
-export const getActivityLabel = (type: string): string => {
-  switch (type) {
-    case 'connexion': return 'Connexion';
-    case 'consultation': return 'Consultation';
-    case 'inscription_event': return 'Inscription';
-    case 'modification_profil': return 'Modification profil';
-    case 'questionnaire_reponse': return 'Questionnaire';
-    default: return type;
-  }
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { ActivityFiltersState, ActivityStats, AnonymousActivity, ActivityTabView } from './types';
+
+// Helper to get a user-friendly label for activity types
+export const getActivityLabel = (activityType: string): string => {
+  const activityLabels: Record<string, string> = {
+    'login': 'Connexion',
+    'logout': 'Déconnexion',
+    'scan_emotion': 'Scan émotionnel',
+    'journal_entry': 'Journal',
+    'music_play': 'Écoute musicale',
+    'vr_session': 'Session VR',
+    'profile_update': 'Mise à jour profil',
+    'invitation_sent': 'Invitation envoyée',
+    'invitation_accepted': 'Invitation acceptée',
+    'account_created': 'Compte créé',
+  };
+  
+  return activityLabels[activityType] || activityType;
 };
 
-/**
- * Export activity data as CSV
- */
-export const exportActivityData = (
-  activeTab: ActivityTabView,
+// Format CSV data based on the active tab
+export const formatCsvData = (
+  activeTab: ActivityTabView, 
   data: AnonymousActivity[] | ActivityStats[]
-): void => {
-  if (data.length === 0) return;
-  
-  let csvContent = '';
-  let fileName = '';
-  
+): any[] => {
   if (activeTab === 'daily') {
-    const activities = data as AnonymousActivity[];
-    const csvHeaders = ['Type d\'activité', 'Catégorie', 'Nombre', 'Date'];
-    csvContent = activities.map(activity => {
-      return [
-        activity.activity_type,
-        activity.category,
-        activity.count,
-        activity.timestamp_day
-      ].join(',');
-    }).join('\n');
-    fileName = 'activites_anonymes.csv';
-    
-    const csv = [csvHeaders.join(','), csvContent].join('\n');
-    downloadCsv(csv, fileName);
+    return (data as AnonymousActivity[]).map(item => ({
+      Date: item.timestamp_day,
+      'Type d\'activité': getActivityLabel(item.activity_type),
+      Catégorie: item.category,
+      'Nombre': item.count
+    }));
   } else {
-    const stats = data as ActivityStats[];
-    const csvHeaders = ['Type d\'activité', 'Total', 'Pourcentage'];
-    csvContent = stats.map(stat => {
-      return [
-        stat.activity_type,
-        stat.total_count,
-        `${stat.percentage}%`
-      ].join(',');
-    }).join('\n');
-    fileName = 'statistiques_activites.csv';
-    
-    const csv = [csvHeaders.join(','), csvContent].join('\n');
-    downloadCsv(csv, fileName);
+    return (data as ActivityStats[]).map(item => ({
+      'Type d\'activité': getActivityLabel(item.activity_type),
+      'Nombre total': item.total_count,
+      'Pourcentage': `${item.percentage.toFixed(1)}%`
+    }));
   }
 };
 
-/**
- * Create and download a CSV file
- */
-const downloadCsv = (csvContent: string, fileName: string): void => {
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', fileName);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+// Get a default file name for CSV export
+export const getDefaultCsvFileName = (activeTab: ActivityTabView): string => {
+  const today = format(new Date(), 'yyyy-MM-dd', { locale: fr });
+  return activeTab === 'daily' 
+    ? `activites-journalieres-${today}.csv` 
+    : `statistiques-activites-${today}.csv`;
+};
+
+// Apply filters to activity data
+export const applyFilters = (
+  data: AnonymousActivity[], 
+  filters: ActivityFiltersState
+): AnonymousActivity[] => {
+  return data.filter(activity => {
+    // Apply search filter
+    const matchesSearch = !filters.searchTerm || 
+      activity.activity_type.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
+      activity.category.toLowerCase().includes(filters.searchTerm.toLowerCase());
+    
+    // Apply activity type filter
+    const matchesType = !filters.activityType || activity.activity_type === filters.activityType;
+    
+    // Apply date filters if provided
+    const activityDate = new Date(activity.timestamp_day);
+    const matchesStartDate = !filters.startDate || activityDate >= filters.startDate;
+    const matchesEndDate = !filters.endDate || activityDate <= filters.endDate;
+    
+    return matchesSearch && matchesType && matchesStartDate && matchesEndDate;
+  });
 };
