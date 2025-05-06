@@ -1,22 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import {
-  BarChart2,
-  MessageSquare,
-  Trophy,
-  Sparkles,
-  ShieldCheck,
-  CalendarDays,
-  Settings,
-  Activity,
-  LineChart
-} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import PeriodSelector from './PeriodSelector';
-
-// Import all tab components
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
 import ScanTeamTab from './tabs/ScanTeamTab';
 import JournalTrendsTab from './tabs/JournalTrendsTab';
@@ -26,46 +12,31 @@ import HRActionsTab from './tabs/HRActionsTab';
 import EventsCalendarTab from './tabs/EventsCalendarTab';
 import ComplianceTab from './tabs/ComplianceTab';
 import AdminSettingsTab from './tabs/AdminSettingsTab';
+import { 
+  BarChart2, MessageSquare, Trophy, Sparkles, 
+  ShieldCheck, CalendarDays, Settings, Activity, LineChart 
+} from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("vue-globale");
-  const [selectedPeriod, setSelectedPeriod] = useState("30");
+  const [timePeriod, setTimePeriod] = useState<string>("30");
+  const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
+  const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Mock data for the dashboard
-  const dashboardStats = {
-    absenteeism: {
-      current: 5.2,
-      previous: 7.8,
-      trend: -2.6,
-      data: [4, 5, 7, 5, 6, 5, 4, 5, 3, 4, 5, 6, 5, 4, 3]
-    },
-    emotionalScore: {
-      current: 78,
-      previous: 72,
-      trend: 6,
-      data: [72, 71, 73, 74, 76, 77, 75, 78, 79, 78, 77, 78, 79, 80, 78]
-    },
-    productivity: {
-      current: 92,
-      previous: 87,
-      trend: 5,
-      data: [85, 86, 88, 87, 89, 90, 91, 92, 93, 92, 91, 92, 92, 93, 92]
-    },
-    journalEntries: [
-      { date: '2024-05-01', avgScore: 76, checkIns: 42 },
-      { date: '2024-05-02', avgScore: 78, checkIns: 38 },
-      { date: '2024-05-03', avgScore: 75, checkIns: 45 },
-      { date: '2024-05-04', avgScore: 79, checkIns: 40 },
-      { date: '2024-05-05', avgScore: 80, checkIns: 37 }
-    ]
-  };
+  // Mock data for emotional climate
+  const emotionalScoreTrend = [
+    { date: '1/5', value: 72 },
+    { date: '2/5', value: 75 },
+    { date: '3/5', value: 78 },
+    { date: '4/5', value: 80 }
+  ];
 
-  // Mock data for social cocoon section
+  // Mock data for Social Cocoon section
   const socialCocoonData = {
     totalPosts: 248,
     moderationRate: 3.2,
-    activeUsers: 87,
     topHashtags: [
       { tag: '#bienetre', count: 42 },
       { tag: '#entraide', count: 36 },
@@ -127,74 +98,101 @@ const AdminDashboard: React.FC = () => {
     certifications: ['ISO 27001', 'RGPD', 'HDS']
   };
 
-  // Convert dashboard data to the format expected by components
-  const absenteeismChartData = dashboardStats.absenteeism.data.map((value, index) => ({
-    date: `${index+1}/5`,
-    value
-  }));
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        setIsLoading(true);
+        
+        // Simulation de chargement des données
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Données de démonstration pour l'absentéisme
+        const absentData = Array.from({ length: 15 }, (_, i) => ({
+          date: `${i+1}/5`,
+          value: 4 + Math.floor(Math.random() * 5)
+        }));
+        
+        // Données de démonstration pour la productivité
+        const prodData = Array.from({ length: 15 }, (_, i) => ({
+          date: `${i+1}/5`,
+          value: 85 + Math.floor(Math.random() * 10)
+        }));
+        
+        setAbsenteeismData(absentData);
+        setProductivityData(prodData);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    loadDashboardData();
+  }, [timePeriod]);
   
-  const emotionalScoreTrend = dashboardStats.emotionalScore.data.map((value, index) => ({
-    date: `${index+1}/5`,
-    value
-  }));
-
   return (
-    <div className="max-w-7xl mx-auto animate-fade-in">
-      {/* Header Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-[#1B365D]">Dashboard Direction</h1>
-        <p className="text-slate-600 italic">Pilotage & Bien-être Collectif</p>
+    <div className="max-w-7xl mx-auto">
+      {/* Hero Section with Period Selector */}
+      <div className="mb-10 animate-fade-in">
+        <div className="flex flex-col md:flex-row items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>
+            <h2 className="text-xl text-muted-foreground mt-2">
+              Métriques globales et anonymisées
+            </h2>
+          </div>
+          <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+        </div>
       </div>
-
+      
       {/* Tabs Navigation */}
       <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
         <TabsList className="mb-4 bg-white/50 backdrop-blur-sm">
-          <TabsTrigger value="vue-globale" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="vue-globale">
             <BarChart2 className="mr-2 h-4 w-4" />
             Vue Globale
           </TabsTrigger>
-          <TabsTrigger value="scan-team" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="scan-team">
             <Activity className="mr-2 h-4 w-4" />
-            Scan Émotionnel - Équipe
+            Scan Émotionnel
           </TabsTrigger>
-          <TabsTrigger value="journal-trends" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="journal-trends">
             <LineChart className="mr-2 h-4 w-4" />
-            Journal - Tendances
+            Journal
           </TabsTrigger>
-          <TabsTrigger value="social-cocoon" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="social-cocoon">
             <MessageSquare className="mr-2 h-4 w-4" />
             Social Cocoon
           </TabsTrigger>
-          <TabsTrigger value="gamification" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="gamification">
             <Trophy className="mr-2 h-4 w-4" />
             Gamification
           </TabsTrigger>
-          <TabsTrigger value="actions-rh" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="actions-rh">
             <Sparkles className="mr-2 h-4 w-4" />
             Actions RH
           </TabsTrigger>
-          <TabsTrigger value="events" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="events">
             <CalendarDays className="mr-2 h-4 w-4" />
             Événements
           </TabsTrigger>
-          <TabsTrigger value="compliance" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="compliance">
             <ShieldCheck className="mr-2 h-4 w-4" />
             Conformité
           </TabsTrigger>
-          <TabsTrigger value="settings" className="rounded-full data-[state=active]:bg-[#1B365D]/10">
+          <TabsTrigger value="settings">
             <Settings className="mr-2 h-4 w-4" />
             Paramètres
           </TabsTrigger>
         </TabsList>
-
-        <PeriodSelector timePeriod={selectedPeriod} setTimePeriod={setSelectedPeriod} />
         
         {/* Tab Contents */}
         <TabsContent value="vue-globale" className="mt-6">
           <GlobalOverviewTab 
-            absenteeismChartData={absenteeismChartData}
+            absenteeismData={absenteeismData}
             emotionalScoreTrend={emotionalScoreTrend}
-            dashboardStats={dashboardStats} 
+            isLoading={isLoading}
+            socialCocoonData={socialCocoonData}
             gamificationData={gamificationData}
           />
         </TabsContent>
@@ -202,7 +200,7 @@ const AdminDashboard: React.FC = () => {
         <TabsContent value="scan-team" className="mt-6">
           <ScanTeamTab 
             emotionalScoreTrend={emotionalScoreTrend} 
-            currentScore={dashboardStats.emotionalScore.current}
+            currentScore={78}
           />
         </TabsContent>
         
