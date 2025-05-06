@@ -1,11 +1,17 @@
 
 import React, { useState, useRef, useCallback } from 'react';
-import { Brush, BrushStartEndIndex } from 'recharts';
+import { Brush } from 'recharts';
 import { ChartControls } from './ChartControls';
 import { ChartContainer } from './ChartContainer';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from "@/lib/utils";
 import { ChartConfig } from './types';
+
+// Define our own BrushStartEndIndex interface since it's not exported from recharts
+interface BrushStartEndIndex {
+  startIndex?: number;
+  endIndex?: number;
+}
 
 interface ZoomableChartProps {
   children: React.ReactNode;
@@ -193,8 +199,13 @@ export const ZoomableChart: React.FC<ZoomableChartProps> = ({
       >
         <ChartContainer config={config}>
           {/* Clone the chart component and add startIndex/endIndex props */}
-          {React.cloneElement(children as React.ReactElement, {
-            data: visibleData,
+          {React.Children.map(children, child => {
+            if (React.isValidElement(child)) {
+              return React.cloneElement(child, {
+                data: visibleData,
+              });
+            }
+            return child;
           })}
           
           {/* Add the brush component */}
