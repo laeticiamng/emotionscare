@@ -5,14 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
-import { AnonymousActivity, ActivityStats, ActivityTabView } from './tabs/activity-logs/types';
+import { AnonymousActivity, ActivityStats, ActivityTabView } from '../dashboard/admin/tabs/activity-logs/types';
 import { getActivityData, getActivityStats } from '@/lib/activityLogService';
 import DailyActivityTable from "@/components/dashboard/admin/tabs/activity-logs/DailyActivityTable";
 import StatsTable from "@/components/dashboard/admin/tabs/activity-logs/StatsTable";
+import { applyFilters, exportActivityData } from '@/components/dashboard/admin/tabs/activity-logs/activityUtils';
 import ActionBar from '@/components/dashboard/admin/tabs/activity-logs/ActionBar';
 
 // Helper function to apply filters
-const applyFilters = (data: AnonymousActivity[], filters: any): AnonymousActivity[] => {
+const applyActivityFilters = (data: AnonymousActivity[], filters: any): AnonymousActivity[] => {
   if (!data) return [];
   
   let filteredData = [...data];
@@ -94,7 +95,7 @@ const UserActivityLogTab: React.FC = () => {
 
   // Apply filters when they change
   useEffect(() => {
-    setFilteredActivities(applyFilters(activities, filters));
+    setFilteredActivities(applyActivityFilters(activities, filters));
   }, [filters, activities]);
 
   // Export data functionality 
@@ -182,7 +183,13 @@ const UserActivityLogTab: React.FC = () => {
                 <TabsTrigger value="stats">Statistiques</TabsTrigger>
               </TabsList>
               
-              <ActionBar filters={filters} setFilters={setFilters} />
+              <ActionBar 
+                activeTab={activeTab}
+                hasData={activeTab === 'daily' ? filteredActivities.length > 0 : stats.length > 0}
+                isLoading={isLoading}
+                onExport={handleExport}
+                totalCount={activeTab === 'daily' ? filteredActivities.length : stats.length}
+              />
             </div>
             
             <TabsContent value="daily" className="mt-4">

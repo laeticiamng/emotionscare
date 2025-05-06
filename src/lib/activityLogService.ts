@@ -1,5 +1,6 @@
 
 import { supabase } from '@/lib/supabase-client';
+import { AnonymousActivity, ActivityStats } from '@/components/dashboard/admin/tabs/activity-logs/types';
 
 export type ActivityType = 
   | 'connexion'
@@ -14,6 +15,109 @@ interface ActivityLogData {
   activity_details?: Record<string, any>;
   user_ip?: string;
 }
+
+// Mock data for development
+const mockActivities: AnonymousActivity[] = [
+  {
+    id: '1',
+    activity_type: 'login',
+    category: 'authentication',
+    count: 25,
+    timestamp_day: '2023-07-01'
+  },
+  {
+    id: '2',
+    activity_type: 'scan_emotion',
+    category: 'wellness',
+    count: 18,
+    timestamp_day: '2023-07-01'
+  },
+  {
+    id: '3',
+    activity_type: 'journal_entry',
+    category: 'wellness',
+    count: 12,
+    timestamp_day: '2023-07-02'
+  },
+  {
+    id: '4',
+    activity_type: 'vr_session',
+    category: 'wellness',
+    count: 8,
+    timestamp_day: '2023-07-02'
+  },
+  {
+    id: '5',
+    activity_type: 'profile_update',
+    category: 'account',
+    count: 5,
+    timestamp_day: '2023-07-03'
+  }
+];
+
+const mockStats: ActivityStats[] = [
+  {
+    activity_type: 'login',
+    total_count: 125,
+    percentage: 40.5
+  },
+  {
+    activity_type: 'scan_emotion',
+    total_count: 82,
+    percentage: 26.5
+  },
+  {
+    activity_type: 'journal_entry',
+    total_count: 45,
+    percentage: 14.5
+  },
+  {
+    activity_type: 'vr_session',
+    total_count: 37,
+    percentage: 12.0
+  },
+  {
+    activity_type: 'profile_update',
+    total_count: 20,
+    percentage: 6.5
+  }
+];
+
+/**
+ * Get activity data
+ */
+export const getActivityData = async (): Promise<AnonymousActivity[]> => {
+  try {
+    // In a real implementation, we would fetch this from the database
+    // const { data, error } = await supabase.rpc('get_anonymous_activity_logs');
+    // if (error) throw error;
+    // return data;
+    
+    // For now, return mock data
+    return Promise.resolve(mockActivities);
+  } catch (error) {
+    console.error("Error fetching activity data:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get activity statistics
+ */
+export const getActivityStats = async (): Promise<ActivityStats[]> => {
+  try {
+    // In a real implementation, we would fetch this from the database
+    // const { data, error } = await supabase.rpc('get_activity_stats');
+    // if (error) throw error;
+    // return data;
+    
+    // For now, return mock data
+    return Promise.resolve(mockStats);
+  } catch (error) {
+    console.error("Error fetching activity stats:", error);
+    throw error;
+  }
+};
 
 /**
  * Service for logging user activities

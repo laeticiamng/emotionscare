@@ -1,157 +1,121 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { updateUser } from '@/data/mockUsers';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import ThemeSelectionField from '@/components/preferences/ThemeSelectionField';
+import FontSizeField from '@/components/preferences/FontSizeField';
+import ColorAccentField from '@/components/preferences/ColorAccentField';
+import { updateUser } from '@/lib/userService';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserPreferences } from '@/types';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 const OnboardingPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [selectedTheme, setSelectedTheme] = useState('light');
-  const [selectedFontSize, setSelectedFontSize] = useState('medium');
-  const [selectedBackground, setSelectedBackground] = useState('default');
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1);
-
-  const handleComplete = async () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [theme, setTheme] = useState<"light" | "dark" | "pastel" | "system">("light");
+  const [fontSize, setFontSize] = useState<"small" | "medium" | "large">("medium");
+  const [backgroundColor, setBackgroundColor] = useState<"default" | "blue" | "mint" | "coral">("default");
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!user) return;
     
-    setLoading(true);
+    setIsSubmitting(true);
     
     try {
-      await updateUser({
-        ...user,
-        onboarded: true,
-        preferences: {
-          theme: selectedTheme as 'light' | 'dark' | 'pastel' | 'system',
-          fontSize: selectedFontSize as 'small' | 'medium' | 'large',
-          backgroundColor: selectedBackground as 'default' | 'blue' | 'mint' | 'coral',
-          accentColor: 'blue', // Default accent color
-          notifications: {
-            email: false,
-            push: true,
-            sms: false
-          }
+      // Create preferences object
+      const preferences: UserPreferences = {
+        theme,
+        fontSize,
+        backgroundColor,
+        accentColor: "#FF6F61", // Default accent color
+        notifications: {
+          email: true,
+          push: true,
+          sms: false
         }
+      };
+      
+      // Update user with new preferences and mark as onboarded
+      const updatedUser = await updateUser({
+        ...user,
+        preferences,
+        onboarded: true
       });
+      
+      // Update local user state
+      setUser(updatedUser);
+      
+      // Redirect to dashboard
+      navigate('/dashboard');
       
       toast({
-        title: "Configuration terminée",
-        description: "Vos préférences ont été enregistrées",
+        title: "Bienvenue !",
+        description: "Vos préférences ont été enregistrées."
       });
-      
-      navigate("/dashboard");
     } catch (error) {
+      console.error("Error during onboarding:", error);
       toast({
         title: "Erreur",
-        description: "Impossible d'enregistrer vos préférences",
+        description: "Une erreur est survenue lors de l'enregistrement de vos préférences.",
         variant: "destructive"
       });
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
-
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
-
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-center">
-            {step === 1 && "Bienvenue sur Cocoon"}
-            {step === 2 && "Personnalisez votre expérience"}
-            {step === 3 && "Dernière étape"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {step === 1 && (
-            <div className="space-y-4">
-              <p className="text-center">
-                Cocoon est votre espace de bien-être personnel.
-              </p>
-              <div className="flex justify-center">
-                <Button onClick={nextStep}>Commencer</Button>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Thème</p>
-                <Tabs 
-                  value={selectedTheme} 
-                  onValueChange={setSelectedTheme}
-                  className="w-full"
-                >
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="light">Clair</TabsTrigger>
-                    <TabsTrigger value="dark">Sombre</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Taille du texte</p>
-                <Tabs 
-                  value={selectedFontSize} 
-                  onValueChange={setSelectedFontSize}
-                  className="w-full"
-                >
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="small">Petit</TabsTrigger>
-                    <TabsTrigger value="medium">Moyen</TabsTrigger>
-                    <TabsTrigger value="large">Grand</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-sm font-medium">Couleur d'ambiance</p>
-                <Tabs 
-                  value={selectedBackground} 
-                  onValueChange={setSelectedBackground}
-                  className="w-full"
-                >
-                  <TabsList className="grid w-full grid-cols-2 gap-2">
-                    <TabsTrigger value="default">Standard</TabsTrigger>
-                    <TabsTrigger value="blue">Bleu</TabsTrigger>
-                    <TabsTrigger value="mint">Menthe</TabsTrigger>
-                    <TabsTrigger value="coral">Corail</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+    <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#FAFBFC] to-[#E8F1FA]">
+      <div className="w-full max-w-xl p-4 animate-fade-in">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-semibold text-[#1B365D] mb-1">
+            Bienvenue sur EmotionsCare<span className="text-xs align-super">™</span>
+          </h1>
+          <p className="text-slate-600">Personnalisons votre expérience</p>
+        </div>
+        
+        <form onSubmit={handleSubmit}>
+          <Card className="shadow-lg border-[#E8F1FA]">
+            <CardHeader>
+              <CardTitle>Préférences d'affichage</CardTitle>
+            </CardHeader>
+            
+            <CardContent className="space-y-8">
+              <ThemeSelectionField
+                value={theme}
+                onChange={setTheme}
+              />
               
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={prevStep}>Retour</Button>
-                <Button onClick={nextStep}>Suivant</Button>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-6">
-              <p className="text-center">
-                Merci d'avoir configuré votre profil. Vous êtes prêt à commencer votre parcours de bien-être !
-              </p>
+              <FontSizeField
+                value={fontSize}
+                onChange={setFontSize}
+              />
               
-              <div className="flex justify-between pt-4">
-                <Button variant="outline" onClick={prevStep}>Retour</Button>
-                <Button onClick={handleComplete} disabled={loading}>
-                  {loading ? "Chargement..." : "Terminer"}
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              <ColorAccentField
+                value={backgroundColor}
+                onChange={(color) => setBackgroundColor(color as "default" | "blue" | "mint" | "coral")}
+              />
+            </CardContent>
+            
+            <CardFooter className="flex justify-end">
+              <Button 
+                type="submit" 
+                size="lg"
+                disabled={isSubmitting}
+                className="bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white"
+              >
+                {isSubmitting ? 'Enregistrement...' : 'Commencer mon expérience'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </div>
     </div>
   );
 };

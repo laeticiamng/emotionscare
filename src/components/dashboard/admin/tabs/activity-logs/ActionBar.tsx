@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Download } from 'lucide-react';
-import { ActivityTabView } from './types';
+import { Download } from "lucide-react";
+import { ActivityTabView, ActivityFiltersState } from "./types";
 
 interface ActionBarProps {
   activeTab: ActivityTabView;
@@ -10,38 +10,41 @@ interface ActionBarProps {
   isLoading: boolean;
   onExport: () => void;
   totalCount: number;
+  filters?: ActivityFiltersState;
+  setFilters?: React.Dispatch<React.SetStateAction<ActivityFiltersState>>;
 }
 
-const ActionBar: React.FC<ActionBarProps> = ({
-  activeTab,
-  hasData,
-  isLoading,
+const ActionBar: React.FC<ActionBarProps> = ({ 
+  activeTab, 
+  hasData, 
+  isLoading, 
   onExport,
-  totalCount
+  totalCount,
+  filters,
+  setFilters
 }) => {
   return (
-    <div className="flex justify-between items-center">
-      <div className="text-sm text-muted-foreground">
-        {activeTab === 'daily' ? (
-          <>
-            {totalCount} activité{totalCount !== 1 ? 's' : ''} anonymisée{totalCount !== 1 ? 's' : ''}
-          </>
-        ) : (
-          <>
-            {totalCount} type{totalCount !== 1 ? 's' : ''} d'activité
-          </>
+    <div className="flex items-center justify-between mt-4 mb-2">
+      <div>
+        {!isLoading && (
+          <p className="text-sm text-muted-foreground">
+            {hasData 
+              ? `${totalCount} ${activeTab === 'daily' ? 'activités' : 'types d\'activités'} trouvés` 
+              : 'Aucun résultat trouvé'}
+          </p>
         )}
       </div>
-      
-      <Button 
-        variant="outline" 
-        size="sm"
-        onClick={onExport}
-        disabled={!hasData || isLoading}
-      >
-        <Download className="h-4 w-4 mr-2" />
-        Exporter
-      </Button>
+      <div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onExport}
+          disabled={isLoading || !hasData}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Exporter en CSV
+        </Button>
+      </div>
     </div>
   );
 };
