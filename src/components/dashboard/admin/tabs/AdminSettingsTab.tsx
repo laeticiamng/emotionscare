@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdminSettingsTabProps {
@@ -13,170 +12,150 @@ interface AdminSettingsTabProps {
 const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Skeleton className="h-80 w-full" />
-        <Skeleton className="h-80 w-full" />
-        <Skeleton className="h-80 w-full col-span-1 md:col-span-2" />
+      <div className="grid grid-cols-1 gap-6">
+        <Skeleton className="h-96 w-full" />
       </div>
     );
   }
-
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle>Gestion des rôles</CardTitle>
-          <CardDescription>Administrer les utilisateurs et leurs accès</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-              <div>
-                <h4 className="font-medium">Marie Dupont</h4>
-                <p className="text-sm text-muted-foreground">RH - marie.dupont@example.com</p>
-              </div>
-              <Button variant="outline" size="sm">Modifier rôle</Button>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-              <div>
-                <h4 className="font-medium">Pierre Martin</h4>
-                <p className="text-sm text-muted-foreground">Direction - pierre.martin@example.com</p>
-              </div>
-              <Button variant="outline" size="sm">Modifier rôle</Button>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-md">
-              <div>
-                <h4 className="font-medium">Sophie Bernard</h4>
-                <p className="text-sm text-muted-foreground">Utilisateur - sophie.bernard@example.com</p>
-              </div>
-              <Button variant="outline" size="sm">Modifier rôle</Button>
-            </div>
-          </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Paramètres Administrateur</CardTitle>
+        <CardDescription>Configurez les paramètres de l'application pour tous les utilisateurs</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="general">
+          <TabsList className="mb-4">
+            <TabsTrigger value="general">Général</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="security">Sécurité</TabsTrigger>
+            <TabsTrigger value="display">Affichage</TabsTrigger>
+          </TabsList>
           
-          <div className="mt-6">
-            <Button className="w-full">
-              Gérer tous les utilisateurs
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle>Configuration des seuils d'alerte</CardTitle>
-          <CardDescription>Paramétrer les notifications et alertes</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <div>
-              <Label className="mb-2 block">Seuil d'alerte score émotionnel</Label>
-              <div className="flex items-center">
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="100" 
-                  defaultValue="65" 
-                  className="w-full"
-                />
-                <span className="ml-2 font-medium">65/100</span>
+          <TabsContent value="general">
+            <div className="grid gap-6">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Nom de l'entreprise</h3>
+                <input type="text" className="w-full p-2 border rounded" defaultValue="EmotionsCare SAS" />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Une alerte sera générée si un score descend en dessous de cette valeur</p>
-            </div>
-            
-            <div>
-              <Label className="mb-2 block">Seuil d'alerte absentéisme</Label>
-              <div className="flex items-center">
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="20" 
-                  defaultValue="7" 
-                  className="w-full"
-                />
-                <span className="ml-2 font-medium">7%</span>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">Langue par défaut</h3>
+                <select className="w-full p-2 border rounded">
+                  <option value="fr">Français</option>
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
+                </select>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Une alerte sera générée si l'absentéisme dépasse ce taux</p>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Switch id="alert-email" />
-              <Label htmlFor="alert-email">Recevoir les alertes par email</Label>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Switch id="alert-notification" defaultChecked />
-              <Label htmlFor="alert-notification">Recevoir les alertes dans l'application</Label>
-            </div>
-            
-            <Button className="w-full">
-              Enregistrer les paramètres
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="col-span-1 md:col-span-2 glass-card">
-        <CardHeader>
-          <CardTitle>Workflows automatisés</CardTitle>
-          <CardDescription>Configurer des actions automatiques basées sur des déclencheurs</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-medium">Check-in hebdomadaire</h3>
-                  <p className="text-sm text-muted-foreground">Envoie automatiquement une demande de check-in tous les lundis</p>
-                </div>
-                <Switch defaultChecked />
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">Fuseau horaire</h3>
+                <select className="w-full p-2 border rounded">
+                  <option value="europe-paris">Europe/Paris (UTC+1)</option>
+                  <option value="europe-london">Europe/London (UTC+0)</option>
+                  <option value="america-new_york">America/New_York (UTC-5)</option>
+                </select>
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-xs">Déclencheur</Label>
-                  <div className="bg-gray-50 p-2 rounded mt-1">Chaque lundi à 9h</div>
-                </div>
-                <div>
-                  <Label className="text-xs">Action</Label>
-                  <div className="bg-gray-50 p-2 rounded mt-1">Email + notification app</div>
-                </div>
-                <div>
-                  <Label className="text-xs">Cible</Label>
-                  <div className="bg-gray-50 p-2 rounded mt-1">Tous les utilisateurs</div>
-                </div>
+              
+              <div className="flex justify-end">
+                <Button>Enregistrer les modifications</Button>
               </div>
             </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-medium">Alerte score émotionnel critique</h3>
-                  <p className="text-sm text-muted-foreground">Notifie les managers si le score moyen descend sous le seuil</p>
+          </TabsContent>
+          
+          <TabsContent value="notifications">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Notifications par défaut</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Notifications quotidiennes</label>
+                    <input type="checkbox" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Alertes de bien-être</label>
+                    <input type="checkbox" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Annonces système</label>
+                    <input type="checkbox" defaultChecked />
+                  </div>
                 </div>
-                <Switch defaultChecked />
               </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-xs">Déclencheur</Label>
-                  <div className="bg-gray-50 p-2 rounded mt-1">Score &lt; 65 pendant 3 jours</div>
-                </div>
-                <div>
-                  <Label className="text-xs">Action</Label>
-                  <div className="bg-gray-50 p-2 rounded mt-1">Alerte RH + suggestion</div>
-                </div>
-                <div>
-                  <Label className="text-xs">Cible</Label>
-                  <div className="bg-gray-50 p-2 rounded mt-1">Managers concernés</div>
-                </div>
+              
+              <div className="flex justify-end">
+                <Button>Enregistrer les modifications</Button>
               </div>
             </div>
-            
-            <Button className="w-full mt-4">
-              Créer un nouveau workflow
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </TabsContent>
+          
+          <TabsContent value="security">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Sécurité du compte</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Authentification à deux facteurs</label>
+                    <input type="checkbox" />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Expiration du mot de passe (90 jours)</label>
+                    <input type="checkbox" defaultChecked />
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">Politique de mot de passe</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Longueur minimale (8 caractères)</label>
+                    <input type="checkbox" defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm">Exiger des caractères spéciaux</label>
+                    <input type="checkbox" defaultChecked />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button>Enregistrer les modifications</Button>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="display">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Thème par défaut</h3>
+                <select className="w-full p-2 border rounded">
+                  <option value="light">Clair</option>
+                  <option value="dark">Sombre</option>
+                  <option value="system">Système</option>
+                </select>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">Couleur d'accentuation</h3>
+                <div className="flex gap-2">
+                  <div className="w-10 h-10 bg-blue-500 rounded cursor-pointer"></div>
+                  <div className="w-10 h-10 bg-green-500 rounded cursor-pointer"></div>
+                  <div className="w-10 h-10 bg-purple-500 rounded cursor-pointer"></div>
+                  <div className="w-10 h-10 bg-amber-500 rounded cursor-pointer"></div>
+                  <div className="w-10 h-10 bg-pink-500 rounded cursor-pointer"></div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end">
+                <Button>Enregistrer les modifications</Button>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 

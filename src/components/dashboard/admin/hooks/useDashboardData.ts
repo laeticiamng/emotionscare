@@ -1,55 +1,45 @@
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { fetchReports, fetchGamificationStats } from '@/lib/dashboardService';
+import { useState, useEffect } from 'react';
+import { fetchReports, fetchUsersAvgScore, fetchUsersWithStatus } from '@/lib/dashboardService';
+import { ChartData, DashboardStats } from '../tabs/overview/types';
 import { useSegment } from '@/contexts/SegmentContext';
-import { ChartData } from '@/components/dashboard/admin/tabs/overview/types';
 
 export const useDashboardData = (timePeriod: string) => {
-  const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
-  const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
+  const [absenteeismData, setAbsenteeismData] = useState<ChartData[]>([]);
+  const [productivityData, setProductivityData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { segment } = useSegment();
+  const { activeDimension, activeOption } = useSegment();
   
-  const fetchData = useCallback(async () => {
+  const segmentFilter = activeDimension && activeOption ? {
+    dimensionKey: activeDimension.key,
+    optionKey: activeOption.key
+  } : undefined;
+
+  const fetchData = async () => {
     try {
       setIsLoading(true);
+      const reportsData = await fetchReports(
+        ['absenteeism', 'productivity'], 
+        parseInt(timePeriod),
+        segmentFilter
+      );
       
-      // Add some randomness to simulate data changes during refresh
-      const jitter = () => (Math.random() * 0.4) - 0.2; // -0.2 to +0.2
-      
-      const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod), segment);
-      
-      // Add jitter to the data to simulate real-time changes
-      const absenteeism = reportsData.absenteeism?.map(item => ({
-        ...item,
-        value: Math.max(0, item.value + jitter())
-      })) || [];
-      
-      const productivity = reportsData.productivity?.map(item => ({
-        ...item,
-        value: Math.min(100, item.value + jitter())
-      })) || [];
-      
-      setAbsenteeismData(absenteeism);
-      setProductivityData(productivity);
-
-      return { absenteeism, productivity };
+      setAbsenteeismData(reportsData.absenteeism || []);
+      setProductivityData(reportsData.productivity || []);
     } catch (error) {
-      console.error("Error loading dashboard data:", error);
-      return { absenteeism: [], productivity: [] };
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [timePeriod, segment]);
-  
-  // Fetch data when dependencies change
+  };
+
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-  
-  return { 
-    absenteeismData, 
-    productivityData, 
+  }, [timePeriod, activeDimension?.key, activeOption?.key]);
+
+  return {
+    absenteeismData,
+    productivityData,
     isLoading,
     refetchAll: fetchData
   };
@@ -57,86 +47,82 @@ export const useDashboardData = (timePeriod: string) => {
 
 export const useEmotionalScoreTrend = () => {
   const [data, setData] = useState<ChartData[]>([]);
-  const { segment } = useSegment();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { activeDimension, activeOption } = useSegment();
   
-  const fetchData = useCallback(async () => {
-    // Mock emotional score trend data
-    const mockData = [
-      { date: '1/5', value: 72 },
-      { date: '2/5', value: 75 },
-      { date: '3/5', value: 71 },
-      { date: '4/5', value: 74 },
-      { date: '5/5', value: 77 },
-      { date: '6/5', value: 76 },
-      { date: '7/5', value: 75.5 },
-    ];
-    
-    // Add jitter to simulate real-time changes
-    const jitter = () => (Math.random() * 3) - 1.5; // -1.5 to +1.5
-    const updatedData = mockData.map(item => ({
-      ...item,
-      value: Math.min(100, Math.max(0, item.value + jitter()))
-    }));
-    
-    setData(updatedData);
-    return updatedData;
-  }, [segment]);
-  
+  const segmentFilter = activeDimension && activeOption ? {
+    dimensionKey: activeDimension.key,
+    optionKey: activeOption.key
+  } : undefined;
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const emotionalData = await fetchUsersAvgScore(7, segmentFilter);
+      setData(emotionalData);
+    } catch (error) {
+      console.error("Error fetching emotional score trend:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-  
-  return { data, refetch: fetchData };
+  }, [activeDimension?.key, activeOption?.key]);
+
+  return {
+    data,
+    isLoading,
+    refetch: fetchData
+  };
 };
 
 export const useDashboardStats = () => {
-  const [data, setData] = useState({
-    activeUsersCount: 85,
-    absentTeamMembers: 3,
-    averageEmotionalScore: 76,
-    activeGameifications: 12,
-    productivity: {
-      current: 89,
-      trend: 3
-    },
-    emotionalScore: {
-      current: 76,
-      trend: -2
-    }
+  const [data, setData] = useState<DashboardStats>({
+    totalUsers: 0,
+    activeToday: 0,
+    averageScore: 0,
+    criticalAlerts: 0,
+    completion: 0
   });
-  const { segment } = useSegment();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { activeDimension, activeOption } = useSegment();
   
-  const fetchData = useCallback(async () => {
+  const segmentFilter = activeDimension && activeOption ? {
+    dimensionKey: activeDimension.key,
+    optionKey: activeOption.key
+  } : undefined;
+
+  const fetchData = async () => {
     try {
-      // Simulate fetching stats with randomness to show changes on refresh
-      const gamificationStats = await fetchGamificationStats(segment);
+      setIsLoading(true);
+      const totalUsers = 256;
+      const activeUsers = await fetchUsersWithStatus("active", 1, segmentFilter);
+      const avgScore = 78;
+      const criticalUsers = 5;
       
-      const updatedData = {
-        activeUsersCount: 80 + Math.floor(Math.random() * 10), // 80-89
-        absentTeamMembers: 2 + Math.floor(Math.random() * 3), // 2-4
-        averageEmotionalScore: 74 + Math.floor(Math.random() * 6), // 74-79
-        activeGameifications: gamificationStats.totalBadges || 12,
-        productivity: {
-          current: 85 + Math.floor(Math.random() * 10), // 85-94
-          trend: Math.random() > 0.5 ? 3 : -2
-        },
-        emotionalScore: {
-          current: 74 + Math.floor(Math.random() * 6), // 74-79
-          trend: Math.random() > 0.5 ? -2 : 2
-        }
-      };
-      
-      setData(updatedData);
-      return updatedData;
+      setData({
+        totalUsers,
+        activeToday: activeUsers,
+        averageScore: avgScore,
+        criticalAlerts: criticalUsers,
+        completion: 92
+      });
     } catch (error) {
-      console.error("Error loading dashboard stats:", error);
-      return data;
+      console.error("Error fetching dashboard stats:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [segment, data]);
-  
+  };
+
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-  
-  return { data, refetch: fetchData };
+  }, [activeDimension?.key, activeOption?.key]);
+
+  return {
+    data,
+    isLoading,
+    refetch: fetchData
+  };
 };

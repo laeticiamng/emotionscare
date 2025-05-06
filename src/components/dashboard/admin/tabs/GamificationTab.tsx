@@ -5,7 +5,7 @@ import { Trophy } from 'lucide-react';
 import GamificationSummaryCard from '../GamificationSummaryCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface GamificationTabProps {
+export interface GamificationTabProps {
   gamificationData: {
     activeUsersPercent: number;
     totalBadges: number;

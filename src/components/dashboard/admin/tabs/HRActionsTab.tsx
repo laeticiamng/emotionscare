@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface HRActionsTabProps {
+export interface HRActionsTabProps {
   rhSuggestions: Array<{
     title: string;
     description: string;

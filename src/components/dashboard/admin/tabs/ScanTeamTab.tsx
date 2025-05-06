@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface ScanTeamTabProps {
+export interface ScanTeamTabProps {
   emotionalScoreTrend: Array<{ date: string; value: number }>;
   currentScore: number;
   isLoading?: boolean;

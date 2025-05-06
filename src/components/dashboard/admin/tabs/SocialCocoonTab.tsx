@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import SocialCocoonCard from '../SocialCocoonCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface SocialCocoonTabProps {
+export interface SocialCocoonTabProps {
   socialCocoonData: {
     totalPosts: number;
     moderationRate: number;

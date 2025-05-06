@@ -5,15 +5,16 @@ export interface ChartData {
 }
 
 export interface DashboardStats {
-  activeUsersCount?: number;
-  absentTeamMembers?: number;
-  averageEmotionalScore?: number;
-  activeGameifications?: number;
-  productivity: {
+  totalUsers: number;
+  activeToday: number;
+  averageScore: number;
+  criticalAlerts: number;
+  completion: number;
+  productivity?: {
     current: number;
     trend: number;
   };
-  emotionalScore: {
+  emotionalScore?: {
     current: number;
     trend: number;
   };

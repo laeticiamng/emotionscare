@@ -95,19 +95,23 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       </TabsContent>
       
       <TabsContent value="scan-equipe" className="mt-0">
-        <ScanTeamTab isLoading={isLoading} />
+        <ScanTeamTab 
+          emotionalScoreTrend={emotionalScoreTrend} 
+          currentScore={dashboardStats.averageScore || 75}
+          isLoading={isLoading} 
+        />
       </TabsContent>
       
       <TabsContent value="social-cocoon" className="mt-0">
-        <SocialCocoonTab socialStats={socialCocoonStats} isLoading={isLoading} />
+        <SocialCocoonTab socialCocoonData={socialCocoonStats} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="gamification" className="mt-0">
-        <GamificationTab gamificationStats={gamificationStats} isLoading={isLoading} />
+        <GamificationTab gamificationData={gamificationStats} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="evenements" className="mt-0">
-        <EventsCalendarTab events={eventsData} isLoading={isLoading} />
+        <EventsCalendarTab eventsData={eventsData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="journal-trends" className="mt-0">
@@ -115,7 +119,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       </TabsContent>
       
       <TabsContent value="actions-rh" className="mt-0">
-        <HRActionsTab actions={hrActionsData} isLoading={isLoading} />
+        <HRActionsTab rhSuggestions={hrActionsData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="compliance" className="mt-0">

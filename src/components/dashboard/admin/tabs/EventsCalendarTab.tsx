@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface EventsCalendarTabProps {
+export interface EventsCalendarTabProps {
   eventsData: Array<{
     date: string;
     title: string;
