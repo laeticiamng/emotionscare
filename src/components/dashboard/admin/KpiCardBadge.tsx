@@ -18,15 +18,15 @@ interface KpiCardBadgeProps {
  * Displays a trend badge with appropriate styling based on trend direction
  */
 const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className, isLoading = false }) => {
-  // Determine badge color based on trend
-  const getBadgeClasses = (trend: 'up' | 'down' | 'neutral') => {
+  // Determine badge variant based on trend
+  const getBadgeVariant = (trend: 'up' | 'down' | 'neutral') => {
     switch(trend) {
       case 'up':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return 'success-subtle';
       case 'down':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        return 'error-subtle';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-400';
+        return 'info-subtle';
     }
   };
 
@@ -42,10 +42,8 @@ const KpiCardBadge: React.FC<KpiCardBadgeProps> = ({ delta, className, isLoading
   return (
     <div className={cn("mt-1 flex items-center", className)}>
       <Badge 
-        className={cn(
-          "text-sm font-medium px-2 py-1", 
-          getBadgeClasses(delta.trend)
-        )}
+        variant={getBadgeVariant(delta.trend)}
+        className="text-sm font-medium px-2 py-1"
       >
         {delta.trend === 'up' ? '↑' : delta.trend === 'down' ? '↓' : '•'} {delta.value}%
       </Badge>

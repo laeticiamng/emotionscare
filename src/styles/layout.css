@@ -5,12 +5,12 @@
 }
 
 .premium-section {
-  @apply py-8 md:py-8;
+  @apply py-8 md:py-12;
 }
 
 /* Spacious content sections */
 .content-spacious {
-  @apply space-y-6;
+  @apply space-y-6 md:space-y-8;
 }
 
 /* Card hover effects */
@@ -28,4 +28,85 @@
 
 .pastel .interactive-card {
   @apply hover:shadow-md;
+}
+
+/* Content layouts */
+.dashboard-layout {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.sidebar-layout {
+  @apply flex flex-col md:flex-row gap-6;
+}
+
+.sidebar-layout .sidebar {
+  @apply w-full md:w-64 shrink-0;
+}
+
+.sidebar-layout .content {
+  @apply flex-grow;
+}
+
+/* Full-bleed layout sections */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Section spacings */
+.section-margin {
+  @apply my-8 md:my-12;
+}
+
+.content-padding {
+  @apply p-4 md:p-6 lg:p-8;
+}
+
+/* Grid layouts */
+.grid-auto-fit {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-auto-fill {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Split layouts */
+.split-layout {
+  @apply grid md:grid-cols-2 gap-6;
+}
+
+/* Card layouts */
+.cards-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Form layouts */
+.form-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Responsive containers */
+.container-sm {
+  @apply max-w-screen-sm mx-auto px-4;
+}
+
+.container-md {
+  @apply max-w-screen-md mx-auto px-4;
+}
+
+.container-lg {
+  @apply max-w-screen-lg mx-auto px-4;
+}
+
+/* Special layout for KPI cards */
+.kpi-cards-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }

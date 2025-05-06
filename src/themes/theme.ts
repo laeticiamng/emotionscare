@@ -26,6 +26,27 @@ export interface ColorPalette {
   border: string;
   input: string;
   ring: string;
+  // Semantic colors
+  success: {
+    light: string;
+    DEFAULT: string; 
+    dark: string;
+  };
+  warning: {
+    light: string;
+    DEFAULT: string;
+    dark: string;
+  };
+  info: {
+    light: string;
+    DEFAULT: string;
+    dark: string;
+  };
+  error: {
+    light: string;
+    DEFAULT: string;
+    dark: string;
+  };
 }
 
 // Palette de couleurs pour le thème clair premium
@@ -35,17 +56,38 @@ export const lightTheme: ColorPalette = {
   foreground: 'hsl(220, 25%, 16%)',
   card: 'hsl(0, 0%, 100%)',
   cardForeground: 'hsl(220, 25%, 16%)',
-  primary: 'hsl(220, 47%, 16%)',
+  primary: 'hsl(220, 100%, 50%)',
   primaryForeground: 'hsl(210, 40%, 98%)',
   secondary: 'hsl(210, 40%, 96.1%)',
   secondaryForeground: 'hsl(220, 47%, 16%)',
-  accent: 'hsl(210, 40%, 96.1%)',
-  accentForeground: 'hsl(220, 47%, 16%)',
+  accent: 'hsl(339, 90%, 65%)',
+  accentForeground: 'hsl(210, 40%, 98%)',
   muted: 'hsl(210, 40%, 96.1%)',
   mutedForeground: 'hsl(215.4, 16.3%, 46.9%)',
   border: 'hsl(214.3, 31.8%, 91.4%)',
   input: 'hsl(214.3, 31.8%, 91.4%)',
-  ring: 'hsl(220, 47%, 16%)',
+  ring: 'hsl(220, 100%, 50%)',
+  // Semantic colors
+  success: {
+    light: '#D1FAE5',
+    DEFAULT: '#10B981',
+    dark: '#047857',
+  },
+  warning: {
+    light: '#FEF3C7',
+    DEFAULT: '#F59E0B',
+    dark: '#B45309',
+  },
+  info: {
+    light: '#DBEAFE',
+    DEFAULT: '#3B82F6',
+    dark: '#1D4ED8',
+  },
+  error: {
+    light: '#FEE2E2',
+    DEFAULT: '#EF4444',
+    dark: '#B91C1C',
+  },
 };
 
 // Palette de couleurs pour le thème sombre premium
@@ -55,17 +97,38 @@ export const darkTheme: ColorPalette = {
   foreground: 'hsl(210, 40%, 98%)',
   card: 'hsl(220, 20%, 14%)',
   cardForeground: 'hsl(210, 40%, 98%)',
-  primary: 'hsl(210, 40%, 98%)',
-  primaryForeground: 'hsl(220, 47%, 16%)',
+  primary: 'hsl(217, 91%, 60%)',
+  primaryForeground: 'hsl(210, 40%, 98%)',
   secondary: 'hsl(220, 15%, 25%)',
   secondaryForeground: 'hsl(210, 40%, 98%)',
-  accent: 'hsl(220, 15%, 25%)',
+  accent: 'hsl(339, 90%, 65%)',
   accentForeground: 'hsl(210, 40%, 98%)',
   muted: 'hsl(220, 15%, 25%)',
   mutedForeground: 'hsl(215, 20%, 75%)',
   border: 'hsl(220, 15%, 25%)',
   input: 'hsl(220, 15%, 22%)',
-  ring: 'hsl(210, 40%, 90%)',
+  ring: 'hsl(217, 91%, 60%)',
+  // Semantic colors with adjusted contrast for dark theme
+  success: {
+    light: '#064E3B', // Darker background for dark mode
+    DEFAULT: '#10B981', 
+    dark: '#A7F3D0', // Lighter text for dark mode
+  },
+  warning: {
+    light: '#78350F',
+    DEFAULT: '#F59E0B',
+    dark: '#FDE68A',
+  },
+  info: {
+    light: '#1E3A8A',
+    DEFAULT: '#3B82F6',
+    dark: '#BFDBFE',
+  },
+  error: {
+    light: '#7F1D1D',
+    DEFAULT: '#EF4444',
+    dark: '#FECACA',
+  },
 };
 
 // Palette de couleurs pour le thème pastel premium
@@ -79,13 +142,34 @@ export const pastelTheme: ColorPalette = {
   primaryForeground: 'hsl(0, 0%, 100%)',
   secondary: 'hsl(210, 50%, 92%)',
   secondaryForeground: 'hsl(220, 47%, 16%)',
-  accent: 'hsl(210, 50%, 88%)',
+  accent: 'hsl(339, 90%, 75%)',
   accentForeground: 'hsl(220, 47%, 16%)',
   muted: 'hsl(210, 50%, 92%)',
   mutedForeground: 'hsl(220, 15%, 40%)',
   border: 'hsl(210, 50%, 85%)',
   input: 'hsl(210, 50%, 85%)',
   ring: 'hsl(210, 70%, 50%)',
+  // Semantic colors with softer pastel tones
+  success: {
+    light: '#ECFDF5',
+    DEFAULT: '#10B981',
+    dark: '#047857',
+  },
+  warning: {
+    light: '#FFFBEB',
+    DEFAULT: '#F59E0B',
+    dark: '#92400E',
+  },
+  info: {
+    light: '#EFF6FF',
+    DEFAULT: '#3B82F6',
+    dark: '#1E40AF',
+  },
+  error: {
+    light: '#FEF2F2',
+    DEFAULT: '#EF4444',
+    dark: '#991B1B',
+  },
 };
 
 // Couleurs spécifiques pour le thème bien-être (wellness)

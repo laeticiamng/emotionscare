@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 16%;
  
-    --primary: 220 47% 16%;
+    --primary: 220 100% 50%;
     --primary-foreground: 210 40% 98%;
  
     --secondary: 210 40% 96.1%;
@@ -25,15 +25,15 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
  
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 220 47% 16%;
+    --accent: 339 90% 65%;
+    --accent-foreground: 210 40% 98%;
  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 220 47% 16%;
+    --ring: 220 100% 50%;
  
     --radius: 1rem;
     
@@ -56,8 +56,8 @@
     --popover: 220 20% 14%;
     --popover-foreground: 210 40% 98%;
  
-    --primary: 210 40% 98%;
-    --primary-foreground: 220 47% 16%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
  
     --secondary: 220 15% 25%;
     --secondary-foreground: 210 40% 98%;
@@ -65,7 +65,7 @@
     --muted: 220 15% 25%;
     --muted-foreground: 215 20% 75%;
  
-    --accent: 220 15% 25%;
+    --accent: 339 90% 65%;
     --accent-foreground: 210 40% 98%;
  
     --destructive: 0 62.8% 40%;
@@ -73,7 +73,7 @@
  
     --border: 220 15% 28%;
     --input: 220 15% 25%;
-    --ring: 210 40% 90%;
+    --ring: 217 91% 60%;
   }
 
   /* Pastel theme - Subtle blue premium feel */
@@ -96,7 +96,7 @@
     --muted: 210 50% 92%;
     --muted-foreground: 220 20% 40%;
  
-    --accent: 210 50% 88%;
+    --accent: 339 90% 75%;
     --accent-foreground: 220 47% 16%;
  
     --destructive: 0 84.2% 60.2%;
@@ -349,4 +349,112 @@
 /* Improved focus states */
 .focus-premium {
   @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background;
+}
+
+/* Semantic colors utility classes */
+.bg-success {
+  @apply bg-success-500 dark:bg-success-600;
+}
+
+.bg-success-subtle {
+  @apply bg-success-50 dark:bg-success-900/30;
+}
+
+.text-success {
+  @apply text-success-700 dark:text-success-400;
+}
+
+.border-success {
+  @apply border-success-500 dark:border-success-400;
+}
+
+.ring-success {
+  @apply ring-success-400 dark:ring-success-500;
+}
+
+.bg-warning {
+  @apply bg-warning-500 dark:bg-warning-600;
+}
+
+.bg-warning-subtle {
+  @apply bg-warning-50 dark:bg-warning-900/30;
+}
+
+.text-warning {
+  @apply text-warning-700 dark:text-warning-400;
+}
+
+.border-warning {
+  @apply border-warning-500 dark:border-warning-400;
+}
+
+.ring-warning {
+  @apply ring-warning-400 dark:ring-warning-500;
+}
+
+.bg-info {
+  @apply bg-info-500 dark:bg-info-600;
+}
+
+.bg-info-subtle {
+  @apply bg-info-50 dark:bg-info-900/30;
+}
+
+.text-info {
+  @apply text-info-700 dark:text-info-400;
+}
+
+.border-info {
+  @apply border-info-500 dark:border-info-400;
+}
+
+.ring-info {
+  @apply ring-info-400 dark:ring-info-500;
+}
+
+.bg-error {
+  @apply bg-destructive dark:bg-destructive/90;
+}
+
+.bg-error-subtle {
+  @apply bg-destructive-50 dark:bg-destructive-900/30;
+}
+
+.text-error {
+  @apply text-destructive-700 dark:text-destructive-400;
+}
+
+.border-error {
+  @apply border-destructive dark:border-destructive-400;
+}
+
+.ring-error {
+  @apply ring-destructive/40 dark:ring-destructive/60;
+}
+
+/* État et interaction */
+.btn-hover-effect {
+  @apply hover:translate-y-[-2px] active:translate-y-0 transition-all;
+}
+
+/* High contrast focus ring pour accessibilité */
+.focus-ring-high-contrast {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+}
+
+/* Alert & notification styles */
+.alert-success {
+  @apply bg-success-50 border-success-200 text-success-800 dark:bg-success-900/20 dark:border-success-800/30 dark:text-success-200;
+}
+
+.alert-warning {
+  @apply bg-warning-50 border-warning-200 text-warning-800 dark:bg-warning-900/20 dark:border-warning-800/30 dark:text-warning-200;
+}
+
+.alert-info {
+  @apply bg-info-50 border-info-200 text-info-800 dark:bg-info-900/20 dark:border-info-800/30 dark:text-info-200;
+}
+
+.alert-error {
+  @apply bg-destructive-50 border-destructive-200 text-destructive-800 dark:bg-destructive-900/20 dark:border-destructive-800/30 dark:text-destructive-200;
 }

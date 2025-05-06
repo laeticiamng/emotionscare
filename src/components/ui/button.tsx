@@ -23,6 +23,10 @@ const buttonVariants = cva(
         coral: "bg-wellness-coral text-white hover:bg-wellness-coral/90 shadow-soft hover:shadow-medium",
         mint: "bg-wellness-mint text-slate-800 hover:bg-wellness-mint/90 shadow-soft hover:shadow-medium",
         premium: "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-sm hover:shadow-md",
+        success: "bg-success text-white hover:bg-success-600 shadow-sm hover:shadow-md",
+        warning: "bg-warning text-white hover:bg-warning-600 shadow-sm hover:shadow-md",
+        info: "bg-info text-white hover:bg-info-600 shadow-sm hover:shadow-md",
+        error: "bg-destructive text-white hover:bg-destructive-600 shadow-sm hover:shadow-md",
       },
       size: {
         default: "h-10 px-5 py-2",
