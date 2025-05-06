@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 import { Shell } from "@/components/Shell";
@@ -20,10 +20,9 @@ import { updateUser } from '@/lib/userService';
 import InvitePage from './pages/InvitePage';
 import { AuthProvider } from './contexts/AuthContext';
 
-// App component as router wrapper
-const App = () => {
+// App component for handling authentication checks and redirects
+const AppContent = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   
   // Check authentication status on component mount
@@ -41,7 +40,6 @@ const App = () => {
             title: "Bienvenue !",
             description: "Veuillez compléter votre profil pour une expérience optimale."
           });
-          navigate('/settings');
         }
       } else {
         setIsAuthenticated(false);
@@ -49,7 +47,7 @@ const App = () => {
     };
     
     checkAuthentication();
-  }, [setUser, setIsAuthenticated, navigate, toast]);
+  }, [setUser, setIsAuthenticated, toast]);
   
   // Onboarding flow simulation
   useEffect(() => {
@@ -71,7 +69,6 @@ const App = () => {
               title: "Profil complété !",
               description: "Votre compte est maintenant configuré."
             });
-            navigate('/dashboard');
           } catch (error) {
             console.error("Error updating user:", error);
             toast({
@@ -85,7 +82,7 @@ const App = () => {
     };
     
     completeOnboarding();
-  }, [isAuthenticated, setUser, navigate, toast]);
+  }, [isAuthenticated, setUser, toast]);
   
   return null;
 };
@@ -152,7 +149,7 @@ const router = createBrowserRouter([
 function AppWrapper() {
   return (
     <AuthProvider>
-      <App />
+      <AppContent />
       <RouterProvider router={router} />
     </AuthProvider>
   );
