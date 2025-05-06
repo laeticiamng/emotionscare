@@ -4,7 +4,7 @@ import {
   Calendar, 
   MessageSquare, 
   Headphones, 
-  VrHeadset, 
+  Headset, // Changed from VrHeadset to Headset
   UserCheck, 
   Settings
 } from 'lucide-react';
@@ -64,7 +64,7 @@ export const UserActivityTimeline: React.FC<UserActivityTimelineProps> = ({ user
       case 'music_play':
         return <Headphones className="h-5 w-5" />;
       case 'vr_session':
-        return <VrHeadset className="h-5 w-5" />;
+        return <Headset className="h-5 w-5" />; // Changed from VrHeadset to Headset
       case 'login':
         return <UserCheck className="h-5 w-5" />;
       case 'profile_update':

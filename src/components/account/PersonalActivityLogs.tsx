@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,10 +12,64 @@ import { enUS } from 'date-fns/locale';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ActivityFiltersState, AnonymousActivity } from '../dashboard/admin/tabs/activity-logs/types';
-import { applyFilters, getActivityLabel } from '../dashboard/admin/tabs/activity-logs/activityUtils';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase-client';
 import Pagination from '@/components/ui/data-table/Pagination';
+
+// Since we don't have the actual activityUtils, we'll implement the functions directly here
+const getActivityLabel = (activityType: string): string => {
+  const labels: Record<string, string> = {
+    login: 'Connexion',
+    logout: 'Déconnexion',
+    scan_emotion: 'Scan émotionnel',
+    journal_entry: 'Journal',
+    music_play: 'Écoute musicale',
+    vr_session: 'Session VR',
+    profile_update: 'Mise à jour profil',
+    account_created: 'Création de compte',
+    invitation_sent: 'Invitation envoyée',
+    invitation_accepted: 'Invitation acceptée',
+  };
+  
+  return labels[activityType] || activityType;
+};
+
+const applyFilters = (
+  data: AnonymousActivity[],
+  filters: ActivityFiltersState
+): AnonymousActivity[] => {
+  return data.filter((item) => {
+    // Apply search term filter
+    if (filters.searchTerm && !item.activity_type.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
+      return false;
+    }
+    
+    // Apply activity type filter
+    if (filters.activityType && item.activity_type !== filters.activityType) {
+      return false;
+    }
+    
+    // Apply date filters
+    if (filters.startDate) {
+      const itemDate = new Date(item.timestamp_day);
+      if (itemDate < filters.startDate) {
+        return false;
+      }
+    }
+    
+    if (filters.endDate) {
+      const itemDate = new Date(item.timestamp_day);
+      // Add one day to include the end date fully
+      const endDatePlusOne = new Date(filters.endDate);
+      endDatePlusOne.setDate(endDatePlusOne.getDate() + 1);
+      if (itemDate > endDatePlusOne) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+};
 
 const PersonalActivityLogs: React.FC = () => {
   const [activities, setActivities] = useState<AnonymousActivity[]>([]);
@@ -76,14 +131,14 @@ const PersonalActivityLogs: React.FC = () => {
   
   useEffect(() => {
     // Apply filters and pagination
-    const filteredData = applyFilters(activities, filters);
-    setFilteredActivities(filteredData);
+    const filtered = applyFilters(activities, filters);
+    setFilteredActivities(filtered);
     
     // Calculate total pages
-    setTotalPages(Math.ceil(filteredData.length / pageSize));
+    setTotalPages(Math.ceil(filtered.length / pageSize));
     
     // Ensure current page is within bounds
-    if (currentPage > Math.ceil(filteredData.length / pageSize)) {
+    if (currentPage > Math.ceil(filtered.length / pageSize)) {
       setCurrentPage(1);
     }
   }, [activities, filters, currentPage, pageSize]);

@@ -1,9 +1,15 @@
 
 import React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { getActivityLabel } from "./activityUtils";
 import { ActivityStats } from './types';
-import { getActivityLabel } from './activityUtils';
 
 interface StatsTableProps {
   stats: ActivityStats[];
@@ -11,14 +17,14 @@ interface StatsTableProps {
   error: string | null;
 }
 
-const StatsTable: React.FC<StatsTableProps> = ({
-  stats,
-  isLoading,
-  error
+const StatsTable: React.FC<StatsTableProps> = ({ 
+  stats, 
+  isLoading, 
+  error 
 }) => {
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex justify-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -26,16 +32,16 @@ const StatsTable: React.FC<StatsTableProps> = ({
 
   if (error) {
     return (
-      <div className="text-center py-8 text-red-500">
-        Erreur: {error}
+      <div className="py-8 text-center">
+        <p className="text-destructive">{error}</p>
       </div>
     );
   }
 
-  if (!stats || stats.length === 0) {
+  if (stats.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Aucune donnée statistique disponible.
+      <div className="py-8 text-center">
+        <p className="text-muted-foreground">Aucune statistique disponible.</p>
       </div>
     );
   }
@@ -47,21 +53,15 @@ const StatsTable: React.FC<StatsTableProps> = ({
           <TableRow>
             <TableHead>Type d'activité</TableHead>
             <TableHead>Nombre total</TableHead>
-            <TableHead>Distribution</TableHead>
-            <TableHead className="text-right">Pourcentage</TableHead>
+            <TableHead>Pourcentage</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {stats.map((stat) => (
-            <TableRow key={stat.activity_type}>
+          {stats.map((stat, index) => (
+            <TableRow key={index}>
               <TableCell>{getActivityLabel(stat.activity_type)}</TableCell>
               <TableCell>{stat.total_count}</TableCell>
-              <TableCell className="w-[30%]">
-                <Progress value={stat.percentage} className="h-2" />
-              </TableCell>
-              <TableCell className="text-right font-medium">
-                {stat.percentage.toFixed(1)}%
-              </TableCell>
+              <TableCell>{stat.percentage.toFixed(1)}%</TableCell>
             </TableRow>
           ))}
         </TableBody>

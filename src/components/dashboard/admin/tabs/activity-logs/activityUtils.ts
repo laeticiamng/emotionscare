@@ -1,9 +1,6 @@
 
-import { AnonymousActivity, ActivityStats, ActivityFiltersState, ActivityTabView } from './types';
+import { AnonymousActivity, ActivityStats, ActivityFiltersState, ActivityTabView } from "./types";
 
-/**
- * Gets a human-readable label for an activity type
- */
 export const getActivityLabel = (activityType: string): string => {
   const labels: Record<string, string> = {
     login: 'Connexion',
@@ -21,15 +18,10 @@ export const getActivityLabel = (activityType: string): string => {
   return labels[activityType] || activityType;
 };
 
-/**
- * Apply filters to activity data
- */
 export const applyFilters = (
   data: AnonymousActivity[] | ActivityStats[], 
   filters: ActivityFiltersState
 ): AnonymousActivity[] | ActivityStats[] => {
-  if (!data.length) return data;
-  
   return data.filter((item) => {
     // Apply search term filter
     if (filters.searchTerm && !JSON.stringify(item).toLowerCase().includes(filters.searchTerm.toLowerCase())) {
@@ -37,7 +29,7 @@ export const applyFilters = (
     }
     
     // Apply activity type filter
-    if (filters.activityType && filters.activityType !== 'all' && item.activity_type !== filters.activityType) {
+    if (filters.activityType && 'activity_type' in item && item.activity_type !== filters.activityType) {
       return false;
     }
     
@@ -61,12 +53,9 @@ export const applyFilters = (
     }
     
     return true;
-  }) as any;
+  });
 };
 
-/**
- * Format data for CSV export
- */
 export const formatCsvData = (
   tabView: ActivityTabView,
   data: AnonymousActivity[] | ActivityStats[]
@@ -87,9 +76,6 @@ export const formatCsvData = (
   }
 };
 
-/**
- * Generate default CSV filename
- */
 export const getDefaultCsvFileName = (tabView: ActivityTabView): string => {
   const date = new Date().toISOString().split('T')[0];
   return tabView === 'daily'
@@ -97,47 +83,20 @@ export const getDefaultCsvFileName = (tabView: ActivityTabView): string => {
     : `statistiques-activites-${date}.csv`;
 };
 
-/**
- * Prepares activity data for export to CSV or other formats
- */
-export const exportActivityData = (data: AnonymousActivity[] | ActivityStats[], format: 'csv' | 'json' = 'csv'): string => {
-  if (data.length === 0) {
-    return '';
-  }
-
-  if (format === 'json') {
-    return JSON.stringify(data, null, 2);
-  }
+// Added function for compatibility with ActivityLogsTab.tsx
+export const exportActivityData = (data: any[], filename: string): void => {
+  const csv = [
+    Object.keys(data[0]).join(','),
+    ...data.map(item => Object.values(item).join(','))
+  ].join('\n');
   
-  // Assuming CSV format
-  // First, determine if we're dealing with daily activities or stats
-  const isActivityStats = 'percentage' in data[0];
-  
-  // Create headers
-  const headers = isActivityStats 
-    ? ['Type', 'Total', 'Percentage']
-    : ['ID', 'Type', 'Category', 'Count', 'Date'];
-  
-  // Create rows
-  const rows = data.map(item => {
-    if (isActivityStats) {
-      const stat = item as ActivityStats;
-      return [
-        stat.activity_type,
-        stat.total_count.toString(),
-        stat.percentage.toFixed(1) + '%'
-      ].join(',');
-    } else {
-      const activity = item as AnonymousActivity;
-      return [
-        activity.id,
-        activity.activity_type,
-        activity.category,
-        activity.count.toString(),
-        activity.timestamp_day
-      ].join(',');
-    }
-  });
-  
-  return [headers.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
