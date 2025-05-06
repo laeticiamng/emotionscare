@@ -16,7 +16,7 @@ const CallToAction: React.FC<CallToActionProps> = ({ type, className = '' }) => 
     if (type === 'user') {
       navigate('/login');
     } else {
-      navigate('/admin-login');
+      navigate('/admin/login'); // Utilisation du bon chemin pour la connexion admin
     }
   };
   

@@ -132,6 +132,10 @@ const router = createBrowserRouter([
     element: <AdminLoginPage />
   },
   {
+    path: "/admin-login", // Ajout de cette route pour compatibilité
+    element: <AdminLoginPage />
+  },
+  {
     path: "/forgot-password",
     element: <ForgotPasswordPage />
   },
