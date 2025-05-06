@@ -25,6 +25,21 @@
       .footer-duplicate {
         display: none !important;
       }
+      
+      /* Cible spécifique pour les doublons internes */
+      #root nav:nth-of-type(2),
+      #root header:nth-of-type(2),
+      .page-content nav.fixed:nth-of-type(2),
+      .page-content .internal-header:nth-of-type(2) {
+        display: none !important;
+      }
+      
+      /* Cible le doublon interne en bas */
+      #root footer:nth-of-type(2),
+      .page-content .internal-footer:nth-of-type(2),
+      .page-content footer:nth-of-type(2) {
+        display: none !important;
+      }
     </style>
   </head>
   <body>
@@ -58,7 +73,34 @@
           }
         }
         
+        // Script amélioré pour les doublons internes
+        const internalHeaders = document.querySelectorAll('#root .internal-header, #root nav.fixed');
+        if (internalHeaders.length > 1) {
+          Array.from(internalHeaders).slice(1).forEach(el => el.remove());
+        }
+        
+        const internalFooters = document.querySelectorAll('#root .internal-footer, #root footer');
+        if (internalFooters.length > 1) {
+          Array.from(internalFooters).slice(1).forEach(el => el.remove());
+        }
+        
         console.log('Vérification et suppression des éléments dupliqués effectuées');
+      });
+      
+      // Script supplémentaire après chargement complet de la page
+      window.addEventListener('load', () => {
+        // Seconde vérification après chargement complet
+        setTimeout(() => {
+          // Re-vérifier les doublons qui pourraient être injectés au scroll
+          const navBars = document.querySelectorAll('nav.fixed');
+          if (navBars.length > 1) {
+            for (let i = 1; i < navBars.length; i++) {
+              navBars[i].remove();
+            }
+          }
+          
+          console.log('Seconde vérification effectuée');
+        }, 1000);
       });
     </script>
   </body>
