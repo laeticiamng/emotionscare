@@ -11,6 +11,7 @@ import MobileNavigation from './navigation/MobileNavigation';
 import ThemeSwitcher from './ui/ThemeSwitcher';
 import GlobalSearch from './search/GlobalSearch';
 import NotificationsPanel from './notifications/NotificationsPanel';
+import { useNotificationBadge } from '@/hooks/useNotificationBadge';
 import { Button } from './ui/button';
 import { HomeIcon, LogIn } from 'lucide-react';
 
@@ -22,6 +23,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isAdmin = user ? isAdminRole(user.role) : false;
+  const { unreadCount } = useNotificationBadge();
   
   // Sélectionner les bons éléments de navigation en fonction du rôle
   const navigationItems = isAdmin ? adminTopNavItems : topNavItems;
@@ -47,7 +49,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
               {/* Add NotificationsPanel */}
               {isAuthenticated && <NotificationsPanel />}
               <ThemeSwitcher variant="outline" size="sm" showLabel={false} />
-              <UserMenu badgesCount={0} />
+              <UserMenu badgesCount={unreadCount} />
             </div>
           </>
         ) : (

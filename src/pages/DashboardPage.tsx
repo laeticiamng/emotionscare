@@ -8,6 +8,7 @@ import AdminDashboard from '@/components/dashboard/admin/AdminDashboard';
 import { isAdminRole, isUserRole } from '@/utils/roleUtils';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { notificationService } from '@/lib/coach/notification-service';
 
 const DashboardPage: React.FC = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -29,6 +30,35 @@ const DashboardPage: React.FC = () => {
       navigate('/login');
     }
   }, [isLoading, isAuthenticated, navigate, toast]);
+  
+  // Demo: Add a sample notification when the dashboard loads
+  useEffect(() => {
+    if (user?.id) {
+      // Add a welcome notification
+      setTimeout(() => {
+        notificationService.addNotification(user.id, {
+          id: `welcome-${Date.now()}`,
+          type: 'info',
+          title: 'Bienvenue dans votre dashboard',
+          message: 'Découvrez les nouvelles fonctionnalités disponibles',
+          timestamp: new Date(),
+          read: false
+        });
+        
+        // Add another notification after a delay
+        setTimeout(() => {
+          notificationService.addNotification(user.id, {
+            id: `reminder-${Date.now()}`,
+            type: 'reminder',
+            title: 'Rappel: Scan émotionnel',
+            message: 'N\'oubliez pas de compléter votre scan émotionnel quotidien',
+            timestamp: new Date(),
+            read: false
+          });
+        }, 10000); // 10 seconds later
+      }, 3000); // 3 seconds after load
+    }
+  }, [user?.id]);
   
   if (isLoading) {
     console.log("DashboardPage - Loading...");

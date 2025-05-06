@@ -13,24 +13,20 @@ import {
   NotificationFilter 
 } from '@/hooks/useNotifications';
 import NotificationItem from './NotificationItem';
-import { Badge } from '@/components/ui/badge';
+import NotificationBadge from './NotificationBadge';
+import { useNotificationBadge } from '@/hooks/useNotificationBadge';
 
-interface NotificationsPanelProps {
-  badgesCount?: number;
-}
-
-const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ 
-  badgesCount = 0 
-}) => {
+const NotificationsPanel: React.FC = () => {
   const {
     notifications,
-    unreadCount,
     isLoading,
     filter,
     setFilter,
     markAsRead,
     markAllAsRead
   } = useNotifications();
+  
+  const { unreadCount } = useNotificationBadge();
   
   const handleFilterChange = (value: string) => {
     setFilter(value as NotificationFilter);
@@ -47,12 +43,10 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
-              className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center p-0 text-[10px]"
-            >
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </Badge>
+            <NotificationBadge 
+              count={unreadCount}
+              className="absolute -top-1 -right-1"
+            />
           )}
         </Button>
       </PopoverTrigger>

@@ -10,6 +10,10 @@ export function useNotificationBadge() {
   useEffect(() => {
     if (!user?.id) return;
     
+    // Get initial count
+    const initialCount = notificationService.getUnreadCount(user.id);
+    setUnreadCount(initialCount);
+    
     // Subscribe to notification updates
     const unsubscribe = notificationService.subscribeToUnreadCount(
       user.id, 
@@ -19,17 +23,21 @@ export function useNotificationBadge() {
     return unsubscribe;
   }, [user?.id]);
   
+  const markAsRead = (notificationId: string) => {
+    if (user?.id) {
+      notificationService.markAsRead(user.id, notificationId);
+    }
+  };
+  
+  const markAllAsRead = () => {
+    if (user?.id) {
+      notificationService.markAllAsRead(user.id);
+    }
+  };
+  
   return {
     unreadCount,
-    markAsRead: (notificationId: string) => {
-      if (user?.id) {
-        notificationService.markAsRead(user.id, notificationId);
-      }
-    },
-    markAllAsRead: () => {
-      if (user?.id) {
-        notificationService.markAllAsRead(user.id);
-      }
-    }
+    markAsRead,
+    markAllAsRead
   };
 }
