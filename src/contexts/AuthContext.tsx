@@ -1,173 +1,226 @@
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase-client';
+import { User } from '@/types';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
-import { getCurrentUser, loginUser, logoutUser, updateUser } from '../data/mockData';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
-import { isAdminRole } from '@/utils/roleUtils';
+// Import the activityLogService
+import { activityLogService } from '@/lib/activityLogService';
 
-interface AuthContextType {
+interface AuthContextProps {
   user: User | null;
-  isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<User | null>;
+  isLoading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  signOut: () => Promise<void>; // Add signOut method as alias for logout
-  updateUserProfile: (userData: Partial<User>) => Promise<void>;
+  signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType>({
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+const AuthContext = createContext<AuthContextProps>({
   user: null,
-  isLoading: false,
   isAuthenticated: false,
-  login: async () => null,
-  logout: async () => {},
-  signOut: async () => {}, // Add signOut as alias
-  updateUserProfile: async () => {},
+  isLoading: false,
+  error: null,
+  login: async () => ({ success: false, error: 'Not implemented' }),
+  logout: async () => { },
+  signup: async () => ({ success: false, error: 'Not implemented' }),
+  updateUser: async () => { }
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+const mapUser = (supabaseUser: any): User => {
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email!,
+    name: supabaseUser.user_metadata?.name || supabaseUser.email!.split('@')[0],
+    role: supabaseUser.user_metadata?.role || 'user',
+    avatar: supabaseUser.user_metadata?.avatar || `https://api.dicebear.com/7.x/thumbs/svg?seed=${supabaseUser.email}`,
+    image: supabaseUser.user_metadata?.image,
+    streak: supabaseUser.user_metadata?.streak,
+    dailyGoal: supabaseUser.user_metadata?.dailyGoal,
+    weeklyGoal: supabaseUser.user_metadata?.weeklyGoal,
+    preferences: supabaseUser.user_metadata?.preferences,
+    anonymity_code: supabaseUser.user_metadata?.anonymity_code,
+    emotional_score: supabaseUser.user_metadata?.emotional_score,
+    onboarded: supabaseUser.user_metadata?.onboarded,
+    alias: supabaseUser.user_metadata?.alias,
+    bio: supabaseUser.user_metadata?.bio,
+    joined_at: supabaseUser.user_metadata?.joined_at,
+    location_url: supabaseUser.user_metadata?.location_url,
+  };
+};
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
-
-  // Vérifier si l'utilisateur est déjà connecté
+  
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currentUser = getCurrentUser();
-        setUser(currentUser);
-        console.log("Auth checked, current user:", currentUser);
-      } catch (error) {
-        console.error('Authentication error:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    const getSession = async () => {
+      setIsLoading(true);
+      supabase.auth.getSession()
+        .then(({ data: { session } }) => {
+          if (session) {
+            setUser(mapUser(session.user));
+            setIsAuthenticated(true);
+          }
+        })
+        .catch(err => {
+          console.error('getSession error:', err);
+          setError(err.message);
+        })
+        .finally(() => setIsLoading(false));
     };
-
-    checkAuth();
+    
+    getSession();
+    
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setUser(mapUser(session.user));
+        setIsAuthenticated(true);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    });
+  }, []);
+  
+  const signup = useCallback(async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            avatar: `https://api.dicebear.com/7.x/thumbs/svg?seed=${email}`,
+            role: 'user'
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      const user = data.user;
+      setUser(mapUser(user));
+      setIsAuthenticated(true);
+      
+      return { success: true };
+    } catch (err) {
+      console.error('Signup error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to signup');
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to signup' };
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const login = async (email: string, password: string): Promise<User | null> => {
+  // Update the login function to log the activity
+  const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
+    setError(null);
+    
     try {
-      console.log(`Attempting login for email: ${email}`);
-      // Pour Sophie, on accepte le mot de passe "sophie" ou pas de mot de passe du tout
-      let loggedInUser;
-      
-      if (email === 'sophie@example.com') {
-        if (!password || password === 'sophie') {
-          loggedInUser = await loginUser(email, password);
-        } else {
-          throw new Error("Mot de passe incorrect pour Sophie");
-        }
-      } else if (email === 'admin@example.com') {
-        if (!password || password === 'admin') {
-          loggedInUser = await loginUser(email, password);
-        } else {
-          throw new Error("Mot de passe incorrect pour Admin");
-        }
-      } else {
-        loggedInUser = await loginUser(email, password);
-      }
-      
-      setUser(loggedInUser);
-      console.log("Login successful, user:", loggedInUser);
-      
-      // Afficher un message de bienvenue
-      toast({
-        title: `Bienvenue, ${loggedInUser.name}`,
-        description: "Vous êtes maintenant connecté(e)",
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
       
-      // Rediriger selon le rôle et la page actuelle
-      if (isAdminRole(loggedInUser.role)) {
-        console.log("Admin user detected, redirecting to dashboard");
-        navigate('/dashboard');
-      } else {
-        console.log("Regular user detected, redirecting to dashboard");
-        navigate('/dashboard');
+      if (error) throw error;
+      
+      const user = data.user;
+      setUser(mapUser(user));
+      setIsAuthenticated(true);
+      
+      // Log the login activity
+      if (user) {
+        activityLogService.logLogin(user.id);
       }
       
-      return loggedInUser;
-    } catch (error: any) {
-      console.error("Login error:", error);
-      toast({
-        title: "Erreur de connexion",
-        description: error.message || "Identifiants incorrects",
-        variant: "destructive"
-      });
-      throw error;
+      return { success: true };
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to login');
+      return { success: false, error: err instanceof Error ? err.message : 'Failed to login' };
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const logout = async () => {
+  }, []);
+  
+  const logout = useCallback(async () => {
     setIsLoading(true);
+    
     try {
-      await logoutUser();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       setUser(null);
-      navigate('/');
-      toast({
-        title: "Déconnexion réussie",
-        description: "À bientôt!",
-      });
-    } catch (error: any) {
-      console.error("Logout error:", error);
-      toast({
-        title: "Erreur de déconnexion",
-        description: error.message,
-        variant: "destructive"
-      });
+      setIsAuthenticated(false);
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to logout');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Add signOut as an alias for logout
-  const signOut = logout;
-
-  const updateUserProfile = async (userData: Partial<User>) => {
+  }, [navigate]);
+  
+  const updateUser = useCallback(async (updates: Partial<User>) => {
     setIsLoading(true);
+    setError(null);
+    
     try {
-      const updatedUser = await updateUser(userData);
-      setUser(updatedUser);
-      toast({
-        title: "Profil mis à jour",
-        description: "Vos informations ont été mises à jour avec succès.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Erreur de mise à jour",
-        description: error.message,
-        variant: "destructive"
-      });
-      throw error;
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Optimistically update the user in the context
+      setUser(prevUser => ({ ...prevUser!, ...updates }));
+      
+      setIsAuthenticated(true);
+    } catch (err) {
+      console.error('Update user error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update user');
     } finally {
       setIsLoading(false);
     }
-  };
-
+  }, [user?.id]);
+  
   const value = {
     user,
+    isAuthenticated,
     isLoading,
-    isAuthenticated: !!user,
+    error,
     login,
     logout,
-    signOut, // Include signOut in the context value
-    updateUserProfile,
+    signup,
+    updateUser
   };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 };

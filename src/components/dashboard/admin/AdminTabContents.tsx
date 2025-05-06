@@ -12,6 +12,7 @@ import ComplianceTab from './tabs/ComplianceTab';
 import WeatherActivitiesTab from './tabs/weather/WeatherActivitiesTab';
 import AdminSettingsTab from './tabs/AdminSettingsTab';
 import UsersListTab from './tabs/UsersListTab';
+import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
 
 interface AdminTabContentsProps {
@@ -128,6 +129,10 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       
       <TabsContent value="users-list" className="mt-0">
         <UsersListTab />
+      </TabsContent>
+      
+      <TabsContent value="activity-logs" className="mt-0">
+        <ActivityLogsTab />
       </TabsContent>
       
       <TabsContent value="admin-settings" className="mt-0">

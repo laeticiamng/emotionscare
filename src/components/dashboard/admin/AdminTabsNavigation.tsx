@@ -1,59 +1,143 @@
 
 import React from 'react';
-import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  BarChart3, 
-  Radio, 
-  Users, 
-  Trophy, 
-  Calendar, 
-  BookOpen, 
-  Activity, 
-  ShieldCheck, 
-  CloudSun,
-  Settings,
-  UserRound
-} from "lucide-react";
+  BarChart, Calendar, Cloud, 
+  FileText, Globe, Settings, 
+  Shield, Users, Zap,
+  Activity // Add this import for activity logs
+} from 'lucide-react';
+import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface AdminTabsNavigationProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
-  disabled?: boolean;
+  onTabChange: (tab: string) => void;
 }
 
-const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({ 
-  activeTab, 
-  setActiveTab,
-  disabled = false
+const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({
+  activeTab,
+  onTabChange
 }) => {
-  const tabItems = [
-    { id: "vue-globale", label: "Vue Globale", icon: <BarChart3 className="h-4 w-4 mr-2" /> },
-    { id: "scan-equipe", label: "Scans Équipe", icon: <Radio className="h-4 w-4 mr-2" /> },
-    { id: "social-cocoon", label: "Social Cocoon", icon: <Users className="h-4 w-4 mr-2" /> },
-    { id: "gamification", label: "Gamification", icon: <Trophy className="h-4 w-4 mr-2" /> },
-    { id: "evenements", label: "Événements", icon: <Calendar className="h-4 w-4 mr-2" /> },
-    { id: "journal-trends", label: "Journal", icon: <BookOpen className="h-4 w-4 mr-2" /> },
-    { id: "actions-rh", label: "Actions RH", icon: <Activity className="h-4 w-4 mr-2" /> },
-    { id: "compliance", label: "Conformité", icon: <ShieldCheck className="h-4 w-4 mr-2" /> },
-    { id: "weather-activities", label: "Météo & Activités", icon: <CloudSun className="h-4 w-4 mr-2" /> },
-    { id: "users-list", label: "Utilisateurs", icon: <UserRound className="h-4 w-4 mr-2" /> },
-    { id: "admin-settings", label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" /> },
-  ];
-  
   return (
-    <TabsList className="w-full flex flex-wrap justify-start overflow-x-auto p-0 rounded-md border">
-      {tabItems.map(tab => (
-        <TabsTrigger
-          key={tab.id}
-          value={tab.id}
-          onClick={() => setActiveTab(tab.id)}
-          disabled={disabled}
-          className="flex items-center px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none first:rounded-l-md last:rounded-r-md"
-        >
-          {tab.icon}
-          <span className="hidden sm:inline">{tab.label}</span>
-        </TabsTrigger>
-      ))}
+    <TabsList className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 w-full">
+      <TabsTrigger 
+        value="vue-globale"
+        onClick={() => onTabChange('vue-globale')}
+        className="w-full"
+        data-state={activeTab === 'vue-globale' ? 'active' : ''}
+      >
+        <Globe className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Vue globale</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="scan-equipe"
+        onClick={() => onTabChange('scan-equipe')}
+        className="w-full"
+        data-state={activeTab === 'scan-equipe' ? 'active' : ''}
+      >
+        <BarChart className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Scan équipe</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="social-cocoon"
+        onClick={() => onTabChange('social-cocoon')}
+        className="w-full"
+        data-state={activeTab === 'social-cocoon' ? 'active' : ''}
+      >
+        <Zap className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Social Cocoon</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="gamification"
+        onClick={() => onTabChange('gamification')}
+        className="w-full"
+        data-state={activeTab === 'gamification' ? 'active' : ''}
+      >
+        <Zap className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Gamification</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="evenements"
+        onClick={() => onTabChange('evenements')}
+        className="w-full"
+        data-state={activeTab === 'evenements' ? 'active' : ''}
+      >
+        <Calendar className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Événements</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="journal-trends"
+        onClick={() => onTabChange('journal-trends')}
+        className="w-full"
+        data-state={activeTab === 'journal-trends' ? 'active' : ''}
+      >
+        <FileText className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Journal</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="actions-rh"
+        onClick={() => onTabChange('actions-rh')}
+        className="w-full"
+        data-state={activeTab === 'actions-rh' ? 'active' : ''}
+      >
+        <FileText className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Actions RH</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="compliance"
+        onClick={() => onTabChange('compliance')}
+        className="w-full"
+        data-state={activeTab === 'compliance' ? 'active' : ''}
+      >
+        <Shield className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Compliance</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="weather-activities"
+        onClick={() => onTabChange('weather-activities')}
+        className="w-full"
+        data-state={activeTab === 'weather-activities' ? 'active' : ''}
+      >
+        <Cloud className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Weather</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="users-list"
+        onClick={() => onTabChange('users-list')}
+        className="w-full"
+        data-state={activeTab === 'users-list' ? 'active' : ''}
+      >
+        <Users className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Utilisateurs</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="activity-logs"
+        onClick={() => onTabChange('activity-logs')}
+        className="w-full"
+        data-state={activeTab === 'activity-logs' ? 'active' : ''}
+      >
+        <Activity className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Logs d'activité</span>
+      </TabsTrigger>
+      
+      <TabsTrigger 
+        value="admin-settings"
+        onClick={() => onTabChange('admin-settings')}
+        className="w-full"
+        data-state={activeTab === 'admin-settings' ? 'active' : ''}
+      >
+        <Settings className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline-block">Paramètres</span>
+      </TabsTrigger>
     </TabsList>
   );
 };
