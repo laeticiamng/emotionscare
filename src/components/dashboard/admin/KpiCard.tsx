@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LucideIcon } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import KpiCardBadge from './KpiCardBadge';
+import KpiCardValue from './KpiCardValue';
 
 export interface KpiCardProps {
   title: string;
@@ -16,31 +18,24 @@ export interface KpiCardProps {
   };
   subtitle?: React.ReactNode;
   ariaLabel?: string;
+  className?: string;
 }
 
+/**
+ * KpiCard component for displaying key performance indicators
+ */
 const KpiCard: React.FC<KpiCardProps> = ({ 
   title, 
   value, 
   icon: Icon, 
   delta, 
   subtitle,
-  ariaLabel
+  ariaLabel,
+  className
 }) => {
-  // Determine badge color based on trend
-  const getBadgeClasses = (trend: 'up' | 'down' | 'neutral') => {
-    switch(trend) {
-      case 'up':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'down':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800/50 dark:text-gray-400';
-    }
-  };
-
   return (
     <Card 
-      className="p-4 transition-shadow duration-200 hover:shadow-md"
+      className={cn("p-4 transition-shadow duration-200 hover:shadow-md", className)}
       aria-label={ariaLabel}
     >
       <CardHeader className="p-0 pb-2 space-y-0">
@@ -50,27 +45,9 @@ const KpiCard: React.FC<KpiCardProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="text-3xl font-bold text-gray-900 dark:text-gray-50">
-          {value}
-        </div>
+        <KpiCardValue value={value} />
         
-        {delta && (
-          <div className="mt-1 flex items-center">
-            <Badge 
-              className={cn(
-                "text-sm font-medium px-2 py-1", 
-                getBadgeClasses(delta.trend)
-              )}
-            >
-              {delta.trend === 'up' ? '↑' : delta.trend === 'down' ? '↓' : '•'} {delta.value}%
-            </Badge>
-            {delta.label && (
-              <span className="text-sm text-muted-foreground ml-2">
-                {delta.label}
-              </span>
-            )}
-          </div>
-        )}
+        {delta && <KpiCardBadge delta={delta} />}
         
         {subtitle && (
           <div className="mt-1">
