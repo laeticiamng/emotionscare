@@ -18,9 +18,9 @@ interface ThemeSwitcherProps {
 }
 
 /**
- * Composant premium pour changer de thème
- * Permet à l'utilisateur de basculer entre les thèmes clair, sombre et pastel
- * avec une interface soignée de style Apple
+ * Premium theme switcher component
+ * Allows users to toggle between light, dark and pastel themes
+ * with a sleek Apple-inspired interface
  */
 const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   variant = 'outline',
@@ -29,13 +29,13 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
 }) => {
   const { theme, setThemePreference } = useTheme();
 
-  // Icône à afficher en fonction du thème actuel
+  // Icon to display based on current theme
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'pastel' ? Palette : Sun;
   
-  // Texte à afficher en fonction du thème actuel
+  // Text to display based on current theme
   const themeText = theme === 'dark' ? 'Sombre' : theme === 'pastel' ? 'Pastel' : 'Clair';
   
-  // Fonction pour changer de thème
+  // Function to change theme
   const handleThemeChange = (newTheme: ThemeName) => {
     setThemePreference(newTheme);
   };

@@ -9,7 +9,7 @@ import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 const Index = () => {
   const { theme } = useTheme();
   
-  // Effet pour définir la classe sur l'élément body pour retirer les marges par défaut
+  // Effect to set class on body element to remove default margins
   useEffect(() => {
     document.body.classList.add('home-page');
     
@@ -34,16 +34,16 @@ const Index = () => {
   
   return (
     <div className="min-h-screen flex flex-col w-full">
-      {/* Fond avec gradient subtil */}
+      {/* Background with subtle gradient */}
       <div className="absolute inset-0 -z-10">
         <div className={`w-full h-full ${
-          theme === 'dark' ? 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]' :
-          theme === 'pastel' ? 'bg-gradient-to-br from-blue-50 to-blue-100/70' :
-          'bg-gradient-to-br from-white to-gray-50'
+          theme === 'dark' ? 'bg-gradient-to-br from-[#22252F] to-[#2D3440]' : // Warmer dark theme
+          theme === 'pastel' ? 'bg-gradient-to-br from-blue-50 to-indigo-100/60' : // More vibrant pastel
+          'bg-gradient-to-br from-white to-gray-50/80' // Warmer light tone
         }`}></div>
       </div>
       
-      {/* Header & Branding - Plus d'impact visuel */}
+      {/* Header & Branding - More visual impact */}
       <header className="w-full py-16 md:py-20 lg:py-24 text-center animate-fade-in max-w-[1400px] mx-auto px-6">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 tracking-tight heading-elegant">
           Emotions<span className="text-primary">Care</span>
@@ -61,10 +61,10 @@ const Index = () => {
         </div>
       </header>
       
-      {/* Main Content - Meilleure utilisation de l'espace */}
+      {/* Main Content - Better space utilization */}
       <main className="flex-grow flex flex-col items-center justify-center p-6 md:p-10 lg:p-12">
         <div className="max-w-[1400px] mx-auto w-full">
-          {/* Cards Container - Espacement optimisé */}
+          {/* Cards Container - Optimized spacing */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 mb-20">
             {/* User Card */}
             <RoleCard
@@ -83,12 +83,12 @@ const Index = () => {
             />
           </div>
           
-          {/* Value Proposition Section - Plus d'impact */}
+          {/* Value Proposition Section - More impact */}
           <ValueProposition />
         </div>
       </main>
       
-      {/* Footer - Style premium */}
+      {/* Footer - Premium style */}
       <footer className="w-full bg-primary text-primary-foreground py-8 px-4 mt-12">
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between px-6">
           <p className="mb-4 md:mb-0 font-medium">© {new Date().getFullYear()} ResiMax™ – GDPR compliant</p>

@@ -32,11 +32,11 @@ const Layout = ({ children }: LayoutProps) => {
     );
   }
   
-  // Determine background classes based on theme
+  // Determine background classes based on theme - Using warmer gradients
   const getBgClasses = () => {
-    if (theme === 'dark') return 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]';
-    if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-blue-100/70';
-    return 'bg-gradient-to-br from-white to-gray-50';
+    if (theme === 'dark') return 'bg-gradient-to-br from-[#22252F] to-[#2D3440]'; // Slightly warmer dark
+    if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-indigo-100/60'; // More vibrant pastel
+    return 'bg-gradient-to-br from-white to-gray-50/80'; // Warmer light mode
   };
   
   return (
@@ -56,9 +56,9 @@ const Layout = ({ children }: LayoutProps) => {
           'w-full'
         }`}>
           <main className={`animate-fade-in ${
-            isMobile ? 'w-full px-3 py-4' : 
+            isMobile ? 'w-full px-4 py-6' : // More padding on mobile
             isHomePage && !isAuthenticated ? 'w-full p-0' : 
-            'w-full max-w-[1400px] mx-auto py-8 px-6 md:px-8 lg:px-10'
+            'w-full max-w-[1400px] mx-auto py-8 px-8 md:px-10 lg:px-12' // More spacious layout
           }`}>
             {children || <Outlet />}
           </main>

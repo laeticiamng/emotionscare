@@ -21,11 +21,11 @@ const MobileNavigation = () => {
   const location = useLocation();
   const isAdmin = user ? isAdminRole(user.role) : false;
 
-  // Regrouper les items de navigation
+  // Group navigation items
   const topItems = isAdmin ? adminTopNavItems : topNavItems;
   const sideItems = isAdmin ? adminSidebarItems : sidebarItems;
   
-  // Combiner les deux pour le menu mobile, avec des séparateurs visuels
+  // Combine both for mobile menu, with visual separators
   const allNavigationItems = [
     ...topItems.map(item => ({ ...item, section: 'principal' })),
     ...sideItems.map(item => ({ ...item, section: 'outils' }))

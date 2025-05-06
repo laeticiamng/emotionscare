@@ -15,31 +15,31 @@ interface CoachAssistantProps {
 }
 
 /**
- * Composant Assistant Coach IA
- * Affiche une interface de chat interactive avec l'API OpenAI (GPT-4)
- * Fournit des réponses contextualisées basées sur l'état émotionnel de l'utilisateur
+ * Coach Assistant AI Component
+ * Displays an interactive chat interface with OpenAI API (GPT-4)
+ * Provides contextualized responses based on user emotional state
  */
 const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [apiReady, setApiReady] = useState(true);
 
-  // Vérifier la connexion API lors du chargement
+  // Check API connection on load
   useEffect(() => {
     if (user?.id) {
-      // Vérification de la connexion à l'API
+      // API connection check
       const checkAPIConnection = async () => {
         try {
           const result = await triggerCoachEvent('api_check', user.id);
           // Fix boolean check by calling an actual function instead
           const success = await checkConnectionStatus(user.id);
-          console.log("API OpenAI connection check:", success ? "OK" : "Error");
+          console.log("OpenAI API connection check:", success ? "OK" : "Error");
           setApiReady(success);
           
           if (!success) {
             toast({
-              title: "Erreur de connexion",
-              description: "La connexion à l'API OpenAI n'a pas pu être établie. Certaines fonctionnalités peuvent être limitées.",
+              title: "Connection Error",
+              description: "Could not establish connection to OpenAI API. Some features may be limited.",
               variant: "destructive"
             });
           }
@@ -47,8 +47,8 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
           console.error("Error connecting to OpenAI API:", error);
           setApiReady(false);
           toast({
-            title: "Erreur de connexion",
-            description: "La connexion à l'API OpenAI n'a pas pu être établie. Certaines fonctionnalités peuvent être limitées.",
+            title: "Connection Error",
+            description: "Could not establish connection to OpenAI API. Some features may be limited.",
             variant: "destructive"
           });
         }
@@ -56,7 +56,7 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
       
       checkAPIConnection();
       
-      // Nous utilisons setTimeout pour éviter de bloquer le rendu
+      // We use setTimeout to avoid blocking the render
       setTimeout(() => {
         triggerCoachEvent('daily_reminder', user.id);
       }, 1000);
