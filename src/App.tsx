@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 import { Shell } from "@/components/Shell";
-import { Home } from "@/pages/Home";
+import Index from '@/pages/Index';
 import { Docs } from "@/pages/Docs";
 import { Pricing } from "@/pages/Pricing";
 import { Contact } from "@/pages/Contact";
@@ -95,7 +95,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home />
+        element: <Index />
       },
       {
         path: "/docs",
