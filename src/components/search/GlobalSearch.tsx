@@ -2,17 +2,17 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useGlobalSearch, SearchResult, SearchResults, sectionLabels } from '@/hooks/useGlobalSearch';
+import { useGlobalSearch, SearchResult, SearchResults as SearchResultsType, sectionLabels } from '@/hooks/useGlobalSearch';
 import { Search, Loader, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const SearchResults = ({ 
+const SearchResultsList = ({ 
   data, 
   onSelect,
   highlightedIndex,
   setHighlightedIndex
 }: { 
-  data: SearchResults; 
+  data: SearchResultsType; 
   onSelect: (path: string) => void;
   highlightedIndex: number;
   setHighlightedIndex: (index: number) => void;
@@ -48,7 +48,7 @@ const SearchResults = ({
         return (
           <div key={sectionKey} className="space-y-1">
             <h3 className="text-sm font-semibold text-muted-foreground uppercase px-2 py-1">
-              {sectionLabels[sectionKey as keyof SearchResults]}
+              {sectionLabels[sectionKey as keyof SearchResultsType]}
             </h3>
             <div className="space-y-1">
               {items.map((item, idx) => {
@@ -85,7 +85,7 @@ const SearchResults = ({
 };
 
 // Helper to get all results as a flat array
-function getFlatResults(results: SearchResults): SearchResult[] {
+function getFlatResults(results: SearchResultsType): SearchResult[] {
   return Object.values(results).reduce<SearchResult[]>((acc, section) => {
     return [...acc, ...section];
   }, []);
@@ -213,7 +213,7 @@ const GlobalSearch: React.FC = () => {
                 <p className="mt-2 text-sm text-muted-foreground">Recherche en cours...</p>
               </div>
             ) : results ? (
-              <SearchResults 
+              <SearchResultsList 
                 data={results} 
                 onSelect={handleSelect} 
                 highlightedIndex={highlightedIndex}
