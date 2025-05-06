@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, 
   Heart, 
@@ -19,8 +18,11 @@ import {
   Sparkles
 } from "lucide-react";
 
+// Import the NavItemConfig interface
+import { NavItemConfig } from "@/components/ui/sidebar/SidebarNavGroup";
+
 // Items pour la barre du haut (navbar) - fonctionnalités principales
-export const topNavItems = [
+export const topNavItems: NavItemConfig[] = [
   {
     path: "/dashboard",
     label: "Tableau de bord",
@@ -48,7 +50,7 @@ export const topNavItems = [
 ];
 
 // Configuration pour la sidebar utilisateur - fonctionnalités complémentaires
-export const sidebarItems = [
+export const sidebarItems: NavItemConfig[] = [
   {
     path: "/social-cocoon",
     label: "Communauté",
@@ -88,7 +90,7 @@ export const sidebarItems = [
 ];
 
 // Configuration spécifique pour la sidebar admin - fonctionnalités analytiques
-export const adminSidebarItems = [
+export const adminSidebarItems: NavItemConfig[] = [
   {
     path: "/vr-analytics",
     label: "Statistiques VR",
@@ -110,7 +112,7 @@ export const adminSidebarItems = [
 ];
 
 // Items de navbar spécifiques pour les admin (remplace topNavItems pour les admins)
-export const adminTopNavItems = [
+export const adminTopNavItems: NavItemConfig[] = [
   {
     path: "/dashboard",
     label: "Tableau de bord global",
@@ -138,7 +140,7 @@ export const adminTopNavItems = [
 ];
 
 // Éléments de pied de page communs
-export const footerNavItems = [
+export const footerNavItems: NavItemConfig[] = [
   {
     path: "/my-data",
     label: "Mes Données",

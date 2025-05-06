@@ -1,10 +1,9 @@
 
 import React from 'react';
 import NavItemButton from './NavItemButton';
-import { LucideIcon } from 'lucide-react';
 
-// Définition de l'interface manquante
-interface NavItemConfig {
+// Export the interface so it can be imported elsewhere
+export interface NavItemConfig {
   path: string;
   label: string;
   icon: React.ReactElement;
