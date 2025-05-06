@@ -19,6 +19,12 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   
   console.log("ProtectedLayout - Auth state:", { isAuthenticated, user, isLoading, path: location.pathname });
   
+  // Skip protection for authentication pages
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
+  if (isAuthPage) {
+    return <Layout>{children}</Layout>;
+  }
+  
   // Show loading state
   if (isLoading) {
     console.log("ProtectedLayout - Loading...");

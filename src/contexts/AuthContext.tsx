@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
 import { getCurrentUser, loginUser, logoutUser, updateUser } from '../data/mockData';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { isAdminRole } from '@/utils/roleUtils';
 
@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   // Vérifier si l'utilisateur est déjà connecté
@@ -55,11 +56,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log(`Attempting login for email: ${email}`);
       // Pour Sophie, on accepte le mot de passe "sophie" ou pas de mot de passe du tout
       let loggedInUser;
+      
       if (email === 'sophie@example.com') {
         if (!password || password === 'sophie') {
           loggedInUser = await loginUser(email, password);
         } else {
           throw new Error("Mot de passe incorrect pour Sophie");
+        }
+      } else if (email === 'admin@example.com') {
+        if (!password || password === 'admin') {
+          loggedInUser = await loginUser(email, password);
+        } else {
+          throw new Error("Mot de passe incorrect pour Admin");
         }
       } else {
         loggedInUser = await loginUser(email, password);
@@ -74,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Vous êtes maintenant connecté(e)",
       });
       
-      // Rediriger selon le rôle
+      // Rediriger selon le rôle et la page actuelle
       if (isAdminRole(loggedInUser.role)) {
         console.log("Admin user detected, redirecting to dashboard");
         navigate('/dashboard');

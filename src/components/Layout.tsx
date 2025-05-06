@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import GlobalNav from './GlobalNav';
 import SecurityFooter from './SecurityFooter';
@@ -17,9 +17,13 @@ const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { theme } = useTheme();
+  const location = useLocation();
   
-  // Si non authentifié, afficher uniquement les enfants (pages login/register)
-  if (!isAuthenticated) {
+  // Don't render layout for login/admin-login pages
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
+  
+  // If on auth page or not authenticated, display only the children (pages login/register)
+  if (isAuthPage || !isAuthenticated) {
     return <div className="animate-fade-in">{children || <Outlet />}</div>;
   }
   
