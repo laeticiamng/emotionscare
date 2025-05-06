@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useCallback } from 'react';
 import DashboardHeader from './DashboardHeader';
 import UserSidePanel from './UserSidePanel';
 import ModulesSection from '@/components/home/ModulesSection';
@@ -24,7 +25,7 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) => {
   const [minimalView, setMinimalView] = useState(false);
   const isMobile = useIsMobile();
-  const { kpis, shortcuts, isLoading } = useDashboardHero(user?.id);
+  const { kpis, shortcuts, isLoading, refetch: refetchDashboardHero } = useDashboardHero(user?.id);
   const [collapsedSections, setCollapsedSections] = useState({
     modules: false,
     emotionScan: isMobile,
@@ -41,10 +42,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
     }));
   };
   
+  // Refresh all user dashboard data
+  const refreshDashboardData = useCallback(async () => {
+    console.log('Refreshing user dashboard data...');
+    await refetchDashboardHero();
+    console.log('User dashboard data refresh complete');
+  }, [refetchDashboardHero]);
+  
   return (
     <div className="animate-fade-in w-full">
       <div className="flex justify-between items-center flex-wrap gap-2 mb-6">
-        <DashboardHeader user={user} />
+        <DashboardHeader 
+          user={user} 
+          onRefresh={refreshDashboardData}
+        />
         {!isMobile && (
           <Button 
             variant="outline" 

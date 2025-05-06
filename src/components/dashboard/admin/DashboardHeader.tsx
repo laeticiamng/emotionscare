@@ -3,19 +3,35 @@ import React from 'react';
 import PeriodSelector from './PeriodSelector';
 import { SegmentSelector } from './SegmentSelector';
 import { useSegment } from '@/contexts/SegmentContext';
+import AutoRefreshControl from '@/components/dashboard/AutoRefreshControl';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 
 interface DashboardHeaderProps {
   timePeriod: string;
   setTimePeriod: (period: string) => void;
   isLoading?: boolean;
+  onRefresh?: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
   timePeriod, 
   setTimePeriod, 
-  isLoading = false 
+  isLoading = false,
+  onRefresh = () => {}
 }) => {
   const { activeDimension, activeOption } = useSegment();
+  
+  const {
+    enabled: autoRefreshEnabled,
+    interval: autoRefreshInterval,
+    refreshing,
+    toggleAutoRefresh,
+    changeInterval
+  } = useAutoRefresh({
+    onRefresh,
+    defaultEnabled: false,
+    defaultInterval: 60000 // 1 minute default
+  });
   
   return (
     <div className="mb-8 animate-fade-in">
@@ -31,7 +47,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+        <div className="flex flex-wrap gap-3 mt-4 md:mt-0 items-center">
+          <AutoRefreshControl
+            enabled={autoRefreshEnabled}
+            interval={autoRefreshInterval}
+            refreshing={refreshing}
+            onToggle={toggleAutoRefresh}
+            onIntervalChange={changeInterval}
+          />
           <SegmentSelector />
           <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
         </div>

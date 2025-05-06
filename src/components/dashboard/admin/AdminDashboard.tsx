@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs } from "@/components/ui/tabs";
 import { useDashboardData, useEmotionalScoreTrend, useDashboardStats } from './hooks/useDashboardData';
@@ -20,9 +20,9 @@ const AdminDashboard: React.FC = () => {
   const [timePeriod, setTimePeriod] = useState<string>("30");
   
   // Use custom hooks to fetch data
-  const { absenteeismData, productivityData, isLoading } = useDashboardData(timePeriod);
-  const emotionalScoreTrend = useEmotionalScoreTrend();
-  const dashboardStats = useDashboardStats();
+  const { absenteeismData, productivityData, isLoading, refetchAll } = useDashboardData(timePeriod);
+  const { data: emotionalScoreTrend, refetch: refetchEmotionalTrend } = useEmotionalScoreTrend();
+  const { data: dashboardStats, refetch: refetchDashboardStats } = useDashboardStats();
 
   const adminKpis = [
     { 
@@ -64,6 +64,17 @@ const AdminDashboard: React.FC = () => {
     { label: 'Audit', icon: FileSearch, to: '/compliance', variant: 'outline' as const }
   ];
   
+  // Refresh all dashboard data
+  const refreshAllData = useCallback(async () => {
+    console.log('Refreshing all dashboard data...');
+    await Promise.all([
+      refetchAll(),
+      refetchEmotionalTrend(),
+      refetchDashboardStats()
+    ]);
+    console.log('Dashboard data refresh complete');
+  }, [refetchAll, refetchEmotionalTrend, refetchDashboardStats]);
+  
   return (
     <SegmentProvider>
       <div className="max-w-7xl mx-auto">
@@ -79,6 +90,7 @@ const AdminDashboard: React.FC = () => {
           timePeriod={timePeriod} 
           setTimePeriod={setTimePeriod} 
           isLoading={isLoading}
+          onRefresh={refreshAllData}
         />
         
         {/* Tabs Navigation */}
