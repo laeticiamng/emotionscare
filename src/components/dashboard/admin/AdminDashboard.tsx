@@ -66,6 +66,7 @@ const AdminDashboard: React.FC = () => {
   
   // Prepare formatted dashboard stats for the components expecting the old format
   const formattedDashboardStats = {
+    ...dashboardStats,
     productivity: {
       current: dashboardStats.averageEmotionalScore || 76,
       trend: 3

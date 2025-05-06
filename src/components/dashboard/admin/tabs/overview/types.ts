@@ -9,11 +9,11 @@ export interface DashboardStats {
   absentTeamMembers?: number;
   averageEmotionalScore?: number;
   activeGameifications?: number;
-  productivity?: {
+  productivity: {
     current: number;
     trend: number;
   };
-  emotionalScore?: {
+  emotionalScore: {
     current: number;
     trend: number;
   };

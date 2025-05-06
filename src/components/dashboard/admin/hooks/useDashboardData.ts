@@ -90,7 +90,15 @@ export const useDashboardStats = () => {
     activeUsersCount: 85,
     absentTeamMembers: 3,
     averageEmotionalScore: 76,
-    activeGameifications: 12
+    activeGameifications: 12,
+    productivity: {
+      current: 89,
+      trend: 3
+    },
+    emotionalScore: {
+      current: 76,
+      trend: -2
+    }
   });
   const { segment } = useSegment();
   
@@ -103,7 +111,15 @@ export const useDashboardStats = () => {
         activeUsersCount: 80 + Math.floor(Math.random() * 10), // 80-89
         absentTeamMembers: 2 + Math.floor(Math.random() * 3), // 2-4
         averageEmotionalScore: 74 + Math.floor(Math.random() * 6), // 74-79
-        activeGameifications: gamificationStats.totalBadges || 12
+        activeGameifications: gamificationStats.totalBadges || 12,
+        productivity: {
+          current: 85 + Math.floor(Math.random() * 10), // 85-94
+          trend: Math.random() > 0.5 ? 3 : -2
+        },
+        emotionalScore: {
+          current: 74 + Math.floor(Math.random() * 6), // 74-79
+          trend: Math.random() > 0.5 ? -2 : 2
+        }
       };
       
       setData(updatedData);
