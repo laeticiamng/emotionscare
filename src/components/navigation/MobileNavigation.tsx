@@ -53,14 +53,14 @@ const MobileNavigation = () => {
           variant="ghost" 
           size="icon" 
           aria-label="Menu"
-          className="focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          className="focus:ring-0"
         >
           <Menu className="h-6 w-6" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[90vw] sm:w-[350px] p-0">
+      <SheetContent side="left" className="w-[85vw] sm:w-[320px] p-0">
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center justify-between p-3 border-b">
             <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={() => setIsOpen(false)}>
               <span className="font-bold text-lg text-primary">{isAdmin ? "EC Admin" : "EmotionsCare"}</span>
             </NavLink>
@@ -69,14 +69,15 @@ const MobileNavigation = () => {
               size="icon" 
               onClick={() => setIsOpen(false)}
               aria-label="Fermer le menu"
+              className="focus:ring-0"
             >
               <X className="h-5 w-5" />
             </Button>
           </div>
           
-          <div className="flex-1 overflow-y-auto py-2">
+          <div className="flex-1 overflow-y-auto py-1">
             {user && (
-              <div className="flex items-center gap-3 p-4 mb-2 mx-2 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3 p-3 mb-2 mx-2 bg-muted/50 rounded-lg">
                 <Avatar>
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback>{user.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
@@ -88,7 +89,7 @@ const MobileNavigation = () => {
               </div>
             )}
             
-            <nav className="flex flex-col space-y-1 px-2">
+            <nav className="flex flex-col space-y-0 px-2">
               {allNavigationItems.map((item, index) => {
                 const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
                 return (
@@ -97,15 +98,15 @@ const MobileNavigation = () => {
                     <NavLink
                       to={item.path}
                       className={cn(
-                        "flex items-center py-3 px-3 rounded-md transition-colors",
+                        "flex items-center py-2 px-3 rounded-md transition-colors text-sm",
                         isActive
                           ? "bg-primary text-primary-foreground font-medium"
                           : "hover:bg-accent/50"
                       )}
                       onClick={() => setIsOpen(false)}
                     >
-                      {item.icon}
-                      <span className="ml-2">{item.label}</span>
+                      {React.cloneElement(item.icon, { className: "w-4 h-4 mr-2" })}
+                      <span>{item.label}</span>
                     </NavLink>
                   </React.Fragment>
                 );
@@ -117,13 +118,13 @@ const MobileNavigation = () => {
                     Extras
                   </div>
                   <button 
-                    className="flex items-center py-3 px-3 rounded-md transition-colors hover:bg-accent/50 w-full text-left"
+                    className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50 w-full text-left text-sm"
                     onClick={() => {
                       openDrawer();
                       setIsOpen(false);
                     }}
                   >
-                    <Music className="w-5 h-5 mr-2" />
+                    <Music className="w-4 h-4 mr-2" />
                     <span>Soundtrack du bien-être</span>
                   </button>
                 </>
@@ -131,16 +132,16 @@ const MobileNavigation = () => {
             </nav>
           </div>
           
-          <div className="p-4 border-t">
+          <div className="p-3 border-t">
             <Button 
               variant="outline" 
-              className="w-full justify-start text-muted-foreground hover:text-destructive" 
+              className="w-full justify-start text-muted-foreground hover:text-destructive text-sm" 
               onClick={() => {
                 handleLogout();
                 setIsOpen(false);
               }}
             >
-              <LogOut size={18} className="mr-2" />
+              <LogOut size={16} className="mr-2" />
               <span>Déconnexion</span>
             </Button>
           </div>

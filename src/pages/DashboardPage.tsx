@@ -7,14 +7,12 @@ import UserDashboard from '@/components/dashboard/UserDashboard';
 import AdminDashboard from '@/components/dashboard/admin/AdminDashboard';
 import { isAdminRole, isUserRole } from '@/utils/roleUtils';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import SessionTimeoutAlert from '@/components/SessionTimeoutAlert';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const DashboardPage: React.FC = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [sessionContinued, setSessionContinued] = useState(false);
   const isMobile = useIsMobile();
   
   console.log("DashboardPage - Auth state:", { user, isAuthenticated, isLoading });
@@ -58,9 +56,8 @@ const DashboardPage: React.FC = () => {
   };
   
   return (
-    <div className={`${isMobile ? 'w-full px-0' : 'container mx-auto py-6'}`}>
+    <div className={`${isMobile ? 'w-full px-0 py-1' : 'container mx-auto py-6'}`}>
       {renderDashboard()}
-      <SessionTimeoutAlert />
     </div>
   );
 };

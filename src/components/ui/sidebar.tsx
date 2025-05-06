@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Sidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // Collapsed by default
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -127,35 +126,11 @@ const Sidebar = () => {
         )}
       </div>
       
-      {/* Notification et contrôle d'affichage */}
       <div className="p-2 border-t border-border">
-        <div className="flex items-center justify-between mb-2 px-2">
-          {!collapsed && (
-            <span className="text-xs text-muted-foreground">Notifications</span>
-          )}
-          
-          {collapsed ? (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex justify-center py-2">
-                    <NotificationBar userId={user?.id} unreadCount={3} />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  Notifications
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ) : (
-            <NotificationBar userId={user?.id} unreadCount={3} />
-          )}
-        </div>
-        
         <Button 
           variant="outline" 
           size={collapsed ? "icon" : "sm"}
-          className={`${collapsed ? '' : 'w-full justify-between'}`}
+          className={`${collapsed ? '' : 'w-full justify-between'} mt-2`}
           onClick={() => setCollapsed(!collapsed)}
         >
           {!collapsed && <span className="text-xs">Réduire</span>}

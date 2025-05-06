@@ -16,7 +16,7 @@ const Layout = ({ children }: LayoutProps) => {
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   
-  // If not authenticated, only render the children (login/register pages)
+  // Si non authentifié, afficher uniquement les enfants (pages login/register)
   if (!isAuthenticated) {
     console.log("Layout - Not authenticated, rendering without navigation");
     return <>{children || <Outlet />}</>;
@@ -27,9 +27,10 @@ const Layout = ({ children }: LayoutProps) => {
       <GlobalNav />
       <SessionTimeoutAlert />
       <div className="flex flex-1 overflow-hidden pt-16">
-        <Sidebar />
-        <div className="flex-1 overflow-auto bg-background w-full">
-          <main className={`${isMobile ? 'w-full p-0' : 'container mx-auto p-6'}`}>
+        {/* La sidebar n'apparaît que sur desktop */}
+        {!isMobile && <Sidebar />}
+        <div className={`flex-1 overflow-auto bg-background ${isMobile ? 'w-full' : 'w-full pl-16'}`}>
+          <main className={`${isMobile ? 'w-full px-1 py-2' : 'container mx-auto p-6'}`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />
