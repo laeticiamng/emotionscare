@@ -130,12 +130,14 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       
       // Create emotion object
       const emotion: Emotion = {
+        id: `emotion-${Date.now()}`, // Generate a temporary ID
         user_id: userId,
         date: new Date().toISOString(),
         emotion: result.emotion,
-        confidence: result.confidence, // Ensure confidence is passed
+        confidence: result.confidence,
         text: result.transcript,
         audio_url: isConfidential ? undefined : 'mock-url-to-audio-file',
+        source: 'audio', // Optional property
       };
       
       onAnalysisComplete(emotion, result);

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -10,11 +11,11 @@ import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useToast } from "@/hooks/use-toast";
-import { ActivityTabView, AnonymousActivity, ActivityFiltersState, ActivityStats } from './tabs/activity-logs/types';
-import DailyActivityTable from './tabs/activity-logs/DailyActivityTable';
-import StatsTable from './tabs/activity-logs/StatsTable';
-import { applyFilters, formatCsvData, getActivityLabel, getDefaultCsvFileName } from './tabs/activity-logs/activityUtils';
-import ActionBar from './tabs/activity-logs/ActionBar';
+import { ActivityTabView, AnonymousActivity, ActivityFiltersState, ActivityStats } from '../dashboard/admin/tabs/activity-logs/types';
+import DailyActivityTable from '../dashboard/admin/tabs/activity-logs/DailyActivityTable';
+import StatsTable from '../dashboard/admin/tabs/activity-logs/StatsTable';
+import { applyFilters, formatCsvData, getActivityLabel, getDefaultCsvFileName } from '../dashboard/admin/tabs/activity-logs/activityUtils';
+import ActionBar from '../dashboard/admin/tabs/activity-logs/ActionBar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Pagination from '@/components/ui/data-table/Pagination';
 
@@ -76,7 +77,7 @@ const UserActivityLogTab: React.FC = () => {
         // Simulate API call with pagination
         const startIndex = (page - 1) * pageSize;
         const endIndex = startIndex + pageSize;
-        const filteredData = applyFilters([...mockDailyActivities], filters);
+        const filteredData = applyFilters([...mockDailyActivities], filters) as AnonymousActivity[];
         const paginatedData = filteredData.slice(startIndex, endIndex);
         
         setActivities(paginatedData);
@@ -113,7 +114,11 @@ const UserActivityLogTab: React.FC = () => {
   };
   
   const handleDateChange = (date: DateRange | undefined) => {
-    setFilters({ ...filters, startDate: date?.from, endDate: date?.to });
+    setFilters({ 
+      ...filters, 
+      startDate: date?.from, 
+      endDate: date?.to 
+    });
     setPage(1); // Reset page when changing dates
   };
 
@@ -124,6 +129,10 @@ const UserActivityLogTab: React.FC = () => {
   const handleLimitChange = (newLimit: number) => {
     setPageSize(newLimit);
     setPage(1);
+  };
+  
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as ActivityTabView);
   };
   
   const handleExport = () => {
@@ -179,7 +188,7 @@ const UserActivityLogTab: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Tabs defaultValue="daily" value={activeTab} onValueChange={setActiveTab}>
+          <Tabs defaultValue="daily" value={activeTab} onValueChange={handleTabChange}>
             <TabsList>
               <TabsTrigger value="daily">Activité journalière</TabsTrigger>
               <TabsTrigger value="stats">Statistiques</TabsTrigger>

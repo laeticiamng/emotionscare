@@ -1,155 +1,59 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import type { Challenge, UserChallenge, Badge, UserBadge } from '../types/gamification';
+import { Badge } from "@/types";
 
-// Mock data (until we create actual tables in Supabase)
-const mockChallenges: Challenge[] = [
-  { 
-    id: '1', 
-    title: 'Journal quotidien', 
-    description: 'Écrivez dans votre journal aujourd\'hui',
-    points: 10 
-  },
-  { 
-    id: '2', 
-    title: 'Scan émotionnel', 
-    description: 'Complétez un scan émotionnel',
-    points: 15 
-  },
-  { 
-    id: '3', 
-    title: 'Exercice de respiration', 
-    description: 'Faites 5 minutes d\'exercices de respiration',
-    points: 5 
-  }
-];
+// Get all badges for a user
+export const getUserBadges = async (userId: string): Promise<Badge[]> => {
+  // In a real app, this would be a fetch call to your API
+  return mockBadges.filter(badge => badge.user_id === userId);
+};
 
+// Check if user has earned any new badges
+export const checkForNewBadges = async (userId: string): Promise<Badge[]> => {
+  // Mock logic for badge earning
+  const existingBadges = await getUserBadges(userId);
+  const newBadges: Badge[] = [];
+  
+  // This would contain real logic in a production app
+  return newBadges;
+};
+
+// Mock badges data
 const mockBadges: Badge[] = [
   {
-    id: '1',
-    name: 'Premier pas',
-    description: 'Obtenez 10 points en une journée',
-    icon_url: '/badges/first-steps.svg',
-    threshold: 10
+    id: "1",
+    user_id: "user1",
+    name: "Premier pas",
+    description: "Première utilisation de l'application",
+    icon_url: "/badges/first-steps.svg",
+    threshold: 1,
+    awarded_at: new Date().toISOString(),
   },
   {
-    id: '2',
-    name: 'Super conscient',
-    description: 'Obtenez 25 points en une journée',
-    icon_url: '/badges/super-aware.svg',
-    threshold: 25
+    id: "2",
+    user_id: "user1",
+    name: "Explorateur",
+    description: "A visité toutes les sections de l'application",
+    icon_url: "/badges/explorer.svg",
+    threshold: 5,
+    awarded_at: new Date().toISOString(),
   },
   {
-    id: '3',
-    name: 'Maître du bien-être',
-    description: 'Obtenez 50 points en une journée',
-    icon_url: '/badges/wellness-master.svg',
-    threshold: 50
+    id: "3",
+    user_id: "user2",
+    name: "Journal intime",
+    description: "A complété 5 entrées de journal",
+    icon_url: "/badges/journal.svg",
+    threshold: 5,
+    awarded_at: new Date().toISOString(),
   }
 ];
 
-/** 1) Récupérer la liste des challenges disponibles */
-export async function fetchChallenges(): Promise<Challenge[]> {
-  // In a real implementation, we would query the database
-  // const { data, error } = await supabase
-  //   .from('challenges')
-  //   .select('*')
-  //   .order('points', { ascending: false });
-    
-  // if (error) throw error;
-  // return data || [];
-  
-  // Using mock data for now
-  return Promise.resolve(mockChallenges);
-}
-
-/** 2) Récupérer la progression de l'utilisateur pour aujourd'hui */
-export async function fetchUserChallenges(user_id: string): Promise<UserChallenge[]> {
-  // In a real implementation, we would query the database
-  // const today = new Date().toISOString().slice(0,10);
-  // const { data, error } = await supabase
-  //   .from('user_challenges')
-  //   .select('*')
-  //   .eq('user_id', user_id)
-  //   .like('date', `${today}%`);
-    
-  // if (error) throw error;
-  // return data || [];
-  
-  // Mock data - let's assume the first challenge is completed
-  const today = new Date().toISOString();
-  return Promise.resolve([
-    {
-      id: '101',
-      user_id,
-      challenge_id: '1',
-      date: today,
-      completed: true
-    }
-  ]);
-}
-
-/** 3) Marquer un challenge comme complété */
-export async function completeChallenge(uc: Omit<UserChallenge,'id'>): Promise<UserChallenge> {
-  // In a real implementation, we would upsert to the database
-  // const { data, error } = await supabase
-  //   .from('user_challenges')
-  //   .upsert(uc, { onConflict: 'user_id,challenge_id,date' })
-  //   .select('*')
-  //   .single();
-    
-  // if (error || !data) throw error || new Error("Failed to complete challenge");
-  // return data;
-  
-  // Mock implementation - just return the challenge with an ID
-  return Promise.resolve({
-    ...uc,
-    id: Math.random().toString(36).substring(2, 9)
-  });
-}
-
-/** 4) Récupérer les badges et ceux déjà gagnés */
-export async function fetchBadges(user_id: string): Promise<{ all: Badge[]; earned: UserBadge[] }> {
-  // In a real implementation, we would query the database
-  // const [{ data: all, error: allErr }, { data: earned, error: earnedErr }] = await Promise.all([
-  //   supabase.from('badges').select('*'),
-  //   supabase.from('user_badges').select('*').eq('user_id', user_id),
-  // ]);
-  
-  // if (allErr || earnedErr) throw allErr || earnedErr;
-  // return { all: all || [], earned: earned || [] };
-  
-  // Mock implementation - assume the user has earned the first badge
-  const mockUserBadges: UserBadge[] = [
-    {
-      id: '201',
-      user_id,
-      badge_id: '1',
-      awarded_on: new Date().toISOString()
-    }
-  ];
-  
-  return Promise.resolve({ 
-    all: mockBadges, 
-    earned: mockUserBadges 
-  });
-}
-
-/** 5) Attribuer un badge */
-export async function awardBadge(ub: Omit<UserBadge,'id'>): Promise<UserBadge> {
-  // In a real implementation, we would insert to the database
-  // const { data, error } = await supabase
-  //   .from('user_badges')
-  //   .insert(ub)
-  //   .select('*')
-  //   .single();
-    
-  // if (error || !data) throw error || new Error("Failed to award badge");
-  // return data;
-  
-  // Mock implementation - just return with an ID
-  return Promise.resolve({
-    ...ub,
-    id: Math.random().toString(36).substring(2, 9)
-  });
-}
+// Calculate progress for a specific badge type
+export const calculateBadgeProgress = (
+  userId: string, 
+  badgeType: string, 
+  currentValue: number
+): number => {
+  // This would calculate real progress in a production app
+  return Math.min(100, (currentValue / 5) * 100);
+};

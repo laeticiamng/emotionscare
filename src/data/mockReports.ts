@@ -5,9 +5,16 @@ import { Report } from '../types';
 export const mockReports: Report[] = [
   {
     id: '1',
-    user_id: '1',
     date: '2023-04-07T00:00:00Z',
     title: 'Rapport hebdomadaire',
+    data: {
+      metrics: {
+        absenteeism: 3.5,
+        changePct: -2.1,
+      }
+    },
+    type: 'weekly',
+    user_id: '1',
     summary: 'Résumé des indicateurs de performance',
     mood_score: 75,
     categories: ['travail', 'stress'],
@@ -20,9 +27,16 @@ export const mockReports: Report[] = [
   },
   {
     id: '2',
-    user_id: '1',
     date: '2023-04-14T00:00:00Z',
     title: 'Rapport hebdomadaire',
+    data: {
+      metrics: {
+        absenteeism: 3.2,
+        changePct: -8.6,
+      }
+    },
+    type: 'weekly',
+    user_id: '1',
     summary: 'Résumé des indicateurs de performance',
     mood_score: 82,
     categories: ['travail', 'productivité'],
@@ -35,9 +49,16 @@ export const mockReports: Report[] = [
   },
   {
     id: '3',
-    user_id: '1',
     date: '2023-04-07T00:00:00Z',
     title: 'Rapport de productivité',
+    data: {
+      metrics: {
+        productivity: 87.3,
+        changePct: 1.5,
+      }
+    },
+    type: 'productivity',
+    user_id: '1',
     summary: 'Analyse de votre productivité',
     mood_score: 70,
     categories: ['travail', 'productivité'],
@@ -50,9 +71,16 @@ export const mockReports: Report[] = [
   },
   {
     id: '4',
-    user_id: '1',
     date: '2023-04-14T00:00:00Z',
     title: 'Rapport de productivité',
+    data: {
+      metrics: {
+        productivity: 89.7,
+        changePct: 2.7,
+      }
+    },
+    type: 'productivity',
+    user_id: '1',
     summary: 'Analyse de votre productivité',
     mood_score: 85,
     categories: ['travail', 'bien-être'],

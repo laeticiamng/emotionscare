@@ -29,7 +29,7 @@ export interface UserPreferences {
   theme: string;
   fontSize: string;
   accentColor: string;
-  backgroundColor?: string; // Added for PreferencesForm
+  backgroundColor?: string; 
   notifications: {
     email: boolean;
     push: boolean;
@@ -134,6 +134,7 @@ export interface VRSession {
   emotional_impact?: number;
   is_audio_only?: boolean; // Added for compatibility
   template_id?: string; // Added for compatibility
+  duration?: number; // Added for compatibility with useVRSession.tsx
 }
 
 // Invitation Types
@@ -148,7 +149,6 @@ export interface Invitation {
   accepted_at?: string;
 }
 
-// Use UserRole for role typing
 export interface InvitationFormData {
   email: string;
   role: string;

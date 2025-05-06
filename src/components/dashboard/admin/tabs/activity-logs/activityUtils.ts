@@ -72,3 +72,35 @@ export const applyFilters = (
     return matchesSearch && matchesType && matchesStartDate && matchesEndDate;
   });
 };
+
+// Add the missing exportActivityData function
+export const exportActivityData = (
+  activeTab: ActivityTabView,
+  data: AnonymousActivity[] | ActivityStats[]
+): void => {
+  const formattedData = formatCsvData(activeTab, data);
+  const fileName = getDefaultCsvFileName(activeTab);
+  
+  // Create CSV content
+  const headers = Object.keys(formattedData[0]);
+  const csvContent = [
+    headers.join(','),
+    ...formattedData.map(row => 
+      headers.map(header => 
+        typeof row[header] === 'string' && row[header].includes(',') 
+          ? `"${row[header]}"` 
+          : row[header]
+      ).join(',')
+    )
+  ].join('\n');
+  
+  // Create download link
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};

@@ -1,81 +1,91 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-// Session security configuration (configurable for future hardening)
-const SESSION_TIMEOUT_MINUTES = 15;
-const ACTIVITY_EVENTS = [
-  'mousedown', 'keydown', 'touchstart', 'scroll'
-];
-
-export function useSessionSecurity() {
-  const { logout, isAuthenticated } = useAuth();
-  const { toast } = useToast();
+export function useSessionSecurity(
+  inactivityTimeoutMs: number = 30 * 60 * 1000, // Default 30 minutes
+  warningTimeMs: number = 60 * 1000 // Warning 1 minute before logout
+) {
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
-  const [timeoutWarning, setTimeoutWarning] = useState(false);
-  
-  // Reset the last activity timestamp when user interacts with the page
-  const updateActivity = () => {
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const { isAuthenticated, signOut } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Function to handle user activity
+  const handleUserActivity = useCallback(() => {
     setLastActivity(Date.now());
-    if (timeoutWarning) {
-      setTimeoutWarning(false);
-      toast({
-        title: "Session prolongée",
-        description: "Votre activité a été détectée. Votre session a été prolongée.",
-        variant: "default"
-      });
-    }
-  };
-  
-  // Monitor for user inactivity and log them out if inactive for too long
+    setShowWarning(false);
+  }, []);
+
+  // Check for inactivity
   useEffect(() => {
     if (!isAuthenticated) return;
+
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
     
-    // Add event listeners for user activity
-    ACTIVITY_EVENTS.forEach(event => 
-      window.addEventListener(event, updateActivity, { passive: true })
-    );
-    
-    // Check for inactivity every minute
-    const checkInterval = setInterval(() => {
-      const inactiveTimeMinutes = (Date.now() - lastActivity) / (1000 * 60);
+    // Add event listeners
+    activityEvents.forEach(event => {
+      window.addEventListener(event, handleUserActivity);
+    });
+
+    // Set up interval to check inactivity
+    const intervalId = setInterval(() => {
+      const now = Date.now();
+      const timeElapsed = now - lastActivity;
       
-      // Show warning when 1 minute before timeout
-      if (inactiveTimeMinutes >= SESSION_TIMEOUT_MINUTES - 1 && !timeoutWarning) {
-        setTimeoutWarning(true);
+      // Show warning before logout
+      if (timeElapsed >= inactivityTimeoutMs - warningTimeMs && !showWarning) {
+        setShowWarning(true);
         toast({
-          title: "Alerte d'inactivité",
-          description: "Votre session se terminera dans 1 minute en raison d'inactivité",
-          variant: "destructive",
-          duration: 60000 // Show until session times out or user interacts
+          title: "Session expiration",
+          description: `Your session will expire in ${Math.round(warningTimeMs / 1000 / 60)} minute(s) due to inactivity.`,
+          duration: warningTimeMs,
         });
       }
       
-      // Log out after timeout period
-      if (inactiveTimeMinutes >= SESSION_TIMEOUT_MINUTES) {
-        console.log(`Session expired after ${SESSION_TIMEOUT_MINUTES} minutes of inactivity`);
-        toast({
-          title: "Session expirée",
-          description: "Vous avez été déconnecté en raison d'inactivité",
-          variant: "destructive"
+      // Logout if inactive
+      if (timeElapsed >= inactivityTimeoutMs) {
+        signOut().then(() => {
+          toast({
+            title: "Session expired",
+            description: "You have been logged out due to inactivity.",
+            variant: "destructive",
+          });
+          navigate('/login');
         });
-        logout();
       }
-    }, 20000); // Check every 20 seconds (more responsive)
-    
+    }, 10000); // Check every 10 seconds
+
+    // Cleanup
     return () => {
-      // Clean up event listeners and interval
-      ACTIVITY_EVENTS.forEach(event => 
-        window.removeEventListener(event, updateActivity)
-      );
-      clearInterval(checkInterval);
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, handleUserActivity);
+      });
+      clearInterval(intervalId);
     };
-  }, [lastActivity, logout, isAuthenticated, timeoutWarning, toast]);
-  
+  }, [
+    isAuthenticated, 
+    lastActivity, 
+    handleUserActivity, 
+    inactivityTimeoutMs, 
+    warningTimeMs, 
+    showWarning, 
+    signOut, 
+    toast, 
+    navigate
+  ]);
+
+  // Reset timer on demand (useful after important actions)
+  const resetTimer = () => {
+    handleUserActivity();
+  };
+
   return {
-    timeoutWarning,
-    resetActivity: updateActivity,
-    sessionTimeoutMinutes: SESSION_TIMEOUT_MINUTES
+    showWarning,
+    resetTimer,
+    timeLeft: Math.max(0, inactivityTimeoutMs - (Date.now() - lastActivity))
   };
 }

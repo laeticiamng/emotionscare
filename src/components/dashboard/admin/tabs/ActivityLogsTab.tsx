@@ -5,11 +5,11 @@ import { BarChart2, Users } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ActivityFiltersState, ActivityTabView } from './activity-logs/types';
 import { useActivityData } from './activity-logs/useActivityData';
-import { exportActivityData } from './activity-logs/activityUtils';
 import ActivityFilters from './activity-logs/ActivityFilters';
 import DailyActivitiesTable from './activity-logs/DailyActivitiesTable';
 import StatsTable from './activity-logs/StatsTable';
 import ActionBar from './activity-logs/ActionBar';
+import { formatCsvData, getDefaultCsvFileName } from './activity-logs/activityUtils';
 
 const ActivityLogsTab: React.FC = () => {
   // Tab state
@@ -69,10 +69,40 @@ const ActivityLogsTab: React.FC = () => {
     if (activeTab === 'daily' && anonymousActivities.length === 0) return;
     if (activeTab === 'stats' && activityStats.length === 0) return;
     
-    exportActivityData(
+    // Format the data
+    const formattedData = formatCsvData(
       activeTab,
       activeTab === 'daily' ? anonymousActivities : activityStats
     );
+    
+    // Create CSV content
+    const headers = Object.keys(formattedData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...formattedData.map(row => 
+        headers.map(header => 
+          typeof row[header] === 'string' && row[header].includes(',') 
+            ? `"${row[header]}"` 
+            : row[header]
+        ).join(',')
+      )
+    ].join('\n');
+    
+    // Download the file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const fileName = getDefaultCsvFileName(activeTab);
+    
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   };
   
   return (

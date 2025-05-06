@@ -11,6 +11,7 @@ import ThemeSelectionField from './ThemeSelectionField';
 import FontSizeField from './FontSizeField';
 import ColorAccentField from './ColorAccentField';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserPreferences } from '@/types';
 
 const formSchema = z.object({
   fontSize: z.enum(['small', 'medium', 'large']),
@@ -25,8 +26,21 @@ const PreferencesForm: React.FC = () => {
   const { themePreference, setThemePreference } = useTheme();
   const { toast } = useToast();
   
-  // Initialize with user preferences if available
-  const preferences = user?.preferences || {};
+  // Initialize with default preferences
+  const defaultPreferences: Partial<UserPreferences> = {
+    fontSize: 'medium',
+    backgroundColor: 'default',
+    theme: themePreference || 'system',
+    accentColor: 'blue',
+    notifications: {
+      email: false,
+      push: true,
+      sms: false
+    }
+  };
+  
+  // Merge with user preferences if available
+  const preferences = user?.preferences ? user.preferences : defaultPreferences;
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -42,14 +56,26 @@ const PreferencesForm: React.FC = () => {
       // Apply theme immediately
       setThemePreference(data.theme);
       
-      // Save preferences to user profile
-      await updateUserProfile({
-        ...user,
-        preferences: {
-          ...preferences,
-          ...data
+      // Create complete preferences object
+      const updatedPreferences: UserPreferences = {
+        ...preferences,
+        ...data,
+        // Ensure required properties are present
+        accentColor: preferences.accentColor || 'blue',
+        notifications: preferences.notifications || {
+          email: false,
+          push: true,
+          sms: false
         }
-      });
+      };
+      
+      // Save preferences to user profile
+      if (user) {
+        await updateUserProfile({
+          ...user,
+          preferences: updatedPreferences
+        });
+      }
       
       toast({
         title: "Préférences sauvegardées",
