@@ -123,7 +123,7 @@ export function useChat() {
       const avgScore = emotions.reduce((acc, emotion) => acc + (emotion.score || 50), 0) / emotions.length;
       
       // Récupérer les émotions récentes
-      const recentEmotions = emotions.map(e => e.emotion).join(', ');
+      const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
       
       return {
         recentEmotions,

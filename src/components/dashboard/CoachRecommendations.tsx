@@ -25,12 +25,12 @@ const CoachRecommendations: React.FC = () => {
       // Récupérer les données émotionnelles récentes si disponibles
       const { data: emotions } = await supabase
         .from('emotions')
-        .select('emotion, score')
+        .select('emojis, score')
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .limit(3);
       
-      const recentEmotions = emotions?.map(e => e.emotion).join(', ') || '';
+      const recentEmotions = emotions?.map(e => e.emojis).join(', ') || '';
       const avgScore = emotions?.length ? 
         Math.round(emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length) : 
         50;

@@ -17,6 +17,9 @@ serve(async (req) => {
 
   try {
     const { message, userContext } = await req.json();
+    
+    console.log("Received request with message:", message);
+    console.log("User context:", userContext);
 
     // Construire un prompt adapté au contexte de l'utilisateur
     const systemPrompt = userContext ? 
@@ -29,6 +32,11 @@ serve(async (req) => {
        Réponds toujours en français de manière précise et directe.`;
 
     console.log("Calling OpenAI with message:", message);
+    console.log("System prompt:", systemPrompt);
+    
+    if (!openAIApiKey) {
+      throw new Error("OpenAI API key is not configured");
+    }
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -47,13 +55,15 @@ serve(async (req) => {
     });
 
     const data = await response.json();
-    console.log("OpenAI response received");
+    console.log("OpenAI response received:", data);
 
     if (!data.choices || data.choices.length === 0) {
+      console.error("No choices returned from OpenAI:", data);
       throw new Error('No response from OpenAI');
     }
 
     const aiResponse = data.choices[0].message.content.trim();
+    console.log("Formatted AI response:", aiResponse);
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

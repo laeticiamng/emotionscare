@@ -82,8 +82,8 @@ export class CoachService {
         body: {
           message: question,
           userContext: {
-            recentEmotions: userEmotionalData.recentEmotions.map(e => e.emotion).join(', '),
-            currentScore: userEmotionalData.averageScore
+            recentEmotions: userEmotionalData?.lastEmotions?.map(e => e.emotion).join(', ') || '',
+            currentScore: userEmotionalData?.averageScore || 50
           }
         }
       });
