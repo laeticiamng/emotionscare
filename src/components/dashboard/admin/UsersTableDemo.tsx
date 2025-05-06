@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import PaginationControls from '@/components/ui/data-table/Pagination';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { toast } from 'sonner';
 import { mockUsers } from '@/data/mockUsers';
+import SortableTableHead, { SortDirection } from '@/components/ui/data-table/SortableTableHead';
 
 // Generate more mock users for testing
 const generateMockUsers = (count: number) => {
@@ -36,6 +36,8 @@ const generateMockUsers = (count: number) => {
 // Generate 100 users for demo
 const DEMO_USERS = generateMockUsers(100);
 
+export type SortableField = "name" | "email" | "role" | "emotional_score" | "anonymity_code";
+
 interface UsersTableDemoProps {
   defaultPageSize?: number;
   pageSizeOptions?: number[];
@@ -47,9 +49,11 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
   pageSizeOptions = [10, 25, 50, 100],
   showLoadMoreButton = false,
 }) => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialPage = Number(searchParams.get('page')) || 1;
   const initialLimit = Number(searchParams.get('limit')) || defaultPageSize;
+  const initialSortField = (searchParams.get('sortField') as SortableField) || null;
+  const initialSortDirection = (searchParams.get('sortDirection') as SortDirection) || null;
   
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialLimit);
@@ -57,9 +61,33 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<typeof DEMO_USERS>([]);
   const [totalItems, setTotalItems] = useState(0);
+  const [sortField, setSortField] = useState<SortableField | null>(initialSortField);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(initialSortDirection);
 
-  // Simulate server-side pagination
-  const fetchUsers = async (page: number, limit: number) => {
+  // Handle sorting
+  const handleSort = (field: SortableField) => {
+    let newDirection: SortDirection = 'asc';
+    
+    // If already sorting by this field, cycle through sort directions
+    if (field === sortField) {
+      if (sortDirection === 'asc') newDirection = 'desc';
+      else if (sortDirection === 'desc') newDirection = null;
+      else newDirection = 'asc';
+    }
+    
+    setSortField(newDirection === null ? null : field);
+    setSortDirection(newDirection);
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+
+  // Check if a column is currently sorted
+  const isSorted = (field: SortableField): SortDirection => {
+    if (field !== sortField) return null;
+    return sortDirection;
+  };
+
+  // Simulate server-side pagination and sorting
+  const fetchUsers = async (page: number, limit: number, field: SortableField | null, direction: SortDirection) => {
     setIsLoading(true);
     setError(null);
     
@@ -67,14 +95,56 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Simulate pagination calculation
+      // Create a sorted copy of the data if sorting is applied
+      let sortedUsers = [...DEMO_USERS];
+      
+      if (field && direction) {
+        sortedUsers.sort((a, b) => {
+          // Handle different field types
+          let valueA: any = a[field];
+          let valueB: any = b[field];
+          
+          // Special case for nested name field
+          if (field === 'name') {
+            valueA = a.name?.toLowerCase() || '';
+            valueB = b.name?.toLowerCase() || '';
+          }
+          
+          // Handle null/undefined values
+          if (valueA === null || valueA === undefined) valueA = '';
+          if (valueB === null || valueB === undefined) valueB = '';
+          
+          // Compare based on direction
+          const compareResult = typeof valueA === 'string' 
+            ? valueA.localeCompare(valueB) 
+            : valueA - valueB;
+            
+          return direction === 'asc' ? compareResult : -compareResult;
+        });
+      }
+      
+      // Simulate pagination
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
-      const paginatedUsers = DEMO_USERS.slice(startIndex, endIndex);
+      const paginatedUsers = sortedUsers.slice(startIndex, endIndex);
+      
+      // Update URL parameters
+      searchParams.set('page', page.toString());
+      searchParams.set('limit', limit.toString());
+      
+      if (field && direction) {
+        searchParams.set('sortField', field);
+        searchParams.set('sortDirection', direction);
+      } else {
+        searchParams.delete('sortField');
+        searchParams.delete('sortDirection');
+      }
+      
+      setSearchParams(searchParams, { replace: true });
       
       // Update state with "fetched" data
       setUsers(paginatedUsers);
-      setTotalItems(DEMO_USERS.length);
+      setTotalItems(sortedUsers.length);
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Impossible de charger la page. Veuillez réessayer.');
@@ -84,10 +154,10 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
     }
   };
 
-  // Fetch users when page or page size changes
+  // Fetch users when page, page size, or sorting changes
   useEffect(() => {
-    fetchUsers(currentPage, pageSize);
-  }, [currentPage, pageSize]);
+    fetchUsers(currentPage, pageSize, sortField, sortDirection);
+  }, [currentPage, pageSize, sortField, sortDirection]);
 
   // Handle page change
   const handlePageChange = (page: number) => {
@@ -112,7 +182,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
 
   // Handle retry on error
   const handleRetry = () => {
-    fetchUsers(currentPage, pageSize);
+    fetchUsers(currentPage, pageSize, sortField, sortDirection);
   };
 
   return (
@@ -125,10 +195,39 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[250px]">Utilisateur</TableHead>
-              <TableHead>Score émotionnel</TableHead>
-              <TableHead>Rôle</TableHead>
-              <TableHead className="text-right">Code d'anonymisation</TableHead>
+              <SortableTableHead 
+                isSorted={isSorted('name')}
+                onSort={() => handleSort('name')}
+                className="w-[250px]"
+                ariaLabel="Nom d'utilisateur"
+              >
+                Utilisateur
+              </SortableTableHead>
+              
+              <SortableTableHead 
+                isSorted={isSorted('emotional_score')}
+                onSort={() => handleSort('emotional_score')}
+                ariaLabel="Score émotionnel"
+              >
+                Score émotionnel
+              </SortableTableHead>
+              
+              <SortableTableHead 
+                isSorted={isSorted('role')}
+                onSort={() => handleSort('role')}
+                ariaLabel="Rôle"
+              >
+                Rôle
+              </SortableTableHead>
+              
+              <SortableTableHead 
+                isSorted={isSorted('anonymity_code')}
+                onSort={() => handleSort('anonymity_code')}
+                className="text-right"
+                ariaLabel="Code d'anonymisation"
+              >
+                Code d'anonymisation
+              </SortableTableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
