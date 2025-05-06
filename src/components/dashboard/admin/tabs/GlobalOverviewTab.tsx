@@ -1,9 +1,8 @@
 
 import React from 'react';
-import AbsenteeismCard from './overview/AbsenteeismCard';
-import EmotionalClimateCard from '../EmotionalClimateCard';
 import GdprDisclaimer from './overview/GdprDisclaimer';
 import KpiCardsGrid from '../KpiCardsGrid';
+import ChartSwitcher from '../../charts/ChartSwitcher';
 import { ChartData, DashboardStats, GamificationData } from './overview/types';
 
 interface GlobalOverviewTabProps {
@@ -21,13 +20,24 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Absenteeism Chart */}
-      <AbsenteeismCard data={absenteeismChartData} />
+      {/* Charts with switcher */}
+      <ChartSwitcher
+        title="Taux d'absentéisme"
+        description="Évolution du taux d'absence"
+        availableViews={["line", "area"]}
+        defaultView="line"
+        data={absenteeismChartData}
+      />
       
-      {/* Emotional Climate Card */}
-      <EmotionalClimateCard emotionalScoreTrend={emotionalScoreTrend} />
+      <ChartSwitcher
+        title="Climate Émotionnel"
+        description="Évolution du score émotionnel"
+        availableViews={["line", "bar"]}
+        defaultView="line"
+        data={emotionalScoreTrend}
+      />
       
-      {/* KPI Summary Cards - Replaced with our new unified component */}
+      {/* KPI Summary Cards */}
       <KpiCardsGrid 
         dashboardStats={dashboardStats}
         gamificationData={gamificationData}
