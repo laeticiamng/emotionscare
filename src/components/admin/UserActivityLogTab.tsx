@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ActivityTabView, AnonymousActivity, ActivityFiltersState, ActivityStats } from '../dashboard/admin/tabs/activity-logs/types';
 import DailyActivityTable from '../dashboard/admin/tabs/activity-logs/DailyActivityTable';
 import StatsTable from '../dashboard/admin/tabs/activity-logs/StatsTable';
-import { applyFilters, formatCsvData, getActivityLabel, getDefaultCsvFileName } from '../dashboard/admin/tabs/activity-logs/activityUtils';
+import { formatCsvData, getActivityLabel, getDefaultCsvFileName } from '../dashboard/admin/tabs/activity-logs/activityUtils';
 import ActionBar from '../dashboard/admin/tabs/activity-logs/ActionBar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Pagination from '@/components/ui/data-table/Pagination';

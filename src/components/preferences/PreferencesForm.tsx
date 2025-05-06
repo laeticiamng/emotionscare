@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form } from "@/components/ui/form";
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/contexts/ThemeContext';
 import ThemeSelectionField from './ThemeSelectionField';
 import FontSizeField from './FontSizeField';
@@ -27,7 +26,7 @@ const PreferencesForm: React.FC = () => {
   const { toast } = useToast();
   
   // Initialize with default preferences
-  const defaultPreferences: Partial<UserPreferences> = {
+  const defaultPreferences: UserPreferences = {
     fontSize: 'medium',
     backgroundColor: 'default',
     theme: themePreference || 'system',
@@ -45,7 +44,7 @@ const PreferencesForm: React.FC = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fontSize: preferences.fontSize || 'medium',
+      fontSize: preferences.fontSize,
       backgroundColor: preferences.backgroundColor || 'default',
       theme: preferences.theme || themePreference || 'system',
     }
@@ -59,8 +58,9 @@ const PreferencesForm: React.FC = () => {
       // Create complete preferences object
       const updatedPreferences: UserPreferences = {
         ...preferences,
-        ...data,
-        // Ensure required properties are present
+        fontSize: data.fontSize,
+        backgroundColor: data.backgroundColor,
+        theme: data.theme,
         accentColor: preferences.accentColor || 'blue',
         notifications: preferences.notifications || {
           email: false,

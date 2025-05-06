@@ -27,9 +27,9 @@ export enum UserRole {
 
 export interface UserPreferences {
   theme: string;
-  fontSize: string;
+  fontSize: "small" | "medium" | "large";
   accentColor: string;
-  backgroundColor?: string; 
+  backgroundColor?: "default" | "blue" | "mint" | "coral"; 
   notifications: {
     email: boolean;
     push: boolean;
@@ -132,9 +132,10 @@ export interface VRSession {
   heart_rate_before?: number;
   heart_rate_after?: number;
   emotional_impact?: number;
-  is_audio_only?: boolean; // Added for compatibility
-  template_id?: string; // Added for compatibility
-  duration?: number; // Added for compatibility with useVRSession.tsx
+  is_audio_only?: boolean;
+  template_id?: string;
+  duration?: number;
+  completed?: boolean; // Added to fix VRSession type errors
 }
 
 // Invitation Types

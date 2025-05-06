@@ -1,5 +1,6 @@
 
 import { Badge } from "@/types";
+import { Challenge, UserChallenge, UserBadge } from "@/types/gamification";
 
 // Get all badges for a user
 export const getUserBadges = async (userId: string): Promise<Badge[]> => {
@@ -56,4 +57,68 @@ export const calculateBadgeProgress = (
 ): number => {
   // This would calculate real progress in a production app
   return Math.min(100, (currentValue / 5) * 100);
+};
+
+// Mock challenges data
+const mockChallenges: Challenge[] = [
+  {
+    id: "1",
+    title: "Première émotion",
+    description: "Enregistrez votre première émotion",
+    points: 10
+  },
+  {
+    id: "2",
+    title: "Journal quotidien",
+    description: "Écrivez une entrée dans votre journal",
+    points: 5
+  },
+  {
+    id: "3",
+    title: "Session de méditation",
+    description: "Complétez une session VR de méditation",
+    points: 15
+  }
+];
+
+// Mock user challenges data
+const mockUserChallenges: UserChallenge[] = [];
+
+// Fetch all available challenges
+export const fetchChallenges = async (): Promise<Challenge[]> => {
+  // In a real app, this would fetch from an API
+  return mockChallenges;
+};
+
+// Fetch user-specific challenge progress
+export const fetchUserChallenges = async (userId: string): Promise<UserChallenge[]> => {
+  // In a real app, this would fetch from an API with the user ID
+  return mockUserChallenges.filter(uc => uc.user_id === userId);
+};
+
+// Complete a challenge for a user
+export const completeChallenge = async (challengeData: UserChallenge): Promise<UserChallenge> => {
+  // In a real app, this would be a POST request to an API
+  const newChallenge = {
+    ...challengeData,
+    id: `uc-${Date.now()}`
+  };
+  
+  mockUserChallenges.push(newChallenge);
+  return newChallenge;
+};
+
+// Mock data for earned badges
+const mockEarnedBadges: UserBadge[] = [];
+
+// Fetch all badges and user's earned badges
+export const fetchBadges = async (userId: string) => {
+  // In a real app, this would fetch from an API
+  const allBadges = mockBadges; // All possible badges
+  const earnedBadges = mockEarnedBadges.filter(eb => eb.user_id === userId);
+  
+  return {
+    all: allBadges,
+    earned: earnedBadges
+  };
 };

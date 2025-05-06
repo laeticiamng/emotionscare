@@ -28,9 +28,15 @@ const OnboardingPage: React.FC = () => {
         ...user,
         onboarded: true,
         preferences: {
-          theme: selectedTheme === 'light' ? 'light' : 'dark',
+          theme: selectedTheme as 'light' | 'dark' | 'pastel' | 'system',
           fontSize: selectedFontSize as 'small' | 'medium' | 'large',
-          backgroundColor: selectedBackground as 'default' | 'blue' | 'mint' | 'coral'
+          backgroundColor: selectedBackground as 'default' | 'blue' | 'mint' | 'coral',
+          accentColor: 'blue', // Default accent color
+          notifications: {
+            email: false,
+            push: true,
+            sms: false
+          }
         }
       });
       

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 import { User } from '@/types';
@@ -36,7 +35,7 @@ const AdminLoginPage = () => {
     try {
       const result = await login(email, password);
       
-      // Check if the result is a User or an error response
+      // Check if the result is a User
       if ('id' in result) {
         // Result is a User
         const user = result as User;
@@ -58,10 +57,10 @@ const AdminLoginPage = () => {
           navigate('/'); // Redirection vers l'accueil si pas admin
         }
       } else {
-        // Result is an error response
+        // Handle error case
         toast({
           title: "Erreur de connexion",
-          description: result.error || "Impossible de se connecter. Veuillez vérifier vos identifiants.",
+          description: "Impossible de se connecter. Veuillez vérifier vos identifiants.",
           variant: "destructive"
         });
       }

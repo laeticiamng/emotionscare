@@ -1,18 +1,19 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
-import { ActivityStats } from './types';
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { AnonymousActivity } from './types';
 import { getActivityLabel } from './activityUtils';
 
-interface StatsTableProps {
-  stats: ActivityStats[];
+interface DailyActivityTableProps {
+  activities: AnonymousActivity[];
   isLoading: boolean;
   error: string | null;
 }
 
-const StatsTable: React.FC<StatsTableProps> = ({
-  stats,
+const DailyActivityTable: React.FC<DailyActivityTableProps> = ({
+  activities,
   isLoading,
   error
 }) => {
@@ -32,10 +33,10 @@ const StatsTable: React.FC<StatsTableProps> = ({
     );
   }
 
-  if (!stats || stats.length === 0) {
+  if (!activities || activities.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Aucune donnée statistique disponible.
+        Aucune activité pour la période sélectionnée.
       </div>
     );
   }
@@ -45,22 +46,28 @@ const StatsTable: React.FC<StatsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Date</TableHead>
             <TableHead>Type d'activité</TableHead>
-            <TableHead>Nombre total</TableHead>
-            <TableHead>Distribution</TableHead>
-            <TableHead className="text-right">Pourcentage</TableHead>
+            <TableHead>Catégorie</TableHead>
+            <TableHead className="text-right">Nombre</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {stats.map((stat) => (
-            <TableRow key={stat.activity_type}>
-              <TableCell>{getActivityLabel(stat.activity_type)}</TableCell>
-              <TableCell>{stat.total_count}</TableCell>
-              <TableCell className="w-[30%]">
-                <Progress value={stat.percentage} className="h-2" />
+          {activities.map((activity) => (
+            <TableRow key={activity.id}>
+              <TableCell>
+                {format(
+                  new Date(activity.timestamp_day), 
+                  'dd MMM yyyy', 
+                  { locale: fr }
+                )}
+              </TableCell>
+              <TableCell>{getActivityLabel(activity.activity_type)}</TableCell>
+              <TableCell>
+                <span className="capitalize">{activity.category}</span>
               </TableCell>
               <TableCell className="text-right font-medium">
-                {stat.percentage.toFixed(1)}%
+                {activity.count}
               </TableCell>
             </TableRow>
           ))}
@@ -70,4 +77,4 @@ const StatsTable: React.FC<StatsTableProps> = ({
   );
 };
 
-export default StatsTable;
+export default DailyActivityTable;

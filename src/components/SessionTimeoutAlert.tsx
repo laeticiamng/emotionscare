@@ -6,11 +6,11 @@ import { AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const SessionTimeoutAlert: React.FC = () => {
-  const { timeoutWarning, resetActivity, sessionTimeoutMinutes } = useSessionSecurity();
+  const { showWarning, resetTimer, timeLeft } = useSessionSecurity();
   const { toast } = useToast();
   
   useEffect(() => {
-    if (timeoutWarning) {
+    if (showWarning) {
       toast({
         title: "Alerte de sécurité",
         description: 
@@ -21,7 +21,7 @@ const SessionTimeoutAlert: React.FC = () => {
             </div>
             <Button 
               size="sm" 
-              onClick={resetActivity} 
+              onClick={resetTimer} 
               variant="outline"
             >
               Prolonger la session
@@ -30,7 +30,7 @@ const SessionTimeoutAlert: React.FC = () => {
         duration: 60000
       });
     }
-  }, [timeoutWarning, toast, resetActivity]);
+  }, [showWarning, toast, resetTimer]);
   
   return null; // This is a non-visual component
 };
