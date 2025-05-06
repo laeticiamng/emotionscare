@@ -18,10 +18,11 @@ export const getActivityLabel = (activityType: string): string => {
   return labels[activityType] || activityType;
 };
 
-export const applyFilters = (
-  data: AnonymousActivity[] | ActivityStats[], 
+// Fix the type issue by using a generic approach
+export const applyFilters = <T extends AnonymousActivity | ActivityStats>(
+  data: T[], 
   filters: ActivityFiltersState
-): AnonymousActivity[] | ActivityStats[] => {
+): T[] => {
   return data.filter((item) => {
     // Apply search term filter
     if (filters.searchTerm && !JSON.stringify(item).toLowerCase().includes(filters.searchTerm.toLowerCase())) {

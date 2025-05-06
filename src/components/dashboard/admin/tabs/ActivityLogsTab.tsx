@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,35 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import DailyActivityTable from "./activity-logs/DailyActivityTable";
 import StatsTable from "./activity-logs/StatsTable";
 import ActionBar from "./activity-logs/ActionBar";
-
-// Define these functions since they were referenced but not available
-const formatCsvData = (
-  tabView: ActivityTabView,
-  data: AnonymousActivity[] | ActivityStats[]
-): Record<string, string>[] => {
-  if (tabView === 'daily') {
-    return (data as AnonymousActivity[]).map(item => ({
-      'ID': item.id,
-      'Type': item.activity_type,
-      'Catégorie': item.category,
-      'Nombre': item.count.toString(),
-      'Date': item.timestamp_day
-    }));
-  } else {
-    return (data as ActivityStats[]).map(item => ({
-      'Type': item.activity_type,
-      'Total': item.total_count.toString(),
-      'Pourcentage': `${item.percentage.toFixed(1)}%`
-    }));
-  }
-};
-
-const getDefaultCsvFileName = (tabView: ActivityTabView): string => {
-  const date = new Date().toISOString().split('T')[0];
-  return tabView === 'daily'
-    ? `activites-journalieres-${date}.csv`
-    : `statistiques-activites-${date}.csv`;
-};
+import { formatCsvData, getDefaultCsvFileName } from "./activity-logs/activityUtils";
 
 // Mock data for demo
 const mockActivities: AnonymousActivity[] = [
@@ -89,14 +62,9 @@ const ActivityLogsTab: React.FC = () => {
   const [filteredStats, setFilteredStats] = useState<ActivityStats[]>(mockStats);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Fix the type issue by converting Date objects to strings
-  const [filters, setFilters] = useState<{
-    searchTerm: string;
-    activityType: string;
-    startDate: string;
-    endDate: string;
-  }>({
+  
+  // Fix by using separate filters state for dateRange
+  const [filters, setFilters] = useState({
     searchTerm: '',
     activityType: '',
     startDate: '',
@@ -152,8 +120,13 @@ const ActivityLogsTab: React.FC = () => {
     }
   };
 
-  // Fix: Convert ActivityFiltersState to string-based dates
-  const handleApplyFilters = (activityFilters: ActivityFiltersState) => {
+  // Create a properly typed function for filter handling
+  const handleApplyFilters = (activityFilters: {
+    searchTerm: string;
+    activityType: string;
+    startDate?: Date;
+    endDate?: Date;
+  }) => {
     setFilters({
       searchTerm: activityFilters.searchTerm,
       activityType: activityFilters.activityType,
