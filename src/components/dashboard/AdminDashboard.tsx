@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { fetchReports } from '@/lib/dashboardService';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DashboardFooter from '@/components/dashboard/DashboardFooter';
 import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
 import AdminChartSection from '@/components/dashboard/admin/AdminChartSection';
 import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateCard';
@@ -105,7 +104,7 @@ const AdminDashboard: React.FC = () => {
         <GamificationSummaryCard gamificationStats={gamificationData} />
       </div>
       
-      <DashboardFooter isAdmin={true} />
+      {/* Remove DashboardFooter here as well */}
     </div>
   );
 };

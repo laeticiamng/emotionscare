@@ -6,7 +6,6 @@ import ModulesSection from '@/components/home/ModulesSection';
 import EmotionScanSection from './EmotionScanSection';
 import SocialCocoonWidget from './SocialCocoonWidget';
 import GamificationWidget from './GamificationWidget';
-import DashboardFooter from './DashboardFooter';
 import type { User } from '@/types';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import { Button } from '@/components/ui/button';
@@ -180,8 +179,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         </div>
       </div>
       
-      {/* Remove this DashboardFooter since it also includes the SecurityFooter which is already rendered in Layout.tsx */}
-      {/* {!isMobile && <DashboardFooter />} */}
+      {/* Completely remove the DashboardFooter since SecurityFooter is already in Layout */}
     </div>
   );
 };
