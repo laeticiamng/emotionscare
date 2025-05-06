@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import {
   createBrowserRouter,
@@ -5,12 +6,12 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from "@/hooks/use-toast"
-import { Shell } from "@/components/Shell"
-import { Home } from "@/pages/Home"
-import { Docs } from "@/pages/Docs"
-import { Pricing } from "@/pages/Pricing"
-import { Contact } from "@/pages/Contact"
+import { useToast } from "@/hooks/use-toast";
+import Layout from "@/components/Layout";
+import { Home } from "@/pages/Home";
+import { Docs } from "@/pages/Docs";
+import { Pricing } from "@/pages/Pricing";
+import { Contact } from "@/pages/Contact";
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import DashboardPage from '@/pages/DashboardPage';
@@ -24,7 +25,7 @@ import { User } from '@/types';
 import InvitePage from './pages/InvitePage';
 
 const App: React.FC = () => {
-  const { setUser, isAuthenticated, setIsAuthenticated } = useAuth();
+  const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -93,7 +94,7 @@ const App: React.FC = () => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Shell />,
+    element: <Layout />,
     children: [
       {
         path: "/",
@@ -149,12 +150,15 @@ const router = createBrowserRouter([
 
 function AppWrapper() {
   return (
-    <AuthContext.AuthProvider>
-      <App />
-      <RouterProvider router={router} />
-    </AuthContext.AuthProvider>
+    <>
+      <AuthProvider>
+        <App />
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </>
   );
 }
 
 export default AppWrapper;
-import { AuthContext } from './contexts/AuthContext';
+
+import { AuthProvider } from './contexts/AuthContext';
