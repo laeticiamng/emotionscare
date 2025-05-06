@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
-import { ActivityTabView, ActivityFiltersState } from "./types";
+import { ActivityTabView } from "./types";
 
 interface ActionBarProps {
   activeTab: ActivityTabView;
@@ -10,8 +10,6 @@ interface ActionBarProps {
   isLoading: boolean;
   onExport: () => void;
   totalCount: number;
-  filters?: ActivityFiltersState;
-  setFilters?: React.Dispatch<React.SetStateAction<ActivityFiltersState>>;
 }
 
 const ActionBar: React.FC<ActionBarProps> = ({ 
@@ -19,9 +17,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
   hasData, 
   isLoading, 
   onExport,
-  totalCount,
-  filters,
-  setFilters
+  totalCount
 }) => {
   return (
     <div className="flex items-center justify-between mt-4 mb-2">
