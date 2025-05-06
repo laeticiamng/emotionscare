@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Music, LogOut, Sun, Moon } from 'lucide-react';
+import { Menu, X, Music, LogOut, Sun, Moon, CloudSun } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -17,7 +17,6 @@ const MobileNavigation = () => {
   const { user, logout } = useAuth();
   const { openDrawer } = useMusic();
   const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = user ? isAdminRole(user.role) : false;
@@ -47,6 +46,33 @@ const MobileNavigation = () => {
       );
     }
     return null;
+  };
+
+  // Get theme icon and text based on current theme
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'light':
+        return <Moon className="w-4 h-4 mr-2" />;
+      case 'dark':
+        return <CloudSun className="w-4 h-4 mr-2" />;
+      case 'pastel':
+        return <Sun className="w-4 h-4 mr-2 text-amber-500" />;
+      default:
+        return <Moon className="w-4 h-4 mr-2" />;
+    }
+  };
+
+  const getThemeText = () => {
+    switch (theme) {
+      case 'light':
+        return 'Passer au mode sombre';
+      case 'dark':
+        return 'Passer au mode pastel';
+      case 'pastel':
+        return 'Passer au mode clair';
+      default:
+        return 'Changer de thème';
+    }
   };
 
   return (
@@ -125,11 +151,8 @@ const MobileNavigation = () => {
                   setIsOpen(false);
                 }}
               >
-                {isDark ? 
-                  <Sun className="w-4 h-4 mr-2 text-amber-500" /> : 
-                  <Moon className="w-4 h-4 mr-2" />
-                }
-                <span>{isDark ? 'Passer au mode clair' : 'Passer au mode sombre'}</span>
+                {getThemeIcon()}
+                <span>{getThemeText()}</span>
               </button>
               
               {!isAdmin && (

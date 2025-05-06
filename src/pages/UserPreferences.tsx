@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -24,13 +25,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
-import { Sun, Moon, Palette } from 'lucide-react';
+import { Sun, Moon, Palette, CloudSun } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const formSchema = z.object({
   fontSize: z.enum(['small', 'medium', 'large']),
   backgroundColor: z.enum(['default', 'blue', 'mint', 'coral']),
-  theme: z.enum(['light', 'dark', 'system'])
+  theme: z.enum(['light', 'dark', 'pastel', 'system'])
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -81,8 +82,8 @@ const UserPreferences = () => {
   };
 
   return (
-    <div className="container max-w-3xl py-10">
-      <Card>
+    <div className="container max-w-4xl py-10">
+      <Card className="premium-card">
         <CardHeader>
           <CardTitle className="text-2xl">Mes préférences</CardTitle>
           <CardDescription>Personnalisez votre expérience EmotionsCare</CardDescription>
@@ -96,33 +97,42 @@ const UserPreferences = () => {
                 name="theme"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel className="flex items-center">
-                      <Palette className="mr-2 h-4 w-4" />
-                      Thème
+                    <FormLabel className="flex items-center text-lg font-medium">
+                      <Palette className="mr-2 h-5 w-5" />
+                      Thème visuel
                     </FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                        className="grid grid-cols-1 md:grid-cols-4 gap-4"
                       >
-                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer">
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
                           <Sun className="h-8 w-8 text-amber-500" />
                           <RadioGroupItem value="light" id="light-theme" className="sr-only" />
-                          <Label htmlFor="light-theme" className="cursor-pointer">Clair</Label>
+                          <Label htmlFor="light-theme" className="cursor-pointer font-medium">Mode clair</Label>
+                          <span className="text-xs text-muted-foreground text-center">Élégant et lumineux</span>
                         </div>
-                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer">
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
                           <Moon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
                           <RadioGroupItem value="dark" id="dark-theme" className="sr-only" />
-                          <Label htmlFor="dark-theme" className="cursor-pointer">Sombre</Label>
+                          <Label htmlFor="dark-theme" className="cursor-pointer font-medium">Mode sombre</Label>
+                          <span className="text-xs text-muted-foreground text-center">Premium et profond</span>
                         </div>
-                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer">
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
+                          <CloudSun className="h-8 w-8 text-blue-500" />
+                          <RadioGroupItem value="pastel" id="pastel-theme" className="sr-only" />
+                          <Label htmlFor="pastel-theme" className="cursor-pointer font-medium">Mode pastel</Label>
+                          <span className="text-xs text-muted-foreground text-center">Doux et apaisant</span>
+                        </div>
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
                           <div className="flex">
                             <Sun className="h-8 w-8 text-amber-500" />
                             <Moon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 -ml-3" />
                           </div>
                           <RadioGroupItem value="system" id="system-theme" className="sr-only" />
-                          <Label htmlFor="system-theme" className="cursor-pointer">Système</Label>
+                          <Label htmlFor="system-theme" className="cursor-pointer font-medium">Système</Label>
+                          <span className="text-xs text-muted-foreground text-center">Suit vos préférences systèmes</span>
                         </div>
                       </RadioGroup>
                     </FormControl>
@@ -139,7 +149,7 @@ const UserPreferences = () => {
                 name="fontSize"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Taille de la police</FormLabel>
+                    <FormLabel className="text-lg font-medium">Taille de la police</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -173,7 +183,7 @@ const UserPreferences = () => {
                 name="backgroundColor"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Couleur d'accent</FormLabel>
+                    <FormLabel className="text-lg font-medium">Couleur d'accent</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -230,7 +240,7 @@ const UserPreferences = () => {
                 )}
               />
 
-              <Button type="submit">Enregistrer mes préférences</Button>
+              <Button type="submit" className="w-full md:w-auto">Enregistrer mes préférences</Button>
             </form>
           </Form>
         </CardContent>

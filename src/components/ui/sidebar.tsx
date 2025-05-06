@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { sidebarItems, adminSidebarItems, footerNavItems } from '@/components/navigation/navConfig';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Bell, Settings, Sun, Moon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Settings, Sun, Moon, CloudSun } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 import NotificationBar from '@/components/notifications/NotificationBar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -18,7 +19,6 @@ const Sidebar = () => {
   const isAdmin = isAdminRole(user?.role);
   const isMobile = useIsMobile();
   const { theme, toggleTheme } = useTheme();
-  const isDark = theme === 'dark';
   
   // Si on est sur mobile, on ne rend pas du tout le sidebar
   if (isMobile) {
@@ -34,6 +34,34 @@ const Sidebar = () => {
   
   const isActive = (path: string) => {
     return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
+  };
+
+  // Get the appropriate theme icon
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'light':
+        return <Moon className="h-5 w-5" />;
+      case 'dark':
+        return <Sun className="h-5 w-5" />;
+      case 'pastel':
+        return <CloudSun className="h-5 w-5" />;
+      default:
+        return <Moon className="h-5 w-5" />;
+    }
+  };
+
+  // Get theme tooltip text
+  const getThemeTooltipText = () => {
+    switch (theme) {
+      case 'light':
+        return 'Mode sombre';
+      case 'dark':
+        return 'Mode pastel';
+      case 'pastel':
+        return 'Mode clair';
+      default:
+        return 'Changer de thème';
+    }
   };
 
   return (
@@ -136,11 +164,11 @@ const Sidebar = () => {
                         className="w-full h-10"
                         onClick={toggleTheme}
                       >
-                        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                        {getThemeIcon()}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="right">
-                      {isDark ? 'Mode clair' : 'Mode sombre'}
+                      {getThemeTooltipText()}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -150,8 +178,8 @@ const Sidebar = () => {
                   className="w-full justify-start px-3"
                   onClick={toggleTheme}
                 >
-                  {isDark ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
-                  <span>{isDark ? 'Mode clair' : 'Mode sombre'}</span>
+                  {getThemeIcon()}
+                  <span className="ml-2">{getThemeTooltipText()}</span>
                 </Button>
               )}
             </div>

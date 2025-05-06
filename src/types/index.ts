@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -12,7 +11,7 @@ export interface User {
   preferences?: {
     fontSize?: 'small' | 'medium' | 'large';
     backgroundColor?: 'default' | 'blue' | 'mint' | 'coral';
-    theme?: 'light' | 'dark' | 'system';
+    theme?: 'light' | 'dark' | 'pastel' | 'system';
   };
   anonymity_code?: string;
   emotional_score?: number;

@@ -56,7 +56,7 @@ const DashboardPage: React.FC = () => {
   };
   
   return (
-    <div className={`${isMobile ? 'w-full px-0 py-1' : 'container mx-auto py-6'}`}>
+    <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
       {renderDashboard()}
     </div>
   );

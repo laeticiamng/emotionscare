@@ -4,7 +4,9 @@
 @tailwind utilities;
  
 @layer base {
-  :root {
+  /* Light theme - Premium clean white */
+  :root,
+  .light {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -43,34 +45,66 @@
     --wellness-lavender: 240 67% 94%;
   }
  
+  /* Dark theme - Premium dark elegant */
   .dark {
-    --background: 222.2 47.4% 8%; /* Plus foncé */
-    --foreground: 210 40% 98%; /* Plus clair pour texte */
+    --background: 222.2 47.4% 8%; /* Deeper, more premium dark */
+    --foreground: 210 40% 98%; /* Crisp white text */
  
-    --card: 222.2 47.4% 11%; /* Fond de carte légèrement plus clair */
-    --card-foreground: 210 40% 98%; /* Texte clair sur fond sombre */
+    --card: 222.2 47.4% 11%; /* Slightly lighter card background for depth */
+    --card-foreground: 210 40% 98%;
  
     --popover: 222.2 47.4% 10%;
     --popover-foreground: 210 40% 98%;
  
-    --primary: 210 40% 98%; /* Couleur primaire inversée */
+    --primary: 210 40% 98%; /* Bright primary for contrast */
     --primary-foreground: 222.2 47.4% 11.2%;
  
-    --secondary: 217.2 32.6% 20%; /* Secondaire plus fort */
+    --secondary: 217.2 32.6% 20%; /* Rich secondary color */
     --secondary-foreground: 210 40% 98%;
  
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 75%; /* Plus visible en mode sombre */
+    --muted-foreground: 215 20.2% 75%;
  
-    --accent: 217.2 32.6% 20%; /* Accent plus prononcé */
+    --accent: 217.2 32.6% 20%;
     --accent-foreground: 210 40% 98%;
  
-    --destructive: 0 62.8% 40%; /* Rouge plus foncé */
+    --destructive: 0 62.8% 40%;
     --destructive-foreground: 210 40% 98%;
  
-    --border: 217.2 32.6% 22%; /* Bordures plus visibles */
+    --border: 217.2 32.6% 22%;
     --input: 217.2 32.6% 20%;
-    --ring: 212.7 26.8% 70%; /* Plus visible sur fond sombre */
+    --ring: 212.7 26.8% 70%;
+  }
+
+  /* Pastel theme - Soft blue premium feel */
+  .pastel {
+    --background: 210 50% 97%; /* Soft pastel blue background */
+    --foreground: 222.2 47.4% 11.2%; /* Dark text for readability */
+
+    --card: 210 40% 98%;
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --popover: 210 40% 98%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+ 
+    --primary: 210 100% 50%; /* Vibrant blue primary */
+    --primary-foreground: 0 0% 100%;
+ 
+    --secondary: 210 40% 90%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 90%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 85%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 40% 80%;
+    --input: 210 40% 80%;
+    --ring: 210 100% 50%;
   }
 }
  
@@ -93,12 +127,38 @@
   @apply border-[#1A1F2C]/50 bg-[#1A1F2C]/80;
 }
 
+.pastel .glass-card {
+  @apply border-blue-200/80 bg-blue-50/90;
+}
+
 .apple-card {
   @apply rounded-2xl border border-[#E8F1FA] bg-white shadow-sm;
 }
 
 .dark .apple-card {
   @apply border-[#2C3340] bg-[#1A1F2C];
+}
+
+.pastel .apple-card {
+  @apply border-blue-200 bg-blue-50;
+}
+
+/* Premium card with Apple-inspired design */
+.premium-card {
+  @apply rounded-2xl border shadow-sm transition-all duration-300 overflow-hidden;
+}
+
+.light .premium-card {
+  @apply border-gray-100 bg-white shadow-sm hover:shadow-md;
+}
+
+.dark .premium-card {
+  @apply border-gray-800 bg-gray-900 shadow-md hover:shadow-lg;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.pastel .premium-card {
+  @apply border-blue-200 bg-blue-50/80 shadow-sm hover:shadow-md;
 }
 
 /* Animation classes */
@@ -134,4 +194,13 @@
   transition-property: background-color, border-color, color, fill, stroke;
   transition-duration: 0.3s;
   transition-timing-function: ease;
+}
+
+/* Premium layout classes */
+.premium-layout {
+  @apply max-w-7xl mx-auto w-full;
+}
+
+.premium-section {
+  @apply py-6 px-4 md:py-8 md:px-6;
 }

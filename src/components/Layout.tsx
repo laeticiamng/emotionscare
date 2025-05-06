@@ -30,7 +30,7 @@ const Layout = ({ children }: LayoutProps) => {
         {/* La sidebar n'apparaît que sur desktop */}
         {!isMobile && <Sidebar />}
         <div className={`flex-1 overflow-auto bg-background ${isMobile ? 'w-full' : 'w-full pl-16'}`}>
-          <main className={`${isMobile ? 'w-full px-1 py-2' : 'container mx-auto p-6'}`}>
+          <main className={`${isMobile ? 'w-full px-1 py-2' : 'premium-layout px-4 py-6 md:px-8 lg:px-12 xl:px-16'}`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />

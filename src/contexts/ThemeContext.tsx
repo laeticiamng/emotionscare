@@ -1,6 +1,7 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type ThemeType = 'light' | 'dark';
+type ThemeType = 'light' | 'dark' | 'pastel';
 type ThemePreference = ThemeType | 'system';
 
 interface ThemeContextType {
@@ -10,6 +11,7 @@ interface ThemeContextType {
   setTheme: (theme: ThemeType) => void;
   setThemePreference: (preference: ThemePreference) => void;
   isDark: boolean;
+  isPastel: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -18,7 +20,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [themePreference, setThemePreference] = useState<ThemePreference>(() => {
     // Check for stored theme preference
     const storedTheme = localStorage.getItem('themePreference');
-    if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'system') {
+    if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'pastel' || storedTheme === 'system') {
       return storedTheme as ThemePreference;
     }
     // Default to system
@@ -65,25 +67,25 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [themePreference]);
 
   useEffect(() => {
-    // Update the document class when theme changes
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    // Remove previous theme classes
+    document.documentElement.classList.remove('dark', 'light', 'pastel');
+    
+    // Add the new theme class
+    document.documentElement.classList.add(theme);
   }, [theme]);
 
   const toggleTheme = () => {
     setThemePreference(prevTheme => {
       if (prevTheme === 'system') {
-        return theme === 'dark' ? 'light' : 'dark';
+        return theme === 'dark' ? 'light' : theme === 'light' ? 'pastel' : 'dark';
       } else {
-        return prevTheme === 'dark' ? 'light' : 'dark';
+        return prevTheme === 'dark' ? 'light' : prevTheme === 'light' ? 'pastel' : 'dark';
       }
     });
   };
 
   const isDark = theme === 'dark';
+  const isPastel = theme === 'pastel';
 
   return (
     <ThemeContext.Provider value={{ 
@@ -92,7 +94,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       toggleTheme, 
       setTheme, 
       setThemePreference,
-      isDark 
+      isDark,
+      isPastel
     }}>
       {children}
     </ThemeContext.Provider>
