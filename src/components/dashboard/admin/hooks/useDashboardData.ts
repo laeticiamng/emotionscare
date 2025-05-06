@@ -7,7 +7,7 @@ export const useDashboardData = (timePeriod: string) => {
   const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
   const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { activeSegment } = useSegment();
+  const { segment } = useSegment();
   
   const fetchData = useCallback(async () => {
     try {
@@ -16,7 +16,7 @@ export const useDashboardData = (timePeriod: string) => {
       // Add some randomness to simulate data changes during refresh
       const jitter = () => (Math.random() * 0.4) - 0.2; // -0.2 to +0.2
       
-      const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod), activeSegment);
+      const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod), segment);
       
       // Add jitter to the data to simulate real-time changes
       const absenteeism = reportsData.absenteeism?.map(item => ({
@@ -36,7 +36,7 @@ export const useDashboardData = (timePeriod: string) => {
     } finally {
       setIsLoading(false);
     }
-  }, [timePeriod, activeSegment]);
+  }, [timePeriod, segment]);
   
   // Fetch data when dependencies change
   useEffect(() => {
@@ -53,7 +53,7 @@ export const useDashboardData = (timePeriod: string) => {
 
 export const useEmotionalScoreTrend = () => {
   const [data, setData] = useState<Array<{ date: string; value: number }>>([]);
-  const { activeSegment } = useSegment();
+  const { segment } = useSegment();
   
   const fetchData = useCallback(async () => {
     // Mock emotional score trend data
@@ -76,7 +76,7 @@ export const useEmotionalScoreTrend = () => {
     
     setData(updatedData);
     return updatedData;
-  }, [activeSegment]);
+  }, [segment]);
   
   useEffect(() => {
     fetchData();
@@ -92,12 +92,12 @@ export const useDashboardStats = () => {
     averageEmotionalScore: 76,
     activeGameifications: 12
   });
-  const { activeSegment } = useSegment();
+  const { segment } = useSegment();
   
   const fetchData = useCallback(async () => {
     try {
       // Simulate fetching stats with randomness to show changes on refresh
-      const gamificationStats = await fetchGamificationStats(activeSegment);
+      const gamificationStats = await fetchGamificationStats(segment);
       
       const updatedData = {
         activeUsersCount: 80 + Math.floor(Math.random() * 10), // 80-89
@@ -112,7 +112,7 @@ export const useDashboardStats = () => {
       console.error("Error loading dashboard stats:", error);
       return data;
     }
-  }, [activeSegment, data]);
+  }, [segment, data]);
   
   useEffect(() => {
     fetchData();

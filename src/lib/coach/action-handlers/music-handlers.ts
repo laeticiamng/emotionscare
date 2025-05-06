@@ -13,6 +13,7 @@ export class PlayMusicPresetHandler implements ActionHandler {
     console.log(`Playing music preset "${payload.preset}" for user ${userId}`);
     notificationService.addNotification(userId, {
       id: `music-preset-${Date.now()}`,
+      title: "Playlist activée",
       message: `Playlist "${payload.preset}" activée pour accompagner votre moment.`,
       type: 'info',
       timestamp: new Date()

@@ -15,6 +15,7 @@ export class CheckScanStatusHandler implements ActionHandler {
     if (!hasScannedToday) {
       notificationService.addNotification(userId, {
         id: `scan-reminder-${Date.now()}`,
+        title: "Rappel de scan",
         message: "Vous n'avez pas encore fait votre scan émotionnel aujourd'hui. Prenez un moment pour vous !",
         type: 'info',
         timestamp: new Date()
@@ -32,6 +33,7 @@ export class SuggestJournalEntryHandler implements ActionHandler {
   execute(userId: string): void {
     notificationService.addNotification(userId, {
       id: `journal-suggest-${Date.now()}`,
+      title: "Suggestion journal",
       message: "Exprimer vos pensées dans votre journal pourrait vous aider à mieux comprendre vos émotions actuelles.",
       type: 'info',
       timestamp: new Date()
@@ -57,6 +59,7 @@ export class SuggestWellnessActivityHandler implements ActionHandler {
     
     notificationService.addNotification(userId, {
       id: `wellness-suggest-${Date.now()}`,
+      title: "Activité bien-être",
       message: randomActivity,
       type: 'info',
       timestamp: new Date()

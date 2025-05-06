@@ -64,6 +64,18 @@ const AdminDashboard: React.FC = () => {
     { label: 'Audit', icon: FileSearch, to: '/compliance', variant: 'outline' as const }
   ];
   
+  // Prepare formatted dashboard stats for the components expecting the old format
+  const formattedDashboardStats = {
+    productivity: {
+      current: dashboardStats.averageEmotionalScore || 76,
+      trend: 3
+    },
+    emotionalScore: {
+      current: dashboardStats.averageEmotionalScore || 76,
+      trend: -2
+    }
+  };
+  
   // Refresh all dashboard data
   const refreshAllData = useCallback(async () => {
     console.log('Refreshing all dashboard data...');
@@ -102,8 +114,7 @@ const AdminDashboard: React.FC = () => {
             activeTab={activeTab}
             absenteeismData={absenteeismData}
             emotionalScoreTrend={emotionalScoreTrend}
-            dashboardStats={dashboardStats}
-            isLoading={isLoading}
+            dashboardStats={formattedDashboardStats}
           />
         </Tabs>
         

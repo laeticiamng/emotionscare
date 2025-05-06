@@ -14,9 +14,10 @@ export type CoachAction = {
 export type CoachNotification = {
   id: string;
   type: 'info' | 'warning' | 'success' | 'error' | 'system' | 'invitation' | 'reminder';
-  title: string;
+  title?: string;  // Make title optional for backward compatibility
   message: string;
   timestamp: Date;
+  user_id?: string; // Add user_id as optional for backward compatibility
   read?: boolean;
   link?: string;
 };

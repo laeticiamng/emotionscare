@@ -12,6 +12,7 @@ export class SendDashboardAlertHandler implements ActionHandler {
   execute(userId: string, payload: any): void {
     notificationService.addNotification(userId, {
       id: `dashboard-alert-${Date.now()}`,
+      title: payload.title || "Alerte",
       message: payload.message,
       type: 'warning',
       timestamp: new Date()
@@ -28,6 +29,7 @@ export class SendDashboardNotificationHandler implements ActionHandler {
   execute(userId: string, payload: any): void {
     notificationService.addNotification(userId, {
       id: `dashboard-notif-${Date.now()}`,
+      title: payload.title || "Notification",
       message: payload.message,
       type: 'info',
       timestamp: new Date()

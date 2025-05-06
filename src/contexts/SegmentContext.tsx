@@ -24,6 +24,7 @@ interface SegmentContextValue {
   isLoading: boolean;
   activeDimension: SegmentDimension | null;
   activeOption: SegmentOption | null;
+  activeSegment: string | null; // Added this property for backward compatibility
 }
 
 const SegmentContext = createContext<SegmentContextValue | undefined>(undefined);
@@ -137,6 +138,11 @@ export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Find active dimension and option based on current selection
   const activeDimension = dimensions.find(d => d.key === segment.dimensionKey) || null;
   const activeOption = activeDimension?.options.find(o => o.key === segment.optionKey) || null;
+  
+  // Compute active segment string (for backward compatibility)
+  const activeSegment = segment.dimensionKey && segment.optionKey 
+    ? `${segment.dimensionKey}:${segment.optionKey}`
+    : null;
 
   return (
     <SegmentContext.Provider value={{ 
@@ -145,7 +151,8 @@ export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ child
       dimensions,
       isLoading,
       activeDimension,
-      activeOption
+      activeOption,
+      activeSegment
     }}>
       {children}
     </SegmentContext.Provider>

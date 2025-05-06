@@ -15,10 +15,12 @@ class NotificationService {
 
     const notifications = this.notifications.get(userId);
     if (notifications) {
-      notifications.push({
+      const notificationWithUserId = {
         ...notification,
         user_id: userId
-      });
+      } as CoachNotification;
+      
+      notifications.push(notificationWithUserId);
       
       // Notify listeners
       this.notifyListeners(userId);

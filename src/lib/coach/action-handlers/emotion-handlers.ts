@@ -17,6 +17,7 @@ export class CheckEmotionAlertHandler implements ActionHandler {
       if (['tristesse', 'colère', 'anxiété'].includes(emotion.toLowerCase()) && confidence > 0.7) {
         notificationService.addNotification(userId, {
           id: `emotion-alert-${Date.now()}`,
+          title: "Alerte émotion",
           message: "On dirait que ça n'a pas été facile aujourd'hui. Un petit moment VR pourrait aider ?",
           type: 'info',
           timestamp: new Date()
@@ -49,6 +50,7 @@ export class SuggestVRSessionHandler implements ActionHandler {
       
       notificationService.addNotification(userId, {
         id: `vr-suggest-${Date.now()}`,
+        title: "Suggestion VR",
         message: `Une session VR "${templateName}" pourrait être bénéfique pour vous en ce moment.`,
         type: 'info',
         timestamp: new Date()
@@ -88,6 +90,7 @@ export class CheckTrendAlertHandler implements ActionHandler {
     if (emotionalDataService.hasNegativeTrend(userId)) {
       notificationService.addNotification(userId, {
         id: `trend-alert-${Date.now()}`,
+        title: "Tendance émotionnelle",
         message: "J'ai remarqué une tendance émotionnelle qui pourrait mériter attention. Des exercices de bien-être sont disponibles.",
         type: 'warning',
         timestamp: new Date()

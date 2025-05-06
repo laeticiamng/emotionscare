@@ -13,6 +13,7 @@ export class FindBuddyHandler implements ActionHandler {
     console.log(`Finding buddy for user ${userId}`);
     notificationService.addNotification(userId, {
       id: `find-buddy-${Date.now()}`,
+      title: "Recherche de buddy",
       message: "Recherche d'un buddy compatible en cours...",
       type: 'info',
       timestamp: new Date()
@@ -29,6 +30,7 @@ export class SendBuddyMessageHandler implements ActionHandler {
   execute(userId: string): void {
     notificationService.addNotification(userId, {
       id: `buddy-message-${Date.now()}`,
+      title: "Message buddy",
       message: "Votre buddy du jour est prêt à vous écouter anonymement !",
       type: 'success',
       timestamp: new Date()

@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +49,7 @@ const DashboardPage: React.FC = () => {
         setTimeout(() => {
           notificationService.addNotification(user.id, {
             id: `reminder-${Date.now()}`,
-            type: 'reminder', // This is now a valid type
+            type: 'reminder',
             title: 'Rappel: Scan émotionnel',
             message: 'N\'oubliez pas de compléter votre scan émotionnel quotidien',
             timestamp: new Date(),
