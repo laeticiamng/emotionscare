@@ -1,0 +1,31 @@
+
+/* Premium layout classes */
+.premium-layout {
+  @apply max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8;
+}
+
+.premium-section {
+  @apply py-8 md:py-12;
+}
+
+/* Spacious content sections */
+.content-spacious {
+  @apply space-y-6 md:space-y-8;
+}
+
+/* Card hover effects */
+.interactive-card {
+  @apply transform transition-all duration-300 hover:-translate-y-1;
+}
+
+.light .interactive-card {
+  @apply hover:shadow-md;
+}
+
+.dark .interactive-card {
+  @apply hover:shadow-[0_8px_16px_rgba(0,0,0,0.25)];
+}
+
+.pastel .interactive-card {
+  @apply hover:shadow-md;
+}
