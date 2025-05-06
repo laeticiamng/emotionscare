@@ -1,44 +1,118 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { InvitationStats } from '@/types/invitation';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { InvitationStats as InvitationStatsType } from '@/types';
+import { getInvitationStats } from '@/services/invitationService';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-interface InvitationStatsCardProps {
-  stats: InvitationStats;
+const InvitationStats: React.FC = () => {
+  const [stats, setStats] = useState<InvitationStatsType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const invitationStats = await getInvitationStats();
+        setStats(invitationStats);
+      } catch (error: any) {
+        console.error("Error fetching invitation stats:", error);
+        setError(error.message || "Impossible de récupérer les statistiques d'invitation");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Erreur</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Aucune donnée</AlertTitle>
+        <AlertDescription>Aucune statistique d'invitation disponible pour le moment.</AlertDescription>
+      </Alert>
+    );
+  }
+
+  const acceptRate = stats.sent > 0 ? Math.round((stats.accepted / stats.sent) * 100) : 0;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatCard
+          title="Invitations envoyées"
+          value={stats.sent}
+          description="Nombre total d'invitations"
+        />
+        <StatCard
+          title="Invitations acceptées"
+          value={stats.accepted}
+          description={`${acceptRate}% de taux d'acceptation`}
+          progress={acceptRate}
+        />
+        <StatCard
+          title="Invitations en attente"
+          value={stats.pending}
+          description="En attente d'activation"
+        />
+      </div>
+
+      <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          Toutes les données affichées ici sont entièrement anonymisées conformément à notre politique
+          de confidentialité. Aucune information personnelle n'est accessible après l'envoi des invitations.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+interface StatCardProps {
+  title: string;
+  value: number;
+  description: string;
+  progress?: number;
 }
 
-const InvitationStatsCard: React.FC<InvitationStatsCardProps> = ({ stats }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value, description, progress }) => {
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-2xl">Invitations</CardTitle>
-        <CardDescription>Aperçu anonymisé des invitations</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatItem label="Envoyées" value={stats.sent} className="bg-primary/10" />
-          <StatItem label="Acceptées" value={stats.accepted} className="bg-green-500/10" />
-          <StatItem label="En attente" value={stats.pending} className="bg-yellow-500/10" />
-          <StatItem label="Expirées" value={stats.expired} className="bg-gray-200" />
-        </div>
+      <CardContent className="pt-6">
+        <div className="text-2xl font-bold">{value}</div>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs text-muted-foreground mt-1">{description}</p>
+        {progress !== undefined && (
+          <Progress value={progress} className="h-1 mt-4" />
+        )}
       </CardContent>
     </Card>
   );
 };
 
-interface StatItemProps {
-  label: string;
-  value: number;
-  className?: string;
-}
-
-const StatItem: React.FC<StatItemProps> = ({ label, value, className = '' }) => {
-  return (
-    <div className={`flex flex-col items-center justify-center p-4 rounded-md ${className}`}>
-      <span className="text-3xl font-semibold">{value}</span>
-      <span className="text-sm text-muted-foreground mt-1">{label}</span>
-    </div>
-  );
-};
-
-export default InvitationStatsCard;
+export default InvitationStats;

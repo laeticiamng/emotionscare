@@ -1,8 +1,6 @@
 
 import { supabase } from "@/lib/supabase-client";
-import { InvitationFormData, InvitationStats } from "@/types/invitation";
-
-const PROJECT_ID = "yaincoxihiqdksxgrsrk"; // L'ID de votre projet Supabase
+import { InvitationFormData, InvitationStats } from "@/types";
 
 export const sendInvitation = async (data: InvitationFormData): Promise<void> => {
   const { email, role } = data;

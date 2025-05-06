@@ -1,13 +1,9 @@
 
 import React, { useEffect } from 'react';
-import {
-  createBrowserRouter,
-  RouterProvider,
-  useNavigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
-import Layout from "@/components/Layout";
+import { Shell } from "@/components/Shell";
 import { Home } from "@/pages/Home";
 import { Docs } from "@/pages/Docs";
 import { Pricing } from "@/pages/Pricing";
@@ -21,17 +17,20 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import { getCurrentUser } from '@/data/mockUsers';
 import { updateUser } from '@/lib/userService';
-import { User } from '@/types';
 import InvitePage from './pages/InvitePage';
+import { AuthProvider } from './contexts/AuthContext';
 
-const App: React.FC = () => {
+// App component as router wrapper
+const App = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  // Check authentication status on component mount
   useEffect(() => {
     const checkAuthentication = async () => {
       const storedUser = getCurrentUser();
+      
       if (storedUser) {
         setUser(storedUser);
         setIsAuthenticated(true);
@@ -40,7 +39,7 @@ const App: React.FC = () => {
         if (!storedUser.onboarded) {
           toast({
             title: "Bienvenue !",
-            description: "Veuillez compléter votre profil pour une expérience optimale.",
+            description: "Veuillez compléter votre profil pour une expérience optimale."
           });
           navigate('/settings');
         }
@@ -63,14 +62,14 @@ const App: React.FC = () => {
         // Simulate completing the onboarding process
         const user = getCurrentUser();
         if (user) {
-          const updatedUser: Partial<User> = { ...user, onboarded: true };
+          const updatedUser = { ...user, onboarded: true };
+          
           try {
             const newUser = await updateUser(updatedUser);
             setUser(newUser);
-            
             toast({
               title: "Profil complété !",
-              description: "Votre compte est maintenant configuré.",
+              description: "Votre compte est maintenant configuré."
             });
             navigate('/dashboard');
           } catch (error) {
@@ -91,74 +90,72 @@ const App: React.FC = () => {
   return null;
 };
 
+// Router configuration
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <Shell />,
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Home />
       },
       {
         path: "/docs",
-        element: <Docs />,
+        element: <Docs />
       },
       {
         path: "/pricing",
-        element: <Pricing />,
+        element: <Pricing />
       },
       {
         path: "/contact",
-        element: <Contact />,
-      },
-    ],
+        element: <Contact />
+      }
+    ]
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <LoginPage />
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: <RegisterPage />
   },
   {
     path: "/dashboard",
-    element: <DashboardPage />,
+    element: <DashboardPage />
   },
   {
     path: "/settings",
-    element: <SettingsPage />,
+    element: <SettingsPage />
   },
   {
     path: "/admin/login",
-    element: <AdminLoginPage />,
+    element: <AdminLoginPage />
   },
-   {
+  {
     path: "/forgot-password",
-    element: <ForgotPasswordPage />,
+    element: <ForgotPasswordPage />
   },
   {
     path: "/reset-password",
-    element: <ResetPasswordPage />,
+    element: <ResetPasswordPage />
   },
   {
     path: "/invite",
-    element: <InvitePage />,
+    element: <InvitePage />
   }
 ]);
 
+// Main component that provides auth context and router
 function AppWrapper() {
   return (
-    <>
-      <AuthProvider>
-        <App />
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </>
+    <AuthProvider>
+      <App />
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }
 
 export default AppWrapper;
-
-import { AuthProvider } from './contexts/AuthContext';

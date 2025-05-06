@@ -356,6 +356,39 @@ export type Database = {
         }
         Relationships: []
       }
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          role: string
+          status: Database["public"]["Enums"]["invitation_status"]
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          role: string
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          role?: string
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token?: string
+        }
+        Relationships: []
+      }
       item_situation_relations: {
         Row: {
           created_at: string | null
@@ -747,6 +780,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_invitation: {
+        Args: { token_param: string }
+        Returns: boolean
+      }
+      count_all_invitations: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      count_invitations_by_status: {
+        Args: { status_param: Database["public"]["Enums"]["invitation_status"] }
+        Returns: number
+      }
       create_activity_log_cleanup_job: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -776,9 +821,13 @@ export type Database = {
           timestamp_day: string
         }[]
       }
+      verify_invitation_token: {
+        Args: { token_param: string }
+        Returns: Json
+      }
     }
     Enums: {
-      [_ in never]: never
+      invitation_status: "pending" | "accepted" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -893,6 +942,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      invitation_status: ["pending", "accepted", "expired"],
+    },
   },
 } as const

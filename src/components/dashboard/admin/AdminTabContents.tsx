@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -19,7 +20,7 @@ interface AdminTabContentsProps {
   activeTab: string;
   absenteeismData: Array<{ date: string; value: number }>;
   emotionalScoreTrend: Array<{ date: string; value: number }>;
-  dashboardStats: DashboardStats; // Using the imported DashboardStats type directly
+  dashboardStats: DashboardStats;
   isLoading?: boolean;
 }
 

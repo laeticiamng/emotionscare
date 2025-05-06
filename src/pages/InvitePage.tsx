@@ -1,275 +1,237 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase-client';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import Layout from '@/components/Layout';
+import { InvitationVerificationResult } from '@/types';
 
-// Schéma de validation du formulaire d'inscription
-const registrationSchema = z.object({
-  firstName: z.string().min(2, { message: "Le prénom est obligatoire" }),
-  lastName: z.string().min(2, { message: "Le nom est obligatoire" }),
-  password: z.string().min(8, { message: "Le mot de passe doit contenir au moins 8 caractères" }),
-  acceptTerms: z.literal(true, {
-    errorMap: () => ({ message: "Vous devez accepter les conditions d'utilisation" })
-  })
+const signupSchema = z.object({
+  name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"]
 });
 
-type RegistrationFormData = z.infer<typeof registrationSchema>;
+type SignupFormData = z.infer<typeof signupSchema>;
 
 const InvitePage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams.get('token') || '';
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { toast } = useToast();
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [invitationStatus, setInvitationStatus] = useState<'loading' | 'valid' | 'invalid'>('loading');
+  const [invitationData, setInvitationData] = useState<InvitationVerificationResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [invitationData, setInvitationData] = useState<{
-    email: string;
-    role: string;
-    valid: boolean;
-  } | null>(null);
 
-  const form = useForm<RegistrationFormData>({
-    resolver: zodResolver(registrationSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      password: '',
-      acceptTerms: false,
-    },
+  const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema)
   });
 
-  // Vérifier la validité du token d'invitation
   useEffect(() => {
-    const verifyInvitationToken = async () => {
+    const verifyInvitation = async () => {
       if (!token) {
-        toast.error("Token d'invitation manquant");
-        navigate('/');
+        setInvitationStatus('invalid');
         return;
       }
 
       try {
-        // Vérifier le token auprès de l'API
-        const { data, error } = await supabase
-          .rpc('verify_invitation_token', { token_param: token });
-
+        const { data, error } = await supabase.rpc('verify_invitation_token', { token_param: token });
+        
         if (error || !data || !data.valid) {
-          toast.error("Ce lien d'invitation est invalide ou a expiré");
-          navigate('/');
-          return;
+          setInvitationStatus('invalid');
+          setInvitationData(data || { valid: false, message: error?.message || "Invitation invalide" });
+        } else {
+          setInvitationStatus('valid');
+          setInvitationData(data);
         }
-
-        setInvitationData(data);
       } catch (error) {
-        console.error('Error verifying invitation:', error);
-        toast.error("Erreur lors de la vérification de l'invitation");
-        navigate('/');
-      } finally {
-        setIsLoading(false);
+        console.error("Error verifying invitation:", error);
+        setInvitationStatus('invalid');
       }
     };
 
-    verifyInvitationToken();
-  }, [token, navigate]);
+    verifyInvitation();
+  }, [token]);
 
-  const handleSubmit = async (data: RegistrationFormData) => {
+  const onSubmit = async (data: SignupFormData) => {
     if (!invitationData?.email) {
-      toast.error("Données d'invitation manquantes");
+      toast({
+        title: "Erreur",
+        description: "Données d'invitation invalides",
+        variant: "destructive"
+      });
       return;
     }
-
+    
     setIsSubmitting(true);
-
+    
     try {
-      // Créer le compte utilisateur
+      // Register the user with Supabase Auth
       const { error: signUpError } = await supabase.auth.signUp({
         email: invitationData.email,
         password: data.password,
         options: {
           data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
+            name: data.name,
             role: invitationData.role,
+            anonymity_code: Math.random().toString(36).substring(2, 10)
           }
         }
       });
 
       if (signUpError) throw signUpError;
+      
+      // Accept the invitation
+      const { data: acceptResult, error: acceptError } = await supabase.rpc('accept_invitation', { token_param: token });
+      
+      if (acceptError || !acceptResult) {
+        throw new Error(acceptError?.message || "Impossible d'accepter l'invitation");
+      }
 
-      // Marquer l'invitation comme acceptée
-      const { error: updateError } = await supabase
-        .rpc('accept_invitation', { token_param: token });
-
-      if (updateError) throw updateError;
-
-      // Connecter l'utilisateur
-      await login(invitationData.email, data.password);
-
-      toast.success("Compte activé avec succès !");
-      navigate('/dashboard');
+      toast({
+        title: "Compte créé avec succès !",
+        description: "Bienvenue sur EmotionsCare. Vous pouvez maintenant vous connecter.",
+      });
+      
+      // Redirect to login page
+      navigate("/login");
+      
     } catch (error: any) {
-      console.error('Error registering user:', error);
-      toast.error(error.message || "Erreur lors de l'activation du compte");
+      toast({
+        title: "Erreur lors de la création du compte",
+        description: error.message || "Une erreur s'est produite. Veuillez réessayer.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
+  if (invitationStatus === 'loading') {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
+      <Layout>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Vérification de l'invitation</CardTitle>
+              <CardDescription>Nous vérifions votre invitation...</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center p-6">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
     );
   }
 
-  if (!invitationData?.valid) {
+  if (invitationStatus === 'invalid') {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-center">Invitation invalide</CardTitle>
-            <CardDescription className="text-center">
-              Ce lien d'invitation est invalide ou a expiré.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Button className="w-full" onClick={() => navigate('/')}>
-              Retour à l'accueil
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      <Layout>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Invitation invalide</CardTitle>
+              <CardDescription>
+                {invitationData?.message || "Cette invitation n'est plus valide ou a expiré."}
+              </CardDescription>
+            </CardHeader>
+            <CardFooter>
+              <Button variant="outline" onClick={() => navigate("/")}>
+                Retourner à l'accueil
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FAFBFC] to-[#E8F1FA] p-4">
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-semibold mb-1 text-[#1B365D]">
-            EmotionsCare<span className="text-xs align-super">™</span>
-          </h1>
-          <p className="text-slate-600">Activez votre compte</p>
-        </div>
-
-        <Card className="shadow-lg border-[#E8F1FA]">
+    <Layout>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Bienvenue chez EmotionsCare</CardTitle>
+            <CardTitle>Créez votre compte EmotionsCare</CardTitle>
             <CardDescription>
-              Veuillez compléter votre inscription pour activer votre compte
+              Complétez votre inscription pour accéder à votre espace bien-être.
             </CardDescription>
           </CardHeader>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground rounded-md bg-muted/50 p-3">
-                  <p>Compte à activer : <strong>{invitationData?.email}</strong></p>
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Prénom</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Votre prénom" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input 
+                  id="email"
+                  value={invitationData?.email || ''} 
+                  disabled 
+                  readOnly
                 />
-
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Votre nom" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="name">Votre nom complet</Label>
+                <Input
+                  id="name"
+                  placeholder="Prénom et Nom"
+                  {...register("name")}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="Créez un mot de passe sécurisé" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                {errors.name && (
+                  <p className="text-sm font-medium text-red-500">{errors.name.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Choisissez un mot de passe sécurisé"
+                  {...register("password")}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="acceptTerms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          J'accepte les conditions d'utilisation et la politique de confidentialité
-                        </FormLabel>
-                        <p className="text-xs text-muted-foreground">
-                          Vos données personnelles seront anonymisées et protégées conformément au RGPD.
-                        </p>
-                      </div>
-                    </FormItem>
-                  )}
+                {errors.password && (
+                  <p className="text-sm font-medium text-red-500">{errors.password.message}</p>
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirmez votre mot de passe"
+                  {...register("confirmPassword")}
                 />
-              </CardContent>
-
-              <CardFooter>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Activation en cours...
-                    </>
-                  ) : (
-                    'Activer mon compte'
-                  )}
+                {errors.confirmPassword && (
+                  <p className="text-sm font-medium text-red-500">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+              
+              <div className="pt-4">
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? 'Création en cours...' : 'Créer mon compte'}
                 </Button>
-              </CardFooter>
+              </div>
+              
+              <p className="text-xs text-muted-foreground text-center">
+                En créant votre compte, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+              </p>
             </form>
-          </Form>
+          </CardContent>
         </Card>
-
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          Cette invitation expirera sous 48 heures pour des raisons de sécurité.
-        </p>
       </div>
-    </div>
+    </Layout>
   );
 };
 
