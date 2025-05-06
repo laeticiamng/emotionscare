@@ -1,20 +1,23 @@
 
-/**
- * Types of activities that can be logged
- */
-export type ActivityType = 
-  | 'connexion'
-  | 'consultation'
-  | 'inscription_event'
-  | 'modification_profil'
-  | 'questionnaire_reponse';
+// Activity type definitions
+export interface ActivityLogEntry {
+  id: string;
+  userId: string;
+  activityType: string;
+  timestamp: string;
+  details: Record<string, any>;
+}
 
-/**
- * Activity log data for creating a new activity log
- */
-export interface ActivityLogData {
-  user_id: string;
-  activity_type: ActivityType;
-  activity_details?: Record<string, any>;
-  user_ip?: string;
+export type ActivityType = 
+  | 'login'
+  | 'scan_emotion'
+  | 'journal_entry'
+  | 'vr_session'
+  | 'profile_update'
+  | 'consultation'
+  | 'event_registration'
+  | 'questionnaire_response';
+
+export interface ActivityLogOptions {
+  silent?: boolean;
 }

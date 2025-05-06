@@ -12,15 +12,21 @@ import { notificationService } from '@/lib/coach/notification-service';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 
 const DashboardPage: React.FC = () => {
+  console.log("DashboardPage Component - Initializing");
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  console.log("DashboardPage - Auth state:", { user, isAuthenticated, isLoading });
+  console.log("DashboardPage - Auth state:", { 
+    user: user ? { id: user.id, role: user.role } : null, 
+    isAuthenticated, 
+    isLoading 
+  });
   
   // Redirect to login if not authenticated
   useEffect(() => {
+    console.log("DashboardPage - Auth effect running, isLoading:", isLoading, "isAuthenticated:", isAuthenticated);
     if (!isLoading && !isAuthenticated) {
       console.log("DashboardPage - Not authenticated, redirecting to login");
       toast({
@@ -62,7 +68,7 @@ const DashboardPage: React.FC = () => {
   }, [user?.id]);
   
   if (isLoading) {
-    console.log("DashboardPage - Loading...");
+    console.log("DashboardPage - Showing loading animation");
     return <LoadingAnimation />;
   }
   
@@ -76,9 +82,15 @@ const DashboardPage: React.FC = () => {
     <DashboardContainer>
       <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
         {isAdmin ? (
-          <AdminDashboard />
+          <>
+            {console.log("DashboardPage - Rendering AdminDashboard")}
+            <AdminDashboard />
+          </>
         ) : (
-          <UserDashboard user={user} />
+          <>
+            {console.log("DashboardPage - Rendering UserDashboard")}
+            <UserDashboard user={user} />
+          </>
         )}
       </div>
     </DashboardContainer>

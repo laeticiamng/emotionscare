@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,8 @@ import ActivityFilters from "./activity-logs/ActivityFilters";
 import { useUserActivityLogState } from "./hooks/useUserActivityLogState";
 
 const UserActivityLogTab: React.FC = () => {
+  console.log("Rendering UserActivityLogTab");
+  
   const {
     activeTab,
     setActiveTab,
@@ -21,6 +22,14 @@ const UserActivityLogTab: React.FC = () => {
     handleDateRangeChange,
     handleExport
   } = useUserActivityLogState();
+
+  console.log("Activity log state:", { 
+    activeTab, 
+    activitiesCount: filteredActivities?.length,
+    statsCount: stats?.length,
+    isLoading, 
+    error 
+  });
 
   return (
     <div className="space-y-4">
