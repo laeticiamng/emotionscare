@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ThemeName, themes } from '@/themes/theme';
 
@@ -71,6 +72,19 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     
     // Add the new theme class
     document.documentElement.classList.add(theme);
+    
+    // Set a data attribute for additional theme-specific styles
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    // Adjust meta theme-color for mobile browsers
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute(
+        'content',
+        theme === 'dark' ? '#1F2430' : 
+        theme === 'pastel' ? '#EDF4FF' : '#ffffff'
+      );
+    }
   }, [theme]);
 
   const toggleTheme = () => {

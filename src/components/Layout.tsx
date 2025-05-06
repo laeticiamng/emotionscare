@@ -50,8 +50,16 @@ const Layout = ({ children }: LayoutProps) => {
         {/* La sidebar n'apparaît que sur desktop et pour les utilisateurs authentifiés */}
         {!isMobile && isAuthenticated && <Sidebar />}
         
-        <div className={`flex-1 overflow-auto bg-background/80 backdrop-blur-sm transition-all ${isMobile ? 'w-full' : isAuthenticated ? 'w-full pl-16' : 'w-full'}`}>
-          <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : isHomePage && !isAuthenticated ? 'w-full p-0' : 'container max-w-7xl mx-auto py-8 px-4 md:px-6 lg:px-8'}`}>
+        <div className={`flex-1 overflow-auto transition-all ${
+          isMobile ? 'w-full' : 
+          isAuthenticated ? 'w-full pl-16 pr-0' : 
+          'w-full'
+        }`}>
+          <main className={`animate-fade-in ${
+            isMobile ? 'w-full px-3 py-4' : 
+            isHomePage && !isAuthenticated ? 'w-full p-0' : 
+            'w-full max-w-[1400px] mx-auto py-8 px-6 md:px-8 lg:px-10'
+          }`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />

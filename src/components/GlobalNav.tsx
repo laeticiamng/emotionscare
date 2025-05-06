@@ -26,7 +26,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
   
   return (
     <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur-sm border-b shadow-sm">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container h-16 flex items-center justify-between max-w-[1400px] px-4 md:px-6 lg:px-8">
         {/* Logo - cliquable pour revenir à l'accueil (/) */}
         <Logo isAdmin={isAdmin} homePath="/" />
         

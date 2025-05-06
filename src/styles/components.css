@@ -13,34 +13,68 @@
   @apply border-blue-200/80 bg-blue-50/90 shadow-md;
 }
 
-.apple-card {
-  @apply rounded-2xl border border-[#E8F1FA] bg-white shadow-md;
-}
-
-.dark .apple-card {
-  @apply border-[#353A47] bg-[#1F2430] shadow-[0_4px_12px_rgba(0,0,0,0.15)];
-}
-
-.pastel .apple-card {
-  @apply border-blue-200 bg-blue-50 shadow-sm;
-}
-
 /* Premium card with Apple-inspired design */
-.premium-card {
+.card-premium {
   @apply rounded-2xl border shadow-sm transition-all duration-300 overflow-hidden;
 }
 
-.light .premium-card {
+.light .card-premium {
   @apply border-gray-100 bg-white shadow-sm hover:shadow-md;
 }
 
-.dark .premium-card {
+.dark .card-premium {
   @apply border-gray-800 bg-[#1F2430] shadow-md hover:shadow-xl;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-.pastel .premium-card {
+.pastel .card-premium {
   @apply border-blue-200 bg-blue-50/80 shadow-sm hover:shadow-md;
+}
+
+/* Focus styles */
+.focus-premium {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+}
+
+/* Button styles */
+.btn-premium {
+  @apply rounded-xl transition-all duration-300;
+}
+
+.hover-lift {
+  @apply hover:-translate-y-0.5 transition-transform duration-300;
+}
+
+/* Shadow styles */
+.shadow-premium {
+  @apply shadow-md hover:shadow-lg transition-shadow duration-300;
+}
+
+.dark .shadow-premium {
+  @apply shadow-[0_8px_24px_rgba(0,0,0,0.25)] hover:shadow-[0_12px_28px_rgba(0,0,0,0.3)];
+}
+
+/* Dashboard layout */
+.dashboard-premium {
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-6;
+}
+
+.dashboard-main {
+  @apply lg:col-span-8 space-y-6;
+}
+
+.dashboard-side {
+  @apply lg:col-span-4 space-y-6;
+}
+
+/* Text styles */
+.heading-elegant {
+  @apply tracking-tight;
+}
+
+/* Content layout */
+.content-premium {
+  @apply w-full max-w-[1400px] mx-auto;
 }
 
 /* Comment blocks styling */
@@ -58,12 +92,4 @@
 
 .pastel .comment-block {
   @apply border-blue-200 bg-blue-100/50;
-}
-
-.comment-block:nth-child(even) {
-  @apply bg-opacity-75;
-}
-
-.dark .comment-block:nth-child(even) {
-  @apply bg-[#23273A];
 }

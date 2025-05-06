@@ -14,7 +14,7 @@ const UserPreferences = () => {
   const { theme } = useTheme();
   
   return (
-    <div className="container max-w-4xl py-10 animate-fade-in">
+    <div className="container max-w-4xl py-8 md:py-10 animate-fade-in">
       <Card className="card-premium shadow-premium overflow-hidden">
         <div className={`h-2.5 w-full ${
           theme === 'dark' ? 'bg-primary/25' :
@@ -26,12 +26,12 @@ const UserPreferences = () => {
           <CardTitle className="text-3xl heading-elegant flex items-center">
             <span>Mes préférences</span>
           </CardTitle>
-          <CardDescription className="text-base mt-2">
+          <CardDescription className="text-base mt-3 text-muted-foreground">
             Personnalisez votre expérience EmotionsCare selon vos goûts et besoins
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-10 pt-6">
+        <CardContent className="space-y-10 pt-6 px-8">
           <p className="text-muted-foreground text-balance text-lg">
             Adaptez l'interface à votre style en choisissant parmi nos thèmes professionnels 
             et en personnalisant l'affichage selon vos préférences.
