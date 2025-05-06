@@ -14,19 +14,20 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   rectSortingStrategy,
+  useSortable
 } from '@dnd-kit/sortable';
-import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import KpiCard from './KpiCard';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, TrendingUp, Activity, Users } from 'lucide-react';
 import { toast } from "sonner";
+import { LucideIcon } from 'lucide-react';
 
 // Type for the card data
 interface KpiCardData {
   id: string;
   title: string;
   value: string | React.ReactNode;
-  icon: React.ComponentType;
+  icon: LucideIcon;
   delta?: {
     value: number;
     label?: string;
@@ -118,7 +119,7 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboard
       id: 'productivity',
       title: 'Productivité',
       value: `${dashboardStats.productivity.current}%`,
-      icon: () => import('lucide-react').then(mod => mod.TrendingUp),
+      icon: TrendingUp,
       delta: {
         value: dashboardStats.productivity.trend,
         label: "vs période précédente",
@@ -130,7 +131,7 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboard
       id: 'emotionalScore',
       title: 'Score émotionnel moyen',
       value: `${dashboardStats.emotionalScore.current}/100`,
-      icon: () => import('lucide-react').then(mod => mod.Activity),
+      icon: Activity,
       delta: {
         value: dashboardStats.emotionalScore.trend,
         label: "vs période précédente",
@@ -142,7 +143,7 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboard
       id: 'engagementGamification',
       title: 'Engagement gamification',
       value: `${gamificationData.activeUsersPercent}%`,
-      icon: () => import('lucide-react').then(mod => mod.Users),
+      icon: Users,
       subtitle: `${gamificationData.totalBadges} badges distribués ce mois`,
       ariaLabel: `Engagement gamification: ${gamificationData.activeUsersPercent}%`
     }
