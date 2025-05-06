@@ -1,97 +1,95 @@
 
 import React from 'react';
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface PaginationControlsProps {
   currentPage: number;
   totalPages: number;
+  pageSize: number;
+  totalItems: number;
   onPageChange: (page: number) => void;
-  pageSize?: number;
   onPageSizeChange?: (size: number) => void;
-  totalItems?: number;
-  isLoading?: boolean;
   pageSizeOptions?: number[];
 }
 
 const Pagination: React.FC<PaginationControlsProps> = ({
   currentPage,
   totalPages,
-  onPageChange,
   pageSize,
-  onPageSizeChange,
   totalItems,
-  isLoading = false,
+  onPageChange,
+  onPageSizeChange,
   pageSizeOptions = [10, 25, 50, 100]
 }) => {
-  const canGoPrevious = currentPage > 1;
-  const canGoNext = currentPage < totalPages;
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
 
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
+  const startItem = (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalItems);
+  
   return (
-    <div className="flex items-center justify-between space-x-6">
-      <div className="flex items-center space-x-2">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(1)}
-          disabled={!canGoPrevious || isLoading}
-          aria-label="First page"
-        >
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={!canGoPrevious || isLoading}
-          aria-label="Previous page"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        
-        {/* Pages display */}
-        <span className="text-sm text-muted-foreground">
-          Page {currentPage} sur {totalPages}
-          {totalItems !== undefined && ` (${totalItems} éléments)`}
-        </span>
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={!canGoNext || isLoading}
-          aria-label="Next page"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onPageChange(totalPages)}
-          disabled={!canGoNext || isLoading}
-          aria-label="Last page"
-        >
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+      <div className="text-sm text-muted-foreground">
+        Affichage de {startItem} à {endItem} sur {totalItems} éléments
       </div>
       
-      {/* Only show page size selector if the prop is provided */}
-      {pageSize && onPageSizeChange && (
+      <div className="flex items-center space-x-6 lg:space-x-8">
+        {onPageSizeChange && (
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium">Lignes par page</p>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => onPageSizeChange(Number(value))}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {pageSizeOptions.map((size) => (
+                  <SelectItem key={size} value={size.toString()}>{size}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-muted-foreground">Afficher</span>
-          <select
-            className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm"
-            value={pageSize}
-            onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            disabled={isLoading}
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
           >
-            {pageSizeOptions.map((size) => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-          <span className="text-sm text-muted-foreground">par page</span>
+            <span className="sr-only">Page précédente</span>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center justify-center text-sm font-medium">
+            Page {currentPage} sur {totalPages}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+          >
+            <span className="sr-only">Page suivante</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
