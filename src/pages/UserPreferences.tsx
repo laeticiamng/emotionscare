@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
@@ -24,19 +25,22 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@/components/ui/use-toast';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Palette } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const formSchema = z.object({
   fontSize: z.enum(['small', 'medium', 'large']),
   backgroundColor: z.enum(['default', 'blue', 'mint', 'coral']),
+  theme: z.enum(['light', 'dark', 'system'])
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const UserPreferences = () => {
   const { user, updateUserProfile } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   // Initialize with user preferences if available
   const preferences = user?.preferences || {};
@@ -46,11 +50,20 @@ const UserPreferences = () => {
     defaultValues: {
       fontSize: preferences.fontSize || 'medium',
       backgroundColor: preferences.backgroundColor || 'default',
+      theme: preferences.theme || (theme === 'dark' ? 'dark' : 'light'),
     }
   });
 
   const onSubmit = async (data: FormValues) => {
     try {
+      // Apply theme immediately
+      if (data.theme === 'system') {
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        setTheme(systemTheme);
+      } else {
+        setTheme(data.theme as 'light' | 'dark');
+      }
+      
       // Save preferences to user profile
       await updateUserProfile({
         ...user,
@@ -84,6 +97,49 @@ const UserPreferences = () => {
         <CardContent className="space-y-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="theme"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="flex items-center">
+                      <Palette className="mr-2 h-4 w-4" />
+                      Thème
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                      >
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer">
+                          <Sun className="h-8 w-8 text-amber-500" />
+                          <RadioGroupItem value="light" id="light-theme" className="sr-only" />
+                          <Label htmlFor="light-theme" className="cursor-pointer">Clair</Label>
+                        </div>
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer">
+                          <Moon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+                          <RadioGroupItem value="dark" id="dark-theme" className="sr-only" />
+                          <Label htmlFor="dark-theme" className="cursor-pointer">Sombre</Label>
+                        </div>
+                        <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer">
+                          <div className="flex">
+                            <Sun className="h-8 w-8 text-amber-500" />
+                            <Moon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 -ml-3" />
+                          </div>
+                          <RadioGroupItem value="system" id="system-theme" className="sr-only" />
+                          <Label htmlFor="system-theme" className="cursor-pointer">Système</Label>
+                        </div>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormDescription>
+                      Cette option modifie l'apparence globale de l'application.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="fontSize"
@@ -136,7 +192,7 @@ const UserPreferences = () => {
                             htmlFor="default-color" 
                             className="flex items-center gap-2"
                           >
-                            <div className="w-6 h-6 rounded-full bg-[#1B365D]"></div>
+                            <div className="w-6 h-6 rounded-full bg-[#1B365D] dark:ring-1 dark:ring-white/20"></div>
                             Par défaut
                           </Label>
                         </div>
@@ -146,7 +202,7 @@ const UserPreferences = () => {
                             htmlFor="blue-color" 
                             className="flex items-center gap-2"
                           >
-                            <div className="w-6 h-6 rounded-full bg-[#4A90E2]"></div>
+                            <div className="w-6 h-6 rounded-full bg-[#4A90E2] dark:ring-1 dark:ring-white/20"></div>
                             Bleu
                           </Label>
                         </div>
@@ -156,7 +212,7 @@ const UserPreferences = () => {
                             htmlFor="mint-color" 
                             className="flex items-center gap-2"
                           >
-                            <div className="w-6 h-6 rounded-full bg-[#A8E6CF]"></div>
+                            <div className="w-6 h-6 rounded-full bg-[#A8E6CF] dark:ring-1 dark:ring-white/20"></div>
                             Menthe
                           </Label>
                         </div>
@@ -166,7 +222,7 @@ const UserPreferences = () => {
                             htmlFor="coral-color" 
                             className="flex items-center gap-2"
                           >
-                            <div className="w-6 h-6 rounded-full bg-[#FF6F61]"></div>
+                            <div className="w-6 h-6 rounded-full bg-[#FF6F61] dark:ring-1 dark:ring-white/20"></div>
                             Corail
                           </Label>
                         </div>
@@ -179,33 +235,6 @@ const UserPreferences = () => {
                   </FormItem>
                 )}
               />
-
-              <div className="space-y-3">
-                <FormLabel>Thème</FormLabel>
-                <div className="flex items-center space-x-2">
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    onClick={toggleTheme}
-                    className="flex items-center gap-2"
-                  >
-                    {theme === 'dark' ? (
-                      <>
-                        <Sun className="h-4 w-4" />
-                        Passer au mode clair
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="h-4 w-4" />
-                        Passer au mode sombre
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <FormDescription>
-                  Cette option modifie l'apparence globale de l'application.
-                </FormDescription>
-              </div>
 
               <Button type="submit">Enregistrer mes préférences</Button>
             </form>

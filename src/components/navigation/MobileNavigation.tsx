@@ -1,13 +1,14 @@
 
 import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Music, LogOut } from 'lucide-react';
+import { Menu, X, Music, LogOut, Sun, Moon } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { topNavItems, sidebarItems, adminTopNavItems, adminSidebarItems } from './navConfig';
 import { isAdminRole } from '@/utils/roleUtils';
 
@@ -15,6 +16,8 @@ const MobileNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const { openDrawer } = useMusic();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = user ? isAdminRole(user.role) : false;
@@ -111,6 +114,23 @@ const MobileNavigation = () => {
                   </React.Fragment>
                 );
               })}
+              
+              <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+                Thème
+              </div>
+              <button 
+                className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50 w-full text-left text-sm"
+                onClick={() => {
+                  toggleTheme();
+                  setIsOpen(false);
+                }}
+              >
+                {isDark ? 
+                  <Sun className="w-4 h-4 mr-2 text-amber-500" /> : 
+                  <Moon className="w-4 h-4 mr-2" />
+                }
+                <span>{isDark ? 'Passer au mode clair' : 'Passer au mode sombre'}</span>
+              </button>
               
               {!isAdmin && (
                 <>

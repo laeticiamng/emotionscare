@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { sidebarItems, adminSidebarItems, footerNavItems } from '@/components/navigation/navConfig';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Bell, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Settings, Sun, Moon } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 import NotificationBar from '@/components/notifications/NotificationBar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(true); // Collapsed by default
@@ -16,6 +18,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const isAdmin = isAdminRole(user?.role);
   const isMobile = useIsMobile();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
   
   // Si on est sur mobile, on ne rend pas du tout le sidebar
   if (isMobile) {
@@ -121,6 +125,36 @@ const Sidebar = () => {
                   </Button>
                 )
               ))}
+              
+              {/* Bouton de basculement de thème */}
+              {collapsed ? (
+                <TooltipProvider>
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-full h-10"
+                        onClick={toggleTheme}
+                      >
+                        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      {isDark ? 'Mode clair' : 'Mode sombre'}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              ) : (
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start px-3"
+                  onClick={toggleTheme}
+                >
+                  {isDark ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
+                  <span>{isDark ? 'Mode clair' : 'Mode sombre'}</span>
+                </Button>
+              )}
             </div>
           </>
         )}

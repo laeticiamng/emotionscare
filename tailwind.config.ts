@@ -51,12 +51,26 @@ const config = {
         },
         wellness: {
           purple: "#9b87f5",
-          darkPurple: "#7E69AB",
+          darkPurple: "#7E69AB", 
           softPurple: "#E5DEFF",
           coral: "#FF6B6B",
           mint: "#4ECDC4",
           softBlue: "#D3E4FD",
           dark: "#1A1F2C",
+          darkGlass: "rgba(26, 31, 44, 0.8)",
+        },
+        dark: {
+          DEFAULT: "#1A1F2C",
+          950: "#121722",
+          900: "#1A1F2C",
+          800: "#2C3340",
+          700: "#3D4554",
+          600: "#4E5769",
+          500: "#616A7D",
+          400: "#8990A0",
+          300: "#B1B6C3",
+          200: "#D3D6DF",
+          100: "#F1F2F5",
         },
       },
       borderRadius: {
@@ -68,6 +82,8 @@ const config = {
       boxShadow: {
         'soft': '0 4px 8px rgba(0, 0, 0, 0.05)',
         'medium': '0 8px 16px rgba(0, 0, 0, 0.1)',
+        'dark-soft': '0 4px 12px rgba(0, 0, 0, 0.2)',
+        'dark-medium': '0 8px 24px rgba(0, 0, 0, 0.3)',
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
@@ -85,6 +101,9 @@ const config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      backgroundImage: {
+        'dark-gradient': 'linear-gradient(to bottom right, #1A1F2C, #2C3340)',
       },
     },
   },
