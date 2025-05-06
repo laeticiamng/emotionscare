@@ -180,7 +180,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         </div>
       </div>
       
-      {!isMobile && <DashboardFooter />}
+      {/* Remove this DashboardFooter since it also includes the SecurityFooter which is already rendered in Layout.tsx */}
+      {/* {!isMobile && <DashboardFooter />} */}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Shield, Lock, FileCheck, Search, Mail, Check, Building, Home } from 'lu
 
 /**
  * Composant affichant les certifications de sécurité avec une présentation élégante
+ * Ce composant ne doit être utilisé qu'une fois dans l'application pour éviter les duplications
  */
 const SecurityCertifications: React.FC = () => {
   // Données des certifications regroupées pour éviter les répétitions

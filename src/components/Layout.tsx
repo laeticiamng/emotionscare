@@ -41,7 +41,7 @@ const Layout = ({ children }: LayoutProps) => {
   
   return (
     <div className={`flex flex-col min-h-screen ${getBgClasses()}`}>
-      {/* Navigation globale */}
+      {/* Navigation globale - Only show once */}
       <GlobalNav isAuthenticated={isAuthenticated} />
       
       {isAuthenticated && <SessionTimeoutAlert />}
@@ -63,7 +63,7 @@ const Layout = ({ children }: LayoutProps) => {
             {children || <Outlet />}
           </main>
           
-          {/* Un seul SecurityFooter centralisé */}
+          {/* Un seul SecurityFooter centralisé - Only show if not on auth page */}
           {!isAuthPage && <SecurityFooter />}
         </div>
       </div>
