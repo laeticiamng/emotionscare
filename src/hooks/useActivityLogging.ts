@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { activityLogService } from '@/lib/activityLogService';
+import { activityLogService } from '@/lib/activity';
 
 /**
  * Hook to automatically log activities based on route changes and user actions
