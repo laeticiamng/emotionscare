@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Ban, FileExport, Trash2 } from 'lucide-react';
+import { Ban, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { BulkActionProps } from '../types/tableTypes';
@@ -74,7 +74,7 @@ const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelec
           onClick={handleBulkExport}
           aria-label={`Exporter ${selectedCount} utilisateurs sélectionnés`}
         >
-          <FileExport size={16} />
+          <FileText size={16} />
           Exporter ({selectedCount})
         </Button>
         
