@@ -10,6 +10,10 @@ export interface BrushStartEndIndex {
 export interface UseChartZoomProps {
   data: any[];
   chartRef: RefObject<HTMLDivElement>;
+  segment?: {
+    dimensionKey: string | null;
+    optionKey: string | null;
+  };
 }
 
 export interface UseChartZoomReturn {
@@ -25,7 +29,7 @@ export interface UseChartZoomReturn {
   handleTouchStart: (e: React.TouchEvent<HTMLDivElement>) => void;
 }
 
-export function useChartZoom({ data, chartRef }: UseChartZoomProps): UseChartZoomReturn {
+export function useChartZoom({ data, chartRef, segment }: UseChartZoomProps): UseChartZoomReturn {
   // State for zoom domain indexes
   const [startIndex, setStartIndex] = useState<number>(0);
   const [endIndex, setEndIndex] = useState<number>(data.length - 1);
@@ -33,6 +37,13 @@ export function useChartZoom({ data, chartRef }: UseChartZoomProps): UseChartZoo
   // State for panning
   const [isPanning, setIsPanning] = useState<boolean>(false);
   const [panStart, setPanStart] = useState<{ x: number; index: number }>({ x: 0, index: 0 });
+
+  // Reset zoom when data or segment changes
+  // This ensures the chart shows the complete new dataset when segment changes
+  useCallback(() => {
+    setStartIndex(0);
+    setEndIndex(data.length - 1);
+  }, [data, segment?.dimensionKey, segment?.optionKey]);
 
   // Calculate visible data range
   const visibleData = data.slice(startIndex, endIndex + 1);

@@ -8,6 +8,7 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import { cn } from "@/lib/utils";
 import { ChartConfig } from './types';
 import { useChartZoom } from './hooks/useChartZoom';
+import { useSegment } from '@/contexts/SegmentContext';
 
 interface ZoomableChartProps {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export const ZoomableChart: React.FC<ZoomableChartProps> = ({
 }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const chartRef = useRef<HTMLDivElement>(null);
+  const { segment } = useSegment();
   
   const {
     startIndex,
@@ -42,13 +44,27 @@ export const ZoomableChart: React.FC<ZoomableChartProps> = ({
     resetZoom,
     handleMouseDown,
     handleTouchStart
-  } = useChartZoom({ data, chartRef });
+  } = useChartZoom({ data, chartRef, segment });
   
   // Format date range for display
   const dateRange = visibleData.length > 0 ? {
     start: visibleData[0][brushDataKey],
     end: visibleData[visibleData.length - 1][brushDataKey]
   } : { start: '', end: '' };
+
+  // Handle empty data state
+  if (data.length === 0) {
+    return (
+      <div className={cn("relative flex flex-col items-center justify-center h-64", className)}>
+        <p className="text-muted-foreground text-center">
+          Aucune donnée disponible
+          {segment.dimensionKey && segment.optionKey && (
+            <> pour ce segment</>
+          )}
+        </p>
+      </div>
+    );
+  }
   
   return (
     <div className={cn("relative", className)}>

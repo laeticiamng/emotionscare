@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
-import { Tabs } from "@/components/ui/tabs";
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Tabs } from "@/components/ui/tabs";
+import { useDashboardData, useEmotionalScoreTrend, useDashboardStats } from './hooks/useDashboardData';
 import DashboardHeader from './DashboardHeader';
 import AdminTabsNavigation from './AdminTabsNavigation';
 import AdminTabContents from './AdminTabContents';
 import AdminFooter from './AdminFooter';
-import { useDashboardData, useEmotionalScoreTrend, useDashboardStats } from './hooks/useDashboardData';
+import { SegmentProvider } from '@/contexts/SegmentContext';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -19,30 +20,32 @@ const AdminDashboard: React.FC = () => {
   const dashboardStats = useDashboardStats();
   
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Hero Section with Period Selector */}
-      <DashboardHeader 
-        timePeriod={timePeriod} 
-        setTimePeriod={setTimePeriod} 
-        isLoading={isLoading}
-      />
-      
-      {/* Tabs Navigation */}
-      <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
-        <AdminTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} disabled={isLoading} />
-        
-        {/* Tab Contents */}
-        <AdminTabContents 
-          activeTab={activeTab}
-          absenteeismData={absenteeismData}
-          emotionalScoreTrend={emotionalScoreTrend}
-          dashboardStats={dashboardStats}
+    <SegmentProvider>
+      <div className="max-w-7xl mx-auto">
+        {/* Hero Section with Period Selector */}
+        <DashboardHeader 
+          timePeriod={timePeriod} 
+          setTimePeriod={setTimePeriod} 
           isLoading={isLoading}
         />
-      </Tabs>
-      
-      <AdminFooter />
-    </div>
+        
+        {/* Tabs Navigation */}
+        <Tabs defaultValue="vue-globale" className="mb-8" onValueChange={setActiveTab} value={activeTab}>
+          <AdminTabsNavigation activeTab={activeTab} setActiveTab={setActiveTab} disabled={isLoading} />
+          
+          {/* Tab Contents */}
+          <AdminTabContents 
+            activeTab={activeTab}
+            absenteeismData={absenteeismData}
+            emotionalScoreTrend={emotionalScoreTrend}
+            dashboardStats={dashboardStats}
+            isLoading={isLoading}
+          />
+        </Tabs>
+        
+        <AdminFooter />
+      </div>
+    </SegmentProvider>
   );
 };
 

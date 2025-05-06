@@ -1,6 +1,8 @@
 
 import React from 'react';
 import PeriodSelector from './PeriodSelector';
+import { SegmentSelector } from './SegmentSelector';
+import { useSegment } from '@/contexts/SegmentContext';
 
 interface DashboardHeaderProps {
   timePeriod: string;
@@ -10,9 +12,11 @@ interface DashboardHeaderProps {
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
   timePeriod, 
-  setTimePeriod,
-  isLoading = false
+  setTimePeriod, 
+  isLoading = false 
 }) => {
+  const { activeDimension, activeOption } = useSegment();
+  
   return (
     <div className="mb-10 animate-fade-in">
       <div className="flex flex-col md:flex-row items-start justify-between">
@@ -20,17 +24,17 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>
           <h2 className="text-xl text-muted-foreground mt-2">
             Métriques globales et anonymisées
-            {isLoading && (
-              <span className="inline-block ml-2 w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" 
-                    aria-hidden="true" />
-            )}
           </h2>
+          {activeDimension && activeOption && (
+            <div className="mt-2 text-sm font-medium text-primary">
+              Segment actif : {activeDimension.label} → {activeOption.label}
+            </div>
+          )}
         </div>
-        <PeriodSelector 
-          timePeriod={timePeriod} 
-          setTimePeriod={setTimePeriod} 
-          disabled={isLoading} 
-        />
+        <div className="flex flex-wrap gap-2 mt-4 md:mt-0">
+          <SegmentSelector />
+          <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+        </div>
       </div>
     </div>
   );

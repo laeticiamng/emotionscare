@@ -11,4 +11,5 @@ export { ZoomableChart } from "./ZoomableChart";
 export { ChartControls } from "./ChartControls";
 export { ChartDateRange } from "./ChartDateRange";
 export { useChartZoom } from "./hooks/useChartZoom";
+export { useSegment } from "@/contexts/SegmentContext";
 export { useChart } from "./context";

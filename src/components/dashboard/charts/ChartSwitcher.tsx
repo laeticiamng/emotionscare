@@ -7,6 +7,7 @@ import ProductivityChart from './ProductivityChart';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { ZoomableChart } from '@/components/ui/chart/ZoomableChart';
+import { useSegment } from '@/contexts/SegmentContext';
 
 export type ChartType = "line" | "bar" | "area";
 
@@ -32,6 +33,9 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   data,
   isLoading = false
 }) => {
+  // Get segment context
+  const { segment, activeDimension, activeOption } = useSegment();
+  
   // Use the first available view as default if none specified
   const initialView = defaultView || availableViews[0] || "line";
   
@@ -82,6 +86,20 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
       );
     }
     
+    if (data.length === 0) {
+      return (
+        <div className="h-48 w-full flex items-center justify-center">
+          <p className="text-muted-foreground text-center">
+            {activeDimension && activeOption ? (
+              <>Aucune donnée pour {activeDimension.label} → {activeOption.label}</>
+            ) : (
+              <>Aucune donnée disponible</>
+            )}
+          </p>
+        </div>
+      );
+    }
+    
     switch (view) {
       case "line":
         return <AbsenteeismChart data={data} />;
@@ -108,6 +126,15 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
     area: "Afficher l'aire"
   };
 
+  // Display loading state or segment filter messaging
+  const getDescription = () => {
+    if (isLoading) return "Chargement...";
+    if (segment.dimensionKey && segment.optionKey && activeDimension && activeOption) {
+      return `${description || ''} - ${activeDimension.label}: ${activeOption.label}`;
+    }
+    return description;
+  };
+
   return (
     <div className={cn(
       "card-premium p-4 rounded-2xl shadow-sm transition-opacity duration-300",
@@ -118,9 +145,9 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
           <h3 className="text-xl font-semibold">
             {isLoading ? <Skeleton className="h-6 w-36" /> : title}
           </h3>
-          {description && (
+          {getDescription() && (
             <p className="text-sm text-muted-foreground">
-              {isLoading ? <Skeleton className="h-4 w-24 mt-1" /> : description}
+              {isLoading ? <Skeleton className="h-4 w-24 mt-1" /> : getDescription()}
             </p>
           )}
         </div>
