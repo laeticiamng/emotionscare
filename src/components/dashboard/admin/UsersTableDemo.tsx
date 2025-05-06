@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Table } from '@/components/ui/table';
-import PaginationControls from '@/components/ui/data-table/Pagination';
+import Pagination from '@/components/ui/data-table/Pagination';
 import { useSortableTable } from '@/hooks/useSortableTable';
 import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField } from './types/tableTypes';
+import { SortableField, SortableTableOptions } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
 import { useSelectedUsers } from '@/hooks/useSelectedUsers';
@@ -26,7 +26,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
   const { sortField, sortDirection, handleSort, isSorted } = useSortableTable<SortableField>({
     storageKey: 'user-table-sort',
     persistInUrl: true
-  });
+  } as SortableTableOptions<SortableField>);
   
   // Table data management
   const {
@@ -105,8 +105,8 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
       
       {/* Pagination or Load More Button */}
       {!showLoadMoreButton ? (
-        <div className="px-4">
-          <PaginationControls
+        <div className="px-4 py-4">
+          <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             pageSize={pageSize}

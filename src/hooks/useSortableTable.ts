@@ -1,97 +1,98 @@
 
-import { useState, useCallback } from 'react';
-import { SortableField } from '@/components/dashboard/admin/types/tableTypes';
+import { useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { SortableTableOptions } from '@/components/dashboard/admin/types/tableTypes';
 
-type SortDirection = 'asc' | 'desc' | null;
+export type SortDirection = 'asc' | 'desc' | null;
 
-export interface SortState {
-  field: SortableField | null;
-  direction: SortDirection;
-}
-
-export function useSortableTable<T>(initialData: T[], initialSort?: SortState) {
-  const [sortState, setSortState] = useState<SortState>(initialSort || {
-    field: null,
-    direction: null,
-  });
+export function useSortableTable<T extends string>(options: SortableTableOptions<T>) {
+  const {
+    storageKey,
+    persistInUrl = false,
+    defaultField,
+    defaultDirection = null
+  } = options;
   
-  const [data, setData] = useState<T[]>(initialData);
+  const [searchParams, setSearchParams] = useSearchParams();
   
-  // Callback to handle sorting
-  const handleSort = useCallback((field: SortableField) => {
-    setSortState((prev) => ({
-      field,
-      direction:
-        prev.field === field
-          ? prev.direction === 'asc'
-            ? 'desc'
-            : prev.direction === 'desc'
-            ? null
-            : 'asc'
-          : 'asc',
-    }));
+  // Initialize sort state from URL or localStorage or defaults
+  const initSortField = (): T => {
+    if (persistInUrl) {
+      const urlField = searchParams.get('sort');
+      if (urlField) return urlField as T;
+    }
+    
+    if (storageKey) {
+      const savedSort = localStorage.getItem(`${storageKey}-field`);
+      if (savedSort) return savedSort as T;
+    }
+    
+    return defaultField as T;
+  };
+  
+  const initSortDirection = (): SortDirection => {
+    if (persistInUrl) {
+      const urlDirection = searchParams.get('direction');
+      if (urlDirection && (urlDirection === 'asc' || urlDirection === 'desc')) {
+        return urlDirection as SortDirection;
+      }
+    }
+    
+    if (storageKey) {
+      const savedDirection = localStorage.getItem(`${storageKey}-direction`);
+      if (savedDirection && (savedDirection === 'asc' || savedDirection === 'desc' || savedDirection === 'null')) {
+        return savedDirection === 'null' ? null : savedDirection as SortDirection;
+      }
+    }
+    
+    return defaultDirection;
+  };
+  
+  const [sortField, setSortField] = useState<T | undefined>(initSortField());
+  const [sortDirection, setSortDirection] = useState<SortDirection>(initSortDirection());
+  
+  // Update storage when sort changes
+  useEffect(() => {
+    if (sortField) {
+      if (storageKey) {
+        localStorage.setItem(`${storageKey}-field`, sortField as string);
+        localStorage.setItem(`${storageKey}-direction`, sortDirection === null ? 'null' : sortDirection);
+      }
+      
+      if (persistInUrl) {
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('sort', sortField as string);
+        if (sortDirection) {
+          newParams.set('direction', sortDirection);
+        } else {
+          newParams.delete('direction');
+        }
+        setSearchParams(newParams);
+      }
+    }
+  }, [sortField, sortDirection, storageKey, persistInUrl, searchParams, setSearchParams]);
+  
+  // Handler for column sort clicks
+  const handleSort = useCallback((field: T) => {
+    setSortField(prevField => {
+      setSortDirection(prevDirection => {
+        if (prevField !== field) {
+          return 'asc'; // New column, start with ascending
+        } else {
+          // Toggle through: asc -> desc -> null (if 3-state sorting) -> asc
+          if (prevDirection === 'asc') return 'desc';
+          if (prevDirection === 'desc') return null;
+          return 'asc';
+        }
+      });
+      return field;
+    });
   }, []);
   
-  // Helper to check sort state for a given field
-  const isSorted = useCallback(
-    (field: SortableField) => {
-      return sortState.field === field ? sortState.direction : null;
-    },
-    [sortState]
-  );
+  // Helper to check if a column is sorted
+  const isSorted = useCallback((field: T): SortDirection => {
+    return field === sortField ? sortDirection : null;
+  }, [sortField, sortDirection]);
   
-  // Update data when source data or sort state changes
-  const updateData = useCallback((newData: T[]) => {
-    if (sortState.field && sortState.direction) {
-      const sortedData = [...newData].sort((a, b) => {
-        const fieldA = a[sortState.field as keyof T];
-        const fieldB = b[sortState.field as keyof T];
-        
-        // Safe comparison that handles different types
-        const compareValues = (valA: any, valB: any): number => {
-          // Handle null/undefined values
-          if (valA == null && valB == null) return 0;
-          if (valA == null) return -1;
-          if (valB == null) return 1;
-          
-          // Handle string comparison
-          if (typeof valA === 'string' && typeof valB === 'string') {
-            return valA.localeCompare(valB);
-          }
-          
-          // Handle number comparison
-          if (typeof valA === 'number' && typeof valB === 'number') {
-            return valA - valB;
-          }
-          
-          // Convert to string for any other type
-          return String(valA).localeCompare(String(valB));
-        };
-        
-        const result = compareValues(fieldA, fieldB);
-        return sortState.direction === 'asc' ? result : -result;
-      });
-      
-      setData(sortedData);
-    } else {
-      setData(newData);
-    }
-  }, [sortState]);
-  
-  // For compatibility with existing code using sortField and sortDirection
-  const sortField = sortState.field;
-  const sortDirection = sortState.direction;
-  
-  return { 
-    data, 
-    sortState, 
-    handleSort, 
-    isSorted, 
-    updateData,
-    // Add these for backward compatibility
-    sortField,
-    sortDirection
-  };
+  return { sortField, sortDirection, handleSort, isSorted };
 }
-
-export default useSortableTable;

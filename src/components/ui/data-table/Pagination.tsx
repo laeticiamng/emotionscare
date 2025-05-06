@@ -10,6 +10,8 @@ export interface PaginationControlsProps {
   pageSize?: number;
   onPageSizeChange?: (size: number) => void;
   totalItems?: number;
+  isLoading?: boolean;
+  pageSizeOptions?: number[];
 }
 
 const Pagination: React.FC<PaginationControlsProps> = ({
@@ -18,7 +20,9 @@ const Pagination: React.FC<PaginationControlsProps> = ({
   onPageChange,
   pageSize,
   onPageSizeChange,
-  totalItems
+  totalItems,
+  isLoading = false,
+  pageSizeOptions = [10, 25, 50, 100]
 }) => {
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
@@ -30,7 +34,7 @@ const Pagination: React.FC<PaginationControlsProps> = ({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(1)}
-          disabled={!canGoPrevious}
+          disabled={!canGoPrevious || isLoading}
           aria-label="First page"
         >
           <ChevronsLeft className="h-4 w-4" />
@@ -39,7 +43,7 @@ const Pagination: React.FC<PaginationControlsProps> = ({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={!canGoPrevious}
+          disabled={!canGoPrevious || isLoading}
           aria-label="Previous page"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -55,7 +59,7 @@ const Pagination: React.FC<PaginationControlsProps> = ({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={!canGoNext}
+          disabled={!canGoNext || isLoading}
           aria-label="Next page"
         >
           <ChevronRight className="h-4 w-4" />
@@ -64,7 +68,7 @@ const Pagination: React.FC<PaginationControlsProps> = ({
           variant="outline"
           size="icon"
           onClick={() => onPageChange(totalPages)}
-          disabled={!canGoNext}
+          disabled={!canGoNext || isLoading}
           aria-label="Last page"
         >
           <ChevronsRight className="h-4 w-4" />
@@ -79,11 +83,11 @@ const Pagination: React.FC<PaginationControlsProps> = ({
             className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm"
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            disabled={isLoading}
           >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>{size}</option>
+            ))}
           </select>
           <span className="text-sm text-muted-foreground">par page</span>
         </div>

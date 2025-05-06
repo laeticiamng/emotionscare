@@ -5,7 +5,7 @@ import { Table } from '@/components/ui/table';
 import InfiniteScroll from '@/components/ui/data-table/InfiniteScroll';
 import { useSortableTable } from '@/hooks/useSortableTable';
 import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField } from './types/tableTypes';
+import { SortableField, SortableTableOptions } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
 import { useSelectedUsers } from '@/hooks/useSelectedUsers';
@@ -22,7 +22,7 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
   const { sortField, sortDirection, handleSort, isSorted } = useSortableTable<SortableField>({
     storageKey: 'user-table-infinite-sort',
     persistInUrl: true
-  });
+  } as SortableTableOptions<SortableField>);
   
   // Table data management
   const {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -46,6 +45,7 @@ const ActivityLogsTab: React.FC = () => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   
+  // Fetch anonymous activities function
   const fetchAnonymousActivities = async () => {
     setIsLoading(true);
     setError(null);
@@ -144,10 +144,10 @@ const ActivityLogsTab: React.FC = () => {
           activity.count,
           activity.timestamp_day
         ].join(',');
-      });
+      }).join('\n');
       fileName = 'activites_anonymes.csv';
       
-      const csv = [csvHeaders.join(','), ...csvContent].join('\n');
+      const csv = [csvHeaders.join(','), csvContent].join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       
@@ -165,10 +165,10 @@ const ActivityLogsTab: React.FC = () => {
           stat.total_count,
           `${stat.percentage}%`
         ].join(',');
-      });
+      }).join('\n');
       fileName = 'statistiques_activites.csv';
       
-      const csv = [csvHeaders.join(','), ...csvContent].join('\n');
+      const csv = [csvHeaders.join(','), csvContent].join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       
