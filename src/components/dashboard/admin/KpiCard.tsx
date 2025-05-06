@@ -75,7 +75,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
         {delta && <KpiCardBadge delta={delta} isLoading={isLoading} />}
         
         {subtitle && (
-          <div className="mt-1">
+          <div className="mt-2">
             {isLoading ? (
               <Skeleton className="h-4 w-full" />
             ) : (

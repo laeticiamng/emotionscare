@@ -23,7 +23,7 @@ const ChartCard: React.FC<ChartCardProps> = ({
 }) => {
   return (
     <Card className="glass-card overflow-hidden">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-0">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg">
             {isLoading ? <Skeleton className="h-6 w-40" /> : title}

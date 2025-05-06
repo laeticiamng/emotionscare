@@ -18,7 +18,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const { activeDimension, activeOption } = useSegment();
   
   return (
-    <div className="mb-10 animate-fade-in">
+    <div className="mb-8 animate-fade-in">
       <div className="flex flex-col md:flex-row items-start justify-between">
         <div>
           <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>

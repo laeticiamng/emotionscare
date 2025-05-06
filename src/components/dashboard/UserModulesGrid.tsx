@@ -55,23 +55,23 @@ const UserModulesGrid: React.FC = () => {
       {modules.map((module, index) => (
         <div 
           key={module.title}
-          className={`module-card ${module.bgClass} cursor-pointer rounded-3xl shadow-soft hover:shadow-medium border border-white/50 p-5 transition-all duration-300 hover:translate-y-[-4px]`}
+          className={`module-card ${module.bgClass} cursor-pointer rounded-3xl shadow-soft hover:shadow-medium border border-white/50 p-4 transition-all duration-300 hover:translate-y-[-4px]`}
           onClick={() => navigate(module.path)}
           style={{ animationDelay: `${0.1 * index}s` }}
         >
           <div className="flex flex-col h-full">
             <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-full bg-white/50 backdrop-blur-sm">
+              <div className="p-2 rounded-full bg-white/50 backdrop-blur-sm">
                 <module.icon className="h-6 w-6 text-cocoon-600" />
               </div>
               
-              <div className="text-xs font-medium text-cocoon-700 bg-white/70 backdrop-blur-sm px-3 py-1 rounded-full">
+              <div className="text-xs font-medium text-cocoon-700 bg-white/70 backdrop-blur-sm px-2 py-1 rounded-full">
                 {module.indicator}
               </div>
             </div>
             
             <div className="flex-grow">
-              <h3 className="font-semibold text-lg mb-1">{module.title}</h3>
+              <h3 className="font-semibold text-lg mb-2">{module.title}</h3>
               <p className="text-sm text-muted-foreground">{module.description}</p>
             </div>
             

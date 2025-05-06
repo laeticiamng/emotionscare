@@ -47,7 +47,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({
       
       {/* Time range selector in a separate card */}
       <Card className={cn(
-        "col-span-1 lg:col-span-2 p-4 flex flex-wrap gap-4 justify-center transition-opacity duration-200",
+        "col-span-1 lg:col-span-2 p-4 flex flex-wrap gap-2 justify-center transition-opacity duration-200",
         isLoading && "opacity-70 pointer-events-none"
       )}>
         <button

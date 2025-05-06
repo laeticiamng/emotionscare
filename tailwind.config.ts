@@ -1,4 +1,3 @@
-
 import { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import anim from "tailwindcss-animate";
@@ -152,6 +151,11 @@ const config = {
         'premium-pastel': 'linear-gradient(135deg, rgba(237,244,255,1) 0%, rgba(230,240,255,1) 100%)',
       },
       spacing: {
+        '1': '4px',
+        '2': '8px',
+        '4': '16px',
+        '6': '24px',
+        '8': '32px',
         '18': '4.5rem',
         '22': '5.5rem',
       },

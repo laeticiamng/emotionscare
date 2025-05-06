@@ -5,12 +5,12 @@
 }
 
 .premium-section {
-  @apply py-8 md:py-12;
+  @apply py-8 md:py-8;
 }
 
 /* Spacious content sections */
 .content-spacious {
-  @apply space-y-6 md:space-y-8;
+  @apply space-y-6;
 }
 
 /* Card hover effects */

@@ -56,9 +56,9 @@ const Layout = ({ children }: LayoutProps) => {
           'w-full'
         }`}>
           <main className={`animate-fade-in ${
-            isMobile ? 'w-full px-4 py-6' : 
+            isMobile ? 'w-full px-4 py-4' : 
             isHomePage && !isAuthenticated ? 'w-full p-0' : 
-            'w-full max-w-[1400px] mx-auto py-8 px-8 md:px-10 lg:px-12'
+            'w-full max-w-[1400px] mx-auto py-8 px-8'
           }`}>
             {children || <Outlet />}
           </main>

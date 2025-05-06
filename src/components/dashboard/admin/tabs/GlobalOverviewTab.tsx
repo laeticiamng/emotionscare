@@ -109,9 +109,9 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       </div>
       
       {isEmpty ? (
-        <div className="text-center p-12 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+        <div className="text-center p-4 bg-gray-50 dark:bg-gray-800/40 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
           <h3 className="text-xl font-semibold mb-2">Aucun widget sélectionné</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
             Vous n'avez aucun widget activé sur votre tableau de bord.
           </p>
           <Button onClick={() => setIsSettingsOpen(true)}>

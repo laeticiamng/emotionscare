@@ -41,7 +41,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   
   return (
     <div className="animate-fade-in w-full">
-      <div className="flex justify-between items-center flex-wrap gap-3 mb-8">
+      <div className="flex justify-between items-center flex-wrap gap-2 mb-8">
         <DashboardHeader user={user} />
         {!isMobile && (
           <Button 
@@ -71,7 +71,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         {/* Main Content Area */}
         <div className="dashboard-main">
           {/* Emotion Scan Section */}
-          <div className="card-premium p-6 lg:p-8">
+          <div className="card-premium p-4 lg:p-4">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('emotionScan')}
@@ -85,7 +85,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
             </div>
             
             {!collapsedSections.emotionScan && (
-              <div className="mt-6">
+              <div className="mt-4">
                 <EmotionScanSection />
               </div>
             )}
@@ -93,7 +93,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           
           {/* Social Section - Only in full view */}
           {(!minimalView || isMobile) && (
-            <div className="card-premium p-6 lg:p-8 mt-6">
+            <div className="card-premium p-4 lg:p-4 mt-6">
               <div 
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleSection('social')}
@@ -105,7 +105,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
               </div>
               
               {!collapsedSections.social && (
-                <div className="mt-6">
+                <div className="mt-4">
                   <SocialCocoonWidget />
                 </div>
               )}
@@ -116,7 +116,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         {/* Side Panel */}
         <div className="dashboard-side">
           {/* User Side Panel */}
-          <div className="card-premium p-6 lg:p-8">
+          <div className="card-premium p-4 lg:p-4">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('sidePanel')}
@@ -128,14 +128,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
             </div>
             
             {!collapsedSections.sidePanel && (
-              <div className="mt-6">
+              <div className="mt-4">
                 <UserSidePanel />
               </div>
             )}
           </div>
           
           {/* VR Prompt Widget */}
-          <div className="card-premium p-6 lg:p-8 mt-6">
+          <div className="card-premium p-4 lg:p-4 mt-6">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('vr')}
@@ -147,7 +147,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
             </div>
             
             {!collapsedSections.vr && (
-              <div className="mt-6">
+              <div className="mt-4">
                 <VRPromptWidget 
                   userId={user?.id || '00000000-0000-0000-0000-000000000000'} 
                   latestEmotion={latestEmotion}
@@ -158,7 +158,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           
           {/* Gamification Widget - Only in full view or on mobile */}
           {(!minimalView || isMobile) && (
-            <div className="card-premium p-6 lg:p-8 mt-6">
+            <div className="card-premium p-4 lg:p-4 mt-6">
               <div 
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleSection('gamification')}
@@ -170,7 +170,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
               </div>
               
               {!collapsedSections.gamification && (
-                <div className="mt-6">
+                <div className="mt-4">
                   <GamificationWidget />
                 </div>
               )}

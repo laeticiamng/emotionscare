@@ -105,8 +105,8 @@ export const ZoomableChart: React.FC<ZoomableChartProps> = ({
             startIndex={startIndex}
             endIndex={endIndex}
             onChange={handleBrushChange}
-            gap={5}
-            y={10}
+            gap={4}
+            y={8}
             alwaysShowText={false}
           />
         </ChartContainer>
