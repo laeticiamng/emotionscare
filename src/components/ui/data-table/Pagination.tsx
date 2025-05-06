@@ -9,6 +9,7 @@ export interface PaginationControlsProps {
   onPageChange: (page: number) => void;
   pageSize?: number;
   onPageSizeChange?: (size: number) => void;
+  totalItems?: number;
 }
 
 const Pagination: React.FC<PaginationControlsProps> = ({
@@ -16,7 +17,8 @@ const Pagination: React.FC<PaginationControlsProps> = ({
   totalPages,
   onPageChange,
   pageSize,
-  onPageSizeChange
+  onPageSizeChange,
+  totalItems
 }) => {
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
@@ -46,6 +48,7 @@ const Pagination: React.FC<PaginationControlsProps> = ({
         {/* Pages display */}
         <span className="text-sm text-muted-foreground">
           Page {currentPage} sur {totalPages}
+          {totalItems !== undefined && ` (${totalItems} éléments)`}
         </span>
 
         <Button

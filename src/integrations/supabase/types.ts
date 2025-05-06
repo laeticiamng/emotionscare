@@ -747,7 +747,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_activity_log_cleanup_job: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      get_activity_stats: {
+        Args: { p_start_date?: string; p_end_date?: string }
+        Returns: {
+          activity_type: string
+          total_count: number
+          percentage: number
+        }[]
+      }
+      get_anonymous_activity_logs: {
+        Args: {
+          p_start_date?: string
+          p_end_date?: string
+          p_activity_type?: string
+          p_search_term?: string
+          p_page?: number
+          p_page_size?: number
+        }
+        Returns: {
+          id: string
+          activity_type: string
+          category: string
+          count: number
+          timestamp_day: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

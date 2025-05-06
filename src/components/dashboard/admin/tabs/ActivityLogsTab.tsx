@@ -136,7 +136,7 @@ const ActivityLogsTab: React.FC = () => {
     let fileName = '';
     
     if (activeTab === 'daily') {
-      const headers = ['Type d\'activité', 'Catégorie', 'Nombre', 'Date'];
+      const csvHeaders = ['Type d\'activité', 'Catégorie', 'Nombre', 'Date'];
       csvContent = anonymousActivities.map(activity => {
         return [
           activity.activity_type,
@@ -146,8 +146,19 @@ const ActivityLogsTab: React.FC = () => {
         ].join(',');
       });
       fileName = 'activites_anonymes.csv';
+      
+      const csv = [csvHeaders.join(','), ...csvContent].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
-      const headers = ['Type d\'activité', 'Total', 'Pourcentage'];
+      const csvHeaders = ['Type d\'activité', 'Total', 'Pourcentage'];
       csvContent = activityStats.map(stat => {
         return [
           stat.activity_type,
@@ -156,18 +167,18 @@ const ActivityLogsTab: React.FC = () => {
         ].join(',');
       });
       fileName = 'statistiques_activites.csv';
+      
+      const csv = [csvHeaders.join(','), ...csvContent].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-    
-    const csv = [headers.join(','), ...csvContent].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
   
   const clearFilters = () => {

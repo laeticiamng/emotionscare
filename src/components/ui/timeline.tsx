@@ -8,7 +8,7 @@ const Timeline = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("space-y-6", className)}
+    className={cn("space-y-4", className)}
     {...props}
   />
 ));
@@ -20,7 +20,7 @@ const TimelineItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("relative pb-6 pl-6", className)}
+    className={cn("relative pb-4", className)}
     {...props}
   />
 ));
@@ -32,7 +32,7 @@ const TimelineHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center mb-1", className)}
+    className={cn("flex items-center gap-2", className)}
     {...props}
   />
 ));
@@ -45,7 +45,7 @@ const TimelineIcon = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "absolute left-0 flex items-center justify-center w-6 h-6 rounded-full bg-background border border-border -translate-x-1/2",
+      "flex h-7 w-7 items-center justify-center rounded-full border bg-background",
       className
     )}
     {...props}
@@ -54,12 +54,12 @@ const TimelineIcon = React.forwardRef<
 TimelineIcon.displayName = "TimelineIcon";
 
 const TimelineTitle = React.forwardRef<
-  HTMLParagraphElement,
+  HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-base font-medium", className)}
+    className={cn("font-medium", className)}
     {...props}
   />
 ));
@@ -71,19 +71,19 @@ const TimelineContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("ml-2 relative", className)}
+    className={cn("pl-[38px] pt-2", className)}
     {...props}
   />
 ));
 TimelineContent.displayName = "TimelineContent";
 
 const TimelineBody = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <p
+  <div
     ref={ref}
-    className={cn("text-muted-foreground", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ));
@@ -96,5 +96,5 @@ export {
   TimelineIcon,
   TimelineTitle,
   TimelineContent,
-  TimelineBody,
+  TimelineBody
 };

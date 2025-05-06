@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -11,7 +12,7 @@ import ComplianceTab from './tabs/ComplianceTab';
 import WeatherActivitiesTab from './tabs/weather/WeatherActivitiesTab';
 import AdminSettingsTab from './tabs/AdminSettingsTab';
 import UsersListTab from './tabs/UsersListTab';
-import ActivityLogsTab from '../tabs/ActivityLogsTab';
+import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
 
 interface AdminTabContentsProps {

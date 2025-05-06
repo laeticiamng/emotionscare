@@ -1,18 +1,34 @@
 
-export type SortableField = "name" | "email" | "role" | "emotional_score" | "anonymity_code";
+export type SortableField = 'id' | 'name' | 'email' | 'role' | 'location' | 'department' | 'createdAt' | 'lastActivity' | 'status' | string;
 
-export interface UserData {
+export interface SortableColumn {
+  key: SortableField;
+  label: string;
+}
+
+export interface SortableFieldConfig {
+  field: SortableField;
+  storageKey?: string;
+  label: string;
+}
+
+export interface TableFilter {
+  id: string;
+  label: string;
+  options: { label: string; value: string }[];
+  defaultValue?: string;
+  placeholder?: string;
+}
+
+export interface UserTableRow {
   id: string;
   name: string;
   email: string;
   role: string;
-  avatar?: string;
-  emotional_score?: number;
-  anonymity_code?: string;
-}
-
-// New interface for bulk actions
-export interface BulkActionProps {
-  selectedUsers: string[];
-  onClearSelection: () => void;
+  department: string;
+  location: string;
+  status: string;
+  createdAt: string;
+  lastActivity?: string;
+  [key: string]: any;
 }
