@@ -1,44 +1,46 @@
 
 import { AnonymousActivity, ActivityStats } from '@/components/dashboard/admin/tabs/activity-logs/types';
 
+// Mock data for anonymous activities (daily view)
 export const mockActivities: AnonymousActivity[] = [
   {
     id: '1',
     activity_type: 'login',
-    category: 'authentification',
+    category: 'authentication',
     count: 25,
     timestamp_day: '2023-07-01'
   },
   {
     id: '2',
     activity_type: 'scan_emotion',
-    category: 'bien-être',
+    category: 'wellness',
     count: 18,
     timestamp_day: '2023-07-01'
   },
   {
     id: '3',
-    activity_type: 'consultation',
-    category: 'activités',
+    activity_type: 'journal_entry',
+    category: 'wellness',
     count: 12,
-    timestamp_day: '2023-07-01'
+    timestamp_day: '2023-07-02'
   },
   {
     id: '4',
-    activity_type: 'login',
-    category: 'authentification',
-    count: 28,
-    timestamp_day: '2023-06-30'
+    activity_type: 'vr_session',
+    category: 'wellness',
+    count: 8,
+    timestamp_day: '2023-07-02'
   },
   {
     id: '5',
-    activity_type: 'scan_emotion',
-    category: 'bien-être',
-    count: 22,
-    timestamp_day: '2023-06-30'
+    activity_type: 'profile_update',
+    category: 'account',
+    count: 5,
+    timestamp_day: '2023-07-03'
   }
 ];
 
+// Mock data for activity statistics (stats view)
 export const mockStats: ActivityStats[] = [
   {
     activity_type: 'login',
@@ -51,18 +53,18 @@ export const mockStats: ActivityStats[] = [
     percentage: 26.5
   },
   {
-    activity_type: 'consultation',
-    total_count: 48,
-    percentage: 15.5
+    activity_type: 'journal_entry',
+    total_count: 54,
+    percentage: 17.5
   },
   {
-    activity_type: 'commentaire',
-    total_count: 35,
-    percentage: 11.3
+    activity_type: 'vr_session',
+    total_count: 32,
+    percentage: 10.4
   },
   {
-    activity_type: 'autre',
-    total_count: 19,
-    percentage: 6.2
+    activity_type: 'profile_update',
+    total_count: 16,
+    percentage: 5.1
   }
 ];

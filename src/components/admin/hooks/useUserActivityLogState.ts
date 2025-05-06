@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { AnonymousActivity, ActivityStats, ActivityTabView } from '../../dashboard/admin/tabs/activity-logs/types';
-import { getActivityData, getActivityStats } from '@/lib/activity/activityDataService';
+import { getActivityData, getActivityStats } from '@/lib/activityLogService';
 import { useToast } from '@/hooks/use-toast';
 
 interface UseUserActivityLogStateResult {
