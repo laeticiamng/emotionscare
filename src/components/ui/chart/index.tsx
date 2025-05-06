@@ -9,4 +9,6 @@ export { ChartInteractiveLegend } from "./ChartInteractiveLegend";
 export { ChartStyle } from "./ChartStyle";
 export { ZoomableChart } from "./ZoomableChart";
 export { ChartControls } from "./ChartControls";
+export { ChartDateRange } from "./ChartDateRange";
+export { useChartZoom } from "./hooks/useChartZoom";
 export { useChart } from "./context";
