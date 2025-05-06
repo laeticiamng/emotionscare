@@ -72,6 +72,19 @@ const config = {
           200: "#D6D9E0",
           100: "#F1F2F5",
         },
+        cocoon: {
+          50: "#F5F7FA",
+          100: "#E6F0FF",
+          200: "#CCE0FF",
+          300: "#99C0FF", 
+          400: "#66A0FF",
+          500: "#3380FF",
+          600: "#0066FF",
+          700: "#0052CC",
+          800: "#003D99",
+          900: "#002966",
+          950: "#001A40"
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -87,9 +100,14 @@ const config = {
         'dark-medium': '0 10px 30px rgba(0, 0, 0, 0.3)',
         'premium': '0 20px 40px rgba(0, 0, 0, 0.1)',
         'premium-dark': '0 20px 40px rgba(0, 0, 0, 0.3)',
+        'premium-light': '0 10px 30px -5px rgba(0, 0, 0, 0.08)',
+        'premium-card': '0 12px 24px -6px rgba(0, 0, 0, 0.12)',
+        'button-premium': '0 4px 10px -2px rgba(0, 0, 0, 0.1)',
       },
       fontFamily: {
         sans: ["Inter var", "SF Pro Display", ...fontFamily.sans],
+        system: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
+        apple: ["SF Pro Display", "-apple-system", "BlinkMacSystemFont", "Helvetica", "Arial", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -108,21 +126,45 @@ const config = {
           "0%": { opacity: "0", transform: "scale(0.97)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
+        "slide-in-right": {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0)" }
+        },
+        "slide-in-left": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.4s ease-out forwards",
         "scale-in": "scale-in 0.3s ease-out forwards",
+        "slide-in-right": "slide-in-right 0.3s ease-out",
+        "slide-in-left": "slide-in-left 0.3s ease-out",
       },
       backgroundImage: {
         'dark-gradient': 'linear-gradient(to bottom right, #1F2430, #353A47)',
         'light-gradient': 'linear-gradient(to bottom right, #FFFFFF, #F0F4F8)',
         'pastel-gradient': 'linear-gradient(to bottom right, #F0F8FF, #E0F0FF)',
+        'premium-light': 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(246,249,252,1) 100%)',
+        'premium-dark': 'linear-gradient(135deg, rgba(31,36,48,1) 0%, rgba(36,41,56,1) 100%)',
+        'premium-pastel': 'linear-gradient(135deg, rgba(237,244,255,1) 0%, rgba(230,240,255,1) 100%)',
       },
       spacing: {
         '18': '4.5rem',
         '22': '5.5rem',
+      },
+      transitionProperty: {
+        'height': 'height',
+        'spacing': 'margin, padding',
+      },
+      transitionTimingFunction: {
+        'apple': 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+      },
+      transitionDuration: {
+        '250': '250ms',
+        '350': '350ms',
       },
     },
   },

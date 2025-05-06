@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,14 +7,14 @@
   /* Light theme - Premium clean white */
   :root,
   .light {
-    --background: 0 0% 99%;
-    --foreground: 220 20% 16%;
+    --background: 0 0% 100%;
+    --foreground: 220 25% 16%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 16%;
+    --card-foreground: 220 25% 16%;
  
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 16%;
+    --popover-foreground: 220 25% 16%;
  
     --primary: 220 47% 16%;
     --primary-foreground: 210 40% 98%;
@@ -44,25 +45,25 @@
     --wellness-lavender: 240 67% 94%;
   }
  
-  /* Dark theme - Premium dark elegant, mais légèrement éclairci pour une meilleure lisibilité */
+  /* Dark theme - Premium dark elegant */
   .dark {
-    --background: 220 20% 14%; /* Légèrement éclairci pour une meilleure lisibilité */
-    --foreground: 210 40% 98%; /* Texte blanc pur pour contraste optimal */
+    --background: 220 20% 12%; 
+    --foreground: 210 40% 98%;
  
-    --card: 220 20% 16%; /* Cartes légèrement plus claires que le fond */
+    --card: 220 20% 14%;
     --card-foreground: 210 40% 98%;
  
-    --popover: 220 20% 16%;
+    --popover: 220 20% 14%;
     --popover-foreground: 210 40% 98%;
  
     --primary: 210 40% 98%;
     --primary-foreground: 220 47% 16%;
  
-    --secondary: 220 15% 25%; /* Secondaire plus distinctif */
+    --secondary: 220 15% 25%;
     --secondary-foreground: 210 40% 98%;
  
     --muted: 220 15% 25%;
-    --muted-foreground: 215 20% 75%; /* Texte muet plus lisible */
+    --muted-foreground: 215 20% 75%;
  
     --accent: 220 15% 25%;
     --accent-foreground: 210 40% 98%;
@@ -70,47 +71,48 @@
     --destructive: 0 62.8% 40%;
     --destructive-foreground: 210 40% 98%;
  
-    --border: 220 15% 28%; /* Légèrement plus visible */
+    --border: 220 15% 28%;
     --input: 220 15% 25%;
     --ring: 210 40% 90%;
   }
 
-  /* Pastel theme - Subtle blue premium feel - optimisé pour la lisibilité */
+  /* Pastel theme - Subtle blue premium feel */
   .pastel {
-    --background: 210 50% 97%; /* Bleu pastel très subtil */
-    --foreground: 220 25% 20%; /* Texte plus foncé pour meilleur contraste */
+    --background: 210 60% 98%;
+    --foreground: 220 25% 20%;
 
-    --card: 210 40% 98%;
+    --card: 210 50% 99%;
     --card-foreground: 220 25% 20%;
  
-    --popover: 210 40% 98%;
+    --popover: 210 50% 99%;
     --popover-foreground: 220 25% 20%;
  
-    --primary: 210 70% 50%; /* Bleu premium */
+    --primary: 210 70% 50%;
     --primary-foreground: 0 0% 100%;
  
-    --secondary: 210 40% 90%;
+    --secondary: 210 50% 92%;
     --secondary-foreground: 220 47% 16%;
  
-    --muted: 210 40% 90%;
-    --muted-foreground: 220 20% 40%; /* Meilleur contraste */
+    --muted: 210 50% 92%;
+    --muted-foreground: 220 20% 40%;
  
-    --accent: 210 40% 85%;
+    --accent: 210 50% 88%;
     --accent-foreground: 220 47% 16%;
  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 40% 80%;
-    --input: 210 40% 80%;
+    --border: 210 50% 85%;
+    --input: 210 50% 85%;
     --ring: 210 70% 50%;
   }
 
-  /* Font configuration for all themes - Typographie optimisée */
+  /* Font configuration for all themes - Typographie optimisée et harmonisée */
   html {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-family: "Inter var", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 }
  
@@ -124,9 +126,10 @@
     letter-spacing: -0.011em;
   }
 
-  /* Typography styling - Amélioré pour une lisibilité optimale */
+  /* Typography styling - Amélioré pour une lisibilité optimale et harmonisée */
   h1, h2, h3, h4, h5, h6 {
     @apply font-medium tracking-tight leading-tight;
+    font-family: "Inter var", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   
   h1 {
@@ -275,16 +278,22 @@
   @apply hover:shadow-[0_6px_12px_rgba(0,0,0,0.3)];
 }
 
-/* Improved transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+/* Improved spacing */
+.content-with-spacing {
+  @apply p-6 md:p-8 lg:p-10;
+}
+
+.card-with-spacing {
+  @apply p-6 md:p-8;
+}
+
+.section-with-spacing {
+  @apply py-8 md:py-10 lg:py-12;
 }
 
 /* Premium layout classes */
 .premium-layout {
-  @apply max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8;
+  @apply max-w-7xl mx-auto w-full px-6 sm:px-8 lg:px-10;
 }
 
 .premium-section {
@@ -313,3 +322,31 @@
   @apply hover:shadow-md;
 }
 
+/* New premium styles */
+.premium-gradient-light {
+  background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(246,249,252,1) 100%);
+}
+
+.premium-gradient-dark {
+  background: linear-gradient(135deg, rgba(31,36,48,1) 0%, rgba(36,41,56,1) 100%);
+}
+
+.premium-gradient-pastel {
+  background: linear-gradient(135deg, rgba(237,244,255,1) 0%, rgba(230,240,255,1) 100%);
+}
+
+/* Apple-style text */
+.apple-text {
+  @apply font-medium tracking-tight;
+  letter-spacing: -0.02em;
+}
+
+.apple-heading {
+  @apply font-semibold tracking-tight;
+  letter-spacing: -0.03em;
+}
+
+/* Improved focus states */
+.focus-premium {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background;
+}

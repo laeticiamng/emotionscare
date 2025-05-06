@@ -1,3 +1,4 @@
+
 /* Premium UI Enhancements */
 
 /* Glassmorphism Cards */
@@ -28,15 +29,15 @@
 }
 
 .light .btn-premium {
-  @apply hover:shadow-md;
+  @apply shadow-button-premium hover:shadow-md;
 }
 
 .dark .btn-premium {
-  @apply hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)];
+  @apply shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.25)];
 }
 
 .pastel .btn-premium {
-  @apply hover:shadow-md;
+  @apply shadow-button-premium hover:shadow-md;
 }
 
 /* Elegant Section Spacing */
@@ -47,6 +48,7 @@
 /* Premium Typography */
 .heading-elegant {
   @apply font-medium tracking-tight;
+  letter-spacing: -0.02em;
 }
 
 /* Premium Transitions */
@@ -60,59 +62,63 @@
 }
 
 .light .card-premium {
-  @apply border-gray-100/50 bg-white shadow-sm hover:shadow-md;
+  @apply border-gray-100/50 bg-white shadow-premium-light hover:shadow-premium-card;
 }
 
 .dark .card-premium {
-  @apply border-gray-800/50 bg-[#1F2430] shadow-md hover:shadow-lg;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  @apply border-gray-800/50 bg-[#1F2430] shadow-premium-dark hover:shadow-[0_15px_35px_rgba(0,0,0,0.25)];
 }
 
 .pastel .card-premium {
-  @apply border-blue-100/70 bg-blue-50/80 shadow-sm hover:shadow-md;
+  @apply border-blue-100/70 bg-blue-50/80 shadow-premium-light hover:shadow-premium-card;
 }
 
-/* Premium Layout Spacing */
-.content-premium {
-  @apply space-y-8 md:space-y-12;
+/* Dashboard Grid Layout */
+.dashboard-premium {
+  @apply grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8;
+}
+
+.dashboard-main {
+  @apply lg:col-span-3 space-y-6 lg:space-y-8;
+}
+
+.dashboard-side {
+  @apply lg:col-span-2 space-y-6 lg:space-y-8;
 }
 
 /* Apple-inspired Design Elements */
 .premium-card {
-  @apply rounded-2xl border shadow-md overflow-hidden transition-all;
+  @apply rounded-2xl border shadow-premium-card overflow-hidden transition-all;
 }
 
 .light .premium-card {
   @apply border-gray-100/70 bg-white;
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
 }
 
 .dark .premium-card {
   @apply border-gray-800/70 bg-[#1F2430];
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.25);
 }
 
 .pastel .premium-card {
   @apply border-blue-100/70 bg-blue-50/90;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
 }
 
 /* Enhanced Glassmorphism Effect */
-.glassmorphism {
+.premium-glass {
   @apply backdrop-blur-lg border transition-all;
 }
 
-.light .glassmorphism {
+.light .premium-glass {
   @apply border-gray-100/40 bg-white/80;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-.dark .glassmorphism {
+.dark .premium-glass {
   @apply border-gray-700/40 bg-[#1F2430]/80;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 }
 
-.pastel .glassmorphism {
+.pastel .premium-glass {
   @apply border-blue-200/40 bg-blue-50/80;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
@@ -134,19 +140,20 @@
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
 }
 
-/* Premium Container - Optimized spacing */
-.premium-container {
-  @apply max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-10 xl:px-16;
-}
-
 /* Home page specific styles */
 .home-page {
   overflow-x: hidden;
 }
 
 /* Enhanced Typography */
-.heading-elegant {
-  letter-spacing: -0.02em;
+.text-premium {
+  @apply font-medium;
+  letter-spacing: -0.01em;
+}
+
+.heading-premium {
+  @apply font-semibold;
+  letter-spacing: -0.03em;
 }
 
 /* Hover animations */
@@ -158,31 +165,34 @@
   @apply transition-transform duration-300 ease-in-out transform hover:scale-[1.02];
 }
 
+.hover-subtle {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+.hover-subtle:hover {
+  filter: brightness(1.05);
+}
+
 /* Card improvements */
-.card-premium {
-  @apply rounded-xl lg:rounded-2xl border transition-all duration-300 overflow-hidden;
+.apple-style-card {
+  @apply rounded-xl lg:rounded-2xl border transition-all duration-300;
 }
 
-.light .card-premium {
-  @apply border-gray-200/50 bg-white shadow-sm hover:shadow-md;
+.light .apple-style-card {
+  @apply border-gray-100 bg-white shadow-sm;
 }
 
-.dark .card-premium {
-  @apply border-gray-700/50 bg-[#1F2430] shadow-md hover:shadow-lg;
+.dark .apple-style-card {
+  @apply border-gray-800 bg-[#1F2430] shadow-md;
 }
 
-.pastel .card-premium {
-  @apply border-blue-200/50 bg-blue-50/80 shadow-sm hover:shadow-md;
-}
-
-/* Button enhancements */
-.button-premium {
-  @apply rounded-xl transition-all duration-300 transform hover:-translate-y-0.5;
+.pastel .apple-style-card {
+  @apply border-blue-100 bg-blue-50 shadow-sm;
 }
 
 /* Focus states */
 .focus-premium {
-  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
 }
 
 /* Content spacing */
@@ -190,7 +200,7 @@
   @apply space-y-8 md:space-y-10;
 }
 
-/* Typography enhancements */
+/* Typography improvements */
 .text-balance {
   text-wrap: balance;
 }
@@ -198,10 +208,41 @@
 /* Dynamic spacings based on device */
 @media (max-width: 640px) {
   .card-premium {
-    @apply rounded-xl;
+    @apply rounded-xl p-4;
   }
   
   .premium-container {
     @apply px-4;
   }
+}
+
+/* Icon styles */
+.icon-premium {
+  @apply h-5 w-5 flex-shrink-0;
+}
+
+.icon-premium-lg {
+  @apply h-6 w-6 flex-shrink-0;
+}
+
+/* Button styles */
+.button-premium {
+  @apply rounded-xl px-4 py-2 font-medium transition-all duration-300 focus-premium;
+}
+
+/* Badge premium styles */
+.badge-premium {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.light .badge-premium {
+  @apply bg-primary/10 text-primary;
+}
+
+.dark .badge-premium {
+  @apply bg-primary/20 text-primary-foreground;
+}
+
+.pastel .badge-premium {
+  @apply bg-primary/10 text-primary;
 }

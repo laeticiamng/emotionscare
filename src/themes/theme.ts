@@ -1,7 +1,7 @@
 
 /**
  * theme.ts
- * Exporte les palettes de couleurs pour les différents thèmes de l'application
+ * Définit les palettes de couleurs pour les différents thèmes de l'application
  * Facilite l'accès aux couleurs dans les composants React
  */
 
@@ -31,10 +31,10 @@ export interface ColorPalette {
 // Palette de couleurs pour le thème clair premium
 export const lightTheme: ColorPalette = {
   name: 'light',
-  background: 'hsl(0, 0%, 99%)',
-  foreground: 'hsl(220, 20%, 16%)',
+  background: 'hsl(0, 0%, 100%)', // Pure white for maximum clarity
+  foreground: 'hsl(220, 25%, 16%)',
   card: 'hsl(0, 0%, 100%)',
-  cardForeground: 'hsl(220, 20%, 16%)',
+  cardForeground: 'hsl(220, 25%, 16%)',
   primary: 'hsl(220, 47%, 16%)',
   primaryForeground: 'hsl(210, 40%, 98%)',
   secondary: 'hsl(210, 40%, 96.1%)',
@@ -71,20 +71,20 @@ export const darkTheme: ColorPalette = {
 // Palette de couleurs pour le thème pastel premium
 export const pastelTheme: ColorPalette = {
   name: 'pastel',
-  background: 'hsl(210, 50%, 97%)',
-  foreground: 'hsl(220, 20%, 16%)',
-  card: 'hsl(210, 40%, 98%)',
-  cardForeground: 'hsl(220, 20%, 16%)',
+  background: 'hsl(210, 60%, 98%)', // Very light blue-ish background
+  foreground: 'hsl(220, 25%, 20%)',
+  card: 'hsl(210, 50%, 99%)',
+  cardForeground: 'hsl(220, 25%, 20%)',
   primary: 'hsl(210, 70%, 50%)',
   primaryForeground: 'hsl(0, 0%, 100%)',
-  secondary: 'hsl(210, 40%, 90%)',
+  secondary: 'hsl(210, 50%, 92%)',
   secondaryForeground: 'hsl(220, 47%, 16%)',
-  accent: 'hsl(210, 40%, 85%)',
+  accent: 'hsl(210, 50%, 88%)',
   accentForeground: 'hsl(220, 47%, 16%)',
-  muted: 'hsl(210, 40%, 90%)',
+  muted: 'hsl(210, 50%, 92%)',
   mutedForeground: 'hsl(220, 15%, 40%)',
-  border: 'hsl(210, 40%, 80%)',
-  input: 'hsl(210, 40%, 80%)',
+  border: 'hsl(210, 50%, 85%)',
+  input: 'hsl(210, 50%, 85%)',
   ring: 'hsl(210, 70%, 50%)',
 };
 

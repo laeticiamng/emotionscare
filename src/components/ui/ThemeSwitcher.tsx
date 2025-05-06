@@ -18,8 +18,9 @@ interface ThemeSwitcherProps {
 }
 
 /**
- * Composant pour changer de thème
+ * Composant premium pour changer de thème
  * Permet à l'utilisateur de basculer entre les thèmes clair, sombre et pastel
+ * avec une interface soignée de style Apple
  */
 const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   variant = 'outline',
@@ -52,10 +53,10 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           <span className="sr-only">Changer de thème</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[220px] shadow-premium">
+      <DropdownMenuContent align="end" className="min-w-[220px] shadow-premium rounded-xl border p-1">
         <DropdownMenuItem 
           onClick={() => handleThemeChange('light')}
-          className="cursor-pointer py-3"
+          className="cursor-pointer py-3 rounded-lg"
         >
           <Sun className="mr-3 h-5 w-5 text-amber-500" />
           <span className="font-medium">Mode clair</span>
@@ -67,7 +68,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('dark')}
-          className="cursor-pointer py-3"
+          className="cursor-pointer py-3 rounded-lg"
         >
           <Moon className="mr-3 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
           <span className="font-medium">Mode sombre</span>
@@ -79,7 +80,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('pastel')}
-          className="cursor-pointer py-3"
+          className="cursor-pointer py-3 rounded-lg"
         >
           <Palette className="mr-3 h-5 w-5 text-blue-500" />
           <span className="font-medium">Mode pastel</span>

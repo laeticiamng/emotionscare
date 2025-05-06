@@ -43,13 +43,13 @@ function App() {
     <>
       <Suspense fallback={<Loading />}>
         <Routes>
+          {/* Landing page - this is now first in the routes order */}
+          <Route path="/" element={<Layout><Index /></Layout>} />
+          
           {/* Auth routes (no navigation) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
-          
-          {/* Landing page */}
-          <Route path="/" element={<Layout><Index /></Layout>} />
           
           {/* Protected routes (require authentication) */}
           <Route element={<ProtectedLayout><Layout /></ProtectedLayout>}>

@@ -1,38 +1,48 @@
 
-/* 
- * App-specific styles that aren't covered by the component styles
- * This file is kept minimal as most styles are now in the modular CSS files
- */
+/* Import premium styles */
+@import './styles/premium.css';
 
-/* Root container styles */
+/* App-specific styles */
 #root {
-  margin: 0 auto;
-  text-align: center;
+  width: 100%;
 }
 
-/* Legacy styles kept for backward compatibility */
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* Dashboard settings */
+.dashboard-premium {
+  @apply grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8;
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.dashboard-main {
+  @apply lg:col-span-3 space-y-6 lg:space-y-8;
 }
 
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.dashboard-side {
+  @apply lg:col-span-2 space-y-6 lg:space-y-8;
 }
 
-@keyframes logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Make app content fill the screen */
+html, body, #root {
+  height: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Loading animations */
+.loading-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-dots > div {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin: 0 0.25rem;
+  border-radius: 50%;
+  animation: loading-dots 0.6s infinite alternate;
+}
+.loading-dots > div:nth-child(1) { animation-delay: 0s; }
+.loading-dots > div:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots > div:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes loading-dots {
+  0% { transform: scale(0.5); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 1; }
 }
