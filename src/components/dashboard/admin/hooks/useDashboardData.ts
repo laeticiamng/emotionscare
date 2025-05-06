@@ -84,7 +84,9 @@ export const useDashboardStats = () => {
     activeToday: 0,
     averageScore: 0,
     criticalAlerts: 0,
-    completion: 0
+    completion: 0,
+    productivity: { current: 0, trend: 0 },
+    emotionalScore: { current: 0, trend: 0 }
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { activeDimension, activeOption } = useSegment();
@@ -107,7 +109,9 @@ export const useDashboardStats = () => {
         activeToday: activeUsers,
         averageScore: avgScore,
         criticalAlerts: criticalUsers,
-        completion: 92
+        completion: 92,
+        productivity: { current: 85, trend: 3 },
+        emotionalScore: { current: avgScore, trend: 2 }
       });
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);

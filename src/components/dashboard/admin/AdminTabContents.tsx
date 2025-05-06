@@ -23,6 +23,14 @@ interface AdminTabContentsProps {
     averageScore: number;
     criticalAlerts: number;
     completion: number;
+    productivity?: {
+      current: number;
+      trend: number;
+    };
+    emotionalScore?: {
+      current: number;
+      trend: number;
+    };
   };
   isLoading?: boolean;
 }
@@ -35,7 +43,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   isLoading = false
 }) => {
   // Mock data for other tabs
-  const gamificationStats = {
+  const gamificationData = {
     activeUsersPercent: 68,
     totalBadges: 24,
     badgeLevels: [
@@ -50,7 +58,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
     ]
   };
   
-  const socialCocoonStats = {
+  const socialCocoonData = {
     totalPosts: 248,
     moderationRate: 3.2,
     topHashtags: [
@@ -90,6 +98,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
           absenteeismChartData={absenteeismData}
           emotionalScoreTrend={emotionalScoreTrend}
           dashboardStats={dashboardStats}
+          gamificationData={gamificationData}
           isLoading={isLoading}
         />
       </TabsContent>
@@ -103,11 +112,11 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       </TabsContent>
       
       <TabsContent value="social-cocoon" className="mt-0">
-        <SocialCocoonTab socialCocoonData={socialCocoonStats} isLoading={isLoading} />
+        <SocialCocoonTab socialCocoonData={socialCocoonData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="gamification" className="mt-0">
-        <GamificationTab gamificationData={gamificationStats} isLoading={isLoading} />
+        <GamificationTab gamificationData={gamificationData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="evenements" className="mt-0">
@@ -135,7 +144,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       </TabsContent>
       
       <TabsContent value="admin-settings" className="mt-0">
-        <AdminSettingsTab isLoading={isLoading} />
+        <AdminSettingsTab />
       </TabsContent>
     </>
   );

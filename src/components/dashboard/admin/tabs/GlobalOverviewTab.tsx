@@ -88,6 +88,13 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
     );
   }
 
+  // Ensure dashboardStats has the required properties even if they're not provided
+  const completeStats = {
+    ...dashboardStats,
+    productivity: dashboardStats.productivity || { current: 0, trend: 0 },
+    emotionalScore: dashboardStats.emotionalScore || { current: 0, trend: 0 }
+  };
+
   return (
     <div>
       {/* Settings Button */}
@@ -145,7 +152,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
           {/* KPI Summary Cards - conditionally rendered */}
           {enabledWidgets.includes('kpiCards') && (
             <DraggableKpiCardsGrid 
-              dashboardStats={dashboardStats}
+              dashboardStats={completeStats}
               gamificationData={gamificationData}
             />
           )}

@@ -10,11 +10,11 @@ export interface DashboardStats {
   averageScore: number;
   criticalAlerts: number;
   completion: number;
-  productivity?: {
+  productivity: {
     current: number;
     trend: number;
   };
-  emotionalScore?: {
+  emotionalScore: {
     current: number;
     trend: number;
   };
