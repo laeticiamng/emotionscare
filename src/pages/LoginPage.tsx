@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Shield, Lock } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
@@ -25,7 +25,7 @@ const LoginPage = () => {
     try {
       // Pour Sophie, le mot de passe est maintenant "sophie" ou vide
       await login(email, password);
-      // La navigation et les toasts sont gérés dans le contexte d'authentification
+      navigate('/dashboard');
     } catch (error) {
       // Les erreurs sont gérées dans le contexte d'authentification
       console.error("Erreur de connexion:", error);
@@ -91,6 +91,14 @@ const LoginPage = () => {
                   placeholder="••••••••"
                   className="border border-muted"
                 />
+                <div className="flex justify-end">
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
               </div>
             </CardContent>
 

@@ -1,104 +1,116 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Form } from "@/components/ui/form";
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/contexts/ThemeContext';
+import { UserPreferences } from '@/types';
 import ThemeSelectionField from './ThemeSelectionField';
 import FontSizeField from './FontSizeField';
 import ColorAccentField from './ColorAccentField';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserPreferences } from '@/types';
-
-const formSchema = z.object({
-  fontSize: z.enum(['small', 'medium', 'large']),
-  backgroundColor: z.enum(['default', 'blue', 'mint', 'coral']),
-  theme: z.enum(['light', 'dark', 'pastel', 'system'])
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { updateUser } from '@/lib/userService';
 
 const PreferencesForm: React.FC = () => {
-  const { user, updateUserProfile } = useAuth();
-  const { themePreference, setThemePreference } = useTheme();
+  const { user, setUser } = useAuth();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Initialize with default preferences
+  // Initialize with default preferences if user doesn't have them
   const defaultPreferences: UserPreferences = {
-    fontSize: 'medium',
-    backgroundColor: 'default',
-    theme: themePreference || 'system',
-    accentColor: 'blue',
+    theme: "light",
+    fontSize: "medium",
+    backgroundColor: "default",
+    accentColor: "#FF6F61",
     notifications: {
-      email: false,
+      email: true,
       push: true,
       sms: false
     }
   };
   
-  // Merge with user preferences if available
-  const preferences = user?.preferences ? user.preferences : defaultPreferences;
-  
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      fontSize: preferences.fontSize,
-      backgroundColor: preferences.backgroundColor || 'default',
-      theme: preferences.theme || themePreference || 'system',
-    }
-  });
+  // Use user's existing preferences or defaults
+  const [preferences, setPreferences] = useState<UserPreferences>(
+    user?.preferences || defaultPreferences
+  );
 
-  const onSubmit = async (data: FormValues) => {
-    try {
-      // Apply theme immediately
-      setThemePreference(data.theme);
-      
-      // Create complete preferences object
-      const updatedPreferences: UserPreferences = {
-        ...preferences,
-        fontSize: data.fontSize,
-        backgroundColor: data.backgroundColor,
-        theme: data.theme,
-        accentColor: preferences.accentColor || 'blue',
-        notifications: preferences.notifications || {
-          email: false,
-          push: true,
-          sms: false
-        }
-      };
-      
-      // Save preferences to user profile
-      if (user) {
-        await updateUserProfile({
-          ...user,
-          preferences: updatedPreferences
-        });
-      }
-      
-      toast({
-        title: "Préférences sauvegardées",
-        description: "Vos préférences ont été mises à jour avec succès."
-      });
-    } catch (error) {
+  // Update preferences when user changes
+  useEffect(() => {
+    if (user?.preferences) {
+      setPreferences(user.preferences);
+    }
+  }, [user?.preferences]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
       toast({
         title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences.",
+        description: "Vous devez être connecté pour modifier vos préférences",
         variant: "destructive"
       });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Update user with new preferences
+      const updatedUser = await updateUser({
+        ...user,
+        preferences: preferences
+      });
+      
+      setUser(updatedUser);
+      
+      toast({
+        title: "Préférences mises à jour",
+        description: "Vos préférences ont été enregistrées avec succès"
+      });
+    } catch (error) {
+      console.error("Failed to update preferences:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour vos préférences",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <ThemeSelectionField form={form} />
-        <FontSizeField form={form} />
-        <ColorAccentField form={form} />
-        <Button type="submit" className="w-full md:w-auto">Enregistrer mes préférences</Button>
-      </form>
-    </Form>
+    <form onSubmit={handleSubmit}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Préférences d'affichage</CardTitle>
+          <CardDescription>
+            Personnalisez votre expérience sur EmotionsCare
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <ThemeSelectionField 
+            value={preferences.theme} 
+            onChange={(theme) => setPreferences({...preferences, theme})} 
+          />
+          
+          <FontSizeField 
+            value={preferences.fontSize}
+            onChange={(fontSize) => setPreferences({...preferences, fontSize})}
+          />
+          
+          <ColorAccentField 
+            value={preferences.accentColor}
+            onChange={(accentColor) => setPreferences({...preferences, accentColor})}
+          />
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Enregistrement..." : "Enregistrer les préférences"}
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
   );
 };
 

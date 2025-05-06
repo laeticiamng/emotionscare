@@ -26,7 +26,7 @@ export enum UserRole {
 }
 
 export interface UserPreferences {
-  theme: string;
+  theme: "light" | "dark" | "pastel" | "system";
   fontSize: "small" | "medium" | "large";
   accentColor: string;
   backgroundColor?: "default" | "blue" | "mint" | "coral"; 
@@ -50,8 +50,8 @@ export interface Emotion {
   confidence?: number;
   transcript?: string;
   intensity?: number;
-  source?: string; // Added for compatibility with existing code
-  is_confidential?: boolean; // Added for compatibility
+  source?: string; 
+  is_confidential?: boolean;
 }
 
 export interface EmotionResult {
@@ -75,10 +75,10 @@ export interface JournalEntry {
 export interface MoodData {
   date: string;
   value: number;
-  originalDate?: Date; // Added for compatibility
-  sentiment?: number; // Added for compatibility
-  anxiety?: number; // Added for compatibility
-  energy?: number; // Added for compatibility
+  originalDate?: Date;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 export interface Badge {
@@ -88,10 +88,10 @@ export interface Badge {
   description: string;
   image_url?: string;
   awarded_at: string;
-  icon_url?: string; // Added for compatibility
-  threshold?: number; // Added for compatibility
-  category?: string; // Added for compatibility
-  unlocked?: boolean; // Added for compatibility
+  icon_url?: string;
+  threshold?: number;
+  category?: string;
+  unlocked?: boolean;
 }
 
 export interface Report {
@@ -100,16 +100,16 @@ export interface Report {
   date: string;
   data: any;
   type: string;
-  user_id?: string; // Added for compatibility
-  summary?: string; // Added for compatibility
-  mood_score?: number; // Added for compatibility
-  categories?: string[]; // Added for compatibility
-  recommendations?: string[]; // Added for compatibility
-  metric?: string; // Added for compatibility
-  period_start?: string; // Added for compatibility
-  period_end?: string; // Added for compatibility
-  value?: number; // Added for compatibility
-  change_pct?: number; // Added for compatibility
+  user_id?: string;
+  summary?: string;
+  mood_score?: number;
+  categories?: string[];
+  recommendations?: string[];
+  metric?: string;
+  period_start?: string;
+  period_end?: string;
+  value?: number;
+  change_pct?: number;
 }
 
 export interface VRSessionTemplate {
@@ -135,7 +135,7 @@ export interface VRSession {
   is_audio_only?: boolean;
   template_id?: string;
   duration?: number;
-  completed?: boolean; // Added to fix VRSession type errors
+  completed?: boolean;
 }
 
 // Invitation Types
@@ -168,4 +168,23 @@ export interface InvitationVerificationResult {
   message?: string;
   email?: string;
   role?: string;
+}
+
+// Challenge Types
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  category: string;
+  requirements?: string;
+  icon_url?: string;
+}
+
+export interface UserChallenge {
+  id: string;
+  user_id: string;
+  challenge_id: string;
+  date: string;
+  completed: boolean;
 }

@@ -1,99 +1,102 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase-client';
-import { ActivityLog } from '@/components/admin/UserActivityTimeline';
+import { useState, useEffect } from 'react';
+import { AnonymousActivity, ActivityStats } from '@/components/admin/tabs/activity-logs/types';
+import { getActivityData, getActivityStats } from '@/lib/activityLogService';
 
-interface UseUserActivityLogsOptions {
-  userId?: string;
-  limit?: number;
-  page?: number;
+export interface ActivityLogFilters {
+  startDate: string;
+  endDate: string;
+  activityType: string;
+  searchTerm: string;
 }
 
-interface UserActivityLogsResult {
-  logs: ActivityLog[];
-  totalLogs: number;
-  totalPages: number;
-  currentPage: number;
-  isLoading: boolean;
-  error: string | null;
-  fetchLogs: (options?: { page?: number; limit?: number }) => Promise<void>;
-  setPage: (page: number) => void;
-  setLimit: (limit: number) => void;
-}
-
-export const useUserActivityLogs = ({
-  userId,
-  limit: initialLimit = 10,
-  page: initialPage = 1
-}: UseUserActivityLogsOptions = {}): UserActivityLogsResult => {
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [totalLogs, setTotalLogs] = useState(0);
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [limit, setLimit] = useState(initialLimit);
-  const [isLoading, setIsLoading] = useState(false);
+export const useUserActivityLogs = () => {
+  const [activities, setActivities] = useState<AnonymousActivity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<AnonymousActivity[]>([]);
+  const [stats, setStats] = useState<ActivityStats[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  const fetchLogs = useCallback(async (options?: { page?: number; limit?: number }) => {
-    if (!userId) {
-      setLogs([]);
-      setTotalLogs(0);
-      return;
-    }
+  const [filters, setFilters] = useState<ActivityLogFilters>({
+    startDate: '',
+    endDate: '',
+    activityType: 'all',
+    searchTerm: ''
+  });
 
-    const page = options?.page || currentPage;
-    const pageSize = options?.limit || limit;
-    const startIndex = (page - 1) * pageSize;
-    
+  // Fetch activity data
+  const fetchActivityData = async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // First, get the total count for pagination
-      const { count, error: countError } = await supabase
-        .from('user_activity_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId);
+      const [activitiesData, statsData] = await Promise.all([
+        getActivityData(),
+        getActivityStats()
+      ]);
       
-      if (countError) throw new Error(countError.message);
-      
-      // Then fetch the paginated data
-      const { data, error: fetchError } = await supabase
-        .from('user_activity_logs')
-        .select('*')
-        .eq('user_id', userId)
-        .order('timestamp', { ascending: false })
-        .range(startIndex, startIndex + pageSize - 1);
-        
-      if (fetchError) throw new Error(fetchError.message);
-      
-      setLogs(data || []);
-      setTotalLogs(count || 0);
+      setActivities(activitiesData);
+      setFilteredActivities(activitiesData);
+      setStats(statsData);
     } catch (err) {
-      console.error('Error fetching activity logs:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch activity logs');
+      console.error("Error fetching activity data:", err);
+      setError("Impossible de charger les données d'activité");
     } finally {
       setIsLoading(false);
     }
-  }, [userId, currentPage, limit]);
-  
-  // Refetch logs when dependencies change
-  useEffect(() => {
-    fetchLogs();
-  }, [fetchLogs]);
-  
-  const setPage = (page: number) => {
-    setCurrentPage(page);
   };
-  
+
+  // Apply filters
+  const applyFilters = (filters: ActivityLogFilters) => {
+    if (!activities.length) return;
+    
+    let filtered = [...activities];
+    
+    // Apply date filters
+    if (filters.startDate) {
+      filtered = filtered.filter(item => 
+        new Date(item.timestamp_day) >= new Date(filters.startDate)
+      );
+    }
+    
+    if (filters.endDate) {
+      filtered = filtered.filter(item => 
+        new Date(item.timestamp_day) <= new Date(filters.endDate)
+      );
+    }
+    
+    // Apply type filter
+    if (filters.activityType && filters.activityType !== 'all') {
+      filtered = filtered.filter(item => 
+        item.activity_type === filters.activityType
+      );
+    }
+    
+    // Apply search filter
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(item => 
+        item.activity_type.toLowerCase().includes(searchLower) ||
+        item.category.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    setFilteredActivities(filtered);
+  };
+
+  // Apply filters when they change
+  useEffect(() => {
+    applyFilters(filters);
+  }, [filters, activities]);
+
   return {
-    logs,
-    totalLogs,
-    totalPages: Math.ceil(totalLogs / limit),
-    currentPage,
+    activities,
+    filteredActivities,
+    stats,
     isLoading,
     error,
-    fetchLogs,
-    setPage,
-    setLimit,
+    filters,
+    setFilters,
+    fetchActivityData,
+    refreshData: fetchActivityData
   };
 };

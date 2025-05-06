@@ -1,124 +1,181 @@
 
-import { Badge } from "@/types";
-import { Challenge, UserChallenge, UserBadge } from "@/types/gamification";
+import { Badge, Challenge, UserChallenge } from '@/types';
+import { mockBadges } from '@/data/mockBadges';
 
-// Get all badges for a user
-export const getUserBadges = async (userId: string): Promise<Badge[]> => {
-  // In a real app, this would be a fetch call to your API
-  return mockBadges.filter(badge => badge.user_id === userId);
+// Mocked badges data and service functions
+// In a real app, these would make API calls to a server
+
+export const fetchUserBadges = async (userId: string): Promise<Badge[]> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Filter badges by user_id
+      const userBadges = mockBadges.filter(badge => badge.user_id === userId);
+      resolve(userBadges);
+    }, 500);
+  });
 };
 
-// Check if user has earned any new badges
-export const checkForNewBadges = async (userId: string): Promise<Badge[]> => {
-  // Mock logic for badge earning
-  const existingBadges = await getUserBadges(userId);
-  const newBadges: Badge[] = [];
-  
-  // This would contain real logic in a production app
-  return newBadges;
+export const fetchBadgeById = async (badgeId: string): Promise<Badge | null> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const badge = mockBadges.find(b => b.id === badgeId);
+      resolve(badge || null);
+    }, 300);
+  });
 };
 
-// Mock badges data
-const mockBadges: Badge[] = [
-  {
-    id: "1",
-    user_id: "user1",
-    name: "Premier pas",
-    description: "Première utilisation de l'application",
-    icon_url: "/badges/first-steps.svg",
-    threshold: 1,
-    awarded_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    user_id: "user1",
-    name: "Explorateur",
-    description: "A visité toutes les sections de l'application",
-    icon_url: "/badges/explorer.svg",
-    threshold: 5,
-    awarded_at: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    user_id: "user2",
-    name: "Journal intime",
-    description: "A complété 5 entrées de journal",
-    icon_url: "/badges/journal.svg",
-    threshold: 5,
-    awarded_at: new Date().toISOString(),
-  }
-];
-
-// Calculate progress for a specific badge type
-export const calculateBadgeProgress = (
-  userId: string, 
-  badgeType: string, 
-  currentValue: number
-): number => {
-  // This would calculate real progress in a production app
-  return Math.min(100, (currentValue / 5) * 100);
+// Mock available badges for all users
+export const fetchAvailableBadges = async (): Promise<Badge[]> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const availableBadges: Badge[] = [
+        {
+          id: "available-1",
+          user_id: "", // Empty as it's not awarded yet
+          name: "Premier pas",
+          description: "Commencer son parcours de bien-être émotionnel",
+          icon_url: "/badges/first-steps.svg",
+          threshold: 1,
+          awarded_at: ""
+        },
+        {
+          id: "available-2", 
+          user_id: "",
+          name: "Explorateur émotionnel",
+          description: "Découvrir 5 activités différentes",
+          icon_url: "/badges/explorer.svg",
+          threshold: 5,
+          awarded_at: ""
+        },
+        {
+          id: "available-3",
+          user_id: "",
+          name: "Maître Zen",
+          description: "Compléter 10 sessions de méditation",
+          icon_url: "/badges/zen-master.svg",
+          threshold: 10,
+          awarded_at: ""
+        }
+      ];
+      resolve(availableBadges);
+    }, 500);
+  });
 };
 
-// Mock challenges data
+export const fetchBadgesCount = async (userId: string): Promise<number> => {
+  // Simulate API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const userBadges = mockBadges.filter(badge => badge.user_id === userId);
+      resolve(userBadges.length);
+    }, 200);
+  });
+};
+
+// Mock challenges
 const mockChallenges: Challenge[] = [
   {
-    id: "1",
-    title: "Première émotion",
-    description: "Enregistrez votre première émotion",
-    points: 10
+    id: "challenge-1",
+    title: "7 jours de scan émotionnel",
+    description: "Effectuez un scan émotionnel chaque jour pendant une semaine",
+    points: 100,
+    category: "bien-être",
+    requirements: "7 scans consécutifs",
+    icon_url: "/challenges/weekly-scan.svg"
   },
   {
-    id: "2",
-    title: "Journal quotidien",
-    description: "Écrivez une entrée dans votre journal",
-    points: 5
+    id: "challenge-2",
+    title: "Journal de gratitude",
+    description: "Notez 3 choses pour lesquelles vous êtes reconnaissant",
+    points: 50,
+    category: "journal",
+    requirements: "3 entrées de journal",
+    icon_url: "/challenges/gratitude.svg"
   },
   {
-    id: "3",
-    title: "Session de méditation",
-    description: "Complétez une session VR de méditation",
-    points: 15
+    id: "challenge-3",
+    title: "Session VR relaxante",
+    description: "Complétez une session VR de relaxation de 10 minutes",
+    points: 75,
+    category: "vr",
+    requirements: "1 session VR complète",
+    icon_url: "/challenges/vr-session.svg"
   }
 ];
 
-// Mock user challenges data
-const mockUserChallenges: UserChallenge[] = [];
+// Mock user challenges
+const mockUserChallenges: UserChallenge[] = [
+  {
+    id: "user-challenge-1",
+    user_id: "1", // Sophie
+    challenge_id: "challenge-1",
+    date: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+    completed: true
+  },
+  {
+    id: "user-challenge-2",
+    user_id: "1", // Sophie
+    challenge_id: "challenge-2",
+    date: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
+    completed: false
+  }
+];
 
-// Fetch all available challenges
+// Challenge-related functions
 export const fetchChallenges = async (): Promise<Challenge[]> => {
-  // In a real app, this would fetch from an API
-  return mockChallenges;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(mockChallenges);
+    }, 500);
+  });
 };
 
-// Fetch user-specific challenge progress
 export const fetchUserChallenges = async (userId: string): Promise<UserChallenge[]> => {
-  // In a real app, this would fetch from an API with the user ID
-  return mockUserChallenges.filter(uc => uc.user_id === userId);
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const challenges = mockUserChallenges.filter(c => c.user_id === userId);
+      resolve(challenges);
+    }, 500);
+  });
 };
 
-// Complete a challenge for a user
-export const completeChallenge = async (challengeData: UserChallenge): Promise<UserChallenge> => {
-  // In a real app, this would be a POST request to an API
-  const newChallenge = {
-    ...challengeData,
-    id: `uc-${Date.now()}`
-  };
-  
-  mockUserChallenges.push(newChallenge);
-  return newChallenge;
+export const completeChallenge = async (
+  userId: string, 
+  challengeId: string
+): Promise<UserChallenge> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Check if user already has this challenge
+      const existingChallenge = mockUserChallenges.find(
+        c => c.user_id === userId && c.challenge_id === challengeId
+      );
+      
+      if (existingChallenge) {
+        // Update existing challenge
+        existingChallenge.completed = true;
+        existingChallenge.date = new Date().toISOString();
+        resolve(existingChallenge);
+      } else {
+        // Create new completed challenge
+        const newChallenge: UserChallenge = {
+          id: `user-challenge-${Date.now()}`,
+          user_id: userId,
+          challenge_id: challengeId,
+          date: new Date().toISOString(),
+          completed: true
+        };
+        
+        // In a real app, would add to database
+        mockUserChallenges.push(newChallenge);
+        resolve(newChallenge);
+      }
+    }, 700);
+  });
 };
 
-// Mock data for earned badges
-const mockEarnedBadges: UserBadge[] = [];
-
-// Fetch all badges and user's earned badges
 export const fetchBadges = async (userId: string) => {
-  // In a real app, this would fetch from an API
-  const allBadges = mockBadges; // All possible badges
-  const earnedBadges = mockEarnedBadges.filter(eb => eb.user_id === userId);
-  
-  return {
-    all: allBadges,
-    earned: earnedBadges
-  };
+  return fetchUserBadges(userId);
 };

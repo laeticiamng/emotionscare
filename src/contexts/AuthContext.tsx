@@ -1,6 +1,8 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import { loginUser, logoutUser, updateUser as updateUserService } from '@/data/mockUsers';
 
 export interface AuthContextProps {
   user: User | null;
@@ -33,34 +35,68 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { toast } = useToast();
 
-  // Mock login function
+  // Login function
   const login = async (email: string, password: string): Promise<User> => {
-    // Simulate API call
-    const mockUser: User = {
-      id: '1',
-      name: 'Test User',
-      email: email,
-      role: 'user',
-      onboarded: true,
-      anonymity_code: 'ABC123',
-    };
-    
-    setUser(mockUser);
-    setIsAuthenticated(true);
-    return mockUser;
+    try {
+      // Simulate API call
+      const user = await loginUser(email, password);
+      
+      setUser(user);
+      setIsAuthenticated(true);
+      
+      toast({
+        title: "Connexion réussie",
+        description: `Bienvenue, ${user.name}!`,
+      });
+      
+      return user;
+    } catch (error: any) {
+      toast({
+        title: "Erreur de connexion",
+        description: error.message || "Identifiants incorrects. Veuillez réessayer.",
+        variant: "destructive"
+      });
+      throw error;
+    }
   };
 
-  // Mock function to update user profile
+  // Update user profile function
   const updateUserProfile = async (updatedUser: User): Promise<User> => {
-    setUser(updatedUser);
-    return updatedUser;
+    try {
+      const result = await updateUserService(updatedUser);
+      setUser(result);
+      return result;
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de mettre à jour le profil",
+        variant: "destructive"
+      });
+      throw error;
+    }
   };
 
-  // Mock sign out function
+  // Sign out function
   const signOut = async (): Promise<void> => {
-    setUser(null);
-    setIsAuthenticated(false);
+    try {
+      await logoutUser();
+      setUser(null);
+      setIsAuthenticated(false);
+      
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de vous déconnecter",
+        variant: "destructive"
+      });
+      throw error;
+    }
   };
   
   // Alias for signOut for compatibility

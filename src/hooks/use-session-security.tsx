@@ -1,91 +1,88 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
-export function useSessionSecurity(
-  inactivityTimeoutMs: number = 30 * 60 * 1000, // Default 30 minutes
-  warningTimeMs: number = 60 * 1000 // Warning 1 minute before logout
-) {
+interface UseSessionSecurityOptions {
+  sessionTimeout: number;
+  warningTime: number;
+}
+
+// Default options
+const defaultOptions: UseSessionSecurityOptions = {
+  sessionTimeout: 30 * 60 * 1000, // 30 minutes
+  warningTime: 1 * 60 * 1000,    // 1 minute
+};
+
+export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> = {}) => {
+  const { signOut } = useAuth();
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   const [showWarning, setShowWarning] = useState<boolean>(false);
-  const { isAuthenticated, signOut } = useAuth();
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const [timeLeft, setTimeLeft] = useState<number>(0);
 
-  // Function to handle user activity
-  const handleUserActivity = useCallback(() => {
+  // Merge default options with provided options
+  const sessionOptions = {
+    ...defaultOptions,
+    ...options
+  };
+
+  const { sessionTimeout, warningTime } = sessionOptions;
+  const warningThreshold = sessionTimeout - warningTime;
+
+  // Reset the timer when user activity is detected
+  const resetTimer = useCallback(() => {
     setLastActivity(Date.now());
     setShowWarning(false);
   }, []);
 
-  // Check for inactivity
+  // Effect to handle user activity tracking
   useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    // Events to track for user activity
+    const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
     
-    // Add event listeners
+    // Function to update last activity time
+    const updateActivity = () => {
+      resetTimer();
+    };
+    
+    // Add event listeners for each activity type
     activityEvents.forEach(event => {
-      window.addEventListener(event, handleUserActivity);
+      window.addEventListener(event, updateActivity);
     });
-
-    // Set up interval to check inactivity
-    const intervalId = setInterval(() => {
-      const now = Date.now();
-      const timeElapsed = now - lastActivity;
-      
-      // Show warning before logout
-      if (timeElapsed >= inactivityTimeoutMs - warningTimeMs && !showWarning) {
-        setShowWarning(true);
-        toast({
-          title: "Session expiration",
-          description: `Your session will expire in ${Math.round(warningTimeMs / 1000 / 60)} minute(s) due to inactivity.`,
-          duration: warningTimeMs,
-        });
-      }
-      
-      // Logout if inactive
-      if (timeElapsed >= inactivityTimeoutMs) {
-        signOut().then(() => {
-          toast({
-            title: "Session expired",
-            description: "You have been logged out due to inactivity.",
-            variant: "destructive",
-          });
-          navigate('/login');
-        });
-      }
-    }, 10000); // Check every 10 seconds
-
-    // Cleanup
+    
+    // Clean up event listeners
     return () => {
       activityEvents.forEach(event => {
-        window.removeEventListener(event, handleUserActivity);
+        window.removeEventListener(event, updateActivity);
       });
-      clearInterval(intervalId);
     };
-  }, [
-    isAuthenticated, 
-    lastActivity, 
-    handleUserActivity, 
-    inactivityTimeoutMs, 
-    warningTimeMs, 
-    showWarning, 
-    signOut, 
-    toast, 
-    navigate
-  ]);
-
-  // Reset timer on demand (useful after important actions)
-  const resetTimer = () => {
-    handleUserActivity();
-  };
+  }, [resetTimer]);
+  
+  // Effect to check session timeout
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentTime = Date.now();
+      const timeSinceLastActivity = currentTime - lastActivity;
+      
+      // Calculate time left before session expires
+      const remainingTime = Math.max(0, sessionTimeout - timeSinceLastActivity);
+      setTimeLeft(remainingTime);
+      
+      if (timeSinceLastActivity > sessionTimeout) {
+        // Session has expired, log user out
+        signOut();
+        setShowWarning(false);
+      } else if (timeSinceLastActivity > warningThreshold && !showWarning) {
+        // Show warning before session expires
+        setShowWarning(true);
+      }
+    }, 1000);
+    
+    return () => clearInterval(intervalId);
+  }, [lastActivity, sessionTimeout, warningThreshold, showWarning, signOut]);
 
   return {
     showWarning,
     resetTimer,
-    timeLeft: Math.max(0, inactivityTimeoutMs - (Date.now() - lastActivity))
+    timeLeft
   };
-}
+};

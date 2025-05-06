@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,38 +34,24 @@ const AdminLoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      const result = await login(email, password);
+      const user = await login(email, password);
       
-      // Check if the result is a User
-      if ('id' in result) {
-        // Result is a User
-        const user = result as User;
-        
-        // Vérifie si l'utilisateur a des privilèges d'administration
-        if (isAdminRole(user.role)) {
-          toast({
-            title: "Connexion réussie",
-            description: `Bienvenue dans l'espace administration, ${user.name}!`,
-          });
-          // Navigation explicite vers le tableau de bord après connexion admin réussie
-          navigate('/dashboard');
-        } else {
-          toast({
-            title: "Accès refusé",
-            description: "Vous n'avez pas les droits d'administration nécessaires",
-            variant: "destructive"
-          });
-          navigate('/'); // Redirection vers l'accueil si pas admin
-        }
-      } else {
-        // Handle error case
+      // Vérifie si l'utilisateur a des privilèges d'administration
+      if (isAdminRole(user.role)) {
         toast({
-          title: "Erreur de connexion",
-          description: "Impossible de se connecter. Veuillez vérifier vos identifiants.",
+          title: "Connexion réussie",
+          description: `Bienvenue dans l'espace administration, ${user.name}!`,
+        });
+        // Navigation explicite vers le tableau de bord après connexion admin réussie
+        navigate('/dashboard');
+      } else {
+        toast({
+          title: "Accès refusé",
+          description: "Vous n'avez pas les droits d'administration nécessaires",
           variant: "destructive"
         });
+        navigate('/'); // Redirection vers l'accueil si pas admin
       }
-      
     } catch (error: any) {
       console.error("Erreur de connexion admin:", error);
       toast({
