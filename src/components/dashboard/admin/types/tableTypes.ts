@@ -10,3 +10,9 @@ export interface UserData {
   emotional_score?: number;
   anonymity_code?: string;
 }
+
+// New interface for bulk actions
+export interface BulkActionProps {
+  selectedUsers: string[];
+  onClearSelection: () => void;
+}

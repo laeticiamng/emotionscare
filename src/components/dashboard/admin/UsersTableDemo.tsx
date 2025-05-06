@@ -8,6 +8,8 @@ import { useUserTableData } from '@/hooks/useUserTableData';
 import { SortableField } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
+import { useSelectedUsers } from '@/hooks/useSelectedUsers';
+import BulkActionsBar from './table-components/BulkActionsBar';
 
 interface UsersTableDemoProps {
   defaultPageSize?: number;
@@ -47,6 +49,16 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
     defaultSortDirection: sortDirection
   });
   
+  // Selected users management
+  const {
+    selectedUsers,
+    toggleUserSelection,
+    toggleSelectAll,
+    clearSelection,
+    allSelected,
+    hasSelectedUsers
+  } = useSelectedUsers(users);
+  
   // Fetch users when sort, page or page size changes
   React.useEffect(() => {
     fetchUsers(currentPage, pageSize, sortField, sortDirection);
@@ -58,16 +70,35 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
         <h3 className="font-medium">Utilisateurs ({totalItems})</h3>
       </div>
       
+      {/* Show bulk actions bar only when users are selected */}
+      {hasSelectedUsers && (
+        <div className="px-4 py-2">
+          <BulkActionsBar 
+            selectedUsers={selectedUsers} 
+            onClearSelection={clearSelection}
+          />
+        </div>
+      )}
+      
       <div className="overflow-x-auto">
         <Table>
-          <UserTableHeader onSort={handleSort} isSorted={isSorted} />
+          <UserTableHeader 
+            onSort={handleSort} 
+            isSorted={isSorted} 
+            onSelectAll={toggleSelectAll}
+            allSelected={allSelected}
+            hasSelectionEnabled={true}
+          />
           <UserTableBody 
             users={users} 
             isLoading={isLoading} 
             error={error} 
             hasData={users.length > 0}
             onRetry={handleRetry}
-            isLoadingMore={isLoading && users.length > 0} 
+            isLoadingMore={isLoading && users.length > 0}
+            selectedUsers={selectedUsers}
+            onSelectUser={toggleUserSelection}
+            hasSelectionEnabled={true}
           />
         </Table>
       </div>

@@ -33,15 +33,15 @@ export function useSortableTable<T>({
   
   // Load from localStorage if provided a key and not found in URL
   const [storageField, storageDirection] = storageKey && !urlField 
-    ? loadSortFromStorage<T>(storageKey)
+    ? loadSortFromStorage(storageKey)
     : [null, null];
   
-  const [sortField, setSortField] = useState<T | null>(
-    urlField || storageField || initialField
-  );
-  const [sortDirection, setSortDirection] = useState<SortDirection>(
-    urlDirection || storageDirection || initialDirection
-  );
+  // Initialize state with proper values
+  const initialStateField = urlField || storageField || initialField;
+  const initialStateDirection = urlDirection || storageDirection || initialDirection;
+  
+  const [sortField, setSortField] = useState<T | null>(initialStateField);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(initialStateDirection);
   
   // Handle sorting when a column header is clicked
   const handleSort = useCallback((field: T) => {

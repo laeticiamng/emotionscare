@@ -12,6 +12,9 @@ interface UserTableBodyProps {
   hasData: boolean;
   onRetry?: () => void;
   isLoadingMore?: boolean;
+  selectedUsers?: string[];
+  onSelectUser?: (userId: string, isSelected: boolean) => void;
+  hasSelectionEnabled?: boolean;
 }
 
 const UserTableBody: React.FC<UserTableBodyProps> = ({ 
@@ -20,14 +23,17 @@ const UserTableBody: React.FC<UserTableBodyProps> = ({
   error, 
   hasData,
   onRetry,
-  isLoadingMore = false
+  isLoadingMore = false,
+  selectedUsers = [],
+  onSelectUser,
+  hasSelectionEnabled = false
 }) => {
   // Loading state with no data
   if (isLoading && users.length === 0) {
     return (
       <TableBody>
         <TableRow>
-          <TableCell colSpan={4} className="h-24 text-center">
+          <TableCell colSpan={hasSelectionEnabled ? 5 : 4} className="h-24 text-center">
             <LoadingAnimation text="Chargement des utilisateurs..." />
           </TableCell>
         </TableRow>
@@ -40,7 +46,7 @@ const UserTableBody: React.FC<UserTableBodyProps> = ({
     return (
       <TableBody>
         <TableRow>
-          <TableCell colSpan={4} className="h-24">
+          <TableCell colSpan={hasSelectionEnabled ? 5 : 4} className="h-24">
             <div className="flex flex-col items-center justify-center">
               <p className="text-destructive mb-2">{error}</p>
               {onRetry && (
@@ -63,7 +69,7 @@ const UserTableBody: React.FC<UserTableBodyProps> = ({
     return (
       <TableBody>
         <TableRow>
-          <TableCell colSpan={4} className="h-24 text-center">
+          <TableCell colSpan={hasSelectionEnabled ? 5 : 4} className="h-24 text-center">
             Aucun utilisateur trouvé.
           </TableCell>
         </TableRow>
@@ -75,11 +81,17 @@ const UserTableBody: React.FC<UserTableBodyProps> = ({
   return (
     <TableBody>
       {users.map((user) => (
-        <UserTableRow key={user.id} user={user} />
+        <UserTableRow 
+          key={user.id} 
+          user={user} 
+          isSelected={selectedUsers.includes(user.id)}
+          onSelect={onSelectUser}
+          hasSelectionEnabled={hasSelectionEnabled}
+        />
       ))}
       {isLoadingMore && (
         <TableRow>
-          <TableCell colSpan={4} className="h-12 text-center border-t">
+          <TableCell colSpan={hasSelectionEnabled ? 5 : 4} className="h-12 text-center border-t">
             <div className="inline-flex items-center">
               <div className="h-4 w-4 border-2 border-t-primary border-r-primary border-b-primary/30 border-l-primary/30 rounded-full animate-spin mr-2"></div>
               Chargement...

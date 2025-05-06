@@ -8,6 +8,8 @@ import { useUserTableData } from '@/hooks/useUserTableData';
 import { SortableField } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
+import { useSelectedUsers } from '@/hooks/useSelectedUsers';
+import BulkActionsBar from './table-components/BulkActionsBar';
 
 interface UsersTableWithInfiniteScrollProps {
   pageSize?: number;
@@ -27,7 +29,6 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
     users,
     isLoading,
     error,
-    currentPage,
     hasMore,
     totalItems,
     fetchUsers,
@@ -38,6 +39,16 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
     defaultSortField: sortField,
     defaultSortDirection: sortDirection
   });
+  
+  // Selected users management
+  const {
+    selectedUsers,
+    toggleUserSelection,
+    toggleSelectAll,
+    clearSelection,
+    allSelected,
+    hasSelectedUsers
+  } = useSelectedUsers(users);
   
   // Fetch users when sorting changes
   React.useEffect(() => {
@@ -50,6 +61,16 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
         <h3 className="font-medium">Utilisateurs avec défilement infini ({totalItems})</h3>
       </div>
       
+      {/* Show bulk actions bar only when users are selected */}
+      {hasSelectedUsers && (
+        <div className="px-4 py-2">
+          <BulkActionsBar 
+            selectedUsers={selectedUsers} 
+            onClearSelection={clearSelection}
+          />
+        </div>
+      )}
+      
       <div className="overflow-x-auto">
         <InfiniteScroll
           onLoadMore={handleLoadMore}
@@ -58,14 +79,23 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
           threshold={0.8}
         >
           <Table>
-            <UserTableHeader onSort={handleSort} isSorted={isSorted} />
+            <UserTableHeader 
+              onSort={handleSort} 
+              isSorted={isSorted} 
+              onSelectAll={toggleSelectAll}
+              allSelected={allSelected}
+              hasSelectionEnabled={true}
+            />
             <UserTableBody 
               users={users} 
               isLoading={isLoading} 
               error={error} 
               hasData={users.length > 0}
               onRetry={handleRetry}
-              isLoadingMore={false} 
+              isLoadingMore={false}
+              selectedUsers={selectedUsers}
+              onSelectUser={toggleUserSelection}
+              hasSelectionEnabled={true}
             />
           </Table>
         </InfiniteScroll>

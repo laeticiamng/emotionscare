@@ -1,18 +1,38 @@
 
 import React from 'react';
-import { TableHeader, TableRow } from '@/components/ui/table';
+import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
 import SortableTableHead, { SortDirection } from '@/components/ui/data-table/SortableTableHead';
 import { SortableField } from '../types/tableTypes';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface UserTableHeaderProps {
   onSort: (field: SortableField) => void;
   isSorted: (field: SortableField) => SortDirection;
+  onSelectAll?: () => void;
+  allSelected?: boolean;
+  hasSelectionEnabled?: boolean;
 }
 
-const UserTableHeader: React.FC<UserTableHeaderProps> = ({ onSort, isSorted }) => {
+const UserTableHeader: React.FC<UserTableHeaderProps> = ({ 
+  onSort, 
+  isSorted, 
+  onSelectAll, 
+  allSelected = false,
+  hasSelectionEnabled = false
+}) => {
   return (
     <TableHeader>
       <TableRow>
+        {hasSelectionEnabled && (
+          <TableHead className="w-[40px] px-2">
+            <Checkbox 
+              checked={allSelected}
+              onCheckedChange={onSelectAll}
+              aria-label="Sélectionner tous les utilisateurs"
+            />
+          </TableHead>
+        )}
+        
         <SortableTableHead 
           isSorted={isSorted('name')}
           onSort={() => onSort('name')}
