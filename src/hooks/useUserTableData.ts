@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import { mockUsers } from '@/data/mockUsers';
 import { SortDirection } from '@/components/ui/data-table/SortableTableHead';
 import { sortData } from '@/utils/sortUtils';
-import { SortableField } from '@/components/dashboard/admin/types/tableTypes';
+import { SortableField, UserData } from '@/components/dashboard/admin/types/tableTypes';
+import { User } from '@/types';
 
 export type UserTableOptions = {
   defaultPageSize?: number;
@@ -14,27 +15,47 @@ export type UserTableOptions = {
   defaultSortDirection?: SortDirection;
 };
 
+// Helper function to convert User to UserData
+const mapUserToUserData = (user: User): UserData => {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    department: user.role === 'admin' ? 'Administration' : 'General',
+    location: 'Headquarters',
+    status: user.onboarded ? 'Active' : 'Pending',
+    avatar: user.avatar || user.image,
+    createdAt: user.joined_at || new Date().toISOString(),
+    lastActivity: undefined,
+    emotional_score: user.emotional_score,
+    anonymity_code: user.anonymity_code
+  };
+};
+
 // Generate more mock users for testing (reusing the logic)
-const generateMockUsers = (count: number) => {
+const generateMockUsers = (count: number): UserData[] => {
   const users = [...mockUsers];
   const baseLength = users.length;
   
-  for (let i = 0; i < count - baseLength; i++) {
-    const id = `generated-${i+1}`;
-    const index = i % mockUsers.length; // Cycle through the original users for data
-    const baseUser = mockUsers[index];
+  const mappedUsers: UserData[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const index = i < baseLength ? i : i % mockUsers.length;
+    const id = i < baseLength ? users[index].id : `generated-${i-baseLength+1}`;
+    const baseUser = users[index];
     
-    users.push({
-      ...baseUser,
+    mappedUsers.push({
+      ...mapUserToUserData(baseUser),
       id,
-      name: `${baseUser.name} ${Math.floor(i / mockUsers.length) + 1}`,
-      email: `user${i+baseLength+1}@example.com`,
-      anonymity_code: `AC${100000 + i}`,
-      emotional_score: Math.floor(Math.random() * 100),
+      name: i >= baseLength ? `${baseUser.name} ${Math.floor((i - baseLength) / mockUsers.length) + 1}` : baseUser.name,
+      email: i >= baseLength ? `user${i+1}@example.com` : baseUser.email,
+      anonymity_code: i >= baseLength ? `AC${100000 + i}` : baseUser.anonymity_code,
+      emotional_score: i >= baseLength ? Math.floor(Math.random() * 100) : baseUser.emotional_score,
     });
   }
   
-  return users;
+  return mappedUsers;
 };
 
 // Generate 100 users for demo
@@ -56,7 +77,7 @@ export function useUserTableData({
   const [pageSize, setPageSize] = useState(initialLimit);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [users, setUsers] = useState<typeof DEMO_USERS>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   

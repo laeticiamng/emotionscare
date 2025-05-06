@@ -21,8 +21,10 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
   // Sorting state management
   const { sortField, sortDirection, handleSort, isSorted } = useSortableTable<SortableField>({
     storageKey: 'user-table-infinite-sort',
-    persistInUrl: true
-  } as SortableTableOptions<SortableField>);
+    persistInUrl: true,
+    defaultField: 'name',
+    defaultDirection: 'asc'
+  });
   
   // Table data management
   const {

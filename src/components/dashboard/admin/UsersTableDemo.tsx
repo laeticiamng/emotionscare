@@ -25,8 +25,10 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
   // Sorting state management
   const { sortField, sortDirection, handleSort, isSorted } = useSortableTable<SortableField>({
     storageKey: 'user-table-sort',
-    persistInUrl: true
-  } as SortableTableOptions<SortableField>);
+    persistInUrl: true,
+    defaultField: 'name',
+    defaultDirection: 'asc'
+  });
   
   // Table data management
   const {

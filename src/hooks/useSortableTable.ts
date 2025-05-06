@@ -16,7 +16,7 @@ export function useSortableTable<T extends string>(options: SortableTableOptions
   const [searchParams, setSearchParams] = useSearchParams();
   
   // Initialize sort state from URL or localStorage or defaults
-  const initSortField = (): T => {
+  const initSortField = (): T | undefined => {
     if (persistInUrl) {
       const urlField = searchParams.get('sort');
       if (urlField) return urlField as T;
@@ -27,7 +27,7 @@ export function useSortableTable<T extends string>(options: SortableTableOptions
       if (savedSort) return savedSort as T;
     }
     
-    return defaultField as T;
+    return defaultField;
   };
   
   const initSortDirection = (): SortDirection => {
