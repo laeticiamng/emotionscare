@@ -3,7 +3,7 @@ import React from 'react';
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   BarChart2, MessageSquare, Trophy, Sparkles, 
-  ShieldCheck, CalendarDays, Settings, Activity, LineChart 
+  ShieldCheck, CalendarDays, Settings, Activity, LineChart, CloudSun
 } from 'lucide-react';
 
 interface AdminTabsNavigationProps {
@@ -19,11 +19,11 @@ const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({ activeTab, se
         <BarChart2 className="mr-2 h-4 w-4" />
         Vue Globale
       </TabsTrigger>
-      <TabsTrigger value="scan-team" onClick={() => setActiveTab("scan-team")} disabled={disabled}>
+      <TabsTrigger value="scan-equipe" onClick={() => setActiveTab("scan-equipe")} disabled={disabled}>
         <Activity className="mr-2 h-4 w-4" />
         Scan Émotionnel
       </TabsTrigger>
-      <TabsTrigger value="journal-trends" onClick={() => setActiveTab("journal-trends")} disabled={disabled}>
+      <TabsTrigger value="journal" onClick={() => setActiveTab("journal")} disabled={disabled}>
         <LineChart className="mr-2 h-4 w-4" />
         Journal
       </TabsTrigger>
@@ -34,6 +34,10 @@ const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({ activeTab, se
       <TabsTrigger value="gamification" onClick={() => setActiveTab("gamification")} disabled={disabled}>
         <Trophy className="mr-2 h-4 w-4" />
         Gamification
+      </TabsTrigger>
+      <TabsTrigger value="meteo-activites" onClick={() => setActiveTab("meteo-activites")} disabled={disabled}>
+        <CloudSun className="mr-2 h-4 w-4" />
+        Météo & Activités
       </TabsTrigger>
       <TabsTrigger value="actions-rh" onClick={() => setActiveTab("actions-rh")} disabled={disabled}>
         <Sparkles className="mr-2 h-4 w-4" />

@@ -10,13 +10,15 @@ import { toast } from 'sonner';
 
 // Default settings for pagination
 const DEFAULT_SETTINGS = {
-  mode: 'paginated',
+  mode: 'paginated' as PaginationMode,
   defaultLimit: '25',
   maxLimit: '100'
 };
 
+type PaginationMode = 'paginated' | 'loadMore' | 'infinite';
+
 interface PaginationSettings {
-  mode: 'paginated' | 'loadMore' | 'infinite';
+  mode: PaginationMode;
   defaultLimit: string;
   maxLimit: string;
 }
@@ -99,7 +101,7 @@ const PaginationSettings: React.FC = () => {
               <h3 className="text-lg font-medium">Mode de pagination</h3>
               <RadioGroup 
                 value={settings.mode} 
-                onValueChange={(value) => setSettings({ ...settings, mode: value as PaginationSettings['mode'] })}
+                onValueChange={(value) => setSettings({ ...settings, mode: value as PaginationMode })}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="paginated" id="paginated" />
