@@ -21,6 +21,7 @@ export interface KpiCardProps {
   ariaLabel?: string;
   className?: string;
   isLoading?: boolean;
+  onClick?: () => void; // Added onClick handler for drill-down
 }
 
 /**
@@ -34,13 +35,24 @@ const KpiCard: React.FC<KpiCardProps> = ({
   subtitle,
   ariaLabel,
   className,
-  isLoading = false
+  isLoading = false,
+  onClick
 }) => {
+  // Determine if the card is interactive
+  const isInteractive = typeof onClick === 'function';
+  
   return (
     <Card 
-      className={cn("p-4 transition-shadow duration-200 hover:shadow-md", className)}
-      aria-label={ariaLabel}
+      className={cn(
+        "p-4 transition-all duration-200", 
+        isInteractive && "cursor-pointer hover:shadow-md hover:translate-y-[-2px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none", 
+        className
+      )}
+      aria-label={ariaLabel || (isInteractive ? `Voir détails ${title}` : undefined)}
       aria-busy={isLoading}
+      onClick={onClick}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
     >
       <CardHeader className="p-0 pb-2 space-y-0">
         <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">

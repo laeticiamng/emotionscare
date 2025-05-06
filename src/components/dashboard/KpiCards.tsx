@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import CountUp from 'react-countup';
 import KpiCard from './admin/KpiCard';
+import { useNavigate } from 'react-router-dom';
 
 interface KpiCardsProps {
   vrSessionsThisMonth: number;
@@ -25,6 +26,13 @@ const KpiCards: React.FC<KpiCardsProps> = ({
   // Calculate delta percentage between this month and last month
   const sessionsDelta = vrSessionsLastMonth ? 
     Math.round(((vrSessionsThisMonth - vrSessionsLastMonth) / vrSessionsLastMonth) * 100) : 0;
+  
+  const navigate = useNavigate();
+  
+  // Define drill-down routes for each KPI
+  const navigateToEmotionDetails = () => navigate('/journal');
+  const navigateToVRSessions = () => navigate('/vr-sessions');
+  const navigateToBadges = () => navigate('/gamification');
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -46,6 +54,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
               <Progress value={avgEmotionalScore} className="h-2 bg-gray-100 mt-2" />
             }
             ariaLabel={`Score émotionnel moyen: ${avgEmotionalScore}/100`}
+            onClick={navigateToEmotionDetails}
           />
           
           <KpiCard
@@ -58,6 +67,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
               trend: sessionsDelta >= 0 ? 'up' : 'down'
             }}
             ariaLabel={`Sessions VR ce mois: ${vrSessionsThisMonth}`}
+            onClick={navigateToVRSessions}
           />
           
           <KpiCard
@@ -66,6 +76,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
             icon={Trophy}
             subtitle="Félicitations!"
             ariaLabel={`Badges gagnés: ${userBadgesCount}`}
+            onClick={navigateToBadges}
           />
         </>
       )}

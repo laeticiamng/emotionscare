@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { TrendingUp, Activity, Users } from 'lucide-react';
 import DraggableCard from './DraggableCard';
 import { KpiCardData } from './types';
+import { useNavigate } from 'react-router-dom';
 
 // Props for our grid component
 interface DraggableKpiCardsGridProps {
@@ -40,6 +41,13 @@ interface DraggableKpiCardsGridProps {
 
 // Main component that handles the draggable grid
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboardStats, gamificationData }) => {
+  const navigate = useNavigate();
+  
+  // Define navigation handlers for drill-down
+  const navigateToProductivity = () => navigate('/stats/productivity');
+  const navigateToEmotionalScore = () => navigate('/stats/emotional-score');
+  const navigateToEngagement = () => navigate('/stats/engagement');
+  
   // Create card data from props
   const createCardData = (): KpiCardData[] => [
     {
@@ -52,7 +60,8 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboard
         label: "vs période précédente",
         trend: dashboardStats.productivity.trend >= 0 ? 'up' : 'down'
       },
-      ariaLabel: `Productivité: ${dashboardStats.productivity.current}%`
+      ariaLabel: `Productivité: ${dashboardStats.productivity.current}%`,
+      onClick: navigateToProductivity
     },
     {
       id: 'emotionalScore',
@@ -64,7 +73,8 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboard
         label: "vs période précédente",
         trend: dashboardStats.emotionalScore.trend >= 0 ? 'up' : 'down'
       },
-      ariaLabel: `Score émotionnel moyen: ${dashboardStats.emotionalScore.current}/100`
+      ariaLabel: `Score émotionnel moyen: ${dashboardStats.emotionalScore.current}/100`,
+      onClick: navigateToEmotionalScore
     },
     {
       id: 'engagementGamification',
@@ -72,7 +82,8 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ dashboard
       value: `${gamificationData.activeUsersPercent}%`,
       icon: Users,
       subtitle: `${gamificationData.totalBadges} badges distribués ce mois`,
-      ariaLabel: `Engagement gamification: ${gamificationData.activeUsersPercent}%`
+      ariaLabel: `Engagement gamification: ${gamificationData.activeUsersPercent}%`,
+      onClick: navigateToEngagement
     }
   ];
 

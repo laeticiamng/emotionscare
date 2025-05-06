@@ -51,6 +51,7 @@ const DraggableCard: React.FC<DraggableCardProps> = (props) => {
           delta={props.delta} 
           subtitle={props.subtitle} 
           ariaLabel={props.ariaLabel}
+          onClick={props.onClick}
         />
       </div>
     </div>

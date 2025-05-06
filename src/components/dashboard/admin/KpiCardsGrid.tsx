@@ -2,6 +2,7 @@
 import React from 'react';
 import KpiCard from './KpiCard';
 import { Users, Activity, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface KpiCardsGridProps {
   dashboardStats: {
@@ -21,6 +22,13 @@ interface KpiCardsGridProps {
 }
 
 const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificationData }) => {
+  const navigate = useNavigate();
+  
+  // Define navigation handlers for drill-down
+  const navigateToProductivity = () => navigate('/stats/productivity');
+  const navigateToEmotionalScore = () => navigate('/stats/emotional-score');
+  const navigateToEngagement = () => navigate('/stats/engagement');
+  
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 col-span-1 md:col-span-2">
       {/* Productivity Card */}
@@ -34,6 +42,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificatio
           trend: dashboardStats.productivity.trend >= 0 ? 'up' : 'down'
         }}
         ariaLabel={`Productivité: ${dashboardStats.productivity.current}%`}
+        onClick={navigateToProductivity}
       />
       
       {/* Emotional Score Card */}
@@ -47,6 +56,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificatio
           trend: dashboardStats.emotionalScore.trend >= 0 ? 'up' : 'down'
         }}
         ariaLabel={`Score émotionnel moyen: ${dashboardStats.emotionalScore.current}/100`}
+        onClick={navigateToEmotionalScore}
       />
       
       {/* Engagement Gamification Card */}
@@ -56,6 +66,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificatio
         icon={Users}
         subtitle={`${gamificationData.totalBadges} badges distribués ce mois`}
         ariaLabel={`Engagement gamification: ${gamificationData.activeUsersPercent}%`}
+        onClick={navigateToEngagement}
       />
     </div>
   );

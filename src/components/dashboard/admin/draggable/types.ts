@@ -14,6 +14,7 @@ export interface KpiCardData {
   };
   subtitle?: React.ReactNode;
   ariaLabel?: string;
+  onClick?: () => void; // Added onClick handler for drill-down
 }
 
 // Props for our draggable card component
