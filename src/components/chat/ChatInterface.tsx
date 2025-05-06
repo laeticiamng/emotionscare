@@ -35,8 +35,9 @@ interface ChatInterfaceProps {
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standalone = true }) => {
-  const { messages, isLoading, addUserMessage, addBotMessage, processMessage } = useChat();
+  const { messages, isLoading, addUserMessage, addBotMessage, processMessage, sessionId } = useChat();
   const [input, setInput] = useState('');
+  const [typing, setTyping] = useState(false);
   const navigate = useNavigate();
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
   const { toast } = useToast();
@@ -49,6 +50,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
     }
   }, [messages]);
 
+  // Effet pour l'animation de typing
+  useEffect(() => {
+    if (typing) {
+      const timer = setTimeout(() => {
+        setTyping(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [typing]);
+
   const handleSend = async () => {
     if (input.trim() === '' || isLoading) return;
 
@@ -57,8 +68,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
     const userInput = input;
     setInput('');
 
+    // Afficher l'animation de typing
+    setTyping(true);
+
     try {
-      // Process the message with OpenAI
+      // Process the message with OpenAI GPT-4
       const { response, intent } = await processMessage(userInput);
       addBotMessage(response);
 
@@ -117,6 +131,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
                 </div>
               </div>
             ))}
+            
+            {/* Indicateur "en train d'écrire..." */}
+            {typing && (
+              <div className="flex gap-2 justify-start">
+                <div className="rounded-lg p-3 bg-muted text-foreground max-w-[80%]">
+                  <div className="loading-dots">
+                    <div className="bg-foreground/70"></div>
+                    <div className="bg-foreground/70"></div>
+                    <div className="bg-foreground/70"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
 
             {/* Command buttons that appear after certain bot responses */}
@@ -176,9 +204,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-grow"
-            disabled={isLoading}
+            disabled={isLoading || typing}
           />
-          <Button type="submit" size="icon" variant="default" disabled={isLoading}>
+          <Button type="submit" size="icon" variant="default" disabled={isLoading || typing}>
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -198,6 +226,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5" />
             Assistant EmotionsCare
+            <span className="text-xs text-muted-foreground ml-auto">
+              Session: {sessionId.substring(0, 8)}
+            </span>
           </CardTitle>
         </CardHeader>
         {renderContent()}

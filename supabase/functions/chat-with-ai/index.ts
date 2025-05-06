@@ -16,10 +16,16 @@ serve(async (req) => {
   }
 
   try {
-    const { message, userContext } = await req.json();
+    if (!openAIApiKey) {
+      console.error("OpenAI API key not configured");
+      throw new Error("OpenAI API key is not configured");
+    }
+
+    const { message, userContext, sessionId, stream = false } = await req.json();
     
     console.log("Received request with message:", message);
     console.log("User context:", userContext);
+    console.log("Session ID:", sessionId);
 
     // Construire un prompt adapté au contexte de l'utilisateur
     const systemPrompt = userContext ? 
@@ -31,43 +37,80 @@ serve(async (req) => {
       `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
        Réponds toujours en français de manière précise et directe.`;
 
-    console.log("Calling OpenAI with message:", message);
     console.log("System prompt:", systemPrompt);
     
-    if (!openAIApiKey) {
-      throw new Error("OpenAI API key is not configured");
+    const requestBody = {
+      model: 'gpt-4', // Utilisation de GPT-4 standard comme demandé
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      temperature: 0.6, // Température équilibrée comme recommandé
+      max_tokens: 1024, // Pour des réponses complètes
+      stream: stream // Support du streaming si demandé
+    };
+
+    // Si stream est activé, gérer différemment la réponse
+    if (stream) {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      // Retourner directement le flux de la réponse
+      return new Response(response.body, {
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive'
+        },
+      });
+    } else {
+      // Traitement normal pour les réponses non streamées
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+      console.log("OpenAI response received");
+
+      if (!data.choices || data.choices.length === 0) {
+        console.error("No choices returned from OpenAI:", data);
+        throw new Error('No response from OpenAI');
+      }
+
+      const aiResponse = data.choices[0].message.content.trim();
+      console.log("Formatted AI response received");
+
+      // Stocker le message et la réponse si un sessionId est fourni
+      if (sessionId) {
+        try {
+          // Cette partie pourrait être étendue pour stocker les messages dans une table Supabase
+          console.log(`Storing message in session ${sessionId}`);
+          // Implémentation à développer selon les besoins
+        } catch (storageError) {
+          console.error("Error storing message:", storageError);
+          // Ne pas bloquer la réponse en cas d'erreur de stockage
+        }
+      }
+
+      return new Response(JSON.stringify({ 
+        response: aiResponse,
+        sessionId: sessionId
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
-    
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    const data = await response.json();
-    console.log("OpenAI response received:", data);
-
-    if (!data.choices || data.choices.length === 0) {
-      console.error("No choices returned from OpenAI:", data);
-      throw new Error('No response from OpenAI');
-    }
-
-    const aiResponse = data.choices[0].message.content.trim();
-    console.log("Formatted AI response:", aiResponse);
-
-    return new Response(JSON.stringify({ response: aiResponse }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   } catch (error) {
     console.error('Error in chat-with-ai function:', error);
     return new Response(JSON.stringify({ 

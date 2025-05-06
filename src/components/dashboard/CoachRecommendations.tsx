@@ -95,7 +95,7 @@ const CoachRecommendations: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-full"
+              className="w-full hover-lift"
               onClick={generateRecommendations}
             >
               Actualiser

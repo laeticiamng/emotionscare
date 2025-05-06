@@ -1,90 +1,106 @@
 
-import { CoachEvent, CoachRoutine } from './types';
-import { coachRoutines } from './routines';
-import { notificationService } from './notification-service';
-import { emotionalDataService } from './emotional-data';
-import { actionExecutor } from './action-executor';
+import { CoachAction, CoachEvent } from './types';
 import { supabase } from '@/integrations/supabase/client';
+import { actionExecutor } from './action-executor';
+import { determineActions } from './emotional-data';
+import { routines } from './routines';
 
 /**
- * Main service for orchestrating coach routines and actions
+ * Service pour le coach IA
  */
-export class CoachService {
-  private routines: CoachRoutine[] = coachRoutines;
-
+class CoachService {
   /**
-   * Processes an event and triggers the corresponding routine
+   * Traiter un événement coach
    */
   async processEvent(event: CoachEvent): Promise<void> {
-    console.log(`Coach IA: Processing event ${event.type} for user ${event.user_id}`, event);
-    
-    // Find all routines matching the event type, sorted by priority
-    const matchingRoutines = this.routines
-      .filter(routine => routine.trigger === event.type)
-      .sort((a, b) => b.priority - a.priority);
+    console.log(`Coach IA: Processing event ${event.type}`);
+
+    // Obtient les actions à effectuer basées sur l'évènement
+    const actions = await this.getActions(event);
+
+    // Exécute chaque action
+    for (const action of actions) {
+      await actionExecutor.executeAction(action, event);
+    }
+  }
+  
+  /**
+   * Vérifier la connexion à l'API OpenAI
+   */
+  async checkAPIConnection(): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+        body: {
+          message: "Simple connection test, please respond with 'API connection successful'",
+          userContext: null
+        }
+      });
       
-    if (matchingRoutines.length === 0) {
-      console.warn(`No routine found for event type: ${event.type}`);
-      return;
-    }
-
-    // Execute the highest priority routine first
-    const primaryRoutine = matchingRoutines[0];
-    console.log(`Coach IA: Starting primary routine "${primaryRoutine.name}"`);
-    await this.executeRoutine(primaryRoutine, event);
-    
-    // Execute secondary routines in parallel if they exist
-    if (matchingRoutines.length > 1) {
-      console.log(`Coach IA: Starting ${matchingRoutines.length - 1} secondary routines`);
-      await Promise.all(matchingRoutines.slice(1).map(routine => 
-        this.executeRoutine(routine, event)
-      ));
+      if (error) throw error;
+      return data && data.response && data.response.includes('connection');
+    } catch (error) {
+      console.error('API connection check failed:', error);
+      return false;
     }
   }
 
   /**
-   * Executes a complete routine
+   * Déterminer les actions à effectuer en fonction de l'événement
    */
-  private async executeRoutine(routine: CoachRoutine, event: CoachEvent): Promise<void> {
-    for (const action of routine.actions) {
-      try {
-        await actionExecutor.executeAction(action, event);
-      } catch (error) {
-        console.error(`Failed to execute action ${action.type}:`, error);
-      }
+  private async getActions(event: CoachEvent): Promise<CoachAction[]> {
+    switch (event.type) {
+      case 'api_check':
+        return [{ type: 'check_api_connection', payload: {} }];
+        
+      case 'scan_completed':
+        return determineActions(event);
+        
+      case 'predictive_alert':
+        return [
+          { type: 'check_trend_alert', payload: event.data || {} },
+          { type: 'suggest_wellness_activity', payload: {} }
+        ];
+        
+      case 'daily_reminder':
+        return routines.getDailyReminder();
+        
+      default:
+        console.warn(`Unknown event type: ${event.type}`);
+        return [];
     }
-    console.log(`Coach IA: Routine "${routine.name}" completed`);
   }
 
   /**
-   * Gets notifications for a user
-   */
-  getNotifications(userId: string) {
-    return notificationService.getNotifications(userId);
-  }
-  
-  /**
-   * Gets emotional data for a user
-   */
-  getUserEmotionalData(userId: string) {
-    return emotionalDataService.getUserEmotionalData(userId);
-  }
-  
-  /**
-   * Sends a query to the OpenAI API through the Edge Function
+   * Envoyer une question directement au coach
    */
   async askCoachQuestion(userId: string, question: string): Promise<string> {
     try {
-      // Récupérer le contexte émotionnel pour enrichir la requête
-      const userEmotionalData = await this.getUserEmotionalData(userId);
+      // Get user emotional context
+      const { data: emotions } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false })
+        .limit(3);
       
+      let userContext = null;
+      
+      if (emotions && emotions.length > 0) {
+        const recentEmotions = emotions.map(e => e.emojis || e.emotion).join(', ');
+        const avgScore = emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length;
+        
+        userContext = {
+          recentEmotions,
+          currentScore: Math.round(avgScore),
+          lastEmotionDate: emotions[0].date
+        };
+      }
+      
+      // Send question to OpenAI
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
           message: question,
-          userContext: {
-            recentEmotions: userEmotionalData?.lastEmotions?.map(e => e.emotion).join(', ') || '',
-            currentScore: userEmotionalData?.averageScore || 50
-          }
+          userContext
         }
       });
       
@@ -93,19 +109,28 @@ export class CoachService {
       return data.response;
     } catch (error) {
       console.error('Error asking coach question:', error);
-      return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question. Veuillez réessayer plus tard.";
+      return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question.";
     }
   }
 }
 
-// Export singleton service instance
 export const coachService = new CoachService();
 
-// Helper for manually triggering a coach event (for demo and testing)
-export const triggerCoachEvent = (eventType: 'scan_completed' | 'predictive_alert' | 'daily_reminder', userId: string, data?: any) => {
-  return coachService.processEvent({
+/**
+ * Trigger an event for the coach
+ */
+export function triggerCoachEvent(
+  eventType: 'scan_completed' | 'predictive_alert' | 'daily_reminder' | 'api_check',
+  userId: string,
+  data?: any
+): Promise<void> {
+  const event: CoachEvent = {
     type: eventType,
     user_id: userId,
     data
-  });
-};
+  };
+  
+  return coachService.processEvent(event);
+}
+
+export * from './types';
