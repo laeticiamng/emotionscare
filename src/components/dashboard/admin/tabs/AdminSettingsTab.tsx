@@ -4,8 +4,23 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from '@/components/ui/skeleton';
 
-const AdminSettingsTab: React.FC = () => {
+interface AdminSettingsTabProps {
+  isLoading?: boolean;
+}
+
+const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-80 w-full" />
+        <Skeleton className="h-80 w-full" />
+        <Skeleton className="h-80 w-full col-span-1 md:col-span-2" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="glass-card">

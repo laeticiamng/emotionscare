@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface EventsCalendarTabProps {
   eventsData: Array<{
@@ -10,9 +11,20 @@ interface EventsCalendarTabProps {
     status: string;
     attendees: number;
   }>;
+  isLoading?: boolean;
 }
 
-const EventsCalendarTab: React.FC<EventsCalendarTabProps> = ({ eventsData }) => {
+const EventsCalendarTab: React.FC<EventsCalendarTabProps> = ({ eventsData, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-80 w-full col-span-1 md:col-span-2" />
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="glass-card col-span-1 md:col-span-2">

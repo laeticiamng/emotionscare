@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ComplianceTabProps {
   complianceData: {
@@ -13,9 +14,20 @@ interface ComplianceTabProps {
     dataRetention: string;
     certifications: string[];
   };
+  isLoading?: boolean;
 }
 
-const ComplianceTab: React.FC<ComplianceTabProps> = ({ complianceData }) => {
+const ComplianceTab: React.FC<ComplianceTabProps> = ({ complianceData, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-80 w-full" />
+        <Skeleton className="h-80 w-full" />
+        <Skeleton className="h-80 w-full col-span-1 md:col-span-2" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="glass-card">

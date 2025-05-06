@@ -3,13 +3,39 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ScanTeamTabProps {
   emotionalScoreTrend: Array<{ date: string; value: number }>;
   currentScore: number;
+  isLoading?: boolean;
 }
 
-const ScanTeamTab: React.FC<ScanTeamTabProps> = ({ emotionalScoreTrend, currentScore }) => {
+const ScanTeamTab: React.FC<ScanTeamTabProps> = ({ emotionalScoreTrend, currentScore, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="glass-card col-span-1 md:col-span-2">
+          <CardHeader>
+            <CardTitle>Score émotionnel de l'équipe</CardTitle>
+            <CardDescription>Évolution du score moyen et des alertes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64">
+              <Skeleton className="w-full h-full" />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="glass-card col-span-1 md:col-span-2">

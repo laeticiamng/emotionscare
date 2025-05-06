@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
 import GamificationSummaryCard from '../GamificationSummaryCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface GamificationTabProps {
   gamificationData: {
@@ -11,9 +12,20 @@ interface GamificationTabProps {
     badgeLevels: Array<{ level: string; count: number }>;
     topChallenges: Array<{ name: string; completions: number }>;
   };
+  isLoading?: boolean;
 }
 
-const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData }) => {
+const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-80 w-full col-span-1 md:col-span-2" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <GamificationSummaryCard gamificationStats={gamificationData} />

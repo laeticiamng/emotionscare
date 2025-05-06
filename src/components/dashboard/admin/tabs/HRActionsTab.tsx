@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface HRActionsTabProps {
   rhSuggestions: Array<{
@@ -9,9 +10,20 @@ interface HRActionsTabProps {
     description: string;
     icon: string;
   }>;
+  isLoading?: boolean;
 }
 
-const HRActionsTab: React.FC<HRActionsTabProps> = ({ rhSuggestions }) => {
+const HRActionsTab: React.FC<HRActionsTabProps> = ({ rhSuggestions, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-96 w-full col-span-1 md:col-span-2" />
+        <Skeleton className="h-80 w-full" />
+        <Skeleton className="h-80 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="col-span-1 md:col-span-2 glass-card">

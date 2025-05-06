@@ -8,19 +8,23 @@ import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import WidgetSettings, { widgetCatalog } from '../WidgetSettings';
 import { toast } from "sonner";
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface GlobalOverviewTabProps {
   absenteeismChartData: ChartData[];
   emotionalScoreTrend: ChartData[];
   dashboardStats: DashboardStats;
   gamificationData: GamificationData;
+  isLoading?: boolean;
 }
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ 
   absenteeismChartData, 
   emotionalScoreTrend,
   dashboardStats,
-  gamificationData
+  gamificationData,
+  isLoading = false
 }) => {
   const [enabledWidgets, setEnabledWidgets] = useState<string[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -68,6 +72,22 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
   // Determine if we should show an empty state
   const isEmpty = enabledWidgets.length === 0;
 
+  if (isLoading && enabledWidgets.length > 0) {
+    return (
+      <div className="space-y-6">
+        {enabledWidgets.includes('absenteeism') && (
+          <Skeleton className="w-full h-64" />
+        )}
+        {enabledWidgets.includes('emotionalScore') && (
+          <Skeleton className="w-full h-64" />
+        )}
+        {enabledWidgets.includes('kpiCards') && (
+          <Skeleton className="w-full h-40" />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Settings Button */}
@@ -77,6 +97,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
           size="sm"
           className="flex items-center gap-2"
           onClick={() => setIsSettingsOpen(true)}
+          disabled={isLoading}
         >
           <Settings size={16} />
           <span>Configurer widgets</span>

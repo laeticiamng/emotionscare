@@ -7,6 +7,7 @@ import TeamFilterControls from '@/components/scan/TeamFilterControls';
 import TeamStatCards from '@/components/scan/TeamStatCards';
 import AISuggestions from '@/components/scan/AISuggestions';
 import { User } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface TeamTabContentProps {
   filteredUsers: User[];
@@ -40,11 +41,21 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({
       
       <Separator className="my-6" />
       
-      <TeamStatCards />
-      
-      <TeamOverview users={filteredUsers} />
-
-      <AISuggestions />
+      {isLoading ? (
+        <div className="space-y-6">
+          <Skeleton className="w-full h-20" />
+          <Skeleton className="w-full h-64" />
+          <Skeleton className="w-full h-40" />
+        </div>
+      ) : (
+        <>
+          <TeamStatCards />
+          
+          <TeamOverview users={filteredUsers} />
+  
+          <AISuggestions />
+        </>
+      )}
     </Card>
   );
 };

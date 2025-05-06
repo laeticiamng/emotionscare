@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SocialCocoonCard from '../SocialCocoonCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface SocialCocoonTabProps {
   socialCocoonData: {
@@ -10,9 +11,20 @@ interface SocialCocoonTabProps {
     moderationRate: number;
     topHashtags: Array<{ tag: string; count: number }>;
   };
+  isLoading?: boolean;
 }
 
-const SocialCocoonTab: React.FC<SocialCocoonTabProps> = ({ socialCocoonData }) => {
+const SocialCocoonTab: React.FC<SocialCocoonTabProps> = ({ socialCocoonData, isLoading = false }) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-64 w-full" />
+        <Skeleton className="h-64 w-full col-span-1 md:col-span-2" />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <SocialCocoonCard socialStats={socialCocoonData} />

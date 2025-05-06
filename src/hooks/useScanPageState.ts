@@ -40,7 +40,7 @@ export function useScanPageState(userId?: string) {
     fetchEmotionHistory().then(setEmotions);
   };
 
-  const refreshEmotionHistory = async () => {
+  const refreshEmotionHistory = async (): Promise<void> => {
     setLoading(true);
     try {
       const data = await fetchEmotionHistory();
