@@ -25,7 +25,7 @@ const ThemeSelectionField: React.FC<ThemeSelectionFieldProps> = ({ form }) => {
       control={form.control}
       name="theme"
       render={({ field }) => (
-        <FormItem className="space-y-3">
+        <FormItem className="space-y-4">
           <FormLabel className="flex items-center text-lg font-medium">
             <Palette className="mr-2 h-5 w-5" />
             Thème visuel
@@ -34,10 +34,10 @@ const ThemeSelectionField: React.FC<ThemeSelectionFieldProps> = ({ form }) => {
             <RadioGroup
               onValueChange={field.onChange}
               defaultValue={field.value}
-              className="grid grid-cols-1 md:grid-cols-4 gap-4"
+              className="grid grid-cols-1 md:grid-cols-4 gap-5"
             >
-              <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
-                <Sun className="h-8 w-8 text-amber-500" />
+              <div className={`flex flex-col items-center space-y-2.5 p-5 border rounded-xl hover:bg-accent/50 cursor-pointer transition-all ${field.value === "light" ? "bg-accent/30 ring-2 ring-primary/30" : ""}`}>
+                <Sun className="h-9 w-9 text-amber-500" />
                 <input 
                   type="radio"
                   id="light-theme"
@@ -46,11 +46,11 @@ const ThemeSelectionField: React.FC<ThemeSelectionFieldProps> = ({ form }) => {
                   className="sr-only"
                   checked={field.value === "light"}
                 />
-                <Label htmlFor="light-theme" className="cursor-pointer font-medium">Mode clair</Label>
-                <span className="text-xs text-muted-foreground text-center">Élégant et lumineux</span>
+                <Label htmlFor="light-theme" className="cursor-pointer font-medium text-base">Mode clair</Label>
+                <span className="text-sm text-muted-foreground text-center">Élégant et lumineux</span>
               </div>
-              <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
-                <Moon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+              <div className={`flex flex-col items-center space-y-2.5 p-5 border rounded-xl hover:bg-accent/50 cursor-pointer transition-all ${field.value === "dark" ? "bg-accent/30 ring-2 ring-primary/30" : ""}`}>
+                <Moon className="h-9 w-9 text-indigo-600 dark:text-indigo-400" />
                 <input
                   type="radio"
                   id="dark-theme"
@@ -59,11 +59,11 @@ const ThemeSelectionField: React.FC<ThemeSelectionFieldProps> = ({ form }) => {
                   className="sr-only"
                   checked={field.value === "dark"}
                 />
-                <Label htmlFor="dark-theme" className="cursor-pointer font-medium">Mode sombre</Label>
-                <span className="text-xs text-muted-foreground text-center">Premium et profond</span>
+                <Label htmlFor="dark-theme" className="cursor-pointer font-medium text-base">Mode sombre</Label>
+                <span className="text-sm text-muted-foreground text-center">Premium et profond</span>
               </div>
-              <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
-                <CloudSun className="h-8 w-8 text-blue-500" />
+              <div className={`flex flex-col items-center space-y-2.5 p-5 border rounded-xl hover:bg-accent/50 cursor-pointer transition-all ${field.value === "pastel" ? "bg-accent/30 ring-2 ring-primary/30" : ""}`}>
+                <CloudSun className="h-9 w-9 text-blue-500" />
                 <input
                   type="radio"
                   id="pastel-theme"
@@ -72,13 +72,13 @@ const ThemeSelectionField: React.FC<ThemeSelectionFieldProps> = ({ form }) => {
                   className="sr-only"
                   checked={field.value === "pastel"}
                 />
-                <Label htmlFor="pastel-theme" className="cursor-pointer font-medium">Mode pastel</Label>
-                <span className="text-xs text-muted-foreground text-center">Doux et apaisant</span>
+                <Label htmlFor="pastel-theme" className="cursor-pointer font-medium text-base">Mode pastel</Label>
+                <span className="text-sm text-muted-foreground text-center">Doux et apaisant</span>
               </div>
-              <div className="flex flex-col items-center space-y-2 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-all">
+              <div className={`flex flex-col items-center space-y-2.5 p-5 border rounded-xl hover:bg-accent/50 cursor-pointer transition-all ${field.value === "system" ? "bg-accent/30 ring-2 ring-primary/30" : ""}`}>
                 <div className="flex">
-                  <Sun className="h-8 w-8 text-amber-500" />
-                  <Moon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 -ml-3" />
+                  <Sun className="h-9 w-9 text-amber-500" />
+                  <Moon className="h-9 w-9 text-indigo-600 dark:text-indigo-400 -ml-3" />
                 </div>
                 <input
                   type="radio"
@@ -88,13 +88,13 @@ const ThemeSelectionField: React.FC<ThemeSelectionFieldProps> = ({ form }) => {
                   className="sr-only"
                   checked={field.value === "system"}
                 />
-                <Label htmlFor="system-theme" className="cursor-pointer font-medium">Système</Label>
-                <span className="text-xs text-muted-foreground text-center">Suit vos préférences systèmes</span>
+                <Label htmlFor="system-theme" className="cursor-pointer font-medium text-base">Système</Label>
+                <span className="text-sm text-muted-foreground text-center">Suit vos préférences systèmes</span>
               </div>
             </RadioGroup>
           </FormControl>
-          <FormDescription>
-            Cette option modifie l'apparence globale de l'application.
+          <FormDescription className="text-base">
+            Cette option modifie l'apparence globale de l'application pour une expérience personnalisée.
           </FormDescription>
           <FormMessage />
         </FormItem>

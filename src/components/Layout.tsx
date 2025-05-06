@@ -21,10 +21,15 @@ const Layout = ({ children }: LayoutProps) => {
   
   // Don't render layout for login/admin-login pages
   const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
+  const isHomePage = location.pathname === '/';
   
   // If on auth page or not authenticated, display only the children (pages login/register)
   if (isAuthPage || !isAuthenticated) {
-    return <div className="animate-fade-in">{children || <Outlet />}</div>;
+    return (
+      <div className="animate-fade-in min-h-screen">
+        {children || <Outlet />}
+      </div>
+    );
   }
   
   // Déterminer les classes de fond en fonction du thème
@@ -39,7 +44,7 @@ const Layout = ({ children }: LayoutProps) => {
       <GlobalNav />
       <SessionTimeoutAlert />
       <div className="flex flex-1 overflow-hidden pt-16">
-        {/* La sidebar n'apparaît que sur desktop */}
+        {/* La sidebar n'apparaît que sur desktop et pour les utilisateurs authentifiés */}
         {!isMobile && <Sidebar />}
         <div className={`flex-1 overflow-auto bg-background/80 backdrop-blur-sm transition-all ${isMobile ? 'w-full' : 'w-full pl-16'}`}>
           <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : 'premium-container py-8 md:px-8 lg:px-12'}`}>

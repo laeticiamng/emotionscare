@@ -45,20 +45,20 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         <Button 
           variant={variant} 
           size={size} 
-          className="focus-premium hover-lift"
+          className="focus-premium hover-lift shadow-sm"
         >
-          <ThemeIcon className="h-[1.2rem] w-[1.2rem]" />
-          {showLabel && <span className="ml-2">{themeText}</span>}
+          <ThemeIcon className="h-[1.3rem] w-[1.3rem]" />
+          {showLabel && <span className="ml-2 font-medium">{themeText}</span>}
           <span className="sr-only">Changer de thème</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[180px]">
+      <DropdownMenuContent align="end" className="min-w-[200px] shadow-premium">
         <DropdownMenuItem 
           onClick={() => handleThemeChange('light')}
-          className="cursor-pointer"
+          className="cursor-pointer py-2.5"
         >
-          <Sun className="mr-2 h-4 w-4" />
-          <span>Mode clair</span>
+          <Sun className="mr-2.5 h-5 w-5 text-amber-500" />
+          <span className="font-medium">Mode clair</span>
           {theme === 'light' && (
             <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
               Actif
@@ -67,10 +67,10 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('dark')}
-          className="cursor-pointer"
+          className="cursor-pointer py-2.5"
         >
-          <Moon className="mr-2 h-4 w-4" />
-          <span>Mode sombre</span>
+          <Moon className="mr-2.5 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+          <span className="font-medium">Mode sombre</span>
           {theme === 'dark' && (
             <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
               Actif
@@ -79,10 +79,10 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => handleThemeChange('pastel')}
-          className="cursor-pointer"
+          className="cursor-pointer py-2.5"
         >
-          <Palette className="mr-2 h-4 w-4" />
-          <span>Mode pastel</span>
+          <Palette className="mr-2.5 h-5 w-5 text-blue-500" />
+          <span className="font-medium">Mode pastel</span>
           {theme === 'pastel' && (
             <span className="ml-auto text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
               Actif

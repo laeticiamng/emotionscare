@@ -4,6 +4,7 @@ import { Shield, User } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import RoleCard from '@/components/home/RoleCard';
 import ValueProposition from '@/components/home/ValueProposition';
+import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 
 const Index = () => {
   const { theme } = useTheme();
@@ -36,6 +37,10 @@ const Index = () => {
         <p className="text-base md:text-xl italic font-light max-w-2xl mx-auto text-muted-foreground text-balance">
           Votre bien-être au cœur de votre journée professionnelle
         </p>
+        
+        <div className="mt-6">
+          <ThemeSwitcher variant="outline" size="default" showLabel={true} />
+        </div>
       </header>
       
       {/* Main Content */}

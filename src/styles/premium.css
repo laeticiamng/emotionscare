@@ -194,3 +194,42 @@
     @apply py-6;
   }
 }
+
+/* Enhanced card elevation and depth */
+.card-elevated {
+  @apply transition-all duration-300;
+}
+
+.light .card-elevated {
+  @apply shadow-lg hover:shadow-xl;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .card-elevated {
+  @apply shadow-xl hover:shadow-2xl;
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.35);
+}
+
+.pastel .card-elevated {
+  @apply shadow-lg hover:shadow-xl;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Improved spacing for better readability */
+.content-spacious {
+  @apply space-y-6 lg:space-y-8;
+}
+
+/* Enhanced typography for better readability */
+.text-enhanced {
+  @apply leading-relaxed tracking-wide;
+}
+
+.text-premium {
+  @apply font-medium tracking-tight;
+}
+
+/* Larger text sizes */
+.text-larger {
+  font-size: 105%;
+}

@@ -16,13 +16,13 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const getThemeIcon = () => {
     switch (theme) {
       case 'light':
-        return <Moon className="h-5 w-5" />;
+        return <Moon className="h-[1.3rem] w-[1.3rem]" />;
       case 'dark':
-        return <Sun className="h-5 w-5" />;
+        return <Sun className="h-[1.3rem] w-[1.3rem]" />;
       case 'pastel':
-        return <CloudSun className="h-5 w-5" />;
+        return <CloudSun className="h-[1.3rem] w-[1.3rem]" />;
       default:
-        return <Moon className="h-5 w-5" />;
+        return <Moon className="h-[1.3rem] w-[1.3rem]" />;
     }
   };
 
@@ -47,13 +47,13 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="w-full h-10"
+            className="w-full h-10 focus-premium hover-lift"
             onClick={toggleTheme}
           >
             {getThemeIcon()}
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="right">
+        <TooltipContent side="right" className="font-medium">
           {getThemeTooltipText()}
         </TooltipContent>
       </Tooltip>
@@ -61,11 +61,11 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   ) : (
     <Button
       variant="ghost"
-      className="w-full justify-start px-3"
+      className="w-full justify-start px-3 focus-premium hover-lift"
       onClick={toggleTheme}
     >
       {getThemeIcon()}
-      <span className="ml-2">{getThemeTooltipText()}</span>
+      <span className="ml-2 font-medium">{getThemeTooltipText()}</span>
     </Button>
   );
 };

@@ -27,7 +27,7 @@ const CallToAction: React.FC<CallToActionProps> = ({ type, className = '' }) => 
       className={`w-full max-w-xs hover-lift shadow-premium ${className}`}
       variant={type === 'admin' ? 'outline' : 'default'}
     >
-      {type === 'user' ? 'Me connecter' : 'Connexion Admin'}
+      <span className="mr-1.5">{type === 'user' ? 'Me connecter' : 'Connexion Admin'}</span>
       <ArrowRight size={18} />
     </Button>
   );

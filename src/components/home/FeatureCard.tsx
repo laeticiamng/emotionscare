@@ -8,9 +8,9 @@ interface FeatureCardProps {
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description }) => {
   return (
-    <div className="card-premium p-6 text-center hover-lift">
-      <h3 className="font-medium text-xl mb-3 heading-elegant">{title}</h3>
-      <p className="text-muted-foreground text-balance">{description}</p>
+    <div className="card-premium p-7 text-center hover-lift shadow-premium">
+      <h3 className="font-medium text-xl mb-4 heading-elegant">{title}</h3>
+      <p className="text-muted-foreground text-balance text-[1.05rem] leading-relaxed">{description}</p>
     </div>
   );
 };
