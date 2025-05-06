@@ -1,7 +1,7 @@
 
 import React from 'react';
 import GdprDisclaimer from './overview/GdprDisclaimer';
-import KpiCardsGrid from '../KpiCardsGrid';
+import DraggableKpiCardsGrid from '../DraggableKpiCardsGrid';
 import ChartSwitcher from '../../charts/ChartSwitcher';
 import { ChartData, DashboardStats, GamificationData } from './overview/types';
 
@@ -37,8 +37,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
         data={emotionalScoreTrend}
       />
       
-      {/* KPI Summary Cards */}
-      <KpiCardsGrid 
+      {/* KPI Summary Cards - Now using DraggableKpiCardsGrid instead of regular KpiCardsGrid */}
+      <DraggableKpiCardsGrid 
         dashboardStats={dashboardStats}
         gamificationData={gamificationData}
       />
