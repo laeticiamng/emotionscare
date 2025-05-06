@@ -1,7 +1,15 @@
 
 import React from 'react';
 import NavItemButton from './NavItemButton';
-import { NavItemConfig } from '@/components/navigation/navConfig';
+import { LucideIcon } from 'lucide-react';
+
+// Définition de l'interface manquante
+interface NavItemConfig {
+  path: string;
+  label: string;
+  icon: React.ReactElement;
+  roles?: string[];
+}
 
 interface SidebarNavGroupProps {
   title: string;
