@@ -127,7 +127,14 @@ export function getOpenAIHeaders(apiKey: string) {
  * Generate a cache key for OpenAI requests
  */
 export function generateCacheKey(model: string, messages: any[]): string {
-  // Use the last user message as the key, plus the model
-  const lastUserMessage = messages.findLast(m => m.role === 'user')?.content || '';
+  // Find the last user message (replacing findLast with a more compatible approach)
+  let lastUserMessage = '';
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === 'user') {
+      lastUserMessage = messages[i].content || '';
+      break;
+    }
+  }
+  
   return `${model}:${lastUserMessage.substring(0, 100)}`;
 }
