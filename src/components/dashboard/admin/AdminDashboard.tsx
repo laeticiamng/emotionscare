@@ -130,6 +130,18 @@ const AdminDashboard: React.FC = () => {
     loadDashboardData();
   }, [timePeriod]);
   
+  // Calculate stats for dashboard KPIs
+  const dashboardStats = {
+    productivity: {
+      current: 87,
+      trend: 2.5
+    },
+    emotionalScore: {
+      current: 78,
+      trend: 3.8
+    }
+  };
+  
   return (
     <div className="max-w-7xl mx-auto">
       {/* Hero Section with Period Selector */}
@@ -189,10 +201,9 @@ const AdminDashboard: React.FC = () => {
         {/* Tab Contents */}
         <TabsContent value="vue-globale" className="mt-6">
           <GlobalOverviewTab 
-            absenteeismData={absenteeismData}
+            absenteeismChartData={absenteeismData}
             emotionalScoreTrend={emotionalScoreTrend}
-            isLoading={isLoading}
-            socialCocoonData={socialCocoonData}
+            dashboardStats={dashboardStats}
             gamificationData={gamificationData}
           />
         </TabsContent>
