@@ -29,9 +29,9 @@ const Layout = ({ children }: LayoutProps) => {
   
   // Déterminer les classes de fond en fonction du thème
   const getBgClasses = () => {
-    if (theme === 'dark') return 'bg-dark-gradient';
-    if (theme === 'pastel') return 'bg-pastel-gradient';
-    return 'bg-light-gradient';
+    if (theme === 'dark') return 'bg-gradient-to-br from-[#1F2430] to-[#2A303D]';
+    if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-blue-100/70';
+    return 'bg-gradient-to-br from-white to-gray-100';
   };
   
   return (
@@ -41,8 +41,8 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-1 overflow-hidden pt-16">
         {/* La sidebar n'apparaît que sur desktop */}
         {!isMobile && <Sidebar />}
-        <div className={`flex-1 overflow-auto bg-background transition-all ${isMobile ? 'w-full' : 'w-full pl-16'}`}>
-          <main className={`animate-fade-in ${isMobile ? 'w-full px-2 py-3' : 'premium-layout px-6 py-8 md:px-8 lg:px-12 xl:px-16'}`}>
+        <div className={`flex-1 overflow-auto bg-background/80 backdrop-blur-sm transition-all ${isMobile ? 'w-full' : 'w-full pl-16'}`}>
+          <main className={`animate-fade-in ${isMobile ? 'w-full px-3 py-4' : 'premium-container py-8 md:px-8 lg:px-12'}`}>
             {children || <Outlet />}
           </main>
           <SecurityFooter />

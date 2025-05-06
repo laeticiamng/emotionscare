@@ -12,9 +12,9 @@ import PreferencesForm from '@/components/preferences/PreferencesForm';
 const UserPreferences = () => {
   return (
     <div className="container max-w-4xl py-10">
-      <Card className="premium-card">
+      <Card className="card-premium">
         <CardHeader>
-          <CardTitle className="text-2xl">Mes préférences</CardTitle>
+          <CardTitle className="text-2xl heading-elegant">Mes préférences</CardTitle>
           <CardDescription>Personnalisez votre expérience EmotionsCare</CardDescription>
         </CardHeader>
 

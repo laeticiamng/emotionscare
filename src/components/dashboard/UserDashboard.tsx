@@ -10,7 +10,7 @@ import DashboardFooter from './DashboardFooter';
 import type { User } from '@/types';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, LayoutDashboard, LayoutGrid } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UserDashboardProps {
@@ -41,31 +41,41 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   };
   
   return (
-    <div className={`${isMobile ? 'px-0' : 'content-spacious'} animate-fade-in`}>
+    <div className={`${isMobile ? 'px-0' : 'content-premium'} animate-fade-in`}>
       <div className="flex justify-between items-center flex-wrap gap-3 mb-6">
         <DashboardHeader user={user} />
         {!isMobile && (
           <Button 
             variant="outline" 
-            className="ml-auto"
+            className="ml-auto focus-premium btn-premium"
             onClick={() => setMinimalView(!minimalView)}
           >
-            {minimalView ? 'Vue Complète' : 'Vue Minimaliste'}
+            {minimalView ? (
+              <>
+                <LayoutDashboard size={18} />
+                <span>Vue Complète</span>
+              </>
+            ) : (
+              <>
+                <LayoutGrid size={18} />
+                <span>Vue Minimaliste</span>
+              </>
+            )}
           </Button>
         )}
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+      <div className="dashboard-premium">
         {/* Main Content Area */}
-        <div className="col-span-1 lg:col-span-8 space-y-6">
+        <div className="dashboard-main">
           {/* Modules Section */}
-          <div className="premium-card p-4 lg:p-6">
+          <div className="card-premium p-4 lg:p-6">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('modules')}
             >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>Modules</h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto">
+              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Modules</h2>
+              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
                 {collapsedSections.modules ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
               </Button>
             </div>
@@ -78,15 +88,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           </div>
           
           {/* Emotion Scan Section */}
-          <div className="premium-card p-4 lg:p-6">
+          <div className="card-premium p-4 lg:p-6">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('emotionScan')}
             >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>
+              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>
                 {isMobile ? 'Santé Émotionnelle' : 'Votre Santé Émotionnelle'}
               </h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto">
+              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
                 {collapsedSections.emotionScan ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
               </Button>
             </div>
@@ -100,13 +110,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           
           {/* Social Section - Only in full view */}
           {(!minimalView || isMobile) && (
-            <div className="premium-card p-4 lg:p-6">
+            <div className="card-premium p-4 lg:p-6">
               <div 
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleSection('social')}
               >
-                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>Communauté</h2>
-                <Button variant="ghost" size="sm" className="p-1 h-auto">
+                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Communauté</h2>
+                <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
                   {collapsedSections.social ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
                 </Button>
               </div>
@@ -121,15 +131,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         </div>
         
         {/* Side Panel */}
-        <div className="col-span-1 lg:col-span-4 space-y-6">
+        <div className="dashboard-side">
           {/* User Side Panel */}
-          <div className="premium-card p-4 lg:p-6">
+          <div className="card-premium p-4 lg:p-6">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('sidePanel')}
             >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>Profil</h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto">
+              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Profil</h2>
+              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
                 {collapsedSections.sidePanel ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
               </Button>
             </div>
@@ -142,13 +152,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           </div>
           
           {/* VR Prompt Widget */}
-          <div className="premium-card p-4 lg:p-6">
+          <div className="card-premium p-4 lg:p-6">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('vr')}
             >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>Micro-pause VR</h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto">
+              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Micro-pause VR</h2>
+              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
                 {collapsedSections.vr ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
               </Button>
             </div>
@@ -165,13 +175,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           
           {/* Gamification Widget - Only in full view or on mobile */}
           {(!minimalView || isMobile) && (
-            <div className="premium-card p-4 lg:p-6">
+            <div className="card-premium p-4 lg:p-6">
               <div 
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleSection('gamification')}
               >
-                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold`}>Récompenses</h2>
-                <Button variant="ghost" size="sm" className="p-1 h-auto">
+                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Récompenses</h2>
+                <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
                   {collapsedSections.gamification ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
                 </Button>
               </div>

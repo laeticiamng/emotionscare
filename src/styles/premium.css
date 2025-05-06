@@ -1,0 +1,196 @@
+
+/* Premium UI Enhancements */
+
+/* Glassmorphism Cards */
+.glassmorphism {
+  @apply backdrop-blur-sm border bg-background/80 shadow-sm transition-all;
+}
+
+.light .glassmorphism {
+  @apply border-gray-100/40 shadow-sm;
+}
+
+.dark .glassmorphism {
+  @apply border-gray-700/40 shadow-md;
+}
+
+.pastel .glassmorphism {
+  @apply border-blue-200/40 shadow-sm;
+}
+
+/* Premium Card Container */
+.premium-container {
+  @apply max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-12;
+}
+
+/* Improved Button Variants */
+.btn-premium {
+  @apply rounded-xl transform transition-all duration-300 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary/50;
+}
+
+.light .btn-premium {
+  @apply hover:shadow-md;
+}
+
+.dark .btn-premium {
+  @apply hover:shadow-[0_8px_16px_rgba(0,0,0,0.2)];
+}
+
+.pastel .btn-premium {
+  @apply hover:shadow-md;
+}
+
+/* Elegant Section Spacing */
+.section-elegant {
+  @apply py-10 md:py-16;
+}
+
+/* Premium Typography */
+.heading-elegant {
+  @apply font-medium tracking-tight;
+}
+
+/* Premium Transitions */
+.premium-transition {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Advanced Card Styles */
+.card-premium {
+  @apply rounded-2xl border shadow-sm overflow-hidden transition-all duration-300;
+}
+
+.light .card-premium {
+  @apply border-gray-100/50 bg-white shadow-sm hover:shadow-md;
+}
+
+.dark .card-premium {
+  @apply border-gray-800/50 bg-[#1F2430] shadow-md hover:shadow-lg;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.pastel .card-premium {
+  @apply border-blue-100/70 bg-blue-50/80 shadow-sm hover:shadow-md;
+}
+
+/* Premium Layout Spacing */
+.content-premium {
+  @apply space-y-8 md:space-y-12;
+}
+
+/* Apple-inspired Design Elements */
+.apple-button {
+  @apply rounded-xl bg-primary text-primary-foreground px-6 py-3 font-medium transition-all duration-300 transform hover:-translate-y-0.5 hover:shadow-md active:translate-y-0;
+}
+
+.apple-card {
+  @apply rounded-2xl border shadow-md overflow-hidden transition-all;
+}
+
+.light .apple-card {
+  @apply border-gray-100/70 bg-white;
+}
+
+.dark .apple-card {
+  @apply border-gray-800/70 bg-[#1F2430];
+}
+
+.pastel .apple-card {
+  @apply border-blue-100/70 bg-blue-50/90;
+}
+
+/* Premium Form Controls */
+.input-premium {
+  @apply rounded-xl border-input bg-background px-4 py-3 text-foreground shadow-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/30;
+}
+
+/* Premium Grid Layouts */
+.grid-premium {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8;
+}
+
+/* Premium Avatar */
+.avatar-premium {
+  @apply rounded-full border-2 border-primary/20 shadow-sm overflow-hidden;
+}
+
+/* Premium Gradients */
+.gradient-light {
+  @apply bg-gradient-to-br from-white to-gray-100;
+}
+
+.gradient-dark {
+  @apply bg-gradient-to-br from-[#1F2430] to-[#2A303D];
+}
+
+.gradient-pastel {
+  @apply bg-gradient-to-br from-blue-50 to-blue-100/70;
+}
+
+/* Text Enhancements */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Premium Dashboard Layout */
+.dashboard-premium {
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8;
+}
+
+.dashboard-main {
+  @apply col-span-1 lg:col-span-8 space-y-6;
+}
+
+.dashboard-side {
+  @apply col-span-1 lg:col-span-4 space-y-6;
+}
+
+/* Animation Improvements */
+.hover-lift {
+  @apply transition-transform duration-300 hover:-translate-y-1;
+}
+
+.hover-grow {
+  @apply transition-transform duration-300 hover:scale-[1.02];
+}
+
+/* Focus and Active States */
+.focus-premium {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2;
+}
+
+/* Improved shadows */
+.shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Device adaptations */
+@media (max-width: 640px) {
+  .card-premium {
+    @apply rounded-xl;
+  }
+  
+  .apple-button {
+    @apply px-4 py-2;
+  }
+}
+
+/* Premium status indicators */
+.status-dot {
+  @apply inline-block h-2.5 w-2.5 rounded-full;
+}
+
+/* Mobile optimization */
+@media (max-width: 640px) {
+  .premium-container {
+    @apply px-3;
+  }
+  
+  .section-elegant {
+    @apply py-6;
+  }
+}
