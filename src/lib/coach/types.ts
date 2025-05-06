@@ -10,12 +10,12 @@ export type CoachAction = {
   payload?: any;
 };
 
-// Add notification type for coach service
+// Update notification type for coach service to include title and support more notification types
 export type CoachNotification = {
   id: string;
-  user_id: string;
+  type: 'info' | 'warning' | 'success' | 'error' | 'system' | 'invitation' | 'reminder';
+  title: string;
   message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
   timestamp: Date;
   read?: boolean;
   link?: string;
