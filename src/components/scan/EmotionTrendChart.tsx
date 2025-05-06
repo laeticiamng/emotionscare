@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
+import { ChartInteractiveLegend } from '@/components/ui/chart';
+import { useMediaQuery } from '@/hooks/use-mobile';
 import type { Emotion } from '@/types';
 
 interface EmotionTrendChartProps {
@@ -10,6 +12,9 @@ interface EmotionTrendChartProps {
 }
 
 const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 7 }) => {
+  const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  
   // Format data for the chart
   const chartData = React.useMemo(() => {
     const recentEmotions = emotions.slice(0, days).reverse();
@@ -28,6 +33,14 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
     return '#ef4444'; // red
   };
 
+  const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
+    if (isHidden) {
+      setHiddenSeries(hiddenSeries.filter(key => key !== dataKey));
+    } else {
+      setHiddenSeries([...hiddenSeries, dataKey]);
+    }
+  };
+
   if (emotions.length === 0) {
     return (
       <Card className="p-4 text-center text-muted-foreground">
@@ -41,7 +54,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
           <XAxis 
@@ -58,13 +71,23 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
             labelFormatter={(label) => `Date: ${label}`}
             contentStyle={{ borderRadius: '8px', padding: '10px' }}
           />
-          <Line
-            type="monotone"
-            dataKey="score"
-            stroke="#9b87f5"
-            strokeWidth={3}
-            dot={{ stroke: '#9b87f5', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 8, fill: '#7E69AB' }}
+          {!hiddenSeries.includes('score') && (
+            <Line
+              type="monotone"
+              dataKey="score"
+              stroke="#9b87f5"
+              strokeWidth={3}
+              dot={{ stroke: '#9b87f5', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 8, fill: '#7E69AB' }}
+              name="Score émotionnel"
+            />
+          )}
+          <ChartInteractiveLegend 
+            onToggleSeries={handleToggleSeries}
+            hiddenSeries={hiddenSeries}
+            verticalAlign={isMobile ? "bottom" : "top"}
+            align="right"
+            layout={isMobile ? "vertical" : "horizontal"}
           />
         </LineChart>
       </ResponsiveContainer>

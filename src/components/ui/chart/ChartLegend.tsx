@@ -13,10 +13,24 @@ const ChartLegendContent = React.forwardRef<
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean;
       nameKey?: string;
+      onClick?: (item: any) => void;
+      hiddenSeries?: string[];
+      activeClassName?: string;
+      inactiveClassName?: string;
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
+    { 
+      className, 
+      hideIcon = false, 
+      payload, 
+      verticalAlign = "bottom", 
+      nameKey,
+      onClick,
+      hiddenSeries = [],
+      activeClassName = "",
+      inactiveClassName = ""
+    },
     ref
   ) => {
     const { config } = useChart();
@@ -24,6 +38,21 @@ const ChartLegendContent = React.forwardRef<
     if (!payload?.length) {
       return null;
     }
+
+    const handleClick = (item: any) => {
+      if (onClick) {
+        onClick(item);
+      }
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent, item: any) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (onClick) {
+          onClick(item);
+        }
+      }
+    };
 
     return (
       <div
@@ -37,25 +66,37 @@ const ChartLegendContent = React.forwardRef<
         {payload.map((item) => {
           const key = `${nameKey || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
-
+          const isHidden = hiddenSeries.includes(key);
+          
           return (
             <div
               key={item.value}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
+                onClick ? "cursor-pointer" : "",
+                isHidden ? inactiveClassName : activeClassName
               )}
+              onClick={() => handleClick(item)}
+              onKeyDown={(e) => handleKeyDown(e, item)}
+              tabIndex={onClick ? 0 : undefined}
+              role={onClick ? "button" : undefined}
+              aria-pressed={isHidden}
+              aria-label={onClick ? `Basculer la série ${item.value}` : undefined}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
+                  className={cn(
+                    "h-2 w-2 shrink-0 rounded-[2px]",
+                    isHidden && "opacity-40"
+                  )}
                   style={{
                     backgroundColor: item.color,
                   }}
                 />
               )}
-              {itemConfig?.label}
+              {itemConfig?.label || item.value}
             </div>
           );
         })}
@@ -63,6 +104,6 @@ const ChartLegendContent = React.forwardRef<
     );
   }
 );
-ChartLegendContent.displayName = "ChartLegend";
+ChartLegendContent.displayName = "ChartLegendContent";
 
 export { ChartLegend, ChartLegendContent };
