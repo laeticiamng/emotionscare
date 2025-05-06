@@ -17,10 +17,11 @@ serve(async (req) => {
 
   try {
     if (!openAIApiKey) {
+      console.error("API key missing");
       throw new Error("API key missing");
     }
 
-    // Simple request to OpenAI to check connection
+    // Simple request to OpenAI to check connection with the new model format
     const response = await fetch('https://api.openai.com/v1/models', {
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`
@@ -28,13 +29,36 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`API returned status ${response.status}: ${errorText}`);
       throw new Error(`API returned status ${response.status}`);
     }
 
     const data = await response.json();
+    
+    // Check if we have access to the required models
+    const availableModels = data.data.map((model: any) => model.id);
+    
+    const requiredModels = [
+      "gpt-4o-mini-2024-07-18", 
+      "gpt-4o-2024-08-06"
+    ];
+    
+    // Check if at least one of our required models is available
+    const hasRequiredModel = requiredModels.some(model => 
+      availableModels.includes(model) || 
+      availableModels.some((m: string) => m.startsWith(model.split('-').slice(0, 2).join('-')))
+    );
+    
+    if (!hasRequiredModel) {
+      console.warn("No required models available:", requiredModels);
+      console.log("Available models:", availableModels);
+    }
+
     return new Response(JSON.stringify({ 
       connected: true,
-      models: data.data?.length || 0
+      models: data.data?.length || 0,
+      hasRequiredModels: hasRequiredModel
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

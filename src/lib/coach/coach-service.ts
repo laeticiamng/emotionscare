@@ -1,5 +1,5 @@
 
-import { CoachAction, CoachEvent } from './types';
+import { CoachAction, CoachEvent, AI_MODEL_CONFIG, CoachModule } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { actionExecutor } from './action-executor';
 import { determineActions } from './emotional-data';
@@ -29,15 +29,16 @@ class CoachService {
    */
   async checkAPIConnection(): Promise<boolean> {
     try {
-      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-        body: {
-          message: "Simple connection test, please respond with 'API connection successful'",
-          userContext: null
-        }
+      const { data, error } = await supabase.functions.invoke('check-api-connection', {
+        body: {}
       });
       
-      if (error) throw error;
-      return data && data.response && data.response.includes('connection');
+      if (error) {
+        console.error('API connection check failed:', error);
+        return false;
+      }
+      
+      return data && data.connected === true;
     } catch (error) {
       console.error('API connection check failed:', error);
       return false;
@@ -71,6 +72,32 @@ class CoachService {
   }
 
   /**
+   * Sélectionner le modèle approprié en fonction du module et du contexte
+   */
+  selectModel(module: CoachModule, context?: any): string {
+    // Budget control logic
+    const monthlyUsage = this.getMonthlyUsage();
+    const threshold = 100; // Example threshold in USD
+    
+    // Fallback to cheaper model if budget exceeded
+    if (monthlyUsage > threshold && module !== 'scan') {
+      return "gpt-4o-mini-2024-07-18";
+    }
+    
+    // Use the configured model for the module
+    return AI_MODEL_CONFIG[module].model;
+  }
+  
+  /**
+   * Get estimated monthly usage (placeholder implementation)
+   */
+  private getMonthlyUsage(): number {
+    // In a real implementation, this would query usage metrics from a database
+    // For now, return a mock value
+    return 50; // Example: $50 spent this month
+  }
+
+  /**
    * Envoyer une question directement au coach
    */
   async askCoachQuestion(userId: string, question: string): Promise<string> {
@@ -96,11 +123,15 @@ class CoachService {
         };
       }
       
+      // Determine model based on question length and complexity
+      const model = question.length > 100 ? "gpt-4.1-2025-04-14" : "gpt-4o-mini-2024-07-18";
+      
       // Send question to OpenAI
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
           message: question,
-          userContext
+          userContext,
+          model
         }
       });
       

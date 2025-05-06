@@ -1,33 +1,70 @@
 
-// Types for the Coach service
-export interface CoachEvent {
-  type: 'scan_completed' | 'predictive_alert' | 'daily_reminder';
+export type CoachEvent = {
+  type: 'scan_completed' | 'predictive_alert' | 'daily_reminder' | 'api_check';
   user_id: string;
   data?: any;
-}
+};
 
-export interface CoachAction {
+export type CoachAction = {
   type: string;
   payload?: any;
-}
+};
 
-export interface CoachRoutine {
-  name: string;
-  description: string;
-  trigger: string;
-  actions: CoachAction[];
-  priority: number; // Priorité de la routine (plus élevée = plus importante)
-}
+// Add additional types for coach service
+export type EmotionalData = {
+  emotion?: string;
+  emojis?: string;
+  score?: number;
+  date?: string;
+  intensity?: number;
+  feedback?: string;
+};
 
-export interface CoachNotification {
-  id: string;
-  message: string;
-  type: 'info' | 'warning' | 'success';
-  timestamp: Date;
-}
+export type AIModelParams = {
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  stream: boolean;
+};
 
-export interface UserEmotionalData {
-  lastEmotions: Array<{ emotion: string, timestamp: Date, confidence: number }>;
-  averageScore: number;
-  trends: { [key: string]: number };
-}
+export type CoachModule = 'chat' | 'coach' | 'journal' | 'buddy' | 'scan';
+
+// Config for different AI models based on module
+export const AI_MODEL_CONFIG: Record<CoachModule, AIModelParams> = {
+  chat: {
+    model: "gpt-4o-mini-2024-07-18",
+    temperature: 0.2,
+    max_tokens: 256,
+    top_p: 1.0,
+    stream: false
+  },
+  coach: {
+    model: "gpt-4.1-2025-04-14",
+    temperature: 0.4,
+    max_tokens: 512,
+    top_p: 1.0,
+    stream: true
+  },
+  journal: {
+    model: "gpt-4.1-2025-04-14",
+    temperature: 0.3,
+    max_tokens: 1024,
+    top_p: 1.0,
+    stream: false
+  },
+  buddy: {
+    model: "gpt-4o-mini-2024-07-18",
+    temperature: 0.5,
+    max_tokens: 256,
+    top_p: 1.0,
+    stream: false
+  },
+  scan: {
+    model: "gpt-4o-mini-2024-07-18",
+    temperature: 0.2,
+    max_tokens: 128,
+    top_p: 1.0,
+    stream: false
+  }
+};

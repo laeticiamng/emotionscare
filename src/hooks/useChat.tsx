@@ -3,7 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { v4 as uuidv4 } from '@faker-js/faker';
+// Fix for the v4 import error
+import { faker } from '@faker-js/faker';
 
 type ChatMessage = {
   id: string;
@@ -33,7 +34,8 @@ export function useChat() {
     if (storedSessionId) {
       setSessionId(storedSessionId);
     } else {
-      const newSessionId = uuidv4();
+      // Use faker.string.uuid() instead of v4
+      const newSessionId = faker.string.uuid();
       localStorage.setItem('emotionscare_chat_session', newSessionId);
       setSessionId(newSessionId);
     }
@@ -70,17 +72,20 @@ export function useChat() {
       // Récupérer le contexte émotionnel de l'utilisateur
       const userContext = await getUserContext(user?.id);
       
+      // Determine which model to use based on the message content and length
+      const model = text.length > 100 ? "gpt-4.1-2025-04-14" : "gpt-4o-mini-2024-07-18";
+      
       // Préparer les options pour l'appel à l'API
       const options = {
         message: text,
         userContext,
         sessionId,
-        stream: useStream
+        stream: useStream,
+        model
       };
 
       // Appel à la fonction Edge Supabase
       if (useStream) {
-        // Mise en place pour le streaming (à implémenter si nécessaire)
         console.log("Streaming not fully implemented yet");
       }
       
@@ -173,11 +178,7 @@ export function useChat() {
 
   // Fonction pour charger l'historique des messages
   const loadMessageHistory = useCallback(async () => {
-    // Cette fonction pourrait être développée pour charger l'historique des messages
-    // depuis Supabase si on souhaite persister les conversations
     console.log('Chargement de l\'historique des messages pour la session:', sessionId);
-    
-    // Pour l'instant, nous gardons la conversation en mémoire uniquement
     return messages;
   }, [sessionId, messages]);
 

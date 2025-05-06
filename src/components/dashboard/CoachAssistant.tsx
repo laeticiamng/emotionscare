@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,7 @@ interface CoachAssistantProps {
 const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [apiReady, setApiReady] = useState(true);
 
   // Vérifier la connexion API lors du chargement
   useEffect(() => {
@@ -28,10 +29,22 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
       // Vérification de la connexion à l'API
       const checkAPIConnection = async () => {
         try {
-          const testResult = await triggerCoachEvent('api_check', user.id);
-          console.log("API OpenAI connection check:", testResult ? "OK" : "Error");
+          const result = await triggerCoachEvent('api_check', user.id);
+          // Fix boolean check by calling an actual function instead
+          const success = await checkConnectionStatus(user.id);
+          console.log("API OpenAI connection check:", success ? "OK" : "Error");
+          setApiReady(success);
+          
+          if (!success) {
+            toast({
+              title: "Erreur de connexion",
+              description: "La connexion à l'API OpenAI n'a pas pu être établie. Certaines fonctionnalités peuvent être limitées.",
+              variant: "destructive"
+            });
+          }
         } catch (error) {
           console.error("Error connecting to OpenAI API:", error);
+          setApiReady(false);
           toast({
             title: "Erreur de connexion",
             description: "La connexion à l'API OpenAI n'a pas pu être établie. Certaines fonctionnalités peuvent être limitées.",
@@ -48,13 +61,27 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
       }, 1000);
     }
   }, [user?.id, toast]);
+  
+  // Function to check the API connection status
+  const checkConnectionStatus = async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('check-api-connection', {
+        body: { userId }
+      });
+      
+      return data?.connected === true;
+    } catch (error) {
+      console.error("Error checking API connection status:", error);
+      return false;
+    }
+  };
 
   return (
     <Card className={cn("flex flex-col premium-card", className)} style={style}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-xl heading-premium">
           <Sparkles className="h-5 w-5 text-primary" />
-          Coach IA
+          Coach IA {apiReady ? '' : '(Limité)'}
         </CardTitle>
       </CardHeader>
       

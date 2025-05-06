@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Brain, Loader2 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { AI_MODEL_CONFIG } from '@/lib/coach/types';
 
 const CoachRecommendations: React.FC = () => {
   const [recommendations, setRecommendations] = useState<string[]>([]);
@@ -35,6 +36,9 @@ const CoachRecommendations: React.FC = () => {
         Math.round(emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length) : 
         50;
       
+      // Using the scan model config for recommendations
+      const modelConfig = AI_MODEL_CONFIG.scan;
+      
       // Générer des recommandations avec l'API OpenAI
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
@@ -42,7 +46,12 @@ const CoachRecommendations: React.FC = () => {
           userContext: {
             recentEmotions,
             currentScore: avgScore
-          }
+          },
+          model: modelConfig.model,
+          temperature: modelConfig.temperature,
+          max_tokens: modelConfig.max_tokens,
+          top_p: modelConfig.top_p,
+          stream: modelConfig.stream
         }
       });
       

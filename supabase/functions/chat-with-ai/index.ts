@@ -9,6 +9,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Cache implementation for frequent requests
+const cache = new Map();
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -21,11 +24,35 @@ serve(async (req) => {
       throw new Error("OpenAI API key is not configured");
     }
 
-    const { message, userContext, sessionId, stream = false } = await req.json();
+    // Parse request body
+    const { 
+      message, 
+      userContext, 
+      sessionId, 
+      stream = false, 
+      model = "gpt-4o-mini-2024-07-18", // Default to cheaper model
+      temperature = 0.6, 
+      max_tokens = 512, 
+      top_p = 1.0 
+    } = await req.json();
     
     console.log("Received request with message:", message);
     console.log("User context:", userContext);
     console.log("Session ID:", sessionId);
+    console.log("Model:", model);
+
+    // Check cache for FAQ-type questions (only for non-streaming responses)
+    if (!stream && !userContext) {
+      const cacheKey = `${model}:${message}`;
+      const cachedResponse = cache.get(cacheKey);
+      
+      if (cachedResponse) {
+        console.log("Returning cached response");
+        return new Response(JSON.stringify(cachedResponse), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     // Construire un prompt adapté au contexte de l'utilisateur
     const systemPrompt = userContext ? 
@@ -39,18 +66,22 @@ serve(async (req) => {
 
     console.log("System prompt:", systemPrompt);
     
+    // Build OpenAI request body with the specified or default parameters
     const requestBody = {
-      model: 'gpt-4', // Utilisation de GPT-4 standard comme demandé
+      model: model, 
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
       ],
-      temperature: 0.6, // Température équilibrée comme recommandé
-      max_tokens: 1024, // Pour des réponses complètes
-      stream: stream // Support du streaming si demandé
+      temperature: temperature,
+      max_tokens: max_tokens,
+      top_p: top_p,
+      stream: stream
     };
 
-    // Si stream est activé, gérer différemment la réponse
+    console.log("Request to OpenAI:", JSON.stringify(requestBody, null, 2));
+
+    // If stream is activated, handle differently
     if (stream) {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -61,7 +92,7 @@ serve(async (req) => {
         body: JSON.stringify(requestBody),
       });
 
-      // Retourner directement le flux de la réponse
+      // Return the stream directly
       return new Response(response.body, {
         headers: { 
           ...corsHeaders, 
@@ -71,7 +102,7 @@ serve(async (req) => {
         },
       });
     } else {
-      // Traitement normal pour les réponses non streamées
+      // Regular non-streaming request
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -92,21 +123,31 @@ serve(async (req) => {
       const aiResponse = data.choices[0].message.content.trim();
       console.log("Formatted AI response received");
 
-      // Stocker le message et la réponse si un sessionId est fourni
+      // Cache FAQ-type responses (if no user context) with 24-hour TTL
+      if (!userContext) {
+        const cacheKey = `${model}:${message}`;
+        cache.set(cacheKey, { response: aiResponse, sessionId });
+        
+        // Set a timeout to delete from cache after 24 hours
+        setTimeout(() => {
+          cache.delete(cacheKey);
+        }, 24 * 60 * 60 * 1000); 
+      }
+
+      // Store the message and response if sessionId is provided
       if (sessionId) {
         try {
-          // Cette partie pourrait être étendue pour stocker les messages dans une table Supabase
           console.log(`Storing message in session ${sessionId}`);
-          // Implémentation à développer selon les besoins
+          // Implementation to be developed as needed
         } catch (storageError) {
           console.error("Error storing message:", storageError);
-          // Ne pas bloquer la réponse en cas d'erreur de stockage
         }
       }
 
       return new Response(JSON.stringify({ 
         response: aiResponse,
-        sessionId: sessionId
+        sessionId: sessionId,
+        model: model // Return the model used for debugging
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
