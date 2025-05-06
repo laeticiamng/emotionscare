@@ -6,6 +6,7 @@ import './styles/index.css';
 import './styles/premium.css';
 import './styles/components.css';
 import './App.css';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 console.log("Starting application initialization");
 
@@ -20,9 +21,11 @@ const queryClient = new QueryClient({
 });
 
 createRoot(document.getElementById("root")!).render(
-  <QueryClientProvider client={queryClient}>
-    <App />
-  </QueryClientProvider>
+  <ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 console.log("Application initialization completed");
