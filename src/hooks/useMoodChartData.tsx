@@ -28,7 +28,7 @@ export function useMoodChartData(entries: JournalEntry[], timeRange: '7' | '30' 
         const entryId = parseInt(entry.id.replace(/[^0-9]/g, '1'));
         data.push({
           date: dateStr,
-          originalDate: date,
+          value: 40 + (entryId * 11) % 60,  // Use value for the base interface
           sentiment: 40 + (entryId * 11) % 60,  // Between 40 and 100
           anxiety: 10 + (entryId * 7) % 60,    // Between 10 and 70
           energy: 30 + (entryId * 13) % 60     // Between 30 and 90
@@ -36,7 +36,7 @@ export function useMoodChartData(entries: JournalEntry[], timeRange: '7' | '30' 
       } else if (Math.random() > 0.7) {  // Add values for some dates without entries
         data.push({
           date: dateStr,
-          originalDate: date,
+          value: Math.floor(50 + Math.random() * 50), // Use value for the base interface
           sentiment: Math.floor(50 + Math.random() * 50),  // Between 50 and 100
           anxiety: Math.floor(10 + Math.random() * 60),    // Between 10 and 70
           energy: Math.floor(30 + Math.random() * 60)      // Between 30 and 90

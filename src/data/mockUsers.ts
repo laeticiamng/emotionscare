@@ -11,6 +11,7 @@ export const mockUsers: User[] = [
     anonymity_code: 'SM472931',
     emotional_score: 82,
     avatar: 'https://i.pravatar.cc/150?img=1',
+    onboarded: true,
   },
   {
     id: '2',
@@ -20,6 +21,7 @@ export const mockUsers: User[] = [
     anonymity_code: 'TD659812',
     emotional_score: 65,
     avatar: 'https://i.pravatar.cc/150?img=2',
+    onboarded: true,
   },
   {
     id: '3',
@@ -29,6 +31,7 @@ export const mockUsers: User[] = [
     anonymity_code: 'EP847103',
     emotional_score: 78,
     avatar: 'https://i.pravatar.cc/150?img=3',
+    onboarded: true,
   },
   {
     id: '4',
@@ -38,6 +41,7 @@ export const mockUsers: User[] = [
     anonymity_code: 'AD123456',
     emotional_score: 95,
     avatar: 'https://i.pravatar.cc/150?img=12',
+    onboarded: true,
   },
 ];
 

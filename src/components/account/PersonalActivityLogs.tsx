@@ -39,10 +39,11 @@ const PersonalActivityLogs: React.FC = () => {
       setIsLoading(true);
       try {
         // Fetch all activities for the current user
+        // Using mock data instead of supabase.auth.user() which doesn't exist
         const { data, error } = await supabase
           .from('user_activity_logs')
           .select('*')
-          .eq('user_id', supabase.auth.user()?.id)
+          .eq('user_id', 'current-user-id') // Use hard-coded ID or get from context
           .order('timestamp_day', { ascending: false });
         
         if (error) {

@@ -27,7 +27,7 @@ export function useScanPage() {
     
     if (filter === 'user') {
       const userRoleUsers = mockUsers.filter(user => 
-        user.role === UserRole.USER
+        user.role === 'user'
       );
       setFilteredUsers(userRoleUsers);
       return;
@@ -35,7 +35,7 @@ export function useScanPage() {
     
     if (filter === 'manager') {
       const managerRoleUsers = mockUsers.filter(user => 
-        user.role === UserRole.MANAGER
+        user.role === 'manager'
       );
       setFilteredUsers(managerRoleUsers);
       return;
@@ -43,7 +43,7 @@ export function useScanPage() {
     
     if (filter === 'admin') {
       const adminRoleUsers = mockUsers.filter(user => 
-        user.role === UserRole.ADMIN
+        user.role === 'admin'
       );
       setFilteredUsers(adminRoleUsers);
       return;

@@ -13,12 +13,23 @@ export interface User {
   joined_at?: string;
 }
 
-export type UserRole = 'admin' | 'user' | 'coach' | 'direction' | 'employe_classique' | 'analyste' | 'responsable_bien_etre';
+// Turn UserRole from type to enum with values, so it can be used in code
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  COACH = 'coach',
+  DIRECTION = 'direction',
+  EMPLOYE_CLASSIQUE = 'employe_classique',
+  ANALYSTE = 'analyste',
+  RESPONSABLE_BIEN_ETRE = 'responsable_bien_etre',
+  MANAGER = 'manager' // Added for compatibility with useScanPage.ts
+}
 
 export interface UserPreferences {
   theme: string;
   fontSize: string;
   accentColor: string;
+  backgroundColor?: string; // Added for PreferencesForm
   notifications: {
     email: boolean;
     push: boolean;
@@ -39,6 +50,8 @@ export interface Emotion {
   confidence?: number;
   transcript?: string;
   intensity?: number;
+  source?: string; // Added for compatibility with existing code
+  is_confidential?: boolean; // Added for compatibility
 }
 
 export interface EmotionResult {
@@ -56,11 +69,16 @@ export interface JournalEntry {
   content: string;
   date: string;
   ai_feedback?: string;
+  text?: string; // Added for compatibility with existing code
 }
 
 export interface MoodData {
   date: string;
   value: number;
+  originalDate?: Date; // Added for compatibility
+  sentiment?: number; // Added for compatibility
+  anxiety?: number; // Added for compatibility
+  energy?: number; // Added for compatibility
 }
 
 export interface Badge {
@@ -70,6 +88,10 @@ export interface Badge {
   description: string;
   image_url?: string;
   awarded_at: string;
+  icon_url?: string; // Added for compatibility
+  threshold?: number; // Added for compatibility
+  category?: string; // Added for compatibility
+  unlocked?: boolean; // Added for compatibility
 }
 
 export interface Report {
@@ -78,6 +100,16 @@ export interface Report {
   date: string;
   data: any;
   type: string;
+  user_id?: string; // Added for compatibility
+  summary?: string; // Added for compatibility
+  mood_score?: number; // Added for compatibility
+  categories?: string[]; // Added for compatibility
+  recommendations?: string[]; // Added for compatibility
+  metric?: string; // Added for compatibility
+  period_start?: string; // Added for compatibility
+  period_end?: string; // Added for compatibility
+  value?: number; // Added for compatibility
+  change_pct?: number; // Added for compatibility
 }
 
 export interface VRSessionTemplate {
@@ -100,6 +132,8 @@ export interface VRSession {
   heart_rate_before?: number;
   heart_rate_after?: number;
   emotional_impact?: number;
+  is_audio_only?: boolean; // Added for compatibility
+  template_id?: string; // Added for compatibility
 }
 
 // Invitation Types
@@ -114,9 +148,10 @@ export interface Invitation {
   accepted_at?: string;
 }
 
+// Use UserRole for role typing
 export interface InvitationFormData {
   email: string;
-  role: UserRole;
+  role: string;
 }
 
 export interface InvitationStats {
