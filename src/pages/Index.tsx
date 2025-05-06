@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import RoleCard from '@/components/home/RoleCard';
 import ValueProposition from '@/components/home/ValueProposition';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
+import ModulesSection from '@/components/home/ModulesSection';
 
 const Index = () => {
   const { theme } = useTheme();
@@ -64,8 +65,11 @@ const Index = () => {
       {/* Main Content - Better space utilization */}
       <main className="flex-grow flex flex-col items-center justify-center p-6 md:p-10 lg:p-12">
         <div className="max-w-[1400px] mx-auto w-full">
+          {/* Modules Section */}
+          <ModulesSection />
+          
           {/* Cards Container - Optimized spacing */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 my-12">
             {/* User Card */}
             <RoleCard
               title="Espace Collaborateur"
@@ -87,18 +91,6 @@ const Index = () => {
           <ValueProposition />
         </div>
       </main>
-      
-      {/* Footer - Premium style */}
-      <footer className="w-full bg-primary text-primary-foreground py-8 px-4 mt-12">
-        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between px-6">
-          <p className="mb-4 md:mb-0 font-medium">© {new Date().getFullYear()} ResiMax™ – GDPR compliant</p>
-          <div className="flex space-x-8">
-            <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground hover:underline transition-colors">Mentions légales</a>
-            <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground hover:underline transition-colors">Support</a>
-            <a href="#" className="text-primary-foreground/80 hover:text-primary-foreground hover:underline transition-colors">Confidentialité</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

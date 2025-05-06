@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import DashboardHeader from './DashboardHeader';
 import UserSidePanel from './UserSidePanel';
-import ModulesSection from './ModulesSection';
+import ModulesSection from '@/components/home/ModulesSection';
 import EmotionScanSection from './EmotionScanSection';
 import SocialCocoonWidget from './SocialCocoonWidget';
 import GamificationWidget from './GamificationWidget';
@@ -65,28 +65,12 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         )}
       </div>
       
-      <div className="dashboard-premium">
+      {/* Modules Section - Using our reusable component */}
+      <ModulesSection collapsed={collapsedSections.modules} onToggle={() => toggleSection('modules')} />
+      
+      <div className="dashboard-premium mt-6">
         {/* Main Content Area */}
         <div className="dashboard-main">
-          {/* Modules Section */}
-          <div className="card-premium p-6 lg:p-8">
-            <div 
-              className="flex justify-between items-center cursor-pointer"
-              onClick={() => toggleSection('modules')}
-            >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Modules</h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
-                {collapsedSections.modules ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-              </Button>
-            </div>
-            
-            {!collapsedSections.modules && (
-              <div className="mt-6">
-                <ModulesSection />
-              </div>
-            )}
-          </div>
-          
           {/* Emotion Scan Section */}
           <div className="card-premium p-6 lg:p-8">
             <div 
@@ -110,7 +94,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           
           {/* Social Section - Only in full view */}
           {(!minimalView || isMobile) && (
-            <div className="card-premium p-6 lg:p-8">
+            <div className="card-premium p-6 lg:p-8 mt-6">
               <div 
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleSection('social')}
@@ -152,7 +136,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           </div>
           
           {/* VR Prompt Widget */}
-          <div className="card-premium p-6 lg:p-8">
+          <div className="card-premium p-6 lg:p-8 mt-6">
             <div 
               className="flex justify-between items-center cursor-pointer"
               onClick={() => toggleSection('vr')}
@@ -175,7 +159,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           
           {/* Gamification Widget - Only in full view or on mobile */}
           {(!minimalView || isMobile) && (
-            <div className="card-premium p-6 lg:p-8">
+            <div className="card-premium p-6 lg:p-8 mt-6">
               <div 
                 className="flex justify-between items-center cursor-pointer"
                 onClick={() => toggleSection('gamification')}

@@ -23,7 +23,7 @@ const Layout = ({ children }: LayoutProps) => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
   const isHomePage = location.pathname === '/';
   
-  // If on auth page or not authenticated and not on home page, display only the children (pages login/register)
+  // If on auth page or not authenticated and not on home page, display only the children (login/register pages)
   if (isAuthPage || (!isAuthenticated && !isHomePage)) {
     return (
       <div className="animate-fade-in min-h-screen">
@@ -41,7 +41,7 @@ const Layout = ({ children }: LayoutProps) => {
   
   return (
     <div className={`flex flex-col min-h-screen ${getBgClasses()}`}>
-      {/* GlobalNav includes all top navigation in a single component */}
+      {/* Single GlobalNav - includes all top navigation */}
       <GlobalNav isAuthenticated={isAuthenticated} />
       
       {isAuthenticated && <SessionTimeoutAlert />}
@@ -62,6 +62,8 @@ const Layout = ({ children }: LayoutProps) => {
           }`}>
             {children || <Outlet />}
           </main>
+          
+          {/* Un seul SecurityFooter */}
           <SecurityFooter />
         </div>
       </div>
