@@ -50,7 +50,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
     }
   }, [messages]);
 
-  // Effet pour l'animation de typing
+  // Effect for typing animation
   useEffect(() => {
     if (typing) {
       const timer = setTimeout(() => {
@@ -68,7 +68,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
     const userInput = input;
     setInput('');
 
-    // Afficher l'animation de typing
+    // Show typing animation
     setTyping(true);
 
     try {
@@ -132,7 +132,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
               </div>
             ))}
             
-            {/* Indicateur "en train d'écrire..." */}
+            {/* "Writing..." indicator */}
             {typing && (
               <div className="flex gap-2 justify-start">
                 <div className="rounded-lg p-3 bg-muted text-foreground max-w-[80%]">

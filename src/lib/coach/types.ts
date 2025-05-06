@@ -10,6 +10,17 @@ export type CoachAction = {
   payload?: any;
 };
 
+// Add notification type for coach service
+export type CoachNotification = {
+  id: string;
+  user_id: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date;
+  read?: boolean;
+  link?: string;
+};
+
 // Add additional types for coach service
 export type EmotionalData = {
   emotion?: string;

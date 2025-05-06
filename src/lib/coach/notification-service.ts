@@ -1,38 +1,69 @@
 
 import { CoachNotification } from './types';
 
-/**
- * Service for managing coach notifications
- */
-export class NotificationService {
-  // Stockage des notifications (dans une application réelle, cela serait persisté en base de données)
+class NotificationService {
   private notifications: Map<string, CoachNotification[]> = new Map();
 
   /**
-   * Adds a notification for a user
+   * Add a notification for a user
    */
-  addNotification(userId: string, notification: CoachNotification): void {
+  addNotification(userId: string, notification: Omit<CoachNotification, 'user_id'>): void {
     if (!this.notifications.has(userId)) {
       this.notifications.set(userId, []);
     }
-    
-    const userNotifications = this.notifications.get(userId)!;
-    userNotifications.push(notification);
-    
-    // Limiter le nombre de notifications stockées
-    if (userNotifications.length > 20) {
-      userNotifications.shift();
+
+    const notifications = this.notifications.get(userId);
+    if (notifications) {
+      notifications.push({
+        ...notification,
+        user_id: userId
+      });
     }
-    
-    console.log(`[NOTIFICATION for ${userId}] ${notification.message} (${notification.type})`);
   }
-  
+
   /**
-   * Gets notifications for a user
+   * Get all notifications for a user
    */
   getNotifications(userId: string): CoachNotification[] {
     return this.notifications.get(userId) || [];
   }
+
+  /**
+   * Mark a notification as read
+   */
+  markAsRead(userId: string, notificationId: string): void {
+    const notifications = this.notifications.get(userId);
+    if (!notifications) return;
+
+    const notification = notifications.find(n => n.id === notificationId);
+    if (notification) {
+      notification.read = true;
+    }
+  }
+
+  /**
+   * Get unread notifications count
+   */
+  getUnreadCount(userId: string): number {
+    const notifications = this.notifications.get(userId);
+    if (!notifications) return 0;
+
+    return notifications.filter(n => !n.read).length;
+  }
+
+  /**
+   * Delete a notification
+   */
+  deleteNotification(userId: string, notificationId: string): void {
+    const notifications = this.notifications.get(userId);
+    if (!notifications) return;
+
+    const index = notifications.findIndex(n => n.id === notificationId);
+    if (index >= 0) {
+      notifications.splice(index, 1);
+    }
+  }
 }
 
+// Create a singleton instance
 export const notificationService = new NotificationService();

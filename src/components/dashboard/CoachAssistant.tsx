@@ -7,6 +7,7 @@ import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/contexts/AuthContext';
 import { triggerCoachEvent } from '@/lib/coachService';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CoachAssistantProps {
   className?: string;
