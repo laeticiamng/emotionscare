@@ -1,90 +1,110 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SortDirection } from '@/components/ui/data-table/SortableTableHead';
-import { 
-  handleSortCycle, 
-  saveSortToSearchParams,
-  saveSortToStorage,
-  loadSortFromStorage
-} from '@/utils/sortUtils';
 
-interface UseSortableTableProps<T> {
-  initialField?: T | null;
-  initialDirection?: SortDirection;
+export type SortDirection = 'asc' | 'desc' | undefined;
+
+interface UseSortableTableOptions {
   storageKey?: string;
   persistInUrl?: boolean;
+  defaultSortField?: string;
+  defaultSortDirection?: SortDirection;
 }
 
-/**
- * A hook for managing sortable table state including URL and localStorage persistence
- */
-export function useSortableTable<T>({
-  initialField = null,
-  initialDirection = null,
+export const useSortableTable = <T extends string>({
   storageKey,
-  persistInUrl = true
-}: UseSortableTableProps<T> = {}) {
+  persistInUrl = false,
+  defaultSortField,
+  defaultSortDirection = 'asc'
+}: UseSortableTableOptions = {}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Try to load from URL first, then localStorage, then fall back to initial values
-  const urlField = persistInUrl ? (searchParams.get('sortField') as T | null) : null;
-  const urlDirection = persistInUrl ? (searchParams.get('sortDirection') as SortDirection) : null;
-  
-  // Load from localStorage if provided a key and not found in URL
-  const [storageField, storageDirection] = storageKey && !urlField 
-    ? loadSortFromStorage(storageKey)
-    : [null, null];
-  
-  // Initialize state with proper values
-  const initialStateField = urlField || storageField || initialField;
-  const initialStateDirection = urlDirection || storageDirection || initialDirection;
-  
-  const [sortField, setSortField] = useState<T | null>(initialStateField);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(initialStateDirection);
-  
-  // Handle sorting when a column header is clicked
-  const handleSort = useCallback((field: T) => {
-    const [newField, newDirection] = handleSortCycle(sortField, sortDirection, field);
-    
-    setSortField(newField);
-    setSortDirection(newDirection);
-    
-    // Save to URL params if enabled
+  // Initialize sort state from URL or localStorage if enabled
+  const initializeSort = () => {
     if (persistInUrl) {
-      const newParams = saveSortToSearchParams(
-        searchParams, 
-        newField !== null ? String(newField) : null,
-        newDirection
-      );
-      setSearchParams(newParams, { replace: true });
+      const fieldFromUrl = searchParams.get('sortField');
+      const dirFromUrl = searchParams.get('sortDir') as SortDirection;
+      
+      if (fieldFromUrl) {
+        return {
+          field: fieldFromUrl as T,
+          direction: dirFromUrl || defaultSortDirection
+        };
+      }
     }
     
-    // Save to localStorage if enabled
     if (storageKey) {
-      saveSortToStorage(
-        storageKey,
-        newField !== null ? String(newField) : null,
-        newDirection
-      );
+      const savedSort = localStorage.getItem(storageKey);
+      if (savedSort) {
+        try {
+          const { field, direction } = JSON.parse(savedSort);
+          return { field: field as T, direction };
+        } catch (e) {
+          console.error('Error parsing saved sort:', e);
+        }
+      }
     }
-  }, [sortField, sortDirection, searchParams, setSearchParams, persistInUrl, storageKey]);
+    
+    return {
+      field: defaultSortField as T | undefined,
+      direction: defaultSortDirection
+    };
+  };
   
-  // Check if a column is currently sorted
-  const isSorted = useCallback((field: T): SortDirection => {
-    if (field !== sortField) return null;
-    return sortDirection;
-  }, [sortField, sortDirection]);
+  const [sortState, setSortState] = useState(initializeSort);
   
-  // Initialize from URL or localStorage on mount
+  // Update URL and localStorage when sort changes
   useEffect(() => {
-    // Already handled in the useState initializers
-  }, []);
+    if (persistInUrl && sortState.field) {
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set('sortField', sortState.field as string);
+        if (sortState.direction) {
+          newParams.set('sortDir', sortState.direction);
+        } else {
+          newParams.delete('sortDir');
+        }
+        return newParams;
+      });
+    }
+    
+    if (storageKey && sortState.field) {
+      localStorage.setItem(storageKey, JSON.stringify(sortState));
+    }
+  }, [sortState, persistInUrl, storageKey, setSearchParams]);
+  
+  // Handle sort toggle
+  const handleSort = (field: T) => {
+    setSortState(prev => {
+      if (prev.field === field) {
+        // Cycle through: asc -> desc -> undefined -> asc
+        const nextDirection: SortDirection = 
+          prev.direction === 'asc' ? 'desc' : 
+          prev.direction === 'desc' ? undefined : 'asc';
+        
+        return {
+          field,
+          direction: nextDirection
+        };
+      }
+      
+      // New field, start with ascending
+      return {
+        field,
+        direction: 'asc'
+      };
+    });
+  };
+  
+  // Check if a field is sorted
+  const isSorted = (field: T): SortDirection => {
+    return sortState.field === field ? sortState.direction : undefined;
+  };
   
   return {
-    sortField,
-    sortDirection,
+    sortField: sortState.field,
+    sortDirection: sortState.direction,
     handleSort,
     isSorted
   };
-}
+};

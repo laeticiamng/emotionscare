@@ -1,13 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Ban, FileText, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { BulkActionProps } from '../types/tableTypes';
 import { toast } from 'sonner';
+import { SecureConfirmationDialog } from '@/components/ui/secure-confirmation-dialog';
 
 const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelection }) => {
   const selectedCount = selectedUsers.length;
+  
+  // State for secure confirmation dialogs
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [banDialogOpen, setBanDialogOpen] = useState(false);
   
   // Handler for bulk delete action
   const handleBulkDelete = () => {
@@ -15,6 +20,7 @@ const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelec
     // In a real app, we would call an API endpoint here
     toast.success(`${selectedCount} utilisateurs supprimés avec succès`);
     onClearSelection();
+    setDeleteDialogOpen(false);
   };
   
   // Handler for bulk export action
@@ -30,6 +36,7 @@ const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelec
     // In a real app, we would call an API endpoint here
     toast.success(`${selectedCount} utilisateurs bannis avec succès`);
     onClearSelection();
+    setBanDialogOpen(false);
   };
   
   return (
@@ -39,33 +46,16 @@ const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelec
       </div>
       
       <div className="flex gap-2">
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button 
-              variant="destructive" 
-              size="sm"
-              className="flex items-center gap-1"
-              aria-label={`Supprimer ${selectedCount} utilisateurs sélectionnés`}
-            >
-              <Trash2 size={16} />
-              Supprimer ({selectedCount})
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Êtes-vous sûr(e) ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Vous allez supprimer définitivement {selectedCount} utilisateur{selectedCount > 1 ? 's' : ''}. Cette action est irréversible.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Non, annuler</AlertDialogCancel>
-              <AlertDialogAction onClick={handleBulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                Oui, supprimer ces utilisateurs
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button 
+          variant="destructive" 
+          size="sm"
+          className="flex items-center gap-1"
+          aria-label={`Supprimer ${selectedCount} utilisateurs sélectionnés`}
+          onClick={() => setDeleteDialogOpen(true)}
+        >
+          <Trash2 size={16} />
+          Supprimer ({selectedCount})
+        </Button>
         
         <Button 
           variant="secondary" 
@@ -78,33 +68,16 @@ const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelec
           Exporter ({selectedCount})
         </Button>
         
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button 
-              variant="warning" 
-              size="sm"
-              className="flex items-center gap-1"
-              aria-label={`Bannir ${selectedCount} utilisateurs sélectionnés`}
-            >
-              <Ban size={16} />
-              Bannir ({selectedCount})
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Êtes-vous sûr(e) ?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Vous allez bannir {selectedCount} utilisateur{selectedCount > 1 ? 's' : ''} de la plateforme.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Non, annuler</AlertDialogCancel>
-              <AlertDialogAction onClick={handleBulkBan} className="bg-warning text-white hover:bg-warning/90">
-                Oui, bannir ces utilisateurs
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button 
+          variant="warning" 
+          size="sm"
+          className="flex items-center gap-1"
+          aria-label={`Bannir ${selectedCount} utilisateurs sélectionnés`}
+          onClick={() => setBanDialogOpen(true)}
+        >
+          <Ban size={16} />
+          Bannir ({selectedCount})
+        </Button>
         
         <Button 
           variant="outline" 
@@ -115,6 +88,30 @@ const BulkActionsBar: React.FC<BulkActionProps> = ({ selectedUsers, onClearSelec
           Annuler
         </Button>
       </div>
+      
+      {/* Secure Confirmation Dialog for Delete action */}
+      <SecureConfirmationDialog
+        title="⚠️ Attention : action irréversible !"
+        description={`Vous êtes sur le point de supprimer définitivement les comptes de ${selectedCount} utilisateur${selectedCount > 1 ? 's' : ''}. Cette action est irréversible et entraînera la suppression définitive de toutes leurs données d'utilisation et de bien-être.`}
+        actionLabel={`Oui, supprimer définitivement`}
+        isOpen={deleteDialogOpen}
+        onConfirm={handleBulkDelete}
+        onCancel={() => setDeleteDialogOpen(false)}
+        confirmationWord="CONFIRMER"
+        isDestructive={true}
+      />
+      
+      {/* Secure Confirmation Dialog for Ban action */}
+      <SecureConfirmationDialog
+        title="⚠️ Confirmation nécessaire"
+        description={`Vous êtes sur le point de bannir ${selectedCount} utilisateur${selectedCount > 1 ? 's' : ''}. Ces utilisateurs ne pourront plus accéder à la plateforme jusqu'à ce que vous leviez cette restriction.`}
+        actionLabel={`Oui, bannir ces utilisateurs`}
+        isOpen={banDialogOpen}
+        onConfirm={handleBulkBan}
+        onCancel={() => setBanDialogOpen(false)}
+        confirmationWord="CONFIRMER"
+        isDestructive={true}
+      />
     </div>
   );
 };
