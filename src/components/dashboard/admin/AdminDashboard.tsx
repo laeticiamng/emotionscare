@@ -7,66 +7,44 @@ import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
 import AdminTabsNavigation from './AdminTabsNavigation';
 import AdminTabContents from './AdminTabContents';
 import { SegmentProvider } from '@/contexts/SegmentContext';
+import { useDashboardData, useEmotionalScoreTrend, useDashboardStats } from './hooks/useDashboardData';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("vue-globale");
-  const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
-  const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
-  const [emotionalScoreTrend, setEmotionalScoreTrend] = useState<Array<{ date: string; value: number }>>([
-    { date: '1/5', value: 72 },
-    { date: '2/5', value: 75 },
-    { date: '3/5', value: 78 },
-    { date: '4/5', value: 80 }
-  ]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [timePeriod, setTimePeriod] = useState<string>('7');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Dashboard stats with required properties
-  const dashboardStats = {
-    totalUsers: 245,
-    activeUsers: 187,
-    productivity: {
-      current: 92,
-      trend: 3
-    },
-    emotionalScore: {
-      current: 78,
-      trend: 2
-    },
-    absenteeismRate: 4.2,
-    engagementRate: 76
+  // Use custom hooks for data fetching
+  const { absenteeismData, productivityData, isLoading: dataLoading, refetchAll } = useDashboardData(timePeriod);
+  const { data: emotionalScoreTrend, refetch: refetchEmotional } = useEmotionalScoreTrend();
+  const { data: dashboardStats, refetch: refetchStats } = useDashboardStats();
+
+  // Function to handle refresh trigger from DashboardHeader
+  const handleRefresh = () => {
+    setIsLoading(true);
+    Promise.all([
+      refetchAll(),
+      refetchEmotional(),
+      refetchStats()
+    ]).finally(() => {
+      setIsLoading(false);
+    });
   };
-
+  
   useEffect(() => {
-    async function loadDashboardData() {
-      try {
-        setIsLoading(true);
-        
-        // Load reports data
-        const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod));
-        
-        setAbsenteeismData(reportsData.absenteeism || []);
-        setProductivityData(reportsData.productivity || []);
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
-    loadDashboardData();
-  }, [timePeriod]);
+    setIsLoading(false);
+  }, [absenteeismData, emotionalScoreTrend, dashboardStats]);
   
   return (
     <SegmentProvider>
       <div className="max-w-7xl mx-auto">
         {/* Dashboard header with period selector */}
         <DashboardHeader 
-          title="Tableau de bord Direction"
-          subtitle="Métriques globales et anonymisées"
           timePeriod={timePeriod}
           setTimePeriod={setTimePeriod}
+          isLoading={isLoading}
+          onRefresh={handleRefresh}
         />
         
         {/* Main tabs navigation and content */}
@@ -82,6 +60,7 @@ const AdminDashboard: React.FC = () => {
             absenteeismData={absenteeismData}
             emotionalScoreTrend={emotionalScoreTrend}
             dashboardStats={dashboardStats}
+            isLoading={isLoading || dataLoading}
           />
         </Tabs>
       </div>

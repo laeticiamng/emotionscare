@@ -20,6 +20,7 @@ interface AdminTabContentsProps {
   absenteeismData: ChartData[];
   emotionalScoreTrend: ChartData[];
   dashboardStats: DashboardStats;
+  isLoading?: boolean;
 }
 
 const AdminTabContents: React.FC<AdminTabContentsProps> = ({
@@ -27,13 +28,22 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   absenteeismData,
   emotionalScoreTrend,
   dashboardStats,
+  isLoading = false,
 }) => {
-  // Dummy data for tabs that require props
+  // Create properly formatted data for each component
   const gamificationData = {
-    activeUsers: 85,
-    totalChallenges: 24,
-    completionRate: 68,
-    topPerformers: []
+    activeUsersPercent: 85,
+    totalBadges: 24,
+    badgeLevels: [
+      { level: 'Bronze', count: 14 },
+      { level: 'Argent', count: 7 },
+      { level: 'Or', count: 3 }
+    ],
+    topChallenges: [
+      { name: 'Check-in quotidien', completions: 156 },
+      { name: 'Partage d\'expérience', completions: 87 },
+      { name: 'Lecture bien-être', completions: 63 }
+    ]
   };
 
   const scanTeamData = {
@@ -42,78 +52,87 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   };
 
   const socialCocoonData = {
-    posts: 248,
-    engagementRate: 72,
-    topTags: ['#bienetre', '#entraide', '#motivation']
+    totalPosts: 248,
+    moderationRate: 5.2,
+    topHashtags: [
+      { tag: '#bienetre', count: 42 },
+      { tag: '#entraide', count: 36 },
+      { tag: '#motivation', count: 31 }
+    ]
   };
 
-  const eventsData = {
-    upcoming: 5,
-    registered: 120,
-    attendance: 85
-  };
+  const eventsData = [
+    { date: '2025-05-10', title: 'Atelier Bien-être', status: 'confirmed', attendees: 24 },
+    { date: '2025-05-15', title: 'Séance Méditation', status: 'pending', attendees: 18 },
+    { date: '2025-05-22', title: 'Challenge d\'équipe', status: 'confirmed', attendees: 32 }
+  ];
 
-  const hrSuggestions = {
-    total: 12,
-    priority: 3,
-    resolved: 8
-  };
+  const hrSuggestions = [
+    { title: 'Séance de cohésion', description: 'Organiser un atelier pour renforcer l\'esprit d\'équipe', icon: '🤝' },
+    { title: 'Journée bien-être', description: 'Proposer une journée dédiée aux activités de bien-être', icon: '🧘' },
+    { title: 'Formation gestion du stress', description: 'Mettre en place des sessions sur la gestion du stress', icon: '🌿' }
+  ];
 
   const complianceData = {
-    completionRate: 94,
-    pendingReports: 3,
-    lastUpdate: '2025-04-28'
+    mfaEnabled: 92,
+    lastKeyRotation: '2025-04-15',
+    lastPentest: '2025-03-22',
+    gdprCompliance: 'Conforme',
+    dataRetention: '30 jours',
+    certifications: ['ISO 27001', 'RGPD', 'HDS']
   };
 
   return (
     <>
       <TabsContent value="vue-globale" className="space-y-4 animate-in fade-in-50">
         <GlobalOverviewTab 
-          absenteeismData={absenteeismData} 
+          absenteeismChartData={absenteeismData} 
           emotionalScoreTrend={emotionalScoreTrend}
           dashboardStats={dashboardStats}
+          gamificationData={gamificationData}
+          isLoading={isLoading}
         />
       </TabsContent>
       
       <TabsContent value="gamification" className="animate-in fade-in-50">
-        <GamificationTab gamificationData={gamificationData} />
+        <GamificationTab gamificationData={gamificationData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="scan-equipe" className="animate-in fade-in-50">
-        <ScanTeamTab {...scanTeamData} />
+        <ScanTeamTab {...scanTeamData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="journal" className="animate-in fade-in-50">
-        <JournalTrendsTab />
+        <JournalTrendsTab isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="social-cocoon" className="animate-in fade-in-50">
-        <SocialCocoonTab socialCocoonData={socialCocoonData} />
+        <SocialCocoonTab socialCocoonData={socialCocoonData} isLoading={isLoading} />
       </TabsContent>
       
-      <TabsContent value="calendrier" className="animate-in fade-in-50">
-        <EventsCalendarTab eventsData={eventsData} />
+      <TabsContent value="events" className="animate-in fade-in-50">
+        <EventsCalendarTab eventsData={eventsData} isLoading={isLoading} />
       </TabsContent>
       
-      <TabsContent value="rh" className="animate-in fade-in-50">
-        <HRActionsTab rhSuggestions={hrSuggestions} />
+      <TabsContent value="actions-rh" className="animate-in fade-in-50">
+        <HRActionsTab rhSuggestions={hrSuggestions} isLoading={isLoading} />
       </TabsContent>
       
-      <TabsContent value="conformite" className="animate-in fade-in-50">
-        <ComplianceTab complianceData={complianceData} />
+      <TabsContent value="compliance" className="animate-in fade-in-50">
+        <ComplianceTab complianceData={complianceData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="meteo-activites" className="animate-in fade-in-50">
         <WeatherActivitiesTab />
       </TabsContent>
       
-      <TabsContent value="parametres" className="space-y-8 animate-in fade-in-50">
+      <TabsContent value="settings" className="space-y-8 animate-in fade-in-50">
         <AdminSettingsTab />
         
         {/* Pagination Settings Section */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Paramètres d'affichage et pagination</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-3xl font-bold tracking-tight">Paramètres d'affichage et pagination</h2>
+          <p className="text-muted-foreground mt-2">
             Configurez les options de pagination et d'affichage des données pour tous les utilisateurs de l'application.
           </p>
           <PaginationSettings />

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fetchReports, fetchGamificationStats } from '@/lib/dashboardService';
 import { useSegment } from '@/contexts/SegmentContext';
+import { ChartData } from '@/components/dashboard/admin/tabs/overview/types';
 
 export const useDashboardData = (timePeriod: string) => {
   const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
@@ -31,8 +32,11 @@ export const useDashboardData = (timePeriod: string) => {
       
       setAbsenteeismData(absenteeism);
       setProductivityData(productivity);
+
+      return { absenteeism, productivity };
     } catch (error) {
       console.error("Error loading dashboard data:", error);
+      return { absenteeism: [], productivity: [] };
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +56,7 @@ export const useDashboardData = (timePeriod: string) => {
 };
 
 export const useEmotionalScoreTrend = () => {
-  const [data, setData] = useState<Array<{ date: string; value: number }>>([]);
+  const [data, setData] = useState<ChartData[]>([]);
   const { segment } = useSegment();
   
   const fetchData = useCallback(async () => {
