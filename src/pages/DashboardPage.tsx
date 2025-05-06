@@ -9,6 +9,7 @@ import { isAdminRole, isUserRole } from '@/utils/roleUtils';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { notificationService } from '@/lib/coach/notification-service';
+import DashboardContainer from '@/components/dashboard/DashboardContainer';
 
 const DashboardPage: React.FC = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -71,24 +72,16 @@ const DashboardPage: React.FC = () => {
   
   console.log(`DashboardPage - Determining dashboard type: isAdmin=${isAdmin}, isUser=${isUser}, role=${user?.role}`);
   
-  // Default to UserDashboard if role is not explicitly admin/direction
-  const renderDashboard = () => {
-    if (isAdmin) {
-      console.log("DashboardPage - Rendering AdminDashboard");
-      return <AdminDashboard />;
-    } else if (isUser || !user?.role) {
-      console.log("DashboardPage - Rendering UserDashboard");
-      return <UserDashboard user={user} />;
-    } else {
-      console.warn(`Unknown user role: ${user?.role}, defaulting to UserDashboard`);
-      return <UserDashboard user={user} />;
-    }
-  };
-  
   return (
-    <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
-      {renderDashboard()}
-    </div>
+    <DashboardContainer>
+      <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
+        {isAdmin ? (
+          <AdminDashboard />
+        ) : (
+          <UserDashboard user={user} />
+        )}
+      </div>
+    </DashboardContainer>
   );
 };
 

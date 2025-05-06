@@ -19,6 +19,7 @@ import { getCurrentUser } from '@/data/mockUsers';
 import { updateUser } from '@/lib/userService';
 import InvitePage from './pages/InvitePage';
 import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedLayout } from './components/ProtectedLayout';
 
 // App component for handling authentication checks and redirects
 const AppContent = () => {
@@ -108,6 +109,14 @@ const router = createBrowserRouter([
       {
         path: "/contact",
         element: <Contact />
+      },
+      {
+        path: "/dashboard",
+        element: <ProtectedLayout><DashboardPage /></ProtectedLayout>
+      },
+      {
+        path: "/settings",
+        element: <ProtectedLayout><SettingsPage /></ProtectedLayout>
       }
     ]
   },
@@ -118,14 +127,6 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />
-  },
-  {
-    path: "/dashboard",
-    element: <DashboardPage />
-  },
-  {
-    path: "/settings",
-    element: <SettingsPage />
   },
   {
     path: "/admin/login",
