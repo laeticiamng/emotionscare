@@ -3,6 +3,63 @@ import { ActivityLogData } from './activityTypes';
 import { supabase } from '@/lib/supabase-client';
 
 /**
+ * Activity log service with methods for logging different types of activities
+ */
+export const activityLogService = {
+  /**
+   * Log a user consultation activity
+   * @param userId The user ID
+   * @param details The consultation details
+   */
+  logConsultation: async (userId: string, details: { title: string; type: string; id?: string }) => {
+    return logActivity({
+      user_id: userId,
+      activity_type: 'consultation',
+      activity_details: details
+    });
+  },
+
+  /**
+   * Log a profile update activity
+   * @param userId The user ID
+   * @param details Optional details about the update
+   */
+  logProfileUpdate: async (userId: string, details?: Record<string, any>) => {
+    return logActivity({
+      user_id: userId,
+      activity_type: 'modification_profil',
+      activity_details: details
+    });
+  },
+
+  /**
+   * Log an event registration activity
+   * @param userId The user ID
+   * @param event The event details
+   */
+  logEventRegistration: async (userId: string, event: { title: string; date?: string; id?: string }) => {
+    return logActivity({
+      user_id: userId,
+      activity_type: 'inscription_event',
+      activity_details: event
+    });
+  },
+
+  /**
+   * Log a questionnaire response activity
+   * @param userId The user ID
+   * @param questionnaire The questionnaire details
+   */
+  logQuestionnaireResponse: async (userId: string, questionnaire: { title: string; id?: string }) => {
+    return logActivity({
+      user_id: userId,
+      activity_type: 'questionnaire_reponse',
+      activity_details: questionnaire
+    });
+  }
+};
+
+/**
  * Log an activity to the database
  * @param activityData The activity data to log
  * @returns Promise with the created activity or error
