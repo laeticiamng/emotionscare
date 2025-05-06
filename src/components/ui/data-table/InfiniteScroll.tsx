@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface InfiniteScrollProps {
   onLoadMore: () => void;
@@ -7,7 +7,7 @@ interface InfiniteScrollProps {
   loading: boolean;
   threshold?: number;
   children: React.ReactNode;
-  loadingElement?: React.ReactNode;
+  className?: string;
 }
 
 const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
@@ -16,58 +16,57 @@ const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   loading,
   threshold = 0.8,
   children,
-  loadingElement,
+  className,
 }) => {
-  const observerRef = useRef<HTMLDivElement | null>(null);
-  
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [sentryVisible, setSentryVisible] = useState(false);
+  const observer = useRef<IntersectionObserver | null>(null);
+  const sentryRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const currentObserver = observerRef.current;
-    
-    if (!currentObserver || !hasMore || loading) return;
-    
-    const observer = new IntersectionObserver(
+    // Create intersection observer to detect when sentry is visible
+    observer.current = new IntersectionObserver(
       (entries) => {
-        // When the sentinel comes into view, load more content if we can
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          onLoadMore();
-        }
+        const [entry] = entries;
+        setSentryVisible(entry.isIntersecting);
       },
       {
-        // Start loading when the element is partially visible
-        threshold,
-        // Use viewport as the root
         root: null,
-        rootMargin: '100px',
+        rootMargin: '0px',
+        threshold, // Load when threshold % of the element is visible
       }
     );
-    
-    observer.observe(currentObserver);
-    
+
+    // Observe the sentry element
+    if (sentryRef.current) {
+      observer.current.observe(sentryRef.current);
+    }
+
     return () => {
-      if (currentObserver) {
-        observer.unobserve(currentObserver);
+      if (observer.current) {
+        observer.current.disconnect();
       }
     };
-  }, [hasMore, loading, onLoadMore, threshold]);
-  
+  }, [threshold]);
+
+  // Trigger load more when sentry becomes visible
+  useEffect(() => {
+    if (sentryVisible && hasMore && !loading) {
+      onLoadMore();
+    }
+  }, [sentryVisible, hasMore, loading, onLoadMore]);
+
   return (
-    <div className="relative">
+    <div ref={scrollContainerRef} className={className}>
       {children}
       
-      {/* This is the sentinel element that gets observed */}
-      <div ref={observerRef} className="h-10" />
-      
-      {/* Loading indicator shown at the bottom when loading */}
-      {loading && hasMore && (
-        <div className="py-4 flex justify-center">
-          {loadingElement || (
-            <div className="flex items-center gap-2">
-              <div className="h-4 w-4 border-2 border-t-primary border-r-primary border-b-primary/30 border-l-primary/30 rounded-full animate-spin"></div>
-              <span>Chargement...</span>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Invisible sentry element at the bottom */}
+      <div 
+        ref={sentryRef}
+        aria-hidden="true"
+        style={{ height: '10px', width: '100%' }}
+        data-testid="infinite-scroll-sentry"
+      />
     </div>
   );
 };

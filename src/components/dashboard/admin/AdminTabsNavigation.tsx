@@ -2,9 +2,18 @@
 import React from 'react';
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  BarChart2, MessageSquare, Trophy, Sparkles, 
-  ShieldCheck, CalendarDays, Settings, Activity, LineChart, CloudSun
-} from 'lucide-react';
+  BarChart3, 
+  Radio, 
+  Users, 
+  Trophy, 
+  Calendar, 
+  BookOpen, 
+  Activity, 
+  ShieldCheck, 
+  CloudSun,
+  Settings,
+  UserRound
+} from "lucide-react";
 
 interface AdminTabsNavigationProps {
   activeTab: string;
@@ -12,49 +21,39 @@ interface AdminTabsNavigationProps {
   disabled?: boolean;
 }
 
-const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({ activeTab, setActiveTab, disabled }) => {
+const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({ 
+  activeTab, 
+  setActiveTab,
+  disabled = false
+}) => {
+  const tabItems = [
+    { id: "vue-globale", label: "Vue Globale", icon: <BarChart3 className="h-4 w-4 mr-2" /> },
+    { id: "scan-equipe", label: "Scans Équipe", icon: <Radio className="h-4 w-4 mr-2" /> },
+    { id: "social-cocoon", label: "Social Cocoon", icon: <Users className="h-4 w-4 mr-2" /> },
+    { id: "gamification", label: "Gamification", icon: <Trophy className="h-4 w-4 mr-2" /> },
+    { id: "evenements", label: "Événements", icon: <Calendar className="h-4 w-4 mr-2" /> },
+    { id: "journal-trends", label: "Journal", icon: <BookOpen className="h-4 w-4 mr-2" /> },
+    { id: "actions-rh", label: "Actions RH", icon: <Activity className="h-4 w-4 mr-2" /> },
+    { id: "compliance", label: "Conformité", icon: <ShieldCheck className="h-4 w-4 mr-2" /> },
+    { id: "weather-activities", label: "Météo & Activités", icon: <CloudSun className="h-4 w-4 mr-2" /> },
+    { id: "users-list", label: "Utilisateurs", icon: <UserRound className="h-4 w-4 mr-2" /> },
+    { id: "admin-settings", label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" /> },
+  ];
+  
   return (
-    <TabsList className="mb-4 bg-white/50 backdrop-blur-sm">
-      <TabsTrigger value="vue-globale" onClick={() => setActiveTab("vue-globale")} disabled={disabled}>
-        <BarChart2 className="mr-2 h-4 w-4" />
-        Vue Globale
-      </TabsTrigger>
-      <TabsTrigger value="scan-equipe" onClick={() => setActiveTab("scan-equipe")} disabled={disabled}>
-        <Activity className="mr-2 h-4 w-4" />
-        Scan Émotionnel
-      </TabsTrigger>
-      <TabsTrigger value="journal" onClick={() => setActiveTab("journal")} disabled={disabled}>
-        <LineChart className="mr-2 h-4 w-4" />
-        Journal
-      </TabsTrigger>
-      <TabsTrigger value="social-cocoon" onClick={() => setActiveTab("social-cocoon")} disabled={disabled}>
-        <MessageSquare className="mr-2 h-4 w-4" />
-        Social Cocoon
-      </TabsTrigger>
-      <TabsTrigger value="gamification" onClick={() => setActiveTab("gamification")} disabled={disabled}>
-        <Trophy className="mr-2 h-4 w-4" />
-        Gamification
-      </TabsTrigger>
-      <TabsTrigger value="meteo-activites" onClick={() => setActiveTab("meteo-activites")} disabled={disabled}>
-        <CloudSun className="mr-2 h-4 w-4" />
-        Météo & Activités
-      </TabsTrigger>
-      <TabsTrigger value="actions-rh" onClick={() => setActiveTab("actions-rh")} disabled={disabled}>
-        <Sparkles className="mr-2 h-4 w-4" />
-        Actions RH
-      </TabsTrigger>
-      <TabsTrigger value="events" onClick={() => setActiveTab("events")} disabled={disabled}>
-        <CalendarDays className="mr-2 h-4 w-4" />
-        Événements
-      </TabsTrigger>
-      <TabsTrigger value="compliance" onClick={() => setActiveTab("compliance")} disabled={disabled}>
-        <ShieldCheck className="mr-2 h-4 w-4" />
-        Conformité
-      </TabsTrigger>
-      <TabsTrigger value="settings" onClick={() => setActiveTab("settings")} disabled={disabled}>
-        <Settings className="mr-2 h-4 w-4" />
-        Paramètres
-      </TabsTrigger>
+    <TabsList className="w-full flex flex-wrap justify-start overflow-x-auto p-0 rounded-md border">
+      {tabItems.map(tab => (
+        <TabsTrigger
+          key={tab.id}
+          value={tab.id}
+          onClick={() => setActiveTab(tab.id)}
+          disabled={disabled}
+          className="flex items-center px-3 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-none first:rounded-l-md last:rounded-r-md"
+        >
+          {tab.icon}
+          <span className="hidden sm:inline">{tab.label}</span>
+        </TabsTrigger>
+      ))}
     </TabsList>
   );
 };
