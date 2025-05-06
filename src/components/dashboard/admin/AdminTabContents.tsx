@@ -1,93 +1,81 @@
 
 import React from 'react';
-import { TabsContent } from "@/components/ui/tabs";
-import GlobalOverviewTab from './tabs/GlobalOverviewTab';
-import ScanTeamTab from './tabs/ScanTeamTab';
-import JournalTrendsTab from './tabs/JournalTrendsTab';
-import SocialCocoonTab from './tabs/SocialCocoonTab';
+import { TabsContent } from '@/components/ui/tabs';
+import GlobalOverviewTab from './tabs/overview/GlobalOverviewTab';
 import GamificationTab from './tabs/GamificationTab';
-import HRActionsTab from './tabs/HRActionsTab';
+import JournalTrendsTab from './tabs/JournalTrendsTab';
+import ScanTeamTab from './tabs/ScanTeamTab';
+import SocialCocoonTab from './tabs/SocialCocoonTab';
 import EventsCalendarTab from './tabs/EventsCalendarTab';
 import ComplianceTab from './tabs/ComplianceTab';
+import HRActionsTab from './tabs/HRActionsTab';
 import AdminSettingsTab from './tabs/AdminSettingsTab';
-import { 
-  socialCocoonData,
-  gamificationData,
-  rhSuggestions,
-  eventsData,
-  complianceData
-} from './data/mockData';
+import PaginationSettings from './settings/PaginationSettings';
+import { ChartData } from './tabs/overview/types';
+import { DashboardStats } from './tabs/overview/types';
 
 interface AdminTabContentsProps {
   activeTab: string;
-  absenteeismData: Array<{ date: string; value: number }>;
-  emotionalScoreTrend: Array<{ date: string; value: number }>;
-  dashboardStats: {
-    productivity: {
-      current: number;
-      trend: number;
-    };
-    emotionalScore: {
-      current: number;
-      trend: number;
-    };
-  };
-  isLoading?: boolean;
+  absenteeismData: ChartData[];
+  emotionalScoreTrend: ChartData[];
+  dashboardStats: DashboardStats;
 }
 
-const AdminTabContents: React.FC<AdminTabContentsProps> = ({ 
+const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   activeTab,
   absenteeismData,
   emotionalScoreTrend,
   dashboardStats,
-  isLoading = false
 }) => {
   return (
     <>
-      <TabsContent value="vue-globale" className="mt-6">
+      <TabsContent value="vue-globale" className="space-y-4 animate-in fade-in-50">
         <GlobalOverviewTab 
-          absenteeismChartData={absenteeismData}
+          absenteeismData={absenteeismData} 
           emotionalScoreTrend={emotionalScoreTrend}
           dashboardStats={dashboardStats}
-          gamificationData={gamificationData}
-          isLoading={isLoading}
         />
       </TabsContent>
       
-      <TabsContent value="scan-team" className="mt-6">
-        <ScanTeamTab 
-          emotionalScoreTrend={emotionalScoreTrend} 
-          currentScore={78}
-          isLoading={isLoading}
-        />
+      <TabsContent value="gamification" className="animate-in fade-in-50">
+        <GamificationTab />
       </TabsContent>
       
-      <TabsContent value="journal-trends" className="mt-6">
-        <JournalTrendsTab isLoading={isLoading} />
+      <TabsContent value="scan-equipe" className="animate-in fade-in-50">
+        <ScanTeamTab />
       </TabsContent>
       
-      <TabsContent value="social-cocoon" className="mt-6">
-        <SocialCocoonTab socialCocoonData={socialCocoonData} isLoading={isLoading} />
+      <TabsContent value="journal" className="animate-in fade-in-50">
+        <JournalTrendsTab />
       </TabsContent>
       
-      <TabsContent value="gamification" className="mt-6">
-        <GamificationTab gamificationData={gamificationData} isLoading={isLoading} />
+      <TabsContent value="social-cocoon" className="animate-in fade-in-50">
+        <SocialCocoonTab />
       </TabsContent>
       
-      <TabsContent value="actions-rh" className="mt-6">
-        <HRActionsTab rhSuggestions={rhSuggestions} isLoading={isLoading} />
+      <TabsContent value="calendrier" className="animate-in fade-in-50">
+        <EventsCalendarTab />
       </TabsContent>
       
-      <TabsContent value="events" className="mt-6">
-        <EventsCalendarTab eventsData={eventsData} isLoading={isLoading} />
+      <TabsContent value="rh" className="animate-in fade-in-50">
+        <HRActionsTab />
       </TabsContent>
       
-      <TabsContent value="compliance" className="mt-6">
-        <ComplianceTab complianceData={complianceData} isLoading={isLoading} />
+      <TabsContent value="conformite" className="animate-in fade-in-50">
+        <ComplianceTab />
       </TabsContent>
       
-      <TabsContent value="settings" className="mt-6">
-        <AdminSettingsTab isLoading={isLoading} />
+      <TabsContent value="parametres" className="space-y-8 animate-in fade-in-50">
+        <AdminSettingsTab />
+        
+        {/* New Pagination Settings Section */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Paramètres d'affichage et pagination</h2>
+          <p className="text-muted-foreground">
+            Configurez les options de pagination et d'affichage des données pour tous les utilisateurs de l'application.
+          </p>
+          <PaginationSettings />
+        </div>
       </TabsContent>
     </>
   );

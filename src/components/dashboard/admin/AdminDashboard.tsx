@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tabs } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useDashboardData, useEmotionalScoreTrend, useDashboardStats } from './hooks/useDashboardData';
 import DashboardHeader from './DashboardHeader';
 import AdminTabsNavigation from './AdminTabsNavigation';
@@ -9,6 +9,9 @@ import AdminTabContents from './AdminTabContents';
 import AdminFooter from './AdminFooter';
 import { SegmentProvider } from '@/contexts/SegmentContext';
 import AdminHero from './AdminHero';
+import UsersTableDemo from './UsersTableDemo';
+import UsersTableWithInfiniteScroll from './UsersTableWithInfiniteScroll';
+import { Button } from '@/components/ui/button';
 import { 
   Users, FilePlus, FileSearch, Bell, 
   Activity, TrendingUp, UserCheck, AlertTriangle 
@@ -23,6 +26,9 @@ const AdminDashboardContent: React.FC = () => {
   const { absenteeismData, productivityData, isLoading, refetchAll } = useDashboardData(timePeriod);
   const { data: emotionalScoreTrend, refetch: refetchEmotionalTrend } = useEmotionalScoreTrend();
   const { data: dashboardStats, refetch: refetchDashboardStats } = useDashboardStats();
+  
+  // State for pagination display mode
+  const [paginationMode, setPaginationMode] = useState<'paginated' | 'loadMore' | 'infinite'>('paginated');
 
   const adminKpis = [
     { 
@@ -88,6 +94,30 @@ const AdminDashboardContent: React.FC = () => {
     console.log('Dashboard data refresh complete');
   }, [refetchAll, refetchEmotionalTrend, refetchDashboardStats]);
   
+  // Load pagination preferences from localStorage
+  useEffect(() => {
+    const savedMode = localStorage.getItem('emotionscare-pagination-mode');
+    if (savedMode === 'loadMore' || savedMode === 'paginated' || savedMode === 'infinite') {
+      setPaginationMode(savedMode as 'paginated' | 'loadMore' | 'infinite');
+    }
+  }, []);
+  
+  // Set pagination mode and save to localStorage
+  const setPaginationModeWithSave = (mode: 'paginated' | 'loadMore' | 'infinite') => {
+    setPaginationMode(mode);
+    localStorage.setItem('emotionscare-pagination-mode', mode);
+  };
+  
+  // Get the correct mode labels
+  const getModeLabel = () => {
+    switch (paginationMode) {
+      case 'paginated': return 'Pagination classique';
+      case 'loadMore': return 'Charger plus';
+      case 'infinite': return 'Défilement infini';
+      default: return 'Mode de pagination';
+    }
+  };
+  
   return (
     <div className="max-w-7xl mx-auto">
       {/* Admin Hero Section */}
@@ -117,6 +147,49 @@ const AdminDashboardContent: React.FC = () => {
           dashboardStats={formattedDashboardStats}
         />
       </Tabs>
+      
+      {/* Users List with Pagination Demo */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+          <h2 className="text-2xl font-semibold">Liste des utilisateurs</h2>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant={paginationMode === 'paginated' ? 'default' : 'outline'} 
+              onClick={() => setPaginationModeWithSave('paginated')}
+            >
+              Pages numérotées
+            </Button>
+            <Button 
+              size="sm" 
+              variant={paginationMode === 'loadMore' ? 'default' : 'outline'} 
+              onClick={() => setPaginationModeWithSave('loadMore')}
+            >
+              Charger plus
+            </Button>
+            <Button 
+              size="sm" 
+              variant={paginationMode === 'infinite' ? 'default' : 'outline'} 
+              onClick={() => setPaginationModeWithSave('infinite')}
+            >
+              Défilement infini
+            </Button>
+          </div>
+        </div>
+        
+        {/* Render the appropriate table based on the pagination mode */}
+        {paginationMode === 'paginated' && (
+          <UsersTableDemo showLoadMoreButton={false} defaultPageSize={25} />
+        )}
+        
+        {paginationMode === 'loadMore' && (
+          <UsersTableDemo showLoadMoreButton={true} defaultPageSize={25} />
+        )}
+        
+        {paginationMode === 'infinite' && (
+          <UsersTableWithInfiniteScroll pageSize={25} />
+        )}
+      </div>
       
       <AdminFooter />
     </div>
