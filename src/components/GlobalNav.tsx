@@ -9,6 +9,7 @@ import DesktopNavigation from './navigation/DesktopNavigation';
 import UserMenu from './navigation/UserMenu';
 import MobileNavigation from './navigation/MobileNavigation';
 import ThemeSwitcher from './ui/ThemeSwitcher';
+import GlobalSearch from './search/GlobalSearch';
 import { Button } from './ui/button';
 import { HomeIcon, LogIn } from 'lucide-react';
 
@@ -34,6 +35,11 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
           <>
             {/* Desktop Navigation pour utilisateurs authentifiés */}
             <DesktopNavigation navigationItems={navigationItems} />
+            
+            {/* Global Search - only for authenticated users */}
+            <div className="flex items-center ml-auto mr-4">
+              <GlobalSearch />
+            </div>
             
             {/* User Profile - Desktop */}
             <div className="flex items-center gap-4">

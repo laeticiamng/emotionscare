@@ -8,6 +8,7 @@ import SessionTimeoutAlert from './SessionTimeoutAlert';
 import Sidebar from './ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useTheme } from '@/contexts/ThemeContext';
+import GlobalSearch from './search/GlobalSearch';
 
 interface LayoutProps {
   children?: React.ReactNode;
