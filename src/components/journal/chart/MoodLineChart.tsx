@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { ChartContainer, ChartInteractiveLegend } from '@/components/ui/chart';
+import { ChartContainer, ChartInteractiveLegend, ZoomableChart } from '@/components/ui/chart';
 import type { MoodData } from '@/types';
 import MoodChartTooltip from './MoodChartTooltip';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -30,26 +30,30 @@ const MoodLineChart: React.FC<MoodLineChartProps> = ({ data }) => {
     }
   };
 
+  const chartConfig = {
+    sentiment: { 
+      color: '#4A90E2',
+      label: 'Sentiment' 
+    },
+    anxiety: { 
+      color: '#E53E3E',
+      label: 'Anxiété' 
+    },
+    energy: { 
+      color: '#38A169',
+      label: 'Énergie' 
+    }
+  };
+
   return (
     <div className="h-80">
-      <ChartContainer 
-        config={{
-          sentiment: { 
-            color: '#4A90E2',
-            label: 'Sentiment' 
-          },
-          anxiety: { 
-            color: '#E53E3E',
-            label: 'Anxiété' 
-          },
-          energy: { 
-            color: '#38A169',
-            label: 'Énergie' 
-          }
-        }}
+      <ZoomableChart 
+        data={enrichedData} 
+        config={chartConfig} 
+        brushDataKey="date"
+        showControls={!isMobile}
       >
         <LineChart
-          data={enrichedData}
           margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -97,7 +101,7 @@ const MoodLineChart: React.FC<MoodLineChartProps> = ({ data }) => {
             />
           )}
         </LineChart>
-      </ChartContainer>
+      </ZoomableChart>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import AbsenteeismChart from './AbsenteeismChart';
 import ProductivityChart from './ProductivityChart';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { ZoomableChart } from '@/components/ui/chart/ZoomableChart';
 
 export type ChartType = "line" | "bar" | "area";
 
@@ -58,6 +59,17 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
     if (newView && availableViews.includes(newView as ChartType)) {
       setView(newView as ChartType);
     }
+  };
+
+  // Chart config for ZoomableChart
+  const chartConfig = {
+    value: { 
+      theme: { 
+        light: view === 'bar' ? '#4A90E2' : '#7ED321', 
+        dark: view === 'bar' ? '#4A90E2' : '#7ED321' 
+      },
+      label: title
+    },
   };
 
   // Render the appropriate chart based on current view

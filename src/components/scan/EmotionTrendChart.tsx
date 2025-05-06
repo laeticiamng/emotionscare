@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
-import { ChartInteractiveLegend } from '@/components/ui/chart';
+import { ChartInteractiveLegend, ZoomableChart } from '@/components/ui/chart';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import type { Emotion } from '@/types';
 
@@ -88,11 +88,17 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
     );
   };
 
+  const chartConfig = {
+    score: { 
+      color: '#9b87f5',
+      label: 'Score émotionnel' 
+    },
+  };
+
   return (
     <div className="w-full h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart
-          data={chartData}
+      <ZoomableChart data={chartData} config={chartConfig} showControls={!isMobile}>
+        <LineChart 
           margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
@@ -130,7 +136,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
             layout={isMobile ? "vertical" : "horizontal"}
           />
         </LineChart>
-      </ResponsiveContainer>
+      </ZoomableChart>
     </div>
   );
 };

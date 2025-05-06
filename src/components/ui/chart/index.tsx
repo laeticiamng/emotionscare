@@ -7,4 +7,6 @@ export { ChartTooltip, ChartTooltipContent } from "./ChartTooltip";
 export { ChartLegend, ChartLegendContent } from "./ChartLegend";
 export { ChartInteractiveLegend } from "./ChartInteractiveLegend";
 export { ChartStyle } from "./ChartStyle";
+export { ZoomableChart } from "./ZoomableChart";
+export { ChartControls } from "./ChartControls";
 export { useChart } from "./context";
