@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   BarChart, Calendar, Cloud, 
@@ -141,13 +140,12 @@ const AdminTabsNavigation: React.FC<AdminTabsNavigationProps> = ({
       
       <TabsTrigger 
         value="activity-logs"
-        onClick={() => handleTabClick('activity-logs')}
-        className="w-full"
-        data-state={activeTab === 'activity-logs' ? 'active' : ''}
+        onClick={() => onTabChange('activity-logs')}
         disabled={disabled}
+        className="flex items-center"
       >
-        <Activity className="h-4 w-4 mr-2" />
-        <span className="hidden sm:inline-block">Logs d'activité</span>
+        <Activity className="mr-2 h-4 w-4" />
+        Activités (anonymes)
       </TabsTrigger>
       
       <TabsTrigger 

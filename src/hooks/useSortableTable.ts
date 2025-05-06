@@ -78,7 +78,20 @@ export function useSortableTable<T>(initialData: T[], initialSort?: SortState) {
     }
   }, [sortState]);
   
-  return { data, sortState, handleSort, isSorted, updateData };
+  // For compatibility with existing code using sortField and sortDirection
+  const sortField = sortState.field;
+  const sortDirection = sortState.direction;
+  
+  return { 
+    data, 
+    sortState, 
+    handleSort, 
+    isSorted, 
+    updateData,
+    // Add these for backward compatibility
+    sortField,
+    sortDirection
+  };
 }
 
 export default useSortableTable;

@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import Pagination from '@/components/ui/data-table/Pagination'; // Fix: import default export
+import Pagination from '@/components/ui/data-table/Pagination';
 import { Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface UserActivityLogTabProps {
   userId: string;
@@ -16,6 +17,7 @@ interface UserActivityLogTabProps {
 const UserActivityLogTab: React.FC<UserActivityLogTabProps> = ({ userId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [periodFilter, setPeriodFilter] = useState('all');
+  const { toast } = useToast();
   
   const {
     logs,
@@ -53,6 +55,11 @@ const UserActivityLogTab: React.FC<UserActivityLogTabProps> = ({ userId }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    toast({
+      title: "Export réussi",
+      description: "Les logs d'activité ont été exportés avec succès.",
+    });
   };
   
   return (
@@ -112,6 +119,8 @@ const UserActivityLogTab: React.FC<UserActivityLogTabProps> = ({ userId }) => {
                   currentPage={currentPage}
                   totalPages={totalPages}
                   onPageChange={setPage}
+                  pageSize={10}
+                  onPageSizeChange={setLimit}
                 />
               </div>
             )}
@@ -123,6 +132,15 @@ const UserActivityLogTab: React.FC<UserActivityLogTabProps> = ({ userId }) => {
             )}
           </>
         )}
+        
+        <div className="mt-6 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm">
+          <p className="font-medium">Rappel RGPD</p>
+          <p className="mt-1">
+            Ces données sont stockées dans le cadre de la sécurité et de l'amélioration de l'expérience
+            utilisateur. Elles seront automatiquement supprimées après 12 mois, conformément à notre politique
+            de rétention des données.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
