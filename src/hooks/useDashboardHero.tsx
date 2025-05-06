@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  Activity, Calendar, Heart, UserGroup, 
-  Zap, Users, TrendingUp, Clock
+  Activity, Calendar, Heart, Users, 
+  Zap, Clock, TrendingUp
 } from 'lucide-react';
 import { DashboardKpi, DashboardShortcut } from '@/components/dashboard/DashboardHero';
 
@@ -34,7 +34,7 @@ export const useDashboardHero = (userId: string | undefined) => {
             key: 'active_users', 
             label: 'Utilisateurs actifs', 
             value: '85%', 
-            icon: UserGroup,
+            icon: Users,
             trend: { value: 5, direction: 'up' }
           },
           { 
