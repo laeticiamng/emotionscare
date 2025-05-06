@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartInteractiveLegend } from '@/components/ui/chart';
-import { useMediaQuery } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import type { Emotion } from '@/types';
 
 interface EmotionTrendChartProps {
@@ -15,14 +15,15 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
   
-  // Format data for the chart
+  // Format data for the chart and add previous values for delta calculation
   const chartData = React.useMemo(() => {
     const recentEmotions = emotions.slice(0, days).reverse();
     
-    return recentEmotions.map(emotion => ({
+    return recentEmotions.map((emotion, idx) => ({
       date: new Date(emotion.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
       score: emotion.score || 0,
-      emotion: emotion.emotion
+      emotion: emotion.emotion,
+      previousScore: idx > 0 ? recentEmotions[idx - 1].score : null
     }));
   }, [emotions, days]);
 
@@ -49,6 +50,44 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
     );
   }
 
+  // Create custom tooltip component to show score and delta
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload || !payload.length) return null;
+    
+    const currentData = payload[0].payload;
+    const score = currentData.score;
+    const previousScore = currentData.previousScore;
+    
+    // Calculate delta percentage if previous value exists
+    let deltaPercent = null;
+    if (previousScore !== null) {
+      deltaPercent = Math.round(((score - previousScore) / Math.abs(previousScore)) * 100);
+    }
+    
+    return (
+      <div 
+        className="bg-white p-3 rounded-lg shadow-lg border border-gray-200 transition-opacity duration-150 ease-out"
+        role="tooltip"
+      >
+        <div className="text-sm text-gray-500 mb-1">{label}</div>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#9b87f5' }}></span>
+          <span className="font-medium text-gray-800">
+            {score.toLocaleString()}%
+          </span>
+          {deltaPercent !== null && (
+            <span className={`text-sm font-medium ${deltaPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {deltaPercent > 0 ? '+' : ''}{deltaPercent}%
+            </span>
+          )}
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Émotion: {currentData.emotion}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="w-full h-64">
       <ResponsiveContainer width="100%" height="100%">
@@ -67,9 +106,10 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, days = 
             tickFormatter={(value) => `${value}%`}
           />
           <Tooltip 
-            formatter={(value: number) => [`${value}%`, 'Score']}
-            labelFormatter={(label) => `Date: ${label}`}
-            contentStyle={{ borderRadius: '8px', padding: '10px' }}
+            content={<CustomTooltip />}
+            wrapperStyle={{ overflow: 'visible' }} 
+            cursor={{ stroke: '#f0f0f0', strokeWidth: 1 }}
+            trigger={isMobile ? "click" : "hover"}
           />
           {!hiddenSeries.includes('score') && (
             <Line

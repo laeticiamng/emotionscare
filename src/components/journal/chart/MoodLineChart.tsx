@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
 import { ChartContainer, ChartInteractiveLegend } from '@/components/ui/chart';
 import type { MoodData } from '@/types';
 import MoodChartTooltip from './MoodChartTooltip';
-import { useMediaQuery } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface MoodLineChartProps {
   data: MoodData[];
@@ -13,6 +13,14 @@ interface MoodLineChartProps {
 const MoodLineChart: React.FC<MoodLineChartProps> = ({ data }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  // Enrich data with previous values for delta calculation
+  const enrichedData = data.map((point, idx) => ({
+    ...point,
+    previousSentiment: idx > 0 ? data[idx - 1].sentiment : null,
+    previousAnxiety: idx > 0 ? data[idx - 1].anxiety : null,
+    previousEnergy: idx > 0 ? data[idx - 1].energy : null
+  }));
 
   const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
     if (isHidden) {
@@ -41,7 +49,7 @@ const MoodLineChart: React.FC<MoodLineChartProps> = ({ data }) => {
         }}
       >
         <LineChart
-          data={data}
+          data={enrichedData}
           margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

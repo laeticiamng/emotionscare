@@ -4,6 +4,7 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import { useChart } from "./context";
 import { ChartConfig } from "./types";
+import { Badge } from "../badge";
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
@@ -117,6 +118,14 @@ const ChartTooltipContent = React.forwardRef<
       return null;
     }
 
+    // Calculate if we should show delta values
+    const showDeltas = payload.some(item => 
+      item.payload && 
+      item.dataKey &&
+      `previous${item.dataKey.charAt(0).toUpperCase() + item.dataKey.slice(1)}` in item.payload ||
+      'previousValue' in item.payload
+    );
+
     const nestLabel = payload.length === 1 && indicator !== "dot";
 
     return (
@@ -124,8 +133,11 @@ const ChartTooltipContent = React.forwardRef<
         ref={ref}
         className={cn(
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
+          "transition-opacity duration-150 ease-out",
           className
         )}
+        role="tooltip"
+        aria-live="polite"
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
@@ -133,6 +145,25 @@ const ChartTooltipContent = React.forwardRef<
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
             const indicatorColor = color || item.payload.fill || item.color;
+            
+            // Calculate delta if available
+            const previousValueKey = item.dataKey === 'value' ? 'previousValue' : 
+              `previous${item.dataKey.charAt(0).toUpperCase() + item.dataKey.slice(1)}`;
+            
+            const previousValue = item.payload && previousValueKey in item.payload ? 
+              item.payload[previousValueKey] : null;
+            
+            let delta = null;
+            if (previousValue !== null && item.value !== null && previousValue !== 0) {
+              delta = Math.round(((item.value - previousValue) / Math.abs(previousValue)) * 100);
+            }
+            
+            const isDeltaPositive = delta !== null && delta >= 0;
+            const isDeltaNegative = delta !== null && delta < 0;
+            
+            // Choose colors for delta badges
+            const deltaColor = isDeltaPositive ? 'text-green-600' : 
+                              isDeltaNegative ? 'text-red-600' : '';
 
             return (
               <div
@@ -182,11 +213,22 @@ const ChartTooltipContent = React.forwardRef<
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
-                      {item.value && (
-                        <span className="font-mono font-medium tabular-nums text-foreground">
-                          {item.value.toLocaleString()}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {item.value && (
+                          <span className="font-mono font-medium tabular-nums text-foreground">
+                            {item.value.toLocaleString()}
+                          </span>
+                        )}
+                        
+                        {delta !== null && (
+                          <span className={cn(
+                            "text-xs font-medium",
+                            deltaColor
+                          )}>
+                            {delta > 0 ? '+' : ''}{delta}%
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </>
                 )}

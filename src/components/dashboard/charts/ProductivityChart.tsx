@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartInteractiveLegend } from "@/components/ui/chart";
-import { useMediaQuery } from '@/hooks/use-mobile';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface ProductivityChartProps {
   data: Array<{ date: string; value: number }>;
@@ -11,6 +11,12 @@ interface ProductivityChartProps {
 const ProductivityChart: React.FC<ProductivityChartProps> = ({ data }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  // Enrich data with previous values for delta calculation
+  const enrichedData = data.map((point, idx) => ({
+    ...point,
+    previousValue: idx > 0 ? data[idx - 1].value : null
+  }));
 
   const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
     if (isHidden) {
@@ -30,7 +36,7 @@ const ProductivityChart: React.FC<ProductivityChartProps> = ({ data }) => {
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 15, right: 30, left: 20, bottom: 5 }}>
+        <BarChart data={enrichedData} margin={{ top: 15, right: 30, left: 20, bottom: 5 }}>
           <defs>
             <linearGradient id="wellnessBlueGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#4A90E2" stopOpacity={1}/>
