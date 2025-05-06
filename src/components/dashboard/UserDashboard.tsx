@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardHeader from './DashboardHeader';
 import UserSidePanel from './UserSidePanel';
@@ -6,11 +5,13 @@ import ModulesSection from '@/components/home/ModulesSection';
 import EmotionScanSection from './EmotionScanSection';
 import SocialCocoonWidget from './SocialCocoonWidget';
 import GamificationWidget from './GamificationWidget';
+import DashboardHero from './DashboardHero';
 import type { User } from '@/types';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, LayoutDashboard, LayoutGrid } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDashboardHero } from '@/hooks/useDashboardHero';
 
 interface UserDashboardProps {
   user: User | null;
@@ -23,6 +24,7 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) => {
   const [minimalView, setMinimalView] = useState(false);
   const isMobile = useIsMobile();
+  const { kpis, shortcuts, isLoading } = useDashboardHero(user?.id);
   const [collapsedSections, setCollapsedSections] = useState({
     modules: false,
     emotionScan: isMobile,
@@ -41,7 +43,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   
   return (
     <div className="animate-fade-in w-full">
-      <div className="flex justify-between items-center flex-wrap gap-2 mb-8">
+      <div className="flex justify-between items-center flex-wrap gap-2 mb-6">
         <DashboardHeader user={user} />
         {!isMobile && (
           <Button 
@@ -63,6 +65,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           </Button>
         )}
       </div>
+      
+      {/* Hero Section */}
+      <DashboardHero 
+        userName={user?.name || 'Utilisateur'}
+        kpis={kpis}
+        shortcuts={shortcuts}
+        isLoading={isLoading}
+      />
       
       {/* Modules Section - Using our reusable component */}
       <ModulesSection collapsed={collapsedSections.modules} onToggle={() => toggleSection('modules')} />
