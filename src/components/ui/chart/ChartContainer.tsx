@@ -20,6 +20,11 @@ const ChartContainer = React.forwardRef<
   const uniqueId = React.useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
+  // Find the first valid React element or return null if none exists
+  const firstValidElement = React.Children.toArray(children).find(
+    (child): child is React.ReactElement => React.isValidElement(child)
+  ) as React.ReactElement | undefined;
+
   return (
     <ChartContext.Provider value={{ config }}>
       <div
@@ -33,13 +38,7 @@ const ChartContainer = React.forwardRef<
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {/* Ensure we only pass a single child to ResponsiveContainer */}
-          {React.Children.count(children) === 1
-            ? children
-            : React.Children.map(children, (child) => {
-                if (!React.isValidElement(child)) return null;
-                return child;
-              })[0] || null}
+          {firstValidElement || null}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
