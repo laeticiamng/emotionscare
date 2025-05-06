@@ -23,7 +23,7 @@ const Layout = ({ children }: LayoutProps) => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
   const isHomePage = location.pathname === '/';
   
-  // If on auth page or not authenticated and not on home page, display only the children (login/register pages)
+  // Si sur page auth ou non authentifié et pas sur homepage, afficher uniquement les enfants
   if (isAuthPage || (!isAuthenticated && !isHomePage)) {
     return (
       <div className="animate-fade-in min-h-screen">
@@ -34,20 +34,20 @@ const Layout = ({ children }: LayoutProps) => {
   
   // Determine background classes based on theme - Using warmer gradients
   const getBgClasses = () => {
-    if (theme === 'dark') return 'bg-gradient-to-br from-[#22252F] to-[#2D3440]'; // Slightly warmer dark
-    if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-indigo-100/60'; // More vibrant pastel
-    return 'bg-gradient-to-br from-white to-gray-50/80'; // Warmer light mode
+    if (theme === 'dark') return 'bg-gradient-to-br from-[#22252F] to-[#2D3440]'; 
+    if (theme === 'pastel') return 'bg-gradient-to-br from-blue-50 to-indigo-100/60'; 
+    return 'bg-gradient-to-br from-white to-gray-50/80'; 
   };
   
   return (
     <div className={`flex flex-col min-h-screen ${getBgClasses()}`}>
-      {/* Single GlobalNav - includes all top navigation */}
+      {/* Navigation globale */}
       <GlobalNav isAuthenticated={isAuthenticated} />
       
       {isAuthenticated && <SessionTimeoutAlert />}
       
       <div className="flex flex-1 overflow-hidden pt-16">
-        {/* Sidebar only appears on desktop for authenticated users */}
+        {/* Sidebar uniquement pour desktop et utilisateurs authentifiés */}
         {!isMobile && isAuthenticated && <Sidebar />}
         
         <div className={`flex-1 overflow-auto transition-all ${
@@ -56,15 +56,15 @@ const Layout = ({ children }: LayoutProps) => {
           'w-full'
         }`}>
           <main className={`animate-fade-in ${
-            isMobile ? 'w-full px-4 py-6' : // More padding on mobile
+            isMobile ? 'w-full px-4 py-6' : 
             isHomePage && !isAuthenticated ? 'w-full p-0' : 
-            'w-full max-w-[1400px] mx-auto py-8 px-8 md:px-10 lg:px-12' // More spacious layout
+            'w-full max-w-[1400px] mx-auto py-8 px-8 md:px-10 lg:px-12'
           }`}>
             {children || <Outlet />}
           </main>
           
-          {/* Un seul SecurityFooter */}
-          <SecurityFooter />
+          {/* Un seul SecurityFooter centralisé */}
+          {!isAuthPage && <SecurityFooter />}
         </div>
       </div>
     </div>
