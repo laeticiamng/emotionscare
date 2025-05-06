@@ -36,6 +36,11 @@ const AdminDashboard: React.FC = () => {
     setIsLoading(false);
   }, [absenteeismData, emotionalScoreTrend, dashboardStats]);
   
+  // Handler for tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+  
   return (
     <SegmentProvider>
       <div className="max-w-7xl mx-auto">
@@ -51,7 +56,7 @@ const AdminDashboard: React.FC = () => {
         <Tabs value={activeTab} className="space-y-4">
           <AdminTabsNavigation 
             activeTab={activeTab}
-            setActiveTab={setActiveTab}
+            onTabChange={handleTabChange}
             disabled={isLoading}
           />
           

@@ -1,110 +1,84 @@
 
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { SortableField } from '@/components/dashboard/admin/types/tableTypes';
 
-export type SortDirection = 'asc' | 'desc' | undefined;
+type SortDirection = 'asc' | 'desc' | null;
 
-interface UseSortableTableOptions {
-  storageKey?: string;
-  persistInUrl?: boolean;
-  defaultSortField?: string;
-  defaultSortDirection?: SortDirection;
+export interface SortState {
+  field: SortableField | null;
+  direction: SortDirection;
 }
 
-export const useSortableTable = <T extends string>({
-  storageKey,
-  persistInUrl = false,
-  defaultSortField,
-  defaultSortDirection = 'asc'
-}: UseSortableTableOptions = {}) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+export function useSortableTable<T>(initialData: T[], initialSort?: SortState) {
+  const [sortState, setSortState] = useState<SortState>(initialSort || {
+    field: null,
+    direction: null,
+  });
   
-  // Initialize sort state from URL or localStorage if enabled
-  const initializeSort = () => {
-    if (persistInUrl) {
-      const fieldFromUrl = searchParams.get('sortField');
-      const dirFromUrl = searchParams.get('sortDir') as SortDirection;
-      
-      if (fieldFromUrl) {
-        return {
-          field: fieldFromUrl as T,
-          direction: dirFromUrl || defaultSortDirection
-        };
-      }
-    }
-    
-    if (storageKey) {
-      const savedSort = localStorage.getItem(storageKey);
-      if (savedSort) {
-        try {
-          const { field, direction } = JSON.parse(savedSort);
-          return { field: field as T, direction };
-        } catch (e) {
-          console.error('Error parsing saved sort:', e);
-        }
-      }
-    }
-    
-    return {
-      field: defaultSortField as T | undefined,
-      direction: defaultSortDirection
-    };
-  };
+  const [data, setData] = useState<T[]>(initialData);
   
-  const [sortState, setSortState] = useState(initializeSort);
+  // Callback to handle sorting
+  const handleSort = useCallback((field: SortableField) => {
+    setSortState((prev) => ({
+      field,
+      direction:
+        prev.field === field
+          ? prev.direction === 'asc'
+            ? 'desc'
+            : prev.direction === 'desc'
+            ? null
+            : 'asc'
+          : 'asc',
+    }));
+  }, []);
   
-  // Update URL and localStorage when sort changes
-  useEffect(() => {
-    if (persistInUrl && sortState.field) {
-      setSearchParams(prev => {
-        const newParams = new URLSearchParams(prev);
-        newParams.set('sortField', sortState.field as string);
-        if (sortState.direction) {
-          newParams.set('sortDir', sortState.direction);
-        } else {
-          newParams.delete('sortDir');
-        }
-        return newParams;
-      });
-    }
-    
-    if (storageKey && sortState.field) {
-      localStorage.setItem(storageKey, JSON.stringify(sortState));
-    }
-  }, [sortState, persistInUrl, storageKey, setSearchParams]);
+  // Helper to check sort state for a given field
+  const isSorted = useCallback(
+    (field: SortableField) => {
+      return sortState.field === field ? sortState.direction : null;
+    },
+    [sortState]
+  );
   
-  // Handle sort toggle
-  const handleSort = (field: T) => {
-    setSortState(prev => {
-      if (prev.field === field) {
-        // Cycle through: asc -> desc -> undefined -> asc
-        const nextDirection: SortDirection = 
-          prev.direction === 'asc' ? 'desc' : 
-          prev.direction === 'desc' ? undefined : 'asc';
+  // Update data when source data or sort state changes
+  const updateData = useCallback((newData: T[]) => {
+    if (sortState.field && sortState.direction) {
+      const sortedData = [...newData].sort((a, b) => {
+        const fieldA = a[sortState.field as keyof T];
+        const fieldB = b[sortState.field as keyof T];
         
-        return {
-          field,
-          direction: nextDirection
+        // Safe comparison that handles different types
+        const compareValues = (valA: any, valB: any): number => {
+          // Handle null/undefined values
+          if (valA == null && valB == null) return 0;
+          if (valA == null) return -1;
+          if (valB == null) return 1;
+          
+          // Handle string comparison
+          if (typeof valA === 'string' && typeof valB === 'string') {
+            return valA.localeCompare(valB);
+          }
+          
+          // Handle number comparison
+          if (typeof valA === 'number' && typeof valB === 'number') {
+            return valA - valB;
+          }
+          
+          // Convert to string for any other type
+          return String(valA).localeCompare(String(valB));
         };
-      }
+        
+        const result = compareValues(fieldA, fieldB);
+        return sortState.direction === 'asc' ? result : -result;
+      });
       
-      // New field, start with ascending
-      return {
-        field,
-        direction: 'asc'
-      };
-    });
-  };
+      setData(sortedData);
+    } else {
+      setData(newData);
+    }
+  }, [sortState]);
   
-  // Check if a field is sorted
-  const isSorted = (field: T): SortDirection => {
-    return sortState.field === field ? sortState.direction : undefined;
-  };
-  
-  return {
-    sortField: sortState.field,
-    sortDirection: sortState.direction,
-    handleSort,
-    isSorted
-  };
-};
+  return { data, sortState, handleSort, isSorted, updateData };
+}
+
+export default useSortableTable;

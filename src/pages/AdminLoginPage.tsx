@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
+import { User } from '@/types';
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('admin@example.com'); // Préremplit avec l'email de démo
@@ -33,27 +34,39 @@ const AdminLoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      const user = await login(email, password);
+      const result = await login(email, password);
       
-      // Vérifie si l'utilisateur a des privilèges d'administration
-      if (user && isAdminRole(user.role)) {
-        toast({
-          title: "Connexion réussie",
-          description: `Bienvenue dans l'espace administration, ${user.name}!`,
-        });
-        // Navigation explicite vers le tableau de bord après connexion admin réussie
-        navigate('/dashboard');
+      // Check if the result is a User or an error response
+      if ('id' in result) {
+        // Result is a User
+        const user = result as User;
+        
+        // Vérifie si l'utilisateur a des privilèges d'administration
+        if (isAdminRole(user.role)) {
+          toast({
+            title: "Connexion réussie",
+            description: `Bienvenue dans l'espace administration, ${user.name}!`,
+          });
+          // Navigation explicite vers le tableau de bord après connexion admin réussie
+          navigate('/dashboard');
+        } else {
+          toast({
+            title: "Accès refusé",
+            description: "Vous n'avez pas les droits d'administration nécessaires",
+            variant: "destructive"
+          });
+          navigate('/'); // Redirection vers l'accueil si pas admin
+        }
       } else {
+        // Result is an error response
         toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas les droits d'administration nécessaires",
+          title: "Erreur de connexion",
+          description: result.error || "Impossible de se connecter. Veuillez vérifier vos identifiants.",
           variant: "destructive"
         });
-        navigate('/'); // Redirection vers l'accueil si pas admin
       }
       
     } catch (error: any) {
-      // Gestion des erreurs déjà dans le contexte d'authentification
       console.error("Erreur de connexion admin:", error);
       toast({
         title: "Erreur de connexion",

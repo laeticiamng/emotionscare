@@ -7,14 +7,20 @@ import { Download, Filter } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Pagination } from "@/components/ui/data-table/Pagination";
+import Pagination from "@/components/ui/data-table/Pagination";
 import { supabase } from '@/lib/supabase-client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ActivityLog } from '@/components/admin/UserActivityTimeline';
 
+// Extended ActivityLog type with user information
+interface ExtendedActivityLog extends ActivityLog {
+  userName: string;
+  userEmail: string;
+}
+
 const ActivityLogsTab: React.FC = () => {
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [logs, setLogs] = useState<ExtendedActivityLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);

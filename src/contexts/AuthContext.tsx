@@ -1,226 +1,214 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { User } from '@/types';
 
-// Import the activityLogService
-import { activityLogService } from '@/lib/activityLogService';
-
 interface AuthContextProps {
-  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  user: User | null;
+  login: (email: string, password: string) => Promise<User | { success: boolean; error?: string }>;
+  register: (email: string, password: string, userData?: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
-  updateUser: (updates: Partial<User>) => Promise<void>;
+  signOut: () => Promise<void>; // Added for compatibility
+  updateUserProfile: (data: Partial<User>) => Promise<{ success: boolean; error?: string }>; // Added for compatibility
 }
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-const AuthContext = createContext<AuthContextProps>({
-  user: null,
+const defaultAuthContext: AuthContextProps = {
   isAuthenticated: false,
-  isLoading: false,
-  error: null,
+  isLoading: true,
+  user: null,
   login: async () => ({ success: false, error: 'Not implemented' }),
-  logout: async () => { },
-  signup: async () => ({ success: false, error: 'Not implemented' }),
-  updateUser: async () => { }
-});
-
-const mapUser = (supabaseUser: any): User => {
-  return {
-    id: supabaseUser.id,
-    email: supabaseUser.email!,
-    name: supabaseUser.user_metadata?.name || supabaseUser.email!.split('@')[0],
-    role: supabaseUser.user_metadata?.role || 'user',
-    avatar: supabaseUser.user_metadata?.avatar || `https://api.dicebear.com/7.x/thumbs/svg?seed=${supabaseUser.email}`,
-    image: supabaseUser.user_metadata?.image,
-    streak: supabaseUser.user_metadata?.streak,
-    dailyGoal: supabaseUser.user_metadata?.dailyGoal,
-    weeklyGoal: supabaseUser.user_metadata?.weeklyGoal,
-    preferences: supabaseUser.user_metadata?.preferences,
-    anonymity_code: supabaseUser.user_metadata?.anonymity_code,
-    emotional_score: supabaseUser.user_metadata?.emotional_score,
-    onboarded: supabaseUser.user_metadata?.onboarded,
-    alias: supabaseUser.user_metadata?.alias,
-    bio: supabaseUser.user_metadata?.bio,
-    joined_at: supabaseUser.user_metadata?.joined_at,
-    location_url: supabaseUser.user_metadata?.location_url,
-  };
+  register: async () => ({ success: false, error: 'Not implemented' }),
+  logout: async () => {},
+  signOut: async () => {}, // Added for compatibility
+  updateUserProfile: async () => ({ success: false, error: 'Not implemented' }), // Added for compatibility
 };
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+const AuthContext = createContext<AuthContextProps>(defaultAuthContext);
+
+export const useAuth = () => useContext(AuthContext);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  
+
   useEffect(() => {
-    const getSession = async () => {
-      setIsLoading(true);
-      supabase.auth.getSession()
-        .then(({ data: { session } }) => {
-          if (session) {
-            setUser(mapUser(session.user));
-            setIsAuthenticated(true);
-          }
-        })
-        .catch(err => {
-          console.error('getSession error:', err);
-          setError(err.message);
-        })
-        .finally(() => setIsLoading(false));
-    };
-    
-    getSession();
-    
-    // Listen for auth state changes
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setUser(mapUser(session.user));
-        setIsAuthenticated(true);
-      } else if (event === 'SIGNED_OUT') {
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          // Fetch more user data if needed
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          
+          // Combine auth user with profile data
+          const userData: User = {
+            id: user.id,
+            name: profileData?.name || user.email?.split('@')[0] || 'User',
+            email: user.email || '',
+            role: profileData?.role || 'Utilisateur',
+            avatar: profileData?.avatar_url || '/images/default-avatar.png',
+          };
+          
+          setUser(userData);
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
         setUser(null);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        checkAuth();
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsLoading(false);
       }
     });
+
+    // Check initial auth state
+    checkAuth();
+
+    // Clean up the subscription
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
-  
-  const signup = useCallback(async (email: string, password: string, name: string) => {
-    setIsLoading(true);
-    setError(null);
-    
+
+  const login = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        console.error('Login error:', error.message);
+        return { success: false, error: error.message };
+      }
+      
+      if (data.user) {
+        // Fetch user profile data
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
+        
+        // Create user object with roles and other data
+        const userData: User = {
+          id: data.user.id,
+          name: profileData?.name || data.user.email?.split('@')[0] || 'User',
+          email: data.user.email || '',
+          role: profileData?.role || 'Utilisateur',
+          avatar: profileData?.avatar_url || '/images/default-avatar.png',
+        };
+        
+        setUser(userData);
+        setIsAuthenticated(true);
+        return userData; // Return the user object for direct usage
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Login exception:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'An unknown error occurred during login'
+      };
+    }
+  };
+
+  const register = async (email: string, password: string, userData?: Partial<User>) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
         password,
         options: {
           data: {
-            name,
-            avatar: `https://api.dicebear.com/7.x/thumbs/svg?seed=${email}`,
-            role: 'user'
+            name: userData?.name,
+            role: userData?.role || 'Utilisateur',
           }
         }
       });
       
-      if (error) throw error;
-      
-      const user = data.user;
-      setUser(mapUser(user));
-      setIsAuthenticated(true);
-      
-      return { success: true };
-    } catch (err) {
-      console.error('Signup error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to signup');
-      return { success: false, error: err instanceof Error ? err.message : 'Failed to signup' };
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Update the login function to log the activity
-  const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) throw error;
-      
-      const user = data.user;
-      setUser(mapUser(user));
-      setIsAuthenticated(true);
-      
-      // Log the login activity
-      if (user) {
-        activityLogService.logLogin(user.id);
+      if (error) {
+        return { success: false, error: error.message };
       }
       
+      // Note: User won't be automatically logged in, they'll need to confirm email first
       return { success: true };
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to login');
-      return { success: false, error: err instanceof Error ? err.message : 'Failed to login' };
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'An unknown error occurred during registration'
+      };
     }
-  }, []);
-  
-  const logout = useCallback(async () => {
-    setIsLoading(true);
-    
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      setUser(null);
-      setIsAuthenticated(false);
-      navigate('/login');
-    } catch (err) {
-      console.error('Logout error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to logout');
-    } finally {
-      setIsLoading(false);
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  // Alias for logout for compatibility
+  const signOut = logout;
+
+  // Function to update user profile
+  const updateUserProfile = async (data: Partial<User>) => {
+    if (!user || !user.id) {
+      return { success: false, error: 'No authenticated user' };
     }
-  }, [navigate]);
-  
-  const updateUser = useCallback(async (updates: Partial<User>) => {
-    setIsLoading(true);
-    setError(null);
-    
+
     try {
-      if (!user?.id) throw new Error('User not authenticated');
-      
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
-        .update(updates)
-        .eq('id', user.id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      // Optimistically update the user in the context
-      setUser(prevUser => ({ ...prevUser!, ...updates }));
-      
-      setIsAuthenticated(true);
-    } catch (err) {
-      console.error('Update user error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update user');
-    } finally {
-      setIsLoading(false);
+        .update({
+          name: data.name,
+          avatar_url: data.avatar,
+          // Add any other fields you want to update
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      // Update local user state
+      setUser(prev => prev ? { ...prev, ...data } : null);
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Failed to update profile'
+      };
     }
-  }, [user?.id]);
-  
+  };
+
   const value = {
-    user,
     isAuthenticated,
     isLoading,
-    error,
+    user,
     login,
+    register,
     logout,
-    signup,
-    updateUser
+    signOut, // Added for compatibility
+    updateUserProfile, // Added for compatibility
   };
-  
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
 
-export const useAuth = () => {
-  return useContext(AuthContext);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

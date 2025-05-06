@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Pagination } from '@/components/ui/data-table/Pagination';
+import Pagination from '@/components/ui/data-table/Pagination'; // Fix: import default export
 import { Download } from 'lucide-react';
 
 interface UserActivityLogTabProps {
