@@ -45,10 +45,8 @@ export function useScanPageState(userId?: string) {
     try {
       const data = await fetchEmotionHistory();
       setEmotions(data);
-      return data;
     } catch (error) {
       console.error("Error refreshing emotion history:", error);
-      throw error;
     } finally {
       setTimeout(() => setLoading(false), 600);
     }

@@ -40,9 +40,9 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({
       
       <Separator className="my-6" />
       
-      <TeamStatCards isLoading={isLoading} />
+      <TeamStatCards />
       
-      <TeamOverview users={filteredUsers} isLoading={isLoading} />
+      <TeamOverview users={filteredUsers} />
 
       <AISuggestions />
     </Card>

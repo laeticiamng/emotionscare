@@ -32,13 +32,15 @@ interface AdminTabContentsProps {
       trend: number;
     };
   };
+  isLoading?: boolean;
 }
 
 const AdminTabContents: React.FC<AdminTabContentsProps> = ({ 
   activeTab,
   absenteeismData,
   emotionalScoreTrend,
-  dashboardStats
+  dashboardStats,
+  isLoading = false
 }) => {
   return (
     <>
@@ -48,6 +50,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
           emotionalScoreTrend={emotionalScoreTrend}
           dashboardStats={dashboardStats}
           gamificationData={gamificationData}
+          isLoading={isLoading}
         />
       </TabsContent>
       
@@ -55,35 +58,36 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
         <ScanTeamTab 
           emotionalScoreTrend={emotionalScoreTrend} 
           currentScore={78}
+          isLoading={isLoading}
         />
       </TabsContent>
       
       <TabsContent value="journal-trends" className="mt-6">
-        <JournalTrendsTab />
+        <JournalTrendsTab isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="social-cocoon" className="mt-6">
-        <SocialCocoonTab socialCocoonData={socialCocoonData} />
+        <SocialCocoonTab socialCocoonData={socialCocoonData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="gamification" className="mt-6">
-        <GamificationTab gamificationData={gamificationData} />
+        <GamificationTab gamificationData={gamificationData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="actions-rh" className="mt-6">
-        <HRActionsTab rhSuggestions={rhSuggestions} />
+        <HRActionsTab rhSuggestions={rhSuggestions} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="events" className="mt-6">
-        <EventsCalendarTab eventsData={eventsData} />
+        <EventsCalendarTab eventsData={eventsData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="compliance" className="mt-6">
-        <ComplianceTab complianceData={complianceData} />
+        <ComplianceTab complianceData={complianceData} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="settings" className="mt-6">
-        <AdminSettingsTab />
+        <AdminSettingsTab isLoading={isLoading} />
       </TabsContent>
     </>
   );
