@@ -1,5 +1,6 @@
 
-import { AI_MODEL_CONFIG, CoachModule, AIModelParams } from '@/lib/coach/types';
+import { OpenAIModelParams, AI_MODEL_CONFIG, AIModule } from './openai-config';
+import { budgetMonitor } from './budgetMonitor';
 
 interface ModelSelectionCriteria {
   textLength?: number;
@@ -7,8 +8,7 @@ interface ModelSelectionCriteria {
   isComplex?: boolean;
   isFrequentRequest?: boolean;
   isBatchOperation?: boolean;
-  moduleType: CoachModule;
-  budgetExceeded?: boolean;
+  moduleType: AIModule;
 }
 
 /**
@@ -21,25 +21,23 @@ interface ModelSelectionCriteria {
  * - Buddy & Scan: gpt-4o-mini-2024-07-18
  * - Budget guardrails to downgrade models when needed
  */
-export function selectAIModel(criteria: ModelSelectionCriteria): AIModelParams {
+export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<OpenAIModelParams> {
   // Clone the default config for the module
   const config = { ...AI_MODEL_CONFIG[criteria.moduleType] };
   
+  // Check budget constraints
+  const budgetExceeded = await budgetMonitor.hasExceededBudget(config.model);
+  
   // Budget guardrail - always use cheaper model if budget exceeded
-  if (criteria.budgetExceeded && criteria.moduleType !== 'scan') {
-    return {
-      model: "gpt-4o-mini-2024-07-18",
-      temperature: config.temperature,
-      max_tokens: config.max_tokens,
-      top_p: config.top_p,
-      stream: config.stream
-    };
+  if (budgetExceeded && criteria.moduleType !== 'scan') {
+    console.log(`Budget exceeded for ${config.model}, downgrading to gpt-4o-mini-2024-07-18`);
+    config.model = "gpt-4o-mini-2024-07-18";
   }
   
   // For initial coach sessions, use more powerful model
   if (criteria.moduleType === 'coach' && criteria.isComplex) {
     return {
-      model: "gpt-4.1-2025-04-14",
+      model: budgetExceeded ? "gpt-4o-mini-2024-07-18" : "gpt-4.1-2025-04-14",
       temperature: 0.4,
       max_tokens: 512,
       top_p: 1.0,
@@ -50,7 +48,7 @@ export function selectAIModel(criteria: ModelSelectionCriteria): AIModelParams {
   // For journal batch operations, use more capable model
   if (criteria.moduleType === 'journal' && criteria.isBatchOperation) {
     return {
-      model: "gpt-4.1-2025-04-14",
+      model: budgetExceeded ? "gpt-4o-mini-2024-07-18" : "gpt-4.1-2025-04-14",
       temperature: 0.3,
       max_tokens: 1024,
       top_p: 1.0,
@@ -65,7 +63,9 @@ export function selectAIModel(criteria: ModelSelectionCriteria): AIModelParams {
       temperature: 0.2,
       max_tokens: 256,
       top_p: 1.0,
-      stream: false
+      stream: false,
+      cacheEnabled: true,
+      cacheTTL: 86400 // 24 hours
     };
   }
   
@@ -76,7 +76,7 @@ export function selectAIModel(criteria: ModelSelectionCriteria): AIModelParams {
 /**
  * Check if a request should be cached (for 24h)
  */
-export function shouldCacheResponse(moduleType: CoachModule): boolean {
+export function shouldCacheResponse(moduleType: AIModule): boolean {
   // Only cache FAQ and Scan responses
   return ['chat', 'scan'].includes(moduleType);
 }

@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { coachService, CoachEvent, triggerCoachEvent } from '@/lib/coachService';
+import { coachService, CoachEvent, triggerCoachEvent } from '@/lib/coach/coach-service';
 import { useMusic } from '@/contexts/MusicContext';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,7 +41,6 @@ export function useCoach() {
       
       // Actions supplémentaires selon le type d'événement
       if (eventType === 'scan_completed' && data?.emojis) {
-        // Fix: Use emojis or another available property instead of emotion
         // Charger une playlist adaptée à l'émotion
         loadPlaylistForEmotion(data.emojis);
         
@@ -49,11 +48,18 @@ export function useCoach() {
         try {
           const { data: aiResponse, error } = await supabase.functions.invoke('chat-with-ai', {
             body: {
-              message: `Propose une activité simple de bien-être adaptée à quelqu'un qui ressent ${data.emojis}. Réponds en une phrase courte.`,
+              messages: [{
+                role: 'user',
+                content: `Propose une activité simple de bien-être adaptée à quelqu'un qui ressent ${data.emojis}. Réponds en une phrase courte.`
+              }],
               userContext: {
                 recentEmotions: data.emojis,
                 currentScore: data.score || 50
-              }
+              },
+              module: 'scan',
+              model: "gpt-4o-mini-2024-07-18",
+              temperature: 0.2,
+              max_tokens: 128
             }
           });
           

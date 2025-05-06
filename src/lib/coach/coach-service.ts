@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { actionExecutor } from './action-executor';
 import { determineActions } from './emotional-data';
 import { routines } from './routines';
+import { budgetMonitor } from '@/lib/ai/budgetMonitor';
 
 /**
  * Service pour le coach IA
@@ -74,13 +75,13 @@ class CoachService {
   /**
    * Sélectionner le modèle approprié en fonction du module et du contexte
    */
-  selectModel(module: CoachModule, context?: any): string {
+  async selectModel(module: CoachModule, context?: any): Promise<string> {
     // Budget control logic
-    const monthlyUsage = this.getMonthlyUsage();
+    const monthlyUsage = await this.getMonthlyUsage();
     const threshold = 100; // Example threshold in USD
     
     // Fallback to cheaper model if budget exceeded
-    if (monthlyUsage > threshold && module !== 'scan') {
+    if (await budgetMonitor.hasExceededBudget() && module !== 'scan') {
       return "gpt-4o-mini-2024-07-18";
     }
     
@@ -89,12 +90,24 @@ class CoachService {
   }
   
   /**
-   * Get estimated monthly usage (placeholder implementation)
+   * Get estimated monthly usage
    */
-  private getMonthlyUsage(): number {
-    // In a real implementation, this would query usage metrics from a database
-    // For now, return a mock value
-    return 50; // Example: $50 spent this month
+  private async getMonthlyUsage(): Promise<number> {
+    try {
+      const { data, error } = await supabase.functions.invoke('monitor-api-usage', {
+        body: {}
+      });
+      
+      if (error || !data) {
+        console.error('Error getting monthly usage:', error);
+        return 0;
+      }
+      
+      return data.usage?.total || 0;
+    } catch (error) {
+      console.error('Error getting monthly usage:', error);
+      return 0;
+    }
   }
 
   /**
@@ -113,7 +126,7 @@ class CoachService {
       let userContext = null;
       
       if (emotions && emotions.length > 0) {
-        // Fix: Use emojis field instead of emotion, or derive the emotion from other fields
+        // Use emojis field instead of emotion, or derive the emotion from other fields
         const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
         const avgScore = emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length;
         
@@ -124,15 +137,26 @@ class CoachService {
         };
       }
       
+      // Check budget constraints before selecting model
+      const budgetExceeded = await budgetMonitor.hasExceededBudget("gpt-4.1-2025-04-14");
+      
       // Determine model based on question length and complexity
-      const model = question.length > 100 ? "gpt-4.1-2025-04-14" : "gpt-4o-mini-2024-07-18";
+      const model = budgetExceeded ? "gpt-4o-mini-2024-07-18" : 
+                   question.length > 100 ? "gpt-4.1-2025-04-14" : "gpt-4o-mini-2024-07-18";
       
       // Send question to OpenAI
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
-          message: question,
+          messages: [{
+            role: 'user',
+            content: question
+          }],
           userContext,
-          model
+          model,
+          module: 'coach',
+          temperature: 0.4,
+          max_tokens: 512,
+          stream: false
         }
       });
       

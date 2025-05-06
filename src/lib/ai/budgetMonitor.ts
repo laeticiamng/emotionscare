@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { BUDGET_THRESHOLDS, BUDGET_FALLBACKS } from './openai-config';
 
 /**
  * Budget monitoring service for OpenAI API usage
@@ -13,11 +14,8 @@ class BudgetMonitor {
   private cache: Map<string, number> = new Map();
   private lastUpdate: Date | null = null;
   private updateFrequency = 60 * 60 * 1000; // 1 hour
-  private thresholds = {
-    'gpt-4.1-2025-04-14': 100, // $100 threshold for expensive model
-    'gpt-4o-2024-08-06': 75,  // $75 threshold for medium model
-    'default': 200 // $200 overall threshold
-  };
+  private thresholds = BUDGET_THRESHOLDS;
+  private fallbacks = BUDGET_FALLBACKS;
   
   /**
    * Get the current token usage for a specific model
@@ -42,6 +40,13 @@ class BudgetMonitor {
     let totalUsage = 0;
     this.cache.forEach(usage => totalUsage += usage);
     return totalUsage > this.thresholds.default;
+  }
+  
+  /**
+   * Get the fallback model if budget is exceeded
+   */
+  getFallbackModel(model: string): string {
+    return this.fallbacks[model] || this.fallbacks.default;
   }
   
   /**

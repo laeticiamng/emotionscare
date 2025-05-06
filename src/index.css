@@ -4,10 +4,10 @@
 @tailwind utilities;
  
 @layer base {
-  /* Light theme - Premium clean white */
+  /* Light theme - Warm and inviting */
   :root,
   .light {
-    --background: 0 0% 99%;
+    --background: 30 30% 99%; /* Slightly warm tone */
     --foreground: 220 20% 16%;
 
     --card: 0 0% 100%;
@@ -16,24 +16,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 16%;
  
-    --primary: 220 47% 16%;
+    --primary: 250 47% 60%; /* Warmer primary purple */
     --primary-foreground: 210 40% 98%;
  
-    --secondary: 210 40% 96.1%;
+    --secondary: 240 40% 97%;
     --secondary-foreground: 220 47% 16%;
  
-    --muted: 210 40% 96.1%;
+    --muted: 240 30% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
  
-    --accent: 210 40% 96.1%;
+    --accent: 30 60% 96%;  /* Warm accent */
     --accent-foreground: 220 47% 16%;
  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
+    --border: 240 30% 92%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 220 47% 16%;
+    --ring: 250 47% 60%;
  
     --radius: 1rem;
     
@@ -45,66 +45,66 @@
     --wellness-lavender: 240 67% 94%;
   }
  
-  /* Dark theme - Premium dark elegant */
+  /* Dark theme - Premium dark elegant with warmth */
   .dark {
-    --background: 220 20% 12%; /* Charcoal/anthracite légèrement éclairci */
-    --foreground: 210 40% 98%; /* Texte blanc pur pour contraste optimal */
+    --background: 240 10% 15%; /* Warmer, less harsh background */
+    --foreground: 210 40% 98%;
  
-    --card: 220 20% 14%; /* Cartes légèrement plus claires que le fond */
+    --card: 240 10% 17%; /* Slightly lighter cards for contrast */
     --card-foreground: 210 40% 98%;
  
-    --popover: 220 20% 14%;
+    --popover: 240 10% 17%;
     --popover-foreground: 210 40% 98%;
  
-    --primary: 210 40% 98%;
+    --primary: 250 60% 70%; /* Brighter, more vibrant purple */
     --primary-foreground: 220 47% 16%;
  
-    --secondary: 220 15% 25%; /* Secondaire plus distinctif */
+    --secondary: 240 15% 25%;
     --secondary-foreground: 210 40% 98%;
  
-    --muted: 220 15% 25%;
-    --muted-foreground: 215 20% 75%; /* Texte muet plus lisible */
+    --muted: 240 15% 25%;
+    --muted-foreground: 215 20% 75%; 
  
-    --accent: 220 15% 25%;
+    --accent: 240 15% 30%; /* Slightly more vibrant accent */
     --accent-foreground: 210 40% 98%;
  
     --destructive: 0 62.8% 40%;
     --destructive-foreground: 210 40% 98%;
  
-    --border: 220 15% 25%;
-    --input: 220 15% 22%;
-    --ring: 210 40% 90%;
+    --border: 240 15% 25%;
+    --input: 240 15% 22%;
+    --ring: 250 60% 70%;
   }
 
-  /* Pastel theme - Subtle blue premium feel */
+  /* Pastel theme - Soft blue with enhanced warmth */
   .pastel {
-    --background: 210 50% 97%; /* Bleu pastel très subtil */
-    --foreground: 220 20% 16%; /* Texte anthracite pour contraste */
+    --background: 220 50% 97%; /* Softer blue pastel background */
+    --foreground: 220 20% 16%;
 
-    --card: 210 40% 98%;
+    --card: 220 40% 98%;
     --card-foreground: 220 20% 16%;
  
-    --popover: 210 40% 98%;
+    --popover: 220 40% 98%;
     --popover-foreground: 220 20% 16%;
  
-    --primary: 210 70% 50%; /* Bleu premium */
+    --primary: 250 70% 70%; /* Soft lavender primary */
     --primary-foreground: 0 0% 100%;
  
-    --secondary: 210 40% 90%;
+    --secondary: 220 40% 92%;
     --secondary-foreground: 220 47% 16%;
  
-    --muted: 210 40% 90%;
+    --muted: 220 40% 92%;
     --muted-foreground: 220 15% 40%;
  
-    --accent: 210 40% 85%;
+    --accent: 340 90% 95%; /* Soft pink accent */
     --accent-foreground: 220 47% 16%;
  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 40% 80%;
-    --input: 210 40% 80%;
-    --ring: 210 70% 50%;
+    --border: 220 40% 85%;
+    --input: 220 40% 80%;
+    --ring: 250 70% 60%;
   }
 
   /* Font configuration for all themes */
@@ -186,7 +186,7 @@
 }
 
 .dark .premium-card {
-  @apply border-gray-800 bg-[#1F2430] shadow-md hover:shadow-xl;
+  @apply border-gray-800 bg-[#2A2D3A] shadow-md hover:shadow-xl;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
@@ -204,7 +204,7 @@
 }
 
 .dark .comment-block {
-  @apply border-gray-700 bg-[#26293A] shadow-md;
+  @apply border-gray-700 bg-[#303349] shadow-md;
 }
 
 .pastel .comment-block {
@@ -216,7 +216,7 @@
 }
 
 .dark .comment-block:nth-child(even) {
-  @apply bg-[#23273A];
+  @apply bg-[#32374F];
 }
 
 /* Animation classes */
@@ -302,4 +302,102 @@
 
 .pastel .interactive-card {
   @apply hover:shadow-md;
+}
+
+/* Wider layouts for better spacing */
+.dashboard-premium {
+  @apply grid grid-cols-1 lg:grid-cols-12 gap-6;
+}
+
+.dashboard-main {
+  @apply col-span-1 lg:col-span-8 space-y-6;
+}
+
+.dashboard-side {
+  @apply col-span-1 lg:col-span-4 space-y-6;
+}
+
+/* Card styling improvements */
+.card-premium {
+  @apply rounded-2xl border shadow-sm transition-all;
+}
+
+.light .card-premium {
+  @apply border-gray-100 bg-white shadow-sm hover:shadow-md;
+}
+
+.dark .card-premium {
+  @apply border-gray-800 bg-[#2A2D3A] shadow-md;
+}
+
+.pastel .card-premium {
+  @apply border-blue-200 bg-blue-50/80 shadow-sm;
+}
+
+/* Elegant headings */
+.heading-elegant {
+  @apply text-2xl font-semibold tracking-tight;
+}
+
+.light .heading-elegant {
+  @apply text-gray-800;
+}
+
+.dark .heading-elegant {
+  @apply text-gray-100;
+}
+
+.pastel .heading-elegant {
+  @apply text-gray-700;
+}
+
+/* Button hover lift effect */
+.hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md;
+}
+
+/* Focus states */
+.focus-premium {
+  @apply focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:outline-none;
+}
+
+.dark .focus-premium {
+  @apply focus:ring-primary/70 focus:ring-offset-gray-900;
+}
+
+/* Heading with premium styling */
+.heading-premium {
+  @apply text-lg font-semibold flex items-center gap-2;
+}
+
+/* Loading dots animation */
+.loading-dots {
+  @apply flex gap-1.5;
+}
+
+.loading-dots div {
+  @apply w-2 h-2 rounded-full;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots div:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots div:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+/* Chat input with better padding and focus */
+.chat-input {
+  @apply p-3 rounded-xl border border-input bg-background hover:border-primary/50 focus:border-primary;
 }

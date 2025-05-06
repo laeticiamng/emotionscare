@@ -9,8 +9,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Cache implementation for frequent requests
+// Cache implementation for frequent requests (24h TTL)
 const cache = new Map();
+const CACHE_TTL = 86400 * 1000; // 24 hours in milliseconds
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -26,24 +27,24 @@ serve(async (req) => {
 
     // Parse request body
     const { 
-      message, 
+      messages, 
       userContext, 
       sessionId, 
       stream = false, 
       model = "gpt-4o-mini-2024-07-18", // Default to cheaper model
       temperature = 0.6, 
       max_tokens = 512, 
-      top_p = 1.0 
+      top_p = 1.0,
+      module = "chat",  // Default module type
+      cacheEnabled = true // Enable caching by default for efficiency
     } = await req.json();
     
-    console.log("Received request with message:", message);
+    console.log(`Request to OpenAI API - Module: ${module}, Model: ${model}`);
     console.log("User context:", userContext);
-    console.log("Session ID:", sessionId);
-    console.log("Model:", model);
 
     // Check cache for FAQ-type questions (only for non-streaming responses)
-    if (!stream && !userContext) {
-      const cacheKey = `${model}:${message}`;
+    if (!stream && cacheEnabled && !userContext) {
+      const cacheKey = `${model}:${messages[messages.length - 1]?.content || ''}`;
       const cachedResponse = cache.get(cacheKey);
       
       if (cachedResponse) {
@@ -64,24 +65,29 @@ serve(async (req) => {
       `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
        Réponds toujours en français de manière précise et directe.`;
 
-    console.log("System prompt:", systemPrompt);
+    // Inject the system prompt if not already present
+    const messagesWithSystem = messages[0]?.role === 'system' ? 
+      messages : 
+      [{ role: 'system', content: systemPrompt }, ...messages];
     
-    // Build OpenAI request body with the specified or default parameters
+    // Build OpenAI request body with the specified parameters
     const requestBody = {
-      model: model, 
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: message }
-      ],
+      model: model,
+      messages: messagesWithSystem,
       temperature: temperature,
       max_tokens: max_tokens,
       top_p: top_p,
       stream: stream
     };
 
-    console.log("Request to OpenAI:", JSON.stringify(requestBody, null, 2));
+    console.log("Request to OpenAI:", JSON.stringify({
+      model: requestBody.model,
+      messageCount: requestBody.messages.length,
+      temperature: requestBody.temperature,
+      stream: requestBody.stream
+    }));
 
-    // If stream is activated, handle differently
+    // If stream is activated, handle streaming
     if (stream) {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -123,15 +129,16 @@ serve(async (req) => {
       const aiResponse = data.choices[0].message.content.trim();
       console.log("Formatted AI response received");
 
-      // Cache FAQ-type responses (if no user context) with 24-hour TTL
-      if (!userContext) {
-        const cacheKey = `${model}:${message}`;
-        cache.set(cacheKey, { response: aiResponse, sessionId });
+      // Cache responses if caching is enabled with proper TTL
+      if (cacheEnabled) {
+        const cacheKey = `${model}:${messages[messages.length - 1]?.content || ''}`;
+        const responseObject = { response: aiResponse, sessionId, model };
+        cache.set(cacheKey, responseObject);
         
-        // Set a timeout to delete from cache after 24 hours
+        // Set a timeout to delete from cache after TTL period
         setTimeout(() => {
           cache.delete(cacheKey);
-        }, 24 * 60 * 60 * 1000); 
+        }, CACHE_TTL); 
       }
 
       // Store the message and response if sessionId is provided

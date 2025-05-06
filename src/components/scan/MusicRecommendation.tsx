@@ -78,7 +78,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
   }
   
   // Descriptions des effets musicaux selon l'émotion
-  const musicDescription = {
+  const musicDescription: Record<string, string> = {
     happy: "Profitez de cette énergie positive avec une playlist enjouée",
     calm: "Une ambiance apaisante pour vous aider à retrouver la sérénité",
     energetic: "Une sélection dynamique pour canaliser votre énergie",
@@ -97,7 +97,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
   };
 
   return (
-    <Card className="mt-6 border-t-4" style={{ borderTopColor: '#6366F1' }}>
+    <Card className="mt-6 border-t-4 hover:shadow-md transition-all duration-300" style={{ borderTopColor: '#6366F1' }}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-lg">
           <Music className="mr-2 h-5 w-5" />
@@ -117,7 +117,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
         
         <Button 
           onClick={handlePlayMusic}
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 hover:-translate-y-0.5 transition-transform"
           variant="outline"
         >
           <PlayCircle className="h-5 w-5" />
