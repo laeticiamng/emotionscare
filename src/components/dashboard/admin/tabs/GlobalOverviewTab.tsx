@@ -2,8 +2,8 @@
 import React from 'react';
 import AbsenteeismCard from './overview/AbsenteeismCard';
 import EmotionalClimateCard from '../EmotionalClimateCard';
-import KpiSummaryCards from './overview/KpiSummaryCards';
 import GdprDisclaimer from './overview/GdprDisclaimer';
+import KpiCardsGrid from '../KpiCardsGrid';
 import { ChartData, DashboardStats, GamificationData } from './overview/types';
 
 interface GlobalOverviewTabProps {
@@ -27,8 +27,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       {/* Emotional Climate Card */}
       <EmotionalClimateCard emotionalScoreTrend={emotionalScoreTrend} />
       
-      {/* KPI Summary Cards */}
-      <KpiSummaryCards 
+      {/* KPI Summary Cards - Replaced with our new unified component */}
+      <KpiCardsGrid 
         dashboardStats={dashboardStats}
         gamificationData={gamificationData}
       />
