@@ -7,6 +7,7 @@ import { HeartPulse, Music } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useMusicRecommendation } from '@/components/scan/live/useMusicRecommendation';
 import type { Emotion } from '@/types';
+import { EmotionResult } from '@/lib/scanService';
 
 interface EmotionScannerProps {
   latestEmotion: Emotion | null;
@@ -21,7 +22,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({ latestEmotion, isLoadin
   const handleMusicTherapy = () => {
     if (latestEmotion) {
       // Convert Emotion to EmotionResult for handlePlayMusic
-      const emotionResult = {
+      const emotionResult: EmotionResult = {
         emotion: latestEmotion.emotion || 'neutral',
         confidence: latestEmotion.confidence || 0.5,
         score: latestEmotion.score || 50

@@ -14,7 +14,6 @@ import AdminLoginPage from './pages/AdminLoginPage';
 import NotImplementedPage from './pages/NotImplementedPage';
 import NotFoundPage from './pages/NotFound';
 import ScanPage from './pages/ScanPage';
-import NotImplementedPage from './pages/NotImplementedPage';
 import JournalPage from './pages/JournalPage';
 import SettingsPage from './pages/SettingsPage';
 import MusicTherapyPage from './pages/MusicTherapyPage';
