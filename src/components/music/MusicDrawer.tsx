@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import MusicPlayer from './MusicPlayer';
+import MusicPlayer from './player/MusicPlayer';
 
 const MusicDrawer: React.FC = () => {
   const { isDrawerOpen, closeDrawer, currentTrack } = useMusic();
