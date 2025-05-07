@@ -2,7 +2,50 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import ColorGrid from './ColorGrid';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+// Simple color swatch component
+const ColorSwatch = ({ color, name, textColor = 'white' }: { color: string; name: string; textColor?: string }) => (
+  <div 
+    className="rounded-md overflow-hidden shadow-sm mb-2" 
+    style={{ backgroundColor: color }}
+  >
+    <div className="p-4 flex items-center justify-between" style={{ color: textColor }}>
+      <span className="font-medium">{name}</span>
+      <span className="text-xs opacity-70">{color}</span>
+    </div>
+  </div>
+);
+
+// Color grid component for displaying color groups
+const ColorGrid = ({ 
+  title, 
+  colors 
+}: { 
+  title: string; 
+  colors: Array<{ name: string; bgColor: string; textColor?: string; hasBorder?: boolean; borderColor?: string }> 
+}) => {
+  return (
+    <div>
+      <h3 className="font-medium text-sm mb-2">{title}</h3>
+      <div className="space-y-1">
+        {colors.map((colorItem, i) => (
+          <div 
+            key={`${colorItem.name}-${i}`}
+            className={`${colorItem.hasBorder ? 'border' : ''} rounded-md overflow-hidden`}
+            style={{ borderColor: colorItem.borderColor || 'transparent' }}
+          >
+            <ColorSwatch 
+              color={colorItem.bgColor} 
+              name={colorItem.name}
+              textColor={colorItem.textColor}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 /**
  * Composant d'exemple pour démontrer l'utilisation des couleurs du thème
