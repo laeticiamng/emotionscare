@@ -68,7 +68,7 @@ function App() {
               <Route path="docs" element={<Docs />} />
               <Route path="invite" element={<InvitePage />} />
               
-              <Route path="/" element={<ProtectedLayout />}>
+              <Route element={<ProtectedLayout />}>
                 <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="scan" element={<ScanPage />} />
                 <Route path="scan/:id" element={<ScanDetailPage />} />
