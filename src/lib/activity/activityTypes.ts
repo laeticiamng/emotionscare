@@ -1,34 +1,23 @@
 
+/**
+ * Activity types for tracking user actions
+ */
+export type ActivityType =
+  | 'visit_page'
+  | 'scan_emotion'
+  | 'use_coach'
+  | 'play_music'
+  | 'visit_coach_chat_page'
+  | 'coach_interaction'
+  | string;
+
+/**
+ * Structure of an activity log entry
+ */
 export interface ActivityLog {
-  id: string;
+  id?: string;
   user_id: string;
   activity_type: string;
-  timestamp: Date;
-  details: Record<string, any>;
-}
-
-export interface ActivitySummary {
-  activity_type: string;
-  count: number;
-  category?: string;
-}
-
-export interface DailyActivity {
-  date: string;
-  count: number;
-  activity_type: string;
-}
-
-export interface AnonymizedActivityLog {
-  id: string;
-  activity_type: string;
-  category: string;
-  count: number;
-  timestamp_day: string;
-}
-
-export interface ActivityStats {
-  activity_type: string;
-  total_count: number;
-  percentage: number;
+  timestamp: string;
+  activity_details?: Record<string, any>;
 }

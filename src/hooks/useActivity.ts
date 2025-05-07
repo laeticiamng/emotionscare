@@ -36,18 +36,16 @@ export function useActivity() {
       // Log to console for development
       console.log('Activity logged:', activity);
       
-      // If we have a user_activity table in the database, log to it
+      // Instead of trying to insert into a non-existent table,
+      // we'll call the existing activity logging service
       try {
-        const { error } = await supabase
-          .from('user_activity')
-          .insert(activity);
-          
-        if (error) {
-          console.error('Error logging activity to database:', error);
+        // Import and use the activityLogService
+        const { logActivity: logActivityService } = await import('@/lib/activity/activityLogService');
+        if (logActivityService) {
+          logActivityService(user.id, activityType, data);
         }
-      } catch (dbError) {
-        // If the table doesn't exist, just log to console
-        console.log('Activity logging to database skipped:', dbError);
+      } catch (serviceError) {
+        console.log('Activity logging to service skipped:', serviceError);
       }
       
       return true;

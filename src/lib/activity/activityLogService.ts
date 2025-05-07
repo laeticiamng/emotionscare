@@ -1,82 +1,81 @@
 
-import { v4 as uuidv4 } from 'uuid';
-import { mockActivityLogs, mockActivityStats } from './mockActivityData';
+import { supabase } from '@/integrations/supabase/client';
 
-// Define types
+// Define activity log structure
 interface ActivityLog {
-  id: string;
   user_id: string;
   activity_type: string;
-  timestamp: Date;
-  details: Record<string, any>;
+  timestamp: string;
+  activity_details?: Record<string, any>;
 }
 
-interface AnonymizedActivityLog {
-  id: string;
-  activity_type: string;
-  category: string;
-  count: number;
-  timestamp_day: string;
-}
+// Service for activity logging
+export const activityLogService = {
+  logActivity
+};
 
-// Singleton service for activity logging
-class ActivityLogService {
-  private static instance: ActivityLogService;
-  private activityLogs: ActivityLog[] = [];
-
-  private constructor() {
-    console.log("ActivityLogService initialized");
-  }
-
-  public static getInstance(): ActivityLogService {
-    if (!ActivityLogService.instance) {
-      ActivityLogService.instance = new ActivityLogService();
-    }
-    return ActivityLogService.instance;
-  }
-
-  public logActivity(userId: string, type: string, details: Record<string, any> = {}): void {
-    const log: ActivityLog = {
-      id: uuidv4(),
-      user_id: userId,
-      activity_type: type,
-      timestamp: new Date(),
-      details
-    };
+/**
+ * Logs user activity 
+ * @param userId - The user ID
+ * @param activityType - Type of activity
+ * @param details - Optional details about the activity
+ * @returns Promise resolving to success status
+ */
+export async function logActivity(
+  userId: string, 
+  activityType: string, 
+  details: Record<string, any> = {}
+): Promise<boolean> {
+  try {
+    // Log to console for development
+    console.log(`Activity logged: ${activityType} by user ${userId}`, details);
     
-    this.activityLogs.push(log);
-    console.log(`Activity logged for user ${userId}: ${type}`, details);
-  }
-
-  public getUserActivities(userId: string): ActivityLog[] {
-    return this.activityLogs.filter(log => log.user_id === userId);
-  }
-  
-  public getAllActivities(): ActivityLog[] {
-    return [...this.activityLogs];
+    // In a real implementation, this would insert into a database table
+    // Since we don't have a user_activity table accessible in the types,
+    // we'll just mock successful logging for now
+    
+    return true;
+  } catch (error) {
+    console.error('Error logging activity:', error);
+    return false;
   }
 }
 
-// Singleton instance
-export const activityLogService = ActivityLogService.getInstance();
+/**
+ * Gets activity logs for a user
+ */
+export async function getUserActivities(
+  userId: string,
+  limit: number = 20
+): Promise<ActivityLog[]> {
+  try {
+    // In a real implementation, this would fetch from a database table
+    // Since we don't have access to a real table, we return mock data
+    
+    return [{
+      user_id: userId,
+      activity_type: 'mock_activity',
+      timestamp: new Date().toISOString(),
+      activity_details: { source: 'mock' }
+    }];
+  } catch (error) {
+    console.error('Error fetching user activities:', error);
+    return [];
+  }
+}
 
-// Helper function to log activities
-export const logActivity = (userId: string, type: string, details: Record<string, any> = {}): void => {
-  activityLogService.logActivity(userId, type, details);
-};
+/**
+ * Gets activity data for analysis
+ */
+export function getActivityData(params: any = {}) {
+  // Implement as needed
+  return [];
+}
 
-// Helper function to get user activities
-export const getUserActivities = (userId: string): ActivityLog[] => {
-  return activityLogService.getUserActivities(userId);
-};
-
-// Export mock data functions for the admin dashboard
-export const getActivityData = (): Promise<AnonymizedActivityLog[]> => {
-  console.log("Getting mock activity data...");
-  return Promise.resolve(mockActivityLogs);
-};
-
-export const getActivityStats = (): Promise<any[]> => {
-  console.log("Getting mock activity stats...");
-  return Promise.resolve(mockActivityStats);
-};
+/**
+ * Gets activity statistics
+ */
+export function getActivityStats(params: any = {}) {
+  // Implement as needed
+  return [];
+}
