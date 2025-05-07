@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import AudioVisualizer from './AudioVisualizer';
 import { Card, CardContent } from '@/components/ui/card';

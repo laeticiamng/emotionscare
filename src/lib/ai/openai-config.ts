@@ -23,7 +23,7 @@ export type AIModule = 'chat' | 'coach' | 'coach_followup' | 'journal' | 'buddy'
 export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   // Chat general & FAQ - cheapest model with caching
   chat: {
-    model: "gpt-4o-mini-2024-07-18",
+    model: "gpt-4o-mini",
     temperature: 0.2,
     max_tokens: 256,
     top_p: 1.0,
@@ -34,7 +34,7 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   
   // Coach initial session - more powerful model with streaming
   coach: {
-    model: "gpt-4.1-2025-04-14",
+    model: "gpt-4o",
     temperature: 0.4,
     max_tokens: 512,
     top_p: 1.0,
@@ -43,7 +43,7 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   
   // Coach follow-up sessions - cheaper model with streaming
   coach_followup: {
-    model: "gpt-4o-mini-2024-07-18",
+    model: "gpt-4o-mini",
     temperature: 0.2,
     max_tokens: 512,
     top_p: 1.0,
@@ -52,7 +52,7 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   
   // Journal & long-form content - powerful model for batch processing
   journal: {
-    model: "gpt-4.1-2025-04-14",
+    model: "gpt-4o",
     temperature: 0.3,
     max_tokens: 1024,
     top_p: 1.0,
@@ -61,7 +61,7 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   
   // Buddy/peer suggestions - friendly tone, shorter responses
   buddy: {
-    model: "gpt-4o-mini-2024-07-18",
+    model: "gpt-4o-mini",
     temperature: 0.5,
     max_tokens: 256,
     top_p: 1.0,
@@ -70,7 +70,7 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   
   // Scan/quick check-ups - efficient, concise responses
   scan: {
-    model: "gpt-4o-mini-2024-07-18",
+    model: "gpt-4o-mini",
     temperature: 0.2,
     max_tokens: 128,
     top_p: 1.0,
@@ -85,18 +85,17 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
  * When thresholds are exceeded, the system will downgrade to more cost-effective models
  */
 export const BUDGET_THRESHOLDS = {
-  "gpt-4.1-2025-04-14": 100, // $100 monthly threshold
-  "gpt-4o-2024-08-06": 75,   // $75 monthly threshold
-  "default": 200              // $200 overall budget threshold
+  "gpt-4o": 100, // $100 monthly threshold
+  "gpt-4o-mini": 20,   // $20 monthly threshold
+  "default": 200       // $200 overall budget threshold
 };
 
 /**
  * Models to use as fallbacks when budget thresholds are exceeded
  */
 export const BUDGET_FALLBACKS = {
-  "gpt-4.1-2025-04-14": "gpt-4o-mini-2024-07-18",
-  "gpt-4o-2024-08-06": "gpt-4o-mini-2024-07-18",
-  "default": "gpt-4o-mini-2024-07-18"
+  "gpt-4o": "gpt-4o-mini",
+  "default": "gpt-4o-mini"
 };
 
 /**
@@ -107,7 +106,7 @@ export function getModelConfig(module: AIModule, budgetExceeded = false): OpenAI
   
   // Apply budget guardrails if needed
   if (budgetExceeded && module !== 'scan') { // Always keep scan quality as it's minimal cost
-    config.model = "gpt-4o-mini-2024-07-18";
+    config.model = "gpt-4o-mini";
   }
   
   return config;
