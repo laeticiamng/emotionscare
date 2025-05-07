@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Music, Plus, LibrarySquare, Magic, Palette, Sliders } from 'lucide-react';
+import { ArrowLeft, Music, Plus, LibrarySquare, Palette, Sliders } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExpandedTabs, ExpandedTabsList, ExpandedTabsTrigger, ExpandedTabsContent } from '@/components/ui/expanded-tabs';
@@ -84,7 +84,7 @@ const MusicGenerationPage = () => {
             active={activeTab === 'recommend'} 
             onClick={() => setActiveTab('recommend')}
           >
-            <Magic className="h-4 w-4 mr-2" />
+            <Music className="h-4 w-4 mr-2" />
             Recommandations
           </ExpandedTabsTrigger>
           
