@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -18,6 +17,8 @@ import JournalPage from './pages/JournalPage';
 import SettingsPage from './pages/SettingsPage';
 import MusicTherapyPage from './pages/MusicTherapyPage';
 import MusicGenerationPage from './pages/MusicGenerationPage';
+import CoachPage from './pages/CoachPage';
+import CoachChatPage from './pages/CoachChatPage';
 
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,6 +73,10 @@ function AppRoutes({ toast }) {
         {/* Music Therapy Routes */}
         <Route path="/music" element={<ProtectedLayout><MusicTherapyPage /></ProtectedLayout>} />
         <Route path="/music/create" element={<ProtectedLayout><MusicGenerationPage /></ProtectedLayout>} />
+        
+        {/* Coach routes */}
+        <Route path="/coach" element={<CoachPage />} />
+        <Route path="/coach-chat" element={<CoachChatPage />} />
         
         {/* Not Found Route - fallback for all other routes */}
         <Route path="*" element={<NotFoundPage />} />
