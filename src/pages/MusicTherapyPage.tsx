@@ -19,7 +19,7 @@ const MusicTherapyPage = () => {
   const [activeTab, setActiveTab] = useState('listen');
   const [latestEmotion, setLatestEmotion] = useState<any>(null);
   const { toast } = useToast();
-  const { currentEmotion, currentTrack, isPlaying, openDrawer } = useMusic();
+  const { currentEmotion, currentTrack, isPlaying, openDrawer, loadPlaylistForEmotion } = useMusic();
   const [ambientLighting, setAmbientLighting] = useState(false);
   const [adaptiveWorkspace, setAdaptiveWorkspace] = useState(false);
 
@@ -68,6 +68,21 @@ const MusicTherapyPage = () => {
         ? "Votre environnement s'adaptera à votre état émotionnel" 
         : "Adaptation automatique désactivée"
     });
+  };
+
+  // Define the handler for selecting a music preset
+  const handleSelectPreset = (preset: any) => {
+    console.log('Selected preset:', preset);
+    
+    // Apply the selected preset to the music player
+    if (preset.mood) {
+      loadPlaylistForEmotion(preset.mood);
+      
+      toast({
+        title: `Preset "${preset.name}" activé`,
+        description: `Une nouvelle ambiance musicale adaptée à votre humeur a été chargée.`,
+      });
+    }
   };
 
   return (
@@ -163,7 +178,10 @@ const MusicTherapyPage = () => {
           </Card>
 
           {/* Recommended music presets based on emotions */}
-          <RecommendedPresets emotion={latestEmotion} />
+          <RecommendedPresets 
+            onSelectPreset={handleSelectPreset} 
+            emotion={latestEmotion} 
+          />
           
           {/* Ambient Workspace Control */}
           <Card className="border-t-4" style={{ borderTopColor: 'var(--primary)' }}>
