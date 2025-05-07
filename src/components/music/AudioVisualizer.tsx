@@ -93,7 +93,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   }, [isPlaying, audioUrl]);
 
   // Drawing functions for different visualizer types
-  const drawBars = (ctx: CanvasRenderContext2D, bufferLength: number, dataArray: Uint8Array, width: number, height: number) => {
+  const drawBars = (ctx: CanvasRenderingContext2D, bufferLength: number, dataArray: Uint8Array, width: number, height: number) => {
     const barWidth = (width / bufferLength) * 2.5;
     let x = 0;
     
@@ -114,7 +114,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     }
   };
 
-  const drawCircle = (ctx: CanvasRenderContext2D, bufferLength: number, dataArray: Uint8Array, width: number, height: number) => {
+  const drawCircle = (ctx: CanvasRenderingContext2D, bufferLength: number, dataArray: Uint8Array, width: number, height: number) => {
     const centerX = width / 2;
     const centerY = height / 2;
     const radius = Math.min(centerX, centerY) - 10;
@@ -142,7 +142,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     }
   };
 
-  const drawWave = (ctx: CanvasRenderContext2D, bufferLength: number, dataArray: Uint8Array, width: number, height: number) => {
+  const drawWave = (ctx: CanvasRenderingContext2D, bufferLength: number, dataArray: Uint8Array, width: number, height: number) => {
     const primColor = primaryColor || (theme === 'dark' ? '#6366F1' : '#4F46E5');
     
     ctx.beginPath();
