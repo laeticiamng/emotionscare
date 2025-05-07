@@ -16,11 +16,11 @@ export const useBranding = () => {
   
   const getLogoSize = (size: BrandingOptions['size'] = 'md') => {
     switch (size) {
-      case 'sm': return 'h-6 w-auto';
-      case 'md': return 'h-8 w-auto';
-      case 'lg': return 'h-12 w-auto';
-      case 'xl': return 'h-24 w-auto';
-      default: return 'h-8 w-auto';
+      case 'sm': return 'h-8 w-auto';
+      case 'md': return 'h-10 w-auto';
+      case 'lg': return 'h-14 w-auto';
+      case 'xl': return 'h-28 w-auto';
+      default: return 'h-10 w-auto';
     }
   };
   
