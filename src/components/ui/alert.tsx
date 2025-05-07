@@ -15,7 +15,7 @@ const alertVariants = cva(
         success:
           "alert-success",
         warning:
-          "alert-warning",
+          "border-amber-500/50 text-amber-700 dark:text-amber-400 dark:border-amber-500/30 [&>svg]:text-amber-500",
         info:
           "alert-info",
         error:

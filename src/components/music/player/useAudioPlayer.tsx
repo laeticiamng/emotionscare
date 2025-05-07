@@ -229,7 +229,7 @@ export function useAudioPlayer() {
         toast({
           title: "Erreur audio",
           description: `${errorMsg}. Nouvelle tentative ${retryCount.current}/3...`,
-          variant: "warning"
+          variant: "default" // Changed from "warning" to "default" since "warning" isn't a valid variant
         });
         
         // Small delay before retry

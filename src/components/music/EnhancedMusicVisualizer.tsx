@@ -12,6 +12,8 @@ interface EnhancedMusicVisualizerProps {
   showControls?: boolean;
   height?: number;
   className?: string;
+  intensity?: number; // Add the missing intensity prop
+  volume?: number;    // Add volume prop for mute functionality
 }
 
 /**
@@ -22,7 +24,9 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
   emotion = 'neutral',
   showControls = true,
   height = 120,
-  className
+  className,
+  intensity = 50,  // Default intensity value
+  volume = 1        // Default volume
 }) => {
   const { 
     currentTrack, 
@@ -31,7 +35,7 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
     pauseTrack,
     nextTrack,
     previousTrack,
-    volume,
+    volume: contextVolume,
     setVolume 
   } = useMusic();
   
@@ -98,17 +102,21 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
     }
   };
 
+  // Use the provided volume to adjust intensity and visualization
+  const effectiveVolume = volume !== undefined ? volume : contextVolume;
+
   return (
     <Card className={`overflow-hidden ${className}`}>
       <CardContent className="p-4">
         <div className="rounded-md bg-muted/30 p-2 overflow-hidden">
           <AudioVisualizer
             audioUrl={currentTrack?.url}
-            isPlaying={isPlaying}
+            isPlaying={isPlaying && effectiveVolume > 0} // Only show playing visualization if not muted
             variant={visualizerStyle.variant}
             height={height}
             primaryColor={visualizerStyle.primaryColor}
             secondaryColor={visualizerStyle.secondaryColor}
+            intensity={intensity} // Use the intensity prop
           />
         </div>
         
@@ -160,7 +168,7 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
             <div className="flex items-center space-x-2">
               <Volume2 className="h-4 w-4 text-muted-foreground" />
               <Slider
-                defaultValue={[volume * 100]}
+                defaultValue={[effectiveVolume * 100]}
                 max={100}
                 step={1}
                 onValueChange={handleVolumeChange}
