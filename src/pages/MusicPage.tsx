@@ -1,222 +1,266 @@
 
 import React, { useState, useEffect } from 'react';
-import ProtectedLayout from '@/components/ProtectedLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMusic } from '@/contexts/MusicContext';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
-import { useCoach } from '@/hooks/coach/useCoach';
-import { useMusicalCreation } from '@/hooks/useMusicalCreation';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Sparkles } from 'lucide-react';
 import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
 import AudioEqualizer from '@/components/music/AudioEqualizer';
-import MusicPlayer from '@/components/music/MusicPlayer';
-import { Button } from '@/components/ui/button';
-import { Music, Sparkles, ListMusic, Headphones, Plus } from 'lucide-react';
-import MusicMoodVisualization from '@/components/music/MusicMoodVisualization';
+import { useToast } from '@/hooks/use-toast';
+import { useActivityLogging } from '@/hooks/useActivityLogging';
+import ProtectedLayout from '@/components/ProtectedLayout';
+
+interface MusicMoodVisualizationProps {
+  mood: string;
+}
+
+const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({ mood }) => {
+  return (
+    <div className="rounded-xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 p-4">
+      <h3 className="font-medium mb-3">Visualisation pour ambiance "{mood}"</h3>
+      <div className="h-[180px]">
+        <EnhancedMusicVisualizer 
+          emotion={mood}
+          height={160}
+          showControls={false}
+        />
+      </div>
+    </div>
+  );
+};
+
+const MusicLibrary = () => {
+  const { playlists, loadPlaylistById } = useMusic();
+  const { toast } = useToast();
+  
+  const handlePlayPlaylist = (id: string) => {
+    loadPlaylistById(id);
+    toast({
+      title: "Playlist chargée",
+      description: "Lecture de la playlist démarrée",
+    });
+  };
+  
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {playlists.map((playlist) => (
+          <Card key={playlist.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <CardContent className="p-0">
+              <div className="flex items-center">
+                <div className="w-16 h-16 bg-primary/20 flex items-center justify-center">
+                  <Music className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1 p-4">
+                  <h3 className="font-medium">{playlist.name}</h3>
+                  <p className="text-sm text-muted-foreground">{playlist.tracks.length} morceaux</p>
+                </div>
+                <div className="pr-4">
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="rounded-full h-10 w-10 p-0" 
+                    onClick={() => handlePlayPlaylist(playlist.id)}
+                  >
+                    <Play className="h-5 w-5" />
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const MusicMixer = () => {
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Mixage audio</CardTitle>
+          <CardDescription>Ajustez les paramètres audio pour une expérience personnalisée</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AudioEqualizer />
+        </CardContent>
+      </Card>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <MusicMoodVisualization mood="calm" />
+        <MusicMoodVisualization mood="focused" />
+      </div>
+    </div>
+  );
+};
 
 const MusicPage = () => {
-  const { loadPlaylistForEmotion, openDrawer, currentTrack } = useMusic();
-  const { lastEmotion } = useCoach();
-  const { creations, loadUserCreations } = useMusicalCreation();
+  const { 
+    currentTrack, 
+    isPlaying, 
+    playTrack, 
+    pauseTrack, 
+    nextTrack, 
+    previousTrack,
+    volume,
+    setVolume
+  } = useMusic();
   const { logUserAction } = useActivityLogging('music');
-  const [isLoadingCreations, setIsLoadingCreations] = useState(false);
+  const [activeTab, setActiveTab] = useState('player');
   
-  // Charger les créations musicales au chargement de la page
   useEffect(() => {
-    const fetchUserCreations = async () => {
-      setIsLoadingCreations(true);
-      try {
-        await loadUserCreations();
-        logUserAction('view_music_library');
-      } catch (error) {
-        console.error('Error loading music creations:', error);
-      } finally {
-        setIsLoadingCreations(false);
-      }
-    };
-    
-    fetchUserCreations();
-  }, [loadUserCreations, logUserAction]);
+    logUserAction('visit_music_page');
+  }, [logUserAction]);
+  
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0] / 100);
+  };
+  
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      pauseTrack();
+      logUserAction('pause_music');
+    } else if (currentTrack) {
+      playTrack(currentTrack);
+      logUserAction('play_music');
+    }
+  };
   
   return (
     <ProtectedLayout>
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">Expérience Musicale</h1>
-          <p className="text-muted-foreground">Écoutez, ajustez et créez votre ambiance sonore</p>
-        </header>
+      <div className="container mx-auto p-4 max-w-7xl">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold">Musique Thérapeutique</h1>
+        </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="player" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="player">Lecteur</TabsTrigger>
-                <TabsTrigger value="library">Bibliothèque</TabsTrigger>
-                <TabsTrigger value="mood">Humeur</TabsTrigger>
-              </TabsList>
+        <Card className="mb-6 overflow-hidden">
+          <CardContent className="p-0">
+            <div className="flex flex-col md:flex-row">
+              <div className="w-full md:w-1/3 bg-muted/20 p-6 flex flex-col justify-center items-center">
+                <div className="rounded-full h-32 w-32 bg-primary/10 flex items-center justify-center mb-4">
+                  <Music className="h-12 w-12 text-primary/80" />
+                </div>
+                <h2 className="text-xl font-medium text-center">
+                  {currentTrack?.title || "Aucune piste sélectionnée"}
+                </h2>
+                <p className="text-muted-foreground text-center">
+                  {currentTrack?.artist || "Sélectionnez une piste pour commencer"}
+                </p>
+              </div>
               
-              <TabsContent value="player">
-                <Card className="shadow-lg overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Music className="h-5 w-5 text-primary" />
-                      Lecteur musical
-                    </CardTitle>
-                    <CardDescription>Écoutez et ajustez votre musique</CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-6 grid gap-6">
-                    {currentTrack ? (
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <EnhancedMusicVisualizer 
-                          emotion={lastEmotion || 'neutral'} 
-                          height={200}
-                          showControls={false}
-                        />
-                        <MusicPlayer />
-                      </div>
+              <div className="flex-1 p-6">
+                <div className="h-[180px] mb-6">
+                  <EnhancedMusicVisualizer 
+                    showControls={false}
+                    height={180}
+                  />
+                </div>
+                
+                <div className="flex justify-center space-x-2 mb-4">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10"
+                    onClick={previousTrack}
+                    disabled={!currentTrack}
+                  >
+                    <SkipBack className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button 
+                    variant="default" 
+                    size="icon"
+                    className="h-12 w-12" 
+                    onClick={togglePlayPause}
+                    disabled={!currentTrack}
+                  >
+                    {isPlaying ? (
+                      <Pause className="h-6 w-6" />
                     ) : (
-                      <div className="text-center p-12 bg-muted/20 rounded-lg border border-dashed">
-                        <Music className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                        <h3 className="text-lg font-medium mb-2">Aucune musique en cours</h3>
-                        <p className="text-muted-foreground mb-6">
-                          Sélectionnez un morceau pour commencer à écouter
-                        </p>
-                        <Button onClick={() => loadPlaylistForEmotion('neutral')}>
-                          Charger une playlist
-                        </Button>
-                      </div>
+                      <Play className="h-6 w-6" />
                     )}
-                    
-                    <AudioEqualizer className="mt-6" />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="library">
-                <Card className="shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <ListMusic className="h-5 w-5 text-primary" />
-                        <span>Bibliothèque musicale</span>
-                      </div>
-                      <Button size="sm">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Nouvelle création
-                      </Button>
-                    </CardTitle>
-                    <CardDescription>Vos morceaux et playlists personnalisés</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {isLoadingCreations ? (
-                      <div className="flex justify-center p-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4">
-                        {creations.map((creation) => (
-                          <div 
-                            key={creation.id} 
-                            className="flex items-center p-3 bg-muted/30 hover:bg-muted/40 rounded-md cursor-pointer"
-                          >
-                            <div className="h-12 w-12 bg-primary/20 flex items-center justify-center rounded-md mr-3">
-                              <Music className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="flex-grow">
-                              <h4 className="font-medium">{creation.title}</h4>
-                              <p className="text-xs text-muted-foreground">
-                                Créé le {new Date(creation.createdAt).toLocaleDateString()}
-                              </p>
-                            </div>
-                            <Button variant="ghost" size="icon" className="ml-2">
-                              <Play className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
-                        
-                        {creations.length === 0 && (
-                          <div className="text-center p-8 bg-muted/20 rounded-md border border-dashed">
-                            <p>Aucune création musicale pour le moment</p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="mood">
-                <Card className="shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      <span>Musique & Humeur</span>
-                    </CardTitle>
-                    <CardDescription>Découvrez comment la musique influence vos émotions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-6">
-                      <h3 className="text-lg mb-4">Visualisation des émotions</h3>
-                      <MusicMoodVisualization />
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-3">
-                      {['calm', 'focused', 'energetic'].map((emotion) => (
-                        <Button
-                          key={emotion}
-                          variant="outline"
-                          className="flex flex-col h-auto py-4"
-                          onClick={() => {
-                            loadPlaylistForEmotion(emotion);
-                            logUserAction('select_mood_playlist', { emotion });
-                            openDrawer();
-                          }}
-                        >
-                          <Headphones className="h-8 w-8 mb-2" />
-                          <span className="capitalize">{emotion}</span>
-                        </Button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-10 w-10"
+                    onClick={nextTrack}
+                    disabled={!currentTrack}
+                  >
+                    <SkipForward className="h-5 w-5" />
+                  </Button>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Volume2 className="h-4 w-4 text-muted-foreground" />
+                  <Slider
+                    defaultValue={[volume * 100]}
+                    max={100}
+                    step={1}
+                    onValueChange={handleVolumeChange}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="player">Lecteur</TabsTrigger>
+            <TabsTrigger value="library">Bibliothèque</TabsTrigger>
+            <TabsTrigger value="mixer">Mixage</TabsTrigger>
+          </TabsList>
           
-          <div className="space-y-6">
-            <EnhancedMusicVisualizer 
-              emotion={lastEmotion || 'neutral'} 
-              showControls={true}
-              className="shadow-lg"
-            />
-            
-            <Card className="shadow-lg">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Playlists recommandées</CardTitle>
+          <TabsContent value="player">
+            <Card>
+              <CardHeader>
+                <CardTitle>Lecteur musical</CardTitle>
+                <CardDescription>Écoutez de la musique adaptée à votre état émotionnel</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-2">
-                  {['happy', 'calm', 'focused', 'energetic', 'melancholic'].map((emotion) => (
-                    <div 
-                      key={emotion}
-                      className="flex items-center p-2 hover:bg-muted/30 rounded-md cursor-pointer"
-                      onClick={() => {
-                        loadPlaylistForEmotion(emotion);
-                        logUserAction('select_emotion_playlist', { emotion });
-                        openDrawer();
-                      }}
-                    >
-                      <div className={`h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center mr-3`}>
-                        <Music className="h-4 w-4 text-primary" />
-                      </div>
-                      <span className="capitalize">{emotion}</span>
+                <EnhancedMusicVisualizer 
+                  showControls={true}
+                  height={200}
+                  className="mb-4"
+                />
+                
+                <Card className="bg-muted/20 p-4">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    <div>
+                      <h3 className="font-medium">Musique adaptative</h3>
+                      <p className="text-sm text-muted-foreground">
+                        La musique s'adapte automatiquement à votre état émotionnel détecté lors des scans
+                      </p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                </Card>
               </CardContent>
             </Card>
-          </div>
-        </div>
+          </TabsContent>
+          
+          <TabsContent value="library">
+            <Card>
+              <CardHeader>
+                <CardTitle>Bibliothèque musicale</CardTitle>
+                <CardDescription>Explorez notre collection de playlists thérapeutiques</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MusicLibrary />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="mixer">
+            <MusicMixer />
+          </TabsContent>
+        </Tabs>
       </div>
     </ProtectedLayout>
   );

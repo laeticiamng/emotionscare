@@ -1,33 +1,10 @@
 
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.enhanced-emotion-analyze]
+verify_jwt = true
+
 [api]
-enabled = true
+schema_path = "schema.graphql"
+enabled = false
 port = 54321
-schemas = ["public", "storage", "graphql_public"]
-
-[db]
-port = 54322
-
-[studio]
-enabled = true
-port = 54323
-api_url = "http://localhost"
-
-[inbucket]
-enabled = true
-port = 54324
-
-[auth]
-enabled = true
-site_url = "http://localhost:5173"
-
-[storage]
-enabled = true
-
-[realtime]
-enabled = true
-
-[functions]
-[functions.send-invitation]
-verify_jwt = false
