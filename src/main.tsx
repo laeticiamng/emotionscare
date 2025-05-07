@@ -1,12 +1,12 @@
 
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom'; 
 import App from './App.tsx';
 import './styles/index.css';
 import './styles/premium.css';
 import './styles/components.css';
 import './App.css';
-import { ThemeProvider } from './contexts/ThemeContext';
 
 const initializeApp = () => {
   console.info(`🚀 Application EmotionsCare - Démarrage [${new Date().toISOString()}]`);
@@ -37,11 +37,11 @@ const initializeApp = () => {
   const root = createRoot(rootElement);
   
   root.render(
-    <ThemeProvider>
+    <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
-    </ThemeProvider>
+    </BrowserRouter>
   );
   
   console.info("✅ Application initialization completed");
