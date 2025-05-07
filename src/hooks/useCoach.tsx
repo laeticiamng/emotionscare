@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Hook pour interagir avec le service Coach IA et recevoir des notifications
+ * Hook pour interagir avec le service Coach IA et recevoir des recommandations
  */
 export function useCoach() {
   const { user } = useAuth();
@@ -18,6 +18,87 @@ export function useCoach() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastTrigger, setLastTrigger] = useState<Date | null>(null);
   const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [sessionScore, setSessionScore] = useState<number | null>(null);
+  const [lastEmotion, setLastEmotion] = useState<string | null>(null);
+
+  // Fetch initial recommendations on component mount
+  useEffect(() => {
+    if (user?.id && recommendations.length === 0) {
+      generateRecommendation();
+    }
+  }, [user?.id]);
+
+  // Generate a recommendation based on recent user data
+  const generateRecommendation = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      // Get recent emotion data
+      const { data: emotions } = await supabase
+        .from('emotions')
+        .select('emojis, score')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(3);
+      
+      const recentEmojis = emotions?.length ? emotions[0].emojis : null;
+      const avgScore = emotions?.length ? 
+        Math.round(emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length) : 
+        null;
+      
+      if (avgScore) {
+        setSessionScore(avgScore);
+      }
+      
+      if (recentEmojis) {
+        setLastEmotion(recentEmojis);
+      }
+      
+      // Generate recommendation with AI
+      const prompt = `Donne-moi un conseil bien-être court et pratique ${
+        recentEmojis ? `pour une personne qui ressent ${recentEmojis}` : 
+        avgScore ? `pour une personne dont le score émotionnel est ${avgScore}/100` : 
+        ''
+      }. Sois concis (max 160 caractères) et actionable.`;
+      
+      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+        body: {
+          message: prompt,
+          userContext: {
+            recentEmotions: recentEmojis,
+            currentScore: avgScore
+          },
+          model: "gpt-4o-mini",
+          temperature: 0.3,
+          max_tokens: 100
+        }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.response) {
+        // Clean up response
+        const recommendation = data.response.trim()
+          .replace(/^["']|["']$/g, '') // Remove quotes
+          .replace(/^\d+\.\s*/, ''); // Remove numbering
+        
+        setRecommendations(prev => [recommendation, ...prev].slice(0, 5));
+      }
+    } catch (error) {
+      console.error('Error generating recommendation:', error);
+      
+      // Provide fallback recommendations
+      const fallbackRecommendations = [
+        "Prenez une pause de 5 minutes pour respirer profondément et vous recentrer.",
+        "Une courte marche de 10 minutes peut faire des merveilles pour votre concentration et votre humeur.",
+        "Essayez la méthode 4-7-8 : inspirez pendant 4s, retenez 7s, expirez 8s. Répétez 4 fois."
+      ];
+      
+      // Add a random recommendation
+      const randomIndex = Math.floor(Math.random() * fallbackRecommendations.length);
+      setRecommendations(prev => [fallbackRecommendations[randomIndex], ...prev].slice(0, 5));
+    }
+  }, [user?.id]);
 
   // Fonction pour déclencher un événement Coach IA
   const triggerEvent = useCallback(async (eventType: 'scan_completed' | 'predictive_alert' | 'daily_reminder', data?: any) => {
@@ -39,60 +120,19 @@ export function useCoach() {
       // Mettre à jour la date du dernier déclenchement
       setLastTrigger(new Date());
       
+      // Generate a new recommendation
+      generateRecommendation();
+      
       // Actions supplémentaires selon le type d'événement
       if (eventType === 'scan_completed' && data?.emojis) {
         // Charger une playlist adaptée à l'émotion
         loadPlaylistForEmotion(data.emojis);
-        
-        // Ajouter une recommandation basée sur l'émotion via l'API OpenAI
-        try {
-          const { data: aiResponse, error } = await supabase.functions.invoke('chat-with-ai', {
-            body: {
-              messages: [{
-                role: 'user',
-                content: `Propose une activité simple de bien-être adaptée à quelqu'un qui ressent ${data.emojis}. Réponds en une phrase courte.`
-              }],
-              userContext: {
-                recentEmotions: data.emojis,
-                currentScore: data.score || 50
-              },
-              module: 'scan',
-              model: "gpt-4o-mini-2024-07-18",
-              temperature: 0.2,
-              max_tokens: 128
-            }
-          });
-          
-          if (!error && aiResponse.response) {
-            setRecommendations(prev => [aiResponse.response, ...prev].slice(0, 5));
-          }
-        } catch (error) {
-          console.error('Error getting AI recommendation:', error);
-          // Fallback recommendations en cas d'erreur
-          let recommendation = '';
-          
-          // Use emoji data to determine recommendation
-          const emoji = data.emojis.toLowerCase();
-          if (emoji.includes('😢') || emoji.includes('😭')) {
-            recommendation = 'Une session VR de méditation pourrait vous aider à retrouver votre équilibre.';
-          } else if (emoji.includes('😡') || emoji.includes('😠')) {
-            recommendation = 'Je vous suggère une séance de relaxation guidée pour canaliser votre énergie.';
-          } else if (emoji.includes('😰') || emoji.includes('😨')) {
-            recommendation = 'Des exercices de respiration profonde pourraient vous aider à vous recentrer.';
-          } else if (emoji.includes('😓') || emoji.includes('😖')) {
-            recommendation = 'Prenez un moment pour vous détendre avec notre playlist apaisante.';
-          } else {
-            recommendation = 'Continuez à prendre soin de vous avec nos routines bien-être.';
-          }
-          
-          setRecommendations(prev => [recommendation, ...prev].slice(0, 5));
+        setLastEmotion(data.emojis);
+        if (data.score) {
+          setSessionScore(data.score);
         }
       }
       
-      toast({
-        title: "Coach IA",
-        description: "Votre routine bien-être a été activée",
-      });
     } catch (error) {
       console.error('Error triggering coach event:', error);
       toast({
@@ -103,11 +143,11 @@ export function useCoach() {
     } finally {
       setIsProcessing(false);
     }
-  }, [user, toast, loadPlaylistForEmotion]);
+  }, [user, toast, loadPlaylistForEmotion, generateRecommendation]);
 
   // Pour déclencher un événement après un scan émotionnel
-  const triggerAfterScan = useCallback((emojis: string, confidence: number = 0.8) => {
-    return triggerEvent('scan_completed', { emojis, confidence });
+  const triggerAfterScan = useCallback((emojis: string, score: number = 50) => {
+    return triggerEvent('scan_completed', { emojis, score });
   }, [triggerEvent]);
 
   // Pour déclencher une alerte préventive
@@ -139,12 +179,15 @@ export function useCoach() {
     if (!user?.id) return "Veuillez vous connecter pour utiliser le coach IA.";
     
     try {
+      // Obtenir de nouvelles recommandations basées sur la question
+      generateRecommendation();
+      
       return await coachService.askCoachQuestion(user.id, question);
     } catch (error) {
       console.error('Error asking coach question:', error);
       return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question.";
     }
-  }, [user]);
+  }, [user, generateRecommendation]);
 
   return {
     triggerAfterScan,
@@ -154,7 +197,10 @@ export function useCoach() {
     askQuestion,
     isProcessing,
     lastTrigger,
-    recommendations
+    recommendations,
+    generateRecommendation,
+    sessionScore,
+    lastEmotion
   };
 }
 
