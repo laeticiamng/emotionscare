@@ -9,12 +9,28 @@ import TeamTabContent from "@/components/scan/TeamTabContent";
 import ScanPageHeader from "@/components/scan/ScanPageHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { useActivityLogging } from '@/hooks/useActivityLogging';
+import { useScanPageState } from '@/hooks/useScanPageState';
 
 const ScanPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>("scan");
   const { user } = useAuth();
   const { logUserAction } = useActivityLogging('scan_page');
   
+  const {
+    activeTab,
+    setActiveTab,
+    showScanForm,
+    setShowScanForm,
+    emotions,
+    loading,
+    periodFilter,
+    setPeriodFilter,
+    filteredUsers,
+    selectedFilter,
+    filterUsers,
+    handleScanSaved,
+    refreshEmotionHistory
+  } = useScanPageState(user?.id);
+
   // Function to handle starting a new scan
   const handleStartScan = () => {
     setActiveTab('scan');
@@ -42,6 +58,8 @@ const ScanPage: React.FC = () => {
         {/* Page Header */}
         <ScanPageHeader 
           activeTab={activeTab}
+          showScanForm={showScanForm}
+          setShowScanForm={setShowScanForm}
         />
         
         <Card className="mt-6">
@@ -58,20 +76,26 @@ const ScanPage: React.FC = () => {
             {/* Tabs Content */}
             <div className="p-6">
               <TabsContent value="scan" className="mt-0">
-                <ScanTabContent userId={user.id} />
+                <ScanTabContent 
+                  userId={user.id}
+                  showScanForm={showScanForm}
+                  setShowScanForm={setShowScanForm}
+                  handleScanSaved={handleScanSaved}
+                  onResultSaved={refreshEmotionHistory}
+                />
               </TabsContent>
               
               <TabsContent value="history" className="mt-0">
-                <HistoryTabContent />
+                <HistoryTabContent emotions={emotions} />
               </TabsContent>
               
               <TabsContent value="team" className="mt-0">
                 <TeamTabContent 
-                  filteredUsers={[]} 
-                  selectedFilter="all" 
-                  filterUsers={() => {}} 
-                  periodFilter="week"
-                  setPeriodFilter={() => {}}
+                  filteredUsers={filteredUsers} 
+                  selectedFilter={selectedFilter} 
+                  filterUsers={filterUsers} 
+                  periodFilter={periodFilter === '7' ? '7' : periodFilter === '30' ? '30' : '90'}
+                  setPeriodFilter={setPeriodFilter}
                 />
               </TabsContent>
             </div>

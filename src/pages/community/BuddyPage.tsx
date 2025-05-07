@@ -108,11 +108,7 @@ const BuddyPage: React.FC = () => {
                     {filteredBuddies.map(buddy => (
                       <BuddyCard
                         key={buddy.id}
-                        name={buddy.name}
-                        department={buddy.department}
-                        interests={buddy.interests}
-                        compatibility={buddy.compatibility}
-                        avatarUrl={buddy.avatar}
+                        buddy={buddy}
                       />
                     ))}
                   </div>

@@ -5,18 +5,18 @@ import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import EmotionScanLive from '@/components/scan/EmotionScanLive';
 
 interface ScanTabContentProps {
-  showScanForm: boolean;
   userId: string;
-  handleScanSaved: () => void;
+  showScanForm: boolean;
   setShowScanForm: (show: boolean) => void;
+  handleScanSaved: () => void;
   onResultSaved: () => Promise<void>;
 }
 
 const ScanTabContent: React.FC<ScanTabContentProps> = ({
-  showScanForm,
   userId,
-  handleScanSaved,
+  showScanForm,
   setShowScanForm,
+  handleScanSaved,
   onResultSaved
 }) => {
   return (
