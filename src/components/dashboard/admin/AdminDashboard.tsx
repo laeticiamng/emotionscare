@@ -9,7 +9,7 @@ import AdminChartSection from '@/components/dashboard/admin/AdminChartSection';
 import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateCard';
 import SocialCocoonCard from '@/components/dashboard/admin/SocialCocoonCard';
 import GamificationSummaryCard from '@/components/dashboard/admin/GamificationSummaryCard';
-import { SegmentProvider } from '@/contexts/SegmentContext';
+import { useSegment } from '@/contexts/SegmentContext';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -17,6 +17,7 @@ const AdminDashboard: React.FC = () => {
   const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [timePeriod, setTimePeriod] = useState<string>('7');
+  const { segment } = useSegment(); // Utiliser le contexte qui vient du parent
 
   // Mock data for Social Cocoon section
   const socialCocoonData = {
@@ -65,50 +66,48 @@ const AdminDashboard: React.FC = () => {
     }
     
     loadDashboardData();
-  }, [timePeriod]);
+  }, [timePeriod, segment]); // Ajout de segment dans les dépendances pour recharger si le segment change
   
   return (
-    <SegmentProvider>
-      <div className="max-w-7xl mx-auto">
-        {/* Hero Section with Period Selector */}
-        <div className="mb-10 animate-fade-in">
-          <div className="flex flex-col md:flex-row items-start justify-between">
-            <div>
-              <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>
-              <h2 className="text-xl text-muted-foreground mt-2">
-                Métriques globales et anonymisées
-              </h2>
-            </div>
-            <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+    <div className="max-w-7xl mx-auto">
+      {/* Hero Section with Period Selector */}
+      <div className="mb-10 animate-fade-in">
+        <div className="flex flex-col md:flex-row items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>
+            <h2 className="text-xl text-muted-foreground mt-2">
+              Métriques globales et anonymisées
+            </h2>
           </div>
+          <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
         </div>
-        
-        {/* Main Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Charts Section */}
-          <AdminChartSection 
-            absenteeismData={absenteeismData} 
-            productivityData={productivityData}
-          />
-          
-          {/* Emotional Climate Overview */}
-          <EmotionalClimateCard emotionalScoreTrend={[
-            { date: '1/5', value: 72 },
-            { date: '2/5', value: 75 },
-            { date: '3/5', value: 78 },
-            { date: '4/5', value: 80 }
-          ]} />
-          
-          {/* Social Cocoon Analytics */}
-          <SocialCocoonCard socialStats={socialCocoonData} />
-          
-          {/* Gamification Summary */}
-          <GamificationSummaryCard gamificationStats={gamificationData} />
-        </div>
-        
-        {/* Completely removed DashboardFooter */}
       </div>
-    </SegmentProvider>
+      
+      {/* Main Content */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Charts Section */}
+        <AdminChartSection 
+          absenteeismData={absenteeismData} 
+          productivityData={productivityData}
+        />
+        
+        {/* Emotional Climate Overview */}
+        <EmotionalClimateCard emotionalScoreTrend={[
+          { date: '1/5', value: 72 },
+          { date: '2/5', value: 75 },
+          { date: '3/5', value: 78 },
+          { date: '4/5', value: 80 }
+        ]} />
+        
+        {/* Social Cocoon Analytics */}
+        <SocialCocoonCard socialStats={socialCocoonData} />
+        
+        {/* Gamification Summary */}
+        <GamificationSummaryCard gamificationStats={gamificationData} />
+      </div>
+      
+      {/* Completely removed DashboardFooter */}
+    </div>
   );
 };
 

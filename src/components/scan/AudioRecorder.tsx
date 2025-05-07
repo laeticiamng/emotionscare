@@ -11,9 +11,11 @@ interface AudioRecorderProps {
 const AudioRecorder = ({ audioUrl, setAudioUrl }: AudioRecorderProps) => {
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
 
   const startRecording = async () => {
     try {
+      setPermissionError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const audioChunks: BlobPart[] = [];
@@ -33,6 +35,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl }: AudioRecorderProps) => {
       setMediaRecorder(recorder);
     } catch (error) {
       console.error('Error accessing microphone:', error);
+      setPermissionError("Impossible d'accéder au microphone. Veuillez vérifier les permissions de votre navigateur.");
     }
   };
 
@@ -45,7 +48,13 @@ const AudioRecorder = ({ audioUrl, setAudioUrl }: AudioRecorderProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center">
+        {permissionError && (
+          <div className="text-destructive text-sm mb-3 text-center">
+            {permissionError}
+          </div>
+        )}
+
         {!recording ? (
           <Button 
             onClick={startRecording}

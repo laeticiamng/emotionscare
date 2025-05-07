@@ -58,7 +58,7 @@ const SidebarContent: React.FC = () => {
 const Sidebar: React.FC = () => {
   const isMobile = useIsMobile();
   
-  // Si on est sur mobile, on ne rend pas du tout le sidebar
+  // Si on est sur mobile, on ne rend pas du tout le sidebar (géré par MobileNavigation)
   if (isMobile) {
     return null;
   }

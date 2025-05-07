@@ -1,26 +1,22 @@
 
 import React from 'react';
-import PeriodSelector from './PeriodSelector';
-import { SegmentSelector } from './SegmentSelector';
-import { useSegment } from '@/contexts/SegmentContext';
+import { User } from '@/types';
+import { Separator } from '@/components/ui/separator';
 import AutoRefreshControl from '@/components/dashboard/AutoRefreshControl';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
+import { SegmentSelector } from '@/components/dashboard/admin/SegmentSelector';
 
 interface DashboardHeaderProps {
-  timePeriod: string;
-  setTimePeriod: (period: string) => void;
-  isLoading?: boolean;
+  user: User | null;
+  isAdmin?: boolean;
   onRefresh?: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
-  timePeriod, 
-  setTimePeriod, 
-  isLoading = false,
-  onRefresh = () => {}
+  user, 
+  isAdmin = false,
+  onRefresh = () => {} 
 }) => {
-  const { activeDimension, activeOption } = useSegment();
-  
   const {
     enabled: autoRefreshEnabled,
     interval: autoRefreshInterval,
@@ -34,32 +30,37 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   });
   
   return (
-    <div className="mb-8 animate-fade-in">
-      <div className="flex flex-col md:flex-row items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tableau de bord <span className="font-semibold">Direction</span></h1>
-          <h2 className="text-muted-foreground mt-2">
-            Métriques globales et anonymisées
-          </h2>
-          {activeDimension && activeOption && (
-            <div className="mt-2 text-sm font-medium text-primary">
-              Segment actif : {activeDimension.label} → {activeOption.label}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-3 mt-4 md:mt-0 items-center">
-          <AutoRefreshControl
-            enabled={autoRefreshEnabled}
-            interval={autoRefreshInterval}
-            refreshing={refreshing}
-            onToggle={toggleAutoRefresh}
-            onIntervalChange={changeInterval}
-          />
-          <SegmentSelector />
-          <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+    <>
+      <div className="mb-10 animate-fade-in">
+        <div className="flex flex-col md:flex-row items-start justify-between">
+          <div>
+            <h1>
+              {isAdmin ? (
+                <>Tableau de bord <span className="font-semibold">Direction</span></>
+              ) : (
+                <>Bienvenue, <span className="font-semibold">{user?.name || 'utilisateur'}</span></>
+              )}
+            </h1>
+            <h2 className="text-muted-foreground mt-2">
+              {isAdmin ? 'Métriques globales et anonymisées' : 'Votre espace bien-être personnel'}
+            </h2>
+          </div>
+          
+          <div className="mt-4 md:mt-0 flex items-center space-x-4">
+            {isAdmin && <SegmentSelector />}
+            <AutoRefreshControl
+              enabled={autoRefreshEnabled}
+              interval={autoRefreshInterval}
+              refreshing={refreshing}
+              onToggle={toggleAutoRefresh}
+              onIntervalChange={changeInterval}
+            />
+          </div>
         </div>
       </div>
-    </div>
+      
+      <Separator className="mb-8" />
+    </>
   );
 };
 

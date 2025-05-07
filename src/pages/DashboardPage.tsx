@@ -84,19 +84,19 @@ const DashboardPage: React.FC = () => {
   return (
     <DashboardContainer>
       <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
-        {isAdmin ? (
-          <>
-            {console.log("DashboardPage - Rendering AdminDashboard")}
-            <SegmentProvider>
+        <SegmentProvider>
+          {isAdmin ? (
+            <>
+              {console.log("DashboardPage - Rendering AdminDashboard")}
               <AdminDashboard />
-            </SegmentProvider>
-          </>
-        ) : (
-          <>
-            {console.log("DashboardPage - Rendering UserDashboard")}
-            <UserDashboard user={user} />
-          </>
-        )}
+            </>
+          ) : (
+            <>
+              {console.log("DashboardPage - Rendering UserDashboard")}
+              <UserDashboard user={user} />
+            </>
+          )}
+        </SegmentProvider>
       </div>
     </DashboardContainer>
   );

@@ -19,11 +19,14 @@ interface GlobalNavProps {
   isAuthenticated?: boolean;
 }
 
-const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
-  const { user } = useAuth();
+const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
+  const { user, isAuthenticated: authState } = useAuth();
   const navigate = useNavigate();
   const isAdmin = user ? isAdminRole(user.role) : false;
   const { unreadCount } = useNotificationBadge();
+  
+  // Utiliser l'état d'authentification du contexte si isAuthenticated n'est pas fourni en prop
+  const authenticated = isAuthenticated || authState;
   
   // Sélectionner les bons éléments de navigation en fonction du rôle
   const navigationItems = isAdmin ? adminTopNavItems : topNavItems;
@@ -34,7 +37,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
         {/* Logo - cliquable pour revenir à l'accueil (/) */}
         <Logo isAdmin={isAdmin} homePath="/" />
         
-        {isAuthenticated ? (
+        {authenticated ? (
           <>
             {/* Desktop Navigation pour utilisateurs authentifiés */}
             <DesktopNavigation navigationItems={navigationItems} />
@@ -47,7 +50,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
             {/* User Profile - Desktop */}
             <div className="flex items-center gap-4">
               {/* Add NotificationsPanel */}
-              {isAuthenticated && <NotificationsPanel />}
+              <NotificationsPanel />
               <ThemeSwitcher variant="outline" size="sm" showLabel={false} />
               <UserMenu badgesCount={unreadCount} />
             </div>
@@ -60,6 +63,15 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
                 <Link to="/" className="text-foreground/90 hover:text-foreground font-medium text-sm flex items-center gap-1.5 hover:translate-y-[-2px] transition-transform">
                   <HomeIcon size={18} />
                   <span>Accueil</span>
+                </Link>
+                <Link to="/docs" className="text-foreground/80 hover:text-foreground text-sm flex items-center hover:translate-y-[-2px] transition-transform">
+                  Documentation
+                </Link>
+                <Link to="/pricing" className="text-foreground/80 hover:text-foreground text-sm flex items-center hover:translate-y-[-2px] transition-transform">
+                  Tarifs
+                </Link>
+                <Link to="/contact" className="text-foreground/80 hover:text-foreground text-sm flex items-center hover:translate-y-[-2px] transition-transform">
+                  Contact
                 </Link>
               </nav>
             </div>
@@ -75,6 +87,14 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated }) => {
               >
                 <LogIn size={16} className="mr-2" />
                 Connexion
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="hover-lift"
+                onClick={() => navigate('/register')}
+              >
+                Inscription
               </Button>
             </div>
           </>

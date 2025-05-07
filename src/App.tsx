@@ -22,6 +22,8 @@ import CoachPage from './pages/CoachPage';
 import SocialCocoonPage from './pages/SocialCocoonPage';
 import GamificationPage from './pages/GamificationPage';
 import BuddyPage from './pages/BuddyPage';
+import VRSessionPage from './pages/VRSessionPage';
+import MusicWellbeingPage from './pages/MusicWellbeingPage';
 
 // Router configuration
 const router = createBrowserRouter([
@@ -55,7 +57,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/scan",
-        element: <ScanPage />
+        element: <ProtectedLayout><ScanPage /></ProtectedLayout>
       },
       {
         path: "/coach",
@@ -72,6 +74,14 @@ const router = createBrowserRouter([
       {
         path: "/gamification",
         element: <ProtectedLayout><GamificationPage /></ProtectedLayout>
+      },
+      {
+        path: "/vr-session",
+        element: <ProtectedLayout><VRSessionPage /></ProtectedLayout>
+      },
+      {
+        path: "/music",
+        element: <ProtectedLayout><MusicWellbeingPage /></ProtectedLayout>
       }
     ]
   },
