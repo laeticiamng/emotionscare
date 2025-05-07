@@ -1,68 +1,54 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Track } from '@/services/music/types';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Loader2, Music, AlertCircle } from 'lucide-react';
 
 interface TrackInfoProps {
-  currentTrack: Track;
+  currentTrack: any; // Using any to handle different track formats
   loadingTrack: boolean;
-  audioError: string | null;
+  audioError: boolean;
 }
 
-const TrackInfo: React.FC<TrackInfoProps> = ({ currentTrack, loadingTrack, audioError }) => {
-  const defaultCoverUrl = '/images/default-cover.jpg';
-  
-  // Fonction pour tenter de recharger l'image en cas d'erreur
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.log("Image de couverture non chargée, utilisation de l'image par défaut");
-    (e.target as HTMLImageElement).src = defaultCoverUrl;
-  };
+const TrackInfo: React.FC<TrackInfoProps> = ({ 
+  currentTrack, 
+  loadingTrack, 
+  audioError 
+}) => {
+  // Extract track information with fallbacks
+  const title = currentTrack.title || currentTrack.name || 'Unknown Track';
+  const artist = currentTrack.artist || 'Unknown Artist';
+  const imageUrl = currentTrack.imageUrl || currentTrack.coverArt || '';
   
   return (
-    <div className="flex items-center gap-4 mb-4">
-      <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0 border">
-        <img 
-          src={currentTrack.cover || defaultCoverUrl} 
-          alt={currentTrack.title}
-          className="object-cover h-full w-full"
-          onError={handleImageError}
-        />
+    <div className="flex items-center space-x-3 mb-4">
+      <div className="relative h-16 w-16 min-w-16 rounded overflow-hidden bg-muted">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={title} 
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center bg-muted">
+            <Music className="h-8 w-8 text-muted-foreground" />
+          </div>
+        )}
         
         {loadingTrack && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/50">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        )}
+        
+        {audioError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
+            <AlertCircle className="h-8 w-8 text-destructive" />
           </div>
         )}
       </div>
       
-      <div className="flex flex-col flex-1 min-w-0">
-        <h3 className="font-medium truncate">{currentTrack.title}</h3>
-        <p className="text-sm text-muted-foreground truncate">{currentTrack.artist}</p>
-        
-        {audioError && (
-          <Alert variant="destructive" className="mt-2 py-1">
-            <div className="flex items-center">
-              <AlertCircle className="h-4 w-4 mr-2" />
-              <div className="flex-1">
-                <AlertTitle className="text-xs">Erreur de lecture</AlertTitle>
-                <AlertDescription className="text-xs">
-                  {audioError}
-                </AlertDescription>
-              </div>
-              <Button 
-                size="sm" 
-                variant="destructive" 
-                className="h-6 text-xs py-0"
-                onClick={() => window.location.reload()}
-              >
-                Rafraîchir
-              </Button>
-            </div>
-          </Alert>
-        )}
+      <div className="flex-1 min-w-0">
+        <div className="font-medium truncate">{title}</div>
+        <div className="text-sm text-muted-foreground truncate">{artist}</div>
       </div>
     </div>
   );

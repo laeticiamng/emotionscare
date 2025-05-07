@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { toast } from '@/hooks/use-toast';
@@ -52,8 +53,23 @@ export function useAudioPlayer() {
       setCurrentTime(0);
       setDuration(0);
       
+      // Check if currentTrack has the required properties
+      const audioUrl = currentTrack.audioUrl || currentTrack.url || '';
+      
+      if (!audioUrl) {
+        console.error('Track is missing audioUrl property:', currentTrack);
+        setAudioError(true);
+        setLoadingTrack(false);
+        toast({
+          title: "Erreur de lecture",
+          description: "Format de piste audio invalide.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Load and play new track
-      audioRef.current.src = currentTrack.audioUrl;
+      audioRef.current.src = audioUrl;
       audioRef.current.load();
       
       if (isPlaying) {
@@ -107,7 +123,7 @@ export function useAudioPlayer() {
     toast({
       title: "Erreur de lecture",
       description: "Impossible de lire ce morceau. Veuillez essayer un autre titre.",
-      variant: "destructive" // Utilisez "destructive" au lieu de "warning"
+      variant: "destructive"
     });
   };
   
