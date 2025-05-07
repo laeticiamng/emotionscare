@@ -21,3 +21,23 @@ export interface ActivityLog {
   timestamp: string;
   activity_details?: Record<string, any>;
 }
+
+/**
+ * Anonymized activity log structure for reporting
+ */
+export interface AnonymizedActivityLog {
+  id: string;
+  activity_type: string;
+  category: string;
+  count: number;
+  timestamp_day: string;
+}
+
+/**
+ * Activity statistics for aggregated reporting
+ */
+export interface ActivityStats {
+  activity_type: string;
+  total_count: number;
+  percentage: number;
+}
