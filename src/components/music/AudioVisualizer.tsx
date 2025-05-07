@@ -45,7 +45,8 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     // Create audio context and analyzer
     if (!audioContextRef.current) {
       try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        // Fix: Use AudioContext and only provide type fallback for compatibility
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
         audioContextRef.current = new AudioContext();
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;

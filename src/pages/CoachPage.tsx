@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +13,7 @@ import MusicRecommendationCard from '@/components/coach/MusicRecommendationCard'
 import MusicEmotionSync from '@/components/scan/MusicEmotionSync';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VREmotionRecommendation from '@/components/vr/VREmotionRecommendation';
+import { Emotion } from '@/types';
 
 const CoachPage = () => {
   const { user } = useAuth();
@@ -35,6 +35,15 @@ const CoachPage = () => {
     setAutoSync(!autoSync);
     logUserAction('toggle_music_sync', { enabled: !autoSync });
   };
+  
+  // Create a properly typed emotion object for VREmotionRecommendation 
+  const emotionForVR = lastEmotion ? {
+    id: 'temp-id',  // Required by the Emotion type
+    user_id: user?.id || 'anonymous',
+    date: new Date().toISOString(),
+    emotion: lastEmotion,
+    score: sessionScore || 50
+  } as Emotion : null;
   
   return (
     <ProtectedLayout>
@@ -103,7 +112,7 @@ const CoachPage = () => {
                     {/* VR recommendation based on emotion */}
                     {lastEmotion && (
                       <div className="mt-6">
-                        <VREmotionRecommendation emotion={{ emotion: lastEmotion, score: sessionScore || 50 }} />
+                        <VREmotionRecommendation emotion={emotionForVR} />
                       </div>
                     )}
                   </CardContent>
