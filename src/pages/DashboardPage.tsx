@@ -10,6 +10,7 @@ import LoadingAnimation from '@/components/ui/loading-animation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { notificationService } from '@/lib/coach/notification-service';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
+import { SegmentProvider } from '@/contexts/SegmentContext';
 
 const DashboardPage: React.FC = () => {
   console.log("DashboardPage Component - Initializing");
@@ -86,7 +87,9 @@ const DashboardPage: React.FC = () => {
         {isAdmin ? (
           <>
             {console.log("DashboardPage - Rendering AdminDashboard")}
-            <AdminDashboard />
+            <SegmentProvider>
+              <AdminDashboard />
+            </SegmentProvider>
           </>
         ) : (
           <>
