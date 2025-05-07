@@ -12,15 +12,18 @@ import { Separator } from "@/components/ui/separator";
 
 const LoginPage = () => {
   const [email, setEmail] = useState('sophie@example.com');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('sophie');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   
+  console.log("LoginPage: Initial render", { isAuthenticated, isLoading });
+  
   // Redirect if already authenticated
   useEffect(() => {
+    console.log("LoginPage: Auth effect running", { isAuthenticated, isLoading });
     if (isAuthenticated && !isLoading) {
       console.log("LoginPage: Already authenticated, redirecting to dashboard");
       navigate('/dashboard');
@@ -29,6 +32,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log("LoginPage: Form submitted", { email, password: password ? "provided" : "empty" });
     
     if (!email || email.trim() === '') {
       toast({
@@ -42,16 +47,25 @@ const LoginPage = () => {
     setIsSubmitting(true);
     try {
       console.log("LoginPage: Attempting login with:", email);
-      // Pour Sophie, le mot de passe est maintenant "sophie" ou vide
       const user = await login(email, password);
-      console.log("LoginPage: Login successful, redirecting to dashboard");
+      console.log("LoginPage: Login successful", user);
+      
+      toast({
+        title: "Connexion réussie",
+        description: `Bienvenue, ${user.name}!`,
+      });
       
       // Redirect to the dashboard or the page they were trying to access
       const from = (location.state as any)?.from?.pathname || '/dashboard';
+      console.log("LoginPage: Redirecting to", from);
       navigate(from);
-    } catch (error) {
-      // Les erreurs sont gérées dans le contexte d'authentification
+    } catch (error: any) {
       console.error("Erreur de connexion:", error);
+      toast({
+        title: "Erreur de connexion",
+        description: error.message || "Identifiants incorrects. Veuillez réessayer.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }

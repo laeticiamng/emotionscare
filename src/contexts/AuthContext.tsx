@@ -37,20 +37,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
+  console.log("AuthProvider - Initializing");
+
   // Check for existing session on mount
   useEffect(() => {
     const checkExistingSession = async () => {
+      console.log("AuthProvider - Checking for existing session");
       try {
         const currentUser = getCurrentUser();
+        console.log("AuthProvider - CurrentUser check:", currentUser);
         if (currentUser) {
           setUser(currentUser);
           setIsAuthenticated(true);
           console.log("AuthProvider - Restored session for:", currentUser.name);
+        } else {
+          console.log("AuthProvider - No existing session found");
+          setUser(null);
+          setIsAuthenticated(false);
         }
       } catch (error) {
         console.error("Error checking session:", error);
+        setUser(null);
+        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
+        console.log("AuthProvider - Finished loading check");
       }
     };
     
@@ -59,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Login function
   const login = async (email: string, password: string): Promise<User> => {
+    console.log("AuthProvider - Login attempt:", email);
     try {
       setIsLoading(true);
       // Simulate API call
@@ -75,6 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("Login successful:", user);
       return user;
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Erreur de connexion",
         description: error.message || "Identifiants incorrects. Veuillez réessayer.",
@@ -104,6 +117,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Sign out function
   const signOut = async (): Promise<void> => {
+    console.log("AuthProvider - Signing out");
     try {
       setIsLoading(true);
       await logoutUser();
@@ -144,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading,
   };
 
+  console.log("AuthProvider - Current state:", { isAuthenticated, isLoading, user: user?.name });
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
