@@ -1,150 +1,174 @@
-import { 
-  LayoutDashboard, 
-  Heart, 
-  BookText, 
-  Users, 
-  MessageSquare, 
-  Music,
-  Trophy, 
+import React from 'react';
+import {
+  Home,
+  FileText,
+  Calendar,
+  HeartPulse,
+  Users,
   Settings,
-  UserIcon, 
-  HeadphonesIcon,
-  Video,
-  Brain,
-  BarChart2,
-  ShieldCheck,
-  CalendarDays,
-  Gauge,
-  Sparkles
-} from "lucide-react";
+  VrHeadset,
+  Music,
+  LineChart,
+  MessageCircle,
+  Award,
+  Database,
+  Bell,
+  Shield,
+  Clock
+} from 'lucide-react';
+import { NavItemConfig } from '@/components/ui/sidebar/SidebarNavGroup';
 
-// Import the NavItemConfig interface
-import { NavItemConfig } from "@/components/ui/sidebar/SidebarNavGroup";
-
-// Items pour la barre du haut (navbar) - fonctionnalités principales
-export const topNavItems: NavItemConfig[] = [
+// Top navigation items (for desktop header)
+export const topNavItems = [
   {
-    path: "/dashboard",
-    label: "Tableau de bord",
-    icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/dashboard',
+    label: 'Tableau de bord',
+    icon: <Home className="h-5 w-5" />
   },
   {
-    path: "/scan",
-    label: "Scan émotionnel",
-    icon: <Heart className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/scan',
+    label: 'Scan émotionnel',
+    icon: <HeartPulse className="h-5 w-5" />
   },
   {
-    path: "/journal",
-    label: "Journal",
-    icon: <BookText className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/music',
+    label: 'Musicothérapie',
+    icon: <Music className="h-5 w-5" />
   },
   {
-    path: "/buddy",
-    label: "Buddy",
-    icon: <UserIcon className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
-  },
+    path: '/vr',
+    label: 'VR Immersive',
+    icon: <VrHeadset className="h-5 w-5" />
+  }
 ];
 
-// Configuration pour la sidebar utilisateur - fonctionnalités complémentaires
+// Admin top navigation items
+export const adminTopNavItems = [
+  {
+    path: '/admin',
+    label: 'Administration',
+    icon: <Home className="h-5 w-5" />
+  },
+  {
+    path: '/admin/users',
+    label: 'Utilisateurs',
+    icon: <Users className="h-5 w-5" />
+  },
+  {
+    path: '/admin/activity',
+    label: 'Activité',
+    icon: <LineChart className="h-5 w-5" />
+  },
+  {
+    path: '/admin/settings',
+    label: 'Paramètres',
+    icon: <Settings className="h-5 w-5" />
+  }
+];
+
+// Sidebar navigation items (for desktop sidebar)
 export const sidebarItems: NavItemConfig[] = [
   {
-    path: "/social-cocoon",
-    label: "Communauté",
-    icon: <Users className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/dashboard',
+    label: 'Tableau de bord',
+    icon: <Home className="h-5 w-5" />
   },
   {
-    path: "/groups",
-    label: "Groupes",
-    icon: <MessageSquare className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/scan',
+    label: 'Scan émotionnel',
+    icon: <HeartPulse className="h-5 w-5" />
   },
   {
-    path: "/coach",
-    label: "Coach IA",
-    icon: <Brain className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/music',
+    label: 'Musicothérapie',
+    icon: <Music className="h-5 w-5" />
   },
   {
-    path: "/vr-sessions",
-    label: "Micro-pauses VR",
-    icon: <Video className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/vr',
+    label: 'VR Immersive',
+    icon: <VrHeadset className="h-5 w-5" />
   },
   {
-    path: "/music-wellbeing",
-    label: "Musicothérapie",
-    icon: <HeadphonesIcon className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/journal',
+    label: 'Journal intime',
+    icon: <FileText className="h-5 w-5" />
   },
   {
-    path: "/gamification",
-    label: "Récompenses",
-    icon: <Trophy className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/community',
+    label: 'Communauté',
+    icon: <Users className="h-5 w-5" />
   },
+  {
+    path: '/chat',
+    label: 'Coach IA',
+    icon: <MessageCircle className="h-5 w-5" />
+  },
+  {
+    path: '/events',
+    label: 'Événements',
+    icon: <Calendar className="h-5 w-5" />
+  }
 ];
 
-// Configuration spécifique pour la sidebar admin - fonctionnalités analytiques
+// Admin sidebar navigation items
 export const adminSidebarItems: NavItemConfig[] = [
   {
-    path: "/vr-analytics",
-    label: "Statistiques VR",
-    icon: <BarChart2 className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
+    path: '/admin',
+    label: 'Vue d\'ensemble',
+    icon: <Home className="h-5 w-5" />
   },
   {
-    path: "/compliance",
-    label: "Conformité & Sécurité",
-    icon: <ShieldCheck className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
+    path: '/admin/users',
+    label: 'Gestion des utilisateurs',
+    icon: <Users className="h-5 w-5" />
   },
   {
-    path: "/account",
-    label: "Paramètres Admin",
-    icon: <Settings className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
+    path: '/admin/activity',
+    label: 'Suivi de l\'activité',
+    icon: <LineChart className="h-5 w-5" />
   },
+  {
+    path: '/admin/notifications',
+    label: 'Notifications',
+    icon: <Bell className="h-5 w-5" />
+  },
+  {
+    path: '/admin/security',
+    label: 'Sécurité',
+    icon: <Shield className="h-5 w-5" />
+  },
+  {
+    path: '/admin/audit-log',
+    label: 'Journal d\'audit',
+    icon: <Clock className="h-5 w-5" />
+  },
+  {
+    path: '/admin/database',
+    label: 'Base de données',
+    icon: <Database className="h-5 w-5" />
+  },
+  {
+    path: '/admin/rewards',
+    label: 'Récompenses',
+    icon: <Award className="h-5 w-5" />
+  },
+  {
+    path: '/admin/settings',
+    label: 'Paramètres',
+    icon: <Settings className="h-5 w-5" />
+  }
 ];
 
-// Items de navbar spécifiques pour les admin (remplace topNavItems pour les admins)
-export const adminTopNavItems: NavItemConfig[] = [
-  {
-    path: "/dashboard",
-    label: "Tableau de bord global",
-    icon: <LayoutDashboard className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/scan",
-    label: "Scan émotionnel - Équipe",
-    icon: <Heart className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/journal",
-    label: "Journal - Tendances",
-    icon: <BookText className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-  {
-    path: "/social-cocoon",
-    label: "Social Cocoon - Pilotage",
-    icon: <Users className="h-5 w-5 mr-2" />,
-    roles: ["admin", "Admin"],
-  },
-];
-
-// Éléments de pied de page communs
+// Footer navigation items (for desktop sidebar footer)
 export const footerNavItems: NavItemConfig[] = [
   {
-    path: "/my-data",
-    label: "Mes Données",
-    icon: <Settings className="h-5 w-5 mr-2" />,
-    roles: ["user", "admin", "Admin", "Utilisateur"],
+    path: '/settings',
+    label: 'Paramètres',
+    icon: <Settings className="h-5 w-5" />
+  },
+  {
+    path: '/help',
+    label: 'Aide',
+    icon: <MessageCircle className="h-5 w-5" />
   }
 ];

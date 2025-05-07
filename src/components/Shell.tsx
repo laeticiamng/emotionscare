@@ -6,6 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
+import MusicDrawer from "./music/MusicDrawer";
 
 export const Shell: React.FC = () => {
   const isMobile = useIsMobile();
@@ -32,6 +33,9 @@ export const Shell: React.FC = () => {
       
       {/* Système de notifications toast */}
       <Toaster />
+      
+      {/* Music Player Drawer - accessible from anywhere */}
+      <MusicDrawer />
     </div>
   );
 };

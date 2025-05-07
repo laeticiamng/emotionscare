@@ -1,95 +1,79 @@
 
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback } from 'react';
 import { getPlaylist } from '@/lib/musicService';
-import { Track, Playlist } from '@/services/music/types';
+import type { Track, Playlist } from '@/services/music/types';
 
-/**
- * Hook to manage playlist loading and track navigation
- */
 export function usePlaylistManager() {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
-  const { toast } = useToast();
-
-  /**
-   * Load a playlist based on emotion
-   */
-  const loadPlaylistForEmotion = async (emotion: string) => {
-    try {
-      const musicPlaylist = await getPlaylist(emotion);
-      
-      // Convert MusicPlaylist to Playlist using our converter logic
-      const convertedPlaylist: Playlist = {
-        id: musicPlaylist.id,
-        name: musicPlaylist.name,
-        emotion: musicPlaylist.emotion,
-        tracks: musicPlaylist.tracks.map(track => ({
-          id: track.id,
-          title: track.title,
-          artist: track.artist,
-          duration: track.duration,
-          url: track.audioUrl,
-          cover: track.coverUrl,
-        }))
-      };
-      
-      setPlaylist(convertedPlaylist);
-      setCurrentEmotion(emotion);
-      
-      toast({
-        title: "Playlist chargée",
-        description: `Ambiance "${convertedPlaylist.name}" prête à être écoutée`,
-      });
-
-      return convertedPlaylist;
-    } catch (error) {
-      console.error('Error loading playlist:', error);
-      toast({
-        title: "Erreur de chargement",
-        description: "Impossible de charger la playlist",
-        variant: "destructive"
-      });
-      return null;
-    }
-  };
-
-  /**
-   * Get the next track in the playlist
-   */
-  const getNextTrack = (currentTrack: Track, shuffle: boolean): Track => {
-    if (!playlist || !currentTrack) return currentTrack;
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<Playlist | null> => {
+    setIsLoading(true);
+    setError(null);
     
-    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+    try {
+      console.log(`Loading playlist for emotion: ${emotion}`);
+      const emotionPlaylist = await getPlaylist(emotion);
+      setPlaylist(emotionPlaylist);
+      setCurrentEmotion(emotion);
+      return emotionPlaylist;
+    } catch (err) {
+      console.error('Error loading playlist:', err);
+      setError(`Failed to load playlist: ${err instanceof Error ? err.message : String(err)}`);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+  
+  const getNextTrack = useCallback((currentTrack: Track, shuffle: boolean): Track => {
+    if (!playlist || !playlist.tracks.length) return currentTrack;
     
     if (shuffle) {
-      const nextIndex = Math.floor(Math.random() * playlist.tracks.length);
-      return playlist.tracks[nextIndex];
+      // Return a random track different from current
+      const availableTracks = playlist.tracks.filter(t => t.id !== currentTrack.id);
+      if (availableTracks.length === 0) return currentTrack;
+      
+      const randomIndex = Math.floor(Math.random() * availableTracks.length);
+      return availableTracks[randomIndex];
     } else {
+      // Find current track index
+      const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+      if (currentIndex === -1) return playlist.tracks[0];
+      
+      // Return next track or loop to first
       const nextIndex = (currentIndex + 1) % playlist.tracks.length;
       return playlist.tracks[nextIndex];
     }
-  };
-
-  /**
-   * Get the previous track in the playlist
-   */
-  const getPreviousTrack = (currentTrack: Track, shuffle: boolean): Track => {
-    if (!playlist || !currentTrack) return currentTrack;
-    
-    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+  }, [playlist]);
+  
+  const getPreviousTrack = useCallback((currentTrack: Track, shuffle: boolean): Track => {
+    if (!playlist || !playlist.tracks.length) return currentTrack;
     
     if (shuffle) {
-      const prevIndex = Math.floor(Math.random() * playlist.tracks.length);
-      return playlist.tracks[prevIndex];
+      // For shuffle mode, previous is also random
+      const availableTracks = playlist.tracks.filter(t => t.id !== currentTrack.id);
+      if (availableTracks.length === 0) return currentTrack;
+      
+      const randomIndex = Math.floor(Math.random() * availableTracks.length);
+      return availableTracks[randomIndex];
     } else {
+      // Find current track index
+      const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+      if (currentIndex === -1) return playlist.tracks[0];
+      
+      // Return previous track or loop to last
       const prevIndex = (currentIndex - 1 + playlist.tracks.length) % playlist.tracks.length;
       return playlist.tracks[prevIndex];
     }
-  };
-
+  }, [playlist]);
+  
   return {
     playlist,
+    isLoading,
+    error,
     currentEmotion,
     loadPlaylistForEmotion,
     getNextTrack,

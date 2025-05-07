@@ -1,23 +1,25 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
-/**
- * Hook to manage drawer state
- */
 export function useDrawerState() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  const openDrawer = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  
+  const openDrawer = useCallback(() => {
     setIsDrawerOpen(true);
-  };
-
-  const closeDrawer = () => {
+  }, []);
+  
+  const closeDrawer = useCallback(() => {
     setIsDrawerOpen(false);
-  };
-
+  }, []);
+  
+  const toggleDrawer = useCallback(() => {
+    setIsDrawerOpen(prev => !prev);
+  }, []);
+  
   return {
     isDrawerOpen,
     openDrawer,
-    closeDrawer
+    closeDrawer,
+    toggleDrawer
   };
 }

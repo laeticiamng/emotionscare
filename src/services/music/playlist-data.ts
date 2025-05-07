@@ -1,38 +1,34 @@
 
-// Ce fichier sert de fallback si l'API TopMedia n'est pas disponible
 import { MusicTrack } from '@/types/music';
 
-// Types d'émotions disponibles dans notre système
-type EmotionKey = 'happy' | 'calm' | 'energetic' | 'focused' | 'neutral';
-
-// Structure des playlists par émotion
-export const emotionPlaylists: Record<EmotionKey, MusicTrack[]> = {
+// Define types of playlists with sample tracks
+export const emotionPlaylists: Record<string, MusicTrack[]> = {
   happy: [
     {
       id: 'happy-1',
-      title: 'Walking on Sunshine',
+      title: 'Sunshine Melody',
       artist: 'Mood Elevators',
       duration: 187,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_7cad99ae24.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_9598e49d65.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1520962922320-2038eebab146',
       emotion: 'happy'
     },
     {
       id: 'happy-2',
-      title: 'Joyful Morning',
-      artist: 'The Optimists',
-      duration: 204,
-      audioUrl: 'https://cdn.pixabay.com/audio/2021/11/23/audio_cb4f1212a9.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1517230878791-4d28214057c2',
+      title: 'Dancing Lights',
+      artist: 'Positive Energy',
+      duration: 212,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1504898770365-14faca6a7320',
       emotion: 'happy'
     },
     {
       id: 'happy-3',
-      title: 'Positive Vibes',
-      artist: 'Sunshine Orchestra',
+      title: 'Morning Joy',
+      artist: 'Sunrise Sounds',
       duration: 195,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/16/audio_3242a0cf66.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1475724017904-b712052c192a',
       emotion: 'happy'
     }
   ],
@@ -40,30 +36,60 @@ export const emotionPlaylists: Record<EmotionKey, MusicTrack[]> = {
   calm: [
     {
       id: 'calm-1',
-      title: 'Ocean Breeze',
-      artist: 'Tranquil Sounds',
-      duration: 238,
-      audioUrl: 'https://cdn.pixabay.com/audio/2021/04/07/audio_b84467212c.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
+      title: 'Ocean Waves',
+      artist: 'Nature Sounds',
+      duration: 240,
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bede44.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0',
       emotion: 'calm'
     },
     {
       id: 'calm-2',
-      title: 'Rainfall Meditation',
-      artist: 'Nature Harmony',
-      duration: 226,
-      audioUrl: 'https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bede44.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0',
+      title: 'Gentle Rain',
+      artist: 'Peaceful Mind',
+      duration: 225,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/10/05/audio_304e9ebf75.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17',
       emotion: 'calm'
     },
     {
       id: 'calm-3',
-      title: 'Silent Forest',
-      artist: 'Mindful Melodies',
-      duration: 247,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e',
+      title: 'Meditation Hour',
+      artist: 'Zen Masters',
+      duration: 315,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5',
       emotion: 'calm'
+    }
+  ],
+  
+  focused: [
+    {
+      id: 'focused-1',
+      title: 'Concentration',
+      artist: 'Mind Flow',
+      duration: 202,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/13/audio_d200f84d3e.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173',
+      emotion: 'focused'
+    },
+    {
+      id: 'focused-2',
+      title: 'Deep Work',
+      artist: 'Cognitive Boost',
+      duration: 243,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f',
+      emotion: 'focused'
+    },
+    {
+      id: 'focused-3',
+      title: 'Mind Zone',
+      artist: 'Concentration Wave',
+      duration: 198,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8b0d50f4d.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1516542076529-1ea3854896f2',
+      emotion: 'focused'
     }
   ],
   
@@ -71,88 +97,58 @@ export const emotionPlaylists: Record<EmotionKey, MusicTrack[]> = {
     {
       id: 'energetic-1',
       title: 'Power Up',
-      artist: 'Energy Beats',
-      duration: 173,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/23/audio_69a61cd8d8.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1535743686920-55e4145369b9',
+      artist: 'Energy Boost',
+      duration: 165,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/19/audio_270f49b1d1.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1470319149933-6db8be0f50fa',
       emotion: 'energetic'
     },
     {
       id: 'energetic-2',
-      title: 'Morning Workout',
-      artist: 'Fitness Groove',
-      duration: 192,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_5dbbdc33b6.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c',
+      title: 'Momentum',
+      artist: 'Rhythm Surge',
+      duration: 183,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/21/audio_d16703ac0e.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773',
       emotion: 'energetic'
     },
     {
       id: 'energetic-3',
-      title: 'Dynamic Flow',
-      artist: 'Rhythm Revolution',
-      duration: 185,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/16/audio_7b7e244725.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1534258936925-c58bed479fcb',
+      title: 'Fast Forward',
+      artist: 'Adrenaline Wave',
+      duration: 175,
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/11/25/audio_5c6b9de330.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1604594849809-dfedbc827105',
       emotion: 'energetic'
-    }
-  ],
-  
-  focused: [
-    {
-      id: 'focused-1',
-      title: 'Deep Concentration',
-      artist: 'Mind Masters',
-      duration: 256,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8b0124e4d.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173',
-      emotion: 'focused'
-    },
-    {
-      id: 'focused-2',
-      title: 'Study Session',
-      artist: 'Cognitive Flow',
-      duration: 218,
-      audioUrl: 'https://cdn.pixabay.com/audio/2021/12/13/audio_98ccd8b74c.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f',
-      emotion: 'focused'
-    },
-    {
-      id: 'focused-3',
-      title: 'Productive Space',
-      artist: 'Task Completion',
-      duration: 231,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/02/07/audio_d6ba19a93f.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc',
-      emotion: 'focused'
     }
   ],
   
   neutral: [
     {
       id: 'neutral-1',
-      title: 'Ambient Flow',
-      artist: 'Balance Project',
+      title: 'Soft Balance',
+      artist: 'Harmony Flow',
       duration: 210,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/25/audio_3812f01b28.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1465146633011-14f8e0781093',
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/11/01/audio_00fa5593f3.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1500964757637-c85e8a162699',
       emotion: 'neutral'
     },
     {
       id: 'neutral-2',
-      title: 'Middle Ground',
-      artist: 'Equilibrium',
-      duration: 197,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/04/27/audio_c8d45d5c59.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8',
+      title: 'Gentle Day',
+      artist: 'Everyday Sounds',
+      duration: 235,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/26/audio_978b2a8dc3.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a',
       emotion: 'neutral'
     },
     {
       id: 'neutral-3',
-      title: 'Everyday Soundtrack',
-      artist: 'Normal State',
-      duration: 223,
-      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_2dde668d05.mp3',
-      coverUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05',
+      title: 'Balanced Mind',
+      artist: 'Middle Ground',
+      duration: 195,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/04/27/audio_568b66efef.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946',
       emotion: 'neutral'
     }
   ]
