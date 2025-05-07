@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Music, PlayCircle, Headphones } from 'lucide-react';
+import { ArrowLeft, Music, PlayCircle, Headphones, SparklesIcon, LibrarySquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
@@ -123,6 +123,26 @@ const MusicWellbeingPage = () => {
         </Card>
       )}
       
+      {/* Generation Capabilities Card */}
+      <Card className="border border-purple-200 shadow-sm bg-gradient-to-r from-purple-50 to-indigo-50">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 flex-shrink-0 bg-purple-100 rounded-full flex items-center justify-center">
+              <SparklesIcon className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="flex-grow">
+              <h3 className="text-lg font-semibold">Création musicale personnalisée</h3>
+              <p className="text-sm text-muted-foreground">
+                Générez des compositions musicales uniques adaptées à vos besoins thérapeutiques 
+              </p>
+            </div>
+            <Button onClick={() => navigate('/music/create')}>
+              Créer ma musique
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      
       {/* Main Content */}
       <Tabs defaultValue="playlists" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-2">
@@ -150,14 +170,16 @@ const MusicWellbeingPage = () => {
                       <li key={i}>{benefit}</li>
                     ))}
                   </ul>
+                </CardContent>
+                <CardFooter>
                   <Button 
-                    className="w-full mt-4"
+                    className="w-full"
                     onClick={() => handlePlayMusic(playlist.id)}
                   >
                     <PlayCircle className="mr-2 h-4 w-4" />
                     Écouter cette playlist
                   </Button>
-                </CardContent>
+                </CardFooter>
               </Card>
             ))}
           </div>
