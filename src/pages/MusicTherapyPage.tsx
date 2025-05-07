@@ -13,6 +13,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import AudioVisualizer from '@/components/music/AudioVisualizer';
 
 const MusicTherapyPage = () => {
   const navigate = useNavigate();
@@ -22,19 +23,39 @@ const MusicTherapyPage = () => {
   const { currentEmotion, currentTrack, isPlaying, openDrawer, loadPlaylistForEmotion } = useMusic();
   const [ambientLighting, setAmbientLighting] = useState(false);
   const [adaptiveWorkspace, setAdaptiveWorkspace] = useState(false);
+  const [visualizerVariant, setVisualizerVariant] = useState<'bars' | 'circle' | 'wave'>('bars');
 
   useEffect(() => {
     const loadLatestEmotion = async () => {
       try {
         const emotion = await fetchLatestEmotion();
         setLatestEmotion(emotion);
+        
+        // Auto-load music based on emotion if available
+        if (emotion?.emojis && !currentTrack) {
+          // This will be handled by the preset component
+        }
       } catch (error) {
         console.error('Erreur lors du chargement de la dernière émotion:', error);
       }
     };
 
     loadLatestEmotion();
-  }, []);
+    
+    // Rotate visualizer variant every 30 seconds for dynamic experience
+    const visualizerInterval = setInterval(() => {
+      setVisualizerVariant(current => {
+        switch(current) {
+          case 'bars': return 'wave';
+          case 'wave': return 'circle';
+          case 'circle': return 'bars';
+          default: return 'bars';
+        }
+      });
+    }, 30000);
+    
+    return () => clearInterval(visualizerInterval);
+  }, [currentTrack]);
 
   const handleCreateMusic = () => {
     navigate('/music/create');
@@ -57,6 +78,14 @@ const MusicTherapyPage = () => {
         ? "Votre éclairage connecté est maintenant synchronisé avec votre musique" 
         : "Synchronisation de l'éclairage désactivée"
     });
+    
+    // Simulate integration with connected lighting
+    if (checked && currentTrack) {
+      toast({
+        title: "Configuration de l'éclairage",
+        description: `Configuration des lumières adaptée à l'ambiance ${currentEmotion || 'neutre'}`,
+      });
+    }
   };
   
   const handleAdaptiveWorkspaceChange = (checked: boolean) => {
@@ -68,6 +97,16 @@ const MusicTherapyPage = () => {
         ? "Votre environnement s'adaptera à votre état émotionnel" 
         : "Adaptation automatique désactivée"
     });
+    
+    // Simulate adaptation based on current emotion
+    if (checked && currentEmotion) {
+      setTimeout(() => {
+        toast({
+          title: "Environnement adapté",
+          description: `Workspace optimisé pour l'état émotionnel: ${currentEmotion}`,
+        });
+      }, 1500);
+    }
   };
 
   // Define the handler for selecting a music preset
@@ -82,6 +121,16 @@ const MusicTherapyPage = () => {
         title: `Preset "${preset.name}" activé`,
         description: `Une nouvelle ambiance musicale adaptée à votre humeur a été chargée.`,
       });
+      
+      // If ambient lighting is on, adjust lighting too
+      if (ambientLighting) {
+        setTimeout(() => {
+          toast({
+            title: "Ambiance lumineuse ajustée",
+            description: `Éclairage synchronisé avec l'ambiance "${preset.mood}"`,
+          });
+        }, 1000);
+      }
     }
   };
 
@@ -122,6 +171,18 @@ const MusicTherapyPage = () => {
               {isPlaying ? "Contrôler" : "Reprendre"}
             </Button>
           </CardContent>
+          
+          {/* Add audio visualizer for playing tracks */}
+          {isPlaying && (
+            <div className="px-6 pb-6">
+              <AudioVisualizer 
+                audioUrl={currentTrack.url} 
+                isPlaying={isPlaying}
+                variant={visualizerVariant}
+                height={60}
+              />
+            </div>
+          )}
         </Card>
       )}
 

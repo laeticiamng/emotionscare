@@ -1,8 +1,9 @@
 
-import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Music, Heart, Brain, Sun, Moon } from 'lucide-react';
+import MusicPresetCard from './MusicPresetCard';
+import { useMusic } from '@/contexts/MusicContext';
 
 interface PresetProps {
   name: string;
@@ -17,7 +18,7 @@ interface PresetProps {
 
 interface RecommendedPresetsProps {
   onSelectPreset: (preset: Omit<PresetProps, 'icon' | 'description'>) => void;
-  emotion?: any; // Add the emotion property to the interface
+  emotion?: any;
 }
 
 const presets: PresetProps[] = [
@@ -64,41 +65,92 @@ const presets: PresetProps[] = [
 ];
 
 const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({ onSelectPreset, emotion }) => {
+  const { currentEmotion } = useMusic();
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  
   // You can use the emotion prop here to customize presets if needed
   // For example, filtering or sorting presets based on the emotion
+
+  // Function to handle preset selection
+  const handleSelectPreset = (preset: PresetProps) => {
+    setActivePreset(preset.name);
+    onSelectPreset({
+      name: preset.name,
+      genre: preset.genre,
+      mood: preset.mood,
+      tempo: preset.tempo,
+      duration: preset.duration,
+      instruments: preset.instruments,
+    });
+  };
+  
+  // Get recommended preset based on emotion if available
+  const getRecommendedPreset = () => {
+    if (!emotion || !emotion.emojis) return null;
+    
+    // Map emoticons to moods
+    const emojiMoodMap: Record<string, string> = {
+      '😊': 'happy',
+      '😄': 'happy',
+      '😢': 'melancholic',
+      '😭': 'melancholic',
+      '😡': 'calm', // calming for anger
+      '😠': 'calm',
+      '😰': 'calm',
+      '😨': 'calm',
+      '😌': 'calm',
+      '🧠': 'focused',
+      '🧘': 'calm'
+    };
+    
+    // Try to match emoji with a mood
+    for (const char of emotion.emojis) {
+      if (emojiMoodMap[char]) {
+        const matchingPresets = presets.filter(p => p.mood === emojiMoodMap[char]);
+        if (matchingPresets.length > 0) {
+          return matchingPresets[0];
+        }
+      }
+    }
+    
+    return null;
+  };
+  
+  const recommendedPreset = getRecommendedPreset();
   
   return (
-    <div className="space-y-3">
-      {presets.map((preset) => (
-        <Card 
-          key={preset.name} 
-          className="hover:bg-muted/40 transition-colors cursor-pointer"
-          onClick={() => onSelectPreset({
-            name: preset.name,
-            genre: preset.genre,
-            mood: preset.mood,
-            tempo: preset.tempo,
-            duration: preset.duration,
-            instruments: preset.instruments,
-          })}
-        >
-          <CardContent className="p-3">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                {preset.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm">{preset.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{preset.description}</p>
-              </div>
-              <Button variant="ghost" size="sm" className="ml-auto">
-                <Music className="h-3.5 w-3.5 mr-1" />
-                <span className="text-xs">Utiliser</span>
-              </Button>
+    <div>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center">
+            <Music className="mr-2 h-5 w-5" />
+            Ambiances musicales recommandées
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {recommendedPreset && (
+            <div className="mb-4 p-3 bg-primary/10 rounded-lg">
+              <p className="text-sm font-medium">Recommandé pour votre humeur {emotion?.emojis}:</p>
+              <MusicPresetCard 
+                preset={recommendedPreset} 
+                onSelect={handleSelectPreset}
+                isActive={activePreset === recommendedPreset.name || currentEmotion === recommendedPreset.mood}
+              />
             </div>
-          </CardContent>
-        </Card>
-      ))}
+          )}
+          
+          <div className="space-y-3">
+            {presets.map((preset) => (
+              <MusicPresetCard 
+                key={preset.name} 
+                preset={preset} 
+                onSelect={handleSelectPreset}
+                isActive={activePreset === preset.name || currentEmotion === preset.mood} 
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
