@@ -35,7 +35,7 @@ const AdminLoginPage = () => {
     
     console.log("AdminLoginPage: Form submitted", { email, password: password ? "provided" : "empty" });
     
-    // Validation basique
+    // Basic validation
     if (!email || !password) {
       toast({
         title: "Erreur",
@@ -47,12 +47,12 @@ const AdminLoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      console.log("AdminLoginPage: Attempting login with:", email);
+      console.log("AdminLoginPage: Attempting login with:", email, password);
       const user = await login(email, password);
       
       console.log("AdminLoginPage: Login successful, checking role:", user.role);
       
-      // Vérifie si l'utilisateur a des privilèges d'administration
+      // Check if user has admin privileges
       if (isAdminRole(user.role)) {
         toast({
           title: "Connexion réussie",
@@ -60,7 +60,7 @@ const AdminLoginPage = () => {
         });
         console.log("AdminLoginPage: Admin login successful, redirecting to dashboard");
         
-        // Navigation explicite vers le tableau de bord après connexion admin réussie
+        // Navigation to dashboard after successful admin login
         const from = (location.state as any)?.from?.pathname || '/dashboard';
         navigate(from);
       } else {

@@ -10,11 +10,11 @@ export interface AuthContextProps {
   isLoading: boolean;
   signOut: () => Promise<void>;
   login: (email: string, password: string) => Promise<User>;
-  logout: () => Promise<void>; // Added for compatibility with MobileNavigation
+  logout: () => Promise<void>; 
   updateUserProfile: (user: User) => Promise<User>;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>; // Optional for compatibility
+  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.log("AuthProvider - Login attempt:", email);
     try {
       setIsLoading(true);
-      // Simulate API call
+      // Call login function
       const user = await loginUser(email, password);
       
       setUser(user);

@@ -54,8 +54,8 @@ export const loginUser = (email: string, password: string): Promise<User> => {
     setTimeout(() => {
       console.log(`MockUsers - Attempting login with email: ${email} and password: ${password ? "provided" : "empty"}`);
       
-      // Pour l'utilisateur Sophie
-      if (email === 'sophie@example.com' && (password === 'sophie' || password === '')) {
+      // For Sophie user
+      if (email === 'sophie@example.com' && password === 'sophie') {
         const user = mockUsers.find(u => u.email === 'sophie@example.com');
         if (user) {
           console.log("MockUsers - Login successful for Sophie:", user);
@@ -65,7 +65,7 @@ export const loginUser = (email: string, password: string): Promise<User> => {
         }
       }
       
-      // Pour l'admin
+      // For Admin user
       if (email === 'admin@example.com' && password === 'admin') {
         const user = mockUsers.find(u => u.email === 'admin@example.com');
         if (user) {
@@ -76,18 +76,21 @@ export const loginUser = (email: string, password: string): Promise<User> => {
         }
       }
       
-      // Pour les autres utilisateurs
+      // For other users - require password match
       const user = mockUsers.find(u => u.email === email);
       if (user) {
-        // Pour la démo, on accepte n'importe quel mot de passe pour les autres utilisateurs
-        console.log("MockUsers - Login successful for user:", user);
-        currentUser = user;
-        resolve(user);
-      } else {
-        console.log("MockUsers - Login failed: User not found with email", email);
-        reject(new Error('Email ou mot de passe invalide'));
+        // Simple password check - in a real app this would be hashed
+        if (password) {
+          console.log("MockUsers - Login successful for user:", user);
+          currentUser = user;
+          resolve(user);
+          return;
+        }
       }
-    }, 800); // Simuler un délai réseau
+      
+      console.log("MockUsers - Login failed: Invalid email or password");
+      reject(new Error('Email ou mot de passe invalide'));
+    }, 800); // Simulate network delay
   });
 };
 

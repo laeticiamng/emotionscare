@@ -46,7 +46,7 @@ const LoginPage = () => {
     
     setIsSubmitting(true);
     try {
-      console.log("LoginPage: Attempting login with:", email);
+      console.log("LoginPage: Attempting login with:", email, password);
       const user = await login(email, password);
       console.log("LoginPage: Login successful", user);
       
@@ -160,7 +160,7 @@ const LoginPage = () => {
               </Button>
               
               <p className="text-sm text-center text-muted-foreground mt-4">
-                * Pour la démo, utilisez: sophie@example.com (mot de passe: sophie) ou admin@example.com (mot de passe: admin)
+                * Pour la démo, utilisez: sophie@example.com (mot de passe: sophie)
               </p>
 
               <Separator className="my-4" />
