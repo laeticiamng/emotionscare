@@ -6,6 +6,7 @@ import RoleCard from '@/components/home/RoleCard';
 import ValueProposition from '@/components/home/ValueProposition';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 import ModulesSection from '@/components/home/ModulesSection';
+import InnovationTabs from '@/components/home/InnovationTabs';
 
 const Index = () => {
   const { theme } = useTheme();
@@ -74,6 +75,11 @@ const Index = () => {
         <div className="max-w-[1400px] mx-auto w-full">
           {/* Modules Section */}
           <ModulesSection />
+          
+          {/* Innovations - New section */}
+          <div className="mt-16">
+            <InnovationTabs />
+          </div>
           
           {/* Cards Container - Optimized spacing */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 my-12">

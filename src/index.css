@@ -4,114 +4,103 @@
 @tailwind utilities;
  
 @layer base {
-  /* Light theme - Warm and inviting */
-  :root,
-  .light {
-    --background: 30 30% 99%; /* Slightly warm tone */
-    --foreground: 220 20% 16%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 16%;
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
  
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 16%;
- 
-    --primary: 250 47% 60%; /* Warmer primary purple */
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 240 40% 97%;
-    --secondary-foreground: 220 47% 16%;
- 
-    --muted: 240 30% 96%;
+    --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
  
-    --accent: 30 60% 96%;  /* Warm accent */
-    --accent-foreground: 220 47% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
  
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 240 30% 92%;
+    --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 250 47% 60%;
  
-    --radius: 1rem;
-    
-    /* Wellness theme colors */
-    --wellness-blue: 210 67% 59%;
-    --wellness-mint: 160 79% 85%;
-    --wellness-coral: 11 100% 69%;
-    --wellness-peach: 25 100% 94%;
-    --wellness-lavender: 240 67% 94%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
   }
  
-  /* Dark theme - Premium dark elegant with warmth */
   .dark {
-    --background: 240 10% 15%; /* Warmer, less harsh background */
-    --foreground: 210 40% 98%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
  
-    --card: 240 10% 17%; /* Slightly lighter cards for contrast */
-    --card-foreground: 210 40% 98%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
  
-    --popover: 240 10% 17%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 250 60% 70%; /* Brighter, more vibrant purple */
-    --primary-foreground: 220 47% 16%;
- 
-    --secondary: 240 15% 25%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 240 15% 25%;
-    --muted-foreground: 215 20% 75%; 
- 
-    --accent: 240 15% 30%; /* Slightly more vibrant accent */
+    --accent: 216 34% 17%;
     --accent-foreground: 210 40% 98%;
  
-    --destructive: 0 62.8% 40%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+ 
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+ 
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+ 
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
  
-    --border: 240 15% 25%;
-    --input: 240 15% 22%;
-    --ring: 250 60% 70%;
+    --ring: 216 34% 17%;
+ 
+    --radius: 0.5rem;
   }
 
-  /* Pastel theme - Soft blue with enhanced warmth */
   .pastel {
-    --background: 220 50% 97%; /* Softer blue pastel background */
-    --foreground: 220 20% 16%;
-
-    --card: 220 40% 98%;
-    --card-foreground: 220 20% 16%;
+    --background: 210 100% 98%;
+    --foreground: 222.2 47.4% 11.2%;
  
-    --popover: 220 40% 98%;
-    --popover-foreground: 220 20% 16%;
+    --muted: 210 40% 90%;
+    --muted-foreground: 215.4 16.3% 46.9%;
  
-    --primary: 250 70% 70%; /* Soft lavender primary */
-    --primary-foreground: 0 0% 100%;
+    --popover: 210 100% 98%;
+    --popover-foreground: 222.2 47.4% 11.2%;
  
-    --secondary: 220 40% 92%;
-    --secondary-foreground: 220 47% 16%;
+    --border: 214.3 31.8% 85.4%;
+    --input: 214.3 31.8% 85.4%;
  
-    --muted: 220 40% 92%;
-    --muted-foreground: 220 15% 40%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
  
-    --accent: 340 90% 95%; /* Soft pink accent */
-    --accent-foreground: 220 47% 16%;
+    --primary: 260 80% 65%;
+    --primary-foreground: 210 40% 98%;
  
-    --destructive: 0 84.2% 60.2%;
+    --secondary: 180 50% 85%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 120 60% 90%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 70% 65%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 220 40% 85%;
-    --input: 220 40% 80%;
-    --ring: 250 70% 60%;
-  }
-
-  /* Font configuration for all themes */
-  html {
-    font-size: 16px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
   }
 }
  
@@ -121,106 +110,82 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
 
-  /* Typography styling - Enhanced with new heading scale */
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-medium tracking-tight leading-tight;
+.heading-elegant {
+  font-feature-settings: "ss01" 1, "ss02" 1, "ss03" 1;
+  letter-spacing: -0.02em;
+}
+
+/* Masquer les scrollbars tout en préservant la fonctionnalité */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE et Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari et Opera */
+}
+
+/* Style pour la page d'accueil */
+.home-page {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Styles premium pour les cartes et éléments spéciaux */
+.card-premium {
+  background-color: rgba(var(--background), 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--border), 0.2);
+}
+
+.shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1);
+}
+
+.focus-premium:focus {
+  @apply ring-2 ring-primary/30 outline-none;
+}
+
+/* Style pour le dashboard */
+.dashboard-premium {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-premium {
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas: 
+      "main side";
   }
   
-  h1 {
-    @apply text-h1 mb-6;
+  .dashboard-main {
+    grid-area: main;
   }
   
-  h2 {
-    @apply text-h2 mb-4;
-  }
-  
-  h3 {
-    @apply text-h3 mb-3;
-  }
-  
-  h4 {
-    @apply text-h4 mb-2;
-  }
-  
-  p {
-    @apply leading-relaxed;
+  .dashboard-side {
+    grid-area: side;
   }
 }
 
-/* Custom classes */
-.glass-card {
-  @apply rounded-2xl border border-[#E8F1FA]/80 bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300;
-  backdrop-filter: blur(12px);
-}
-
-.dark .glass-card {
-  @apply border-[#353A47]/50 bg-[#1F2430]/80 shadow-[0_8px_16px_rgba(0,0,0,0.2)];
-}
-
-.pastel .glass-card {
-  @apply border-blue-200/80 bg-blue-50/90 shadow-md;
-}
-
-.apple-card {
-  @apply rounded-2xl border border-[#E8F1FA] bg-white shadow-md;
-}
-
-.dark .apple-card {
-  @apply border-[#353A47] bg-[#1F2430] shadow-[0_4px_12px_rgba(0,0,0,0.15)];
-}
-
-.pastel .apple-card {
-  @apply border-blue-200 bg-blue-50 shadow-sm;
-}
-
-/* Premium card with Apple-inspired design */
-.premium-card {
-  @apply rounded-2xl border shadow-sm transition-all duration-300 overflow-hidden;
-}
-
-.light .premium-card {
-  @apply border-gray-100 bg-white shadow-sm hover:shadow-md;
-}
-
-.dark .premium-card {
-  @apply border-gray-800 bg-[#2A2D3A] shadow-md hover:shadow-xl;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.pastel .premium-card {
-  @apply border-blue-200 bg-blue-50/80 shadow-sm hover:shadow-md;
-}
-
-/* Comment blocks styling */
-.comment-block {
-  @apply rounded-xl border p-4 mb-4 transition-all duration-300;
-}
-
-.light .comment-block {
-  @apply border-gray-200 bg-gray-50;
-}
-
-.dark .comment-block {
-  @apply border-gray-700 bg-[#303349] shadow-md;
-}
-
-.pastel .comment-block {
-  @apply border-blue-200 bg-blue-100/50;
-}
-
-.comment-block:nth-child(even) {
-  @apply bg-opacity-75;
-}
-
-.dark .comment-block:nth-child(even) {
-  @apply bg-[#32374F];
-}
-
-/* Animation classes */
-@keyframes fade-in {
+/* Animations */
+@keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -232,172 +197,5 @@
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s ease-out forwards;
-}
-
-.animate-delayed {
-  opacity: 0;
-  animation: fade-in 0.5s ease-out forwards;
-  animation-fill-mode: both;
-}
-
-.dashboard-card {
-  animation: fade-in 0.5s ease-out forwards;
-  animation-fill-mode: both;
-}
-
-.dashboard-card:nth-child(1) { animation-delay: 0ms; }
-.dashboard-card:nth-child(2) { animation-delay: 100ms; }
-.dashboard-card:nth-child(3) { animation-delay: 200ms; }
-.dashboard-card:nth-child(4) { animation-delay: 300ms; }
-.dashboard-card:nth-child(5) { animation-delay: 400ms; }
-.dashboard-card:nth-child(6) { animation-delay: 500ms; }
-
-/* Button hover effects */
-.premium-button {
-  @apply rounded-xl transition-all duration-300 transform hover:-translate-y-0.5;
-}
-
-.light .premium-button {
-  @apply hover:shadow-md;
-}
-
-.dark .premium-button {
-  @apply hover:shadow-[0_6px_12px_rgba(0,0,0,0.3)];
-}
-
-/* Improved transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
-  transition-duration: 0.3s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Premium layout classes */
-.premium-layout {
-  @apply max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8;
-}
-
-.premium-section {
-  @apply py-8 md:py-12;
-}
-
-/* Spacious content sections */
-.content-spacious {
-  @apply space-y-6 md:space-y-8;
-}
-
-/* Card hover effects */
-.interactive-card {
-  @apply transform transition-all duration-300 hover:-translate-y-1;
-}
-
-.light .interactive-card {
-  @apply hover:shadow-md;
-}
-
-.dark .interactive-card {
-  @apply hover:shadow-[0_8px_16px_rgba(0,0,0,0.25)];
-}
-
-.pastel .interactive-card {
-  @apply hover:shadow-md;
-}
-
-/* Wider layouts for better spacing */
-.dashboard-premium {
-  @apply grid grid-cols-1 lg:grid-cols-12 gap-6;
-}
-
-.dashboard-main {
-  @apply col-span-1 lg:col-span-8 space-y-6;
-}
-
-.dashboard-side {
-  @apply col-span-1 lg:col-span-4 space-y-6;
-}
-
-/* Card styling improvements */
-.card-premium {
-  @apply rounded-2xl border shadow-sm transition-all;
-}
-
-.light .card-premium {
-  @apply border-gray-100 bg-white shadow-sm hover:shadow-md;
-}
-
-.dark .card-premium {
-  @apply border-gray-800 bg-[#2A2D3A] shadow-md;
-}
-
-.pastel .card-premium {
-  @apply border-blue-200 bg-blue-50/80 shadow-sm;
-}
-
-/* Elegant headings */
-.heading-elegant {
-  @apply text-2xl font-semibold tracking-tight;
-}
-
-.light .heading-elegant {
-  @apply text-gray-800;
-}
-
-.dark .heading-elegant {
-  @apply text-gray-100;
-}
-
-.pastel .heading-elegant {
-  @apply text-gray-700;
-}
-
-/* Button hover lift effect */
-.hover-lift {
-  @apply transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md;
-}
-
-/* Focus states */
-.focus-premium {
-  @apply focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:outline-none;
-}
-
-.dark .focus-premium {
-  @apply focus:ring-primary/70 focus:ring-offset-gray-900;
-}
-
-/* Heading with premium styling */
-.heading-premium {
-  @apply text-lg font-semibold flex items-center gap-2;
-}
-
-/* Loading dots animation */
-.loading-dots {
-  @apply flex gap-1.5;
-}
-
-.loading-dots div {
-  @apply w-2 h-2 rounded-full;
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-
-.loading-dots div:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.loading-dots div:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
-/* Chat input with better padding and focus */
-.chat-input {
-  @apply p-3 rounded-xl border border-input bg-background hover:border-primary/50 focus:border-primary;
+  animation: fadeIn 0.6s ease-out forwards;
 }

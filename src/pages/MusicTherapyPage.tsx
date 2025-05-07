@@ -1,10 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Music, Plus, Volume2 } from 'lucide-react';
+import { Music, Plus, Volume2, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ExpandedTabs, ExpandedTabsList, ExpandedTabsTrigger, ExpandedTabsContent } from '@/components/ui/expanded-tabs';
 import { fetchLatestEmotion } from '@/lib/scanService';
 import MusicPlayer from '@/components/music/MusicPlayer';
 import RecommendedPresets from '@/components/music/RecommendedPresets';
@@ -35,6 +35,13 @@ const MusicTherapyPage = () => {
     navigate('/music/create');
   };
 
+  const handleCollectiveJam = () => {
+    toast({
+      title: "Fonctionnalité à venir",
+      description: "L'univers sonore collaboratif sera bientôt disponible!",
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -46,19 +53,35 @@ const MusicTherapyPage = () => {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="listen" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="listen">
-            <Volume2 className="h-4 w-4 mr-2" />
+      <ExpandedTabs>
+        <ExpandedTabsList>
+          <ExpandedTabsTrigger 
+            active={activeTab === 'listen'} 
+            onClick={() => setActiveTab('listen')}
+          >
+            <Volume2 className="h-4 w-4 mr-2 inline" />
             Écouter
-          </TabsTrigger>
-          <TabsTrigger value="create" onClick={handleCreateMusic}>
-            <Plus className="h-4 w-4 mr-2" />
+          </ExpandedTabsTrigger>
+          <ExpandedTabsTrigger 
+            active={activeTab === 'create'} 
+            onClick={() => handleCreateMusic()}
+          >
+            <Plus className="h-4 w-4 mr-2 inline" />
             Créer ma musique
-          </TabsTrigger>
-        </TabsList>
+          </ExpandedTabsTrigger>
+          <ExpandedTabsTrigger 
+            active={activeTab === 'jam'} 
+            onClick={() => {
+              setActiveTab('jam');
+              handleCollectiveJam();
+            }}
+          >
+            <Music className="h-4 w-4 mr-2 inline" />
+            Jam collective
+          </ExpandedTabsTrigger>
+        </ExpandedTabsList>
         
-        <TabsContent value="listen" className="mt-6 space-y-6">
+        <ExpandedTabsContent active={activeTab === 'listen'} className="mt-6 space-y-6">
           {/* Current emotional state and music player */}
           <Card>
             <CardHeader>
@@ -79,12 +102,60 @@ const MusicTherapyPage = () => {
 
           {/* Recommended music presets based on emotions */}
           <RecommendedPresets emotion={latestEmotion} />
-        </TabsContent>
+          
+          {/* New feature - Ambient Workspace Control */}
+          <Card className="border-t-4" style={{ borderTopColor: 'var(--primary)' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Lightbulb className="mr-2 h-5 w-5" />
+                Ambiance Adaptive Workspace
+              </CardTitle>
+              <CardDescription>
+                Contrôle intelligent de votre environnement de travail
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4">
+                Synchronisez votre éclairage connecté avec votre musique et votre état émotionnel pour une expérience immersive complète.
+              </p>
+              <Button variant="outline" onClick={() => toast({
+                title: "Fonctionnalité à venir",
+                description: "Le contrôle de l'éclairage sera bientôt disponible!"
+              })}>
+                Configurer mon éclairage
+              </Button>
+            </CardContent>
+          </Card>
+        </ExpandedTabsContent>
         
-        <TabsContent value="create" className="mt-6">
+        <ExpandedTabsContent active={activeTab === 'create'} className="mt-6">
           {/* This tab will redirect to the creation page */}
-        </TabsContent>
-      </Tabs>
+        </ExpandedTabsContent>
+        
+        <ExpandedTabsContent active={activeTab === 'jam'} className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Univers sonore collaboratif</CardTitle>
+              <CardDescription>
+                Créez des jams musicales en temps réel avec votre équipe
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center text-center space-y-4">
+              <Music className="h-16 w-16 text-muted-foreground" />
+              <h3 className="text-lg font-medium">Fonctionnalité en développement</h3>
+              <p className="text-muted-foreground max-w-md">
+                Nous travaillons actuellement sur cette innovation qui permettra de créer de la musique collaborative avec votre équipe en temps réel.
+              </p>
+              <Button variant="outline" onClick={() => toast({
+                title: "En développement",
+                description: "Nous vous informerons dès que cette fonctionnalité sera disponible!"
+              })}>
+                Me notifier à la sortie
+              </Button>
+            </CardContent>
+          </Card>
+        </ExpandedTabsContent>
+      </ExpandedTabs>
     </div>
   );
 };
