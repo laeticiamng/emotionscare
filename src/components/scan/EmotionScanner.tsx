@@ -20,8 +20,15 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({ latestEmotion, isLoadin
   
   const handleMusicTherapy = () => {
     if (latestEmotion) {
+      // Convert Emotion to EmotionResult for handlePlayMusic
+      const emotionResult = {
+        emotion: latestEmotion.emotion || 'neutral',
+        confidence: latestEmotion.confidence || 0.5,
+        score: latestEmotion.score || 50
+      };
+      
       // First play the recommended music
-      handlePlayMusic(latestEmotion);
+      handlePlayMusic(emotionResult);
       
       // Then navigate to the music therapy page
       setTimeout(() => {

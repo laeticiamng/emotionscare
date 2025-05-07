@@ -2,6 +2,24 @@
 import { useState, useCallback } from 'react';
 import { getPlaylist } from '@/lib/musicService';
 import type { Track, Playlist } from '@/services/music/types';
+import type { MusicTrack, MusicPlaylist } from '@/types/music';
+
+// Helper function to convert between types
+const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => ({
+  id: musicTrack.id,
+  title: musicTrack.title,
+  artist: musicTrack.artist,
+  duration: musicTrack.duration,
+  url: musicTrack.audioUrl,
+  cover: musicTrack.coverUrl,
+});
+
+const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => ({
+  id: musicPlaylist.id,
+  name: musicPlaylist.name,
+  emotion: musicPlaylist.emotion,
+  tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
+});
 
 export function usePlaylistManager() {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
@@ -16,8 +34,12 @@ export function usePlaylistManager() {
     try {
       console.log(`Loading playlist for emotion: ${emotion}`);
       const emotionPlaylist = await getPlaylist(emotion);
-      setPlaylist(emotionPlaylist);
-      setCurrentEmotion(emotion);
+      
+      // Ensure we have the correct type
+      if (emotionPlaylist) {
+        setPlaylist(emotionPlaylist);
+        setCurrentEmotion(emotion);
+      }
       return emotionPlaylist;
     } catch (err) {
       console.error('Error loading playlist:', err);

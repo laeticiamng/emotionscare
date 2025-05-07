@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -5,15 +6,15 @@ import { AuthProvider } from './contexts/AuthContext';
 import { MusicProvider } from './contexts/MusicContext';
 import { Shell } from './components/Shell';
 import ProtectedLayout from './components/ProtectedLayout';
-import HomePage from './pages/HomePage';
+import Home from './pages/Home';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminLoginPage from './pages/AdminLoginPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import NotFoundPage from './pages/NotFoundPage';
+import NotImplementedPage from './pages/NotImplementedPage';
+import NotFoundPage from './pages/NotFound';
 import ScanPage from './pages/ScanPage';
-import VRTherapyPage from './pages/VRTherapyPage';
+import NotImplementedPage from './pages/NotImplementedPage';
 import JournalPage from './pages/JournalPage';
 import SettingsPage from './pages/SettingsPage';
 import MusicTherapyPage from './pages/MusicTherapyPage';
@@ -42,10 +43,10 @@ function App() {
           <MusicProvider>
             <Routes>
               <Route element={<Shell />}>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
                 <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
-                <Route path="/vr" element={<ProtectedLayout><VRTherapyPage /></ProtectedLayout>} />
+                <Route path="/vr" element={<ProtectedLayout><NotImplementedPage /></ProtectedLayout>} />
                 <Route path="/journal" element={<ProtectedLayout><JournalPage /></ProtectedLayout>} />
                 <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
                 
@@ -55,7 +56,7 @@ function App() {
                 <Route path="/admin-login" element={<AdminLoginPage />} />
                 
                 {/* Admin Routes - accessible only to admins */}
-                <Route path="/admin" element={<ProtectedLayout requireRole="admin"><AdminDashboardPage /></ProtectedLayout>} />
+                <Route path="/admin" element={<ProtectedLayout requireRole="admin"><NotImplementedPage /></ProtectedLayout>} />
                 
                 {/* Music Therapy Routes */}
                 <Route path="/music" element={<ProtectedLayout><MusicTherapyPage /></ProtectedLayout>} />

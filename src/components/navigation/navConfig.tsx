@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Home,
@@ -6,7 +7,7 @@ import {
   HeartPulse,
   Users,
   Settings,
-  VrHeadset,
+  Headset,
   Music,
   LineChart,
   MessageCircle,
@@ -38,7 +39,7 @@ export const topNavItems = [
   {
     path: '/vr',
     label: 'VR Immersive',
-    icon: <VrHeadset className="h-5 w-5" />
+    icon: <Headset className="h-5 w-5" />
   }
 ];
 
@@ -86,7 +87,7 @@ export const sidebarItems: NavItemConfig[] = [
   {
     path: '/vr',
     label: 'VR Immersive',
-    icon: <VrHeadset className="h-5 w-5" />
+    icon: <Headset className="h-5 w-5" />
   },
   {
     path: '/journal',
