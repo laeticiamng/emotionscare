@@ -10,3 +10,9 @@ export {
 
 // Export types
 export * from './activityTypes';
+
+// Re-export from activityDataService
+export {
+  getActivityData as getAnonymousActivityData,
+  getActivityStats as getAnonymousActivityStats
+} from './activityDataService';

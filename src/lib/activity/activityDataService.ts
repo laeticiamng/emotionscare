@@ -1,13 +1,12 @@
 
-import { supabase } from '@/lib/supabase-client';
-import { AnonymousActivity, ActivityStats } from '@/components/dashboard/admin/tabs/activity-logs/types';
-import { mockActivities, mockStats } from './mockActivityData';
+import { AnonymizedActivityLog, ActivityStats } from './activityTypes';
+import { mockActivityLogs, mockActivityStats } from './mockActivityData';
 
 /**
  * Get anonymous activity data
  * @returns Promise with activity data
  */
-export const getActivityData = async (): Promise<AnonymousActivity[]> => {
+export const getActivityData = async (): Promise<AnonymizedActivityLog[]> => {
   try {
     console.log("activityDataService: Fetching activity data...");
     // In a real implementation, we would fetch this from the database
@@ -16,8 +15,8 @@ export const getActivityData = async (): Promise<AnonymousActivity[]> => {
     // return data;
     
     // For now, return mock data
-    console.log("activityDataService: Returning mock data", mockActivities.length);
-    return Promise.resolve(mockActivities);
+    console.log("activityDataService: Returning mock data", mockActivityLogs.length);
+    return Promise.resolve(mockActivityLogs);
   } catch (error) {
     console.error("Error fetching activity data:", error);
     throw error;
@@ -37,8 +36,8 @@ export const getActivityStats = async (): Promise<ActivityStats[]> => {
     // return data;
     
     // For now, return mock data
-    console.log("activityDataService: Returning mock stats", mockStats.length);
-    return Promise.resolve(mockStats);
+    console.log("activityDataService: Returning mock stats", mockActivityStats.length);
+    return Promise.resolve(mockActivityStats);
   } catch (error) {
     console.error("Error fetching activity stats:", error);
     throw error;

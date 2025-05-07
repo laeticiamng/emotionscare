@@ -1,91 +1,82 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ScanTabContent from '@/components/scan/ScanTabContent';
-import HistoryTabContent from '@/components/scan/HistoryTabContent';
-import TeamTabContent from '@/components/scan/TeamTabContent';
-import ScanPageHeader from '@/components/scan/ScanPageHeader';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { Card } from '@/components/ui/card';
-import ProtectedLayout from '@/components/ProtectedLayout';
+import { Card } from "@/components/ui/card";
+import ProtectedLayout from "@/components/ProtectedLayout";
+import ScanTabContent from "@/components/scan/ScanTabContent";
+import HistoryTabContent from "@/components/scan/HistoryTabContent";
+import TeamTabContent from "@/components/scan/TeamTabContent";
+import ScanPageHeader from "@/components/scan/ScanPageHeader";
+import { useAuth } from "@/contexts/AuthContext";
+import { useActivityLogging } from '@/hooks/useActivityLogging';
 
 const ScanPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>("scan");
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>('scan');
-  const [showScanForm, setShowScanForm] = useState<boolean>(false);
-  const { toast } = useToast();
+  const { logUserAction } = useActivityLogging('scan_page');
   
-  console.log("ScanPage - Rendering with user:", user ? { id: user.id, role: user.role } : "No user");
+  // Function to handle starting a new scan
+  const handleStartScan = () => {
+    setActiveTab('scan');
+    if (user?.id) {
+      logUserAction('start_scan', { method: 'manual' });
+    }
+  };
 
-  // Handle callback when a scan is saved
-  const handleScanSaved = useCallback(() => {
-    toast({
-      title: "Scan émotionnel sauvegardé",
-      description: "Votre scan émotionnel a été enregistré avec succès"
-    });
-    setShowScanForm(false);
-    setActiveTab('history');
-  }, [toast]);
-
-  // Function to refresh data after a new scan is saved
-  const handleResultSaved = useCallback(async () => {
-    console.log("Scan result saved, refreshing data...");
-    // This would typically refresh history data
-    return Promise.resolve();
-  }, []);
+  if (!user) {
+    return (
+      <ProtectedLayout>
+        <div className="flex justify-center items-center h-full">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold mb-2">Chargement...</h1>
+            <p className="text-muted-foreground">Veuillez patienter pendant que nous chargeons vos données</p>
+          </div>
+        </div>
+      </ProtectedLayout>
+    );
+  }
 
   return (
     <ProtectedLayout>
-      <div className="w-full max-w-7xl mx-auto p-4 md:p-6 animate-fade-in">
+      <div className="container mx-auto p-6 max-w-7xl">
+        {/* Page Header */}
         <ScanPageHeader 
-          activeTab={activeTab} 
-          onStartScan={() => {
-            setShowScanForm(true);
-            setActiveTab('scan');
-          }}
+          activeTab={activeTab}
         />
         
-        <Tabs 
-          defaultValue="scan"
-          value={activeTab} 
-          onValueChange={setActiveTab}
-          className="mt-6"
-        >
-          <TabsList className="mb-6">
-            <TabsTrigger value="scan">Scan Émotionnel</TabsTrigger>
-            <TabsTrigger value="history">Historique</TabsTrigger>
-            {user?.role === 'admin' && (
-              <TabsTrigger value="team">Équipe</TabsTrigger>
-            )}
-          </TabsList>
-          
-          <TabsContent value="scan">
-            <ScanTabContent 
-              showScanForm={showScanForm}
-              userId={user?.id || ''}
-              handleScanSaved={handleScanSaved}
-              setShowScanForm={setShowScanForm}
-              onResultSaved={handleResultSaved}
-            />
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <Card className="p-6 shadow-md rounded-3xl">
-              <HistoryTabContent 
-                userId={user?.id || ''}
-              />
-            </Card>
-          </TabsContent>
-          
-          {user?.role === 'admin' && (
-            <TabsContent value="team">
-              <Card className="p-6 shadow-md rounded-3xl">
-                <TeamTabContent />
-              </Card>
-            </TabsContent>
-          )}
-        </Tabs>
+        <Card className="mt-6">
+          {/* Tabs Navigation */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="border-b px-6 py-2">
+              <TabsList className="grid grid-cols-3">
+                <TabsTrigger value="scan">Nouveau scan</TabsTrigger>
+                <TabsTrigger value="history">Mon historique</TabsTrigger>
+                <TabsTrigger value="team">Équipe</TabsTrigger>
+              </TabsList>
+            </div>
+            
+            {/* Tabs Content */}
+            <div className="p-6">
+              <TabsContent value="scan" className="mt-0">
+                <ScanTabContent userId={user.id} />
+              </TabsContent>
+              
+              <TabsContent value="history" className="mt-0">
+                <HistoryTabContent />
+              </TabsContent>
+              
+              <TabsContent value="team" className="mt-0">
+                <TeamTabContent 
+                  filteredUsers={[]} 
+                  selectedFilter="all" 
+                  filterUsers={() => {}} 
+                  periodFilter="week"
+                  setPeriodFilter={() => {}}
+                />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </Card>
       </div>
     </ProtectedLayout>
   );
