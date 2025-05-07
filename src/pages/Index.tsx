@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Shield, User } from 'lucide-react';
+import { Shield, User, Music, HeartPulse, MessageCircle, FileText } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import RoleCard from '@/components/home/RoleCard';
 import ValueProposition from '@/components/home/ValueProposition';
@@ -20,17 +20,17 @@ const Index = () => {
   }, []);
   
   const userFeatures = [
-    "Check-in émotionnel individuel",
-    "Social Cocoon 100% positif",
+    "Check-in émotionnel quotidien",
+    "Musicothérapie adaptative",
     "Coach IA personnalisé",
-    "Gamification & Daily Streak"
+    "Journal émotionnel guidé"
   ];
   
   const adminFeatures = [
-    "Indicateurs anonymisés",
-    "Journal de bord global",
-    "Outils prédictifs d'action",
-    "Analyse 360° du bien-être"
+    "Tableau de bord analytique",
+    "Prédiction turnover émotionnel",
+    "Analyse ROI bien-être",
+    "Suivi anonymisé des équipes"
   ];
   
   return (
@@ -94,7 +94,46 @@ const Index = () => {
             />
           </div>
           
-          {/* Value Proposition Section - More impact */}
+          {/* Featured Modules Section - Highlighting key innovations */}
+          <div className="card-premium p-10 md:p-14 mb-12 rounded-3xl shadow-premium">
+            <h2 className="text-3xl font-semibold text-center mb-10 heading-elegant">
+              Innovations Exclusives
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-background/90 border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+                    <Music className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-xl font-medium">Musicothérapie Adaptative</h3>
+                </div>
+                <p className="text-muted-foreground">Génération musicale IA en temps réel adaptée à votre état émotionnel pour améliorer votre bien-être.</p>
+              </div>
+              
+              <div className="bg-background/90 border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+                    <HeartPulse className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-xl font-medium">Jumeau Émotionnel</h3>
+                </div>
+                <p className="text-muted-foreground">Votre avatar IA personnel qui apprend de vos émotions et vous propose un programme sur mesure.</p>
+              </div>
+              
+              <div className="bg-background/90 border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+                    <MessageCircle className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-xl font-medium">Coach IA</h3>
+                </div>
+                <p className="text-muted-foreground">Assistant intelligent qui vous guide avec des micro-exercices adaptés à votre état émotionnel.</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Value Proposition Section */}
           <ValueProposition />
         </div>
       </main>

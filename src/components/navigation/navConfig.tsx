@@ -15,7 +15,8 @@ import {
   Database,
   Bell,
   Shield,
-  Clock
+  Clock,
+  Brain
 } from 'lucide-react';
 import { NavItemConfig } from '@/components/ui/sidebar/SidebarNavGroup';
 
@@ -40,6 +41,11 @@ export const topNavItems = [
     path: '/vr',
     label: 'VR Immersive',
     icon: <Headset className="h-5 w-5" />
+  },
+  {
+    path: '/journal',
+    label: 'Journal émotionnel',
+    icon: <FileText className="h-5 w-5" />
   }
 ];
 
@@ -91,18 +97,18 @@ export const sidebarItems: NavItemConfig[] = [
   },
   {
     path: '/journal',
-    label: 'Journal intime',
+    label: 'Journal émotionnel',
     icon: <FileText className="h-5 w-5" />
   },
   {
     path: '/community',
-    label: 'Communauté',
+    label: 'Social Cocoon',
     icon: <Users className="h-5 w-5" />
   },
   {
     path: '/chat',
     label: 'Coach IA',
-    icon: <MessageCircle className="h-5 w-5" />
+    icon: <Brain className="h-5 w-5" />
   },
   {
     path: '/events',

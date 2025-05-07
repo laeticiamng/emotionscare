@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { MusicProvider } from './contexts/MusicContext';
 import { Shell } from './components/Shell';
 import ProtectedLayout from './components/ProtectedLayout';
-import Home from './pages/Home';
+import Index from './pages/Index';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -20,6 +20,7 @@ import MusicTherapyPage from './pages/MusicTherapyPage';
 import MusicGenerationPage from './pages/MusicGenerationPage';
 
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from '@/contexts/AuthContext';
 
 function App() {
   const { toast } = useToast();
@@ -52,8 +53,8 @@ function AppRoutes({ toast }) {
 
   return (
     <Routes>
+      <Route path="/" element={<Index />} />
       <Route element={<Shell />}>
-        <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
         <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
         <Route path="/vr" element={<ProtectedLayout><NotImplementedPage /></ProtectedLayout>} />
@@ -78,8 +79,5 @@ function AppRoutes({ toast }) {
     </Routes>
   );
 }
-
-// Ajout de l'import manquant pour useAuth
-import { useAuth } from '@/contexts/AuthContext';
 
 export default App;
