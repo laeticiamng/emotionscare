@@ -87,7 +87,7 @@ export const emotionRecommendationService = {
     const mockData: Record<string, EmotionRecommendation[]> = {
       happy: [
         { emotion: 'happy', category: 'music', content: 'Écoutez notre playlist "Énergétique" pour maintenir cette bonne humeur tout au long de la journée.' },
-        { emotion: 'happy', category: 'exercise', content: 'Profitez de cette énergie positive avec une courte session d'exercice de 15 minutes en plein air.' },
+        { emotion: 'happy', category: 'exercise', content: 'Profitez de cette énergie positive avec une courte session d\'exercice de 15 minutes en plein air.' },
         { emotion: 'happy', category: 'general', content: 'Partagez cette joie avec quelqu\'un autour de vous aujourd\'hui!' }
       ],
       sad: [
