@@ -12,8 +12,8 @@ interface EnhancedMusicVisualizerProps {
   showControls?: boolean;
   height?: number;
   className?: string;
-  intensity?: number; // Add the missing intensity prop
-  volume?: number;    // Add volume prop for mute functionality
+  intensity?: number;
+  volume?: number;
 }
 
 /**
@@ -25,8 +25,8 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
   showControls = true,
   height = 120,
   className,
-  intensity = 50,  // Default intensity value
-  volume = 1        // Default volume
+  intensity = 50,
+  volume = 1
 }) => {
   const { 
     currentTrack, 
