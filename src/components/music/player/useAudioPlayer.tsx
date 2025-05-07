@@ -1,362 +1,217 @@
-
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useRef } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
-import { Track } from '@/services/music/types';
+import { toast } from '@/hooks/use-toast';
 
 export function useAudioPlayer() {
-  const { 
-    currentTrack, 
-    isPlaying, 
-    volume,
-    playTrack, 
-    pauseTrack, 
-    nextTrack, 
-    previousTrack, 
-    setVolume 
-  } = useMusic();
-  
+  const { currentTrack, nextTrack: goToNextTrack, previousTrack: goToPreviousTrack } = useMusic();
+  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [audioError, setAudioError] = useState<string | null>(null);
+  const [volume, setVolume] = useState(0.7);
+  const [audioError, setAudioError] = useState(false);
   const [loadingTrack, setLoadingTrack] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const retryCount = useRef(0);
-  const { toast } = useToast();
-
-  // Create and manage audio element
-  useEffect(() => {
-    // Create audio element if needed
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      
-      // Add event listeners
-      audioRef.current.addEventListener('timeupdate', updateProgress);
-      audioRef.current.addEventListener('loadeddata', setAudioData);
-      audioRef.current.addEventListener('ended', handleTrackEnd);
-      audioRef.current.addEventListener('error', handleAudioError);
-      audioRef.current.addEventListener('loadstart', () => setLoadingTrack(true));
-      audioRef.current.addEventListener('canplay', () => {
-        setLoadingTrack(false);
-        retryCount.current = 0; // Reset retry count on successful load
-      });
-      
-      // Add stalled and waiting event handlers
-      audioRef.current.addEventListener('stalled', () => {
-        console.log("Audio playback stalled");
-        setLoadingTrack(true);
-      });
-      
-      audioRef.current.addEventListener('waiting', () => {
-        console.log("Audio playback waiting for data");
-        setLoadingTrack(true);
-      });
-      
-      audioRef.current.addEventListener('playing', () => {
-        console.log("Audio playback started");
-        setLoadingTrack(false);
-        setAudioError(null);
-      });
-    }
-    
-    // Update audio source when track changes
-    if (currentTrack) {
-      console.log(`Loading track: ${currentTrack.title} - URL: ${currentTrack.url}`);
-      setAudioError(null); // Reset previous errors
-      setLoadingTrack(true);
-      
-      try {
-        // Force cache busting for all tracks to avoid stale data
-        const cacheBuster = `?cache=${Date.now()}`;
-        const trackUrl = currentTrack.url.includes('?') 
-          ? `${currentTrack.url}&_=${Date.now()}` 
-          : `${currentTrack.url}${cacheBuster}`;
-        
-        audioRef.current.src = trackUrl;
-        audioRef.current.volume = volume;
-        audioRef.current.crossOrigin = "anonymous"; // Enable CORS for external audio resources
-        
-        if (isPlaying) {
-          playAudio();
-        }
-      } catch (err) {
-        console.error("Error setting audio source:", err);
-        setAudioError(`Erreur de chargement: ${err instanceof Error ? err.message : String(err)}`);
-        setLoadingTrack(false);
-      }
-    }
-    
-    // Cleanup
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', updateProgress);
-        audioRef.current.removeEventListener('loadeddata', setAudioData);
-        audioRef.current.removeEventListener('ended', handleTrackEnd);
-        audioRef.current.removeEventListener('error', handleAudioError);
-        audioRef.current.removeEventListener('loadstart', () => setLoadingTrack(true));
-        audioRef.current.removeEventListener('canplay', () => setLoadingTrack(false));
-        audioRef.current.removeEventListener('stalled', () => setLoadingTrack(true));
-        audioRef.current.removeEventListener('waiting', () => setLoadingTrack(true));
-        audioRef.current.removeEventListener('playing', () => setLoadingTrack(false));
-        audioRef.current.pause();
-      }
-    };
-  }, [currentTrack]);
   
-  // Handle play/pause changes
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  
+  // Initialize audio element
   useEffect(() => {
-    if (!audioRef.current || !currentTrack) return;
+    const audio = new Audio();
+    audioRef.current = audio;
     
-    if (isPlaying) {
-      playAudio();
-    } else {
-      audioRef.current.pause();
+    audio.volume = volume;
+    
+    // Event listeners
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleTrackEnd);
+    audio.addEventListener('error', handleError);
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleTrackEnd);
+      audio.removeEventListener('error', handleError);
+      
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, []);
+  
+  // Handle track changes
+  useEffect(() => {
+    if (currentTrack && audioRef.current) {
+      setLoadingTrack(true);
+      setAudioError(false);
+      
+      // Reset state
+      setCurrentTime(0);
+      setDuration(0);
+      
+      // Load and play new track
+      audioRef.current.src = currentTrack.audioUrl;
+      audioRef.current.load();
+      
+      if (isPlaying) {
+        const playPromise = audioRef.current.play();
+        
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+              setLoadingTrack(false);
+            })
+            .catch(error => {
+              console.error('Playback error:', error);
+              setIsPlaying(false);
+              setLoadingTrack(false);
+            });
+        }
+      } else {
+        setLoadingTrack(false);
+      }
     }
-  }, [isPlaying]);
+  }, [currentTrack]);
   
   // Handle volume changes
   useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.volume = volume;
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
   }, [volume]);
   
-  // Start playback with better error handling
-  const playAudio = () => {
-    if (!audioRef.current) return;
-    
-    setLoadingTrack(true);
-    const playPromise = audioRef.current.play();
-    
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setLoadingTrack(false);
-          console.log("Playback started successfully");
-        })
-        .catch(err => {
-          console.error("Audio playback error:", err);
-          
-          // Specific error handling based on error type
-          if (err.name === 'NotAllowedError') {
-            setAudioError("La lecture automatique n'est pas autorisée par votre navigateur");
-            toast({
-              title: "Lecture audio bloquée",
-              description: "Votre navigateur a bloqué la lecture automatique. Cliquez sur Play pour continuer.",
-              variant: "destructive"
-            });
-          } 
-          else if (err.name === 'NotSupportedError') {
-            setAudioError("Format audio non supporté");
-          }
-          else if (err.name === 'AbortError') {
-            setAudioError("Lecture interrompue");
-          }
-          else {
-            setAudioError(`Erreur de lecture: ${err.message}`);
-          }
-          
-          setLoadingTrack(false);
-          
-          // Auto-retry logic
-          if (retryCount.current < 3) {
-            retryCount.current++;
-            
-            toast({
-              title: "Tentative de récupération",
-              description: `Problème de lecture, nouvelle tentative ${retryCount.current}/3...`
-            });
-            
-            setTimeout(() => {
-              if (currentTrack) {
-                console.log(`Retry attempt ${retryCount.current} for track: ${currentTrack.title}`);
-                
-                // Try with a different Audio instance for better recovery
-                if (audioRef.current) {
-                  // Try alternate audio source format if available
-                  playTrack(currentTrack);
-                }
-              }
-            }, 1500);
-          } else {
-            toast({
-              title: "Problème de lecture",
-              description: "Impossible de lire ce morceau. Passage au morceau suivant...",
-              variant: "destructive"
-            });
-            
-            setTimeout(() => {
-              nextTrack();
-            }, 1500);
-          }
-        });
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
     }
   };
   
-  // Audio error handler with improved diagnostics
-  const handleAudioError = (e: Event) => {
-    const error = (e.target as HTMLAudioElement).error;
-    if (error) {
-      console.error("Audio error:", error.message, error.code);
-      let errorMsg = '';
-      
-      // More specific error messages based on code
-      switch(error.code) {
-        case MediaError.MEDIA_ERR_ABORTED:
-          errorMsg = "La lecture a été interrompue";
-          break;
-        case MediaError.MEDIA_ERR_NETWORK:
-          errorMsg = "Problème réseau lors du chargement";
-          break;
-        case MediaError.MEDIA_ERR_DECODE:
-          errorMsg = "Impossible de décoder le fichier audio";
-          break;
-        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-          errorMsg = "Format audio non supporté ou URL incorrecte";
-          break;
-        default:
-          errorMsg = error.message || "Erreur inconnue";
-      }
-      
-      // Log additional information for debugging
-      console.log(`Audio error details: Code ${error.code}, Audio src: ${audioRef.current?.src}`);
-      
-      setAudioError(`Erreur: ${errorMsg}`);
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
       setLoadingTrack(false);
-      
-      if (retryCount.current < 3) {
-        retryCount.current++;
-        
-        toast({
-          title: "Erreur audio",
-          description: `${errorMsg}. Nouvelle tentative ${retryCount.current}/3...`,
-          variant: "default" // Changed from "warning" to "default" since "warning" isn't a valid variant
-        });
-        
-        // Small delay before retry
-        setTimeout(() => {
-          if (currentTrack) {
-            // Try with an alternative approach based on error type
-            if (error.code === MediaError.MEDIA_ERR_NETWORK) {
-              // For network errors, try with a different URL format or fallback
-              console.log("Network error, trying alternative approach");
-              
-              // Check if we can use a different audio source format
-              if (currentTrack.url.endsWith('.mp3')) {
-                // Try with .ogg version if available, or just retry with cache busting
-                const alternateUrl = currentTrack.url.replace('.mp3', '.ogg');
-                const trackWithAlternateUrl = {
-                  ...currentTrack,
-                  url: alternateUrl
-                };
-                playTrack(trackWithAlternateUrl);
-              } else {
-                // Just retry with cache busting
-                const refreshedTrack = {
-                  ...currentTrack,
-                  url: `${currentTrack.url}${currentTrack.url.includes('?') ? '&' : '?'}_=${Date.now()}`
-                };
-                playTrack(refreshedTrack);
-              }
-            } else {
-              // For other errors, create a new audio element and try again
-              if (audioRef.current) {
-                const oldAudio = audioRef.current;
-                
-                // Clean up old reference
-                oldAudio.removeEventListener('timeupdate', updateProgress);
-                oldAudio.removeEventListener('loadeddata', setAudioData);
-                oldAudio.removeEventListener('ended', handleTrackEnd);
-                oldAudio.removeEventListener('error', handleAudioError);
-                
-                // Create new audio element
-                audioRef.current = new Audio();
-                audioRef.current.volume = oldAudio.volume;
-                
-                // Re-add event listeners
-                audioRef.current.addEventListener('timeupdate', updateProgress);
-                audioRef.current.addEventListener('loadeddata', setAudioData);
-                audioRef.current.addEventListener('ended', handleTrackEnd);
-                audioRef.current.addEventListener('error', handleAudioError);
-                audioRef.current.addEventListener('loadstart', () => setLoadingTrack(true));
-                audioRef.current.addEventListener('canplay', () => setLoadingTrack(false));
-                
-                // Try loading with cache busting
-                audioRef.current.src = `${currentTrack.url}?cache=${Date.now()}`;
-                playAudio();
-              }
-            }
-          }
-        }, 1000);
-      } else {
-        toast({
-          title: "Erreur de lecture",
-          description: `${errorMsg}. Passage au morceau suivant...`,
-          variant: "destructive"
-        });
-        
-        // Automatically move to next track
-        setTimeout(() => {
-          nextTrack();
-        }, 1500);
-      }
     }
-  };
-  
-  // Update progress
-  const updateProgress = () => {
-    if (!audioRef.current) return;
-    setCurrentTime(audioRef.current.currentTime);
-  };
-  
-  // Set audio data
-  const setAudioData = () => {
-    if (!audioRef.current) return;
-    setDuration(audioRef.current.duration);
-    setAudioError(null); // Reset error on successful load
   };
   
   const handleTrackEnd = () => {
     nextTrack();
   };
   
-  const handleProgressClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !currentTrack) return;
+  const handleError = () => {
+    setAudioError(true);
+    setLoadingTrack(false);
+    toast({
+      title: "Erreur de lecture",
+      description: "Impossible de lire ce morceau. Veuillez essayer un autre titre.",
+      variant: "destructive" // Utilisez "destructive" au lieu de "warning"
+    });
+  };
+  
+  const playTrack = (track: any) => {
+    if (!audioRef.current) return;
+    
+    const playPromise = audioRef.current.play();
+    
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsPlaying(true);
+          startTimeUpdateAnimation();
+        })
+        .catch(error => {
+          console.error('Playback error:', error);
+          setIsPlaying(false);
+        });
+    }
+  };
+  
+  const pauseTrack = () => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.pause();
+    setIsPlaying(false);
+    
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+  };
+  
+  const startTimeUpdateAnimation = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    
+    const animate = () => {
+      if (audioRef.current) {
+        setCurrentTime(audioRef.current.currentTime);
+      }
+      animationRef.current = requestAnimationFrame(animate);
+    };
+    
+    animationRef.current = requestAnimationFrame(animate);
+  };
+  
+  const nextTrack = () => {
+    goToNextTrack();
+  };
+  
+  const previousTrack = () => {
+    if (audioRef.current && audioRef.current.currentTime > 3) {
+      // If more than 3 seconds into the song, restart it
+      audioRef.current.currentTime = 0;
+    } else {
+      // Otherwise go to previous track
+      goToPreviousTrack();
+    }
+  };
+  
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current || duration === 0) return;
     
     const progressBar = e.currentTarget;
-    const clickPosition = (e.clientX - progressBar.getBoundingClientRect().left) / progressBar.offsetWidth;
+    const rect = progressBar.getBoundingClientRect();
+    const clickPosition = (e.clientX - rect.left) / rect.width;
     const newTime = clickPosition * duration;
     
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
-  }, [currentTrack, duration]);
+  };
   
-  // Format time display
-  const formatTime = useCallback((time: number) => {
-    if (!time) return "0:00";
+  const handleVolumeChange = (values: number[]) => {
+    const newVolume = values[0];
+    setVolume(newVolume);
+    
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+  
+  const formatTime = (time: number): string => {
+    if (isNaN(time)) return '0:00';
     
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }, []);
+  };
   
-  // Handle volume change
-  const handleVolumeChange = useCallback((values: number[]) => {
-    setVolume(values[0]);
-  }, [setVolume]);
-
   return {
+    isPlaying,
     currentTime,
     duration,
+    volume,
     audioError,
     loadingTrack,
-    isPlaying,
-    volume,
-    handleVolumeChange,
     handleProgressClick,
     playTrack,
     pauseTrack,
     nextTrack,
     previousTrack,
+    handleVolumeChange,
     formatTime
   };
 }

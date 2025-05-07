@@ -2,22 +2,22 @@
 /**
  * OpenAI API Client
  * 
- * Secure client for interacting with OpenAI APIs with built-in
- * error handling, retry logic, and response validation.
+ * Client sécurisé pour interagir avec les API OpenAI avec gestion d'erreur
+ * intégrée, logique de retry, et validation des réponses.
  */
 import { toast } from "@/hooks/use-toast";
 import { AI_MODEL_CONFIG, AIModule, OpenAIModelParams } from "./openai-config";
 
 const OPENAI_API_BASE_URL = "https://api.openai.com/v1";
 
-// Cache implementation for API responses
+// Implémentation de cache pour les réponses API
 const responseCache = new Map<string, {
   data: any,
   timestamp: number
 }>();
 
 /**
- * Make a request to OpenAI API with automatic retries and error handling
+ * Effectuer une requête à l'API OpenAI avec retry automatique et gestion des erreurs
  */
 export async function callOpenAI<T>(
   endpoint: string,
@@ -25,15 +25,15 @@ export async function callOpenAI<T>(
   apiKey?: string,
   cacheOptions?: { enabled: boolean, ttl: number }
 ): Promise<T> {
-  // Use API key from environment or from parameter
+  // Utiliser la clé API de l'environnement ou du paramètre
   const key = apiKey || process.env.OPENAI_API_KEY;
   
   if (!key) {
-    console.error("OpenAI API key is missing");
-    throw new Error("API key is required to use this feature");
+    console.error("La clé API OpenAI est manquante");
+    throw new Error("Une clé API est requise pour utiliser cette fonctionnalité");
   }
   
-  // Generate cache key from the request if caching is enabled
+  // Générer une clé de cache à partir de la requête si le cache est activé
   let cacheKey = "";
   if (cacheOptions?.enabled) {
     cacheKey = `${endpoint}:${JSON.stringify(body)}`;
@@ -41,12 +41,12 @@ export async function callOpenAI<T>(
     
     if (cachedResponse && 
         (Date.now() - cachedResponse.timestamp) < (cacheOptions.ttl * 1000)) {
-      console.log("Using cached response for:", endpoint);
+      console.log("Utilisation de la réponse en cache pour:", endpoint);
       return cachedResponse.data as T;
     }
   }
 
-  // API request configuration
+  // Configuration de requête API
   const config = {
     method: "POST",
     headers: {
@@ -61,7 +61,7 @@ export async function callOpenAI<T>(
     
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("OpenAI API Error:", errorData);
+      console.error("Erreur API OpenAI:", errorData);
       
       if (response.status === 429) {
         toast({
@@ -82,7 +82,7 @@ export async function callOpenAI<T>(
 
     const data = await response.json();
     
-    // Store in cache if enabled
+    // Stocker en cache si activé
     if (cacheOptions?.enabled && cacheKey) {
       responseCache.set(cacheKey, {
         data,
@@ -92,13 +92,13 @@ export async function callOpenAI<T>(
     
     return data as T;
   } catch (error) {
-    console.error("Failed to call OpenAI:", error);
+    console.error("Échec de l'appel à OpenAI:", error);
     throw error;
   }
 }
 
 /**
- * Fetch with automatic retry for transient errors
+ * Fetch avec retry automatique pour les erreurs transitoires
  */
 async function fetchWithRetry(
   url: string, 
@@ -113,18 +113,18 @@ async function fetchWithRetry(
       return await fetch(url, options);
     } catch (error) {
       lastError = error as Error;
-      console.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed:`, error);
+      console.warn(`Tentative de retry ${attempt + 1}/${maxRetries} échouée:`, error);
       
-      // Wait before next retry with exponential backoff
+      // Attendre avant la prochaine tentative avec backoff exponentiel
       await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, attempt)));
     }
   }
   
-  throw lastError || new Error(`Failed after ${maxRetries} attempts`);
+  throw lastError || new Error(`Échec après ${maxRetries} tentatives`);
 }
 
 /**
- * Send a chat request to OpenAI
+ * Envoyer une requête de chat à OpenAI
  */
 export async function chatCompletion(
   messages: Array<{role: string, content: string}>,
@@ -153,7 +153,7 @@ export async function chatCompletion(
 }
 
 /**
- * Moderate content via OpenAI's moderation endpoint
+ * Modérer du contenu via l'endpoint de modération d'OpenAI
  */
 export async function moderateContent(
   content: string,
@@ -171,12 +171,12 @@ export async function moderateContent(
       input: content
     },
     apiKey,
-    { enabled: true, ttl: 60 } // Cache moderation results for a minute
+    { enabled: true, ttl: 60 } // Mettre en cache les résultats de modération pendant une minute
   );
 }
 
 /**
- * Check if the OpenAI API is accessible
+ * Vérifier si l'API OpenAI est accessible
  */
 export async function checkApiConnection(apiKey?: string): Promise<boolean> {
   try {
@@ -191,7 +191,7 @@ export async function checkApiConnection(apiKey?: string): Promise<boolean> {
     
     return !!response.choices.length;
   } catch (error) {
-    console.error("API connection check failed:", error);
+    console.error("La vérification de connexion API a échoué:", error);
     return false;
   }
 }

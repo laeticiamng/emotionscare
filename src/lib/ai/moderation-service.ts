@@ -53,7 +53,7 @@ export async function checkContentSafety(content: string): Promise<ModerationRes
     toast({
       title: "Erreur de modération",
       description: "Impossible de vérifier le contenu pour le moment.",
-      variant: "warning"
+      variant: "warning" // Variant personnalisé défini dans le toast.tsx
     });
     
     // Par défaut, en cas d'erreur, on suppose que le contenu est sûr

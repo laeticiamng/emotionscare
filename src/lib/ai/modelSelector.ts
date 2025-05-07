@@ -12,32 +12,32 @@ interface ModelSelectionCriteria {
 }
 
 /**
- * Intelligent model selector based on request criteria
+ * Sélecteur de modèle intelligent basé sur les critères de la requête
  * 
- * This implements the specification from the prompt:
- * - Chat/FAQ: gpt-4o-mini-2024-07-18 (with 24h cache)
- * - Coach init: gpt-4.1-2025-04-14 → then follow-up with gpt-4o-mini-2024-07-18
- * - Journal batch: gpt-4.1-2025-04-14
- * - Buddy & Scan: gpt-4o-mini-2024-07-18
- * - Budget guardrails to downgrade models when needed
+ * Cela implémente la spécification issue du prompt:
+ * - Chat/FAQ: gpt-4o-mini (avec cache 24h)
+ * - Coach init: gpt-4o → puis suivi avec gpt-4o-mini
+ * - Journal batch: gpt-4o
+ * - Buddy & Scan: gpt-4o-mini
+ * - Garde-fous budgétaires pour rétrograder les modèles si nécessaire
  */
 export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<OpenAIModelParams> {
-  // Clone the default config for the module
+  // Cloner la configuration par défaut pour le module
   const config = { ...AI_MODEL_CONFIG[criteria.moduleType] };
   
-  // Check budget constraints
+  // Vérifier les contraintes budgétaires
   const budgetExceeded = await budgetMonitor.hasExceededBudget(config.model);
   
-  // Budget guardrail - always use cheaper model if budget exceeded
+  // Garde-fou budgétaire - toujours utiliser un modèle moins cher si le budget est dépassé
   if (budgetExceeded && criteria.moduleType !== 'scan') {
-    console.log(`Budget exceeded for ${config.model}, downgrading to gpt-4o-mini-2024-07-18`);
-    config.model = "gpt-4o-mini-2024-07-18";
+    console.log(`Budget dépassé pour ${config.model}, passage à gpt-4o-mini`);
+    config.model = "gpt-4o-mini";
   }
   
-  // For initial coach sessions, use more powerful model
+  // Pour les sessions de coach initiales, utiliser le modèle plus puissant
   if (criteria.moduleType === 'coach' && criteria.isComplex) {
     return {
-      model: budgetExceeded ? "gpt-4o-mini-2024-07-18" : "gpt-4.1-2025-04-14",
+      model: budgetExceeded ? "gpt-4o-mini" : "gpt-4o",
       temperature: 0.4,
       max_tokens: 512,
       top_p: 1.0,
@@ -45,10 +45,10 @@ export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<O
     };
   }
   
-  // For journal batch operations, use more capable model
+  // Pour les opérations batch du journal, utiliser un modèle plus capable
   if (criteria.moduleType === 'journal' && criteria.isBatchOperation) {
     return {
-      model: budgetExceeded ? "gpt-4o-mini-2024-07-18" : "gpt-4.1-2025-04-14",
+      model: budgetExceeded ? "gpt-4o-mini" : "gpt-4o",
       temperature: 0.3,
       max_tokens: 1024,
       top_p: 1.0,
@@ -56,33 +56,33 @@ export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<O
     };
   }
   
-  // For frequently asked questions with caching
+  // Pour les questions fréquemment posées avec mise en cache
   if (criteria.isFrequentRequest && criteria.moduleType === 'chat') {
     return {
-      model: "gpt-4o-mini-2024-07-18",
+      model: "gpt-4o-mini",
       temperature: 0.2,
       max_tokens: 256,
       top_p: 1.0,
       stream: false,
       cacheEnabled: true,
-      cacheTTL: 86400 // 24 hours
+      cacheTTL: 86400 // 24 heures
     };
   }
   
-  // Return the default configuration for the module
+  // Retourner la configuration par défaut pour le module
   return config;
 }
 
 /**
- * Check if a request should be cached (for 24h)
+ * Vérifier si une requête doit être mise en cache (pour 24h)
  */
 export function shouldCacheResponse(moduleType: AIModule): boolean {
-  // Only cache FAQ and Scan responses
+  // Ne mettre en cache que les réponses FAQ et Scan
   return ['chat', 'scan'].includes(moduleType);
 }
 
 /**
- * Generate cache key for AI responses
+ * Générer une clé de cache pour les réponses AI
  */
 export function generateCacheKey(model: string, prompt: string): string {
   return `${model}:${prompt.substring(0, 100)}`;
