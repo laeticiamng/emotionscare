@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import Shell from '@/components/Shell';
 import Index from '@/pages/Index';
 import Home from '@/pages/Home';
@@ -68,7 +68,7 @@ function App() {
               <Route path="docs" element={<Docs />} />
               <Route path="invite" element={<InvitePage />} />
               
-              <Route element={<ProtectedLayout />}>
+              <Route element={<ProtectedLayout><Outlet /></ProtectedLayout>}>
                 <Route path="dashboard" element={<DashboardPage />} />
                 <Route path="scan" element={<ScanPage />} />
                 <Route path="scan/:id" element={<ScanDetailPage />} />
