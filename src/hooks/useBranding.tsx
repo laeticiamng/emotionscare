@@ -11,7 +11,7 @@ export const useBranding = () => {
   const { theme } = useTheme();
   
   const getLogoPath = () => {
-    return '/images/emotionscare-logo.svg';
+    return '/images/emotionscare-new-logo.svg';
   };
   
   const getLogoSize = (size: BrandingOptions['size'] = 'md') => {
