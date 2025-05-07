@@ -68,3 +68,8 @@ export const mockStats: ActivityStats[] = [
     percentage: 5.1
   }
 ];
+
+console.log("mockActivityData loaded:", { 
+  activities: mockActivities.length,
+  stats: mockStats.length
+});

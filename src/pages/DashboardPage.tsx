@@ -43,6 +43,7 @@ const DashboardPage: React.FC = () => {
     if (user?.id) {
       // Add a welcome notification
       setTimeout(() => {
+        console.log("DashboardPage - Adding welcome notification");
         notificationService.addNotification(user.id, {
           id: `welcome-${Date.now()}`,
           title: 'Bienvenue dans votre dashboard',
@@ -54,6 +55,7 @@ const DashboardPage: React.FC = () => {
         
         // Add another notification after a delay
         setTimeout(() => {
+          console.log("DashboardPage - Adding reminder notification");
           notificationService.addNotification(user.id, {
             id: `reminder-${Date.now()}`,
             title: 'Rappel: Scan émotionnel',

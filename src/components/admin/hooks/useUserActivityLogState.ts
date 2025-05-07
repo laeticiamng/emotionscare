@@ -47,6 +47,7 @@ export const useUserActivityLogState = (): UseUserActivityLogStateResult => {
 
   // Fetch activity data
   useEffect(() => {
+    console.log("useUserActivityLogState: Fetching activity data...");
     setIsLoading(true);
     setError(null);
     
@@ -55,6 +56,10 @@ export const useUserActivityLogState = (): UseUserActivityLogStateResult => {
       getActivityStats()
     ])
       .then(([activitiesData, statsData]) => {
+        console.log("useUserActivityLogState: Data fetched successfully", { 
+          activitiesLength: activitiesData.length, 
+          statsLength: statsData.length 
+        });
         setActivities(activitiesData);
         setFilteredActivities(activitiesData);
         setStats(statsData);
@@ -176,6 +181,15 @@ export const useUserActivityLogState = (): UseUserActivityLogStateResult => {
       });
     }
   };
+
+  console.log("useUserActivityLogState: Returning state", { 
+    activeTab, 
+    activitiesCount: activities.length,
+    filteredActivitiesCount: filteredActivities.length,
+    statsCount: stats.length,
+    isLoading, 
+    error 
+  });
 
   return {
     activeTab,

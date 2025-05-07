@@ -16,6 +16,8 @@ export const useActivityLogging = () => {
   useEffect(() => {
     if (!isAuthenticated || !user?.id) return;
     
+    console.log(`useActivityLogging - Detected path change: ${location.pathname}`);
+    
     // We don't want to log every single page view, just meaningful ones
     const pagesToLog = {
       '/scan': { title: 'Scan émotionnel', type: 'feature' },
@@ -32,6 +34,7 @@ export const useActivityLogging = () => {
     const exactMatch = pagesToLog[currentPath];
     
     if (exactMatch) {
+      console.log(`useActivityLogging - Logging consultation for: ${exactMatch.title}`);
       activityLogService.logConsultation(user.id, {
         title: exactMatch.title,
         type: exactMatch.type
