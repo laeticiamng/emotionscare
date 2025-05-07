@@ -1,16 +1,15 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { usePlaylistManager } from '@/hooks/usePlaylistManager';
-import { useDrawerState } from '@/hooks/useDrawerState';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { Track, Playlist } from '@/services/music/types';
+import { getPlaylist } from '@/lib/musicService';
+import { useToast } from '@/hooks/use-toast';
 
 interface MusicContextType {
   currentTrack: Track | null;
   isPlaying: boolean;
   volume: number;
   playlist: Playlist | null;
-  playlists: Playlist[]; // Ajout de la propriété playlists
+  playlists: Playlist[];
   currentEmotion: string;
   isDrawerOpen: boolean;
   repeat: boolean;
@@ -24,7 +23,7 @@ interface MusicContextType {
   toggleRepeat: () => void;
   toggleShuffle: () => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<void>;
-  loadPlaylistById: (id: string) => Promise<void>; // Ajout de la méthode loadPlaylistById
+  loadPlaylistById: (id: string) => Promise<void>;
   openDrawer: () => void;
   closeDrawer: () => void;
 }
@@ -32,40 +31,34 @@ interface MusicContextType {
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]); // État pour stocker les playlists
-
-  // Use our custom hooks to manage different aspects of the music player
-  const {
-    currentTrack,
-    isPlaying,
-    volume,
-    repeat,
-    shuffle,
-    playTrack,
-    pauseTrack,
-    setVolume,
-    toggleRepeat,
-    toggleShuffle,
-    setCurrentTrack
-  } = useAudioPlayer();
-
-  const {
-    playlist,
-    currentEmotion,
-    loadPlaylistForEmotion: loadPlaylist,
-    getNextTrack,
-    getPreviousTrack
-  } = usePlaylistManager();
-
-  const {
-    isDrawerOpen,
-    openDrawer,
-    closeDrawer
-  } = useDrawerState();
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.7);
+  const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]); 
+  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [repeat, setRepeat] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
+  
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio();
+    audioRef.current.volume = volume;
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   // Load initial playlist and available playlists
   useEffect(() => {
-    loadPlaylist('neutral');
+    loadPlaylistForEmotion('neutral');
     
     // Initialize some default playlists for demo
     const defaultPlaylists: Playlist[] = [
@@ -98,30 +91,172 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     setPlaylists(defaultPlaylists);
   }, []);
 
-  // Handle loading of playlist and set first track
-  const loadPlaylistForEmotion = async (emotion: string) => {
-    const newPlaylist = await loadPlaylist(emotion);
-    if (newPlaylist && newPlaylist.tracks.length > 0) {
-      setCurrentTrack(newPlaylist.tracks[0]);
+  // Load a playlist for a specific emotion
+  const loadPlaylistForEmotion = async (emotion: string): Promise<Playlist | null> => {
+    try {
+      setCurrentEmotion(emotion);
+      
+      // Here we would normally fetch from API, but for now use mock data
+      const mockTracks = [
+        {
+          id: '1',
+          title: 'Méditation Profonde',
+          artist: 'Zen Masters',
+          album: 'Sérénité',
+          duration: 180,
+          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          cover: 'https://picsum.photos/seed/track1/200',
+        },
+        {
+          id: '2',
+          title: 'Voyage Intérieur',
+          artist: 'Mindfulness',
+          album: 'Voyage',
+          duration: 210,
+          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+          cover: 'https://picsum.photos/seed/track2/200',
+        },
+        {
+          id: '3',
+          title: 'Relaxation Guidée',
+          artist: 'Nature Sounds',
+          album: 'Tranquillité',
+          duration: 240,
+          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+          cover: 'https://picsum.photos/seed/track3/200',
+        }
+      ];
+      
+      const newPlaylist = {
+        id: `${emotion}-playlist`,
+        name: `Playlist ${emotion}`,
+        emotion: emotion,
+        tracks: mockTracks
+      };
+      
+      setPlaylist(newPlaylist);
+      
+      // Auto-play the first track if no track is playing
+      if (!currentTrack && mockTracks.length > 0) {
+        setCurrentTrack(mockTracks[0]);
+      }
+      
+      return newPlaylist;
+    } catch (error) {
+      console.error('Error loading playlist:', error);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger la playlist. Veuillez réessayer.",
+        variant: "destructive"
+      });
+      return null;
     }
   };
   
-  // Add loadPlaylistById method
-  const loadPlaylistById = async (id: string) => {
-    // Trouver la playlist correspondante dans la liste des playlists
+  // Load playlist by ID
+  const loadPlaylistById = async (id: string): Promise<void> => {
     const playlist = playlists.find(pl => pl.id === id);
     if (playlist) {
-      // Charger la playlist basée sur l'émotion associée
       await loadPlaylistForEmotion(playlist.emotion || 'neutral');
     }
   };
   
-  // Add loadTrack method
-  const loadTrack = (track: any) => {
+  // Load a specific track
+  const loadTrack = (track: Track) => {
     setCurrentTrack(track);
   };
 
-  // Navigation functions
+  // Play a track
+  const playTrack = (track: Track) => {
+    if (!audioRef.current) return;
+    
+    // If trying to play a different track
+    if (!currentTrack || track.id !== currentTrack.id) {
+      setCurrentTrack(track);
+      audioRef.current.src = track.url;
+      audioRef.current.load();
+    }
+    
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(err => {
+          console.error('Error playing audio:', err);
+          setIsPlaying(false);
+          toast({
+            title: "Erreur de lecture",
+            description: "Impossible de lire ce morceau. Veuillez réessayer.",
+            variant: "destructive"
+          });
+        });
+    }
+  };
+  
+  // Pause current track
+  const pauseTrack = () => {
+    if (!audioRef.current) return;
+    audioRef.current.pause();
+    setIsPlaying(false);
+  };
+
+  // Function to get next track (with shuffle support)
+  const getNextTrack = (currentTrack: Track, useShuffle: boolean): Track => {
+    if (!playlist || playlist.tracks.length === 0) {
+      return currentTrack;
+    }
+    
+    if (useShuffle) {
+      // Get a random track that's not the current one
+      const availableTracks = playlist.tracks.filter(t => t.id !== currentTrack.id);
+      if (availableTracks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableTracks.length);
+        return availableTracks[randomIndex];
+      }
+      return currentTrack;
+    } else {
+      // Get next track in the playlist
+      const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+      if (currentIndex !== -1 && currentIndex < playlist.tracks.length - 1) {
+        return playlist.tracks[currentIndex + 1];
+      } else if (repeat && playlist.tracks.length > 0) {
+        // Loop back to the beginning if repeat is enabled
+        return playlist.tracks[0];
+      }
+      return currentTrack;
+    }
+  };
+  
+  // Function to get previous track
+  const getPreviousTrack = (currentTrack: Track, useShuffle: boolean): Track => {
+    if (!playlist || playlist.tracks.length === 0) {
+      return currentTrack;
+    }
+    
+    if (useShuffle) {
+      // Get a random track that's not the current one
+      const availableTracks = playlist.tracks.filter(t => t.id !== currentTrack.id);
+      if (availableTracks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableTracks.length);
+        return availableTracks[randomIndex];
+      }
+      return currentTrack;
+    } else {
+      // Get previous track in the playlist
+      const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+      if (currentIndex > 0) {
+        return playlist.tracks[currentIndex - 1];
+      } else if (repeat && playlist.tracks.length > 0) {
+        // Loop to the end if repeat is enabled
+        return playlist.tracks[playlist.tracks.length - 1];
+      }
+      return currentTrack;
+    }
+  };
+
+  // Play next track
   const nextTrack = () => {
     if (!currentTrack || !playlist) return;
     
@@ -129,11 +264,32 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     playTrack(nextTrackItem);
   };
   
+  // Play previous track
   const previousTrack = () => {
     if (!currentTrack || !playlist) return;
     
     const prevTrackItem = getPreviousTrack(currentTrack, shuffle);
     playTrack(prevTrackItem);
+  };
+  
+  // Toggle repeat mode
+  const toggleRepeat = () => {
+    setRepeat(!repeat);
+  };
+  
+  // Toggle shuffle mode
+  const toggleShuffle = () => {
+    setShuffle(!shuffle);
+  };
+  
+  // Open the music drawer
+  const openDrawer = () => {
+    setIsDrawerOpen(true);
+  };
+  
+  // Close the music drawer
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
   };
 
   return (
@@ -142,7 +298,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       isPlaying,
       volume,
       playlist,
-      playlists, // Ajout des playlists à la valeur du contexte
+      playlists,
       currentEmotion,
       isDrawerOpen,
       repeat,
@@ -156,7 +312,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       toggleRepeat,
       toggleShuffle,
       loadPlaylistForEmotion,
-      loadPlaylistById, // Ajout de la méthode dans la valeur du contexte
+      loadPlaylistById,
       openDrawer,
       closeDrawer,
     }}>

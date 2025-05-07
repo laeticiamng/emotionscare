@@ -21,7 +21,7 @@ export function useCoachQueries(generateRecommendation: () => Promise<void>) {
       
       // Obtenir de nouvelles recommandations basées sur la question
       try {
-        generateRecommendation();
+        await generateRecommendation();
       } catch (recError) {
         console.log('Non-critical error generating recommendations:', recError);
       }

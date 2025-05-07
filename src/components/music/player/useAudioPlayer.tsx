@@ -1,15 +1,17 @@
+
 import { useState, useEffect, useRef } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { Track } from '@/services/music/types';
 
 export function useAudioPlayer() {
-  const { currentTrack, nextTrack: goToNextTrack, previousTrack: goToPreviousTrack } = useMusic();
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolume] = useState(0.7); // 0 to 1
   const [audioError, setAudioError] = useState(false);
   const [loadingTrack, setLoadingTrack] = useState(false);
+  const { toast } = useToast();
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const animationRef = useRef<number | null>(null);
@@ -22,6 +24,38 @@ export function useAudioPlayer() {
     audio.volume = volume;
     
     // Event listeners
+    const handleTimeUpdate = () => {
+      if (audio) setCurrentTime(audio.currentTime);
+    };
+    
+    const handleLoadedMetadata = () => {
+      if (audio) {
+        setDuration(audio.duration);
+        setLoadingTrack(false);
+      }
+    };
+    
+    const handleTrackEnd = () => {
+      setIsPlaying(false);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      // Call nextTrack to autoplay the next track
+      nextTrack();
+    };
+    
+    const handleError = () => {
+      setAudioError(true);
+      setLoadingTrack(false);
+      setIsPlaying(false);
+      toast({
+        title: "Erreur de lecture",
+        description: "Impossible de lire ce morceau. Veuillez essayer un autre titre.",
+        variant: "destructive"
+      });
+    };
+    
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('ended', handleTrackEnd);
@@ -40,7 +74,7 @@ export function useAudioPlayer() {
       audio.pause();
       audioRef.current = null;
     };
-  }, []);
+  }, [toast, volume]);
   
   // Handle track changes
   useEffect(() => {
@@ -52,8 +86,7 @@ export function useAudioPlayer() {
       setCurrentTime(0);
       setDuration(0);
       
-      // Get audio URL from track object, accounting for different property names
-      // Some track objects use 'url' and others use 'audioUrl'
+      // Get audio URL from track object
       const audioUrl = currentTrack.url || '';
       
       if (!audioUrl) {
@@ -80,6 +113,7 @@ export function useAudioPlayer() {
             .then(() => {
               setIsPlaying(true);
               setLoadingTrack(false);
+              startTimeUpdateAnimation();
             })
             .catch(error => {
               console.error('Playback error:', error);
@@ -91,7 +125,7 @@ export function useAudioPlayer() {
         setLoadingTrack(false);
       }
     }
-  }, [currentTrack]);
+  }, [currentTrack, isPlaying, toast]);
   
   // Handle volume changes
   useEffect(() => {
@@ -99,63 +133,6 @@ export function useAudioPlayer() {
       audioRef.current.volume = volume;
     }
   }, [volume]);
-  
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-  
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-      setLoadingTrack(false);
-    }
-  };
-  
-  const handleTrackEnd = () => {
-    nextTrack();
-  };
-  
-  const handleError = () => {
-    setAudioError(true);
-    setLoadingTrack(false);
-    toast({
-      title: "Erreur de lecture",
-      description: "Impossible de lire ce morceau. Veuillez essayer un autre titre.",
-      variant: "destructive"
-    });
-  };
-  
-  const playTrack = (track: any) => {
-    if (!audioRef.current) return;
-    
-    const playPromise = audioRef.current.play();
-    
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsPlaying(true);
-          startTimeUpdateAnimation();
-        })
-        .catch(error => {
-          console.error('Playback error:', error);
-          setIsPlaying(false);
-        });
-    }
-  };
-  
-  const pauseTrack = () => {
-    if (!audioRef.current) return;
-    
-    audioRef.current.pause();
-    setIsPlaying(false);
-    
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
-  };
   
   const startTimeUpdateAnimation = () => {
     if (animationRef.current) {
@@ -172,8 +149,43 @@ export function useAudioPlayer() {
     animationRef.current = requestAnimationFrame(animate);
   };
   
+  const playTrack = (track: Track) => {
+    if (track !== currentTrack) {
+      setCurrentTrack(track);
+    }
+    
+    if (audioRef.current) {
+      const playPromise = audioRef.current.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+            startTimeUpdateAnimation();
+          })
+          .catch(error => {
+            console.error('Playback error:', error);
+            setIsPlaying(false);
+          });
+      }
+    }
+  };
+  
+  const pauseTrack = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    }
+  };
+  
   const nextTrack = () => {
-    goToNextTrack();
+    // This is a placeholder that will be overridden by the parent component
+    console.log('Next track requested - will be handled by MusicContext');
   };
   
   const previousTrack = () => {
@@ -181,8 +193,8 @@ export function useAudioPlayer() {
       // If more than 3 seconds into the song, restart it
       audioRef.current.currentTime = 0;
     } else {
-      // Otherwise go to previous track
-      goToPreviousTrack();
+      // This is a placeholder that will be overridden by the parent component
+      console.log('Previous track requested - will be handled by MusicContext');
     }
   };
   

@@ -27,7 +27,7 @@ serve(async (req) => {
 
     // Parse request body
     const { 
-      messages, 
+      message, 
       userContext, 
       sessionId, 
       stream = false, 
@@ -44,7 +44,7 @@ serve(async (req) => {
 
     // Check cache for FAQ-type questions (only for non-streaming responses)
     if (!stream && cacheEnabled && !userContext) {
-      const cacheKey = `${model}:${messages[messages.length - 1]?.content || ''}`;
+      const cacheKey = `${model}:${message || ''}`;
       const cachedResponse = cache.get(cacheKey);
       
       if (cachedResponse) {
@@ -65,15 +65,15 @@ serve(async (req) => {
       `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
        Réponds toujours en français de manière précise et directe.`;
 
-    // Inject the system prompt if not already present
-    const messagesWithSystem = messages[0]?.role === 'system' ? 
-      messages : 
-      [{ role: 'system', content: systemPrompt }, ...messages];
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: message }
+    ];
     
     // Build OpenAI request body with the specified parameters
     const requestBody = {
       model: model,
-      messages: messagesWithSystem,
+      messages: messages,
       temperature: temperature,
       max_tokens: max_tokens,
       top_p: top_p,
@@ -131,7 +131,7 @@ serve(async (req) => {
 
       // Cache responses if caching is enabled with proper TTL
       if (cacheEnabled) {
-        const cacheKey = `${model}:${messages[messages.length - 1]?.content || ''}`;
+        const cacheKey = `${model}:${message || ''}`;
         const responseObject = { response: aiResponse, sessionId, model };
         cache.set(cacheKey, responseObject);
         
