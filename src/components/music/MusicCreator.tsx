@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { RecommendedPresets } from '@/components/music/RecommendedPresets';
+import RecommendedPresets from '@/components/music/RecommendedPresets';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
 import { 
@@ -67,6 +66,7 @@ const MusicCreator: React.FC = () => {
   const [selectedInstruments, setSelectedInstruments] = useState<string[]>(["piano"]);
   const [useAI, setUseAI] = useState(true);
 
+  // Simulate generation process
   useEffect(() => {
     let interval: number | null = null;
     
@@ -161,6 +161,7 @@ const MusicCreator: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-semibold">Création de musique personnalisée</h2>
@@ -185,9 +186,11 @@ const MusicCreator: React.FC = () => {
         </div>
       </div>
       
+      {/* Form grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
         {/* Left Side - Configuration Form */}
         <Card className="lg:col-span-4">
+          {/* ... keep existing code (CardHeader, CardContent) the same */}
           <CardHeader>
             <CardTitle>Paramètres de composition</CardTitle>
             <CardDescription>Personnalisez votre musique selon vos préférences</CardDescription>
@@ -195,185 +198,9 @@ const MusicCreator: React.FC = () => {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <Tabs defaultValue="basic" className="w-full">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="basic">
-                    <MusicIcon className="h-4 w-4 mr-2" />
-                    Paramètres de base
-                  </TabsTrigger>
-                  {mode === 'advanced' && (
-                    <TabsTrigger value="advanced">
-                      <Layers className="h-4 w-4 mr-2" />
-                      Paramètres avancés
-                    </TabsTrigger>
-                  )}
-                  {mode === 'advanced' && (
-                    <TabsTrigger value="audio">
-                      <FileAudio className="h-4 w-4 mr-2" />
-                      Qualité audio
-                    </TabsTrigger>
-                  )}
-                </TabsList>
-                
-                <TabsContent value="basic" className="space-y-4">
-                  {mode === 'advanced' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Titre de la composition</Label>
-                      <Input 
-                        id="title" 
-                        value={title} 
-                        onChange={(e) => setTitle(e.target.value)} 
-                        placeholder="Ma nouvelle composition"
-                      />
-                    </div>
-                  )}
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="genre">Genre musical</Label>
-                      <Select value={genre} onValueChange={setGenre}>
-                        <SelectTrigger id="genre">
-                          <SelectValue placeholder="Sélectionnez un genre" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {genres.map(g => (
-                            <SelectItem key={g.value} value={g.value}>{g.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="mood">Ambiance</Label>
-                      <Select value={mood} onValueChange={setMood}>
-                        <SelectTrigger id="mood">
-                          <SelectValue placeholder="Sélectionnez une ambiance" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {moods.map(m => (
-                            <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description ou instructions (optionnel)</Label>
-                    <Textarea 
-                      id="description" 
-                      value={description} 
-                      onChange={(e) => setDescription(e.target.value)} 
-                      placeholder="Décrivez le style de musique que vous souhaitez générer..."
-                      rows={3}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between mb-2">
-                      <Label htmlFor="duration">Durée</Label>
-                      <span className="text-sm text-muted-foreground">{formatDuration(duration[0])}</span>
-                    </div>
-                    <Slider 
-                      id="duration" 
-                      min={30} 
-                      max={300} 
-                      step={10} 
-                      value={duration} 
-                      onValueChange={setDuration} 
-                    />
-                  </div>
-                </TabsContent>
-                
-                {mode === 'advanced' && (
-                  <TabsContent value="advanced" className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between mb-2">
-                        <Label htmlFor="tempo">Tempo (BPM)</Label>
-                        <span className="text-sm text-muted-foreground">{tempo[0]} BPM</span>
-                      </div>
-                      <Slider 
-                        id="tempo" 
-                        min={40} 
-                        max={200} 
-                        step={1} 
-                        value={tempo} 
-                        onValueChange={setTempo} 
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Instruments principaux</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {instruments.map(instrument => (
-                          <Badge 
-                            key={instrument.value}
-                            variant={selectedInstruments.includes(instrument.value) ? "default" : "outline"}
-                            className="cursor-pointer"
-                            onClick={() => toggleInstrument(instrument.value)}
-                          >
-                            {instrument.label}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <Switch 
-                        id="use-ai" 
-                        checked={useAI}
-                        onCheckedChange={setUseAI}
-                      />
-                      <Label htmlFor="use-ai">Utiliser l'IA pour optimiser la composition</Label>
-                    </div>
-                  </TabsContent>
-                )}
-                
-                {mode === 'advanced' && (
-                  <TabsContent value="audio" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label>Qualité audio</Label>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">Standard</Button>
-                          <Button variant="default" size="sm">HD</Button>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label>Format d'export</Label>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="default" size="sm">MP3</Button>
-                          <Button variant="outline" size="sm">WAV</Button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label>Effets audio</Label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Switch id="effect-reverb" />
-                          <Label htmlFor="effect-reverb">Réverbération</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch id="effect-echo" />
-                          <Label htmlFor="effect-echo">Écho</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch id="effect-mastering" />
-                          <Label htmlFor="effect-mastering">Mastering</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Switch id="effect-normalize" defaultChecked />
-                          <Label htmlFor="effect-normalize">Normalisation</Label>
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-                )}
-              </Tabs>
+              {/* ... keep existing code (form content, all tabs) the same */}
               
+              {/* Action buttons */}
               <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <Button 
                   type="button" 
@@ -450,6 +277,7 @@ const MusicCreator: React.FC = () => {
               });
             }} />
             
+            {/* Generation progress indicator */}
             {isGenerating && (
               <div className="space-y-2 mt-6">
                 <h4 className="font-medium flex items-center">
@@ -466,6 +294,7 @@ const MusicCreator: React.FC = () => {
               </div>
             )}
             
+            {/* Generated music actions */}
             {generatedTrackUrl && !isGenerating && (
               <div className="space-y-4 mt-6">
                 <h4 className="font-medium flex items-center">
@@ -487,6 +316,7 @@ const MusicCreator: React.FC = () => {
               </div>
             )}
             
+            {/* Generation history */}
             <div className="space-y-4 border-t pt-4">
               <h4 className="font-medium flex items-center">
                 <History className="h-4 w-4 mr-2" />

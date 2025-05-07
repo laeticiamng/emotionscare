@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -20,7 +19,7 @@ export function useMusicalCreation() {
   const [generatedLyrics, setGeneratedLyrics] = useState<string>('');
   const { toast } = useToast();
 
-  // Generate lyrics based on a theme/prompt
+  // Handle generating lyrics
   const handleGenerateLyrics = useCallback(async (prompt: string) => {
     setIsLoading(true);
     try {

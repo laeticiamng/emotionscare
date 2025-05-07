@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Music, Plus, LibrarySquare, Palette, Sliders } from 'lucide-react';
+import { ArrowLeft, Music, Plus, LibrarySquare, Palette, Sliders, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExpandedTabs, ExpandedTabsList, ExpandedTabsTrigger, ExpandedTabsContent } from '@/components/ui/expanded-tabs';
@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 const MusicGenerationPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('recommend');
-  const { loadUserCreations, userCreations } = useMusicalCreation();
+  const { loadUserCreations, creations } = useMusicalCreation();
   const { toast } = useToast();
 
   // Load user creations when component mounts
@@ -35,7 +35,7 @@ const MusicGenerationPage = () => {
         title: "Mode création activé",
         description: "Créez votre propre composition musicale personnalisée",
       });
-    } else if (tab === 'library' && userCreations.length === 0) {
+    } else if (tab === 'library' && creations.length === 0) {
       toast({
         title: "Bibliothèque vide",
         description: "Commencez à créer de la musique pour remplir votre bibliothèque",

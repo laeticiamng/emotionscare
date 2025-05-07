@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   Play, Pause, Download, MoreHorizontal, Search, 
-  Music, Trash, Edit, Share2, Bookmark, ListFilter, Grid2x2, List 
+  Music, Trash, Edit, Share2, Bookmark, ListFilter, Grid2x2, List, Plus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";

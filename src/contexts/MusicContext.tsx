@@ -15,6 +15,7 @@ interface MusicContextType {
   repeat: boolean;
   shuffle: boolean;
   playTrack: (track: Track) => void;
+  loadTrack: (track: any) => void; // Add loadTrack method
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
@@ -70,6 +71,11 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       setCurrentTrack(newPlaylist.tracks[0]);
     }
   };
+  
+  // Add loadTrack method
+  const loadTrack = (track: any) => {
+    setCurrentTrack(track);
+  };
 
   // Navigation functions
   const nextTrack = () => {
@@ -97,6 +103,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       repeat,
       shuffle,
       playTrack,
+      loadTrack, // Added loadTrack
       pauseTrack,
       nextTrack,
       previousTrack,
