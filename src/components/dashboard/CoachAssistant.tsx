@@ -169,10 +169,10 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
                 size="sm" 
                 className="text-xs"
                 onClick={() => {
-                  // This would normally send the message to the chat interface
-                  // Using DOM simulation since we don't have direct access to ChatInterface methods
+                  // Fixed: Using HTMLInputElement to ensure click() method is available
+                  // and adding null checks with optional chaining
                   const input = document.querySelector('input[placeholder*="message"]') as HTMLInputElement;
-                  const button = input?.closest('form')?.querySelector('button[type="submit"]');
+                  const button = input?.closest('form')?.querySelector('button[type="submit"]') as HTMLButtonElement;
                   
                   if (input && button) {
                     input.value = suggestion;

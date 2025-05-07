@@ -9,7 +9,7 @@ import useCoach from '@/hooks/useCoach';
 import EmotionMusicVisualizer from '@/components/music/EmotionMusicVisualizer';
 import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
-import { Music, VolumeUp } from 'lucide-react';
+import { Music, Volume } from 'lucide-react';
 
 const CoachPage = () => {
   const { user } = useAuth();
