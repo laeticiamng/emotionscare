@@ -17,6 +17,7 @@ interface PresetProps {
 
 interface RecommendedPresetsProps {
   onSelectPreset: (preset: Omit<PresetProps, 'icon' | 'description'>) => void;
+  emotion?: any; // Add the emotion property to the interface
 }
 
 const presets: PresetProps[] = [
@@ -62,7 +63,10 @@ const presets: PresetProps[] = [
   },
 ];
 
-const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({ onSelectPreset }) => {
+const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({ onSelectPreset, emotion }) => {
+  // You can use the emotion prop here to customize presets if needed
+  // For example, filtering or sorting presets based on the emotion
+  
   return (
     <div className="space-y-3">
       {presets.map((preset) => (
