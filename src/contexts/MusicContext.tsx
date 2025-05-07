@@ -10,12 +10,13 @@ interface MusicContextType {
   isPlaying: boolean;
   volume: number;
   playlist: Playlist | null;
+  playlists: Playlist[]; // Ajout de la propriété playlists
   currentEmotion: string;
   isDrawerOpen: boolean;
   repeat: boolean;
   shuffle: boolean;
   playTrack: (track: Track) => void;
-  loadTrack: (track: any) => void; // Add loadTrack method
+  loadTrack: (track: any) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
@@ -23,6 +24,7 @@ interface MusicContextType {
   toggleRepeat: () => void;
   toggleShuffle: () => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<void>;
+  loadPlaylistById: (id: string) => Promise<void>; // Ajout de la méthode loadPlaylistById
   openDrawer: () => void;
   closeDrawer: () => void;
 }
@@ -30,6 +32,8 @@ interface MusicContextType {
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export function MusicProvider({ children }: { children: React.ReactNode }) {
+  const [playlists, setPlaylists] = useState<Playlist[]>([]); // État pour stocker les playlists
+
   // Use our custom hooks to manage different aspects of the music player
   const {
     currentTrack,
@@ -59,9 +63,39 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     closeDrawer
   } = useDrawerState();
 
-  // Load initial playlist
+  // Load initial playlist and available playlists
   useEffect(() => {
     loadPlaylist('neutral');
+    
+    // Initialize some default playlists for demo
+    const defaultPlaylists: Playlist[] = [
+      {
+        id: 'calm-playlist',
+        name: 'Musique Calme',
+        emotion: 'calm',
+        tracks: []
+      },
+      {
+        id: 'focus-playlist',
+        name: 'Concentration',
+        emotion: 'focused',
+        tracks: []
+      },
+      {
+        id: 'energy-playlist',
+        name: 'Boost d\'Énergie',
+        emotion: 'energetic',
+        tracks: []
+      },
+      {
+        id: 'relaxation-playlist',
+        name: 'Relaxation Profonde',
+        emotion: 'calm',
+        tracks: []
+      }
+    ];
+    
+    setPlaylists(defaultPlaylists);
   }, []);
 
   // Handle loading of playlist and set first track
@@ -69,6 +103,16 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     const newPlaylist = await loadPlaylist(emotion);
     if (newPlaylist && newPlaylist.tracks.length > 0) {
       setCurrentTrack(newPlaylist.tracks[0]);
+    }
+  };
+  
+  // Add loadPlaylistById method
+  const loadPlaylistById = async (id: string) => {
+    // Trouver la playlist correspondante dans la liste des playlists
+    const playlist = playlists.find(pl => pl.id === id);
+    if (playlist) {
+      // Charger la playlist basée sur l'émotion associée
+      await loadPlaylistForEmotion(playlist.emotion || 'neutral');
     }
   };
   
@@ -98,12 +142,13 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       isPlaying,
       volume,
       playlist,
+      playlists, // Ajout des playlists à la valeur du contexte
       currentEmotion,
       isDrawerOpen,
       repeat,
       shuffle,
       playTrack,
-      loadTrack, // Added loadTrack
+      loadTrack,
       pauseTrack,
       nextTrack,
       previousTrack,
@@ -111,6 +156,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       toggleRepeat,
       toggleShuffle,
       loadPlaylistForEmotion,
+      loadPlaylistById, // Ajout de la méthode dans la valeur du contexte
       openDrawer,
       closeDrawer,
     }}>
