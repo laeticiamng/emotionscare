@@ -16,6 +16,7 @@ import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import InvitePage from './pages/InvitePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedLayout } from './components/ProtectedLayout';
+import { MusicProvider } from './contexts/MusicContext';
 
 // Router configuration
 const router = createBrowserRouter([
@@ -83,7 +84,9 @@ const router = createBrowserRouter([
 function AppWrapper() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <MusicProvider>
+        <RouterProvider router={router} />
+      </MusicProvider>
     </AuthProvider>
   );
 }
