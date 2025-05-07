@@ -21,6 +21,7 @@ export function useAudioPlayer() {
   const [audioError, setAudioError] = useState<string | null>(null);
   const [loadingTrack, setLoadingTrack] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const retryCount = useRef(0);
   const { toast } = useToast();
 
   // Create and manage audio element
@@ -35,7 +36,10 @@ export function useAudioPlayer() {
       audioRef.current.addEventListener('ended', handleTrackEnd);
       audioRef.current.addEventListener('error', handleAudioError);
       audioRef.current.addEventListener('loadstart', () => setLoadingTrack(true));
-      audioRef.current.addEventListener('canplay', () => setLoadingTrack(false));
+      audioRef.current.addEventListener('canplay', () => {
+        setLoadingTrack(false);
+        retryCount.current = 0; // Reset retry count on successful load
+      });
     }
     
     // Update audio source when track changes
@@ -43,11 +47,23 @@ export function useAudioPlayer() {
       console.log(`Loading track: ${currentTrack.title} - URL: ${currentTrack.url}`);
       setAudioError(null); // Reset previous errors
       setLoadingTrack(true);
-      audioRef.current.src = currentTrack.url;
-      audioRef.current.volume = volume;
       
-      if (isPlaying) {
-        playAudio();
+      try {
+        audioRef.current.src = currentTrack.url;
+        audioRef.current.volume = volume;
+        
+        // Add cache-busting query parameter if it's a local URL and we've had issues
+        if (retryCount.current > 0 && !currentTrack.url.startsWith('http')) {
+          audioRef.current.src = `${currentTrack.url}?cache=${Date.now()}`;
+        }
+        
+        if (isPlaying) {
+          playAudio();
+        }
+      } catch (err) {
+        console.error("Error setting audio source:", err);
+        setAudioError(`Erreur de chargement: ${err instanceof Error ? err.message : String(err)}`);
+        setLoadingTrack(false);
       }
     }
     
@@ -96,20 +112,42 @@ export function useAudioPlayer() {
         })
         .catch(err => {
           console.error("Audio playback error:", err);
-          setAudioError(`Playback error: ${err.message}`);
+          setAudioError(`Erreur de lecture: ${err.message}`);
           setLoadingTrack(false);
           
-          // Notify user of error
-          toast({
-            title: "Problème de lecture",
-            description: "Impossible de lire ce morceau. Essai du morceau suivant...",
-            variant: "destructive"
-          });
-          
-          // Automatically try next track
-          setTimeout(() => {
-            nextTrack();
-          }, 1500);
+          // If auto-play fails, try to recover
+          if (err.name === 'NotAllowedError') {
+            toast({
+              title: "Lecture audio bloquée",
+              description: "Votre navigateur a bloqué la lecture automatique. Cliquez sur Play pour continuer.",
+              variant: "destructive"
+            });
+          } else if (retryCount.current < 3) {
+            // Retry a few times before giving up
+            retryCount.current++;
+            
+            toast({
+              title: "Tentative de récupération",
+              description: `Problème de lecture, nouvelle tentative ${retryCount.current}/3...`
+            });
+            
+            setTimeout(() => {
+              if (currentTrack) {
+                playTrack(currentTrack);
+              }
+            }, 1000);
+          } else {
+            // After several retries, move to the next track
+            toast({
+              title: "Problème de lecture",
+              description: "Impossible de lire ce morceau. Passage au morceau suivant...",
+              variant: "destructive"
+            });
+            
+            setTimeout(() => {
+              nextTrack();
+            }, 1500);
+          }
         });
     }
   };
@@ -142,16 +180,50 @@ export function useAudioPlayer() {
       setAudioError(`Erreur: ${errorMsg}`);
       setLoadingTrack(false);
       
-      toast({
-        title: "Erreur de lecture",
-        description: `${errorMsg}. Passage au morceau suivant...`,
-        variant: "destructive"
-      });
-      
-      // Automatically move to next track
-      setTimeout(() => {
-        nextTrack();
-      }, 1500);
+      if (retryCount.current < 3) {
+        retryCount.current++;
+        
+        toast({
+          title: "Erreur audio",
+          description: `${errorMsg}. Nouvelle tentative ${retryCount.current}/3...`
+        });
+        
+        // Small delay before retry
+        setTimeout(() => {
+          if (currentTrack) {
+            // Try with a new Audio element
+            if (audioRef.current) {
+              // Create a new audio element
+              const oldAudio = audioRef.current;
+              audioRef.current = new Audio();
+              audioRef.current.volume = oldAudio.volume;
+              
+              // Re-add event listeners
+              audioRef.current.addEventListener('timeupdate', updateProgress);
+              audioRef.current.addEventListener('loadeddata', setAudioData);
+              audioRef.current.addEventListener('ended', handleTrackEnd);
+              audioRef.current.addEventListener('error', handleAudioError);
+              audioRef.current.addEventListener('loadstart', () => setLoadingTrack(true));
+              audioRef.current.addEventListener('canplay', () => setLoadingTrack(false));
+              
+              // Try loading with cache busting
+              audioRef.current.src = `${currentTrack.url}?cache=${Date.now()}`;
+              playAudio();
+            }
+          }
+        }, 1000);
+      } else {
+        toast({
+          title: "Erreur de lecture",
+          description: `${errorMsg}. Passage au morceau suivant...`,
+          variant: "destructive"
+        });
+        
+        // Automatically move to next track
+        setTimeout(() => {
+          nextTrack();
+        }, 1500);
+      }
     }
   };
   

@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { useToast } from '@/hooks/use-toast';
 
 interface MusicMoodVisualizationProps {
   mood: string;
@@ -18,6 +19,7 @@ const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
   const [localIntensity, setLocalIntensity] = useState(intensity);
   const [muted, setMuted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { toast } = useToast();
   
   // Update local intensity when prop changes
   useEffect(() => {
@@ -39,6 +41,10 @@ const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
   // Toggle mute
   const toggleMute = () => {
     setMuted(!muted);
+    toast({
+      title: muted ? "Son activé" : "Son désactivé",
+      description: muted ? "La visualisation sonore est maintenant active" : "La visualisation sonore est maintenant muette"
+    });
   };
   
   // Toggle expanded view
@@ -57,6 +63,7 @@ const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
               size="icon" 
               className="h-8 w-8" 
               onClick={toggleMute}
+              title={muted ? "Activer le son" : "Désactiver le son"}
             >
               {muted ? (
                 <VolumeX className="h-4 w-4" />
@@ -69,8 +76,19 @@ const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
               size="sm" 
               onClick={toggleExpand}
               className="h-8"
+              title={isExpanded ? "Réduire la visualisation" : "Agrandir la visualisation"}
             >
-              {isExpanded ? 'Réduire' : 'Agrandir'}
+              {isExpanded ? (
+                <>
+                  <Minimize className="h-4 w-4 mr-2" />
+                  Réduire
+                </>
+              ) : (
+                <>
+                  <Maximize className="h-4 w-4 mr-2" />
+                  Agrandir
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -80,6 +98,8 @@ const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
             emotion={mood}
             height={isExpanded ? 280 : 160}
             showControls={false}
+            muted={muted}
+            intensity={localIntensity}
           />
         </div>
         
