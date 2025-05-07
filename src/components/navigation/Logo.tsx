@@ -16,22 +16,14 @@ const Logo: React.FC<LogoProps> = ({
   size = 'md',
   variant = 'default'
 }) => {
-  const { logoPath, getLogoSize, primaryColor } = useBranding();
+  const { primaryColor } = useBranding();
   const showText = variant !== 'minimal';
   
   return (
     <Link to={homePath} className="flex items-center gap-2.5 transition-all duration-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-md group">
       <div className="flex items-center">
-        <div className="bg-white p-1 rounded-full shadow-sm">
-          <img 
-            src={logoPath}
-            alt="EmotionsCare Logo" 
-            className={`${getLogoSize(size)}`}
-          />
-        </div>
-        
         {showText && (
-          <div className="font-semibold text-xl tracking-tight ml-2">
+          <div className="font-semibold text-xl tracking-tight">
             <span className="group-hover:opacity-90 transition-opacity">
               Emotions<span className="text-primary font-semibold">Care</span>
             </span>
