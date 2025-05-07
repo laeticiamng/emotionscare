@@ -6,7 +6,8 @@ import { Brain, RefreshCw, Music, ArrowRight, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useCoach } from '@/hooks/coach/useCoach';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { useActivity } from '@/hooks/useActivity';
 
 const EnhancedCoachAI: React.FC = () => {
   const { user } = useAuth();
@@ -18,6 +19,8 @@ const EnhancedCoachAI: React.FC = () => {
     isProcessing,
     askQuestion
   } = useCoach();
+  const { toast } = useToast();
+  const { logActivity } = useActivity();
   
   const [customQuestion, setCustomQuestion] = useState('');
   const [response, setResponse] = useState('');
@@ -40,6 +43,7 @@ const EnhancedCoachAI: React.FC = () => {
   const handlePlayMusic = (emotion: string = lastEmotion || 'calm') => {
     loadPlaylistForEmotion(emotion);
     openDrawer();
+    logActivity('play_music', { emotion, source: 'coach' });
     toast({
       title: "Musique adaptée",
       description: `Une playlist adaptée à votre humeur a été lancée.`
@@ -53,6 +57,7 @@ const EnhancedCoachAI: React.FC = () => {
     try {
       const result = await askQuestion(customQuestion);
       setResponse(result);
+      setCustomQuestion('');
     } catch (error) {
       console.error('Error asking AI question:', error);
       toast({
@@ -62,7 +67,6 @@ const EnhancedCoachAI: React.FC = () => {
       });
     } finally {
       setIsThinking(false);
-      setCustomQuestion('');
     }
   };
   

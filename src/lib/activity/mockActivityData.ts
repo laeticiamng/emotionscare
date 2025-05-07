@@ -1,79 +1,75 @@
 
+import { ActivityType } from './activityTypes';
 import { AnonymizedActivityLog, ActivityStats } from './activityTypes';
 
-// Mock anonymized activity logs for admin dashboard
-export const mockActivityLogs: AnonymizedActivityLog[] = [
+/**
+ * Mock data for anonymized activity logs
+ */
+export const mockAnonymizedLogs: AnonymizedActivityLog[] = [
   {
     id: '1',
-    activity_type: 'login',
-    category: 'authentication',
-    count: 128,
-    timestamp_day: '2023-05-01'
+    activity_type: 'visit_page',
+    category: 'navigation',
+    count: 156,
+    timestamp_day: '2025-05-01'
   },
   {
     id: '2',
     activity_type: 'scan_emotion',
-    category: 'wellness',
-    count: 98,
-    timestamp_day: '2023-05-01'
+    category: 'engagement',
+    count: 78,
+    timestamp_day: '2025-05-01'
   },
   {
     id: '3',
-    activity_type: 'journal_entry',
-    category: 'wellness',
+    activity_type: 'use_coach',
+    category: 'engagement',
     count: 42,
-    timestamp_day: '2023-05-01'
+    timestamp_day: '2025-05-01'
   },
   {
     id: '4',
-    activity_type: 'coach_message',
-    category: 'coaching',
-    count: 76,
-    timestamp_day: '2023-05-02'
+    activity_type: 'play_music',
+    category: 'engagement',
+    count: 63,
+    timestamp_day: '2025-05-01'
   },
   {
     id: '5',
-    activity_type: 'vr_session',
-    category: 'wellness',
-    count: 31,
-    timestamp_day: '2023-05-02'
+    activity_type: 'coach_interaction',
+    category: 'engagement',
+    count: 37,
+    timestamp_day: '2025-05-01'
   }
 ];
 
-// Mock activity statistics
+/**
+ * Mock data for activity statistics
+ */
 export const mockActivityStats: ActivityStats[] = [
   {
-    activity_type: 'login',
-    total_count: 580,
-    percentage: 28.5
+    activity_type: 'visit_page',
+    total_count: 456,
+    percentage: 42
   },
   {
     activity_type: 'scan_emotion',
-    total_count: 423,
-    percentage: 20.8
+    total_count: 213,
+    percentage: 19
   },
   {
-    activity_type: 'journal_entry',
-    total_count: 217,
-    percentage: 10.7
+    activity_type: 'use_coach',
+    total_count: 187,
+    percentage: 17
   },
   {
-    activity_type: 'coach_message',
-    total_count: 382,
-    percentage: 18.7
+    activity_type: 'play_music',
+    total_count: 145,
+    percentage: 13
   },
   {
-    activity_type: 'vr_session',
-    total_count: 156,
-    percentage: 7.6
-  },
-  {
-    activity_type: 'music_play',
-    total_count: 278,
-    percentage: 13.7
+    activity_type: 'coach_interaction', 
+    total_count: 97,
+    percentage: 9
   }
 ];
-
-// Alias for compatibility with existing imports
-export const mockActivities = mockActivityLogs;
-export const mockStats = mockActivityStats;

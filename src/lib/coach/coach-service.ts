@@ -1,4 +1,3 @@
-
 import { CoachAction, CoachEvent, AI_MODEL_CONFIG, CoachModule } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { actionExecutor } from './action-executor';
@@ -123,7 +122,10 @@ class CoachService {
         .order('date', { ascending: false })
         .limit(3);
       
-      let userContext = null;
+      let userContext = {
+        recentEmotions: null,
+        currentScore: null
+      };
       
       if (emotions && emotions.length > 0) {
         // Use emojis field instead of emotion, or derive the emotion from other fields
@@ -147,22 +149,18 @@ class CoachService {
       // Send question to OpenAI
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
-          messages: [{
-            role: 'user',
-            content: question
-          }],
+          message: question,
           userContext,
           model,
           module: 'coach',
           temperature: 0.4,
-          max_tokens: 512,
-          stream: false
+          max_tokens: 512
         }
       });
       
       if (error) throw error;
       
-      return data.response;
+      return data?.response || "Je suis désolé, je n'ai pas pu traiter votre demande.";
     } catch (error) {
       console.error('Error asking coach question:', error);
       return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question.";

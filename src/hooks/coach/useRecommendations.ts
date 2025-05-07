@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useActivity } from '@/hooks/useActivity';
 
 /**
  * Hook to handle coach recommendations generation and management
@@ -11,6 +12,7 @@ export function useRecommendations() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [sessionScore, setSessionScore] = useState<number | null>(null);
   const [lastEmotion, setLastEmotion] = useState<string | null>(null);
+  const { logActivity } = useActivity();
 
   // Generate a recommendation based on recent user data
   const generateRecommendation = useCallback(async () => {
@@ -67,6 +69,12 @@ export function useRecommendations() {
           .replace(/^\d+\.\s*/, ''); // Remove numbering
         
         setRecommendations(prev => [recommendation, ...prev].slice(0, 5));
+        
+        // Log activity
+        logActivity('use_coach', { 
+          action: 'recommendation_generated', 
+          emotion: recentEmojis || 'unknown'
+        });
       }
     } catch (error) {
       console.error('Error generating recommendation:', error);
@@ -82,7 +90,7 @@ export function useRecommendations() {
       const randomIndex = Math.floor(Math.random() * fallbackRecommendations.length);
       setRecommendations(prev => [fallbackRecommendations[randomIndex], ...prev].slice(0, 5));
     }
-  }, [user?.id]);
+  }, [user?.id, logActivity]);
 
   return {
     recommendations,
