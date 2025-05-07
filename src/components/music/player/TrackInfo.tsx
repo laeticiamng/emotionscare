@@ -16,7 +16,7 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   // Extract track information with fallbacks
   const title = currentTrack.title || currentTrack.name || 'Unknown Track';
   const artist = currentTrack.artist || 'Unknown Artist';
-  const imageUrl = currentTrack.imageUrl || currentTrack.coverArt || '';
+  const imageUrl = currentTrack.coverUrl || currentTrack.cover || '';
   
   return (
     <div className="flex items-center space-x-3 mb-4">

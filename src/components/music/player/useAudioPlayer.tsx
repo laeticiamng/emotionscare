@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { toast } from '@/hooks/use-toast';
@@ -53,11 +52,12 @@ export function useAudioPlayer() {
       setCurrentTime(0);
       setDuration(0);
       
-      // Check if currentTrack has the required properties
-      const audioUrl = currentTrack.audioUrl || currentTrack.url || '';
+      // Get audio URL from track object, accounting for different property names
+      // Some track objects use 'url' and others use 'audioUrl'
+      const audioUrl = currentTrack.url || '';
       
       if (!audioUrl) {
-        console.error('Track is missing audioUrl property:', currentTrack);
+        console.error('Track is missing url property:', currentTrack);
         setAudioError(true);
         setLoadingTrack(false);
         toast({
