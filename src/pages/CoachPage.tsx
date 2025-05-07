@@ -1,209 +1,111 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ProtectedLayout from '@/components/ProtectedLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChatInterface } from '@/components/chat/ChatInterface';
-import { useAuth } from '@/contexts/AuthContext';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
-import { useCoach } from '@/hooks/coach/useCoach';
-import { useMusic } from '@/contexts/MusicContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Volume, Sparkles } from 'lucide-react';
-import MusicRecommendationCard from '@/components/coach/MusicRecommendationCard';
-import MusicEmotionSync from '@/components/scan/MusicEmotionSync';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import VREmotionRecommendation from '@/components/vr/VREmotionRecommendation';
-import { Emotion } from '@/types';
-import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
+import { Input } from '@/components/ui/input';
+import { MessageCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const CoachPage = () => {
-  const { user } = useAuth();
-  const { logUserAction } = useActivityLogging('coach');
-  const { recommendations, lastEmotion, triggerDailyReminder, sessionScore } = useCoach();
-  const { currentTrack, isPlaying, playTrack, pauseTrack, openDrawer } = useMusic();
-  const [autoSync, setAutoSync] = useState(false);
-  const [activeTab, setActiveTab] = useState('chat');
+  const [userQuestion, setUserQuestion] = useState('');
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
-  // Trigger initial recommendations when page loads
-  useEffect(() => {
-    if (user?.id) {
-      logUserAction('visit_coach_page');
-      triggerDailyReminder();
+  const handleStartCoaching = () => {
+    if (userQuestion.trim()) {
+      // Naviguer vers la page de chat avec la question initiale
+      navigate('/coach-chat', { state: { initialQuestion: userQuestion } });
+    } else {
+      // Naviguer simplement vers la page de chat
+      navigate('/coach-chat');
     }
-  }, [user?.id, logUserAction, triggerDailyReminder]);
-
-  // Enable autoSync effect
-  const toggleAutoSync = () => {
-    setAutoSync(!autoSync);
-    logUserAction('toggle_music_sync', { enabled: !autoSync });
   };
   
-  // Create a properly typed emotion object for VREmotionRecommendation 
-  const emotionForVR = lastEmotion ? {
-    id: 'temp-id',  // Required by the Emotion type
-    user_id: user?.id || 'anonymous',
-    date: new Date().toISOString(),
-    emotion: lastEmotion,
-    score: sessionScore || 50
-  } as Emotion : null;
+  const handleQuickQuestion = (question: string) => {
+    navigate('/coach-chat', { state: { initialQuestion: question } });
+  };
   
   return (
     <ProtectedLayout>
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">Coach IA</h1>
-          <p className="text-muted-foreground">Conseils personnalisés pour améliorer votre bien-être</p>
-        </header>
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <h1 className="text-3xl font-bold mb-6">Coach IA Personnel</h1>
         
-        {/* Invisible component for emotion-music synchronization */}
-        <MusicEmotionSync emotion={lastEmotion || 'neutral'} autoSync={autoSync} />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Tabs defaultValue="chat" className="w-full" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="chat">Discussion</TabsTrigger>
-                <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="chat">
-                <Card className="shadow-lg border-t-4 border-t-primary overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      Discussion avec votre coach IA
-                    </CardTitle>
-                    <CardDescription>
-                      Posez vos questions et recevez des conseils adaptés à votre situation
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <ChatInterface />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="recommendations">
-                <Card className="shadow-lg border-t-4 border-t-primary overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-primary" />
-                      Recommandations personnalisées
-                    </CardTitle>
-                    <CardDescription>
-                      Conseils de bien-être basés sur votre état émotionnel actuel
-                      {sessionScore && ` (Score: ${sessionScore}/100)`}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {recommendations.length > 0 ? (
-                      <ul className="space-y-4">
-                        {recommendations.map((rec, idx) => (
-                          <li key={idx} className="p-4 bg-muted/30 rounded-md hover:bg-muted/50 transition-colors">
-                            <p>{rec}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <div className="text-center p-6 bg-muted/20 rounded-md">
-                        <p>Aucune recommandation disponible pour le moment</p>
-                        <Button 
-                          onClick={triggerDailyReminder} 
-                          variant="outline" 
-                          className="mt-4"
-                        >
-                          Générer des recommandations
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {/* VR recommendation based on emotion */}
-                    {lastEmotion && (
-                      <div className="mt-6">
-                        <VREmotionRecommendation emotion={emotionForVR} />
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-          
-          <div className="space-y-6">
-            {/* Enhanced Music visualization card */}
-            <Card className="overflow-hidden shadow-lg border-t-4" style={{borderTopColor: '#6366F1'}}>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Music className="h-5 w-5 text-primary" />
-                    <span>Ambiance musicale</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleAutoSync}
-                    className={`text-xs ${autoSync ? 'bg-primary/20 text-primary' : ''}`}
-                  >
-                    {autoSync ? 'Sync auto ON' : 'Sync auto OFF'}
-                  </Button>
-                </CardTitle>
-                <CardDescription>
-                  Musique adaptée à votre état émotionnel
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-3">
-                <EnhancedMusicVisualizer 
-                  emotion={lastEmotion || 'neutral'} 
-                  showControls={true}
-                />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Posez une question à votre coach</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-muted-foreground">Votre coach personnel est là pour vous aider à améliorer votre bien-être et votre équilibre émotionnel.</p>
                 
-                <div className="mt-4 flex justify-end">
-                  <Button 
-                    variant="default" 
-                    size="sm"
-                    onClick={openDrawer}
-                  >
-                    <Music className="h-4 w-4 mr-2" />
-                    Ouvrir le lecteur
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Comment puis-je réduire mon stress au travail ?"
+                    value={userQuestion}
+                    onChange={(e) => setUserQuestion(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleStartCoaching}>
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Demander
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-            
-            {/* Music recommendation */}
-            <MusicRecommendationCard emotion={lastEmotion || 'neutral'} />
-            
-            {/* Coach recommendations summary */}
-            {recommendations.length > 0 && (
-              <Card className="shadow-lg">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    Recommandations du jour
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {recommendations.slice(0, 3).map((rec, idx) => (
-                      <li key={idx} className="p-3 bg-muted/30 rounded-md text-sm hover:bg-muted/40 transition-colors">
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
-                  {recommendations.length > 3 && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="w-full mt-2"
-                      onClick={() => setActiveTab('recommendations')}
-                    >
-                      Voir toutes les recommandations
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                
+                <Button variant="outline" className="w-full" onClick={handleStartCoaching}>
+                  Démarrer une conversation
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Questions populaires</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {["Comment gérer mon anxiété ?", "Techniques de respiration", "Améliorer mon sommeil"].map((question) => (
+                  <Button 
+                    key={question}
+                    variant="ghost" 
+                    className="w-full justify-start text-left" 
+                    onClick={() => handleQuickQuestion(question)}
+                  >
+                    {question}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recommandations personnalisées</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4 text-muted-foreground">Recommandations basées sur votre profil émotionnel récent.</p>
+              <Button onClick={() => toast({ title: "Fonctionnalité à venir", description: "Les recommandations personnalisées seront bientôt disponibles." })}>
+                Voir mes recommandations
+              </Button>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Historique des conversations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4 text-muted-foreground">Retrouvez l'historique de vos échanges avec le coach IA.</p>
+              <Button onClick={() => navigate('/coach-chat')} variant="outline">
+                Voir l'historique
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </ProtectedLayout>

@@ -1,203 +1,160 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Brain, MessageSquare, Music, Heart } from 'lucide-react';
-import { useCoach } from '@/hooks/coach/useCoach';
-import { useAuth } from '@/contexts/AuthContext';
-import { useActivity } from '@/hooks/useActivity';
-import EnhancedCoachAI from '@/components/coach/EnhancedCoachAI';
-import { useMusic } from '@/contexts/MusicContext';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { Send } from 'lucide-react';
+import { ChatMessage } from '@/types/chat';
 
-const CoachChatPage: React.FC = () => {
-  const { user } = useAuth();
-  const { logActivity } = useActivity();
-  const { triggerDailyReminder, lastEmotion } = useCoach();
-  const { openDrawer } = useMusic();
-  const [activeTab, setActiveTab] = useState('chat');
+const CoachChatPage = () => {
+  const [userMessage, setUserMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      text: 'Bonjour, je suis votre coach IA. Comment puis-je vous aider aujourd\'hui ?',
+      sender: 'bot',
+      timestamp: new Date(),
+    },
+  ]);
+  const { toast } = useToast();
+  const location = useLocation();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
+  // Récupérer la question initiale des paramètres de navigation
   useEffect(() => {
-    if (user) {
-      logActivity('visit_coach_chat_page');
-      triggerDailyReminder();
+    const state = location.state as { initialQuestion?: string } | undefined;
+    if (state?.initialQuestion) {
+      handleSendMessage(state.initialQuestion);
     }
-  }, [user, logActivity, triggerDailyReminder]);
+  }, [location.state]);
+
+  // Faire défiler automatiquement vers le bas lorsque de nouveaux messages arrivent
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleSendMessage = async (messageText: string = userMessage) => {
+    if (!messageText.trim()) return;
+    
+    // Ajouter le message de l'utilisateur
+    const userMessageObj: ChatMessage = {
+      id: Date.now().toString(),
+      text: messageText,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+    
+    setMessages((prevMessages) => [...prevMessages, userMessageObj]);
+    setUserMessage('');
+    setIsLoading(true);
+    
+    // Simuler une réponse du coach IA (à remplacer par une vraie API)
+    setTimeout(() => {
+      const botResponse: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: generateCoachResponse(messageText),
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      
+      setMessages((prevMessages) => [...prevMessages, botResponse]);
+      setIsLoading(false);
+    }, 1500);
+  };
   
+  // Fonction temporaire pour générer une réponse en attendant l'intégration avec l'API
+  const generateCoachResponse = (question: string): string => {
+    const responses = [
+      "C'est une excellente question. Je vous suggère de prendre le temps de réfléchir à vos priorités et à ce qui compte vraiment pour vous.",
+      "Pour gérer ce type de situation, essayez de pratiquer la pleine conscience pendant quelques minutes chaque jour.",
+      "Votre bien-être est important. Avez-vous pensé à intégrer de courtes pauses dans votre journée de travail ?",
+      "Je comprends ce que vous ressentez. Beaucoup de personnes font face à des défis similaires. Essayez de vous concentrer sur les aspects que vous pouvez contrôler.",
+      "Une approche qui pourrait vous aider serait d'établir une routine matinale qui vous prépare mentalement pour la journée.",
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+  };
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
     <ProtectedLayout>
-      <div className="container mx-auto p-4 max-w-7xl">
-        <header className="mb-6">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Brain className="h-6 w-6 text-primary" />
-            Coach IA - Discussion personnalisée
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Interagissez avec votre coach IA personnel pour obtenir des conseils adaptés à votre état émotionnel
-          </p>
-        </header>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="chat" className="flex items-center gap-1">
-                  <MessageSquare className="h-4 w-4" />
-                  Discussion
-                </TabsTrigger>
-                <TabsTrigger value="bien-etre" className="flex items-center gap-1">
-                  <Heart className="h-4 w-4" />
-                  Bien-être
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="chat" className="space-y-4">
-                <Card className="shadow-lg">
-                  <CardContent className="p-0">
-                    <EnhancedCoachAI />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="bien-etre" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-rose-500" />
-                      Activités bien-être recommandées
-                    </CardTitle>
-                    <CardDescription>
-                      Activités personnalisées pour améliorer votre bien-être quotidien
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card className="bg-muted/30 border">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium mb-2">Respiration consciente</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            5 minutes de respiration profonde pour réduire le stress et l'anxiété
-                          </p>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Démarrer l'exercice
-                          </Button>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="bg-muted/30 border">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium mb-2">Pause active</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            3 minutes d'étirements simples à faire à votre bureau
-                          </p>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Voir les exercices
-                          </Button>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="bg-muted/30 border">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium mb-2">Moment de gratitude</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Noter 3 choses positives qui se sont passées aujourd'hui
-                          </p>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Ouvrir le journal
-                          </Button>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="bg-muted/30 border">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium mb-2">Pause musicale</h3>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Écouter une musique apaisante pendant 5 minutes
-                          </p>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="w-full"
-                            onClick={openDrawer}
-                          >
-                            <Music className="h-4 w-4 mr-2" />
-                            Ouvrir le lecteur
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+      <div className="container mx-auto px-4 py-4 max-w-4xl h-[80vh] flex flex-col">
+        <Card className="flex-grow flex flex-col overflow-hidden p-0">
+          {/* En-tête du chat */}
+          <div className="bg-secondary/50 p-4 border-b">
+            <h1 className="text-xl font-semibold">Coach IA Personnel</h1>
+            <p className="text-sm text-muted-foreground">Discutez avec votre coach pour obtenir des conseils personnalisés</p>
           </div>
           
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-primary" />
-                  Profil émotionnel
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-3 bg-muted/30 rounded-lg">
-                    <h3 className="text-sm font-medium mb-1">État émotionnel actuel</h3>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <p>{lastEmotion || 'Neutre'}</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Tendances récentes</h3>
-                    <div className="h-32 bg-muted/20 rounded-md flex items-center justify-center">
-                      <p className="text-sm text-muted-foreground">Graphique des émotions</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Facteurs de stress identifiés</h3>
-                    <ul className="space-y-1">
-                      <li className="text-sm flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        <span>Charge de travail</span>
-                      </li>
-                      <li className="text-sm flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                        <span>Qualité du sommeil</span>
-                      </li>
-                    </ul>
+          {/* Zone de messages */}
+          <div className="flex-grow overflow-y-auto p-4 space-y-4">
+            {messages.map((msg) => (
+              <div 
+                key={msg.id}
+                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div 
+                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                    msg.sender === 'user' 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted'
+                  }`}
+                >
+                  <p>{msg.text}</p>
+                  <p className="text-xs opacity-70 mt-1">
+                    {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-muted max-w-[80%] rounded-lg px-4 py-2">
+                  <div className="flex space-x-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Music className="h-4 w-4" />
-                  Musique adaptée
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm mb-3">
-                  Écoutez une playlist spécialement conçue pour votre état émotionnel actuel.
-                </p>
-                <Button 
-                  className="w-full"
-                  variant="outline"
-                  onClick={openDrawer}
-                >
-                  <Music className="h-4 w-4 mr-2" />
-                  Ouvrir le lecteur musical
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
-        </div>
+          
+          {/* Zone de saisie */}
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <Input 
+                ref={inputRef}
+                value={userMessage}
+                onChange={(e) => setUserMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Écrivez votre message..."
+                className="flex-grow"
+                disabled={isLoading}
+              />
+              <Button onClick={() => handleSendMessage()} disabled={isLoading || !userMessage.trim()}>
+                <Send className="h-4 w-4" />
+                <span className="sr-only">Envoyer</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
       </div>
     </ProtectedLayout>
   );
