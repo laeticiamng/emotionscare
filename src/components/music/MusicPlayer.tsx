@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useMusic } from '@/contexts/MusicContext';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 
 const MusicPlayer = () => {
   const { 
@@ -21,7 +22,9 @@ const MusicPlayer = () => {
   
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [audioError, setAudioError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Create audio element if it doesn't exist
@@ -32,15 +35,18 @@ const MusicPlayer = () => {
       audioRef.current.addEventListener('timeupdate', updateProgress);
       audioRef.current.addEventListener('loadeddata', setAudioData);
       audioRef.current.addEventListener('ended', handleTrackEnd);
+      audioRef.current.addEventListener('error', handleAudioError);
     }
     
     // Update audio source when track changes
     if (currentTrack) {
+      console.log(`Chargement du morceau: ${currentTrack.title} - URL: ${currentTrack.url}`);
+      setAudioError(null); // Reset any previous error
       audioRef.current.src = currentTrack.url;
       audioRef.current.volume = volume;
       
       if (isPlaying) {
-        audioRef.current.play().catch(err => console.error("Error playing track:", err));
+        playAudio();
       }
     }
     
@@ -50,6 +56,7 @@ const MusicPlayer = () => {
         audioRef.current.removeEventListener('timeupdate', updateProgress);
         audioRef.current.removeEventListener('loadeddata', setAudioData);
         audioRef.current.removeEventListener('ended', handleTrackEnd);
+        audioRef.current.removeEventListener('error', handleAudioError);
         audioRef.current.pause();
       }
     };
@@ -57,10 +64,10 @@ const MusicPlayer = () => {
   
   // Handle play/pause changes
   useEffect(() => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !currentTrack) return;
     
     if (isPlaying) {
-      audioRef.current.play().catch(err => console.error("Error playing track:", err));
+      playAudio();
     } else {
       audioRef.current.pause();
     }
@@ -72,6 +79,43 @@ const MusicPlayer = () => {
     audioRef.current.volume = volume;
   }, [volume]);
   
+  const playAudio = () => {
+    if (!audioRef.current) return;
+    
+    const playPromise = audioRef.current.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.error("Error playing audio:", err);
+        setAudioError(`Erreur de lecture: ${err.message}`);
+        
+        // Notify user about the error
+        toast({
+          title: "Erreur de lecture",
+          description: "Impossible de lire ce morceau. Essayez un autre titre.",
+          variant: "destructive"
+        });
+        
+        // Try to play next track automatically
+        nextTrack();
+      });
+    }
+  };
+  
+  const handleAudioError = (e: Event) => {
+    const error = (e.target as HTMLAudioElement).error;
+    if (error) {
+      console.error("Audio error:", error.message);
+      setAudioError(`Erreur: ${error.message}`);
+      
+      toast({
+        title: "Problème de lecture audio",
+        description: `${error.message}. Essayez un autre morceau.`,
+        variant: "destructive"
+      });
+    }
+  };
+  
   const updateProgress = () => {
     if (!audioRef.current) return;
     setCurrentTime(audioRef.current.currentTime);
@@ -80,6 +124,7 @@ const MusicPlayer = () => {
   const setAudioData = () => {
     if (!audioRef.current) return;
     setDuration(audioRef.current.duration);
+    setAudioError(null); // Clear error on successful load
   };
   
   const handleTrackEnd = () => {
@@ -143,6 +188,10 @@ const MusicPlayer = () => {
         <div className="flex-1 min-w-0">
           <h3 className="font-medium leading-none truncate">{currentTrack.title}</h3>
           <p className="text-sm text-muted-foreground mt-1 truncate">{currentTrack.artist}</p>
+          
+          {audioError && (
+            <p className="text-xs text-destructive mt-1">{audioError}</p>
+          )}
         </div>
       </div>
       

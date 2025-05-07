@@ -3,23 +3,23 @@ import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { Track, Playlist } from './types';
 
 /**
- * Helper function to convert between MusicTrack and internal Track
+ * Convertit un MusicTrack en Track
  */
-export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
+export function convertMusicTrackToTrack(musicTrack: MusicTrack): Track {
   return {
     id: musicTrack.id,
     title: musicTrack.title,
     artist: musicTrack.artist,
     duration: musicTrack.duration,
     url: musicTrack.audioUrl,
-    cover: musicTrack.coverUrl,
+    cover: musicTrack.coverUrl
   };
-};
+}
 
 /**
- * Helper function to convert between internal Track and MusicTrack
+ * Convertit un Track en MusicTrack
  */
-export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
+export function convertTrackToMusicTrack(track: Track): MusicTrack {
   return {
     id: track.id,
     title: track.title,
@@ -27,29 +27,30 @@ export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
     duration: track.duration,
     audioUrl: track.url,
     coverUrl: track.cover || '',
+    emotion: 'neutral' // Valeur par défaut
   };
-};
+}
 
 /**
- * Convert MusicPlaylist to internal Playlist format
+ * Convertit une MusicPlaylist en Playlist
  */
-export const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => {
+export function convertMusicPlaylistToPlaylist(musicPlaylist: MusicPlaylist): Playlist {
   return {
     id: musicPlaylist.id,
     name: musicPlaylist.name,
     emotion: musicPlaylist.emotion,
     tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
   };
-};
+}
 
 /**
- * Convert internal Playlist to MusicPlaylist format
+ * Convertit une Playlist en MusicPlaylist
  */
-export const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
+export function convertPlaylistToMusicPlaylist(playlist: Playlist): MusicPlaylist {
   return {
     id: playlist.id,
     name: playlist.name,
     emotion: playlist.emotion || 'neutral',
     tracks: playlist.tracks.map(convertTrackToMusicTrack)
   };
-};
+}
