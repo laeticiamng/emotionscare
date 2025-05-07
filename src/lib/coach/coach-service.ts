@@ -4,6 +4,7 @@ import { actionExecutor } from './action-executor';
 import { determineActions } from './emotional-data';
 import { routines } from './routines';
 import { budgetMonitor } from '@/lib/ai/budgetMonitor';
+import { UserContext } from '@/types/chat';
 
 /**
  * Service pour le coach IA
@@ -122,7 +123,7 @@ class CoachService {
         .order('date', { ascending: false })
         .limit(3);
       
-      let userContext = {
+      let userContext: UserContext = {
         recentEmotions: null,
         currentScore: null
       };
