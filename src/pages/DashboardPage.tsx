@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -11,15 +11,16 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { notificationService } from '@/lib/coach/notification-service';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { SegmentProvider } from '@/contexts/SegmentContext';
+import useLogger from '@/hooks/useLogger';
 
 const DashboardPage: React.FC = () => {
-  console.log("DashboardPage Component - Initializing");
+  const logger = useLogger('DashboardPage');
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  console.log("DashboardPage - Auth state:", { 
+  logger.debug('Component initializing', { 
     user: user ? { id: user.id, role: user.role } : null, 
     isAuthenticated, 
     isLoading 
@@ -27,9 +28,10 @@ const DashboardPage: React.FC = () => {
   
   // Redirect to login if not authenticated
   useEffect(() => {
-    console.log("DashboardPage - Auth effect running, isLoading:", isLoading, "isAuthenticated:", isAuthenticated);
+    logger.debug('Auth effect running', { isLoading, isAuthenticated });
+    
     if (!isLoading && !isAuthenticated) {
-      console.log("DashboardPage - Not authenticated, redirecting to login");
+      logger.info('Not authenticated, redirecting to login');
       toast({
         title: "Accès refusé",
         description: "Veuillez vous connecter pour accéder à cette page",
@@ -37,49 +39,62 @@ const DashboardPage: React.FC = () => {
       });
       navigate('/login');
     }
-  }, [isLoading, isAuthenticated, navigate, toast]);
+  }, [isLoading, isAuthenticated, navigate, toast, logger]);
   
-  // Demo: Add a sample notification when the dashboard loads
+  // Add demo notifications
+  const addWelcomeNotification = useCallback(() => {
+    if (!user?.id) return;
+    
+    logger.debug('Adding welcome notification');
+    notificationService.addNotification(user.id, {
+      id: `welcome-${Date.now()}`,
+      title: 'Bienvenue dans votre dashboard',
+      message: 'Découvrez les nouvelles fonctionnalités disponibles',
+      type: 'info',
+      timestamp: new Date(),
+      read: false
+    });
+  }, [user?.id, logger]);
+  
+  const addReminderNotification = useCallback(() => {
+    if (!user?.id) return;
+    
+    logger.debug('Adding reminder notification');
+    notificationService.addNotification(user.id, {
+      id: `reminder-${Date.now()}`,
+      title: 'Rappel: Scan émotionnel',
+      message: 'N\'oubliez pas de compléter votre scan émotionnel quotidien',
+      type: 'reminder',
+      timestamp: new Date(),
+      read: false
+    });
+  }, [user?.id, logger]);
+  
+  // Demo: Add sample notifications when the dashboard loads
   useEffect(() => {
     if (user?.id) {
-      // Add a welcome notification
-      setTimeout(() => {
-        console.log("DashboardPage - Adding welcome notification");
-        notificationService.addNotification(user.id, {
-          id: `welcome-${Date.now()}`,
-          title: 'Bienvenue dans votre dashboard',
-          message: 'Découvrez les nouvelles fonctionnalités disponibles',
-          type: 'info',
-          timestamp: new Date(),
-          read: false
-        });
-        
-        // Add another notification after a delay
-        setTimeout(() => {
-          console.log("DashboardPage - Adding reminder notification");
-          notificationService.addNotification(user.id, {
-            id: `reminder-${Date.now()}`,
-            title: 'Rappel: Scan émotionnel',
-            message: 'N\'oubliez pas de compléter votre scan émotionnel quotidien',
-            type: 'reminder',
-            timestamp: new Date(),
-            read: false
-          });
-        }, 10000); // 10 seconds later
-      }, 3000); // 3 seconds after load
+      // Add notifications with delays
+      const welcomeTimer = setTimeout(addWelcomeNotification, 3000);
+      const reminderTimer = setTimeout(addReminderNotification, 13000);
+      
+      // Clean up timers
+      return () => {
+        clearTimeout(welcomeTimer);
+        clearTimeout(reminderTimer);
+      };
     }
-  }, [user?.id]);
+  }, [user?.id, addWelcomeNotification, addReminderNotification]);
   
   if (isLoading) {
-    console.log("DashboardPage - Showing loading animation");
+    logger.debug('Showing loading animation');
     return <LoadingAnimation />;
   }
   
-  // Determine dashboard type based on user role with appropriate fallback
+  // Determine dashboard type based on user role
   const isAdmin = isAdminRole(user?.role);
   const isUser = isUserRole(user?.role);
   
-  console.log(`DashboardPage - Determining dashboard type: isAdmin=${isAdmin}, isUser=${isUser}, role=${user?.role}`);
+  logger.debug('Determining dashboard type', { isAdmin, isUser, role: user?.role });
   
   return (
     <DashboardContainer>

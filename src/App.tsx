@@ -1,121 +1,173 @@
 
-import React from 'react';
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import React, { Suspense, lazy } from 'react';
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { Shell } from "@/components/Shell";
-import Index from '@/pages/Index';
-import { Docs } from "@/pages/Docs";
-import { Pricing } from "@/pages/Pricing";
-import { Contact } from "@/pages/Contact";
-import LoginPage from '@/pages/LoginPage';
-import RegisterPage from '@/pages/RegisterPage';
-import DashboardPage from '@/pages/DashboardPage';
-import SettingsPage from '@/pages/SettingsPage';
-import AdminLoginPage from '@/pages/AdminLoginPage';
-import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
-import ResetPasswordPage from '@/pages/ResetPasswordPage';
-import InvitePage from './pages/InvitePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedLayout } from './components/ProtectedLayout';
 import { MusicProvider } from './contexts/MusicContext';
-import ScanPage from './pages/ScanPage';
-import CoachPage from './pages/CoachPage';
-import SocialCocoonPage from './pages/SocialCocoonPage';
-import GamificationPage from './pages/GamificationPage';
-import BuddyPage from './pages/BuddyPage';
-import VRSessionPage from './pages/VRSessionPage';
-import MusicWellbeingPage from './pages/MusicWellbeingPage';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
-// Router configuration
+// Chargement paresseux des pages pour améliorer les performances
+const Index = lazy(() => import('@/pages/Index'));
+const Docs = lazy(() => import('@/pages/Docs'));
+const Pricing = lazy(() => import('@/pages/Pricing'));
+const Contact = lazy(() => import('@/pages/Contact'));
+const LoginPage = lazy(() => import('@/pages/LoginPage'));
+const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
+const AdminLoginPage = lazy(() => import('@/pages/AdminLoginPage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
+const InvitePage = lazy(() => import('./pages/InvitePage'));
+const ScanPage = lazy(() => import('./pages/ScanPage'));
+const CoachPage = lazy(() => import('./pages/CoachPage'));
+const SocialCocoonPage = lazy(() => import('./pages/SocialCocoonPage'));
+const GamificationPage = lazy(() => import('./pages/GamificationPage'));
+const BuddyPage = lazy(() => import('./pages/BuddyPage'));
+const VRSessionPage = lazy(() => import('./pages/VRSessionPage'));
+const MusicWellbeingPage = lazy(() => import('./pages/MusicWellbeingPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFound'));
+
+// Composant de chargement pour les imports paresseux
+const SuspenseLoader = ({ children }: { children: React.ReactNode }) => (
+  <Suspense fallback={<LoadingAnimation />}>
+    {children}
+  </Suspense>
+);
+
+// Configuration du routeur
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Shell />,
+    errorElement: <SuspenseLoader><NotFoundPage /></SuspenseLoader>,
     children: [
       {
-        path: "/",
-        element: <Index />
+        index: true,
+        element: <SuspenseLoader><Index /></SuspenseLoader>
       },
       {
-        path: "/docs",
-        element: <Docs />
+        path: "docs",
+        element: <SuspenseLoader><Docs /></SuspenseLoader>
       },
       {
-        path: "/pricing",
-        element: <Pricing />
+        path: "pricing",
+        element: <SuspenseLoader><Pricing /></SuspenseLoader>
       },
       {
-        path: "/contact",
-        element: <Contact />
+        path: "contact",
+        element: <SuspenseLoader><Contact /></SuspenseLoader>
       },
       {
-        path: "/dashboard",
-        element: <ProtectedLayout><DashboardPage /></ProtectedLayout>
+        path: "dashboard",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><DashboardPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/settings",
-        element: <ProtectedLayout><SettingsPage /></ProtectedLayout>
+        path: "settings",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><SettingsPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/scan",
-        element: <ProtectedLayout><ScanPage /></ProtectedLayout>
+        path: "scan",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><ScanPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/coach",
-        element: <ProtectedLayout><CoachPage /></ProtectedLayout>
+        path: "coach",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><CoachPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/social-cocoon",
-        element: <ProtectedLayout><SocialCocoonPage /></ProtectedLayout>
+        path: "social-cocoon",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><SocialCocoonPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/buddy",
-        element: <ProtectedLayout><BuddyPage /></ProtectedLayout>
+        path: "buddy",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><BuddyPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/gamification",
-        element: <ProtectedLayout><GamificationPage /></ProtectedLayout>
+        path: "gamification",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><GamificationPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/vr-session",
-        element: <ProtectedLayout><VRSessionPage /></ProtectedLayout>
+        path: "vr-session",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><VRSessionPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
       },
       {
-        path: "/music",
-        element: <ProtectedLayout><MusicWellbeingPage /></ProtectedLayout>
+        path: "music",
+        element: (
+          <ProtectedLayout>
+            <SuspenseLoader><MusicWellbeingPage /></SuspenseLoader>
+          </ProtectedLayout>
+        )
+      },
+      {
+        path: "*",
+        element: <Navigate to="/" replace />
       }
     ]
   },
   {
     path: "/login",
-    element: <LoginPage />
+    element: <SuspenseLoader><LoginPage /></SuspenseLoader>
   },
   {
     path: "/register",
-    element: <RegisterPage />
+    element: <SuspenseLoader><RegisterPage /></SuspenseLoader>
   },
   {
     path: "/admin/login",
-    element: <AdminLoginPage />
+    element: <SuspenseLoader><AdminLoginPage /></SuspenseLoader>
   },
   {
-    path: "/admin-login", // Ajout de cette route pour compatibilité
-    element: <AdminLoginPage />
+    path: "/admin-login", // Pour compatibilité
+    element: <Navigate to="/admin/login" replace />
   },
   {
     path: "/forgot-password",
-    element: <ForgotPasswordPage />
+    element: <SuspenseLoader><ForgotPasswordPage /></SuspenseLoader>
   },
   {
     path: "/reset-password",
-    element: <ResetPasswordPage />
+    element: <SuspenseLoader><ResetPasswordPage /></SuspenseLoader>
   },
   {
     path: "/invite",
-    element: <InvitePage />
+    element: <SuspenseLoader><InvitePage /></SuspenseLoader>
   }
 ]);
 
-// Main component that provides auth context and router
+// Composant principal qui fournit le contexte d'authentification et le routeur
 function AppWrapper() {
   return (
     <AuthProvider>

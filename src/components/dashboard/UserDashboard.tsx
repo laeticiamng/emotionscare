@@ -1,18 +1,20 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import DashboardHeader from './DashboardHeader';
-import UserSidePanel from './UserSidePanel';
 import ModulesSection from '@/components/home/ModulesSection';
-import EmotionScanSection from './EmotionScanSection';
-import SocialCocoonWidget from './SocialCocoonWidget';
-import GamificationWidget from './GamificationWidget';
 import DashboardHero from './DashboardHero';
 import type { User } from '@/types';
-import VRPromptWidget from '../vr/VRPromptWidget';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, LayoutDashboard, LayoutGrid } from 'lucide-react';
+import { LayoutDashboard, LayoutGrid } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDashboardHero } from '@/hooks/useDashboardHero';
+import { 
+  EmotionDashboardSection, 
+  SocialDashboardSection,
+  ProfileDashboardSection,
+  VRDashboardSection,
+  GamificationDashboardSection
+} from './UserDashboardSections';
 
 interface UserDashboardProps {
   user: User | null;
@@ -35,19 +37,31 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
     vr: isMobile
   });
   
-  const toggleSection = (section: keyof typeof collapsedSections) => {
+  const toggleSection = useCallback((section: keyof typeof collapsedSections) => {
     setCollapsedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
-  };
+  }, []);
   
   // Refresh all user dashboard data
   const refreshDashboardData = useCallback(async () => {
-    console.log('Refreshing user dashboard data...');
     await refetchDashboardHero();
-    console.log('User dashboard data refresh complete');
   }, [refetchDashboardHero]);
+
+  useEffect(() => {
+    // Ajuster l'état de collapse des sections en fonction du type d'appareil
+    if (isMobile) {
+      setCollapsedSections(prev => ({
+        ...prev,
+        emotionScan: true,
+        sidePanel: true,
+        social: true,
+        gamification: true,
+        vr: true
+      }));
+    }
+  }, [isMobile]);
   
   return (
     <div className="animate-fade-in w-full">
@@ -86,50 +100,29 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
       />
       
       {/* Modules Section - Using our reusable component */}
-      <ModulesSection collapsed={collapsedSections.modules} onToggle={() => toggleSection('modules')} />
+      <ModulesSection 
+        collapsed={collapsedSections.modules} 
+        onToggle={() => toggleSection('modules')} 
+      />
       
       <div className="dashboard-premium mt-6">
         {/* Main Content Area */}
         <div className="dashboard-main">
           {/* Emotion Scan Section */}
-          <div className="card-premium p-4 lg:p-4">
-            <div 
-              className="flex justify-between items-center cursor-pointer"
-              onClick={() => toggleSection('emotionScan')}
-            >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>
-                {isMobile ? 'Santé Émotionnelle' : 'Votre Santé Émotionnelle'}
-              </h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
-                {collapsedSections.emotionScan ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-              </Button>
-            </div>
-            
-            {!collapsedSections.emotionScan && (
-              <div className="mt-4">
-                <EmotionScanSection />
-              </div>
-            )}
-          </div>
+          <EmotionDashboardSection
+            collapsed={collapsedSections.emotionScan}
+            onToggle={() => toggleSection('emotionScan')}
+            isMobile={isMobile}
+          />
           
           {/* Social Section - Only in full view */}
           {(!minimalView || isMobile) && (
-            <div className="card-premium p-4 lg:p-4 mt-6">
-              <div 
-                className="flex justify-between items-center cursor-pointer"
-                onClick={() => toggleSection('social')}
-              >
-                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Communauté</h2>
-                <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
-                  {collapsedSections.social ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-                </Button>
-              </div>
-              
-              {!collapsedSections.social && (
-                <div className="mt-4">
-                  <SocialCocoonWidget />
-                </div>
-              )}
+            <div className="mt-6">
+              <SocialDashboardSection
+                collapsed={collapsedSections.social}
+                onToggle={() => toggleSection('social')}
+                isMobile={isMobile}
+              />
             </div>
           )}
         </div>
@@ -137,64 +130,31 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         {/* Side Panel */}
         <div className="dashboard-side">
           {/* User Side Panel */}
-          <div className="card-premium p-4 lg:p-4">
-            <div 
-              className="flex justify-between items-center cursor-pointer"
-              onClick={() => toggleSection('sidePanel')}
-            >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Profil</h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
-                {collapsedSections.sidePanel ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-              </Button>
-            </div>
-            
-            {!collapsedSections.sidePanel && (
-              <div className="mt-4">
-                <UserSidePanel />
-              </div>
-            )}
-          </div>
+          <ProfileDashboardSection
+            collapsed={collapsedSections.sidePanel}
+            onToggle={() => toggleSection('sidePanel')}
+            isMobile={isMobile}
+          />
           
           {/* VR Prompt Widget */}
-          <div className="card-premium p-4 lg:p-4 mt-6">
-            <div 
-              className="flex justify-between items-center cursor-pointer"
-              onClick={() => toggleSection('vr')}
-            >
-              <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Micro-pause VR</h2>
-              <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
-                {collapsedSections.vr ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-              </Button>
-            </div>
-            
-            {!collapsedSections.vr && (
-              <div className="mt-4">
-                <VRPromptWidget 
-                  userId={user?.id || '00000000-0000-0000-0000-000000000000'} 
-                  latestEmotion={latestEmotion}
-                />
-              </div>
-            )}
+          <div className="mt-6">
+            <VRDashboardSection
+              collapsed={collapsedSections.vr}
+              onToggle={() => toggleSection('vr')}
+              isMobile={isMobile}
+              userId={user?.id || '00000000-0000-0000-0000-000000000000'}
+              latestEmotion={latestEmotion}
+            />
           </div>
           
           {/* Gamification Widget - Only in full view or on mobile */}
           {(!minimalView || isMobile) && (
-            <div className="card-premium p-4 lg:p-4 mt-6">
-              <div 
-                className="flex justify-between items-center cursor-pointer"
-                onClick={() => toggleSection('gamification')}
-              >
-                <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-semibold heading-elegant`}>Récompenses</h2>
-                <Button variant="ghost" size="sm" className="p-1 h-auto focus-premium">
-                  {collapsedSections.gamification ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
-                </Button>
-              </div>
-              
-              {!collapsedSections.gamification && (
-                <div className="mt-4">
-                  <GamificationWidget />
-                </div>
-              )}
+            <div className="mt-6">
+              <GamificationDashboardSection
+                collapsed={collapsedSections.gamification}
+                onToggle={() => toggleSection('gamification')}
+                isMobile={isMobile}
+              />
             </div>
           )}
         </div>

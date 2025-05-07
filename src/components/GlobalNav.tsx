@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { topNavItems, adminTopNavItems } from './navigation/navConfig';
@@ -14,6 +14,7 @@ import NotificationsPanel from './notifications/NotificationsPanel';
 import { useNotificationBadge } from '@/hooks/useNotificationBadge';
 import { Button } from './ui/button';
 import { HomeIcon, LogIn } from 'lucide-react';
+import useLogger from '@/hooks/useLogger';
 
 interface GlobalNavProps {
   isAuthenticated?: boolean;
@@ -24,6 +25,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
   const navigate = useNavigate();
   const isAdmin = user ? isAdminRole(user.role) : false;
   const { unreadCount } = useNotificationBadge();
+  const logger = useLogger('GlobalNav');
   
   // Utiliser l'état d'authentification du contexte si isAuthenticated n'est pas fourni en prop
   const authenticated = isAuthenticated || authState;
@@ -31,7 +33,21 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
   // Sélectionner les bons éléments de navigation en fonction du rôle
   const navigationItems = isAdmin ? adminTopNavItems : topNavItems;
   
-  console.log("GlobalNav rendering - authenticated:", authenticated, "user:", user?.name, "role:", user?.role);
+  logger.info('Rendering navigation', { 
+    authenticated, 
+    userName: user?.name,
+    userRole: user?.role
+  });
+  
+  const handleLoginClick = useCallback(() => {
+    logger.debug('Login button clicked');
+    navigate('/login');
+  }, [navigate, logger]);
+  
+  const handleRegisterClick = useCallback(() => {
+    logger.debug('Register button clicked');
+    navigate('/register');
+  }, [navigate, logger]);
   
   return (
     <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur-sm border-b shadow-sm">
@@ -85,7 +101,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
                 variant="default" 
                 size="sm" 
                 className="hover-lift shadow-sm"
-                onClick={() => navigate('/login')}
+                onClick={handleLoginClick}
               >
                 <LogIn size={16} className="mr-2" />
                 Connexion
@@ -94,7 +110,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
                 variant="outline" 
                 size="sm" 
                 className="hover-lift"
-                onClick={() => navigate('/register')}
+                onClick={handleRegisterClick}
               >
                 Inscription
               </Button>
@@ -109,4 +125,5 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
   );
 };
 
-export default GlobalNav;
+// Utilisation de memo pour éviter les re-rendus inutiles
+export default memo(GlobalNav);

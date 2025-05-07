@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
+import useLogger from '@/hooks/useLogger';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -15,18 +16,15 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const logger = useLogger('NavItem');
   const isAdmin = isAdminRole(user?.role);
   
-  console.log(`NavItem render: ${label}, to: ${to}, current path: ${location.pathname}, isAdmin: ${isAdmin}`);
-  
   // Si active n'est pas explicitement fourni, déterminer à partir de l'emplacement actuel
-  // Pour une correspondance plus précise, vérifiez si le chemin commence par la route
-  // Cela aide avec les routes imbriquées comme /buddy/123
   const isActive = active !== undefined 
     ? active 
     : location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     
     // Pour les utilisateurs admin, rediriger vers la version admin de certaines pages
@@ -36,9 +34,9 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
       targetPath = '/dashboard';
     }
     
-    console.log(`NavItem clicked: ${label}, navigating to ${targetPath}`);
+    logger.debug(`Navigation item clicked`, { label, to: targetPath });
     navigate(targetPath);
-  };
+  }, [to, isAdmin, navigate, label, logger]);
 
   return (
     <button
@@ -56,4 +54,5 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
   );
 };
 
-export default NavItem;
+// Utiliser memo pour éviter les renders inutiles
+export default memo(NavItem);
