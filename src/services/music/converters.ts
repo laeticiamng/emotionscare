@@ -3,7 +3,7 @@ import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { Track, Playlist } from './types';
 
 /**
- * Convertit un MusicTrack en Track
+ * Convert a MusicTrack to a Track
  */
 export function convertMusicTrackToTrack(musicTrack: MusicTrack): Track {
   return {
@@ -11,13 +11,13 @@ export function convertMusicTrackToTrack(musicTrack: MusicTrack): Track {
     title: musicTrack.title,
     artist: musicTrack.artist,
     duration: musicTrack.duration,
-    url: musicTrack.audioUrl,
-    cover: musicTrack.coverUrl
+    url: musicTrack.audioUrl, // Assurez-vous que cette propriété est correcte
+    cover: musicTrack.coverUrl // Et celle-ci aussi
   };
 }
 
 /**
- * Convertit un Track en MusicTrack
+ * Convert a Track to a MusicTrack
  */
 export function convertTrackToMusicTrack(track: Track): MusicTrack {
   return {
@@ -25,32 +25,36 @@ export function convertTrackToMusicTrack(track: Track): MusicTrack {
     title: track.title,
     artist: track.artist,
     duration: track.duration,
-    audioUrl: track.url,
+    audioUrl: track.url, // Assurez-vous que cette conversion est correcte
     coverUrl: track.cover || '',
-    emotion: 'neutral' // Valeur par défaut
+    emotion: 'neutral' // Émotion par défaut
   };
 }
 
 /**
- * Convertit une MusicPlaylist en Playlist
+ * Convert a MusicPlaylist to a Playlist
  */
 export function convertMusicPlaylistToPlaylist(musicPlaylist: MusicPlaylist): Playlist {
+  const tracks = musicPlaylist.tracks.map(convertMusicTrackToTrack);
+  
   return {
     id: musicPlaylist.id,
     name: musicPlaylist.name,
     emotion: musicPlaylist.emotion,
-    tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
+    tracks: tracks
   };
 }
 
 /**
- * Convertit une Playlist en MusicPlaylist
+ * Convert a Playlist to a MusicPlaylist
  */
 export function convertPlaylistToMusicPlaylist(playlist: Playlist): MusicPlaylist {
+  const tracks = playlist.tracks.map(convertTrackToMusicTrack);
+  
   return {
     id: playlist.id,
     name: playlist.name,
     emotion: playlist.emotion || 'neutral',
-    tracks: playlist.tracks.map(convertTrackToMusicTrack)
+    tracks: tracks
   };
 }

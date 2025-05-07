@@ -23,25 +23,30 @@ const MusicPlayer = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [audioError, setAudioError] = useState<string | null>(null);
+  const [loadingTrack, setLoadingTrack] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
+  // Création et gestion de l'élément audio
   useEffect(() => {
-    // Create audio element if it doesn't exist
+    // Création de l'élément audio si nécessaire
     if (!audioRef.current) {
       audioRef.current = new Audio();
       
-      // Add event listeners
+      // Ajout des écouteurs d'événements
       audioRef.current.addEventListener('timeupdate', updateProgress);
       audioRef.current.addEventListener('loadeddata', setAudioData);
       audioRef.current.addEventListener('ended', handleTrackEnd);
       audioRef.current.addEventListener('error', handleAudioError);
+      audioRef.current.addEventListener('loadstart', () => setLoadingTrack(true));
+      audioRef.current.addEventListener('canplay', () => setLoadingTrack(false));
     }
     
-    // Update audio source when track changes
+    // Mise à jour de la source audio quand la piste change
     if (currentTrack) {
       console.log(`Chargement du morceau: ${currentTrack.title} - URL: ${currentTrack.url}`);
-      setAudioError(null); // Reset any previous error
+      setAudioError(null); // Réinitialiser les erreurs précédentes
+      setLoadingTrack(true);
       audioRef.current.src = currentTrack.url;
       audioRef.current.volume = volume;
       
@@ -50,19 +55,21 @@ const MusicPlayer = () => {
       }
     }
     
-    // Cleanup
+    // Nettoyage
     return () => {
       if (audioRef.current) {
         audioRef.current.removeEventListener('timeupdate', updateProgress);
         audioRef.current.removeEventListener('loadeddata', setAudioData);
         audioRef.current.removeEventListener('ended', handleTrackEnd);
         audioRef.current.removeEventListener('error', handleAudioError);
+        audioRef.current.removeEventListener('loadstart', () => setLoadingTrack(true));
+        audioRef.current.removeEventListener('canplay', () => setLoadingTrack(false));
         audioRef.current.pause();
       }
     };
   }, [currentTrack]);
   
-  // Handle play/pause changes
+  // Gestion des changements lecture/pause
   useEffect(() => {
     if (!audioRef.current || !currentTrack) return;
     
@@ -73,58 +80,96 @@ const MusicPlayer = () => {
     }
   }, [isPlaying]);
   
-  // Handle volume changes
+  // Gestion des changements de volume
   useEffect(() => {
     if (!audioRef.current) return;
     audioRef.current.volume = volume;
   }, [volume]);
   
+  // Fonction pour lancer la lecture
   const playAudio = () => {
     if (!audioRef.current) return;
     
+    setLoadingTrack(true);
     const playPromise = audioRef.current.play();
     
     if (playPromise !== undefined) {
-      playPromise.catch(err => {
-        console.error("Error playing audio:", err);
-        setAudioError(`Erreur de lecture: ${err.message}`);
-        
-        // Notify user about the error
-        toast({
-          title: "Erreur de lecture",
-          description: "Impossible de lire ce morceau. Essayez un autre titre.",
-          variant: "destructive"
+      playPromise
+        .then(() => {
+          setLoadingTrack(false);
+        })
+        .catch(err => {
+          console.error("Erreur de lecture audio:", err);
+          setAudioError(`Erreur de lecture: ${err.message}`);
+          setLoadingTrack(false);
+          
+          // Notifier l'utilisateur de l'erreur
+          toast({
+            title: "Problème de lecture",
+            description: "Impossible de lire ce morceau. Essai du morceau suivant...",
+            variant: "destructive"
+          });
+          
+          // Tenter automatiquement de passer au morceau suivant
+          setTimeout(() => {
+            nextTrack();
+          }, 1500);
         });
-        
-        // Try to play next track automatically
-        nextTrack();
-      });
     }
   };
   
+  // Gestionnaire d'erreur audio
   const handleAudioError = (e: Event) => {
     const error = (e.target as HTMLAudioElement).error;
     if (error) {
-      console.error("Audio error:", error.message);
-      setAudioError(`Erreur: ${error.message}`);
+      console.error("Erreur audio:", error.message, error.code);
+      let errorMsg = '';
+      
+      // Messages d'erreur plus spécifiques selon le code
+      switch(error.code) {
+        case MediaError.MEDIA_ERR_ABORTED:
+          errorMsg = "La lecture a été interrompue";
+          break;
+        case MediaError.MEDIA_ERR_NETWORK:
+          errorMsg = "Problème réseau lors du chargement";
+          break;
+        case MediaError.MEDIA_ERR_DECODE:
+          errorMsg = "Impossible de décoder le fichier audio";
+          break;
+        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+          errorMsg = "Format audio non supporté ou introuvable";
+          break;
+        default:
+          errorMsg = error.message;
+      }
+      
+      setAudioError(`Erreur: ${errorMsg}`);
+      setLoadingTrack(false);
       
       toast({
-        title: "Problème de lecture audio",
-        description: `${error.message}. Essayez un autre morceau.`,
+        title: "Erreur de lecture",
+        description: `${errorMsg}. Passage au morceau suivant...`,
         variant: "destructive"
       });
+      
+      // Passer automatiquement au morceau suivant
+      setTimeout(() => {
+        nextTrack();
+      }, 1500);
     }
   };
   
+  // Mise à jour de la progression
   const updateProgress = () => {
     if (!audioRef.current) return;
     setCurrentTime(audioRef.current.currentTime);
   };
   
+  // Configuration des données audio
   const setAudioData = () => {
     if (!audioRef.current) return;
     setDuration(audioRef.current.duration);
-    setAudioError(null); // Clear error on successful load
+    setAudioError(null); // Réinitialiser l'erreur en cas de chargement réussi
   };
   
   const handleTrackEnd = () => {
@@ -142,6 +187,7 @@ const MusicPlayer = () => {
     setCurrentTime(newTime);
   };
   
+  // Format du temps affiché
   const formatTime = (time: number) => {
     if (!time) return "0:00";
     
@@ -150,13 +196,15 @@ const MusicPlayer = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
   
+  // Gestion du changement de volume
   const handleVolumeChange = (values: number[]) => {
     setVolume(values[0]);
   };
   
-  // Volume icon based on current volume
+  // Icône de volume selon le niveau actuel
   const VolumeIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
   
+  // Si aucune piste n'est sélectionnée
   if (!currentTrack) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center bg-muted/20 rounded-lg border border-dashed">
@@ -178,6 +226,16 @@ const MusicPlayer = () => {
               src={currentTrack.cover} 
               alt={currentTrack.title} 
               className="h-full w-full object-cover" 
+              onError={(e) => {
+                // Fallback en cas d'erreur de chargement d'image
+                e.currentTarget.src = '';
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.classList.add('bg-primary/10');
+                const icon = document.createElement('div');
+                icon.className = 'h-full w-full flex items-center justify-center';
+                icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary/70"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>';
+                e.currentTarget.parentElement!.appendChild(icon);
+              }}
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center bg-primary/10">
@@ -189,13 +247,17 @@ const MusicPlayer = () => {
           <h3 className="font-medium leading-none truncate">{currentTrack.title}</h3>
           <p className="text-sm text-muted-foreground mt-1 truncate">{currentTrack.artist}</p>
           
+          {loadingTrack && (
+            <p className="text-xs text-muted mt-1">Chargement en cours...</p>
+          )}
+          
           {audioError && (
             <p className="text-xs text-destructive mt-1">{audioError}</p>
           )}
         </div>
       </div>
       
-      {/* Progress bar */}
+      {/* Barre de progression */}
       <div className="space-y-1 mb-4">
         <div 
           className="relative h-1.5 bg-secondary/50 rounded-full overflow-hidden cursor-pointer"
@@ -212,7 +274,7 @@ const MusicPlayer = () => {
         </div>
       </div>
       
-      {/* Controls */}
+      {/* Contrôles */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-1">
           <Button 
@@ -229,6 +291,7 @@ const MusicPlayer = () => {
             size="icon" 
             className="rounded-full h-9 w-9" 
             onClick={isPlaying ? pauseTrack : () => playTrack(currentTrack)}
+            disabled={loadingTrack}
           >
             {isPlaying ? <Pause size={18} /> : <Play size={18} />}
           </Button>
@@ -243,7 +306,7 @@ const MusicPlayer = () => {
           </Button>
         </div>
         
-        {/* Volume control */}
+        {/* Contrôle du volume */}
         <div className="flex items-center gap-2 w-28">
           <VolumeIcon size={18} className="text-muted-foreground" />
           <Slider
