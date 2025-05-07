@@ -56,7 +56,7 @@ const ContactPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-medium">Adresse</h3>
-                  <p className="text-muted-foreground">123 Avenue du Bien-être, 75008 Paris</p>
+                  <p className="text-muted-foreground">Siège social</p>
                 </div>
               </div>
               
@@ -66,7 +66,7 @@ const ContactPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-medium">Téléphone</h3>
-                  <p className="text-muted-foreground">+33 (0)1 23 45 67 89</p>
+                  <p className="text-muted-foreground">Contactez-nous par téléphone</p>
                 </div>
               </div>
               
