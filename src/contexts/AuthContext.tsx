@@ -1,8 +1,8 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { loginUser, logoutUser, updateUser as updateUserService } from '@/data/mockUsers';
+import { loginUser, logoutUser, getCurrentUser, updateUser as updateUserService } from '@/data/mockUsers';
 
 export interface AuthContextProps {
   user: User | null;
@@ -37,9 +37,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { toast } = useToast();
 
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      try {
+        const currentUser = getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          setIsAuthenticated(true);
+          console.log("AuthProvider - Restored session for:", currentUser.name);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkExistingSession();
+  }, []);
+
   // Login function
   const login = async (email: string, password: string): Promise<User> => {
     try {
+      setIsLoading(true);
       // Simulate API call
       const user = await loginUser(email, password);
       
@@ -51,6 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: `Bienvenue, ${user.name}!`,
       });
       
+      console.log("Login successful:", user);
       return user;
     } catch (error: any) {
       toast({
@@ -59,6 +81,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         variant: "destructive"
       });
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -81,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign out function
   const signOut = async (): Promise<void> => {
     try {
+      setIsLoading(true);
       await logoutUser();
       setUser(null);
       setIsAuthenticated(false);
@@ -89,6 +114,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         title: "Déconnexion réussie",
         description: "Vous avez été déconnecté avec succès",
       });
+      
+      console.log("User signed out successfully");
     } catch (error: any) {
       toast({
         title: "Erreur",
@@ -96,6 +123,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         variant: "destructive"
       });
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
   

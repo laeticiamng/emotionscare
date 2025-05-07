@@ -1,11 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Shield, Lock } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
@@ -14,18 +14,41 @@ const LoginPage = () => {
   const [email, setEmail] = useState('sophie@example.com');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      console.log("LoginPage: Already authenticated, redirecting to dashboard");
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!email || email.trim() === '') {
+      toast({
+        title: "Email requis",
+        description: "Veuillez entrer votre adresse email",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
+      console.log("LoginPage: Attempting login with:", email);
       // Pour Sophie, le mot de passe est maintenant "sophie" ou vide
-      await login(email, password);
-      navigate('/dashboard');
+      const user = await login(email, password);
+      console.log("LoginPage: Login successful, redirecting to dashboard");
+      
+      // Redirect to the dashboard or the page they were trying to access
+      const from = (location.state as any)?.from?.pathname || '/dashboard';
+      navigate(from);
     } catch (error) {
       // Les erreurs sont gérées dans le contexte d'authentification
       console.error("Erreur de connexion:", error);
@@ -33,6 +56,17 @@ const LoginPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  // If still checking authentication status, show minimal UI
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2>Chargement...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#FAFBFC] to-[#E8F1FA]">

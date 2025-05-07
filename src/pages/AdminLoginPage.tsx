@@ -1,23 +1,31 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Shield } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
-import { User } from '@/types';
 
 const AdminLoginPage = () => {
   const [email, setEmail] = useState('admin@example.com'); // Préremplit avec l'email de démo
   const [password, setPassword] = useState(''); // Pas de préremplissage du mot de passe pour la sécurité
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  // Redirect if already authenticated as admin
+  useEffect(() => {
+    if (isAuthenticated && !isLoading && user && isAdminRole(user.role)) {
+      console.log("AdminLoginPage: Already authenticated as admin, redirecting to dashboard");
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +42,7 @@ const AdminLoginPage = () => {
 
     setIsSubmitting(true);
     try {
+      console.log("AdminLoginPage: Attempting login with:", email);
       const user = await login(email, password);
       
       // Vérifie si l'utilisateur a des privilèges d'administration
@@ -42,8 +51,11 @@ const AdminLoginPage = () => {
           title: "Connexion réussie",
           description: `Bienvenue dans l'espace administration, ${user.name}!`,
         });
+        console.log("AdminLoginPage: Admin login successful, redirecting to dashboard");
+        
         // Navigation explicite vers le tableau de bord après connexion admin réussie
-        navigate('/dashboard');
+        const from = (location.state as any)?.from?.pathname || '/dashboard';
+        navigate(from);
       } else {
         toast({
           title: "Accès refusé",
@@ -63,6 +75,17 @@ const AdminLoginPage = () => {
       setIsSubmitting(false);
     }
   };
+
+  // If still checking authentication status, show minimal UI
+  if (isLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2>Chargement...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#FAFBFC] to-[#E8F1FA]">

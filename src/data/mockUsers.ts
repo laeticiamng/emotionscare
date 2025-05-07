@@ -52,10 +52,13 @@ export let currentUser: User | null = null;
 export const loginUser = (email: string, password: string): Promise<User> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
+      console.log(`Attempting login with email: ${email} and password: ${password ? "provided" : "empty"}`);
+      
       // Pour l'utilisateur Sophie, accepter le mot de passe "sophie" ou pas de mot de passe
       if (email === 'sophie@example.com' && (!password || password === 'sophie')) {
         const sophieUser = mockUsers.find(u => u.email === 'sophie@example.com');
         if (sophieUser) {
+          console.log("Login successful for Sophie:", sophieUser);
           currentUser = sophieUser;
           resolve(sophieUser);
           return;
@@ -66,18 +69,22 @@ export const loginUser = (email: string, password: string): Promise<User> => {
       if (email === 'admin@example.com' && password === 'admin') {
         const adminUser = mockUsers.find(u => u.email === 'admin@example.com');
         if (adminUser) {
+          console.log("Login successful for Admin:", adminUser);
           currentUser = adminUser;
           resolve(adminUser);
           return;
         }
       }
       
+      // Pour les autres utilisateurs ou si les conditions spécifiques ne sont pas remplies
       const user = mockUsers.find(u => u.email === email);
       if (user) {
         // Dans une vraie application, on vérifierait le mot de passe ici
+        console.log("Login successful for other user:", user);
         currentUser = user;
         resolve(user);
       } else {
+        console.log("Login failed: User not found with email", email);
         reject(new Error('Email ou mot de passe invalide'));
       }
     }, 800); // Simuler un délai réseau
@@ -87,6 +94,7 @@ export const loginUser = (email: string, password: string): Promise<User> => {
 export const logoutUser = (): Promise<void> => {
   return new Promise((resolve) => {
     setTimeout(() => {
+      console.log("Logging out user:", currentUser?.email);
       currentUser = null;
       resolve();
     }, 300);
@@ -97,6 +105,7 @@ export const updateUser = (userData: Partial<User>): Promise<User> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (!currentUser) {
+        console.error("Cannot update user: No user is logged in");
         reject(new Error('User not logged in'));
         return;
       }
@@ -108,6 +117,7 @@ export const updateUser = (userData: Partial<User>): Promise<User> => {
       const index = mockUsers.findIndex(u => u.id === currentUser?.id);
       if (index !== -1) {
         mockUsers[index] = updatedUser;
+        console.log("User updated:", updatedUser);
       }
       
       resolve(updatedUser);
@@ -116,6 +126,7 @@ export const updateUser = (userData: Partial<User>): Promise<User> => {
 };
 
 export const getCurrentUser = (): User | null => {
+  console.log("Getting current user:", currentUser);
   return currentUser;
 };
 

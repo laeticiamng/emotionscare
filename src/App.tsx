@@ -1,8 +1,6 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from "@/hooks/use-toast";
 import { Shell } from "@/components/Shell";
 import Index from '@/pages/Index';
 import { Docs } from "@/pages/Docs";
@@ -15,78 +13,9 @@ import SettingsPage from '@/pages/SettingsPage';
 import AdminLoginPage from '@/pages/AdminLoginPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
-import { getCurrentUser } from '@/data/mockUsers';
-import { updateUser } from '@/lib/userService';
 import InvitePage from './pages/InvitePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedLayout } from './components/ProtectedLayout';
-
-// App component for handling authentication checks and redirects
-const AppContent = () => {
-  const { user, setUser, isAuthenticated, setIsAuthenticated } = useAuth();
-  const { toast } = useToast();
-  
-  // Check authentication status on component mount
-  useEffect(() => {
-    const checkAuthentication = async () => {
-      const storedUser = getCurrentUser();
-      
-      if (storedUser) {
-        setUser(storedUser);
-        setIsAuthenticated(true);
-        
-        // Check if the user needs to be onboarded
-        if (!storedUser.onboarded) {
-          toast({
-            title: "Bienvenue !",
-            description: "Veuillez compléter votre profil pour une expérience optimale."
-          });
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-    };
-    
-    checkAuthentication();
-  }, [setUser, setIsAuthenticated, toast]);
-  
-  // Onboarding flow simulation
-  useEffect(() => {
-    const completeOnboarding = async () => {
-      // Check if the user is authenticated and has just registered
-      const urlParams = new URLSearchParams(window.location.search);
-      const justRegistered = urlParams.get('registered') === 'true';
-      
-      if (isAuthenticated && justRegistered) {
-        // Simulate completing the onboarding process
-        const user = getCurrentUser();
-        if (user) {
-          const updatedUser = { ...user, onboarded: true };
-          
-          try {
-            const newUser = await updateUser(updatedUser);
-            setUser(newUser);
-            toast({
-              title: "Profil complété !",
-              description: "Votre compte est maintenant configuré."
-            });
-          } catch (error) {
-            console.error("Error updating user:", error);
-            toast({
-              title: "Erreur",
-              description: "Impossible de mettre à jour votre profil. Veuillez réessayer.",
-              variant: "destructive"
-            });
-          }
-        }
-      }
-    };
-    
-    completeOnboarding();
-  }, [isAuthenticated, setUser, toast]);
-  
-  return null;
-};
 
 // Router configuration
 const router = createBrowserRouter([
@@ -154,7 +83,6 @@ const router = createBrowserRouter([
 function AppWrapper() {
   return (
     <AuthProvider>
-      <AppContent />
       <RouterProvider router={router} />
     </AuthProvider>
   );

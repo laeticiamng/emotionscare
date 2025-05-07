@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import Layout from './Layout';
@@ -20,8 +20,9 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   console.log("ProtectedLayout - Auth state:", { isAuthenticated, user, isLoading, path: location.pathname });
   
   // Skip protection for authentication pages
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login' || location.pathname === '/admin/login';
   if (isAuthPage) {
+    console.log("ProtectedLayout - On auth page, skipping protection");
     return <Layout>{children}</Layout>;
   }
   
