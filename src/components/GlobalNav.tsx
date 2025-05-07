@@ -31,6 +31,8 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isAuthenticated = false }) => {
   // Sélectionner les bons éléments de navigation en fonction du rôle
   const navigationItems = isAdmin ? adminTopNavItems : topNavItems;
   
+  console.log("GlobalNav rendering - authenticated:", authenticated, "user:", user?.name, "role:", user?.role);
+  
   return (
     <header className="fixed top-0 z-50 w-full bg-background/95 backdrop-blur-sm border-b shadow-sm">
       <div className="container h-16 flex items-center justify-between max-w-[1400px] px-4 md:px-6 lg:px-8">

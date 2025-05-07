@@ -86,15 +86,9 @@ const DashboardPage: React.FC = () => {
       <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
         <SegmentProvider>
           {isAdmin ? (
-            <>
-              {console.log("DashboardPage - Rendering AdminDashboard")}
-              <AdminDashboard />
-            </>
+            <AdminDashboard />
           ) : (
-            <>
-              {console.log("DashboardPage - Rendering UserDashboard")}
-              <UserDashboard user={user} />
-            </>
+            <UserDashboard user={user} />
           )}
         </SegmentProvider>
       </div>

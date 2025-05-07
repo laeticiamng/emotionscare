@@ -1,15 +1,29 @@
 
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import GlobalNav from "./GlobalNav";
+import { Toaster } from "./ui/toaster";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Sidebar from "./ui/sidebar";
 
-export const Shell: React.FC<React.PropsWithChildren> = ({ children }) => {
+export function Shell() {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="relative min-h-screen flex flex-col">
-      <div className="flex-1">
-        {children || <Outlet />}
+    <div className="min-h-screen flex flex-col">
+      <GlobalNav />
+      
+      <div className="flex flex-1 pt-16">
+        {!isMobile && <Sidebar />}
+        
+        <main className="flex-1 w-full">
+          <div className="container max-w-[1400px] px-4 py-6 md:px-6 lg:px-8">
+            <Outlet />
+          </div>
+        </main>
       </div>
+      
       <Toaster />
     </div>
   );
-};
+}
