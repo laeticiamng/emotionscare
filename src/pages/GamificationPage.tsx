@@ -1,37 +1,66 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BadgeGrid } from '@/components/gamification/BadgeGrid';
-import { ChallengeItem } from '@/components/gamification/ChallengeItem';
+import BadgeGrid from '@/components/gamification/BadgeGrid';
+import ChallengeItem from '@/components/gamification/ChallengeItem';
+import { fetchBadges, fetchChallenges, completeChallenge } from '@/lib/gamificationService';
+import { Challenge } from '@/types/gamification';
+import { useActivityLogging } from '@/hooks/useActivityLogging';
+import { toast } from "sonner";
 
 const GamificationPage = () => {
-  const challenges = [
-    {
-      id: "1",
-      title: "Check-in quotidien",
-      description: "Effectuez un scan émotionnel chaque jour pendant une semaine",
-      progress: 5,
-      total: 7,
-      reward: "Badge Bronze"
-    },
-    {
-      id: "2",
-      title: "Partage d'expérience",
-      description: "Partagez votre expérience dans Social Cocoon",
-      progress: 2,
-      total: 3,
-      reward: "15 points"
-    },
-    {
-      id: "3",
-      title: "Session VR",
-      description: "Complétez une session de relaxation en réalité virtuelle",
-      progress: 0,
-      total: 1,
-      reward: "Badge Silver"
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
+  const [badges, setBadges] = useState<any[]>([]);
+  const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Log page visit
+  useActivityLogging('gamification');
+
+  useEffect(() => {
+    const loadGamificationData = async () => {
+      try {
+        // Load challenges
+        const challengesData = await fetchChallenges();
+        setChallenges(challengesData);
+        
+        // Load badges
+        const badgeResponse = await fetchBadges();
+        setBadges(badgeResponse.all);
+        setEarnedBadgeIds(badgeResponse.earned.map(badge => badge.id));
+      } catch (error) {
+        console.error("Error loading gamification data:", error);
+        toast.error("Erreur lors du chargement des données de gamification");
+      }
+    };
+    
+    loadGamificationData();
+  }, []);
+
+  const handleCompleteChallenge = async (challengeId: string) => {
+    setIsLoading(true);
+    try {
+      const success = await completeChallenge(challengeId);
+      if (success) {
+        setCompletedChallenges(prev => [...prev, challengeId]);
+        toast.success("Défi complété avec succès!");
+      }
+    } catch (error) {
+      console.error("Error completing challenge:", error);
+      toast.error("Erreur lors de la complétion du défi");
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  // Calculate progress percentage for badges
+  const calculateProgress = (threshold: number) => {
+    // This is a simple mock calculation
+    // In a real app, this would be calculated based on user activities
+    return Math.min(Math.floor(Math.random() * threshold), threshold);
+  };
   
   return (
     <ProtectedLayout>
@@ -49,8 +78,21 @@ const GamificationPage = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {challenges.map(challenge => (
-                  <ChallengeItem key={challenge.id} challenge={challenge} />
+                  <ChallengeItem 
+                    key={challenge.id}
+                    title={challenge.title}
+                    description={challenge.description}
+                    points={challenge.points}
+                    isCompleted={completedChallenges.includes(challenge.id)}
+                    onComplete={() => handleCompleteChallenge(challenge.id)}
+                    isLoading={isLoading}
+                  />
                 ))}
+                {challenges.length === 0 && (
+                  <p className="text-center py-4 text-muted-foreground">
+                    Aucun défi disponible actuellement
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -61,7 +103,11 @@ const GamificationPage = () => {
                 <CardTitle>Mes badges</CardTitle>
               </CardHeader>
               <CardContent>
-                <BadgeGrid />
+                <BadgeGrid 
+                  badges={badges} 
+                  earnedBadgeIds={earnedBadgeIds} 
+                  progressFunction={calculateProgress}
+                />
               </CardContent>
             </Card>
           </div>

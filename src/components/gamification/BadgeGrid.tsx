@@ -33,6 +33,12 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
           />
         );
       })}
+      
+      {badges.length === 0 && (
+        <p className="col-span-full text-center py-4 text-muted-foreground">
+          Aucun badge disponible actuellement
+        </p>
+      )}
     </div>
   );
 };

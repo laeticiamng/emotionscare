@@ -4,9 +4,11 @@ import ProtectedLayout from '@/components/ProtectedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/contexts/AuthContext';
+import { useActivityLogging } from '@/hooks/useActivityLogging';
 
 const CoachPage = () => {
   const { user } = useAuth();
+  const { logUserAction } = useActivityLogging('coach');
   
   return (
     <ProtectedLayout>
@@ -24,7 +26,8 @@ const CoachPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChatInterface userId={user?.id} />
+            {/* Pass user ID as a custom prop that the ChatInterface component can use internally */}
+            <ChatInterface />
           </CardContent>
         </Card>
       </div>
