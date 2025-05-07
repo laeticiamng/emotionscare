@@ -46,6 +46,13 @@ const Index = () => {
       
       {/* Header & Branding - More visual impact */}
       <header className="w-full py-16 md:py-20 lg:py-24 text-center animate-fade-in max-w-[1400px] mx-auto px-6">
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/images/emotionscare-logo.svg" 
+            alt="EmotionsCare Logo" 
+            className="h-24 md:h-28 lg:h-32 w-auto"
+          />
+        </div>
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 tracking-tight heading-elegant">
           Emotions<span className="text-primary">Care</span>
           <span className="text-sm align-super">™</span>

@@ -15,7 +15,7 @@ export const Shell: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation globale */}
+      {/* Navigation globale avec logo */}
       <GlobalNav />
       
       <div className="flex flex-1 pt-16">
