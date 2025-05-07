@@ -11,7 +11,7 @@ export const useBranding = () => {
   const { theme } = useTheme();
   
   const getLogoPath = () => {
-    return '/lovable-uploads/e46a1af3-522c-43d2-bdb6-8d154343961a.png';
+    return '/lovable-uploads/9758de91-3129-47ab-9074-ae033c24878a.png';
   };
   
   const getLogoSize = (size: BrandingOptions['size'] = 'md') => {
