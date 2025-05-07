@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/contexts/AuthContext';
 import { useActivityLogging } from '@/hooks/useActivityLogging';
-import useCoach from '@/hooks/useCoach';
+import { useCoach } from '@/hooks/coach/useCoach';
 import EmotionMusicVisualizer from '@/components/music/EmotionMusicVisualizer';
 import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';

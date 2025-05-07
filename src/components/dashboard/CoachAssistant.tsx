@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,11 +5,10 @@ import { Sparkles, SendHorizontal, Music, Brain, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/contexts/AuthContext';
-import { triggerCoachEvent } from '@/lib/coachService';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMusic } from '@/contexts/MusicContext';
-import useCoach from '@/hooks/useCoach';
+import { useCoach } from '@/hooks/coach/useCoach';
 
 interface CoachAssistantProps {
   className?: string;
