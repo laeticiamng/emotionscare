@@ -10,3 +10,10 @@ export interface ChatResponse {
   intent?: string;
   sessionId?: string;
 }
+
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}

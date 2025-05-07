@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { Track, Playlist } from '@/services/music/types';
 import { getPlaylist } from '@/lib/musicService';
@@ -92,7 +91,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Load a playlist for a specific emotion
-  const loadPlaylistForEmotion = async (emotion: string): Promise<Playlist | null> => {
+  const loadPlaylistForEmotion = async (emotion: string): Promise<void> => {
     try {
       setCurrentEmotion(emotion);
       
@@ -140,8 +139,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
       if (!currentTrack && mockTracks.length > 0) {
         setCurrentTrack(mockTracks[0]);
       }
-      
-      return newPlaylist;
     } catch (error) {
       console.error('Error loading playlist:', error);
       toast({
@@ -149,7 +146,6 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
         description: "Impossible de charger la playlist. Veuillez réessayer.",
         variant: "destructive"
       });
-      return null;
     }
   };
   
