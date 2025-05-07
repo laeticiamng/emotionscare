@@ -1,99 +1,159 @@
 
+// Ce fichier sert de fallback si l'API TopMedia n'est pas disponible
 import { MusicTrack } from '@/types/music';
 
-/**
- * Sample playlists based on emotions - using public domain music for demo
- */
-export const emotionPlaylists: Record<string, MusicTrack[]> = {
+// Types d'émotions disponibles dans notre système
+type EmotionKey = 'happy' | 'calm' | 'energetic' | 'focused' | 'neutral';
+
+// Structure des playlists par émotion
+export const emotionPlaylists: Record<EmotionKey, MusicTrack[]> = {
   happy: [
-    { 
-      id: '1', 
-      title: 'Walking on Sunshine', 
-      artist: 'Katrina & The Waves', 
-      duration: 238, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Broke_For_Free/Directionless_EP/Broke_For_Free_-_01_-_Night_Owl.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Katrina_and_the_Waves_Walking_on_Sunshine_Single_Cover.jpeg/220px-Katrina_and_the_Waves_Walking_on_Sunshine_Single_Cover.jpeg',
+    {
+      id: 'happy-1',
+      title: 'Walking on Sunshine',
+      artist: 'Mood Elevators',
+      duration: 187,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_7cad99ae24.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1452421822248-d4c2b47f0c81',
       emotion: 'happy'
     },
-    { 
-      id: '2', 
-      title: 'Good Vibrations', 
-      artist: 'The Beach Boys', 
-      duration: 218, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_07_-_Downfall.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/73/Good_vibrations.jpg/220px-Good_vibrations.jpg',
+    {
+      id: 'happy-2',
+      title: 'Joyful Morning',
+      artist: 'The Optimists',
+      duration: 204,
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/11/23/audio_cb4f1212a9.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1517230878791-4d28214057c2',
       emotion: 'happy'
     },
+    {
+      id: 'happy-3',
+      title: 'Positive Vibes',
+      artist: 'Sunshine Orchestra',
+      duration: 195,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9',
+      emotion: 'happy'
+    }
   ],
+  
   calm: [
-    { 
-      id: '6', 
-      title: 'Weightless', 
-      artist: 'Marconi Union', 
-      duration: 480, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Music_for_Video/Podington_Bear/Solo_Instruments/Podington_Bear_-_Smooth_Piano.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Marconi_Union_-_Weightless_Part_1.jpg',
+    {
+      id: 'calm-1',
+      title: 'Ocean Breeze',
+      artist: 'Tranquil Sounds',
+      duration: 238,
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/04/07/audio_b84467212c.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
       emotion: 'calm'
     },
-    { 
-      id: '7', 
-      title: 'Clair de Lune', 
-      artist: 'Claude Debussy', 
-      duration: 300, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Jared_C._Balogh/Improvisation/Jared_C_Balogh_-_01_-_The_Thought.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Claude_Debussy_ca_1908%2C_foto_av_F%C3%A9lix_Nadar.jpg/170px-Claude_Debussy_ca_1908%2C_foto_av_F%C3%A9lix_Nadar.jpg',
+    {
+      id: 'calm-2',
+      title: 'Rainfall Meditation',
+      artist: 'Nature Harmony',
+      duration: 226,
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bede44.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1515694346937-94d85e41e6f0',
       emotion: 'calm'
     },
+    {
+      id: 'calm-3',
+      title: 'Silent Forest',
+      artist: 'Mindful Melodies',
+      duration: 247,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e',
+      emotion: 'calm'
+    }
   ],
-  neutral: [
-    { 
-      id: '21', 
-      title: 'Arrival of the Birds', 
-      artist: 'The Cinematic Orchestra', 
-      duration: 320, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/5/51/The_Cinematic_Orchestra_-_The_Crimson_Wing_-_Mystery_of_the_Flamingos.jpg',
-      emotion: 'neutral'
+  
+  energetic: [
+    {
+      id: 'energetic-1',
+      title: 'Power Up',
+      artist: 'Energy Beats',
+      duration: 173,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/23/audio_69a61cd8d8.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1535743686920-55e4145369b9',
+      emotion: 'energetic'
     },
-    { 
-      id: '22', 
-      title: 'River Flows In You', 
-      artist: 'Yiruma', 
-      duration: 185, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/River_Flows_in_You_album_cover.jpg/220px-River_Flows_in_You_album_cover.jpg',
-      emotion: 'neutral'
+    {
+      id: 'energetic-2',
+      title: 'Morning Workout',
+      artist: 'Fitness Groove',
+      duration: 192,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_5dbbdc33b6.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1538805060514-97d9cc17730c',
+      emotion: 'energetic'
     },
-    { 
-      id: '23', 
-      title: 'Nuvole Bianche', 
-      artist: 'Ludovico Einaudi', 
-      duration: 355, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/5/5e/Ludovico_Einaudi_-_Una_Mattina.png',
-      emotion: 'neutral'
-    },
+    {
+      id: 'energetic-3',
+      title: 'Dynamic Flow',
+      artist: 'Rhythm Revolution',
+      duration: 185,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/16/audio_7b7e244725.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1534258936925-c58bed479fcb',
+      emotion: 'energetic'
+    }
   ],
-  stressed: [
-    { 
-      id: '16', 
-      title: 'Weightless', 
-      artist: 'Marconi Union', 
-      duration: 480, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/d/d0/Marconi_Union_-_Weightless_Part_1.jpg',
-      emotion: 'stressed'
-    },
-  ],
+  
   focused: [
-    { 
-      id: '11', 
-      title: 'Time', 
-      artist: 'Hans Zimmer', 
-      duration: 275, 
-      audioUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3', 
-      coverUrl: 'https://upload.wikimedia.org/wikipedia/en/2/2e/Inception_OST.jpg',
+    {
+      id: 'focused-1',
+      title: 'Deep Concentration',
+      artist: 'Mind Masters',
+      duration: 256,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8b0124e4d.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173',
       emotion: 'focused'
     },
+    {
+      id: 'focused-2',
+      title: 'Study Session',
+      artist: 'Cognitive Flow',
+      duration: 218,
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/12/13/audio_98ccd8b74c.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f',
+      emotion: 'focused'
+    },
+    {
+      id: 'focused-3',
+      title: 'Productive Space',
+      artist: 'Task Completion',
+      duration: 231,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/02/07/audio_d6ba19a93f.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc',
+      emotion: 'focused'
+    }
   ],
+  
+  neutral: [
+    {
+      id: 'neutral-1',
+      title: 'Ambient Flow',
+      artist: 'Balance Project',
+      duration: 210,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/25/audio_3812f01b28.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1465146633011-14f8e0781093',
+      emotion: 'neutral'
+    },
+    {
+      id: 'neutral-2',
+      title: 'Middle Ground',
+      artist: 'Equilibrium',
+      duration: 197,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/04/27/audio_c8d45d5c59.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8',
+      emotion: 'neutral'
+    },
+    {
+      id: 'neutral-3',
+      title: 'Everyday Soundtrack',
+      artist: 'Normal State',
+      duration: 223,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_2dde668d05.mp3',
+      coverUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05',
+      emotion: 'neutral'
+    }
+  ]
 };

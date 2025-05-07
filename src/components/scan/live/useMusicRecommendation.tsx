@@ -4,18 +4,41 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/lib/scanService';
 
-// Map des émotions vers les types de musique
+// Mapping plus complet des émotions vers les types de musique
 const EMOTION_TO_MUSIC: Record<string, string> = {
+  // États positifs
   happy: 'happy',
-  sad: 'calm',
-  angry: 'calm',
-  anxious: 'calm',
-  calm: 'neutral',
   excited: 'energetic',
+  joyful: 'happy',
+  satisfied: 'happy',
+  energetic: 'energetic',
+  
+  // États calmes
+  calm: 'calm',
+  relaxed: 'calm',
+  peaceful: 'calm',
+  tranquil: 'calm',
+  
+  // États négatifs - musique apaisante
+  sad: 'calm',
+  anxious: 'calm',
   stressed: 'calm',
+  angry: 'calm',
+  frustrated: 'calm',
+  overwhelmed: 'calm',
   tired: 'calm',
+  
+  // États de concentration
+  focused: 'focused',
+  determined: 'focused',
+  concentrated: 'focused',
+  
+  // État neutre
   neutral: 'neutral',
-  focused: 'focused'
+  normal: 'neutral',
+  
+  // Valeurs par défaut pour émotions non mappées
+  default: 'neutral'
 };
 
 export function useMusicRecommendation() {
@@ -26,7 +49,10 @@ export function useMusicRecommendation() {
   const handlePlayMusic = useCallback((emotionResult?: EmotionResult | null) => {
     if (!emotionResult || !emotionResult.emotion) return;
     
-    const musicType = EMOTION_TO_MUSIC[emotionResult.emotion.toLowerCase()] || 'neutral';
+    const emotionKey = emotionResult.emotion.toLowerCase();
+    const musicType = EMOTION_TO_MUSIC[emotionKey] || EMOTION_TO_MUSIC.default;
+    
+    console.log(`Émotion détectée: ${emotionKey} → Type de musique: ${musicType}`);
     
     loadPlaylistForEmotion(musicType);
     openDrawer();
