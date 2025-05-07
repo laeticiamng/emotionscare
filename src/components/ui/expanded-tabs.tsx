@@ -42,8 +42,8 @@ const ExpandedTabsTrigger = React.forwardRef<
     className={cn(
       "px-4 py-2 rounded-lg font-medium text-sm transition-all relative overflow-hidden group",
       active 
-        ? "bg-primary text-primary-foreground" 
-        : "bg-muted hover:bg-muted/80 text-muted-foreground",
+        ? "bg-primary text-primary-foreground shadow-md" 
+        : "bg-muted hover:bg-muted/80 text-muted-foreground hover:shadow-sm",
       className
     )}
     {...props}
@@ -75,7 +75,7 @@ const ExpandedTabsContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "mt-2 rounded-lg",
+      "rounded-lg",
       active 
         ? "block animate-in fade-in-50 duration-300 ease-out" 
         : "hidden",

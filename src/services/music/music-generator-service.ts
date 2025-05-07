@@ -13,6 +13,7 @@ export async function generateLyrics(prompt: string): Promise<string> {
   try {
     console.log(`Generating lyrics with prompt: ${prompt}`);
     
+    // Direct API call to generate lyrics based on prompt
     const response = await fetch(`${API_BASE_URL}/lyrics`, {
       method: 'POST',
       headers: {
@@ -81,9 +82,20 @@ export async function submitMusicGenerationTask(params: {
   model_version?: string;
   continue_at?: number;
   continue_song_id?: string;
+  mood?: string;
 }): Promise<{ song_id: string; task_id: string }> {
   try {
     console.log(`Submitting advanced music generation task:`, params);
+    
+    // Add mood to description if available
+    const enhancedPrompt = params.mood 
+      ? `${params.prompt} avec une ambiance ${params.mood}` 
+      : params.prompt;
+    
+    const requestParams = {
+      ...params,
+      prompt: enhancedPrompt
+    };
     
     const response = await fetch(`${API_BASE_URL_V2}/submit`, {
       method: 'POST',
@@ -91,7 +103,7 @@ export async function submitMusicGenerationTask(params: {
         'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(params)
+      body: JSON.stringify(requestParams)
     });
     
     if (!response.ok) {
@@ -180,6 +192,59 @@ export async function concatenateSongs(songIds: string[]): Promise<{
   }
 }
 
+/**
+ * Get music generation suggestions based on mood
+ */
+export async function getMoodSuggestions(mood: string): Promise<{
+  title: string;
+  prompt: string;
+  instrumental: boolean;
+  lyrics?: string;
+}> {
+  // These would ideally come from an API or database
+  const suggestions: Record<string, {
+    title: string;
+    prompt: string;
+    instrumental: boolean;
+    lyrics?: string;
+  }> = {
+    happy: {
+      title: "Mélodie Joyeuse",
+      prompt: "Une chanson pop entraînante avec des accords majeurs, une mélodie positive et des rythmes dynamiques",
+      instrumental: false,
+      lyrics: "La vie est belle sous le soleil\nChaque jour est une nouvelle chance\nDe sourire et d'être heureux\nEmbrasse le moment présent"
+    },
+    calm: {
+      title: "Tranquillité Sonore",
+      prompt: "Une composition ambient avec des nappes de synthé relaxantes, des mélodies douces et une ambiance zen",
+      instrumental: true
+    },
+    focused: {
+      title: "Concentration Profonde",
+      prompt: "Une musique électronique minimaliste avec des rythmes subtils et des sonorités cristallines propices à la concentration",
+      instrumental: true
+    },
+    energetic: {
+      title: "Boost d'Énergie",
+      prompt: "Un morceau électronique rythmé avec des percussions énergiques, des montées et des drops dynamiques",
+      instrumental: true
+    },
+    melancholic: {
+      title: "Mélancolie Poétique",
+      prompt: "Une ballade piano-voix mélancolique avec des harmonies mineurs et une ambiance intime",
+      instrumental: false,
+      lyrics: "Les souvenirs s'effacent comme des traces dans le sable\nMais ton image reste gravée dans mon cœur\nLe temps passe mais certaines choses demeurent\nComme cette douce mélancolie qui m'habite"
+    },
+    neutral: {
+      title: "Équilibre Sonore",
+      prompt: "Une composition équilibrée avec des éléments acoustiques et électroniques, créant une ambiance ni trop énergique ni trop calme",
+      instrumental: true
+    }
+  };
+
+  return suggestions[mood] || suggestions.neutral;
+}
+
 // Types for user music creations
 export interface MusicCreation {
   id: string;
@@ -191,6 +256,7 @@ export interface MusicCreation {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   createdAt: string;
   instrumental: boolean;
+  mood?: string;
 }
 
 /**
@@ -230,7 +296,8 @@ export async function getUserMusicCreations(userId: string): Promise<MusicCreati
         audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3',
         status: 'completed',
         createdAt: new Date(Date.now() - 86400000).toISOString(),
-        instrumental: true
+        instrumental: true,
+        mood: 'calm'
       },
       {
         id: 'mock-2',
@@ -241,7 +308,20 @@ export async function getUserMusicCreations(userId: string): Promise<MusicCreati
         audioUrl: 'https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bede44.mp3',
         status: 'completed',
         createdAt: new Date(Date.now() - 172800000).toISOString(),
-        instrumental: false
+        instrumental: false,
+        mood: 'calm'
+      },
+      {
+        id: 'mock-3',
+        userId,
+        title: 'Énergie matinale',
+        prompt: 'musique motivante pour commencer la journée',
+        lyrics: undefined,
+        audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+        status: 'completed',
+        createdAt: new Date(Date.now() - 259200000).toISOString(),
+        instrumental: true,
+        mood: 'energetic'
       }
     ];
   } catch (error) {

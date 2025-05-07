@@ -9,7 +9,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Méditation au bord de l\'eau',
       artist: 'Nature Sounds',
       duration: 180,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6435fe5.mp3?filename=ocean-waves-112924.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3?filename=ocean-waves-112924.mp3',
       coverUrl: '/images/calm-1.jpg',
       emotion: 'calm'
     },
@@ -18,7 +18,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Sérénité nocturne',
       artist: 'Ambient Dreams',
       duration: 240,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_00fa5593f3.mp3?filename=ambient-piano-amp-strings-10711.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/11/25/audio_00fa5593f3.mp3?filename=ambient-piano-amp-strings-10711.mp3',
       coverUrl: '/images/calm-2.jpg',
       emotion: 'calm'
     },
@@ -27,7 +27,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Forêt enchantée',
       artist: 'Deep Relaxation',
       duration: 210,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_90852d2423.mp3?filename=forest-with-small-river-birds-and-nature-field-recording-6735.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_90852d2423.mp3?filename=forest-with-small-river-birds-and-nature-field-recording-6735.mp3',
       coverUrl: '/images/calm-3.jpg',
       emotion: 'calm'
     }
@@ -38,7 +38,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Sunshine Vibes',
       artist: 'Happy Tunes',
       duration: 165,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=summer-walk-153562.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3?filename=summer-walk-153562.mp3',
       coverUrl: '/images/happy-1.jpg',
       emotion: 'happy'
     },
@@ -47,7 +47,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Morning Energy',
       artist: 'Mood Lifters',
       duration: 195,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/30/audio_946f4ebb05.mp3?filename=motivational-electronic-distant-132919.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/10/30/audio_946f4ebb05.mp3?filename=motivational-electronic-distant-132919.mp3',
       coverUrl: '/images/happy-2.jpg',
       emotion: 'happy'
     },
@@ -56,7 +56,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Summer Dreams',
       artist: 'Beach Collective',
       duration: 182,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/08/04/audio_884fe92c21.mp3?filename=hawaii-groove-184287.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/04/audio_884fe92c21.mp3?filename=hawaii-groove-184287.mp3',
       coverUrl: '/images/happy-3.jpg',
       emotion: 'happy'
     }
@@ -67,7 +67,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Power Up',
       artist: 'Workout Beats',
       duration: 175,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_40ce8a1485.mp3?filename=powerful-beat-121008.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/10/audio_40ce8a1485.mp3?filename=powerful-beat-121008.mp3',
       coverUrl: '/images/energetic-1.jpg',
       emotion: 'energetic'
     },
@@ -76,8 +76,17 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Electric Rush',
       artist: 'Energy Collective',
       duration: 188,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2021/12/13/audio_cb4f1211a4.mp3?filename=sport-fashion-rock-synthwave-electro-romantic-powerful-opener-epic-legends-142467.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/12/13/audio_cb4f1211a4.mp3?filename=sport-fashion-rock-synthwave-electro-romantic-powerful-opener-epic-legends-142467.mp3',
       coverUrl: '/images/energetic-2.jpg',
+      emotion: 'energetic'
+    },
+    {
+      id: 'energetic-3',
+      title: 'Dynamic Motion',
+      artist: 'Fitness Club',
+      duration: 166,
+      audioUrl: 'https://cdn.pixabay.com/audio/2023/06/13/audio_1bd3dd8018.mp3?filename=upbeat-and-energetic-powerful-dance-pop-empowering-inspiring-175382.mp3',
+      coverUrl: '/images/energetic-3.jpg',
       emotion: 'energetic'
     }
   ],
@@ -87,7 +96,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Deep Concentration',
       artist: 'Mind Focus',
       duration: 210,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_c8182d3dfd.mp3?filename=electronic-future-beats-117997.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/04/27/audio_c8182d3dfd.mp3?filename=electronic-future-beats-117997.mp3',
       coverUrl: '/images/focused-1.jpg',
       emotion: 'focused'
     },
@@ -96,8 +105,17 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Clarity',
       artist: 'Study Sessions',
       duration: 195,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_dc39bede44.mp3?filename=evident-curiousity-114347.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bede44.mp3?filename=evident-curiousity-114347.mp3',
       coverUrl: '/images/focused-2.jpg',
+      emotion: 'focused'
+    },
+    {
+      id: 'focused-3',
+      title: 'Productivity Flow',
+      artist: 'Work Ambience',
+      duration: 225,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/08/03/audio_d0da13b3d4.mp3?filename=relaxing-145038.mp3',
+      coverUrl: '/images/focused-3.jpg',
       emotion: 'focused'
     }
   ],
@@ -107,7 +125,7 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Ambient Flow',
       artist: 'Neutral Minds',
       duration: 190,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2022/02/22/audio_508bd7ce5e.mp3?filename=quiet-place-piano-with-ambient-pad-119382.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/02/22/audio_508bd7ce5e.mp3?filename=quiet-place-piano-with-ambient-pad-119382.mp3',
       coverUrl: '/images/neutral-1.jpg',
       emotion: 'neutral'
     },
@@ -116,9 +134,47 @@ export const emotionPlaylists: Record<string, MusicTrack[]> = {
       title: 'Gentle Waves',
       artist: 'Sound Balance',
       duration: 205,
-      audioUrl: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_9614bc2d96.mp3?filename=moment-of-relief-12609.mp3',
+      audioUrl: 'https://cdn.pixabay.com/audio/2021/09/06/audio_9614bc2d96.mp3?filename=moment-of-relief-12609.mp3',
       coverUrl: '/images/neutral-2.jpg',
       emotion: 'neutral'
+    },
+    {
+      id: 'neutral-3',
+      title: 'Everyday Harmony',
+      artist: 'Ambient Artists',
+      duration: 175,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_b29b8337fa.mp3?filename=warm-memories-130982.mp3',
+      coverUrl: '/images/neutral-3.jpg',
+      emotion: 'neutral'
+    }
+  ],
+  melancholic: [
+    {
+      id: 'melancholic-1',
+      title: 'Rainy Reflections',
+      artist: 'Emotional Piano',
+      duration: 218,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/04/20/audio_cb337924de.mp3?filename=sad-piano-114586.mp3',
+      coverUrl: '/images/melancholic-1.jpg',
+      emotion: 'melancholic'
+    },
+    {
+      id: 'melancholic-2',
+      title: 'Nostalgic Dreams',
+      artist: 'Memory Lane',
+      duration: 196,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_6b7a8b1b22.mp3?filename=cinematic-documentary-piano-115669.mp3',
+      coverUrl: '/images/melancholic-2.jpg',
+      emotion: 'melancholic'
+    },
+    {
+      id: 'melancholic-3',
+      title: 'Sweet Sorrow',
+      artist: 'Sunset Strings',
+      duration: 227,
+      audioUrl: 'https://cdn.pixabay.com/audio/2022/03/09/audio_c3ec9a9c0f.mp3?filename=sad-piano-theme-piano-version-3783.mp3',
+      coverUrl: '/images/melancholic-3.jpg',
+      emotion: 'melancholic'
     }
   ]
 };
