@@ -25,7 +25,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   });
   
   // Skip protection for authentication pages
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login' || location.pathname === '/admin/login';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/admin-login';
   if (isAuthPage) {
     console.log("ProtectedLayout - On auth page, skipping protection");
     return <Layout>{children}</Layout>;
@@ -50,7 +50,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   }
   
   // Check for role requirements
-  if (requireRole && user?.role !== requireRole && user?.role !== 'Admin' && user?.role !== 'admin') {
+  if (requireRole && user?.role !== requireRole && user?.role !== 'admin' && user?.role !== 'Admin') {
     console.log(`ProtectedLayout - Role check failed: user role ${user?.role} vs required ${requireRole}`);
     return (
       <Layout>

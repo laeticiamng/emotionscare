@@ -11,16 +11,19 @@ import { ArrowLeft, Shield } from 'lucide-react';
 import { isAdminRole } from '@/utils/roleUtils';
 
 const AdminLoginPage = () => {
-  const [email, setEmail] = useState('admin@example.com'); // Préremplit avec l'email de démo
-  const [password, setPassword] = useState(''); // Pas de préremplissage du mot de passe pour la sécurité
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('admin');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  
+  console.log("AdminLoginPage: Initial render", { isAuthenticated, isLoading, user });
 
   // Redirect if already authenticated as admin
   useEffect(() => {
+    console.log("AdminLoginPage: Auth effect running", { isAuthenticated, isLoading, user, role: user?.role });
     if (isAuthenticated && !isLoading && user && isAdminRole(user.role)) {
       console.log("AdminLoginPage: Already authenticated as admin, redirecting to dashboard");
       navigate('/dashboard');
@@ -29,6 +32,8 @@ const AdminLoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log("AdminLoginPage: Form submitted", { email, password: password ? "provided" : "empty" });
     
     // Validation basique
     if (!email || !password) {
@@ -44,6 +49,8 @@ const AdminLoginPage = () => {
     try {
       console.log("AdminLoginPage: Attempting login with:", email);
       const user = await login(email, password);
+      
+      console.log("AdminLoginPage: Login successful, checking role:", user.role);
       
       // Vérifie si l'utilisateur a des privilèges d'administration
       if (isAdminRole(user.role)) {
@@ -62,7 +69,7 @@ const AdminLoginPage = () => {
           description: "Vous n'avez pas les droits d'administration nécessaires",
           variant: "destructive"
         });
-        navigate('/'); // Redirection vers l'accueil si pas admin
+        navigate('/');
       }
     } catch (error: any) {
       console.error("Erreur de connexion admin:", error);

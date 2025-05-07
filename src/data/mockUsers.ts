@@ -54,32 +54,32 @@ export const loginUser = (email: string, password: string): Promise<User> => {
     setTimeout(() => {
       console.log(`MockUsers - Attempting login with email: ${email} and password: ${password ? "provided" : "empty"}`);
       
-      // Pour l'utilisateur Sophie, accepter le mot de passe "sophie" ou pas de mot de passe
+      // Pour l'utilisateur Sophie
       if (email === 'sophie@example.com' && (password === 'sophie' || password === '')) {
-        const sophieUser = mockUsers.find(u => u.email === 'sophie@example.com');
-        if (sophieUser) {
-          console.log("MockUsers - Login successful for Sophie:", sophieUser);
-          currentUser = sophieUser;
-          resolve(sophieUser);
+        const user = mockUsers.find(u => u.email === 'sophie@example.com');
+        if (user) {
+          console.log("MockUsers - Login successful for Sophie:", user);
+          currentUser = user;
+          resolve(user);
           return;
         }
       }
       
-      // Pour la démo, accepter "admin" comme mot de passe pour l'utilisateur admin@example.com
+      // Pour l'admin
       if (email === 'admin@example.com' && password === 'admin') {
-        const adminUser = mockUsers.find(u => u.email === 'admin@example.com');
-        if (adminUser) {
-          console.log("MockUsers - Login successful for Admin:", adminUser);
-          currentUser = adminUser;
-          resolve(adminUser);
+        const user = mockUsers.find(u => u.email === 'admin@example.com');
+        if (user) {
+          console.log("MockUsers - Login successful for Admin:", user);
+          currentUser = user;
+          resolve(user);
           return;
         }
       }
       
-      // Pour les autres utilisateurs ou si les conditions spécifiques ne sont pas remplies
+      // Pour les autres utilisateurs
       const user = mockUsers.find(u => u.email === email);
       if (user) {
-        // Dans une vraie application, on vérifierait le mot de passe ici
+        // Pour la démo, on accepte n'importe quel mot de passe pour les autres utilisateurs
         console.log("MockUsers - Login successful for user:", user);
         currentUser = user;
         resolve(user);

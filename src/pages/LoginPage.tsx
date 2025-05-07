@@ -160,7 +160,7 @@ const LoginPage = () => {
               </Button>
               
               <p className="text-sm text-center text-muted-foreground mt-4">
-                * Pour la démo, utilisez: sophie@example.com (mot de passe: sophie)
+                * Pour la démo, utilisez: sophie@example.com (mot de passe: sophie) ou admin@example.com (mot de passe: admin)
               </p>
 
               <Separator className="my-4" />
