@@ -1,171 +1,95 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { getBuddyRequests, sendBuddyRequest, acceptBuddyRequest, rejectBuddyRequest } from '@/lib/communityService';
+import React from 'react';
+import ProtectedLayout from '@/components/ProtectedLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Search, UserPlus } from 'lucide-react';
+import { BuddyCard } from '@/components/community/BuddyCard';
 
 const BuddyPage = () => {
-  const [buddyRequests, setBuddyRequests] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { user } = useAuth();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const loadBuddyRequests = async () => {
-      if (!user) return;
-      
-      setIsLoading(true);
-      try {
-        const requests = await getBuddyRequests();
-        setBuddyRequests(requests);
-      } catch (error) {
-        console.error('Error loading buddy requests:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les demandes de connexion",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadBuddyRequests();
-  }, [user, toast]);
-
-  const handleSendRequest = async () => {
-    if (!user) return;
-    
-    try {
-      await sendBuddyRequest('some-user-id');
-      toast({
-        title: "Demande envoyée",
-        description: "Votre demande de connexion a été envoyée"
-      });
-    } catch (error) {
-      console.error('Error sending buddy request:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer la demande de connexion",
-        variant: "destructive"
-      });
+  const buddies = [
+    {
+      id: "1",
+      name: "Alex Dubois",
+      role: "Marketing",
+      anonymityCode: "AD123456",
+      status: "online",
+      lastActive: "Il y a 5 minutes",
+      avatar: "https://i.pravatar.cc/150?img=3"
+    },
+    {
+      id: "2",
+      name: "Marie Leroy", 
+      role: "Design",
+      anonymityCode: "ML789012",
+      status: "offline",
+      lastActive: "Hier",
+      avatar: "https://i.pravatar.cc/150?img=5"
+    },
+    {
+      id: "3",
+      name: "Thomas Martin",
+      role: "Développeur",
+      anonymityCode: "TM345678",
+      status: "busy",
+      lastActive: "Il y a 3 heures",
+      avatar: "https://i.pravatar.cc/150?img=8"
     }
-  };
-
-  const handleAcceptRequest = async (requestId: string) => {
-    try {
-      await acceptBuddyRequest(requestId);
-      
-      // Update local state
-      setBuddyRequests(prevRequests => 
-        prevRequests.filter(request => request.id !== requestId)
-      );
-      
-      toast({
-        title: "Demande acceptée",
-        description: "Vous êtes maintenant connectés"
-      });
-    } catch (error) {
-      console.error('Error accepting buddy request:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'accepter la demande",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleRejectRequest = async (requestId: string) => {
-    try {
-      await rejectBuddyRequest(requestId);
-      
-      // Update local state
-      setBuddyRequests(prevRequests => 
-        prevRequests.filter(request => request.id !== requestId)
-      );
-      
-      toast({
-        title: "Demande refusée",
-        description: "La demande a été refusée"
-      });
-    } catch (error) {
-      console.error('Error rejecting buddy request:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de refuser la demande",
-        variant: "destructive"
-      });
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
+  ];
+  
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Connexions</h1>
-      
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Demandes de connexion</h2>
+    <ProtectedLayout>
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold">Programme Buddy</h1>
+          <p className="text-muted-foreground">Connexions de confiance avec des collègues pour un soutien mutuel</p>
+        </header>
         
-        {buddyRequests.length === 0 ? (
-          <p className="text-muted-foreground">Vous n'avez pas de demandes en attente</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {buddyRequests.map(request => (
-              <Card key={request.id} className="p-4 flex flex-col">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                    {request.sender?.name?.charAt(0) || "?"}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{request.sender?.name || "Utilisateur"}</h3>
-                    <p className="text-sm text-muted-foreground">Envoyée il y a 2 jours</p>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <Card className="mb-6">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Mes Buddies</CardTitle>
+                <Button>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Ajouter un Buddy
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                    <Input className="pl-10" placeholder="Rechercher un buddy..." />
                   </div>
                 </div>
                 
-                <div className="flex space-x-2 mt-auto">
-                  <Button 
-                    variant="default" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => handleAcceptRequest(request.id)}
-                  >
-                    Accepter
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => handleRejectRequest(request.id)}
-                  >
-                    Refuser
-                  </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {buddies.map(buddy => (
+                    <BuddyCard key={buddy.id} buddy={buddy} />
+                  ))}
                 </div>
-              </Card>
-            ))}
+              </CardContent>
+            </Card>
           </div>
-        )}
+          
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Suggestions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Les suggestions de buddy sont basées sur vos intérêts communs et votre compatibilité émotionnelle.
+                </p>
+                
+                <Button className="w-full">Voir les suggestions</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-      
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Trouver des connexions</h2>
-        <p className="text-muted-foreground mb-4">
-          Connectez-vous avec d'autres utilisateurs pour partager votre parcours de bien-être
-        </p>
-        
-        <Button onClick={handleSendRequest}>
-          Rechercher des connexions
-        </Button>
-      </div>
-    </div>
+    </ProtectedLayout>
   );
 };
 

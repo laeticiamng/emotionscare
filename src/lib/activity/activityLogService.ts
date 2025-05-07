@@ -1,65 +1,82 @@
 
-import { supabase } from '@/lib/supabase-client';
+import { v4 as uuidv4 } from 'uuid';
+import { mockActivityLogs, mockActivityStats } from './mockActivityData';
 
-// Basic activity logging service
-export const activityLogService = {
-  logConsultation: (userId: string, details: any) => {
-    console.log(`Logging consultation for user ${userId}:`, details);
-    return logActivity(userId, 'consultation', details);
-  },
-  
-  logProfileUpdate: (userId: string, details?: Record<string, any>) => {
-    console.log(`Logging profile update for user ${userId}:`, details);
-    return logActivity(userId, 'profile_update', details || {});
-  },
-  
-  logEventRegistration: (userId: string, event: { title: string; date?: string; id?: string }) => {
-    console.log(`Logging event registration for user ${userId}:`, event);
-    return logActivity(userId, 'event_registration', event);
-  },
-  
-  logQuestionnaireResponse: (userId: string, questionnaire: { title: string; id?: string }) => {
-    console.log(`Logging questionnaire response for user ${userId}:`, questionnaire);
-    return logActivity(userId, 'questionnaire_response', questionnaire);
+// Define types
+interface ActivityLog {
+  id: string;
+  user_id: string;
+  activity_type: string;
+  timestamp: Date;
+  details: Record<string, any>;
+}
+
+interface AnonymizedActivityLog {
+  id: string;
+  activity_type: string;
+  category: string;
+  count: number;
+  timestamp_day: string;
+}
+
+// Singleton service for activity logging
+class ActivityLogService {
+  private static instance: ActivityLogService;
+  private activityLogs: ActivityLog[] = [];
+
+  private constructor() {
+    console.log("ActivityLogService initialized");
   }
+
+  public static getInstance(): ActivityLogService {
+    if (!ActivityLogService.instance) {
+      ActivityLogService.instance = new ActivityLogService();
+    }
+    return ActivityLogService.instance;
+  }
+
+  public logActivity(userId: string, type: string, details: Record<string, any> = {}): void {
+    const log: ActivityLog = {
+      id: uuidv4(),
+      user_id: userId,
+      activity_type: type,
+      timestamp: new Date(),
+      details
+    };
+    
+    this.activityLogs.push(log);
+    console.log(`Activity logged for user ${userId}: ${type}`, details);
+  }
+
+  public getUserActivities(userId: string): ActivityLog[] {
+    return this.activityLogs.filter(log => log.user_id === userId);
+  }
+  
+  public getAllActivities(): ActivityLog[] {
+    return [...this.activityLogs];
+  }
+}
+
+// Singleton instance
+export const activityLogService = ActivityLogService.getInstance();
+
+// Helper function to log activities
+export const logActivity = (userId: string, type: string, details: Record<string, any> = {}): void => {
+  activityLogService.logActivity(userId, type, details);
 };
 
-// Log an activity
-export const logActivity = async (userId: string, activityType: string, activityDetails: any) => {
-  try {
-    console.log(`Logging activity: ${activityType} for user ${userId}`);
-    
-    // In a real implementation, we would insert into the database
-    // const { data, error } = await supabase.from('user_activity_logs').insert({
-    //   user_id: userId,
-    //   activity_type: activityType,
-    //   activity_details: activityDetails
-    // });
-    
-    // if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error("Error logging activity:", error);
-    return false;
-  }
+// Helper function to get user activities
+export const getUserActivities = (userId: string): ActivityLog[] => {
+  return activityLogService.getUserActivities(userId);
 };
 
-// Get activities for a specific user
-export const getUserActivities = async (userId: string) => {
-  try {
-    console.log(`Getting activities for user ${userId}`);
-    
-    // In a real implementation, we would fetch from the database
-    // const { data, error } = await supabase
-    //   .from('user_activity_logs')
-    //   .select('*')
-    //   .eq('user_id', userId)
-    //   .order('timestamp', { ascending: false });
-    
-    // if (error) throw error;
-    return [];
-  } catch (error) {
-    console.error("Error getting user activities:", error);
-    return [];
-  }
+// Export mock data functions for the admin dashboard
+export const getActivityData = (): Promise<AnonymizedActivityLog[]> => {
+  console.log("Getting mock activity data...");
+  return Promise.resolve(mockActivityLogs);
+};
+
+export const getActivityStats = (): Promise<any[]> => {
+  console.log("Getting mock activity stats...");
+  return Promise.resolve(mockActivityStats);
 };

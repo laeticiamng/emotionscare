@@ -17,6 +17,11 @@ import InvitePage from './pages/InvitePage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedLayout } from './components/ProtectedLayout';
 import { MusicProvider } from './contexts/MusicContext';
+import ScanPage from './pages/ScanPage';
+import CoachPage from './pages/CoachPage';
+import SocialCocoonPage from './pages/SocialCocoonPage';
+import GamificationPage from './pages/GamificationPage';
+import BuddyPage from './pages/BuddyPage';
 
 // Router configuration
 const router = createBrowserRouter([
@@ -47,6 +52,26 @@ const router = createBrowserRouter([
       {
         path: "/settings",
         element: <ProtectedLayout><SettingsPage /></ProtectedLayout>
+      },
+      {
+        path: "/scan",
+        element: <ScanPage />
+      },
+      {
+        path: "/coach",
+        element: <ProtectedLayout><CoachPage /></ProtectedLayout>
+      },
+      {
+        path: "/social-cocoon",
+        element: <ProtectedLayout><SocialCocoonPage /></ProtectedLayout>
+      },
+      {
+        path: "/buddy",
+        element: <ProtectedLayout><BuddyPage /></ProtectedLayout>
+      },
+      {
+        path: "/gamification",
+        element: <ProtectedLayout><GamificationPage /></ProtectedLayout>
       }
     ]
   },
