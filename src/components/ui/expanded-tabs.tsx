@@ -48,22 +48,23 @@ const ExpandedTabsTrigger = React.forwardRef<
     )}
     {...props}
   >
-    {/* Effet d'animation au survol */}
+    {/* Animation d'effet hover pour les onglets non actifs */}
     {!active && (
       <span className="absolute inset-0 w-full h-full bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
     )}
     
-    {/* Animation de clic */}
+    {/* Animation de sélection pour les onglets actifs */}
     {active && (
       <motion.span
         initial={{ scale: 0, opacity: 0.5 }}
         animate={{ scale: 1, opacity: 0 }}
+        transition={{ duration: 0.3 }}
         className="absolute inset-0 rounded-lg bg-primary-foreground"
       />
     )}
     
     {/* Contenu du bouton */}
-    <span className="relative z-10">{props.children}</span>
+    <span className="relative z-10 flex items-center justify-center">{props.children}</span>
   </button>
 ));
 ExpandedTabsTrigger.displayName = "ExpandedTabsTrigger";
@@ -75,9 +76,9 @@ const ExpandedTabsContent = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-lg",
+      "rounded-lg transition-all",
       active 
-        ? "block animate-in fade-in-50 duration-300 ease-out" 
+        ? "animate-in fade-in-50 duration-300 ease-out block" 
         : "hidden",
       className
     )}

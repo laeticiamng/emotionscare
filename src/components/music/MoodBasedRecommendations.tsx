@@ -1,359 +1,288 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Music, Sparkles, HeadphonesIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useMusicalCreation } from '@/hooks/useMusicalCreation';
 import { useMusic } from '@/contexts/MusicContext';
-import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { PlayCircle, Heart, Download, Share2, Filter } from 'lucide-react';
 
-const moodTemplates = {
-  happy: {
-    title: "Mélodie Joyeuse",
-    prompt: "Une chanson pop entraînante avec des accords majeurs, une mélodie positive et des rythmes dynamiques",
-    genre: "pop",
-    tempo: 80,
-    instrumental: false,
-    lyrics: "La vie est belle sous le soleil\nChaque jour est une nouvelle chance\nDe sourire et d'être heureux\nEmbrasse le moment présent"
-  },
-  calm: {
-    title: "Tranquillité Sonore",
-    prompt: "Une composition ambient avec des nappes de synthé relaxantes, des mélodies douces et une ambiance zen",
-    genre: "ambient",
-    tempo: 30,
-    instrumental: true,
-    lyrics: ""
-  },
-  focused: {
-    title: "Concentration Profonde",
-    prompt: "Une musique électronique minimaliste avec des rythmes subtils et des sonorités cristallines propices à la concentration",
-    genre: "electronic",
-    tempo: 50,
-    instrumental: true,
-    lyrics: ""
-  },
-  energetic: {
-    title: "Boost d'Énergie",
-    prompt: "Un morceau électronique rythmé avec des percussions énergiques, des montées et des drops dynamiques",
-    genre: "electronic",
-    tempo: 90,
-    instrumental: true,
-    lyrics: ""
-  },
-  melancholic: {
-    title: "Mélancolie Poétique",
-    prompt: "Une ballade piano-voix mélancolique avec des harmonies mineurs et une ambiance intime",
-    genre: "piano",
-    tempo: 40,
-    instrumental: false,
-    lyrics: "Les souvenirs s'effacent comme des traces dans le sable\nMais ton image reste gravée dans mon cœur\nLe temps passe mais certaines choses demeurent\nComme cette douce mélancolie qui m'habite"
-  }
-};
+interface MoodTrack {
+  id: string;
+  title: string;
+  description: string;
+  mood: string;
+  duration: string;
+  coverUrl: string;
+}
 
-const genres = [
-  { value: "pop", label: "Pop" },
-  { value: "rock", label: "Rock" },
-  { value: "electronic", label: "Électronique" },
-  { value: "ambient", label: "Ambient" },
-  { value: "classical", label: "Classique" },
-  { value: "jazz", label: "Jazz" },
-  { value: "piano", label: "Piano solo" },
-  { value: "hiphop", label: "Hip-Hop" }
+const moodCategories = [
+  { id: 'happy', name: 'Heureux', emoji: '😊', color: 'from-yellow-400/80 to-amber-300/80' },
+  { id: 'calm', name: 'Calme', emoji: '😌', color: 'from-blue-400/80 to-cyan-300/80' },
+  { id: 'energetic', name: 'Énergique', emoji: '⚡', color: 'from-red-400/80 to-orange-300/80' },
+  { id: 'focused', name: 'Concentré', emoji: '🧠', color: 'from-purple-400/80 to-violet-300/80' },
+  { id: 'melancholic', name: 'Mélancolique', emoji: '🌧️', color: 'from-indigo-400/80 to-blue-300/80' },
 ];
 
-const MoodBasedRecommendations = ({ currentEmotion }: { currentEmotion?: string }) => {
-  const [selectedMood, setSelectedMood] = useState(currentEmotion || "happy");
-  const [customTitle, setCustomTitle] = useState("");
-  const [customPrompt, setCustomPrompt] = useState("");
-  const [customGenre, setCustomGenre] = useState("pop");
-  const [customTempo, setCustomTempo] = useState(50);
-  const [customInstrumental, setCustomInstrumental] = useState(false);
-  const [customLyrics, setCustomLyrics] = useState("");
-  const [isCustomMode, setIsCustomMode] = useState(false);
-  
+const moodTracks: Record<string, MoodTrack[]> = {
+  'happy': [
+    {
+      id: 'happy-1',
+      title: 'Sunshine Vibes',
+      description: 'Une mélodie joyeuse et ensoleillée pour booster votre humeur',
+      mood: 'happy',
+      duration: '3:24',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'happy-2',
+      title: 'Joyful Morning',
+      description: 'Démarrez votre journée avec cette composition légère et positive',
+      mood: 'happy',
+      duration: '2:45',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'happy-3',
+      title: 'Positive Thinking',
+      description: 'Une mélodie qui inspire des pensées positives et de la joie',
+      mood: 'happy',
+      duration: '3:12',
+      coverUrl: '/images/music-wave.svg'
+    },
+  ],
+  'calm': [
+    {
+      id: 'calm-1',
+      title: 'Ocean Breeze',
+      description: 'Des sons apaisants inspirés par l\'océan pour la relaxation',
+      mood: 'calm',
+      duration: '5:10',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'calm-2',
+      title: 'Evening Meditation',
+      description: 'Parfait pour méditer ou se détendre en fin de journée',
+      mood: 'calm',
+      duration: '6:30',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'calm-3',
+      title: 'Gentle Rain',
+      description: 'Le son apaisant de la pluie pour calmer l\'esprit',
+      mood: 'calm',
+      duration: '4:55',
+      coverUrl: '/images/music-wave.svg'
+    },
+  ],
+  'energetic': [
+    {
+      id: 'energetic-1',
+      title: 'Power Up',
+      description: 'Un rythme dynamique pour booster votre énergie',
+      mood: 'energetic',
+      duration: '2:40',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'energetic-2',
+      title: 'Workout Beat',
+      description: 'Le compagnon parfait pour vos séances d\'entraînement',
+      mood: 'energetic',
+      duration: '3:15',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'energetic-3',
+      title: 'Morning Boost',
+      description: 'Commencez votre journée avec énergie et enthousiasme',
+      mood: 'energetic',
+      duration: '2:50',
+      coverUrl: '/images/music-wave.svg'
+    },
+  ],
+  'focused': [
+    {
+      id: 'focused-1',
+      title: 'Deep Concentration',
+      description: 'Pour les moments qui nécessitent une attention totale',
+      mood: 'focused',
+      duration: '4:20',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'focused-2',
+      title: 'Study Session',
+      description: 'Optimisez votre temps d\'étude avec cette composition',
+      mood: 'focused',
+      duration: '5:15',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'focused-3',
+      title: 'Clarity',
+      description: 'Une musique qui aide à clarifier vos pensées',
+      mood: 'focused',
+      duration: '3:50',
+      coverUrl: '/images/music-wave.svg'
+    },
+  ],
+  'melancholic': [
+    {
+      id: 'melancholic-1',
+      title: 'Rainy Day',
+      description: 'Une mélodie contemplative pour les jours de pluie',
+      mood: 'melancholic',
+      duration: '4:05',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'melancholic-2',
+      title: 'Quiet Thoughts',
+      description: 'Un espace sonore pour vos moments de réflexion profonde',
+      mood: 'melancholic',
+      duration: '4:40',
+      coverUrl: '/images/music-wave.svg'
+    },
+    {
+      id: 'melancholic-3',
+      title: 'Nostalgia',
+      description: 'Une composition qui évoque les souvenirs du passé',
+      mood: 'melancholic',
+      duration: '3:35',
+      coverUrl: '/images/music-wave.svg'
+    },
+  ],
+};
+
+const MoodBasedRecommendations: React.FC = () => {
+  const [selectedMood, setSelectedMood] = useState('happy');
+  const [favorites, setFavorites] = useState<string[]>([]);
   const { toast } = useToast();
-  const { createMusicTrack, isLoading, isProcessing, progress } = useMusicalCreation();
-  
-  // Map detected emotion to our mood types
-  const getMoodFromEmotion = (emotion?: string) => {
-    if (!emotion) return "happy";
+  const { loadPlaylistForEmotion, openDrawer } = useMusic();
+
+  const handlePlayTrack = (track: MoodTrack) => {
+    loadPlaylistForEmotion(track.mood);
+    openDrawer();
     
-    const emotionLower = emotion.toLowerCase();
-    if (emotionLower.includes("happy") || emotionLower.includes("joy")) return "happy";
-    if (emotionLower.includes("calm") || emotionLower.includes("peaceful")) return "calm";
-    if (emotionLower.includes("focus") || emotionLower.includes("concentr")) return "focused";
-    if (emotionLower.includes("energ") || emotionLower.includes("activ")) return "energetic";
-    if (emotionLower.includes("sad") || emotionLower.includes("melanch")) return "melancholic";
-    
-    return "happy"; // default
+    toast({
+      title: "Lecture démarrée",
+      description: `"${track.title}" est maintenant en lecture`,
+    });
   };
-  
-  // Handle mood selection
-  const handleMoodSelect = (mood: string) => {
-    setSelectedMood(mood);
-    setIsCustomMode(false);
-  };
-  
-  // Handle custom mode toggle
-  const handleCustomModeToggle = () => {
-    if (!isCustomMode) {
-      // Initialize with selected mood template
-      const template = moodTemplates[selectedMood as keyof typeof moodTemplates];
-      setCustomTitle(template.title);
-      setCustomPrompt(template.prompt);
-      setCustomGenre(template.genre);
-      setCustomTempo(template.tempo);
-      setCustomInstrumental(template.instrumental);
-      setCustomLyrics(template.lyrics);
-    }
-    setIsCustomMode(!isCustomMode);
-  };
-  
-  // Generate music based on selected mood or custom settings
-  const handleGenerateMusic = async () => {
-    try {
-      if (isCustomMode) {
-        // Use custom settings
-        await createMusicTrack({
-          title: customTitle || `Création ${new Date().toLocaleDateString()}`,
-          prompt: `${customPrompt} dans le style ${customGenre} avec un tempo ${customTempo > 70 ? 'rapide' : customTempo > 40 ? 'modéré' : 'lent'}`,
-          lyrics: customInstrumental ? undefined : customLyrics,
-          instrumental: customInstrumental
+
+  const handleToggleFavorite = (trackId: string) => {
+    setFavorites(prev => {
+      if (prev.includes(trackId)) {
+        toast({
+          title: "Retiré des favoris",
+          description: "Ce morceau a été retiré de vos favoris",
+          variant: "default",
         });
+        return prev.filter(id => id !== trackId);
       } else {
-        // Use template settings
-        const template = moodTemplates[selectedMood as keyof typeof moodTemplates];
-        await createMusicTrack({
-          title: template.title,
-          prompt: template.prompt,
-          lyrics: template.instrumental ? undefined : template.lyrics,
-          instrumental: template.instrumental
+        toast({
+          title: "Ajouté aux favoris",
+          description: "Ce morceau a été ajouté à vos favoris",
+          variant: "default",
         });
+        return [...prev, trackId];
       }
-      
-      toast({
-        title: "Génération musicale lancée",
-        description: "Votre musique est en cours de création, cela peut prendre quelques minutes.",
-      });
-    } catch (error) {
-      console.error('Error generating music:', error);
-      toast({
-        title: "Erreur",
-        description: "Un problème est survenu lors de la génération de la musique.",
-        variant: "destructive"
-      });
-    }
+    });
   };
-  
-  // Define recommended mood based on currentEmotion
-  const recommendedMood = getMoodFromEmotion(currentEmotion);
-  
+
+  const handleGenerateCustom = () => {
+    toast({
+      title: "Génération personnalisée",
+      description: "Utilisez l'onglet Création avancée pour personnaliser votre musique",
+      variant: "default",
+    });
+  };
+
   return (
     <div className="space-y-6">
-      {currentEmotion && (
-        <div className="flex items-center p-3 bg-primary/10 rounded-lg">
-          <AlertCircle className="mr-2 h-4 w-4 text-primary" />
-          <p className="text-sm">
-            Basé sur votre émotion actuelle (<span className="font-medium">{currentEmotion}</span>), 
-            nous recommandons une musique de type <span className="font-medium">{recommendedMood}</span>
-          </p>
-        </div>
-      )}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Recommandations basées sur l'humeur</h2>
+        <Button variant="outline" size="sm">
+          <Filter className="h-4 w-4 mr-2" />
+          Filtres
+        </Button>
+      </div>
       
-      <div className="space-y-2">
-        <h3 className="font-medium">Sélectionnez une ambiance musicale</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-          {Object.keys(moodTemplates).map((mood) => (
-            <Button
-              key={mood}
-              variant={selectedMood === mood ? "default" : "outline"}
-              className="flex flex-col items-center justify-center h-20 transition-all"
-              onClick={() => handleMoodSelect(mood)}
-            >
-              <span className="text-lg mb-1">
-                {mood === 'happy' ? '😊' : 
-                 mood === 'calm' ? '😌' : 
-                 mood === 'focused' ? '🧠' : 
-                 mood === 'energetic' ? '⚡' : 
-                 mood === 'melancholic' ? '🌧️' : '🎵'}
-              </span>
-              <span className="text-xs capitalize">{mood}</span>
-            </Button>
+      <Tabs defaultValue={selectedMood} onValueChange={setSelectedMood} className="w-full">
+        <TabsList className="mb-6 flex flex-wrap">
+          {moodCategories.map((mood) => (
+            <TabsTrigger key={mood.id} value={mood.id} className="px-4 py-2">
+              <span className="mr-2">{mood.emoji}</span>
+              {mood.name}
+            </TabsTrigger>
           ))}
-        </div>
-      </div>
-      
-      <div className="flex justify-between items-center">
-        <h3 className="font-medium">
-          {isCustomMode ? "Mode personnalisé" : `Template: ${selectedMood}`}
-        </h3>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handleCustomModeToggle}
-        >
-          {isCustomMode ? "Utiliser le template" : "Personnaliser"}
-        </Button>
-      </div>
-      
-      {isCustomMode ? (
-        <Card>
-          <CardContent className="pt-4 space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">Titre</label>
-              <Input
-                id="title"
-                value={customTitle}
-                onChange={(e) => setCustomTitle(e.target.value)}
-                placeholder="Titre de votre création"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="prompt" className="text-sm font-medium">Description musicale</label>
-              <Input
-                id="prompt"
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                placeholder="Décrivez l'ambiance, les instruments, etc."
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="genre" className="text-sm font-medium">Genre musical</label>
-                <Select value={customGenre} onValueChange={setCustomGenre}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez un genre" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {genres.map((genre) => (
-                      <SelectItem key={genre.value} value={genre.value}>
-                        {genre.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <label htmlFor="tempo" className="text-sm font-medium">Tempo</label>
-                  <span className="text-xs">
-                    {customTempo < 40 ? "Lent" : customTempo < 70 ? "Modéré" : "Rapide"}
-                  </span>
-                </div>
-                <Slider
-                  id="tempo"
-                  value={[customTempo]}
-                  min={10}
-                  max={100}
-                  step={1}
-                  onValueChange={(values) => setCustomTempo(values[0])}
-                />
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Mode instrumental</span>
-              <Button 
-                variant={customInstrumental ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCustomInstrumental(!customInstrumental)}
-              >
-                {customInstrumental ? "Activé" : "Désactivé"}
-              </Button>
-            </div>
-            
-            {!customInstrumental && (
-              <div className="space-y-2">
-                <label htmlFor="lyrics" className="text-sm font-medium">Paroles</label>
-                <textarea
-                  id="lyrics"
-                  value={customLyrics}
-                  onChange={(e) => setCustomLyrics(e.target.value)}
-                  placeholder="Entrez les paroles de votre chanson"
-                  className="w-full h-24 p-2 border rounded-md bg-background resize-none"
-                />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="pt-4">
-            <div className="space-y-4">
-              {selectedMood && (
-                <>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Titre</span>
-                    <span>{moodTemplates[selectedMood as keyof typeof moodTemplates].title}</span>
+        </TabsList>
+        
+        {moodCategories.map((mood) => (
+          <TabsContent key={mood.id} value={mood.id} className="mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {moodTracks[mood.id].map((track) => (
+                <Card key={track.id} className={`overflow-hidden transition-all duration-300 hover:shadow-lg border border-border/50 hover:border-primary/30`}>
+                  <div className={`h-28 bg-gradient-to-r ${mood.color} flex items-center justify-center p-4`}>
+                    <img 
+                      src={track.coverUrl} 
+                      alt={track.title} 
+                      className="h-full opacity-40"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
                   </div>
                   
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Genre</span>
-                    <Badge variant="outline">
-                      {genres.find(g => g.value === moodTemplates[selectedMood as keyof typeof moodTemplates].genre)?.label || "Autre"}
-                    </Badge>
-                  </div>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">{track.title}</CardTitle>
+                    <CardDescription>{track.description}</CardDescription>
+                  </CardHeader>
                   
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Tempo</span>
-                    <span>
-                      {moodTemplates[selectedMood as keyof typeof moodTemplates].tempo < 40 ? "Lent" : 
-                       moodTemplates[selectedMood as keyof typeof moodTemplates].tempo < 70 ? "Modéré" : "Rapide"}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium">Type</span>
-                    <span>
-                      {moodTemplates[selectedMood as keyof typeof moodTemplates].instrumental ? 
-                        "Instrumental" : "Avec paroles"}
-                    </span>
-                  </div>
-                </>
-              )}
+                  <CardContent>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-muted-foreground">Durée: {track.duration}</span>
+                      <div className="flex items-center space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleToggleFavorite(track.id)}
+                          className={favorites.includes(track.id) ? "text-red-500" : ""}
+                        >
+                          <Heart className="h-5 w-5" fill={favorites.includes(track.id) ? "currentColor" : "none"} />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Download className="h-5 w-5" />
+                        </Button>
+                        <Button variant="ghost" size="icon">
+                          <Share2 className="h-5 w-5" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      variant="default" 
+                      className="w-full mt-2"
+                      onClick={() => handlePlayTrack(track)}
+                    >
+                      <PlayCircle className="mr-2 h-5 w-5" />
+                      Écouter
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      )}
-      
-      {/* Progress indicator */}
-      {isProcessing && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Génération en cours...</span>
-            <span className="text-sm">{progress}%</span>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
-      )}
-      
-      <div className="pt-2">
-        <Button 
-          onClick={handleGenerateMusic} 
-          disabled={isLoading || isProcessing}
-          className="w-full"
-        >
-          {isLoading || isProcessing ? (
-            <>
-              <HeadphonesIcon className="mr-2 h-4 w-4 animate-pulse" />
-              Génération en cours...
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-2 h-4 w-4" />
-              Générer ma musique
-            </>
-          )}
-        </Button>
-      </div>
+            
+            <div className="mt-8 text-center">
+              <p className="text-muted-foreground mb-4">Vous ne trouvez pas ce que vous cherchez?</p>
+              <Button onClick={handleGenerateCustom}>Générer une musique personnalisée</Button>
+            </div>
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 };
