@@ -11,7 +11,7 @@ export const Shell: React.FC = () => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
   
-  logger.debug('Rendering shell component', { isMobile });
+  logger.debug('Rendering shell component', { data: { isMobile } });
 
   return (
     <div className="min-h-screen flex flex-col">

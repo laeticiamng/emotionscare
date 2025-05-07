@@ -7,6 +7,7 @@ interface LogOptions {
   component?: string;
   timestamp?: boolean;
   data?: Record<string, any>;
+  [key: string]: any; // Autoriser d'autres propriétés personnalisées
 }
 
 export const useLogger = (defaultComponent?: string) => {
@@ -17,14 +18,18 @@ export const useLogger = (defaultComponent?: string) => {
   ) => {
     const { 
       component = defaultComponent || 'App', 
-      timestamp = true, 
-      data = {} 
+      timestamp = true,
+      data = {},
+      ...customData
     } = options;
+    
+    // Fusionner les données personnalisées avec data
+    const mergedData = { ...data, ...customData };
     
     const time = timestamp ? new Date().toISOString() : null;
     const prefix = timestamp ? `${time} [${component}]` : `[${component}]`;
     
-    return { prefix, message, data };
+    return { prefix, message, data: mergedData };
   }, [defaultComponent]);
 
   const log = useCallback((

@@ -1,20 +1,15 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import DashboardHeader from './DashboardHeader';
 import ModulesSection from '@/components/home/ModulesSection';
 import DashboardHero from './DashboardHero';
 import type { User } from '@/types';
-import { Button } from '@/components/ui/button';
-import { LayoutDashboard, LayoutGrid } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDashboardHero } from '@/hooks/useDashboardHero';
-import { 
-  EmotionDashboardSection, 
-  SocialDashboardSection,
-  ProfileDashboardSection,
-  VRDashboardSection,
-  GamificationDashboardSection
-} from './UserDashboardSections';
+import DashboardViewToggle from './DashboardViewToggle';
+import DashboardContent from './DashboardContent';
+import useDashboardState from '@/hooks/useDashboardState';
+import useLogger from '@/hooks/useLogger';
 
 interface UserDashboardProps {
   user: User | null;
@@ -25,43 +20,23 @@ interface UserDashboardProps {
 }
 
 const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) => {
-  const [minimalView, setMinimalView] = useState(false);
+  const logger = useLogger('UserDashboard');
   const isMobile = useIsMobile();
   const { kpis, shortcuts, isLoading, refetch: refetchDashboardHero } = useDashboardHero(user?.id);
-  const [collapsedSections, setCollapsedSections] = useState({
-    modules: false,
-    emotionScan: isMobile,
-    sidePanel: isMobile,
-    social: isMobile,
-    gamification: isMobile,
-    vr: isMobile
-  });
-  
-  const toggleSection = useCallback((section: keyof typeof collapsedSections) => {
-    setCollapsedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  }, []);
+  const { 
+    minimalView, 
+    collapsedSections, 
+    toggleSection, 
+    toggleMinimalView 
+  } = useDashboardState();
   
   // Refresh all user dashboard data
   const refreshDashboardData = useCallback(async () => {
+    logger.debug('Refreshing dashboard data');
     await refetchDashboardHero();
-  }, [refetchDashboardHero]);
+  }, [refetchDashboardHero, logger]);
 
-  useEffect(() => {
-    // Ajuster l'état de collapse des sections en fonction du type d'appareil
-    if (isMobile) {
-      setCollapsedSections(prev => ({
-        ...prev,
-        emotionScan: true,
-        sidePanel: true,
-        social: true,
-        gamification: true,
-        vr: true
-      }));
-    }
-  }, [isMobile]);
+  logger.debug('Rendering UserDashboard component');
   
   return (
     <div className="animate-fade-in w-full">
@@ -71,23 +46,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
           onRefresh={refreshDashboardData}
         />
         {!isMobile && (
-          <Button 
-            variant="outline" 
-            className="ml-auto focus-premium btn-premium"
-            onClick={() => setMinimalView(!minimalView)}
-          >
-            {minimalView ? (
-              <>
-                <LayoutDashboard size={18} />
-                <span className="ml-2">Vue Complète</span>
-              </>
-            ) : (
-              <>
-                <LayoutGrid size={18} />
-                <span className="ml-2">Vue Minimaliste</span>
-              </>
-            )}
-          </Button>
+          <DashboardViewToggle
+            minimalView={minimalView}
+            onToggle={toggleMinimalView}
+          />
         )}
       </div>
       
@@ -105,60 +67,15 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         onToggle={() => toggleSection('modules')} 
       />
       
-      <div className="dashboard-premium mt-6">
-        {/* Main Content Area */}
-        <div className="dashboard-main">
-          {/* Emotion Scan Section */}
-          <EmotionDashboardSection
-            collapsed={collapsedSections.emotionScan}
-            onToggle={() => toggleSection('emotionScan')}
-            isMobile={isMobile}
-          />
-          
-          {/* Social Section - Only in full view */}
-          {(!minimalView || isMobile) && (
-            <div className="mt-6">
-              <SocialDashboardSection
-                collapsed={collapsedSections.social}
-                onToggle={() => toggleSection('social')}
-                isMobile={isMobile}
-              />
-            </div>
-          )}
-        </div>
-        
-        {/* Side Panel */}
-        <div className="dashboard-side">
-          {/* User Side Panel */}
-          <ProfileDashboardSection
-            collapsed={collapsedSections.sidePanel}
-            onToggle={() => toggleSection('sidePanel')}
-            isMobile={isMobile}
-          />
-          
-          {/* VR Prompt Widget */}
-          <div className="mt-6">
-            <VRDashboardSection
-              collapsed={collapsedSections.vr}
-              onToggle={() => toggleSection('vr')}
-              isMobile={isMobile}
-              userId={user?.id || '00000000-0000-0000-0000-000000000000'}
-              latestEmotion={latestEmotion}
-            />
-          </div>
-          
-          {/* Gamification Widget - Only in full view or on mobile */}
-          {(!minimalView || isMobile) && (
-            <div className="mt-6">
-              <GamificationDashboardSection
-                collapsed={collapsedSections.gamification}
-                onToggle={() => toggleSection('gamification')}
-                isMobile={isMobile}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Main Dashboard Content */}
+      <DashboardContent
+        isMobile={isMobile}
+        minimalView={minimalView}
+        collapsedSections={collapsedSections}
+        toggleSection={toggleSection}
+        userId={user?.id || ''}
+        latestEmotion={latestEmotion}
+      />
     </div>
   );
 };

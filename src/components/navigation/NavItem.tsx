@@ -34,7 +34,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
       targetPath = '/dashboard';
     }
     
-    logger.debug(`Navigation item clicked`, { label, to: targetPath });
+    logger.debug(`Navigation item clicked`, { data: { label, to: targetPath } });
     navigate(targetPath);
   }, [to, isAdmin, navigate, label, logger]);
 

@@ -21,14 +21,18 @@ const DashboardPage: React.FC = () => {
   const isMobile = useIsMobile();
   
   logger.debug('Component initializing', { 
-    user: user ? { id: user.id, role: user.role } : null, 
-    isAuthenticated, 
-    isLoading 
+    data: {
+      user: user ? { id: user.id, role: user.role } : null, 
+      isAuthenticated, 
+      isLoading 
+    }
   });
   
   // Redirect to login if not authenticated
   useEffect(() => {
-    logger.debug('Auth effect running', { isLoading, isAuthenticated });
+    logger.debug('Auth effect running', { 
+      data: { isLoading, isAuthenticated }
+    });
     
     if (!isLoading && !isAuthenticated) {
       logger.info('Not authenticated, redirecting to login');
@@ -94,7 +98,9 @@ const DashboardPage: React.FC = () => {
   const isAdmin = isAdminRole(user?.role);
   const isUser = isUserRole(user?.role);
   
-  logger.debug('Determining dashboard type', { isAdmin, isUser, role: user?.role });
+  logger.debug('Determining dashboard type', { 
+    data: { isAdmin, isUser, role: user?.role }
+  });
   
   return (
     <DashboardContainer>

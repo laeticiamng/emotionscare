@@ -1,4 +1,3 @@
-
 import React, { Suspense, lazy } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { Shell } from "@/components/Shell";
@@ -7,11 +6,13 @@ import { ProtectedLayout } from './components/ProtectedLayout';
 import { MusicProvider } from './contexts/MusicContext';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
+// Import direct des pages qui posent problème pour assurer qu'elles ont un export default
+import DocsPage from '@/pages/Docs';
+import PricingPage from '@/pages/Pricing';
+import ContactPage from '@/pages/Contact';
+
 // Chargement paresseux des pages pour améliorer les performances
 const Index = lazy(() => import('@/pages/Index'));
-const Docs = lazy(() => import('@/pages/Docs'));
-const Pricing = lazy(() => import('@/pages/Pricing'));
-const Contact = lazy(() => import('@/pages/Contact'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
@@ -49,15 +50,15 @@ const router = createBrowserRouter([
       },
       {
         path: "docs",
-        element: <SuspenseLoader><Docs /></SuspenseLoader>
+        element: <DocsPage />
       },
       {
         path: "pricing",
-        element: <SuspenseLoader><Pricing /></SuspenseLoader>
+        element: <PricingPage />
       },
       {
         path: "contact",
-        element: <SuspenseLoader><Contact /></SuspenseLoader>
+        element: <ContactPage />
       },
       {
         path: "dashboard",
