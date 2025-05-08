@@ -25,17 +25,14 @@ import VRPage from './pages/VRPage';
 import MusicPage from './pages/MusicPage';
 
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from '@/contexts/AuthContext';
 
 function App() {
-  const { toast } = useToast();
-
   return (
     <div className="app">
       <ThemeProvider>
         <AuthProvider>
           <MusicProvider>
-            <AppRoutes toast={toast} />
+            <AppRoutes />
           </MusicProvider>
         </AuthProvider>
       </ThemeProvider>
@@ -43,8 +40,9 @@ function App() {
   );
 }
 
-// Séparation des routes dans un composant distinct pour pouvoir utiliser les hooks de contexte correctement
-function AppRoutes({ toast }) {
+// Separate routes component to properly use context hooks
+function AppRoutes() {
+  const { toast } = useToast();
   const { isAuthenticated, user } = useAuth();
 
   React.useEffect(() => {
@@ -89,5 +87,8 @@ function AppRoutes({ toast }) {
     </Routes>
   );
 }
+
+// Add the missing useAuth import
+import { useAuth } from '@/contexts/AuthContext';
 
 export default App;
