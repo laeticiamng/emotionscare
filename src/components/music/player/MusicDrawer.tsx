@@ -11,7 +11,7 @@ export interface MusicDrawerProps {
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  console.log('MusicDrawer rendered with:', { open, onClose: !!onClose });
+  console.log('MusicDrawer rendering with:', { open, onClose: !!onClose });
   
   if (!open) return null;
 
