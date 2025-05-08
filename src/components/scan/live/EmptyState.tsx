@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { WaveformCircle } from 'lucide-react';
+import { AudioWaveform } from 'lucide-react';
 
 interface EmptyStateProps {
   message?: string;
@@ -13,7 +13,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div className={`flex flex-col items-center justify-center p-6 text-center ${className || ''}`}>
-      <WaveformCircle className="h-12 w-12 text-muted-foreground/50 mb-3" />
+      <AudioWaveform className="h-12 w-12 text-muted-foreground/50 mb-3" />
       <p className="text-sm text-muted-foreground max-w-xs">
         {message}
       </p>

@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, MicOff, Loader2, WaveformCircle, Check } from 'lucide-react';
+import { Mic, MicOff, Loader2, AudioWaveform, Check } from 'lucide-react';
 import AudioProcessor from './live/AudioProcessor';
 import EmotionResult from './live/EmotionResult';
 import { useToast } from '@/hooks/use-toast';
@@ -196,7 +195,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
         
         {isProcessing && (
           <div className="flex flex-col items-center justify-center space-y-2 w-full p-4">
-            <WaveformCircle className="h-12 w-12 text-primary animate-pulse" />
+            <AudioWaveform className="h-12 w-12 text-primary animate-pulse" />
             <p className="text-sm">Analyse en cours...</p>
             <Progress value={Math.random() * 100} className="w-full h-1" />
           </div>
@@ -251,4 +250,3 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
 };
 
 export default EmotionScanLive;
-
