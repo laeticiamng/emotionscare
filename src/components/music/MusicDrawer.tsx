@@ -1,15 +1,14 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import MusicPlayer from './MusicPlayer';
 import { useDrawerState } from '@/hooks/useDrawerState';
 
 const MusicDrawer = () => {
-  // We'll use the basic component structure for now, with no trigger
-  // The drawer will be controlled from outside
+  const { isDrawerOpen } = useDrawerState();
   
   return (
-    <Drawer>
+    <Drawer open={isDrawerOpen}>
       <DrawerContent>
         <div className="p-4 max-w-md mx-auto">
           <MusicPlayer />
