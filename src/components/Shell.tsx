@@ -6,7 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
-// Import avec chemin direct relatif pour résoudre les problèmes
+// Import with direct relative path to solve import issues
 import MusicDrawer from "./music/player/MusicDrawer";
 import useLogger from "@/hooks/useLogger";
 
@@ -19,21 +19,21 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   const logger = useLogger('Shell');
   const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
   
-  // Debug pour vérifier l'import
+  // Debug for checking the import
   console.log('[DEBUG] MusicDrawer =', MusicDrawer);
   
   logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation globale avec logo */}
+      {/* Global navigation with logo */}
       <GlobalNav />
       
       <div className="flex flex-1 pt-16">
-        {/* Sidebar sur les écrans non-mobiles */}
+        {/* Sidebar on non-mobile screens */}
         {!isMobile && <Sidebar />}
         
-        {/* Contenu principal */}
+        {/* Main content */}
         <main className="flex-1 w-full">
           <div className="container max-w-[1400px] px-4 py-6 md:px-6 lg:px-8">
             {children || <Outlet />}
@@ -51,7 +51,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
         🎵
       </button>
       
-      {/* Système de notifications toast */}
+      {/* Toast notification system */}
       <Toaster />
       
       {/* Music Player Drawer */}
