@@ -1,5 +1,4 @@
-
-import { MusicPlaylist } from '@/types/music';
+import { MusicPlaylist } from '@/types';
 
 // Données de playlists pour diverses émotions
 export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {

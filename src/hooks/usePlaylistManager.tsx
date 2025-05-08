@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Track, Playlist } from '@/services/music/types';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types';
 import { convertMusicTrackToTrack, convertTrackToMusicTrack,
          convertMusicPlaylistToPlaylist, convertPlaylistToMusicPlaylist } from '@/services/music/converters';
 import { useToast } from '@/hooks/use-toast';

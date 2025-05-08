@@ -109,7 +109,7 @@ const EmotionScanner: React.FC<Props> = ({ onEmotionDetected }) => {
         </form>
       ) : (
         <div className="space-y-6">
-          <EmotionScanResult result={result} />
+          <EmotionScanResult data={result} />
           <div className="flex justify-end">
             <Button onClick={resetForm} variant="outline">
               Nouvelle analyse

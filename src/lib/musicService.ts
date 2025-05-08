@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types';
 
 // Re-export everything from the service modules
 export { getPlaylist } from '@/services/music/playlist-service';

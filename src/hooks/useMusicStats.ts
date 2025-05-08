@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { MusicPlaylist } from '@/types/music';
+import { MusicPlaylist } from '@/types';
 
 interface MusicStats {
   totalListeningTime: number; // en secondes

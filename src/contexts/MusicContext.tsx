@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { convertTrackToMusicTrack, convertPlaylistToMusicPlaylist } from '@/services/music/converters';
 import { usePlaylistManager } from '@/hooks/usePlaylistManager';

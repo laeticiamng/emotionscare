@@ -1,5 +1,5 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types';
 import { Track, Playlist } from './types';
 
 /**

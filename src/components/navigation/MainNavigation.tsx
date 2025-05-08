@@ -36,7 +36,7 @@ const MainNavigation: React.FC = () => {
       {navigationItems.map((item) => (
         <NavItem
           key={item.href}
-          icon={item.icon}
+          icon={item.icon ? React.createElement(item.icon) : null}
           label={item.title}
           to={item.href}
           active={pathname === item.href || pathname.startsWith(`${item.href}/`)}

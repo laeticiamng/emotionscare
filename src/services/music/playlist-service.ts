@@ -1,7 +1,6 @@
-
 import { Playlist } from './types';
 import { convertMusicPlaylistToPlaylist } from './converters';
-import { MusicPlaylist } from '@/types/music';
+import { MusicPlaylist } from '@/types';
 
 // Données mockées de playlists pour le développement
 const mockPlaylists: Record<string, MusicPlaylist> = {
