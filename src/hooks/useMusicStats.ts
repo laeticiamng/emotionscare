@@ -1,89 +1,78 @@
 
-import { useState, useEffect, useMemo } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { getUserListeningHistory } from '@/services/music/user-service';
-import { MusicTrack } from '@/types/music';
+import { useState, useEffect } from 'react';
+import { MusicPlaylist } from '@/types/music';
 
-export const useMusicStats = (userId?: string) => {
-  const [listeningHistory, setListeningHistory] = useState<MusicTrack[]>([]);
-  const [totalListeningTime, setTotalListeningTime] = useState(0);
-  const [mostPlayedGenre, setMostPlayedGenre] = useState('');
-  const [mostPlayedTrack, setMostPlayedTrack] = useState('');
-  const [mostPlayedArtist, setMostPlayedArtist] = useState('');
-  const [favoriteEmotion, setFavoriteEmotion] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const { playlists } = useMusic();
+interface MusicStats {
+  totalListeningTime: number; // en secondes
+  mostPlayedGenre: string;
+  mostPlayedTrack: string;
+  mostPlayedArtist: string;
+  favoriteEmotion: string;
+  listenedTracksCount: number;
+}
 
-  const hasData = useMemo(() => {
-    return listeningHistory.length > 0;
-  }, [listeningHistory]);
-
+export default function useMusicStats(userId?: string) {
+  const [stats, setStats] = useState<MusicStats>({
+    totalListeningTime: 0,
+    mostPlayedGenre: '',
+    mostPlayedTrack: '',
+    mostPlayedArtist: '',
+    favoriteEmotion: '',
+    listenedTracksCount: 0
+  });
+  
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [hasData, setHasData] = useState<boolean>(false);
+  
   useEffect(() => {
-    const loadStats = async () => {
-      if (!userId) return;
+    const fetchStats = async () => {
+      setIsLoading(true);
       
       try {
-        setIsLoading(true);
+        // Simuler un appel d'API
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Charger l'historique d'écoute
-        const history = await getUserListeningHistory(userId);
-        setListeningHistory(history);
-        
-        // Calculer le temps total d'écoute
-        const totalTime = history.reduce((acc, track) => acc + (track.duration || 0), 0);
-        setTotalListeningTime(totalTime);
-        
-        // Déterminer le genre le plus écouté (simplifié)
-        setMostPlayedGenre('Relaxation');
-        
-        // Définir le titre le plus écouté (simulé)
-        setMostPlayedTrack('Ocean Waves');
-        
-        // Définir l'artiste préféré (simulé)
-        setMostPlayedArtist('Nature Sounds');
-        
-        // Définir l'émotion favorite (simulée)
-        setFavoriteEmotion('calm');
-        
+        // Données simulées
+        if (userId) {
+          setStats({
+            totalListeningTime: 7823, // 2h10m23s
+            mostPlayedGenre: 'Ambient',
+            mostPlayedTrack: 'Ocean Waves at Sunset',
+            mostPlayedArtist: 'Nature Sounds',
+            favoriteEmotion: 'Calm',
+            listenedTracksCount: 42
+          });
+          setHasData(true);
+        } else {
+          // Si pas d'utilisateur, pas de données
+          setHasData(false);
+        }
       } catch (error) {
-        console.error('Error loading music stats:', error);
+        console.error('Erreur lors de la récupération des statistiques musicales:', error);
+        setHasData(false);
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadStats();
-  }, [userId, playlists]);
-
-  // Format time in minutes and seconds
-  const formatListeningTime = (seconds: number) => {
+    fetchStats();
+  }, [userId]);
+  
+  // Formater le temps d'écoute pour l'affichage
+  const formatListeningTime = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     
     if (hours > 0) {
-      return `${hours}h ${minutes}min`;
+      return `${hours}h ${minutes}m`;
     }
     return `${minutes} minutes`;
   };
   
-  // Compile stats into a single object for easy access
-  const stats = {
-    totalListeningTime,
-    mostPlayedGenre,
-    mostPlayedTrack,
-    mostPlayedArtist,
-    favoriteEmotion
-  };
-  
   return {
-    listeningHistory,
-    totalListeningTime,
-    mostPlayedGenre,
-    isLoading,
     stats,
-    formatListeningTime,
-    hasData
+    isLoading,
+    hasData,
+    formatListeningTime
   };
-};
-
-export default useMusicStats;
+}
