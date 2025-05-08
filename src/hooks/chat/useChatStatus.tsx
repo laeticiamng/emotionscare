@@ -3,90 +3,122 @@ import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 
 /**
- * Hook for managing chat loading state
+ * Hook pour gérer le statut du chat (chargement, erreur, etc.)
  */
 export function useChatStatus() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
-  // Send message function wrapper that handles loading state
-  const sendMessage = useCallback(async (
-    messageText: string,
-    addUserMessage: (message: ChatMessage) => void,
-    addBotMessage: (message: ChatMessage) => void,
-    apiFunction: (messageText: string) => Promise<string>,
-    clearTypingIndicator: () => void
-  ) => {
-    setIsLoading(true);
-    try {
-      // Add the user message
-      const userMessageObj: ChatMessage = {
+  // Process sending a message
+  const sendMessage = useCallback(
+    (
+      text: string,
+      addUserMessage: (message: ChatMessage) => void,
+      addBotMessage: (message: ChatMessage) => void,
+      processMessage: (text: string) => Promise<string>,
+      onComplete?: () => void
+    ) => {
+      // Add user message
+      const userMessage: ChatMessage = {
         id: Date.now().toString(),
-        text: messageText,
+        text,
         sender: 'user',
-        timestamp: new Date(),
+        timestamp: new Date()
       };
+      addUserMessage(userMessage);
       
-      addUserMessage(userMessageObj);
-      clearTypingIndicator();
+      // Process the message
+      setIsLoading(true);
+      setError(null);
       
-      // Get a response from the API
-      const response = await apiFunction(messageText);
-      
-      // Add the response
-      const botResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: response,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      
-      addBotMessage(botResponse);
-      
-      return response;
-    } catch (error) {
-      console.error('Error in chat:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      processMessage(text)
+        .then((response) => {
+          // Add bot response
+          const botMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            text: response,
+            sender: 'bot',
+            timestamp: new Date()
+          };
+          addBotMessage(botMessage);
+        })
+        .catch((err) => {
+          console.error('Error processing message:', err);
+          setError('Failed to process message');
+          
+          // Add error message
+          const errorMessage: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
+            sender: 'bot',
+            timestamp: new Date()
+          };
+          addBotMessage(errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
+          if (onComplete) onComplete();
+        });
+    },
+    []
+  );
   
-  // Regenerate response function wrapper that handles loading state
-  const regenerateResponse = useCallback(async (
-    messages: ChatMessage[],
-    addBotMessage: (message: ChatMessage) => void,
-    apiFunction: (messageText: string) => Promise<string>
-  ) => {
-    setIsLoading(true);
-    try {
-      // Get the last user message
-      const lastUserMessage = [...messages].reverse().find(msg => msg.sender === 'user');
-      if (!lastUserMessage) return null;
+  // Process regenerating a response
+  const regenerateResponse = useCallback(
+    (
+      messages: ChatMessage[],
+      addBotMessage: (message: ChatMessage) => void,
+      processMessage: (text: string) => Promise<string>
+    ) => {
+      // Find the last user message
+      const lastUserMessage = [...messages]
+        .reverse()
+        .find((msg) => msg.sender === 'user');
       
-      // Get a new response
-      const response = await apiFunction(lastUserMessage.text);
+      if (!lastUserMessage) {
+        setError('No message to regenerate');
+        return;
+      }
       
-      // Add the new response
-      const botResponse: ChatMessage = {
-        id: Date.now().toString(),
-        text: response,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
+      // Process the message
+      setIsLoading(true);
+      setError(null);
       
-      addBotMessage(botResponse);
-      return response;
-    } catch (error) {
-      console.error('Error regenerating response:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      processMessage(lastUserMessage.text)
+        .then((response) => {
+          // Add bot response
+          const botMessage: ChatMessage = {
+            id: Date.now().toString(),
+            text: response,
+            sender: 'bot',
+            timestamp: new Date()
+          };
+          addBotMessage(botMessage);
+        })
+        .catch((err) => {
+          console.error('Error regenerating response:', err);
+          setError('Failed to regenerate response');
+          
+          // Add error message
+          const errorMessage: ChatMessage = {
+            id: Date.now().toString(),
+            text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
+            sender: 'bot',
+            timestamp: new Date()
+          };
+          addBotMessage(errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    },
+    []
+  );
   
   return {
     isLoading,
-    setIsLoading,
+    error,
+    setError,
     sendMessage,
     regenerateResponse
   };

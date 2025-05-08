@@ -1,53 +1,46 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { useChatHistory } from '@/hooks/chat/useChatHistory';
 
 /**
- * Hook for managing chat messages
+ * Hook spécialisé pour gérer les messages du chat avec le coach
  */
-export function useCoachMessages(initialQuestion?: string) {
-  // State for messages in the current conversation
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      text: 'Bonjour, je suis votre coach IA. Comment puis-je vous aider aujourd\'hui ?',
-      sender: 'bot',
-      timestamp: new Date(),
-    },
-  ]);
+export function useCoachMessages() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   
-  // Chat history integration
-  const { saveMessages } = useChatHistory();
-  
-  // Save messages when they change
-  useEffect(() => {
-    if (messages.length > 1) { // Only save if there are user messages
-      saveMessages(messages);
-    }
-  }, [messages, saveMessages]);
-
-  // Adding a message
+  // Ajouter un nouveau message à la conversation
   const addMessage = useCallback((message: ChatMessage) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
+    setMessages(prev => [...prev, message]);
   }, []);
-
-  // Reset messages to initial state
+  
+  // Remplacer tous les messages (utile lors du chargement d'une conversation existante)
   const resetMessages = useCallback(() => {
-    setMessages([
-      {
-        id: '1',
-        text: 'Bonjour, je suis votre coach IA. Comment puis-je vous aider aujourd\'hui ?',
-        sender: 'bot',
-        timestamp: new Date(),
-      },
-    ]);
+    setMessages([]);
+  }, []);
+  
+  // Ajouter un message du système (non visible par l'utilisateur)
+  const addSystemMessage = useCallback((text: string) => {
+    const systemMessage: ChatMessage = {
+      id: `system-${Date.now()}`,
+      text,
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, systemMessage]);
+  }, []);
+  
+  // Supprimer le dernier message (utile pour annuler une action)
+  const removeLastMessage = useCallback(() => {
+    setMessages(prev => prev.slice(0, -1));
   }, []);
   
   return {
     messages,
     setMessages,
     addMessage,
-    resetMessages
+    resetMessages,
+    addSystemMessage,
+    removeLastMessage
   };
 }

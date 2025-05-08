@@ -1,46 +1,53 @@
 
-import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useCallback, useEffect } from 'react';
 
 /**
- * Hook for managing typing indicator in chat
+ * Hook spécialisé pour gérer l'indicateur de frappe dans le chat
  */
 export function useTypingIndicator() {
-  const [typingIndicator, setTypingIndicator] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [typingIndicator, setTypingIndicator] = useState<boolean>(false);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   
-  // Handle user typing and show indicators
+  // Fonction pour afficher l'indicateur de frappe
   const handleUserTyping = useCallback(() => {
-    // Reset typing indicator after a delay
-    const resetIndicatorAfterDelay = () => {
-      const timeout = setTimeout(() => {
-        setTypingIndicator(null);
-      }, 30000); // 30 seconds timeout
-      return timeout;
-    };
+    setTypingIndicator(true);
     
-    // Set indicator based on message length and complexity
-    setTypingIndicator("Le coach réfléchit...");
-    const timeout = resetIndicatorAfterDelay();
+    // Efface le timeout précédent s'il existe
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
     
-    // Clean up timeout if the component unmounts
-    return () => clearTimeout(timeout);
-  }, []);
+    // Définir un nouveau timeout pour masquer l'indicateur après 1 seconde d'inactivité
+    const timeout = setTimeout(() => {
+      setTypingIndicator(false);
+    }, 1000);
+    
+    setTypingTimeout(timeout);
+  }, [typingTimeout]);
   
-  // Clear typing indicator
+  // Fonction pour masquer l'indicateur de frappe
   const clearTypingIndicator = useCallback(() => {
-    setTypingIndicator(null);
-  }, []);
+    setTypingIndicator(false);
+    
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+      setTypingTimeout(null);
+    }
+  }, [typingTimeout]);
   
-  // Handle typing error (e.g., network issues)
+  // Fonction pour gérer les erreurs d'indicateur de frappe
   const handleTypingError = useCallback(() => {
-    setTypingIndicator(null);
-    toast({
-      title: "Problème de connexion",
-      description: "La communication avec le coach a été interrompue. Veuillez réessayer.",
-      variant: "destructive"
-    });
-  }, [toast]);
+    clearTypingIndicator();
+  }, [clearTypingIndicator]);
+  
+  // Nettoyer les timeouts lors du démontage du composant
+  useEffect(() => {
+    return () => {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+    };
+  }, [typingTimeout]);
   
   return {
     typingIndicator,
