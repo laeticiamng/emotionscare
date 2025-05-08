@@ -1,53 +1,36 @@
-import React from 'react';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerClose,
-} from '@/components/ui/drawer';
-import MusicPlayer from './MusicPlayer';
-import useLogger from '@/hooks/useLogger';
+import React from 'react'
+import useLogger from '@/hooks/useLogger'
 
 export interface MusicDrawerProps {
-  open: boolean;
-  onClose: () => void;
+  open: boolean
+  onClose: () => void
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  // 🔍 Diagnostic des imports
-  console.group('🔍 Imports MusicDrawer');
-  console.log('→ Drawer              :', typeof Drawer, Drawer);
-  console.log('→ DrawerContent       :', typeof DrawerContent, DrawerContent);
-  console.log('→ DrawerHeader        :', typeof DrawerHeader, DrawerHeader);
-  console.log('→ DrawerTitle         :', typeof DrawerTitle, DrawerTitle);
-  console.log('→ DrawerClose         :', typeof DrawerClose, DrawerClose);
-  console.log('→ MusicPlayer         :', typeof MusicPlayer, MusicPlayer);
-  console.log('→ useLogger           :', typeof useLogger, useLogger);
-  console.groupEnd();
+  const logger = useLogger('MusicDrawer-Stub')
 
-  const logger = useLogger('MusicDrawer');
+  // Ne rien rendre si fermé
+  if (!open) return null
 
-  if (!open) return null;
+  // Log de montage
+  console.log('✅ MusicDrawer stub mounted — open=', open)
+  logger.debug('MusicDrawer stub mounted', { open })
 
-  logger.debug('Rendering MusicDrawer', { open });
+  // Simple rectangle gris
   return (
-    <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DrawerContent className="max-h-[80vh] focus:outline-none">
-        <DrawerHeader className="flex justify-between items-center">
-          <DrawerTitle>Lecteur de musique</DrawerTitle>
-          <DrawerClose asChild>
-            <button onClick={onClose} type="button">
-              ✕
-            </button>
-          </DrawerClose>
-        </DrawerHeader>
-        <div className="px-4 pb-4">
-          <MusicPlayer />
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
-};
+    <div style={{
+      position: 'fixed',
+      top: 0, right: 0, bottom: 0,
+      width: 300,
+      background: '#ddd',
+      boxShadow: '-2px 0 5px rgba(0,0,0,0.2)',
+      padding: 16,
+      zIndex: 1000,
+    }}>
+      <h2>Stub MusicDrawer OK!</h2>
+      <button onClick={onClose}>Fermer</button>
+    </div>
+  )
+}
 
-export default MusicDrawer;
+export default MusicDrawer
