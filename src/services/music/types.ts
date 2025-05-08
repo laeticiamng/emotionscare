@@ -1,5 +1,5 @@
 
-// Internal types specific to music service implementation
+// Types utilisés par les services de musique
 export interface Track {
   id: string;
   title: string;
@@ -7,9 +7,6 @@ export interface Track {
   duration: number;
   url: string;
   cover?: string;
-  coverUrl?: string;   // Ajouté pour compatibilité avec MusicTrack
-  isPlaying?: boolean; // Added for compatibility
-  audioUrl?: string;   // Added for compatibility
 }
 
 export interface Playlist {

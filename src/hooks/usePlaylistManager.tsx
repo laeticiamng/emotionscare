@@ -1,90 +1,185 @@
 
-import { useState, useCallback } from 'react';
-import { getPlaylist } from '@/lib/musicService';
-import type { Track, Playlist } from '@/services/music/types';
-import type { MusicTrack, MusicPlaylist } from '@/types/music';
-import { convertMusicPlaylistToPlaylist } from '@/services/music/converters';
+import { useState, useEffect, useCallback } from 'react';
+import { Track, Playlist } from '@/services/music/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { convertMusicTrackToTrack, convertTrackToMusicTrack,
+         convertMusicPlaylistToPlaylist, convertPlaylistToMusicPlaylist } from '@/services/music/converters';
+import { useToast } from '@/hooks/use-toast';
 
-export function usePlaylistManager() {
-  const [playlist, setPlaylist] = useState<Playlist | null>(null);
-  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<Playlist | null> => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      console.log(`Loading playlist for emotion: ${emotion}`);
-      const emotionPlaylist = await getPlaylist(emotion);
-      
-      // Ensure we have the correct type by converting MusicPlaylist to Playlist
-      if (emotionPlaylist) {
-        const convertedPlaylist = convertMusicPlaylistToPlaylist(emotionPlaylist);
-        setPlaylist(convertedPlaylist);
-        setCurrentEmotion(emotion);
-        return convertedPlaylist;
+// Playlists prédéfinies pour les différentes émotions
+const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
+  happy: {
+    id: 'happy-playlist',
+    name: 'Playlist Joyeuse',
+    emotion: 'happy',
+    tracks: [
+      {
+        id: 'happy-1',
+        title: 'Sunshine Melody',
+        artist: 'Happy Vibes',
+        duration: 180,
+        audioUrl: 'https://example.com/happy1.mp3',
+        coverUrl: 'https://example.com/happy1.jpg'
+      },
+      {
+        id: 'happy-2',
+        title: 'Dancing Mood',
+        artist: 'Positive Notes',
+        duration: 210,
+        audioUrl: 'https://example.com/happy2.mp3',
+        coverUrl: 'https://example.com/happy2.jpg'
       }
-      return null;
-    } catch (err) {
-      console.error('Error loading playlist:', err);
-      setError(`Failed to load playlist: ${err instanceof Error ? err.message : String(err)}`);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
+    ]
+  },
+  calm: {
+    id: 'calm-playlist',
+    name: 'Playlist Apaisante',
+    emotion: 'calm',
+    tracks: [
+      {
+        id: 'calm-1',
+        title: 'Ocean Waves',
+        artist: 'Nature Sounds',
+        duration: 240,
+        audioUrl: 'https://example.com/calm1.mp3',
+        coverUrl: 'https://example.com/calm1.jpg'
+      },
+      {
+        id: 'calm-2',
+        title: 'Forest Serenity',
+        artist: 'Relaxation Masters',
+        duration: 300,
+        audioUrl: 'https://example.com/calm2.mp3',
+        coverUrl: 'https://example.com/calm2.jpg'
+      }
+    ]
+  },
+  focused: {
+    id: 'focused-playlist',
+    name: 'Playlist Concentration',
+    emotion: 'focused',
+    tracks: [
+      {
+        id: 'focused-1',
+        title: 'Deep Focus',
+        artist: 'Concentration Project',
+        duration: 280,
+        audioUrl: 'https://example.com/focused1.mp3',
+        coverUrl: 'https://example.com/focused1.jpg'
+      },
+      {
+        id: 'focused-2',
+        title: 'Study Session',
+        artist: 'Brain Waves',
+        duration: 320,
+        audioUrl: 'https://example.com/focused2.mp3',
+        coverUrl: 'https://example.com/focused2.jpg'
+      }
+    ]
+  },
+  energetic: {
+    id: 'energetic-playlist',
+    name: 'Playlist Énergique',
+    emotion: 'energetic',
+    tracks: [
+      {
+        id: 'energetic-1',
+        title: 'Power Up',
+        artist: 'Energy Boost',
+        duration: 190,
+        audioUrl: 'https://example.com/energetic1.mp3',
+        coverUrl: 'https://example.com/energetic1.jpg'
+      },
+      {
+        id: 'energetic-2',
+        title: 'Workout Rhythm',
+        artist: 'High Intensity',
+        duration: 220,
+        audioUrl: 'https://example.com/energetic2.mp3',
+        coverUrl: 'https://example.com/energetic2.jpg'
+      }
+    ]
+  },
+  neutral: {
+    id: 'neutral-playlist',
+    name: 'Playlist Neutre',
+    emotion: 'neutral',
+    tracks: [
+      {
+        id: 'neutral-1',
+        title: 'Ambient Background',
+        artist: 'Neutral Tones',
+        duration: 240,
+        audioUrl: 'https://example.com/neutral1.mp3',
+        coverUrl: 'https://example.com/neutral1.jpg'
+      },
+      {
+        id: 'neutral-2',
+        title: 'Easy Listening',
+        artist: 'Smooth Sounds',
+        duration: 260,
+        audioUrl: 'https://example.com/neutral2.mp3',
+        coverUrl: 'https://example.com/neutral2.jpg'
+      }
+    ]
+  }
+};
+
+export const usePlaylistManager = () => {
+  const [playlists, setPlaylists] = useState<Record<string, Playlist>>({});
+  const [currentPlaylistId, setCurrentPlaylistId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  // Initialiser les playlists au chargement du hook
+  useEffect(() => {
+    const convertedPlaylists: Record<string, Playlist> = {};
+    
+    Object.entries(EMOTION_PLAYLISTS).forEach(([emotion, musicPlaylist]) => {
+      convertedPlaylists[emotion] = convertMusicPlaylistToPlaylist(musicPlaylist);
+    });
+    
+    setPlaylists(convertedPlaylists);
   }, []);
-  
-  const getNextTrack = useCallback((currentTrack: Track, shuffle: boolean): Track => {
-    if (!playlist || !playlist.tracks.length) return currentTrack;
+
+  // Obtenir la playlist actuelle
+  const getCurrentPlaylist = useCallback(() => {
+    if (!currentPlaylistId || !playlists[currentPlaylistId]) return null;
+    return playlists[currentPlaylistId];
+  }, [currentPlaylistId, playlists]);
+
+  // Charger une playlist pour une émotion spécifique
+  const loadPlaylistForEmotion = useCallback((emotion: string) => {
+    const normalizedEmotion = emotion.toLowerCase();
     
-    if (shuffle) {
-      // Return a random track different from current
-      const availableTracks = playlist.tracks.filter(t => t.id !== currentTrack.id);
-      if (availableTracks.length === 0) return currentTrack;
-      
-      const randomIndex = Math.floor(Math.random() * availableTracks.length);
-      return availableTracks[randomIndex];
+    if (playlists[normalizedEmotion]) {
+      setCurrentPlaylistId(normalizedEmotion);
+      return playlists[normalizedEmotion];
+    } else if (playlists['neutral']) {
+      // Fallback sur la playlist neutre si l'émotion n'existe pas
+      setCurrentPlaylistId('neutral');
+      toast({
+        title: "Playlist indisponible",
+        description: `La playlist pour "${emotion}" n'existe pas. Utilisation de la playlist neutre.`,
+      });
+      return playlists['neutral'];
     } else {
-      // Find current track index
-      const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-      if (currentIndex === -1) return playlist.tracks[0];
-      
-      // Return next track or loop to first
-      const nextIndex = (currentIndex + 1) % playlist.tracks.length;
-      return playlist.tracks[nextIndex];
+      toast({
+        title: "Erreur de musique",
+        description: "Impossible de charger une playlist. Veuillez réessayer.",
+        variant: "destructive"
+      });
+      return null;
     }
-  }, [playlist]);
-  
-  const getPreviousTrack = useCallback((currentTrack: Track, shuffle: boolean): Track => {
-    if (!playlist || !playlist.tracks.length) return currentTrack;
-    
-    if (shuffle) {
-      // For shuffle mode, previous is also random
-      const availableTracks = playlist.tracks.filter(t => t.id !== currentTrack.id);
-      if (availableTracks.length === 0) return currentTrack;
-      
-      const randomIndex = Math.floor(Math.random() * availableTracks.length);
-      return availableTracks[randomIndex];
-    } else {
-      // Find current track index
-      const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-      if (currentIndex === -1) return playlist.tracks[0];
-      
-      // Return previous track or loop to last
-      const prevIndex = (currentIndex - 1 + playlist.tracks.length) % playlist.tracks.length;
-      return playlist.tracks[prevIndex];
-    }
-  }, [playlist]);
-  
+  }, [playlists, toast]);
+
   return {
-    playlist,
-    isLoading,
-    error,
-    currentEmotion,
-    loadPlaylistForEmotion,
-    getNextTrack,
-    getPreviousTrack
+    playlists,
+    setPlaylists,
+    currentPlaylistId,
+    setCurrentPlaylistId,
+    getCurrentPlaylist,
+    loadPlaylistForEmotion
   };
-}
+};
+
+export default usePlaylistManager;

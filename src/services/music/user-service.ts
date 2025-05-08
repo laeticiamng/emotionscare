@@ -2,31 +2,53 @@
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack } from '@/types/music';
 
-/**
- * Save a user's current track to the database
- * @param userId The ID of the user
- * @param trackId The ID of the track
- */
-export async function saveUserCurrentTrack(userId: string, trackId: string): Promise<void> {
+// Enregistre la piste en cours d'écoute pour un utilisateur
+export const saveUserCurrentTrack = async (userId: string, track: MusicTrack): Promise<void> => {
   try {
-    // In a real implementation, this would save to the database
-    console.log(`Saving track ${trackId} for user ${userId}`);
+    // Simulation d'un appel API
+    console.log(`Enregistrement de la piste pour l'utilisateur ${userId}:`, track.title);
+    
+    // Dans une implémentation réelle, on ferait:
+    // const { data, error } = await supabase
+    //   .from('user_listening_history')
+    //   .insert({
+    //     user_id: userId,
+    //     track_id: track.id,
+    //     timestamp: new Date()
+    //   });
+    
+    // if (error) throw error;
   } catch (error) {
-    console.error('Error saving user track:', error);
-    throw error;
+    console.error('Error saving user current track:', error);
   }
-}
+};
 
-/**
- * Get a user's listening history
- * @param userId The ID of the user
- */
-export async function getUserListeningHistory(userId: string): Promise<MusicTrack[]> {
+// Récupère l'historique d'écoute d'un utilisateur
+export const getUserListeningHistory = async (userId: string): Promise<MusicTrack[]> => {
   try {
-    // In a real implementation, this would query the database
-    return [];
+    console.log(`Récupération de l'historique d'écoute pour l'utilisateur: ${userId}`);
+    
+    // Simulation, dans un cas réel on utiliserait Supabase
+    return [
+      {
+        id: 'track-1',
+        title: 'Morning Meditation',
+        artist: 'Zen Masters',
+        duration: 240,
+        audioUrl: 'https://example.com/track1.mp3',
+        coverUrl: 'https://example.com/cover1.jpg'
+      },
+      {
+        id: 'track-2',
+        title: 'Evening Relaxation',
+        artist: 'Sleep Well',
+        duration: 300,
+        audioUrl: 'https://example.com/track2.mp3',
+        coverUrl: 'https://example.com/cover2.jpg'
+      }
+    ];
   } catch (error) {
     console.error('Error fetching user listening history:', error);
-    throw error;
+    return [];
   }
-}
+};

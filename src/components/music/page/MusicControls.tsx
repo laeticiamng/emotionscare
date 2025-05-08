@@ -25,9 +25,9 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     setVolume 
   } = useMusic();
   
-  // Fix: Pass an array with a single value instead of a single number
-  const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0]);
+  // Fix: Accepter un tableau de valeurs et utiliser le premier élément
+  const handleVolumeChange = (values: number[]) => {
+    setVolume(values[0] / 100);
   };
   
   const togglePlayPause = () => {
