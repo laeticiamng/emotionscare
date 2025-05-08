@@ -6,7 +6,6 @@ import { ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import WelcomeHero from '@/components/home/WelcomeHero';
 import ModulesSection from '@/components/home/ModulesSection';
-import { Shell } from '@/components/Shell';
 
 const Index = () => {
   const { user, isAuthenticated } = useAuth();
