@@ -158,7 +158,7 @@ export const chatHistoryService = {
         conversation_id: conversationId,
         text: message.text,
         sender: message.sender,
-        timestamp: message.timestamp
+        timestamp: message.timestamp.toISOString() // Convert Date to ISO string
       }));
       
       // Insert all messages for the conversation

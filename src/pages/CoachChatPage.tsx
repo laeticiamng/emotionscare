@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import CoachChatContainer from '@/components/coach/CoachChatContainer';
 
 const CoachChatPage = () => {
+  // Get the coach chat functionality
   const { 
     messages, 
     setMessages,
