@@ -4,10 +4,25 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/types';
 import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
+import { EmotionToMusicMap } from '@/types/audio-player';
 
 export function useMusicEmotionIntegration() {
   const { loadPlaylistForEmotion, playTrack, currentPlaylist, currentTrack, isPlaying } = useMusic();
   const { toast } = useToast();
+  
+  // Define emotion to music mapping
+  const EMOTION_TO_MUSIC_MAP: EmotionToMusicMap = {
+    'happy': 'happy',
+    'sad': 'calm',
+    'angry': 'calm',
+    'anxious': 'calm',
+    'neutral': 'neutral',
+    'calm': 'calm',
+    'stressed': 'calm',
+    'energetic': 'energetic',
+    'focused': 'focused',
+    'default': 'neutral'
+  };
   
   const activateMusicForEmotion = useCallback((emotionResult: EmotionResult) => {
     if (!emotionResult.emotion) return;
@@ -32,6 +47,7 @@ export function useMusicEmotionIntegration() {
   }, [loadPlaylistForEmotion, playTrack, currentTrack, isPlaying, toast]);
   
   return {
-    activateMusicForEmotion
+    activateMusicForEmotion,
+    EMOTION_TO_MUSIC_MAP
   };
 }

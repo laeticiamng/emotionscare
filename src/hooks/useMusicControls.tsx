@@ -3,8 +3,9 @@ import { useCallback } from 'react';
 import { MusicTrack } from '@/types';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAudioPlayerState } from '@/hooks/audio/useAudioPlayerState';
+import { UseMusicControlsReturn } from '@/types/audio-player';
 
-export function useMusicControls() {
+export function useMusicControls(): UseMusicControlsReturn {
   const {
     playTrack: playAudioTrack,
     pauseTrack: pauseAudioTrack,
