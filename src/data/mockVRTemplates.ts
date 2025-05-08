@@ -11,6 +11,7 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     duration: 5,
     preview_url: 'https://www.youtube.com/embed/BHACKCNDMW8',
     description: 'Une immersion en forêt pour apaiser l\'esprit et calmer les pensées agitées.',
+    is_audio_only: false, // Added required field
     recommended_mood: 'calm'
   },
   {
@@ -21,6 +22,7 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     duration: 7,
     preview_url: 'https://www.youtube.com/embed/LTZqYzu3jQo',
     description: 'Écoutez le bruit des vagues et ressentez la brise marine pour une détente profonde.',
+    is_audio_only: false, // Added required field
     recommended_mood: 'calm'
   },
   {

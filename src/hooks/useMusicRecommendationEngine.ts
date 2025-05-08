@@ -1,6 +1,14 @@
 
 import { useCallback } from 'react';
 
+// Adding EmotionCategory enum that was missing
+export enum EmotionCategory {
+  POSITIVE = 'positive',
+  CALM = 'calm',
+  FOCUS = 'focus',
+  NEGATIVE = 'negative'
+}
+
 // Mock music recommendations data
 const musicRecommendations = {
   'happy': [

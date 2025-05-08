@@ -21,13 +21,18 @@ export interface User {
   joined_at?: string;
   onboarded?: boolean;
   preferences?: UserPreferences;
+  team_name?: string; // Added missing field
 }
 
 // Enum for user roles
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
-  MANAGER = 'manager'
+  MANAGER = 'manager',
+  // Adding missing roles
+  EMPLOYEE = 'employee',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager'
 }
 
 // User preferences
@@ -79,6 +84,7 @@ export interface Emotion {
   emojis?: string;
   ai_feedback?: string;
   feedback?: string;
+  intensity?: number; // Added missing field
 }
 
 // VR related types
@@ -109,6 +115,12 @@ export interface VRSession {
   mood_before?: string;
   mood_after?: string;
   template?: VRSessionTemplate;
+  // Added missing fields
+  date?: string;
+  duration_seconds?: number;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
 }
 
 // Music related types
@@ -123,6 +135,11 @@ export interface MusicTrack {
   genre?: string;
   audioUrl?: string;
   externalUrl?: string;
+  // Added missing fields
+  cover?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  isPlaying?: boolean;
 }
 
 export interface MusicPlaylist {
@@ -142,6 +159,10 @@ export interface MoodData {
   originalDate?: string;
   value: number;
   label?: string;
+  // Added missing fields
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 // Journal related types
@@ -156,6 +177,10 @@ export interface JournalEntry {
   updated_at?: string;
   tags?: string[];
   is_private: boolean;
+  // Added missing fields
+  date?: string;
+  text?: string;
+  ai_feedback?: string;
 }
 
 // Badge for gamification
@@ -170,6 +195,12 @@ export interface Badge {
   progress?: number;
   total_required?: number;
   unlocked_at?: string;
+  // Added missing fields
+  user_id?: string;
+  threshold?: number;
+  icon_url?: string;
+  image_url?: string;
+  awarded_at?: string;
 }
 
 // Invitation related types
@@ -187,6 +218,9 @@ export interface InvitationStats {
   accepted: number;
   expired: number;
   teams: Record<string, number>;
+  // Added missing fields
+  sent?: number;
+  recent_invites?: any[];
 }
 
 // Report type
@@ -202,4 +236,6 @@ export interface Report {
     change?: number;
   }[];
   chart_data?: any;
+  // Added missing fields
+  date?: string;
 }
