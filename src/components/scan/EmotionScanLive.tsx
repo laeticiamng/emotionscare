@@ -10,6 +10,7 @@ import { saveRealtimeEmotionScan } from '@/lib/scanService';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+import EmptyState from './live/EmptyState';
 
 interface EmotionScanLiveProps {
   userId?: string;
