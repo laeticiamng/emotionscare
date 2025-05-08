@@ -58,7 +58,7 @@ function AppRoutes({ toast }) {
 
   return (
     <Routes>
-      <Route path="/" element={<Index />} />
+      <Route path="/" element={<Shell><Index /></Shell>} />
       <Route element={<Shell />}>
         <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
         <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
