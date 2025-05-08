@@ -6,7 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
-// Import with direct relative path to solve import issues
+// Import MusicDrawer directly to ensure it's properly loaded
 import MusicDrawer from "./music/player/MusicDrawer";
 import useLogger from "@/hooks/useLogger";
 
@@ -18,9 +18,6 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
   const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
-  
-  // Debug for checking the import
-  console.log('[DEBUG] MusicDrawer =', MusicDrawer);
   
   logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
@@ -54,12 +51,14 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Toast notification system */}
       <Toaster />
       
-      {/* Music Player Drawer */}
-      <React.Suspense fallback={null}>
-        <MusicDrawer 
-          open={isDrawerOpen} 
-          onClose={closeDrawer} 
-        />
+      {/* Music Player Drawer - Using React.Suspense with a proper fallback */}
+      <React.Suspense fallback={<div className="hidden">Loading...</div>}>
+        {isDrawerOpen && (
+          <MusicDrawer 
+            open={isDrawerOpen} 
+            onClose={closeDrawer} 
+          />
+        )}
       </React.Suspense>
     </div>
   );

@@ -28,8 +28,6 @@ const MusicControls: React.FC<MusicControlsProps> = ({
 }) => {
   const [isMuted, setIsMuted] = React.useState(false);
   
-  console.log("MusicControls rendering with isPlaying:", isPlaying);
-  
   const handlePlayPause = () => {
     if (isPlaying) {
       onPause();

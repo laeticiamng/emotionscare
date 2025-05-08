@@ -11,8 +11,6 @@ export interface MusicDrawerProps {
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  console.log('[DEBUG] MusicDrawer rendering with:', { open, onClose: typeof onClose === 'function' });
-  
   return (
     <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DrawerContent className="max-h-[80vh] focus:outline-none">
