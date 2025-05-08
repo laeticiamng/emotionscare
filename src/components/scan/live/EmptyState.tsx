@@ -1,12 +1,22 @@
 
 import React from 'react';
-import { Mic } from 'lucide-react';
+import { WaveformCircle } from 'lucide-react';
 
-const EmptyState: React.FC = () => {
+interface EmptyStateProps {
+  message?: string;
+  className?: string;
+}
+
+const EmptyState: React.FC<EmptyStateProps> = ({ 
+  message = "Cliquez sur le bouton d'enregistrement pour commencer l'analyse vocale", 
+  className 
+}) => {
   return (
-    <div className="py-8 flex flex-col items-center text-center text-muted-foreground">
-      <Mic className="h-10 w-10 mb-4 opacity-50" />
-      <p>Cliquez sur "Commencer" pour analyser vos émotions en temps réel via votre voix</p>
+    <div className={`flex flex-col items-center justify-center p-6 text-center ${className || ''}`}>
+      <WaveformCircle className="h-12 w-12 text-muted-foreground/50 mb-3" />
+      <p className="text-sm text-muted-foreground max-w-xs">
+        {message}
+      </p>
     </div>
   );
 };

@@ -1,49 +1,59 @@
 
 import React from 'react';
-import { Mic, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-type StatusType = 'idle' | 'recording' | 'processing' | 'success' | 'error';
+type StatusType = 'loading' | 'success' | 'error' | 'idle';
 
 interface StatusIndicatorProps {
   status: StatusType;
+  message?: string;
   className?: string;
 }
 
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status, className = '' }) => {
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({
+  status,
+  message,
+  className
+}) => {
   const getIcon = () => {
     switch (status) {
-      case 'recording':
-        return <Mic className="h-5 w-5 text-red-500 animate-pulse" />;
-      case 'processing':
-        return <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />;
+      case 'loading':
+        return <Loader2 className="h-4 w-4 animate-spin" />;
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
       case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
+        return <AlertTriangle className="h-4 w-4 text-red-500" />;
       default:
-        return <Mic className="h-5 w-5 text-gray-400" />;
+        return null;
     }
   };
-
-  const getLabel = () => {
+  
+  const getBgColor = () => {
     switch (status) {
-      case 'recording':
-        return 'Enregistrement en cours...';
-      case 'processing':
-        return 'Traitement audio...';
+      case 'loading':
+        return 'bg-blue-50 border-blue-200 text-blue-700';
       case 'success':
-        return 'Analyse complétée';
+        return 'bg-green-50 border-green-200 text-green-700';
       case 'error':
-        return 'Erreur de traitement';
+        return 'bg-red-50 border-red-200 text-red-700';
       default:
-        return 'Prêt à enregistrer';
+        return 'bg-gray-50 border-gray-200 text-gray-700';
     }
   };
-
+  
+  if (status === 'idle') return null;
+  
   return (
-    <div className={`flex items-center ${className}`}>
+    <div 
+      className={cn(
+        "flex items-center gap-2 px-3 py-2 rounded-md border text-sm",
+        getBgColor(),
+        className
+      )}
+    >
       {getIcon()}
-      <span className="ml-2 text-sm">{getLabel()}</span>
+      {message && <span>{message}</span>}
     </div>
   );
 };

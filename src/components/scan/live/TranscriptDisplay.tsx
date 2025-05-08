@@ -1,52 +1,46 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface TranscriptDisplayProps {
   text: string;
-  isPartial?: boolean;
+  emotion?: string;
   className?: string;
 }
 
 const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ 
   text, 
-  isPartial = false,
-  className = '' 
+  emotion,
+  className
 }) => {
-  const [displayText, setDisplayText] = useState<string>(text);
-
-  // Animate typing effect for partial transcripts
-  useEffect(() => {
-    if (isPartial && text) {
-      setDisplayText('');
-      let index = 0;
-      const timer = setInterval(() => {
-        setDisplayText(prev => prev + text.charAt(index));
-        index++;
-        if (index >= text.length) {
-          clearInterval(timer);
-        }
-      }, 50);
-      
-      return () => clearInterval(timer);
-    } else {
-      setDisplayText(text);
-    }
-  }, [text, isPartial]);
-
   if (!text) return null;
-
+  
+  // Obtenir une couleur d'arrière-plan en fonction de l'émotion
+  const getEmotionColor = () => {
+    if (!emotion) return '';
+    
+    const colorMap: Record<string, string> = {
+      'happy': 'border-l-green-500',
+      'sad': 'border-l-blue-500',
+      'calm': 'border-l-sky-500',
+      'anxious': 'border-l-amber-500',
+      'angry': 'border-l-red-500',
+      'neutral': 'border-l-gray-500',
+      'excited': 'border-l-purple-500',
+      'stressed': 'border-l-orange-500'
+    };
+    
+    return colorMap[emotion.toLowerCase()] || '';
+  };
+  
   return (
-    <Card className={`p-3 bg-muted/50 ${className}`}>
-      <p className="text-sm leading-relaxed">
-        {displayText}
-        {isPartial && <span className="animate-pulse">▋</span>}
-      </p>
-      {isPartial && (
-        <p className="text-xs text-muted-foreground mt-1 italic">
-          Transcription en cours...
-        </p>
-      )}
+    <Card className={`shadow-sm overflow-hidden ${className || ''}`}>
+      <CardHeader className="bg-muted/30 px-4 py-2">
+        <CardTitle className="text-sm">Transcription</CardTitle>
+      </CardHeader>
+      <CardContent className={`p-3 border-l-4 ${getEmotionColor()}`}>
+        <p className="text-sm whitespace-pre-wrap">{text}</p>
+      </CardContent>
     </Card>
   );
 };
