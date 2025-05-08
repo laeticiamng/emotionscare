@@ -25,6 +25,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     setVolume 
   } = useMusic();
   
+  // Fix: Pass an array with a single value instead of a single number
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0]);
   };
@@ -124,7 +125,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
             defaultValue={[volume * 100]}
             max={100}
             step={1}
-            onValueChange={(values) => handleVolumeChange(values[0] / 100)}
+            onValueChange={handleVolumeChange}
             className="w-20"
           />
           

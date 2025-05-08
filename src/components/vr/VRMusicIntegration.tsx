@@ -119,12 +119,15 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
         )}
       </CardContent>
       
-      <style jsx>{`
+      {/* Fix: Use proper style tag syntax without 'jsx: true' property */}
+      <style>
+        {`
         @keyframes pulse {
           0% { height: 20%; }
           100% { height: 80%; }
         }
-      `}</style>
+        `}
+      </style>
     </Card>
   );
 };
