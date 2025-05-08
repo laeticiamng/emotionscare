@@ -8,13 +8,13 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 interface ModulesSectionProps {
   collapsed?: boolean;
   onToggle?: () => void;
-  showHeading?: boolean;  // Add this prop to fix the error
+  showHeading?: boolean;
 }
 
 const ModulesSection: React.FC<ModulesSectionProps> = ({ 
   collapsed = false, 
   onToggle,
-  showHeading = true  // Default to true
+  showHeading = true
 }) => {
   const modules = [
     {
