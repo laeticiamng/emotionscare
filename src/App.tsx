@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -20,6 +19,8 @@ import MusicTherapyPage from './pages/MusicTherapyPage';
 import MusicGenerationPage from './pages/MusicGenerationPage';
 import CoachPage from './pages/CoachPage';
 import CoachChatPage from './pages/CoachChatPage';
+import VRPage from './pages/VRPage';
+import MusicPage from './pages/MusicPage';
 
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from '@/contexts/AuthContext';
@@ -59,7 +60,7 @@ function AppRoutes({ toast }) {
       <Route element={<Shell />}>
         <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
         <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
-        <Route path="/vr" element={<ProtectedLayout><NotImplementedPage /></ProtectedLayout>} />
+        <Route path="/vr" element={<ProtectedLayout><VRPage /></ProtectedLayout>} />
         <Route path="/journal" element={<ProtectedLayout><JournalPage /></ProtectedLayout>} />
         <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
         

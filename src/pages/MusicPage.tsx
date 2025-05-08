@@ -1,31 +1,74 @@
 
 import React, { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
-import ProtectedLayout from '@/components/ProtectedLayout';
-import MusicPlayerCard from '@/components/music/page/MusicPlayerCard';
 import MusicTabs from '@/components/music/page/MusicTabs';
-import { Music } from 'lucide-react';
+import { useMusic } from '@/contexts/MusicContext';
+import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import PageTitle from '@/components/ui/page-title';
 
-const MusicPage = () => {
-  const { logUserAction } = useActivityLogging('music');
-  const [activeTab, setActiveTab] = useState('player');
-  
+const MusicPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('player');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { initializeMusicSystem, error } = useMusic();
+  const { toast } = useToast();
+
   useEffect(() => {
-    logUserAction('visit_music_page');
-  }, [logUserAction]);
-  
+    const loadMusic = async () => {
+      try {
+        setIsLoading(true);
+        await initializeMusicSystem();
+      } catch (err) {
+        console.error("Erreur d'initialisation du système musical:", err);
+        toast({
+          title: "Erreur d'initialisation",
+          description: "Impossible de charger le module musical. Veuillez réessayer.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMusic();
+  }, [initializeMusicSystem, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center w-full h-64">
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <span className="ml-2 text-muted-foreground">Chargement du module musical...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-medium text-destructive mb-2">Erreur de chargement</h2>
+        <p className="text-muted-foreground">
+          Une erreur est survenue lors du chargement du module musical.
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors"
+        >
+          Réessayer
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <ProtectedLayout>
-      <div className="container mx-auto p-4 max-w-7xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Musique Thérapeutique</h1>
-        </div>
-        
-        <MusicPlayerCard />
+    <div className="container mx-auto p-4">
+      <PageTitle
+        title="Musique Thérapeutique"
+        description="Écoutez de la musique adaptée à votre état émotionnel"
+      />
+      
+      <div className="mt-6">
         <MusicTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
-    </ProtectedLayout>
+    </div>
   );
 };
 
