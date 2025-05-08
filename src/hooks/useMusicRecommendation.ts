@@ -1,10 +1,10 @@
-
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { MusicTrack } from '@/types/music';
+import type { EmotionResult } from '@/types';
+import type { MusicTrack } from '@/types'; // Import MusicTrack type
 
-// Mapping des émotions vers les types de musique
+// Mapping plus complet des émotions vers les types de musique
 const EMOTION_TO_MUSIC: Record<string, string> = {
   // États positifs
   happy: 'happy',
@@ -42,52 +42,45 @@ const EMOTION_TO_MUSIC: Record<string, string> = {
 };
 
 export function useMusicRecommendation() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, openDrawer } = useMusic();
+  const { loadPlaylistForEmotion, openDrawer, setCurrentTrack, setIsPlaying } = useMusic();
   const { toast } = useToast();
+  
+  // Fix the function causing the error by ensuring proper type compatibility
+  const playTrack = (track: MusicTrack) => {
+    // Convert track to the expected format if needed
+    const compatibleTrack: MusicTrack = {
+      ...track,
+      url: track.url || track.audioUrl || '',  // Ensure url is defined
+      artist: track.artist || 'Unknown Artist', // Ensure artist is defined
+      // Include other required fields to satisfy the type
+      id: track.id,
+      title: track.title,
+    };
+    
+    setCurrentTrack(compatibleTrack);
+    setIsPlaying(true);
+  };
 
-  const loadMusicForMood = useCallback(async (emotion: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const emotionKey = emotion.toLowerCase();
-      const musicType = EMOTION_TO_MUSIC[emotionKey] || EMOTION_TO_MUSIC.default;
-      
-      console.log(`Chargement de musique pour l'émotion: ${emotionKey} → Type: ${musicType}`);
-      
-      const playlist = loadPlaylistForEmotion(musicType);
-      if (playlist && playlist.tracks.length > 0) {
-        setCurrentTrack(playlist.tracks[0]);
-        playTrack(playlist.tracks[0]);
-      } else {
-        setError(`Aucune musique disponible pour l'humeur "${emotion}"`);
-      }
-    } catch (err) {
-      console.error('Erreur lors du chargement de la musique:', err);
-      setError("Une erreur est survenue lors du chargement de la musique");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadPlaylistForEmotion, playTrack]);
-
-  const togglePlayPause = useCallback(() => {
-    if (isPlaying) {
-      pauseTrack();
-    } else if (currentTrack) {
-      playTrack(currentTrack);
-    }
-  }, [isPlaying, currentTrack, playTrack, pauseTrack]);
+  // Handler pour activer la musique adaptée à l'émotion
+  const handlePlayMusic = useCallback((emotionResult?: EmotionResult | null) => {
+    if (!emotionResult || !emotionResult.emotion) return;
+    
+    const emotionKey = emotionResult.emotion.toLowerCase();
+    const musicType = EMOTION_TO_MUSIC[emotionKey] || EMOTION_TO_MUSIC.default;
+    
+    console.log(`Émotion détectée: ${emotionKey} → Type de musique: ${musicType}`);
+    
+    loadPlaylistForEmotion(musicType);
+    openDrawer();
+    
+    toast({
+      title: "Playlist activée",
+      description: `Votre ambiance musicale "${musicType}" est prête à être écoutée`,
+    });
+  }, [loadPlaylistForEmotion, openDrawer, toast, setCurrentTrack, setIsPlaying]);
 
   return {
-    isLoading,
-    currentTrack,
-    error,
-    loadMusicForMood,
-    togglePlayPause
+    handlePlayMusic,
+    EMOTION_TO_MUSIC
   };
 }
-
-export default useMusicRecommendation;

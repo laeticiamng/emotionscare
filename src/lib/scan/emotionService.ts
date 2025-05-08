@@ -1,3 +1,4 @@
+
 import { Emotion } from '@/types';
 
 // Mock function to simulate inserting an emotion
@@ -10,7 +11,9 @@ export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion 
     }
     
     // Convert Date to string if it's a Date object
-    const dateString = emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date;
+    const dateString = typeof emotion.date === 'object' && emotion.date instanceof Date 
+      ? emotion.date.toISOString() 
+      : emotion.date;
     
     // Create emotion data object with string date
     const emotionData = {
@@ -102,7 +105,7 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
 // Alias for getEmotionHistory to match the imported name in scanService
 export const fetchEmotionHistory = getEmotionHistory;
 
-// Example of fixing instanceof issue
+// Fixed to use proper type checking instead of instanceof
 export const handleError = (error: unknown): string => {
   // Using type checking with 'as' instead of instanceof
   if (error && typeof error === 'object' && 'message' in error) {

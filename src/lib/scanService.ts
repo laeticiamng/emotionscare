@@ -2,7 +2,6 @@
 import { Emotion, EmotionResult } from '@/types';
 import { 
   analyzeEmotion as analyzeEmotionService, 
-  analyzeEmotions as analyzeEmotionsService, 
   analyzeAudioStream as analyzeAudioStreamService, 
   saveRealtimeEmotionScan as saveRealtimeEmotionScanService 
 } from '@/lib/scan/analyzeService';

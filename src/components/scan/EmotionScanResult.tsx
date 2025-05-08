@@ -14,6 +14,18 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
   // Derive an emotion label from available properties
   const emotionLabel = getEmotionLabel(data);
   
+  // Convert EmotionResult to compatible Emotion object when needed
+  const emotionCompatible: Partial<Emotion> = {
+    id: data.id || `emotion-${Date.now()}`,
+    user_id: data.user_id || '',
+    date: data.date || new Date().toISOString(),
+    emotion: data.emotion,
+    score: data.score !== undefined ? data.score : (data.confidence ? Math.round(data.confidence * 100) : 50),
+    text: data.text || data.transcript,
+    emojis: data.emojis,
+    ai_feedback: data.feedback || data.ai_feedback
+  };
+  
   return (
     <Card className="w-full">
       <CardHeader>
@@ -32,8 +44,8 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
             </p>
             
             <div className="space-y-6">
-              <MusicRecommendation emotion={data} />
-              <VREmotionRecommendation emotion={data} />
+              <MusicRecommendation emotion={emotionCompatible as Emotion} />
+              <VREmotionRecommendation emotion={emotionCompatible as Emotion} />
             </div>
           </TabsContent>
           

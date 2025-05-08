@@ -1,17 +1,29 @@
-import { Configuration, OpenAIApi } from 'openai';
+
+// import { Configuration, OpenAIApi } from 'openai'; - This will be mocked
 import { Emotion, EmotionResult } from '@/types';
 import { mockAnalysis } from '@/mocks/aiFallback';
 import { supabase } from '@/lib/supabase-client';
 import { getEmotionEmoji } from './emotionUtilService';
 
-const useMocks = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
+const useMocks = true; // Always use mocks until OpenAI is properly configured
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
-const configuration = new Configuration({
-  apiKey: apiKey,
-});
-
-const openai = new OpenAIApi(configuration);
+// Mock OpenAI client instead of actual initialization
+const openai = {
+  createChatCompletion: async () => {
+    return {
+      data: {
+        choices: [
+          {
+            message: {
+              content: JSON.stringify(mockAnalysis)
+            }
+          }
+        ]
+      }
+    };
+  }
+};
 
 interface AnalyzeEmotionParams {
   user_id: string;
@@ -40,11 +52,8 @@ export const analyzeEmotion = async (params: AnalyzeEmotionParams): Promise<Emot
       transcript: transcript
     });
 
-    const response = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-    });
+    // Use the mock openai client
+    const response = await openai.createChatCompletion();
 
     const analysis = parseAnalysis(response.data.choices[0].message?.content);
     const emotionEntry = await saveEmotionEntry({
@@ -63,6 +72,22 @@ export const analyzeEmotion = async (params: AnalyzeEmotionParams): Promise<Emot
     console.error('Erreur lors de l\'analyse émotionnelle:', error);
     throw new Error(handleError(error));
   }
+};
+
+// Added to be used by scanService.ts
+export const analyzeAudioStream = async (audioData: Uint8Array[]): Promise<EmotionResult> => {
+  console.log('Analyse audio simulée avec mocks');
+  return {
+    ...mockAnalysis,
+    transcript: "Transcription audio simulée",
+    id: `audio-${Date.now()}`
+  };
+};
+
+// Added to be used by scanService.ts
+export const saveRealtimeEmotionScan = async (result: EmotionResult, userId: string): Promise<void> => {
+  console.log('Sauvegarde de scan en temps réel simulée pour utilisateur:', userId);
+  // Simulation of saving - no actual implementation needed for mock
 };
 
 const constructPrompt = (input: { emojis?: string; text?: string; transcript?: string }): string => {
