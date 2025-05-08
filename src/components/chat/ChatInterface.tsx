@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { SendHorizontal, Bot, Play, PlayCircle, Music, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -34,6 +33,7 @@ interface ChatInterfaceProps {
   standalone?: boolean;
 }
 
+// Export as named export for direct imports
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standalone = true }) => {
   const { messages, isLoading, addUserMessage, addBotMessage, processMessage, sessionId } = useChat();
   const [input, setInput] = useState('');
@@ -239,3 +239,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ className, standal
   // For embedded use (inside another component)
   return <div className={`flex flex-col h-full ${className}`}>{renderContent()}</div>;
 };
+
+// Add default export for lazy loading
+export default ChatInterface;
