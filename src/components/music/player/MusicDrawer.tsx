@@ -2,7 +2,7 @@
 import React from 'react';
 import { Drawer, DrawerContent, DrawerClose, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { X, Music } from 'lucide-react';
+import { X } from 'lucide-react';
 import MusicPlayer from './MusicPlayer';
 
 export interface MusicDrawerProps {
