@@ -1,18 +1,11 @@
 
-import { create } from 'zustand';
+import { useState, useCallback } from 'react';
 
-interface DrawerState {
-  isDrawerOpen: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
-  toggleDrawer: () => void;
+export default function useDrawerState() {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const openDrawer = useCallback(() => setIsDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setIsDrawerOpen(false), []);
+  const toggleDrawer = useCallback(() => setIsDrawerOpen(prev => !prev), []);
+  
+  return { isDrawerOpen, openDrawer, closeDrawer, toggleDrawer };
 }
-
-const useDrawerState = create<DrawerState>((set) => ({
-  isDrawerOpen: false,
-  openDrawer: () => set({ isDrawerOpen: true }),
-  closeDrawer: () => set({ isDrawerOpen: false }),
-  toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
-}));
-
-export default useDrawerState;

@@ -1,12 +1,12 @@
 
-import React, { memo, ReactNode, useState } from "react";
+import React, { memo, ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 import GlobalNav from "./GlobalNav";
 import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
-import MusicDrawer from "./music/player/MusicDrawer"; // Import du composant MusicDrawer depuis le bon chemin
+import MusicDrawer from "./music/player/MusicDrawer";
 import useDrawerState from "@/hooks/useDrawerState";
 
 interface ShellProps {
