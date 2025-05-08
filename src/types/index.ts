@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -121,6 +120,8 @@ export interface VRSessionTemplate {
   is_audio_only?: boolean;
   audio_url?: string;
   completion_rate?: number;
+  title?: string;  // Adding title property
+  recommended_mood?: string; // Adding recommended_mood property
 }
 
 export interface VRSession {

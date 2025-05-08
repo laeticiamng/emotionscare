@@ -96,11 +96,13 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
     }
   }, [isPaused, currentTrack, pauseTrack, playTrack]);
   
+  const sessionTitle = template.title || template.theme;
+  
   return (
     <div className="flex flex-col space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gradient-to-br from-purple-900/80 to-indigo-700/80 backdrop-blur p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-white">
-          <h2 className="text-xl font-bold mb-6">{template.title}</h2>
+          <h2 className="text-xl font-bold mb-6">{sessionTitle}</h2>
           
           <VRAudioSession
             template={template}
