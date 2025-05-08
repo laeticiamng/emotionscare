@@ -106,7 +106,7 @@ export function useChatHistory() {
   }, [user?.id, loadConversations]);
   
   // Save messages to current conversation or create new conversation
-  const saveMessages = useCallback(async (messages: ChatMessage[]) => {
+  const saveMessages = useCallback(async (conversationId: string, messages: ChatMessage[]) => {
     if (!user?.id || messages.length <= 1) return; // Skip if only system message
     
     try {
@@ -115,7 +115,7 @@ export function useChatHistory() {
       if (relevantMessages.length === 0) return;
       
       // Determine conversation details
-      let convId = activeConversationId;
+      let convId = conversationId;
       const firstUserMsg = relevantMessages.find(m => m.sender === 'user');
       
       // Create a new conversation if needed
@@ -171,7 +171,7 @@ export function useChatHistory() {
     } catch (err) {
       console.error('Failed to save messages:', err);
     }
-  }, [user?.id, activeConversationId, loadConversations]);
+  }, [user?.id, loadConversations]);
   
   // Delete a conversation and its messages
   const deleteConversation = useCallback(async (conversationId: string) => {

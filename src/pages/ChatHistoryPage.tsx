@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -39,7 +39,7 @@ const ChatHistoryPage = () => {
     
     if (conversations) {
       conversations.forEach(convo => {
-        const date = new Date(convo.createdAt || Date.now());
+        const date = convo.createdAt;
         const dateKey = format(date, 'yyyy-MM-dd');
         
         if (!groups[dateKey]) {
@@ -172,7 +172,7 @@ const ChatHistoryPage = () => {
                           
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className="text-xs">
-                              {format(new Date(conversation.createdAt || Date.now()), 'HH:mm', { locale: fr })}
+                              {format(conversation.createdAt, 'HH:mm', { locale: fr })}
                             </Badge>
                           </div>
                         </div>

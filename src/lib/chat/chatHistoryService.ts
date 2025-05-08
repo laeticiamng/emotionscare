@@ -35,7 +35,7 @@ export const chatHistoryService = {
   /**
    * Crée une nouvelle conversation
    */
-  async createConversation(userId: string, title: string = 'Nouvelle conversation'): Promise<string> {
+  async createConversation(userId: string, title: string = 'Nouvelle conversation'): Promise<string | null> {
     const conversationId = uuidv4();
     
     const { error } = await supabase

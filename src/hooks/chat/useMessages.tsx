@@ -63,20 +63,8 @@ export function useMessages() {
     setError(null);
     try {
       console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
-      const result = await chatHistoryService.saveMessages(conversationId, messages);
-      
-      if (!result) {
-        console.error('Failed to save messages');
-        const errorMessage = 'Impossible de sauvegarder les messages.';
-        setError(errorMessage);
-        toast({
-          title: "Erreur",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      }
-      
-      return result;
+      await chatHistoryService.saveMessages(conversationId, messages);
+      return true;
     } catch (error) {
       console.error('Error saving messages:', error);
       const errorMessage = 'Impossible de sauvegarder les messages.';

@@ -61,22 +61,13 @@ export function useConversationManagement(userId?: string) {
     setIsLoading(true);
     try {
       console.log('Deleting conversation:', conversationId);
-      const success = await chatHistoryService.deleteConversation(conversationId);
+      await chatHistoryService.deleteConversation(conversationId);
       
-      if (success) {
-        toast({
-          title: "Conversation supprimée",
-          description: "La conversation a été supprimée avec succès."
-        });
-        return true;
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible de supprimer la conversation.",
-          variant: "destructive"
-        });
-        return false;
-      }
+      toast({
+        title: "Conversation supprimée",
+        description: "La conversation a été supprimée avec succès."
+      });
+      return true;
     } catch (error) {
       console.error('Error deleting conversation:', error);
       toast({
@@ -93,7 +84,6 @@ export function useConversationManagement(userId?: string) {
   // Update conversation title and last message
   const updateConversation = useCallback(async (
     conversationId: string, 
-    title: string, 
     lastMessage: string
   ): Promise<boolean> => {
     if (!conversationId) {
@@ -102,17 +92,10 @@ export function useConversationManagement(userId?: string) {
     }
     
     try {
-      console.log('Updating conversation:', conversationId, 'title:', title);
-      const success = await chatHistoryService.updateConversation(
-        conversationId, 
-        title, 
-        lastMessage
-      );
+      console.log('Updating conversation:', conversationId, 'last message:', lastMessage);
+      await chatHistoryService.updateConversation(conversationId, lastMessage);
       
-      if (!success) {
-        console.error('Failed to update conversation:', conversationId);
-      }
-      return success;
+      return true;
     } catch (error) {
       console.error('Error updating conversation:', error);
       return false;
