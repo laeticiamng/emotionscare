@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { Emotion } from '@/types';
@@ -124,7 +125,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
           const emotion: Emotion = {
             id: `scan-${Date.now()}`,
             user_id: userId,
-            date: new Date().toISOString(), // Convert Date to string
+            date: new Date().toISOString(),
             score: Math.round(result.confidence * 100),
             emotion: result.emotion,
             text: result.transcript

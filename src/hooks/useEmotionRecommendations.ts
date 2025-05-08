@@ -62,7 +62,7 @@ export function useEmotionRecommendations({
     if (autoFetch) {
       fetchRecommendations();
     }
-  }, [autoFetch, emotion, category]);
+  }, [autoFetch, emotion, category, fetchRecommendations]);
 
   // Pour changer l'émotion et recharger les recommandations
   const updateEmotion = useCallback((newEmotion: string) => {

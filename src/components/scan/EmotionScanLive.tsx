@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import EmptyState from './live/EmptyState';
+import MusicEmotionRecommendation from './live/MusicEmotionRecommendation';
 
 interface EmotionScanLiveProps {
   userId?: string;
@@ -220,18 +222,29 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
           </Label>
         </div>
         
-        {result && emotion && (
-          <div className="w-full bg-muted/30 rounded-lg p-4 animate-fade-in">
-            <div className="flex items-center gap-2 mb-2">
-              <Check className="text-green-500 h-5 w-5" />
-              <h4 className="font-medium">Analyse complétée</h4>
+        {result && emotion ? (
+          <div className="w-full space-y-4">
+            <div className="bg-muted/30 rounded-lg p-4 animate-fade-in">
+              <div className="flex items-center gap-2 mb-2">
+                <Check className="text-green-500 h-5 w-5" />
+                <h4 className="font-medium">Analyse complétée</h4>
+              </div>
+              <EmotionResult 
+                emotion={result.emotion || ''} 
+                confidence={result.confidence || 0} 
+                transcript={result.transcript || ''} 
+              />
             </div>
-            <EmotionResult 
-              emotion={result.emotion || ''} 
-              confidence={result.confidence || 0} 
-              transcript={result.transcript || ''} 
+            
+            <MusicEmotionRecommendation 
+              emotionResult={result} 
+              isLoading={isSaving} 
             />
           </div>
+        ) : (
+          !isListening && !isProcessing && !error && (
+            <EmptyState message="Cliquez sur le bouton pour commencer l'analyse vocale et obtenir des recommandations musicales personnalisées" />
+          )
         )}
       </div>
       
