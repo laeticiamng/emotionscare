@@ -96,6 +96,8 @@ export function useChatHistory() {
 
   // Save messages for a conversation
   const saveMessages = useCallback(async (messages: ChatMessage[]): Promise<boolean> => {
+    if (!user?.id) return false;
+    
     if (!activeConversationId) {
       // Create a new conversation if none is active
       let conversationId = activeConversationId;
@@ -124,7 +126,7 @@ export function useChatHistory() {
         return false;
       }
     }
-  }, [activeConversationId, createConversation]);
+  }, [activeConversationId, createConversation, user?.id]);
 
   return {
     conversations,

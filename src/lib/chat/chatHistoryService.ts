@@ -12,10 +12,6 @@ export interface ChatConversation {
   updatedAt: Date;
 }
 
-// First, we need to create the necessary tables in Supabase
-// This would normally be done via SQL migrations in a separate step
-// For now, we'll simulate table existence and focus on the service implementation
-
 /**
  * Service for managing chat history
  */
@@ -25,28 +21,24 @@ export const chatHistoryService = {
    */
   async getConversations(userId: string): Promise<ChatConversation[]> {
     try {
-      // This is a mock implementation since the tables don't exist yet
-      // In a real implementation, we would query the Supabase tables
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .order('updated_at', { ascending: false });
       
-      // Mock data
-      return [
-        {
-          id: '1',
-          userId: userId,
-          title: 'Première conversation',
-          lastMessage: 'Bonjour, comment allez-vous ?',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: '2',
-          userId: userId,
-          title: 'Gestion du stress',
-          lastMessage: 'Essayez de pratiquer la respiration profonde.',
-          createdAt: new Date(Date.now() - 86400000), // Yesterday
-          updatedAt: new Date(Date.now() - 86400000)
-        }
-      ];
+      if (error) {
+        console.error('Error fetching conversations:', error);
+        return [];
+      }
+      
+      return data.map(conversation => ({
+        id: conversation.id,
+        userId: conversation.user_id,
+        title: conversation.title,
+        lastMessage: conversation.last_message || '',
+        createdAt: new Date(conversation.created_at),
+        updatedAt: new Date(conversation.updated_at)
+      }));
     } catch (error) {
       console.error('Error getting conversations:', error);
       return [];
@@ -58,10 +50,21 @@ export const chatHistoryService = {
    */
   async createConversation(userId: string, title: string): Promise<string | null> {
     try {
-      // Mock implementation
-      const conversationId = uuidv4();
-      console.log(`Created conversation ${conversationId} for user ${userId} with title "${title}"`);
-      return conversationId;
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: userId,
+          title: title || 'Nouvelle conversation'
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating conversation:', error);
+        return null;
+      }
+      
+      return data.id;
     } catch (error) {
       console.error('Error creating conversation:', error);
       return null;
@@ -73,8 +76,19 @@ export const chatHistoryService = {
    */
   async updateConversation(conversationId: string, title: string, lastMessage: string): Promise<boolean> {
     try {
-      // Mock implementation
-      console.log(`Updated conversation ${conversationId} with title "${title}" and last message "${lastMessage}"`);
+      const { error } = await supabase
+        .from('chat_conversations')
+        .update({
+          title,
+          last_message: lastMessage
+        })
+        .eq('id', conversationId);
+      
+      if (error) {
+        console.error('Error updating conversation:', error);
+        return false;
+      }
+      
       return true;
     } catch (error) {
       console.error('Error updating conversation:', error);
@@ -87,8 +101,17 @@ export const chatHistoryService = {
    */
   async deleteConversation(conversationId: string): Promise<boolean> {
     try {
-      // Mock implementation
-      console.log(`Deleted conversation ${conversationId}`);
+      // Due to cascade delete in the database, we only need to delete the conversation
+      const { error } = await supabase
+        .from('chat_conversations')
+        .delete()
+        .eq('id', conversationId);
+      
+      if (error) {
+        console.error('Error deleting conversation:', error);
+        return false;
+      }
+      
       return true;
     } catch (error) {
       console.error('Error deleting conversation:', error);
@@ -101,27 +124,23 @@ export const chatHistoryService = {
    */
   async getMessages(conversationId: string): Promise<ChatMessage[]> {
     try {
-      // Mock implementation
-      return [
-        {
-          id: '1',
-          text: 'Bonjour, je suis votre coach IA. Comment puis-je vous aider aujourd\'hui ?',
-          sender: 'bot',
-          timestamp: new Date(),
-        },
-        {
-          id: '2',
-          text: 'Bonjour, j\'aimerais des conseils pour mieux gérer mon stress.',
-          sender: 'user',
-          timestamp: new Date(Date.now() - 60000),
-        },
-        {
-          id: '3',
-          text: 'Je comprends tout à fait. La gestion du stress est importante pour votre bien-être. Voici quelques techniques que je vous recommande...',
-          sender: 'bot',
-          timestamp: new Date(Date.now() - 30000),
-        },
-      ];
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('timestamp', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return [];
+      }
+      
+      return data.map(message => ({
+        id: message.id,
+        text: message.text,
+        sender: message.sender as 'user' | 'bot',
+        timestamp: new Date(message.timestamp),
+      }));
     } catch (error) {
       console.error('Error getting messages:', error);
       return [];
@@ -133,8 +152,24 @@ export const chatHistoryService = {
    */
   async saveMessages(conversationId: string, messages: ChatMessage[]): Promise<boolean> {
     try {
-      // Mock implementation
-      console.log(`Saved ${messages.length} messages to conversation ${conversationId}`);
+      // Filter for messages that need to be saved
+      const messagesToSave = messages.map(message => ({
+        id: message.id,
+        conversation_id: conversationId,
+        text: message.text,
+        sender: message.sender,
+        timestamp: message.timestamp
+      }));
+      
+      // Insert all messages for the conversation
+      const { error } = await supabase
+        .from('chat_messages')
+        .upsert(messagesToSave, { onConflict: 'id' });
+      
+      if (error) {
+        console.error('Error saving messages:', error);
+        return false;
+      }
       
       // Update conversation with last message if there are messages
       if (messages.length > 0) {
