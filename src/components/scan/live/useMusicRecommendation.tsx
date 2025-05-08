@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import type { EmotionResult } from '@/lib/scanService';
+import type { EmotionResult } from '@/types';
 
 // Mapping plus complet des émotions vers les types de musique
 const EMOTION_TO_MUSIC: Record<string, string> = {

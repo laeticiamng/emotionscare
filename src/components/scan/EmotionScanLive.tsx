@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, MicOff, Loader2, AudioWaveform } from 'lucide-react';
+import { Mic, MicOff, Loader2, AudioWaveform, Info } from 'lucide-react';
 import AudioProcessor from './live/AudioProcessor';
 import EmotionResult from './live/EmotionResult';
 import { useToast } from '@/hooks/use-toast';
@@ -14,6 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import EmptyState from './live/EmptyState';
 import MusicEmotionRecommendation from './live/MusicEmotionRecommendation';
 import LiveEmotionResults from './live/LiveEmotionResults';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface EmotionScanLiveProps {
   userId?: string;
@@ -31,7 +32,29 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
   const [isConfidential, setIsConfidential] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [micPermissionsChecked, setMicPermissionsChecked] = useState(false);
+  const [micAllowed, setMicAllowed] = useState(true);
   const { toast } = useToast();
+  
+  // Vérifier les permissions de microphone au chargement
+  useEffect(() => {
+    const checkMicrophonePermission = async () => {
+      try {
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        setMicAllowed(permissionStatus.state !== 'denied');
+        setMicPermissionsChecked(true);
+        
+        permissionStatus.addEventListener('change', () => {
+          setMicAllowed(permissionStatus.state !== 'denied');
+        });
+      } catch (error) {
+        console.log('Permission API not supported, assuming microphone is available');
+        setMicPermissionsChecked(true);
+      }
+    };
+    
+    checkMicrophonePermission();
+  }, []);
 
   // Reset recording duration when not listening
   useEffect(() => {
@@ -85,6 +108,11 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
     setResult(resultData);
     setIsListening(false);
     setIsProcessing(false);
+    
+    toast({
+      title: 'Analyse terminée',
+      description: `Émotion détectée : ${resultData.emotion} (${Math.round(resultData.confidence * 100)}% de confiance)`,
+    });
   };
   
   const saveResult = async () => {
@@ -112,7 +140,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
       
       toast({
         title: 'Scan sauvegardé',
-        description: 'Votre scan émotionnel a été enregistré.'
+        description: 'Votre scan émotionnel a été enregistré avec succès.'
       });
       
       if (onComplete && emotion) {
@@ -162,6 +190,29 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
       }
     };
   }, [isListening]);
+
+  // Afficher un message différent si le microphone est refusé
+  if (micPermissionsChecked && !micAllowed) {
+    return (
+      <Card className="p-6 shadow-md">
+        <Alert variant="destructive" className="mb-4">
+          <Info className="h-5 w-5" />
+          <AlertTitle>Accès au microphone bloqué</AlertTitle>
+          <AlertDescription>
+            Pour utiliser la fonction de scan vocal, veuillez autoriser l'accès au microphone dans les paramètres de votre navigateur.
+          </AlertDescription>
+        </Alert>
+        <div className="flex justify-center mt-4">
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+          >
+            Réessayer
+          </Button>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 shadow-md">
@@ -215,6 +266,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
             <AudioWaveform className="h-12 w-12 text-primary animate-pulse" />
             <p className="text-sm">Analyse en cours...</p>
             <Progress value={Math.random() * 100} className="w-full h-1" />
+            <p className="text-xs text-muted-foreground">{progress}</p>
           </div>
         )}
         

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -17,6 +18,7 @@ import JournalPage from './pages/JournalPage';
 import SettingsPage from './pages/SettingsPage';
 import MusicTherapyPage from './pages/MusicTherapyPage';
 import MusicGenerationPage from './pages/MusicGenerationPage';
+import MusicPreferencesPage from './pages/MusicPreferencesPage';
 import CoachPage from './pages/CoachPage';
 import CoachChatPage from './pages/CoachChatPage';
 import VRPage from './pages/VRPage';
@@ -75,6 +77,7 @@ function AppRoutes({ toast }) {
         {/* Music Therapy Routes */}
         <Route path="/music" element={<ProtectedLayout><MusicTherapyPage /></ProtectedLayout>} />
         <Route path="/music/create" element={<ProtectedLayout><MusicGenerationPage /></ProtectedLayout>} />
+        <Route path="/music/preferences" element={<ProtectedLayout><MusicPreferencesPage /></ProtectedLayout>} />
         
         {/* Coach routes */}
         <Route path="/coach" element={<ProtectedLayout><CoachPage /></ProtectedLayout>} />

@@ -2,116 +2,52 @@
 import { useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import type { EmotionResult } from '@/lib/scanService';
-import type { Emotion } from '@/types';
+import type { EmotionResult } from '@/types';
 
-// Mapping complet des émotions vers les types de musique
-const EMOTION_TO_MUSIC: Record<string, string> = {
-  // États positifs
+// Mapping des émotions vers les types de musique
+const EMOTION_TO_MUSIC_MAP: Record<string, string> = {
   happy: 'happy',
   excited: 'energetic',
   joyful: 'happy',
-  satisfied: 'happy',
-  energetic: 'energetic',
-  
-  // États calmes
-  calm: 'calm',
-  relaxed: 'calm',
-  peaceful: 'calm',
-  tranquil: 'calm',
-  
-  // États négatifs - musique apaisante
   sad: 'calm',
   anxious: 'calm',
   stressed: 'calm',
   angry: 'calm',
-  frustrated: 'calm',
-  overwhelmed: 'calm',
-  tired: 'calm',
-  
-  // États de concentration
-  focused: 'focused',
-  determined: 'focused',
-  concentrated: 'focused',
-  
-  // État neutre
+  calm: 'calm',
+  relaxed: 'calm',
   neutral: 'neutral',
-  normal: 'neutral',
-  
-  // Valeurs par défaut pour émotions non mappées
+  focused: 'focused',
   default: 'neutral'
 };
 
-export interface MusicEmotionOptions {
-  showToast?: boolean;
-  openDrawer?: boolean;
-}
-
 export function useMusicEmotionIntegration() {
-  const { loadPlaylistForEmotion, openDrawer } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, currentPlaylist, currentTrack, isPlaying } = useMusic();
   const { toast } = useToast();
   
-  // Handler pour activer la musique adaptée à une émotion brute (string)
-  const playMusicForEmotion = useCallback((
-    emotion: string, 
-    options: MusicEmotionOptions = {}
-  ) => {
-    const { showToast = true, openDrawer: shouldOpenDrawer = true } = options;
+  const activateMusicForEmotion = useCallback((emotionResult: EmotionResult) => {
+    if (!emotionResult.emotion) return;
     
-    const emotionKey = emotion.toLowerCase();
-    const musicType = EMOTION_TO_MUSIC[emotionKey] || EMOTION_TO_MUSIC.default;
+    const emotionKey = emotionResult.emotion.toLowerCase();
+    const musicType = EMOTION_TO_MUSIC_MAP[emotionKey] || EMOTION_TO_MUSIC_MAP.default;
     
-    console.log(`Émotion détectée: ${emotionKey} → Type de musique: ${musicType}`);
+    const playlist = loadPlaylistForEmotion(musicType);
     
-    loadPlaylistForEmotion(musicType);
-    
-    if (shouldOpenDrawer) {
-      openDrawer();
-    }
-    
-    if (showToast) {
+    if (playlist && playlist.tracks.length > 0) {
+      // Si aucune musique n'est en cours, commencer à jouer
+      if (!currentTrack || !isPlaying) {
+        playTrack(playlist.tracks[0]);
+      }
+      
+      // Notifier l'utilisateur
       toast({
-        title: "Playlist activée",
-        description: `Votre ambiance musicale "${musicType}" est prête à être écoutée`,
+        title: "Musique adaptée à votre émotion",
+        description: `Playlist '${musicType}' disponible dans le lecteur de musique`
       });
     }
-    
-    return musicType;
-  }, [loadPlaylistForEmotion, openDrawer, toast]);
+  }, [loadPlaylistForEmotion, playTrack, currentTrack, isPlaying, toast]);
   
-  // Handler pour activer la musique adaptée à un objet EmotionResult
-  const playMusicForEmotionResult = useCallback((
-    emotionResult?: EmotionResult | null,
-    options: MusicEmotionOptions = {}
-  ) => {
-    if (!emotionResult || !emotionResult.emotion) return null;
-    
-    return playMusicForEmotion(emotionResult.emotion, options);
-  }, [playMusicForEmotion]);
-  
-  // Handler pour activer la musique adaptée à un objet Emotion
-  const playMusicForEmotionObject = useCallback((
-    emotion?: Emotion | null,
-    options: MusicEmotionOptions = {}
-  ) => {
-    if (!emotion || !emotion.emotion) return null;
-    
-    return playMusicForEmotion(emotion.emotion, options);
-  }, [playMusicForEmotion]);
-  
-  // Obtenir le type de musique recommandé pour une émotion sans jouer
-  const getMusicTypeForEmotion = useCallback((emotion: string) => {
-    const emotionKey = emotion.toLowerCase();
-    return EMOTION_TO_MUSIC[emotionKey] || EMOTION_TO_MUSIC.default;
-  }, []);
-
   return {
-    playMusicForEmotion,
-    playMusicForEmotionResult,
-    playMusicForEmotionObject,
-    getMusicTypeForEmotion,
-    EMOTION_TO_MUSIC
+    activateMusicForEmotion,
+    EMOTION_TO_MUSIC_MAP
   };
 }
-
-export default useMusicEmotionIntegration;

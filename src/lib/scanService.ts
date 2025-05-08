@@ -1,6 +1,4 @@
 
-// Update or create the scanService.ts to include the proper function signatures
-
 import { Emotion, EmotionResult } from '@/types';
 import { 
   analyzeEmotion as analyzeEmotionService, 

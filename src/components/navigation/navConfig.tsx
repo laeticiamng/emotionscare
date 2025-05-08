@@ -2,180 +2,241 @@
 import React from 'react';
 import {
   Home,
-  FileText,
-  Calendar,
-  HeartPulse,
+  Heart,
+  Gauge,
+  BarChart3,
   Users,
   Settings,
-  Headset,
+  FileText,
   Music,
-  LineChart,
-  MessageCircle,
-  Award,
+  Headphones,
+  VolumeX,
+  ThumbsUp,
+  Layout,
+  ArrowRightLeft,
+  BookOpen,
+  Clock,
+  Shuffle,
+  Shield,
+  UserCog,
+  Webhook,
   Database,
   Bell,
-  Shield,
-  Clock,
-  Brain
+  LineChart,
+  ClipboardList,
+  CalendarDays,
+  Activity,
+  VideoIcon
 } from 'lucide-react';
-import { NavItemConfig } from '@/components/ui/sidebar/SidebarNavGroup';
 
-// Top navigation items (for desktop header)
-export const topNavItems = [
+export type NavItem = {
+  title: string;
+  href: string;
+  icon: React.ElementType;
+  description?: string;
+  isDisabled?: boolean;
+  isExternal?: boolean;
+  isPro?: boolean;
+  badge?: string | number;
+};
+
+// Sidebar navigation items for regular users
+export const sidebarItems: NavItem[] = [
   {
-    path: '/dashboard',
-    label: 'Tableau de bord',
-    icon: <Home className="h-5 w-5" />
+    title: 'Tableau de bord',
+    href: '/dashboard',
+    icon: Gauge,
+    description: 'Aperçu de votre bien-être émotionnel',
   },
   {
-    path: '/scan',
-    label: 'Scan émotionnel',
-    icon: <HeartPulse className="h-5 w-5" />
+    title: 'Scan émotionnel',
+    href: '/scan',
+    icon: Heart,
+    description: 'Analyser votre état émotionnel',
   },
   {
-    path: '/music',
-    label: 'Musicothérapie',
-    icon: <Music className="h-5 w-5" />
+    title: 'Journal',
+    href: '/journal',
+    icon: FileText,
+    description: 'Votre journal émotionnel',
   },
   {
-    path: '/vr',
-    label: 'VR Immersive',
-    icon: <Headset className="h-5 w-5" />
+    title: 'Musique',
+    href: '/music',
+    icon: Headphones,
+    description: 'Thérapie musicale basée sur vos émotions',
   },
   {
-    path: '/journal',
-    label: 'Journal émotionnel',
-    icon: <FileText className="h-5 w-5" />
+    title: 'Réalité virtuelle',
+    href: '/vr',
+    icon: VideoIcon,
+    description: 'Immersion VR pour rééquilibrage émotionnel',
+  },
+  {
+    title: 'Coach IA',
+    href: '/coach',
+    icon: ThumbsUp,
+    description: 'Votre coach d\'équilibre émotionnel',
+  },
+];
+
+// Sidebar navigation items for admin users
+export const adminSidebarItems: NavItem[] = [
+  {
+    title: 'Administration',
+    href: '/dashboard',
+    icon: Gauge,
+    description: 'Tableau de bord d\'administration',
+  },
+  {
+    title: 'Utilisateurs',
+    href: '/admin/users',
+    icon: Users,
+    description: 'Gestion des utilisateurs',
+  },
+  {
+    title: 'Analyse',
+    href: '/admin/analytics',
+    icon: BarChart3,
+    description: 'Analyser les données',
+  },
+  {
+    title: 'Paramètres',
+    href: '/admin/settings',
+    icon: Settings,
+    description: 'Configuration du système',
   }
 ];
 
-// Admin top navigation items
-export const adminTopNavItems = [
+// Footer navigation items (shown at the bottom of the sidebar)
+export const footerNavItems: NavItem[] = [
   {
-    path: '/admin',
-    label: 'Administration',
-    icon: <Home className="h-5 w-5" />
+    title: 'Paramètres',
+    href: '/settings',
+    icon: Settings,
+    description: 'Personnaliser votre environnement',
   },
-  {
-    path: '/admin/users',
-    label: 'Utilisateurs',
-    icon: <Users className="h-5 w-5" />
-  },
-  {
-    path: '/admin/activity',
-    label: 'Activité',
-    icon: <LineChart className="h-5 w-5" />
-  },
-  {
-    path: '/admin/settings',
-    label: 'Paramètres',
-    icon: <Settings className="h-5 w-5" />
-  }
 ];
 
-// Sidebar navigation items (for desktop sidebar)
-export const sidebarItems: NavItemConfig[] = [
-  {
-    path: '/dashboard',
-    label: 'Tableau de bord',
-    icon: <Home className="h-5 w-5" />
-  },
-  {
-    path: '/scan',
-    label: 'Scan émotionnel',
-    icon: <HeartPulse className="h-5 w-5" />
-  },
-  {
-    path: '/music',
-    label: 'Musicothérapie',
-    icon: <Music className="h-5 w-5" />
-  },
-  {
-    path: '/vr',
-    label: 'VR Immersive',
-    icon: <Headset className="h-5 w-5" />
-  },
-  {
-    path: '/journal',
-    label: 'Journal émotionnel',
-    icon: <FileText className="h-5 w-5" />
-  },
-  {
-    path: '/community',
-    label: 'Social Cocoon',
-    icon: <Users className="h-5 w-5" />
-  },
-  {
-    path: '/coach',
-    label: 'Coach IA',
-    icon: <Brain className="h-5 w-5" />
-  },
-  {
-    path: '/events',
-    label: 'Événements',
-    icon: <Calendar className="h-5 w-5" />
-  }
+// Navigation items for the mobile drawer
+export const drawerItems: NavItem[] = [
+  ...sidebarItems,
+  ...footerNavItems
 ];
 
-// Admin sidebar navigation items
-export const adminSidebarItems: NavItemConfig[] = [
+// Desktop navigation items (shown in the header)
+export const desktopItems: NavItem[] = [
   {
-    path: '/admin',
+    title: 'Accueil',
+    href: '/',
+    icon: Home,
+  },
+  {
+    title: 'Tableau de bord',
+    href: '/dashboard',
+    icon: Gauge,
+  },
+  {
+    title: 'Scan',
+    href: '/scan',
+    icon: Heart,
+  },
+  {
+    title: 'Journal',
+    href: '/journal',
+    icon: FileText,
+  },
+];
+
+// Dashboard shortcuts for quick navigation
+export const dashboardShortcuts: NavItem[] = [
+  {
+    title: 'Nouveau scan',
+    href: '/scan',
+    icon: Heart,
+    description: 'Faire un scan émotionnel',
+  },
+  {
+    title: 'Journal',
+    href: '/journal',
+    icon: FileText,
+    description: 'Noter mon ressenti',
+  },
+  {
+    title: 'Musique',
+    href: '/music',
+    icon: Music,
+    description: 'Thérapie musicale',
+  },
+  {
+    title: 'VR',
+    href: '/vr',
+    icon: VideoIcon,
+    description: 'Session immersive',
+  },
+];
+
+// Admin dashboard tabs
+export const adminDashboardTabs = [
+  {
+    id: 'overview',
     label: 'Vue d\'ensemble',
-    icon: <Home className="h-5 w-5" />
+    icon: Layout,
   },
   {
-    path: '/admin/users',
-    label: 'Gestion des utilisateurs',
-    icon: <Users className="h-5 w-5" />
+    id: 'users',
+    label: 'Utilisateurs',
+    icon: Users,
   },
   {
-    path: '/admin/activity',
-    label: 'Suivi de l\'activité',
-    icon: <LineChart className="h-5 w-5" />
+    id: 'analytics',
+    label: 'Analyses',
+    icon: BarChart3,
   },
   {
-    path: '/admin/notifications',
-    label: 'Notifications',
-    icon: <Bell className="h-5 w-5" />
+    id: 'scan',
+    label: 'Scan d\'équipes',
+    icon: Heart,
   },
   {
-    path: '/admin/security',
-    label: 'Sécurité',
-    icon: <Shield className="h-5 w-5" />
+    id: 'vr',
+    label: 'Sessions VR',
+    icon: VideoIcon,
   },
   {
-    path: '/admin/audit-log',
-    label: 'Journal d\'audit',
-    icon: <Clock className="h-5 w-5" />
+    id: 'journal',
+    label: 'Tendances journal',
+    icon: LineChart,
   },
   {
-    path: '/admin/database',
-    label: 'Base de données',
-    icon: <Database className="h-5 w-5" />
+    id: 'social',
+    label: 'Cocon social',
+    icon: Users,
   },
   {
-    path: '/admin/rewards',
-    label: 'Récompenses',
-    icon: <Award className="h-5 w-5" />
+    id: 'gamification',
+    label: 'Gamification',
+    icon: ThumbsUp,
   },
   {
-    path: '/admin/settings',
+    id: 'invitations',
+    label: 'Invitations',
+    icon: Bell,
+  },
+  {
+    id: 'settings',
     label: 'Paramètres',
-    icon: <Settings className="h-5 w-5" />
-  }
+    icon: Settings,
+  },
 ];
 
-// Footer navigation items (for desktop sidebar footer)
-export const footerNavItems: NavItemConfig[] = [
-  {
-    path: '/settings',
-    label: 'Paramètres',
-    icon: <Settings className="h-5 w-5" />
-  },
-  {
-    path: '/help',
-    label: 'Aide',
-    icon: <MessageCircle className="h-5 w-5" />
-  }
-];
+// Export the navigation items for use throughout the app
+export default {
+  sidebar: sidebarItems,
+  adminSidebar: adminSidebarItems,
+  footer: footerNavItems,
+  drawer: drawerItems,
+  desktop: desktopItems,
+  dashboardShortcuts,
+  adminDashboardTabs,
+};

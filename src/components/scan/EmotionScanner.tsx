@@ -1,112 +1,123 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { HeartPulse, Music } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useMusicRecommendation } from '@/components/scan/live/useMusicRecommendation';
-import type { Emotion } from '@/types';
-import { EmotionResult } from '@/lib/scanService';
+import React, { useState, useCallback } from 'react';
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScannerIcon, Mic, FileText } from "lucide-react";
+import AudioRecorder from "./AudioRecorder";
+import EmotionScanResult from "./EmotionScanResult";
+import { useAuth } from '@/contexts/AuthContext';
+import { analyzeEmotion } from '@/lib/scanService';
+import { EmotionResult } from '@/types';
 
-interface EmotionScannerProps {
-  latestEmotion: Emotion | null;
-  isLoading?: boolean;
+interface Props {
+  onEmotionDetected?: (emotion: string) => void;
 }
 
-const EmotionScanner: React.FC<EmotionScannerProps> = ({ latestEmotion, isLoading = false }) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const { handlePlayMusic } = useMusicRecommendation();
-  
-  const handleMusicTherapy = () => {
-    if (latestEmotion) {
-      // Convert Emotion to EmotionResult for handlePlayMusic
-      const emotionResult: EmotionResult = {
-        emotion: latestEmotion.emotion || 'neutral',
-        confidence: latestEmotion.confidence || 0.5,
-        score: latestEmotion.score || 50
-      };
+const EmotionScanner: React.FC<Props> = ({ onEmotionDetected }) => {
+  const [activeTab, setActiveTab] = useState<string>("text");
+  const [text, setText] = useState<string>("");
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const { user } = useAuth();
+
+  const resetForm = () => {
+    setText("");
+    setAudioUrl(null);
+    setResult(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+    
+    if (!text && !audioUrl) {
+      // No input to analyze
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      const analysisResult = await analyzeEmotion({
+        user_id: user.id,
+        text: text || undefined,
+        audio_url: audioUrl || undefined,
+      });
       
-      // First play the recommended music
-      handlePlayMusic(emotionResult);
+      setResult(analysisResult);
       
-      // Then navigate to the music therapy page
-      setTimeout(() => {
-        navigate('/music');
-        toast({
-          title: 'Musicothérapie activée',
-          description: 'Profitez de cette playlist adaptée à votre humeur',
-        });
-      }, 500);
-    } else {
-      // Just navigate to the music therapy page if no emotion is detected
-      navigate('/music');
+      if (onEmotionDetected) {
+        onEmotionDetected(analysisResult.emotion);
+      }
+    } catch (error) {
+      console.error("Error analyzing emotion:", error);
+    } finally {
+      setLoading(false);
     }
   };
-  
+
+  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  }, []);
+
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center">
-          <HeartPulse className="mr-2 h-5 w-5 text-primary" />
-          Scanner émotionnel
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="text-center py-4">
-            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-            <p className="mt-2 text-sm text-muted-foreground">Analyse en cours...</p>
-          </div>
-        ) : latestEmotion ? (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">État émotionnel détecté:</h3>
-                <p className="text-xl font-semibold">
-                  {latestEmotion.emojis || ''} {latestEmotion.emotion || 'Neutre'}
-                </p>
-                {latestEmotion.text && (
-                  <p className="text-sm text-muted-foreground mt-1 italic">
-                    "{latestEmotion.text.slice(0, 60)}{latestEmotion.text.length > 60 ? '...' : ''}"
-                  </p>
-                )}
-              </div>
-              {latestEmotion.score !== undefined && (
-                <div className="text-right">
-                  <div className="text-sm text-muted-foreground">Score</div>
-                  <div className="text-2xl font-bold">{latestEmotion.score}</div>
-                </div>
-              )}
+    <div className="space-y-6">
+      {!result ? (
+        <form onSubmit={handleSubmit}>
+          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-2">
+              <TabsTrigger value="text" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span>Texte</span>
+              </TabsTrigger>
+              <TabsTrigger value="audio" className="flex items-center gap-2">
+                <Mic className="h-4 w-4" />
+                <span>Audio</span>
+              </TabsTrigger>
+            </TabsList>
+            <div className="mt-4">
+              <TabsContent value="text" className="space-y-4">
+                <Textarea 
+                  placeholder="Décrivez votre état émotionnel actuel..."
+                  value={text}
+                  onChange={handleTextChange}
+                  rows={5}
+                />
+              </TabsContent>
+              <TabsContent value="audio" className="space-y-4">
+                <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} />
+              </TabsContent>
             </div>
-            
+          </Tabs>
+          
+          <div className="mt-6 flex justify-end">
             <Button 
-              onClick={handleMusicTherapy} 
-              variant="outline" 
-              className="w-full"
+              type="submit" 
+              disabled={loading || (!text && !audioUrl)}
+              className="flex items-center gap-2"
             >
-              <Music className="mr-2 h-4 w-4" />
-              Thérapie musicale adaptée
+              <ScannerIcon className="h-4 w-4" />
+              {loading ? "Analyse en cours..." : "Analyser"}
             </Button>
           </div>
-        ) : (
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground">
-              Aucune donnée émotionnelle récente disponible.
-            </p>
-            <Button 
-              onClick={() => navigate('/scan')} 
-              variant="outline" 
-              className="mt-3"
-              size="sm"
-            >
-              Faire un scan émotionnel
+        </form>
+      ) : (
+        <div className="space-y-6">
+          <EmotionScanResult result={result} />
+          <div className="flex justify-end">
+            <Button onClick={resetForm} variant="outline">
+              Nouvelle analyse
             </Button>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </div>
   );
 };
 
