@@ -1,8 +1,9 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { User, UserRole } from '../types';
 
 // Mock Users
-const users: Record<string, User> = {
+export const users: Record<string, User> = {
   // Admin User
   "admin@example.com": {
     id: "1",
@@ -55,6 +56,9 @@ const users: Record<string, User> = {
     onboarded: true,
   },
 };
+
+// Export mockUsers with the array version to match what's expected in imports
+export const mockUsers = Object.values(users);
 
 // Current user state (simulating auth)
 export let currentUser: User | null = null;

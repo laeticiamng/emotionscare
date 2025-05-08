@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { InvitationFormData, InvitationStats } from '@/types/invitation';
 
@@ -36,9 +37,11 @@ let mockInvitations = [
 export const getInvitationsStats = async (): Promise<InvitationStats> => {
   await new Promise(resolve => setTimeout(resolve, 500)); // Simulating API delay
   
+  const total = mockInvitations.length;
+  
   return {
-    total: mockInvitations.length,
-    sent: mockInvitations.length,
+    total,
+    sent: total,
     pending: mockInvitations.filter(inv => inv.status === 'pending').length,
     accepted: mockInvitations.filter(inv => inv.status === 'accepted').length,
     expired: mockInvitations.filter(inv => inv.status === 'expired').length
@@ -62,4 +65,12 @@ export const createInvitation = async (invitationData: InvitationFormData): Prom
   mockInvitations.push(newInvitation);
   
   return { invitation: newInvitation };
+};
+
+// Add the missing sendInvitation function that's imported in InvitationForm
+export const sendInvitation = async (invitationData: InvitationFormData): Promise<any> => {
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+  
+  // Reuse the createInvitation function to maintain consistency
+  return createInvitation(invitationData);
 };

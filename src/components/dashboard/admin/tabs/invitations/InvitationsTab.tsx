@@ -1,16 +1,38 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InvitationForm from '@/components/invitations/InvitationForm';
-import InvitationStats from './InvitationStats';
+import { InvitationStatsCards } from './InvitationStats';
 import InvitationModal from './InvitationModal';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import { getInvitationsStats } from '@/services/invitationService';
+import { InvitationStats } from '@/types';
 
 const InvitationsTab: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [stats, setStats] = useState<InvitationStats>({
+    total: 0,
+    sent: 0,
+    pending: 0,
+    accepted: 0,
+    expired: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const statsData = await getInvitationsStats();
+        setStats(statsData);
+      } catch (error) {
+        console.error('Error fetching invitation stats:', error);
+      }
+    };
+    
+    fetchStats();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -42,7 +64,7 @@ const InvitationsTab: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <InvitationStats />
+              <InvitationStatsCards stats={stats} />
             </CardContent>
           </Card>
         </TabsContent>

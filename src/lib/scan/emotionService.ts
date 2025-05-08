@@ -1,3 +1,4 @@
+
 import { Emotion } from '@/types';
 
 // Mock function to simulate inserting an emotion
@@ -21,6 +22,9 @@ export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion 
   }
 };
 
+// Alias for insertEmotion to match the imported name in scanService
+export const createEmotionEntry = insertEmotion;
+
 // Mock function to simulate fetching the latest emotion for a user
 export const getLatestEmotion = async (userId: string): Promise<Emotion | null> => {
   // Simulate fetching from a database
@@ -39,6 +43,9 @@ export const getLatestEmotion = async (userId: string): Promise<Emotion | null> 
     source: 'mock'
   } as Emotion;
 };
+
+// Alias for getLatestEmotion to match the imported name in scanService
+export const fetchLatestEmotion = getLatestEmotion;
 
 // Mock function to simulate fetching emotion history for a user
 export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
@@ -71,3 +78,6 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
     }
   ] as Emotion[];
 };
+
+// Alias for getEmotionHistory to match the imported name in scanService
+export const fetchEmotionHistory = getEmotionHistory;

@@ -68,7 +68,7 @@ export const analyzeEmotion = async (payload: {
 
 export const fetchEmotionHistory = async (userId?: string): Promise<Emotion[]> => {
   try {
-    return await fetchEmotionHistoryService();
+    return await fetchEmotionHistoryService(userId || '');
   } catch (error) {
     console.error('Error fetching emotion history:', error);
     return [];
@@ -91,7 +91,7 @@ export const createEmotionEntry = async (data: {
 
 export const fetchLatestEmotion = async (userId?: string): Promise<Emotion | null> => {
   try {
-    return await fetchLatestEmotionService();
+    return await fetchLatestEmotionService(userId || '');
   } catch (error) {
     console.error('Error fetching latest emotion:', error);
     return null;
