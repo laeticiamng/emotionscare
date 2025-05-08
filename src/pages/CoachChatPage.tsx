@@ -6,9 +6,8 @@ import { useCoachChat } from '@/hooks/chat/useCoachChat';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { useToast } from '@/hooks/use-toast';
 import CoachChatContainer from '@/components/coach/CoachChatContainer';
-import { Loader, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import StatusIndicator from '@/components/ui/status/StatusIndicator';
+import CoachNavigation from '@/components/coach/CoachNavigation';
 
 const CoachChatPage = () => {
   // Get the coach chat functionality
@@ -131,29 +130,29 @@ const CoachChatPage = () => {
   return (
     <ProtectedLayout>
       <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl h-[80vh] flex flex-col">
+        {/* Navigation */}
+        <CoachNavigation onBackClick={handleBackClick} />
+        
+        {/* Loading indicator */}
         {isLoading && (
-          <div className="fixed top-4 right-4 bg-primary/20 p-2 rounded-full z-50">
-            <Loader className="animate-spin text-primary h-6 w-6" />
-          </div>
+          <StatusIndicator 
+            type="loading"
+            position="fixed"
+          />
         )}
 
+        {/* Error display */}
         {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Erreur</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-            <div className="mt-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setError(null)}
-              >
-                Fermer
-              </Button>
-            </div>
-          </Alert>
+          <StatusIndicator 
+            type="error"
+            title="Erreur"
+            message={error}
+            className="mb-4"
+            onDismiss={() => setError(null)}
+          />
         )}
 
+        {/* Chat container */}
         <CoachChatContainer
           messages={messages}
           isLoading={isLoading}

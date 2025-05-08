@@ -106,7 +106,7 @@ export const sidebarItems: NavItemConfig[] = [
     icon: <Users className="h-5 w-5" />
   },
   {
-    path: '/chat',
+    path: '/coach',
     label: 'Coach IA',
     icon: <Brain className="h-5 w-5" />
   },

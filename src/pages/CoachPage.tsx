@@ -4,11 +4,13 @@ import ProtectedLayout from '@/components/ProtectedLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Brain, Music, RefreshCw, History } from 'lucide-react';
+import { MessageCircle, Brain, Music, RefreshCw, History, ArrowRight, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useActivity } from '@/hooks/useActivity';
 import { useAuth } from '@/contexts/AuthContext';
+import CoachNavigation from '@/components/coach/CoachNavigation';
+import StatusIndicator from '@/components/ui/status/StatusIndicator';
 
 const CoachPage = () => {
   const [userQuestion, setUserQuestion] = useState('');
@@ -91,12 +93,24 @@ const CoachPage = () => {
   return (
     <ProtectedLayout>
       <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <h1 className="text-3xl font-bold mb-6">Coach IA Personnel</h1>
+        {/* Navigation */}
+        <CoachNavigation showBackButton={false} />
+        
+        {/* Loading indicator if needed */}
+        {isSubmitting && (
+          <StatusIndicator 
+            type="loading" 
+            position="fixed" 
+          />
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="md:col-span-2">
+          <Card className="md:col-span-2 transition-all duration-300 hover:shadow-md">
             <CardHeader>
-              <CardTitle>Posez une question à votre coach</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                Posez une question à votre coach
+              </CardTitle>
               <CardDescription>
                 Votre coach personnel est là pour vous aider à améliorer votre bien-être et votre équilibre émotionnel
               </CardDescription>
@@ -129,17 +143,18 @@ const CoachPage = () => {
                 
                 <Button 
                   variant="outline" 
-                  className="w-full" 
+                  className="w-full flex items-center gap-2 hover:bg-primary/10" 
                   onClick={handleStartCoaching}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Chargement..." : "Démarrer une conversation"}
+                  <ArrowRight className="h-4 w-4" />
+                  <span>Démarrer une conversation</span>
                 </Button>
               </div>
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle>Questions populaires</CardTitle>
             </CardHeader>
@@ -154,10 +169,11 @@ const CoachPage = () => {
                   <Button 
                     key={question}
                     variant="ghost" 
-                    className="w-full justify-start text-left" 
+                    className="w-full justify-start text-left hover:bg-primary/10 transition-colors" 
                     onClick={() => handleQuickQuestion(question)}
                     disabled={isSubmitting}
                   >
+                    <ArrowRight className="h-4 w-4 mr-2 opacity-70" />
                     {question}
                   </Button>
                 ))}
@@ -167,9 +183,12 @@ const CoachPage = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+          <Card className="transition-all duration-300 hover:shadow-md">
             <CardHeader>
-              <CardTitle>Recommandations personnalisées</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                Recommandations personnalisées
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-muted-foreground">Recommandations basées sur votre profil émotionnel récent.</p>
@@ -197,16 +216,19 @@ const CoachPage = () => {
             </CardContent>
           </Card>
           
-          <Card>
+          <Card className="transition-all duration-300 hover:shadow-md">
             <CardHeader>
-              <CardTitle>Historique des conversations</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" />
+                Historique des conversations
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-muted-foreground">Retrouvez l'historique de vos échanges avec le coach IA.</p>
               <Button 
                 onClick={() => {
                   logActivity('view_chat_history');
-                  navigate('/coach-chat');
+                  navigate('/coach/history');
                 }} 
                 variant="outline"
                 className="w-full"
