@@ -8,6 +8,7 @@ import { fetchBadges, fetchChallenges, completeChallenge } from '@/lib/gamificat
 import { Challenge } from '@/types/gamification';
 import { useActivityLogging } from '@/hooks/useActivityLogging';
 import { toast } from "sonner";
+import { useAuth } from '@/contexts/AuthContext';
 
 const GamificationPage = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -15,6 +16,7 @@ const GamificationPage = () => {
   const [badges, setBadges] = useState<any[]>([]);
   const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
   
   // Log page visit
   useActivityLogging('gamification');
@@ -42,7 +44,9 @@ const GamificationPage = () => {
   const handleCompleteChallenge = async (challengeId: string) => {
     setIsLoading(true);
     try {
-      const success = await completeChallenge(challengeId);
+      const userId = user?.id || 'anonymous';
+      const success = await completeChallenge(userId, challengeId);
+      
       if (success) {
         setCompletedChallenges(prev => [...prev, challengeId]);
         toast.success("Défi complété avec succès!");

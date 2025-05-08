@@ -1,4 +1,3 @@
-
 // Si le fichier existe déjà, nous ajoutons ou modifions ces types
 export interface User {
   id: string;
@@ -231,6 +230,9 @@ export interface InvitationStats {
   accepted: number;
   expired: number;
 }
+
+// Explicitly export the InvitationVerificationResult type
+export type { InvitationVerificationResult } from './invitation';
 
 // Challenge type for gamification
 export interface Challenge {

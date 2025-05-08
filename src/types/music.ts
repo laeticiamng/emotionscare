@@ -12,7 +12,7 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;
+  duration: number;    // Changed from optional to required
   audioUrl: string;
   coverUrl: string;
   emotion?: string;
@@ -28,4 +28,3 @@ export interface MusicPlaylist {
   emotion: string;
   tracks: MusicTrack[];
 }
-

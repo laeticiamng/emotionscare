@@ -1,5 +1,14 @@
-
 import { Badge, Challenge } from '@/types';
+
+// Define BadgeResponse interface
+export interface BadgeResponse {
+  id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  category: string;
+  unlocked: boolean;
+}
 
 // Mock badges
 const mockBadges: Badge[] = [
@@ -54,8 +63,17 @@ export const getBadgeDetails = async (badgeId: string): Promise<BadgeResponse | 
   };
 };
 
-// Get active challenges
-export const getActiveChallenges = async (userId: string): Promise<Challenge[]> => {
+// Add these missing functions that GamificationPage.tsx is trying to use
+export const fetchBadges = async (): Promise<{all: Badge[], earned: Badge[]}> => {
+  // In a real app, this would be an API call
+  const earned = mockBadges.filter(badge => badge.unlocked);
+  return {
+    all: mockBadges,
+    earned
+  };
+};
+
+export const fetchChallenges = async (): Promise<Challenge[]> => {
   // In a real app, this would be an API call
   return [
     {
@@ -95,9 +113,10 @@ export const getActiveChallenges = async (userId: string): Promise<Challenge[]> 
 };
 
 // Complete a challenge
-export const completeChallenge = async (userId: string, challengeId: string): Promise<void> => {
+export const completeChallenge = async (userId: string, challengeId: string): Promise<boolean> => {
   // In a real app, this would be an API call
   console.log(`Challenge ${challengeId} marked as completed for user ${userId}`);
+  return true; // Return a boolean to indicate success
 };
 
 // Track challenge progress

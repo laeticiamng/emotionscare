@@ -5,27 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2, VolumeX, RefreshCw } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { MusicTrack } from '@/types';
+import { MusicTrack, VRSessionTemplate } from '@/types';
 import { useVRSessionTimer } from '@/hooks/useVRSessionTimer';
 import { YoutubeEmbed } from '../ui/youtube-embed';
 import VRSessionProgress from './VRSessionProgress';
 
-interface VRSessionWithMusicProps {
+export interface VRSessionWithMusicProps {
+  template: VRSessionTemplate;
+  onCompleteSession: () => void;
   emotion?: string;
-  sessionDuration: number; // in seconds
   videoUrl?: string;
   audioUrl?: string;
   isAudioOnly?: boolean;
-  onComplete: () => void;
 }
 
-export const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
+  template,
   emotion = 'calm',
-  sessionDuration,
   videoUrl,
   audioUrl,
   isAudioOnly = false,
-  onComplete
+  onCompleteSession
 }) => {
   const [isMuted, setIsMuted] = useState(false);
   const { toast } = useToast();
@@ -36,8 +36,8 @@ export const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
     percentageComplete,
     formatTimeRemaining,
   } = useVRSessionTimer({ 
-    totalDurationSeconds: sessionDuration,
-    onComplete
+    totalDurationSeconds: template.duration * 60, // Convert minutes to seconds
+    onComplete: onCompleteSession
   });
   
   // Load emotionally appropriate music when session starts
@@ -94,7 +94,7 @@ export const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
             controls={false} 
             showInfo={false}
             loop={true}
-            mute={isMuted} // Fixed attribute name
+            mute={isMuted} // Using proper mute property instead of muted
           />
         ) : (
           <div className="flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-purple-800 text-white">
@@ -134,7 +134,7 @@ export const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
                 <RefreshCw className="h-5 w-5" />
               </Button>
               
-              <Button variant="default" onClick={onComplete}>
+              <Button variant="default" onClick={onCompleteSession}>
                 Terminer la session
               </Button>
             </div>
