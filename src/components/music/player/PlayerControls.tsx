@@ -2,16 +2,11 @@
 import React from 'react';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PlayerControlsProps } from '@/types/audio-player';
 
-interface PlayerControlsProps {
-  isPlaying: boolean;
-  loadingTrack: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onPrevious: () => void;
-  onNext: () => void;
-}
-
+/**
+ * Playback control buttons (play/pause, next/previous)
+ */
 const PlayerControls: React.FC<PlayerControlsProps> = ({
   isPlaying,
   loadingTrack,
@@ -21,7 +16,7 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
   onNext
 }) => {
   return (
-    <div className="flex items-center gap-2 flex-1">
+    <div className="flex items-center gap-2 justify-center">
       <Button 
         variant="ghost" 
         size="icon" 

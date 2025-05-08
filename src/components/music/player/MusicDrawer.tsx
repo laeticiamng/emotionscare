@@ -10,8 +10,11 @@ export interface MusicDrawerProps {
   onClose: () => void;
 }
 
+/**
+ * Drawer component that contains the music player
+ */
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  // Ne pas rendre le Drawer si pas ouvert
+  // Don't render the Drawer if not open
   if (!open) return null;
   
   return (

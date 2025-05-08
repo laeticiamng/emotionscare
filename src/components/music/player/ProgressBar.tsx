@@ -1,17 +1,14 @@
 
 import React from 'react';
+import { ProgressBarProps } from '@/types/audio-player';
+import { formatTime } from '@/hooks/audio/audioPlayerUtils';
 
-interface ProgressBarProps {
-  currentTime: number;
-  duration: number;
-  formatTime: (time: number) => string;
-  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-}
-
+/**
+ * Audio progress bar with time indicators
+ */
 const ProgressBar: React.FC<ProgressBarProps> = ({
   currentTime,
   duration,
-  formatTime,
   handleProgressClick
 }) => {
   return (
@@ -22,7 +19,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       >
         <div 
           className="absolute left-0 top-0 h-full bg-primary"
-          style={{ width: `${(currentTime / duration) * 100}%` }}
+          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
         />
       </div>
       <div className="flex justify-between text-xs text-muted-foreground">

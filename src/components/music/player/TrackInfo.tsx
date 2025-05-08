@@ -1,21 +1,18 @@
 
 import React from 'react';
 import { Loader2, Music } from 'lucide-react';
-import { Track } from '@/services/music/types';
+import { TrackInfoProps } from '@/types/audio-player';
 import { MusicTrack } from '@/types/music';
 
-interface TrackInfoProps {
-  currentTrack: Track | MusicTrack;
-  loadingTrack: boolean;
-  audioError: boolean;
-}
-
+/**
+ * Display for current track information (title, artist, cover)
+ */
 const TrackInfo: React.FC<TrackInfoProps> = ({
   currentTrack,
   loadingTrack,
   audioError
 }) => {
-  // Déterminer l'URL de la couverture de la piste selon le type de piste
+  // Get cover URL from different possible properties
   const getCoverUrl = () => {
     if (!currentTrack) return null;
     
@@ -48,14 +45,14 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
         )}
       </div>
       
-      <div>
-        <h3 className="font-medium leading-tight">
+      <div className="flex-1 min-w-0">
+        <h3 className="font-medium leading-tight truncate">
           {currentTrack.title}
           {audioError && (
             <span className="text-destructive text-xs ml-2">(Erreur)</span>
           )}
         </h3>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground truncate">
           {currentTrack.artist}
         </p>
       </div>

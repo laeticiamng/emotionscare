@@ -1,104 +1,102 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from 'lucide-react';
+import PlayerControls from './PlayerControls';
+import VolumeControl from './VolumeControl';
+import { useAudioPlayerState } from '@/hooks/audio/useAudioPlayerState';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 
 interface MusicControlsProps {
-  isPlaying: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onNext?: () => void;
-  onPrevious?: () => void;
-  onVolumeChange?: (volume: number) => void;
-  volume?: number;
   showVolume?: boolean;
-  showDetails?: boolean;
+  showRepeat?: boolean;
+  showShuffle?: boolean;
+  compact?: boolean;
 }
 
+/**
+ * Flexible music control component that can be configured with different options
+ */
 const MusicControls: React.FC<MusicControlsProps> = ({
-  isPlaying,
-  onPlay,
-  onPause,
-  onNext,
-  onPrevious,
-  onVolumeChange,
-  volume = 100,
-  showVolume = false,
-  showDetails = true
+  showVolume = true,
+  showRepeat = false,
+  showShuffle = false,
+  compact = false
 }) => {
-  const [isMuted, setIsMuted] = React.useState(false);
+  const {
+    isPlaying,
+    volume,
+    loadingTrack,
+    repeat,
+    shuffle,
+    toggleRepeat,
+    toggleShuffle
+  } = useAudioPlayerState();
   
-  const handlePlayPause = () => {
-    if (isPlaying) {
-      onPause();
-    } else {
-      onPlay();
-    }
+  const {
+    pauseTrack,
+    resumeTrack,
+    nextTrack,
+    previousTrack,
+    handleVolumeChange
+  } = useAudioPlayer();
+  
+  const handlePlay = () => {
+    resumeTrack();
   };
   
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (onVolumeChange) {
-      onVolumeChange(isMuted ? volume : 0);
-    }
+  const handlePause = () => {
+    pauseTrack();
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={`flex ${compact ? 'flex-row' : 'flex-col'} gap-2`}>
       <div className="flex items-center justify-center gap-2">
-        {onPrevious && (
+        <PlayerControls
+          isPlaying={isPlaying}
+          loadingTrack={loadingTrack}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onPrevious={previousTrack}
+          onNext={nextTrack}
+        />
+        
+        {showRepeat && (
           <Button 
-            variant="ghost" 
+            variant={repeat ? "secondary" : "ghost"} 
             size="icon"
-            onClick={onPrevious}
+            onClick={toggleRepeat}
             className="rounded-full"
+            title="Répéter"
           >
-            <SkipBack className="h-5 w-5" />
+            <Repeat className="h-4 w-4" />
           </Button>
         )}
         
-        <Button 
-          variant="default" 
-          size="icon"
-          onClick={handlePlayPause}
-          className="rounded-full"
-        >
-          {isPlaying ? (
-            <Pause className="h-5 w-5" />
-          ) : (
-            <Play className="h-5 w-5" />
-          )}
-        </Button>
-        
-        {onNext && (
+        {showShuffle && (
           <Button 
-            variant="ghost" 
+            variant={shuffle ? "secondary" : "ghost"} 
             size="icon"
-            onClick={onNext}
+            onClick={toggleShuffle}
             className="rounded-full"
+            title="Lecture aléatoire"
           >
-            <SkipForward className="h-5 w-5" />
-          </Button>
-        )}
-        
-        {showVolume && (
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={toggleMute}
-            className="rounded-full"
-          >
-            {isMuted ? (
-              <VolumeX className="h-5 w-5" />
-            ) : (
-              <Volume2 className="h-5 w-5" />
-            )}
+            <Shuffle className="h-4 w-4" />
           </Button>
         )}
       </div>
       
-      {showDetails && (
-        <div className="text-xs text-center text-muted-foreground">
+      {showVolume && (
+        <div className={`${compact ? 'ml-auto' : 'mt-2'} flex justify-center`}>
+          <VolumeControl 
+            volume={volume} 
+            onVolumeChange={handleVolumeChange} 
+          />
+        </div>
+      )}
+      
+      {!compact && (
+        <div className="text-xs text-center text-muted-foreground mt-1">
           {isPlaying ? "En cours de lecture" : "En pause"}
         </div>
       )}

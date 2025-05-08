@@ -2,12 +2,11 @@
 import React from 'react';
 import { Volume2, Volume1, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
+import { VolumeControlProps } from '@/types/audio-player';
 
-interface VolumeControlProps {
-  volume: number;
-  onVolumeChange: (values: number[]) => void;
-}
-
+/**
+ * Volume slider with icon that changes based on volume level
+ */
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onVolumeChange
@@ -19,9 +18,9 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
     <div className="flex items-center gap-2 w-28">
       <VolumeIcon size={18} className="text-muted-foreground" />
       <Slider
-        value={[volume]}
-        max={1}
-        step={0.01}
+        value={[volume * 100]}
+        max={100}
+        step={1}
         onValueChange={onVolumeChange}
         className="flex-1"
       />
