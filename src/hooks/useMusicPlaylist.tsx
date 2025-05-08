@@ -1,30 +1,28 @@
 
 import { useCallback } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
-import { getPlaylist } from '@/services/music/playlist-service';
-import { useToast } from '@/hooks/use-toast';
+import { MusicPlaylist } from '@/types';
 import { usePlaylistManager } from '@/hooks/usePlaylistManager';
 import { convertPlaylistToMusicPlaylist } from '@/services/music/converters';
+import { loadPlaylistById, convertPlaylistsData } from '@/services/music/playlist-utils';
+import { usePlaylistNotifications } from '@/hooks/music/usePlaylistNotifications';
 
 export function useMusicPlaylist() {
-  const { toast } = useToast();
+  const { notifyPlaylistError } = usePlaylistNotifications();
   const { 
     playlists: playlistsData, 
     getCurrentPlaylist, 
     loadPlaylistForEmotion: loadPlaylist 
   } = usePlaylistManager();
   
-  // Conversion de la playlist active au format MusicPlaylist
+  // Conversion of the playlist active to MusicPlaylist format
   const currentPlaylist = getCurrentPlaylist() 
     ? convertPlaylistToMusicPlaylist(getCurrentPlaylist()!) 
     : null;
 
-  // Conversion des playlists au format MusicPlaylist[]
-  const playlists = Object.values(playlistsData).map(playlist => 
-    convertPlaylistToMusicPlaylist(playlist)
-  );
+  // Conversion of playlists to MusicPlaylist[] format
+  const playlists = convertPlaylistsData(playlistsData);
 
-  // Fonction pour charger une playlist basée sur une émotion
+  // Function to load a playlist based on emotion
   const loadPlaylistForEmotion = useCallback((emotion: string) => {
     const playlist = loadPlaylist(emotion);
     
@@ -35,30 +33,16 @@ export function useMusicPlaylist() {
     return null;
   }, [loadPlaylist]);
 
-  // Fonction pour charger une playlist par ID
-  const loadPlaylistById = useCallback(async (id: string) => {
-    try {
-      const playlist = await getPlaylist(id);
-      if (playlist) {
-        return convertPlaylistToMusicPlaylist(playlist);
-      }
-      return null;
-    } catch (err) {
-      console.error('Erreur lors du chargement de la playlist:', err);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger la playlist",
-        variant: "destructive"
-      });
-      return null;
-    }
-  }, [toast]);
+  // Function to load a playlist by ID
+  const handleLoadPlaylistById = useCallback(async (id: string) => {
+    return loadPlaylistById(id, notifyPlaylistError);
+  }, [notifyPlaylistError]);
 
   return {
     currentPlaylist,
     playlists,
     loadPlaylistForEmotion,
-    loadPlaylistById
+    loadPlaylistById: handleLoadPlaylistById
   };
 }
 

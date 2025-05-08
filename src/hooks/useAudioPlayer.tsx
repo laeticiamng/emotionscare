@@ -1,4 +1,3 @@
-
 import { useCallback, useRef, useEffect } from 'react';
 import { Track } from '@/types/music';
 import { useAudioEvents } from './audio/useAudioEvents';
@@ -175,12 +174,12 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   }, [setStateVolume]);
 
   const toggleRepeat = useCallback(() => {
-    setRepeat(prev => !prev);
-  }, [setRepeat]);
+    setRepeat(!repeat);
+  }, [repeat, setRepeat]);
 
   const toggleShuffle = useCallback(() => {
-    setShuffle(prev => !prev);
-  }, [setShuffle]);
+    setShuffle(!shuffle);
+  }, [shuffle, setShuffle]);
 
   const seekTo = useCallback((seconds: number) => {
     if (audioRef.current) {

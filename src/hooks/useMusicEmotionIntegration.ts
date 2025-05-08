@@ -18,15 +18,15 @@ export function useMusicEmotionIntegration() {
     const playlist = loadPlaylistForEmotion(musicType);
     
     if (playlist && playlist.tracks.length > 0) {
-      // Si aucune musique n'est en cours, commencer à jouer
+      // If no music is playing, start playing
       if (!currentTrack || !isPlaying) {
         playTrack(playlist.tracks[0]);
       }
       
-      // Notifier l'utilisateur
+      // Notify the user
       toast({
-        title: "Musique adaptée à votre émotion",
-        description: `Playlist '${musicType}' disponible dans le lecteur de musique`
+        title: "Music adapted to your emotion",
+        description: `Playlist '${musicType}' available in the music player`
       });
     }
   }, [loadPlaylistForEmotion, playTrack, currentTrack, isPlaying, toast]);
