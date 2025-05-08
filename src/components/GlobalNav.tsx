@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -84,7 +85,7 @@ const GlobalNav = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.image} alt={user.name} />
+                    <AvatarImage src={user.avatar || user.image || user.avatar_url} alt={user.name} />
                     <AvatarFallback>{user.name?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
                   </Avatar>
                 </Button>

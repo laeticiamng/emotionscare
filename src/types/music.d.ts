@@ -12,6 +12,7 @@ export interface MusicTrack {
   year?: number;
   url?: string;
   cover?: string;
+  externalUrl?: string;
 }
 
 export interface MusicPlaylist {

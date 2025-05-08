@@ -73,7 +73,12 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
 };
 
 // Helper function to derive an emotion label
-function getEmotionLabel(emotion: Emotion): string {
+function getEmotionLabel(emotion: EmotionResult | Emotion): string {
+  // If it's an EmotionResult with a direct emotion property
+  if ('emotion' in emotion && emotion.emotion) {
+    return emotion.emotion;
+  }
+  
   // Try to derive emotion from emojis
   if (emotion.emojis) {
     if (emotion.emojis.includes('😊') || emotion.emojis.includes('😄')) return 'Heureux';
