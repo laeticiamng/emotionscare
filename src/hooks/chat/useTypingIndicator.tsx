@@ -1,53 +1,47 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 /**
- * Hook for managing typing indicator state
+ * Hook for managing typing indicator in chat
  */
 export function useTypingIndicator() {
   const [typingIndicator, setTypingIndicator] = useState<string | null>(null);
-  const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
+  const { toast } = useToast();
   
-  // Handle cleanup of typing timer when component unmounts
-  useEffect(() => {
-    return () => {
-      if (typingTimer) clearTimeout(typingTimer);
-    };
-  }, [typingTimer]);
-  
-  // Handle user typing
+  // Handle user typing and show indicators
   const handleUserTyping = useCallback(() => {
-    // Show typing indicator
-    if (!typingIndicator) {
-      setTypingIndicator('Vous êtes en train d\'écrire...');
-    }
-    
-    // Clear previous timer
-    if (typingTimer) {
-      clearTimeout(typingTimer);
-    }
-    
-    // Set new timer to clear typing indicator after 1.5 seconds of inactivity
-    const timer = setTimeout(() => {
-      setTypingIndicator(null);
-    }, 1500);
-    
-    setTypingTimer(timer);
-    
-    return () => {
-      if (timer) clearTimeout(timer);
+    // Reset typing indicator after a delay
+    const resetIndicatorAfterDelay = () => {
+      setTimeout(() => {
+        setTypingIndicator(null);
+      }, 30000); // 30 seconds timeout
     };
-  }, [typingIndicator, typingTimer]);
+    
+    // Set indicator based on message length and complexity
+    setTypingIndicator("Le coach réfléchit...");
+    resetIndicatorAfterDelay();
+  }, []);
   
   // Clear typing indicator
   const clearTypingIndicator = useCallback(() => {
-    if (typingTimer) clearTimeout(typingTimer);
     setTypingIndicator(null);
-  }, [typingTimer]);
+  }, []);
+  
+  // Handle typing error (e.g., network issues)
+  const handleTypingError = useCallback(() => {
+    setTypingIndicator(null);
+    toast({
+      title: "Problème de connexion",
+      description: "La communication avec le coach a été interrompue. Veuillez réessayer.",
+      variant: "destructive"
+    });
+  }, [toast]);
   
   return {
     typingIndicator,
     handleUserTyping,
-    clearTypingIndicator
+    clearTypingIndicator,
+    handleTypingError
   };
 }

@@ -14,7 +14,7 @@ export function useCoachChat(initialQuestion?: string) {
   
   // Use specialized hooks
   const { messages, setMessages, addMessage, resetMessages } = useCoachMessages();
-  const { typingIndicator, handleUserTyping, clearTypingIndicator } = useTypingIndicator();
+  const { typingIndicator, handleUserTyping, clearTypingIndicator, handleTypingError } = useTypingIndicator();
   const { sendMessage, regenerateResponse, isLoading } = useChatStatus();
   const { handleSendMessage, handleRegenerate } = useCoachChatActions({
     userMessage,
@@ -52,6 +52,7 @@ export function useCoachChat(initialQuestion?: string) {
     handleKeyDown,
     handleRegenerate,
     handleUserTyping,
+    handleTypingError,
     resetMessages
   };
 }

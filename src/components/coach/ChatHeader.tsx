@@ -1,43 +1,40 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChatHeaderProps {
-  onBackClick: () => void;
-  title?: string;
-  actions?: ReactNode;
+  title: string;
+  onBackClick?: () => void;
+  actions?: React.ReactNode;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({ 
-  onBackClick, 
-  title = "Coach IA Personnel",
+  title, 
+  onBackClick,
   actions 
 }) => {
-  const isMobile = useIsMobile();
-  
   return (
-    <div className="bg-secondary/50 p-3 md:p-4 border-b flex justify-between items-center">
-      <div className="flex items-center">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={onBackClick}
-          aria-label="Retour"
-          className="mr-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="sr-only">Retour</span>
-        </Button>
-        <div>
-          <h1 className="text-lg md:text-xl font-semibold">{title}</h1>
-          {!isMobile && (
-            <p className="text-sm text-muted-foreground">Discutez avec votre coach pour obtenir des conseils personnalisés</p>
-          )}
-        </div>
+    <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center gap-2">
+        {onBackClick && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onBackClick}
+            className="mr-2"
+            aria-label="Retour"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        )}
+        <h2 className="text-lg font-medium">{title}</h2>
       </div>
-      {actions}
+      {actions && (
+        <div className="flex items-center">
+          {actions}
+        </div>
+      )}
     </div>
   );
 };
