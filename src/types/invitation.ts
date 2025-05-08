@@ -5,6 +5,7 @@ export interface InvitationFormData {
 }
 
 export interface InvitationStats {
+  total: number; // Added required property
   sent: number;
   pending: number;
   accepted: number;

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '@/types';
@@ -6,9 +7,12 @@ import { loginUser, logoutUser, getCurrentUser } from '@/data/mockUsers';
 interface AuthContextProps {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  isAuthenticated: boolean; // Added missing property
+  login: (email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   signOut: () => void;
+  updateUser?: (userData: Partial<User>) => void; // Added missing property
+  setUser?: (user: User | null) => void; // Added missing property
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -28,7 +32,7 @@ const mockAdminUser: User = {
   anonymity_code: 'ADMIN123',
   emotional_score: 85,
   onboarded: true,
-  created_at: new Date().toISOString(), // Added required property
+  created_at: new Date().toISOString(),
   preferences: {
     theme: 'light',
     fontSize: 'medium',
@@ -52,7 +56,7 @@ const mockNewUser: User = {
   anonymity_code: 'NEW456',
   emotional_score: 70,
   onboarded: false,
-  created_at: new Date().toISOString(), // Added required property
+  created_at: new Date().toISOString(),
   preferences: {
     theme: 'light',
     fontSize: 'medium',
@@ -71,6 +75,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Computed property for authentication status
+  const isAuthenticated = user !== null;
+
   useEffect(() => {
     const loadUser = async () => {
       setIsLoading(true);
@@ -87,12 +94,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
       const user = await loginUser(email, password);
       setUser(user);
-      navigate('/dashboard');
+      return user;
     } catch (error: any) {
       console.error("Login failed:", error);
       throw error;
@@ -118,13 +125,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async () => {
     await logout();
   };
+  
+  // User update function
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...userData });
+    }
+  };
 
   const value: AuthContextProps = {
     user,
     isLoading,
+    isAuthenticated,
     login,
     logout,
     signOut,
+    updateUser,
+    setUser,
   };
 
   return (

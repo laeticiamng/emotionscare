@@ -10,29 +10,76 @@ export interface BadgeResponse {
   unlocked: boolean;
 }
 
-// Mock badges
+// Sample badges with proper structure
 const mockBadges: Badge[] = [
   {
-    id: '1',
-    user_id: 'user1',
-    name: 'Premier scan',
-    description: 'Effectuer son premier scan émotionnel',
-    image_url: '/badges/first-scan.png',
-    icon_url: '/badges/icons/first-scan.svg',
-    category: 'scan',
+    id: "1",
+    user_id: "1",
+    name: "Premier pas",
+    description: "Compléter votre premier scan émotionnel",
+    image_url: "/badges/first-scan.svg",
+    icon_url: "/badges/icons/scan-icon.svg",
+    category: "scan",
     unlocked: true,
-    awarded_at: '2023-05-10T14:28:00.000Z'
+    awarded_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    threshold: 1
   },
   {
-    id: '2',
-    user_id: 'user1',
-    name: 'Coach en herbe',
-    description: 'Compléter 5 discussions avec le coach',
-    image_url: '/badges/coach-apprentice.png',
-    icon_url: '/badges/icons/coach-apprentice.svg',
-    category: 'coach',
+    id: "2",
+    user_id: "1",
+    name: "Semaine positive",
+    description: "Maintenir un score de bien-être au-dessus de 75% pendant 7 jours consécutifs",
+    image_url: "/badges/positive-week.svg",
+    icon_url: "/badges/icons/positive-icon.svg",
+    category: "streak",
+    unlocked: false,
+    awarded_at: new Date().toISOString(),
+    threshold: 7
+  },
+  {
+    id: "3",
+    user_id: "1",
+    name: "Coach en herbe",
+    description: "Compléter 5 discussions avec le coach",
+    image_url: "/badges/coach-apprentice.png",
+    icon_url: "/badges/icons/coach-apprentice.svg",
+    category: "coach",
     unlocked: false,
     threshold: 5
+  }
+];
+
+// Sample challenges with proper structure
+const mockChallenges: Challenge[] = [
+  {
+    id: "1",
+    title: "Fièvre écriture",
+    description: "Écrire dans votre journal pendant 3 jours consécutifs",
+    points: 100,
+    completed: false,
+    progress: 1,
+    total: 3,
+    category: "journal",
+  },
+  {
+    id: "2",
+    title: "Série de méditation",
+    description: "Compléter 5 sessions de méditation VR",
+    points: 200,
+    completed: false,
+    progress: 3,
+    total: 5,
+    category: "vr",
+  },
+  {
+    id: "3",
+    title: "Expert émotionnel",
+    description: "Atteindre un score de bien-être de 90% ou plus",
+    points: 500,
+    completed: false,
+    progress: 82,
+    total: 90,
+    category: "scan",
   }
 ];
 
@@ -75,41 +122,7 @@ export const fetchBadges = async (): Promise<{all: Badge[], earned: Badge[]}> =>
 
 export const fetchChallenges = async (): Promise<Challenge[]> => {
   // In a real app, this would be an API call
-  return [
-    {
-      id: 'c1',
-      title: 'Semaine du bien-être',
-      description: 'Effectuez un scan émotionnel chaque jour pendant une semaine',
-      points: 100,
-      progress: 4,
-      total: 7,
-      completed: false,
-      category: 'scan',
-      requirements: ['Scan quotidien', 'Seuil de bien-être > 60%']
-    },
-    {
-      id: 'c2',
-      title: 'Master du journal',
-      description: 'Écrivez dans votre journal 3 jours consécutifs',
-      points: 75,
-      progress: 2,
-      total: 3,
-      completed: false,
-      category: 'journal',
-      requirements: ['Entrée quotidienne', 'Minimum 50 mots']
-    },
-    {
-      id: 'c3',
-      title: 'Expert VR',
-      description: 'Complétez 5 sessions VR différentes',
-      points: 150,
-      progress: 3,
-      total: 5,
-      completed: false,
-      category: 'vr',
-      requirements: ['Sessions uniques', 'Durée minimale 5 minutes']
-    }
-  ];
+  return mockChallenges;
 };
 
 // Complete a challenge

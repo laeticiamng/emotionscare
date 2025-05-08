@@ -1,53 +1,60 @@
-
+import { v4 as uuidv4 } from 'uuid';
 import { User, UserRole } from '../types';
 
 // Mock Users
-export const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'Sophie Martin',
-    email: 'sophie@example.com',
-    role: UserRole.USER,
-    anonymity_code: 'SM472931',
-    emotional_score: 82,
-    avatar: 'https://i.pravatar.cc/150?img=1',
+const users: Record<string, User> = {
+  // Admin User
+  "admin@example.com": {
+    id: "1",
+    name: "Admin",
+    email: "admin@example.com",
+    role: UserRole.ADMIN,
+    created_at: new Date().toISOString(),
+    anonymity_code: "A1",
+    emotional_score: 85,
+    avatar: "https://i.pravatar.cc/300?img=68",
     onboarded: true,
-    created_at: new Date().toISOString(), // Added required property
   },
-  {
-    id: '2',
-    name: 'Thomas Dubois',
-    email: 'thomas@example.com',
+  
+  // Sophie - Primary user
+  "sophie@example.com": {
+    id: "2",
+    name: "Sophie",
+    email: "sophie@example.com",
     role: UserRole.USER,
-    anonymity_code: 'TD659812',
-    emotional_score: 65,
-    avatar: 'https://i.pravatar.cc/150?img=2',
-    onboarded: true,
-    created_at: new Date().toISOString(), // Added required property
-  },
-  {
-    id: '3',
-    name: 'Emma Petit',
-    email: 'emma@example.com',
-    role: UserRole.USER,
-    anonymity_code: 'EP847103',
+    created_at: new Date().toISOString(),
+    anonymity_code: "S1",
     emotional_score: 78,
-    avatar: 'https://i.pravatar.cc/150?img=3',
+    avatar: "https://i.pravatar.cc/300?img=48",
     onboarded: true,
-    created_at: new Date().toISOString(), // Added required property
   },
-  {
-    id: '4',
-    name: 'Admin Direction',
-    email: 'admin@example.com',
-    role: 'admin',  // Role admin pour l'accès direction
-    anonymity_code: 'AD123456',
-    emotional_score: 95,
-    avatar: 'https://i.pravatar.cc/150?img=12',
+  
+  // Marc - User with low emotional score
+  "marc@example.com": {
+    id: "3",
+    name: "Marc",
+    email: "marc@example.com",
+    role: UserRole.USER,
+    created_at: new Date().toISOString(),
+    anonymity_code: "M1",
+    emotional_score: 45,
+    avatar: "https://i.pravatar.cc/300?img=57",
     onboarded: true,
-    created_at: new Date().toISOString(), // Added required property
   },
-];
+  
+  // Emma - Manager
+  "emma@example.com": {
+    id: "4",
+    name: "Emma",
+    email: "emma@example.com",
+    role: "manager",
+    created_at: new Date().toISOString(),
+    anonymity_code: "E1",
+    emotional_score: 72,
+    avatar: "https://i.pravatar.cc/300?img=45",
+    onboarded: true,
+  },
+};
 
 // Current user state (simulating auth)
 export let currentUser: User | null = null;
@@ -60,7 +67,7 @@ export const loginUser = (email: string, password: string): Promise<User> => {
       
       // For Sophie user
       if (email === 'sophie@example.com' && password === 'sophie') {
-        const user = mockUsers.find(u => u.email === 'sophie@example.com');
+        const user = users["sophie@example.com"];
         if (user) {
           console.log("MockUsers - Login successful for Sophie:", user);
           currentUser = user;
@@ -71,7 +78,7 @@ export const loginUser = (email: string, password: string): Promise<User> => {
       
       // For Admin user
       if (email === 'admin@example.com' && password === 'admin') {
-        const user = mockUsers.find(u => u.email === 'admin@example.com');
+        const user = users["admin@example.com"];
         if (user) {
           console.log("MockUsers - Login successful for Admin:", user);
           currentUser = user;
@@ -81,7 +88,7 @@ export const loginUser = (email: string, password: string): Promise<User> => {
       }
       
       // For other users - require password match
-      const user = mockUsers.find(u => u.email === email);
+      const user = users[email];
       if (user) {
         // Simple password check - in a real app this would be hashed
         if (password) {
@@ -121,9 +128,9 @@ export const updateUser = (userData: Partial<User>): Promise<User> => {
       currentUser = updatedUser;
       
       // Update the mock users array too
-      const index = mockUsers.findIndex(u => u.id === currentUser?.id);
+      const index = Object.keys(users).findIndex(u => u === currentUser?.email);
       if (index !== -1) {
-        mockUsers[index] = updatedUser;
+        users[currentUser?.email] = updatedUser;
         console.log("MockUsers - User updated:", updatedUser);
       }
       

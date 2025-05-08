@@ -14,6 +14,7 @@ export interface MusicTrack {
   url?: string;
   cover?: string;
   externalUrl?: string;
+  isPlaying?: boolean; // Added missing property
 }
 
 export interface MusicPlaylist {

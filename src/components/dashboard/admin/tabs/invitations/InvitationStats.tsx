@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Card,
@@ -76,3 +77,6 @@ export const InvitationStatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
     </div>
   );
 };
+
+// Add default export
+export default InvitationStatsCards;

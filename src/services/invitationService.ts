@@ -1,53 +1,65 @@
+import { v4 as uuidv4 } from 'uuid';
+import { InvitationFormData, InvitationStats } from '@/types/invitation';
 
-import { supabase } from "@/lib/supabase-client";
-import { InvitationFormData, InvitationStats } from "@/types";
-
-export const sendInvitation = async (data: InvitationFormData): Promise<void> => {
-  const { email, role } = data;
-  
-  // Appel à la fonction Edge pour envoyer l'invitation
-  const response = await supabase.functions.invoke("send-invitation", {
-    body: { email, role },
-  });
-  
-  if (response.error) {
-    console.error("Error sending invitation:", response.error);
-    throw new Error(response.error.message || "Échec de l'envoi de l'invitation");
+// Mock invitation data
+let mockInvitations = [
+  {
+    id: uuidv4(),
+    email: 'johndoe@example.com',
+    role: 'user',
+    status: 'pending',
+    token: uuidv4(),
+    created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: uuidv4(),
+    email: 'janedoe@example.com',
+    role: 'admin',
+    status: 'accepted',
+    token: uuidv4(),
+    created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    accepted_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    id: uuidv4(),
+    email: 'mark@example.com',
+    role: 'user',
+    status: 'expired',
+    token: uuidv4(),
+    created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+    expires_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   }
+];
+
+export const getInvitationsStats = async (): Promise<InvitationStats> => {
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulating API delay
   
-  return response.data;
+  return {
+    total: mockInvitations.length,
+    sent: mockInvitations.length,
+    pending: mockInvitations.filter(inv => inv.status === 'pending').length,
+    accepted: mockInvitations.filter(inv => inv.status === 'accepted').length,
+    expired: mockInvitations.filter(inv => inv.status === 'expired').length
+  };
 };
 
-export const getInvitationStats = async (): Promise<InvitationStats> => {
-  try {
-    // En situation réelle, récupérer des données agrégées depuis Supabase
-    // Exemple agrégé pour respecter la confidentialité
-    const { data: pendingCount } = await supabase
-      .rpc('count_invitations_by_status', { status_param: 'pending' });
-      
-    const { data: acceptedCount } = await supabase
-      .rpc('count_invitations_by_status', { status_param: 'accepted' });
-      
-    const { data: expiredCount } = await supabase
-      .rpc('count_invitations_by_status', { status_param: 'expired' });
-      
-    const { data: totalCount } = await supabase
-      .rpc('count_all_invitations');
-    
-    return {
-      sent: totalCount || 0,
-      pending: pendingCount || 0,
-      accepted: acceptedCount || 0,
-      expired: expiredCount || 0
-    };
-  } catch (error) {
-    console.error("Error fetching invitation stats:", error);
-    // Retourner des statistiques par défaut en cas d'erreur
-    return {
-      sent: 0,
-      accepted: 0,
-      pending: 0,
-      expired: 0
-    };
-  }
+export const createInvitation = async (invitationData: InvitationFormData): Promise<any> => {
+  const now = new Date();
+  const expiresIn = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+  
+  const newInvitation = {
+    id: uuidv4(),
+    email: invitationData.email,
+    role: invitationData.role,
+    status: 'pending',
+    token: uuidv4(),
+    created_at: now.toISOString(),
+    expires_at: new Date(now.getTime() + expiresIn).toISOString(),
+  };
+  
+  mockInvitations.push(newInvitation);
+  
+  return { invitation: newInvitation };
 };

@@ -1,92 +1,73 @@
+import { Emotion } from '@/types';
 
-import { supabase } from '@/integrations/supabase/client';
-import type { Emotion } from '@/types';
-
-/** Sauvegarde un scan émotionnel */
-export async function saveEmotionScan(entry: Omit<Emotion,'id'>): Promise<Emotion> {
-  const { date, emotion, intensity, user_id, text, score, emojis, ai_feedback, audio_url } = entry;
-
-  const { data, error } = await supabase
-    .from('emotions')
-    .insert({ 
-      date, 
-      emotion, 
-      intensity, 
-      user_id, 
-      text, 
-      score,
-      emojis,
-      ai_feedback,
-      audio_url
-    })
-    .select()
-    .single();
-
-  if (error || !data) throw error || new Error('Failed to save emotion scan');
-  return data as unknown as Emotion;
-}
-
-/** Récupère l'historique des scans */
-export async function fetchEmotionHistory(): Promise<Emotion[]> {
-  const { data, error } = await supabase
-    .from('emotions')
-    .select('*')
-    .order('date', { ascending: false });
-    
-  if (error) throw error;
-  return data as unknown as Emotion[] || [];
-}
-
-export function ensureValidUUID(id: string): string {
-  // Vérifier si c'est déjà un UUID valide
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-    return id;
-  }
-  
-  // Générer un UUID déterministe basé sur l'identifiant fourni
-  // Pour garantir que le même ID produira toujours le même UUID
-  const paddedId = id.padStart(12, '0').substring(0, 12);
-  return `00000000-0000-0000-0000-${paddedId}`;
-}
-
-export async function createEmotionEntry(payload: {
-  user_id?: string;
-  emojis?: string;
-  text?: string;
-  audio_url?: string;
-}): Promise<Emotion> {
+// Mock function to simulate inserting an emotion
+export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion | null> => {
   try {
-    const entry: Omit<Emotion, 'id'> = {
-      date: new Date().toISOString(),
-      emotion: 'neutral',  // Default emotion
-      intensity: 5,        // Default intensity
-      score: 50,           // Default score
-      text: payload.text || '',
-      emojis: payload.emojis,
-      audio_url: payload.audio_url,
-      user_id: payload.user_id || '00000000-0000-0000-0000-000000000000' // Default user_id if not provided
+    // Convert Date to string if it's a Date object
+    const emotionData = {
+      ...emotion,
+      date: emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date,
     };
     
-    return await saveEmotionScan(entry);
+    // Here you would typically insert into a database
+    // For now, just return the input with generated ID
+    return {
+      id: `emotion-${Date.now()}`,
+      ...emotionData,
+    } as Emotion;
   } catch (error) {
-    console.error('Error in createEmotionEntry:', error);
-    throw error;
+    console.error("Error inserting emotion:", error);
+    return null;
   }
-}
+};
 
-export async function fetchLatestEmotion(): Promise<Emotion | null> {
-  try {
-    const { data, error } = await supabase
-      .from('emotions')
-      .select('*')
-      .order('date', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+// Mock function to simulate fetching the latest emotion for a user
+export const getLatestEmotion = async (userId: string): Promise<Emotion | null> => {
+  // Simulate fetching from a database
+  // Replace this with your actual data fetching logic
+  
+  // For now, return a mock emotion
+  return {
+    id: 'latest-emotion-123',
+    user_id: userId,
+    date: new Date(),
+    score: 75,
+    emotion: 'happy',
+    text: 'Feeling good today!',
+    emojis: '😊',
+    ai_feedback: 'Keep up the positive vibes!',
+    source: 'mock'
+  } as Emotion;
+};
 
-    if (error) throw error;
-    return data as unknown as Emotion | null;
-  } catch (error) {
-    console.error('Error in fetchLatestEmotion:', error);
-    throw error;
-  }
-}
+// Mock function to simulate fetching emotion history for a user
+export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
+  // Simulate fetching from a database
+  // Replace this with your actual data fetching logic
+  
+  // For now, return an array of mock emotions
+  return [
+    {
+      id: 'emotion-1',
+      user_id: userId,
+      date: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      score: 60,
+      emotion: 'neutral',
+      text: 'Just another day',
+      emojis: '😐',
+      ai_feedback: 'Try to find something interesting today!',
+      source: 'mock'
+    },
+    {
+      id: 'emotion-2',
+      user_id: userId,
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      score: 80,
+      emotion: 'happy',
+      text: 'Had a great workout!',
+      emojis: '💪😊',
+      ai_feedback: 'Great job on staying active!',
+      source: 'mock'
+    }
+  ] as Emotion[];
+};

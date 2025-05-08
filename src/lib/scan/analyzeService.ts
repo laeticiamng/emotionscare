@@ -197,3 +197,25 @@ function calculateScoreFromEmotion(emotion: string): number {
     default: return 50;
   }
 }
+
+/**
+ * Sauvegarde des analyses d'émotions en temps réel
+ */
+export const saveEmotion = async (emotion: Emotion): Promise<Emotion | null> => {
+  try {
+    console.log("Saving emotion:", emotion);
+    
+    // Convert Date to string if it's a Date object
+    const emotionData = {
+      ...emotion,
+      date: emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date,
+    };
+
+    // Here you would typically save to a database
+    // For now, just return the input
+    return emotionData;
+  } catch (error) {
+    console.error("Error saving emotion:", error);
+    return null;
+  }
+};

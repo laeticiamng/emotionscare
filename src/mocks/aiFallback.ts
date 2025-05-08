@@ -1,4 +1,3 @@
-
 // Fallbacks pour les analyses d'émotions quand l'API ne répond pas
 
 import type { Emotion, EmotionResult } from '@/types';
@@ -157,8 +156,8 @@ export const createFallbackEmotion = (
     emojis,
     audio_url: audioUrl,
     source: 'fallback',
-    is_confidential: true,
     confidence: result.confidence,
+    is_confidential: true,
     ai_feedback: getFallbackFeedback(result.emotion || 'neutral')
   };
 };

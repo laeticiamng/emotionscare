@@ -51,8 +51,9 @@ export interface Emotion {
   text?: string;
   audio_url?: string;
   ai_feedback?: string;
-  confidence?: number; // Added missing property
-  source?: string; // Added missing property
+  confidence?: number;
+  source?: string;
+  is_confidential?: boolean; // Added missing property
 }
 
 export interface EmotionResult {
@@ -81,7 +82,7 @@ export interface VRSessionTemplate {
   recommended_mood?: string;
   is_audio_only?: boolean;
   audio_url?: string;
-  completion_rate?: number; // Added missing property
+  completion_rate?: number;
 }
 
 export interface VRSession {
@@ -95,11 +96,11 @@ export interface VRSession {
   feedback?: string;
   emotional_state_before?: string;
   emotional_state_after?: string;
-  date?: string | Date; // Added missing property
-  is_audio_only?: boolean; // Added missing property
-  duration_seconds?: number; // Added missing property
-  heart_rate_before?: number; // Added missing property
-  heart_rate_after?: number; // Added missing property
+  date?: string | Date;
+  is_audio_only?: boolean;
+  duration_seconds?: number;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
 }
 
 // Badge and gamification types
@@ -109,11 +110,11 @@ export interface Badge {
   name: string;
   description: string;
   image_url?: string;
-  icon_url?: string; // Added missing property
+  icon_url?: string;
   category?: string;
   unlocked?: boolean;
   awarded_at: string;
-  threshold?: number; // Added missing property
+  threshold?: number;
 }
 
 export interface Challenge {
@@ -122,7 +123,8 @@ export interface Challenge {
   description: string;
   points: number;
   completed: boolean;
-  progress?: number; // Added missing property
+  progress?: number;
+  total?: number; // Added missing property
   deadline?: string;
   category?: string;
 }
@@ -133,7 +135,7 @@ export interface JournalEntry {
   user_id: string;
   date: string | Date;
   content: string;
-  text?: string; // Added missing property
+  text?: string;
   mood?: string;
   mood_score?: number;
   tags?: string[];
@@ -163,32 +165,13 @@ export interface Report {
 export interface MoodData {
   date: string;
   value: number;
-  originalDate?: string; // Added missing property
+  originalDate?: string;
   sentiment?: number;
   anxiety?: number;
   energy?: number;
 }
 
-// Invitation types
-export interface InvitationFormData {
-  email: string;
-  role: string;
-  expiresIn: number;
-}
-
-export interface InvitationStats {
-  total: number;
-  accepted: number;
-  pending: number;
-  expired: number;
-  sent: number; // Added missing property
-}
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  message?: string;
-  email?: string;
-  role?: string;
-}
+// Add missing InvitationStats export
+export * from './invitation';
 
 // Add any missing types here
