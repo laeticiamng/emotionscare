@@ -8,12 +8,11 @@ interface DrawerState {
   toggleDrawer: () => void;
 }
 
-export const useDrawerState = create<DrawerState>((set) => ({
+const useDrawerState = create<DrawerState>((set) => ({
   isDrawerOpen: false,
   openDrawer: () => set({ isDrawerOpen: true }),
   closeDrawer: () => set({ isDrawerOpen: false }),
   toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
 }));
 
-// Export en default aussi pour plus de flexibilité
 export default useDrawerState;
