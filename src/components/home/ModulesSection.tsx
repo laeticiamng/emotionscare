@@ -8,9 +8,14 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 interface ModulesSectionProps {
   collapsed?: boolean;
   onToggle?: () => void;
+  showHeading?: boolean;  // Add this prop to fix the error
 }
 
-const ModulesSection: React.FC<ModulesSectionProps> = ({ collapsed = false, onToggle }) => {
+const ModulesSection: React.FC<ModulesSectionProps> = ({ 
+  collapsed = false, 
+  onToggle,
+  showHeading = true  // Default to true
+}) => {
   const modules = [
     {
       icon: <Eye className="w-5 h-5" />,
@@ -75,7 +80,7 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({ collapsed = false, onTo
       
       {!collapsed && (
         <>
-          <h3 className="text-xl font-medium mb-6">Navigation rapide</h3>
+          {showHeading && <h3 className="text-xl font-medium mb-6">Navigation rapide</h3>}
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {modules.map((module, index) => (
