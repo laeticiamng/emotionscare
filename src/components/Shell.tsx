@@ -1,5 +1,5 @@
 
-import React, { memo, ReactNode } from "react";
+import React, { memo, ReactNode, useState } from "react";
 import { Outlet } from "react-router-dom";
 import GlobalNav from "./GlobalNav";
 import { Toaster } from "./ui/toaster";
@@ -7,6 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
 import MusicDrawer from "./music/player/MusicDrawer"; // Import du composant MusicDrawer depuis le bon chemin
+import useDrawerState from "@/hooks/useDrawerState";
 
 interface ShellProps {
   children?: ReactNode;
@@ -15,8 +16,9 @@ interface ShellProps {
 const Shell: React.FC<ShellProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
+  const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
   
-  logger.debug('Rendering shell component', { data: { isMobile } });
+  logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -39,7 +41,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       <Toaster />
       
       {/* Music Player Drawer - accessible from anywhere */}
-      <MusicDrawer />
+      <MusicDrawer open={isDrawerOpen} onClose={closeDrawer} />
     </div>
   );
 };
