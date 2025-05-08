@@ -6,9 +6,9 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
-// Import MusicDrawer directly to ensure it's properly loaded
-import MusicDrawer from "./music/player/MusicDrawer";
 import useLogger from "@/hooks/useLogger";
+// Import from barrel file
+import { MusicDrawer } from "./music/player";
 
 interface ShellProps {
   children?: ReactNode;
@@ -51,15 +51,13 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Toast notification system */}
       <Toaster />
       
-      {/* Music Player Drawer - Using React.Suspense with a proper fallback */}
-      <React.Suspense fallback={<div className="hidden">Loading...</div>}>
-        {isDrawerOpen && (
-          <MusicDrawer 
-            open={isDrawerOpen} 
-            onClose={closeDrawer} 
-          />
-        )}
-      </React.Suspense>
+      {/* Music Player Drawer - Simple direct rendering without Suspense */}
+      {isDrawerOpen && (
+        <MusicDrawer 
+          open={isDrawerOpen} 
+          onClose={closeDrawer} 
+        />
+      )}
     </div>
   );
 };

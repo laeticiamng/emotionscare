@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
-import MusicControls from './MusicControls';
+import { MusicControls } from './index';
 
 interface MusicPlayerProps {
   // Add props if needed
