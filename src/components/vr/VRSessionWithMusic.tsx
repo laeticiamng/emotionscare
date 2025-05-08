@@ -1,121 +1,171 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { VRSessionTemplate } from '@/types';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
-import YoutubeEmbed from './YoutubeEmbed';
+import { VRSessionTemplate } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, Music } from 'lucide-react';
 import VRAudioSession from './VRAudioSession';
-import VRSessionProgress from './VRSessionProgress';
-import VRSessionControls from './VRSessionControls';
 import VRMusicTrackInfo from './VRMusicTrackInfo';
-import { useVRSessionTimer } from '@/hooks/useVRSessionTimer';
+import { getPlaylist } from '@/lib/musicService';
+import { useToast } from '@/hooks/use-toast';
+import MusicMoodVisualization from '@/components/music/page/MusicMoodVisualization';
 
 interface VRSessionWithMusicProps {
   template: VRSessionTemplate;
   onCompleteSession: () => void;
 }
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onCompleteSession }) => {
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
+  template,
+  onCompleteSession
+}) => {
   const [isPaused, setIsPaused] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const { loadPlaylistForEmotion, openDrawer, isPlaying, pauseTrack, playTrack, currentTrack } = useMusic();
+  const [sessionDuration, setSessionDuration] = useState(0);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const { currentTrack, playTrack, pauseTrack, loadPlaylistForEmotion } = useMusic();
   const { toast } = useToast();
   
-  const totalDurationSeconds = template.duration * 60;
-  
-  const { percentageComplete, formatTimeRemaining } = useVRSessionTimer({
-    totalDurationSeconds,
-    isPaused,
-    onComplete: onCompleteSession
-  });
-
-  const togglePlayPause = () => {
-    setIsPaused(!isPaused);
-    setIsAudioPlaying(!isPaused);
-  };
-  
-  const toggleAmbianceMusic = () => {
-    if (isMusicPlaying) {
-      pauseTrack();
-      setIsMusicPlaying(false);
-      toast({
-        title: "Musique d'ambiance désactivée",
-        description: "La musique a été mise en pause"
-      });
-    } else {
-      // Map VR template themes to music playlists
-      const musicTypeMap: Record<string, string> = {
-        'Forêt apaisante': 'calm',
-        'Plage relaxante': 'calm',
-        'Méditation guidée': 'focused',
-        'Respiration profonde': 'focused',
-        'Montagne': 'calm',
-        'Espace': 'focused',
-        'Urbain Zen': 'calm'
-      };
-      
-      const musicType = musicTypeMap[template.theme] || 'calm';
-      
-      loadPlaylistForEmotion(musicType);
-      setIsMusicPlaying(true);
-      toast({
-        title: "Musique d'ambiance activée",
-        description: `Playlist "${musicType}" ajoutée à votre expérience VR`
-      });
+  // Set initial duration and remaining time
+  useEffect(() => {
+    if (template.duration) {
+      setSessionDuration(template.duration);
+      setRemainingTime(template.duration);
     }
-  };
-
+  }, [template.duration]);
+  
+  // Load appropriate music for the VR session
+  useEffect(() => {
+    const loadSessionMusic = async () => {
+      if (template.recommended_mood) {
+        try {
+          await loadPlaylistForEmotion(template.recommended_mood);
+          toast({
+            title: "Musique d'ambiance activée",
+            description: `Playlist "${template.recommended_mood}" chargée pour votre session VR`
+          });
+        } catch (error) {
+          console.error("Erreur lors du chargement de la playlist:", error);
+        }
+      }
+    };
+    
+    loadSessionMusic();
+  }, [template.recommended_mood, loadPlaylistForEmotion, toast]);
+  
+  // Timer to countdown session
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    
+    if (!isPaused && remainingTime > 0) {
+      timer = setInterval(() => {
+        setRemainingTime(prev => {
+          const newTime = prev - 1;
+          if (newTime <= 0) {
+            clearInterval(timer);
+            onCompleteSession();
+            return 0;
+          }
+          return newTime;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isPaused, remainingTime, onCompleteSession]);
+  
+  // Format time for display
+  const formatTime = useCallback((seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }, []);
+  
+  // Toggle pause/play
+  const handleTogglePause = useCallback(() => {
+    setIsPaused(!isPaused);
+    
+    // Also control music playback
+    if (currentTrack) {
+      if (!isPaused) {
+        pauseTrack();
+      } else {
+        playTrack(currentTrack);
+      }
+    }
+  }, [isPaused, currentTrack, pauseTrack, playTrack]);
+  
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardContent className="p-6 space-y-4 text-center">
-          <h2 className="text-xl font-semibold">{template.theme}</h2>
+    <div className="flex flex-col space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gradient-to-br from-purple-900/80 to-indigo-700/80 backdrop-blur p-6 rounded-lg shadow-lg flex flex-col items-center justify-center text-white">
+          <h2 className="text-xl font-bold mb-6">{template.title}</h2>
           
-          <div className="space-y-6">
-            <div className="relative rounded-xl overflow-hidden border border-muted">
-              {template.is_audio_only ? (
-                <VRAudioSession
-                  template={template}
-                  isPaused={isPaused}
-                  onTogglePause={togglePlayPause}
-                  onComplete={onCompleteSession}
-                />
-              ) : (
-                <AspectRatio ratio={16/9} className="max-w-4xl mx-auto">
-                  <YoutubeEmbed 
-                    videoUrl={template.preview_url}
-                    autoplay={true}
-                    controls={true}
-                    showInfo={false}
-                    loop={true}
-                  />
-                </AspectRatio>
-              )}
+          <VRAudioSession
+            template={template}
+            isPaused={isPaused}
+            onTogglePause={handleTogglePause}
+            onComplete={onCompleteSession}
+          />
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm opacity-80">Session en cours</p>
+            <div className="text-2xl font-medium">
+              {formatTime(remainingTime)} / {formatTime(sessionDuration)}
             </div>
-
-            <VRSessionProgress 
-              percentageComplete={percentageComplete} 
-              timeRemaining={formatTimeRemaining()}
-            />
-
-            <VRSessionControls
-              isAudioOnly={template.is_audio_only || false}
-              isPaused={isPaused}
-              isMusicPlaying={isMusicPlaying}
-              onTogglePause={togglePlayPause}
-              onToggleMusic={toggleAmbianceMusic}
-              onComplete={onCompleteSession}
-            />
             
-            {isMusicPlaying && currentTrack && (
-              <VRMusicTrackInfo currentTrack={currentTrack} />
+            <Button 
+              variant="outline" 
+              className="mt-4 border-white/30 hover:bg-white/10"
+              onClick={handleTogglePause}
+            >
+              {isPaused ? (
+                <>
+                  <Play className="mr-2 h-4 w-4" />
+                  Reprendre
+                </>
+              ) : (
+                <>
+                  <Pause className="mr-2 h-4 w-4" />
+                  Pause
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+        
+        <div className="space-y-6">
+          <div className="bg-secondary/10 backdrop-blur p-6 rounded-lg border">
+            <h3 className="text-lg font-medium mb-4 flex items-center">
+              <Music className="mr-2 h-5 w-5 text-primary" />
+              Ambiance sonore
+            </h3>
+            
+            {currentTrack ? (
+              <>
+                <VRMusicTrackInfo currentTrack={currentTrack} />
+                
+                <div className="mt-6">
+                  <MusicMoodVisualization 
+                    mood={template.recommended_mood || 'calm'} 
+                    intensity={60}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center justify-center h-32 text-muted-foreground">
+                Chargement de l'ambiance musicale...
+              </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+          
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+            <h3 className="text-sm font-medium mb-2">À propos de cette session</h3>
+            <p className="text-sm text-muted-foreground">{template.description}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
