@@ -22,7 +22,7 @@ export const generateMockMoodData = (days: number): MoodData[] => {
         sentiment: Math.floor(50 + Math.random() * 40),
         anxiety: Math.floor(10 + Math.random() * 50),
         energy: Math.floor(30 + Math.random() * 60),
-        originalDate: formattedDate  // Use string format instead of Date object
+        originalDate: formattedDate  // Use string format as defined in MoodData
       });
     }
   }

@@ -1,3 +1,4 @@
+
 // Si le fichier existe déjà, nous ajoutons ou modifions ces types
 export interface User {
   id: string;
@@ -59,6 +60,10 @@ export interface MusicTrack {
   externalUrl?: string;
   mood?: string;
   isPlaying?: boolean;
+  // For compatibility
+  url?: string;
+  cover?: string;
+  coverUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -66,6 +71,7 @@ export interface MusicPlaylist {
   name: string;
   description?: string;
   mood?: string;
+  emotion?: string;
   tracks: MusicTrack[];
 }
 
@@ -140,6 +146,16 @@ export interface Badge {
   unlocked: boolean;
   awarded_at?: string;
   threshold?: number;
+}
+
+// Badge API response
+export interface BadgeResponse {
+  id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  category: string;
+  unlocked: boolean;
 }
 
 // Journal entries
@@ -226,12 +242,8 @@ export interface Challenge {
   total: number;
   completed: boolean;
   category?: string;
+  requirements?: string[];
 }
 
-// Re-export types from other modules for compatibility
-export * from './chat';
-export * from './invitation';
+// Export types from music.ts for compatibility
 export * from './music';
-export * from './community';
-export * from './gamification';
-export * from './scan';

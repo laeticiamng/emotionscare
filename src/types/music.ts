@@ -16,6 +16,10 @@ export interface MusicTrack {
   audioUrl: string;
   coverUrl: string;
   emotion?: string;
+  // Additional properties for compatibility
+  url?: string;      // Alias for audioUrl
+  cover?: string;    // Alias for coverUrl
+  isPlaying?: boolean;
 }
 
 export interface MusicPlaylist {
@@ -24,3 +28,4 @@ export interface MusicPlaylist {
   emotion: string;
   tracks: MusicTrack[];
 }
+
