@@ -6,7 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
-import MusicDrawer from "./music/MusicDrawer"; // We're keeping this file
+import MusicDrawer from "./music/MusicDrawer"; // Import explicite du composant MusicDrawer
 
 interface ShellProps {
   children?: ReactNode;
@@ -17,6 +17,8 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   const logger = useLogger('Shell');
   
   logger.debug('Rendering shell component', { data: { isMobile } });
+
+  console.log("Shell rendering, MusicDrawer component:", MusicDrawer);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -39,7 +41,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       <Toaster />
       
       {/* Music Player Drawer - accessible from anywhere */}
-      <MusicDrawer />
+      {MusicDrawer ? <MusicDrawer /> : <div>MusicDrawer is undefined</div>}
     </div>
   );
 };
