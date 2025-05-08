@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Send, RefreshCw } from 'lucide-react';
+import { Send, RefreshCw, ArrowLeft } from 'lucide-react';
 import { ChatMessage } from '@/types/chat';
 import { useCoach } from '@/hooks/coach/useCoach';
 import { useActivity } from '@/hooks/useActivity';
@@ -153,13 +153,23 @@ const CoachChatPage = () => {
       <div className="container mx-auto px-4 py-4 max-w-4xl h-[80vh] flex flex-col">
         <Card className="flex-grow flex flex-col overflow-hidden p-0">
           {/* En-tête du chat */}
-          <div className="bg-secondary/50 p-4 border-b">
-            <h1 className="text-xl font-semibold">Coach IA Personnel</h1>
-            <p className="text-sm text-muted-foreground">Discutez avec votre coach pour obtenir des conseils personnalisés</p>
+          <div className="bg-secondary/50 p-4 border-b flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-semibold">Coach IA Personnel</h1>
+              <p className="text-sm text-muted-foreground">Discutez avec votre coach pour obtenir des conseils personnalisés</p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => window.history.back()}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
           </div>
           
           {/* Zone de messages */}
-          <div className="flex-grow overflow-y-auto p-4 space-y-4">
+          <div className="flex-grow overflow-y-auto p-4 space-y-4" role="log" aria-live="polite">
             {messages.map((msg) => (
               <div 
                 key={msg.id}
@@ -182,7 +192,7 @@ const CoachChatPage = () => {
             {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-muted max-w-[80%] rounded-lg px-4 py-2">
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2" aria-label="Coach est en train d'écrire...">
                     <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
                     <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
@@ -205,8 +215,13 @@ const CoachChatPage = () => {
                   placeholder="Écrivez votre message..."
                   className="flex-grow"
                   disabled={isLoading}
+                  aria-label="Votre message"
                 />
-                <Button onClick={() => handleSendMessage()} disabled={isLoading || !userMessage.trim()}>
+                <Button 
+                  onClick={() => handleSendMessage()} 
+                  disabled={isLoading || !userMessage.trim()} 
+                  aria-label="Envoyer le message"
+                >
                   <Send className="h-4 w-4" />
                   <span className="sr-only">Envoyer</span>
                 </Button>
@@ -219,6 +234,7 @@ const CoachChatPage = () => {
                   className="self-end" 
                   onClick={handleRegenerate}
                   disabled={isLoading}
+                  aria-label="Régénérer une réponse"
                 >
                   <RefreshCw className="h-3 w-3 mr-2" />
                   Régénérer une réponse

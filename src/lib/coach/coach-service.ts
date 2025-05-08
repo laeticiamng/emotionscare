@@ -1,4 +1,3 @@
-
 import { CoachAction, CoachEvent, AI_MODEL_CONFIG, CoachModule } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { actionExecutor } from './action-executor';
@@ -113,7 +112,6 @@ class CoachService {
 
   /**
    * Envoyer une question directement au coach
-   * Mis à jour pour rendre le paramètre userContext optionnel
    */
   async askCoachQuestion(userId: string, question: string, userContext?: UserContext): Promise<string> {
     try {
@@ -159,9 +157,9 @@ class CoachService {
           message: question,
           userContext: contextToUse,
           model,
-          module: 'coach',
           temperature: 0.4,
-          max_tokens: 512
+          max_tokens: 512,
+          module: 'coach'
         }
       });
       
