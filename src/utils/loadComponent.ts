@@ -1,7 +1,10 @@
 
-import React from 'react';
+import React, { ComponentType, LazyExoticComponent } from 'react';
 
-export function loadComponent<T = any>(importFn: () => Promise<any>, exportName?: string) {
+export function loadComponent<T extends ComponentType<any>>(
+  importFn: () => Promise<any>,
+  exportName?: string
+): LazyExoticComponent<T> {
   return React.lazy(async () => {
     const module = await importFn();
     // si exportName fourni, on le prend, sinon module.default
