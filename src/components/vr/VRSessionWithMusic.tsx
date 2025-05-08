@@ -1,146 +1,102 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { VRSessionTemplate } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2, VolumeX, RefreshCw } from 'lucide-react';
+import { Pause, Play, SkipForward } from 'lucide-react';
+import MusicPlayer from '../music/player/MusicPlayer';
 import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
-import { MusicTrack, VRSessionTemplate } from '@/types';
-import { useVRSessionTimer } from '@/hooks/useVRSessionTimer';
-import { YoutubeEmbed } from '../ui/youtube-embed';
-import VRSessionProgress from './VRSessionProgress';
 
 export interface VRSessionWithMusicProps {
   template: VRSessionTemplate;
   onCompleteSession: () => void;
-  emotion?: string;
+  isAudioOnly?: boolean;
   videoUrl?: string;
   audioUrl?: string;
-  isAudioOnly?: boolean;
+  emotion?: string;
 }
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   template,
-  emotion = 'calm',
+  onCompleteSession,
+  isAudioOnly = true,
   videoUrl,
   audioUrl,
-  isAudioOnly = false,
-  onCompleteSession
+  emotion = 'calm'
 }) => {
-  const [isMuted, setIsMuted] = useState(false);
-  const { toast } = useToast();
-  const { loadPlaylistForEmotion, pauseTrack, playTrack, currentTrack } = useMusic();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const { loadPlaylistForEmotion } = useMusic();
   
-  // Initialize timer with proper duration
-  const {
-    percentageComplete,
-    formatTimeRemaining,
-  } = useVRSessionTimer({ 
-    totalDurationSeconds: template.duration * 60, // Convert minutes to seconds
-    onComplete: onCompleteSession
-  });
-  
-  // Load emotionally appropriate music when session starts
   useEffect(() => {
-    loadPlaylistForEmotion(emotion);
-    
-    toast({
-      title: "Session VR démarrée",
-      description: `Musique adaptée à l'état "${emotion}" chargée.`
-    });
-    
-    // Cleanup when component unmounts
-    return () => {
-      pauseTrack();
-    };
-  }, [emotion, loadPlaylistForEmotion, pauseTrack, toast]);
+    // Load appropriate music based on emotion
+    if (emotion) {
+      loadPlaylistForEmotion(emotion);
+    }
+  }, [emotion, loadPlaylistForEmotion]);
   
-  const handleToggleMute = () => {
-    setIsMuted(!isMuted);
-    
-    toast({
-      title: isMuted ? "Son activé" : "Son désactivé",
-      description: isMuted ? "Le son a été réactivé." : "Le son a été coupé.",
-    });
+  // Handle play/pause
+  const togglePlayback = () => {
+    setIsPlaying(!isPlaying);
   };
   
-  const handleRestartSession = () => {
-    // This would typically restart the session
-    toast({
-      title: "Session redémarrée",
-      description: "La session VR a été redémarrée.",
-    });
+  // Skip session
+  const skipSession = () => {
+    onCompleteSession();
   };
   
   return (
-    <div className="space-y-5">
-      {/* Visual Experience Container */}
-      <div className="relative rounded-lg overflow-hidden bg-black aspect-video">
+    <div className="space-y-6">
+      {/* Session display area */}
+      <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
         {isAudioOnly ? (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-indigo-900/80 to-indigo-600/80 text-white">
-            <Volume2 className="h-20 w-20 mb-4" />
-            <h2 className="text-2xl font-bold">Expérience audio</h2>
-            <p className="text-lg">{currentTrack?.title || "Méditation guidée"}</p>
-            
-            <div className="mt-8 text-center">
-              <p className="text-sm opacity-70">Les yeux fermés, concentrez-vous sur votre respiration</p>
-              <p className="text-sm opacity-70">Laissez-vous guider par l'audio</p>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center p-6">
+              <h3 className="text-xl font-medium mb-4">{template.title || "Session audio"}</h3>
+              <p className="text-muted-foreground">
+                {isPlaying ? "Session en cours..." : "Appuyez sur Play pour commencer"}
+              </p>
             </div>
           </div>
-        ) : videoUrl ? (
-          <YoutubeEmbed 
-            videoUrl={videoUrl} 
-            autoplay={true} 
-            controls={false} 
-            showInfo={false}
-            loop={true}
-            mute={isMuted} // Using proper mute property instead of muted
-          />
         ) : (
-          <div className="flex items-center justify-center h-full bg-gradient-to-r from-blue-900 to-purple-800 text-white">
-            <p className="text-xl font-semibold">Vidéo de démonstration</p>
-          </div>
+          videoUrl && (
+            <video 
+              src={videoUrl} 
+              className="w-full h-full object-cover" 
+              controls={false}
+              loop
+              muted={false}
+              autoPlay={isPlaying}
+            />
+          )
         )}
+        
+        {/* Play/Pause overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <Button 
+            size="lg" 
+            variant="secondary" 
+            className="rounded-full h-16 w-16 mr-4"
+            onClick={togglePlayback}
+          >
+            {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            className="rounded-full bg-white/10 hover:bg-white/20 text-white"
+            onClick={skipSession}
+          >
+            <SkipForward className="h-5 w-5 mr-2" />
+            Terminer
+          </Button>
+        </div>
       </div>
       
-      {/* Session Progress and Controls */}
-      <Card>
-        <CardContent className="p-4 space-y-4">
-          {/* Progress bar */}
-          <VRSessionProgress percentComplete={percentageComplete} />
-          
-          <div className="flex justify-between items-center pt-2">
-            <div>
-              <p className="text-sm font-medium">Temps restant:</p>
-              <p className="text-2xl font-bold">{formatTimeRemaining()}</p>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={handleToggleMute}
-                title={isMuted ? "Activer le son" : "Couper le son"}
-              >
-                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-              </Button>
-              
-              <Button 
-                variant="outline" 
-                size="icon" 
-                onClick={handleRestartSession}
-                title="Redémarrer la session"
-              >
-                <RefreshCw className="h-5 w-5" />
-              </Button>
-              
-              <Button variant="default" onClick={onCompleteSession}>
-                Terminer la session
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Music player */}
+      <div className="p-4 bg-background border rounded-lg">
+        <h3 className="font-medium mb-3">Musique thérapeutique</h3>
+        <MusicPlayer />
+      </div>
     </div>
   );
 };

@@ -44,18 +44,15 @@ const MusicPlayer = () => {
   }
   
   const handlePlay = () => {
-    // Make sure the track has a duration property before playing
-    const trackWithDuration = {
-      ...contextTrack,
-      duration: contextTrack.duration || 0 // Default to 0 if missing
-    };
-    
-    // Convert MusicTrack to Track if needed before playing
-    const trackToPlay = 'url' in trackWithDuration ? 
-      trackWithDuration as Track : 
-      convertMusicTrackToTrack(trackWithDuration as MusicTrack);
-    
-    playTrack(trackToPlay);
+    // Vérifier si le track a besoin d'être converti
+    if ('audioUrl' in contextTrack) {
+      // C'est un MusicTrack, convertissons-le en Track
+      const convertedTrack = convertMusicTrackToTrack(contextTrack as MusicTrack);
+      playTrack(convertedTrack);
+    } else {
+      // C'est déjà un Track
+      playTrack(contextTrack as Track);
+    }
   };
   
   return (

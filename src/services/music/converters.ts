@@ -10,7 +10,7 @@ export function convertMusicTrackToTrack(musicTrack: MusicTrack): Track {
     id: musicTrack.id,
     title: musicTrack.title,
     artist: musicTrack.artist,
-    duration: musicTrack.duration || 0, // Always ensure duration exists
+    duration: musicTrack.duration, // Maintenant requis dans les deux types
     url: musicTrack.audioUrl || musicTrack.url || '', // Use audioUrl or fallback to url
     cover: musicTrack.coverUrl || musicTrack.cover || '' // Use coverUrl or fallback to cover
   };
