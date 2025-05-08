@@ -6,6 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
+// Import directly with a relative path to avoid resolution issues
 import MusicDrawer from "./music/player/MusicDrawer";
 import useLogger from "@/hooks/useLogger";
 
@@ -17,6 +18,9 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
   const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
+  
+  // Debug check to see if MusicDrawer is properly imported
+  console.log('Shell rendering, MusicDrawer =', MusicDrawer);
   
   logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
@@ -51,10 +55,12 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       <Toaster />
       
       {/* Music Player Drawer */}
-      <MusicDrawer 
-        open={isDrawerOpen} 
-        onClose={closeDrawer} 
-      />
+      {typeof MusicDrawer === 'function' && (
+        <MusicDrawer 
+          open={isDrawerOpen} 
+          onClose={closeDrawer} 
+        />
+      )}
     </div>
   );
 };
