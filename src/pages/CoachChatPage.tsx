@@ -7,7 +7,7 @@ import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { useToast } from '@/hooks/use-toast';
 import CoachChatContainer from '@/components/coach/CoachChatContainer';
 import { ChatMessage } from '@/types/chat';
-import { Spinner } from 'lucide-react';
+import { Loader } from 'lucide-react';
 
 const CoachChatPage = () => {
   // Get the coach chat functionality
@@ -105,7 +105,7 @@ const CoachChatPage = () => {
       <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl h-[80vh] flex flex-col">
         {isLoading && (
           <div className="fixed top-4 right-4 bg-primary/20 p-2 rounded-full z-50">
-            <Spinner className="animate-spin text-primary h-6 w-6" />
+            <Loader className="animate-spin text-primary h-6 w-6" />
           </div>
         )}
         <CoachChatContainer

@@ -6,129 +6,118 @@ import { useCoach } from '@/hooks/coach/useCoach';
 import { useActivity } from '@/hooks/useActivity';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 
+interface CoachChatActionsProps {
+  userMessage: string;
+  messages: ChatMessage[];
+  sendMessage: any;
+  regenerateResponse: any;
+  addMessage: (message: ChatMessage) => void;
+  clearTypingIndicator: () => void;
+  setUserMessage: (message: string) => void;
+}
+
 /**
- * Hook to manage chat actions (send, regenerate)
+ * Hook to manage coach chat specific actions (send, regenerate)
  */
-export function useCoachChatActions() {
+export function useCoachChatActions({
+  userMessage,
+  messages,
+  sendMessage,
+  regenerateResponse,
+  addMessage,
+  clearTypingIndicator,
+  setUserMessage
+}: CoachChatActionsProps) {
   const { toast } = useToast();
   const { askQuestion } = useCoach();
   const { logActivity } = useActivity();
   const { activeConversationId, createConversation } = useChatHistory();
   
-  // Handle message sending
-  const sendMessage = useCallback(async (
-    messageText: string,
-    addUserMessage: (message: ChatMessage) => void,
-    addBotMessage: (message: ChatMessage) => void,
-    setLoading: (isLoading: boolean) => void,
-    clearTypingIndicator: () => void
-  ) => {
+  // Handle sending a message
+  const handleSendMessage = useCallback((messageText: string = userMessage) => {
     if (!messageText.trim()) return;
     
-    // Clear typing indicator
-    clearTypingIndicator();
+    const addUserMessage = (message: ChatMessage) => addMessage(message);
+    const addBotMessage = (message: ChatMessage) => addMessage(message);
     
-    // Add the user message
-    const userMessageObj: ChatMessage = {
-      id: Date.now().toString(),
-      text: messageText,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-    
-    addUserMessage(userMessageObj);
-    setLoading(true);
-    
-    try {
-      // Log activity
-      logActivity('coach_chat', { message: messageText });
-      
-      // Ensure we have an active conversation
+    // Handle conversation creation
+    const ensureConversation = async () => {
       if (!activeConversationId) {
         await createConversation(messageText.substring(0, 50));
       }
-      
-      // Get a response from the coach AI
-      const response = await askQuestion(messageText);
-      
-      // Add the coach's response
-      const botResponse: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: response,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      
-      addBotMessage(botResponse);
-    } catch (error) {
-      console.error('Error sending message to coach:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de communiquer avec le coach IA. Veuillez réessayer.",
-        variant: "destructive"
-      });
-      
-      // Add an error message
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        text: "Je suis désolé, mais je rencontre des difficultés techniques. Veuillez réessayer plus tard.",
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      
-      addBotMessage(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeConversationId, askQuestion, createConversation, logActivity, toast]);
+    };
+    
+    // Log activity
+    const logMessageActivity = () => {
+      logActivity('coach_chat', { message: messageText });
+    };
+    
+    // Process message
+    sendMessage(
+      messageText,
+      addUserMessage,
+      addBotMessage,
+      async (text: string) => {
+        try {
+          // Ensure we have an active conversation and log activity
+          await ensureConversation();
+          logMessageActivity();
+          
+          // Get response from coach AI
+          return await askQuestion(text);
+        } catch (error) {
+          console.error('Error asking coach question:', error);
+          toast({
+            title: "Erreur",
+            description: "Impossible de communiquer avec le coach IA. Veuillez réessayer.",
+            variant: "destructive"
+          });
+          return "Je suis désolé, mais je rencontre des difficultés techniques. Veuillez réessayer plus tard.";
+        }
+      },
+      clearTypingIndicator
+    );
+    
+    // Clear input
+    setUserMessage('');
+  }, [userMessage, sendMessage, addMessage, activeConversationId, createConversation, logActivity, askQuestion, toast, clearTypingIndicator, setUserMessage]);
   
-  // Handle regenerate response
-  const regenerateResponse = useCallback(async (
-    messages: ChatMessage[],
-    addBotMessage: (message: ChatMessage) => void,
-    setLoading: (isLoading: boolean) => void
-  ) => {
-    // Get the last user message
-    const lastUserMessage = [...messages].reverse().find(msg => msg.sender === 'user');
-    if (!lastUserMessage) return;
+  // Handle regenerating a response
+  const handleRegenerate = useCallback(() => {
+    const addBotMessage = (message: ChatMessage) => addMessage(message);
     
-    setLoading(true);
-    
-    try {
-      // Log activity
-      logActivity('coach_regenerate', { originalMessageId: lastUserMessage.id });
-      
-      // Get a new response
-      const response = await askQuestion(lastUserMessage.text);
-      
-      // Add the new response
-      const botResponse: ChatMessage = {
-        id: Date.now().toString(),
-        text: response,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      
-      addBotMessage(botResponse);
-      
-      toast({
-        title: "Nouvelle réponse générée",
-        description: "Une nouvelle réponse a été générée pour votre question."
-      });
-    } catch (error) {
-      console.error('Error regenerating response:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer une nouvelle réponse.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [askQuestion, logActivity, toast]);
+    regenerateResponse(
+      messages,
+      addBotMessage,
+      async (text: string) => {
+        try {
+          // Log activity
+          logActivity('coach_regenerate', { originalMessage: text });
+          
+          // Get new response
+          const response = await askQuestion(text);
+          
+          toast({
+            title: "Nouvelle réponse générée",
+            description: "Une nouvelle réponse a été générée pour votre question."
+          });
+          
+          return response;
+        } catch (error) {
+          console.error('Error regenerating response:', error);
+          toast({
+            title: "Erreur",
+            description: "Impossible de générer une nouvelle réponse.",
+            variant: "destructive"
+          });
+          throw error;
+        }
+      }
+    );
+  }, [regenerateResponse, messages, addMessage, logActivity, askQuestion, toast]);
   
   return {
-    sendMessage,
-    regenerateResponse
+    handleSendMessage,
+    handleRegenerate
   };
 }
