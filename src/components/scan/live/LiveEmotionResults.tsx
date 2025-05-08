@@ -83,7 +83,7 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({
         {/* Niveau de confiance */}
         <div className="flex justify-between items-center text-sm">
           <span className="text-muted-foreground">Niveau de confiance</span>
-          <span className="font-medium">{Math.round(result.confidence * 100)}%</span>
+          <span className="font-medium">{Math.round((result.confidence || 0) * 100)}%</span>
         </div>
         
         {/* Transcription */}

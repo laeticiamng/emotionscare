@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate, useLocation } from 'react-router-dom';
 import Layout from './Layout';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import { UserRole } from '@/types';
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -50,7 +51,7 @@ export const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
   }
   
   // Check for role requirements
-  if (requireRole && user?.role !== requireRole && user?.role !== 'admin' && user?.role !== 'Admin') {
+  if (requireRole && user?.role !== requireRole && user?.role !== UserRole.ADMIN) {
     console.log(`ProtectedLayout - Role check failed: user role ${user?.role} vs required ${requireRole}`);
     return (
       <Layout>

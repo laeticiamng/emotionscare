@@ -1,6 +1,4 @@
 
-// If this file doesn't exist, let's create it with proper type definitions
-
 // User types
 export enum UserRole {
   USER = 'user',
@@ -14,9 +12,28 @@ export interface User {
   email: string;
   role: UserRole;
   avatar_url?: string;
+  avatar?: string;  // Added for backward compatibility
+  image?: string;   // Added for backward compatibility
   emotional_score?: number;
   team_id?: string;
   team_name?: string;
+  anonymity_code?: string;
+  onboarded?: boolean;
+  joined_at?: string;
+  created_at?: string;
+  last_active?: string;
+  preferences?: UserPreferences;
+}
+
+// User preferences
+export interface UserPreferences {
+  notifications_enabled?: boolean;
+  theme?: string;
+  language?: string;
+  privacy_level?: 'public' | 'team_only' | 'private';
+  share_data_with_coach?: boolean;
+  daily_reminder?: boolean;
+  reminder_time?: string;
 }
 
 // Emotion types
@@ -35,10 +52,16 @@ export interface Emotion {
 }
 
 export interface EmotionResult {
+  id?: string; // Optional since some API responses might not include an ID
   emotion: string;
   confidence?: number;
   transcript?: string;
   feedback?: string;
+  text?: string;
+  emojis?: string;
+  score?: number;
+  ai_feedback?: string;
+  recommendations?: string[];
 }
 
 // Badge types
@@ -65,4 +88,100 @@ export interface Challenge {
   progress: number;
   total: number;
   category: string;
+}
+
+// VR types
+export interface VRSessionTemplate {
+  id?: string;
+  template_id: string;
+  theme: string;
+  title?: string;
+  duration: number;
+  preview_url: string;
+  description?: string;
+  audio_url?: string;
+  is_audio_only?: boolean;
+  recommended_mood?: string;
+  completion_rate?: number;
+}
+
+export interface VRSession {
+  id: string;
+  user_id: string;
+  template_id: string;
+  date?: string;
+  start_time: string;
+  end_time?: string;
+  duration_seconds: number;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  is_audio_only?: boolean;
+  completed: boolean;
+}
+
+// Music types
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist?: string;
+  url: string;
+  duration?: number;
+  externalUrl?: string;
+  mood?: string;
+  coverImage?: string;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  description?: string;
+  mood: string;
+  tracks: MusicTrack[];
+}
+
+// Journal types
+export interface JournalEntry {
+  id: string;
+  user_id: string;
+  date: string;
+  title?: string;
+  content: string;
+  mood?: string;
+  mood_score?: number;
+  tags?: string[];
+  is_private: boolean;
+}
+
+// Mood data for charts
+export interface MoodData {
+  date: string;
+  originalDate?: string;
+  value: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
+  labels?: {
+    [key: string]: string;
+  };
+}
+
+// Invitation types
+export interface InvitationFormData {
+  email: string;
+  name?: string;
+  role: UserRole;
+  team_id?: string;
+  message?: string;
+}
+
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  recent_invites: {
+    email: string;
+    status: string;
+    created_at: string;
+  }[];
 }
