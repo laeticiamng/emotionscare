@@ -9,10 +9,10 @@ interface MusicDrawerProps {
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = () => {
-  const { isDrawerOpen } = useDrawerState();
+  const { isDrawerOpen, closeDrawer } = useDrawerState();
   
   return (
-    <Drawer open={isDrawerOpen}>
+    <Drawer open={isDrawerOpen} onOpenChange={(open) => !open && closeDrawer()}>
       <DrawerContent>
         <div className="p-4 max-w-md mx-auto">
           <MusicPlayer />
