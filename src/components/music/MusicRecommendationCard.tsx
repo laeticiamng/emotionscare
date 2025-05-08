@@ -5,21 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Music, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
+import EmotionBasedMusicRecommendation from './EmotionBasedMusicRecommendation';
 
 interface MusicRecommendationCardProps {
   emotion?: string;
   intensity?: number;
   standalone?: boolean;
 }
-
-const emotionDescriptions: Record<string, string> = {
-  happy: "Des mélodies positives pour maintenir votre bonne humeur",
-  calm: "Des sons apaisants pour favoriser la détente et la sérénité",
-  focused: "Des rythmes soutenus pour améliorer votre concentration",
-  energetic: "Des tempos dynamiques pour stimuler votre énergie",
-  sad: "Des mélodies apaisantes pour adoucir vos moments difficiles",
-  neutral: "Une ambiance équilibrée adaptée à votre journée"
-};
 
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   emotion = 'neutral',
@@ -29,8 +21,25 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
   const { toast } = useToast();
 
+  // Si nous avons une émotion spécifique, utiliser le composant centralisé
+  if (emotion) {
+    // Créer un objet EmotionResult simulé pour le composant EmotionBasedMusicRecommendation
+    const emotionResult = {
+      emotion: emotion,
+      confidence: intensity / 100,
+      transcript: ""
+    };
+
+    return (
+      <EmotionBasedMusicRecommendation
+        emotionResult={emotionResult}
+        variant={standalone ? "standalone" : "compact"}
+      />
+    );
+  }
+  
+  // Fallback au comportement original (ne devrait plus être utilisé)
   const handlePlayRecommendedMusic = () => {
-    // Map emotion to music type if needed
     const musicType = emotion.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
@@ -41,8 +50,6 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
       description: `Playlist "${emotion}" chargée pour accompagner votre humeur.`
     });
   };
-  
-  const description = emotionDescriptions[emotion.toLowerCase()] || emotionDescriptions.neutral;
 
   return (
     <Card className={standalone ? 'border-t-4 border-t-primary' : ''}>
@@ -53,15 +60,6 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className={standalone ? '' : 'pt-0'}>
-        <div className="mb-3">
-          <h4 className="font-medium mb-1">
-            {emotion === 'neutral' 
-              ? "Ambiance musicale équilibrée" 
-              : `Ambiance adaptée à votre humeur: ${emotion}`}
-          </h4>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-        
         <Button 
           onClick={handlePlayRecommendedMusic}
           className="w-full flex items-center justify-center gap-2"

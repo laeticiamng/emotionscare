@@ -1,197 +1,320 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface AudioVisualizerProps {
   audioUrl?: string;
   isPlaying?: boolean;
   variant?: 'bars' | 'wave' | 'circle';
   height?: number;
-  width?: number;
   primaryColor?: string;
-  secondaryColor?: string;
-  intensity?: number; // Add intensity prop
+  backgroundColor?: string;
+  showControls?: boolean;
 }
 
 const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   audioUrl,
   isPlaying = false,
   variant = 'bars',
-  height = 100,
-  width = 0,
-  primaryColor = '#6366F1',
-  secondaryColor = '#818CF8',
-  intensity = 50 // Default intensity value
+  height = 120,
+  primaryColor = '#7C3AED', // couleur primaire par défaut
+  backgroundColor = 'rgba(124, 58, 237, 0.1)', // couleur de fond par défaut
+  showControls = false,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+  const [localIsPlaying, setLocalIsPlaying] = useState(false);
   
+  // Créer l'élément audio et configurer l'analyseur
   useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+
+    try {
+      if (!audioContextRef.current) {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        audioContextRef.current = new AudioContext();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        analyserRef.current.fftSize = 256;
+        
+        if (audioRef.current) {
+          sourceNodeRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
+          sourceNodeRef.current.connect(analyserRef.current);
+          analyserRef.current.connect(audioContextRef.current.destination);
+        }
+      }
+    } catch (error) {
+      console.error("Error setting up audio context:", error);
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
+
+  // Gérer l'URL audio
+  useEffect(() => {
+    if (audioRef.current && audioUrl) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.load();
+      
+      if (isPlaying) {
+        audioRef.current.play().catch(e => {
+          console.error("Error playing audio:", e);
+        });
+      }
+    }
+  }, [audioUrl]);
+
+  // Gérer l'état de lecture
+  useEffect(() => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying && !localIsPlaying) {
+      audioRef.current.play().catch(e => {
+        console.error("Error playing audio:", e);
+      });
+      setLocalIsPlaying(true);
+    } else if (!isPlaying && localIsPlaying) {
+      audioRef.current.pause();
+      setLocalIsPlaying(false);
+    }
+  }, [isPlaying, localIsPlaying]);
+
+  // Animation du visualiseur
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const analyser = analyserRef.current;
+    
+    if (!canvas || !analyser || !localIsPlaying) {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    const draw = () => {
+      if (!ctx) return;
+      
+      animationRef.current = requestAnimationFrame(draw);
+      
+      analyser.getByteFrequencyData(dataArray);
+      
+      ctx.fillStyle = backgroundColor || 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Différentes visualisations selon le variant
+      switch(variant) {
+        case 'bars':
+          drawBars(ctx, width, height, bufferLength, dataArray);
+          break;
+        case 'wave':
+          drawWave(ctx, width, height, bufferLength, dataArray);
+          break;
+        case 'circle':
+          drawCircle(ctx, width, height, bufferLength, dataArray);
+          break;
+        default:
+          drawBars(ctx, width, height, bufferLength, dataArray);
+      }
+    };
+    
+    draw();
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, [localIsPlaying, variant, primaryColor, backgroundColor]);
+
+  // Fonction pour dessiner des barres
+  const drawBars = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    bufferLength: number,
+    dataArray: Uint8Array
+  ) => {
+    const barWidth = width / bufferLength * 2.5;
+    let x = 0;
+    
+    for (let i = 0; i < bufferLength; i++) {
+      const barHeight = (dataArray[i] / 255) * height;
+      
+      // Simuler de l'activité même sans audio réel
+      let finalHeight = Math.max(5, barHeight || Math.random() * 30);
+      
+      ctx.fillStyle = primaryColor;
+      ctx.fillRect(x, height - finalHeight, barWidth, finalHeight);
+      
+      x += barWidth + 1;
+    }
+  };
+  
+  // Fonction pour dessiner une onde
+  const drawWave = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    bufferLength: number,
+    dataArray: Uint8Array
+  ) => {
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = primaryColor;
+    
+    const sliceWidth = width / bufferLength;
+    let x = 0;
+    
+    for (let i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = v * height / 2;
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+      
+      x += sliceWidth;
+    }
+    
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+  };
+  
+  // Fonction pour dessiner un cercle
+  const drawCircle = (
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    bufferLength: number,
+    dataArray: Uint8Array
+  ) => {
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 4;
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = primaryColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    for (let i = 0; i < bufferLength; i++) {
+      const percent = i / bufferLength;
+      const amplitude = dataArray[i] / 255;
+      
+      const x1 = centerX + radius * Math.cos(percent * 2 * Math.PI);
+      const y1 = centerY + radius * Math.sin(percent * 2 * Math.PI);
+      const x2 = centerX + (radius + amplitude * 50) * Math.cos(percent * 2 * Math.PI);
+      const y2 = centerY + (radius + amplitude * 50) * Math.sin(percent * 2 * Math.PI);
+      
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = primaryColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  };
+
+  // Simuler de l'activité même sans audio réel
+  useEffect(() => {
+    if (!isPlaying) return;
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Set canvas dimensions
-    const containerWidth = width || canvas.parentElement?.clientWidth || window.innerWidth;
-    canvas.width = containerWidth;
-    canvas.height = height;
-    
-    // Create fake audio data for the visualization
-    const drawVisualization = () => {
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      if (!isPlaying) {
-        // Draw idle state (flat line or minimal animation)
-        ctx.beginPath();
-        ctx.strokeStyle = primaryColor;
-        ctx.lineWidth = 2;
-        ctx.moveTo(0, canvas.height / 2);
-        ctx.lineTo(canvas.width, canvas.height / 2);
-        ctx.stroke();
-        return;
-      }
-      
-      // Apply intensity factor (0.1 to 2.0)
-      const intensityFactor = (intensity / 50) * 1.5;
-      
-      // Choose visualization type
-      switch (variant) {
-        case 'bars': {
-          // Draw frequency bars
-          const barCount = 64;
-          const barWidth = canvas.width / barCount;
-          const barMaxHeight = canvas.height * 0.8;
-          
-          for (let i = 0; i < barCount; i++) {
-            // Generate random heights based on position (higher in middle)
-            const positionFactor = 1 - Math.abs((i / barCount) - 0.5) * 2;
-            const randomHeight = Math.random() * barMaxHeight * positionFactor * intensityFactor;
-            const barHeight = Math.max(3, randomHeight);
-            
-            // Create gradient for each bar
-            const gradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
-            gradient.addColorStop(0, primaryColor);
-            gradient.addColorStop(1, secondaryColor);
-            
-            ctx.fillStyle = gradient;
-            ctx.fillRect(
-              i * barWidth, 
-              canvas.height - barHeight, 
-              barWidth - 1, 
-              barHeight
-            );
-          }
-          break;
-        }
+    // Si pas d'audio ou d'analyseur, créer une animation simulée
+    if (!audioUrl || !analyserRef.current) {
+      const drawSimulation = () => {
+        if (!ctx) return;
         
-        case 'wave': {
-          // Draw waveform
-          ctx.beginPath();
-          ctx.moveTo(0, canvas.height / 2);
-          
-          const segmentCount = 100;
-          const amplitude = canvas.height * 0.3 * intensityFactor;
-          const frequency = 2;
-          
-          for (let i = 0; i <= segmentCount; i++) {
-            const x = (canvas.width / segmentCount) * i;
-            const y = (canvas.height / 2) + 
-              Math.sin((Date.now() / 500) + (i / 10)) * amplitude * Math.random() * 0.5 +
-              Math.sin((Date.now() / 800) + (i / 15) * frequency) * amplitude;
-            
-            ctx.lineTo(x, y);
-          }
-          
-          const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-          gradient.addColorStop(0, primaryColor);
-          gradient.addColorStop(1, secondaryColor);
-          
-          ctx.strokeStyle = gradient;
-          ctx.lineWidth = 3;
-          ctx.stroke();
-          break;
-        }
+        animationRef.current = requestAnimationFrame(drawSimulation);
         
-        case 'circle': {
-          // Draw circular visualization
-          const centerX = canvas.width / 2;
-          const centerY = canvas.height / 2;
-          const maxRadius = Math.min(canvas.width, canvas.height) * 0.4;
-          const numCircles = 3;
-          const numPoints = 80;
+        ctx.fillStyle = backgroundColor || 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const barCount = 64;
+        const barWidth = canvas.width / barCount;
+        
+        for (let i = 0; i < barCount; i++) {
+          // Hauteur aléatoire avec un peu de continuité (effet vague)
+          const barHeight = (Math.sin(Date.now() * 0.001 + i * 0.15) + 1) * 0.5 * canvas.height * 0.5;
           
-          for (let c = 0; c < numCircles; c++) {
-            const radius = maxRadius * (0.3 + (0.7 * (c + 1) / numCircles));
-            
-            ctx.beginPath();
-            
-            for (let i = 0; i <= numPoints; i++) {
-              const angle = (i / numPoints) * Math.PI * 2;
-              const noiseFactor = Math.random() * 0.2 + 0.8;
-              const radiusNoise = radius * (1 + Math.sin(Date.now() / 1000 + c * 2 + i) * 0.1 * intensityFactor * noiseFactor);
-              
-              const x = centerX + Math.cos(angle) * radiusNoise;
-              const y = centerY + Math.sin(angle) * radiusNoise;
-              
-              if (i === 0) {
-                ctx.moveTo(x, y);
-              } else {
-                ctx.lineTo(x, y);
-              }
-            }
-            
-            ctx.closePath();
-            
-            const gradientRadius = ctx.createRadialGradient(
-              centerX, centerY, radius * 0.2,
-              centerX, centerY, radius
-            );
-            
-            const alpha = 1 - (c / numCircles) * 0.6;
-            gradientRadius.addColorStop(0, `${primaryColor}${Math.round(alpha * 255).toString(16).padStart(2, '0')}`);
-            gradientRadius.addColorStop(1, `${secondaryColor}${Math.round(alpha * 0.5 * 255).toString(16).padStart(2, '0')}`);
-            
-            ctx.strokeStyle = gradientRadius;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-          }
-          break;
+          ctx.fillStyle = primaryColor;
+          ctx.fillRect(i * barWidth, canvas.height - barHeight, barWidth - 1, barHeight);
         }
+      };
+      
+      drawSimulation();
+      
+      return () => {
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
+        }
+      };
+    }
+  }, [isPlaying, audioUrl, primaryColor, backgroundColor]);
+  
+  // Toggle play/pause local
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (localIsPlaying) {
+        audioRef.current.pause();
+        setLocalIsPlaying(false);
+      } else {
+        audioRef.current.play().catch(console.error);
+        setLocalIsPlaying(true);
       }
-    };
-    
-    // Animation loop
-    const animate = () => {
-      drawVisualization();
-      animationRef.current = requestAnimationFrame(animate);
-    };
-    
-    // Start animation
-    animate();
-    
-    // Cleanup
-    return () => {
-      cancelAnimationFrame(animationRef.current);
-    };
-  }, [
-    isPlaying,
-    variant,
-    height,
-    width,
-    primaryColor,
-    secondaryColor,
-    intensity // Add intensity to the dependency array
-  ]);
+    }
+  };
 
   return (
-    <canvas 
-      ref={canvasRef} 
-      height={height} 
-      className="w-full"
-      style={{ height: `${height}px` }}
-    />
+    <div className="audio-visualizer" style={{ height: `${height}px` }}>
+      <canvas 
+        ref={canvasRef} 
+        width={500}
+        height={height}
+        className="w-full h-full"
+      />
+      
+      {showControls && (
+        <div className="flex justify-center mt-2">
+          <button 
+            onClick={togglePlay}
+            className="px-4 py-1 text-sm bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors"
+          >
+            {localIsPlaying ? 'Pause' : 'Lecture'}
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
