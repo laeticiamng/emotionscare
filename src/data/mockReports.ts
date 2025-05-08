@@ -5,15 +5,18 @@ import { Report } from '../types';
 export const mockReports: Report[] = [
   {
     id: '1',
-    date: '2023-04-07T00:00:00Z', // Now defined in Report type
+    date: '2023-04-07T00:00:00Z',
     title: 'Rapport hebdomadaire',
-    data: {
-      metrics: {
-        absenteeism: 3.5,
-        changePct: -2.1,
-      }
-    },
     type: 'weekly',
+    metrics: [
+      {
+        name: 'absenteeism',
+        value: 3.5,
+        change: -2.1,
+      }
+    ],
+    description: 'Rapport hebdomadaire sur l\'absentéisme',
+    // Additional fields used in code
     user_id: '1',
     summary: 'Résumé des indicateurs de performance',
     mood_score: 75,
@@ -23,20 +26,22 @@ export const mockReports: Report[] = [
     period_start: '2023-04-01T00:00:00Z',
     period_end: '2023-04-07T00:00:00Z',
     value: 3.5,
-    change_pct: -2.1,
-    description: 'Rapport hebdomadaire sur l\'absentéisme' // Added required field
+    change_pct: -2.1
   },
   {
     id: '2',
     date: '2023-04-14T00:00:00Z',
     title: 'Rapport hebdomadaire',
-    data: {
-      metrics: {
-        absenteeism: 3.2,
-        changePct: -8.6,
-      }
-    },
     type: 'weekly',
+    metrics: [
+      {
+        name: 'absenteeism',
+        value: 3.2,
+        change: -8.6,
+      }
+    ],
+    description: 'Rapport hebdomadaire sur l\'absentéisme',
+    // Additional fields used in code
     user_id: '1',
     summary: 'Résumé des indicateurs de performance',
     mood_score: 82,
@@ -46,20 +51,22 @@ export const mockReports: Report[] = [
     period_start: '2023-04-08T00:00:00Z',
     period_end: '2023-04-14T00:00:00Z',
     value: 3.2,
-    change_pct: -8.6,
-    description: 'Rapport hebdomadaire sur l\'absentéisme'
+    change_pct: -8.6
   },
   {
     id: '3',
     date: '2023-04-07T00:00:00Z',
     title: 'Rapport de productivité',
-    data: {
-      metrics: {
-        productivity: 87.3,
-        changePct: 1.5,
-      }
-    },
     type: 'productivity',
+    metrics: [
+      {
+        name: 'productivity',
+        value: 87.3,
+        change: 1.5,
+      }
+    ],
+    description: 'Rapport sur la productivité',
+    // Additional fields used in code
     user_id: '1',
     summary: 'Analyse de votre productivité',
     mood_score: 70,
@@ -69,20 +76,22 @@ export const mockReports: Report[] = [
     period_start: '2023-04-01T00:00:00Z',
     period_end: '2023-04-07T00:00:00Z',
     value: 87.3,
-    change_pct: 1.5,
-    description: 'Rapport sur la productivité'
+    change_pct: 1.5
   },
   {
     id: '4',
     date: '2023-04-14T00:00:00Z',
     title: 'Rapport de productivité',
-    data: {
-      metrics: {
-        productivity: 89.7,
-        changePct: 2.7,
-      }
-    },
     type: 'productivity',
+    metrics: [
+      {
+        name: 'productivity',
+        value: 89.7,
+        change: 2.7,
+      }
+    ],
+    description: 'Rapport sur la productivité',
+    // Additional fields used in code
     user_id: '1',
     summary: 'Analyse de votre productivité',
     mood_score: 85,
@@ -92,7 +101,6 @@ export const mockReports: Report[] = [
     period_start: '2023-04-08T00:00:00Z',
     period_end: '2023-04-14T00:00:00Z',
     value: 89.7,
-    change_pct: 2.7,
-    description: 'Rapport sur la productivité'
+    change_pct: 2.7
   },
 ];

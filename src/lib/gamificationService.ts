@@ -20,6 +20,8 @@ const mockBadges: Badge[] = [
     description: "Compléter votre premier scan émotionnel",
     image_url: "/badges/first-scan.svg",
     icon_url: "/badges/icons/scan-icon.svg",
+    icon: "award",     // Added required field
+    level: 1,          // Added required field
     category: "scan",
     unlocked: true,
     awarded_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -32,6 +34,8 @@ const mockBadges: Badge[] = [
     description: "Maintenir un score de bien-être au-dessus de 75% pendant 7 jours consécutifs",
     image_url: "/badges/positive-week.svg",
     icon_url: "/badges/icons/positive-icon.svg",
+    icon: "sun",        // Added required field
+    level: 2,           // Added required field
     category: "streak",
     unlocked: false,
     awarded_at: new Date().toISOString(),
@@ -44,6 +48,8 @@ const mockBadges: Badge[] = [
     description: "Compléter 5 discussions avec le coach",
     image_url: "/badges/coach-apprentice.png",
     icon_url: "/badges/icons/coach-apprentice.svg",
+    icon: "message-circle",  // Added required field
+    level: 1,                // Added required field
     category: "coach",
     unlocked: false,
     awarded_at: new Date().toISOString(),

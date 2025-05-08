@@ -19,6 +19,7 @@ const InvitationsTab: React.FC = () => {
     accepted: 0,
     expired: 0,
     sent: 0,
+    teams: {},  // Added the required teams field
     recent_invites: []
   });
 
@@ -28,6 +29,7 @@ const InvitationsTab: React.FC = () => {
         const statsData = await getInvitationsStats();
         setStats({
           ...statsData,
+          teams: statsData.teams || {},  // Ensure teams property exists
           recent_invites: statsData.recent_invites || []
         });
       } catch (error) {

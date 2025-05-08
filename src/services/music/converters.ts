@@ -15,6 +15,7 @@ export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
     cover: musicTrack.cover || musicTrack.coverUrl,
     coverUrl: musicTrack.coverUrl || musicTrack.cover,
     audioUrl: musicTrack.audioUrl || musicTrack.url,
+    emotion: musicTrack.emotion, // Now included in MusicTrack type
   };
 };
 
@@ -31,7 +32,7 @@ export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
     cover: track.cover,
     coverUrl: track.coverUrl,
     audioUrl: track.audioUrl,
-    emotion: track.emotion, // Added to match usage
+    emotion: track.emotion, // Now included in MusicTrack type
   };
 };
 
@@ -42,7 +43,7 @@ export const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Pl
   return {
     id: musicPlaylist.id,
     name: musicPlaylist.name,
-    emotion: musicPlaylist.emotion || musicPlaylist.mood || 'neutral', // Fixed to handle emotion properly
+    emotion: musicPlaylist.emotion || musicPlaylist.mood || 'neutral', // Now mood is included in MusicPlaylist
     tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
   };
 };
@@ -54,7 +55,7 @@ export const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylis
   return {
     id: playlist.id,
     name: playlist.name,
-    emotion: playlist.emotion, // Added to match required property
+    emotion: playlist.emotion,
     tracks: playlist.tracks.map(convertTrackToMusicTrack)
   };
 };

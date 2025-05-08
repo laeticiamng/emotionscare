@@ -10,6 +10,8 @@ export const mockBadges: Badge[] = [
     description: 'Première session de VR complétée',
     image_url: '/badges/first-step.svg',
     category: 'achievement',
+    icon: 'award',  // Added required field
+    level: 1,       // Added required field
     unlocked: true,
     awarded_at: '2023-04-15T14:30:00Z',
   },
@@ -20,6 +22,8 @@ export const mockBadges: Badge[] = [
     description: '5 entrées de journal consécutives',
     image_url: '/badges/journal-master.svg',
     category: 'consistency',
+    icon: 'book',    // Added required field
+    level: 1,        // Added required field
     unlocked: true,
     awarded_at: '2023-04-18T09:15:00Z',
   },

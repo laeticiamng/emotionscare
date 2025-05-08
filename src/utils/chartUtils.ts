@@ -12,8 +12,8 @@ export const prepareReportData = (metric: 'absenteeism' | 'productivity') => {
   return mockReports
     .filter(report => report.metric === metric)
     .map(report => ({
-      date: formatDate(report.period_end),
-      value: report.value
+      date: formatDate(report.period_end || report.date || ''),
+      value: report.value || 0
     }))
     .sort((a, b) => {
       const [dayA, monthA] = a.date.split('/').map(Number);

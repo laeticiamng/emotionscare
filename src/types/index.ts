@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'user' | 'admin' | 'manager';
+  role: 'user' | 'admin' | 'manager' | 'employee' | 'analyst' | 'wellbeing_manager';
   avatar?: string;
   image?: string;
   avatar_url?: string;
@@ -21,7 +21,7 @@ export interface User {
   joined_at?: string;
   onboarded?: boolean;
   preferences?: UserPreferences;
-  team_name?: string; // Added missing field
+  team_name?: string;
 }
 
 // Enum for user roles
@@ -84,7 +84,8 @@ export interface Emotion {
   emojis?: string;
   ai_feedback?: string;
   feedback?: string;
-  intensity?: number; // Added missing field
+  intensity?: number;
+  source?: string; // Added for emotionService.ts
 }
 
 // VR related types
@@ -140,6 +141,7 @@ export interface MusicTrack {
   coverUrl?: string;
   coverImage?: string;
   isPlaying?: boolean;
+  emotion?: string; // Added for music converters
 }
 
 export interface MusicPlaylist {
@@ -151,6 +153,7 @@ export interface MusicPlaylist {
   emotion?: string;
   totalDuration?: number;
   createdBy?: string;
+  mood?: string; // Added for converter function
 }
 
 // Mood data for charts
@@ -203,6 +206,18 @@ export interface Badge {
   awarded_at?: string;
 }
 
+// Challenge interface for gamification
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  completed?: boolean;
+  progress?: number;
+  total?: number;
+  category?: string;
+}
+
 // Invitation related types
 export interface InvitationFormData {
   email: string;
@@ -223,6 +238,14 @@ export interface InvitationStats {
   recent_invites?: any[];
 }
 
+// Invitation verification result type
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message?: string;
+  email?: string;
+  role?: string;
+}
+
 // Report type
 export interface Report {
   id: string;
@@ -238,4 +261,16 @@ export interface Report {
   chart_data?: any;
   // Added missing fields
   date?: string;
+  // Fields used in mockReports.ts
+  data?: any;
+  user_id?: string;
+  summary?: string;
+  mood_score?: number;
+  categories?: string[];
+  recommendations?: string[];
+  metric?: string;
+  period_start?: string;
+  period_end?: string;
+  value?: number;
+  change_pct?: number;
 }

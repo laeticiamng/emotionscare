@@ -20,9 +20,12 @@ export async function fetchJournalEntries(userId: string): Promise<JournalEntry[
         user_id: entry.user_id,
         content: entry.content || "",
         date: entry.date,
+        title: entry.content?.substring(0, 30) || "Journal Entry", // Generate a title from content
+        mood: "neutral", // Default mood
+        created_at: entry.date, // Use date as created_at
         ai_feedback: entry.ai_feedback || null,
         text: entry.content || "",  // For compatibility
-        is_private: true // Default value added to match the required property
+        is_private: true // Default value
       };
     });
   } catch (error) {
@@ -48,10 +51,13 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
       id: data.id,
       user_id: data.user_id,
       content: data.content || "",
+      title: data.content?.substring(0, 30) || "Journal Entry", // Generate a title from content
+      mood: "neutral", // Default mood
+      created_at: data.date, // Use date as created_at
       date: data.date,
       ai_feedback: data.ai_feedback || null,
       text: data.content || "",  // For compatibility
-      is_private: true // Default value added
+      is_private: true // Default value
     };
   } catch (error) {
     console.error('Error in fetchJournalEntry:', error);
@@ -66,7 +72,10 @@ export async function createJournalEntry(userId: string, content: string): Promi
       user_id: userId,
       date: new Date().toISOString(),
       content: content,
-      is_private: true // Added required property
+      title: content.substring(0, 30), // Generate a title from content
+      mood: "neutral", // Default mood
+      created_at: new Date().toISOString(),
+      is_private: true // Default value
     };
 
     const { data, error } = await supabase
@@ -82,10 +91,13 @@ export async function createJournalEntry(userId: string, content: string): Promi
       id: data.id,
       user_id: data.user_id,
       content: data.content || "",
+      title: entry.title,
+      mood: entry.mood,
+      created_at: entry.created_at,
       date: data.date,
       ai_feedback: data.ai_feedback || null,
       text: data.content || "",  // For compatibility
-      is_private: true // Default value added
+      is_private: true // Default value
     };
   } catch (error) {
     console.error('Error in createJournalEntry:', error);

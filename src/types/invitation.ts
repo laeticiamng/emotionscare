@@ -10,6 +10,7 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
+  teams: Record<string, number>;
   recent_invites?: {
     email: string;
     status: string;

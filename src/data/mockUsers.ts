@@ -1,4 +1,3 @@
-
 import { User, UserRole } from '@/types';
 
 // Mock user data for development and testing
@@ -7,7 +6,7 @@ export const mockUsers: User[] = [
     id: '1',
     name: 'John Doe',
     email: 'john.doe@example.com',
-    role: UserRole.USER,
+    role: 'user', // Using string literal instead of enum
     emotional_score: 75,
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
     team_id: 'team-1',
@@ -132,8 +131,13 @@ export const generateRandomUser = (): User => {
   const id = Math.random().toString(36).substring(2, 15);
   const name = `Random User ${id}`;
   const email = `random${id}@example.com`;
-  const roles = Object.values(UserRole);
-  const role = roles[Math.floor(Math.random() * roles.length)];
+  
+  // Map UserRole enum values to string literals
+  const roleOptions: ('user' | 'admin' | 'manager' | 'employee' | 'analyst' | 'wellbeing_manager')[] = [
+    'user', 'admin', 'manager', 'employee', 'analyst', 'wellbeing_manager'
+  ];
+  
+  const role = roleOptions[Math.floor(Math.random() * roleOptions.length)];
   const emotional_score = Math.floor(Math.random() * 100);
   const anonymity_code = Math.random().toString(36).substring(2, 10).toUpperCase();
 
