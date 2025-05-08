@@ -22,6 +22,13 @@ export interface UseAudioPlayerReturn {
   nextTrack: () => void;
   previousTrack: () => void;
   setCurrentTrack: (track: Track | null) => void;
+  
+  // Propriétés additionnelles nécessaires pour MusicContext
+  currentTime: number;
+  loadingTrack: boolean;
+  formatTime: (time: number) => string;
+  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleVolumeChange: (values: number[]) => void;
 }
 
 /**
@@ -35,7 +42,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   const [shuffle, setShuffle] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loadingTrack, setLoadingTrack] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [playlist, setPlaylist] = useState<Track[]>([]);
   
@@ -56,7 +63,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     const onTimeUpdate = () => setProgress(audio.currentTime);
     const onLoadedMetadata = () => {
       setDuration(audio.duration || 0);
-      setLoading(false);
+      setLoadingTrack(false);
     };
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
@@ -71,11 +78,11 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     };
     const onError = () => {
       setError(new Error("Erreur de lecture audio"));
-      setLoading(false);
+      setLoadingTrack(false);
       setIsPlaying(false);
     };
-    const onWaiting = () => setLoading(true);
-    const onCanPlay = () => setLoading(false);
+    const onWaiting = () => setLoadingTrack(true);
+    const onCanPlay = () => setLoadingTrack(false);
 
     // Ajouter tous les écouteurs d'événements
     audio.addEventListener('timeupdate', onTimeUpdate);
@@ -110,7 +117,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       return;
     }
 
-    setLoading(true);
+    setLoadingTrack(true);
     setError(null);
     audio.src = sourceUrl;
     
@@ -135,13 +142,13 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     console.error("Erreur de lecture audio:", error);
     setError(error);
     setIsPlaying(false);
-    setLoading(false);
+    setLoadingTrack(false);
   }, []);
 
   // Fonctions pour contrôler la lecture
   const playTrack = useCallback((track: Track) => {
     setCurrentTrack(track);
-    setLoading(true);
+    setLoadingTrack(true);
     setError(null);
     setIsPlaying(true);
   }, []);
@@ -184,15 +191,38 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   const nextTrack = useCallback(() => {
     console.log("Piste suivante demandée");
     // Logique pour passer à la piste suivante dans la playlist
-    // Cette implémentation est simplifiée et devrait être étendue
-    // en fonction de la structure de votre playlist
   }, []);
 
   const previousTrack = useCallback(() => {
     console.log("Piste précédente demandée");
     // Logique pour passer à la piste précédente
-    // À implémenter en fonction de votre structure de playlist
   }, []);
+
+  // Formater le temps (secondes -> MM:SS)
+  const formatTime = useCallback((timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }, []);
+
+  // Gérer le clic sur la barre de progression
+  const handleProgressClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audio || !duration) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const percentage = offsetX / rect.width;
+    const newTime = percentage * duration;
+    
+    seekTo(newTime);
+  }, [audio, duration, seekTo]);
+
+  // Gérer le changement de volume
+  const handleVolumeChange = useCallback((values: number[]) => {
+    if (values.length > 0) {
+      setVolume(values[0] / 100);
+    }
+  }, [setVolume]);
 
   return {
     currentTrack,
@@ -202,7 +232,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     shuffle,
     progress,
     duration,
-    loading,
+    loading: loadingTrack,
     error,
     playTrack,
     pauseTrack,
@@ -213,7 +243,13 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     seekTo,
     nextTrack,
     previousTrack,
-    setCurrentTrack
+    setCurrentTrack,
+    // Propriétés additionnelles
+    currentTime: progress,
+    loadingTrack,
+    formatTime,
+    handleProgressClick,
+    handleVolumeChange
   };
 }
 
