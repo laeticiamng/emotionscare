@@ -6,6 +6,7 @@ export const mockReports: Report[] = [
   {
     id: '1',
     date: '2023-04-07T00:00:00Z',
+    created_at: '2023-04-07T00:00:00Z',  // Added required property
     title: 'Rapport hebdomadaire',
     type: 'weekly',
     metrics: [
@@ -31,6 +32,7 @@ export const mockReports: Report[] = [
   {
     id: '2',
     date: '2023-04-14T00:00:00Z',
+    created_at: '2023-04-14T00:00:00Z',  // Added required property
     title: 'Rapport hebdomadaire',
     type: 'weekly',
     metrics: [
@@ -56,6 +58,7 @@ export const mockReports: Report[] = [
   {
     id: '3',
     date: '2023-04-07T00:00:00Z',
+    created_at: '2023-04-07T00:00:00Z',  // Added required property
     title: 'Rapport de productivité',
     type: 'productivity',
     metrics: [
@@ -81,6 +84,7 @@ export const mockReports: Report[] = [
   {
     id: '4',
     date: '2023-04-14T00:00:00Z',
+    created_at: '2023-04-14T00:00:00Z',  // Added required property
     title: 'Rapport de productivité',
     type: 'productivity',
     metrics: [

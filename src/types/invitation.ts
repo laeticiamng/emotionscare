@@ -2,6 +2,9 @@
 export interface InvitationFormData {
   email: string;
   role: string;
+  name?: string;
+  team_id?: string;
+  message?: string;
 }
 
 export interface InvitationStats {

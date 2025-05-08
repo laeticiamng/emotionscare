@@ -44,7 +44,8 @@ export const getInvitationsStats = async (): Promise<InvitationStats> => {
     sent: total,
     pending: mockInvitations.filter(inv => inv.status === 'pending').length,
     accepted: mockInvitations.filter(inv => inv.status === 'accepted').length,
-    expired: mockInvitations.filter(inv => inv.status === 'expired').length
+    expired: mockInvitations.filter(inv => inv.status === 'expired').length,
+    teams: {} // Added the required teams property with an empty object as default
   };
 };
 

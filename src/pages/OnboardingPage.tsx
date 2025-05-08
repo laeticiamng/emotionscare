@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,12 +37,14 @@ const OnboardingPage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Create preferences object
+      // Create preferences object with all required properties
       const preferences: UserPreferences = {
         theme,
         fontSize,
         backgroundColor,
         accentColor: "#FF6F61", // Default accent color
+        language: "fr", // Added required property
+        privacy_level: "standard", // Added required property
         notifications: {
           email: true,
           push: true,
