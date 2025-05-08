@@ -1,6 +1,6 @@
 
-import { MusicTrack } from '@/types/music';
-import { Track } from './types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { Track, Playlist } from './types';
 
 /**
  * Convertit un objet MusicTrack en Track
@@ -28,5 +28,29 @@ export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
     audioUrl: track.url,
     coverUrl: track.cover,
     duration: track.duration,
+  };
+};
+
+/**
+ * Convertit un objet MusicPlaylist en Playlist
+ */
+export const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => {
+  return {
+    id: musicPlaylist.id,
+    name: musicPlaylist.name,
+    emotion: musicPlaylist.emotion,
+    tracks: musicPlaylist.tracks.map(track => convertMusicTrackToTrack(track)),
+  };
+};
+
+/**
+ * Convertit un objet Playlist en MusicPlaylist
+ */
+export const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
+  return {
+    id: playlist.id,
+    name: playlist.name,
+    emotion: playlist.emotion || 'neutral',
+    tracks: playlist.tracks.map(track => convertTrackToMusicTrack(track)),
   };
 };
