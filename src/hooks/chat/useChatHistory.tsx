@@ -1,31 +1,28 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { chatHistoryService, ChatConversation } from '@/lib/chat/chatHistoryService';
+import { useEffect, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { useConversations } from './useConversations';
+import { useMessages } from './useMessages';
 
+/**
+ * Main hook for chat history management
+ * Combines conversation and message operations
+ */
 export function useChatHistory() {
-  const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
-
-  // Load user conversations
-  const loadConversations = useCallback(async () => {
-    if (!user?.id) return;
-    
-    setIsLoading(true);
-    try {
-      const userConversations = await chatHistoryService.getConversations(user.id);
-      setConversations(userConversations);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.id]);
+  const {
+    conversations,
+    activeConversationId,
+    isLoading,
+    setActiveConversationId,
+    loadConversations,
+    createConversation,
+    deleteConversation,
+    updateConversation
+  } = useConversations();
+  
+  const { loadMessages, saveMessages } = useMessages();
 
   // Load initial conversations
   useEffect(() => {
@@ -34,99 +31,37 @@ export function useChatHistory() {
     }
   }, [user?.id, loadConversations]);
 
-  // Create a new conversation
-  const createConversation = useCallback(async (title: string = "Nouvelle conversation"): Promise<string | null> => {
-    if (!user?.id) return null;
-    
-    try {
-      const conversationId = await chatHistoryService.createConversation(user.id, title);
-      if (conversationId) {
-        await loadConversations();
-        setActiveConversationId(conversationId);
-        return conversationId;
-      }
-      return null;
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      return null;
-    }
-  }, [user?.id, loadConversations]);
-
-  // Delete a conversation
-  const deleteConversation = useCallback(async (conversationId: string) => {
-    try {
-      const success = await chatHistoryService.deleteConversation(conversationId);
-      
-      if (success) {
-        if (activeConversationId === conversationId) {
-          setActiveConversationId(null);
-        }
-        
-        await loadConversations();
-        
-        toast({
-          title: "Conversation supprimée",
-          description: "La conversation a été supprimée avec succès."
-        });
-      }
-    } catch (error) {
-      console.error('Error deleting conversation:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la conversation.",
-        variant: "destructive"
-      });
-    }
-  }, [activeConversationId, loadConversations, toast]);
-
-  // Load messages for a conversation
-  const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
-    setIsLoading(true);
-    try {
-      const messages = await chatHistoryService.getMessages(conversationId);
-      setActiveConversationId(conversationId);
-      return messages;
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Save messages for a conversation
-  const saveMessages = useCallback(async (messages: ChatMessage[]): Promise<boolean> => {
+  // Enhanced saveMessages with conversation creation if needed
+  const saveMessagesWithConversation = useCallback(async (messages: ChatMessage[]): Promise<boolean> => {
     if (!user?.id) return false;
     
     if (!activeConversationId) {
       // Create a new conversation if none is active
-      let conversationId = activeConversationId;
-      
-      if (!conversationId) {
-        // Use the first user message as the title, or a default
-        const firstUserMessage = messages.find(m => m.sender === 'user');
-        const title = firstUserMessage ? firstUserMessage.text.substring(0, 50) : "Nouvelle conversation";
-        conversationId = await createConversation(title);
-      }
+      const firstUserMessage = messages.find(m => m.sender === 'user');
+      const title = firstUserMessage ? firstUserMessage.text.substring(0, 50) : "Nouvelle conversation";
+      const conversationId = await createConversation(title);
       
       if (!conversationId) return false;
       
-      try {
-        return await chatHistoryService.saveMessages(conversationId, messages);
-      } catch (error) {
-        console.error('Error saving messages:', error);
-        return false;
-      }
+      return await saveMessages(conversationId, messages);
     } else {
       // Save to existing conversation
-      try {
-        return await chatHistoryService.saveMessages(activeConversationId, messages);
-      } catch (error) {
-        console.error('Error saving messages:', error);
-        return false;
+      const result = await saveMessages(activeConversationId, messages);
+      
+      // Update conversation title and last message if there are messages
+      if (result && messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        await updateConversation(
+          activeConversationId, 
+          // Use first user message as title, or default
+          messages.find(m => m.sender === 'user')?.text.substring(0, 50) || 'Nouvelle conversation',
+          lastMessage.text.substring(0, 100)
+        );
       }
+      
+      return result;
     }
-  }, [activeConversationId, createConversation, user?.id]);
+  }, [activeConversationId, createConversation, saveMessages, updateConversation, user?.id]);
 
   return {
     conversations,
@@ -136,7 +71,7 @@ export function useChatHistory() {
     deleteConversation,
     loadConversations,
     loadMessages,
-    saveMessages,
+    saveMessages: saveMessagesWithConversation,
     setActiveConversationId
   };
 }

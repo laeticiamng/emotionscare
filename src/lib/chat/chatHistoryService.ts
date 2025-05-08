@@ -171,17 +171,6 @@ export const chatHistoryService = {
         return false;
       }
       
-      // Update conversation with last message if there are messages
-      if (messages.length > 0) {
-        const lastMessage = messages[messages.length - 1];
-        await this.updateConversation(
-          conversationId, 
-          // Use first user message as title, or default
-          messages.find(m => m.sender === 'user')?.text.substring(0, 50) || 'New conversation',
-          lastMessage.text.substring(0, 100)
-        );
-      }
-
       return true;
     } catch (error) {
       console.error('Error saving messages:', error);
