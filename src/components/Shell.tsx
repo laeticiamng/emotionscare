@@ -50,13 +50,11 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Système de notifications toast */}
       <Toaster />
       
-      {/* Music Player Drawer - simple static import */}
-      {isDrawerOpen && (
-        <MusicDrawer 
-          open={isDrawerOpen} 
-          onClose={closeDrawer} 
-        />
-      )}
+      {/* Music Player Drawer */}
+      <MusicDrawer 
+        open={isDrawerOpen} 
+        onClose={closeDrawer} 
+      />
     </div>
   );
 };
