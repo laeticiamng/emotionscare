@@ -13,12 +13,11 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;    // Required
-  audioUrl?: string;   // Optional mais devrait être présent
+  url: string;         // Required for audio playback
+  audioUrl?: string;   // Optional alternative for compatibility
   coverUrl?: string;   // Optional
+  cover?: string;      // Alias for coverUrl, optional
   emotion?: string;    // Optional
-  // Propriété url requise pour la compatibilité
-  url: string;         // Requis pour la lecture audio
-  cover?: string;      // Alias pour coverUrl, optionnel
   isPlaying?: boolean; // Optional
   externalUrl?: string; // Optional - URL pour ouvrir dans un lecteur externe
 }

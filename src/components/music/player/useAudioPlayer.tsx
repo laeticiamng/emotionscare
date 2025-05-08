@@ -81,8 +81,8 @@ export function useAudioPlayer() {
   useEffect(() => {
     if (!audio || !currentTrack) return;
 
-    // Utiliser la propriété url, qui est désormais obligatoire pour tous les types de pistes
-    const audioUrl = currentTrack.url;
+    // Use url property or fallback to audioUrl if available
+    const audioUrl = currentTrack.url || (currentTrack as MusicTrack).audioUrl;
     
     if (audioUrl) {
       setLoadingTrack(true);
@@ -117,9 +117,9 @@ export function useAudioPlayer() {
   }, [audio, isPlaying]);
 
   const playTrack = (track: Track | MusicTrack) => {
-    // S'assurer que la track a une propriété url valide
+    // Ensure track has a valid url property
     if (!track.url && 'audioUrl' in track && track.audioUrl) {
-      (track as MusicTrack).url = track.audioUrl;
+      (track as any).url = track.audioUrl;
     }
     
     setCurrentTrack(track);

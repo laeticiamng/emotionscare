@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 import { convertTrackToMusicTrack, convertPlaylistToMusicPlaylist } from '@/services/music/converters';
@@ -24,7 +24,19 @@ interface MusicContextType {
   openDrawer: () => void;
   closeDrawer: () => void;
   
-  // Nouvelles propriétés nécessaires
+  // Properties for audio player functionality
+  currentTime: number;
+  duration: number;
+  formatTime: (time: number) => string;
+  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleVolumeChange: (values: number[]) => void;
+  repeat: boolean;
+  toggleRepeat: () => void;
+  shuffle: boolean;
+  toggleShuffle: () => void;
+  loadingTrack: boolean;
+  
+  // Required properties
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
   playlists: MusicPlaylist[];
@@ -49,11 +61,21 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   } = usePlaylistManager();
   
   const { 
-    isPlaying, 
+    isPlaying,
     volume, 
-    setVolume, 
+    setVolume,
+    currentTime,
+    duration,
+    repeat,
+    shuffle,
+    loadingTrack,
     playTrack: playAudioTrack,
-    pauseTrack: pauseAudioTrack
+    pauseTrack: pauseAudioTrack,
+    toggleRepeat,
+    toggleShuffle,
+    handleProgressClick,
+    handleVolumeChange,
+    formatTime
   } = useAudioPlayer();
   
   // Conversion de la playlist active au format MusicPlaylist
@@ -131,7 +153,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Assurons-nous que track a toujours une propriété url
     const trackWithUrl = {
       ...track,
-      url: track.url || track.audioUrl
+      url: track.url || track.audioUrl || ''
     };
     playAudioTrack(trackWithUrl);
   }, [playAudioTrack]);
@@ -190,7 +212,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       isDrawerOpen,
       openDrawer,
       closeDrawer,
-      // Nouvelles propriétés
+      // Audio player properties
+      currentTime,
+      duration,
+      formatTime,
+      handleProgressClick,
+      handleVolumeChange,
+      repeat,
+      toggleRepeat,
+      shuffle,
+      toggleShuffle,
+      loadingTrack,
+      // Required properties
       initializeMusicSystem,
       error,
       playlists,
