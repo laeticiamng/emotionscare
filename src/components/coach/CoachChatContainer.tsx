@@ -10,6 +10,9 @@ import ConversationDrawer from '@/components/coach/ConversationDrawer';
 import ConversationList from '@/components/coach/ConversationList';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { ChatMessage } from '@/types/chat';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 interface CoachChatContainerProps {
   messages: ChatMessage[];
@@ -43,7 +46,9 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
     activeConversationId,
     deleteConversation,
     loadMessages,
-    setActiveConversationId
+    setActiveConversationId,
+    error,
+    retryLoadConversations
   } = useChatHistory();
 
   // Handle loading conversation
@@ -61,6 +66,10 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
     if (isMobile) {
       setDrawerOpen(false);
     }
+  };
+
+  const handleBackClick = () => {
+    navigate('/coach');
   };
 
   const renderConversationList = () => (
@@ -85,7 +94,7 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
       {/* Main chat area */}
       <Card className="flex-grow flex flex-col overflow-hidden p-0 shadow-premium relative">
         <ChatHeader 
-          onBackClick={() => navigate(-1)} 
+          onBackClick={handleBackClick} 
           title={
             activeConversationId 
               ? conversations.find(c => c.id === activeConversationId)?.title || "Coach IA Personnel"
@@ -101,6 +110,19 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
             )
           }
         />
+        
+        {error && (
+          <Alert variant="destructive" className="m-2">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="flex justify-between items-center">
+              <span>{error}</span>
+              <Button variant="outline" size="sm" onClick={retryLoadConversations}>
+                Réessayer
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <ChatMessageList 
           messages={messages} 
           isLoading={isLoading} 

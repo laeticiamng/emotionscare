@@ -31,7 +31,9 @@ export function useChatHistory() {
     loadMessages, 
     saveMessages,
     isLoadingMessages,
-    isSavingMessages
+    isSavingMessages,
+    error: messagesError,
+    clearError
   } = useMessages();
 
   // Load initial conversations
@@ -41,9 +43,17 @@ export function useChatHistory() {
       setIsLoadingHistory(true);
       loadConversations()
         .then(() => setIsInitialized(true))
+        .catch(err => {
+          console.error('Failed to load initial conversations:', err);
+          toast({
+            title: "Erreur",
+            description: "Impossible de charger vos conversations.",
+            variant: "destructive"
+          });
+        })
         .finally(() => setIsLoadingHistory(false));
     }
-  }, [user?.id, loadConversations, isInitialized]);
+  }, [user?.id, loadConversations, isInitialized, toast]);
 
   // Enhanced saveMessages with conversation creation if needed
   const saveMessagesWithConversation = useCallback(async (messages: ChatMessage[]): Promise<boolean> => {
@@ -58,6 +68,8 @@ export function useChatHistory() {
     }
     
     try {
+      clearError(); // Clear any previous errors
+      
       if (!activeConversationId) {
         // Create a new conversation if none is active
         const firstUserMessage = messages.find(m => m.sender === 'user');
@@ -111,7 +123,7 @@ export function useChatHistory() {
       });
       return false;
     }
-  }, [activeConversationId, createConversation, saveMessages, updateConversation, user?.id, toast]);
+  }, [activeConversationId, createConversation, saveMessages, updateConversation, user?.id, toast, clearError]);
 
   // Load messages for active conversation
   const loadActiveConversationMessages = useCallback(async (): Promise<ChatMessage[]> => {
@@ -120,17 +132,29 @@ export function useChatHistory() {
       return [];
     }
     
+    clearError(); // Clear any previous errors
     return await loadMessages(activeConversationId);
-  }, [activeConversationId, loadMessages]);
+  }, [activeConversationId, loadMessages, clearError]);
+
+  // Retry loading conversations
+  const retryLoadConversations = useCallback(() => {
+    if (user?.id) {
+      setIsLoadingHistory(true);
+      loadConversations()
+        .finally(() => setIsLoadingHistory(false));
+    }
+  }, [user?.id, loadConversations]);
 
   return {
     conversations,
     activeConversationId,
     isLoading: isLoadingConversations || isLoadingHistory || isLoadingMessages || isSavingMessages,
     isInitialized,
+    error: messagesError,
     createConversation,
     deleteConversation,
     loadConversations,
+    retryLoadConversations,
     loadMessages,
     loadActiveConversationMessages,
     saveMessages: saveMessagesWithConversation,

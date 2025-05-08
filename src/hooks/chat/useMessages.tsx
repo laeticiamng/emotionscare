@@ -11,15 +11,18 @@ export function useMessages() {
   const { toast } = useToast();
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSavingMessages, setIsSavingMessages] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Load messages for a conversation
   const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
     if (!conversationId) {
       console.error('No conversation ID provided to loadMessages');
+      setError('Identifiant de conversation manquant');
       return [];
     }
     
     setIsLoadingMessages(true);
+    setError(null);
     try {
       console.log('Loading messages for conversation:', conversationId);
       const messages = await chatHistoryService.getMessages(conversationId);
@@ -27,9 +30,11 @@ export function useMessages() {
       return messages;
     } catch (error) {
       console.error('Error loading messages:', error);
+      const errorMessage = 'Impossible de charger les messages.';
+      setError(errorMessage);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les messages.",
+        description: errorMessage,
         variant: "destructive"
       });
       return [];
@@ -45,6 +50,7 @@ export function useMessages() {
   ): Promise<boolean> => {
     if (!conversationId) {
       console.error('No conversation ID provided to saveMessages');
+      setError('Identifiant de conversation manquant');
       return false;
     }
     
@@ -54,15 +60,18 @@ export function useMessages() {
     }
     
     setIsSavingMessages(true);
+    setError(null);
     try {
       console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
       const result = await chatHistoryService.saveMessages(conversationId, messages);
       
       if (!result) {
         console.error('Failed to save messages');
+        const errorMessage = 'Impossible de sauvegarder les messages.';
+        setError(errorMessage);
         toast({
           title: "Erreur",
-          description: "Impossible de sauvegarder les messages.",
+          description: errorMessage,
           variant: "destructive"
         });
       }
@@ -70,9 +79,11 @@ export function useMessages() {
       return result;
     } catch (error) {
       console.error('Error saving messages:', error);
+      const errorMessage = 'Impossible de sauvegarder les messages.';
+      setError(errorMessage);
       toast({
         title: "Erreur",
-        description: "Impossible de sauvegarder les messages.",
+        description: errorMessage,
         variant: "destructive"
       });
       return false;
@@ -81,10 +92,16 @@ export function useMessages() {
     }
   }, [toast]);
 
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   return {
     loadMessages,
     saveMessages,
     isLoadingMessages,
-    isSavingMessages
+    isSavingMessages,
+    error,
+    clearError
   };
 }

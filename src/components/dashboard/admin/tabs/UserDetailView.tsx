@@ -37,12 +37,17 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ userId, onBack }) => {
     });
   };
 
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onBack();
+  };
+
   const moodData = generateMockMoodData(30);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={onBack}>
+        <Button variant="ghost" onClick={handleBack}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Retour à la liste
         </Button>
