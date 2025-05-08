@@ -1,3 +1,4 @@
+
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom'; 
@@ -6,28 +7,6 @@ import './styles/index.css';
 import './styles/premium.css';
 import './styles/components.css';
 import './App.css';
-
-// --- DEBUG IMPORTS -------------------------------------------------
-const lazyModules = import.meta.glob(
-  '/src/**/*.{tsx,ts,jsx,js}',
-  { eager: false }    // <-- on laisse Vite charger à la demande
-) as Record<string, () => Promise<any>>;  // typage explicite
-
-for (const [path, loader] of Object.entries(lazyModules)) {
-  if (!path.includes('node_modules')) {
-    loader()
-      .then((mod) => {
-        if (mod?.default === undefined) {
-          // Pas d'export par défaut : on log pour le corriger.
-          console.warn(`[EXPORT-DEBUG] ${path} ➜ pas d'export default`);
-        }
-      })
-      .catch((err) => {
-        console.error(`[IMPORT-DEBUG] ${path} ➜ échec de chargement`, err);
-      });
-  }
-}
-// -------------------------------------------------------------------
 
 const initializeApp = () => {
   console.info(`🚀 Application EmotionsCare - Démarrage [${new Date().toISOString()}]`);

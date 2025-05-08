@@ -40,5 +40,5 @@ const MusicPlayer: React.FC<MusicPlayerProps> = () => {
   );
 };
 
-// Exportation explicite du composant
+// Export explicite du composant
 export default MusicPlayer;
