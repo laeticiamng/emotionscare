@@ -10,6 +10,7 @@ interface YoutubeEmbedProps {
   controls?: boolean;
   showInfo?: boolean;
   loop?: boolean;
+  mute?: boolean;
   className?: string;
   onLoad?: () => void;
   onError?: () => void;
@@ -21,6 +22,7 @@ const YoutubeEmbed: React.FC<YoutubeEmbedProps> = ({
   controls = true,
   showInfo = true,
   loop = false,
+  mute = false,
   className = '',
   onLoad,
   onError
@@ -61,7 +63,7 @@ const YoutubeEmbed: React.FC<YoutubeEmbedProps> = ({
     autoplay ? 1 : 0
   }&controls=${controls ? 1 : 0}&showinfo=${
     showInfo ? 1 : 0
-  }&loop=${loop ? 1 : 0}&rel=0`;
+  }&loop=${loop ? 1 : 0}&rel=0${mute ? '&mute=1' : ''}`;
   
   return (
     <div className={`relative w-full h-full ${className}`}>
