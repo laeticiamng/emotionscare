@@ -11,6 +11,11 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 import ChatHeader from '@/components/coach/ChatHeader';
 import ChatMessageList from '@/components/coach/ChatMessageList';
 import ChatInputForm from '@/components/coach/ChatInputForm';
+import ConversationList from '@/components/coach/ConversationList';
+import { useChatHistory } from '@/hooks/chat/useChatHistory';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
+import { MessageSquareDashed, Menu } from 'lucide-react';
 
 const CoachChatPage = () => {
   const [userMessage, setUserMessage] = useState('');
@@ -25,6 +30,7 @@ const CoachChatPage = () => {
       timestamp: new Date(),
     },
   ]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   
   const { toast } = useToast();
   const { askQuestion, generateRecommendation } = useCoach();
@@ -32,6 +38,22 @@ const CoachChatPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 640px)');
+  const {
+    conversations,
+    activeConversationId,
+    createConversation,
+    deleteConversation,
+    loadMessages,
+    saveMessages,
+    setActiveConversationId
+  } = useChatHistory();
+  
+  // Save messages when they change
+  useEffect(() => {
+    if (messages.length > 1) { // Only save if there are user messages
+      saveMessages(messages);
+    }
+  }, [messages, saveMessages]);
   
   // Récupérer la question initiale des paramètres de navigation
   useEffect(() => {
@@ -86,6 +108,11 @@ const CoachChatPage = () => {
     try {
       // Log d'activité
       logActivity('coach_chat', { message: messageText });
+      
+      // Ensure we have an active conversation
+      if (!activeConversationId) {
+        await createConversation(messageText.substring(0, 50));
+      }
       
       // Obtenir une réponse du coach IA
       const response = await askQuestion(messageText);
@@ -175,27 +202,112 @@ const CoachChatPage = () => {
     };
   }, [typingTimer]);
 
+  // Handle loading conversation
+  const handleLoadConversation = async (conversationId: string) => {
+    try {
+      const loadedMessages = await loadMessages(conversationId);
+      if (loadedMessages.length > 0) {
+        setMessages(loadedMessages);
+        if (isMobile) {
+          setDrawerOpen(false);
+        }
+      } else {
+        toast({
+          title: "Conversation vide",
+          description: "Cette conversation ne contient pas de messages."
+        });
+      }
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la conversation.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Start new conversation
+  const handleNewConversation = () => {
+    setActiveConversationId(null);
+    setMessages([
+      {
+        id: '1',
+        text: 'Bonjour, je suis votre coach IA. Comment puis-je vous aider aujourd\'hui ?',
+        sender: 'bot',
+        timestamp: new Date(),
+      },
+    ]);
+    if (isMobile) {
+      setDrawerOpen(false);
+    }
+  };
+
+  const renderConversationList = () => (
+    <ConversationList
+      conversations={conversations}
+      activeConversationId={activeConversationId}
+      onConversationSelect={handleLoadConversation}
+      onNewConversation={handleNewConversation}
+      onDeleteConversation={deleteConversation}
+    />
+  );
+
   return (
     <ProtectedLayout>
-      <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-4xl h-[80vh] flex flex-col">
-        <Card className="flex-grow flex flex-col overflow-hidden p-0 shadow-premium">
-          <ChatHeader onBackClick={() => navigate(-1)} />
-          <ChatMessageList 
-            messages={messages} 
-            isLoading={isLoading} 
-            typingIndicator={typingIndicator || undefined}
-          />
-          <ChatInputForm
-            userMessage={userMessage}
-            isLoading={isLoading}
-            onUserMessageChange={setUserMessage}
-            onSendMessage={() => handleSendMessage()}
-            onRegenerate={handleRegenerate}
-            hasMessages={messages.length > 1}
-            onKeyDown={handleKeyDown}
-            onTyping={handleUserTyping}
-          />
-        </Card>
+      <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl h-[80vh] flex flex-col">
+        <div className="flex h-full gap-4">
+          {/* Conversations sidebar for desktop */}
+          {!isMobile && (
+            <div className="hidden md:block w-64 h-full">
+              {renderConversationList()}
+            </div>
+          )}
+          
+          {/* Main chat area */}
+          <Card className="flex-grow flex flex-col overflow-hidden p-0 shadow-premium relative">
+            <ChatHeader 
+              onBackClick={() => navigate(-1)} 
+              title={
+                activeConversationId 
+                  ? conversations.find(c => c.id === activeConversationId)?.title || "Coach IA Personnel"
+                  : "Coach IA Personnel"
+              }
+              actions={
+                isMobile && (
+                  <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+                    <DrawerTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Menu de conversation</span>
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <div className="h-[80vh]">
+                        {renderConversationList()}
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
+                )
+              }
+            />
+            <ChatMessageList 
+              messages={messages} 
+              isLoading={isLoading} 
+              typingIndicator={typingIndicator || undefined}
+            />
+            <ChatInputForm
+              userMessage={userMessage}
+              isLoading={isLoading}
+              onUserMessageChange={setUserMessage}
+              onSendMessage={() => handleSendMessage()}
+              onRegenerate={handleRegenerate}
+              hasMessages={messages.length > 1}
+              onKeyDown={handleKeyDown}
+              onTyping={handleUserTyping}
+            />
+          </Card>
+        </div>
       </div>
     </ProtectedLayout>
   );
