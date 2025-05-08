@@ -128,13 +128,11 @@ export function useAudioPlayer() {
 
   const nextTrack = () => {
     // This will be implemented in the MusicContext
-    // But we need the placeholder here for consistency
     console.log('Next track requested from useAudioPlayer');
   };
 
   const previousTrack = () => {
     // This will be implemented in the MusicContext
-    // But we need the placeholder here for consistency
     console.log('Previous track requested from useAudioPlayer');
   };
 

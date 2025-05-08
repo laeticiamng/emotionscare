@@ -7,7 +7,7 @@ import PlayerControls from './PlayerControls';
 import ProgressBar from './ProgressBar';
 import TrackInfo from './TrackInfo';
 import VolumeControl from './VolumeControl';
-import { useAudioPlayer } from './useAudioPlayer';
+import { useAudioPlayer } from '@/components/music/player/useAudioPlayer';
 import { convertMusicTrackToTrack } from '@/services/music/converters';
 import { MusicTrack } from '@/types/music';
 import { Track } from '@/services/music/types';
