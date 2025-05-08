@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { ProgressBarProps } from '@/types/audio-player';
-import { formatTime } from '@/hooks/audio/audioPlayerUtils';
 
 /**
  * Audio progress bar with time indicators
@@ -9,6 +8,7 @@ import { formatTime } from '@/hooks/audio/audioPlayerUtils';
 const ProgressBar: React.FC<ProgressBarProps> = ({
   currentTime,
   duration,
+  formatTime,
   handleProgressClick
 }) => {
   return (

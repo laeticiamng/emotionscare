@@ -20,6 +20,7 @@ const MusicPlayer: React.FC = () => {
     previousTrack,
     handleProgressClick,
     handleVolumeChange,
+    formatTime,
     error
   } = useAudioPlayer();
   
@@ -66,6 +67,7 @@ const MusicPlayer: React.FC = () => {
             <ProgressBar 
               currentTime={currentTime} 
               duration={duration} 
+              formatTime={formatTime}
               handleProgressClick={handleProgressClick} 
             />
             
