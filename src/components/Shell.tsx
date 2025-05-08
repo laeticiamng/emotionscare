@@ -7,9 +7,13 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
 import useDrawerState from "@/hooks/useDrawerState";
+import { loadComponent } from "@/utils/loadComponent";
 
-// Import dynamique du MusicDrawer avec React.lazy
-const MusicDrawer = React.lazy(() => import("./music/player/MusicDrawer"));
+// Import dynamique du MusicDrawer avec notre utilitaire personnalisé
+const MusicDrawer = loadComponent(
+  () => import("./music/player/MusicDrawer"),
+  "default" // ou 'MusicDrawer' si vous avez un export nommé
+);
 
 interface ShellProps {
   children?: ReactNode;
@@ -42,7 +46,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Système de notifications toast */}
       <Toaster />
       
-      {/* Music Player Drawer - chargement avec Suspense */}
+      {/* Music Player Drawer - chargement avec Suspense et notre utilitaire personnalisé */}
       <Suspense fallback={null}>
         {isDrawerOpen && (
           <MusicDrawer open={isDrawerOpen} onClose={closeDrawer} />
