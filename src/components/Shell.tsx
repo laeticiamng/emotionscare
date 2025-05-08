@@ -7,8 +7,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
 import useLogger from "@/hooks/useLogger";
-// Import from barrel file
-import { MusicDrawer } from "./music/player";
+// Import direct du composant pour éviter les erreurs d'import
+import MusicDrawer from "./music/player/MusicDrawer";
 
 interface ShellProps {
   children?: ReactNode;
@@ -51,13 +51,8 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Toast notification system */}
       <Toaster />
       
-      {/* Music Player Drawer - Simple direct rendering without Suspense */}
-      {isDrawerOpen && (
-        <MusicDrawer 
-          open={isDrawerOpen} 
-          onClose={closeDrawer} 
-        />
-      )}
+      {/* Music Player Drawer - Rendu simple et direct */}
+      {isDrawerOpen && <MusicDrawer open={isDrawerOpen} onClose={closeDrawer} />}
     </div>
   );
 };

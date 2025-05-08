@@ -3,7 +3,8 @@ import React from 'react';
 import { Drawer, DrawerContent, DrawerClose, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { MusicPlayer } from './index';
+// Import direct sans passer par barrel pour éviter les références circulaires
+import MusicPlayer from './MusicPlayer';
 
 export interface MusicDrawerProps {
   open: boolean;
@@ -11,6 +12,9 @@ export interface MusicDrawerProps {
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
+  // Ne pas rendre le Drawer si pas ouvert, évite les problèmes de rendu conditionnel
+  if (!open) return null;
+  
   return (
     <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DrawerContent className="max-h-[80vh] focus:outline-none">

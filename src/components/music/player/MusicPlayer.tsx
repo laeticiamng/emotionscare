@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
-import { MusicControls } from './index';
+// Import direct pour éviter les références circulaires potentielles
+import MusicControls from './MusicControls';
 
 interface MusicPlayerProps {
   // Add props if needed
