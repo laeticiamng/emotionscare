@@ -1,116 +1,119 @@
 
+// Update the UserPreferences.theme to accept "pastel" as a valid value
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
 import { useToast } from '@/hooks/use-toast';
-import { UserPreferences } from '@/types';
+import { User, UserPreferences } from '@/types';
 import ThemeSelectionField from './ThemeSelectionField';
 import FontSizeField from './FontSizeField';
 import ColorAccentField from './ColorAccentField';
-import { updateUser } from '@/lib/userService';
+import { useAuth } from '@/contexts/AuthContext';
 
-const PreferencesForm: React.FC = () => {
-  const { user, setUser } = useAuth();
+// Extend the UserPreferences theme type to include "pastel"
+interface ExtendedUserPreferences extends Omit<UserPreferences, 'theme'> {
+  theme: "light" | "dark" | "system" | "pastel";
+}
+
+const PreferencesForm = () => {
+  const { user, updateUser } = useAuth();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
-  // Initialize with default preferences if user doesn't have them
-  const defaultPreferences: UserPreferences = {
-    theme: "light",
-    fontSize: "medium",
-    backgroundColor: "default",
-    accentColor: "#FF6F61",
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
+  // Create a form with default values
+  const form = useForm<ExtendedUserPreferences>({
+    defaultValues: {
+      theme: "light",
+      fontSize: "medium",
+      backgroundColor: "#ffffff",
+      accentColor: "#7C3AED",
+      notifications: {
+        email: true,
+        push: true,
+        sms: false
+      }
     }
-  };
+  });
   
-  // Use user's existing preferences or defaults
-  const [preferences, setPreferences] = useState<UserPreferences>(
-    user?.preferences || defaultPreferences
-  );
-
-  // Update preferences when user changes
+  // Load user preferences when user data is available
   useEffect(() => {
     if (user?.preferences) {
-      setPreferences(user.preferences);
-    }
-  }, [user?.preferences]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) {
-      toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour modifier vos préférences",
-        variant: "destructive"
+      const userPrefs = user.preferences;
+      form.reset({
+        theme: userPrefs.theme as "light" | "dark" | "system" | "pastel",
+        fontSize: userPrefs.fontSize,
+        backgroundColor: userPrefs.backgroundColor,
+        accentColor: userPrefs.accentColor,
+        notifications: userPrefs.notifications
       });
-      return;
     }
-    
-    setIsSubmitting(true);
-    
+  }, [user, form]);
+  
+  const onSubmit = async (data: ExtendedUserPreferences) => {
     try {
-      // Update user with new preferences
-      const updatedUser = await updateUser({
-        ...user,
-        preferences: preferences
-      });
+      setIsSaving(true);
       
-      setUser(updatedUser);
+      // In a real app, save to backend
+      // await updateUserPreferences(user.id, data);
+      
+      // Update local user state with new preferences
+      if (user) {
+        await updateUser({
+          ...user,
+          preferences: data as UserPreferences
+        });
+      }
       
       toast({
-        title: "Préférences mises à jour",
-        description: "Vos préférences ont été enregistrées avec succès"
+        title: "Préférences sauvegardées",
+        description: "Vos préférences ont été mises à jour avec succès."
       });
+      
     } catch (error) {
-      console.error("Failed to update preferences:", error);
+      console.error("Error saving preferences:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour vos préférences",
+        description: "Impossible de sauvegarder vos préférences.",
         variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false);
+      setIsSaving(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Préférences d'affichage</CardTitle>
-          <CardDescription>
-            Personnalisez votre expérience sur EmotionsCare
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <ThemeSelectionField 
-            value={preferences.theme} 
-            onChange={(theme) => setPreferences({...preferences, theme})} 
-          />
-          
-          <FontSizeField 
-            value={preferences.fontSize}
-            onChange={(fontSize) => setPreferences({...preferences, fontSize})}
-          />
-          
-          <ColorAccentField 
-            value={preferences.accentColor}
-            onChange={(accentColor) => setPreferences({...preferences, accentColor})}
-          />
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Enregistrement..." : "Enregistrer les préférences"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <ThemeSelectionField />
+        <FontSizeField />
+        <ColorAccentField />
+        
+        <FormField
+          control={form.control}
+          name="notifications.email"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Notifications par email</FormLabel>
+              </div>
+              <FormControl>
+                <input
+                  type="checkbox"
+                  checked={field.value}
+                  onChange={field.onChange}
+                  className="toggle"
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        
+        <Button type="submit" className="w-full" disabled={isSaving}>
+          {isSaving ? "Sauvegarde en cours..." : "Sauvegarder les préférences"}
+        </Button>
+      </form>
+    </Form>
   );
 };
 

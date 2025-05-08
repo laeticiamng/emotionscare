@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VRSessionTemplate, VRSession } from '@/types';
+import { VRSessionTemplate } from '@/types';
 import VRSessionWithMusic from './VRSessionWithMusic';
 
 interface VRActiveSessionProps {

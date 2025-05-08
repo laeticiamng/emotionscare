@@ -120,7 +120,6 @@ interface VRSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   isMobile: boolean;
-  userId: string;
   latestEmotion?: {
     emotion: string;
     score: number;
@@ -131,9 +130,18 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
   collapsed, 
   onToggle, 
   isMobile,
-  userId,
   latestEmotion
 }) => {
+  // Find a suitable VR template based on the latest emotion
+  const recommendedTemplate = latestEmotion ? {
+    id: 'recommended',
+    theme: 'Méditation guidée',
+    title: 'Session recommandée',
+    duration: 5,
+    preview_url: '',
+    is_audio_only: true,
+  } : undefined;
+  
   return (
     <DashboardSection 
       title="Micro-pause VR" 
@@ -141,10 +149,7 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
       onToggle={onToggle}
       isMobile={isMobile}
     >
-      <VRPromptWidget 
-        userId={userId} 
-        latestEmotion={latestEmotion}
-      />
+      <VRPromptWidget template={recommendedTemplate} />
     </DashboardSection>
   );
 };

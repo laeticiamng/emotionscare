@@ -101,6 +101,7 @@ export interface Emotion {
   confidence?: number;
   audio_url?: string;
   source?: string;
+  is_confidential?: boolean;
 }
 
 export interface EmotionScanResult {
@@ -120,6 +121,7 @@ export interface EmotionResult {
   confidence: number;
   transcript?: string;
   score?: number;
+  feedback?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -176,6 +178,7 @@ export interface MoodData {
   sentiment?: number;
   anxiety?: number;
   energy?: number;
+  originalDate?: string;
 }
 
 // Reports
@@ -212,6 +215,18 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
+}
+
+// Challenge type for gamification
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  progress: number;
+  total: number;
+  completed: boolean;
+  category?: string;
 }
 
 // Re-export types from other modules for compatibility

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +20,15 @@ const OnboardingPage: React.FC = () => {
   const [fontSize, setFontSize] = useState<"small" | "medium" | "large">("medium");
   const [backgroundColor, setBackgroundColor] = useState<"default" | "blue" | "mint" | "coral">("default");
   
+  const themeOptions = [
+    { value: "light", label: "Lumineux" },
+    { value: "dark", label: "Sombre" },
+    { value: "system", label: "Système" },
+    { value: "pastel", label: "Pastel" } 
+  ] as const;
+
+  type ThemeOption = (typeof themeOptions)[number]['value'];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;

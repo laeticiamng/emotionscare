@@ -16,7 +16,7 @@ import { calculateAverageHeartRateReduction, calculateTotalMinutes } from '@/uti
 import { useToast } from '@/hooks/use-toast';
 
 // Import des données simulées pour la démo
-import { mockVRTemplates } from '@/data/mockVRTemplates';
+import { mockVRTemplatesData } from '@/data/mockVRTemplates';
 
 const VRPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("discover");
@@ -43,7 +43,7 @@ const VRPage: React.FC = () => {
         
         // Dans une application réelle, ces données viendraient d'une API
         // Pour l'instant, on utilise des données simulées
-        setTemplates(mockVRTemplates);
+        setTemplates(mockVRTemplatesData);
         setSessions([
           { date: new Date().toISOString(), duration_seconds: 300, heart_rate_before: 85, heart_rate_after: 72 },
           { date: new Date(Date.now() - 86400000).toISOString(), duration_seconds: 600, heart_rate_before: 90, heart_rate_after: 75 }
@@ -122,7 +122,7 @@ const VRPage: React.FC = () => {
         </TabsList>
         
         <TabsContent value="discover" className="space-y-6">
-          <VREmotionRecommendation onSelectTemplate={handleSelectTemplate} />
+          <VREmotionRecommendation />
           <VRTemplateGrid templates={templates} onSelectTemplate={handleSelectTemplate} />
         </TabsContent>
         
@@ -156,7 +156,16 @@ const VRPage: React.FC = () => {
         <TabsContent value="stats">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
-              <VRActiveSession />
+              {activeTemplate ? (
+                <VRActiveSession
+                  template={activeTemplate}
+                  onComplete={handleCompleteSession}
+                />
+              ) : (
+                <div className="p-8 bg-muted rounded-lg text-center">
+                  <p>Aucune session VR active actuellement</p>
+                </div>
+              )}
             </div>
             <div>
               <VRSessionStats

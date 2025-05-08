@@ -44,7 +44,7 @@ const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emoti
   );
   
   // Descriptions of VR benefits by emotion
-  const vrDescription = {
+  const vrDescription: Record<string, string> = {
     happy: "Prolongez votre bien-être avec une immersion visuelle complète",
     sad: "Une expérience apaisante pour améliorer votre humeur naturellement",
     angry: "Un environnement calme pour retrouver votre sérénité intérieure",
