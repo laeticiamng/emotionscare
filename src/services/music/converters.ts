@@ -10,9 +10,9 @@ export function convertMusicTrackToTrack(musicTrack: MusicTrack): Track {
     id: musicTrack.id,
     title: musicTrack.title,
     artist: musicTrack.artist,
-    duration: musicTrack.duration,
-    url: musicTrack.audioUrl, // Assurez-vous que cette propriété est correcte
-    cover: musicTrack.coverUrl // Et celle-ci aussi
+    duration: musicTrack.duration, // This is now required in both types
+    url: musicTrack.audioUrl || musicTrack.url || '', // Use audioUrl or fallback to url
+    cover: musicTrack.coverUrl || musicTrack.cover || '' // Use coverUrl or fallback to cover
   };
 }
 
@@ -24,10 +24,12 @@ export function convertTrackToMusicTrack(track: Track): MusicTrack {
     id: track.id,
     title: track.title,
     artist: track.artist,
-    duration: track.duration,
-    audioUrl: track.url, // Assurez-vous que cette conversion est correcte
+    duration: track.duration, // This is now required in both types
+    audioUrl: track.url,
     coverUrl: track.cover || '',
-    emotion: 'neutral' // Émotion par défaut
+    emotion: 'neutral', // Émotion par défaut
+    url: track.url, // For compatibility
+    cover: track.cover // For compatibility
   };
 }
 

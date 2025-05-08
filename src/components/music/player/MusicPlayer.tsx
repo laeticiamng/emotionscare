@@ -8,6 +8,7 @@ import ProgressBar from './ProgressBar';
 import TrackInfo from './TrackInfo';
 import VolumeControl from './VolumeControl';
 import { useAudioPlayer } from './useAudioPlayer';
+import { convertMusicTrackToTrack } from '@/services/music/converters';
 
 const MusicPlayer = () => {
   const { currentTrack } = useMusic();
@@ -40,6 +41,12 @@ const MusicPlayer = () => {
     );
   }
   
+  const handlePlay = () => {
+    // Convert MusicTrack to Track if needed before playing
+    const trackToPlay = 'url' in currentTrack ? currentTrack : convertMusicTrackToTrack(currentTrack);
+    playTrack(trackToPlay);
+  };
+  
   return (
     <div className="rounded-md border p-4 bg-background">
       <TrackInfo 
@@ -59,7 +66,7 @@ const MusicPlayer = () => {
         <PlayerControls 
           isPlaying={isPlaying} 
           loadingTrack={loadingTrack} 
-          onPlay={() => playTrack(currentTrack)} 
+          onPlay={handlePlay} 
           onPause={pauseTrack} 
           onPrevious={previousTrack} 
           onNext={nextTrack} 
