@@ -15,17 +15,21 @@ const InvitationsTab: React.FC = () => {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [stats, setStats] = useState<InvitationStats>({
     total: 0,
-    sent: 0,
     pending: 0,
     accepted: 0,
-    expired: 0
+    expired: 0,
+    sent: 0,
+    recent_invites: []
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const statsData = await getInvitationsStats();
-        setStats(statsData);
+        setStats({
+          ...statsData,
+          recent_invites: statsData.recent_invites || []
+        });
       } catch (error) {
         console.error('Error fetching invitation stats:', error);
       }

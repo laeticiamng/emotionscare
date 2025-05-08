@@ -1,5 +1,3 @@
-
-// Update the UserPreferences.theme to accept "pastel" as a valid value
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
@@ -11,8 +9,8 @@ import FontSizeField from './FontSizeField';
 import ColorAccentField from './ColorAccentField';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Extend the UserPreferences theme type to include "pastel"
-interface ExtendedUserPreferences extends Omit<UserPreferences, 'theme'> {
+// Match the UserPreferences interface from the types file
+interface ExtendedUserPreferences extends UserPreferences {
   theme: "light" | "dark" | "system" | "pastel";
 }
 
@@ -21,13 +19,16 @@ const PreferencesForm = () => {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   
-  // Create a form with default values
+  // Create a form with default values that match our UserPreferences type
   const form = useForm<ExtendedUserPreferences>({
     defaultValues: {
       theme: "light",
-      fontSize: "medium",
-      backgroundColor: "#ffffff",
-      accentColor: "#7C3AED",
+      notifications_enabled: true,
+      language: "fr",
+      privacy_level: "private",
+      share_data_with_coach: false,
+      daily_reminder: true,
+      reminder_time: "09:00",
       notifications: {
         email: true,
         push: true,
@@ -42,10 +43,17 @@ const PreferencesForm = () => {
       const userPrefs = user.preferences;
       form.reset({
         theme: userPrefs.theme as "light" | "dark" | "system" | "pastel",
-        fontSize: userPrefs.fontSize,
-        backgroundColor: userPrefs.backgroundColor,
-        accentColor: userPrefs.accentColor,
-        notifications: userPrefs.notifications
+        notifications_enabled: userPrefs.notifications_enabled,
+        language: userPrefs.language,
+        privacy_level: userPrefs.privacy_level,
+        share_data_with_coach: userPrefs.share_data_with_coach,
+        daily_reminder: userPrefs.daily_reminder,
+        reminder_time: userPrefs.reminder_time,
+        notifications: userPrefs.notifications || {
+          email: true,
+          push: true,
+          sms: false
+        }
       });
     }
   }, [user, form]);
@@ -100,7 +108,7 @@ const PreferencesForm = () => {
               <FormControl>
                 <input
                   type="checkbox"
-                  checked={field.value}
+                  checked={Boolean(field.value)}
                   onChange={field.onChange}
                   className="toggle"
                 />

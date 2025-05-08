@@ -1,159 +1,111 @@
+import { User, UserRole } from '@/types';
 
-import { v4 as uuidv4 } from 'uuid';
-import { User, UserRole } from '../types';
-
-// Mock Users
-export const users: Record<string, User> = {
-  // Admin User
-  "admin@example.com": {
-    id: "1",
-    name: "Admin",
-    email: "admin@example.com",
+// Mock user data for development and testing
+export const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    role: UserRole.USER,
+    emotional_score: 75,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
+    team_id: 'team-1',
+    team_name: 'Marketing',
+    anonymity_code: 'JD123',
+    last_active: '2023-03-15T10:30:00Z'
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+    role: UserRole.USER,
+    emotional_score: 60,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
+    team_id: 'team-2',
+    team_name: 'Sales',
+    anonymity_code: 'JS456',
+    last_active: '2023-03-14T16:45:00Z'
+  },
+  {
+    id: '3',
+    name: 'Alice Johnson',
+    email: 'alice.j@example.com',
     role: UserRole.ADMIN,
-    created_at: new Date().toISOString(),
-    anonymity_code: "A1",
-    emotional_score: 85,
-    avatar: "https://i.pravatar.cc/300?img=68",
-    onboarded: true,
+    emotional_score: 90,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
+    team_id: 'team-3',
+    team_name: 'IT',
+    anonymity_code: 'AJ789',
+    last_active: '2023-03-16T09:15:00Z'
   },
-  
-  // Sophie - Primary user
-  "sophie@example.com": {
-    id: "2",
-    name: "Sophie",
-    email: "sophie@example.com",
+  {
+    id: '4',
+    name: 'Emma Dupont',
+    email: 'emma.d@example.com',
+    role: UserRole.MANAGER, // Use the enum value instead of string literal
+    emotional_score: 82,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma',
+    team_id: 'team-1',
+    team_name: 'Direction',
+    anonymity_code: 'EM89',
+    last_active: '2023-03-10T14:22:00Z'
+  },
+  {
+    id: '5',
+    name: 'Luc Martin',
+    email: 'luc.m@example.com',
     role: UserRole.USER,
-    created_at: new Date().toISOString(),
-    anonymity_code: "S1",
-    emotional_score: 78,
-    avatar: "https://i.pravatar.cc/300?img=48",
-    onboarded: true,
+    emotional_score: 55,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=luc',
+    team_id: 'team-2',
+    team_name: 'RH',
+    anonymity_code: 'LM234',
+    last_active: '2023-03-12T11:58:00Z'
   },
-  
-  // Marc - User with low emotional score
-  "marc@example.com": {
-    id: "3",
-    name: "Marc",
-    email: "marc@example.com",
+  {
+    id: '6',
+    name: 'Chloé Bernard',
+    email: 'chloe.b@example.com',
     role: UserRole.USER,
-    created_at: new Date().toISOString(),
-    anonymity_code: "M1",
-    emotional_score: 45,
-    avatar: "https://i.pravatar.cc/300?img=57",
-    onboarded: true,
+    emotional_score: 68,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chloe',
+    team_id: 'team-3',
+    team_name: 'Comptabilité',
+    anonymity_code: 'CB567',
+    last_active: '2023-03-13T08:05:00Z'
   },
-  
-  // Emma - Manager
-  "emma@example.com": {
-    id: "4",
-    name: "Emma",
-    email: "emma@example.com",
-    role: "manager",
-    created_at: new Date().toISOString(),
-    anonymity_code: "E1",
-    emotional_score: 72,
-    avatar: "https://i.pravatar.cc/300?img=45",
-    onboarded: true,
-  },
-};
-
-// Export mockUsers with the array version to match what's expected in imports
-export const mockUsers = Object.values(users);
-
-// Current user state (simulating auth)
-export let currentUser: User | null = null;
-
-// Auth functions
-export const loginUser = (email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      console.log(`MockUsers - Attempting login with email: ${email} and password: ${password ? "provided" : "empty"}`);
-      
-      // For Sophie user
-      if (email === 'sophie@example.com' && password === 'sophie') {
-        const user = users["sophie@example.com"];
-        if (user) {
-          console.log("MockUsers - Login successful for Sophie:", user);
-          currentUser = user;
-          resolve(user);
-          return;
-        }
-      }
-      
-      // For Admin user
-      if (email === 'admin@example.com' && password === 'admin') {
-        const user = users["admin@example.com"];
-        if (user) {
-          console.log("MockUsers - Login successful for Admin:", user);
-          currentUser = user;
-          resolve(user);
-          return;
-        }
-      }
-      
-      // For other users - require password match
-      const user = users[email];
-      if (user) {
-        // Simple password check - in a real app this would be hashed
-        if (password) {
-          console.log("MockUsers - Login successful for user:", user);
-          currentUser = user;
-          resolve(user);
-          return;
-        }
-      }
-      
-      console.log("MockUsers - Login failed: Invalid email or password");
-      reject(new Error('Email ou mot de passe invalide'));
-    }, 800); // Simulate network delay
-  });
-};
-
-export const logoutUser = (): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("MockUsers - Logging out user:", currentUser?.email);
-      currentUser = null;
-      resolve();
-    }, 300);
-  });
-};
-
-export const updateUser = (userData: Partial<User>): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (!currentUser) {
-        console.error("MockUsers - Cannot update user: No user is logged in");
-        reject(new Error('User not logged in'));
-        return;
-      }
-      
-      const updatedUser = { ...currentUser, ...userData };
-      currentUser = updatedUser;
-      
-      // Update the mock users array too
-      const index = Object.keys(users).findIndex(u => u === currentUser?.email);
-      if (index !== -1) {
-        users[currentUser?.email] = updatedUser;
-        console.log("MockUsers - User updated:", updatedUser);
-      }
-      
-      resolve(updatedUser);
-    }, 800);
-  });
-};
-
-export const getCurrentUser = (): User | null => {
-  console.log("MockUsers - Getting current user:", currentUser);
-  return currentUser;
-};
-
-// Generate random anonymity code
-export const generateAnonymityCode = (): string => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  {
+    id: '7',
+    name: 'Gabriel Dubois',
+    email: 'gabriel.d@example.com',
+    role: UserRole.USER,
+    emotional_score: 79,
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=gabriel',
+    team_id: 'team-1',
+    team_name: 'Juridique',
+    anonymity_code: 'GD890',
+    last_active: '2023-03-11T17:33:00Z'
   }
-  return code;
+];
+
+// Function to generate a random user
+export const generateRandomUser = (): User => {
+  const id = Math.random().toString(36).substring(2, 15);
+  const name = `Random User ${id}`;
+  const email = `random${id}@example.com`;
+  const roles = Object.values(UserRole);
+  const role = roles[Math.floor(Math.random() * roles.length)];
+  const emotional_score = Math.floor(Math.random() * 100);
+  const anonymity_code = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+  return {
+    id,
+    name,
+    email,
+    role,
+    emotional_score,
+    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`,
+    anonymity_code,
+    last_active: new Date().toISOString()
+  };
 };

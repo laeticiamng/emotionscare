@@ -7,6 +7,8 @@ export interface Track {
   duration: number;
   url: string;
   cover?: string;
+  coverUrl?: string;
+  audioUrl?: string;
 }
 
 export interface Playlist {

@@ -6,7 +6,7 @@ import { X, Music, ListMusic, Heart, MoreHorizontal } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import MusicPlayer from './MusicPlayer';
-import { MusicTrack } from '@/types/music';
+import { MusicTrack } from '@/types';
 
 interface MusicDrawerProps {
   open: boolean;
@@ -16,6 +16,14 @@ interface MusicDrawerProps {
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
   const { currentPlaylist, playTrack, currentTrack } = useMusic();
   const [activeTab, setActiveTab] = useState<string>('player');
+
+  // Function to get the cover image from track
+  const getCoverImage = (track: MusicTrack) => {
+    if (track.coverUrl) return track.coverUrl;
+    if (track.cover) return track.cover;
+    if (track.coverImage) return track.coverImage;
+    return null;
+  };
 
   // Marquer la piste comme favorite (pour démonstration)
   const handleFavorite = (track: MusicTrack) => {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -46,17 +45,13 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     ) : null;
   }
   
-  // Déterminer l'URL de la couverture de la piste selon le type de piste
+  // Déterminer l'URL de la couverture de la piste
   const getCoverUrl = () => {
     if (!currentTrack) return null;
     
-    if ('coverUrl' in currentTrack && currentTrack.coverUrl) {
-      return currentTrack.coverUrl;
-    }
-    
-    if ('cover' in currentTrack && currentTrack.cover) {
-      return currentTrack.cover;
-    }
+    if (currentTrack.coverUrl) return currentTrack.coverUrl;
+    if (currentTrack.cover) return currentTrack.cover;
+    if (currentTrack.coverImage) return currentTrack.coverImage;
     
     return null;
   };

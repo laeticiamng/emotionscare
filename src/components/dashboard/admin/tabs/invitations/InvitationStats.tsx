@@ -25,7 +25,7 @@ export const InvitationStatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
         <CardContent>
           <div className="text-2xl font-bold">{stats.total}</div>
           <p className="text-xs text-muted-foreground">
-            {stats.total > 0 ? `Dont ${stats.sent} envoyées` : 'Aucune invitation'}
+            {stats.total > 0 ? `Dont ${stats.sent || 0} envoyées` : 'Aucune invitation'}
           </p>
         </CardContent>
       </Card>

@@ -1,8 +1,6 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User } from '@/types';
-import { loginUser, logoutUser, getCurrentUser } from '@/data/mockUsers';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase-client';
+import { User, UserRole } from '@/types';
 
 interface AuthContextProps {
   user: User | null;
@@ -21,59 +19,40 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Update the mock user objects to include created_at
-const mockAdminUser: User = {
+// Example user data for development
+const MOCK_ADMIN_USER: User = {
   id: '1',
-  email: 'admin@example.com',
   name: 'Admin User',
-  role: 'admin',
-  avatar_url: 'https://i.pravatar.cc/150?img=1',
-  joined_at: new Date().toISOString(),
-  anonymity_code: 'ADMIN123',
-  emotional_score: 85,
-  onboarded: true,
-  created_at: new Date().toISOString(),
+  email: 'admin@example.com',
+  role: UserRole.ADMIN, // Using the enum value instead of string literal
+  emotional_score: 78,
+  avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
   preferences: {
     theme: 'light',
-    fontSize: 'medium',
-    backgroundColor: '#ffffff',
-    accentColor: '#007bff',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
-    }
+    language: 'fr',
+    privacy_level: 'private',
+    notifications_enabled: true
   }
 };
 
-const mockNewUser: User = {
+const MOCK_USER: User = {
   id: '2',
-  email: 'new@example.com',
-  name: 'New User',
-  role: 'user',
-  avatar_url: 'https://i.pravatar.cc/150?img=2',
-  joined_at: new Date().toISOString(),
-  anonymity_code: 'NEW456',
-  emotional_score: 70,
-  onboarded: false,
-  created_at: new Date().toISOString(),
+  name: 'Regular User',
+  email: 'user@example.com',
+  role: UserRole.USER, // Using the enum value instead of string literal
+  emotional_score: 65,
+  avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
   preferences: {
     theme: 'light',
-    fontSize: 'medium',
-    backgroundColor: '#ffffff',
-    accentColor: '#007bff',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
-    }
+    language: 'fr',
+    privacy_level: 'private',
+    notifications_enabled: true
   }
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   // Computed property for authentication status
   const isAuthenticated = user !== null;
@@ -82,8 +61,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const loadUser = async () => {
       setIsLoading(true);
       try {
-        const currentUser = getCurrentUser();
-        setUser(currentUser);
+        const currentUser = await supabase.auth.getUser();
+        setUser(currentUser.user);
       } catch (error) {
         console.error("Failed to load user:", error);
       } finally {
@@ -97,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
-      const user = await loginUser(email, password);
+      const { user } = await supabase.auth.signIn({ email, password });
       setUser(user);
       return user;
     } catch (error: any) {
@@ -111,9 +90,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await logoutUser();
+      await supabase.auth.signOut();
       setUser(null);
-      navigate('/login');
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {

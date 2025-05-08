@@ -45,15 +45,23 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ className, compact = false })
     );
   }
 
+  // Function to get the cover image from track
+  const getCoverImage = () => {
+    if (currentTrack.coverUrl) return currentTrack.coverUrl;
+    if (currentTrack.cover) return currentTrack.cover;
+    if (currentTrack.coverImage) return currentTrack.coverImage;
+    return null;
+  };
+
   return (
     <Card className={cn("w-full", className)}>
       <CardContent className={cn("p-6", compact ? "space-y-2" : "space-y-4")}>
         {/* Track Info */}
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-secondary/30 rounded overflow-hidden flex-shrink-0">
-            {currentTrack.coverUrl && (
+            {getCoverImage() && (
               <img 
-                src={currentTrack.coverUrl} 
+                src={getCoverImage()} 
                 alt={currentTrack.title} 
                 className="w-full h-full object-cover"
               />

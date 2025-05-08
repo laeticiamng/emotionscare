@@ -55,6 +55,14 @@ export function MusicMiniPlayer() {
     );
   }
 
+  // Function to get the cover image from track
+  const getCoverImage = () => {
+    if (currentTrack.cover) return currentTrack.cover;
+    if (currentTrack.coverUrl) return currentTrack.coverUrl;
+    if (currentTrack.coverImage) return currentTrack.coverImage;
+    return null;
+  };
+
   return (
     <Card className="mb-6 overflow-hidden cursor-pointer" onClick={openDrawer}>
       <CardContent className="p-4">
@@ -70,9 +78,9 @@ export function MusicMiniPlayer() {
         
         <div className="flex items-center mt-4 space-x-3">
           <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center shrink-0 overflow-hidden">
-            {currentTrack.cover || currentTrack.coverUrl ? (
+            {getCoverImage() ? (
               <img 
-                src={currentTrack.coverUrl || currentTrack.cover} 
+                src={getCoverImage()} 
                 alt={`${currentTrack.title} cover`} 
                 className="w-full h-full object-cover"
               />

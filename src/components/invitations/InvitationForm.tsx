@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InvitationFormData } from '@/types';
+import { InvitationFormData, UserRole } from '@/types';
 import { sendInvitation } from '@/services/invitationService';
 import { useToast } from '@/hooks/use-toast';
 
 const invitationSchema = z.object({
   email: z.string().email("L'adresse email n'est pas valide"),
-  role: z.enum(['employe_classique', 'analyste', 'responsable_bien_etre'])
+  role: z.string()
 });
 
 interface InvitationFormProps {
@@ -26,7 +26,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
     resolver: zodResolver(invitationSchema),
     defaultValues: {
       email: '',
-      role: 'employe_classique'
+      role: UserRole.EMPLOYEE
     }
   });
   

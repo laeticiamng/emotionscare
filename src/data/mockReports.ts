@@ -1,7 +1,6 @@
+import { MoodData, Report } from '../types';
 
-import { Report } from '../types';
-
-// Mock Reports
+// Mock report data for development and testing
 export const mockReports: Report[] = [
   {
     id: '1',

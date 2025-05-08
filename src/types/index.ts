@@ -3,7 +3,10 @@
 export enum UserRole {
   USER = 'user',
   MANAGER = 'manager',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
+  EMPLOYEE = 'employe_classique',
+  ANALYST = 'analyste',
+  WELLBEING_MANAGER = 'responsable_bien_etre'
 }
 
 export interface User {
@@ -34,6 +37,14 @@ export interface UserPreferences {
   share_data_with_coach?: boolean;
   daily_reminder?: boolean;
   reminder_time?: string;
+  fontSize?: string;
+  backgroundColor?: string;
+  accentColor?: string;
+  notifications?: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
 }
 
 // Emotion types
@@ -49,10 +60,11 @@ export interface Emotion {
   ai_feedback?: string;
   confidence?: number;
   source?: string;
+  intensity?: number; // Added to match usage
 }
 
 export interface EmotionResult {
-  id?: string; // Optional since some API responses might not include an ID
+  id?: string;
   emotion: string;
   confidence?: number;
   transcript?: string;
@@ -62,6 +74,9 @@ export interface EmotionResult {
   score?: number;
   ai_feedback?: string;
   recommendations?: string[];
+  intensity?: number;
+  user_id?: string;
+  date?: string;
 }
 
 // Badge types
@@ -123,12 +138,15 @@ export interface VRSession {
 export interface MusicTrack {
   id: string;
   title: string;
-  artist?: string;
+  artist: string;
   url: string;
   duration?: number;
   externalUrl?: string;
   mood?: string;
   coverImage?: string;
+  cover?: string;
+  coverUrl?: string;
+  audioUrl?: string; // Added to match usage
 }
 
 export interface MusicPlaylist {
@@ -146,10 +164,12 @@ export interface JournalEntry {
   date: string;
   title?: string;
   content: string;
+  text?: string; // Added for backward compatibility
   mood?: string;
   mood_score?: number;
   tags?: string[];
   is_private: boolean;
+  ai_feedback?: string;
 }
 
 // Mood data for charts
@@ -169,7 +189,7 @@ export interface MoodData {
 export interface InvitationFormData {
   email: string;
   name?: string;
-  role: UserRole;
+  role: string;
   team_id?: string;
   message?: string;
 }
@@ -179,9 +199,27 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
+  sent: number; // Added to match usage
   recent_invites: {
     email: string;
     status: string;
     created_at: string;
   }[];
+}
+
+// Report type for mock data
+export interface Report {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+  type: string;
+  data: any;
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message?: string;
+  email?: string;
+  role?: string;
 }

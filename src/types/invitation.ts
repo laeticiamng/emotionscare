@@ -5,11 +5,16 @@ export interface InvitationFormData {
 }
 
 export interface InvitationStats {
-  total: number; // Added required property
+  total: number;
   sent: number;
   pending: number;
   accepted: number;
   expired: number;
+  recent_invites?: {
+    email: string;
+    status: string;
+    created_at: string;
+  }[];
 }
 
 export interface InvitationVerificationResult {
