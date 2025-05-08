@@ -8,7 +8,7 @@ import WelcomeHero from '@/components/home/WelcomeHero';
 import ModulesSection from '@/components/home/ModulesSection';
 import { Shell } from '@/components/Shell';
 
-export default function Index() {
+const Index = () => {
   const { user, isAuthenticated } = useAuth();
   
   return (
@@ -61,4 +61,6 @@ export default function Index() {
       </div>
     </Shell>
   );
-}
+};
+
+export default Index;

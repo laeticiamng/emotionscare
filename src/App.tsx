@@ -24,7 +24,7 @@ import CoachChatPage from './pages/CoachChatPage';
 import VRPage from './pages/VRPage';
 import MusicPage from './pages/MusicPage';
 
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 
 function App() {
@@ -52,7 +52,7 @@ function AppRoutes({ toast }) {
       toast({
         title: "Bienvenue !",
         description: `Bonjour ${user.name}, ravi de vous revoir.`,
-      })
+      });
     }
   }, [isAuthenticated, user, toast]);
 
@@ -75,7 +75,7 @@ function AppRoutes({ toast }) {
         <Route path="/admin" element={<ProtectedLayout requireRole="admin"><NotImplementedPage /></ProtectedLayout>} />
         
         {/* Music Therapy Routes */}
-        <Route path="/music" element={<ProtectedLayout><MusicTherapyPage /></ProtectedLayout>} />
+        <Route path="/music" element={<ProtectedLayout><MusicPage /></ProtectedLayout>} />
         <Route path="/music/create" element={<ProtectedLayout><MusicGenerationPage /></ProtectedLayout>} />
         <Route path="/music/preferences" element={<ProtectedLayout><MusicPreferencesPage /></ProtectedLayout>} />
         
