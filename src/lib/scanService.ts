@@ -21,6 +21,7 @@ export interface EmotionResult {
   date?: string;
   intensity?: number;
   score?: number;
+  recommendations?: string[];
 }
 
 // Function to analyze audio stream

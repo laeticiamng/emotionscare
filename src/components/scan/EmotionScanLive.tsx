@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mic, MicOff, Loader2, AudioWaveform, Check } from 'lucide-react';
+import { Mic, MicOff, Loader2, AudioWaveform } from 'lucide-react';
 import AudioProcessor from './live/AudioProcessor';
 import EmotionResult from './live/EmotionResult';
 import { useToast } from '@/hooks/use-toast';
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import EmptyState from './live/EmptyState';
 import MusicEmotionRecommendation from './live/MusicEmotionRecommendation';
+import LiveEmotionResults from './live/LiveEmotionResults';
 
 interface EmotionScanLiveProps {
   userId?: string;
@@ -84,12 +85,9 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
     setResult(resultData);
     setIsListening(false);
     setIsProcessing(false);
-    
-    // Save the emotion scan
-    saveResult(emotionData);
   };
   
-  const saveResult = async (emotionData: Emotion) => {
+  const saveResult = async () => {
     if (!userId) {
       toast({
         title: 'Non connecté',
@@ -99,17 +97,26 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
       return;
     }
     
+    if (!emotion || !result) {
+      toast({
+        title: 'Aucun résultat',
+        description: 'Aucun scan à sauvegarder.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     try {
       setIsSaving(true);
-      await saveRealtimeEmotionScan(emotionData, userId);
+      await saveRealtimeEmotionScan(emotion, userId);
       
       toast({
         title: 'Scan sauvegardé',
         description: 'Votre scan émotionnel a été enregistré.'
       });
       
-      if (onComplete) {
-        onComplete(emotionData);
+      if (onComplete && emotion) {
+        onComplete(emotion);
       }
       
       if (onResultSaved) {
@@ -125,6 +132,11 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
     } finally {
       setIsSaving(false);
     }
+  };
+  
+  const handleReset = () => {
+    setEmotion(null);
+    setResult(null);
   };
 
   const renderRecordingStatus = () => {
@@ -156,29 +168,31 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
       <div className="flex flex-col items-center space-y-6">
         <h3 className="text-xl font-semibold">Scan émotionnel en direct</h3>
         
-        <div className="flex items-center space-x-4">
-          <Button
-            onClick={handleToggleListen}
-            variant={isListening ? "destructive" : "default"}
-            disabled={isProcessing || isSaving}
-            className="relative h-14 w-14 rounded-full p-0"
-            aria-label={isListening ? "Arrêter l'écoute" : "Démarrer l'écoute"}
-          >
-            {isListening ? 
-              <MicOff className="h-6 w-6" /> : 
-              <Mic className="h-6 w-6" />
-            }
-            {isListening && (
-              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-ping" />
-            )}
-          </Button>
-          <div>
-            <p className="text-sm text-muted-foreground">
-              {isListening ? 'Cliquez pour arrêter...' : 'Cliquez pour démarrer'}
-            </p>
-            <p className="text-xs text-muted-foreground">{progress}</p>
+        {!result && (
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={handleToggleListen}
+              variant={isListening ? "destructive" : "default"}
+              disabled={isProcessing || isSaving}
+              className="relative h-14 w-14 rounded-full p-0"
+              aria-label={isListening ? "Arrêter l'écoute" : "Démarrer l'écoute"}
+            >
+              {isListening ? 
+                <MicOff className="h-6 w-6" /> : 
+                <Mic className="h-6 w-6" />
+              }
+              {isListening && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-ping" />
+              )}
+            </Button>
+            <div>
+              <p className="text-sm text-muted-foreground">
+                {isListening ? 'Cliquez pour arrêter...' : 'Cliquez pour démarrer'}
+              </p>
+              <p className="text-xs text-muted-foreground">{progress}</p>
+            </div>
           </div>
-        </div>
+        )}
         
         {renderRecordingStatus()}
         
@@ -204,47 +218,32 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
           </div>
         )}
         
-        {isSaving && (
-          <div className="flex items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin mr-2 text-primary" />
-            <span className="text-sm">Sauvegarde en cours...</span>
+        {!result && (
+          <div className="flex items-center space-x-2 w-full justify-center">
+            <Switch
+              id="confidential-mode"
+              checked={isConfidential}
+              onCheckedChange={setIsConfidential}
+            />
+            <Label htmlFor="confidential-mode" className="text-sm text-muted-foreground cursor-pointer">
+              Mode confidentiel (pas de stockage de l'audio)
+            </Label>
           </div>
         )}
         
-        <div className="flex items-center space-x-2 w-full justify-center">
-          <Switch
-            id="confidential-mode"
-            checked={isConfidential}
-            onCheckedChange={setIsConfidential}
-          />
-          <Label htmlFor="confidential-mode" className="text-sm text-muted-foreground cursor-pointer">
-            Mode confidentiel (pas de stockage de l'audio)
-          </Label>
-        </div>
-        
-        {result && emotion ? (
+        {result && (
           <div className="w-full space-y-4">
-            <div className="bg-muted/30 rounded-lg p-4 animate-fade-in">
-              <div className="flex items-center gap-2 mb-2">
-                <Check className="text-green-500 h-5 w-5" />
-                <h4 className="font-medium">Analyse complétée</h4>
-              </div>
-              <EmotionResult 
-                emotion={result.emotion || ''} 
-                confidence={result.confidence || 0} 
-                transcript={result.transcript || ''} 
-              />
-            </div>
-            
-            <MusicEmotionRecommendation 
-              emotionResult={result} 
-              isLoading={isSaving} 
+            <LiveEmotionResults
+              result={result}
+              onSave={saveResult}
+              onReset={handleReset}
+              isSaving={isSaving}
             />
           </div>
-        ) : (
-          !isListening && !isProcessing && !error && (
-            <EmptyState message="Cliquez sur le bouton pour commencer l'analyse vocale et obtenir des recommandations musicales personnalisées" />
-          )
+        )}
+        
+        {!isListening && !isProcessing && !error && !result && (
+          <EmptyState message="Cliquez sur le bouton pour commencer l'analyse vocale et obtenir des recommandations musicales personnalisées" />
         )}
       </div>
       
