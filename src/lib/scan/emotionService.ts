@@ -8,6 +8,7 @@ export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion 
     const emotionData = {
       ...emotion,
       date: emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date,
+      user_id: emotion.user_id || '', // Ensure user_id is always provided
     };
     
     // Here you would typically insert into a database
