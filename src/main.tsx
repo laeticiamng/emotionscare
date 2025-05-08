@@ -1,4 +1,3 @@
-
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom'; 
@@ -9,22 +8,25 @@ import './styles/components.css';
 import './App.css';
 
 // --- DEBUG IMPORTS -------------------------------------------------
-Object.entries(
-  import.meta.glob('/src/**/*.{tsx,ts,jsx,js}')
-).forEach(async ([path, loader]) => {
+const lazyModules = import.meta.glob(
+  '/src/**/*.{tsx,ts,jsx,js}',
+  { eager: false }    // <-- on laisse Vite charger à la demande
+) as Record<string, () => Promise<any>>;  // typage explicite
+
+for (const [path, loader] of Object.entries(lazyModules)) {
   if (!path.includes('node_modules')) {
-    const mod = await loader();
-    for (const key in mod) {
-      if (typeof mod[key] !== 'function' && typeof mod[key] !== 'object') continue;
-      if (
-        mod[key] === undefined ||
-        (mod[key]?.$$typeof && mod[key].render === undefined) // mauvais export React
-      ) {
-        console.error('[IMPORT-DEBUG] invalid export in ->', path, 'export:', key, mod[key]);
-      }
-    }
+    loader()
+      .then((mod) => {
+        if (mod?.default === undefined) {
+          // Pas d'export par défaut : on log pour le corriger.
+          console.warn(`[EXPORT-DEBUG] ${path} ➜ pas d'export default`);
+        }
+      })
+      .catch((err) => {
+        console.error(`[IMPORT-DEBUG] ${path} ➜ échec de chargement`, err);
+      });
   }
-});
+}
 // -------------------------------------------------------------------
 
 const initializeApp = () => {
