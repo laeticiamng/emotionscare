@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
@@ -76,17 +77,17 @@ export function useCoachChatActions({
           
           // Save messages after successful response
           if (activeConversationId) {
-            const chatMessages = [...messages, 
+            const chatMessages: ChatMessage[] = [...messages, 
               {
                 id: Date.now().toString(),
                 text: text,
-                sender: 'user',
+                sender: 'user' as const,
                 timestamp: new Date(),
               },
               {
                 id: (Date.now() + 1).toString(),
                 text: response,
-                sender: 'bot',
+                sender: 'bot' as const,
                 timestamp: new Date(),
               }
             ];
@@ -136,7 +137,7 @@ export function useCoachChatActions({
               updatedMessages.push({
                 id: Date.now().toString(),
                 text: response,
-                sender: 'bot',
+                sender: 'bot' as const,
                 timestamp: new Date(),
               });
               
