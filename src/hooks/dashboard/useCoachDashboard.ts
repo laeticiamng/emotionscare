@@ -13,6 +13,7 @@ export function useCoachDashboard() {
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
   const { apiReady, apiCheckInProgress } = useApiConnection();
   
+  // Questions rapides prédéfinies - peut être étendu ultérieurement pour être chargé depuis une API
   const [quickSuggestions] = useState<string[]>([
     "Comment gérer mon stress?",
     "Recommande-moi une musique apaisante",
@@ -77,8 +78,10 @@ export function useCoachDashboard() {
   }, [user?.id, apiReady, triggerDailyReminder, toast]);
 
   // Déclencher les recommandations quotidiennes au chargement du composant
+  // Avec une meilleure gestion des conditions et un délai retardé
   useEffect(() => {
-    if (user?.id && apiReady && !apiCheckInProgress) {
+    // Ne faire la requête que si toutes les conditions sont réunies
+    if (user?.id && apiReady && !apiCheckInProgress && !isProcessing) {
       // Délai pour éviter de bloquer le rendu
       const reminderTimeout = setTimeout(() => {
         triggerDailyReminder().catch(err => {
@@ -88,7 +91,7 @@ export function useCoachDashboard() {
       
       return () => clearTimeout(reminderTimeout);
     }
-  }, [user?.id, triggerDailyReminder, apiReady, apiCheckInProgress]);
+  }, [user?.id, triggerDailyReminder, apiReady, apiCheckInProgress, isProcessing]);
 
   return {
     recommendations,

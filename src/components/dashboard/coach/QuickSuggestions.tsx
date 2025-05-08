@@ -12,11 +12,13 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [activeQuestion, setActiveQuestion] = useState<string | null>(null);
 
   const handleSuggestionClick = (suggestion: string) => {
     if (isProcessing) return;
     
     setIsProcessing(true);
+    setActiveQuestion(suggestion);
     
     try {
       // Try to find the input element with a more reliable selector
@@ -34,6 +36,7 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
         setTimeout(() => {
           button.click();
           setIsProcessing(false);
+          setActiveQuestion(null);
         }, 50);
       } else {
         // Fallback: navigate to coach chat with the question
@@ -43,6 +46,7 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
         });
         navigate('/coach-chat', { state: { initialQuestion: suggestion } });
         setIsProcessing(false);
+        setActiveQuestion(null);
       }
     } catch (error) {
       console.error('Error processing suggestion:', error);
@@ -53,6 +57,7 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
         variant: "destructive"
       });
       setIsProcessing(false);
+      setActiveQuestion(null);
     }
   };
 
@@ -64,11 +69,15 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
             key={index} 
             variant="outline" 
             size="sm" 
-            className="text-xs"
+            className={`text-xs ${activeQuestion === suggestion ? 'bg-primary/10' : ''}`}
             onClick={() => handleSuggestionClick(suggestion)}
             disabled={isProcessing}
+            aria-busy={isProcessing && activeQuestion === suggestion}
           >
             {suggestion}
+            {isProcessing && activeQuestion === suggestion && (
+              <span className="ml-1 animate-pulse">...</span>
+            )}
           </Button>
         ))}
       </div>

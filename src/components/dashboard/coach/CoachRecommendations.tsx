@@ -19,6 +19,9 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
   onRefresh,
   onPlayMusic 
 }) => {
+  // État de chargement combiné
+  const isLoading = isProcessing || apiCheckInProgress;
+
   // Si nous n'avons pas de recommandations, afficher un état alternatif
   if (recommendations.length === 0) {
     return (
@@ -33,10 +36,11 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
               variant="ghost" 
               size="icon" 
               className="h-6 w-6" 
-              disabled={isProcessing || apiCheckInProgress} 
+              disabled={isLoading} 
               onClick={onRefresh}
+              aria-label="Rafraîchir les recommandations"
             >
-              <RefreshCw className={cn("h-3 w-3", isProcessing && "animate-spin")} />
+              <RefreshCw className={cn("h-3 w-3", isLoading && "animate-spin")} />
             </Button>
           </div>
           <div className="text-xs text-muted-foreground flex items-center gap-1 mb-3">
@@ -48,10 +52,10 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
             variant="outline" 
             className="w-full text-xs h-7"
             onClick={onRefresh}
-            disabled={isProcessing}
+            disabled={isLoading}
           >
-            <RefreshCw className={cn("h-3 w-3 mr-1", isProcessing && "animate-spin")} />
-            Générer des recommandations
+            <RefreshCw className={cn("h-3 w-3 mr-1", isLoading && "animate-spin")} />
+            {isLoading ? "Génération en cours..." : "Générer des recommandations"}
           </Button>
         </div>
       </div>
@@ -70,11 +74,11 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
             variant="ghost" 
             size="icon" 
             className="h-6 w-6" 
-            disabled={isProcessing || apiCheckInProgress} 
+            disabled={isLoading} 
             onClick={onRefresh}
             aria-label="Rafraîchir les recommandations"
           >
-            <RefreshCw className={cn("h-3 w-3", isProcessing && "animate-spin")} />
+            <RefreshCw className={cn("h-3 w-3", isLoading && "animate-spin")} />
           </Button>
         </div>
         <div className="space-y-2">
@@ -84,12 +88,17 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
               <span>{rec}</span>
             </div>
           ))}
+          {recommendations.length > 1 && (
+            <div className="text-xs text-muted-foreground text-right">
+              + {recommendations.length - 1} autre(s)
+            </div>
+          )}
           <Button 
             size="sm" 
             variant="outline" 
             className="w-full text-xs h-7 mt-1"
             onClick={onPlayMusic}
-            disabled={isProcessing}
+            disabled={isLoading}
           >
             <Music className="h-3 w-3 mr-1" />
             Écouter musique recommandée

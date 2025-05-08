@@ -11,6 +11,9 @@ export function useApiConnection() {
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Délai entre deux vérifications d'API (15 minutes)
+  const CHECK_INTERVAL = 15 * 60 * 1000;
+
   // Fonction pour vérifier l'état de la connexion API
   const checkConnectionStatus = useCallback(async (userId: string): Promise<boolean> => {
     try {
@@ -32,7 +35,7 @@ export function useApiConnection() {
 
   // Fonction pour effectuer manuellement un nouveau test de connexion
   const retryConnectionCheck = useCallback(async (): Promise<boolean> => {
-    if (!user?.id || apiCheckInProgress) return false;
+    if (!user?.id || apiCheckInProgress) return apiReady;
     
     try {
       setApiCheckInProgress(true);
@@ -66,45 +69,49 @@ export function useApiConnection() {
     } finally {
       setApiCheckInProgress(false);
     }
-  }, [user?.id, apiCheckInProgress, checkConnectionStatus, toast]);
+  }, [user?.id, apiCheckInProgress, checkConnectionStatus, toast, apiReady]);
 
   // Vérification automatique de la connexion API au chargement
   useEffect(() => {
-    if (user?.id) {
-      // Effectuer la vérification seulement si elle n'est pas déjà en cours
-      if (!apiCheckInProgress) {
-        const checkAPIConnection = async () => {
-          try {
-            setApiCheckInProgress(true);
-            const success = await checkConnectionStatus(user.id);
-            console.log("OpenAI API connection check:", success ? "OK" : "Error");
-            setApiReady(success);
-            setLastCheckTime(new Date());
-            
-            if (!success) {
-              toast({
-                title: "Problème de connexion",
-                description: "Impossible de se connecter à l'API OpenAI. Certaines fonctionnalités peuvent être limitées.",
-                variant: "destructive"
-              });
-            }
-          } catch (error) {
-            console.error("Error connecting to OpenAI API:", error);
-            setApiReady(false);
+    // Ne vérifier que si l'utilisateur est connecté
+    if (!user?.id || apiCheckInProgress) return;
+    
+    // Vérifier s'il n'y a pas eu de vérification récente
+    const shouldCheck = !lastCheckTime || 
+                       (new Date().getTime() - lastCheckTime.getTime() > CHECK_INTERVAL);
+    
+    if (shouldCheck) {
+      const checkAPIConnection = async () => {
+        try {
+          setApiCheckInProgress(true);
+          const success = await checkConnectionStatus(user.id);
+          console.log("OpenAI API connection check:", success ? "OK" : "Error");
+          setApiReady(success);
+          setLastCheckTime(new Date());
+          
+          if (!success) {
             toast({
               title: "Problème de connexion",
               description: "Impossible de se connecter à l'API OpenAI. Certaines fonctionnalités peuvent être limitées.",
               variant: "destructive"
             });
-          } finally {
-            setApiCheckInProgress(false);
           }
-        };
-        
-        checkAPIConnection();
-      }
+        } catch (error) {
+          console.error("Error connecting to OpenAI API:", error);
+          setApiReady(false);
+          toast({
+            title: "Problème de connexion",
+            description: "Impossible de se connecter à l'API OpenAI. Certaines fonctionnalités peuvent être limitées.",
+            variant: "destructive"
+          });
+        } finally {
+          setApiCheckInProgress(false);
+        }
+      };
+      
+      checkAPIConnection();
     }
-  }, [user?.id, toast, checkConnectionStatus, apiCheckInProgress]);
+  }, [user?.id, toast, checkConnectionStatus, apiCheckInProgress, lastCheckTime]);
 
   return {
     apiReady,
