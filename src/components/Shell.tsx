@@ -12,7 +12,7 @@ interface ShellProps {
   children?: ReactNode;
 }
 
-export const Shell: React.FC<ShellProps> = ({ children }) => {
+const Shell: React.FC<ShellProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
   
@@ -44,5 +44,6 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
   );
 };
 
-// Export default for easier imports
+// Export named component and default export for flexibility
+export { Shell };
 export default memo(Shell);

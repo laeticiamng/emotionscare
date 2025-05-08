@@ -5,6 +5,8 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { MusicProvider } from './contexts/MusicContext';
 import { Shell } from './components/Shell';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from "@/hooks/use-toast";
 import ProtectedLayout from './components/ProtectedLayout';
 import Index from './pages/Index';
 import DashboardPage from './pages/DashboardPage';
@@ -23,10 +25,6 @@ import CoachPage from './pages/CoachPage';
 import CoachChatPage from './pages/CoachChatPage';
 import VRPage from './pages/VRPage';
 import MusicPage from './pages/MusicPage';
-
-// Import useAuth hook at the top
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from "@/hooks/use-toast";
 
 function App() {
   return (
