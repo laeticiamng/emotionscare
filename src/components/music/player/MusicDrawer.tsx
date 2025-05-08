@@ -1,81 +1,52 @@
-
-import React, { useEffect } from 'react';
-import * as DrawerUI from '@/components/ui/drawer';
+import React from 'react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from '@/components/ui/drawer';
 import MusicPlayer from './MusicPlayer';
-import useLogger from "@/hooks/useLogger";
+import useLogger from '@/hooks/useLogger';
 
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
 }
 
-/**
- * Drawer component that contains the music player - stubbed version
- */
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  const logger = useLogger('MusicDrawer-Stub');
-  
-  // Debug all imports to identify undefined components
-  useEffect(() => {
-    console.group('🔍 Imports MusicDrawer');
-    console.log('→ MusicDrawer:', typeof MusicDrawer);
-    console.log('→ MusicPlayer:', typeof MusicPlayer);
-    Object.entries(DrawerUI).forEach(([k, v]) =>
-      console.log(`→ DrawerUI.${k}:`, typeof v)
-    );
-    console.groupEnd();
-    
-    logger.debug('MusicDrawer stub mounted', { open });
-    console.log('🔍 MusicDrawer stub mounted, open=', open);
-  }, [open, logger]);
-  
-  // Don't render anything if not open
+  // 🔍 Diagnostic des imports
+  console.group('🔍 Imports MusicDrawer');
+  console.log('→ Drawer              :', typeof Drawer, Drawer);
+  console.log('→ DrawerContent       :', typeof DrawerContent, DrawerContent);
+  console.log('→ DrawerHeader        :', typeof DrawerHeader, DrawerHeader);
+  console.log('→ DrawerTitle         :', typeof DrawerTitle, DrawerTitle);
+  console.log('→ DrawerClose         :', typeof DrawerClose, DrawerClose);
+  console.log('→ MusicPlayer         :', typeof MusicPlayer, MusicPlayer);
+  console.log('→ useLogger           :', typeof useLogger, useLogger);
+  console.groupEnd();
+
+  const logger = useLogger('MusicDrawer');
+
   if (!open) return null;
-  
-  // Render a simple stub first to isolate the issue
+
+  logger.debug('Rendering MusicDrawer', { open });
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      width: '300px',
-      background: '#ddd',
-      boxShadow: '-2px 0 5px rgba(0,0,0,0.2)',
-      padding: '1rem',
-      zIndex: 1000,
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1rem'
-      }}>
-        <h2>Lecteur de musique</h2>
-        <button 
-          onClick={onClose}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '1.2rem'
-          }}
-        >
-          ✕
-        </button>
-      </div>
-      
-      <div style={{
-        padding: '1rem',
-        background: '#eee',
-        borderRadius: '4px',
-        flex: 1
-      }}>
-        ✅ MusicDrawer Stub OK!
-      </div>
-    </div>
+    <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DrawerContent className="max-h-[80vh] focus:outline-none">
+        <DrawerHeader className="flex justify-between items-center">
+          <DrawerTitle>Lecteur de musique</DrawerTitle>
+          <DrawerClose asChild>
+            <button onClick={onClose} type="button">
+              ✕
+            </button>
+          </DrawerClose>
+        </DrawerHeader>
+        <div className="px-4 pb-4">
+          <MusicPlayer />
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
 
