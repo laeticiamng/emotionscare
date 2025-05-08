@@ -1,91 +1,128 @@
 
 import React from 'react';
-import { Music2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
 import PlayerControls from './PlayerControls';
 import ProgressBar from './ProgressBar';
-import TrackInfo from './TrackInfo';
 import VolumeControl from './VolumeControl';
-import { useAudioPlayer } from '@/components/music/player/useAudioPlayer';
-import { convertMusicTrackToTrack } from '@/services/music/converters';
-import { MusicTrack } from '@/types/music';
-import { Track } from '@/services/music/types';
+import { Repeat, Shuffle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-const MusicPlayer = () => {
-  const { currentTrack: contextTrack } = useMusic();
+interface MusicPlayerProps {
+  className?: string;
+  compact?: boolean;
+}
+
+const MusicPlayer: React.FC<MusicPlayerProps> = ({ className, compact = false }) => {
   const { 
-    isPlaying,
+    currentTrack, 
+    isPlaying, 
+    pauseTrack, 
+    playTrack, 
+    nextTrack, 
+    previousTrack,
     currentTime,
     duration,
-    audioError,
-    loadingTrack,
+    formatTime,
     handleProgressClick,
-    playTrack,
-    pauseTrack,
-    nextTrack,
-    previousTrack,
     volume,
     handleVolumeChange,
-    formatTime
-  } = useAudioPlayer();
-  
-  // Si aucun morceau n'est sélectionné, afficher un état vide
-  if (!contextTrack) {
+    repeat,
+    toggleRepeat,
+    shuffle,
+    toggleShuffle,
+    loadingTrack
+  } = useMusic();
+
+  if (!currentTrack) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center bg-muted/20 rounded-lg border border-dashed">
-        <Music2 className="h-12 w-12 mb-4 text-muted-foreground" />
-        <h3 className="text-lg font-medium mb-2">Aucune musique sélectionnée</h3>
-        <p className="text-muted-foreground">
-          Sélectionnez un morceau de musique dans les recommandations ou créez votre propre musique
-        </p>
-      </div>
+      <Card className={cn("w-full", className)}>
+        <CardContent className="p-6 text-center text-muted-foreground">
+          Aucune piste en cours de lecture
+        </CardContent>
+      </Card>
     );
   }
-  
-  const handlePlay = () => {
-    // Vérifier si le track a besoin d'être converti
-    if ('audioUrl' in contextTrack) {
-      // C'est un MusicTrack, convertissons-le en Track
-      const convertedTrack = convertMusicTrackToTrack(contextTrack as MusicTrack);
-      playTrack(convertedTrack);
-    } else {
-      // C'est déjà un Track
-      playTrack(contextTrack as Track);
-    }
-  };
-  
+
   return (
-    <div className="rounded-md border p-4 bg-background">
-      <TrackInfo 
-        currentTrack={contextTrack} 
-        loadingTrack={loadingTrack} 
-        audioError={audioError} 
-      />
-      
-      <ProgressBar 
-        currentTime={currentTime} 
-        duration={duration} 
-        formatTime={formatTime} 
-        handleProgressClick={handleProgressClick} 
-      />
-      
-      <div className="flex items-center justify-between">
-        <PlayerControls 
-          isPlaying={isPlaying} 
-          loadingTrack={loadingTrack} 
-          onPlay={handlePlay} 
-          onPause={pauseTrack} 
-          onPrevious={previousTrack} 
-          onNext={nextTrack} 
+    <Card className={cn("w-full", className)}>
+      <CardContent className={cn("p-6", compact ? "space-y-2" : "space-y-4")}>
+        {/* Track Info */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-secondary/30 rounded overflow-hidden flex-shrink-0">
+            {currentTrack.coverUrl && (
+              <img 
+                src={currentTrack.coverUrl} 
+                alt={currentTrack.title} 
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-medium truncate" title={currentTrack.title}>
+              {currentTrack.title}
+            </h3>
+            <p className="text-sm text-muted-foreground truncate">
+              {currentTrack.artist}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <ProgressBar 
+          currentTime={currentTime}
+          duration={duration}
+          formatTime={formatTime}
+          handleProgressClick={handleProgressClick}
         />
         
-        <VolumeControl 
-          volume={volume} 
-          onVolumeChange={handleVolumeChange} 
-        />
-      </div>
-    </div>
+        {/* Controls */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full h-8 w-8",
+                repeat ? "text-primary" : "text-muted-foreground"
+              )}
+              onClick={toggleRepeat}
+            >
+              <Repeat size={16} />
+            </Button>
+            
+            <PlayerControls
+              isPlaying={isPlaying}
+              loadingTrack={loadingTrack}
+              onPlay={() => currentTrack && playTrack(currentTrack)}
+              onPause={pauseTrack}
+              onPrevious={previousTrack}
+              onNext={nextTrack}
+            />
+            
+            <Button 
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full h-8 w-8",
+                shuffle ? "text-primary" : "text-muted-foreground"
+              )}
+              onClick={toggleShuffle}
+            >
+              <Shuffle size={16} />
+            </Button>
+          </div>
+          
+          {!compact && (
+            <VolumeControl 
+              volume={volume} 
+              onVolumeChange={handleVolumeChange} 
+            />
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

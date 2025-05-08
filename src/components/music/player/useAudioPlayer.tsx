@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Track } from '@/services/music/types';
 import { MusicTrack } from '@/types/music';
@@ -80,14 +81,8 @@ export function useAudioPlayer() {
   useEffect(() => {
     if (!audio || !currentTrack) return;
 
-    // Handle different track formats (Track vs MusicTrack)
-    let audioUrl = '';
-    
-    if ('url' in currentTrack && currentTrack.url) {
-      audioUrl = currentTrack.url;
-    } else if ('audioUrl' in currentTrack && currentTrack.audioUrl) {
-      audioUrl = currentTrack.audioUrl;
-    }
+    // Utiliser la propriété url, qui est désormais obligatoire pour tous les types de pistes
+    const audioUrl = currentTrack.url;
     
     if (audioUrl) {
       setLoadingTrack(true);
@@ -101,7 +96,7 @@ export function useAudioPlayer() {
         });
       }
     }
-  }, [audio, currentTrack]);
+  }, [audio, currentTrack, isPlaying]);
 
   // Toggle play/pause when isPlaying changes
   useEffect(() => {
@@ -122,6 +117,11 @@ export function useAudioPlayer() {
   }, [audio, isPlaying]);
 
   const playTrack = (track: Track | MusicTrack) => {
+    // S'assurer que la track a une propriété url valide
+    if (!track.url && 'audioUrl' in track && track.audioUrl) {
+      (track as MusicTrack).url = track.audioUrl;
+    }
+    
     setCurrentTrack(track);
     setIsPlaying(true);
   };

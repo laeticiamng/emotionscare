@@ -13,14 +13,14 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;    // Required
-  audioUrl: string;
-  coverUrl: string;
-  emotion?: string;
-  // Additional properties for compatibility
-  url: string;      // Alias for audioUrl - maintenant requis
-  cover?: string;    // Alias for coverUrl
-  isPlaying?: boolean;
-  externalUrl?: string; // URL pour ouvrir dans un lecteur externe
+  audioUrl?: string;   // Optional mais devrait être présent
+  coverUrl?: string;   // Optional
+  emotion?: string;    // Optional
+  // Propriété url requise pour la compatibilité
+  url: string;         // Requis pour la lecture audio
+  cover?: string;      // Alias pour coverUrl, optionnel
+  isPlaying?: boolean; // Optional
+  externalUrl?: string; // Optional - URL pour ouvrir dans un lecteur externe
 }
 
 export interface MusicPlaylist {
@@ -29,3 +29,6 @@ export interface MusicPlaylist {
   emotion: string;
   tracks: MusicTrack[];
 }
+
+// Types pour les émotions musicales
+export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';

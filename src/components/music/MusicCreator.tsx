@@ -126,7 +126,7 @@ const MusicCreator: React.FC = () => {
         artist: "IA Compositeur",
         duration: duration[0], // Utiliser la durée définie dans le formulaire
         audioUrl: generatedTrackUrl,
-        url: generatedTrackUrl, // Adding required url property
+        url: generatedTrackUrl, // Ajout de la propriété url requise
         coverUrl: "/images/music-wave.svg"
       };
       

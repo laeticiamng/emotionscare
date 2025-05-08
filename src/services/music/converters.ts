@@ -11,7 +11,7 @@ export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
     id: musicTrack.id,
     title: musicTrack.title,
     artist: musicTrack.artist,
-    url: musicTrack.url || musicTrack.audioUrl || '',
+    url: musicTrack.url,
     cover: musicTrack.coverUrl || musicTrack.cover || '',
     duration: musicTrack.duration || 0,
   };
@@ -26,7 +26,7 @@ export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
     title: track.title,
     artist: track.artist,
     audioUrl: track.url,
-    url: track.url,
+    url: track.url,  // S'assurer que la propriété url est toujours définie
     coverUrl: track.cover || '',
     cover: track.cover,
     duration: track.duration,
