@@ -1,61 +1,60 @@
 
-import React, { memo, ReactNode } from "react";
-import { Outlet } from "react-router-dom";
-import GlobalNav from "./GlobalNav";
+import React, { memo } from "react";
 import { Toaster } from "./ui/toaster";
-import { useIsMobile } from "@/hooks/use-mobile";
-import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
 import useLogger from "@/hooks/useLogger";
-// Import direct pour éviter les problèmes circulaires
-import MusicDrawer from "./music/player/MusicDrawer";
 
 interface ShellProps {
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
-const Shell: React.FC<ShellProps> = ({ children }) => {
-  const isMobile = useIsMobile();
-  const logger = useLogger('Shell');
-  const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
+const Shell: React.FC<ShellProps> = () => {
+  const logger = useLogger('Shell-Stub');
+  const { isDrawerOpen, toggleDrawer, closeDrawer } = useDrawerState();
   
-  logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
+  logger.debug('Rendering shell stub component', { data: { isDrawerOpen } });
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Global navigation with logo */}
-      <GlobalNav />
-      
-      <div className="flex flex-1 pt-16">
-        {/* Sidebar on non-mobile screens */}
-        {!isMobile && <Sidebar />}
-        
-        {/* Main content */}
-        <main className="flex-1 w-full">
-          <div className="container max-w-[1400px] px-4 py-6 md:px-6 lg:px-8">
-            {children || <Outlet />}
-          </div>
-        </main>
-      </div>
-      
-      {/* Music Player Button */}
-      <button
-        className="fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700"
-        onClick={openDrawer}
-        aria-label="Open Music Player"
-        type="button"
+    <div style={{ padding: '2rem', background: '#fcf' }}>
+      <h1>Shell Stub</h1>
+      <button 
+        onClick={toggleDrawer} 
+        style={{ 
+          padding: '0.5rem 1rem',
+          background: '#4a8',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px',
+          cursor: 'pointer'
+        }}
       >
-        🎵
+        🎵 Toggle Music Drawer
       </button>
       
+      {isDrawerOpen && (
+        <div style={{ marginTop: '1rem', padding: '1rem', background: '#eef' }}>
+          ✅ Shell Stub OK - Drawer State: {isDrawerOpen ? 'OPEN' : 'CLOSED'}
+          <div>
+            <button 
+              onClick={closeDrawer}
+              style={{ 
+                marginTop: '0.5rem',
+                padding: '0.25rem 0.5rem',
+                background: '#e44',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Toast notification system */}
       <Toaster />
-      
-      {/* Music Player Drawer */}
-      <MusicDrawer 
-        open={isDrawerOpen} 
-        onClose={closeDrawer} 
-      />
     </div>
   );
 };
