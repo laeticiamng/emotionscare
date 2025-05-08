@@ -15,5 +15,5 @@ export const useDrawerState = create<DrawerState>((set) => ({
   toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
 }));
 
-// Export aussi en default pour ceux qui importeraient sans accolades
+// Export en default aussi pour plus de flexibilité
 export default useDrawerState;

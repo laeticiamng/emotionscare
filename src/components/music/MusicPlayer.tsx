@@ -20,13 +20,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = () => {
     setIsPlaying(false);
   };
 
-  console.log("Rendering MusicPlayer with MusicControls:", MusicControls);
-  
-  if (!MusicControls) {
-    console.error("MusicControls is undefined in MusicPlayer component");
-    return <div>Error: MusicControls component not found</div>;
-  }
-
   return (
     <Card className="music-player">
       <CardHeader>
