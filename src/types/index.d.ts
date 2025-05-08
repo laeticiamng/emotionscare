@@ -29,7 +29,7 @@ export interface EmotionResult {
   date?: string;
   intensity?: number;
   score?: number;
-  recommendations?: string[];
+  recommendations?: string[];  // Added this property to fix the type error
 }
 
 // Ajouter d'autres types globaux au besoin
