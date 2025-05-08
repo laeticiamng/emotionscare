@@ -127,8 +127,8 @@ const CoachChatPage = () => {
   
   const isLoading = isLoadingChat || isLoadingHistory || isLoadingConversation;
 
-  // Convert typingIndicator to string explicitly, handling any potential boolean values
-  const typingIndicatorString = typeof typingIndicator === 'string' ? typingIndicator : '';
+  // Convert typingIndicator to string explicitly, handling any potential null values
+  const typingIndicatorString = typingIndicator || '';
 
   return (
     <ProtectedLayout>

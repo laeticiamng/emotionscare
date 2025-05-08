@@ -13,7 +13,7 @@ interface UseTypingIndicatorOptions {
 export function useTypingIndicator(options: UseTypingIndicatorOptions = {}) {
   const { timeout = 3000, initialState = false } = options;
   
-  // Use string type for typingIndicator instead of boolean
+  // Use string type for typingIndicator
   const [typingIndicator, setTypingIndicator] = useState<string | null>(null);
   const [typingTimeout, setTypingTimeoutRef] = useState<NodeJS.Timeout | null>(null);
   
