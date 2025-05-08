@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { ChatMessage } from '@/types/chat';
 import { useCoach } from '@/hooks/coach/useCoach';
 import { useActivity } from '@/hooks/useActivity';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import ChatHeader from '@/components/coach/ChatHeader';
 import ChatMessageList from '@/components/coach/ChatMessageList';
 import ChatInputForm from '@/components/coach/ChatInputForm';
@@ -14,6 +15,8 @@ import ChatInputForm from '@/components/coach/ChatInputForm';
 const CoachChatPage = () => {
   const [userMessage, setUserMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [typingIndicator, setTypingIndicator] = useState<string | null>(null);
+  const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -22,11 +25,13 @@ const CoachChatPage = () => {
       timestamp: new Date(),
     },
   ]);
+  
   const { toast } = useToast();
   const { askQuestion, generateRecommendation } = useCoach();
   const { logActivity } = useActivity();
   const location = useLocation();
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width: 640px)');
   
   // Récupérer la question initiale des paramètres de navigation
   useEffect(() => {
@@ -36,8 +41,35 @@ const CoachChatPage = () => {
     }
   }, [location.state]);
   
+  const handleUserTyping = useCallback(() => {
+    // Show typing indicator
+    if (!typingIndicator) {
+      setTypingIndicator('Vous êtes en train d\'écrire...');
+    }
+    
+    // Clear previous timer
+    if (typingTimer) {
+      clearTimeout(typingTimer);
+    }
+    
+    // Set new timer to clear typing indicator after 1.5 seconds of inactivity
+    const timer = setTimeout(() => {
+      setTypingIndicator(null);
+    }, 1500);
+    
+    setTypingTimer(timer);
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [typingIndicator, typingTimer]);
+  
   const handleSendMessage = async (messageText: string = userMessage) => {
     if (!messageText.trim()) return;
+    
+    // Clear typing indicator
+    if (typingTimer) clearTimeout(typingTimer);
+    setTypingIndicator(null);
     
     // Ajouter le message de l'utilisateur
     const userMessageObj: ChatMessage = {
@@ -86,8 +118,6 @@ const CoachChatPage = () => {
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
       setIsLoading(false);
-      // Donner le focus à l'input après l'envoi
-      setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
   
@@ -137,13 +167,24 @@ const CoachChatPage = () => {
       setIsLoading(false);
     }
   };
+  
+  // Handle cleanup of typing timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (typingTimer) clearTimeout(typingTimer);
+    };
+  }, [typingTimer]);
 
   return (
     <ProtectedLayout>
-      <div className="container mx-auto px-4 py-4 max-w-4xl h-[80vh] flex flex-col">
-        <Card className="flex-grow flex flex-col overflow-hidden p-0">
-          <ChatHeader onBackClick={() => window.history.back()} />
-          <ChatMessageList messages={messages} isLoading={isLoading} />
+      <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-4xl h-[80vh] flex flex-col">
+        <Card className="flex-grow flex flex-col overflow-hidden p-0 shadow-premium">
+          <ChatHeader onBackClick={() => navigate(-1)} />
+          <ChatMessageList 
+            messages={messages} 
+            isLoading={isLoading} 
+            typingIndicator={typingIndicator || undefined}
+          />
           <ChatInputForm
             userMessage={userMessage}
             isLoading={isLoading}
@@ -152,6 +193,7 @@ const CoachChatPage = () => {
             onRegenerate={handleRegenerate}
             hasMessages={messages.length > 1}
             onKeyDown={handleKeyDown}
+            onTyping={handleUserTyping}
           />
         </Card>
       </div>

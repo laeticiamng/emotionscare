@@ -1,8 +1,9 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Send, RefreshCw } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChatInputFormProps {
   userMessage: string;
@@ -12,6 +13,7 @@ interface ChatInputFormProps {
   onRegenerate: () => void;
   hasMessages: boolean;
   onKeyDown: (e: React.KeyboardEvent) => void;
+  onTyping?: () => void;
 }
 
 const ChatInputForm: React.FC<ChatInputFormProps> = ({
@@ -21,18 +23,32 @@ const ChatInputForm: React.FC<ChatInputFormProps> = ({
   onSendMessage,
   onRegenerate,
   hasMessages,
-  onKeyDown
+  onKeyDown,
+  onTyping
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
+
+  useEffect(() => {
+    // Auto-focus the input when the component mounts
+    if (!isMobile && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isMobile]);
   
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onUserMessageChange(e.target.value);
+    onTyping?.();
+  };
+
   return (
-    <div className="p-4 border-t">
+    <div className="p-3 md:p-4 border-t">
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
           <Input 
             ref={inputRef}
             value={userMessage}
-            onChange={(e) => onUserMessageChange(e.target.value)}
+            onChange={handleChange}
             onKeyDown={onKeyDown}
             placeholder="Écrivez votre message..."
             className="flex-grow"
