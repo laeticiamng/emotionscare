@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -16,7 +15,7 @@ import { Button } from '@/components/ui/button';
 interface CoachChatContainerProps {
   messages: ChatMessage[];
   isLoading: boolean;
-  typingIndicator: string | null;
+  typingIndicator: string;
   userMessage: string;
   onUserMessageChange: (message: string) => void;
   onSendMessage: (message?: string) => void;
@@ -126,7 +125,7 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
         <ChatMessageList 
           messages={messages} 
           isLoading={isLoading} 
-          typingIndicator={typingIndicator || undefined}
+          typingIndicator={typingIndicator}
         />
         <ChatInputForm
           userMessage={userMessage}

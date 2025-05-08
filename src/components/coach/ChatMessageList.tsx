@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface ChatMessageListProps {
   messages: ChatMessage[];
@@ -11,66 +11,51 @@ interface ChatMessageListProps {
 
 const ChatMessageList: React.FC<ChatMessageListProps> = ({ 
   messages, 
-  isLoading,
+  isLoading, 
   typingIndicator 
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
-  
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isLoading, typingIndicator]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, typingIndicator]);
   
   return (
-    <div 
-      className="flex-grow overflow-y-auto p-4 space-y-4" 
-      role="log" 
-      aria-live="polite"
-    >
-      {messages.map((msg) => (
-        <div 
-          key={msg.id}
-          className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-        >
+    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {messages.length === 0 ? (
+        <div className="flex h-full items-center justify-center">
+          <p className="text-muted-foreground text-center">
+            Commencez une nouvelle conversation avec le coach IA pour obtenir de l'aide 
+            sur votre bien-être émotionnel.
+          </p>
+        </div>
+      ) : (
+        messages.map((message) => (
           <div 
-            className={`max-w-[85%] md:max-w-[75%] rounded-lg px-4 py-2 ${
-              msg.sender === 'user' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-muted'
-            }`}
+            key={message.id}
+            className={cn(
+              "flex max-w-[85%] md:max-w-[75%] rounded-lg p-4",
+              message.sender === 'user' 
+                ? "bg-primary/10 ml-auto" 
+                : "bg-muted mr-auto"
+            )}
           >
-            <p>{msg.text}</p>
-            <p className="text-xs opacity-70 mt-1 text-right">
-              {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </p>
+            <span className="whitespace-pre-wrap">{message.text}</span>
           </div>
-        </div>
-      ))}
-      
-      {isLoading && (
-        <div className="flex justify-start">
-          <div className="bg-muted max-w-[85%] md:max-w-[75%] rounded-lg px-4 py-2">
-            <div className="flex space-x-2" aria-label="Coach est en train d'écrire...">
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-            </div>
-          </div>
-        </div>
+        ))
       )}
-
-      {typingIndicator && !isLoading && (
-        <div className="flex justify-start">
-          <div className="bg-muted/50 max-w-[85%] md:max-w-[75%] rounded-lg px-4 py-2">
-            <p className="text-sm text-muted-foreground">{typingIndicator}</p>
-          </div>
+      
+      {/* Typing indicator */}
+      {typingIndicator && (
+        <div className="bg-muted rounded-lg p-4 max-w-[75%] animate-pulse">
+          <span className="text-sm text-muted-foreground">{typingIndicator}</span>
         </div>
       )}
       
+      {/* Element to scroll to */}
       <div ref={messagesEndRef} />
     </div>
   );

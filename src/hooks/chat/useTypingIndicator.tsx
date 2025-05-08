@@ -1,46 +1,28 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+interface UseTypingIndicatorOptions {
+  timeout?: number;
+  initialState?: boolean;
+}
 
 /**
- * Hook spécialisé pour gérer l'indicateur de frappe dans le chat
+ * Hook to manage typing indicator state
+ * Provides functions to handle user typing events and auto-clear the indicator
  */
-export function useTypingIndicator() {
-  const [typingIndicator, setTypingIndicator] = useState<boolean>(false);
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
+export function useTypingIndicator(options: UseTypingIndicatorOptions = {}) {
+  const { timeout = 3000, initialState = false } = options;
   
-  // Fonction pour afficher l'indicateur de frappe
-  const handleUserTyping = useCallback(() => {
-    setTypingIndicator(true);
-    
-    // Efface le timeout précédent s'il existe
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-    
-    // Définir un nouveau timeout pour masquer l'indicateur après 1 seconde d'inactivité
-    const timeout = setTimeout(() => {
-      setTypingIndicator(false);
-    }, 1000);
-    
-    setTypingTimeout(timeout);
-  }, [typingTimeout]);
+  // Use string type for typingIndicator instead of boolean
+  const [typingIndicator, setTypingIndicator] = useState<string | null>(null);
+  const [typingTimeout, setTypingTimeoutRef] = useState<NodeJS.Timeout | null>(null);
   
-  // Fonction pour masquer l'indicateur de frappe
+  // Clear typing indicator after timeout
   const clearTypingIndicator = useCallback(() => {
-    setTypingIndicator(false);
-    
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-      setTypingTimeout(null);
-    }
-  }, [typingTimeout]);
+    setTypingIndicator(null);
+  }, []);
   
-  // Fonction pour gérer les erreurs d'indicateur de frappe
-  const handleTypingError = useCallback(() => {
-    clearTypingIndicator();
-  }, [clearTypingIndicator]);
-  
-  // Nettoyer les timeouts lors du démontage du composant
+  // Cleanup function for timeout
   useEffect(() => {
     return () => {
       if (typingTimeout) {
@@ -49,10 +31,36 @@ export function useTypingIndicator() {
     };
   }, [typingTimeout]);
   
+  // Handle user typing events
+  const handleUserTyping = useCallback(() => {
+    setTypingIndicator("En train d'écrire...");
+    
+    // Clear any existing timeout
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    
+    // Set new timeout to clear indicator
+    const newTimeout = setTimeout(clearTypingIndicator, timeout);
+    setTypingTimeoutRef(newTimeout);
+  }, [clearTypingIndicator, timeout, typingTimeout]);
+  
+  // Handle typing errors
+  const handleTypingError = useCallback(() => {
+    setTypingIndicator("Une erreur s'est produite");
+    
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+    
+    const newTimeout = setTimeout(clearTypingIndicator, timeout);
+    setTypingTimeoutRef(newTimeout);
+  }, [clearTypingIndicator, timeout, typingTimeout]);
+
   return {
     typingIndicator,
     handleUserTyping,
-    clearTypingIndicator,
-    handleTypingError
+    handleTypingError,
+    clearTypingIndicator
   };
 }

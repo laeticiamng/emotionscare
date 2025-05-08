@@ -127,6 +127,9 @@ const CoachChatPage = () => {
   
   const isLoading = isLoadingChat || isLoadingHistory || isLoadingConversation;
 
+  // Convert typingIndicator to string explicitly, handling any potential boolean values
+  const typingIndicatorString = typeof typingIndicator === 'string' ? typingIndicator : '';
+
   return (
     <ProtectedLayout>
       <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl h-[80vh] flex flex-col">
@@ -156,7 +159,7 @@ const CoachChatPage = () => {
         <CoachChatContainer
           messages={messages}
           isLoading={isLoading}
-          typingIndicator={typingIndicator || ""}
+          typingIndicator={typingIndicatorString}
           userMessage={userMessage}
           onUserMessageChange={setUserMessage}
           onSendMessage={handleSendChatMessage}
