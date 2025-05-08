@@ -1,31 +1,22 @@
 
 import React from 'react';
-import { AudioWaveform } from 'lucide-react';
+import { Music } from 'lucide-react';
 
 interface EmptyStateProps {
   message?: string;
-  className?: string;
-  icon?: React.ReactNode;
-  description?: string;
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ 
-  message = "Cliquez sur le bouton d'enregistrement pour commencer l'analyse vocale", 
-  className,
-  icon = <AudioWaveform className="h-12 w-12 text-muted-foreground/50 mb-3" />,
-  description
+  message = "Aucune donnée à afficher" 
 }) => {
   return (
-    <div className={`flex flex-col items-center justify-center p-6 text-center ${className || ''}`}>
-      {icon}
-      <p className="text-sm font-medium text-muted-foreground/80 max-w-xs mb-1">
+    <div className="flex flex-col items-center justify-center py-6 text-center">
+      <div className="w-12 h-12 bg-muted/30 rounded-full flex items-center justify-center mb-4">
+        <Music className="h-6 w-6 text-muted-foreground" />
+      </div>
+      <p className="text-sm text-muted-foreground max-w-xs">
         {message}
       </p>
-      {description && (
-        <p className="text-xs text-muted-foreground/70 max-w-xs">
-          {description}
-        </p>
-      )}
     </div>
   );
 };

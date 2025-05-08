@@ -1,54 +1,63 @@
 
 import React from 'react';
-import { Loader2, Music, AlertCircle } from 'lucide-react';
+import { Loader2, Music } from 'lucide-react';
+import { Track } from '@/services/music/types';
+import { MusicTrack } from '@/types/music';
 
 interface TrackInfoProps {
-  currentTrack: any; // Using any to handle different track formats
+  currentTrack: Track | MusicTrack;
   loadingTrack: boolean;
   audioError: boolean;
 }
 
-const TrackInfo: React.FC<TrackInfoProps> = ({ 
-  currentTrack, 
-  loadingTrack, 
-  audioError 
+const TrackInfo: React.FC<TrackInfoProps> = ({
+  currentTrack,
+  loadingTrack,
+  audioError
 }) => {
-  // Extract track information with fallbacks
-  const title = currentTrack.title || currentTrack.name || 'Unknown Track';
-  const artist = currentTrack.artist || 'Unknown Artist';
-  const imageUrl = currentTrack.coverUrl || currentTrack.cover || '';
+  // Déterminer l'URL de la couverture de la piste selon le type de piste
+  const getCoverUrl = () => {
+    if (!currentTrack) return null;
+    
+    if ('coverUrl' in currentTrack && currentTrack.coverUrl) {
+      return currentTrack.coverUrl;
+    }
+    
+    if ('cover' in currentTrack && currentTrack.cover) {
+      return currentTrack.cover;
+    }
+    
+    return null;
+  };
+  
+  const coverUrl = getCoverUrl();
   
   return (
-    <div className="flex items-center space-x-3 mb-4">
-      <div className="relative h-16 w-16 min-w-16 rounded overflow-hidden bg-muted">
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={title} 
-            className="h-full w-full object-cover"
-          />
+    <div className="flex items-center mb-6 gap-4">
+      <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center overflow-hidden relative">
+        {coverUrl ? (
+          <img src={coverUrl} alt={currentTrack.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="h-full w-full flex items-center justify-center bg-muted">
-            <Music className="h-8 w-8 text-muted-foreground" />
-          </div>
+          <Music className="h-8 w-8 text-muted-foreground" />
         )}
         
         {loadingTrack && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/50">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
-        
-        {audioError && (
-          <div className="absolute inset-0 flex items-center justify-center bg-destructive/10">
-            <AlertCircle className="h-8 w-8 text-destructive" />
           </div>
         )}
       </div>
       
-      <div className="flex-1 min-w-0">
-        <div className="font-medium truncate">{title}</div>
-        <div className="text-sm text-muted-foreground truncate">{artist}</div>
+      <div>
+        <h3 className="font-medium leading-tight">
+          {currentTrack.title}
+          {audioError && (
+            <span className="text-destructive text-xs ml-2">(Erreur)</span>
+          )}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {currentTrack.artist}
+        </p>
       </div>
     </div>
   );
