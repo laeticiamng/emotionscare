@@ -25,9 +25,12 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   
   // État pour stocker le composant chargé dynamiquement
   const [MusicDrawerComponent, setMusicDrawerComponent] = useState<MusicDrawerComponent | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   // Charger le composant MusicDrawer dynamiquement
   useEffect(() => {
+    logger.debug('Loading MusicDrawer component...');
+    
     // Utilisation de l'import dynamique avec un typage plus flexible
     import('./music/player/MusicDrawer')
       .then((module: any) => {
@@ -37,16 +40,26 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
         if (Component && (typeof Component === 'function' || typeof Component.render === 'function')) {
           logger.debug('MusicDrawer component loaded successfully');
           setMusicDrawerComponent(() => Component);
+          setLoadError(null);
         } else {
-          logger.error('MusicDrawer import is not a valid React component:', module);
-          console.error('❌ MusicDrawer import is not a valid React component:', module);
+          const errorMsg = 'MusicDrawer import is not a valid React component';
+          logger.error(errorMsg, module);
+          console.error('❌ ' + errorMsg, module);
+          setLoadError(errorMsg);
         }
       })
       .catch(error => {
-        logger.error('Failed to load MusicDrawer component:', error);
-        console.error('❌ Failed to load MusicDrawer component:', error);
+        const errorMsg = 'Failed to load MusicDrawer component';
+        logger.error(errorMsg, error);
+        console.error('❌ ' + errorMsg, error);
+        setLoadError(errorMsg);
       });
   }, [logger]);
+  
+  const handleCloseDrawer = () => {
+    logger.debug('Closing music drawer');
+    closeDrawer();
+  };
   
   logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
@@ -81,7 +94,23 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       
       {/* Music Player Drawer - render only if component was successfully loaded */}
       {MusicDrawerComponent && isDrawerOpen && (
-        <MusicDrawerComponent open={isDrawerOpen} onClose={closeDrawer} />
+        <MusicDrawerComponent open={isDrawerOpen} onClose={handleCloseDrawer} />
+      )}
+      
+      {/* Error message if component failed to load */}
+      {loadError && isDrawerOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-xl font-semibold text-destructive">Erreur de chargement</h3>
+            <p className="mt-2 text-muted-foreground">{loadError}</p>
+            <button 
+              className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md"
+              onClick={closeDrawer}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
