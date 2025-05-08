@@ -44,5 +44,5 @@ export const Shell: React.FC<ShellProps> = ({ children }) => {
   );
 };
 
-// Optimisation avec memo pour éviter les re-rendus inutiles
+// Export default for easier imports
 export default memo(Shell);

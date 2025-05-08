@@ -24,6 +24,8 @@ import CoachChatPage from './pages/CoachChatPage';
 import VRPage from './pages/VRPage';
 import MusicPage from './pages/MusicPage';
 
+// Import useAuth hook at the top
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 
 function App() {
@@ -87,8 +89,5 @@ function AppRoutes() {
     </Routes>
   );
 }
-
-// Add the missing useAuth import
-import { useAuth } from '@/contexts/AuthContext';
 
 export default App;
