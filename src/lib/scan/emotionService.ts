@@ -4,11 +4,17 @@ import { Emotion } from '@/types';
 // Mock function to simulate inserting an emotion
 export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion | null> => {
   try {
+    // S'assurer que user_id est fourni
+    if (!emotion.user_id) {
+      console.error("Error: user_id is required for emotion insertion");
+      return null;
+    }
+    
     // Convert Date to string if it's a Date object
     const emotionData = {
       ...emotion,
       date: emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date,
-      user_id: emotion.user_id || '', // Ensure user_id is always provided
+      user_id: emotion.user_id, // Ensure user_id is always provided
     };
     
     // Here you would typically insert into a database
@@ -28,6 +34,11 @@ export const createEmotionEntry = insertEmotion;
 
 // Mock function to simulate fetching the latest emotion for a user
 export const getLatestEmotion = async (userId: string): Promise<Emotion | null> => {
+  if (!userId) {
+    console.error("Error: userId is required to fetch latest emotion");
+    return null;
+  }
+  
   // Simulate fetching from a database
   // Replace this with your actual data fetching logic
   
@@ -35,7 +46,7 @@ export const getLatestEmotion = async (userId: string): Promise<Emotion | null> 
   return {
     id: 'latest-emotion-123',
     user_id: userId,
-    date: new Date(),
+    date: new Date().toISOString(),
     score: 75,
     emotion: 'happy',
     text: 'Feeling good today!',
@@ -50,6 +61,12 @@ export const fetchLatestEmotion = getLatestEmotion;
 
 // Mock function to simulate fetching emotion history for a user
 export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
+  if (!userId) {
+    console.warn("Warning: userId not provided for emotion history, returning sample data");
+  }
+  
+  const userIdToUse = userId || 'anonymous';
+  
   // Simulate fetching from a database
   // Replace this with your actual data fetching logic
   
@@ -57,8 +74,8 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
   return [
     {
       id: 'emotion-1',
-      user_id: userId,
-      date: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      user_id: userIdToUse,
+      date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
       score: 60,
       emotion: 'neutral',
       text: 'Just another day',
@@ -68,8 +85,8 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
     },
     {
       id: 'emotion-2',
-      user_id: userId,
-      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      user_id: userIdToUse,
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       score: 80,
       emotion: 'happy',
       text: 'Had a great workout!',

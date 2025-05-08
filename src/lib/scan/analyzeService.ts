@@ -36,29 +36,14 @@ export async function analyzeEmotions(
 
     console.log("Résultat de l'analyse:", result);
 
-    // Calculer un score émotionnel basé sur l'émotion détectée (exemple simple)
-    // Dans une implémentation réelle, ce serait plus sophistiqué
-    let score = 50; // Score neutre par défaut
-    let emotion = result.emotion || 'neutral';
-    
-    // Ajustement du score en fonction de l'émotion
-    switch (emotion) {
-      case 'happy': score = 75; break;
-      case 'excited': score = 85; break;
-      case 'joy': score = 80; break;
-      case 'calm': score = 65; break;
-      case 'neutral': score = 50; break;
-      case 'anxious': score = 35; break;
-      case 'sad': score = 25; break;
-      case 'angry': score = 20; break;
-      case 'frustrated': score = 30; break;
-      default: score = 50;
-    }
+    // Calculer un score émotionnel basé sur l'émotion détectée
+    const score = calculateScoreFromEmotion(result.emotion || 'neutral');
+    const emotion = result.emotion || 'neutral';
 
     // Créer l'entrée d'émotion pour l'enregistrement
     const newEmotion: Emotion = {
-      id: `emotion-${Date.now()}`, // ID temporaire, sera remplacé par la base de données
-      user_id: userId,
+      id: `emotion-${Date.now()}`, // ID temporaire
+      user_id: userId, // ID utilisateur obligatoire
       date: new Date().toISOString(),
       emotion,
       score,
@@ -74,11 +59,16 @@ export async function analyzeEmotions(
     const { data, error } = await supabase
       .from('emotions')
       .insert({
-        ...newEmotion,
-        // Ensure user_id is always provided and not optional
-        user_id: userId,
-        // Ensure date is properly formatted as a string
-        date: typeof newEmotion.date === 'object' ? newEmotion.date.toISOString() : newEmotion.date
+        user_id: userId, // S'assurer que user_id est toujours fourni et non optionnel
+        date: newEmotion.date,
+        emotion: newEmotion.emotion,
+        score: newEmotion.score, 
+        text: newEmotion.text,
+        emojis: newEmotion.emojis,
+        audio_url: newEmotion.audio_url,
+        ai_feedback: newEmotion.ai_feedback,
+        confidence: newEmotion.confidence,
+        source: newEmotion.source
       })
       .select()
       .single();
@@ -147,7 +137,6 @@ export async function analyzeAudioStream(audioData: Uint8Array[]): Promise<Emoti
   console.log("Analyse du flux audio...", audioData.length, "fragments");
   
   // Dans une version réelle, on enverrait les données audio à une API d'analyse
-  // Pour l'instant, on utilise un mock
   return {
     emotion: 'calm',
     confidence: 0.7,
@@ -206,11 +195,17 @@ function calculateScoreFromEmotion(emotion: string): number {
 }
 
 /**
- * Sauvegarde des analyses d'émotions en temps réel
+ * Sauvegarde des analyses d'émotions
  */
 export const saveEmotion = async (emotion: Emotion): Promise<Emotion | null> => {
   try {
     console.log("Saving emotion:", emotion);
+    
+    // S'assurer que user_id est fourni
+    if (!emotion.user_id) {
+      console.error("Error: user_id is required");
+      return null;
+    }
     
     // Convert Date to string if it's a Date object
     const emotionData = {

@@ -33,16 +33,19 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
 // Function to save realtime emotion scan
 export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string): Promise<void> => {
   try {
-    // Make sure emotion has a defined 'emotion' property and confidence property before passing it
-    const emotionWithDefaults: Emotion = {
-      ...emotion,
+    if (!userId) {
+      throw new Error("user_id is required for saving realtime emotion scan");
+    }
+    
+    // Make sure emotion has all required properties
+    const emotionWithDefaults: EmotionResult = {
       emotion: emotion.emotion || 'neutral',
-      confidence: emotion.confidence || 0.5, // Ensure confidence is always provided
-      user_id: emotion.user_id || userId // Ensure user_id is always provided and required
+      confidence: emotion.confidence || 0.5,
+      feedback: emotion.ai_feedback || '',
+      transcript: emotion.text || ''
     };
     
-    // Now emotion has all required properties for the analyzeService's EmotionResult type
-    await saveRealtimeEmotionScanService(emotionWithDefaults as any, userId);
+    await saveRealtimeEmotionScanService(emotionWithDefaults, userId);
   } catch (error) {
     console.error('Error saving emotion scan:', error);
     throw error;
@@ -59,6 +62,11 @@ export const analyzeEmotion = async (payload: {
   share_with_coach?: boolean;
 }): Promise<EmotionResult> => {
   try {
+    // Verify required fields
+    if (!payload.user_id) {
+      throw new Error("user_id is required for emotion analysis");
+    }
+    
     return await analyzeEmotionService(payload);
   } catch (error) {
     console.error('Error analyzing emotion:', error);
@@ -82,7 +90,16 @@ export const createEmotionEntry = async (data: {
   audio_url?: string;
 }): Promise<Emotion> => {
   try {
-    return await createEmotionEntryService(data);
+    // Verify required fields
+    if (!data.user_id) {
+      throw new Error("user_id is required for creating emotion entry");
+    }
+    
+    const result = await createEmotionEntryService(data);
+    if (!result) {
+      throw new Error("Failed to create emotion entry");
+    }
+    return result;
   } catch (error) {
     console.error('Error creating emotion entry:', error);
     throw error;
