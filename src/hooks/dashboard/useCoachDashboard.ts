@@ -4,67 +4,98 @@ import { useCoach } from '@/hooks/coach/useCoach';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useApiConnection } from '@/hooks/dashboard/useApiConnection';
 
 export function useCoachDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const { recommendations, triggerDailyReminder, isProcessing } = useCoach();
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
+  const { apiReady, apiCheckInProgress } = useApiConnection();
+  
   const [quickSuggestions] = useState<string[]>([
     "Comment gérer mon stress?",
     "Recommande-moi une musique apaisante",
-    "J'ai besoin d'une pause mentale"
+    "J'ai besoin d'une pause mentale",
+    "Techniques de respiration efficaces"
   ]);
 
-  // Function to play music recommended by coach
+  // Fonction pour jouer la musique recommandée par le coach
   const playRecommendedMusic = useCallback((emotion: string = 'calm') => {
-    loadPlaylistForEmotion(emotion);
-    openDrawer();
-    toast({
-      title: "Musique activée", 
-      description: `Une playlist adaptée à votre humeur a été lancée.`
-    });
+    try {
+      loadPlaylistForEmotion(emotion);
+      openDrawer();
+      toast({
+        title: "Musique activée", 
+        description: `Une playlist adaptée à votre humeur a été lancée.`
+      });
+    } catch (error) {
+      console.error("Erreur lors du chargement de la musique:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la musique recommandée.",
+        variant: "destructive"
+      });
+    }
   }, [loadPlaylistForEmotion, openDrawer, toast]);
 
-  // Function to refresh recommendations
+  // Fonction pour actualiser les recommandations
   const handleRefreshRecommendations = useCallback(() => {
-    if (user?.id) {
-      triggerDailyReminder()
-        .then(() => {
-          toast({
-            title: "Recommandations actualisées",
-            description: "Nouvelles recommandations personnalisées"
-          });
-        })
-        .catch(err => {
-          console.error("Error refreshing recommendations:", err);
-          toast({
-            title: "Erreur",
-            description: "Impossible d'actualiser les recommandations",
-            variant: "destructive"
-          });
-        });
+    if (!user?.id) {
+      toast({
+        title: "Non connecté",
+        description: "Vous devez être connecté pour obtenir des recommandations.",
+        variant: "destructive"
+      });
+      return;
     }
-  }, [user?.id, triggerDailyReminder, toast]);
+    
+    if (!apiReady) {
+      toast({
+        title: "API indisponible",
+        description: "Le service d'IA n'est pas disponible actuellement.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-  // Trigger daily reminder on component mount
+    triggerDailyReminder()
+      .then(() => {
+        toast({
+          title: "Recommandations actualisées",
+          description: "Nouvelles recommandations personnalisées"
+        });
+      })
+      .catch(err => {
+        console.error("Error refreshing recommendations:", err);
+        toast({
+          title: "Erreur",
+          description: "Impossible d'actualiser les recommandations",
+          variant: "destructive"
+        });
+      });
+  }, [user?.id, apiReady, triggerDailyReminder, toast]);
+
+  // Déclencher les recommandations quotidiennes au chargement du composant
   useEffect(() => {
-    if (user?.id) {
-      // Delay the daily reminder to ensure it doesn't block rendering
+    if (user?.id && apiReady && !apiCheckInProgress) {
+      // Délai pour éviter de bloquer le rendu
       const reminderTimeout = setTimeout(() => {
         triggerDailyReminder().catch(err => {
           console.error("Error triggering daily reminder:", err);
         });
-      }, 1000);
+      }, 2000); // Délai plus long pour éviter les problèmes de chargement
       
       return () => clearTimeout(reminderTimeout);
     }
-  }, [user?.id, triggerDailyReminder]);
+  }, [user?.id, triggerDailyReminder, apiReady, apiCheckInProgress]);
 
   return {
     recommendations,
     isProcessing,
     quickSuggestions,
+    apiReady,
+    apiCheckInProgress,
     playRecommendedMusic,
     handleRefreshRecommendations
   };

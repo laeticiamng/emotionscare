@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -11,24 +11,48 @@ interface QuickSuggestionsProps {
 const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const handleSuggestionClick = (suggestion: string) => {
-    const input = document.querySelector('input[placeholder*="message"]') as HTMLInputElement;
-    const button = input?.closest('form')?.querySelector('button[type="submit"]') as HTMLButtonElement;
+    if (isProcessing) return;
     
-    if (input && button) {
-      input.value = suggestion;
-      // Use event to trigger React state updates
-      const event = new Event('input', { bubbles: true });
-      input.dispatchEvent(event);
-      setTimeout(() => button.click(), 10);
-    } else {
+    setIsProcessing(true);
+    
+    try {
+      // Try to find the input element with a more reliable selector
+      const input = document.querySelector('input[placeholder*="message"], input[placeholder*="Message"]') as HTMLInputElement;
+      const form = input?.closest('form');
+      const button = form?.querySelector('button[type="submit"]') as HTMLButtonElement;
+      
+      if (input && button) {
+        // Set input value and trigger React's change event
+        input.value = suggestion;
+        const event = new Event('input', { bubbles: true });
+        input.dispatchEvent(event);
+        
+        // Use a short timeout to ensure React has processed the state update
+        setTimeout(() => {
+          button.click();
+          setIsProcessing(false);
+        }, 50);
+      } else {
+        // Fallback: navigate to coach chat with the question
+        toast({
+          title: "Question posée",
+          description: suggestion
+        });
+        navigate('/coach-chat', { state: { initialQuestion: suggestion } });
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error('Error processing suggestion:', error);
+      // Ensure we reset processing state even on error
       toast({
-        title: "Question posée",
-        description: suggestion
+        title: "Erreur",
+        description: "Impossible de traiter votre demande",
+        variant: "destructive"
       });
-      // Fallback: navigate to coach chat with the question
-      navigate('/coach-chat', { state: { initialQuestion: suggestion } });
+      setIsProcessing(false);
     }
   };
 
@@ -42,6 +66,7 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
             size="sm" 
             className="text-xs"
             onClick={() => handleSuggestionClick(suggestion)}
+            disabled={isProcessing}
           >
             {suggestion}
           </Button>

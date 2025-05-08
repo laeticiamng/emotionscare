@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Brain, RefreshCw, Music } from 'lucide-react';
+import { AlertOctagon, Brain, RefreshCw, Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CoachRecommendationsProps {
@@ -19,7 +19,44 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
   onRefresh,
   onPlayMusic 
 }) => {
-  if (recommendations.length === 0) return null;
+  // Si nous n'avons pas de recommandations, afficher un état alternatif
+  if (recommendations.length === 0) {
+    return (
+      <div className="px-4 pb-4">
+        <div className="bg-muted/30 rounded-lg p-3 mt-2">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Recommandations IA
+            </h4>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-6 w-6" 
+              disabled={isProcessing || apiCheckInProgress} 
+              onClick={onRefresh}
+            >
+              <RefreshCw className={cn("h-3 w-3", isProcessing && "animate-spin")} />
+            </Button>
+          </div>
+          <div className="text-xs text-muted-foreground flex items-center gap-1 mb-3">
+            <AlertOctagon className="h-3 w-3" /> 
+            Aucune recommandation disponible
+          </div>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="w-full text-xs h-7"
+            onClick={onRefresh}
+            disabled={isProcessing}
+          >
+            <RefreshCw className={cn("h-3 w-3 mr-1", isProcessing && "animate-spin")} />
+            Générer des recommandations
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 pb-4">
@@ -35,6 +72,7 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
             className="h-6 w-6" 
             disabled={isProcessing || apiCheckInProgress} 
             onClick={onRefresh}
+            aria-label="Rafraîchir les recommandations"
           >
             <RefreshCw className={cn("h-3 w-3", isProcessing && "animate-spin")} />
           </Button>
@@ -51,6 +89,7 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
             variant="outline" 
             className="w-full text-xs h-7 mt-1"
             onClick={onPlayMusic}
+            disabled={isProcessing}
           >
             <Music className="h-3 w-3 mr-1" />
             Écouter musique recommandée

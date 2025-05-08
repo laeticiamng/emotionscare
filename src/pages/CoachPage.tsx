@@ -1,38 +1,91 @@
 
 import React, { useState } from 'react';
 import ProtectedLayout from '@/components/ProtectedLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Brain, Music, RefreshCw, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useActivity } from '@/hooks/useActivity';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CoachPage = () => {
   const [userQuestion, setUserQuestion] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { logActivity } = useActivity();
+  const { user, isAuthenticated } = useAuth();
   
   const handleStartCoaching = () => {
-    if (userQuestion.trim()) {
-      // Log d'activité 
-      logActivity('coach_start', { withQuestion: true, question: userQuestion });
-      // Naviguer vers la page de chat avec la question initiale
-      navigate('/coach-chat', { state: { initialQuestion: userQuestion } });
-    } else {
-      // Log d'activité
-      logActivity('coach_start', { withQuestion: false });
-      // Naviguer simplement vers la page de chat
-      navigate('/coach-chat');
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      if (!isAuthenticated) {
+        toast({
+          title: "Connexion requise",
+          description: "Veuillez vous connecter pour utiliser le coach IA.",
+          variant: "destructive"
+        });
+        navigate('/login', { state: { from: '/coach' } });
+        return;
+      }
+      
+      if (userQuestion.trim()) {
+        // Log d'activité 
+        logActivity('coach_start', { withQuestion: true, question: userQuestion });
+        // Naviguer vers la page de chat avec la question initiale
+        navigate('/coach-chat', { state: { initialQuestion: userQuestion } });
+      } else {
+        // Log d'activité
+        logActivity('coach_start', { withQuestion: false });
+        // Naviguer simplement vers la page de chat
+        navigate('/coach-chat');
+      }
+    } catch (error) {
+      console.error('Erreur lors du démarrage du coaching:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer la session de coaching",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
   const handleQuickQuestion = (question: string) => {
-    // Log d'activité
-    logActivity('coach_quick_question', { question });
-    navigate('/coach-chat', { state: { initialQuestion: question } });
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      if (!isAuthenticated) {
+        toast({
+          title: "Connexion requise",
+          description: "Veuillez vous connecter pour utiliser le coach IA.",
+          variant: "destructive"
+        });
+        navigate('/login', { state: { from: '/coach' } });
+        return;
+      }
+      
+      // Log d'activité
+      logActivity('coach_quick_question', { question });
+      navigate('/coach-chat', { state: { initialQuestion: question } });
+    } catch (error) {
+      console.error('Erreur lors du traitement de la question:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de traiter votre demande",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -44,26 +97,43 @@ const CoachPage = () => {
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle>Posez une question à votre coach</CardTitle>
+              <CardDescription>
+                Votre coach personnel est là pour vous aider à améliorer votre bien-être et votre équilibre émotionnel
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <p className="text-muted-foreground">Votre coach personnel est là pour vous aider à améliorer votre bien-être et votre équilibre émotionnel.</p>
-                
                 <div className="flex gap-2">
                   <Input 
                     placeholder="Comment puis-je réduire mon stress au travail ?"
                     value={userQuestion}
                     onChange={(e) => setUserQuestion(e.target.value)}
                     className="flex-1"
+                    disabled={isSubmitting}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !isSubmitting) handleStartCoaching();
+                    }}
                   />
-                  <Button onClick={handleStartCoaching}>
-                    <MessageCircle className="mr-2 h-4 w-4" />
+                  <Button 
+                    onClick={handleStartCoaching}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                    )}
                     Demander
                   </Button>
                 </div>
                 
-                <Button variant="outline" className="w-full" onClick={handleStartCoaching}>
-                  Démarrer une conversation
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={handleStartCoaching}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Chargement..." : "Démarrer une conversation"}
                 </Button>
               </div>
             </CardContent>
@@ -75,12 +145,18 @@ const CoachPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {["Comment gérer mon anxiété ?", "Techniques de respiration", "Améliorer mon sommeil"].map((question) => (
+                {[
+                  "Comment gérer mon anxiété ?", 
+                  "Techniques de respiration", 
+                  "Améliorer mon sommeil", 
+                  "Exercices anti-stress"
+                ].map((question) => (
                   <Button 
                     key={question}
                     variant="ghost" 
                     className="w-full justify-start text-left" 
                     onClick={() => handleQuickQuestion(question)}
+                    disabled={isSubmitting}
                   >
                     {question}
                   </Button>
@@ -97,12 +173,27 @@ const CoachPage = () => {
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-muted-foreground">Recommandations basées sur votre profil émotionnel récent.</p>
-              <Button onClick={() => {
-                logActivity('view_recommendations');
-                toast({ title: "Fonctionnalité à venir", description: "Les recommandations personnalisées seront bientôt disponibles." });
-              }}>
-                Voir mes recommandations
-              </Button>
+              <div className="flex space-x-2">
+                <Button 
+                  onClick={() => {
+                    logActivity('view_recommendations');
+                    navigate('/dashboard');
+                  }}
+                  className="flex-1"
+                >
+                  <Brain className="mr-2 h-4 w-4" />
+                  Voir mes recommandations
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    logActivity('view_music');
+                    navigate('/music');
+                  }}
+                >
+                  <Music className="h-4 w-4" />
+                </Button>
+              </div>
             </CardContent>
           </Card>
           
@@ -118,7 +209,9 @@ const CoachPage = () => {
                   navigate('/coach-chat');
                 }} 
                 variant="outline"
+                className="w-full"
               >
+                <History className="mr-2 h-4 w-4" />
                 Voir l'historique
               </Button>
             </CardContent>

@@ -6,7 +6,9 @@ import { useCoachChat } from '@/hooks/chat/useCoachChat';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { useToast } from '@/hooks/use-toast';
 import CoachChatContainer from '@/components/coach/CoachChatContainer';
-import { Loader } from 'lucide-react';
+import { Loader, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 const CoachChatPage = () => {
   // Get the coach chat functionality
@@ -38,6 +40,7 @@ const CoachChatPage = () => {
   
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [isLoadingConversation, setIsLoadingConversation] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Watch for active conversation changes
   useEffect(() => {
@@ -55,11 +58,12 @@ const CoachChatPage = () => {
       setActiveConversationId(null);
       setCurrentConversationId(null);
       resetMessages();
+      setError(null);
       
       // Using setTimeout to ensure state updates complete before sending message
       setTimeout(() => {
         handleSendMessage(state.initialQuestion);
-      }, 0);
+      }, 100);
       
       // Clear the state to prevent re-sending on navigation
       window.history.replaceState({}, document.title);
@@ -70,9 +74,10 @@ const CoachChatPage = () => {
   const handleLoadConversation = async (conversationId: string) => {
     try {
       setIsLoadingConversation(true);
+      setError(null);
       console.log('Loading conversation:', conversationId);
       const loadedMessages = await loadMessages(conversationId);
-      if (loadedMessages.length > 0) {
+      if (loadedMessages && loadedMessages.length > 0) {
         console.log('Loaded messages:', loadedMessages.length);
         setMessages(loadedMessages);
       } else {
@@ -84,6 +89,7 @@ const CoachChatPage = () => {
       }
     } catch (error) {
       console.error('Error loading conversation:', error);
+      setError("Impossible de charger la conversation. Veuillez réessayer.");
       toast({
         title: "Erreur",
         description: "Impossible de charger la conversation.",
@@ -97,10 +103,21 @@ const CoachChatPage = () => {
 
   // Function to handle sending a new message or an initial question
   const handleSendChatMessage = (message?: string) => {
-    if (message) {
-      handleSendMessage(message);
-    } else {
-      handleSendMessage();
+    try {
+      setError(null);
+      if (message) {
+        handleSendMessage(message);
+      } else {
+        handleSendMessage();
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setError("Impossible d'envoyer votre message. Veuillez réessayer.");
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer votre message.",
+        variant: "destructive"
+      });
     }
   };
   
@@ -119,6 +136,24 @@ const CoachChatPage = () => {
             <Loader className="animate-spin text-primary h-6 w-6" />
           </div>
         )}
+
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Erreur</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+            <div className="mt-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setError(null)}
+              >
+                Fermer
+              </Button>
+            </div>
+          </Alert>
+        )}
+
         <CoachChatContainer
           messages={messages}
           isLoading={isLoading}
