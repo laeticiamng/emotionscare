@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ChatConversation, chatHistoryService } from '@/lib/chat/chatHistoryService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -16,24 +16,44 @@ export function useConversations() {
 
   // Load user conversations
   const loadConversations = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.warn('Cannot load conversations: No user logged in');
+      return;
+    }
     
     setIsLoading(true);
     try {
+      console.log('Loading conversations for user:', user.id);
       const userConversations = await chatHistoryService.getConversations(user.id);
+      console.log('Loaded conversations:', userConversations.length);
       setConversations(userConversations);
+      
+      // If no active conversation is set but we have conversations, set the first one as active
+      if (!activeConversationId && userConversations.length > 0) {
+        console.log('Setting first conversation as active:', userConversations[0].id);
+        setActiveConversationId(userConversations[0].id);
+      }
     } catch (error) {
       console.error('Error loading conversations:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les conversations.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  }, [user?.id, activeConversationId, toast]);
 
   // Create a new conversation
   const createConversation = useCallback(async (title: string = "Nouvelle conversation"): Promise<string | null> => {
-    if (!user?.id) return null;
+    if (!user?.id) {
+      console.error('Cannot create conversation: No user logged in');
+      return null;
+    }
     
     try {
+      console.log('Creating conversation with title:', title);
       const conversationId = await chatHistoryService.createConversation(user.id, title);
       if (conversationId) {
         await loadConversations();
@@ -43,13 +63,19 @@ export function useConversations() {
       return null;
     } catch (error) {
       console.error('Error creating conversation:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer une nouvelle conversation.",
+        variant: "destructive"
+      });
       return null;
     }
-  }, [user?.id, loadConversations]);
+  }, [user?.id, loadConversations, toast]);
 
   // Delete a conversation
   const deleteConversation = useCallback(async (conversationId: string) => {
     try {
+      console.log('Deleting conversation:', conversationId);
       const success = await chatHistoryService.deleteConversation(conversationId);
       
       if (success) {
@@ -81,11 +107,25 @@ export function useConversations() {
     lastMessage: string
   ): Promise<boolean> => {
     try {
-      return await chatHistoryService.updateConversation(
+      console.log('Updating conversation:', conversationId, 'title:', title);
+      const success = await chatHistoryService.updateConversation(
         conversationId, 
         title, 
         lastMessage
       );
+      
+      if (success) {
+        // Update local state to reflect the changes
+        setConversations(prevConversations => 
+          prevConversations.map(conv => 
+            conv.id === conversationId 
+              ? {...conv, title, lastMessage, updatedAt: new Date()} 
+              : conv
+          )
+        );
+      }
+      
+      return success;
     } catch (error) {
       console.error('Error updating conversation:', error);
       return false;

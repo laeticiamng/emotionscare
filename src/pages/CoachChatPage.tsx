@@ -1,11 +1,12 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import { useCoachChat } from '@/hooks/chat/useCoachChat';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { useToast } from '@/hooks/use-toast';
 import CoachChatContainer from '@/components/coach/CoachChatContainer';
+import { ChatMessage } from '@/types/chat';
 
 const CoachChatPage = () => {
   // Get the coach chat functionality
@@ -25,12 +26,25 @@ const CoachChatPage = () => {
 
   const location = useLocation();
   const { toast } = useToast();
-  const { loadMessages } = useChatHistory();
+  const { loadMessages, activeConversationId, setActiveConversationId } = useChatHistory();
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  
+  // Watch for active conversation changes
+  useEffect(() => {
+    if (activeConversationId && activeConversationId !== currentConversationId) {
+      setCurrentConversationId(activeConversationId);
+      handleLoadConversation(activeConversationId);
+    }
+  }, [activeConversationId]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Process any initial question from navigation state
   useEffect(() => {
     const state = location.state as { initialQuestion?: string } | undefined;
     if (state?.initialQuestion) {
+      // Reset conversation state when coming with a new question
+      setActiveConversationId(null);
+      setCurrentConversationId(null);
+      resetMessages();
       handleSendMessage(state.initialQuestion);
     }
   }, [location.state]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -38,8 +52,10 @@ const CoachChatPage = () => {
   // Handle loading conversation
   const handleLoadConversation = async (conversationId: string) => {
     try {
+      console.log('Loading conversation:', conversationId);
       const loadedMessages = await loadMessages(conversationId);
       if (loadedMessages.length > 0) {
+        console.log('Loaded messages:', loadedMessages.length);
         setMessages(loadedMessages);
       } else {
         toast({
@@ -57,6 +73,15 @@ const CoachChatPage = () => {
     }
   };
 
+  // Function to handle sending a new message or an initial question
+  const handleSendChatMessage = (message?: string) => {
+    if (message) {
+      handleSendMessage(message);
+    } else {
+      handleSendMessage();
+    }
+  };
+
   return (
     <ProtectedLayout>
       <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl h-[80vh] flex flex-col">
@@ -66,7 +91,7 @@ const CoachChatPage = () => {
           typingIndicator={typingIndicator}
           userMessage={userMessage}
           onUserMessageChange={setUserMessage}
-          onSendMessage={() => handleSendMessage()}
+          onSendMessage={handleSendChatMessage}
           onRegenerate={handleRegenerate}
           onKeyDown={handleKeyDown}
           onUserTyping={handleUserTyping}

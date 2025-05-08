@@ -21,9 +21,11 @@ export const chatHistoryService = {
    */
   async getConversations(userId: string): Promise<ChatConversation[]> {
     try {
+      console.log('Fetching conversations for user:', userId);
       const { data, error } = await supabase
         .from('chat_conversations')
         .select('*')
+        .eq('user_id', userId)
         .order('updated_at', { ascending: false });
       
       if (error) {
@@ -31,6 +33,7 @@ export const chatHistoryService = {
         return [];
       }
       
+      console.log('Fetched conversations:', data.length);
       return data.map(conversation => ({
         id: conversation.id,
         userId: conversation.user_id,
@@ -50,6 +53,7 @@ export const chatHistoryService = {
    */
   async createConversation(userId: string, title: string): Promise<string | null> {
     try {
+      console.log('Creating conversation for user:', userId);
       const { data, error } = await supabase
         .from('chat_conversations')
         .insert({
@@ -64,6 +68,7 @@ export const chatHistoryService = {
         return null;
       }
       
+      console.log('Created conversation:', data.id);
       return data.id;
     } catch (error) {
       console.error('Error creating conversation:', error);
@@ -76,6 +81,7 @@ export const chatHistoryService = {
    */
   async updateConversation(conversationId: string, title: string, lastMessage: string): Promise<boolean> {
     try {
+      console.log('Updating conversation:', conversationId);
       const { error } = await supabase
         .from('chat_conversations')
         .update({
@@ -101,6 +107,7 @@ export const chatHistoryService = {
    */
   async deleteConversation(conversationId: string): Promise<boolean> {
     try {
+      console.log('Deleting conversation:', conversationId);
       // Due to cascade delete in the database, we only need to delete the conversation
       const { error } = await supabase
         .from('chat_conversations')
@@ -124,6 +131,7 @@ export const chatHistoryService = {
    */
   async getMessages(conversationId: string): Promise<ChatMessage[]> {
     try {
+      console.log('Fetching messages for conversation:', conversationId);
       const { data, error } = await supabase
         .from('chat_messages')
         .select('*')
@@ -135,6 +143,7 @@ export const chatHistoryService = {
         return [];
       }
       
+      console.log('Fetched messages:', data.length);
       return data.map(message => ({
         id: message.id,
         text: message.text,
@@ -152,9 +161,15 @@ export const chatHistoryService = {
    */
   async saveMessages(conversationId: string, messages: ChatMessage[]): Promise<boolean> {
     try {
+      if (!conversationId) {
+        console.error('No conversation ID provided to saveMessages');
+        return false;
+      }
+      
+      console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
       // Filter for messages that need to be saved
       const messagesToSave = messages.map(message => ({
-        id: message.id,
+        id: message.id || uuidv4(), // Ensure every message has an ID
         conversation_id: conversationId,
         text: message.text,
         sender: message.sender,
