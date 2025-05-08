@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChatConversation } from '@/lib/chat/chatHistoryService';
+import { ChatConversation } from '@/types/chat';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PlusCircle, Trash2 } from 'lucide-react';

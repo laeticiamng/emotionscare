@@ -1,16 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
-
-export interface ChatConversation {
-  id: string;
-  userId: string;
-  title: string;
-  lastMessage: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 /**
  * Service for managing chat history

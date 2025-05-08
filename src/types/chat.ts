@@ -17,3 +17,12 @@ export interface ChatMessage {
   sender: 'user' | 'bot';
   timestamp: Date;
 }
+
+export interface ChatConversation {
+  id: string;
+  userId: string;
+  title: string;
+  lastMessage: string;
+  createdAt: Date;
+  updatedAt: Date;
+}

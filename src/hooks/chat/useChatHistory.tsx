@@ -2,18 +2,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
 
-interface Conversation {
-  id: string;
-  title: string;
-  created_at: Date;
-  last_message: string | null;
-}
-
 export function useChatHistory() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +29,17 @@ export function useChatHistory() {
       
       if (error) throw error;
       
-      setConversations(data || []);
+      // Convert the date strings to Date objects and map to ChatConversation type
+      const formattedConversations: ChatConversation[] = (data || []).map(conv => ({
+        id: conv.id,
+        userId: conv.user_id,
+        title: conv.title,
+        lastMessage: conv.last_message || '',
+        createdAt: new Date(conv.created_at),
+        updatedAt: new Date(conv.updated_at)
+      }));
+      
+      setConversations(formattedConversations);
     } catch (err) {
       console.error('Error loading conversations:', err);
       setError("Impossible de charger les conversations. Veuillez réessayer.");

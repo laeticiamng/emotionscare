@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { ChatConversation, chatHistoryService } from '@/lib/chat/chatHistoryService';
+import { ChatConversation, ChatMessage } from '@/types/chat';
+import { chatHistoryService } from '@/lib/chat/chatHistoryService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
