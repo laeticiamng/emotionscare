@@ -54,6 +54,7 @@ export const createFallbackEmotion = (userId: string = 'user-1') => {
     emojis: "😐",
     ai_feedback: "Nous n'avons pas pu analyser précisément votre état émotionnel.",
     confidence: 0.6,
-    source: "fallback"
+    source: "fallback",
+    is_confidential: false
   };
 };

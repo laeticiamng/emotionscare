@@ -1,78 +1,49 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Loader2, PlayCircle } from 'lucide-react';
+import { Music, PlayCircle } from 'lucide-react';
 import { EmotionResult } from '@/types';
-import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
+import { useMusicRecommendation } from './useMusicRecommendation';
 
 interface MusicEmotionRecommendationProps {
   emotionResult: EmotionResult;
-  isLoading?: boolean;
 }
 
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
-  emotionResult,
-  isLoading = false
+  emotionResult
 }) => {
-  const { loadPlaylistForEmotion, playTrack } = useMusic();
-  const { toast } = useToast();
+  const { handlePlayMusic, EMOTION_TO_MUSIC } = useMusicRecommendation();
   
-  const handlePlayMusic = () => {
-    if (!emotionResult.emotion) return;
-    
-    const playlist = loadPlaylistForEmotion(emotionResult.emotion.toLowerCase());
-    
-    if (playlist && playlist.tracks.length > 0) {
-      playTrack(playlist.tracks[0]);
-      
-      toast({
-        title: "Musique lancée",
-        description: `Lecture de '${playlist.tracks[0].title}' démarrée`,
-      });
-    } else {
-      toast({
-        title: "Aucune musique disponible",
-        description: `Aucune playlist n'a été trouvée pour l'émotion ${emotionResult.emotion}`,
-        variant: "destructive"
-      });
-    }
-  };
-
+  // Déterminer le type de musique pour cette émotion
+  const musicType = emotionResult?.emotion 
+    ? (EMOTION_TO_MUSIC[emotionResult.emotion.toLowerCase()] || EMOTION_TO_MUSIC.default)
+    : EMOTION_TO_MUSIC.default;
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Recommandation musicale</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center gap-4">
-          <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-            <Music className="h-6 w-6 text-primary" />
+    <Card className="mt-4 border-none bg-accent/50">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Music className="h-5 w-5 text-primary" />
+            <span className="font-medium">Musique thérapeutique recommandée</span>
           </div>
-          <div className="flex-1">
-            <h4 className="font-medium text-base">
-              Musique adaptée à votre état : {emotionResult.emotion}
-            </h4>
-            <p className="text-sm text-muted-foreground mt-1">
-              Écoutez une sélection musicale conçue pour accompagner et améliorer votre état émotionnel actuel.
-            </p>
-          </div>
-          <Button 
-            onClick={handlePlayMusic} 
-            disabled={isLoading}
-            variant="outline"
-            className="flex-shrink-0"
+          
+          <Button
+            size="sm"
+            variant="default"
+            className="gap-1"
+            onClick={() => handlePlayMusic(emotionResult)}
           >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <PlayCircle className="h-4 w-4 mr-1" />
-                Écouter
-              </>
-            )}
+            <PlayCircle className="h-4 w-4" />
+            <span>Écouter</span>
           </Button>
+        </div>
+        
+        <div className="mt-2 text-sm">
+          <p className="text-muted-foreground">
+            Type: <span className="font-medium text-foreground">{musicType}</span>
+          </p>
         </div>
       </CardContent>
     </Card>

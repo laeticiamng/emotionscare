@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/types';
@@ -42,8 +42,36 @@ const EMOTION_TO_MUSIC: Record<string, string> = {
 };
 
 export function useMusicRecommendation() {
-  const { loadPlaylistForEmotion, openDrawer } = useMusic();
+  const { loadPlaylistForEmotion, openDrawer, currentTrack, isPlaying, playTrack, pauseTrack } = useMusic();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Toggle play/pause functionality
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      pauseTrack();
+    } else if (currentTrack) {
+      playTrack(currentTrack);
+    }
+  };
+
+  // Load music for a specific mood/emotion
+  const loadMusicForMood = useCallback((emotion: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || EMOTION_TO_MUSIC.default;
+      loadPlaylistForEmotion(musicType);
+      
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Error loading music for mood:', err);
+      setError('Failed to load music for this mood');
+      setIsLoading(false);
+    }
+  }, [loadPlaylistForEmotion]);
   
   // Handler pour activer la musique adaptée à l'émotion
   const handlePlayMusic = useCallback((emotionResult?: EmotionResult | null) => {
@@ -65,6 +93,11 @@ export function useMusicRecommendation() {
 
   return {
     handlePlayMusic,
-    EMOTION_TO_MUSIC
+    EMOTION_TO_MUSIC,
+    isLoading,
+    loadMusicForMood,
+    togglePlayPause,
+    currentTrack,
+    error
   };
 }
