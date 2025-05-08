@@ -1,37 +1,10 @@
+
 import { useCallback, useRef, useEffect } from 'react';
-import { Track } from '@/types/music';
+import { MusicTrack } from '@/types/music';
 import { useAudioEvents } from './audio/useAudioEvents';
 import { formatTime, handlePlayError, getTrackAudioUrl } from './audio/audioPlayerUtils';
 import { useAudioPlayerState } from './audio/useAudioPlayerState';
-
-export interface UseAudioPlayerReturn {
-  currentTrack: Track | null;
-  isPlaying: boolean;
-  volume: number;
-  repeat: boolean;
-  shuffle: boolean;
-  progress: number;      // seconds écoulés
-  duration: number;      // durée totale en secondes
-  loading: boolean;
-  error: Error | null;
-  playTrack: (track: Track) => void;
-  pauseTrack: () => void;
-  resumeTrack: () => void;
-  setVolume: (v: number) => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
-  seekTo: (seconds: number) => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  setCurrentTrack: (track: Track | null) => void;
-  
-  // Additional properties needed for MusicContext
-  currentTime: number;
-  loadingTrack: boolean;
-  formatTime: (time: number) => string;
-  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleVolumeChange: (values: number[]) => void;
-}
+import { UseAudioPlayerReturn } from '@/types/audio-player';
 
 /**
  * Centralized hook for managing audio playback throughout the application
@@ -51,8 +24,6 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     setCurrentTrack,
     setIsPlaying,
     setVolume: setStateVolume,
-    setRepeat,
-    setShuffle,
     setProgress,
     setDuration,
     setLoadingTrack,
@@ -148,7 +119,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   }, [isPlaying, currentTrack, handleError]);
 
   // Public API functions
-  const playTrack = useCallback((track: Track) => {
+  const playTrack = useCallback((track: MusicTrack) => {
     setCurrentTrack(track);
     setLoadingTrack(true);
     setError(null);
@@ -172,14 +143,6 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       audioRef.current.volume = clampedValue;
     }
   }, [setStateVolume]);
-
-  const toggleRepeat = useCallback(() => {
-    setRepeat(!repeat);
-  }, [repeat, setRepeat]);
-
-  const toggleShuffle = useCallback(() => {
-    setShuffle(!shuffle);
-  }, [shuffle, setShuffle]);
 
   const seekTo = useCallback((seconds: number) => {
     if (audioRef.current) {
@@ -227,8 +190,8 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     pauseTrack,
     resumeTrack,
     setVolume,
-    toggleRepeat,
-    toggleShuffle,
+    toggleRepeat: useAudioPlayerState().toggleRepeat,
+    toggleShuffle: useAudioPlayerState().toggleShuffle,
     seekTo,
     nextTrack,
     previousTrack,

@@ -1,19 +1,6 @@
 
 import { useEffect, RefObject } from 'react';
-
-interface UseAudioEventsProps {
-  audioRef: RefObject<HTMLAudioElement | null>;
-  onTimeUpdate: (time: number) => void;
-  onDurationChange: (duration: number) => void;
-  onEnded: () => void;
-  onError: (error: Error) => void;
-  onPlay: () => void;
-  onPause: () => void;
-  onWaiting: () => void;
-  onCanPlay: () => void;
-  volume: number;
-  repeat: boolean;
-}
+import { UseAudioEventsProps } from '@/types/audio-player';
 
 /**
  * Hook to handle audio element events separately from state management

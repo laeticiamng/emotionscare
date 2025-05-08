@@ -16,6 +16,7 @@ export interface AudioPlayerState {
   duration: number;
   repeat: boolean;
   shuffle: boolean;
+  progress: number;
   loadingTrack: boolean;
   error: Error | null;
 }
@@ -42,16 +43,30 @@ export interface UseAudioPlayerStateReturn extends AudioPlayerState {
  * Return type for the useAudioPlayer hook
  */
 export interface UseAudioPlayerReturn {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  repeat: boolean;
+  shuffle: boolean;
+  progress: number;
+  duration: number;
+  loading: boolean;
+  error: Error | null;
+  currentTime: number;
+  loadingTrack: boolean;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
   setVolume: (volume: number) => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
   seekTo: (seconds: number) => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setCurrentTrack: (track: MusicTrack | null) => void;
   formatTime: (time: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleVolumeChange: (values: number[]) => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
 }
 
 /**
