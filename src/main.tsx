@@ -8,6 +8,23 @@ import './styles/premium.css';
 import './styles/components.css';
 import './App.css';
 
+// --- DEBUG IMPORTS -------------------------------------------------
+import.meta.glob(['/**/*.{tsx,ts,jsx,js}']).forEach(async (loader, path) => {
+  if (!path.includes('node_modules')) {
+    const mod = await loader();
+    for (const key in mod) {
+      if (typeof mod[key] !== 'function' && typeof mod[key] !== 'object') continue;
+      if (
+        mod[key] === undefined ||
+        (mod[key]?.$$typeof && mod[key].render === undefined) // mauvais export React
+      ) {
+        console.error('[IMPORT-DEBUG] invalid export in ->', path, 'export:', key, mod[key]);
+      }
+    }
+  }
+});
+// -------------------------------------------------------------------
+
 const initializeApp = () => {
   console.info(`🚀 Application EmotionsCare - Démarrage [${new Date().toISOString()}]`);
   console.info(`📌 Version: ${import.meta.env.VITE_APP_VERSION || '1.0.0'}`);

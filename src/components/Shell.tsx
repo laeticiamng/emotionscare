@@ -6,7 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
-// Import avec chemin relatif pour éviter les problèmes de résolution
+// Import avec chemin direct relatif pour résoudre les problèmes
 import MusicDrawer from "./music/player/MusicDrawer";
 import useLogger from "@/hooks/useLogger";
 
@@ -54,13 +54,11 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Système de notifications toast */}
       <Toaster />
       
-      {/* Music Player Drawer avec vérification de type */}
-      {typeof MusicDrawer === 'function' && (
-        <MusicDrawer 
-          open={isDrawerOpen} 
-          onClose={closeDrawer} 
-        />
-      )}
+      {/* Music Player Drawer */}
+      <MusicDrawer 
+        open={isDrawerOpen} 
+        onClose={closeDrawer} 
+      />
     </div>
   );
 };
