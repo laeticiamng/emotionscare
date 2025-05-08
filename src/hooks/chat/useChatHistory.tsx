@@ -65,7 +65,7 @@ export function useChatHistory() {
       return (data || []).map(dbMessage => ({
         id: dbMessage.id,
         text: dbMessage.text,
-        sender: dbMessage.sender as 'user' | 'bot', // Properly casting sender to the expected type
+        sender: dbMessage.sender as 'user' | 'bot', // Explicitly cast to the union type
         timestamp: new Date(dbMessage.timestamp)
       }));
     } catch (err) {
@@ -154,7 +154,7 @@ export function useChatHistory() {
       const dbMessages = relevantMessages.map(msg => ({
         id: msg.id,
         conversation_id: convId,
-        sender: msg.sender, // Ensure sender is correctly typed
+        sender: msg.sender,
         text: msg.text,
         timestamp: msg.timestamp.toISOString()
       }));
@@ -226,6 +226,6 @@ export function useChatHistory() {
     saveMessages,
     deleteConversation,
     retryLoadConversations,
-    createConversation // Added the missing method
+    createConversation
   };
 }

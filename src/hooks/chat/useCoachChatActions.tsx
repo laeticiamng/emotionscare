@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +31,11 @@ export function useCoachChatActions({
   const { toast } = useToast();
   const { askQuestion } = useCoach();
   const { logActivity } = useActivity();
-  const { activeConversationId, saveMessages } = useChatHistory();
+  const { 
+    activeConversationId, 
+    saveMessages, 
+    createConversation 
+  } = useChatHistory();
   
   // Handle sending a message
   const handleSendMessage = useCallback((messageText: string = userMessage) => {

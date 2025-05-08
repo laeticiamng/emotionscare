@@ -174,8 +174,6 @@ const ChatHistoryPage = () => {
                             <Badge variant="outline" className="text-xs">
                               {format(new Date(conversation.createdAt || Date.now()), 'HH:mm', { locale: fr })}
                             </Badge>
-                            
-                            {/* Message count has been removed since it's not in the ChatConversation type */}
                           </div>
                         </div>
                         
