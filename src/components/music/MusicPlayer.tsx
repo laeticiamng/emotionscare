@@ -20,6 +20,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = () => {
     setIsPlaying(false);
   };
 
+  console.log("Rendering MusicPlayer with MusicControls:", MusicControls);
+
   return (
     <Card className="music-player">
       <CardHeader>

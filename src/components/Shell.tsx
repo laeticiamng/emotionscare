@@ -6,7 +6,7 @@ import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
-import MusicDrawer from "./music/MusicDrawer";
+import MusicDrawer from "./music/MusicDrawer"; // We're keeping this file
 
 interface ShellProps {
   children?: ReactNode;
