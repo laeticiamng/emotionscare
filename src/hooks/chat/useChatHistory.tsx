@@ -65,7 +65,7 @@ export function useChatHistory() {
       return (data || []).map(dbMessage => ({
         id: dbMessage.id,
         text: dbMessage.text,
-        sender: dbMessage.sender,
+        sender: dbMessage.sender as 'user' | 'bot', // Properly casting sender to the expected type
         timestamp: new Date(dbMessage.timestamp)
       }));
     } catch (err) {
@@ -73,6 +73,37 @@ export function useChatHistory() {
       throw err;
     }
   }, [user?.id]);
+
+  // Create a new conversation
+  const createConversation = useCallback(async (title?: string): Promise<string | null> => {
+    if (!user?.id) return null;
+    
+    try {
+      const conversationId = uuidv4();
+      const newTitle = title || 'Nouvelle conversation';
+      
+      const { error: convError } = await supabase
+        .from('chat_conversations')
+        .insert({
+          id: conversationId,
+          user_id: user.id,
+          title: newTitle,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      
+      if (convError) throw convError;
+      
+      setActiveConversationId(conversationId);
+      // Refresh conversations list
+      loadConversations();
+      
+      return conversationId;
+    } catch (err) {
+      console.error('Failed to create conversation:', err);
+      return null;
+    }
+  }, [user?.id, loadConversations]);
   
   // Save messages to current conversation or create new conversation
   const saveMessages = useCallback(async (messages: ChatMessage[]) => {
@@ -123,7 +154,7 @@ export function useChatHistory() {
       const dbMessages = relevantMessages.map(msg => ({
         id: msg.id,
         conversation_id: convId,
-        sender: msg.sender,
+        sender: msg.sender, // Ensure sender is correctly typed
         text: msg.text,
         timestamp: msg.timestamp.toISOString()
       }));
@@ -194,6 +225,7 @@ export function useChatHistory() {
     loadMessages,
     saveMessages,
     deleteConversation,
-    retryLoadConversations
+    retryLoadConversations,
+    createConversation // Added the missing method
   };
 }

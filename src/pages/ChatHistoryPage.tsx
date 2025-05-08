@@ -39,7 +39,7 @@ const ChatHistoryPage = () => {
     
     if (conversations) {
       conversations.forEach(convo => {
-        const date = new Date(convo.created_at || Date.now());
+        const date = new Date(convo.createdAt || Date.now());
         const dateKey = format(date, 'yyyy-MM-dd');
         
         if (!groups[dateKey]) {
@@ -164,22 +164,18 @@ const ChatHistoryPage = () => {
                             </h4>
                           </div>
                           
-                          {conversation.last_message && (
+                          {conversation.lastMessage && (
                             <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-                              {conversation.last_message}
+                              {conversation.lastMessage}
                             </p>
                           )}
                           
                           <div className="flex items-center gap-2">
                             <Badge variant="outline" className="text-xs">
-                              {format(new Date(conversation.created_at || Date.now()), 'HH:mm', { locale: fr })}
+                              {format(new Date(conversation.createdAt || Date.now()), 'HH:mm', { locale: fr })}
                             </Badge>
                             
-                            {conversation.message_count && (
-                              <Badge variant="secondary" className="text-xs">
-                                {conversation.message_count} messages
-                              </Badge>
-                            )}
+                            {/* Message count has been removed since it's not in the ChatConversation type */}
                           </div>
                         </div>
                         

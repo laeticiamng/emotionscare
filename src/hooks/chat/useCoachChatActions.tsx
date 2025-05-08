@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +30,7 @@ export function useCoachChatActions({
   const { toast } = useToast();
   const { askQuestion } = useCoach();
   const { logActivity } = useActivity();
-  const { activeConversationId, createConversation, saveMessages } = useChatHistory();
+  const { activeConversationId, saveMessages } = useChatHistory();
   
   // Handle sending a message
   const handleSendMessage = useCallback((messageText: string = userMessage) => {
@@ -39,22 +38,6 @@ export function useCoachChatActions({
     
     const addUserMessage = (message: ChatMessage) => addMessage(message);
     const addBotMessage = (message: ChatMessage) => addMessage(message);
-    
-    // Handle conversation creation
-    const ensureConversation = async () => {
-      if (!activeConversationId) {
-        try {
-          await createConversation(messageText.substring(0, 50));
-        } catch (error) {
-          console.error('Error creating conversation:', error);
-          toast({
-            title: "Erreur",
-            description: "Impossible de créer une nouvelle conversation.",
-            variant: "destructive"
-          });
-        }
-      }
-    };
     
     // Log activity
     const logMessageActivity = () => {
@@ -68,8 +51,7 @@ export function useCoachChatActions({
       addBotMessage,
       async (text: string) => {
         try {
-          // Ensure we have an active conversation and log activity
-          await ensureConversation();
+          // Log activity
           logMessageActivity();
           
           // Get response from coach AI
@@ -111,7 +93,7 @@ export function useCoachChatActions({
     
     // Clear input
     setUserMessage('');
-  }, [userMessage, sendMessage, addMessage, activeConversationId, createConversation, saveMessages, messages, logActivity, askQuestion, toast, clearTypingIndicator, setUserMessage]);
+  }, [userMessage, sendMessage, addMessage, activeConversationId, saveMessages, messages, logActivity, askQuestion, toast, clearTypingIndicator, setUserMessage]);
   
   // Handle regenerating a response
   const handleRegenerate = useCallback(() => {
