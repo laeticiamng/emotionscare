@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +12,7 @@ export function MusicMiniPlayer() {
   const { 
     currentTrack, 
     isPlaying, 
-    playlist, 
+    currentPlaylist, 
     currentEmotion,
     playTrack,
     pauseTrack,
@@ -23,12 +24,12 @@ export function MusicMiniPlayer() {
 
   // Initialize player with default playlist if none loaded
   useEffect(() => {
-    if (!playlist || !currentTrack) {
+    if (!currentPlaylist || !currentTrack) {
       loadPlaylistForEmotion('neutral');
     }
-  }, [playlist, currentTrack, loadPlaylistForEmotion]);
+  }, [currentPlaylist, currentTrack, loadPlaylistForEmotion]);
 
-  if (!playlist || !currentTrack) {
+  if (!currentPlaylist || !currentTrack) {
     return (
       <Card className="mb-6 overflow-hidden cursor-pointer" onClick={() => loadPlaylistForEmotion('neutral')}>
         <CardContent className="p-4">
@@ -69,9 +70,9 @@ export function MusicMiniPlayer() {
         
         <div className="flex items-center mt-4 space-x-3">
           <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center shrink-0 overflow-hidden">
-            {currentTrack.cover ? (
+            {currentTrack.cover || currentTrack.coverUrl ? (
               <img 
-                src={currentTrack.cover} 
+                src={currentTrack.coverUrl || currentTrack.cover} 
                 alt={`${currentTrack.title} cover`} 
                 className="w-full h-full object-cover"
               />

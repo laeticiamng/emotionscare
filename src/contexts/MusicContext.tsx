@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Track } from '@/services/music/types';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
@@ -12,15 +11,20 @@ interface MusicContextType {
   currentPlaylist: MusicPlaylist | null;
   currentEmotion: string | null;
   playlists: MusicPlaylist[];
+  playlist: MusicPlaylist | null; // Ajout de playlist
   playTrack: (track: Track | MusicTrack) => void;
   pauseTrack: () => void;
   setVolume: (volume: number) => void;
   nextTrack: () => void;
   previousTrack: () => void;
   loadPlaylistForEmotion: (emotion: string) => void;
+  loadPlaylistById: (id: string) => void; // Ajout de loadPlaylistById
+  loadTrack: (track: any) => void; // Ajout de loadTrack
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
   openDrawer: () => void;
+  closeDrawer: () => void; // Ajout de closeDrawer
+  isDrawerOpen: boolean; // Ajout de isDrawerOpen
 }
 
 // Création du contexte avec valeur par défaut
@@ -31,15 +35,20 @@ const MusicContext = createContext<MusicContextType>({
   currentPlaylist: null,
   currentEmotion: null,
   playlists: [],
+  playlist: null, // Initialisation de playlist
   playTrack: () => {},
   pauseTrack: () => {},
   setVolume: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
   loadPlaylistForEmotion: () => {},
+  loadPlaylistById: () => {}, // Initialisation de loadPlaylistById
+  loadTrack: () => {}, // Initialisation de loadTrack
   initializeMusicSystem: async () => {},
   error: null,
-  openDrawer: () => {}
+  openDrawer: () => {},
+  closeDrawer: () => {}, // Initialisation de closeDrawer
+  isDrawerOpen: false // Initialisation de isDrawerOpen
 });
 
 // Hook personnalisé pour utiliser le contexte
@@ -201,6 +210,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [error, setError] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
+  // Ajout de playlist comme alias de currentPlaylist pour compatibilité
+  const playlist = currentPlaylist;
+
   // Initialisation du système musical
   const initializeMusicSystem = useCallback(async () => {
     try {
@@ -283,6 +295,49 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [playlists, playTrack, currentTrack]);
 
+  // Ajouter la fonction pour charger une playlist par ID
+  const loadPlaylistById = useCallback((id: string) => {
+    const playlist = playlists.find(p => p.id === id);
+    
+    if (playlist) {
+      setCurrentPlaylist(playlist);
+      setCurrentEmotion(playlist.emotion);
+      
+      // Optionally auto-play the first track
+      if (playlist.tracks.length > 0) {
+        playTrack(playlist.tracks[0]);
+      }
+    } else {
+      console.warn(`No playlist found with ID: ${id}`);
+    }
+  }, [playlists, playTrack]);
+
+  // Ajouter une fonction pour charger une piste spécifique
+  const loadTrack = useCallback((track: any) => {
+    let normalizedTrack: Track | MusicTrack;
+    
+    // Normaliser le format de piste si nécessaire
+    if ('audioUrl' in track || 'coverUrl' in track) {
+      normalizedTrack = track as MusicTrack;
+    } else if ('url' in track) {
+      normalizedTrack = track as Track;
+    } else {
+      // Créer une piste avec le minimum de champs requis
+      normalizedTrack = {
+        id: track.id || `track-${Date.now()}`,
+        title: track.title || 'Unknown Track',
+        artist: track.artist || 'Unknown Artist',
+        duration: track.duration || 0,
+        audioUrl: track.url || '',
+        coverUrl: track.coverImage || '',
+        url: track.url || '',
+      } as MusicTrack;
+    }
+    
+    setCurrentTrack(normalizedTrack);
+    playTrack(normalizedTrack);
+  }, [playTrack]);
+
   // Passer à la piste suivante
   const nextTrack = useCallback(() => {
     if (!currentTrack || !currentPlaylist) return;
@@ -316,6 +371,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsDrawerOpen(true);
   }, []);
 
+  // Fermer le tiroir de musique
+  const closeDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
+
   // La valeur du contexte
   const contextValue: MusicContextType = {
     currentTrack,
@@ -324,15 +384,20 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     currentPlaylist,
     currentEmotion,
     playlists,
+    playlist,
     playTrack,
     pauseTrack,
     setVolume,
     nextTrack,
     previousTrack,
     loadPlaylistForEmotion,
+    loadPlaylistById,
+    loadTrack,
     initializeMusicSystem,
     error,
-    openDrawer
+    openDrawer,
+    closeDrawer,
+    isDrawerOpen
   };
 
   return (

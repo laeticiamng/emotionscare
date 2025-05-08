@@ -45,14 +45,17 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     ) : null;
   }
   
+  // Déterminer l'URL de la couverture de la piste selon le type de piste
+  const coverUrl = currentTrack.coverUrl || currentTrack.cover || null;
+  
   return (
     <div className="flex flex-col gap-2">
       {showDetails && (
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-primary/10 rounded-md flex items-center justify-center overflow-hidden">
-            {currentTrack.cover || currentTrack.coverUrl ? (
+            {coverUrl ? (
               <img 
-                src={currentTrack.cover || currentTrack.coverUrl} 
+                src={coverUrl} 
                 alt={currentTrack.title} 
                 className="w-full h-full object-cover"
               />

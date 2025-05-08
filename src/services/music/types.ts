@@ -9,6 +9,7 @@ export interface Track {
   cover?: string;
   isPlaying?: boolean; // Added for compatibility
   audioUrl?: string;   // Added for compatibility
+  coverUrl?: string;   // Added for compatibility with MusicTrack
 }
 
 export interface Playlist {

@@ -54,7 +54,7 @@ const MusicCreator: React.FC = () => {
   const [generatedTrackUrl, setGeneratedTrackUrl] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
-  const { loadTrack, openDrawer } = useMusic();
+  const { playTrack, openDrawer } = useMusic();
 
   // Form states
   const [title, setTitle] = useState("");
@@ -82,7 +82,7 @@ const MusicCreator: React.FC = () => {
             
             toast({
               title: "Musique générée avec succès",
-              description: `"${title || 'Nouvelle composition'}" est maintenant disponible`,
+              description: `"${title || 'Nouvelle composition'}" est maintenant disponible",
             });
             
             return 0;
@@ -118,13 +118,17 @@ const MusicCreator: React.FC = () => {
     
     setIsPlaying(!isPlaying);
     if (!isPlaying) {
-      loadTrack({
+      // Créer un objet de piste compatible et le jouer directement
+      const generatedTrack = {
         id: "generated-track",
         title: title || "Nouvelle composition",
         artist: "IA Compositeur",
-        url: generatedTrackUrl,
-        coverImage: "/images/music-wave.svg"
-      });
+        duration: duration[0], // Utiliser la durée définie dans le formulaire
+        audioUrl: generatedTrackUrl,
+        coverUrl: "/images/music-wave.svg"
+      };
+      
+      playTrack(generatedTrack);
       openDrawer();
     }
   };
