@@ -11,6 +11,17 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import MusicPlayer from './MusicPlayer';
 
+// Log de diagnostic pour vérifier que tous les composants sont correctement importés
+console.log('UI drawer exports check:', {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+  Button,
+  X
+});
+
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
