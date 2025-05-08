@@ -9,7 +9,9 @@ import './styles/components.css';
 import './App.css';
 
 // --- DEBUG IMPORTS -------------------------------------------------
-import.meta.glob(['/**/*.{tsx,ts,jsx,js}']).forEach(async (loader, path) => {
+Object.entries(
+  import.meta.glob('/src/**/*.{tsx,ts,jsx,js}')
+).forEach(async ([path, loader]) => {
   if (!path.includes('node_modules')) {
     const mod = await loader();
     for (const key in mod) {
