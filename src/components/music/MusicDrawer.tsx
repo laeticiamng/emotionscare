@@ -11,6 +11,10 @@ interface MusicDrawerProps {
 const MusicDrawer: React.FC<MusicDrawerProps> = () => {
   const { isDrawerOpen, closeDrawer } = useDrawerState();
   
+  // Ajout d'un console.log pour déboguer
+  console.log("MusicPlayer component:", MusicPlayer);
+  console.log("Drawer state:", { isDrawerOpen });
+  
   return (
     <Drawer open={isDrawerOpen} onOpenChange={(open) => !open && closeDrawer()}>
       <DrawerContent>

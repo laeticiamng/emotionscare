@@ -11,10 +11,12 @@ const MusicPlayer: React.FC<MusicPlayerProps> = () => {
   const [isPlaying, setIsPlaying] = React.useState(false);
   
   const handlePlay = () => {
+    console.log("Play triggered");
     setIsPlaying(true);
   };
   
   const handlePause = () => {
+    console.log("Pause triggered");
     setIsPlaying(false);
   };
 
