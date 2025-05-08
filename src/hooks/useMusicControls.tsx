@@ -2,11 +2,20 @@
 import { useCallback } from 'react';
 import { MusicTrack } from '@/types';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useAudioPlayerState } from '@/hooks/audio/useAudioPlayerState';
 
 export function useMusicControls() {
-  const { 
+  const {
     playTrack: playAudioTrack,
     pauseTrack: pauseAudioTrack,
+    formatTime,
+    handleProgressClick,
+    handleVolumeChange,
+    setVolume
+  } = useAudioPlayer();
+  
+  const {
+    currentTrack: currentAudioTrack,
     isPlaying,
     currentTime,
     duration,
@@ -15,17 +24,12 @@ export function useMusicControls() {
     loadingTrack,
     toggleRepeat,
     toggleShuffle,
-    handleProgressClick,
-    handleVolumeChange,
-    formatTime,
-    volume,
-    setVolume,
-    currentTrack: currentAudioTrack
-  } = useAudioPlayer();
+    volume
+  } = useAudioPlayerState();
   
-  // Fonctions de contrôle de lecture
+  // Track playback control functions
   const playTrack = useCallback((track: MusicTrack) => {
-    // Assurons-nous que track a toujours une propriété url
+    // Ensure track always has a url property
     const trackWithUrl = {
       ...track,
       url: track.url || track.audioUrl || ''
@@ -40,7 +44,7 @@ export function useMusicControls() {
     
     const currentIndex = currentPlaylist.findIndex(track => track.id === currentTrack.id);
     if (currentIndex === -1 || currentIndex === currentPlaylist.length - 1) {
-      // Si dernière piste ou non trouvée, jouer la première piste
+      // If it's the last track or not found, play the first track
       playTrack(currentPlaylist[0]);
     } else {
       playTrack(currentPlaylist[currentIndex + 1]);
@@ -52,7 +56,7 @@ export function useMusicControls() {
     
     const currentIndex = currentPlaylist.findIndex(track => track.id === currentTrack.id);
     if (currentIndex <= 0) {
-      // Si première piste ou non trouvée, jouer la dernière piste
+      // If it's the first track or not found, play the last track
       playTrack(currentPlaylist[currentPlaylist.length - 1]);
     } else {
       playTrack(currentPlaylist[currentIndex - 1]);
