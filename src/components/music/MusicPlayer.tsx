@@ -1,14 +1,36 @@
 
 import React from 'react';
+import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
+import MusicControls from './MusicControls';
 
-// Create a simple placeholder component since the player implementation isn't available
 const MusicPlayer = () => {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  
+  const handlePlay = () => {
+    setIsPlaying(true);
+  };
+  
+  const handlePause = () => {
+    setIsPlaying(false);
+  };
+
   return (
-    <div className="music-player">
-      <div className="text-center p-4">
-        <p className="text-sm text-muted-foreground">Music Player</p>
-      </div>
-    </div>
+    <Card className="music-player">
+      <CardHeader>
+        <CardTitle className="text-lg">Lecteur musical</CardTitle>
+      </CardHeader>
+      <CardContent className="text-center space-y-4">
+        <div className="py-4">
+          <p className="text-muted-foreground mb-2">Aucun titre en cours de lecture</p>
+        </div>
+        
+        <MusicControls 
+          isPlaying={isPlaying} 
+          onPlay={handlePlay}
+          onPause={handlePause}
+        />
+      </CardContent>
+    </Card>
   );
 };
 

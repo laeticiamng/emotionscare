@@ -1,29 +1,14 @@
 
 import React from 'react';
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { useMusic } from '@/contexts/MusicContext';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import MusicPlayer from './player/MusicPlayer';
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import MusicPlayer from './MusicPlayer';
 
-const MusicDrawer: React.FC = () => {
-  const { isDrawerOpen, closeDrawer } = useMusic();
-  
+const MusicDrawer = () => {
   return (
-    <Drawer open={isDrawerOpen} onOpenChange={(open) => !open && closeDrawer()}>
-      <DrawerContent className="max-h-[85vh]">
-        <div className="mx-auto w-full max-w-md">
-          <DrawerHeader className="flex justify-between items-center">
-            <DrawerTitle>Lecteur musical</DrawerTitle>
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon">
-                <X className="h-4 w-4" />
-              </Button>
-            </DrawerClose>
-          </DrawerHeader>
-          <div className="px-4 py-2 pb-8">
-            <MusicPlayer />
-          </div>
+    <Drawer>
+      <DrawerContent>
+        <div className="p-4 max-w-md mx-auto">
+          <MusicPlayer />
         </div>
       </DrawerContent>
     </Drawer>
