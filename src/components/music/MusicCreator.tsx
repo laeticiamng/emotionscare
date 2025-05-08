@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -202,7 +201,133 @@ const MusicCreator: React.FC = () => {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* ... keep existing code (form content, all tabs) the same */}
+              <Tabs defaultValue="simple">
+                <TabsList>
+                  <TabsTrigger value="simple">Simple</TabsTrigger>
+                  <TabsTrigger value="advanced">Avancé</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="simple" className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="genre">Genre</Label>
+                      <Select value={genre} onValueChange={setGenre}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Sélectionner un genre" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {genres.map(genre => (
+                            <SelectItem key={genre.value} value={genre.value}>{genre.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="mood">Ambiance</Label>
+                      <Select value={mood} onValueChange={setMood}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Sélectionner une ambiance" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {moods.map(mood => (
+                            <SelectItem key={mood.value} value={mood.value}>{mood.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="duration">Durée (secondes)</Label>
+                    <Slider
+                      value={duration}
+                      min={30}
+                      max={300}
+                      step={30}
+                      onValueChange={setDuration}
+                    />
+                    <div className="text-sm text-muted-foreground mt-1">
+                      {formatDuration(duration[0])}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="advanced" className="space-y-4">
+                  <div>
+                    <Label htmlFor="title">Titre de la composition</Label>
+                    <Input 
+                      type="text" 
+                      id="title" 
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)} 
+                      placeholder="Nommez votre chef-d'œuvre" 
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea 
+                      id="description" 
+                      value={description} 
+                      onChange={(e) => setDescription(e.target.value)} 
+                      placeholder="Décrivez l'ambiance de votre musique" 
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="tempo">Tempo (BPM)</Label>
+                      <Slider
+                        value={tempo}
+                        min={60}
+                        max={180}
+                        step={1}
+                        onValueChange={setTempo}
+                      />
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {tempo[0]} BPM
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="duration">Durée (secondes)</Label>
+                      <Slider
+                        value={duration}
+                        min={30}
+                        max={300}
+                        step={30}
+                        onValueChange={setDuration}
+                      />
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {formatDuration(duration[0])}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label>Instruments</Label>
+                    <div className="flex flex-wrap gap-2">
+                      {instruments.map(instrument => (
+                        <Button
+                          key={instrument.value}
+                          variant={selectedInstruments.includes(instrument.value) ? "default" : "outline"}
+                          onClick={() => toggleInstrument(instrument.value)}
+                        >
+                          {instrument.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch id="ai-switch" checked={useAI} onCheckedChange={setUseAI} />
+                    <Label htmlFor="ai-switch">
+                      Utiliser l'IA pour améliorer la composition
+                    </Label>
+                  </div>
+                </TabsContent>
+              </Tabs>
               
               {/* Action buttons */}
               <div className="flex flex-col sm:flex-row justify-between gap-4">

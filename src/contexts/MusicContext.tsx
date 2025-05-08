@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Track } from '@/services/music/types';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
@@ -11,20 +12,20 @@ interface MusicContextType {
   currentPlaylist: MusicPlaylist | null;
   currentEmotion: string | null;
   playlists: MusicPlaylist[];
-  playlist: MusicPlaylist | null; // Ajout de playlist
+  playlist: MusicPlaylist | null; // Alias pour currentPlaylist pour compatibilité
   playTrack: (track: Track | MusicTrack) => void;
   pauseTrack: () => void;
   setVolume: (volume: number) => void;
   nextTrack: () => void;
   previousTrack: () => void;
   loadPlaylistForEmotion: (emotion: string) => void;
-  loadPlaylistById: (id: string) => void; // Ajout de loadPlaylistById
-  loadTrack: (track: any) => void; // Ajout de loadTrack
+  loadTrack: (track: any) => void; // Ajouté pour compatibilité
+  loadPlaylistById: (id: string) => void; // Ajouté pour compatibilité
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
+  isDrawerOpen: boolean; // Ajouté pour compatibilité
   openDrawer: () => void;
-  closeDrawer: () => void; // Ajout de closeDrawer
-  isDrawerOpen: boolean; // Ajout de isDrawerOpen
+  closeDrawer: () => void; // Ajouté pour compatibilité
 }
 
 // Création du contexte avec valeur par défaut
@@ -42,13 +43,13 @@ const MusicContext = createContext<MusicContextType>({
   nextTrack: () => {},
   previousTrack: () => {},
   loadPlaylistForEmotion: () => {},
-  loadPlaylistById: () => {}, // Initialisation de loadPlaylistById
   loadTrack: () => {}, // Initialisation de loadTrack
+  loadPlaylistById: () => {}, // Initialisation de loadPlaylistById
   initializeMusicSystem: async () => {},
   error: null,
+  isDrawerOpen: false, // Initialisation de isDrawerOpen
   openDrawer: () => {},
   closeDrawer: () => {}, // Initialisation de closeDrawer
-  isDrawerOpen: false // Initialisation de isDrawerOpen
 });
 
 // Hook personnalisé pour utiliser le contexte
@@ -264,6 +265,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     audio.src = audioSrc;
     audio.play().catch(err => console.error('Error playing track:', err));
     setIsPlaying(true);
+    
+    // Ouvrir automatiquement le lecteur si fermé
+    setIsDrawerOpen(true);
   }, [audio]);
 
   // Mettre en pause la lecture
@@ -312,37 +316,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [playlists, playTrack]);
 
-  // Ajouter une fonction pour charger une piste spécifique
+  // Ajouter une fonction pour charger une piste spécifique (alias pour playTrack pour compatibilité)
   const loadTrack = useCallback((track: any) => {
-    let normalizedTrack: Track | MusicTrack;
-    
-    // Normaliser le format de piste si nécessaire
-    if ('audioUrl' in track || 'coverUrl' in track) {
-      normalizedTrack = track as MusicTrack;
-    } else if ('url' in track) {
-      normalizedTrack = track as Track;
-    } else {
-      // Créer une piste avec le minimum de champs requis
-      normalizedTrack = {
-        id: track.id || `track-${Date.now()}`,
-        title: track.title || 'Unknown Track',
-        artist: track.artist || 'Unknown Artist',
-        duration: track.duration || 0,
-        audioUrl: track.url || '',
-        coverUrl: track.coverImage || '',
-        url: track.url || '',
-      } as MusicTrack;
-    }
-    
-    setCurrentTrack(normalizedTrack);
-    playTrack(normalizedTrack);
+    // On réutilise simplement playTrack
+    playTrack(track);
   }, [playTrack]);
 
   // Passer à la piste suivante
   const nextTrack = useCallback(() => {
     if (!currentTrack || !currentPlaylist) return;
     
-    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === (currentTrack as any).id);
     if (currentIndex === -1 || currentIndex === currentPlaylist.tracks.length - 1) {
       // Si c'est la dernière piste ou si la piste actuelle n'est pas trouvée, revenir à la première
       playTrack(currentPlaylist.tracks[0]);
@@ -356,7 +340,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const previousTrack = useCallback(() => {
     if (!currentTrack || !currentPlaylist) return;
     
-    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === (currentTrack as any).id);
     if (currentIndex <= 0) {
       // Si c'est la première piste ou si la piste actuelle n'est pas trouvée, aller à la dernière
       playTrack(currentPlaylist.tracks[currentPlaylist.tracks.length - 1]);
