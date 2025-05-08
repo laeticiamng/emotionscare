@@ -1,3 +1,4 @@
+
 import { Badge, Challenge } from '@/types';
 
 // Define BadgeResponse interface
@@ -45,6 +46,7 @@ const mockBadges: Badge[] = [
     icon_url: "/badges/icons/coach-apprentice.svg",
     category: "coach",
     unlocked: false,
+    awarded_at: new Date().toISOString(), // Added the missing awarded_at property
     threshold: 5
   }
 ];

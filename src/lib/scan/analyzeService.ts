@@ -72,7 +72,11 @@ export async function analyzeEmotions(
     // Enregistrer l'émotion dans Supabase
     const { data, error } = await supabase
       .from('emotions')
-      .insert(newEmotion)
+      .insert({
+        ...newEmotion,
+        // Ensure date is properly formatted as a string
+        date: typeof newEmotion.date === 'object' ? newEmotion.date.toISOString() : newEmotion.date
+      })
       .select()
       .single();
 
