@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Track } from '@/services/music/types';
 import { MusicTrack } from '@/types/music';
@@ -82,8 +81,13 @@ export function useAudioPlayer() {
     if (!audio || !currentTrack) return;
 
     // Handle different track formats (Track vs MusicTrack)
-    const audioUrl = 'url' in currentTrack ? currentTrack.url : 
-                   'audioUrl' in currentTrack ? currentTrack.audioUrl : '';
+    let audioUrl = '';
+    
+    if ('url' in currentTrack && currentTrack.url) {
+      audioUrl = currentTrack.url;
+    } else if ('audioUrl' in currentTrack && currentTrack.audioUrl) {
+      audioUrl = currentTrack.audioUrl;
+    }
     
     if (audioUrl) {
       setLoadingTrack(true);

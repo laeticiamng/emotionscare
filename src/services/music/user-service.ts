@@ -36,6 +36,7 @@ export const getUserListeningHistory = async (userId: string): Promise<MusicTrac
         artist: 'Zen Masters',
         duration: 240,
         audioUrl: 'https://example.com/track1.mp3',
+        url: 'https://example.com/track1.mp3',
         coverUrl: 'https://example.com/cover1.jpg'
       },
       {
@@ -44,6 +45,7 @@ export const getUserListeningHistory = async (userId: string): Promise<MusicTrac
         artist: 'Sleep Well',
         duration: 300,
         audioUrl: 'https://example.com/track2.mp3',
+        url: 'https://example.com/track2.mp3',
         coverUrl: 'https://example.com/cover2.jpg'
       }
     ];

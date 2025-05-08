@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -125,6 +126,7 @@ const MusicCreator: React.FC = () => {
         artist: "IA Compositeur",
         duration: duration[0], // Utiliser la durée définie dans le formulaire
         audioUrl: generatedTrackUrl,
+        url: generatedTrackUrl, // Adding required url property
         coverUrl: "/images/music-wave.svg"
       };
       

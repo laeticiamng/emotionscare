@@ -19,6 +19,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Happy Vibes',
         duration: 180,
         audioUrl: 'https://example.com/happy1.mp3',
+        url: 'https://example.com/happy1.mp3',
         coverUrl: 'https://example.com/happy1.jpg'
       },
       {
@@ -27,6 +28,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Positive Notes',
         duration: 210,
         audioUrl: 'https://example.com/happy2.mp3',
+        url: 'https://example.com/happy2.mp3',
         coverUrl: 'https://example.com/happy2.jpg'
       }
     ]
@@ -42,6 +44,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Nature Sounds',
         duration: 240,
         audioUrl: 'https://example.com/calm1.mp3',
+        url: 'https://example.com/calm1.mp3',
         coverUrl: 'https://example.com/calm1.jpg'
       },
       {
@@ -50,6 +53,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Relaxation Masters',
         duration: 300,
         audioUrl: 'https://example.com/calm2.mp3',
+        url: 'https://example.com/calm2.mp3',
         coverUrl: 'https://example.com/calm2.jpg'
       }
     ]
@@ -65,6 +69,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Concentration Project',
         duration: 280,
         audioUrl: 'https://example.com/focused1.mp3',
+        url: 'https://example.com/focused1.mp3',
         coverUrl: 'https://example.com/focused1.jpg'
       },
       {
@@ -73,6 +78,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Brain Waves',
         duration: 320,
         audioUrl: 'https://example.com/focused2.mp3',
+        url: 'https://example.com/focused2.mp3',
         coverUrl: 'https://example.com/focused2.jpg'
       }
     ]
@@ -88,6 +94,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Energy Boost',
         duration: 190,
         audioUrl: 'https://example.com/energetic1.mp3',
+        url: 'https://example.com/energetic1.mp3',
         coverUrl: 'https://example.com/energetic1.jpg'
       },
       {
@@ -96,6 +103,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'High Intensity',
         duration: 220,
         audioUrl: 'https://example.com/energetic2.mp3',
+        url: 'https://example.com/energetic2.mp3',
         coverUrl: 'https://example.com/energetic2.jpg'
       }
     ]
@@ -111,6 +119,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Neutral Tones',
         duration: 240,
         audioUrl: 'https://example.com/neutral1.mp3',
+        url: 'https://example.com/neutral1.mp3',
         coverUrl: 'https://example.com/neutral1.jpg'
       },
       {
@@ -119,6 +128,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         artist: 'Smooth Sounds',
         duration: 260,
         audioUrl: 'https://example.com/neutral2.mp3',
+        url: 'https://example.com/neutral2.mp3',
         coverUrl: 'https://example.com/neutral2.jpg'
       }
     ]
