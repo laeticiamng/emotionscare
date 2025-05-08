@@ -18,7 +18,7 @@ interface VRSessionWithMusicProps {
   onCompleteSession: () => void;
 }
 
-const VRSessionWithMusic = ({ template, onCompleteSession }: VRSessionWithMusicProps) => {
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onCompleteSession }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -27,8 +27,15 @@ const VRSessionWithMusic = ({ template, onCompleteSession }: VRSessionWithMusicP
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const { toast } = useToast();
-  const { timeRemaining, progress, startTimer, pauseTimer, resumeTimer } = useVRSessionTimer({
-    duration: template.duration * 60,
+  const { 
+    timeRemaining, 
+    progress, 
+    startTimer, 
+    pauseTimer, 
+    resumeTimer 
+  } = useVRSessionTimer({
+    totalDurationSeconds: template.duration * 60,
+    isPaused: isPaused,
     onComplete: handleSessionComplete,
   });
 
@@ -38,6 +45,8 @@ const VRSessionWithMusic = ({ template, onCompleteSession }: VRSessionWithMusicP
       id: '1',
       title: 'Méditation calme',
       artist: 'Ambiance naturelle',
+      duration: template.duration * 60,
+      coverUrl: '',
       audioUrl: template.audio_url || 'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3',
     };
     setCurrentTrack(sampleTrack);
@@ -158,12 +167,12 @@ const VRSessionWithMusic = ({ template, onCompleteSession }: VRSessionWithMusicP
                 controls={false}
                 showInfo={false}
                 loop={true}
-                muted={true}
+                mute={true}
               />
             </div>
           )}
 
-          <VRSessionProgress progress={progress} />
+          <VRSessionProgress percentComplete={progress} />
           
           {currentTrack && isMusicPlaying && (
             <div className="space-y-2">

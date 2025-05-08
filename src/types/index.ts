@@ -1,4 +1,3 @@
-
 // Si le fichier existe déjà, nous ajoutons ou modifions ces types
 export interface User {
   id: string;
@@ -160,7 +159,7 @@ export interface JournalEntry {
 
 // User preferences
 export interface UserPreferences {
-  theme: "light" | "dark" | "system";
+  theme: "light" | "dark" | "system" | "pastel";
   fontSize: "small" | "medium" | "large";
   backgroundColor: string;
   accentColor: string;
@@ -178,7 +177,7 @@ export interface MoodData {
   sentiment?: number;
   anxiety?: number;
   energy?: number;
-  originalDate?: string;
+  originalDate?: string; // Change from Date to string
 }
 
 // Reports

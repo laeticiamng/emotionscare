@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 
 interface UseVRSessionTimerProps {
   totalDurationSeconds: number;
-  isPaused: boolean;
+  isPaused?: boolean;
   onComplete: () => void;
 }
 
 export function useVRSessionTimer({ 
   totalDurationSeconds,
-  isPaused,
+  isPaused = false,
   onComplete
 }: UseVRSessionTimerProps) {
   const [elapsed, setElapsed] = useState(0);
@@ -34,19 +34,28 @@ export function useVRSessionTimer({
     };
   }, [isPaused, elapsed, totalDurationSeconds]);
 
+  // Calculate remaining time in seconds
+  const timeRemaining = Math.max(totalDurationSeconds - elapsed, 0);
+  
+  // Calculate progress percentage (0-100)
+  const progress = (elapsed / totalDurationSeconds) * 100;
+
   // Format time remaining as mm:ss
   const formatTimeRemaining = () => {
-    const remainingSeconds = Math.max(totalDurationSeconds - elapsed, 0);
-    const minutes = Math.floor(remainingSeconds / 60);
-    const seconds = remainingSeconds % 60;
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  const percentageComplete = Math.min((elapsed / totalDurationSeconds) * 100, 100);
-
+  // Return enhanced hook with timer control functions
   return {
     elapsed,
-    percentageComplete,
-    formatTimeRemaining
+    timeRemaining,
+    percentageComplete: progress,
+    progress, // For backwards compatibility
+    formatTimeRemaining,
+    startTimer: () => setElapsed(0),
+    pauseTimer: () => {}, // Pausing is handled via the isPaused prop
+    resumeTimer: () => {} // Resuming is handled via the isPaused prop
   };
 }

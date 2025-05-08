@@ -1,165 +1,28 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-import { loginUser, logoutUser, getCurrentUser, updateUser as updateUserService } from '@/data/mockUsers';
 
+// Add updateUser method to the AuthContextProps interface
 export interface AuthContextProps {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signOut: () => Promise<void>;
-  login: (email: string, password: string) => Promise<User>;
-  logout: () => Promise<void>; 
-  updateUserProfile: (user: User) => Promise<User>;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  setUser: (user: User) => void;
+  updateUser: (userData: Partial<User>) => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  signOut: async () => {},
-  login: async () => ({ id: '', name: '', email: '', role: '', anonymity_code: '', onboarded: false }),
+  login: async () => {},
   logout: async () => {},
-  updateUserProfile: async (user: User) => user,
+  register: async () => {},
   setUser: () => {},
-  setIsAuthenticated: () => {},
+  updateUser: async () => { return {} as User; }
 });
 
 export const useAuth = () => useContext(AuthContext);
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { toast } = useToast();
-
-  console.log("AuthProvider - Initializing");
-
-  // Check for existing session on mount
-  useEffect(() => {
-    const checkExistingSession = async () => {
-      console.log("AuthProvider - Checking for existing session");
-      try {
-        const currentUser = getCurrentUser();
-        console.log("AuthProvider - CurrentUser check:", currentUser);
-        if (currentUser) {
-          setUser(currentUser);
-          setIsAuthenticated(true);
-          console.log("AuthProvider - Restored session for:", currentUser.name);
-        } else {
-          console.log("AuthProvider - No existing session found");
-          setUser(null);
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("Error checking session:", error);
-        setUser(null);
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-        console.log("AuthProvider - Finished loading check");
-      }
-    };
-    
-    checkExistingSession();
-  }, []);
-
-  // Login function
-  const login = async (email: string, password: string): Promise<User> => {
-    console.log("AuthProvider - Login attempt:", email);
-    try {
-      setIsLoading(true);
-      // Call login function
-      const user = await loginUser(email, password);
-      
-      setUser(user);
-      setIsAuthenticated(true);
-      
-      toast({
-        title: "Connexion réussie",
-        description: `Bienvenue, ${user.name}!`,
-      });
-      
-      console.log("Login successful:", user);
-      return user;
-    } catch (error: any) {
-      console.error("Login error:", error);
-      toast({
-        title: "Erreur de connexion",
-        description: error.message || "Identifiants incorrects. Veuillez réessayer.",
-        variant: "destructive"
-      });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Update user profile function
-  const updateUserProfile = async (updatedUser: User): Promise<User> => {
-    try {
-      const result = await updateUserService(updatedUser);
-      setUser(result);
-      return result;
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de mettre à jour le profil",
-        variant: "destructive"
-      });
-      throw error;
-    }
-  };
-
-  // Sign out function
-  const signOut = async (): Promise<void> => {
-    console.log("AuthProvider - Signing out");
-    try {
-      setIsLoading(true);
-      await logoutUser();
-      setUser(null);
-      setIsAuthenticated(false);
-      
-      toast({
-        title: "Déconnexion réussie",
-        description: "Vous avez été déconnecté avec succès",
-      });
-      
-      console.log("User signed out successfully");
-    } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de vous déconnecter",
-        variant: "destructive"
-      });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Alias for signOut for compatibility
-  const logout = signOut;
-
-  const value = {
-    user,
-    isAuthenticated,
-    isLoading,
-    signOut,
-    login,
-    logout,
-    updateUserProfile,
-    setUser,
-    setIsAuthenticated,
-    setIsLoading,
-  };
-
-  console.log("AuthProvider - Current state:", { isAuthenticated, isLoading, user: user?.name });
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export { AuthContext };

@@ -37,7 +37,7 @@ const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
       <CardContent>
         {isSessionActive ? (
           <Button 
-            onClick={() => completeSession()} 
+            onClick={completeSession} 
             variant="destructive"
             className="w-full"
           >

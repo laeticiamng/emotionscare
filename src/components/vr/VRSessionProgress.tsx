@@ -1,27 +1,19 @@
 
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
-import { Timer } from 'lucide-react';
 
 interface VRSessionProgressProps {
-  percentageComplete: number;
-  timeRemaining: string;
+  percentComplete: number;
 }
 
-const VRSessionProgress: React.FC<VRSessionProgressProps> = ({ 
-  percentageComplete,
-  timeRemaining
-}) => {
+const VRSessionProgress: React.FC<VRSessionProgressProps> = ({ percentComplete }) => {
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center">
-          <Timer className="h-4 w-4 mr-1" />
-          <span>Temps restant</span>
-        </div>
-        <span className="font-mono">{timeRemaining}</span>
+    <div className="space-y-1.5">
+      <div className="flex justify-between text-xs">
+        <span>Progression de la session</span>
+        <span>{Math.round(percentComplete)}%</span>
       </div>
-      <Progress value={percentageComplete} className="h-2" />
+      <Progress value={percentComplete} className="h-2" />
     </div>
   );
 };

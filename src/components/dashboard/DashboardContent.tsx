@@ -67,7 +67,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
             collapsed={collapsedSections.vr}
             onToggle={() => toggleSection('vr')}
             isMobile={isMobile}
-            userId={userId || '00000000-0000-0000-0000-000000000000'}
             latestEmotion={latestEmotion}
           />
         </div>

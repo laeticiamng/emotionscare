@@ -1,10 +1,10 @@
 
 import { Badge, Challenge, UserChallenge } from '@/types';
 
-// Types for badge responses
-export interface BadgeResponse {
-  all: Badge[];
-  earned: Badge[];
+// Add requirements to the Challenge interface
+export interface ExtendedChallenge extends Challenge {
+  requirements?: string;
+  icon_url?: string;
 }
 
 export const fetchBadges = async (): Promise<BadgeResponse> => {
@@ -57,7 +57,7 @@ export const fetchBadges = async (): Promise<BadgeResponse> => {
 };
 
 // Add the missing functions for challenge management
-export const fetchChallenges = async (): Promise<Challenge[]> => {
+export const fetchChallenges = async (): Promise<ExtendedChallenge[]> => {
   // Mock implementation
   return [
     {
@@ -65,6 +65,9 @@ export const fetchChallenges = async (): Promise<Challenge[]> => {
       title: 'Scan Quotidien',
       description: 'Effectuez un scan émotionnel chaque jour pendant une semaine',
       points: 100,
+      progress: 5,
+      total: 7,
+      completed: false,
       category: 'wellness',
       requirements: '7 scans consécutifs',
       icon_url: '/images/challenges/daily-scan.svg'
@@ -74,6 +77,9 @@ export const fetchChallenges = async (): Promise<Challenge[]> => {
       title: 'Journal Régulier',
       description: 'Écrivez dans votre journal 3 fois cette semaine',
       points: 75,
+      progress: 2,
+      total: 3,
+      completed: false,
       category: 'wellness',
       requirements: '3 entrées en 7 jours',
       icon_url: '/images/challenges/journal.svg'
@@ -83,6 +89,9 @@ export const fetchChallenges = async (): Promise<Challenge[]> => {
       title: 'Session VR Relaxante',
       description: 'Complétez une session VR de relaxation',
       points: 50,
+      progress: 0,
+      total: 1,
+      completed: false,
       category: 'wellness',
       requirements: '1 session de 10 minutes minimum',
       icon_url: '/images/challenges/vr-session.svg'
