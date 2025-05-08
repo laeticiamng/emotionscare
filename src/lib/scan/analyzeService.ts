@@ -1,3 +1,4 @@
+
 import { Emotion, EmotionResult } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { createFallbackEmotion, getFallbackEmotionAnalysis } from '@/mocks/aiFallback';
@@ -74,6 +75,8 @@ export async function analyzeEmotions(
       .from('emotions')
       .insert({
         ...newEmotion,
+        // Ensure user_id is always provided and not optional
+        user_id: userId,
         // Ensure date is properly formatted as a string
         date: typeof newEmotion.date === 'object' ? newEmotion.date.toISOString() : newEmotion.date
       })
