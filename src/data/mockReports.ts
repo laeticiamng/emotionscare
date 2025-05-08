@@ -1,10 +1,11 @@
-import { MoodData, Report } from '../types';
+
+import { Report } from '../types';
 
 // Mock report data for development and testing
 export const mockReports: Report[] = [
   {
     id: '1',
-    date: '2023-04-07T00:00:00Z',
+    date: '2023-04-07T00:00:00Z', // Now defined in Report type
     title: 'Rapport hebdomadaire',
     data: {
       metrics: {
@@ -23,6 +24,7 @@ export const mockReports: Report[] = [
     period_end: '2023-04-07T00:00:00Z',
     value: 3.5,
     change_pct: -2.1,
+    description: 'Rapport hebdomadaire sur l\'absentéisme' // Added required field
   },
   {
     id: '2',
@@ -45,6 +47,7 @@ export const mockReports: Report[] = [
     period_end: '2023-04-14T00:00:00Z',
     value: 3.2,
     change_pct: -8.6,
+    description: 'Rapport hebdomadaire sur l\'absentéisme'
   },
   {
     id: '3',
@@ -67,6 +70,7 @@ export const mockReports: Report[] = [
     period_end: '2023-04-07T00:00:00Z',
     value: 87.3,
     change_pct: 1.5,
+    description: 'Rapport sur la productivité'
   },
   {
     id: '4',
@@ -89,5 +93,6 @@ export const mockReports: Report[] = [
     period_end: '2023-04-14T00:00:00Z',
     value: 89.7,
     change_pct: 2.7,
+    description: 'Rapport sur la productivité'
   },
 ];

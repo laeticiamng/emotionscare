@@ -1,4 +1,3 @@
-
 import { Emotion } from '@/types';
 
 // Mock function to simulate inserting an emotion
@@ -102,3 +101,12 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
 
 // Alias for getEmotionHistory to match the imported name in scanService
 export const fetchEmotionHistory = getEmotionHistory;
+
+// Example of fixing instanceof issue
+export const handleError = (error: unknown): string => {
+  // Using type checking with 'as' instead of instanceof
+  if (error && typeof error === 'object' && 'message' in error) {
+    return (error as Error).message;
+  }
+  return 'An unknown error occurred';
+};

@@ -21,7 +21,8 @@ export async function fetchJournalEntries(userId: string): Promise<JournalEntry[
         content: entry.content || "",
         date: entry.date,
         ai_feedback: entry.ai_feedback || null,
-        text: entry.content || ""  // For compatibility
+        text: entry.content || "",  // For compatibility
+        is_private: true // Default value added to match the required property
       };
     });
   } catch (error) {
@@ -49,7 +50,8 @@ export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> 
       content: data.content || "",
       date: data.date,
       ai_feedback: data.ai_feedback || null,
-      text: data.content || ""  // For compatibility
+      text: data.content || "",  // For compatibility
+      is_private: true // Default value added
     };
   } catch (error) {
     console.error('Error in fetchJournalEntry:', error);
@@ -63,7 +65,8 @@ export async function createJournalEntry(userId: string, content: string): Promi
     const entry = {
       user_id: userId,
       date: new Date().toISOString(),
-      content: content
+      content: content,
+      is_private: true // Added required property
     };
 
     const { data, error } = await supabase
@@ -81,7 +84,8 @@ export async function createJournalEntry(userId: string, content: string): Promi
       content: data.content || "",
       date: data.date,
       ai_feedback: data.ai_feedback || null,
-      text: data.content || ""  // For compatibility
+      text: data.content || "",  // For compatibility
+      is_private: true // Default value added
     };
   } catch (error) {
     console.error('Error in createJournalEntry:', error);

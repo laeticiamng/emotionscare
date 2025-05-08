@@ -1,3 +1,4 @@
+
 import { User, UserRole } from '@/types';
 
 // Mock user data for development and testing
@@ -87,6 +88,44 @@ export const mockUsers: User[] = [
     last_active: '2023-03-11T17:33:00Z'
   }
 ];
+
+// Added missing exported functions needed by mockData.ts
+export const currentUser: User | null = null;
+
+export const loginUser = (email: string, password: string): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    const user = mockUsers.find(u => u.email === email);
+    if (user) {
+      resolve(user);
+    } else {
+      reject(new Error('Invalid credentials'));
+    }
+  });
+};
+
+export const logoutUser = (): Promise<void> => {
+  return Promise.resolve();
+};
+
+export const updateUser = (userId: string, data: Partial<User>): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    const userIndex = mockUsers.findIndex(u => u.id === userId);
+    if (userIndex >= 0) {
+      mockUsers[userIndex] = { ...mockUsers[userIndex], ...data };
+      resolve(mockUsers[userIndex]);
+    } else {
+      reject(new Error('User not found'));
+    }
+  });
+};
+
+export const getCurrentUser = (): Promise<User | null> => {
+  return Promise.resolve(null);
+};
+
+export const generateAnonymityCode = (): string => {
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+};
 
 // Function to generate a random user
 export const generateRandomUser = (): User => {

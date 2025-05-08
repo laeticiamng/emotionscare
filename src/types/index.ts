@@ -37,10 +37,10 @@ export interface UserPreferences {
   share_data_with_coach?: boolean;
   daily_reminder?: boolean;
   reminder_time?: string;
-  fontSize?: string;
-  backgroundColor?: string;
-  accentColor?: string;
-  notifications?: {
+  fontSize?: string; // Added
+  backgroundColor?: string; // Added
+  accentColor?: string; // Added
+  notifications?: { // Added
     email: boolean;
     push: boolean;
     sms: boolean;
@@ -61,10 +61,13 @@ export interface Emotion {
   confidence?: number;
   source?: string;
   intensity?: number; // Added to match usage
+  is_confidential?: boolean; // Added
 }
 
 export interface EmotionResult {
-  id?: string;
+  id?: string; // Making this optional to match usage patterns
+  user_id?: string; // Making this optional to match usage patterns
+  date?: string;    // Making this optional to match usage patterns
   emotion: string;
   confidence?: number;
   transcript?: string;
@@ -75,8 +78,6 @@ export interface EmotionResult {
   ai_feedback?: string;
   recommendations?: string[];
   intensity?: number;
-  user_id?: string;
-  date?: string;
 }
 
 // Badge types
@@ -147,14 +148,19 @@ export interface MusicTrack {
   cover?: string;
   coverUrl?: string;
   audioUrl?: string; // Added to match usage
+  emotion?: string; // Added to match usage
+  isPlaying?: boolean;
+  genre?: string; // Added to match usage
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
   description?: string;
-  mood: string;
+  emotion?: string; // Added to match usage in various files
+  mood?: string;
   tracks: MusicTrack[];
+  coverUrl?: string; // Added to match usage
 }
 
 // Journal types
@@ -168,7 +174,7 @@ export interface JournalEntry {
   mood?: string;
   mood_score?: number;
   tags?: string[];
-  is_private: boolean;
+  is_private: boolean; // Now required based on errors
   ai_feedback?: string;
 }
 
@@ -199,7 +205,7 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
-  sent: number; // Added to match usage
+  sent: number;
   recent_invites: {
     email: string;
     status: string;
@@ -211,10 +217,21 @@ export interface InvitationStats {
 export interface Report {
   id: string;
   title: string;
-  description: string;
-  created_at: string;
+  description?: string;
+  created_at?: string;
   type: string;
   data: any;
+  date?: string; // Added to match usage in mockReports.ts
+  user_id?: string;
+  summary?: string;
+  mood_score?: number;
+  categories?: string[];
+  recommendations?: string[];
+  metric?: string; // Added to match usage in chartUtils.ts
+  period_start?: string;
+  period_end?: string; // Added to match usage in chartUtils.ts
+  value?: number; // Added to match usage in chartUtils.ts
+  change_pct?: number;
 }
 
 export interface InvitationVerificationResult {

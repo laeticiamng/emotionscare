@@ -73,7 +73,7 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
 };
 
 // Helper function to derive an emotion label
-function getEmotionLabel(emotion: EmotionResult | Emotion): string {
+function getEmotionLabel(emotion: EmotionResult | Partial<Emotion>): string {
   // If it's an EmotionResult with a direct emotion property
   if ('emotion' in emotion && emotion.emotion) {
     return emotion.emotion;
