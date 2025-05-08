@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Send } from 'lucide-react';
+import { Send, RefreshCw } from 'lucide-react';
 import { ChatMessage } from '@/types/chat';
 import { useCoach } from '@/hooks/coach/useCoach';
 import { useActivity } from '@/hooks/useActivity';
@@ -81,7 +81,7 @@ const CoachChatPage = () => {
       console.error('Error sending message to coach:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de communiquer avec le coach IA",
+        description: "Impossible de communiquer avec le coach IA. Veuillez réessayer.",
         variant: "destructive"
       });
       
@@ -96,6 +96,8 @@ const CoachChatPage = () => {
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
       setIsLoading(false);
+      // Donner le focus à l'input après l'envoi
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
   
@@ -103,6 +105,46 @@ const CoachChatPage = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handleRegenerate = async () => {
+    // Récupérer le dernier message de l'utilisateur
+    const lastUserMessage = [...messages].reverse().find(msg => msg.sender === 'user');
+    if (!lastUserMessage) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Log
+      logActivity('coach_regenerate', { originalMessageId: lastUserMessage.id });
+      
+      // Obtenir une nouvelle réponse
+      const response = await askQuestion(lastUserMessage.text);
+      
+      // Ajouter la nouvelle réponse
+      const botResponse: ChatMessage = {
+        id: Date.now().toString(),
+        text: response,
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      
+      setMessages((prevMessages) => [...prevMessages, botResponse]);
+      
+      toast({
+        title: "Nouvelle réponse générée",
+        description: "Une nouvelle réponse a été générée pour votre question."
+      });
+    } catch (error) {
+      console.error('Error regenerating response:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer une nouvelle réponse.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -151,22 +193,37 @@ const CoachChatPage = () => {
             <div ref={messagesEndRef} />
           </div>
           
-          {/* Zone de saisie */}
+          {/* Zone de saisie et boutons */}
           <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <Input 
-                ref={inputRef}
-                value={userMessage}
-                onChange={(e) => setUserMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Écrivez votre message..."
-                className="flex-grow"
-                disabled={isLoading}
-              />
-              <Button onClick={() => handleSendMessage()} disabled={isLoading || !userMessage.trim()}>
-                <Send className="h-4 w-4" />
-                <span className="sr-only">Envoyer</span>
-              </Button>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <Input 
+                  ref={inputRef}
+                  value={userMessage}
+                  onChange={(e) => setUserMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Écrivez votre message..."
+                  className="flex-grow"
+                  disabled={isLoading}
+                />
+                <Button onClick={() => handleSendMessage()} disabled={isLoading || !userMessage.trim()}>
+                  <Send className="h-4 w-4" />
+                  <span className="sr-only">Envoyer</span>
+                </Button>
+              </div>
+              
+              {messages.length > 1 && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="self-end" 
+                  onClick={handleRegenerate}
+                  disabled={isLoading}
+                >
+                  <RefreshCw className="h-3 w-3 mr-2" />
+                  Régénérer une réponse
+                </Button>
+              )}
             </div>
           </div>
         </Card>

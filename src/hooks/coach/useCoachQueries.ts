@@ -36,8 +36,8 @@ export function useCoachQueries(generateRecommendation: () => Promise<void>) {
         lastEmotionDate: undefined
       };
       
-      // Appel à l'API du coach avec le contexte utilisateur
-      const response = await coachService.askCoachQuestion(user.id, question, userContext);
+      // Appel à l'API du coach avec le contexte utilisateur (en passant seulement 2 arguments comme attendu)
+      const response = await coachService.askCoachQuestion(user.id, question);
       return response;
     } catch (error) {
       console.error('Error asking coach question:', error);

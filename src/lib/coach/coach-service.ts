@@ -113,7 +113,7 @@ class CoachService {
 
   /**
    * Envoyer une question directement au coach
-   * Updated to correctly handle userContext parameter
+   * Mis à jour pour rendre le paramètre userContext optionnel
    */
   async askCoachQuestion(userId: string, question: string, userContext?: UserContext): Promise<string> {
     try {
