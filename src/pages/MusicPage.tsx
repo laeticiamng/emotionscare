@@ -9,7 +9,7 @@ import PageTitle from '@/components/ui/page-title';
 const MusicPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('player');
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { initializeMusicSystem, error } = useMusic();
+  const { initializeMusicSystem, error, currentTrack } = useMusic();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,6 +31,14 @@ const MusicPage: React.FC = () => {
 
     loadMusic();
   }, [initializeMusicSystem, toast]);
+
+  // Titre dynamique selon la piste en cours
+  const getPageTitle = () => {
+    if (currentTrack) {
+      return `Musique Thérapeutique - ${currentTrack.title} par ${currentTrack.artist}`;
+    }
+    return "Musique Thérapeutique";
+  };
 
   if (isLoading) {
     return (
@@ -61,7 +69,7 @@ const MusicPage: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <PageTitle
-        title="Musique Thérapeutique"
+        title={getPageTitle()}
         description="Écoutez de la musique adaptée à votre état émotionnel"
       />
       

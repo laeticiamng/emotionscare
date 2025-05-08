@@ -46,8 +46,21 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   }
   
   // Déterminer l'URL de la couverture de la piste selon le type de piste
-  const coverUrl = 'coverUrl' in currentTrack ? currentTrack.coverUrl : 
-                   'cover' in currentTrack ? currentTrack.cover : null;
+  const getCoverUrl = () => {
+    if (!currentTrack) return null;
+    
+    if ('coverUrl' in currentTrack && currentTrack.coverUrl) {
+      return currentTrack.coverUrl;
+    }
+    
+    if ('cover' in currentTrack && currentTrack.cover) {
+      return currentTrack.cover;
+    }
+    
+    return null;
+  };
+  
+  const coverUrl = getCoverUrl();
   
   return (
     <div className="flex flex-col gap-2">
@@ -111,7 +124,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
             defaultValue={[volume * 100]}
             max={100}
             step={1}
-            onValueChange={(values) => handleVolumeChange([values[0] / 100])}
+            onValueChange={(values) => handleVolumeChange(values[0] / 100)}
             className="w-20"
           />
           

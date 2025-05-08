@@ -7,7 +7,7 @@ import { X } from 'lucide-react';
 import MusicPlayer from './player/MusicPlayer';
 
 const MusicDrawer: React.FC = () => {
-  const { isDrawerOpen, closeDrawer, currentTrack } = useMusic();
+  const { isDrawerOpen, closeDrawer } = useMusic();
   
   return (
     <Drawer open={isDrawerOpen} onOpenChange={(open) => !open && closeDrawer()}>
