@@ -1,13 +1,15 @@
 
-import React, { memo, ReactNode } from "react";
+import React, { memo, ReactNode, Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import GlobalNav from "./GlobalNav";
 import { Toaster } from "./ui/toaster";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
-import MusicDrawer from "./music/player/MusicDrawer";
 import useDrawerState from "@/hooks/useDrawerState";
+
+// Import dynamique du MusicDrawer avec React.lazy
+const MusicDrawer = React.lazy(() => import("./music/player/MusicDrawer"));
 
 interface ShellProps {
   children?: ReactNode;
@@ -40,8 +42,12 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Système de notifications toast */}
       <Toaster />
       
-      {/* Music Player Drawer - accessible from anywhere */}
-      <MusicDrawer open={isDrawerOpen} onClose={closeDrawer} />
+      {/* Music Player Drawer - chargement avec Suspense */}
+      <Suspense fallback={null}>
+        {isDrawerOpen && (
+          <MusicDrawer open={isDrawerOpen} onClose={closeDrawer} />
+        )}
+      </Suspense>
     </div>
   );
 };
