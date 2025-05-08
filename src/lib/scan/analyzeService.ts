@@ -39,12 +39,13 @@ export async function analyzeEmotions(
     // Calculer un score émotionnel basé sur l'émotion détectée
     const score = calculateScoreFromEmotion(result.emotion || 'neutral');
     const emotion = result.emotion || 'neutral';
+    const dateString = new Date().toISOString();
 
     // Créer l'entrée d'émotion pour l'enregistrement
     const newEmotion: Emotion = {
       id: `emotion-${Date.now()}`, // ID temporaire
       user_id: userId, // ID utilisateur obligatoire
-      date: new Date().toISOString(),
+      date: dateString,
       emotion,
       score,
       text,
@@ -55,12 +56,18 @@ export async function analyzeEmotions(
       source: 'api'
     };
 
+    // S'assurer que user_id est fourni
+    if (!userId) {
+      console.error("Erreur: user_id est requis pour enregistrer une émotion");
+      return newEmotion;
+    }
+
     // Enregistrer l'émotion dans Supabase
     const { data, error } = await supabase
       .from('emotions')
       .insert({
-        user_id: userId, // S'assurer que user_id est toujours fourni et non optionnel
-        date: newEmotion.date,
+        user_id: userId,
+        date: dateString,
         emotion: newEmotion.emotion,
         score: newEmotion.score, 
         text: newEmotion.text,
@@ -153,9 +160,16 @@ export async function saveRealtimeEmotionScan(
   userId: string
 ): Promise<void> {
   try {
+    if (!userId) {
+      console.error("Erreur: user_id est requis pour enregistrer une analyse en temps réel");
+      return;
+    }
+    
+    const dateString = new Date().toISOString();
+    
     const newEmotion = {
-      user_id: userId, // Ensure this is always provided
-      date: new Date().toISOString(),
+      user_id: userId,
+      date: dateString,
       emotion: emotion.emotion,
       score: calculateScoreFromEmotion(emotion.emotion),
       text: emotion.transcript,
@@ -207,10 +221,13 @@ export const saveEmotion = async (emotion: Emotion): Promise<Emotion | null> => 
       return null;
     }
     
-    // Convert Date to string if it's a Date object
+    // Ensure date is always a string
+    const dateString = emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date;
+    
+    // Create emotion data object with string date
     const emotionData = {
       ...emotion,
-      date: emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date,
+      date: dateString,
     };
 
     // Here you would typically save to a database

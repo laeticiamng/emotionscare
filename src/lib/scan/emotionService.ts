@@ -11,9 +11,12 @@ export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion 
     }
     
     // Convert Date to string if it's a Date object
+    const dateString = emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date;
+    
+    // Create emotion data object with string date
     const emotionData = {
       ...emotion,
-      date: emotion.date instanceof Date ? emotion.date.toISOString() : emotion.date,
+      date: dateString,
       user_id: emotion.user_id, // Ensure user_id is always provided
     };
     
