@@ -8,3 +8,4 @@ export { default as TrackInfo } from './TrackInfo';
 export { default as VolumeControl } from './VolumeControl';
 export { default as MusicPlayer } from './MusicPlayer';
 export { default as MusicDrawer } from './MusicDrawer';
+// Nous n'importons plus useAudioPlayer ici car il est maintenant dans src/hooks/

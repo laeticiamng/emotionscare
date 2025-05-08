@@ -1,24 +1,28 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
-// Import direct pour éviter les références circulaires potentielles
 import MusicControls from './MusicControls';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 
-interface MusicPlayerProps {
-  // Add props if needed
-}
-
-const MusicPlayer: React.FC<MusicPlayerProps> = () => {
-  const [isPlaying, setIsPlaying] = React.useState(false);
+const MusicPlayer: React.FC = () => {
+  const { 
+    isPlaying, 
+    playTrack, 
+    pauseTrack,
+    currentTrack,
+    resumeTrack
+  } = useAudioPlayer();
   
   const handlePlay = () => {
     console.log("Play triggered");
-    setIsPlaying(true);
+    if (currentTrack) {
+      resumeTrack();
+    }
   };
   
   const handlePause = () => {
     console.log("Pause triggered");
-    setIsPlaying(false);
+    pauseTrack();
   };
 
   return (
@@ -28,7 +32,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = () => {
       </CardHeader>
       <CardContent className="text-center space-y-4">
         <div className="py-4">
-          <p className="text-muted-foreground mb-2">Aucun titre en cours de lecture</p>
+          {currentTrack ? (
+            <div>
+              <p className="font-medium">{currentTrack.title}</p>
+              <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
+            </div>
+          ) : (
+            <p className="text-muted-foreground mb-2">Aucun titre en cours de lecture</p>
+          )}
         </div>
         
         <MusicControls 
