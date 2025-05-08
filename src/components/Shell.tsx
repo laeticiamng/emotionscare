@@ -7,7 +7,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./ui/sidebar";
 import useDrawerState from "@/hooks/useDrawerState";
 import useLogger from "@/hooks/useLogger";
-// Import direct du composant pour éviter les erreurs d'import
+// Conservons l'import direct pour éviter les problèmes circulaires
 import MusicDrawer from "./music/player/MusicDrawer";
 
 interface ShellProps {
@@ -51,8 +51,16 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Toast notification system */}
       <Toaster />
       
-      {/* Music Player Drawer - Rendu simple et direct */}
+      {/* STUB de test - Remplacer temporairement MusicDrawer pour isoler le problème */}
+      {isDrawerOpen && (
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'white', color: 'black', padding: 20, zIndex: 50, border: '2px solid red' }}>
+          ✔ Le tiroir s'ouvre (stub) ! Cela prouve que useDrawerState fonctionne correctement.
+        </div>
+      )}
+      
+      {/* Commenté temporairement pour le test
       {isDrawerOpen && <MusicDrawer open={isDrawerOpen} onClose={closeDrawer} />}
+      */}
     </div>
   );
 };
