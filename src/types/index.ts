@@ -1,3 +1,4 @@
+
 // Si le fichier existe déjà, nous ajoutons ou modifions ces types
 export interface User {
   id: string;
@@ -126,6 +127,7 @@ export interface EmotionResult {
   transcript?: string;
   score?: number;
   feedback?: string;
+  recommendations?: string[]; // Ajout de cette propriété pour résoudre l'erreur
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

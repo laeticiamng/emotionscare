@@ -21,7 +21,7 @@ export interface EmotionResult {
   date?: string;
   intensity?: number;
   score?: number;
-  recommendations?: string[];
+  recommendations?: string[]; // Ajout de cette propriété pour résoudre l'erreur
 }
 
 // Function to analyze audio stream
