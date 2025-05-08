@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import MusicPlayer from './MusicPlayer';
+// import MusicPlayer from './MusicPlayer';
 
 // Log de diagnostic pour vérifier que tous les composants sont correctement importés
 console.log('UI drawer exports check:', {
@@ -51,7 +51,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
           </DrawerClose>
         </DrawerHeader>
         <div className="px-4 pb-4">
-          <MusicPlayer />
+          {/* Stub MusicPlayer */}
+          {console.log('✅ MusicPlayer stub rendered')}
+          <div>MusicPlayer stub OK!</div>
         </div>
       </DrawerContent>
     </Drawer>
