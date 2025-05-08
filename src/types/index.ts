@@ -5,9 +5,23 @@ export interface User {
   email: string;
   name: string;
   avatar_url?: string;
+  avatar?: string; // Added for compatibility
+  image?: string;  // Added for compatibility
   role?: string;
   created_at?: string;
   last_login?: string;
+  anonymity_code?: string;
+  emotional_score?: number;
+  onboarded?: boolean;
+  joined_at?: string;
+  preferences?: UserPreferences;
+}
+
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  ANALYST = 'analyst',
+  MANAGER = 'manager'
 }
 
 export interface VRSession {
@@ -18,10 +32,12 @@ export interface VRSession {
   location_url: string;
   heart_rate_before?: number | null;
   heart_rate_after?: number | null;
+  is_audio_only?: boolean;
 }
 
 export interface VRSessionTemplate {
   id: string;
+  template_id?: string; // Added for compatibility with mock data
   theme: string;
   title?: string;
   description?: string;
@@ -69,6 +85,24 @@ export interface Notification {
 }
 
 // Émotion / Scan
+export interface Emotion {
+  id: string;
+  user_id: string;
+  date: string;
+  emotion: string;
+  score?: number;
+  tags?: string[];
+  context?: string;
+  notes?: string;
+  text?: string;
+  emojis?: string;
+  intensity?: number;
+  ai_feedback?: string;
+  confidence?: number;
+  audio_url?: string;
+  source?: string;
+}
+
 export interface EmotionScanResult {
   id: string;
   user_id: string;
@@ -79,3 +113,111 @@ export interface EmotionScanResult {
   context?: string;
   notes?: string;
 }
+
+// Enhanced version for API compatibility
+export interface EmotionResult {
+  emotion: string;
+  confidence: number;
+  transcript?: string;
+  score?: number;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  emotion: string;
+  feedback: string;
+}
+
+// Badge
+export interface Badge {
+  id: string;
+  user_id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  icon_url?: string;
+  category: string;
+  unlocked: boolean;
+  awarded_at?: string;
+  threshold?: number;
+}
+
+// Journal entries
+export interface JournalEntry {
+  id: string;
+  user_id: string;
+  date: string;
+  title?: string;
+  content?: string;
+  text?: string;
+  mood?: string;
+  mood_score?: number;
+  tags?: string[];
+  ai_feedback?: string;
+  visibility?: 'private' | 'public' | 'anonymous';
+}
+
+// User preferences
+export interface UserPreferences {
+  theme: "light" | "dark" | "system";
+  fontSize: "small" | "medium" | "large";
+  backgroundColor: string;
+  accentColor: string;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+}
+
+// For chart data
+export interface MoodData {
+  date: string;
+  value: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
+}
+
+// Reports
+export interface Report {
+  id: string;
+  date: string;
+  title: string;
+  data: {
+    metrics: {
+      [key: string]: number;
+    };
+  };
+  type: string;
+  user_id: string;
+  summary: string;
+  mood_score: number;
+  categories: string[];
+  recommendations: string[];
+  metric: string;
+  period_start: string;
+  period_end: string;
+  value: number;
+  change_pct: number;
+}
+
+// Invitation types
+export interface InvitationFormData {
+  email: string;
+  role: string;
+}
+
+export interface InvitationStats {
+  sent: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+}
+
+// Re-export types from other modules for compatibility
+export * from './chat';
+export * from './invitation';
+export * from './music';
+export * from './community';
+export * from './gamification';
+export * from './scan';

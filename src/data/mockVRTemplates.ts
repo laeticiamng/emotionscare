@@ -4,6 +4,7 @@ import { VRSessionTemplate } from '@/types';
 // Mock VR Session Templates
 export const mockVRTemplatesData: VRSessionTemplate[] = [
   {
+    id: '1',
     template_id: '1',
     theme: 'Forêt apaisante',
     title: 'Promenade en forêt',
@@ -13,6 +14,7 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     recommended_mood: 'calm'
   },
   {
+    id: '2',
     template_id: '2',
     theme: 'Plage relaxante',
     title: 'Bord de mer',
@@ -22,6 +24,7 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     recommended_mood: 'calm'
   },
   {
+    id: '3',
     template_id: '3',
     theme: 'Méditation guidée',
     title: 'Méditation pleine conscience',
@@ -33,6 +36,7 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     recommended_mood: 'focused'
   },
   {
+    id: '4',
     template_id: '4',
     theme: 'Respiration profonde',
     title: 'Exercices de respiration',

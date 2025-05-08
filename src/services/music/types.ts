@@ -7,6 +7,8 @@ export interface Track {
   duration: number;
   url: string;
   cover?: string;
+  isPlaying?: boolean; // Added for compatibility
+  audioUrl?: string;   // Added for compatibility
 }
 
 export interface Playlist {
