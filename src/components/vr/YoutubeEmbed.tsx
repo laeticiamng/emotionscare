@@ -1,78 +1,95 @@
 
 import React, { useState } from 'react';
-import { extractYoutubeID, buildYoutubeEmbedUrl } from '@/utils/vrUtils';
+import { extractYoutubeID } from '@/utils/vrUtils';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 interface YoutubeEmbedProps {
-  embedId?: string;
-  videoUrl?: string;
+  videoUrl: string;
   autoplay?: boolean;
   controls?: boolean;
-  mute?: boolean;
-  loop?: boolean;
   showInfo?: boolean;
+  loop?: boolean;
   className?: string;
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
-const YoutubeEmbed: React.FC<YoutubeEmbedProps> = ({ 
-  embedId, 
+const YoutubeEmbed: React.FC<YoutubeEmbedProps> = ({
   videoUrl,
   autoplay = false,
   controls = true,
-  mute = false,
-  loop = false,
   showInfo = true,
-  className = ''
+  loop = false,
+  className = '',
+  onLoad,
+  onError
 }) => {
-  // Get video ID from either embedId prop or extract from videoUrl
-  const videoId = embedId || (videoUrl ? extractYoutubeID(videoUrl) : '');
-
-  // Handle loading and error states
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [key, setKey] = useState(0); // Used to force iframe refresh
+  
+  const videoId = extractYoutubeID(videoUrl);
   
   if (!videoId) {
     return (
-      <div className="flex items-center justify-center w-full h-full bg-gray-100 rounded">
-        <p className="text-gray-500">Video unavailable</p>
+      <div className="flex items-center justify-center w-full h-full min-h-[200px] bg-muted text-center p-4">
+        <p className="text-muted-foreground">URL vidéo invalide ou manquante</p>
       </div>
     );
   }
   
-  // Build the YouTube embed URL with all parameters
-  const embedUrl = buildYoutubeEmbedUrl(videoId, {
-    autoplay,
-    controls,
-    mute,
-    loop,
-    showInfo,
-    rel: false,
-  });
-
+  const handleLoad = () => {
+    setIsLoading(false);
+    setHasError(false);
+    if (onLoad) onLoad();
+  };
+  
+  const handleError = () => {
+    setIsLoading(false);
+    setHasError(true);
+    if (onError) onError();
+  };
+  
+  const refreshIframe = () => {
+    setIsLoading(true);
+    setHasError(false);
+    setKey(prevKey => prevKey + 1);
+  };
+  
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=${
+    autoplay ? 1 : 0
+  }&controls=${controls ? 1 : 0}&showinfo=${
+    showInfo ? 1 : 0
+  }&loop=${loop ? 1 : 0}&rel=0`;
+  
   return (
     <div className={`relative w-full h-full ${className}`}>
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <div className="absolute inset-0 flex items-center justify-center bg-muted">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
         </div>
       )}
       
-      <iframe
-        className={`w-full h-full ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-        src={embedUrl}
-        title="YouTube video player"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setIsLoading(false);
-          setHasError(true);
-        }}
-      ></iframe>
-      
-      {hasError && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-          <p className="text-gray-500">Error loading video</p>
+      {hasError ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted p-4 text-center">
+          <p className="text-muted-foreground mb-4">Erreur de chargement de la vidéo</p>
+          <Button onClick={refreshIframe} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Réessayer
+          </Button>
         </div>
+      ) : (
+        <iframe
+          key={key}
+          src={embedUrl}
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute top-0 left-0 w-full h-full"
+          onLoad={handleLoad}
+          onError={handleError}
+        />
       )}
     </div>
   );

@@ -1,52 +1,53 @@
 
-// Helper function to extract YouTube video ID from URL
-export const extractYoutubeID = (url: string): string => {
-  // Handle URLs like https://www.youtube.com/embed/BHACKCNDMW8
-  if (url.includes('/embed/')) {
-    return url.split('/embed/')[1];
-  }
+/**
+ * Extrait l'identifiant YouTube d'une URL
+ * @param url URL YouTube (divers formats supportés)
+ * @returns l'identifiant YouTube ou null si non trouvé
+ */
+export function extractYoutubeID(url: string): string | null {
+  if (!url) return null;
   
-  // Handle standard YouTube URLs
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   
-  return (match && match[2].length === 11) ? match[2] : '';
-};
+  return (match && match[2].length === 11) ? match[2] : null;
+}
 
-// Function to build YouTube embed URL with parameters
-export const buildYoutubeEmbedUrl = (
-  videoId: string, 
-  options: {
-    autoplay?: boolean;
-    controls?: boolean;
-    mute?: boolean;
-    loop?: boolean;
-    showInfo?: boolean;
-    rel?: boolean;
-  } = {}
-): string => {
-  if (!videoId) return '';
+/**
+ * Calcule la réduction moyenne du rythme cardiaque en BPM
+ * @param sessions Liste des sessions VR
+ * @returns La réduction moyenne du rythme cardiaque
+ */
+export function calculateAverageHeartRateReduction(sessions: any[]): number {
+  if (!sessions || sessions.length === 0) return 0;
   
-  const defaultOptions = {
-    autoplay: false,
-    controls: true,
-    mute: false,
-    loop: false,
-    showInfo: true,
-    rel: false, // Don't show related videos
-  };
+  const validSessions = sessions.filter(
+    session => session.heart_rate_before && session.heart_rate_after
+  );
   
-  const params = { ...defaultOptions, ...options };
+  if (validSessions.length === 0) return 0;
   
-  const queryParams = [
-    params.autoplay ? 'autoplay=1' : '',
-    params.controls ? '' : 'controls=0',
-    params.mute ? 'mute=1' : '',
-    params.loop ? 'loop=1' : '',
-    params.showInfo ? '' : 'showinfo=0',
-    params.rel ? '' : 'rel=0',
-    'enablejsapi=1', // Enable JavaScript API
-  ].filter(Boolean).join('&');
+  const totalReduction = validSessions.reduce((sum, session) => {
+    return sum + (session.heart_rate_before - session.heart_rate_after);
+  }, 0);
   
-  return `https://www.youtube.com/embed/${videoId}${queryParams ? '?' + queryParams : ''}`;
-};
+  return Math.round(totalReduction / validSessions.length);
+}
+
+/**
+ * Calcule le temps total passé en sessions VR en minutes
+ * @param sessions Liste des sessions VR
+ * @returns Le nombre total de minutes
+ */
+export function calculateTotalMinutes(sessions: any[]): number {
+  if (!sessions || sessions.length === 0) return 0;
+  
+  return sessions.reduce((sum, session) => {
+    // Convertit les secondes en minutes
+    const minutes = session.duration_seconds 
+      ? Math.round(session.duration_seconds / 60) 
+      : session.duration || 0;
+    
+    return sum + minutes;
+  }, 0);
+}
