@@ -29,8 +29,9 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   // Load the MusicDrawer component dynamically
   useEffect(() => {
     import('./music/player/MusicDrawer')
-      .then(module => {
+      .then((module: any) => {
         // Try to get either default export or named export
+        // Using any type to avoid TypeScript errors with potential non-existent properties
         const Component = module.default || module.MusicDrawer;
         
         if (Component && (typeof Component === 'function' || typeof Component.render === 'function')) {
