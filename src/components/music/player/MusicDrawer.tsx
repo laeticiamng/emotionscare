@@ -37,5 +37,4 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
   );
 };
 
-// Export explicite et nommé pour être sûr
 export default MusicDrawer;

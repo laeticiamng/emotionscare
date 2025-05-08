@@ -55,10 +55,12 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       <Toaster />
       
       {/* Music Player Drawer */}
-      <MusicDrawer 
-        open={isDrawerOpen} 
-        onClose={closeDrawer} 
-      />
+      <React.Suspense fallback={null}>
+        <MusicDrawer 
+          open={isDrawerOpen} 
+          onClose={closeDrawer} 
+        />
+      </React.Suspense>
     </div>
   );
 };
