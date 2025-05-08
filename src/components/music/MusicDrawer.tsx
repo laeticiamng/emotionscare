@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import MusicPlayer from './MusicPlayer';
 
 const MusicDrawer = () => {
