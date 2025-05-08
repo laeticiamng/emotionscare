@@ -1,48 +1,48 @@
 
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 import { useAuth } from '@/contexts/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
-export interface Conversation {
-  id: string;
-  user_id: string;
-  title: string | null;
-  created_at: string | null;
-  updated_at: string | null;
-  last_message: string | null;
-  message_count: number | null;
-  metadata: Record<string, any> | null;
-}
-
 export function useChatHistory() {
   const { user } = useAuth();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Load all conversations for current user
   const loadConversations = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) return [];
     
     try {
       setIsLoading(true);
       setError(null);
       
       const { data, error: fetchError } = await supabase
-        .from('conversations')
+        .from('chat_conversations')
         .select('*')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
       
       if (fetchError) throw fetchError;
       
-      setConversations(data || []);
+      const formattedConversations: ChatConversation[] = (data || []).map(item => ({
+        id: item.id,
+        userId: item.user_id,
+        title: item.title,
+        lastMessage: item.last_message || '',
+        createdAt: new Date(item.created_at),
+        updatedAt: new Date(item.updated_at)
+      }));
+      
+      setConversations(formattedConversations);
+      return formattedConversations;
     } catch (err) {
       console.error('Failed to load conversations:', err);
       setError('Failed to load conversations');
+      return [];
     } finally {
       setIsLoading(false);
     }
@@ -64,10 +64,9 @@ export function useChatHistory() {
       // Transform database messages to ChatMessage format
       return (data || []).map(dbMessage => ({
         id: dbMessage.id,
-        text: dbMessage.content,
-        sender: dbMessage.sender_type,
-        timestamp: new Date(dbMessage.timestamp),
-        metadata: dbMessage.metadata || {}
+        text: dbMessage.text,
+        sender: dbMessage.sender,
+        timestamp: new Date(dbMessage.timestamp)
       }));
     } catch (err) {
       console.error('Failed to load messages:', err);
@@ -94,13 +93,12 @@ export function useChatHistory() {
         const title = firstUserMsg?.text.slice(0, 50) || 'Nouvelle conversation';
         
         const { error: convError } = await supabase
-          .from('conversations')
+          .from('chat_conversations')
           .insert({
             id: newConvId,
             user_id: user.id,
             title,
             last_message: relevantMessages[relevantMessages.length - 1].text.slice(0, 100),
-            message_count: relevantMessages.length,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           });
@@ -111,10 +109,9 @@ export function useChatHistory() {
       } else {
         // Update existing conversation
         const { error: updateError } = await supabase
-          .from('conversations')
+          .from('chat_conversations')
           .update({
             last_message: relevantMessages[relevantMessages.length - 1].text.slice(0, 100),
-            message_count: relevantMessages.length,
             updated_at: new Date().toISOString()
           })
           .eq('id', convId);
@@ -126,10 +123,9 @@ export function useChatHistory() {
       const dbMessages = relevantMessages.map(msg => ({
         id: msg.id,
         conversation_id: convId,
-        content: msg.text,
-        sender_type: msg.sender,
-        timestamp: msg.timestamp.toISOString(),
-        metadata: msg.metadata || {}
+        sender: msg.sender,
+        text: msg.text,
+        timestamp: msg.timestamp.toISOString()
       }));
       
       // Upsert messages
@@ -148,7 +144,7 @@ export function useChatHistory() {
   
   // Delete a conversation and its messages
   const deleteConversation = useCallback(async (conversationId: string) => {
-    if (!user?.id) return;
+    if (!user?.id) return false;
     
     try {
       // Delete messages first
@@ -161,7 +157,7 @@ export function useChatHistory() {
       
       // Delete conversation
       const { error: convError } = await supabase
-        .from('conversations')
+        .from('chat_conversations')
         .delete()
         .eq('id', conversationId);
       
@@ -174,9 +170,11 @@ export function useChatHistory() {
       if (activeConversationId === conversationId) {
         setActiveConversationId(null);
       }
+      
+      return true;
     } catch (err) {
       console.error('Failed to delete conversation:', err);
-      throw err;
+      return false;
     }
   }, [user?.id, activeConversationId]);
   
