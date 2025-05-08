@@ -80,17 +80,16 @@ export function useConversations() {
   // Update conversation wrapper that also updates local state
   const updateConversationWithState = async (
     conversationId: string, 
-    title: string, 
     lastMessage: string
   ): Promise<boolean> => {
-    const success = await updateConversation(conversationId, title, lastMessage);
+    const success = await updateConversation(conversationId, lastMessage);
     
     if (success) {
       // Update local state to reflect the changes without fetching the whole list again
       setConversations(prevConversations => 
         prevConversations.map(conv => 
           conv.id === conversationId 
-            ? {...conv, title, lastMessage, updatedAt: new Date()} 
+            ? {...conv, lastMessage, updatedAt: new Date()} 
             : conv
         )
       );

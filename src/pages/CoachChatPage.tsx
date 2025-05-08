@@ -156,7 +156,7 @@ const CoachChatPage = () => {
         <CoachChatContainer
           messages={messages}
           isLoading={isLoading}
-          typingIndicator={typingIndicator}
+          typingIndicator={typingIndicator || ""}
           userMessage={userMessage}
           onUserMessageChange={setUserMessage}
           onSendMessage={handleSendChatMessage}
