@@ -1,8 +1,9 @@
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { Track } from '@/types/music';
 import { useAudioEvents } from './audio/useAudioEvents';
 import { formatTime, handlePlayError, getTrackAudioUrl } from './audio/audioPlayerUtils';
+import { useAudioPlayerState } from './audio/useAudioPlayerState';
 
 export interface UseAudioPlayerReturn {
   currentTrack: Track | null;
@@ -37,16 +38,27 @@ export interface UseAudioPlayerReturn {
  * Centralized hook for managing audio playback throughout the application
  */
 export function useAudioPlayer(): UseAudioPlayerReturn {
-  // State management
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(0.7); // 0 to 1
-  const [repeat, setRepeat] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [loadingTrack, setLoadingTrack] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  // Use the separate state management hook
+  const {
+    currentTrack, 
+    isPlaying, 
+    volume,
+    repeat,
+    shuffle,
+    progress,
+    duration,
+    loadingTrack,
+    error,
+    setCurrentTrack,
+    setIsPlaying,
+    setVolume: setStateVolume,
+    setRepeat,
+    setShuffle,
+    setProgress,
+    setDuration,
+    setLoadingTrack,
+    setError
+  } = useAudioPlayerState();
   
   // Audio element ref
   const audioRef = useRef<HTMLAudioElement | null>(
@@ -56,38 +68,38 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   // Event handlers
   const handleTimeUpdate = useCallback((time: number) => {
     setProgress(time);
-  }, []);
+  }, [setProgress]);
   
   const handleDurationChange = useCallback((newDuration: number) => {
     setDuration(newDuration);
     setLoadingTrack(false);
-  }, []);
+  }, [setDuration, setLoadingTrack]);
   
   const handleEnded = useCallback(() => {
     setIsPlaying(false);
-  }, []);
+  }, [setIsPlaying]);
   
   const handleError = useCallback((error: Error) => {
     setError(error);
     setLoadingTrack(false);
     setIsPlaying(false);
-  }, []);
+  }, [setError, setLoadingTrack, setIsPlaying]);
   
   const handlePlay = useCallback(() => {
     setIsPlaying(true);
-  }, []);
+  }, [setIsPlaying]);
   
   const handlePause = useCallback(() => {
     setIsPlaying(false);
-  }, []);
+  }, [setIsPlaying]);
   
   const handleWaiting = useCallback(() => {
     setLoadingTrack(true);
-  }, []);
+  }, [setLoadingTrack]);
   
   const handleCanPlay = useCallback(() => {
     setLoadingTrack(false);
-  }, []);
+  }, [setLoadingTrack]);
   
   // Register audio events
   useAudioEvents({
@@ -122,7 +134,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     if (isPlaying) {
       audio.play().catch(error => handleError(error));
     }
-  }, [currentTrack, isPlaying]);
+  }, [currentTrack, isPlaying, handleError, setLoadingTrack, setError]);
 
   // Toggle play/pause when isPlaying changes
   useEffect(() => {
@@ -134,7 +146,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     } else {
       audio.pause();
     }
-  }, [isPlaying, currentTrack]);
+  }, [isPlaying, currentTrack, handleError]);
 
   // Public API functions
   const playTrack = useCallback((track: Track) => {
@@ -142,40 +154,40 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     setLoadingTrack(true);
     setError(null);
     setIsPlaying(true);
-  }, []);
+  }, [setCurrentTrack, setLoadingTrack, setError, setIsPlaying]);
 
   const pauseTrack = useCallback(() => {
     setIsPlaying(false);
-  }, []);
+  }, [setIsPlaying]);
 
   const resumeTrack = useCallback(() => {
     if (currentTrack) {
       setIsPlaying(true);
     }
-  }, [currentTrack]);
+  }, [currentTrack, setIsPlaying]);
 
   const setVolume = useCallback((value: number) => {
     const clampedValue = Math.max(0, Math.min(1, value));
-    setVolumeState(clampedValue);
+    setStateVolume(clampedValue);
     if (audioRef.current) {
       audioRef.current.volume = clampedValue;
     }
-  }, []);
+  }, [setStateVolume]);
 
   const toggleRepeat = useCallback(() => {
     setRepeat(prev => !prev);
-  }, []);
+  }, [setRepeat]);
 
   const toggleShuffle = useCallback(() => {
     setShuffle(prev => !prev);
-  }, []);
+  }, [setShuffle]);
 
   const seekTo = useCallback((seconds: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = seconds;
       setProgress(seconds);
     }
-  }, []);
+  }, [setProgress]);
 
   const nextTrack = useCallback(() => {
     console.log("Next track requested");
