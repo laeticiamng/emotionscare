@@ -19,8 +19,6 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   const logger = useLogger('Shell');
   const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
   
-  console.log('🔔 Shell rendered; isDrawerOpen=', isDrawerOpen);
-  
   logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
   return (
@@ -43,10 +41,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Music Player Button */}
       <button
         className="fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700"
-        onClick={() => { 
-          openDrawer(); 
-          console.log('🔔 openDrawer clicked'); 
-        }}
+        onClick={openDrawer}
         aria-label="Open Music Player"
         type="button"
       >
@@ -56,7 +51,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       {/* Toast notification system */}
       <Toaster />
       
-      {/* Music Player Drawer Stub */}
+      {/* Music Player Drawer */}
       <MusicDrawer 
         open={isDrawerOpen} 
         onClose={closeDrawer} 
