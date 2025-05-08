@@ -36,8 +36,9 @@ export function useCoachQueries(generateRecommendation: () => Promise<void>) {
         lastEmotionDate: undefined
       };
       
-      // Appel à l'API du coach
-      const response = await coachService.askCoachQuestion(user.id, question, userContext);
+      // Appel à l'API du coach - The error is here, we're passing 3 arguments when the method only expects 2
+      // Let's check the implementation of askCoachQuestion in coachService and fix this
+      const response = await coachService.askCoachQuestion(user.id, question);
       return response;
     } catch (error) {
       console.error('Error asking coach question:', error);

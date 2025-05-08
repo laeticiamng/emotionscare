@@ -1,3 +1,4 @@
+
 import { CoachAction, CoachEvent, AI_MODEL_CONFIG, CoachModule } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { actionExecutor } from './action-executor';
@@ -112,32 +113,37 @@ class CoachService {
 
   /**
    * Envoyer une question directement au coach
+   * Updated to correctly handle userContext parameter
    */
-  async askCoachQuestion(userId: string, question: string): Promise<string> {
+  async askCoachQuestion(userId: string, question: string, userContext?: UserContext): Promise<string> {
     try {
-      // Get user emotional context
-      const { data: emotions } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('date', { ascending: false })
-        .limit(3);
+      // Get user emotional context if not provided
+      let contextToUse = userContext;
       
-      let userContext: UserContext = {
-        recentEmotions: null,
-        currentScore: null
-      };
-      
-      if (emotions && emotions.length > 0) {
-        // Use emojis field instead of emotion, or derive the emotion from other fields
-        const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
-        const avgScore = emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length;
+      if (!contextToUse) {
+        const { data: emotions } = await supabase
+          .from('emotions')
+          .select('*')
+          .eq('user_id', userId)
+          .order('date', { ascending: false })
+          .limit(3);
         
-        userContext = {
-          recentEmotions,
-          currentScore: Math.round(avgScore),
-          lastEmotionDate: emotions[0].date
+        contextToUse = {
+          recentEmotions: null,
+          currentScore: null
         };
+        
+        if (emotions && emotions.length > 0) {
+          // Use emojis field instead of emotion, or derive the emotion from other fields
+          const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
+          const avgScore = emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length;
+          
+          contextToUse = {
+            recentEmotions,
+            currentScore: Math.round(avgScore),
+            lastEmotionDate: emotions[0].date
+          };
+        }
       }
       
       // Check budget constraints before selecting model
@@ -151,7 +157,7 @@ class CoachService {
       const { data, error } = await supabase.functions.invoke('chat-with-ai', {
         body: {
           message: question,
-          userContext,
+          userContext: contextToUse,
           model,
           module: 'coach',
           temperature: 0.4,
