@@ -8,6 +8,8 @@ interface EnhancedMusicVisualizerProps {
   showControls?: boolean;
   height?: number;
   className?: string;
+  intensity?: number;
+  volume?: number;
 }
 
 // Mapping des émotions vers les visualisations
@@ -59,7 +61,9 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
   emotion,
   showControls = true,
   height = 150,
-  className = ''
+  className = '',
+  intensity = 50,
+  volume = 1
 }) => {
   const { currentTrack, isPlaying } = useMusic();
   const [config, setConfig] = useState(DEFAULT_VISUALIZER);
@@ -73,6 +77,9 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
     }
   }, [emotion]);
 
+  // Adjust visualizer height based on intensity
+  const adjustedHeight = intensity ? Math.max(height * 0.7, Math.min(height * 1.3, height * (intensity / 50))) : height;
+
   return (
     <div className={`enhanced-music-visualizer ${className}`}>
       <AudioVisualizer
@@ -81,11 +88,13 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
         variant={config.variant}
         primaryColor={config.color}
         backgroundColor={config.background}
-        height={height}
+        height={adjustedHeight}
         showControls={showControls}
+        volume={volume}
       />
     </div>
   );
 };
 
 export default EnhancedMusicVisualizer;
+export type { EnhancedMusicVisualizerProps };

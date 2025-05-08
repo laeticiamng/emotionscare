@@ -7,8 +7,10 @@ interface AudioVisualizerProps {
   variant?: 'bars' | 'wave' | 'circle';
   height?: number;
   primaryColor?: string;
+  secondaryColor?: string;
   backgroundColor?: string;
   showControls?: boolean;
+  volume?: number;
 }
 
 const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
@@ -17,8 +19,10 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   variant = 'bars',
   height = 120,
   primaryColor = '#7C3AED', // couleur primaire par défaut
+  secondaryColor,
   backgroundColor = 'rgba(124, 58, 237, 0.1)', // couleur de fond par défaut
   showControls = false,
+  volume = 1,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -29,10 +33,15 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
 
   const [localIsPlaying, setLocalIsPlaying] = useState(false);
   
-  // Créer l'élément audio et configurer l'analyseur
+  // Create audio element and set up analyzer
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
+    }
+    
+    // Set volume
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
     }
 
     try {
@@ -58,9 +67,9 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         audioRef.current.src = '';
       }
     };
-  }, []);
+  }, [volume]);
 
-  // Gérer l'URL audio
+  // Handle audio URL
   useEffect(() => {
     if (audioRef.current && audioUrl) {
       audioRef.current.src = audioUrl;
@@ -74,7 +83,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     }
   }, [audioUrl]);
 
-  // Gérer l'état de lecture
+  // Handle playback state
   useEffect(() => {
     if (!audioRef.current) return;
     
@@ -89,7 +98,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     }
   }, [isPlaying, localIsPlaying]);
 
-  // Animation du visualiseur
+  // Animation for visualizer
   useEffect(() => {
     const canvas = canvasRef.current;
     const analyser = analyserRef.current;
@@ -121,7 +130,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       ctx.fillStyle = backgroundColor || 'rgba(0, 0, 0, 0.1)';
       ctx.fillRect(0, 0, width, height);
       
-      // Différentes visualisations selon le variant
+      // Different visualizations based on variant
       switch(variant) {
         case 'bars':
           drawBars(ctx, width, height, bufferLength, dataArray);
@@ -145,9 +154,9 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         animationRef.current = null;
       }
     };
-  }, [localIsPlaying, variant, primaryColor, backgroundColor]);
+  }, [localIsPlaying, variant, primaryColor, secondaryColor, backgroundColor]);
 
-  // Fonction pour dessiner des barres
+  // Draw bars visualization
   const drawBars = (
     ctx: CanvasRenderingContext2D,
     width: number,
@@ -161,17 +170,23 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     for (let i = 0; i < bufferLength; i++) {
       const barHeight = (dataArray[i] / 255) * height;
       
-      // Simuler de l'activité même sans audio réel
+      // Simulate activity even without real audio
       let finalHeight = Math.max(5, barHeight || Math.random() * 30);
       
-      ctx.fillStyle = primaryColor;
+      // Use secondaryColor for alternate bars if provided
+      if (secondaryColor && i % 2 === 0) {
+        ctx.fillStyle = secondaryColor;
+      } else {
+        ctx.fillStyle = primaryColor;
+      }
+      
       ctx.fillRect(x, height - finalHeight, barWidth, finalHeight);
       
       x += barWidth + 1;
     }
   };
   
-  // Fonction pour dessiner une onde
+  // Draw wave visualization
   const drawWave = (
     ctx: CanvasRenderingContext2D,
     width: number,
@@ -201,9 +216,33 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     
     ctx.lineTo(width, height / 2);
     ctx.stroke();
+    
+    // Draw second wave with secondary color if provided
+    if (secondaryColor) {
+      ctx.beginPath();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = secondaryColor;
+      x = 0;
+      
+      for (let i = 0; i < bufferLength; i++) {
+        const v = (dataArray[i] / 128.0) * 0.8; // Slightly smaller wave
+        const y = v * height / 2 + 10; // Offset from primary wave
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        
+        x += sliceWidth;
+      }
+      
+      ctx.lineTo(width, height / 2 + 10);
+      ctx.stroke();
+    }
   };
   
-  // Fonction pour dessiner un cercle
+  // Draw circle visualization
   const drawCircle = (
     ctx: CanvasRenderingContext2D,
     width: number,
@@ -233,13 +272,13 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
-      ctx.strokeStyle = primaryColor;
+      ctx.strokeStyle = secondaryColor || primaryColor;
       ctx.lineWidth = 2;
       ctx.stroke();
     }
   };
 
-  // Simuler de l'activité même sans audio réel
+  // Simulate activity even without audio
   useEffect(() => {
     if (!isPlaying) return;
     
@@ -249,7 +288,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Si pas d'audio ou d'analyseur, créer une animation simulée
+    // If no audio or analyzer, create simulated animation
     if (!audioUrl || !analyserRef.current) {
       const drawSimulation = () => {
         if (!ctx) return;
@@ -263,7 +302,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         const barWidth = canvas.width / barCount;
         
         for (let i = 0; i < barCount; i++) {
-          // Hauteur aléatoire avec un peu de continuité (effet vague)
+          // Random height with some continuity (wave effect)
           const barHeight = (Math.sin(Date.now() * 0.001 + i * 0.15) + 1) * 0.5 * canvas.height * 0.5;
           
           ctx.fillStyle = primaryColor;
@@ -282,7 +321,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     }
   }, [isPlaying, audioUrl, primaryColor, backgroundColor]);
   
-  // Toggle play/pause local
+  // Local toggle play/pause
   const togglePlay = () => {
     if (audioRef.current) {
       if (localIsPlaying) {
@@ -319,3 +358,4 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
 };
 
 export default AudioVisualizer;
+export type { AudioVisualizerProps };

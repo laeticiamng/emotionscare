@@ -99,8 +99,6 @@ const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
             height={isExpanded ? 280 : 160}
             showControls={false}
             intensity={localIntensity}
-            // Correction: retirons la prop 'muted' qui n'est pas supportée
-            // et implémentons la logique de volume à la place
             volume={muted ? 0 : 1}
           />
         </div>
