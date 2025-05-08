@@ -1,31 +1,27 @@
-
 import { MoodData } from '@/types';
-import { subDays, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
-/**
- * Generates mock mood data for charts
- */
+// Function to generate random data for the mood chart
 export const generateMockMoodData = (days: number): MoodData[] => {
-  const now = new Date();
-  const data: MoodData[] = [];
+  const getRandomValue = (min: number, max: number): number => {
+    return Math.random() * (max - min) + min;
+  };
 
-  for (let i = days; i >= 0; i--) {
-    const currentDate = subDays(now, i);
-    const formattedDate = format(currentDate, 'dd/MM', { locale: fr });
+  const moodData: MoodData[] = [];
+  for (let i = 0; i < days; i++) {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() - i);
     
-    // Only generate data for some days (randomized)
-    if (Math.random() > 0.3) {
-      data.push({
-        date: formattedDate,
-        value: Math.floor(50 + Math.random() * 40),  // Between 50-90
-        sentiment: Math.floor(50 + Math.random() * 40),
-        anxiety: Math.floor(10 + Math.random() * 50),
-        energy: Math.floor(30 + Math.random() * 60),
-        originalDate: formattedDate  // Use string format as defined in MoodData
-      });
-    }
+    const isoDate = currentDate.toISOString().split('T')[0];
+    
+    moodData.push({
+      date: isoDate,
+      originalDate: currentDate.toISOString(), // Add the originalDate property
+      value: getRandomValue(40, 95),
+      sentiment: getRandomValue(-1, 1),
+      anxiety: getRandomValue(0, 10),
+      energy: getRandomValue(0, 10),
+    });
   }
 
-  return data;
+  return moodData;
 };

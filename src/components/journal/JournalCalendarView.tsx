@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { fr } from 'date-fns/locale';
@@ -82,6 +81,11 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
     );
   };
 
+  // Use the updated JournalEntry type properties correctly
+  const getEntryContent = (entry: JournalEntry) => {
+    return entry.text || entry.content || "";
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="overflow-hidden border-cocoon-100">
@@ -154,9 +158,7 @@ const JournalCalendarView: React.FC<JournalCalendarViewProps> = ({ entries, onEn
                     )}
                   </div>
                   
-                  <p className="text-sm line-clamp-3 text-foreground mb-2">
-                    {entry.content || entry.text || ''}
-                  </p>
+                  <div className="text-sm line-clamp-3">{getEntryContent(entry)}</div>
                   
                   <div className="flex justify-end items-center text-xs text-primary gap-1 hover:underline">
                     Voir le détail <ArrowRight className="h-3 w-3" />

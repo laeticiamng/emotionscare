@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { JournalEntry } from '@/types';
@@ -20,6 +19,10 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
     if (!content) return '';
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
+  };
+
+  const getEntryContent = (entry: JournalEntry) => {
+    return entry.text || entry.content || "";
   };
 
   if (entries.length === 0) {
@@ -50,9 +53,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
-              {truncateContent(entry.content || entry.text || '')}
-            </p>
+            <div className="line-clamp-3 text-muted-foreground">{getEntryContent(entry)}</div>
           </CardContent>
           <CardFooter className="pt-2">
             <div className="text-sm text-primary flex items-center gap-1">

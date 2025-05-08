@@ -1,12 +1,31 @@
 
-// Importing the MusicTrack and Playlist from index for consistency
-import { MusicTrack, MusicPlaylist } from '@/types';
+// Directly define the types here rather than re-exporting them from index.ts
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  audioUrl?: string;
+  coverUrl?: string;
+  duration?: number;
+  genre?: string;
+  emotion?: string;
+  mood?: string;
+  year?: number;
+  url?: string;
+  cover?: string;
+  externalUrl?: string;
+}
 
-// Re-exporting with the correct type definitions
-export type { MusicTrack, MusicPlaylist };
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  description?: string;
+  coverUrl?: string;
+  emotion?: string;
+  tracks: MusicTrack[];
+}
 
-// Types utilisés par les services de musique (maintaining backward compatibility)
-export interface Track extends MusicTrack {}
+export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
 
-// Make sure that this type is only used for legacy purposes
-// and that new code uses MusicTrack from the main types
+// For backward compatibility
+export type Track = MusicTrack;

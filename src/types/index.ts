@@ -51,6 +51,8 @@ export interface Emotion {
   text?: string;
   audio_url?: string;
   ai_feedback?: string;
+  confidence?: number; // Added missing property
+  source?: string; // Added missing property
 }
 
 export interface EmotionResult {
@@ -79,6 +81,7 @@ export interface VRSessionTemplate {
   recommended_mood?: string;
   is_audio_only?: boolean;
   audio_url?: string;
+  completion_rate?: number; // Added missing property
 }
 
 export interface VRSession {
@@ -92,6 +95,11 @@ export interface VRSession {
   feedback?: string;
   emotional_state_before?: string;
   emotional_state_after?: string;
+  date?: string | Date; // Added missing property
+  is_audio_only?: boolean; // Added missing property
+  duration_seconds?: number; // Added missing property
+  heart_rate_before?: number; // Added missing property
+  heart_rate_after?: number; // Added missing property
 }
 
 // Badge and gamification types
@@ -101,9 +109,11 @@ export interface Badge {
   name: string;
   description: string;
   image_url?: string;
+  icon_url?: string; // Added missing property
   category?: string;
   unlocked?: boolean;
   awarded_at: string;
+  threshold?: number; // Added missing property
 }
 
 export interface Challenge {
@@ -112,6 +122,7 @@ export interface Challenge {
   description: string;
   points: number;
   completed: boolean;
+  progress?: number; // Added missing property
   deadline?: string;
   category?: string;
 }
@@ -122,6 +133,7 @@ export interface JournalEntry {
   user_id: string;
   date: string | Date;
   content: string;
+  text?: string; // Added missing property
   mood?: string;
   mood_score?: number;
   tags?: string[];
@@ -151,6 +163,7 @@ export interface Report {
 export interface MoodData {
   date: string;
   value: number;
+  originalDate?: string; // Added missing property
   sentiment?: number;
   anxiety?: number;
   energy?: number;
@@ -168,7 +181,14 @@ export interface InvitationStats {
   accepted: number;
   pending: number;
   expired: number;
+  sent: number; // Added missing property
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message?: string;
+  email?: string;
+  role?: string;
 }
 
 // Add any missing types here
-

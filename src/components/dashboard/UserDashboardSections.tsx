@@ -7,7 +7,7 @@ import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import GamificationWidget from './GamificationWidget';
-import { User } from '@/types';
+import { User, VRSessionTemplate } from '@/types';
 
 interface SectionProps {
   title: string;
@@ -135,10 +135,12 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
   // Find a suitable VR template based on the latest emotion
   const recommendedTemplate = latestEmotion ? {
     id: 'recommended',
+    template_id: 'recommended',  // Added required property
     theme: 'Méditation guidée',
     title: 'Session recommandée',
     duration: 5,
     preview_url: '',
+    description: 'Session recommandée basée sur votre état émotionnel', // Added required property
     is_audio_only: true,
   } : undefined;
   

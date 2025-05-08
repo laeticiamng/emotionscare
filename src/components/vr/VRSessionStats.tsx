@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -36,10 +35,12 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({
             <div className="text-2xl font-bold">{totalSessions}</div>
             {lastSession && (
               <p className="text-xs text-muted-foreground">
-                Dernière session: {formatDistanceToNow(parseISO(lastSession.date), { 
-                  addSuffix: true, 
-                  locale: fr 
-                })}
+                Dernière session: {formatDistanceToNow(
+                  parseISO(typeof lastSession.date === 'string' ? lastSession.date : 
+                          typeof lastSession.start_time === 'string' ? lastSession.start_time : 
+                          new Date().toISOString()), 
+                  { addSuffix: true, locale: fr }
+                )}
               </p>
             )}
           </CardContent>

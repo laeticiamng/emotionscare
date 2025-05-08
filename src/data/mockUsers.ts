@@ -12,6 +12,7 @@ export const mockUsers: User[] = [
     emotional_score: 82,
     avatar: 'https://i.pravatar.cc/150?img=1',
     onboarded: true,
+    created_at: new Date().toISOString(), // Added required property
   },
   {
     id: '2',
@@ -22,6 +23,7 @@ export const mockUsers: User[] = [
     emotional_score: 65,
     avatar: 'https://i.pravatar.cc/150?img=2',
     onboarded: true,
+    created_at: new Date().toISOString(), // Added required property
   },
   {
     id: '3',
@@ -32,6 +34,7 @@ export const mockUsers: User[] = [
     emotional_score: 78,
     avatar: 'https://i.pravatar.cc/150?img=3',
     onboarded: true,
+    created_at: new Date().toISOString(), // Added required property
   },
   {
     id: '4',
@@ -42,6 +45,7 @@ export const mockUsers: User[] = [
     emotional_score: 95,
     avatar: 'https://i.pravatar.cc/150?img=12',
     onboarded: true,
+    created_at: new Date().toISOString(), // Added required property
   },
 ];
 

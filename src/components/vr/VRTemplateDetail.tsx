@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Clock, Play, CheckCircle, Heart, Headphones } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
