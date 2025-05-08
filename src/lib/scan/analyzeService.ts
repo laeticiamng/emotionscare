@@ -1,4 +1,3 @@
-
 // import { Configuration, OpenAIApi } from 'openai'; - This will be mocked
 import { Emotion, EmotionResult } from '@/types';
 import { mockAnalysis } from '@/mocks/aiFallback';
@@ -6,7 +5,7 @@ import { supabase } from '@/lib/supabase-client';
 import { getEmotionEmoji } from './emotionUtilService';
 
 const useMocks = true; // Always use mocks until OpenAI is properly configured
-const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+const apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
 
 // Mock OpenAI client instead of actual initialization
 const openai = {
