@@ -3,7 +3,11 @@ import React from 'react';
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
 import MusicControls from './MusicControls';
 
-const MusicPlayer = () => {
+interface MusicPlayerProps {
+  // Add props if needed
+}
+
+const MusicPlayer: React.FC<MusicPlayerProps> = () => {
   const [isPlaying, setIsPlaying] = React.useState(false);
   
   const handlePlay = () => {

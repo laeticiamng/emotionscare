@@ -4,7 +4,11 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import MusicPlayer from './MusicPlayer';
 import { useDrawerState } from '@/hooks/useDrawerState';
 
-const MusicDrawer = () => {
+interface MusicDrawerProps {
+  // Add props if needed
+}
+
+const MusicDrawer: React.FC<MusicDrawerProps> = () => {
   const { isDrawerOpen } = useDrawerState();
   
   return (
