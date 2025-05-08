@@ -10,6 +10,9 @@ import {
 } from '@/lib/scan/analyzeService';
 import { createEmotionEntry as createEmotionEntryService, fetchLatestEmotion as fetchLatestEmotionService, fetchEmotionHistory as fetchEmotionHistoryService } from '@/lib/scan/emotionService';
 
+// Re-export the EmotionResult type for components to use
+export type { EmotionResult } from '@/types';
+
 // Function to analyze audio stream
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
   try {
