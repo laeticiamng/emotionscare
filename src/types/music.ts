@@ -20,6 +20,7 @@ export interface MusicTrack {
   url?: string;      // Alias for audioUrl
   cover?: string;    // Alias for coverUrl
   isPlaying?: boolean;
+  externalUrl?: string; // URL pour ouvrir dans un lecteur externe
 }
 
 export interface MusicPlaylist {

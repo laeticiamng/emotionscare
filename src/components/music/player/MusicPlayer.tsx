@@ -30,7 +30,7 @@ const MusicPlayer = () => {
     formatTime
   } = useAudioPlayer();
   
-  // If no track is selected, show empty state
+  // Si aucun morceau n'est sélectionné, afficher un état vide
   if (!contextTrack) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center bg-muted/20 rounded-lg border border-dashed">
