@@ -8,6 +8,8 @@ import EmotionResult from './live/EmotionResult';
 import { useToast } from '@/hooks/use-toast';
 import type { Emotion, EmotionResult as EmotionResultType } from '@/types';
 import { saveRealtimeEmotionScan } from '@/lib/scanService';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface EmotionScanLiveProps {
   userId?: string;
@@ -22,23 +24,27 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
   const [emotion, setEmotion] = useState<Emotion | null>(null);
   const [result, setResult] = useState<EmotionResultType | null>(null);
   const [isConfidential, setIsConfidential] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleToggleListen = () => {
-    setIsListening(!isListening);
+    // Reset state when toggling
     if (isListening) {
       setProgress('');
       setEmotion(null);
       setResult(null);
+      setError(null);
     } else {
       toast({
         title: 'Scan en direct activé',
         description: 'Parlez normalement, votre voix est analysée en temps réel.'
       });
     }
+    setIsListening(!isListening);
   };
 
   const handleError = (message: string) => {
+    setError(message);
     toast({
       title: 'Erreur lors du scan',
       description: message,
@@ -80,6 +86,16 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
       });
   };
 
+  // Reset error if component is unmounted
+  useEffect(() => {
+    return () => {
+      if (isListening) {
+        // Clean up if component unmounts while still listening
+        setIsListening(false);
+      }
+    };
+  }, [isListening]);
+
   return (
     <Card className="p-6 shadow-md">
       <div className="flex flex-col items-center space-y-6">
@@ -91,6 +107,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
             variant={isListening ? "destructive" : "default"}
             disabled={isProcessing}
             className="relative h-14 w-14 rounded-full p-0"
+            aria-label={isListening ? "Arrêter l'écoute" : "Démarrer l'écoute"}
           >
             {isListening ? 
               <MicOff className="h-6 w-6" /> : 
@@ -105,6 +122,20 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
           </div>
         </div>
         
+        {error && (
+          <div className="w-full p-3 bg-destructive/10 text-destructive rounded-md">
+            <p className="text-sm">{error}</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setError(null)} 
+              className="mt-2"
+            >
+              Réessayer
+            </Button>
+          </div>
+        )}
+        
         {isProcessing && (
           <div className="flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -112,18 +143,23 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ userId = '', onComple
           </div>
         )}
         
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="checkbox"
+        <div className="flex items-center space-x-2 w-full justify-center">
+          <Switch
+            id="confidential-mode"
             checked={isConfidential}
-            onChange={() => setIsConfidential(!isConfidential)}
-            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2"
+            onCheckedChange={setIsConfidential}
           />
-          <span className="text-sm text-muted-foreground">Mode confidentiel (pas de stockage de l'audio)</span>
-        </label>
+          <Label htmlFor="confidential-mode" className="text-sm text-muted-foreground cursor-pointer">
+            Mode confidentiel (pas de stockage de l'audio)
+          </Label>
+        </div>
         
         {result && emotion && (
-          <EmotionResult emotion={result.emotion || ''} confidence={result.confidence || 0} transcript={result.transcript || ''} />
+          <EmotionResult 
+            emotion={result.emotion || ''} 
+            confidence={result.confidence || 0} 
+            transcript={result.transcript || ''} 
+          />
         )}
       </div>
       

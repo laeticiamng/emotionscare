@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, SendHorizontal, Music, Brain, RefreshCw } from 'lucide-react';
+import { Sparkles, SendHorizontal, Music, Brain, RefreshCw, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useMusic } from '@/contexts/MusicContext';
 import { useCoach } from '@/hooks/coach/useCoach';
+import { useNavigate } from 'react-router-dom';
 
 interface CoachAssistantProps {
   className?: string;
@@ -24,7 +25,9 @@ interface CoachAssistantProps {
 const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [apiReady, setApiReady] = useState(true);
+  const [apiCheckInProgress, setApiCheckInProgress] = useState(false);
   const { recommendations, triggerDailyReminder, isProcessing } = useCoach();
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
   const [quickSuggestions, setQuickSuggestions] = useState<string[]>([
@@ -49,6 +52,7 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
       // API connection check
       const checkAPIConnection = async () => {
         try {
+          setApiCheckInProgress(true);
           // Fix boolean check by calling an actual function instead
           const success = await checkConnectionStatus(user.id);
           console.log("OpenAI API connection check:", success ? "OK" : "Error");
@@ -56,8 +60,8 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
           
           if (!success) {
             toast({
-              title: "Connection Error",
-              description: "Could not establish connection to OpenAI API. Some features may be limited.",
+              title: "Problème de connexion",
+              description: "Impossible de se connecter à l'API OpenAI. Certaines fonctionnalités peuvent être limitées.",
               variant: "destructive"
             });
           }
@@ -65,19 +69,25 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
           console.error("Error connecting to OpenAI API:", error);
           setApiReady(false);
           toast({
-            title: "Connection Error",
-            description: "Could not establish connection to OpenAI API. Some features may be limited.",
+            title: "Problème de connexion",
+            description: "Impossible de se connecter à l'API OpenAI. Certaines fonctionnalités peuvent être limitées.",
             variant: "destructive"
           });
+        } finally {
+          setApiCheckInProgress(false);
         }
       };
       
       checkAPIConnection();
       
-      // We use setTimeout to avoid blocking the render
-      setTimeout(() => {
-        triggerDailyReminder();
+      // Delay the daily reminder to ensure it doesn't block rendering
+      const reminderTimeout = setTimeout(() => {
+        triggerDailyReminder().catch(err => {
+          console.error("Error triggering daily reminder:", err);
+        });
       }, 1000);
+      
+      return () => clearTimeout(reminderTimeout);
     }
   }, [user?.id, toast, triggerDailyReminder]);
   
@@ -98,20 +108,46 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
   // Function to refresh recommendations
   const handleRefreshRecommendations = () => {
     if (user?.id) {
-      triggerDailyReminder();
-      toast({
-        title: "Recommandations actualisées",
-        description: "Nouvelles recommandations personnalisées"
-      });
+      triggerDailyReminder()
+        .then(() => {
+          toast({
+            title: "Recommandations actualisées",
+            description: "Nouvelles recommandations personnalisées"
+          });
+        })
+        .catch(err => {
+          console.error("Error refreshing recommendations:", err);
+          toast({
+            title: "Erreur",
+            description: "Impossible d'actualiser les recommandations",
+            variant: "destructive"
+          });
+        });
     }
+  };
+  
+  // Navigate to full coach chat
+  const handleOpenFullChat = () => {
+    navigate('/coach-chat');
   };
 
   return (
     <Card className={cn("flex flex-col premium-card h-full", className)} style={style}>
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-xl heading-premium">
-          <Sparkles className="h-5 w-5 text-primary" />
-          Coach IA {apiReady ? '' : '(Limité)'}
+        <CardTitle className="flex items-center justify-between text-xl heading-premium">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Coach IA {apiReady ? '' : '(Limité)'}
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 text-xs"
+            onClick={handleOpenFullChat}
+          >
+            <MessageCircle className="h-4 w-4 mr-1" />
+            Ouvrir
+          </Button>
         </CardTitle>
       </CardHeader>
       
@@ -132,10 +168,10 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
                   variant="ghost" 
                   size="icon" 
                   className="h-6 w-6" 
-                  disabled={isProcessing} 
+                  disabled={isProcessing || apiCheckInProgress} 
                   onClick={handleRefreshRecommendations}
                 >
-                  <RefreshCw className="h-3 w-3" />
+                  <RefreshCw className={cn("h-3 w-3", isProcessing && "animate-spin")} />
                 </Button>
               </div>
               <div className="space-y-2">
@@ -168,19 +204,22 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
                 size="sm" 
                 className="text-xs"
                 onClick={() => {
-                  // Fixed: Using HTMLInputElement to ensure click() method is available
-                  // and adding null checks with optional chaining
                   const input = document.querySelector('input[placeholder*="message"]') as HTMLInputElement;
                   const button = input?.closest('form')?.querySelector('button[type="submit"]') as HTMLButtonElement;
                   
                   if (input && button) {
                     input.value = suggestion;
-                    button.click();
+                    // Use event to trigger React state updates
+                    const event = new Event('input', { bubbles: true });
+                    input.dispatchEvent(event);
+                    setTimeout(() => button.click(), 10);
                   } else {
                     toast({
                       title: "Question posée",
                       description: suggestion
                     });
+                    // Fallback: navigate to coach chat with the question
+                    navigate('/coach-chat', { state: { initialQuestion: suggestion } });
                   }
                 }}
               >

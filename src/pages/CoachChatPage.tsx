@@ -31,7 +31,9 @@ const CoachChatPage = () => {
     loadMessages, 
     activeConversationId, 
     setActiveConversationId,
-    isLoading: isLoadingHistory
+    isLoading: isLoadingHistory,
+    error: chatHistoryError,
+    retryLoadConversations
   } = useChatHistory();
   
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
@@ -43,7 +45,7 @@ const CoachChatPage = () => {
       setCurrentConversationId(activeConversationId);
       handleLoadConversation(activeConversationId);
     }
-  }, [activeConversationId, currentConversationId]); // Removed handleLoadConversation from deps to avoid re-renders
+  }, [activeConversationId, currentConversationId]); 
   
   // Process any initial question from navigation state
   useEffect(() => {
@@ -53,7 +55,11 @@ const CoachChatPage = () => {
       setActiveConversationId(null);
       setCurrentConversationId(null);
       resetMessages();
-      handleSendMessage(state.initialQuestion);
+      
+      // Using setTimeout to ensure state updates complete before sending message
+      setTimeout(() => {
+        handleSendMessage(state.initialQuestion);
+      }, 0);
       
       // Clear the state to prevent re-sending on navigation
       window.history.replaceState({}, document.title);
@@ -124,6 +130,8 @@ const CoachChatPage = () => {
           onKeyDown={handleKeyDown}
           onUserTyping={handleUserTyping}
           onBackClick={handleBackClick}
+          error={chatHistoryError}
+          retryLoadConversations={retryLoadConversations}
         />
       </div>
     </ProtectedLayout>

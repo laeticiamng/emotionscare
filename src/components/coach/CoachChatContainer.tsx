@@ -24,6 +24,8 @@ interface CoachChatContainerProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   onUserTyping: () => void;
   onBackClick?: () => void;
+  error?: string;
+  retryLoadConversations?: () => void;
 }
 
 const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
@@ -36,7 +38,9 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
   onRegenerate,
   onKeyDown,
   onUserTyping,
-  onBackClick
+  onBackClick,
+  error,
+  retryLoadConversations
 }) => {
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -46,9 +50,7 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
     activeConversationId,
     deleteConversation,
     loadMessages,
-    setActiveConversationId,
-    error,
-    retryLoadConversations
+    setActiveConversationId
   } = useChatHistory();
 
   // Handle loading conversation
@@ -112,9 +114,11 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="flex justify-between items-center">
               <span>{error}</span>
-              <Button variant="outline" size="sm" onClick={retryLoadConversations}>
-                Réessayer
-              </Button>
+              {retryLoadConversations && (
+                <Button variant="outline" size="sm" onClick={retryLoadConversations}>
+                  Réessayer
+                </Button>
+              )}
             </AlertDescription>
           </Alert>
         )}

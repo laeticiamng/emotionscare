@@ -1,180 +1,230 @@
 
-import { useEffect, useCallback, useState } from 'react';
-import { ChatMessage } from '@/types/chat';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useConversations } from './useConversations';
-import { useMessages } from './useMessages';
+import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
 
-/**
- * Main hook for chat history management
- * Combines conversation and message operations
- */
+interface Conversation {
+  id: string;
+  title: string;
+  created_at: Date;
+  last_message: string | null;
+}
+
 export function useChatHistory() {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   
-  const {
-    conversations,
-    activeConversationId,
-    isLoading: isLoadingConversations,
-    setActiveConversationId,
-    loadConversations,
-    createConversation,
-    deleteConversation,
-    updateConversation
-  } = useConversations();
-  
-  const { 
-    loadMessages, 
-    saveMessages,
-    isLoadingMessages,
-    isSavingMessages,
-    error: messagesError,
-    clearError
-  } = useMessages();
-
-  // Sync error states
-  useEffect(() => {
-    if (messagesError) {
-      setError(messagesError);
-    }
-  }, [messagesError]);
-
-  // Load initial conversations
-  useEffect(() => {
-    if (user?.id && !isInitialized) {
-      console.log('Loading initial conversations for user:', user.id);
-      setIsLoadingHistory(true);
-      setError(null);
-      loadConversations()
-        .then(() => {
-          setIsInitialized(true);
-          setError(null);
-        })
-        .catch(err => {
-          console.error('Failed to load initial conversations:', err);
-          setError("Impossible de charger vos conversations.");
-          toast({
-            title: "Erreur",
-            description: "Impossible de charger vos conversations.",
-            variant: "destructive"
-          });
-        })
-        .finally(() => setIsLoadingHistory(false));
-    }
-  }, [user?.id, loadConversations, isInitialized, toast]);
-
-  // Enhanced saveMessages with conversation creation if needed
-  const saveMessagesWithConversation = useCallback(async (messages: ChatMessage[]): Promise<boolean> => {
-    if (!user?.id) {
-      console.error('Cannot save messages: No user logged in');
-      setError("Vous devez être connecté pour sauvegarder des messages.");
-      toast({
-        title: "Erreur d'authentification",
-        description: "Vous devez être connecté pour sauvegarder des messages.",
-        variant: "destructive"
-      });
-      return false;
-    }
+  // Load all conversations for the current user
+  const loadConversations = useCallback(async () => {
+    if (!user?.id) return;
     
     try {
-      clearError(); // Clear any previous errors
+      setIsLoading(true);
       setError(null);
       
-      if (!activeConversationId) {
-        // Create a new conversation if none is active
-        const firstUserMessage = messages.find(m => m.sender === 'user');
-        const title = firstUserMessage 
-          ? firstUserMessage.text.substring(0, 50) 
-          : "Nouvelle conversation";
-        console.log('Creating new conversation with title:', title);
-        
-        const conversationId = await createConversation(title);
-        
-        if (!conversationId) {
-          console.error('Failed to create conversation');
-          setError("Impossible de créer une nouvelle conversation.");
-          toast({
-            title: "Erreur",
-            description: "Impossible de créer une nouvelle conversation.",
-            variant: "destructive"
-          });
-          return false;
-        }
-        
-        console.log('Created new conversation:', conversationId);
-        return await saveMessages(conversationId, messages);
-      } else {
-        // Save to existing conversation
-        console.log('Saving to existing conversation:', activeConversationId);
-        const result = await saveMessages(activeConversationId, messages);
-        
-        // Update conversation title and last message if there are messages
-        if (result && messages.length > 0) {
-          const lastMessage = messages[messages.length - 1];
-          const firstUserMessage = messages.find(m => m.sender === 'user');
-          const title = firstUserMessage 
-            ? firstUserMessage.text.substring(0, 50) 
-            : 'Nouvelle conversation';
-          
-          await updateConversation(
-            activeConversationId, 
-            title,
-            lastMessage.text.substring(0, 100)
-          );
-        }
-        
-        return result;
-      }
-    } catch (error) {
-      console.error('Error in saveMessagesWithConversation:', error);
-      setError("Impossible de sauvegarder la conversation.");
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder la conversation.",
-        variant: "destructive"
-      });
-      return false;
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      setConversations(data || []);
+    } catch (err) {
+      console.error('Error loading conversations:', err);
+      setError("Impossible de charger les conversations. Veuillez réessayer.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [activeConversationId, createConversation, saveMessages, updateConversation, user?.id, toast, clearError]);
+  }, [user?.id]);
 
   // Retry loading conversations
   const retryLoadConversations = useCallback(() => {
+    loadConversations();
+  }, [loadConversations]);
+  
+  // Create a new conversation
+  const createConversation = useCallback(async (title: string): Promise<string> => {
+    if (!user?.id) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour créer une conversation.",
+        variant: "destructive"
+      });
+      throw new Error("User not authenticated");
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: user.id,
+          title: title,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      if (data) {
+        setActiveConversationId(data.id);
+        await loadConversations();  // Refresh the list
+        return data.id;
+      } else {
+        throw new Error("No data returned from conversation creation");
+      }
+    } catch (err) {
+      console.error('Error creating conversation:', err);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer une nouvelle conversation.",
+        variant: "destructive"
+      });
+      throw err;
+    }
+  }, [user?.id, loadConversations, toast]);
+  
+  // Load messages for a specific conversation
+  const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('timestamp', { ascending: true });
+      
+      if (error) throw error;
+      
+      setActiveConversationId(conversationId);
+      
+      return (data || []).map(msg => ({
+        id: msg.id,
+        text: msg.text,
+        sender: msg.sender as 'user' | 'bot',
+        timestamp: new Date(msg.timestamp)
+      }));
+    } catch (err) {
+      console.error('Error loading messages:', err);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les messages de cette conversation.",
+        variant: "destructive"
+      });
+      return [];
+    }
+  }, [toast]);
+  
+  // Save messages for the active conversation
+  const saveMessages = useCallback(async (messages: ChatMessage[]) => {
+    if (!activeConversationId || !user?.id || messages.length === 0) return;
+    
+    try {
+      // Get only the new messages that need to be saved
+      const lastMessages = messages.slice(-2);
+      
+      // Map messages to the format expected by the database
+      const messagesToInsert = lastMessages.map(msg => ({
+        conversation_id: activeConversationId,
+        text: msg.text,
+        sender: msg.sender,
+        timestamp: msg.timestamp.toISOString()
+      }));
+      
+      // Insert messages
+      const { error } = await supabase
+        .from('chat_messages')
+        .insert(messagesToInsert);
+      
+      if (error) throw error;
+      
+      // Update the conversation's last_message field
+      const lastMessage = messages[messages.length - 1];
+      await supabase
+        .from('chat_conversations')
+        .update({
+          last_message: lastMessage.text.substring(0, 100),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', activeConversationId);
+      
+      // Refresh the conversations list
+      await loadConversations();
+    } catch (err) {
+      console.error('Error saving messages:', err);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les messages.",
+        variant: "destructive"
+      });
+    }
+  }, [activeConversationId, user?.id, loadConversations, toast]);
+  
+  // Delete a conversation
+  const deleteConversation = useCallback(async (conversationId: string) => {
+    try {
+      // First delete all messages in the conversation
+      const { error: messagesError } = await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('conversation_id', conversationId);
+      
+      if (messagesError) throw messagesError;
+      
+      // Then delete the conversation itself
+      const { error } = await supabase
+        .from('chat_conversations')
+        .delete()
+        .eq('id', conversationId);
+      
+      if (error) throw error;
+      
+      // If the deleted conversation was the active one, clear the active conversation
+      if (activeConversationId === conversationId) {
+        setActiveConversationId(null);
+      }
+      
+      // Refresh the conversations list
+      await loadConversations();
+      
+      toast({
+        title: "Conversation supprimée",
+        description: "La conversation a été supprimée avec succès."
+      });
+    } catch (err) {
+      console.error('Error deleting conversation:', err);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la conversation.",
+        variant: "destructive"
+      });
+    }
+  }, [activeConversationId, loadConversations, toast]);
+  
+  // Load all conversations on component mount
+  useEffect(() => {
     if (user?.id) {
-      setIsLoadingHistory(true);
-      setError(null);
-      loadConversations()
-        .then(() => {
-          setError(null);
-        })
-        .catch(err => {
-          console.error('Error retrying load conversations:', err);
-          setError("Impossible de charger vos conversations.");
-        })
-        .finally(() => setIsLoadingHistory(false));
+      loadConversations();
     }
   }, [user?.id, loadConversations]);
-
+  
   return {
     conversations,
     activeConversationId,
-    isLoading: isLoadingConversations || isLoadingHistory || isLoadingMessages || isSavingMessages,
-    isInitialized,
+    setActiveConversationId,
+    isLoading,
     error,
     createConversation,
-    deleteConversation,
-    loadConversations,
-    retryLoadConversations,
     loadMessages,
-    saveMessages: saveMessagesWithConversation,
-    setActiveConversationId,
-    clearError: useCallback(() => {
-      setError(null);
-      clearError();
-    }, [clearError])
+    saveMessages,
+    deleteConversation,
+    retryLoadConversations
   };
 }

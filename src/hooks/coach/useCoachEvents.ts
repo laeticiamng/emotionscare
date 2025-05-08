@@ -2,12 +2,16 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useMusic } from '@/contexts/MusicContext';
-import { useNavigate } from 'react-router-dom';
-import { coachService, CoachEvent } from '@/lib/coach/coach-service';
+import { triggerCoachEvent } from '@/lib/coach/coach-service';
+import { useActivity } from '@/hooks/useActivity';
+
+type EmotionData = {
+  emotion?: string;
+  score?: number;
+};
 
 /**
- * Hook to handle coach event triggering and processing
+ * Hook to manage coach events/triggers
  */
 export function useCoachEvents(
   generateRecommendation: () => Promise<void>,
@@ -16,84 +20,125 @@ export function useCoachEvents(
 ) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { loadPlaylistForEmotion } = useMusic();
-  const navigate = useNavigate();
+  const { logActivity } = useActivity();
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastTrigger, setLastTrigger] = useState<Date | null>(null);
 
-  // Fonction pour déclencher un événement Coach IA
-  const triggerEvent = useCallback(async (eventType: 'scan_completed' | 'predictive_alert' | 'daily_reminder', data?: any) => {
+  // Trigger coach after a scan
+  const triggerAfterScan = useCallback(async (data: EmotionData) => {
     if (!user?.id) return;
     
-    setIsProcessing(true);
-    
     try {
-      // Créer un événement Coach IA
-      const event: CoachEvent = {
-        type: eventType,
-        user_id: user.id,
-        data
-      };
+      setIsProcessing(true);
       
-      // Traiter l'événement via le service Coach
-      await coachService.processEvent(event);
+      // Set emotion data for local UI usage
+      if (data.emotion) setLastEmotion(data.emotion);
+      if (data.score !== undefined) setSessionScore(data.score);
       
-      // Mettre à jour la date du dernier déclenchement
-      setLastTrigger(new Date());
-      
-      // Generate a new recommendation
-      generateRecommendation();
-      
-      // Actions supplémentaires selon le type d'événement
-      if (eventType === 'scan_completed' && data?.emojis) {
-        // Charger une playlist adaptée à l'émotion
-        loadPlaylistForEmotion(data.emojis);
-        setLastEmotion(data.emojis);
-        if (data.score) {
-          setSessionScore(data.score);
-        }
-      }
-      
-    } catch (error) {
-      console.error('Error triggering coach event:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de traiter votre demande",
-        variant: "destructive"
+      // Log the activity
+      logActivity('coach_scan_trigger', { 
+        emotion: data.emotion,
+        score: data.score 
       });
+      
+      // Trigger the coach event
+      await triggerCoachEvent('scan_completed', user.id, data);
+      
+      // Update recommendations
+      await generateRecommendation();
+      
+      // Update last trigger time
+      setLastTrigger(new Date());
+    } catch (error) {
+      console.error('Error triggering coach after scan:', error);
     } finally {
       setIsProcessing(false);
     }
-  }, [user, toast, loadPlaylistForEmotion, generateRecommendation, setLastEmotion, setSessionScore]);
+  }, [user?.id, setLastEmotion, setSessionScore, logActivity, generateRecommendation]);
 
-  // Pour déclencher un événement après un scan émotionnel
-  const triggerAfterScan = useCallback((emojis: string, score: number = 50) => {
-    return triggerEvent('scan_completed', { emojis, score });
-  }, [triggerEvent]);
-
-  // Pour déclencher une alerte préventive
-  const triggerAlert = useCallback((alertType: string) => {
-    return triggerEvent('predictive_alert', { alertType });
-  }, [triggerEvent]);
-
-  // Pour déclencher un rappel quotidien
-  const triggerDailyReminder = useCallback(() => {
-    return triggerEvent('daily_reminder');
-  }, [triggerEvent]);
-
-  // Suggérer une session VR basée sur l'émotion
-  const suggestVRSession = useCallback((emojis: string) => {
-    // Suggestion basée sur l'émoji
-    toast({
-      title: "Coach IA",
-      description: `Une session VR adaptée à votre état émotionnel est disponible.`,
-    });
+  // Trigger alert for concerning emotion data
+  const triggerAlert = useCallback(async (data: EmotionData) => {
+    if (!user?.id) return;
     
-    // Rediriger vers la page VR avec un délai pour laisser le temps de lire le toast
-    setTimeout(() => {
-      navigate('/vr-session');
-    }, 2000);
-  }, [toast, navigate]);
+    try {
+      setIsProcessing(true);
+      
+      // Log the activity
+      logActivity('coach_alert', { 
+        emotion: data.emotion,
+        score: data.score 
+      });
+      
+      // Trigger the alert
+      await triggerCoachEvent('predictive_alert', user.id, data);
+      
+      // Show a notification
+      toast({
+        title: "Coach IA - Alerte",
+        description: "Une notification de bien-être a été déclenchée suite à l'analyse de vos données émotionnelles.",
+      });
+      
+      // Update last trigger time
+      setLastTrigger(new Date());
+    } catch (error) {
+      console.error('Error triggering coach alert:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [user?.id, logActivity, toast]);
+
+  // Trigger daily reminder
+  const triggerDailyReminder = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      // Log the activity
+      logActivity('coach_daily_reminder', {});
+      
+      // Trigger the daily reminder
+      await triggerCoachEvent('daily_reminder', user.id, {});
+      
+      // Generate recommendations
+      await generateRecommendation();
+      
+      // Update last trigger time
+      setLastTrigger(new Date());
+    } catch (error) {
+      console.error('Error triggering daily reminder:', error);
+      // Don't show errors to the user for background refreshes
+    } finally {
+      setIsProcessing(false);
+    }
+    
+    return; // Explicitly return Promise<void>
+  }, [user?.id, logActivity, generateRecommendation]);
+
+  // Suggest VR session
+  const suggestVRSession = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      // Log the activity
+      logActivity('vr_session_suggestion', {});
+      
+      // Show a notification
+      toast({
+        title: "Suggestion VR",
+        description: "Une session de réalité virtuelle pourrait vous aider à vous détendre.",
+      });
+      
+      // Update last trigger time
+      setLastTrigger(new Date());
+    } catch (error) {
+      console.error('Error suggesting VR session:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [user?.id, logActivity, toast]);
 
   return {
     isProcessing,
