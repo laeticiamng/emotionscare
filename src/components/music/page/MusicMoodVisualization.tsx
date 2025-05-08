@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
 import { Card, CardContent } from '@/components/ui/card';
