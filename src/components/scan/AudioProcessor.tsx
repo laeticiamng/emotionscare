@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { createProcessor } from '@/lib/audioVad';
 import { useToast } from '@/hooks/use-toast';
@@ -132,7 +131,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       const emotion: Emotion = {
         id: `emotion-${Date.now()}`, // Generate a temporary ID
         user_id: userId,
-        date: new Date().toISOString(),
+        date: new Date().toISOString(), // Convert Date to string
         emotion: result.emotion,
         confidence: result.confidence,
         text: result.transcript,
