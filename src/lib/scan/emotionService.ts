@@ -11,9 +11,9 @@ export const insertEmotion = async (emotion: Partial<Emotion>): Promise<Emotion 
     }
     
     // Convert Date to string if it's a Date object
-    const dateString = typeof emotion.date === 'object' && emotion.date instanceof Date 
-      ? emotion.date.toISOString() 
-      : emotion.date;
+    const dateString = typeof emotion.date === 'object' 
+      ? (emotion.date as Date).toISOString() 
+      : emotion.date || new Date().toISOString();
     
     // Create emotion data object with string date
     const emotionData = {

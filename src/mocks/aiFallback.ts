@@ -41,3 +41,19 @@ export const mockEmotions = [
     is_confidential: false
   }
 ];
+
+// Add the missing createFallbackEmotion function
+export const createFallbackEmotion = (userId: string = 'user-1') => {
+  return {
+    id: `emotion-${Date.now()}`,
+    user_id: userId,
+    date: new Date().toISOString(),
+    emotion: "neutral",
+    score: 65,
+    text: "Analyse par défaut",
+    emojis: "😐",
+    ai_feedback: "Nous n'avons pas pu analyser précisément votre état émotionnel.",
+    confidence: 0.6,
+    source: "fallback"
+  };
+};
