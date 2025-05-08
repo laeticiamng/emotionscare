@@ -11,7 +11,7 @@ export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
     id: musicTrack.id,
     title: musicTrack.title,
     artist: musicTrack.artist,
-    url: musicTrack.url,
+    url: musicTrack.url || musicTrack.audioUrl || '',
     cover: musicTrack.coverUrl || musicTrack.cover || '',
     duration: musicTrack.duration || 0,
   };

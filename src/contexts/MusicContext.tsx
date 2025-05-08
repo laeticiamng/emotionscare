@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
