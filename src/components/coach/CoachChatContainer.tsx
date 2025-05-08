@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ChatHeader from '@/components/coach/ChatHeader';
 import ChatMessageList from '@/components/coach/ChatMessageList';
@@ -20,10 +19,11 @@ interface CoachChatContainerProps {
   typingIndicator: string | null;
   userMessage: string;
   onUserMessageChange: (message: string) => void;
-  onSendMessage: () => void;
+  onSendMessage: (message?: string) => void;
   onRegenerate: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
   onUserTyping: () => void;
+  onBackClick?: () => void;
 }
 
 const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
@@ -35,9 +35,9 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
   onSendMessage,
   onRegenerate,
   onKeyDown,
-  onUserTyping
+  onUserTyping,
+  onBackClick
 }) => {
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [drawerOpen, setDrawerOpen] = useState(false);
   
@@ -68,10 +68,6 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
     }
   };
 
-  const handleBackClick = () => {
-    navigate('/coach');
-  };
-
   const renderConversationList = () => (
     <ConversationList
       conversations={conversations}
@@ -94,7 +90,7 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
       {/* Main chat area */}
       <Card className="flex-grow flex flex-col overflow-hidden p-0 shadow-premium relative">
         <ChatHeader 
-          onBackClick={handleBackClick} 
+          onBackClick={onBackClick} 
           title={
             activeConversationId 
               ? conversations.find(c => c.id === activeConversationId)?.title || "Coach IA Personnel"

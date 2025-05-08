@@ -1,12 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import { useCoachChat } from '@/hooks/chat/useCoachChat';
 import { useChatHistory } from '@/hooks/chat/useChatHistory';
 import { useToast } from '@/hooks/use-toast';
 import CoachChatContainer from '@/components/coach/CoachChatContainer';
-import { ChatMessage } from '@/types/chat';
 import { Loader } from 'lucide-react';
 
 const CoachChatPage = () => {
@@ -26,6 +25,7 @@ const CoachChatPage = () => {
   } = useCoachChat();
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { 
     loadMessages, 
@@ -43,7 +43,7 @@ const CoachChatPage = () => {
       setCurrentConversationId(activeConversationId);
       handleLoadConversation(activeConversationId);
     }
-  }, [activeConversationId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeConversationId, currentConversationId]); // Removed handleLoadConversation from deps to avoid re-renders
   
   // Process any initial question from navigation state
   useEffect(() => {
@@ -58,7 +58,7 @@ const CoachChatPage = () => {
       // Clear the state to prevent re-sending on navigation
       window.history.replaceState({}, document.title);
     }
-  }, [location.state]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.state, setActiveConversationId, resetMessages, handleSendMessage]); 
 
   // Handle loading conversation
   const handleLoadConversation = async (conversationId: string) => {
@@ -98,6 +98,11 @@ const CoachChatPage = () => {
     }
   };
   
+  // Function to handle the back button
+  const handleBackClick = () => {
+    navigate('/coach');
+  };
+  
   const isLoading = isLoadingChat || isLoadingHistory || isLoadingConversation;
 
   return (
@@ -118,6 +123,7 @@ const CoachChatPage = () => {
           onRegenerate={handleRegenerate}
           onKeyDown={handleKeyDown}
           onUserTyping={handleUserTyping}
+          onBackClick={handleBackClick}
         />
       </div>
     </ProtectedLayout>

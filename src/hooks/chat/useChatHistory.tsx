@@ -15,6 +15,7 @@ export function useChatHistory() {
   const { toast } = useToast();
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const {
     conversations,
@@ -36,15 +37,27 @@ export function useChatHistory() {
     clearError
   } = useMessages();
 
+  // Sync error states
+  useEffect(() => {
+    if (messagesError) {
+      setError(messagesError);
+    }
+  }, [messagesError]);
+
   // Load initial conversations
   useEffect(() => {
     if (user?.id && !isInitialized) {
       console.log('Loading initial conversations for user:', user.id);
       setIsLoadingHistory(true);
+      setError(null);
       loadConversations()
-        .then(() => setIsInitialized(true))
+        .then(() => {
+          setIsInitialized(true);
+          setError(null);
+        })
         .catch(err => {
           console.error('Failed to load initial conversations:', err);
+          setError("Impossible de charger vos conversations.");
           toast({
             title: "Erreur",
             description: "Impossible de charger vos conversations.",
@@ -59,6 +72,7 @@ export function useChatHistory() {
   const saveMessagesWithConversation = useCallback(async (messages: ChatMessage[]): Promise<boolean> => {
     if (!user?.id) {
       console.error('Cannot save messages: No user logged in');
+      setError("Vous devez être connecté pour sauvegarder des messages.");
       toast({
         title: "Erreur d'authentification",
         description: "Vous devez être connecté pour sauvegarder des messages.",
@@ -69,6 +83,7 @@ export function useChatHistory() {
     
     try {
       clearError(); // Clear any previous errors
+      setError(null);
       
       if (!activeConversationId) {
         // Create a new conversation if none is active
@@ -82,6 +97,7 @@ export function useChatHistory() {
         
         if (!conversationId) {
           console.error('Failed to create conversation');
+          setError("Impossible de créer une nouvelle conversation.");
           toast({
             title: "Erreur",
             description: "Impossible de créer une nouvelle conversation.",
@@ -116,6 +132,7 @@ export function useChatHistory() {
       }
     } catch (error) {
       console.error('Error in saveMessagesWithConversation:', error);
+      setError("Impossible de sauvegarder la conversation.");
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder la conversation.",
@@ -125,22 +142,19 @@ export function useChatHistory() {
     }
   }, [activeConversationId, createConversation, saveMessages, updateConversation, user?.id, toast, clearError]);
 
-  // Load messages for active conversation
-  const loadActiveConversationMessages = useCallback(async (): Promise<ChatMessage[]> => {
-    if (!activeConversationId) {
-      console.warn('No active conversation to load messages from');
-      return [];
-    }
-    
-    clearError(); // Clear any previous errors
-    return await loadMessages(activeConversationId);
-  }, [activeConversationId, loadMessages, clearError]);
-
   // Retry loading conversations
   const retryLoadConversations = useCallback(() => {
     if (user?.id) {
       setIsLoadingHistory(true);
+      setError(null);
       loadConversations()
+        .then(() => {
+          setError(null);
+        })
+        .catch(err => {
+          console.error('Error retrying load conversations:', err);
+          setError("Impossible de charger vos conversations.");
+        })
         .finally(() => setIsLoadingHistory(false));
     }
   }, [user?.id, loadConversations]);
@@ -150,14 +164,17 @@ export function useChatHistory() {
     activeConversationId,
     isLoading: isLoadingConversations || isLoadingHistory || isLoadingMessages || isSavingMessages,
     isInitialized,
-    error: messagesError,
+    error,
     createConversation,
     deleteConversation,
     loadConversations,
     retryLoadConversations,
     loadMessages,
-    loadActiveConversationMessages,
     saveMessages: saveMessagesWithConversation,
-    setActiveConversationId
+    setActiveConversationId,
+    clearError: useCallback(() => {
+      setError(null);
+      clearError();
+    }, [clearError])
   };
 }

@@ -29,6 +29,7 @@ export function useCoachChat(initialQuestion?: string) {
   // Process initial question if provided
   useEffect(() => {
     if (initialQuestion) {
+      console.log('Processing initial question:', initialQuestion);
       handleSendMessage(initialQuestion);
     }
   }, [initialQuestion, handleSendMessage]);

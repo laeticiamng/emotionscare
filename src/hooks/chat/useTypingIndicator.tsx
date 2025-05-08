@@ -13,14 +13,18 @@ export function useTypingIndicator() {
   const handleUserTyping = useCallback(() => {
     // Reset typing indicator after a delay
     const resetIndicatorAfterDelay = () => {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setTypingIndicator(null);
       }, 30000); // 30 seconds timeout
+      return timeout;
     };
     
     // Set indicator based on message length and complexity
     setTypingIndicator("Le coach réfléchit...");
-    resetIndicatorAfterDelay();
+    const timeout = resetIndicatorAfterDelay();
+    
+    // Clean up timeout if the component unmounts
+    return () => clearTimeout(timeout);
   }, []);
   
   // Clear typing indicator

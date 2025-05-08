@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +30,7 @@ export function useCoachChatActions({
   const { toast } = useToast();
   const { askQuestion } = useCoach();
   const { logActivity } = useActivity();
-  const { activeConversationId, createConversation } = useChatHistory();
+  const { activeConversationId, createConversation, saveMessages } = useChatHistory();
   
   // Handle sending a message
   const handleSendMessage = useCallback((messageText: string = userMessage) => {
@@ -43,7 +42,16 @@ export function useCoachChatActions({
     // Handle conversation creation
     const ensureConversation = async () => {
       if (!activeConversationId) {
-        await createConversation(messageText.substring(0, 50));
+        try {
+          await createConversation(messageText.substring(0, 50));
+        } catch (error) {
+          console.error('Error creating conversation:', error);
+          toast({
+            title: "Erreur",
+            description: "Impossible de créer une nouvelle conversation.",
+            variant: "destructive"
+          });
+        }
       }
     };
     
@@ -64,7 +72,29 @@ export function useCoachChatActions({
           logMessageActivity();
           
           // Get response from coach AI
-          return await askQuestion(text);
+          const response = await askQuestion(text);
+          
+          // Save messages after successful response
+          if (activeConversationId) {
+            const chatMessages = [...messages, 
+              {
+                id: Date.now().toString(),
+                text: text,
+                sender: 'user',
+                timestamp: new Date(),
+              },
+              {
+                id: (Date.now() + 1).toString(),
+                text: response,
+                sender: 'bot',
+                timestamp: new Date(),
+              }
+            ];
+            
+            saveMessages(chatMessages);
+          }
+          
+          return response;
         } catch (error) {
           console.error('Error asking coach question:', error);
           toast({
@@ -80,7 +110,7 @@ export function useCoachChatActions({
     
     // Clear input
     setUserMessage('');
-  }, [userMessage, sendMessage, addMessage, activeConversationId, createConversation, logActivity, askQuestion, toast, clearTypingIndicator, setUserMessage]);
+  }, [userMessage, sendMessage, addMessage, activeConversationId, createConversation, saveMessages, messages, logActivity, askQuestion, toast, clearTypingIndicator, setUserMessage]);
   
   // Handle regenerating a response
   const handleRegenerate = useCallback(() => {
@@ -96,6 +126,23 @@ export function useCoachChatActions({
           
           // Get new response
           const response = await askQuestion(text);
+          
+          // Save regenerated message
+          if (activeConversationId) {
+            const lastUserMessageIndex = [...messages].reverse().findIndex(msg => msg.sender === 'user');
+            if (lastUserMessageIndex !== -1) {
+              // Keep all messages up to the last user message, then add the new bot response
+              const updatedMessages = messages.slice(0, messages.length - lastUserMessageIndex);
+              updatedMessages.push({
+                id: Date.now().toString(),
+                text: response,
+                sender: 'bot',
+                timestamp: new Date(),
+              });
+              
+              saveMessages(updatedMessages);
+            }
+          }
           
           toast({
             title: "Nouvelle réponse générée",
@@ -114,7 +161,7 @@ export function useCoachChatActions({
         }
       }
     );
-  }, [regenerateResponse, messages, addMessage, logActivity, askQuestion, toast]);
+  }, [regenerateResponse, messages, addMessage, activeConversationId, saveMessages, logActivity, askQuestion, toast]);
   
   return {
     handleSendMessage,
