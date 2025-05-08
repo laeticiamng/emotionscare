@@ -9,7 +9,7 @@ export function usePlayerControls(audioRef: RefObject<HTMLAudioElement | null>) 
   const {
     duration,
     setProgress,
-    setStateVolume,
+    setVolume,
   } = useAudioPlayerState();
 
   /**
@@ -25,13 +25,13 @@ export function usePlayerControls(audioRef: RefObject<HTMLAudioElement | null>) 
   /**
    * Update the player volume
    */
-  const setVolume = useCallback((value: number) => {
+  const setVolumeLevel = useCallback((value: number) => {
     const clampedValue = Math.max(0, Math.min(1, value));
-    setStateVolume(clampedValue);
+    setVolume(clampedValue);
     if (audioRef.current) {
       audioRef.current.volume = clampedValue;
     }
-  }, [setStateVolume, audioRef]);
+  }, [setVolume, audioRef]);
 
   /**
    * Handle progress bar clicks
@@ -52,13 +52,13 @@ export function usePlayerControls(audioRef: RefObject<HTMLAudioElement | null>) 
    */
   const handleVolumeChange = useCallback((values: number[]) => {
     if (values.length > 0) {
-      setVolume(values[0] / 100);
+      setVolumeLevel(values[0] / 100);
     }
-  }, [setVolume]);
+  }, [setVolumeLevel]);
 
   return {
     seekTo,
-    setVolume,
+    setVolume: setVolumeLevel,
     handleProgressClick,
     handleVolumeChange
   };
