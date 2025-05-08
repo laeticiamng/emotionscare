@@ -1,3 +1,4 @@
+
 import { MusicPlaylist } from '@/types';
 
 // Données de playlists pour diverses émotions
