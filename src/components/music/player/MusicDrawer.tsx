@@ -1,5 +1,7 @@
 
 import React, { useEffect } from 'react';
+import * as DrawerUI from '@/components/ui/drawer';
+import MusicPlayer from './MusicPlayer';
 import useLogger from "@/hooks/useLogger";
 
 export interface MusicDrawerProps {
@@ -13,8 +15,16 @@ export interface MusicDrawerProps {
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
   const logger = useLogger('MusicDrawer-Stub');
   
-  // Diagnostic logging
+  // Debug all imports to identify undefined components
   useEffect(() => {
+    console.group('🔍 Imports MusicDrawer');
+    console.log('→ MusicDrawer:', typeof MusicDrawer);
+    console.log('→ MusicPlayer:', typeof MusicPlayer);
+    Object.entries(DrawerUI).forEach(([k, v]) =>
+      console.log(`→ DrawerUI.${k}:`, typeof v)
+    );
+    console.groupEnd();
+    
     logger.debug('MusicDrawer stub mounted', { open });
     console.log('🔍 MusicDrawer stub mounted, open=', open);
   }, [open, logger]);
@@ -22,6 +32,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
   // Don't render anything if not open
   if (!open) return null;
   
+  // Render a simple stub first to isolate the issue
   return (
     <div style={{
       position: 'fixed',
