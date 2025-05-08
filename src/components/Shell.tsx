@@ -1,5 +1,5 @@
 
-import React, { memo } from "react";
+import React, { memo, ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 import GlobalNav from "./GlobalNav";
 import { Toaster } from "./ui/toaster";
@@ -8,7 +8,11 @@ import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
 import MusicDrawer from "./music/MusicDrawer";
 
-export const Shell: React.FC = () => {
+interface ShellProps {
+  children?: ReactNode;
+}
+
+export const Shell: React.FC<ShellProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
   
@@ -26,7 +30,7 @@ export const Shell: React.FC = () => {
         {/* Contenu principal */}
         <main className="flex-1 w-full">
           <div className="container max-w-[1400px] px-4 py-6 md:px-6 lg:px-8">
-            <Outlet />
+            {children || <Outlet />}
           </div>
         </main>
       </div>
