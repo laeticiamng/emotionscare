@@ -1,33 +1,12 @@
 
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;         // URL du fichier audio
-  cover?: string;      // URL de l'image de couverture
-}
+// Importing the MusicTrack and Playlist from index for consistency
+import { MusicTrack, MusicPlaylist as Playlist } from '@/types';
 
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;    // Required
-  url: string;         // Required for audio playback
-  audioUrl?: string;   // Optional alternative for compatibility
-  coverUrl?: string;   // Optional
-  cover?: string;      // Alias for coverUrl, optional
-  emotion?: string;    // Optional
-  isPlaying?: boolean; // Optional
-  externalUrl?: string; // Optional - URL pour ouvrir dans un lecteur externe
-}
+// Re-exporting with the correct type definitions
+export type { MusicTrack, Playlist };
 
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  emotion: string;
-  tracks: MusicTrack[];
-}
+// Types utilisés par les services de musique (maintaining backward compatibility)
+export interface Track extends MusicTrack {}
 
-// Types pour les émotions musicales
-export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
+// Make sure that this type is only used for legacy purposes
+// and that new code uses MusicTrack from the main types

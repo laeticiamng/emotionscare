@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Shield, Activity, Brain, Bar, BarChart, ChartPieIcon, BarChart3 } from 'lucide-react';
+import { Shield, Activity, Brain, BarChart3, ChartPieIcon } from 'lucide-react';
 
 const ValueProposition: React.FC = () => {
   return (

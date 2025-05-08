@@ -9,6 +9,24 @@ import SidebarNavGroup from './SidebarNavGroup';
 import SidebarFooter from './SidebarFooter';
 import ThemeButton from './ThemeButton';
 
+// Interface to ensure compatibility with NavItemConfig
+interface NavItemConfig {
+  path: string;
+  label: string;
+  icon: React.ElementType;
+  [key: string]: any;
+}
+
+// Function to convert NavItem to NavItemConfig
+const convertToNavItemConfig = (items: any[]) => {
+  return items.map(item => ({
+    path: item.href || "",
+    label: item.title || "",
+    icon: item.icon,
+    ...item
+  }));
+};
+
 // Inner component that uses the sidebar context
 const SidebarContent: React.FC = () => {
   const { user } = useAuth();
@@ -17,6 +35,8 @@ const SidebarContent: React.FC = () => {
   
   // Choisir les éléments de navigation en fonction du rôle
   const items = isAdmin ? adminSidebarItems : sidebarItems;
+  const configItems = convertToNavItemConfig(items);
+  const configFooterItems = convertToNavItemConfig(footerNavItems);
 
   return (
     <aside 
@@ -28,7 +48,7 @@ const SidebarContent: React.FC = () => {
       <div className="flex-1 overflow-y-auto py-4 px-2">
         <SidebarNavGroup
           title={isAdmin ? 'Outils Administrateur' : 'Outils Complémentaires'}
-          items={items}
+          items={configItems}
           collapsed={collapsed}
         />
 
@@ -37,7 +57,7 @@ const SidebarContent: React.FC = () => {
             <div className="my-2 border-t border-border"></div>
             <SidebarNavGroup
               title="Préférences"
-              items={footerNavItems}
+              items={configFooterItems}
               collapsed={collapsed}
             />
             

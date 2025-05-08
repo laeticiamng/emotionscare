@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import { AlertCircle, Pause, Play, Volume2, VolumeX, PictureInPicture, Maximize, Minimize, Clock } from 'lucide-react';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate, MusicTrack } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useMusic } from '@/contexts/MusicContext';
 import VRMusicTrackInfo from './VRMusicTrackInfo';
@@ -58,7 +57,12 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
       
       // Autoplay first track if a playlist is loaded
       if (playlist && playlist.tracks.length > 0 && !currentTrack) {
-        playTrack(playlist.tracks[0]);
+        // Ensure track has required audioUrl property
+        const track: MusicTrack = {
+          ...playlist.tracks[0],
+          audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].url || ''
+        };
+        playTrack(track);
       }
     }
   }, [emotion, loadPlaylistForEmotion, playTrack, EMOTION_TO_MUSIC_MAP, currentTrack]);

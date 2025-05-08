@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
@@ -147,20 +146,26 @@ export function useMusicRecommendationEngine() {
         selectedTrack = playlist.tracks[trackIndex];
       }
       
+      // Make sure the track conforms to the MusicTrack type
+      const normalizedTrack: MusicTrack = {
+        ...selectedTrack,
+        audioUrl: selectedTrack.audioUrl || selectedTrack.url || '',
+      };
+      
       // Autoplay si configuré
       if (config.shouldAutoplay) {
-        playTrack(selectedTrack);
+        playTrack(normalizedTrack);
         openDrawer();
       }
       
       setLastRecommendation({
         emotion: emotionName,
-        track: selectedTrack
+        track: normalizedTrack
       });
       
       return {
         playlist,
-        track: selectedTrack,
+        track: normalizedTrack,
         emotionCategory: getEmotionCategory(emotionName)
       };
       

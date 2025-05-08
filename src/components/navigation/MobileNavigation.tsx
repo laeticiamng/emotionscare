@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { topNavItems, sidebarItems, adminTopNavItems, adminSidebarItems } from './navConfig';
+import { sidebarItems, adminSidebarItems } from './navConfig';
 import { isAdminRole } from '@/utils/roleUtils';
 
 const MobileNavigation = () => {
@@ -21,34 +21,14 @@ const MobileNavigation = () => {
   const location = useLocation();
   const isAdmin = user ? isAdminRole(user.role) : false;
 
-  // Group navigation items
-  const topItems = isAdmin ? adminTopNavItems : topNavItems;
-  const sideItems = isAdmin ? adminSidebarItems : sidebarItems;
-  
-  // Combine both for mobile menu, with visual separators
-  const allNavigationItems = [
-    ...topItems.map(item => ({ ...item, section: 'principal' })),
-    ...sideItems.map(item => ({ ...item, section: 'outils' }))
-  ];
+  // Define navigation items directly from the sidebar config
+  const navigationItems = isAdmin ? adminSidebarItems : sidebarItems;
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const renderSectionHeader = (section: string, index: number) => {
-    const prevItem = index > 0 ? allNavigationItems[index - 1] : null;
-    if (index === 0 || (prevItem && prevItem.section !== section)) {
-      return (
-        <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
-          {section === 'principal' ? 'Navigation principale' : 'Outils complémentaires'}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Get theme icon and text based on current theme
   const getThemeIcon = () => {
     switch (theme) {
       case 'light':
@@ -119,13 +99,17 @@ const MobileNavigation = () => {
             )}
             
             <nav className="flex flex-col space-y-0 px-2">
-              {allNavigationItems.map((item, index) => {
-                const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+              {navigationItems.map((item, index) => {
+                const isActive = location.pathname === item.href || location.pathname.startsWith(`${item.href}/`);
                 return (
-                  <React.Fragment key={item.path}>
-                    {renderSectionHeader(item.section, index)}
+                  <React.Fragment key={item.href}>
+                    {index === 0 || index === Math.floor(navigationItems.length / 2) ? (
+                      <div className="px-3 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+                        {index === 0 ? 'Navigation principale' : 'Outils complémentaires'}
+                      </div>
+                    ) : null}
                     <NavLink
-                      to={item.path}
+                      to={item.href}
                       className={cn(
                         "flex items-center py-2 px-3 rounded-md transition-colors text-sm",
                         isActive
@@ -134,8 +118,8 @@ const MobileNavigation = () => {
                       )}
                       onClick={() => setIsOpen(false)}
                     >
-                      {React.cloneElement(item.icon, { className: "w-4 h-4 mr-2" })}
-                      <span>{item.label}</span>
+                      {React.createElement(item.icon, { className: "w-4 h-4 mr-2" })}
+                      <span>{item.title}</span>
                     </NavLink>
                   </React.Fragment>
                 );

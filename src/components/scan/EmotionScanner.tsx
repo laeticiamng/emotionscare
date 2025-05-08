@@ -3,7 +3,7 @@ import React, { useState, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScannerIcon, Mic, FileText } from "lucide-react";
+import { ScanIcon, Mic, FileText } from "lucide-react";
 import AudioRecorder from "./AudioRecorder";
 import EmotionScanResult from "./EmotionScanResult";
 import { useAuth } from '@/contexts/AuthContext';
@@ -102,7 +102,7 @@ const EmotionScanner: React.FC<Props> = ({ onEmotionDetected }) => {
               disabled={loading || (!text && !audioUrl)}
               className="flex items-center gap-2"
             >
-              <ScannerIcon className="h-4 w-4" />
+              <ScanIcon className="h-4 w-4" />
               {loading ? "Analyse en cours..." : "Analyser"}
             </Button>
           </div>

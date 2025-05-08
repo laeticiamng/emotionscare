@@ -35,11 +35,11 @@ const MainNavigation: React.FC = () => {
     <div className="flex flex-col gap-2 py-2">
       {navigationItems.map((item) => (
         <NavItem
-          key={item.path}
+          key={item.href}
           icon={item.icon}
-          label={item.label}
-          to={item.path}
-          active={pathname === item.path || pathname.startsWith(`${item.path}/`)}
+          label={item.title}
+          to={item.href}
+          active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
         />
       ))}
       

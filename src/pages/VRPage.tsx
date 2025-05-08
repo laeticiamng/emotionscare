@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
@@ -143,6 +142,9 @@ const VRPage: React.FC = () => {
               <VRSessionWithMusic
                 template={activeTemplate}
                 onCompleteSession={handleCompleteSession}
+                isAudioOnly={activeTemplate.is_audio_only}
+                audioUrl={activeTemplate.audio_url || ''}
+                emotion={activeTemplate.recommended_mood || 'calm'}
               />
             ) : (
               <VRSessionView
