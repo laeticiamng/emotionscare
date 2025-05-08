@@ -58,8 +58,8 @@ serve(async (req) => {
     // Construire un prompt adapté au contexte de l'utilisateur
     const systemPrompt = userContext ? 
       `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
-       L'utilisateur a récemment ressenti: ${userContext.recentEmotions || 'des émotions variées'}.
-       Son état émotionnel actuel est évalué à: ${userContext.currentScore || 'non disponible'}/100.
+       ${userContext.recentEmotions ? `L'utilisateur a récemment ressenti: ${userContext.recentEmotions}.` : ''}
+       ${userContext.currentScore ? `Son état émotionnel actuel est évalué à: ${userContext.currentScore}/100.` : ''}
        ${userContext.lastEmotionDate ? `Sa dernière émotion enregistrée date de: ${userContext.lastEmotionDate}` : ''}
        Adapte tes réponses à son contexte émotionnel, reste bienveillant et factuel. 
        Réponds toujours en français de manière précise et directe.` :

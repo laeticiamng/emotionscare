@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Send } from 'lucide-react';
 import { ChatMessage } from '@/types/chat';
+import { useCoach } from '@/hooks/coach/useCoach';
+import { useActivity } from '@/hooks/useActivity';
 
 const CoachChatPage = () => {
   const [userMessage, setUserMessage] = useState('');
@@ -21,6 +23,8 @@ const CoachChatPage = () => {
     },
   ]);
   const { toast } = useToast();
+  const { askQuestion, generateRecommendation } = useCoach();
+  const { logActivity } = useActivity();
   const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,31 +61,42 @@ const CoachChatPage = () => {
     setUserMessage('');
     setIsLoading(true);
     
-    // Simuler une réponse du coach IA (à remplacer par une vraie API)
-    setTimeout(() => {
+    try {
+      // Log d'activité
+      logActivity('coach_chat', { message: messageText });
+      
+      // Obtenir une réponse du coach IA
+      const response = await askQuestion(messageText);
+      
+      // Ajouter la réponse du coach
       const botResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        text: generateCoachResponse(messageText),
+        text: response,
         sender: 'bot',
         timestamp: new Date(),
       };
       
       setMessages((prevMessages) => [...prevMessages, botResponse]);
+    } catch (error) {
+      console.error('Error sending message to coach:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de communiquer avec le coach IA",
+        variant: "destructive"
+      });
+      
+      // Ajouter un message d'erreur
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: "Je suis désolé, mais je rencontre des difficultés techniques. Veuillez réessayer plus tard.",
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
-  };
-  
-  // Fonction temporaire pour générer une réponse en attendant l'intégration avec l'API
-  const generateCoachResponse = (question: string): string => {
-    const responses = [
-      "C'est une excellente question. Je vous suggère de prendre le temps de réfléchir à vos priorités et à ce qui compte vraiment pour vous.",
-      "Pour gérer ce type de situation, essayez de pratiquer la pleine conscience pendant quelques minutes chaque jour.",
-      "Votre bien-être est important. Avez-vous pensé à intégrer de courtes pauses dans votre journée de travail ?",
-      "Je comprends ce que vous ressentez. Beaucoup de personnes font face à des défis similaires. Essayez de vous concentrer sur les aspects que vous pouvez contrôler.",
-      "Une approche qui pourrait vous aider serait d'établir une routine matinale qui vous prépare mentalement pour la journée.",
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
+    }
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {

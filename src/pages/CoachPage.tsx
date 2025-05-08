@@ -7,23 +7,31 @@ import { Input } from '@/components/ui/input';
 import { MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useActivity } from '@/hooks/useActivity';
 
 const CoachPage = () => {
   const [userQuestion, setUserQuestion] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { logActivity } = useActivity();
   
   const handleStartCoaching = () => {
     if (userQuestion.trim()) {
+      // Log d'activité 
+      logActivity('coach_start', { withQuestion: true, question: userQuestion });
       // Naviguer vers la page de chat avec la question initiale
       navigate('/coach-chat', { state: { initialQuestion: userQuestion } });
     } else {
+      // Log d'activité
+      logActivity('coach_start', { withQuestion: false });
       // Naviguer simplement vers la page de chat
       navigate('/coach-chat');
     }
   };
   
   const handleQuickQuestion = (question: string) => {
+    // Log d'activité
+    logActivity('coach_quick_question', { question });
     navigate('/coach-chat', { state: { initialQuestion: question } });
   };
   
@@ -89,7 +97,10 @@ const CoachPage = () => {
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-muted-foreground">Recommandations basées sur votre profil émotionnel récent.</p>
-              <Button onClick={() => toast({ title: "Fonctionnalité à venir", description: "Les recommandations personnalisées seront bientôt disponibles." })}>
+              <Button onClick={() => {
+                logActivity('view_recommendations');
+                toast({ title: "Fonctionnalité à venir", description: "Les recommandations personnalisées seront bientôt disponibles." });
+              }}>
                 Voir mes recommandations
               </Button>
             </CardContent>
@@ -101,7 +112,13 @@ const CoachPage = () => {
             </CardHeader>
             <CardContent>
               <p className="mb-4 text-muted-foreground">Retrouvez l'historique de vos échanges avec le coach IA.</p>
-              <Button onClick={() => navigate('/coach-chat')} variant="outline">
+              <Button 
+                onClick={() => {
+                  logActivity('view_chat_history');
+                  navigate('/coach-chat');
+                }} 
+                variant="outline"
+              >
                 Voir l'historique
               </Button>
             </CardContent>
