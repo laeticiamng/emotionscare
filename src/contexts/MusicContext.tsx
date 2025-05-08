@@ -1,9 +1,10 @@
+
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { convertTrackToMusicTrack, convertPlaylistToMusicPlaylist } from '@/services/music/converters';
 import { usePlaylistManager } from '@/hooks/usePlaylistManager';
-import { useAudioPlayer } from '@/components/music/player/useAudioPlayer';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { getPlaylist } from '@/services/music/playlist-service';
 
 interface MusicContextType {
