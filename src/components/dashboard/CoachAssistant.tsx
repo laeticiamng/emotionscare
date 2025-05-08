@@ -1,15 +1,17 @@
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, MessageCircle } from 'lucide-react';
+import { Sparkles, MessageCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useNavigate } from 'react-router-dom';
 import { useApiConnection } from '@/hooks/dashboard/useApiConnection';
 import { useCoachDashboard } from '@/hooks/dashboard/useCoachDashboard';
 import QuickSuggestions from './coach/QuickSuggestions';
 import CoachRecommendations from './coach/CoachRecommendations';
+
+// Import paresseux de l'interface de chat pour améliorer les performances initiales
+const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'));
 
 interface CoachAssistantProps {
   className?: string;
@@ -18,8 +20,8 @@ interface CoachAssistantProps {
 
 /**
  * Coach Assistant AI Component
- * Displays an interactive chat interface with OpenAI API (GPT-4)
- * Provides contextualized responses based on user emotional state
+ * Affiche une interface de chat interactive avec OpenAI API (GPT-4)
+ * Fournit des réponses contextualisées basées sur l'état émotionnel de l'utilisateur
  */
 const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => {
   const navigate = useNavigate();
@@ -43,7 +45,7 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
         <CardTitle className="flex items-center justify-between text-xl heading-premium">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Coach IA {apiReady ? '' : '(Limité)'}
+            Coach IA {!apiReady && <span className="text-xs text-muted-foreground">(Limité)</span>}
           </div>
           <Button 
             variant="ghost" 
@@ -58,8 +60,14 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
       </CardHeader>
       
       <CardContent className="flex-1 p-0 flex flex-col">
-        <div className="flex-1">
-          <ChatInterface standalone={false} />
+        <div className="flex-1 min-h-[200px]">
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          }>
+            <ChatInterface standalone={false} />
+          </Suspense>
         </div>
         
         <CoachRecommendations

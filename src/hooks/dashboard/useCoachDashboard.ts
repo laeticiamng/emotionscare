@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useCoach } from '@/hooks/coach/useCoach';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +12,7 @@ export function useCoachDashboard() {
   const { recommendations, triggerDailyReminder, isProcessing } = useCoach();
   const { loadPlaylistForEmotion, openDrawer } = useMusic();
   const { apiReady, apiCheckInProgress } = useApiConnection();
+  const hasTriggeredInitialReminder = useRef(false);
   
   // Questions rapides prédéfinies - peut être étendu ultérieurement pour être chargé depuis une API
   const [quickSuggestions] = useState<string[]>([
@@ -66,9 +67,10 @@ export function useCoachDashboard() {
           title: "Recommandations actualisées",
           description: "Nouvelles recommandations personnalisées"
         });
+        hasTriggeredInitialReminder.current = true;
       })
       .catch(err => {
-        console.error("Error refreshing recommendations:", err);
+        console.error("Erreur lors de l'actualisation des recommandations:", err);
         toast({
           title: "Erreur",
           description: "Impossible d'actualiser les recommandations",
@@ -77,17 +79,21 @@ export function useCoachDashboard() {
       });
   }, [user?.id, apiReady, triggerDailyReminder, toast]);
 
-  // Déclencher les recommandations quotidiennes au chargement du composant
-  // Avec une meilleure gestion des conditions et un délai retardé
+  // Déclencher les recommandations quotidiennes au chargement du composant avec une meilleure gestion
   useEffect(() => {
-    // Ne faire la requête que si toutes les conditions sont réunies
-    if (user?.id && apiReady && !apiCheckInProgress && !isProcessing) {
+    // Ne faire la requête que si toutes les conditions sont réunies et si nous ne l'avons pas déjà fait
+    if (user?.id && apiReady && !apiCheckInProgress && !isProcessing && !hasTriggeredInitialReminder.current) {
       // Délai pour éviter de bloquer le rendu
       const reminderTimeout = setTimeout(() => {
-        triggerDailyReminder().catch(err => {
-          console.error("Error triggering daily reminder:", err);
-        });
-      }, 2000); // Délai plus long pour éviter les problèmes de chargement
+        console.log("Déclenchement automatique des recommandations quotidiennes");
+        triggerDailyReminder()
+          .then(() => {
+            hasTriggeredInitialReminder.current = true;
+          })
+          .catch(err => {
+            console.error("Erreur lors du déclenchement des rappels quotidiens:", err);
+          });
+      }, 2500); // Délai plus long pour éviter les problèmes de chargement
       
       return () => clearTimeout(reminderTimeout);
     }

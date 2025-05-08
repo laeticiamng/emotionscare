@@ -21,27 +21,35 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
     setActiveQuestion(suggestion);
     
     try {
-      // Try to find the input element with a more reliable selector
-      const input = document.querySelector('input[placeholder*="message"], input[placeholder*="Message"]') as HTMLInputElement;
+      // Essayer de trouver l'élément d'entrée avec un sélecteur plus fiable
+      const input = document.querySelector('input[placeholder*="message"], input[placeholder*="Message"], input[type="text"]') as HTMLInputElement;
       const form = input?.closest('form');
       const button = form?.querySelector('button[type="submit"]') as HTMLButtonElement;
       
       if (input && button) {
-        // Set input value and trigger React's change event
+        // Définir la valeur d'entrée et déclencher l'événement de changement de React
         input.value = suggestion;
         const event = new Event('input', { bubbles: true });
         input.dispatchEvent(event);
         
-        // Use a short timeout to ensure React has processed the state update
+        // Utiliser un petit délai pour s'assurer que React a traité la mise à jour de l'état
         setTimeout(() => {
           button.click();
-          setIsProcessing(false);
-          setActiveQuestion(null);
-        }, 50);
+          
+          toast({
+            title: "Question envoyée",
+            description: suggestion,
+          });
+          
+          setTimeout(() => {
+            setIsProcessing(false);
+            setActiveQuestion(null);
+          }, 300);
+        }, 100);
       } else {
-        // Fallback: navigate to coach chat with the question
+        // Solution de repli: naviguer vers le chat coach avec la question
         toast({
-          title: "Question posée",
+          title: "Redirection vers le coach",
           description: suggestion
         });
         navigate('/coach-chat', { state: { initialQuestion: suggestion } });
@@ -49,11 +57,11 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
         setActiveQuestion(null);
       }
     } catch (error) {
-      console.error('Error processing suggestion:', error);
-      // Ensure we reset processing state even on error
+      console.error('Erreur lors du traitement de la suggestion:', error);
+      // S'assurer que nous réinitialisons l'état de traitement même en cas d'erreur
       toast({
         title: "Erreur",
-        description: "Impossible de traiter votre demande",
+        description: "Impossible de traiter votre demande. Veuillez réessayer.",
         variant: "destructive"
       });
       setIsProcessing(false);
@@ -69,7 +77,7 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
             key={index} 
             variant="outline" 
             size="sm" 
-            className={`text-xs ${activeQuestion === suggestion ? 'bg-primary/10' : ''}`}
+            className={`text-xs transition-all duration-200 ${activeQuestion === suggestion ? 'bg-primary/10' : ''}`}
             onClick={() => handleSuggestionClick(suggestion)}
             disabled={isProcessing}
             aria-busy={isProcessing && activeQuestion === suggestion}

@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { AlertOctagon, Brain, RefreshCw, Music } from 'lucide-react';
+import { AlertOctagon, Brain, RefreshCw, Music, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CoachRecommendationsProps {
   recommendations: string[];
@@ -32,16 +33,25 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
               <Brain className="h-4 w-4" />
               Recommandations IA
             </h4>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-6 w-6" 
-              disabled={isLoading} 
-              onClick={onRefresh}
-              aria-label="Rafraîchir les recommandations"
-            >
-              <RefreshCw className={cn("h-3 w-3", isLoading && "animate-spin")} />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6" 
+                    disabled={isLoading} 
+                    onClick={onRefresh}
+                    aria-label="Rafraîchir les recommandations"
+                  >
+                    <RefreshCw className={cn("h-3 w-3", isLoading && "animate-spin")} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Actualiser les recommandations</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div className="text-xs text-muted-foreground flex items-center gap-1 mb-3">
             <AlertOctagon className="h-3 w-3" /> 
@@ -70,39 +80,54 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
             <Brain className="h-4 w-4" />
             Recommandations IA
           </h4>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-6 w-6" 
-            disabled={isLoading} 
-            onClick={onRefresh}
-            aria-label="Rafraîchir les recommandations"
-          >
-            <RefreshCw className={cn("h-3 w-3", isLoading && "animate-spin")} />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6" 
+                  disabled={isLoading} 
+                  onClick={onRefresh}
+                  aria-label="Rafraîchir les recommandations"
+                >
+                  <RefreshCw className={cn("h-3 w-3", isLoading && "animate-spin")} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Actualiser les recommandations</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="space-y-2">
-          {recommendations.slice(0, 1).map((rec, i) => (
-            <div key={i} className="text-xs flex gap-2 items-start">
-              <span className="text-primary">•</span>
+          {recommendations.map((rec, i) => (
+            <div key={i} className="text-xs flex gap-2 items-start p-2 bg-background/40 rounded-md transition-all hover:bg-background/60">
+              <span className="text-primary mt-0.5">•</span>
               <span>{rec}</span>
             </div>
           ))}
-          {recommendations.length > 1 && (
-            <div className="text-xs text-muted-foreground text-right">
-              + {recommendations.length - 1} autre(s)
-            </div>
-          )}
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="w-full text-xs h-7 mt-1"
-            onClick={onPlayMusic}
-            disabled={isLoading}
-          >
-            <Music className="h-3 w-3 mr-1" />
-            Écouter musique recommandée
-          </Button>
+          <div className="flex gap-2 mt-3">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="flex-1 text-xs h-7"
+              onClick={onPlayMusic}
+              disabled={isLoading}
+            >
+              <Music className="h-3 w-3 mr-1" />
+              Musique recommandée
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="text-xs h-7 w-8 flex items-center justify-center"
+              onClick={() => window.open('/well-being', '_blank')}
+              title="Plus de conseils bien-être"
+            >
+              <ExternalLink className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
