@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -75,8 +76,8 @@ function AppRoutes({ toast }) {
         <Route path="/music/create" element={<ProtectedLayout><MusicGenerationPage /></ProtectedLayout>} />
         
         {/* Coach routes */}
-        <Route path="/coach" element={<CoachPage />} />
-        <Route path="/coach-chat" element={<CoachChatPage />} />
+        <Route path="/coach" element={<ProtectedLayout><CoachPage /></ProtectedLayout>} />
+        <Route path="/coach-chat" element={<ProtectedLayout><CoachChatPage /></ProtectedLayout>} />
         
         {/* Not Found Route - fallback for all other routes */}
         <Route path="*" element={<NotFoundPage />} />
