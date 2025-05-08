@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { convertTrackToMusicTrack, convertPlaylistToMusicPlaylist } from '@/services/music/converters';
 import { usePlaylistManager } from '@/hooks/usePlaylistManager';
 import { useAudioPlayer } from '@/components/music/player/useAudioPlayer';
+import { getPlaylist } from '@/services/music/playlist-service';
 
 interface MusicContextType {
   currentTrack: MusicTrack | null;
@@ -22,6 +23,12 @@ interface MusicContextType {
   isDrawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
+  
+  // Nouvelles propriétés nécessaires
+  initializeMusicSystem: () => Promise<void>;
+  error: string | null;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -30,10 +37,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
+  const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   const { toast } = useToast();
   const { 
-    playlists, 
+    playlists: playlistsData, 
     currentPlaylistId, 
     getCurrentPlaylist, 
     loadPlaylistForEmotion: loadPlaylist 
@@ -52,6 +61,34 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     ? convertPlaylistToMusicPlaylist(getCurrentPlaylist()!) 
     : null;
 
+  // Conversion des playlists au format MusicPlaylist[]
+  const playlists = Object.values(playlistsData).map(playlist => 
+    convertPlaylistToMusicPlaylist(playlist)
+  );
+
+  // Initialisation du système musical
+  const initializeMusicSystem = useCallback(async () => {
+    try {
+      setError(null);
+      console.log('Initialisation du système musical...');
+      // Simuler un chargement asynchrone
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsInitialized(true);
+      toast({
+        title: "Système musical initialisé",
+        description: "Prêt à jouer de la musique"
+      });
+    } catch (err) {
+      console.error('Erreur lors de l\'initialisation du système musical:', err);
+      setError('Impossible d\'initialiser le système musical');
+      toast({
+        title: "Erreur d'initialisation",
+        description: "Impossible d'initialiser le système musical",
+        variant: "destructive"
+      });
+    }
+  }, [toast]);
+
   // Fonction pour charger une playlist basée sur une émotion
   const loadPlaylistForEmotion = useCallback((emotion: string) => {
     const playlist = loadPlaylist(emotion);
@@ -63,11 +100,40 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     return null;
   }, [loadPlaylist]);
+
+  // Fonction pour charger une playlist par ID
+  const loadPlaylistById = useCallback(async (id: string) => {
+    try {
+      const playlist = await getPlaylist(id);
+      if (playlist) {
+        const musicPlaylist = convertPlaylistToMusicPlaylist(playlist);
+        if (musicPlaylist.tracks.length > 0) {
+          setCurrentTrack(musicPlaylist.tracks[0]);
+          playTrack(musicPlaylist.tracks[0]);
+        }
+        return musicPlaylist;
+      }
+      return null;
+    } catch (err) {
+      console.error('Erreur lors du chargement de la playlist:', err);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la playlist",
+        variant: "destructive"
+      });
+      return null;
+    }
+  }, [toast]);
   
   // Fonctions de contrôle de lecture
   const playTrack = useCallback((track: MusicTrack) => {
     setCurrentTrack(track);
-    playAudioTrack(convertTrackToMusicTrack(track));
+    // Assurons-nous que track a toujours une propriété url
+    const trackWithUrl = {
+      ...track,
+      url: track.url || track.audioUrl
+    };
+    playAudioTrack(trackWithUrl);
   }, [playAudioTrack]);
   
   const pauseTrack = pauseAudioTrack;
@@ -100,6 +166,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const openDrawer = () => setIsDrawerOpen(true);
   const closeDrawer = () => setIsDrawerOpen(false);
 
+  // Initialiser le système musical au chargement du contexte
+  useEffect(() => {
+    if (!isInitialized) {
+      initializeMusicSystem();
+    }
+  }, [isInitialized, initializeMusicSystem]);
+
   return (
     <MusicContext.Provider value={{
       currentTrack,
@@ -116,7 +189,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       loadPlaylistForEmotion,
       isDrawerOpen,
       openDrawer,
-      closeDrawer
+      closeDrawer,
+      // Nouvelles propriétés
+      initializeMusicSystem,
+      error,
+      playlists,
+      loadPlaylistById
     }}>
       {children}
     </MusicContext.Provider>

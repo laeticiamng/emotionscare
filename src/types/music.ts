@@ -17,7 +17,7 @@ export interface MusicTrack {
   coverUrl: string;
   emotion?: string;
   // Additional properties for compatibility
-  url?: string;      // Alias for audioUrl
+  url: string;      // Alias for audioUrl - maintenant requis
   cover?: string;    // Alias for coverUrl
   isPlaying?: boolean;
   externalUrl?: string; // URL pour ouvrir dans un lecteur externe

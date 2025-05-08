@@ -10,7 +10,7 @@ interface MusicStats {
 }
 
 export function useMusicStats() {
-  const { currentPlaylist, playlists, currentEmotion } = useMusic();
+  const { currentPlaylist, currentEmotion } = useMusic();
   const [stats, setStats] = useState<MusicStats>({
     mostPlayedTrack: null,
     mostPlayedArtist: null,
