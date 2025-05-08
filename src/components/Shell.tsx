@@ -1,5 +1,5 @@
 
-import React, { memo, ReactNode, Suspense, useEffect, useState } from "react";
+import React, { memo, ReactNode, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import GlobalNav from "./GlobalNav";
 import { Toaster } from "./ui/toaster";
@@ -8,8 +8,8 @@ import Sidebar from "./ui/sidebar";
 import useLogger from "@/hooks/useLogger";
 import useDrawerState from "@/hooks/useDrawerState";
 
-// Type definition for our drawer component
-type DrawerComponentType = React.ComponentType<{
+// Type pour notre composant MusicDrawer
+type MusicDrawerComponent = React.ComponentType<{
   open: boolean;
   onClose: () => void;
 }>;
@@ -23,15 +23,15 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
   const logger = useLogger('Shell');
   const { isDrawerOpen, closeDrawer, openDrawer, toggleDrawer } = useDrawerState();
   
-  // State to hold the dynamically loaded MusicDrawer component
-  const [MusicDrawerComponent, setMusicDrawerComponent] = useState<DrawerComponentType | null>(null);
+  // État pour stocker le composant chargé dynamiquement
+  const [MusicDrawerComponent, setMusicDrawerComponent] = useState<MusicDrawerComponent | null>(null);
   
-  // Load the MusicDrawer component dynamically
+  // Charger le composant MusicDrawer dynamiquement
   useEffect(() => {
+    // Utilisation de l'import dynamique avec un typage plus flexible
     import('./music/player/MusicDrawer')
       .then((module: any) => {
-        // Try to get either default export or named export
-        // Using any type to avoid TypeScript errors with potential non-existent properties
+        // Essayer d'obtenir soit l'export par défaut soit l'export nommé
         const Component = module.default || module.MusicDrawer;
         
         if (Component && (typeof Component === 'function' || typeof Component.render === 'function')) {
