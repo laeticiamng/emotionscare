@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,7 +83,7 @@ const MusicCreator: React.FC = () => {
             
             toast({
               title: "Musique générée avec succès",
-              description: `"${title || 'Nouvelle composition'}" est maintenant disponible",
+              description: `"${title || 'Nouvelle composition'}" est maintenant disponible`
             });
             
             return 0;
@@ -194,7 +195,6 @@ const MusicCreator: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
         {/* Left Side - Configuration Form */}
         <Card className="lg:col-span-4">
-          {/* ... keep existing code (CardHeader, CardContent) the same */}
           <CardHeader>
             <CardTitle>Paramètres de composition</CardTitle>
             <CardDescription>Personnalisez votre musique selon vos préférences</CardDescription>
