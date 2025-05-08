@@ -12,7 +12,7 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;    // Changed from optional to required
+  duration: number;    // Required
   audioUrl: string;
   coverUrl: string;
   emotion?: string;
