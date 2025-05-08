@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Drawer,
   DrawerContent, 
@@ -34,6 +34,11 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
   // Don't render anything if not open
   if (!open) return null;
   
+  // Log dans useEffect pour s'assurer qu'il s'exécute au montage
+  useEffect(() => {
+    console.log('✅ MusicDrawer rendu avec succès');
+  }, []);
+  
   return (
     <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DrawerContent className="max-h-[80vh] focus:outline-none">
@@ -52,8 +57,10 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
         </DrawerHeader>
         <div className="px-4 pb-4">
           {/* Stub MusicPlayer */}
-          {console.log('✅ MusicPlayer stub rendered')}
-          <div>MusicPlayer stub OK!</div>
+          {/* Corriger : ne pas utiliser console.log dans le JSX */}
+          <div className="p-4 border rounded-md bg-slate-50">
+            MusicPlayer stub OK!
+          </div>
         </div>
       </DrawerContent>
     </Drawer>
