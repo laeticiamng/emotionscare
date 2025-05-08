@@ -16,7 +16,7 @@ interface ShellProps {
 const Shell: React.FC<ShellProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const logger = useLogger('Shell');
-  const { isDrawerOpen, closeDrawer, openDrawer } = useDrawerState();
+  const { isDrawerOpen, closeDrawer, openDrawer, toggleDrawer } = useDrawerState();
   
   logger.debug('Rendering shell component', { data: { isMobile, isDrawerOpen } });
 
