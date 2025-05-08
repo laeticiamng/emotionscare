@@ -14,11 +14,12 @@ export function useChatHistory() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   
   const {
     conversations,
     activeConversationId,
-    isLoading,
+    isLoading: isLoadingConversations,
     setActiveConversationId,
     loadConversations,
     createConversation,
@@ -26,13 +27,21 @@ export function useChatHistory() {
     updateConversation
   } = useConversations();
   
-  const { loadMessages, saveMessages } = useMessages();
+  const { 
+    loadMessages, 
+    saveMessages,
+    isLoadingMessages,
+    isSavingMessages
+  } = useMessages();
 
   // Load initial conversations
   useEffect(() => {
     if (user?.id && !isInitialized) {
       console.log('Loading initial conversations for user:', user.id);
-      loadConversations().then(() => setIsInitialized(true));
+      setIsLoadingHistory(true);
+      loadConversations()
+        .then(() => setIsInitialized(true))
+        .finally(() => setIsLoadingHistory(false));
     }
   }, [user?.id, loadConversations, isInitialized]);
 
@@ -52,13 +61,20 @@ export function useChatHistory() {
       if (!activeConversationId) {
         // Create a new conversation if none is active
         const firstUserMessage = messages.find(m => m.sender === 'user');
-        const title = firstUserMessage ? firstUserMessage.text.substring(0, 50) : "Nouvelle conversation";
+        const title = firstUserMessage 
+          ? firstUserMessage.text.substring(0, 50) 
+          : "Nouvelle conversation";
         console.log('Creating new conversation with title:', title);
         
         const conversationId = await createConversation(title);
         
         if (!conversationId) {
           console.error('Failed to create conversation');
+          toast({
+            title: "Erreur",
+            description: "Impossible de créer une nouvelle conversation.",
+            variant: "destructive"
+          });
           return false;
         }
         
@@ -72,7 +88,10 @@ export function useChatHistory() {
         // Update conversation title and last message if there are messages
         if (result && messages.length > 0) {
           const lastMessage = messages[messages.length - 1];
-          const title = messages.find(m => m.sender === 'user')?.text.substring(0, 50) || 'Nouvelle conversation';
+          const firstUserMessage = messages.find(m => m.sender === 'user');
+          const title = firstUserMessage 
+            ? firstUserMessage.text.substring(0, 50) 
+            : 'Nouvelle conversation';
           
           await updateConversation(
             activeConversationId, 
@@ -107,7 +126,7 @@ export function useChatHistory() {
   return {
     conversations,
     activeConversationId,
-    isLoading,
+    isLoading: isLoadingConversations || isLoadingHistory || isLoadingMessages || isSavingMessages,
     isInitialized,
     createConversation,
     deleteConversation,

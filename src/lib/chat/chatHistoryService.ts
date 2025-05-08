@@ -21,6 +21,11 @@ export const chatHistoryService = {
    */
   async getConversations(userId: string): Promise<ChatConversation[]> {
     try {
+      if (!userId) {
+        console.error('No user ID provided to getConversations');
+        return [];
+      }
+      
       console.log('Fetching conversations for user:', userId);
       const { data, error } = await supabase
         .from('chat_conversations')
@@ -53,6 +58,11 @@ export const chatHistoryService = {
    */
   async createConversation(userId: string, title: string): Promise<string | null> {
     try {
+      if (!userId) {
+        console.error('No user ID provided to createConversation');
+        return null;
+      }
+      
       console.log('Creating conversation for user:', userId);
       const { data, error } = await supabase
         .from('chat_conversations')
@@ -81,6 +91,11 @@ export const chatHistoryService = {
    */
   async updateConversation(conversationId: string, title: string, lastMessage: string): Promise<boolean> {
     try {
+      if (!conversationId) {
+        console.error('No conversation ID provided to updateConversation');
+        return false;
+      }
+      
       console.log('Updating conversation:', conversationId);
       const { error } = await supabase
         .from('chat_conversations')
@@ -107,6 +122,11 @@ export const chatHistoryService = {
    */
   async deleteConversation(conversationId: string): Promise<boolean> {
     try {
+      if (!conversationId) {
+        console.error('No conversation ID provided to deleteConversation');
+        return false;
+      }
+      
       console.log('Deleting conversation:', conversationId);
       // Due to cascade delete in the database, we only need to delete the conversation
       const { error } = await supabase
@@ -131,6 +151,11 @@ export const chatHistoryService = {
    */
   async getMessages(conversationId: string): Promise<ChatMessage[]> {
     try {
+      if (!conversationId) {
+        console.error('No conversation ID provided to getMessages');
+        return [];
+      }
+      
       console.log('Fetching messages for conversation:', conversationId);
       const { data, error } = await supabase
         .from('chat_messages')
@@ -140,6 +165,11 @@ export const chatHistoryService = {
       
       if (error) {
         console.error('Error fetching messages:', error);
+        return [];
+      }
+      
+      if (!data || data.length === 0) {
+        console.log('No messages found for conversation:', conversationId);
         return [];
       }
       
@@ -166,6 +196,11 @@ export const chatHistoryService = {
         return false;
       }
       
+      if (!messages || messages.length === 0) {
+        console.warn('No messages to save for conversation:', conversationId);
+        return false;
+      }
+      
       console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
       // Filter for messages that need to be saved
       const messagesToSave = messages.map(message => ({
@@ -186,6 +221,7 @@ export const chatHistoryService = {
         return false;
       }
       
+      console.log('Successfully saved messages for conversation:', conversationId);
       return true;
     } catch (error) {
       console.error('Error saving messages:', error);

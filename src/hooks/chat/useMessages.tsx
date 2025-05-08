@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { chatHistoryService } from '@/lib/chat/chatHistoryService';
 import { useToast } from '@/hooks/use-toast';
@@ -9,15 +9,18 @@ import { useToast } from '@/hooks/use-toast';
  */
 export function useMessages() {
   const { toast } = useToast();
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isSavingMessages, setIsSavingMessages] = useState(false);
 
   // Load messages for a conversation
   const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
+    if (!conversationId) {
+      console.error('No conversation ID provided to loadMessages');
+      return [];
+    }
+    
+    setIsLoadingMessages(true);
     try {
-      if (!conversationId) {
-        console.error('No conversation ID provided to loadMessages');
-        return [];
-      }
-      
       console.log('Loading messages for conversation:', conversationId);
       const messages = await chatHistoryService.getMessages(conversationId);
       console.log('Loaded messages:', messages.length);
@@ -30,6 +33,8 @@ export function useMessages() {
         variant: "destructive"
       });
       return [];
+    } finally {
+      setIsLoadingMessages(false);
     }
   }, [toast]);
 
@@ -38,27 +43,48 @@ export function useMessages() {
     conversationId: string, 
     messages: ChatMessage[]
   ): Promise<boolean> => {
-    try {
-      if (!conversationId) {
-        console.error('No conversation ID provided to saveMessages');
-        return false;
-      }
-      
-      if (!messages || messages.length === 0) {
-        console.warn('No messages to save');
-        return false;
-      }
-      
-      console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
-      return await chatHistoryService.saveMessages(conversationId, messages);
-    } catch (error) {
-      console.error('Error saving messages:', error);
+    if (!conversationId) {
+      console.error('No conversation ID provided to saveMessages');
       return false;
     }
-  }, []);
+    
+    if (!messages || messages.length === 0) {
+      console.warn('No messages to save');
+      return false;
+    }
+    
+    setIsSavingMessages(true);
+    try {
+      console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
+      const result = await chatHistoryService.saveMessages(conversationId, messages);
+      
+      if (!result) {
+        console.error('Failed to save messages');
+        toast({
+          title: "Erreur",
+          description: "Impossible de sauvegarder les messages.",
+          variant: "destructive"
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error saving messages:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les messages.",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setIsSavingMessages(false);
+    }
+  }, [toast]);
 
   return {
     loadMessages,
-    saveMessages
+    saveMessages,
+    isLoadingMessages,
+    isSavingMessages
   };
 }

@@ -15,7 +15,7 @@ const CoachChatPage = () => {
     setMessages,
     userMessage, 
     setUserMessage, 
-    isLoading, 
+    isLoading: isLoadingChat, 
     typingIndicator,
     handleSendMessage, 
     handleKeyDown, 
@@ -26,8 +26,15 @@ const CoachChatPage = () => {
 
   const location = useLocation();
   const { toast } = useToast();
-  const { loadMessages, activeConversationId, setActiveConversationId } = useChatHistory();
+  const { 
+    loadMessages, 
+    activeConversationId, 
+    setActiveConversationId,
+    isLoading: isLoadingHistory
+  } = useChatHistory();
+  
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [isLoadingConversation, setIsLoadingConversation] = useState(false);
   
   // Watch for active conversation changes
   useEffect(() => {
@@ -46,12 +53,16 @@ const CoachChatPage = () => {
       setCurrentConversationId(null);
       resetMessages();
       handleSendMessage(state.initialQuestion);
+      
+      // Clear the state to prevent re-sending on navigation
+      window.history.replaceState({}, document.title);
     }
   }, [location.state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle loading conversation
   const handleLoadConversation = async (conversationId: string) => {
     try {
+      setIsLoadingConversation(true);
       console.log('Loading conversation:', conversationId);
       const loadedMessages = await loadMessages(conversationId);
       if (loadedMessages.length > 0) {
@@ -62,6 +73,7 @@ const CoachChatPage = () => {
           title: "Conversation vide",
           description: "Cette conversation ne contient pas de messages."
         });
+        resetMessages();
       }
     } catch (error) {
       console.error('Error loading conversation:', error);
@@ -70,6 +82,9 @@ const CoachChatPage = () => {
         description: "Impossible de charger la conversation.",
         variant: "destructive"
       });
+      resetMessages();
+    } finally {
+      setIsLoadingConversation(false);
     }
   };
 
@@ -81,6 +96,8 @@ const CoachChatPage = () => {
       handleSendMessage();
     }
   };
+  
+  const isLoading = isLoadingChat || isLoadingHistory || isLoadingConversation;
 
   return (
     <ProtectedLayout>
