@@ -11,18 +11,12 @@ export interface MusicDrawerProps {
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  // Ajout d'une vérification préventive des propriétés
   console.log('MusicDrawer rendered with:', { open, onClose: !!onClose });
   
   if (!open) return null;
 
-  // Important: utiliser une fonction de callback pour onOpenChange
-  const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) onClose();
-  };
-
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
+    <Drawer open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DrawerContent className="max-h-[80vh] focus:outline-none">
         <DrawerHeader className="flex justify-between items-center">
           <DrawerTitle>Lecteur de musique</DrawerTitle>
@@ -31,13 +25,12 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
               variant="ghost" 
               size="icon" 
               onClick={onClose}
-              type="button" // Ajout explicite du type
+              type="button"
             >
               <X className="h-4 w-4" />
             </Button>
           </DrawerClose>
         </DrawerHeader>
-
         <div className="px-4 pb-4">
           <MusicPlayer />
         </div>
