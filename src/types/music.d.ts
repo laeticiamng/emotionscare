@@ -7,8 +7,11 @@ export interface MusicTrack {
   coverUrl?: string;
   duration?: number;
   genre?: string;
+  emotion?: string;
   mood?: string;
   year?: number;
+  url?: string;
+  cover?: string;
 }
 
 export interface MusicPlaylist {

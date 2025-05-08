@@ -4,15 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MusicRecommendation from './MusicRecommendation';
 import VREmotionRecommendation from '../vr/VREmotionRecommendation';
-import type { Emotion } from '@/types';
+import type { Emotion, EmotionResult } from '@/types';
 
 interface EmotionScanResultProps {
-  emotion: Emotion;
+  data: EmotionResult;
 }
 
-const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ emotion }) => {
+const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
   // Derive an emotion label from available properties
-  const emotionLabel = getEmotionLabel(emotion);
+  const emotionLabel = getEmotionLabel(data);
   
   return (
     <Card className="w-full">
@@ -32,8 +32,8 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ emotion }) => {
             </p>
             
             <div className="space-y-6">
-              <MusicRecommendation emotion={emotion} />
-              <VREmotionRecommendation emotion={emotion} />
+              <MusicRecommendation emotion={data} />
+              <VREmotionRecommendation emotion={data} />
             </div>
           </TabsContent>
           
@@ -44,24 +44,24 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ emotion }) => {
                 <p className="text-2xl font-bold">{emotionLabel}</p>
               </div>
               
-              {emotion.emojis && (
+              {data.emojis && (
                 <div>
                   <h3 className="font-medium mb-1">Émojis</h3>
-                  <p className="text-2xl">{emotion.emojis}</p>
+                  <p className="text-2xl">{data.emojis}</p>
                 </div>
               )}
               
-              {emotion.score && (
+              {data.score && (
                 <div>
                   <h3 className="font-medium mb-1">Intensité</h3>
-                  <p className="text-2xl font-bold">{emotion.score}/10</p>
+                  <p className="text-2xl font-bold">{data.score}/10</p>
                 </div>
               )}
               
-              {emotion.ai_feedback && (
+              {data.ai_feedback && (
                 <div>
                   <h3 className="font-medium mb-1">Analyse IA</h3>
-                  <p className="text-muted-foreground">{emotion.ai_feedback}</p>
+                  <p className="text-muted-foreground">{data.ai_feedback}</p>
                 </div>
               )}
             </div>
