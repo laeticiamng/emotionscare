@@ -1,28 +1,29 @@
 
-export interface UserContext {
-  recentEmotions: string | null;
-  currentScore: number | null;
-  lastEmotionDate?: string;
+// Chat related types used in chat interfaces
+
+import { ChatMessage } from './index';
+
+export interface ChatHistory {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatContext {
+  user_mood?: string;
+  user_history?: string[];
+  recent_activities?: string[];
+  preferences?: Record<string, any>;
 }
 
 export interface ChatResponse {
-  response: string;
-  intent?: string;
-  sessionId?: string;
+  message: string;
+  context?: ChatContext;
+  recommendations?: string[];
+  follow_up_questions?: string[];
 }
 
-export interface ChatMessage {
-  id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
-
-export interface ChatConversation {
-  id: string;
-  userId: string;
-  title: string;
-  lastMessage: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Re-export ChatMessage for backward compatibility
+export type { ChatMessage } from './index';

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import EmojiSelector from './EmojiSelector';
 import AudioRecorder from './AudioRecorder';
 import { useAuth } from '@/contexts/AuthContext';
 import EnhancedMusicVisualizer from '../music/EnhancedMusicVisualizer';
+import { EnhancedEmotionResult } from '@/types/emotion';
 
 interface EnhancedEmotionAnalysisProps {
   onAnalysisComplete?: (result: EnhancedEmotionResult) => void;
@@ -220,19 +220,19 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
               Résultat de l'analyse
             </CardTitle>
             <CardDescription>
-              Analyse IA de votre état émotionnel avec un niveau de confiance de {(result.confidence * 100).toFixed(0)}%
+              Analyse IA de votre état émotionnel avec un niveau de confiance de {((result as EnhancedEmotionResult).confidence * 100).toFixed(0)}%
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <h3 className="text-lg font-medium mb-2">État émotionnel: <span className="text-primary">{result.emotion}</span></h3>
-                <p className="text-muted-foreground">{result.feedback}</p>
+                <h3 className="text-lg font-medium mb-2">État émotionnel: <span className="text-primary">{(result as EnhancedEmotionResult).emotion}</span></h3>
+                <p className="text-muted-foreground">{(result as EnhancedEmotionResult).feedback}</p>
               </div>
               
               <div className="w-full md:w-1/3 h-[120px]">
                 <EnhancedMusicVisualizer 
-                  emotion={result.emotion}
+                  emotion={(result as EnhancedEmotionResult).emotion}
                   height={100}
                   showControls={false}
                 />
@@ -242,7 +242,7 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
             <div className="space-y-2">
               <h3 className="font-medium">Recommandations</h3>
               <ul className="space-y-2">
-                {result.recommendations.map((recommendation, index) => (
+                {(result as EnhancedEmotionResult).recommendations.map((recommendation, index) => (
                   <li key={index} className="bg-muted/30 p-3 rounded-md flex items-start gap-2">
                     <Sparkles className="h-5 w-5 text-primary mt-0.5" />
                     <span>{recommendation}</span>
