@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { Challenge, Badge } from '@/types';
+import { Challenge, Badge } from '@/types/gamification';
 
 // Mock challenges
 let challenges: Challenge[] = [
