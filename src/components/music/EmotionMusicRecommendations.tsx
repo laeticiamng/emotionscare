@@ -36,7 +36,6 @@ export function EmotionMusicRecommendations({
   const {
     currentTrack,
     isPlaying,
-    togglePlay,
     loadPlaylistForEmotion,
     playTrack,
   } = useMusic();
@@ -58,6 +57,20 @@ export function EmotionMusicRecommendations({
       console.error("Error loading music:", err);
       setError("Impossible de charger la musique pour cette émotion");
       setLoading(false);
+    }
+  };
+
+  // Handle play pause toggle
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      // Use the music context's methods
+      if (typeof playTrack === 'function' && currentTrack) {
+        // Replay the same track to pause it
+        playTrack(currentTrack);
+      }
+    } else {
+      // Play if not playing
+      handlePlayMusic(emotion || (emotionResult?.emotion || 'neutral'));
     }
   };
 
@@ -112,7 +125,7 @@ export function EmotionMusicRecommendations({
             <Button
               variant="outline"
               size="sm"
-              onClick={isPlaying ? togglePlay : () => handlePlayMusic(emotionToUse)}
+              onClick={isPlaying ? togglePlayPause : () => handlePlayMusic(emotionToUse)}
               disabled={loading}
               className="flex items-center gap-2"
             >

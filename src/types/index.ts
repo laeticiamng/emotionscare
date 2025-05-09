@@ -17,11 +17,17 @@ export interface User {
   name: string;
   role: UserRole;
   avatar?: string;
+  avatar_url?: string;
+  image?: string;
   department?: string;
   position?: string;
   team_id?: string;
   created_at?: string;
   last_login?: string;
+  joined_at?: string;
+  anonymity_code?: string;
+  emotional_score?: number;
+  onboarded?: boolean;
   preferences?: UserPreferences;
 }
 
@@ -32,7 +38,12 @@ export interface UserPreferences {
   language: string;
   accent_color?: string;
   background_color?: string;
+  notifications?: boolean;
+  reminder_time?: string;
 }
+
+// Theme related types
+export type ThemeName = 'light' | 'dark' | 'pastel' | 'system';
 
 // Emotion related types
 export interface Emotion {
@@ -89,6 +100,8 @@ export interface Badge {
   icon?: string;
   level?: number;
   awarded_at?: string;
+  threshold?: number;
+  icon_url?: string;
 }
 
 // Challenge related types
@@ -121,6 +134,18 @@ export interface VRSessionTemplate {
   popularity: number;
 }
 
+export interface VRSession {
+  id: string;
+  template_id: string;
+  user_id: string;
+  start_time: string;
+  duration: number;
+  completed: boolean;
+  feedback?: string;
+  mood_before?: string;
+  mood_after?: string;
+}
+
 // Journal related types
 export interface JournalEntry {
   id: string;
@@ -133,6 +158,16 @@ export interface JournalEntry {
   ai_feedback?: string;
   text?: string;
   mood_score: number;
+}
+
+// Chart types
+export interface MoodData {
+  date: string;
+  originalDate?: string;
+  value: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 // Chat types
@@ -151,6 +186,9 @@ export interface MusicTrack {
   duration: number;
   url: string;
   cover?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  externalUrl?: string;
 }
 
 export interface Playlist {
@@ -170,6 +208,14 @@ export interface InvitationStats {
   rejected?: number;
   teams?: Record<string, number>;
   recent_invites?: any[];
+}
+
+export interface InvitationFormData {
+  email: string;
+  role: string;
+  name?: string;
+  team_id?: string;
+  message?: string;
 }
 
 // Navigation types

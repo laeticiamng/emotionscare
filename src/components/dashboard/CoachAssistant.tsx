@@ -11,7 +11,9 @@ import QuickSuggestions from './coach/QuickSuggestions';
 import CoachRecommendations from './coach/CoachRecommendations';
 
 // Import paresseux de l'interface de chat pour améliorer les performances initiales
-const ChatInterface = lazy(() => import('@/components/chat/ChatInterface'));
+const ChatInterface = lazy(() => import('@/components/chat/ChatInterface').then(module => ({ 
+  default: module.default 
+})));
 
 interface CoachAssistantProps {
   className?: string;

@@ -1,27 +1,32 @@
+
 import { MoodData } from '@/types';
+import { subDays, format } from 'date-fns';
 
-// Function to generate random data for the mood chart
-export const generateMockMoodData = (days: number): MoodData[] => {
-  const getRandomValue = (min: number, max: number): number => {
-    return Math.random() * (max - min) + min;
-  };
+/**
+ * Generates mock mood data for charts and visualizations
+ */
+export function generateMockMoodData(days = 30): MoodData[] {
+  const today = new Date();
+  const data: MoodData[] = [];
 
-  const moodData: MoodData[] = [];
-  for (let i = 0; i < days; i++) {
-    const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() - i);
+  for (let i = days - 1; i >= 0; i--) {
+    const date = subDays(today, i);
+    const formattedDate = format(date, 'dd/MM');
+    const originalDate = date.toISOString();
     
-    const isoDate = currentDate.toISOString().split('T')[0];
+    // Generate some realistic looking data
+    const baseValue = Math.floor(Math.random() * 30) + 40; // Base between 40-70
+    const dayVariation = Math.floor(Math.random() * 40) - 20; // -20 to +20 variation
     
-    moodData.push({
-      date: isoDate,
-      originalDate: currentDate.toISOString(), // Add the originalDate property
-      value: getRandomValue(40, 95),
-      sentiment: getRandomValue(-1, 1),
-      anxiety: getRandomValue(0, 10),
-      energy: getRandomValue(0, 10),
+    data.push({
+      date: formattedDate,
+      originalDate,
+      value: Math.max(0, Math.min(100, baseValue + dayVariation)),
+      sentiment: Math.max(0, Math.min(100, baseValue + Math.floor(Math.random() * 30) - 15)),
+      anxiety: Math.max(0, Math.min(100, 100 - baseValue + Math.floor(Math.random() * 20) - 10)),
+      energy: Math.max(0, Math.min(100, baseValue - 10 + Math.floor(Math.random() * 40) - 20)),
     });
   }
 
-  return moodData;
-};
+  return data;
+}

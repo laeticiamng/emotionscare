@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const GlobalNav = () => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -85,7 +85,10 @@ const GlobalNav = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.avatar || user.image || user.avatar_url} alt={user.name} />
+                    <AvatarImage 
+                      src={user.avatar || user.image || user.avatar_url} 
+                      alt={user.name} 
+                    />
                     <AvatarFallback>{user.name?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
                   </Avatar>
                 </Button>
@@ -102,7 +105,7 @@ const GlobalNav = () => {
                   <span>Paramètres</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>Déconnexion</DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>Déconnexion</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -157,7 +160,7 @@ const GlobalNav = () => {
                     </NavLink>
                   </li>
                   <li>
-                    <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={logout}>
+                    <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={signOut}>
                       Déconnexion
                     </Button>
                   </li>
