@@ -17,12 +17,14 @@ interface EmotionScanLiveProps {
   userId: string;
   isConfidential?: boolean;
   onScanComplete?: (result: EmotionResult) => void;
+  onResultSaved?: () => Promise<void>;
 }
 
 const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({ 
   userId, 
   isConfidential = false,
-  onScanComplete 
+  onScanComplete,
+  onResultSaved
 }) => {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -103,6 +105,10 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({
       
       if (onScanComplete) {
         onScanComplete(result);
+      }
+      
+      if (onResultSaved) {
+        await onResultSaved();
       }
     } catch (err) {
       console.error('Error saving emotion scan:', err);
@@ -195,7 +201,7 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({
 
         {!isListening && !isProcessing && analysisResult && (
           <>
-            <LiveEmotionResults emotion={analysisResult} />
+            <LiveEmotionResults result={analysisResult} />
             
             {analysisResult.transcript && (
               <TranscriptDisplay transcript={analysisResult.transcript} />

@@ -6,6 +6,7 @@ export interface MusicTrack {
   artist: string;
   audioUrl?: string;
   coverUrl?: string;
+  coverImage?: string;
   duration?: number;
   genre?: string;
   emotion?: string;

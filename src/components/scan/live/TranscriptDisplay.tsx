@@ -1,45 +1,25 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Mic } from 'lucide-react';
 
-interface TranscriptDisplayProps {
-  text: string;
-  emotion?: string;
-  className?: string;
+export interface TranscriptDisplayProps {
+  transcript: string;
 }
 
-const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ 
-  text, 
-  emotion,
-  className
-}) => {
-  if (!text) return null;
-  
-  // Obtenir une couleur d'arrière-plan en fonction de l'émotion
-  const getEmotionColor = () => {
-    if (!emotion) return '';
-    
-    const colorMap: Record<string, string> = {
-      'happy': 'border-l-green-500',
-      'sad': 'border-l-blue-500',
-      'calm': 'border-l-sky-500',
-      'anxious': 'border-l-amber-500',
-      'angry': 'border-l-red-500',
-      'neutral': 'border-l-gray-500',
-      'excited': 'border-l-purple-500',
-      'stressed': 'border-l-orange-500'
-    };
-    
-    return colorMap[emotion.toLowerCase()] || '';
-  };
+const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ transcript }) => {
+  if (!transcript) return null;
   
   return (
-    <Card className={`shadow-sm overflow-hidden ${className || ''}`}>
-      <CardHeader className="bg-muted/30 px-4 py-2">
-        <CardTitle className="text-sm">Transcription</CardTitle>
-      </CardHeader>
-      <CardContent className={`p-3 border-l-4 ${getEmotionColor()}`}>
-        <p className="text-sm whitespace-pre-wrap">{text}</p>
+    <Card className="border-none bg-secondary/20">
+      <CardContent className="pt-4">
+        <div className="flex items-start gap-2">
+          <Mic className="h-4 w-4 mt-1 text-muted-foreground" />
+          <div>
+            <p className="font-medium text-sm mb-1">Transcription</p>
+            <p className="text-sm italic">{transcript}</p>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

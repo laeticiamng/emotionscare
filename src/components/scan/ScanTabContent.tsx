@@ -31,7 +31,8 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
       ) : (
         <EmotionScanLive 
           userId={userId} 
-          onResultSaved={onResultSaved} 
+          onResultSaved={onResultSaved}
+          onScanComplete={() => {}} 
         />
       )}
     </div>

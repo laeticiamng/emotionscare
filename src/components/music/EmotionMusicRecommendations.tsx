@@ -36,9 +36,9 @@ export function EmotionMusicRecommendations({
   const {
     currentTrack,
     isPlaying,
-    fetchPlaylist,
     playTrack,
-    loading,
+    loadPlaylistForEmotion,
+    initializeMusicSystem,
     error
   } = useMusic();
   
@@ -53,7 +53,10 @@ export function EmotionMusicRecommendations({
     
     try {
       const musicType = EMOTION_TO_MUSIC[emotionToPlay.toLowerCase()] || EMOTION_TO_MUSIC.default;
-      await fetchPlaylist(musicType);
+      const playlist = loadPlaylistForEmotion(musicType);
+      if (playlist && playlist.tracks.length > 0) {
+        playTrack(playlist.tracks[0]);
+      }
       setLocalLoading(false);
     } catch (err) {
       console.error("Error loading music:", err);
@@ -64,14 +67,21 @@ export function EmotionMusicRecommendations({
 
   // Handle play pause toggle
   const togglePlayPause = () => {
-    if (currentTrack) {
-      // Use the music context's methods
+    if (isPlaying) {
+      // Pause if playing
+      playTrack(currentTrack!);
+    } else if (currentTrack) {
+      // Resume if paused
       playTrack(currentTrack);
     } else {
       // Play if not playing
       handlePlayMusic(emotion || (emotionResult?.emotion || 'neutral'));
     }
   };
+
+  useEffect(() => {
+    initializeMusicSystem();
+  }, [initializeMusicSystem]);
 
   useEffect(() => {
     if (emotionResult) {
@@ -125,10 +135,10 @@ export function EmotionMusicRecommendations({
               variant="outline"
               size="sm"
               onClick={isPlaying ? togglePlayPause : () => handlePlayMusic(emotionToUse)}
-              disabled={loading || localLoading}
+              disabled={localLoading}
               className="flex items-center gap-2"
             >
-              {loading || localLoading ? (
+              {localLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Chargement...</span>

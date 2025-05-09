@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack } from '@/types';
+import { MusicPlaylist } from '@/types/music';
 
 interface MusicContextType {
   currentTrack: MusicTrack | null;
@@ -22,7 +23,8 @@ interface MusicContextType {
   setOpenDrawer: (open: boolean) => void;
 }
 
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
+// Export the context so it can be imported elsewhere
+export const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export const useMusicMock = (): MusicContextType => {
   // État local pour le contexte musical

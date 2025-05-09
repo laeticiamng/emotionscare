@@ -1,59 +1,32 @@
 
 import React from 'react';
-import { Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-type StatusType = 'loading' | 'success' | 'error' | 'idle';
-
-interface StatusIndicatorProps {
-  status: StatusType;
-  message?: string;
-  className?: string;
+export interface StatusIndicatorProps {
+  isListening: boolean;
+  isProcessing: boolean;
+  statusText: string;
+  error: boolean;
 }
 
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({
-  status,
-  message,
-  className
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({ 
+  isListening,
+  isProcessing,
+  statusText,
+  error
 }) => {
-  const getIcon = () => {
-    switch (status) {
-      case 'loading':
-        return <Loader2 className="h-4 w-4 animate-spin" />;
-      case 'success':
-        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-      case 'error':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      default:
-        return null;
-    }
+  const getStatusColor = () => {
+    if (error) return 'bg-red-500';
+    if (isListening) return 'bg-green-500';
+    if (isProcessing) return 'bg-amber-500';
+    return 'bg-blue-500';
   };
-  
-  const getBgColor = () => {
-    switch (status) {
-      case 'loading':
-        return 'bg-blue-50 border-blue-200 text-blue-700';
-      case 'success':
-        return 'bg-green-50 border-green-200 text-green-700';
-      case 'error':
-        return 'bg-red-50 border-red-200 text-red-700';
-      default:
-        return 'bg-gray-50 border-gray-200 text-gray-700';
-    }
-  };
-  
-  if (status === 'idle') return null;
-  
+
   return (
-    <div 
-      className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-md border text-sm",
-        getBgColor(),
-        className
-      )}
-    >
-      {getIcon()}
-      {message && <span>{message}</span>}
+    <div className="flex items-center">
+      <div className={`w-3 h-3 rounded-full mr-2 ${getStatusColor()}`}>
+        {isListening && <div className="animate-pulse w-full h-full rounded-full bg-green-400"></div>}
+      </div>
+      <span className="text-sm font-medium">{statusText}</span>
     </div>
   );
 };

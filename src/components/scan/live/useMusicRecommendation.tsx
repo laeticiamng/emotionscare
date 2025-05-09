@@ -1,12 +1,12 @@
 
 import { useCallback } from 'react';
 import { useToast } from "@/hooks/use-toast";
-import { useMusicRecommendationEngine } from "@/hooks/useMusicRecommendationEngine";
+import { useMusic } from "@/contexts/MusicContext";
 import { EmotionResult } from '@/types';
 
 export const useMusicRecommendation = () => {
   const { toast } = useToast();
-  const { getRecommendationsForEmotion } = useMusicRecommendationEngine();
+  const { loadPlaylistForEmotion, playTrack } = useMusic();
 
   // Define emotion to music mapping
   const EMOTION_TO_MUSIC = {
@@ -35,17 +35,16 @@ export const useMusicRecommendation = () => {
     }
 
     const { emotion } = emotionResult;
-    const recommendations = getRecommendationsForEmotion(emotion.toLowerCase());
+    const playlist = loadPlaylistForEmotion(emotion.toLowerCase());
 
-    if (recommendations && recommendations.length > 0) {
-      // Here you would typically trigger your music player with the recommendation
+    if (playlist && playlist.tracks.length > 0) {
+      // Play the first track from the playlist
+      playTrack(playlist.tracks[0]);
+      
       toast({
         title: "Musique recommandée",
         description: `Nous vous suggérons d'écouter une ${EMOTION_TO_MUSIC[emotion.toLowerCase()] || EMOTION_TO_MUSIC.default}`,
       });
-      
-      // This is where you would actually play the music
-      console.log('Playing music for emotion:', emotion, 'Recommendation:', recommendations[0]);
     } else {
       toast({
         title: "Aucune recommandation disponible",
@@ -53,7 +52,7 @@ export const useMusicRecommendation = () => {
         variant: "destructive",
       });
     }
-  }, [toast, getRecommendationsForEmotion]);
+  }, [toast, loadPlaylistForEmotion, playTrack]);
 
   return {
     handlePlayMusic,

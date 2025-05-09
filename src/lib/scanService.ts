@@ -44,7 +44,7 @@ export const saveRealtimeEmotionScan = async (emotionData: Partial<EmotionResult
 // Function to analyze text or emojis for emotion
 export const analyzeEmotion = async (input: { 
   text?: string; 
-  emojis?: string; 
+  emojis?: string;
   userId?: string;
 }): Promise<EmotionResult> => {
   // Simulate API call delay
@@ -60,5 +60,61 @@ export const analyzeEmotion = async (input: {
     text: input.text,
     emojis: input.emojis?.split('') || [],
     feedback: "Here is some AI feedback based on your input.",
+  };
+};
+
+// Add the missing functions
+export const fetchEmotionHistory = async (userId?: string): Promise<any[]> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  return Array(5).fill(0).map((_, i) => ({
+    id: uuidv4(),
+    user_id: userId || 'anonymous',
+    date: new Date(Date.now() - i * 86400000).toISOString(), // One day ago * i
+    emotion: ['happy', 'sad', 'neutral', 'anxious', 'calm'][Math.floor(Math.random() * 5)],
+    confidence: Math.random() * 0.5 + 0.5,
+    score: Math.floor(Math.random() * 100),
+    text: i % 2 === 0 ? "Sample text entry for emotion tracking" : undefined,
+    ai_feedback: i % 3 === 0 ? "AI feedback based on your emotional pattern" : undefined
+  }));
+};
+
+export const getEmotions = async (userId?: string): Promise<any[]> => {
+  return fetchEmotionHistory(userId);
+};
+
+export const createEmotionEntry = async (input: {
+  user_id: string;
+  text?: string;
+  emojis?: string;
+  audio_url?: string;
+}): Promise<any> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  return {
+    id: uuidv4(),
+    user_id: input.user_id,
+    date: new Date().toISOString(),
+    emotion: ['happy', 'sad', 'neutral', 'anxious', 'calm'][Math.floor(Math.random() * 5)],
+    confidence: Math.random() * 0.5 + 0.5,
+    score: Math.floor(Math.random() * 100),
+    text: input.text,
+    ai_feedback: "AI feedback on your emotional state"
+  };
+};
+
+export const fetchLatestEmotion = async (userId: string): Promise<any> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 400));
+  
+  return {
+    id: uuidv4(),
+    user_id: userId,
+    date: new Date().toISOString(),
+    emotion: ['happy', 'sad', 'neutral', 'anxious', 'calm'][Math.floor(Math.random() * 5)],
+    confidence: Math.random() * 0.5 + 0.5,
+    score: Math.floor(Math.random() * 100)
   };
 };

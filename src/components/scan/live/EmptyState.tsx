@@ -1,30 +1,20 @@
 
 import React from 'react';
-import { Bot, Music, VolumeX } from 'lucide-react';
+import { Info } from 'lucide-react';
 
-interface EmptyStateProps {
-  message?: string;
-}
-
-const EmptyState: React.FC<EmptyStateProps> = ({ 
-  message = "Commencez l'analyse vocale pour obtenir des résultats" 
-}) => {
+const EmptyState: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
-      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-muted">
-        <Bot className="h-8 w-8 text-muted-foreground" />
+    <div className="text-center p-8 border border-dashed rounded-md bg-muted/30">
+      <div className="flex justify-center mb-4">
+        <div className="rounded-full bg-accent p-3">
+          <Info className="h-6 w-6 text-muted-foreground" />
+        </div>
       </div>
-      <div className="max-w-sm">
-        <h3 className="text-lg font-medium mb-2">Analyse émotionnelle vocale</h3>
-        <p className="text-sm text-muted-foreground">{message}</p>
-      </div>
-      <div className="flex items-center gap-4 mt-4 text-muted-foreground">
-        <VolumeX className="h-5 w-5" />
-        <span className="text-xs">→</span>
-        <Bot className="h-5 w-5" />
-        <span className="text-xs">→</span>
-        <Music className="h-5 w-5" />
-      </div>
+      <h3 className="font-medium text-lg mb-1">Analyseur émotionnel</h3>
+      <p className="text-sm text-muted-foreground max-w-md mx-auto">
+        Cliquez sur le bouton "Démarrer" pour commencer l'enregistrement audio.
+        Parlez de votre journée ou de ce que vous ressentez actuellement.
+      </p>
     </div>
   );
 };
