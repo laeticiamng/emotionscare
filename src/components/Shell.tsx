@@ -1,16 +1,12 @@
 
 import React, { useState } from 'react'
 import { Outlet, Link } from 'react-router-dom'
-import MusicDrawer from '@/components/music/player/MusicDrawer'
+import MusicDrawer from './music/player/MusicDrawer'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from './ui/button'
 import { Headphones, Menu, User } from 'lucide-react'
 
-interface ShellProps {
-  children?: React.ReactNode;
-}
-
-const Shell: React.FC<ShellProps> = ({ children }) => {
+const Shell: React.FC = () => {
   const [musicOpen, setMusicOpen] = useState(false)
   const { isAuthenticated } = useAuth()
 
@@ -64,7 +60,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
       />
 
       <main className="flex-1">
-        {children ?? <Outlet />}
+        <Outlet />
       </main>
 
       <footer className="bg-muted py-6">

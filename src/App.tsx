@@ -44,15 +44,14 @@ function App() {
         <MusicProvider>
           <Routes>
             {/* Route publique racine */}
-            <Route path="/" element={<Shell>{<Index />}</Shell>} />
-
-            {/* Authentification */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/admin-login" element={<AdminLoginPage />} />
-
-            {/* Toutes les autres pages sous Shell */}
-            <Route element={<Shell />}>
+            <Route path="/" element={<Shell />}>
+              <Route index element={<Index />} />
+              
+              {/* Authentification */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/admin-login" element={<AdminLoginPage />} />
+              
               {/* Routes protégées */}
               <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
               <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
