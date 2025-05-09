@@ -1,30 +1,20 @@
 
-/**
- * Type definitions for the audio player functionality
- */
-
 import { MusicTrack } from './music';
 
-/**
- * Interface representing the state of the audio player
- */
-export interface AudioPlayerState {
+// Types for the audio player state
+export interface UseAudioPlayerStateReturn {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  currentTime: number;
-  duration: number;
   repeat: boolean;
   shuffle: boolean;
   progress: number;
+  currentTime: number;
+  duration: number;
   loadingTrack: boolean;
   error: Error | null;
-}
-
-/**
- * Return type for the useAudioPlayerState hook
- */
-export interface UseAudioPlayerStateReturn extends AudioPlayerState {
+  
+  // State setters
   setCurrentTrack: (track: MusicTrack | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setVolume: (volume: number) => void;
@@ -39,10 +29,9 @@ export interface UseAudioPlayerStateReturn extends AudioPlayerState {
   toggleShuffle: () => void;
 }
 
-/**
- * Return type for the useAudioPlayer hook
- */
+// Types for the audio player main hook
 export interface UseAudioPlayerReturn {
+  // State
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
@@ -54,51 +43,37 @@ export interface UseAudioPlayerReturn {
   error: Error | null;
   currentTime: number;
   loadingTrack: boolean;
+  
+  // Track operations
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
-  setVolume: (volume: number) => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
-  seekTo: (seconds: number) => void;
   nextTrack: () => void;
   previousTrack: () => void;
+  
+  // Player controls
+  seekTo: (seconds: number) => void;
+  setVolume: (volume: number) => void;
   setCurrentTrack: (track: MusicTrack | null) => void;
-  formatTime: (time: number) => string;
+  formatTime: (seconds: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleVolumeChange: (values: number[]) => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
 }
 
-/**
- * Props for useAudioEvents hook
- */
-export interface UseAudioEventsProps {
-  audioRef: React.RefObject<HTMLAudioElement | null>;
-  onTimeUpdate: (time: number) => void;
-  onDurationChange: (duration: number) => void;
-  onEnded: () => void;
-  onError: (error: Error) => void;
-  onPlay: () => void;
-  onPause: () => void;
-  onWaiting: () => void;
-  onCanPlay: () => void;
-  volume: number;
-  repeat: boolean;
-}
-
-/**
- * Return type for the useMusicControls hook
- */
+// Types for music controls hook
 export interface UseMusicControlsReturn {
   isPlaying: boolean;
   volume: number;
-  currentTime: number;
-  duration: number;
+  setVolume: (volume: number) => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: (currentTrack: MusicTrack | null, currentPlaylist: MusicTrack[] | null) => void;
   previousTrack: (currentTrack: MusicTrack | null, currentPlaylist: MusicTrack[] | null) => void;
-  formatTime: (time: number) => string;
+  currentTime: number;
+  duration: number;
+  formatTime: (seconds: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleVolumeChange: (values: number[]) => void;
   repeat: boolean;
@@ -106,51 +81,4 @@ export interface UseMusicControlsReturn {
   shuffle: boolean;
   toggleShuffle: () => void;
   loadingTrack: boolean;
-  setVolume: (volume: number) => void;
-}
-
-/**
- * Props for VolumeControl component
- */
-export interface VolumeControlProps {
-  volume: number;
-  onVolumeChange: (values: number[]) => void;
-}
-
-/**
- * Props for ProgressBar component
- */
-export interface ProgressBarProps {
-  currentTime: number;
-  duration: number;
-  formatTime: (time: number) => string;
-  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-}
-
-/**
- * Props for PlayerControls component
- */
-export interface PlayerControlsProps {
-  isPlaying: boolean;
-  loadingTrack: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onPrevious: () => void;
-  onNext: () => void;
-}
-
-/**
- * Props for TrackInfo component
- */
-export interface TrackInfoProps {
-  currentTrack: MusicTrack;
-  loadingTrack: boolean;
-  audioError: boolean;
-}
-
-/**
- * Map of emotions to music types
- */
-export interface EmotionToMusicMap {
-  [key: string]: string;
 }
