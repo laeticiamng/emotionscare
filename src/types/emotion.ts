@@ -32,6 +32,25 @@ export interface EmotionResult {
   source?: string;
 }
 
+// Add the EnhancedEmotionResult interface
+export interface EnhancedEmotionResult extends EmotionResult {
+  insights?: {
+    patterns?: string[];
+    triggers?: string[];
+    recommendations?: string[];
+  };
+  correlations?: {
+    activity?: string;
+    sleep?: number;
+    social?: string;
+  };
+  comparison?: {
+    previous?: number;
+    average?: number;
+    change?: string;
+  };
+}
+
 // Related types for emotion charting
 export interface MoodData {
   date: string;

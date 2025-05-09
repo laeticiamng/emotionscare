@@ -1,7 +1,7 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-export const useIsMobile = () => {
+export function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -9,15 +9,17 @@ export const useIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
 
-    // Vérification initiale
+    // Initial check
     checkIfMobile();
-
-    // Ajout de l'écouteur d'événement
-    window.addEventListener("resize", checkIfMobile);
-
-    // Nettoyage de l'écouteur d'événement
-    return () => window.removeEventListener("resize", checkIfMobile);
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkIfMobile);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
   }, []);
 
   return isMobile;
-};
+}

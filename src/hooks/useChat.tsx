@@ -1,53 +1,66 @@
 
-import { useState } from 'react';
-import { ChatMessage } from '@/types/chat';
+import { useState, useCallback } from 'react';
+import { ChatMessage, ChatResponse, ChatContext } from '@/types';
+import { useToast } from './use-toast';
 import { v4 as uuidv4 } from 'uuid';
 
-// Import the chat processing hook
-import useChatProcessing from './chat/useChatProcessing';
-
-interface UseChatResult {
-  messages: ChatMessage[];
-  addMessage: (text: string, sender: 'user' | 'bot') => void;
-  isProcessing: boolean;
-  processAndAddMessage: (text: string) => Promise<void>;
-  handleSend: (text: string) => Promise<any>; 
+interface UseChatOptions {
+  initialMessages?: ChatMessage[];
+  onError?: (error: Error) => void;
 }
 
-const useChat = (): UseChatResult => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const { isProcessing, processMessage } = useChatProcessing();
+const useChat = (options: UseChatOptions = {}) => {
+  const { initialMessages = [] } = options;
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const addMessage = (text: string, sender: 'user' | 'bot') => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text: text,
-      sender: sender,
-      timestamp: new Date(),
-    };
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-  };
+  // Function to handle sending a message to the AI
+  const handleSend = useCallback(async (message: string) => {
+    try {
+      setIsLoading(true);
+      
+      // Here you would typically make an API call to your AI service
+      // This is a mock implementation
+      const response: ChatResponse = await new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({
+            message: `This is a response to: "${message}"`,
+            text: `This is a response to: "${message}"`,
+            recommendations: ["Try meditation", "Listen to calming music"],
+            follow_up_questions: ["How are you feeling now?", "Would you like some music recommendations?"]
+          });
+        }, 1000);
+      });
 
-  const processAndAddMessage = async (text: string) => {
-    addMessage(text, 'user');
-    const response = await processMessage(text);
-    addMessage(response.message || response.text || 'Je comprends.', 'bot');
-  };
-  
-  // Add the handleSend method to match what's used in ChatInterface
-  const handleSend = async (text: string) => {
-    addMessage(text, 'user');
-    const response = await processMessage(text);
-    addMessage(response.message || response.text || 'Je comprends.', 'bot');
-    return response;
-  };
+      return response;
+    } catch (error) {
+      console.error('Error sending chat message:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to send message. Please try again.',
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  const addMessage = useCallback((message: Omit<ChatMessage, 'id'>) => {
+    setMessages((prev) => [...prev, { ...message, id: uuidv4() }]);
+  }, []);
+
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, []);
 
   return {
     messages,
-    addMessage,
-    isProcessing,
-    processAndAddMessage,
+    isLoading,
     handleSend,
+    addMessage,
+    clearMessages,
   };
 };
 

@@ -1,53 +1,59 @@
 
-import { useState } from 'react';
-import { subDays, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import type { JournalEntry, MoodData } from '@/types';
+import { useMemo } from 'react';
+import { JournalEntry, MoodData } from '@/types';
+import { format, subDays } from 'date-fns';
 
-export function useMoodChartData(entries: JournalEntry[], timeRange: '7' | '30' | '90' = '30') {
-  // Generate mood data for the chart based on journal entries and time range
-  const generateMoodData = (): MoodData[] => {
-    const now = new Date();
-    const days = parseInt(timeRange);
-    const data: MoodData[] = [];
+interface UseMoodChartDataResult {
+  moodData: MoodData[];
+}
+
+export const useMoodChartData = (
+  entries: JournalEntry[],
+  timeRange: '7' | '30' | '90'
+): UseMoodChartDataResult => {
+  const moodData = useMemo(() => {
+    // Convert time range to number of days
+    const days = parseInt(timeRange, 10);
+    const today = new Date();
+    const startDate = subDays(today, days);
     
+    // Filter entries by date range
+    const filteredEntries = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= startDate;
+    });
+    
+    // Initialize an array for all days in the range
+    const allDays: MoodData[] = [];
     for (let i = days; i >= 0; i--) {
-      const date = subDays(now, i);
-      const dateStr = format(date, 'dd/MM', { locale: fr });
-      
-      // Find if an entry exists for this date
-      const entry = entries.find(e => {
-        const entryDate = new Date(e.date);
-        return entryDate.getDate() === date.getDate() && 
-               entryDate.getMonth() === date.getMonth() && 
-               entryDate.getFullYear() === date.getFullYear();
+      const date = subDays(today, i);
+      allDays.push({
+        date: format(date, 'dd/MM'),
+        originalDate: date.toISOString(),
+        value: 0,
+        sentiment: Math.random() * 100, // Mock data
+        anxiety: Math.random() * 100, // Mock data
+        energy: Math.random() * 100 // Mock data
       });
-      
-      // If an entry exists, generate values based on the entry ID
-      if (entry) {
-        const entryId = parseInt(entry.id.replace(/[^0-9]/g, '1'));
-        data.push({
-          date: dateStr,
-          value: 40 + (entryId * 11) % 60,  // Use value for the base interface
-          sentiment: 40 + (entryId * 11) % 60,  // Between 40 and 100
-          anxiety: 10 + (entryId * 7) % 60,    // Between 10 and 70
-          energy: 30 + (entryId * 13) % 60     // Between 30 and 90
-        });
-      } else if (Math.random() > 0.7) {  // Add values for some dates without entries
-        data.push({
-          date: dateStr,
-          value: Math.floor(50 + Math.random() * 50), // Use value for the base interface
-          sentiment: Math.floor(50 + Math.random() * 50),  // Between 50 and 100
-          anxiety: Math.floor(10 + Math.random() * 60),    // Between 10 and 70
-          energy: Math.floor(30 + Math.random() * 60)      // Between 30 and 90
-        });
-      }
     }
     
-    return data;
-  };
-
-  const moodData = generateMoodData();
+    // Merge entry data with the days array
+    filteredEntries.forEach(entry => {
+      const entryDate = new Date(entry.date);
+      const formattedDate = format(entryDate, 'dd/MM');
+      
+      const dayIndex = allDays.findIndex(day => day.date === formattedDate);
+      if (dayIndex !== -1) {
+        allDays[dayIndex].value = entry.mood_score;
+      }
+    });
+    
+    return allDays;
+  }, [entries, timeRange]);
   
-  return { moodData };
-}
+  return {
+    moodData
+  };
+};
+
+export default useMoodChartData;
