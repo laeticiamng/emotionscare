@@ -4,8 +4,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Sparkles, Scan, CirclePlus } from "lucide-react";
-import EmojiSelector from '@/components/scan/EmojiSelector';
-import EmotionTextInput from '@/components/scan/EmotionTextInput';
+import EmojiSelector from '@/components/scan/input/EmojiSelector';
+import EmotionTextInput from '@/components/scan/input/EmotionTextInput';
 import AudioRecorder from '@/components/scan/AudioRecorder';
 
 interface EmotionInputFormProps {

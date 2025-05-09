@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,33 +10,8 @@ import ScanTabContent from '@/components/scan/ScanTabContent';
 import HistoryTabContent from '@/components/scan/HistoryTabContent';
 import TeamTabContent from '@/components/scan/TeamTabContent';
 import { useScanPageState } from '@/hooks/useScanPageState';
-
-// Define the props interfaces for our components
-interface ScanPageHeaderProps {
-  showScanForm: boolean;
-  activeTab: string;
-  setShowScanForm: (show: boolean) => void;
-}
-
-interface ScanTabContentProps {
-  userId: string;
-  showScanForm: boolean;
-  setShowScanForm: (show: boolean) => void;
-  handleScanSaved: () => void;
-  onResultSaved: () => Promise<void>;
-}
-
-interface HistoryTabContentProps {
-  emotions: any[];
-}
-
-interface TeamTabContentProps {
-  filteredUsers: any[];
-  selectedFilter: string;
-  filterUsers: (filter: string) => void;
-  periodFilter: '7' | '30' | '90';
-  setPeriodFilter: (period: '7' | '30' | '90') => void;
-}
+import { useScanBackground } from '@/hooks/useScanBackground';
+import TabBackgroundAnimation from '@/components/scan/animation/TabBackgroundAnimation';
 
 const ScanPage = () => {
   const { user } = useAuth();
@@ -47,7 +22,6 @@ const ScanPage = () => {
     showScanForm,
     setShowScanForm,
     emotions,
-    loading,
     filteredUsers,
     selectedFilter,
     filterUsers,
@@ -57,18 +31,7 @@ const ScanPage = () => {
     refreshEmotionHistory
   } = useScanPageState(user?.id);
   
-  const [backgroundAnimation, setBackgroundAnimation] = useState(0);
-
-  // Change background animation based on active tab
-  useEffect(() => {
-    if (activeTab === 'scan') {
-      setBackgroundAnimation(1);
-    } else if (activeTab === 'history') {
-      setBackgroundAnimation(2);
-    } else {
-      setBackgroundAnimation(3);
-    }
-  }, [activeTab]);
+  const { backgroundAnimation, getBackgroundStyle } = useScanBackground(activeTab);
 
   const handleResultSaved = async () => {
     await refreshEmotionHistory();
@@ -78,49 +41,10 @@ const ScanPage = () => {
     });
   };
 
-  // Get background style based on active tab
-  const getBackgroundStyle = () => {
-    switch (activeTab) {
-      case 'scan':
-        return "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-800/30";
-      case 'history':
-        return "bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-900/30 dark:to-orange-800/30";
-      case 'team':
-        return "bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-900/30 dark:to-teal-800/30";
-      default:
-        return "bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-800/30";
-    }
-  };
-
   return (
     <div className={`min-h-[80vh] pb-12 relative ${getBackgroundStyle()}`}>
       {/* Animated background */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <motion.div
-          className="absolute inset-0"
-          animate={{
-            backgroundPosition: backgroundAnimation === 1 
-              ? ['0% 0%', '100% 100%'] 
-              : backgroundAnimation === 2 
-                ? ['100% 0%', '0% 100%'] 
-                : ['0% 100%', '100% 0%'],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "linear"
-          }}
-          style={{
-            backgroundImage: `radial-gradient(circle at ${backgroundAnimation * 30}% ${100 - backgroundAnimation * 30}%, 
-              rgba(99,102,241,0.15) 0%, 
-              rgba(168,85,247,0.05) 25%, 
-              rgba(236,72,153,0.05) 50%, 
-              rgba(239,68,68,0) 100%)`,
-            backgroundSize: '200% 200%',
-          }}
-        />
-      </div>
+      <TabBackgroundAnimation backgroundAnimation={backgroundAnimation} />
       
       <div className="container mx-auto py-8 relative z-10">
         <motion.div
