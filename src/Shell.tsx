@@ -7,11 +7,16 @@ import { Button } from './components/ui/button'
 import { Headphones, Menu, User } from 'lucide-react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import MobileNavigation from '@/components/navigation/MobileNavigation'
+import { motion } from 'framer-motion'
 
 const Shell: React.FC = () => {
   const [musicOpen, setMusicOpen] = useState(false)
   const { isAuthenticated, user } = useAuth()
   const isMobile = useIsMobile()
+
+  const toggleMusicDrawer = () => {
+    setMusicOpen(prev => !prev);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -28,24 +33,28 @@ const Shell: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              onClick={() => setMusicOpen(o => !o)}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
-              type="button"
-              aria-label="Ouvrir le lecteur musical"
-            >
-              <Headphones className="h-4 w-4" />
-              <span className="hidden sm:inline">Musique</span>
-            </Button>
+            <motion.div whileTap={{ scale: 0.95 }}>
+              <Button
+                onClick={toggleMusicDrawer}
+                variant={musicOpen ? "secondary" : "outline"}
+                size="sm"
+                className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9 transition-all ${
+                  musicOpen ? "bg-primary/10" : ""
+                }`}
+                type="button"
+                aria-label="Ouvrir le lecteur musical"
+              >
+                <Headphones className={`h-4 w-4 ${musicOpen ? "text-primary" : ""}`} />
+                <span className="hidden sm:inline">Musique</span>
+              </Button>
+            </motion.div>
 
             {isAuthenticated ? (
               <Button 
                 variant="default" 
                 size="sm" 
                 asChild
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9 transition-all"
               >
                 <Link to="/dashboard" className="flex items-center gap-1 sm:gap-2">
                   <User className="h-4 w-4" />
@@ -57,7 +66,7 @@ const Shell: React.FC = () => {
                 variant="default" 
                 size="sm" 
                 asChild
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9 transition-all"
               >
                 <Link to="/login" className="flex items-center gap-1 sm:gap-2">
                   <User className="h-4 w-4" />
