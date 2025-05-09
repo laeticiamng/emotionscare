@@ -8,7 +8,7 @@ import Shell from './components/Shell';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 import ProtectedLayout from './components/ProtectedLayout';
-import Index from './pages/Index';
+import Home from './pages/Home';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -57,7 +57,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Shell />}>
-        <Route index element={<Index />} />
+        <Route index element={<Home />} />
         <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
         <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
         <Route path="/vr" element={<ProtectedLayout><VRPage /></ProtectedLayout>} />
