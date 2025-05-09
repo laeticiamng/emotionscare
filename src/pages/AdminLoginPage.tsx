@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,22 +28,6 @@ const AdminLoginPage = () => {
     }
   }, [isAuthenticated, isLoading, user, navigate]);
 
-  const auth = useAuth();
-  
-  const handleLogin = async (email: string, password: string) => {
-    // If auth.login exists, use it; otherwise simulate a login
-    if (auth.login) {
-      return auth.login(email, password);
-    } else {
-      // Simulate login logic for admin
-      console.log("Admin login simulation with:", email);
-      localStorage.setItem("user", JSON.stringify({email, role: "admin"}));
-      // Redirect to admin dashboard
-      navigate("/admin/dashboard");
-      return true;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -58,7 +43,7 @@ const AdminLoginPage = () => {
 
     setIsSubmitting(true);
     try {
-      const user = await handleLogin(email, password);
+      const user = await login(email, password);
       
       // Check if user has admin privileges
       if (isAdminRole(user.role)) {

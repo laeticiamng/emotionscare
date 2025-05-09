@@ -57,14 +57,14 @@ export function useVRSession() {
       const durationSeconds = (activeTemplate.duration || 5) * 60;
       setSessionDuration(durationSeconds);
       
-      // Log session to backend
-      const session = await createVRSession(
-        user.id,
-        durationSeconds,
-        activeTemplate.preview_url || '',
-        heartRate.before,
-        heartRateAfter
-      );
+      // Log session to backend - Fix the arguments mismatch
+      const session = await createVRSession({
+        user_id: user.id,
+        duration: durationSeconds,
+        template_id: activeTemplate.id,
+        is_audio_only: activeTemplate.is_audio_only || false,
+        mood_before: 'neutral'
+      });
       
       toast({
         title: "Session terminée",

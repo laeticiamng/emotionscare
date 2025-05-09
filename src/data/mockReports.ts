@@ -6,9 +6,11 @@ export const mockReports: Report[] = [
   {
     id: '1',
     date: '2023-04-07T00:00:00Z',
-    created_at: '2023-04-07T00:00:00Z',  // Added required property
+    created_at: '2023-04-07T00:00:00Z',
     title: 'Rapport hebdomadaire',
     type: 'weekly',
+    period: 'weekly',
+    data: {},
     metrics: [
       {
         name: 'absenteeism',
@@ -32,9 +34,11 @@ export const mockReports: Report[] = [
   {
     id: '2',
     date: '2023-04-14T00:00:00Z',
-    created_at: '2023-04-14T00:00:00Z',  // Added required property
+    created_at: '2023-04-14T00:00:00Z',
     title: 'Rapport hebdomadaire',
     type: 'weekly',
+    period: 'weekly',
+    data: {},
     metrics: [
       {
         name: 'absenteeism',
@@ -58,9 +62,11 @@ export const mockReports: Report[] = [
   {
     id: '3',
     date: '2023-04-07T00:00:00Z',
-    created_at: '2023-04-07T00:00:00Z',  // Added required property
+    created_at: '2023-04-07T00:00:00Z',
     title: 'Rapport de productivité',
     type: 'productivity',
+    period: 'weekly',
+    data: {},
     metrics: [
       {
         name: 'productivity',
@@ -84,9 +90,11 @@ export const mockReports: Report[] = [
   {
     id: '4',
     date: '2023-04-14T00:00:00Z',
-    created_at: '2023-04-14T00:00:00Z',  // Added required property
+    created_at: '2023-04-14T00:00:00Z',
     title: 'Rapport de productivité',
     type: 'productivity',
+    period: 'weekly',
+    data: {},
     metrics: [
       {
         name: 'productivity',

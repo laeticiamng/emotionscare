@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import MusicTabs from '@/components/music/page/MusicTabs';
 import { useMusic } from '@/contexts/MusicContext';
@@ -18,7 +19,13 @@ const MusicPage: React.FC = () => {
     const loadMusic = async () => {
       try {
         setIsLoading(true);
-        await initializeMusicSystem();
+        // For compatibility, we're adding a check for initializeMusicSystem
+        if (typeof initializeMusicSystem === 'function') {
+          await initializeMusicSystem();
+        } else {
+          // Fallback if function doesn't exist
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       } catch (err) {
         console.error("Erreur d'initialisation du système musical:", err);
         toast({
@@ -79,7 +86,10 @@ const MusicPage: React.FC = () => {
         <MusicTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
 
-      <NewPlaylistDialog open={openFormDialog} setOpen={setOpenFormDialog} />
+      <NewPlaylistDialog 
+        open={openFormDialog} 
+        setOpen={setOpenFormDialog} 
+      />
     </div>
   );
 };

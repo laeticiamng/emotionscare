@@ -1,113 +1,121 @@
 
+import { v4 as uuidv4 } from 'uuid';
 import { JournalEntry } from '@/types';
 
-// Mock journal entries
+// Mock journal entries for development
 let mockJournalEntries: JournalEntry[] = [
   {
     id: '1',
     user_id: 'user-1',
-    title: 'Première journée de travail',
-    content: 'Aujourd\'hui était ma première journée dans ma nouvelle entreprise. J\'étais nerveux mais tout s\'est bien passé.',
-    date: '2023-05-01T10:30:00Z',
+    title: 'Journée productive',
+    content: 'Aujourd\'hui était une journée très productive. J\'ai terminé plusieurs tâches importantes et je me sens accompli.',
     mood: 'happy',
-    created_at: '2023-05-01T19:30:00Z',
-    mood_score: 80
+    date: '2023-06-01T12:00:00Z',
+    created_at: '2023-06-01T12:00:00Z',
+    mood_score: 85
   },
   {
     id: '2',
     user_id: 'user-1',
-    title: 'Session VR relaxante',
-    content: 'J\'ai essayé une nouvelle session VR aujourd\'hui et je me sens vraiment détendu maintenant.',
-    date: '2023-05-03T14:15:00Z',
-    mood: 'calm',
-    created_at: '2023-05-03T20:45:00Z',
-    mood_score: 75
+    title: 'Stress au travail',
+    content: 'La pression au travail était intense aujourd\'hui. Je dois trouver de meilleures façons de gérer mon stress.',
+    mood: 'anxious',
+    date: '2023-06-03T15:30:00Z',
+    created_at: '2023-06-03T15:30:00Z',
+    ai_feedback: 'Essayez des techniques de respiration ou une courte promenade pour réduire le stress.',
+    mood_score: 40
   },
   {
     id: '3',
     user_id: 'user-1',
-    title: 'Journée stressante',
-    content: 'Beaucoup de réunions aujourd\'hui et une présentation importante. Je me sens un peu stressé.',
-    date: '2023-05-05T18:20:00Z',
-    mood: 'anxious',
-    created_at: '2023-05-05T21:30:00Z',
-    mood_score: 45
+    title: 'Découverte musicale',
+    content: 'J\'ai découvert une nouvelle playlist de musique relaxante qui m\'aide à me concentrer. Ça a vraiment amélioré ma journée.',
+    mood: 'calm',
+    date: '2023-06-05T18:45:00Z',
+    created_at: '2023-06-05T18:45:00Z',
+    mood_score: 75
   }
 ];
 
-// Fetch all journal entries
+// Fetch all journal entries for a user
 export const fetchJournalEntries = async (userId: string): Promise<JournalEntry[]> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-
+  
+  // Filter entries by user ID
   return mockJournalEntries.filter(entry => entry.user_id === userId);
 };
 
-// Fetch a specific journal entry
-export const fetchJournalEntry = async (id: string): Promise<JournalEntry> => {
+// Fetch a specific journal entry by ID
+export const fetchJournalEntry = async (id: string): Promise<JournalEntry | undefined> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 300));
-
-  const entry = mockJournalEntries.find(entry => entry.id === id);
-  if (!entry) {
-    throw new Error('Journal entry not found');
-  }
-
-  return entry;
+  
+  return mockJournalEntries.find(entry => entry.id === id);
 };
 
-// Create a new journal entry
+// Create a new journal entry (renamed from saveJournalEntry for compatibility)
 export const createJournalEntry = async (entryData: Partial<JournalEntry>): Promise<JournalEntry> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 700));
-
+  
+  // Generate a mood score based on the mood (simple mapping)
+  const moodScores: Record<string, number> = {
+    'happy': 90,
+    'calm': 75,
+    'sad': 30,
+    'anxious': 40,
+    'angry': 20,
+    'tired': 50,
+    'energetic': 85
+  };
+  
+  // Create new entry
   const newEntry: JournalEntry = {
-    id: `entry-${Date.now()}`,
-    user_id: entryData.user_id || 'user-1', // Default user ID
+    id: uuidv4(),
+    user_id: entryData.user_id || 'user-1',
     title: entryData.title || 'Sans titre',
     content: entryData.content || '',
-    date: entryData.date || new Date().toISOString(),
     mood: entryData.mood || 'neutral',
+    date: entryData.date || new Date().toISOString(),
     created_at: new Date().toISOString(),
-    mood_score: entryData.mood_score || 50
+    mood_score: moodScores[entryData.mood || 'neutral'] || 50,
   };
-
+  
+  // Add AI feedback for certain moods
+  if (['anxious', 'sad', 'angry'].includes(newEntry.mood)) {
+    newEntry.ai_feedback = generateAIFeedback(newEntry.mood);
+  }
+  
+  // Add to mock database
   mockJournalEntries.push(newEntry);
+  
   return newEntry;
 };
 
-// Update an existing journal entry
-export const updateJournalEntry = async (id: string, updates: Partial<JournalEntry>): Promise<JournalEntry> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-
-  const index = mockJournalEntries.findIndex(entry => entry.id === id);
-  if (index === -1) {
-    throw new Error('Journal entry not found');
-  }
-
-  mockJournalEntries[index] = {
-    ...mockJournalEntries[index],
-    ...updates,
-    // Don't update these fields
-    id: mockJournalEntries[index].id,
-    user_id: mockJournalEntries[index].user_id,
-    created_at: mockJournalEntries[index].created_at
+// Simple AI feedback generator based on mood
+function generateAIFeedback(mood: string): string {
+  const feedbacks: Record<string, string[]> = {
+    'anxious': [
+      'Essayez des exercices de respiration profonde pour réduire votre anxiété.',
+      'Prenez quelques minutes pour méditer et vous recentrer.',
+      'Faire une courte promenade peut aider à réduire les tensions.',
+    ],
+    'sad': [
+      'Rappelez-vous que les émotions sont temporaires et fluctuantes.',
+      'Essayez de vous connecter avec un ami ou un proche aujourd\'hui.',
+      'Pratiquez l\'auto-compassion et soyez gentil avec vous-même.',
+    ],
+    'angry': [
+      'Essayez de prendre du recul avant de réagir dans le feu de l\'action.',
+      'La colère masque souvent d\'autres émotions comme la peur ou la tristesse.',
+      'Une activité physique peut vous aider à évacuer cette énergie.',
+    ]
   };
+  
+  const moodFeedbacks = feedbacks[mood] || feedbacks['anxious'];
+  return moodFeedbacks[Math.floor(Math.random() * moodFeedbacks.length)];
+}
 
-  return mockJournalEntries[index];
-};
-
-// Delete a journal entry
-export const deleteJournalEntry = async (id: string): Promise<boolean> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 400));
-
-  const initialLength = mockJournalEntries.length;
-  mockJournalEntries = mockJournalEntries.filter(entry => entry.id !== id);
-
-  return mockJournalEntries.length < initialLength;
-};
-
-// Save journal entry (alias for createJournalEntry for backward compatibility)
+// For compatibility with useCoachEvents
 export const saveJournalEntry = createJournalEntry;

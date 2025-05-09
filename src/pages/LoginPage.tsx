@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,20 +28,6 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, isLoading, navigate, location]);
 
-  const handleLogin = async (email: string, password: string) => {
-    // If auth.login exists, use it; otherwise simulate a login
-    if (auth.login) {
-      return auth.login(email, password);
-    } else {
-      // Simulate login logic
-      console.log("Login simulation with:", email);
-      localStorage.setItem("user", JSON.stringify({email, role: "user"}));
-      // Redirect to dashboard
-      navigate("/dashboard");
-      return true;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -57,7 +44,7 @@ const LoginPage = () => {
     setIsSubmitting(true);
     try {
       console.log("Tentative de connexion avec:", { email, password });
-      await handleLogin(email, password);
+      await login(email, password);
       toast({
         title: "Connexion réussie",
         description: "Bienvenue sur EmotionsCare!",
