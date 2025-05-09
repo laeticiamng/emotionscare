@@ -4,24 +4,44 @@
 export interface JournalEntry {
   id: string;
   user_id: string;
+  title: string;
   content: string;
   date: string;
-  title: string;
-  mood: string;
   created_at: string;
+  updated_at?: string;
+  mood?: number;
+  tags?: string[];
+  is_private?: boolean;
+  emotion?: string;
+  ai_insights?: string;
   ai_feedback?: string;
-  text?: string;
-  mood_score: number;
+  color?: string;
 }
 
-export interface JournalEntryFormData {
-  title: string;
-  content: string;
-  mood: string;
-  ai_analysis?: boolean;
+export interface JournalPrompt {
+  id: string;
+  text: string;
+  category: string;
+  emotion?: string;
+  recommended_for?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
 }
 
-export interface JournalFilterOptions {
-  period: 'all' | 'month' | 'week';
-  mood?: string;
+export interface JournalStats {
+  total_entries: number;
+  streak_days: number;
+  current_month_entries: number;
+  average_mood?: number;
+  most_used_tags?: string[];
+  most_frequent_emotion?: string;
+  completion_rate?: number;
+}
+
+export interface JournalSettings {
+  reminder_time?: string;
+  reminder_days: string[];
+  reminder_enabled: boolean;
+  default_privacy: 'public' | 'private';
+  enable_ai_insights: boolean;
+  prompt_suggestions: boolean;
 }

@@ -152,6 +152,77 @@ export interface UserPreferences {
   };
 }
 
+// Invitation related types
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  sent: number;
+  rejected: number;
+  teams?: Record<string, number>;
+  recent_invites?: any[];
+}
+
+export interface InvitationFormData {
+  email: string;
+  name?: string;
+  role: UserRole;
+  team_id?: string;
+  expiration_days?: number;
+  message?: string;
+}
+
+// Journal Entry related types
+export interface JournalEntry {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  date: string;
+  created_at: string;
+  updated_at?: string;
+  mood?: number;
+  tags?: string[];
+  is_private?: boolean;
+  emotion?: string;
+  ai_insights?: string;
+  ai_feedback?: string;
+  color?: string;
+}
+
+// Mood data for charts
+export interface MoodData {
+  date: string;
+  originalDate?: string;
+  value: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
+}
+
+// Music track related types
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  album?: string;
+  duration: number;
+  url: string;
+  cover_url?: string;
+  genre?: string;
+  mood?: string;
+  emotions?: string[];
+  intensity?: number;
+  bpm?: number;
+  is_favorite?: boolean;
+  play_count?: number;
+  created_at?: string;
+  is_ai_generated?: boolean;
+  track_number?: number;
+  year?: number;
+}
+
 // Export all types from the separate type files
 export * from './emotion';
 export * from './navigation';

@@ -42,7 +42,7 @@ export function useAutoRefresh({
   useEffect(() => {
     if (enabled) {
       handleRefresh();
-      timerRef.current = setInterval(handleRefresh, interval);
+      timerRef.current = setInterval(handleRefresh, interval) as unknown as NodeJS.Timeout;
     } else if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;

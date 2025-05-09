@@ -1,48 +1,44 @@
 
-// Chat related types used in chat interfaces
+// Chat related types
 
 export interface ChatMessage {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
-}
-
-export interface ChatHistory {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ChatContext {
-  user_mood?: string;
-  user_history?: string[];
-  recent_activities?: string[];
-  preferences?: Record<string, any>;
-}
-
-export interface ChatResponse {
-  message: string;
-  text?: string;
-  context?: ChatContext;
-  recommendations?: string[];
-  follow_up_questions?: string[];
+  emotion?: string;
+  emotion_score?: number;
+  is_read?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
-  userId: string;
-  title: string;
-  lastMessage: string;
-  createdAt: Date;
-  updatedAt: Date;
+  title?: string;
+  messages: ChatMessage[];
+  created_at: Date;
+  updated_at?: Date;
+  tags?: string[];
+  user_id: string;
+  summary?: string;
+  context?: Record<string, any>;
 }
 
-export interface UserContext {
-  preferences?: Record<string, any>;
-  recentEmotions?: string[];
-  recentActivities?: string[];
-  userHistory?: Record<string, any>;
+export interface ChatThread {
+  id: string;
+  title: string;
+  last_message?: string;
+  last_timestamp: Date;
+  unread_count: number;
+  is_archived?: boolean;
+  context?: Record<string, any>;
+}
+
+export interface ChatSettings {
+  notification_enabled: boolean;
+  show_typing_indicator: boolean;
+  sound_enabled: boolean;
+  auto_reply?: boolean;
+  suggested_replies?: boolean;
+  history_retention_days?: number;
 }

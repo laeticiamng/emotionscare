@@ -1,38 +1,39 @@
 
-// Types related to emotion scanning and processing
+// Scan related types
 
-import { Emotion, EmotionResult } from './emotion';
-import { User } from './index';
-
-export interface ScanFormData {
+export interface EmotionScan {
+  id: string;
+  user_id: string;
   text?: string;
-  audio?: File | null;
   audio_url?: string;
   emojis?: string;
+  created_at: string;
+  is_confidential?: boolean;
+  share_with_coach?: boolean;
+  result?: any;
 }
 
-export interface ScanFilterOptions {
-  period: '7' | '30' | '90';
-  service: string;
-  anonymized: boolean;
+export interface EmotionScanRequest {
+  userId: string;
+  text?: string;
+  audioUrl?: string;
+  emojis?: string;
+  isConfidential?: boolean;
+  shareWithCoach?: boolean;
 }
 
-export interface ScanUserData {
-  user: User;
-  latestEmotion?: Emotion;
-  emotionCount: number;
-  averageScore: number;
+export interface EmotionScanSettings {
+  enable_auto_scan?: boolean;
+  scan_frequency?: 'daily' | 'twice_daily' | 'weekly';
+  preferred_method?: 'text' | 'audio' | 'emoji';
+  quick_scan_enabled?: boolean;
+  confidential_by_default?: boolean;
+  share_with_coach_by_default?: boolean;
 }
 
-export interface EmotionScanResponse {
-  emotion: EmotionResult;
-  recommendations?: string[];
-}
-
-export interface EmotionVisualizerParams {
+export interface EmotionTrend {
   emotion: string;
-  intensity?: number;
-  size?: 'sm' | 'md' | 'lg';
-  withLabel?: boolean;
-  className?: string;
+  percentage: number;
+  change: number;
+  period: 'day' | 'week' | 'month';
 }

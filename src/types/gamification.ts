@@ -1,36 +1,46 @@
 
-/** Challenge or daily ritual */
+// Gamification related types
+
 export interface Challenge {
   id: string;
-  title?: string;
-  name?: string;
+  title: string;
   description: string;
   points: number;
-  completed: boolean;
-  difficulty: string;
-  image_url?: string;
-  target?: number;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  start_date?: string;
+  end_date?: string;
+  is_completed?: boolean;
   progress?: number;
-  maxProgress?: number;
+  icon?: string;
+  reward_badge_id?: string;
 }
 
-/** User's progress on a challenge */
-export interface UserChallenge {
-  id: string;
+export interface UserProgress {
   user_id: string;
-  challenge_id: string;
-  date: string;
-  completed: boolean;
+  level: number;
+  experience: number;
+  points: number;
+  streak_days: number;
+  badges_count: number;
+  challenges_completed: number;
+  rank?: number;
+  next_level_threshold?: number;
+  progress_percentage?: number;
 }
 
-// Import Badge from index.ts for compatibility
-import { Badge } from './index';
-export type { Badge };
+export interface Leaderboard {
+  period: 'daily' | 'weekly' | 'monthly' | 'all_time';
+  entries: LeaderboardEntry[];
+}
 
-/** The attribution of a badge to a user */
-export interface UserBadge {
-  id: string;
+export interface LeaderboardEntry {
   user_id: string;
-  badge_id: string;
-  awarded_on: string;
+  user_name: string;
+  avatar?: string;
+  anonymity_code?: string;
+  position: number;
+  score: number;
+  delta?: number;
+  team?: string;
 }

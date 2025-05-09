@@ -1,34 +1,56 @@
 
 // Music related types
+
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
+  album?: string;
   duration: number;
   url: string;
-  audioUrl?: string;
-  coverUrl?: string;
-  coverImage?: string;
-  cover?: string;
-  externalUrl?: string;
+  cover_url?: string;
   genre?: string;
-  emotion?: string;
   mood?: string;
+  emotions?: string[];
+  intensity?: number;
+  bpm?: number;
+  is_favorite?: boolean;
+  play_count?: number;
+  created_at?: string;
+  is_ai_generated?: boolean;
+  track_number?: number;
   year?: number;
-  isPlaying?: boolean;
 }
 
 export interface MusicPlaylist {
   id: string;
-  name: string;
+  title: string;
   description?: string;
-  coverUrl?: string;
-  emotion?: string;
+  cover_url?: string;
+  created_at?: string;
+  updated_at?: string;
   tracks: MusicTrack[];
+  creator_id?: string;
+  is_public?: boolean;
+  play_count?: number;
+  duration?: number;
+  mood?: string;
+  is_ai_generated?: boolean;
 }
 
-export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
+export interface MusicPreferences {
+  favorite_genres?: string[];
+  favorite_moods?: string[];
+  volume_level?: number;
+  auto_play?: boolean;
+  recommended_intensity?: number;
+  emotion_sync_enabled?: boolean;
+}
 
-// Backward compatibility aliases
-export type Track = MusicTrack;
-export type Playlist = MusicPlaylist;
+export interface MusicRecommendation {
+  track?: MusicTrack;
+  playlist?: MusicPlaylist;
+  reason?: string;
+  confidence?: number;
+  source: 'emotion' | 'preference' | 'popular' | 'history' | 'ai';
+}

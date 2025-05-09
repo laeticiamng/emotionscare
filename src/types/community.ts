@@ -1,48 +1,42 @@
 
+// Community related types
+
 import { User } from './index';
 
-export interface Post {
+export interface CommunityPost {
   id: string;
   user_id: string;
+  title: string;
   content: string;
-  date: string;
-  reactions: number;
-  is_anonymous: boolean;
+  created_at: string;
+  updated_at?: string;
+  likes_count: number;
+  comments_count: number;
   tags?: string[];
-  comments?: Comment[];
-  media_url?: string;
+  is_anonymous?: boolean;
+  author?: User;
+  is_featured?: boolean;
   image_url?: string;
+  visibility: 'public' | 'team' | 'private';
 }
 
-export interface Comment {
+export interface CommunityComment {
   id: string;
   post_id: string;
   user_id: string;
   content: string;
-  date: string;
-  likes: number;
-  is_anonymous: boolean;
-}
-
-export interface Group {
-  id: string;
-  name: string;
-  description: string;
-  owner_id: string;
-  created_at: string;
-  members_count: number;
-  image_url?: string;
-  tags?: string[];
-  topic?: string;
-  members?: User[];
-}
-
-export interface BuddyRequest {
-  id: string;
-  from_user_id: string;
-  to_user_id: string;
-  status: 'pending' | 'accepted' | 'rejected';
   created_at: string;
   updated_at?: string;
-  user?: User;
+  likes_count: number;
+  parent_id?: string;
+  author?: User;
+  is_edited?: boolean;
+  is_anonymous?: boolean;
+}
+
+export interface CommunityTag {
+  id: string;
+  name: string;
+  count: number;
+  color?: string;
 }
