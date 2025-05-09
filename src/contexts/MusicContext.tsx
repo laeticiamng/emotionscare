@@ -1,242 +1,199 @@
 
-import React, { createContext, useState, useContext, ReactNode, useCallback } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types';
-import { useMusicState } from '@/hooks/useMusicState';
 
 interface MusicContextType {
-  isPlaying: boolean;
   currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null;
-  currentEmotion: string;
-  playlists: MusicPlaylist[];
+  isPlaying: boolean;
   volume: number;
-  error: string | null;
-  
-  // Player controls
-  play: (track: MusicTrack) => void;
-  pause: () => void;
+  setVolume: (volume: number) => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  
-  // Playlist management
-  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
+  playlists: MusicPlaylist[];
+  currentPlaylist: MusicPlaylist | null;
+  currentEmotion: string | null;
   loadPlaylistById: (id: string) => void;
-  
-  // Drawer controls
-  openDrawer: () => void;
-  closeDrawer: () => void;
-  isDrawerOpen: boolean;
-  
-  // System initialization
-  initializeMusicSystem: () => Promise<void>;
+  loadPlaylistForEmotion: (emotion: string) => void;
+  initializeMusicSystem: () => void;
+  error: string | null;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
-export const useMusic = () => {
-  const context = useContext(MusicContext);
-  if (!context) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  return context;
-};
-
-interface MusicProviderProps {
-  children: ReactNode;
-}
-
-export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+export const useMusicMock = (): MusicContextType => {
+  // État local pour le contexte musical
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  // Placeholder for initialization
-  const initializeMusicSystem = useCallback(async () => {
-    try {
-      console.log('Initializing music system...');
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Initialize with some default playlists
-      const defaultPlaylists: MusicPlaylist[] = [
-        {
-          id: 'happy',
-          name: 'Happy Vibes',
-          description: 'Energetic and positive music',
-          tracks: [
-            {
-              id: 'happy-1',
-              title: 'Good Day',
-              artist: 'Happy Artist',
-              duration: 180,
-              url: 'https://example.com/track1.mp3'
-            },
-            {
-              id: 'happy-2',
-              title: 'Sunshine',
-              artist: 'Positive Band',
-              duration: 210,
-              url: 'https://example.com/track2.mp3'
-            }
-          ]
-        },
-        {
-          id: 'calm',
-          name: 'Calming Sounds',
-          description: 'Peaceful and relaxing tracks',
-          tracks: [
-            {
-              id: 'calm-1',
-              title: 'Ocean Waves',
-              artist: 'Nature Sounds',
-              duration: 240,
-              url: 'https://example.com/calm1.mp3'
-            },
-            {
-              id: 'calm-2',
-              title: 'Gentle Rain',
-              artist: 'Meditation Music',
-              duration: 300,
-              url: 'https://example.com/calm2.mp3'
-            }
-          ]
-        },
-        {
-          id: 'neutral',
-          name: 'Neutral Focus',
-          description: 'Background music for focus',
-          tracks: [
-            {
-              id: 'neutral-1',
-              title: 'Deep Focus',
-              artist: 'Concentration',
-              duration: 320,
-              url: 'https://example.com/neutral1.mp3'
-            }
-          ]
-        }
-      ];
-      
-      setPlaylists(defaultPlaylists);
-      setCurrentPlaylist(defaultPlaylists[2]); // Set neutral as default
-      
-    } catch (err) {
-      console.error('Error initializing music system:', err);
-      setError('Failed to initialize music system');
-    }
-  }, []);
-  
-  // Track playback controls
-  const play = useCallback((track: MusicTrack) => {
+
+  // Simulations des fonctions de lecture
+  const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
     setIsPlaying(true);
-  }, []);
-  
-  const pause = useCallback(() => {
+    console.log('Playing track:', track.title);
+  };
+
+  const pauseTrack = () => {
     setIsPlaying(false);
-  }, []);
-  
-  // Aliases for play/pause to match component expectations
-  const playTrack = play;
-  const pauseTrack = pause;
-  
-  // Navigation between tracks
-  const nextTrack = useCallback(() => {
-    if (!currentTrack || !currentPlaylist) return;
-    
+    console.log('Paused track');
+  };
+
+  const nextTrack = () => {
+    if (!currentPlaylist || !currentTrack) return;
     const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex === -1 || currentIndex >= currentPlaylist.tracks.length - 1) {
-      // Loop back to the beginning if at the end
-      play(currentPlaylist.tracks[0]);
-    } else {
-      play(currentPlaylist.tracks[currentIndex + 1]);
-    }
-  }, [currentTrack, currentPlaylist, play]);
-  
-  const previousTrack = useCallback(() => {
-    if (!currentTrack || !currentPlaylist) return;
-    
+    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
+    playTrack(currentPlaylist.tracks[nextIndex]);
+  };
+
+  const previousTrack = () => {
+    if (!currentPlaylist || !currentTrack) return;
     const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex <= 0) {
-      // Go to the end if at the beginning
-      play(currentPlaylist.tracks[currentPlaylist.tracks.length - 1]);
-    } else {
-      play(currentPlaylist.tracks[currentIndex - 1]);
-    }
-  }, [currentTrack, currentPlaylist, play]);
-  
-  // Playlist management
-  const loadPlaylistForEmotion = useCallback((emotion: string): MusicPlaylist | null => {
-    const normalizedEmotion = emotion.toLowerCase();
-    
-    // Find matching playlist or fall back to neutral
-    const playlist = playlists.find(p => p.id === normalizedEmotion) || 
-                    playlists.find(p => p.id === 'neutral');
-    
-    if (playlist) {
-      setCurrentPlaylist(playlist);
-      setCurrentEmotion(normalizedEmotion);
-      return playlist;
-    }
-    
-    return null;
-  }, [playlists]);
-  
-  const loadPlaylistById = useCallback((id: string) => {
+    const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+    playTrack(currentPlaylist.tracks[prevIndex]);
+  };
+
+  const loadPlaylistById = (id: string) => {
     const playlist = playlists.find(p => p.id === id);
     if (playlist) {
       setCurrentPlaylist(playlist);
-      setCurrentEmotion(playlist.id);
+      if (playlist.tracks.length > 0) {
+        setCurrentTrack(playlist.tracks[0]);
+      }
     }
-  }, [playlists]);
-  
-  // Drawer controls
-  const openDrawer = useCallback(() => {
-    setIsDrawerOpen(true);
-  }, []);
-  
-  const closeDrawer = useCallback(() => {
-    setIsDrawerOpen(false);
-  }, []);
+  };
 
-  // Export the context value
-  const contextValue: MusicContextType = {
-    isPlaying,
-    currentTrack,
-    currentPlaylist,
-    currentEmotion,
-    playlists,
-    volume,
-    error,
+  const loadPlaylistForEmotion = (emotion: string) => {
+    console.log(`Loading playlist for emotion: ${emotion}`);
+    setCurrentEmotion(emotion);
     
-    play,
-    pause,
+    // Simuler un chargement de playlist basé sur l'émotion
+    const mockPlaylist: MusicPlaylist = {
+      id: `emotion-${emotion}-${Date.now()}`,
+      name: `Playlist pour ${emotion}`,
+      description: `Musique adaptée pour l'émotion: ${emotion}`,
+      emotion: emotion,
+      tracks: [
+        {
+          id: '1',
+          title: 'Track 1',
+          artist: 'Artist 1',
+          duration: 180,
+          url: '/path/to/audio1.mp3',
+        },
+        {
+          id: '2',
+          title: 'Track 2',
+          artist: 'Artist 2',
+          duration: 210,
+          url: '/path/to/audio2.mp3',
+        },
+        {
+          id: '3',
+          title: 'Track 3',
+          artist: 'Artist 3',
+          duration: 195,
+          url: '/path/to/audio3.mp3',
+        }
+      ]
+    };
+
+    setPlaylists(prev => [...prev, mockPlaylist]);
+    setCurrentPlaylist(mockPlaylist);
+    if (mockPlaylist.tracks.length > 0) {
+      setCurrentTrack(mockPlaylist.tracks[0]);
+    }
+  };
+
+  const initializeMusicSystem = () => {
+    console.log('Initializing music system');
+    // Simuler le chargement des playlists par défaut
+    const defaultPlaylists: MusicPlaylist[] = [
+      {
+        id: 'relaxation',
+        name: 'Relaxation',
+        description: 'Musique calme pour se détendre',
+        tracks: [
+          {
+            id: 'r1',
+            title: 'Calme intérieur',
+            artist: 'RelaxArtist',
+            duration: 240,
+            url: '/path/to/relax1.mp3',
+          },
+          {
+            id: 'r2',
+            title: 'Vagues apaisantes',
+            artist: 'OceanSounds',
+            duration: 300,
+            url: '/path/to/relax2.mp3',
+          }
+        ]
+      },
+      {
+        id: 'energy',
+        name: 'Énergie',
+        description: 'Musique pour se motiver',
+        tracks: [
+          {
+            id: 'e1',
+            title: 'Boost matinal',
+            artist: 'EnergyArtist',
+            duration: 190,
+            url: '/path/to/energy1.mp3',
+          },
+          {
+            id: 'e2',
+            title: 'Motivation maximale',
+            artist: 'MotivationalArtist',
+            duration: 220,
+            url: '/path/to/energy2.mp3',
+          }
+        ]
+      }
+    ];
+
+    setPlaylists(defaultPlaylists);
+  };
+
+  return {
+    currentTrack,
+    isPlaying,
+    volume,
+    setVolume,
     playTrack,
     pauseTrack,
     nextTrack,
     previousTrack,
-    setVolume,
-    
-    loadPlaylistForEmotion,
+    playlists,
+    currentPlaylist,
+    currentEmotion,
     loadPlaylistById,
-    
-    openDrawer,
-    closeDrawer,
-    isDrawerOpen,
-    
-    initializeMusicSystem
+    loadPlaylistForEmotion,
+    initializeMusicSystem,
+    error
   };
+};
+
+export const MusicProvider = ({ children }: { children: ReactNode }) => {
+  const musicMock = useMusicMock();
 
   return (
-    <MusicContext.Provider value={contextValue}>
+    <MusicContext.Provider value={musicMock}>
       {children}
     </MusicContext.Provider>
   );
+};
+
+export const useMusic = (): MusicContextType => {
+  const context = useContext(MusicContext);
+  if (context === undefined) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
 };

@@ -1,61 +1,38 @@
 
-import React from 'react';
+import React, { ReactNode, useEffect } from 'react';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate, useLocation } from 'react-router-dom';
-import LoadingAnimation from '@/components/ui/loading-animation';
-import { UserRole } from '@/types';
 
 interface ProtectedLayoutProps {
-  children: React.ReactNode;
-  requireRole?: string;
+  children: ReactNode;
 }
 
-const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({
-  children,
-  requireRole
-}) => {
-  const { isAuthenticated, user, isLoading } = useAuth();
+const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  
-  console.log("ProtectedLayout - Auth state:", { 
-    isAuthenticated, 
-    user: user ? { id: user.id, name: user.name, email: user.email, role: user.role } : null, 
-    isLoading, 
-    path: location.pathname 
-  });
-  
-  // Show loading state
+
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading) {
+      console.log('User not authenticated, redirecting to login');
+    }
+  }, [isAuthenticated, isLoading]);
+
+  // Si l'authentification est en cours de chargement, affiche un état de chargement
   if (isLoading) {
-    console.log("ProtectedLayout - Loading...");
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <LoadingAnimation />
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
-  
-  // Redirect to login if not authenticated
+
+  // Si l'utilisateur n'est pas authentifié, redirige vers la page de connexion
   if (!isAuthenticated) {
-    console.log("ProtectedLayout - Not authenticated, redirecting to login");
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
-  // Check for role requirements
-  if (requireRole && user?.role !== requireRole && user?.role !== UserRole.ADMIN) {
-    console.log(`ProtectedLayout - Role check failed: user role ${user?.role} vs required ${requireRole}`);
-    return (
-      <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-4">Accès refusé</h1>
-        <p>Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
-      </div>
-    );
-  }
-  
-  // Return the children if all checks pass
-  console.log("ProtectedLayout - All checks passed, rendering content");
-  return <>{children}</>;
+
+  // Si l'utilisateur est authentifié, affiche le contenu protégé
+  return children || <Outlet />;
 };
 
 export default ProtectedLayout;
