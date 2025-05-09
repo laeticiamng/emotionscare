@@ -1,4 +1,3 @@
-
 import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { completeChallenge } from '@/lib/gamificationService';
@@ -19,7 +18,8 @@ export const useCoachEvents = () => {
     } catch (error) {
       // Return a mock mutation object if QueryClient isn't available
       return {
-        mutateAsync: async () => {
+        // Define the mutateAsync function with the same parameter type as the real function
+        mutateAsync: async (params: any) => {
           console.warn('QueryClient not available, using fallback mode');
           return true; // Return true instead of undefined to match the return type of the real mutations
         },
@@ -53,8 +53,6 @@ export const useCoachEvents = () => {
   const handleCompleteChallenge = useCallback(
     async (challengeId: string): Promise<boolean> => {
       try {
-        // The issue is here - we're passing challengeId, but the function might expect void
-        // Let's ensure the type matches by using the correct interface
         await completeChallengeQuery.mutateAsync(challengeId);
         return true;
       } catch (error) {
