@@ -4,7 +4,7 @@ import { Outlet, Link } from 'react-router-dom'
 import MusicDrawer from './music/player/MusicDrawer'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from './ui/button'
-import { Headphones, Menu, User } from 'lucide-react'
+import { Headphones, Menu, Shield, User } from 'lucide-react'
 
 const Shell: React.FC = () => {
   const [musicOpen, setMusicOpen] = useState(false)
@@ -42,12 +42,20 @@ const Shell: React.FC = () => {
                 </Link>
               </Button>
             ) : (
-              <Button variant="default" size="sm" asChild>
-                <Link to="/login" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Connexion</span>
-                </Link>
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/login" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">Connexion</span>
+                  </Link>
+                </Button>
+                <Button variant="default" size="sm" asChild>
+                  <Link to="/admin-login" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    <span className="hidden sm:inline">Direction</span>
+                  </Link>
+                </Button>
+              </div>
             )}
           </div>
         </div>
