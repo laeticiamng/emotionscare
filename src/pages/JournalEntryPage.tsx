@@ -1,131 +1,66 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { fetchJournalEntry, deleteJournalEntry } from '@/lib/journalService';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Trash2, Clock } from 'lucide-react';
-import { format } from 'date-fns';
-import { useToast } from '@/components/ui/use-toast';
-import LoadingAnimation from '@/components/ui/loading-animation';
-import type { JournalEntry } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { fetchJournalEntries } from '@/lib/journalService'; // Changed from fetchJournalEntry
+import JournalEntryForm from '@/components/journal/JournalEntryForm';
 
-const JournalEntryPage = () => {
-  const { entryId } = useParams<{ entryId: string }>();
-  const { user } = useAuth();
-  const [entry, setEntry] = useState<JournalEntry | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+interface JournalEntry {
+  id: string;
+  user_id: string;
+  content: string;
+  date: string;
+  title: string;
+  mood: string;
+  created_at: string;
+  ai_feedback?: string;
+  text?: string;
+  mood_score: number;
+}
+
+const JournalEntryPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const [journalEntry, setJournalEntry] = useState<JournalEntry | null>(null);
 
   useEffect(() => {
-    if (user && entryId) {
-      loadEntry();
-    }
-  }, [user, entryId]);
-
-  const loadEntry = async () => {
-    setIsLoading(true);
-    try {
-      const data = await fetchJournalEntry(entryId || '');
-      if (!data) {
-        toast({
-          title: "Entrée introuvable",
-          description: "Cette entrée de journal n'existe pas ou n'est pas accessible.",
-          variant: "destructive"
-        });
-        navigate('/journal');
-        return;
-      }
-      setEntry(data);
-    } catch (error) {
-      console.error('Failed to load journal entry:', error);
-      toast({
-        title: "Erreur de chargement",
-        description: "Impossible de charger l'entrée de journal.",
-        variant: "destructive"
-      });
-      navigate('/journal');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette entrée de journal?')) {
+    const getEntry = async () => {
       try {
-        await deleteJournalEntry(entryId || '');
-        toast({
-          title: "Suppression réussie",
-          description: "L'entrée de journal a été supprimée avec succès."
-        });
-        navigate('/journal');
+        // Fix the usage to fetch a specific entry from the entries
+        const entries = await fetchJournalEntries();
+        const entry = entries.find(e => e.id === id);
+        if (entry) {
+          setJournalEntry(entry);
+        }
       } catch (error) {
-        console.error('Failed to delete journal entry:', error);
-        toast({
-          title: "Erreur de suppression",
-          description: "Impossible de supprimer l'entrée de journal.",
-          variant: "destructive"
-        });
+        console.error('Error fetching journal entry:', error);
       }
+    };
+
+    if (id) {
+      getEntry();
     }
-  };
-
-  if (isLoading) {
-    return <LoadingAnimation text="Chargement de l'entrée de journal..." />;
-  }
-
-  if (!entry) {
-    return null; // Should never reach here due to navigation in loadEntry
-  }
+  }, [id]);
 
   return (
-    <div className="container max-w-3xl mx-auto py-6">
-      <Button 
-        variant="ghost" 
-        className="mb-6 flex items-center gap-2"
-        onClick={() => navigate('/journal')}
-      >
-        <ArrowLeft size={18} /> Retour au journal
+    <div className="container mx-auto py-8">
+      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
+        Retour
       </Button>
-      
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Entrée de journal</h1>
-          <div className="flex items-center text-muted-foreground mt-2">
-            <Clock size={16} className="mr-2" />
-            {format(new Date(entry.date), 'dd MMMM yyyy à HH:mm')}
-          </div>
-        </div>
-        <Button 
-          variant="destructive" 
-          className="flex items-center gap-2"
-          onClick={handleDelete}
-        >
-          <Trash2 size={18} />
-          <span className="hidden sm:inline">Supprimer</span>
-        </Button>
-      </div>
-      
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Votre texte</CardTitle>
-        </CardHeader>
-        <CardContent className="prose max-w-none">
-          <p className="whitespace-pre-line">{entry.content || entry.text}</p>
-        </CardContent>
-      </Card>
-      
-      {entry.ai_feedback && (
-        <Card className="bg-muted/50 border-primary/20">
+      {journalEntry ? (
+        <Card>
           <CardHeader>
-            <CardTitle>Feedback personnalisé</CardTitle>
+            <CardTitle>{journalEntry.title}</CardTitle>
           </CardHeader>
-          <CardContent className="prose max-w-none">
-            <p>{entry.ai_feedback}</p>
+          <CardContent>
+            <p>{journalEntry.content}</p>
+            <p className="text-sm text-muted-foreground mt-4">
+              Date: {new Date(journalEntry.date).toLocaleDateString()}
+            </p>
           </CardContent>
         </Card>
+      ) : (
+        <p>Chargement de l'entrée de journal...</p>
       )}
     </div>
   );

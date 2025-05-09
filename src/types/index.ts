@@ -1,4 +1,3 @@
-
 // Common types used across the application
 
 // User related types
@@ -92,6 +91,7 @@ export interface Report {
   created_at?: string;
   metrics?: any;
   description?: string;
+  user_id?: string; // Add the missing property
 }
 
 // Badge related types
@@ -106,6 +106,12 @@ export interface Badge {
   awarded_at?: string;
   threshold?: number;
   icon_url?: string;
+  category?: string; // Added missing property
+  image?: string; // Added missing property
+  unlocked?: boolean; // Added missing property
+  progress?: number; // Added missing property
+  maxProgress?: number; // Added missing property
+  criteria?: string; // Added missing property
 }
 
 // Challenge related types
@@ -118,6 +124,9 @@ export interface Challenge {
   completed: boolean;
   deadline?: string;
   total?: number;
+  title?: string; // Added missing property
+  points?: number; // Added missing property
+  maxProgress?: number; // Added missing property
 }
 
 // VR related types
@@ -244,4 +253,14 @@ export interface SidebarNavItem extends NavItem {
 
 export interface NavItemWithChildren extends NavItem {
   items: NavItemWithChildren[];
+}
+
+// Adding MusicPlaylist export for backward compatibility
+export { MusicPlaylist, MusicTrack, MusicEmotion } from '@/types/music';
+
+// Add the missing InvitationVerificationResult interface
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message: string;
+  invitation?: any;
 }

@@ -1,151 +1,99 @@
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { completeChallenge } from "@/lib/gamificationService";
+import { saveRelaxationSession } from "@/lib/vrService";
+import { saveJournalEntry } from "@/lib/journalService";
 
-import { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { triggerCoachEvent } from '@/lib/coach/coach-service';
-import { useActivity } from '@/hooks/useActivity';
-
-type EmotionData = {
-  emotion?: string;
-  score?: number;
-};
-
-/**
- * Hook to manage coach events/triggers
- */
-export function useCoachEvents(
-  generateRecommendation: () => Promise<void>,
-  setLastEmotion: (emotion: string) => void,
-  setSessionScore: (score: number) => void
-) {
-  const { user } = useAuth();
+export function useCoachEvents() {
   const { toast } = useToast();
-  const { logActivity } = useActivity();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [lastTrigger, setLastTrigger] = useState<Date | null>(null);
 
-  // Trigger coach after a scan
-  const triggerAfterScan = useCallback(async (data: EmotionData) => {
-    if (!user?.id) return;
-    
-    try {
-      setIsProcessing(true);
-      
-      // Set emotion data for local UI usage
-      if (data.emotion) setLastEmotion(data.emotion);
-      if (data.score !== undefined) setSessionScore(data.score);
-      
-      // Log the activity
-      logActivity('coach_scan_trigger', { 
-        emotion: data.emotion,
-        score: data.score 
-      });
-      
-      // Trigger the coach event
-      await triggerCoachEvent('scan_completed', user.id, data);
-      
-      // Update recommendations
-      await generateRecommendation();
-      
-      // Update last trigger time
-      setLastTrigger(new Date());
-    } catch (error) {
-      console.error('Error triggering coach after scan:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [user?.id, setLastEmotion, setSessionScore, logActivity, generateRecommendation]);
-
-  // Trigger alert for concerning emotion data
-  const triggerAlert = useCallback(async (data: EmotionData) => {
-    if (!user?.id) return;
-    
-    try {
-      setIsProcessing(true);
-      
-      // Log the activity
-      logActivity('coach_alert', { 
-        emotion: data.emotion,
-        score: data.score 
-      });
-      
-      // Trigger the alert
-      await triggerCoachEvent('predictive_alert', user.id, data);
-      
-      // Show a notification
+  // Mutation to complete a challenge
+  const completeChallengeMutation = useMutation({
+    mutationFn: completeChallenge,
+    onSuccess: () => {
       toast({
-        title: "Coach IA - Alerte",
-        description: "Une notification de bien-être a été déclenchée suite à l'analyse de vos données émotionnelles.",
+        title: "Défi terminé",
+        description: "Félicitations ! Vous avez terminé ce défi.",
       });
-      
-      // Update last trigger time
-      setLastTrigger(new Date());
-    } catch (error) {
-      console.error('Error triggering coach alert:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [user?.id, logActivity, toast]);
-
-  // Trigger daily reminder
-  const triggerDailyReminder = useCallback(async () => {
-    if (!user?.id) return;
-    
-    try {
-      setIsProcessing(true);
-      
-      // Log the activity
-      logActivity('coach_daily_reminder', {});
-      
-      // Trigger the daily reminder
-      await triggerCoachEvent('daily_reminder', user.id, {});
-      
-      // Generate recommendations
-      await generateRecommendation();
-      
-      // Update last trigger time
-      setLastTrigger(new Date());
-    } catch (error) {
-      console.error('Error triggering daily reminder:', error);
-      // Don't show errors to the user for background refreshes
-    } finally {
-      setIsProcessing(false);
-    }
-    
-    return; // Explicitly return Promise<void>
-  }, [user?.id, logActivity, generateRecommendation]);
-
-  // Suggest VR session
-  const suggestVRSession = useCallback(async () => {
-    if (!user?.id) return;
-    
-    try {
-      setIsProcessing(true);
-      
-      // Log the activity
-      logActivity('vr_session_suggestion', {});
-      
-      // Show a notification
+    },
+    onError: (error: any) => {
       toast({
-        title: "Suggestion VR",
-        description: "Une session de réalité virtuelle pourrait vous aider à vous détendre.",
+        title: "Erreur",
+        description: error.message || "Impossible de terminer le défi.",
+        variant: "destructive",
       });
-      
-      // Update last trigger time
-      setLastTrigger(new Date());
-    } catch (error) {
-      console.error('Error suggesting VR session:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [user?.id, logActivity, toast]);
+    },
+  });
+
+  // Function to handle completing a challenge
+  const handleCompleteChallenge = async (challengeId: string) => {
+    completeChallengeMutation.mutate(challengeId);
+    toast({
+      title: "Défi en cours",
+      description: "Votre défi est en cours de traitement."
+    });
+  };
+
+  // Mutation to save a relaxation session
+  const saveRelaxationSessionMutation = useMutation({
+    mutationFn: saveRelaxationSession,
+    onSuccess: () => {
+      toast({
+        title: "Session sauvegardée",
+        description: "Votre session de relaxation a été sauvegardée avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de sauvegarder la session.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Function to handle saving a relaxation session
+  const handleSaveRelaxationSession = async (sessionId: string) => {
+    saveRelaxationSessionMutation.mutate(sessionId);
+    toast({
+      title: "Enregistrement terminé",
+      description: "Votre session de relaxation a été sauvegardée avec succès."
+    });
+  };
+
+  // Mutation to save a journal entry
+  const saveJournalEntryMutation = useMutation({
+    mutationFn: saveJournalEntry,
+    onSuccess: () => {
+      toast({
+        title: "Journal sauvegardé",
+        description: "Votre entrée de journal a été sauvegardée avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de sauvegarder l'entrée de journal.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Function to handle saving a journal entry
+  const handleSaveJournalEntry = async (entryData: any) => {
+    saveJournalEntryMutation.mutate(entryData);
+    toast({
+      title: "Journal enregistré",
+      description: "Votre entrée de journal a été sauvegardée avec succès."
+    });
+  };
 
   return {
-    isProcessing,
-    lastTrigger,
-    triggerAfterScan,
-    triggerAlert,
-    triggerDailyReminder,
-    suggestVRSession
+    handleCompleteChallenge,
+    handleSaveRelaxationSession,
+    handleSaveJournalEntry,
+    isCompletingChallenge: completeChallengeMutation.isLoading,
+    isSavingRelaxation: saveRelaxationSessionMutation.isLoading,
+    isSavingJournalEntry: saveJournalEntryMutation.isLoading,
   };
 }

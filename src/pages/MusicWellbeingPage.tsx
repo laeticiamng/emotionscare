@@ -1,254 +1,362 @@
-
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Music, PlayCircle, Headphones, SparklesIcon, LibrarySquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMusic } from '@/contexts/MusicContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Music } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import { Form } from "@/components/ui/form"
+import {
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Separator } from "@/components/ui/separator"
+import { Switch } from "@/components/ui/switch"
+import { useForm } from "react-hook-form"
+import { cn } from "@/lib/utils"
+import { Slider } from "@/components/ui/slider"
+import { useMusic } from '@/contexts/MusicContext';
 
-// Music therapy playlists with descriptions
-const musicTherapyPlaylists = [
-  {
-    id: 'calm',
-    name: 'Calme et Sérénité',
-    description: 'Mélodies apaisantes pour réduire le stress et l\'anxiété',
-    benefits: [
-      'Diminution de l\'anxiété',
-      'Réduction des tensions musculaires',
-      'Aide à l\'endormissement',
-    ],
-    coverImage: 'https://images.unsplash.com/photo-1506477331477-33d5d8b3dc85?q=80&w=2574&auto=format'
-  },
-  {
-    id: 'focus',
-    name: 'Concentration',
-    description: 'Compositions pour améliorer la concentration et la productivité',
-    benefits: [
-      'Amélioration de la concentration',
-      'Augmentation de la productivité',
-      'Réduction des distractions',
-    ],
-    coverImage: 'https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?q=80&w=2670&auto=format'
-  },
-  {
-    id: 'energetic',
-    name: 'Énergie Positive',
-    description: 'Rythmes dynamisants pour stimuler la motivation et l\'énergie',
-    benefits: [
-      'Stimulation de la motivation',
-      'Amélioration de l\'humeur',
-      'Augmentation du dynamisme',
-    ],
-    coverImage: 'https://images.unsplash.com/photo-1520333789090-1afc82db536a?q=80&w=2671&auto=format'
-  },
-  {
-    id: 'happy',
-    name: 'Bonheur et Joie',
-    description: 'Musiques joyeuses pour élever l\'humeur et générer des émotions positives',
-    benefits: [
-      'Stimulation des sentiments positifs',
-      'Réduction des pensées négatives',
-      'Libération de dopamine',
-    ],
-    coverImage: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2670&auto=format'
-  },
-];
-
-const MusicWellbeingPage = () => {
-  const navigate = useNavigate();
+const MusicWellbeingPage: React.FC = () => {
+  const [openPanel, setOpenPanel] = useState(false);
+  const [openFormDialog, setOpenFormDialog] = useState(false);
   const { toast } = useToast();
-  const { 
-    loadPlaylistForEmotion, 
-    openDrawer, 
-    currentTrack, 
-    isPlaying,
-    currentEmotion 
-  } = useMusic();
-  const [activeTab, setActiveTab] = useState('playlists');
+  const { initializeMusicSystem } = useMusic();
 
-  const handlePlayMusic = (playlistId: string) => {
-    loadPlaylistForEmotion(playlistId);
-    openDrawer();
-    
-    toast({
-      title: "Playlist activée",
-      description: `Votre séance musicale "${playlistId}" est prête à être écoutée`,
-    });
-  };
+  useEffect(() => {
+    const loadMusic = async () => {
+      try {
+        await initializeMusicSystem();
+      } catch (err) {
+        console.error("Erreur d'initialisation du système musical:", err);
+        toast({
+          title: "Erreur d'initialisation",
+          description: "Impossible de charger le module musical. Veuillez réessayer.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    loadMusic();
+  }, [initializeMusicSystem, toast]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Musicothérapie</h1>
+    <div className="container mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Music className="mr-2 h-5 w-5" />
+            Musique Thérapeutique
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           <p className="text-muted-foreground">
-            Le pouvoir réparateur de la musique pour votre bien-être
+            Explorez des playlists conçues pour améliorer votre bien-être émotionnel.
           </p>
-        </div>
-        <Button variant="outline" onClick={() => navigate('/dashboard')}>
-          <ArrowLeft className="mr-2 h-4 w-4" /> Retour au tableau de bord
-        </Button>
-      </div>
-      
-      {/* Current playing overview */}
-      {currentTrack && (
-        <Card className="bg-gradient-to-r from-indigo-600/10 to-indigo-400/10">
-          <CardContent className="flex items-center p-6 gap-4">
-            <div className="w-16 h-16 bg-indigo-600/20 rounded-full flex items-center justify-center flex-shrink-0">
-              {isPlaying ? (
-                <Music className="h-8 w-8 text-indigo-600" />
-              ) : (
-                <Music className="h-8 w-8 text-muted-foreground" />
-              )}
-            </div>
-            <div>
-              <h3 className="font-medium">Actuellement</h3>
-              <p className="text-xl font-semibold">{currentTrack.title}</p>
-              <p className="text-sm text-muted-foreground">
-                {currentTrack.artist} • Playlist {currentEmotion}
-              </p>
-            </div>
-            <Button 
-              className="ml-auto"
-              variant={isPlaying ? "default" : "outline"}
-              onClick={openDrawer}
-            >
-              <Headphones className="mr-2 h-4 w-4" />
-              {isPlaying ? "Contrôler" : "Reprendre"}
+          <div className="mt-4 space-y-4">
+            <Button onClick={() => {
+              if (setOpenPanel) {
+                setOpenPanel(true);
+              }
+            }} variant="outline">
+              Ouvrir le panneau de contrôle
             </Button>
-          </CardContent>
-        </Card>
-      )}
-      
-      {/* Generation Capabilities Card */}
-      <Card className="border border-purple-200 shadow-sm bg-gradient-to-r from-purple-50 to-indigo-50">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 flex-shrink-0 bg-purple-100 rounded-full flex items-center justify-center">
-              <SparklesIcon className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="flex-grow">
-              <h3 className="text-lg font-semibold">Création musicale personnalisée</h3>
-              <p className="text-sm text-muted-foreground">
-                Générez des compositions musicales uniques adaptées à vos besoins thérapeutiques 
-              </p>
-            </div>
-            <Button onClick={() => navigate('/music/create')}>
-              Créer ma musique
+            <Drawer open={openPanel} onOpenChange={setOpenPanel}>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Paramètres de la musique</DrawerTitle>
+                  <DrawerDescription>
+                    Ajustez les paramètres pour une expérience personnalisée.
+                  </DrawerDescription>
+                </DrawerHeader>
+                <div className="p-4">
+                  <FormMusicSettings />
+                </div>
+                <DrawerFooter>
+                  <DrawerClose>Fermer</DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+            <Button onClick={() => setOpenFormDialog(true)} variant="outline" className="w-full">
+              Créer une nouvelle playlist
             </Button>
           </div>
         </CardContent>
       </Card>
-      
-      {/* Main Content */}
-      <Tabs defaultValue="playlists" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-2">
-          <TabsTrigger value="playlists">Playlists Thérapeutiques</TabsTrigger>
-          <TabsTrigger value="science">Science & Bienfaits</TabsTrigger>
-        </TabsList>
-        
-        {/* Playlists Tab */}
-        <TabsContent value="playlists" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {musicTherapyPlaylists.map(playlist => (
-              <Card key={playlist.id} className="overflow-hidden flex flex-col h-full">
-                <div 
-                  className="h-40 bg-cover bg-center" 
-                  style={{ backgroundImage: `url(${playlist.coverImage})` }}
-                />
-                <CardHeader>
-                  <CardTitle>{playlist.name}</CardTitle>
-                  <CardDescription>{playlist.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <h4 className="font-medium mb-2 text-sm">Bienfaits:</h4>
-                  <ul className="space-y-1 text-sm text-muted-foreground list-disc pl-5">
-                    {playlist.benefits.map((benefit, i) => (
-                      <li key={i}>{benefit}</li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    className="w-full"
-                    onClick={() => handlePlayMusic(playlist.id)}
-                  >
-                    <PlayCircle className="mr-2 h-4 w-4" />
-                    Écouter cette playlist
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-        
-        {/* Science Tab */}
-        <TabsContent value="science" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Les bienfaits scientifiques de la musicothérapie</CardTitle>
-              <CardDescription>
-                Comment la musique agit sur notre cerveau et notre corps
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">Effets neurophysiologiques</h3>
-                <p className="text-muted-foreground">
-                  La musique stimule la libération de dopamine et d'endorphines, des 
-                  neurotransmetteurs liés au plaisir et à la réduction de la douleur. 
-                  Elle active également diverses zones du cerveau impliquées dans la 
-                  régulation des émotions.
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">Régulation du stress</h3>
-                <p className="text-muted-foreground">
-                  Des études montrent que l'écoute de musique apaisante peut réduire 
-                  les niveaux de cortisol (hormone du stress) dans le sang et diminuer 
-                  la tension artérielle et le rythme cardiaque.
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">Amélioration de la cognition</h3>
-                <p className="text-muted-foreground">
-                  Certains types de musique peuvent améliorer la concentration, la mémoire 
-                  et les performances cognitives grâce à un phénomène connu sous le nom 
-                  d'"effet Mozart", bien que ses bénéfices s'appliquent à diverses formes 
-                  de musique.
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <h3 className="text-lg font-medium">Recommandations d'utilisation</h3>
-                <ul className="list-disc pl-5 text-muted-foreground space-y-1">
-                  <li>Pour la relaxation: musiques à tempo lent (60-80 BPM)</li>
-                  <li>Pour la concentration: musique classique ou instrumentale sans paroles</li>
-                  <li>Pour l'énergie: musiques à tempo modéré (90-120 BPM)</li>
-                  <li>Pour l'humeur: musiques avec valence positive et familières</li>
-                </ul>
-              </div>
-              
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="italic text-sm text-muted-foreground">
-                  "La musique est l'un des moyens les plus puissants d'influencer directement 
-                  notre état émotionnel sans recourir à des substances externes. Elle active 
-                  les mêmes circuits de récompense du cerveau que ceux impliqués dans les 
-                  expériences naturellement plaisantes comme manger ou socialiser."
-                </p>
-                <p className="text-sm font-medium mt-2">- Dr. Robert Zatorre, Neuroscientifique</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <CreatePlaylistDialog open={openFormDialog} setOpen={setOpenFormDialog} />
     </div>
   );
 };
+
+interface PreferencesFormProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+export function PreferencesForm({ open, setOpen }: PreferencesFormProps) {
+  const form = useForm({
+    defaultValues: {
+      theme: "light",
+      notifications: true,
+    },
+  })
+
+  function onSubmit(values: any) {
+    console.log("Form values:", values);
+    toast({
+      title: "Préférences mises à jour.",
+      description: "Vos préférences ont été enregistrées.",
+    })
+    setOpen(false);
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button variant="outline">Open Preferences</Button>
+      </DrawerTrigger>
+      <DrawerContent className="text-foreground">
+        <DrawerHeader>
+          <DrawerTitle>Preferences</DrawerTitle>
+          <DrawerDescription>
+            Customize your experience.
+          </DrawerDescription>
+        </DrawerHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="theme"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Theme</FormLabel>
+                  <FormDescription>
+                    Choose your preferred theme.
+                  </FormDescription>
+                  <div className="space-y-2">
+                    <div className="grid gap-2">
+                      <Label htmlFor="theme-light" className="peer-available:cursor-pointer peer-available:opacity-70">
+                        <Input
+                          type="radio"
+                          id="theme-light"
+                          value="light"
+                          className="peer hidden"
+                          {...field}
+                        />
+                        Light
+                      </Label>
+                      <Label htmlFor="theme-dark" className="peer-available:cursor-pointer peer-available:opacity-70">
+                        <Input
+                          type="radio"
+                          id="theme-dark"
+                          value="dark"
+                          className="peer hidden"
+                          {...field}
+                        />
+                        Dark
+                      </Label>
+                    </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notifications"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel>Notifications</FormLabel>
+                    <FormDescription>
+                      Enable notifications to stay updated.
+                    </FormDescription>
+                  </div>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormItem>
+              )}
+            />
+            <DrawerFooter>
+              <Button type="submit">Submit</Button>
+            </DrawerFooter>
+          </form>
+        </Form>
+      </DrawerContent>
+    </Drawer>
+  )
+}
+
+interface FormMusicSettingsProps {
+  // preferences: UserPreferences;
+  // onSave: (preferences: UserPreferences) => void;
+}
+
+export function FormMusicSettings() {
+  const form = useForm({
+    defaultValues: {
+      volume: 50,
+      shuffle: false,
+      repeat: false,
+    },
+  })
+
+  function onSubmit(values: any) {
+    console.log("Form values:", values);
+    toast({
+      title: "Paramètres mis à jour.",
+      description: "Vos paramètres musicaux ont été enregistrés.",
+    })
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="volume"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Volume</FormLabel>
+              <FormDescription>
+                Ajustez le volume de la musique.
+              </FormDescription>
+              <Slider
+                defaultValue={[field.value]}
+                max={100}
+                step={1}
+                onValueChange={(value) => field.onChange(value[0])}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="shuffle"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel>Lecture aléatoire</FormLabel>
+                <FormDescription>
+                  Mélanger les pistes de la playlist.
+                </FormDescription>
+              </div>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="repeat"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel>Répéter</FormLabel>
+                <FormDescription>
+                  Répéter la playlist en boucle.
+                </FormDescription>
+              </div>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Enregistrer les paramètres</Button>
+      </form>
+    </Form>
+  )
+}
+
+interface CreatePlaylistDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+export function CreatePlaylistDialog({ open, setOpen }: CreatePlaylistDialogProps) {
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  })
+
+  function onSubmit(values: any) {
+    console.log("Form values:", values);
+    toast({
+      title: "Playlist créée.",
+      description: "Votre nouvelle playlist a été créée avec succès.",
+    })
+    setOpen(false);
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerContent className="text-foreground">
+        <DrawerHeader>
+          <DrawerTitle>Créer une playlist</DrawerTitle>
+          <DrawerDescription>
+            Ajoutez un nom et une description pour votre nouvelle playlist.
+          </DrawerDescription>
+        </DrawerHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom</FormLabel>
+                  <FormDescription>
+                    Choisissez un nom pour votre playlist.
+                  </FormDescription>
+                  <Input placeholder="Nom de la playlist" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormDescription>
+                    Ajoutez une description pour votre playlist.
+                  </FormDescription>
+                  <Input placeholder="Description de la playlist" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DrawerFooter>
+              <Button type="submit">Créer</Button>
+            </DrawerFooter>
+          </form>
+        </Form>
+      </DrawerContent>
+    </Drawer>
+  )
+}
 
 export default MusicWellbeingPage;

@@ -1,61 +1,52 @@
-
-import { MusicTrack, MusicPlaylist } from '@/types';
 import { Track, Playlist } from './types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-/**
- * Convertit un MusicTrack en Track pour la couche de service
- */
-export const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => {
-  return {
-    id: musicTrack.id,
-    title: musicTrack.title,
-    artist: musicTrack.artist,
-    duration: musicTrack.duration || 0,
-    url: musicTrack.url,
-    cover: musicTrack.cover || musicTrack.coverUrl,
-    coverUrl: musicTrack.coverUrl || musicTrack.cover,
-    audioUrl: musicTrack.audioUrl || musicTrack.url,
-    emotion: musicTrack.emotion, // Now included in MusicTrack type
-  };
-};
-
-/**
- * Convertit un Track en MusicTrack pour la couche d'application
- */
-export const convertTrackToMusicTrack = (track: Track): MusicTrack => {
+// Convert Track to MusicTrack
+export function convertTrackToMusicTrack(track: Track): MusicTrack {
   return {
     id: track.id,
     title: track.title,
     artist: track.artist,
-    duration: track.duration,
     url: track.url,
+    duration: track.duration,
+    audioUrl: track.audioUrl,
+    coverUrl: track.coverUrl || track.cover,
+    cover: track.cover,
+    emotion: track.emotion
+  };
+}
+
+// Convert MusicTrack to Track
+export function convertMusicTrackToTrack(track: MusicTrack): Track {
+  return {
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
+    url: track.url,
+    duration: track.duration,
+    audioUrl: track.audioUrl,
     cover: track.cover,
     coverUrl: track.coverUrl,
-    audioUrl: track.audioUrl,
-    emotion: track.emotion, // Now included in MusicTrack type
+    emotion: track.emotion
   };
-};
+}
 
-/**
- * Convertit un MusicPlaylist en Playlist pour la couche de service
- */
-export const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => {
+// Convert MusicPlaylist to Playlist
+export function convertMusicPlaylistToPlaylist(musicPlaylist: MusicPlaylist): Playlist {
   return {
     id: musicPlaylist.id,
     name: musicPlaylist.name,
-    emotion: musicPlaylist.emotion || musicPlaylist.mood || 'neutral', // Now mood is included in MusicPlaylist
+    emotion: musicPlaylist.emotion,
     tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
   };
-};
+}
 
-/**
- * Convertit un Playlist en MusicPlaylist pour la couche d'application
- */
-export const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
+// Convert Playlist to MusicPlaylist
+export function convertPlaylistToMusicPlaylist(playlist: Playlist): MusicPlaylist {
   return {
     id: playlist.id,
     name: playlist.name,
     emotion: playlist.emotion,
     tracks: playlist.tracks.map(convertTrackToMusicTrack)
   };
-};
+}

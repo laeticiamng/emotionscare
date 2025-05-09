@@ -5,7 +5,7 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number; // Required
-  url: string; // Making this required since it's used extensively
+  url: string; // Required since it's used extensively
   audioUrl?: string;
   coverUrl?: string;
   coverImage?: string;

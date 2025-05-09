@@ -46,13 +46,18 @@ export const analyzeEmotion = async (input: {
   text?: string; 
   emojis?: string;
   userId?: string;
+  user_id?: string;
+  audioUrl?: string;
+  audio_url?: string;
+  is_confidential?: boolean;
+  share_with_coach?: boolean;
 }): Promise<EmotionResult> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 800));
   
   return {
     id: uuidv4(),
-    user_id: input.userId,
+    user_id: input.userId || input.user_id,
     date: new Date().toISOString(),
     emotion: ['happy', 'sad', 'neutral', 'anxious', 'calm'][Math.floor(Math.random() * 5)],
     confidence: Math.random() * 0.5 + 0.5, // 0.5-1.0

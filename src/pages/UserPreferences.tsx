@@ -1,46 +1,56 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { UserPreferences } from '@/types';
+import PreferencesForm from './PreferencesForm';
 
-import React from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import PreferencesForm from '@/components/preferences/PreferencesForm';
-import { useTheme } from '@/contexts/ThemeContext';
+const UserPreferencesPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
+  const [userPreferences, setUserPreferences] = useState<UserPreferences>({
+    theme: 'light',
+    notifications_enabled: true,
+    font_size: 'medium',
+    language: 'en',
+  });
 
-const UserPreferences = () => {
-  const { theme } = useTheme();
-  
+  useEffect(() => {
+    if (user && user.preferences) {
+      setUserPreferences(user.preferences);
+    }
+  }, [user]);
+
+  const handleSavePreferences = async (preferences: UserPreferences) => {
+    if (user && updateUser) {
+      await updateUser({ ...user, preferences });
+      setUserPreferences(preferences);
+      navigate('/dashboard');
+    } else {
+      console.error("User or updateUser not available");
+    }
+  };
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="container max-w-4xl py-8 md:py-10 animate-fade-in">
-      <Card className="card-premium shadow-premium overflow-hidden">
-        <div className={`h-2.5 w-full ${
-          theme === 'dark' ? 'bg-primary/25' :
-          theme === 'pastel' ? 'bg-blue-200' :
-          'bg-primary/15'
-        }`}></div>
-        
-        <CardHeader className="pt-8 pb-2">
-          <CardTitle className="text-3xl heading-elegant flex items-center">
-            <span>Mes préférences</span>
-          </CardTitle>
-          <CardDescription className="text-base mt-3 text-muted-foreground">
-            Personnalisez votre expérience EmotionsCare selon vos goûts et besoins
-          </CardDescription>
+    <div className="container mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>User Preferences</CardTitle>
         </CardHeader>
-
-        <CardContent className="space-y-10 pt-6 px-8">
-          <p className="text-muted-foreground text-balance text-lg">
-            Adaptez l'interface à votre style en choisissant parmi nos thèmes professionnels 
-            et en personnalisant l'affichage selon vos préférences.
-          </p>
-          <PreferencesForm />
+        <CardContent>
+          <PreferencesForm 
+            preferences={userPreferences} 
+            onSave={handleSavePreferences} 
+          />
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default UserPreferences;
+export default UserPreferencesPage;
