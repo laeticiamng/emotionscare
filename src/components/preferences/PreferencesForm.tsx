@@ -31,7 +31,8 @@ const PreferencesForm: React.FC<{
   const formPreferences: FormPreferences = {
     ...preferences,
     marketing_emails: preferences.notifications?.email || false,
-    feature_announcements: preferences.notifications?.push || false
+    feature_announcements: preferences.notifications?.push || false,
+    language: preferences.language || 'fr' // Valeur par défaut pour résoudre l'erreur
   };
 
   const { register, handleSubmit, setValue, watch } = useForm<FormPreferences>({
@@ -43,7 +44,7 @@ const PreferencesForm: React.FC<{
     
     // Convert the form data to the UserPreferences format
     const standardPreferences: UserPreferences = {
-      theme: data.theme === 'system' ? 'light' : data.theme as 'light' | 'dark' | 'pastel',
+      theme: data.theme as 'light' | 'dark' | 'pastel', // Gestion du système
       notifications_enabled: data.notifications_enabled,
       font_size: data.font_size,
       language: data.language,

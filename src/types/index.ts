@@ -1,6 +1,12 @@
 
 // Common types used across the application
 
+// Combining all type exports in one place
+// Import and re-export types from various domain files
+
+// Re-export from types.d.ts
+export * from '../types';
+
 // User related types
 export enum UserRole {
   ADMIN = 'admin',
@@ -31,23 +37,8 @@ export interface User {
   preferences?: UserPreferences;
 }
 
-export interface UserPreferences {
-  theme: 'light' | 'dark' | 'pastel';
-  notifications_enabled: boolean;
-  font_size: 'small' | 'medium' | 'large';
-  language: string;
-  accent_color?: string;
-  background_color?: string;
-  notifications?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  reminder_time?: string;
-}
-
 // Theme related types
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'system';
+export type ThemeName = 'light' | 'dark' | 'pastel' | 'system' | 'nature' | 'deep-night';
 
 // Emotion related types
 export interface Emotion {
@@ -207,46 +198,6 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-// Music related types
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  cover?: string;
-  coverUrl?: string;
-  coverImage?: string;
-  externalUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
-  genre?: string;
-  mood?: string;
-  year?: number;
-  isPlaying?: boolean;
-}
-
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  tracks: MusicTrack[];
-  emotion?: string;
-  description?: string;
-  coverUrl?: string;
-}
-
-export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
-
-// Backward compatibility
-export type Playlist = {
-  id: string;
-  name: string;
-  tracks: MusicTrack[];
-  emotion?: string;
-};
-
-export type Track = MusicTrack;
-
 // Invitation types
 export interface InvitationStats {
   total: number;
@@ -275,20 +226,14 @@ export interface InvitationVerificationResult {
   role?: string;
 }
 
-// Navigation types
-export interface NavItem {
-  title: string;
-  href?: string;
-  disabled?: boolean;
-  external?: boolean;
-  icon?: React.ReactNode;
-  label?: string;
-}
+// Export enhanced emotion types
+export * from './emotion';
 
-export interface SidebarNavItem extends NavItem {
-  items?: SidebarNavItem[];
-}
+// Export navigation types
+export * from './navigation';
 
-export interface NavItemWithChildren extends NavItem {
-  items: NavItemWithChildren[];
-}
+// Export chat types
+export * from './chat';
+
+// Export music types
+export * from './music';

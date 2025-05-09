@@ -31,3 +31,4 @@ export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral
 
 // For backward compatibility
 export type Track = MusicTrack;
+export type Playlist = MusicPlaylist;
