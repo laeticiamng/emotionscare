@@ -1,6 +1,7 @@
 
 import React, { ReactNode } from 'react';
 import ProtectedLayout from './ProtectedLayout';
+import { SegmentProvider } from '@/contexts/SegmentContext';
 
 interface ProtectedLayoutWrapperProps {
   children: ReactNode;
@@ -8,9 +9,11 @@ interface ProtectedLayoutWrapperProps {
 
 const ProtectedLayoutWrapper = ({ children }: ProtectedLayoutWrapperProps) => {
   return (
-    <div className="protected-layout-container">
-      {children}
-    </div>
+    <SegmentProvider>
+      <div className="protected-layout-container">
+        {children}
+      </div>
+    </SegmentProvider>
   );
 };
 
