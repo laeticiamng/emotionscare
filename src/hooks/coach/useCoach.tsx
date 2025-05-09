@@ -17,14 +17,31 @@ export function useCoach() {
     setSessionScore
   } = useRecommendations();
   
-  const {
+  // Use coachEvents but handle potential errors if QueryClient isn't available
+  let coachEvents;
+  try {
+    coachEvents = useCoachEvents();
+  } catch (error) {
+    console.warn('Error initializing coach events, using fallback mode:', error);
+    // Provide fallback implementation
+    coachEvents = {
+      handleCompleteChallenge: async () => false,
+      handleSaveRelaxationSession: async () => false,
+      handleSaveJournalEntry: async () => false,
+      isCompletingChallenge: false,
+      isSavingRelaxation: false,
+      isSavingJournalEntry: false
+    };
+  }
+
+  const { 
     handleCompleteChallenge,
     handleSaveRelaxationSession,
     handleSaveJournalEntry,
     isCompletingChallenge,
     isSavingRelaxation,
     isSavingJournalEntry
-  } = useCoachEvents();
+  } = coachEvents;
   
   const { askQuestion } = useCoachQueries();
 

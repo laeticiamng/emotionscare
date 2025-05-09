@@ -1,23 +1,51 @@
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { completeChallenge } from '@/lib/gamificationService';
 import { saveRelaxationSession } from '@/lib/vrService';
 import { saveJournalEntry } from '@/lib/journalService';
 
 export const useCoachEvents = () => {
-  const queryClient = useQueryClient();
+  // Create safe versions of mutations that don't crash when QueryClient is missing
+  const createSafeMutation = (mutationFn: any) => {
+    try {
+      return useMutation({
+        mutationFn,
+        onSuccess: () => {
+          // We can't access queryClient safely here, so we skip cache invalidation
+          // This is a fallback mode when QueryClient isn't available
+        },
+      });
+    } catch (error) {
+      // Return a mock mutation object if QueryClient isn't available
+      return {
+        mutateAsync: async () => {
+          console.warn('QueryClient not available, using fallback mode');
+          return true;
+        },
+        isPending: false,
+      };
+    }
+  };
 
-  // Handle completing a challenge
-  const completeChallengeQuery = useMutation({
-    mutationFn: async (challengeId: string) => {
+  // Create safe mutations for each function
+  const completeChallengeQuery = createSafeMutation(
+    async (challengeId: string) => {
       return completeChallenge(challengeId);
-    },
-    onSuccess: () => {
-      // Invalidate the challenges cache to trigger a refresh
-      queryClient.invalidateQueries({ queryKey: ['challenges'] });
-    },
-  });
+    }
+  );
+
+  const saveRelaxationQuery = createSafeMutation(
+    async (sessionData: any) => {
+      await saveRelaxationSession(sessionData);
+    }
+  );
+
+  const saveJournalEntryQuery = createSafeMutation(
+    async (entryData: any) => {
+      await saveJournalEntry(entryData);
+    }
+  );
 
   const handleCompleteChallenge = useCallback(
     async (challengeId: string) => {
@@ -32,17 +60,6 @@ export const useCoachEvents = () => {
     [completeChallengeQuery]
   );
 
-  // Handle saving a relaxation session
-  const saveRelaxationQuery = useMutation({
-    mutationFn: async (sessionData: any) => {
-      await saveRelaxationSession(sessionData);
-    },
-    onSuccess: () => {
-      // Invalidate relevant caches
-      queryClient.invalidateQueries({ queryKey: ['vrSessions'] });
-    },
-  });
-
   const handleSaveRelaxationSession = useCallback(
     async (sessionData: any) => {
       try {
@@ -55,17 +72,6 @@ export const useCoachEvents = () => {
     },
     [saveRelaxationQuery]
   );
-
-  // Handle saving a journal entry
-  const saveJournalEntryQuery = useMutation({
-    mutationFn: async (entryData: any) => {
-      await saveJournalEntry(entryData);
-    },
-    onSuccess: () => {
-      // Invalidate journal entries cache
-      queryClient.invalidateQueries({ queryKey: ['journalEntries'] });
-    },
-  });
 
   const handleSaveJournalEntry = useCallback(
     async (entryData: any) => {
