@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react'
 import { Outlet, Link, useNavigate } from 'react-router-dom'
-import MusicDrawer from '@/components/music/player/MusicDrawer'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { 
@@ -21,6 +20,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from '@/hooks/use-toast'
+
+// Composant temporaire pour remplacer MusicDrawer en attendant de résoudre l'import
+const MusicDrawer = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
+  return open ? (
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50">
+      <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-background p-6 shadow-lg border-l">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold">Musique</h2>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            Fermer
+          </Button>
+        </div>
+        <p className="text-muted-foreground">Le lecteur de musique sera bientôt disponible.</p>
+      </div>
+    </div>
+  ) : null;
+};
 
 const Shell: React.FC = () => {
   const [musicOpen, setMusicOpen] = useState(false)

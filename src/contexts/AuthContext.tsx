@@ -78,12 +78,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const loadUser = async () => {
       setIsLoading(true);
       try {
+        console.log("AuthProvider: Chargement de l'utilisateur");
         // Commenté pour l'instant car non fonctionnel sans backend
         // const { data: { user }, error } = await supabase.auth.getUser();
         // setUser(user as unknown as User);
 
         // Pour la démo, on n'utilise pas le user de Supabase
-        setUser(null);
+        // Vérifier si un utilisateur est stocké dans le localStorage
+        const storedUser = localStorage.getItem('emotionscare_user');
+        if (storedUser) {
+          console.log("AuthProvider: Utilisateur trouvé dans le localStorage");
+          setUser(JSON.parse(storedUser));
+        } else {
+          setUser(null);
+        }
       } catch (error) {
         console.error("Failed to load user:", error);
       } finally {
@@ -97,17 +105,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
+      console.log("AuthProvider: Tentative de connexion", { email });
       // Simulate authentication for demo
       let mockUser;
       
       if (email === 'admin@example.com' && password === 'admin') {
         mockUser = MOCK_ADMIN_USER;
+        console.log("AuthProvider: Connexion admin réussie");
       } else if (email === 'user@example.com' && password === 'password') {
         mockUser = MOCK_USER;
+        console.log("AuthProvider: Connexion utilisateur réussie");
       } else {
+        console.log("AuthProvider: Identifiants invalides");
         throw new Error("Identifiants invalides. Utilisez admin@example.com/admin ou user@example.com/password");
       }
       
+      // Stocker l'utilisateur dans le localStorage pour la persistance
+      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
       setUser(mockUser);
       return mockUser;
       
@@ -127,7 +141,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      // Pour l'instant on utilise juste un state local
+      console.log("AuthProvider: Déconnexion");
+      // Pour l'instant on utilise juste un state local et localStorage
+      localStorage.removeItem('emotionscare_user');
       setUser(null);
       
       // Version réelle avec Supabase
@@ -148,7 +164,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Fonction de mise à jour de l'utilisateur
   const updateUser = (userData: Partial<User>) => {
     if (user) {
-      setUser({ ...user, ...userData });
+      const updatedUser = { ...user, ...userData };
+      localStorage.setItem('emotionscare_user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
     }
   };
 

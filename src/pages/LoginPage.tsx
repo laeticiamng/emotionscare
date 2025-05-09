@@ -18,10 +18,12 @@ const LoginPage = () => {
   const location = useLocation();
   const { toast } = useToast();
   
-  // Redirect if already authenticated
+  // Mise à jour du useEffect pour assurer le fonctionnement de la redirection après connexion
   useEffect(() => {
+    console.log("LoginPage: Auth state changed", { isAuthenticated, isLoading });
     if (isAuthenticated && !isLoading) {
       const from = (location.state as any)?.from?.pathname || '/dashboard';
+      console.log("Redirecting to:", from);
       navigate(from);
     }
   }, [isAuthenticated, isLoading, navigate, location]);
@@ -41,6 +43,7 @@ const LoginPage = () => {
 
     setIsSubmitting(true);
     try {
+      console.log("Tentative de connexion avec:", { email, password });
       await login(email, password);
       toast({
         title: "Connexion réussie",
