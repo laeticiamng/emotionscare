@@ -14,8 +14,6 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({
   onPlay = () => console.log('Play clicked'),
   onPause = () => console.log('Pause clicked')
 }) => {
-  console.log('🔍 Rendering MiniPlayer with props:', { isPlaying });
-  
   return (
     <Card className="w-full overflow-hidden">
       <CardContent className="p-4">

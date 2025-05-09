@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import {
   Drawer,
   DrawerContent,
@@ -17,17 +17,6 @@ export interface MusicDrawerProps {
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
   const logger = useLogger('MusicDrawer')
-
-  useEffect(() => {
-    console.group('🔍 Imports MusicDrawer')
-    console.log('→ Drawer         :', typeof Drawer, Drawer)
-    console.log('→ DrawerContent  :', typeof DrawerContent, DrawerContent)
-    console.log('→ DrawerHeader   :', typeof DrawerHeader, DrawerHeader)
-    console.log('→ DrawerTitle    :', typeof DrawerTitle, DrawerTitle)
-    console.log('→ DrawerClose    :', typeof DrawerClose, DrawerClose)
-    console.log('→ MiniPlayer     :', typeof MiniPlayer, MiniPlayer)
-    console.groupEnd()
-  }, [])
 
   if (!open) return null
 

@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
@@ -20,16 +20,6 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
   onPrevious,
   onNext
 }) => {
-  useEffect(() => {
-    console.group('🔍 PlayerControls Component Imports');
-    console.log('→ Button     :', typeof Button, Button);
-    console.log('→ Play       :', typeof Play, Play);
-    console.log('→ Pause      :', typeof Pause, Pause);
-    console.log('→ SkipBack   :', typeof SkipBack, SkipBack);
-    console.log('→ SkipForward:', typeof SkipForward, SkipForward);
-    console.groupEnd();
-  }, []);
-  
   return (
     <div className="flex items-center justify-center gap-2">
       <Button 
