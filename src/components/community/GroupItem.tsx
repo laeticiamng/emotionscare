@@ -26,12 +26,12 @@ const GroupItem: React.FC<GroupItemProps> = ({
           <div className="space-y-1">
             <h3 className="font-medium text-lg">{group.name}</h3>
             <Badge variant="outline" className="bg-secondary/20">
-              {group.topic}
+              {group.topic || (group.tags && group.tags[0]) || "Général"}
             </Badge>
           </div>
           <div className="flex items-center text-sm text-gray-500">
             <Users className="h-4 w-4 mr-1" />
-            <span>{group.members?.length || 0} membres</span>
+            <span>{group.members?.length || group.member_count || 0} membres</span>
           </div>
         </div>
       </CardHeader>

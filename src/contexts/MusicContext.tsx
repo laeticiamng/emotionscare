@@ -1,237 +1,166 @@
-
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-interface MusicContextType {
+interface MusicContextProps {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
-  volume: number;
-  setVolume: (volume: number) => void;
+  currentPlaylist: MusicPlaylist | null;
+  currentEmotion: string | null;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  playlists: MusicPlaylist[];
-  currentPlaylist: MusicPlaylist | null;
-  currentEmotion: string | null;
-  loadPlaylistById: (id: string) => void;
-  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
-  initializeMusicSystem: () => void;
-  error: string | null;
+  loadPlaylistForEmotion: (emotionType: string) => MusicPlaylist;
+  createUserPlaylist: (name: string) => MusicPlaylist;
+  savePlaylist: (name: string, tracks: MusicTrack[]) => MusicPlaylist;
   openDrawer: boolean;
-  setOpenDrawer: (open: boolean) => void;
+  setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-// Export the context so it can be imported elsewhere
-export const MusicContext = createContext<MusicContextType | undefined>(undefined);
+const MusicContext = createContext<MusicContextProps>({
+  currentTrack: null,
+  isPlaying: false,
+  currentPlaylist: null,
+  currentEmotion: null,
+  playTrack: () => {},
+  pauseTrack: () => {},
+  nextTrack: () => {},
+  previousTrack: () => {},
+  loadPlaylistForEmotion: () => ({} as MusicPlaylist),
+  createUserPlaylist: () => ({} as MusicPlaylist),
+  savePlaylist: () => ({} as MusicPlaylist),
+  openDrawer: false,
+  setOpenDrawer: () => {},
+});
 
-export const useMusicMock = (): MusicContextType => {
-  // État local pour le contexte musical
+export const useMusic = () => useContext(MusicContext);
+
+const initialEmotionPlaylists: Record<string, MusicTrack[]> = {
+  happy: [
+    { id: '1', title: 'Happy Song 1', artist: 'Artist 1', duration: 180, url: '/music/happy1.mp3' },
+    { id: '2', title: 'Happy Song 2', artist: 'Artist 2', duration: 200, url: '/music/happy2.mp3' },
+  ],
+  calm: [
+    { id: '3', title: 'Calm Song 1', artist: 'Artist 3', duration: 220, url: '/music/calm1.mp3' },
+    { id: '4', title: 'Calm Song 2', artist: 'Artist 4', duration: 240, url: '/music/calm2.mp3' },
+  ],
+  focused: [
+    { id: '5', title: 'Focused Song 1', artist: 'Artist 5', duration: 260, url: '/music/focused1.mp3' },
+    { id: '6', title: 'Focused Song 2', artist: 'Artist 6', duration: 280, url: '/music/focused2.mp3' },
+  ],
+  energetic: [
+    { id: '7', title: 'Energetic Song 1', artist: 'Artist 7', duration: 300, url: '/music/energetic1.mp3' },
+    { id: '8', title: 'Energetic Song 2', artist: 'Artist 8', duration: 320, url: '/music/energetic2.mp3' },
+  ],
+  melancholic: [
+    { id: '9', title: 'Melancholic Song 1', artist: 'Artist 9', duration: 340, url: '/music/melancholic1.mp3' },
+    { id: '10', title: 'Melancholic Song 2', artist: 'Artist 10', duration: 360, url: '/music/melancholic2.mp3' },
+  ],
+};
+
+export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const emotionPlaylists = useMemo(() => initialEmotionPlaylists, []);
 
-  // Simulations des fonctions de lecture
-  const playTrack = (track: MusicTrack) => {
-    // Make sure the track has all required properties
-    const validatedTrack: MusicTrack = {
-      ...track,
-      duration: track.duration || 0,
-      title: track.title || 'Unknown',
-      artist: track.artist || 'Unknown',
-      id: track.id || `track-${Date.now()}`,
-      url: track.url || track.audioUrl || ''
-    };
-    setCurrentTrack(validatedTrack);
+  const playTrack = useCallback((track: MusicTrack) => {
+    setCurrentTrack(track);
     setIsPlaying(true);
-    console.log('Playing track:', validatedTrack.title);
-  };
+  }, []);
 
-  const pauseTrack = () => {
+  const pauseTrack = useCallback(() => {
     setIsPlaying(false);
-    console.log('Paused track');
-  };
+  }, []);
 
-  const nextTrack = () => {
+  const nextTrack = useCallback(() => {
     if (!currentPlaylist || !currentTrack) return;
-    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
-    const nextTrack = currentPlaylist.tracks[nextIndex];
-    // Ensure the track has required properties
-    playTrack({
-      ...nextTrack,
-      duration: nextTrack.duration || 0,
-      url: nextTrack.url || nextTrack.audioUrl || ''
-    });
-  };
+    setCurrentTrack(currentPlaylist.tracks[nextIndex]);
+  }, [currentTrack, currentPlaylist]);
 
-  const previousTrack = () => {
+  const previousTrack = useCallback(() => {
     if (!currentPlaylist || !currentTrack) return;
-    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
-    const prevTrack = currentPlaylist.tracks[prevIndex];
-    // Ensure the track has required properties
-    playTrack({
-      ...prevTrack,
-      duration: prevTrack.duration || 0,
-      url: prevTrack.url || prevTrack.audioUrl || ''
-    });
-  };
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1) return;
+    const previousIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+    setCurrentTrack(currentPlaylist.tracks[previousIndex]);
+  }, [currentTrack, currentPlaylist]);
 
-  const loadPlaylistById = (id: string) => {
-    const playlist = playlists.find(p => p.id === id);
-    if (playlist) {
-      setCurrentPlaylist(playlist);
-      if (playlist.tracks.length > 0) {
-        // Ensure the track has required properties
-        playTrack({
-          ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
-        });
-      }
-    }
-  };
-
-  const loadPlaylistForEmotion = (emotion: string) => {
-    console.log(`Loading playlist for emotion: ${emotion}`);
-    setCurrentEmotion(emotion);
-    
-    // Simuler un chargement de playlist basé sur l'émotion
-    const mockPlaylist: MusicPlaylist = {
-      id: `emotion-${emotion}-${Date.now()}`,
-      name: `Playlist pour ${emotion}`,
-      description: `Musique adaptée pour l'émotion: ${emotion}`,
-      emotion: emotion,
-      tracks: [
-        {
-          id: '1',
-          title: 'Track 1',
-          artist: 'Artist 1',
-          duration: 180,
-          url: '/path/to/audio1.mp3',
-        },
-        {
-          id: '2',
-          title: 'Track 2',
-          artist: 'Artist 2',
-          duration: 210,
-          url: '/path/to/audio2.mp3',
-        },
-        {
-          id: '3',
-          title: 'Track 3',
-          artist: 'Artist 3',
-          duration: 195,
-          url: '/path/to/audio3.mp3',
-        }
-      ]
+  const loadPlaylistForEmotion = useCallback((emotionType: string) => {
+    const emotionPlaylist: MusicPlaylist = {
+      id: `emotion-${emotionType}`,
+      title: `${emotionType.charAt(0).toUpperCase() + emotionType.slice(1)} Music`,
+      name: `${emotionType.charAt(0).toUpperCase() + emotionType.slice(1)} Music`,
+      tracks: emotionPlaylists[emotionType] || [],
+      emotion: emotionType,
     };
-
-    setPlaylists(prev => [...prev, mockPlaylist]);
-    setCurrentPlaylist(mockPlaylist);
-    if (mockPlaylist.tracks.length > 0) {
-      // Ensure the track has required properties
-      setCurrentTrack({
-        ...mockPlaylist.tracks[0],
-        url: mockPlaylist.tracks[0].url || mockPlaylist.tracks[0].audioUrl || ''
-      });
-    }
     
-    return mockPlaylist;
-  };
+    setCurrentPlaylist(emotionPlaylist);
+    setCurrentEmotion(emotionType);
+    
+    if (emotionPlaylists[emotionType] && emotionPlaylists[emotionType].length > 0) {
+      setCurrentTrack(emotionPlaylists[emotionType][0]);
+    } else {
+      setCurrentTrack(null);
+    }
 
-  const initializeMusicSystem = () => {
-    console.log('Initializing music system');
-    // Simuler le chargement des playlists par défaut
-    const defaultPlaylists: MusicPlaylist[] = [
-      {
-        id: 'relaxation',
-        name: 'Relaxation',
-        description: 'Musique calme pour se détendre',
-        tracks: [
-          {
-            id: 'r1',
-            title: 'Calme intérieur',
-            artist: 'RelaxArtist',
-            duration: 240,
-            url: '/path/to/relax1.mp3',
-          },
-          {
-            id: 'r2',
-            title: 'Vagues apaisantes',
-            artist: 'OceanSounds',
-            duration: 300,
-            url: '/path/to/relax2.mp3',
-          }
-        ]
-      },
-      {
-        id: 'energy',
-        name: 'Énergie',
-        description: 'Musique pour se motiver',
-        tracks: [
-          {
-            id: 'e1',
-            title: 'Boost matinal',
-            artist: 'EnergyArtist',
-            duration: 190,
-            url: '/path/to/energy1.mp3',
-          },
-          {
-            id: 'e2',
-            title: 'Motivation maximale',
-            artist: 'MotivationalArtist',
-            duration: 220,
-            url: '/path/to/energy2.mp3',
-          }
-        ]
-      }
-    ];
+    return emotionPlaylist;
+  }, [emotionPlaylists]);
 
-    setPlaylists(defaultPlaylists);
-  };
+  const createUserPlaylist = useCallback((name: string) => {
+    const newPlaylist: MusicPlaylist = {
+      id: `user-${Date.now()}`,
+      title: name,
+      name: name,
+      description: "User created playlist",
+      tracks: [],
+      created_at: new Date().toISOString(),
+    };
+    
+    setCurrentPlaylist(newPlaylist);
+    return newPlaylist;
+  }, []);
 
-  return {
+  const savePlaylist = useCallback((name: string, tracks: MusicTrack[]) => {
+    const newPlaylist: MusicPlaylist = {
+      id: `saved-${Date.now()}`,
+      title: name,
+      name: name,
+      description: "Saved playlist",
+      tracks: tracks,
+      created_at: new Date().toISOString(),
+    };
+    
+    setCurrentPlaylist(newPlaylist);
+    return newPlaylist;
+  }, []);
+
+  const contextValue: MusicContextProps = {
     currentTrack,
     isPlaying,
-    volume,
-    setVolume,
+    currentPlaylist,
+    currentEmotion,
     playTrack,
     pauseTrack,
     nextTrack,
     previousTrack,
-    playlists,
-    currentPlaylist,
-    currentEmotion,
-    loadPlaylistById,
     loadPlaylistForEmotion,
-    initializeMusicSystem,
-    error,
+    createUserPlaylist,
+    savePlaylist,
     openDrawer,
-    setOpenDrawer
+    setOpenDrawer,
   };
-};
-
-export const MusicProvider = ({ children }: { children: ReactNode }) => {
-  const musicMock = useMusicMock();
 
   return (
-    <MusicContext.Provider value={musicMock}>
+    <MusicContext.Provider
+      value={contextValue}
+    >
       {children}
     </MusicContext.Provider>
   );
-};
-
-export const useMusic = (): MusicContextType => {
-  const context = useContext(MusicContext);
-  if (context === undefined) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  return context;
 };

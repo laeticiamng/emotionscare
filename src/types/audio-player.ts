@@ -16,6 +16,8 @@ export interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onProgressClick?: (percent: number) => void;
+  formatTime?: (seconds: number) => string;
+  handleProgressClick?: (percent: number) => void;
 }
 
 export interface UseAudioPlayerStateReturn {

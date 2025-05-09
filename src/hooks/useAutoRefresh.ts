@@ -15,7 +15,7 @@ export function useAutoRefresh({
   const [enabled, setEnabled] = useState(defaultEnabled);
   const [interval, setInterval] = useState(defaultInterval);
   const [refreshing, setRefreshing] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Handle the refresh
   const handleRefresh = useCallback(async () => {

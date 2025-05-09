@@ -17,7 +17,7 @@ export interface ChatConversation {
   title?: string;
   messages: ChatMessage[];
   created_at: Date;
-  updated_at?: Date; // Keep snake_case name in interface
+  updated_at?: Date; 
   tags?: string[];
   user_id: string;
   summary?: string;

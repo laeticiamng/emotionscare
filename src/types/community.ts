@@ -52,4 +52,6 @@ export interface Group {
   cover_image?: string;
   owner_id: string;
   tags?: string[];
+  topic?: string; // Added for GroupItem component
+  members?: Array<any>; // Added for GroupItem component
 }

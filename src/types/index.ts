@@ -199,33 +199,43 @@ export interface MoodData {
   sentiment?: number;
   anxiety?: number;
   energy?: number;
+  previousSentiment?: number | null;
+  previousAnxiety?: number | null;
+  previousEnergy?: number | null;
 }
 
-// Music track related types
-export interface MusicTrack {
+// Emotion related types
+export interface Emotion {
   id: string;
-  title: string;
-  artist: string;
-  album?: string;
-  duration: number;
-  url: string;
-  cover_url?: string;
-  genre?: string;
-  mood?: string;
-  emotions?: string[];
+  user_id: string;
+  emotion: string;
+  confidence: number;
+  timestamp: string;
+  created_at: string;
   intensity?: number;
-  bpm?: number;
-  is_favorite?: boolean;
-  play_count?: number;
-  created_at?: string;
-  is_ai_generated?: boolean;
-  track_number?: number;
-  year?: number;
-  audioUrl?: string; // Alias for url in some components
-  cover?: string; // Alias for cover_url in some components
-  coverUrl?: string; // Alias for cover_url in some components
-  coverImage?: string; // Alias for cover_url in some components
-  externalUrl?: string; // For external music platforms
+  feedback?: string;
+  tags?: string[];
+  notes?: string;
+  emojis?: string;
+  valence?: number;
+  arousal?: number;
+  is_acknowledged?: boolean;
+  related_activity?: string;
+  metadata?: Record<string, any>;
+  context?: string;
+}
+
+export interface EmotionResult {
+  emotion: string;
+  confidence: number;
+  transcript?: string;
+  intensity?: number;
+  emojis?: string;
+  valence?: number;
+  arousal?: number;
+  timestamp?: string;
+  id?: string;
+  metadata?: Record<string, any>;
 }
 
 // Export all types from the separate type files

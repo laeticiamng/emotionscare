@@ -12,9 +12,11 @@ export interface Invitation {
   created_at: string;
   expires_at: string;
   accepted_at?: string;
-  invited_by: string;
+  created_by: string;
   token: string;
   message?: string;
+  reminder_sent_at?: string;
+  reminder_count?: number;
 }
 
 export interface InvitationFormData {
@@ -34,5 +36,5 @@ export interface InvitationStats {
   sent: number;
   rejected: number;
   teams?: Record<string, number>;
-  recent_invites?: Invitation[];
+  recent_invites?: any[];
 }

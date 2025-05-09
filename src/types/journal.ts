@@ -22,26 +22,33 @@ export interface JournalPrompt {
   id: string;
   text: string;
   category: string;
-  emotion?: string;
-  recommended_for?: string[];
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: 'easy' | 'medium' | 'deep';
+  emotional_state?: string[];
+  tags?: string[];
+  is_favorite?: boolean;
+  used_count?: number;
+  created_at?: string;
 }
 
-export interface JournalStats {
+export interface JournalStatistics {
   total_entries: number;
   streak_days: number;
-  current_month_entries: number;
-  average_mood?: number;
-  most_used_tags?: string[];
-  most_frequent_emotion?: string;
-  completion_rate?: number;
+  most_common_emotion: string;
+  average_mood: number;
+  total_words: number;
+  most_active_day: string;
+  entries_by_month: Record<string, number>;
+  mood_evolution: Array<{
+    date: string;
+    mood: number;
+  }>;
 }
 
 export interface JournalSettings {
   reminder_time?: string;
-  reminder_days: string[];
   reminder_enabled: boolean;
-  default_privacy: 'public' | 'private';
-  enable_ai_insights: boolean;
-  prompt_suggestions: boolean;
+  default_privacy: 'private' | 'public';
+  ai_analysis_enabled: boolean;
+  export_format: 'pdf' | 'markdown' | 'txt';
+  storage_limit_days?: number;
 }

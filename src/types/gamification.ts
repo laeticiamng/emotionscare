@@ -1,46 +1,61 @@
 
 // Gamification related types
+import { User, Badge } from './index';
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
   points: number;
+  badge_id?: string;
+  badge?: Badge;
+  start_date: string;
+  end_date?: string;
+  requirements: ChallengeRequirement[];
+  participants?: number;
+  completion_rate?: number;
+  is_featured?: boolean;
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
-  start_date?: string;
-  end_date?: string;
-  is_completed?: boolean;
-  progress?: number;
-  icon?: string;
-  reward_badge_id?: string;
+  user_progress?: UserChallengeProgress;
 }
 
-export interface UserProgress {
+export interface ChallengeRequirement {
+  id: string;
+  challenge_id: string;
+  type: 'count' | 'duration' | 'streak' | 'specific';
+  activity: string;
+  target_value: number;
+  description?: string;
+  custom_validation?: string;
+}
+
+export interface UserChallengeProgress {
   user_id: string;
-  level: number;
-  experience: number;
-  points: number;
-  streak_days: number;
-  badges_count: number;
-  challenges_completed: number;
-  rank?: number;
-  next_level_threshold?: number;
-  progress_percentage?: number;
+  challenge_id: string;
+  started_at: string;
+  completed_at?: string;
+  current_value: number;
+  target_value: number;
+  percentage: number;
+  last_activity_at?: string;
+  requirements_progress?: Record<string, number>;
 }
 
 export interface Leaderboard {
+  id: string;
+  title: string;
   period: 'daily' | 'weekly' | 'monthly' | 'all_time';
+  category?: string;
   entries: LeaderboardEntry[];
+  last_updated: string;
 }
 
 export interface LeaderboardEntry {
-  user_id: string;
-  user_name: string;
-  avatar?: string;
-  anonymity_code?: string;
-  position: number;
-  score: number;
-  delta?: number;
-  team?: string;
+  rank: number;
+  user: User;
+  points: number;
+  change?: number;
+  previous_rank?: number;
+  achievements?: string[];
 }

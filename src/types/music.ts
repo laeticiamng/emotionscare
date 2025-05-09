@@ -43,6 +43,7 @@ export interface MusicPlaylist {
   duration?: number;
   mood?: string;
   is_ai_generated?: boolean;
+  emotion?: string; // Added for MusicContext
 }
 
 export interface MusicPreferences {

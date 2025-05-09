@@ -1,30 +1,43 @@
 
 import React from 'react';
+import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/audio-player';
 
-/**
- * Audio progress bar with time indicators
- */
 const ProgressBar: React.FC<ProgressBarProps> = ({
   currentTime,
   duration,
+  onProgressClick,
   formatTime,
   handleProgressClick
 }) => {
+  // Default formatTime if not provided
+  const formatTimeDefault = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
+  
+  // Use provided formatTime or default implementation
+  const formatTimeDisplay = formatTime || formatTimeDefault;
+  
+  // Use provided handleProgressClick or default to onProgressClick
+  const handleProgressClickFn = handleProgressClick || onProgressClick || ((percent: number) => {});
+
   return (
-    <div className="space-y-1 mb-4">
-      <div 
-        className="relative h-1.5 bg-secondary/50 rounded-full overflow-hidden cursor-pointer"
-        onClick={handleProgressClick}
-      >
-        <div 
-          className="absolute left-0 top-0 h-full bg-primary"
-          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-        />
-      </div>
+    <div className="space-y-1">
+      <Slider
+        value={[currentTime]}
+        max={duration || 1} // Prevent division by zero
+        step={1}
+        onValueChange={(values) => {
+          const percent = (values[0] / (duration || 1)) * 100;
+          handleProgressClickFn(percent);
+        }}
+      />
+      
       <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{formatTime(currentTime)}</span>
-        <span>{formatTime(duration)}</span>
+        <span>{formatTimeDisplay(currentTime)}</span>
+        <span>{formatTimeDisplay(duration || 0)}</span>
       </div>
     </div>
   );

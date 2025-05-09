@@ -1,62 +1,61 @@
 
-// Types related to emotions and emotional analysis
+// Emotion related types
 
 export interface Emotion {
   id: string;
   user_id: string;
   emotion: string;
   confidence: number;
-  date: string;
-  score: number;
-  text?: string;
-  emojis?: string[];
-  ai_feedback?: string;
+  timestamp: string;
+  created_at: string;
   intensity?: number;
-  source?: string;
-  transcript?: string;
+  feedback?: string;
+  tags?: string[];
+  notes?: string;
+  emojis?: string;
+  valence?: number;
+  arousal?: number;
+  is_acknowledged?: boolean;
+  related_activity?: string;
+  metadata?: Record<string, any>;
+  context?: string;
 }
 
 export interface EmotionResult {
-  id?: string;
-  user_id?: string;
-  date?: string;
   emotion: string;
   confidence: number;
-  score?: number;
   transcript?: string;
-  text?: string;
-  emojis?: string[];
-  feedback?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  source?: string;
+  intensity?: number;
+  emojis?: string;
+  valence?: number;
+  arousal?: number;
+  timestamp?: string;
+  id?: string;
+  metadata?: Record<string, any>;
 }
 
-// Enhanced emotion result interface
-export interface EnhancedEmotionResult extends EmotionResult {
-  insights?: {
-    patterns?: string[];
-    triggers?: string[];
-    recommendations?: string[];
-  };
-  correlations?: {
-    activity?: string;
-    sleep?: number;
-    social?: string;
-  };
-  comparison?: {
-    previous?: number;
-    average?: number;
-    change?: string;
-  };
+export interface EmotionFeedbackData {
+  id: string;
+  user_id: string;
+  emotion_id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+  accuracy?: number;
+  usefulness?: number;
+  tags?: string[];
+  is_public?: boolean;
 }
 
-// Related types for emotion charting
-export interface MoodData {
-  date: string;
-  originalDate?: string;
-  value: number;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
+export interface EmotionStatistics {
+  total_scans: number;
+  average_intensity: number;
+  most_frequent: string;
+  trends: Array<{
+    date: string;
+    count: number;
+    emotions: Record<string, number>;
+  }>;
+  recent_change_percent?: number;
+  comparison_period?: string;
 }
