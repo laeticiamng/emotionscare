@@ -58,7 +58,9 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     {conversation.lastMessage || "Aucun message"}
                   </p>
                   <p className="text-xs mt-1">
-                    {conversation.updatedAt.toLocaleDateString()}
+                    {conversation.updated_at instanceof Date 
+                      ? conversation.updated_at.toLocaleDateString() 
+                      : new Date(conversation.updated_at || conversation.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 <Button 

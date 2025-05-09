@@ -221,6 +221,11 @@ export interface MusicTrack {
   is_ai_generated?: boolean;
   track_number?: number;
   year?: number;
+  audioUrl?: string; // Alias for url in some components
+  cover?: string; // Alias for cover_url in some components
+  coverUrl?: string; // Alias for cover_url in some components
+  coverImage?: string; // Alias for cover_url in some components
+  externalUrl?: string; // For external music platforms
 }
 
 // Export all types from the separate type files
@@ -232,5 +237,5 @@ export * from './scan';
 export * from './invitation';
 export * from './community';
 export * from './gamification';
-export * from './audio-player';
 export * from './journal';
+export * from './audio-player';

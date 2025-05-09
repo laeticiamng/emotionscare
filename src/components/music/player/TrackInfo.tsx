@@ -16,12 +16,20 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   const getCoverUrl = () => {
     if (!currentTrack) return null;
     
-    if ('coverUrl' in currentTrack && currentTrack.coverUrl) {
+    if (currentTrack.cover_url) {
+      return currentTrack.cover_url;
+    }
+    
+    if (currentTrack.cover) {
+      return currentTrack.cover;
+    }
+    
+    if (currentTrack.coverUrl) {
       return currentTrack.coverUrl;
     }
     
-    if ('cover' in currentTrack && currentTrack.cover) {
-      return currentTrack.cover;
+    if (currentTrack.coverImage) {
+      return currentTrack.coverImage;
     }
     
     return null;

@@ -17,11 +17,12 @@ export interface ChatConversation {
   title?: string;
   messages: ChatMessage[];
   created_at: Date;
-  updated_at?: Date;
+  updated_at?: Date; // Keep snake_case name in interface
   tags?: string[];
   user_id: string;
   summary?: string;
   context?: Record<string, any>;
+  lastMessage?: string; // Added for ConversationList component
 }
 
 export interface ChatThread {

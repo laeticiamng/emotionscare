@@ -15,7 +15,7 @@ export function useAutoRefresh({
   const [enabled, setEnabled] = useState(defaultEnabled);
   const [interval, setInterval] = useState(defaultInterval);
   const [refreshing, setRefreshing] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
   // Handle the refresh
   const handleRefresh = useCallback(async () => {
@@ -42,7 +42,7 @@ export function useAutoRefresh({
   useEffect(() => {
     if (enabled) {
       handleRefresh();
-      timerRef.current = setInterval(handleRefresh, interval) as unknown as NodeJS.Timeout;
+      timerRef.current = setInterval(handleRefresh, interval);
     } else if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;

@@ -40,3 +40,16 @@ export interface CommunityTag {
   count: number;
   color?: string;
 }
+
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  member_count: number;
+  created_at: string;
+  updated_at?: string;
+  is_private?: boolean;
+  cover_image?: string;
+  owner_id: string;
+  tags?: string[];
+}

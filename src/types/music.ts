@@ -20,11 +20,18 @@ export interface MusicTrack {
   is_ai_generated?: boolean;
   track_number?: number;
   year?: number;
+  // Aliases for compatibility with existing components
+  cover?: string; // Alias for cover_url
+  coverUrl?: string; // Alias for cover_url
+  coverImage?: string; // Alias for cover_url
+  audioUrl?: string; // Alias for url
+  externalUrl?: string; // For external music platforms
 }
 
 export interface MusicPlaylist {
   id: string;
   title: string;
+  name?: string; // Added for compatibility
   description?: string;
   cover_url?: string;
   created_at?: string;
