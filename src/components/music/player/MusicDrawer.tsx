@@ -31,6 +31,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
 
   if (!open) return null
 
+  logger.debug('Rendering MusicDrawer', { open })
   return (
     <Drawer open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DrawerContent className="max-h-[80vh] focus:outline-none">
@@ -40,7 +41,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
             <button onClick={onClose} type="button">✕</button>
           </DrawerClose>
         </DrawerHeader>
-        <div className="px-4 pb-4"><MusicPlayer /></div>
+        <div className="px-4 pb-4">
+          <MusicPlayer />
+        </div>
       </DrawerContent>
     </Drawer>
   )
