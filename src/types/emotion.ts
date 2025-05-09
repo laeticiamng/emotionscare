@@ -32,7 +32,7 @@ export interface EmotionResult {
   source?: string;
 }
 
-// Add the EnhancedEmotionResult interface
+// Enhanced emotion result interface
 export interface EnhancedEmotionResult extends EmotionResult {
   insights?: {
     patterns?: string[];

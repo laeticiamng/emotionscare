@@ -152,7 +152,7 @@ export interface UserPreferences {
   };
 }
 
-// Now explicitly export all types from the separate type files
+// Export all types from the separate type files
 export * from './emotion';
 export * from './navigation';
 export * from './chat';
