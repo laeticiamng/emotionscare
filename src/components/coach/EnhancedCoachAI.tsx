@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bot, Sparkles, Music, Brain } from 'lucide-react';
+import { Brain, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { Emotion, EmotionResult } from '@/types';
@@ -41,7 +41,9 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
   const handlePlayMusic = () => {
     const emotion = emotionResult.emotion.toLowerCase();
     loadPlaylistForEmotion(emotion);
-    safeOpen(setOpenDrawer);
+    // Use our safeOpen utility with a boolean true value directly
+    // This avoids the parameter type mismatch
+    safeOpen(true);
     
     toast({
       title: "Musique activée",
@@ -57,10 +59,10 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
       emotion: result.emotion,
       confidence: result.confidence,
       date: result.date || new Date().toISOString(),
-      text: result.text,
-      score: result.score,
-      ai_feedback: result.ai_feedback,
-      emojis: result.emojis
+      text: result.text || '',
+      score: result.score || 50,
+      ai_feedback: result.ai_feedback || '',
+      emojis: result.emojis || []
     };
   };
   

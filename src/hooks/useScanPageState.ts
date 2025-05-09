@@ -1,11 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { Emotion, User } from '@/types';
+import { Emotion } from '@/types';
 import { fetchEmotionHistory } from '@/lib/scanService';
 import useScanPage from '@/hooks/useScanPage';
 
 export function useScanPageState(userId?: string) {
-  const { filteredUsers, selectedFilter, filterUsers } = useScanPage();
+  const scanPageData = useScanPage();
+  const { filteredUsers, selectedFilter, filterUsers } = scanPageData;
+  
   const [activeTab, setActiveTab] = useState<string>('scan');
   const [showScanForm, setShowScanForm] = useState(false);
   const [emotions, setEmotions] = useState<Emotion[]>([]);

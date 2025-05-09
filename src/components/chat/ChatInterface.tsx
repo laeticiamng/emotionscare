@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,12 +9,19 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useChat } from '@/hooks/useChat';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage } from '@/types';
 import { useApiConnection } from '@/hooks/dashboard/useApiConnection';
 import { Separator } from '@/components/ui/separator';
-import { DEFAULT_CHAT_MESSAGE } from '@/lib/constants';
 import { useActivity } from '@/hooks/useActivity';
 import { safeOpen } from '@/lib/utils';
+
+// Default welcome message
+const DEFAULT_CHAT_MESSAGE = {
+  id: 'welcome',
+  text: 'Bonjour! Je suis votre coach IA. Comment puis-je vous aider aujourd\'hui?',
+  sender: 'bot' as 'bot',
+  timestamp: new Date(),
+};
 
 interface ChatInterfaceProps {
   standalone?: boolean;
@@ -31,7 +39,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ standalone = true, classN
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const { user } = useAuth();
   const { toast } = useToast();
-  const { askQuestion } = useChat();
+  const { handleSend } = useChat();
   const { apiReady, apiCheckInProgress } = useApiConnection();
   const { logActivity } = useActivity();
   
@@ -85,12 +93,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ standalone = true, classN
       // Log activity
       logActivity('coach_interaction', { type: 'question', content: message });
       
-      // Ask the question to the AI
-      const response = await askQuestion(message);
+      // Send the message and get response
+      const response = await handleSend(message);
 
       const botMessage: ChatMessage = {
         id: Date.now().toString(),
-        text: response,
+        text: response?.text || "Je ne comprends pas votre demande. Pouvez-vous reformuler?",
         sender: 'bot',
         timestamp: new Date(),
       };

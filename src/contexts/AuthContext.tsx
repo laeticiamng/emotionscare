@@ -1,16 +1,24 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase-client';
-import { User, UserRole } from '@/types';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
+} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { User, UserPreferences } from '@/types';
 
 interface AuthContextProps {
   user: User | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
-  isAuthenticated: boolean; 
-  login: (email: string, password: string) => Promise<User>;
-  logout: () => Promise<void>;
+  signIn: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
-  updateUser?: (userData: Partial<User>) => void;
-  setUser?: (user: User | null) => void;
+  signUp: (email: string, password?: string, name?: string) => Promise<void>;
+  updateUser: (updates: any) => Promise<void>;
+  preferences: UserPreferences;
+  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -19,178 +27,206 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Example user data for development
-const MOCK_ADMIN_USER: User = {
-  id: '1',
-  name: 'Admin User',
-  email: 'admin@example.com',
-  role: UserRole.ADMIN,
-  emotional_score: 78,
-  avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
-  preferences: {
-    theme: 'light',
-    font_size: 'medium', // Changed fontSize to font_size
-    language: 'fr',
-    privacy_level: 'private',
-    notifications_enabled: true,
-    backgroundColor: '#ffffff',
-    accentColor: '#0284c7',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
-    }
-  }
-};
-
-const MOCK_USER: User = {
-  id: '2',
-  name: 'Regular User',
-  email: 'user@example.com',
-  role: UserRole.USER,
-  emotional_score: 65,
-  avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
-  preferences: {
-    theme: 'light',
-    font_size: 'medium', // Changed fontSize to font_size
-    language: 'fr',
-    privacy_level: 'private',
-    notifications_enabled: true,
-    backgroundColor: '#ffffff',
-    accentColor: '#0284c7',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
-    }
-  }
+const defaultPreferences = {
+  theme: 'light' as const,
+  notifications_enabled: true,
+  font_size: 'medium' as const,
+  language: 'fr',
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Computed property for authentication status
-  const isAuthenticated = user !== null;
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadSession = async () => {
       setIsLoading(true);
       try {
-        console.log("AuthProvider: Chargement de l'utilisateur");
-        // Commenté pour l'instant car non fonctionnel sans backend
-        // const { data: { user }, error } = await supabase.auth.getUser();
-        // setUser(user as unknown as User);
+        const { data: { session } } = await supabase.auth.getSession();
 
-        // Pour la démo, on n'utilise pas le user de Supabase
-        // Vérifier si un utilisateur est stocké dans le localStorage
-        const storedUser = localStorage.getItem('emotionscare_user');
-        if (storedUser) {
-          console.log("AuthProvider: Utilisateur trouvé dans le localStorage");
-          setUser(JSON.parse(storedUser));
+        if (session) {
+          setIsAuthenticated(true);
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select(`name, email, avatar, role, preferences`)
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching user profile:', error);
+          }
+
+          const userProfile: User = {
+            id: session.user.id,
+            email: session.user.email || '',
+            name: profile?.name || 'Utilisateur',
+            avatar: profile?.avatar || '',
+            role: profile?.role || 'user',
+            preferences: {
+              ...defaultPreferences,
+              ...profile?.preferences
+            }
+          };
+          setUser(userProfile);
+          setPreferences(userProfile.preferences || defaultPreferences);
         } else {
+          setIsAuthenticated(false);
           setUser(null);
         }
       } catch (error) {
-        console.error("Failed to load user:", error);
+        console.error("Unexpected error:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadUser();
-  }, []);
+    loadSession();
 
-  const login = async (email: string, password: string): Promise<User> => {
-    setIsLoading(true);
-    try {
-      console.log("AuthProvider: Tentative de connexion", { email });
-      // Simulate authentication for demo
-      let mockUser;
-      
-      if (email === 'admin@example.com' && password === 'admin') {
-        mockUser = MOCK_ADMIN_USER;
-        console.log("AuthProvider: Connexion admin réussie");
-      } else if (email === 'user@example.com' && password === 'password') {
-        mockUser = MOCK_USER;
-        console.log("AuthProvider: Connexion utilisateur réussie");
-      } else {
-        console.log("AuthProvider: Identifiants invalides");
-        throw new Error("Identifiants invalides. Utilisez admin@example.com/admin ou user@example.com/password");
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setIsAuthenticated(true);
+        const userProfile: User = {
+          id: session.user.id,
+          email: session.user.email || '',
+          name: session.user.email || 'Utilisateur',
+          avatar: '',
+          role: 'user',
+          preferences: defaultPreferences
+        };
+        setUser(userProfile);
+        setPreferences(defaultPreferences);
+        navigate('/dashboard');
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        setUser(null);
+        navigate('/login');
       }
-      
-      // Stocker l'utilisateur dans le localStorage pour la persistance
-      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
-      setUser(mockUser);
-      return mockUser;
-      
-      // Code réel pour Supabase (commenté pour la démo)
-      // const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      // if (error) throw error;
-      // setUser(data.user as unknown as User);
-      // return data.user as unknown as User;
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    });
+  }, [navigate]);
 
-  const logout = async () => {
+  const signIn = async (email: string) => {
     setIsLoading(true);
     try {
-      console.log("AuthProvider: Déconnexion");
-      // Pour l'instant on utilise juste un state local et localStorage
-      localStorage.removeItem('emotionscare_user');
-      setUser(null);
-      
-      // Version réelle avec Supabase
-      // await supabase.auth.signOut();
-      // setUser(null);
-    } catch (error) {
-      console.error("Logout failed:", error);
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) throw error;
+      alert('Check your email for the magic link.');
+    } catch (error: any) {
+      alert(error.error_description || error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Alias pour logout pour correspondre à la terminologie sign-out
-  const signOut = async () => {
-    await logout();
+  const signUp = async (email: string, password?: string, name?: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password || 'default_password',
+        options: {
+          data: {
+            name: name || 'New User',
+            avatar: '',
+          },
+        },
+      });
+      if (error) throw error;
+
+      if (data?.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{ id: data.user.id, name: name, email: email }]);
+
+        if (profileError) {
+          console.error('Could not create user profile:', profileError);
+        }
+      }
+
+      alert('Check your email to verify your account!');
+    } catch (error: any) {
+      alert(error.error_description || error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
-  
-  // Fonction de mise à jour de l'utilisateur
-  const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData };
-      localStorage.setItem('emotionscare_user', JSON.stringify(updatedUser));
-      setUser(updatedUser);
+
+  const signOut = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error: any) {
+      alert(error.error_description || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUser = async (updates: any) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.from('profiles').update(updates).eq('id', user?.id);
+      if (error) throw error;
+      setUser({ ...user, ...updates } as User);
+    } catch (error: any) {
+      alert(error.error_description || error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
+    setIsLoading(true);
+    try {
+      const updatedPreferences = { ...preferences, ...newPreferences };
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ preferences: updatedPreferences })
+        .eq('id', user?.id)
+        .select('preferences')
+        .single();
+
+      if (error) {
+        console.error("Error updating preferences:", error);
+        throw error;
+      }
+
+      setPreferences(data.preferences);
+      setUser(prevUser => {
+        if (prevUser) {
+          return { ...prevUser, preferences: data.preferences };
+        }
+        return prevUser;
+      });
+    } catch (error: any) {
+      console.error("Unexpected error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const value: AuthContextProps = {
     user,
-    isLoading,
     isAuthenticated,
-    login,
-    logout,
+    isLoading,
+    signIn,
     signOut,
+    signUp,
     updateUser,
-    setUser,
+    preferences,
+    updatePreferences,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

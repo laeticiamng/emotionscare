@@ -1,10 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import useMusicRecommendation from '@/hooks/useMusicRecommendation';
 import { EmotionResult } from '@/types';
 import { Music, PlayCircle, PauseCircle, Loader2 } from 'lucide-react';
+import { useMusic } from '@/contexts/MusicContext';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
@@ -12,35 +12,68 @@ interface EmotionMusicRecommendationsProps {
   emotionResult?: EmotionResult;
 }
 
+// Define emotion to music mapping locally
+const EMOTION_TO_MUSIC: Record<string, string> = {
+  'happy': 'energetic',
+  'sad': 'calm',
+  'angry': 'calm',
+  'anxious': 'calm',
+  'neutral': 'neutral',
+  'calm': 'calm',
+  'stressed': 'calm',
+  'energetic': 'energetic',
+  'bored': 'energetic',
+  'tired': 'calm',
+  'fearful': 'calm',
+  'default': 'neutral'
+};
+
 export function EmotionMusicRecommendations({
   emotion,
   onPlayMusic,
   emotionResult
 }: EmotionMusicRecommendationsProps) {
   const {
-    isLoading,
-    loadMusicForMood,
-    togglePlayPause,
     currentTrack,
-    error,
-    handlePlayMusic,
-    EMOTION_TO_MUSIC
-  } = useMusicRecommendation();
+    isPlaying,
+    togglePlay,
+    loadPlaylistForEmotion,
+    playTrack,
+  } = useMusic();
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handlePlayMusic = async (emotionToPlay: string) => {
+    if (!emotionToPlay) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const musicType = EMOTION_TO_MUSIC[emotionToPlay.toLowerCase()] || EMOTION_TO_MUSIC.default;
+      await loadPlaylistForEmotion(musicType);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error loading music:", err);
+      setError("Impossible de charger la musique pour cette émotion");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (emotionResult) {
-      handlePlayMusic(emotionResult);
+      handlePlayMusic(emotionResult.emotion);
     }
-  }, [emotionResult, handlePlayMusic]);
+  }, [emotionResult]);
 
   // Déterminer le type de musique à partir de l'émotion
-  const getMusicTypeFromEmotion = (emotion: string): string => {
-    const normalizedEmotion = emotion.toLowerCase();
+  const getMusicTypeFromEmotion = (emotionName: string): string => {
+    const normalizedEmotion = emotionName.toLowerCase();
     return EMOTION_TO_MUSIC[normalizedEmotion] || EMOTION_TO_MUSIC.default;
   };
 
   // Determiner si l'UI doit montrer la musique en cours de lecture
-  const isPlaying = currentTrack !== null;
   const emotionToUse = emotion || (emotionResult?.emotion || 'neutral');
   const musicType = getMusicTypeFromEmotion(emotionToUse);
 
@@ -59,7 +92,7 @@ export function EmotionMusicRecommendations({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => loadMusicForMood(emotionToUse)}
+              onClick={() => handlePlayMusic(emotionToUse)}
               className="ml-2"
             >
               Réessayer
@@ -79,11 +112,11 @@ export function EmotionMusicRecommendations({
             <Button
               variant="outline"
               size="sm"
-              onClick={isPlaying ? togglePlayPause : () => loadMusicForMood(emotionToUse)}
-              disabled={isLoading}
+              onClick={isPlaying ? togglePlay : () => handlePlayMusic(emotionToUse)}
+              disabled={loading}
               className="flex items-center gap-2"
             >
-              {isLoading ? (
+              {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Chargement...</span>
