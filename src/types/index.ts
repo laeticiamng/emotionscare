@@ -1,251 +1,112 @@
 
-// Common types used across the application
+// Export all type definitions for application-wide use
 
-// User related types
-export enum UserRole {
-  ADMIN = 'admin',
-  MANAGER = 'manager',
-  EMPLOYEE = 'employee',
-  USER = 'user',
-  ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager'
-}
+// Core types
+export * from './audio-player';
+export * from './chat';
+export * from './community';
+export * from './emotion';
+export * from './gamification';
+export * from './invitation';
+export * from './journal';
+export * from './music';
+export * from './navigation';
+export * from './scan';
+export * from './vr';
 
+// Base types
 export interface User {
   id: string;
-  email: string;
   name: string;
-  role: UserRole;
-  avatar?: string;
+  email: string;
   avatar_url?: string;
-  image?: string;
-  department?: string;
-  position?: string;
+  role?: UserRole;
+  created_at: string;
+  updated_at?: string;
   team_id?: string;
-  created_at?: string;
+  is_active?: boolean;
   last_login?: string;
-  joined_at?: string;
-  anonymity_code?: string;
-  emotional_score?: number;
-  onboarded?: boolean;
-  preferences?: UserPreferences;
+  preferences?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
-// Theme related types
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'system' | 'nature' | 'deep-night';
+export type UserRole = 'admin' | 'manager' | 'user' | 'guest';
 
-// Report related types
-export interface Report {
-  id: string;
-  title: string;
-  type: string;
-  period: string;
-  data: any;
-  date: string;
-  created_at?: string;
-  metrics?: any;
-  description?: string;
-  user_id?: string;
-  summary?: string;
-  mood_score?: number;
-  categories?: string[];
-  recommendations?: string[];
-  metric?: string;
-  period_start?: string;
-  period_end?: string;
-  value?: number;
-  change_pct?: number;
-}
-
-// Badge related types
 export interface Badge {
   id: string;
-  name: string;
+  title: string;
   description: string;
   image_url: string;
-  user_id: string;
-  icon?: string;
-  level?: number;
-  awarded_at?: string;
-  threshold?: number;
-  icon_url?: string;
+  criteria: string;
   category?: string;
-  image?: string;
-  unlocked?: boolean;
+  points?: number;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  unlocked_at?: string;
   progress?: number;
-  maxProgress?: number;
-  criteria?: string;
+  user_id?: string;
 }
 
-// VR related types
-export interface VRSessionTemplate {
-  id: string;
-  template_id: string;
-  theme: string;
-  title: string;
-  duration: number;
-  preview_url: string;
-  description: string;
-  is_audio_only: boolean;
-  audio_url?: string;
-  recommended_mood?: string;
-  category: string;
-  benefits: string[];
-  emotions: string[];
-  popularity: number;
-  completion_rate?: number;
+export interface MoodData {
+  date: string;
+  score: number;
+  emotion?: string;
+  notes?: string;
+  activities?: string[];
+  user_id: string;
+}
+
+export interface UserStats {
+  user_id: string;
+  total_sessions: number;
+  total_duration_minutes: number;
+  average_mood_score: number;
+  streak_days: number;
+  challenges_completed: number;
+  last_activity: string;
+  most_frequent_emotion?: string;
+}
+
+export interface EnhancedEmotionResult {
+  emotion: string;
+  confidence: number;
+  feedback: string;
+  recommendations: string[];
+  transcript?: string;
+  intensity?: number;
+  valence?: number;
+  arousal?: number;
 }
 
 export interface VRSession {
   id: string;
+  user_id: string;
   template_id: string;
-  user_id: string;
   start_time: string;
-  date?: string;
-  duration: number;
+  end_time?: string;
   duration_seconds?: number;
-  completed: boolean;
-  feedback?: string;
-  mood_before?: string;
-  mood_after?: string;
-  is_audio_only?: boolean;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
-}
-
-// User preferences
-export interface UserPreferences {
-  theme: ThemeName;
-  notifications_enabled: boolean;
-  font_size: 'small' | 'medium' | 'large';
-  language: string;
-  accent_color?: string;
-  background_color?: string;
-  notifications?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  reminder_time?: string;
-  dynamic_theme?: {
-    enable_time_based?: boolean;
-    enable_emotion_based?: boolean;
-    enable_weather_based?: boolean;
-  };
-  accessibility?: {
-    high_contrast?: boolean;
-    reduced_motion?: boolean;
-    screen_reader_optimized?: boolean;
-    keyboard_navigation?: boolean;
-  };
-  audio?: {
-    volume?: number;
-    continue_playback?: boolean;
-    ambient_sound?: string;
-    context_music?: boolean;
-    immersive_mode?: boolean;
-  };
-  data_preferences?: {
-    export_format?: 'json' | 'pdf';
-    incognito_mode?: boolean;
-    data_retention_period?: number;
-  };
-}
-
-// Invitation related types
-export interface InvitationStats {
-  total: number;
-  pending: number;
-  accepted: number;
-  expired: number;
-  sent: number;
-  rejected: number;
-  teams?: Record<string, number>;
-  recent_invites?: any[];
-}
-
-export interface InvitationFormData {
-  email: string;
-  name?: string;
-  role: UserRole;
-  team_id?: string;
-  expiration_days?: number;
-  message?: string;
-}
-
-// Journal Entry related types
-export interface JournalEntry {
-  id: string;
-  user_id: string;
-  title: string;
-  content: string;
-  date: string;
-  created_at: string;
-  updated_at?: string;
-  mood?: number;
-  tags?: string[];
-  is_private?: boolean;
-  emotion?: string;
-  ai_insights?: string;
-  ai_feedback?: string;
-  color?: string;
-}
-
-// Mood data for charts
-export interface MoodData {
-  date: string;
-  originalDate?: string;
-  value: number;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
-  previousSentiment?: number | null;
-  previousAnxiety?: number | null;
-  previousEnergy?: number | null;
-}
-
-// Emotion related types
-export interface Emotion {
-  id: string;
-  user_id: string;
-  emotion: string;
-  confidence: number;
-  timestamp: string;
-  created_at: string;
-  intensity?: number;
-  feedback?: string;
-  tags?: string[];
+  emotion_before?: string;
+  emotion_after?: string;
   notes?: string;
-  emojis?: string;
-  valence?: number;
-  arousal?: number;
-  is_acknowledged?: boolean;
-  related_activity?: string;
-  metadata?: Record<string, any>;
-  context?: string;
+  rating?: number;
+  is_completed: boolean;
+  music_track_id?: string;
 }
 
-export interface EmotionResult {
-  emotion: string;
-  confidence: number;
-  transcript?: string;
-  intensity?: number;
-  emojis?: string;
-  valence?: number;
-  arousal?: number;
-  timestamp?: string;
-  id?: string;
-  metadata?: Record<string, any>;
+export interface VRSessionTemplate {
+  id: string;
+  title: string;
+  description: string;
+  duration_minutes: number;
+  category: string;
+  image_url?: string;
+  is_guided: boolean;
+  difficulty: 'easy' | 'medium' | 'hard';
+  recommended_emotions?: string[];
+  scenery_type?: string;
+  has_music?: boolean;
+  has_narration?: boolean;
+  creator_id?: string;
+  is_featured?: boolean;
+  avg_rating?: number;
+  total_sessions?: number;
 }
-
-// Export all types from the separate type files
-export * from './emotion';
-export * from './navigation';
-export * from './chat';
-export * from './music';
-export * from './scan';
-export * from './invitation';
-export * from './community';
-export * from './gamification';
-export * from './journal';
-export * from './audio-player';

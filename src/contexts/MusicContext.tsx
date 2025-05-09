@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
+import { MusicTrack, MusicPlaylist, MusicPreferences } from '@/types/music';
 
 interface MusicContextProps {
   currentTrack: MusicTrack | null;
@@ -15,6 +16,13 @@ interface MusicContextProps {
   savePlaylist: (name: string, tracks: MusicTrack[]) => MusicPlaylist;
   openDrawer: boolean;
   setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
+  // Add missing properties
+  volume: number;
+  setVolume: (volume: number) => void;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => MusicPlaylist | null;
+  error: Error | null;
+  initializeMusicSystem: () => Promise<void>;
 }
 
 const MusicContext = createContext<MusicContextProps>({
@@ -31,6 +39,13 @@ const MusicContext = createContext<MusicContextProps>({
   savePlaylist: () => ({} as MusicPlaylist),
   openDrawer: false,
   setOpenDrawer: () => {},
+  // Add missing properties to default value
+  volume: 0.5,
+  setVolume: () => {},
+  playlists: [],
+  loadPlaylistById: () => null,
+  error: null,
+  initializeMusicSystem: async () => {},
 });
 
 export const useMusic = () => useContext(MusicContext);
@@ -64,7 +79,35 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [volume, setVolume] = useState(0.5);
+  const [error, setError] = useState<Error | null>(null);
   const emotionPlaylists = useMemo(() => initialEmotionPlaylists, []);
+  
+  // Add this to store all playlists
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+
+  // Initialize the music system
+  const initializeMusicSystem = useCallback(async () => {
+    try {
+      // Here would be code to initialize audio system, preload tracks, etc.
+      // For now, we'll just create default playlists from our emotion playlists
+      const defaultPlaylists: MusicPlaylist[] = Object.entries(emotionPlaylists).map(([emotion, tracks]) => ({
+        id: `emotion-${emotion}`,
+        title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Music`,
+        tracks: tracks,
+        emotion: emotion,
+      }));
+      
+      setPlaylists(defaultPlaylists);
+    } catch (error) {
+      setError(error instanceof Error ? error : new Error('Unknown error initializing music system'));
+    }
+  }, [emotionPlaylists]);
+  
+  // Initialize on mount
+  useEffect(() => {
+    initializeMusicSystem();
+  }, [initializeMusicSystem]);
 
   const playTrack = useCallback((track: MusicTrack) => {
     setCurrentTrack(track);
@@ -95,7 +138,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const emotionPlaylist: MusicPlaylist = {
       id: `emotion-${emotionType}`,
       title: `${emotionType.charAt(0).toUpperCase() + emotionType.slice(1)} Music`,
-      name: `${emotionType.charAt(0).toUpperCase() + emotionType.slice(1)} Music`,
       tracks: emotionPlaylists[emotionType] || [],
       emotion: emotionType,
     };
@@ -111,18 +153,27 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     return emotionPlaylist;
   }, [emotionPlaylists]);
+  
+  const loadPlaylistById = useCallback((id: string) => {
+    const playlist = playlists.find(p => p.id === id);
+    if (playlist) {
+      setCurrentPlaylist(playlist);
+      if (playlist.tracks.length > 0) {
+        setCurrentTrack(playlist.tracks[0]);
+      }
+    }
+    return playlist || null;
+  }, [playlists]);
 
   const createUserPlaylist = useCallback((name: string) => {
     const newPlaylist: MusicPlaylist = {
       id: `user-${Date.now()}`,
       title: name,
-      name: name,
-      description: "User created playlist",
       tracks: [],
-      created_at: new Date().toISOString(),
     };
     
     setCurrentPlaylist(newPlaylist);
+    setPlaylists(prev => [...prev, newPlaylist]);
     return newPlaylist;
   }, []);
 
@@ -130,13 +181,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const newPlaylist: MusicPlaylist = {
       id: `saved-${Date.now()}`,
       title: name,
-      name: name,
-      description: "Saved playlist",
       tracks: tracks,
-      created_at: new Date().toISOString(),
     };
     
     setCurrentPlaylist(newPlaylist);
+    setPlaylists(prev => [...prev, newPlaylist]);
     return newPlaylist;
   }, []);
 
@@ -154,6 +203,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     savePlaylist,
     openDrawer,
     setOpenDrawer,
+    // Add new properties to context value
+    volume,
+    setVolume,
+    playlists,
+    loadPlaylistById,
+    error,
+    initializeMusicSystem,
   };
 
   return (

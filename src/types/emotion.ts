@@ -19,6 +19,11 @@ export interface Emotion {
   related_activity?: string;
   metadata?: Record<string, any>;
   context?: string;
+  // These properties added for consistent use in components
+  score?: number;
+  text?: string;
+  date?: string;
+  ai_feedback?: string;
 }
 
 export interface EmotionResult {
@@ -32,6 +37,14 @@ export interface EmotionResult {
   timestamp?: string;
   id?: string;
   metadata?: Record<string, any>;
+  // These properties added for consistent use in components
+  score?: number;
+  feedback?: string;
+  ai_feedback?: string;
+  text?: string;
+  recommendations?: string[];
+  user_id?: string;
+  date?: string;
 }
 
 export interface EmotionFeedbackData {
@@ -58,4 +71,15 @@ export interface EmotionStatistics {
   }>;
   recent_change_percent?: number;
   comparison_period?: string;
+}
+
+export interface EnhancedEmotionResult {
+  emotion: string;
+  confidence: number;
+  feedback: string;
+  recommendations: string[];
+  transcript?: string;
+  intensity?: number;
+  valence?: number;
+  arousal?: number;
 }
