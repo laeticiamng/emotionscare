@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { fetchJournalEntries, deleteJournalEntry } from '@/lib/journalService';
+import { getJournalEntries, deleteJournalEntry } from '@/lib/journalService';
 import type { JournalEntry } from '@/types';
 import { TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
@@ -31,7 +30,7 @@ const JournalPage = () => {
   const loadEntries = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchJournalEntries(user?.id || '');
+      const data = await getJournalEntries(user?.id || '');
       
       // Filtrer les entrées si nécessaire selon la période sélectionnée
       let filteredData = [...data];

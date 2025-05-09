@@ -19,7 +19,6 @@ export const useCoachChatActions = (conversationId: string) => {
       timestamp: new Date(),
     };
     
-    setMessages(prev => [...prev, newMessage]);
     return newMessage;
   }, []);
   
@@ -32,7 +31,6 @@ export const useCoachChatActions = (conversationId: string) => {
       timestamp: new Date(),
     };
     
-    setMessages(prev => [...prev, newMessage]);
     return newMessage;
   }, []);
 
@@ -48,20 +46,8 @@ export const useCoachChatActions = (conversationId: string) => {
       timestamp: new Date(),
     };
     
-    // Add temporary message
-    setMessages(prev => [...prev, tempMessage]);
-    
     // Process the actual response when ready
     messagePromise.then(response => {
-      // Replace the temporary message with the actual response
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === tempMessage.id 
-            ? { ...msg, text: response } 
-            : msg
-        )
-      );
-      
       // Store response content for streaming visualization
       setResponseContent(response);
       
@@ -69,14 +55,7 @@ export const useCoachChatActions = (conversationId: string) => {
       queryClient.invalidateQueries({ queryKey: ['conversations', conversationId] });
     })
     .catch(error => {
-      // Handle error - replace temp message with error
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === tempMessage.id 
-            ? { ...msg, text: `Error: ${error.message || 'Failed to get response'}` } 
-            : msg
-        )
-      );
+      console.error('Error processing message:', error);
     })
     .finally(() => {
       setIsTyping(false);

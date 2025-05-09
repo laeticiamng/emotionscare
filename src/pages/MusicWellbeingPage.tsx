@@ -1,13 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/use-toast';
 import MusicPlayer from '@/components/music/MusicPlayer';
-import { useToast } from '@/hooks/use-toast';
 
 // Mock data
 const mockEmotions = ['calm', 'focus', 'energy', 'joy', 'relax'];

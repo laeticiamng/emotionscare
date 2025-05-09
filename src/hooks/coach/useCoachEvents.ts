@@ -1,7 +1,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import { gamificationService } from '@/lib/gamificationService';
+import { completeChallenge } from '@/lib/gamificationService';
 import { saveRelaxationSession } from '@/lib/vrService';
 import { saveJournalEntry } from '@/lib/journalService';
 
@@ -11,7 +11,7 @@ export const useCoachEvents = () => {
   // Handle completing a challenge
   const completeChallengeQuery = useMutation({
     mutationFn: async (challengeId: string) => {
-      return gamificationService.completeChallenge(challengeId);
+      return completeChallenge(challengeId);
     },
     onSuccess: () => {
       // Invalidate the challenges cache to trigger a refresh

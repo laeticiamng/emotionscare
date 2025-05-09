@@ -1,174 +1,132 @@
-
-import React, { useEffect, useState } from 'react';
-import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { fetchBadges, fetchChallenges, completeChallenge } from '@/lib/gamificationService';
+import { Badge, Challenge } from '@/types';
 import BadgeGrid from '@/components/gamification/BadgeGrid';
 import ChallengeItem from '@/components/gamification/ChallengeItem';
-import { completeChallenge } from '@/lib/gamificationService';
-import { Challenge } from '@/types/gamification';
-import { Badge } from '@/types';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
-import { toast } from "sonner";
 import { useAuth } from '@/contexts/AuthContext';
-
-// Mock data for development
-const mockChallenges: Challenge[] = [
-  {
-    id: '1',
-    title: 'Saisir une émotion quotidienne',
-    description: 'Utilisez l\'outil d\'analyse d\'émotions une fois par jour',
-    points: 20
-  },
-  {
-    id: '2',
-    title: 'Compléter une session de relaxation',
-    description: 'Suivez une séance de relaxation VR complète',
-    points: 30
-  }
-];
-
-const mockBadges = {
-  all: [
-    {
-      id: '1',
-      name: 'Explorateur',
-      description: 'A exploré toutes les fonctionnalités',
-      image_url: '/badges/explorer.svg',
-      level: 1,
-      threshold: 100,
-      progress: 45,
-      unlocked: false
-    },
-    {
-      id: '2',
-      name: 'Zen Master',
-      description: 'A complété 10 sessions de relaxation',
-      image_url: '/badges/zen.svg',
-      level: 2,
-      threshold: 10,
-      progress: 3,
-      unlocked: false
-    }
-  ],
-  earned: [
-    {
-      id: '3',
-      name: 'Premier pas',
-      description: 'A rejoint la plateforme',
-      image_url: '/badges/first-steps.svg',
-      level: 1,
-      unlocked: true
-    }
-  ]
-};
+import { useToast } from '@/components/ui/use-toast';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
 const GamificationPage = () => {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  
-  // Log page visit
-  useActivityLogging('gamification');
+  const { toast } = useToast();
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [activeTab, setActiveTab] = useState('badges');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadGamificationData = async () => {
+      setIsLoading(true);
       try {
-        // Load challenges
-        setChallenges(mockChallenges);
+        // Load badges and challenges
+        const badgesData = await fetchBadges();
+        const challengesData = await fetchChallenges();
         
-        // Load badges
-        setBadges(mockBadges.all);
-        setEarnedBadgeIds(mockBadges.earned.map(badge => badge.id));
+        // Convert badge data to ensure it's the correct type
+        const typedBadges = badgesData.map(badge => ({
+          ...badge,
+          user_id: badge.user_id || user?.id || 'unknown',
+          icon: badge.icon || 'award'
+        }));
+        
+        setBadges(typedBadges);
+        setChallenges(challengesData);
       } catch (error) {
-        console.error("Error loading gamification data:", error);
-        toast.error("Erreur lors du chargement des données de gamification");
+        console.error('Error loading gamification data:', error);
+        toast({
+          title: 'Erreur',
+          description: "Impossible de charger les données de gamification.",
+          variant: 'destructive'
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
-    
-    loadGamificationData();
-  }, []);
+
+    if (user) {
+      loadGamificationData();
+    }
+  }, [user, toast]);
 
   const handleCompleteChallenge = async (challengeId: string) => {
-    setIsLoading(true);
     try {
-      const userId = user?.id || 'anonymous';
-      const success = await completeChallenge(challengeId);
+      await completeChallenge(challengeId);
       
-      if (success) {
-        setCompletedChallenges(prev => [...prev, challengeId]);
-        toast.success("Défi complété avec succès!");
-      }
+      // Update challenges
+      setChallenges(prev =>
+        prev.map(c =>
+          c.id === challengeId ? { ...c, completed: true, progress: c.target || c.maxProgress || 0 } : c
+        )
+      );
+      
+      toast({
+        title: 'Défi complété !',
+        description: 'Félicitations pour avoir relevé ce défi !',
+      });
     } catch (error) {
-      console.error("Error completing challenge:", error);
-      toast.error("Erreur lors de la complétion du défi");
-    } finally {
-      setIsLoading(false);
+      console.error('Error completing challenge:', error);
+      toast({
+        title: 'Erreur',
+        description: "Impossible de compléter le défi.",
+        variant: 'destructive'
+      });
     }
   };
 
-  // Calculate progress percentage for badges
-  const calculateProgress = (threshold: number) => {
-    // This is a simple mock calculation
-    // In a real app, this would be calculated based on user activities
-    return Math.min(Math.floor(Math.random() * threshold), threshold);
-  };
-  
+  // Rest of the component...
   return (
-    <ProtectedLayoutWrapper>
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold">Gamification</h1>
-          <p className="text-muted-foreground">Relevez des défis et gagnez des récompenses</p>
-        </header>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Défis actifs</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {challenges.map(challenge => (
-                  <ChallengeItem 
-                    key={challenge.id}
-                    title={challenge.title}
-                    description={challenge.description}
-                    points={challenge.points}
-                    isCompleted={completedChallenges.includes(challenge.id)}
-                    onComplete={() => handleCompleteChallenge(challenge.id)}
-                    isLoading={isLoading}
-                  />
-                ))}
-                {challenges.length === 0 && (
-                  <p className="text-center py-4 text-muted-foreground">
-                    Aucun défi disponible actuellement
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div>
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Mes badges</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <BadgeGrid 
-                  badges={badges} 
-                  earnedBadgeIds={earnedBadgeIds} 
-                  progressFunction={calculateProgress}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+    <div className="container max-w-5xl mx-auto py-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Gamification</h1>
+        <p className="text-muted-foreground">
+          Suivez vos progrès, gagnez des badges et relevez des défis pour améliorer votre bien-être
+        </p>
       </div>
-    </ProtectedLayoutWrapper>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+        <TabsList className="grid grid-cols-2 mb-6">
+          <TabsTrigger value="badges">Badges</TabsTrigger>
+          <TabsTrigger value="challenges">Défis</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="badges">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <BadgeGrid badges={badges} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="challenges">
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {challenges.map(challenge => (
+                <ChallengeItem
+                  key={challenge.id}
+                  challenge={challenge}
+                  onComplete={handleCompleteChallenge}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
-export default GamificationPage;
+export default function WrappedGamificationPage() {
+  return (
+    <ProtectedLayoutWrapper>
+      <GamificationPage />
+    </ProtectedLayoutWrapper>
+  );
+}

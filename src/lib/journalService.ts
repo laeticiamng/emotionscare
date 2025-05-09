@@ -10,7 +10,6 @@ let journalEntries: JournalEntry[] = [
     content: 'Journée difficile avec beaucoup de pression au travail.',
     mood: 'stressed',
     mood_score: 3,
-    categories: ['work', 'stress'],
     date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     user_id: 'user-1',
   },
@@ -20,7 +19,6 @@ let journalEntries: JournalEntry[] = [
     content: 'Superbe journée à la plage avec les amis. Très reposant!',
     mood: 'happy',
     mood_score: 8,
-    categories: ['leisure', 'friends'],
     date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     user_id: 'user-1',
   },
@@ -32,6 +30,9 @@ let journalEntries: JournalEntry[] = [
 export const getJournalEntries = async (userId: string): Promise<JournalEntry[]> => {
   return journalEntries.filter(entry => entry.user_id === userId);
 };
+
+// Export with alias for backward compatibility
+export const fetchJournalEntries = getJournalEntries;
 
 /**
  * Get a specific journal entry by ID

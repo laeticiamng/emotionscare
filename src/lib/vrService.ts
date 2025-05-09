@@ -6,7 +6,6 @@ import { VRSession, VRSessionTemplate } from '@/types';
 const vrSessionTemplates: VRSessionTemplate[] = [
   {
     id: 'template-1',
-    name: 'Plage calme',
     description: 'Une plage paisible avec le son des vagues',
     category: 'relaxation',
     duration: 5,
@@ -15,7 +14,6 @@ const vrSessionTemplates: VRSessionTemplate[] = [
   },
   {
     id: 'template-2',
-    name: 'Forêt apaisante',
     description: 'Une promenade dans une forêt tranquille',
     category: 'focus',
     duration: 10,
@@ -54,7 +52,6 @@ export const createVRSession = async (sessionData: Partial<VRSession>): Promise<
     completed: sessionData.completed || true,
     mood_before: sessionData.mood_before || 'neutral',
     mood_after: sessionData.mood_after,
-    notes: sessionData.notes,
     is_audio_only: sessionData.is_audio_only || false,
   };
   
@@ -72,7 +69,14 @@ export const getUserVRSessions = async (userId: string): Promise<VRSession[]> =>
 /**
  * Save a relaxation session
  */
-export const saveRelaxationSession = async (data: any): Promise<void> => {
+export const saveRelaxationSession = async (data: {
+  userId: string;
+  templateId: string;
+  duration?: number;
+  moodBefore?: string;
+  moodAfter?: string;
+  isAudioOnly?: boolean;
+}): Promise<void> => {
   await createVRSession({
     user_id: data.userId,
     template_id: data.templateId,

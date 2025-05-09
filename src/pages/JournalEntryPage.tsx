@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { fetchJournalEntries } from '@/lib/journalService';
+import { getJournalEntries } from '@/lib/journalService';
 
 interface JournalEntry {
   id: string;
@@ -29,7 +28,7 @@ const JournalEntryPage: React.FC = () => {
       try {
         setLoading(true);
         // Fix the usage to fetch a specific entry from the entries
-        const entries = await fetchJournalEntries('user-1');
+        const entries = await getJournalEntries('user-1');
         const entry = entries.find(e => e.id === id);
         
         if (entry) {
