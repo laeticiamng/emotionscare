@@ -7,7 +7,7 @@ export interface Challenge {
   description: string;
   points: number;        // points gagnés à la réussite
   completed: boolean;
-  difficulty?: string;
+  difficulty?: string;   // Added this property
   image_url?: string;
   target?: number;
   progress?: number;

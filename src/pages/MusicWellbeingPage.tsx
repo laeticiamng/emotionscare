@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { MusicTrack } from '@/types';
-import { useMusicPlayer } from '@/hooks/useMusicPlayer';
+import { useMusicControls } from '@/hooks/useMusicControls';
 
 const MusicWellbeingPage = () => {
   const { toast } = useToast();

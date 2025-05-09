@@ -8,9 +8,9 @@ interface ProtectedLayoutWrapperProps {
 
 const ProtectedLayoutWrapper = ({ children }: ProtectedLayoutWrapperProps) => {
   return (
-    <ProtectedLayout>
+    <div className="protected-layout-container">
       {children}
-    </ProtectedLayout>
+    </div>
   );
 };
 
