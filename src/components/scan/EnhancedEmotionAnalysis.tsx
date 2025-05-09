@@ -77,15 +77,24 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
         userContext
       );
       
-      setResult(analysisResult);
+      // Ensure the result has all required fields for EnhancedEmotionResult type
+      const enhancedResult: EnhancedEmotionResult = {
+        ...analysisResult,
+        emotion: analysisResult.emotion || "neutral",
+        confidence: analysisResult.confidence || 0.5,
+        recommendations: analysisResult.recommendations || [],
+        feedback: analysisResult.feedback || ""
+      };
+      
+      setResult(enhancedResult);
       
       if (onAnalysisComplete) {
-        onAnalysisComplete(analysisResult);
+        onAnalysisComplete(enhancedResult);
       }
       
       toast({
         title: "Analyse complétée",
-        description: `État émotionnel détecté : ${analysisResult.emotion}`,
+        description: `État émotionnel détecté : ${enhancedResult.emotion}`,
       });
     } catch (error) {
       console.error('Error during enhanced emotional analysis:', error);

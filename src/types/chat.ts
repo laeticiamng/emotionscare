@@ -23,7 +23,6 @@ export interface ChatResponse {
   context?: ChatContext;
   recommendations?: string[];
   follow_up_questions?: string[];
-  response?: string; // Pour la compatibilité avec les anciens composants
 }
 
 export interface ChatConversation {

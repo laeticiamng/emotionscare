@@ -1,34 +1,39 @@
 
-// Define the types here rather than re-exporting them from index.ts
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number; // Required
-  url: string; // Required since it's used extensively
-  audioUrl?: string;
-  coverUrl?: string;
-  coverImage?: string;
-  cover?: string;
-  externalUrl?: string;
-  genre?: string;
-  emotion?: string;
-  mood?: string;
-  year?: number;
-  isPlaying?: boolean;
+// Music-related types
+
+// Re-export music types from index for backward compatibility
+export type {
+  MusicTrack,
+  MusicPlaylist,
+  MusicEmotion,
+  Track,
+  Playlist
+} from './index';
+
+// Additional music-specific types
+export interface MusicPlayerState {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  muted: boolean;
+  repeat: 'off' | 'track' | 'playlist';
+  shuffle: boolean;
+  queue: MusicTrack[];
 }
 
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  description?: string;
-  coverUrl?: string;
-  emotion?: string;
-  tracks: MusicTrack[];
+export interface MusicAction {
+  type: string;
+  payload?: any;
 }
 
-export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
-
-// For backward compatibility
-export type Track = MusicTrack;
-export type Playlist = MusicPlaylist;
+export interface MusicPlayerControls {
+  play: () => void;
+  pause: () => void;
+  next: () => void;
+  previous: () => void;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+}
