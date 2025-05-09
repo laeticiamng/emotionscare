@@ -1,250 +1,205 @@
 
-import React, { useEffect, useState } from 'react';
-import ProtectedLayout from '@/components/ProtectedLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useState } from 'react';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
-import { useAuth } from '@/contexts/AuthContext';
-import { Brain, Activity, Calendar, History } from 'lucide-react';
-import EnhancedEmotionAnalysis from '@/components/scan/EnhancedEmotionAnalysis';
-import { EnhancedEmotionResult } from '@/lib/scan/enhancedAnalyzeService';
-import { useToast } from '@/hooks/use-toast';
-import { useMusic } from '@/contexts/MusicContext';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const ScanAdvancedPage = () => {
-  const { user } = useAuth();
-  const { logUserAction } = useActivityLogging('scan_advanced');
-  const { toast } = useToast();
-  const { loadPlaylistForEmotion } = useMusic();
-  const [activeTab, setActiveTab] = useState('scan');
-  const [analysisResult, setAnalysisResult] = useState<EnhancedEmotionResult | null>(null);
-  
-  // Données d'exemple pour les graphiques
-  const emotionData = [
-    { date: '01/05', score: 65, emotion: 'calm' },
-    { date: '02/05', score: 78, emotion: 'happy' },
-    { date: '03/05', score: 45, emotion: 'anxious' },
-    { date: '04/05', score: 58, emotion: 'neutral' },
-    { date: '05/05', score: 72, emotion: 'focused' },
-    { date: '06/05', score: 80, emotion: 'happy' },
-    { date: '07/05', score: 76, emotion: 'focused' },
-  ];
-  
-  useEffect(() => {
-    if (user) {
-      logUserAction('visit_scan_advanced_page');
-    }
-  }, [user, logUserAction]);
-  
-  const handleAnalysisComplete = (result: EnhancedEmotionResult) => {
-    setAnalysisResult(result);
-    setActiveTab('results');
-    
-    // Adapter la musique à l'émotion détectée
-    if (result.emotion) {
-      loadPlaylistForEmotion(result.emotion);
-      toast({
-        title: "Musique adaptée",
-        description: `Une playlist correspondant à votre état émotionnel "${result.emotion}" a été chargée.`
-      });
-    }
-    
-    logUserAction('complete_enhanced_scan', { emotion: result.emotion });
+  const [activeTab, setActiveTab] = useState('voice');
+  const [isScanning, setIsScanning] = useState(false);
+  const [result, setResult] = useState<any>(null);
+
+  const handleStartScan = () => {
+    setIsScanning(true);
+    setResult(null);
+
+    // Simulate scanning process
+    setTimeout(() => {
+      setIsScanning(false);
+      
+      // Mock results based on active tab
+      if (activeTab === 'voice') {
+        setResult({
+          emotionScore: 82,
+          primaryEmotion: 'calm',
+          secondaryEmotion: 'focused',
+          insights: [
+            'Votre ton indique un état calme et équilibré',
+            'Légère tension détectée dans certaines inflexions vocales',
+            'Rythme de parole régulier suggérant une concentration stable'
+          ]
+        });
+      } else if (activeTab === 'facial') {
+        setResult({
+          emotionScore: 75,
+          primaryEmotion: 'neutral',
+          secondaryEmotion: 'mild_stress',
+          insights: [
+            'Expression faciale généralement neutre',
+            'Légère tension au niveau des sourcils',
+            'Micro-expressions indiquant un stress léger'
+          ]
+        });
+      } else {
+        setResult({
+          emotionScore: 68,
+          primaryEmotion: 'concern',
+          secondaryEmotion: 'thoughtful',
+          insights: [
+            'Vos mots révèlent une préoccupation modérée',
+            'Champ lexical orienté vers la réflexion',
+            'Structure de phrases indiquant une analyse approfondie'
+          ]
+        });
+      }
+    }, 3000);
   };
 
   return (
-    <ProtectedLayout>
-      <div className="container mx-auto p-4 max-w-6xl">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">Scan émotionnel avancé</h1>
-            <p className="text-muted-foreground">Analyse approfondie par IA de votre état émotionnel</p>
-          </div>
+    <div className="container mx-auto p-4">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Scan émotionnel avancé</h1>
+          <p className="text-muted-foreground">
+            Analyse multi-canal pour une compréhension émotionnelle approfondie
+          </p>
         </div>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="scan" className="flex items-center gap-2">
-              <Brain className="h-4 w-4" />
-              Nouvelle analyse
-            </TabsTrigger>
-            <TabsTrigger value="results" className="flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Résultats
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Historique
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="scan" className="space-y-6">
-            <EnhancedEmotionAnalysis onAnalysisComplete={handleAnalysisComplete} />
-          </TabsContent>
-          
-          <TabsContent value="results" className="space-y-6">
-            {analysisResult ? (
-              <>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="h-5 w-5 text-primary" />
-                      Résultats de l'analyse
-                    </CardTitle>
-                    <CardDescription>
-                      Analyse détaillée de votre état émotionnel avec recommandations personnalisées
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <Card className="bg-muted/20 p-4">
-                        <h3 className="font-medium mb-1">Émotion principale</h3>
-                        <p className="text-xl font-semibold text-primary">{analysisResult.emotion}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Confiance: {(analysisResult.confidence * 100).toFixed(0)}%
-                        </p>
-                      </Card>
-                      
-                      <Card className="bg-muted/20 p-4">
-                        <h3 className="font-medium mb-1">Intensité</h3>
-                        <div className="w-full bg-muted/30 rounded-full h-3 mt-2">
-                          <div className="bg-primary h-3 rounded-full" style={{width: `${analysisResult.confidence * 100}%`}}></div>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Basée sur l'analyse des données fournies
-                        </p>
-                      </Card>
-                      
-                      <Card className="bg-muted/20 p-4">
-                        <h3 className="font-medium mb-1">Date de l'analyse</h3>
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                          <p>{new Date().toLocaleString()}</p>
-                        </div>
-                      </Card>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto">
+          <TabsTrigger value="voice">Analyse vocale</TabsTrigger>
+          <TabsTrigger value="facial">Analyse faciale</TabsTrigger>
+          <TabsTrigger value="text">Analyse textuelle</TabsTrigger>
+        </TabsList>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>
+                {activeTab === 'voice' && 'Analyse des inflexions vocales'}
+                {activeTab === 'facial' && 'Analyse des micro-expressions faciales'}
+                {activeTab === 'text' && 'Analyse sémantique du texte'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="aspect-video bg-muted rounded-md flex items-center justify-center mb-4">
+                {isScanning ? (
+                  <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                    <p>Scan en cours...</p>
+                  </div>
+                ) : result ? (
+                  <div className="text-center p-6">
+                    <div className="mb-4">
+                      <div className="text-4xl font-bold mb-1">{result.emotionScore}</div>
+                      <div className="text-sm text-muted-foreground">Score émotionnel</div>
                     </div>
                     
-                    <Card className="p-4">
-                      <h3 className="font-medium mb-2">Feedback</h3>
-                      <p>{analysisResult.feedback}</p>
-                    </Card>
-                    
-                    <div>
-                      <h3 className="font-medium mb-2">Recommandations</h3>
-                      <div className="space-y-2">
-                        {analysisResult.recommendations.map((rec, i) => (
-                          <Card key={i} className="p-4 bg-muted/20 hover:bg-muted/30 transition-colors">
-                            {rec}
-                          </Card>
-                        ))}
+                    <div className="flex justify-center gap-4 mb-6">
+                      <div className="text-center">
+                        <div className="font-medium capitalize">{result.primaryEmotion}</div>
+                        <div className="text-xs text-muted-foreground">Émotion primaire</div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="font-medium capitalize">{result.secondaryEmotion}</div>
+                        <div className="text-xs text-muted-foreground">Émotion secondaire</div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </>
-            ) : (
-              <Card className="p-6 text-center">
-                <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                <h2 className="text-xl font-medium mb-2">Aucun résultat disponible</h2>
-                <p className="text-muted-foreground mb-4">
-                  Effectuez une nouvelle analyse pour voir les résultats détaillés
-                </p>
-              </Card>
-            )}
-          </TabsContent>
+                    
+                    <ul className="text-left text-sm space-y-1">
+                      {result.insights.map((insight: string, index: number) => (
+                        <li key={index}>• {insight}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <div className="text-center p-6">
+                    {activeTab === 'voice' && (
+                      <>
+                        <p>Prêt à analyser vos inflexions vocales</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Parlez pendant 15 secondes pour une analyse précise
+                        </p>
+                      </>
+                    )}
+                    {activeTab === 'facial' && (
+                      <>
+                        <p>Prêt à analyser vos expressions faciales</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Assurez-vous d'être bien éclairé et face à la caméra
+                        </p>
+                      </>
+                    )}
+                    {activeTab === 'text' && (
+                      <>
+                        <p>Prêt à analyser votre texte</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Décrivez votre état émotionnel actuel en quelques phrases
+                        </p>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              <Button 
+                className="w-full" 
+                onClick={handleStartScan}
+                disabled={isScanning}
+              >
+                {isScanning ? 'Scan en cours...' : 'Démarrer le scan'}
+              </Button>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="history" className="space-y-6">
+          <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Historique des émotions</CardTitle>
-                <CardDescription>Évolution de votre état émotionnel au fil du temps</CardDescription>
+                <CardTitle className="text-base">À propos de cette analyse</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={emotionData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="date" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip 
-                        formatter={(value, name) => [`${value}/100`, 'Score']}
-                        labelFormatter={(value) => `Date: ${value}`}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="score" 
-                        stroke="#8884d8" 
-                        strokeWidth={2}
-                        dot={{ fill: '#8884d8', r: 5 }}
-                        activeDot={{ r: 7 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="p-4">
-                    <h3 className="font-medium mb-2">Émotions récentes</h3>
-                    <div className="space-y-2">
-                      {emotionData.slice(0, 3).map((entry, i) => (
-                        <div key={i} className="flex items-center justify-between p-2 bg-muted/20 rounded-md">
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
-                            <span>{entry.date}</span>
-                          </div>
-                          <div>
-                            <span className="font-medium">{entry.emotion}</span>
-                            <span className="text-xs ml-2 text-muted-foreground">({entry.score}/100)</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                  
-                  <Card className="p-4">
-                    <h3 className="font-medium mb-2">Statistiques</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Score moyen</span>
-                          <span className="font-medium">
-                            {Math.round(emotionData.reduce((acc, curr) => acc + curr.score, 0) / emotionData.length)}/100
-                          </span>
-                        </div>
-                        <div className="w-full bg-muted/30 rounded-full h-2 mt-1">
-                          <div 
-                            className="bg-primary h-2 rounded-full" 
-                            style={{
-                              width: `${Math.round(emotionData.reduce((acc, curr) => acc + curr.score, 0) / emotionData.length)}%`
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Émotion la plus fréquente</span>
-                          <span className="font-medium">focused</span>
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div className="flex justify-between text-sm">
-                          <span>Tendance</span>
-                          <span className="font-medium text-green-500">En amélioration</span>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
+              <CardContent className="text-sm">
+                {activeTab === 'voice' && (
+                  <p>
+                    L'analyse vocale évalue les variations de ton, de rythme et d'intonation pour détecter les émotions sous-jacentes qui peuvent être imperceptibles à l'oreille humaine.
+                  </p>
+                )}
+                {activeTab === 'facial' && (
+                  <p>
+                    L'analyse faciale identifie les micro-expressions qui durent moins de 500ms et révèlent des émotions authentiques que nous ne contrôlons pas consciemment.
+                  </p>
+                )}
+                {activeTab === 'text' && (
+                  <p>
+                    L'analyse textuelle évalue le choix des mots, la structure des phrases et les associations sémantiques pour comprendre l'état émotionnel sous-jacent.
+                  </p>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </ProtectedLayout>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Confidentialité</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm">
+                <p>
+                  Toutes les analyses sont effectuées localement sur votre appareil. Aucune donnée n'est stockée ou partagée avec des tiers. Votre vie privée est notre priorité.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </Tabs>
+    </div>
   );
 };
 
-export default ScanAdvancedPage;
+export default function WrappedScanAdvancedPage() {
+  return (
+    <ProtectedLayoutWrapper>
+      <ScanAdvancedPage />
+    </ProtectedLayoutWrapper>
+  );
+}

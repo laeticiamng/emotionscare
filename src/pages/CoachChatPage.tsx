@@ -1,178 +1,216 @@
 
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import ProtectedLayout from '@/components/ProtectedLayout';
-import { useCoachChat } from '@/hooks/chat/useCoachChat';
-import { useChatHistory } from '@/hooks/chat/useChatHistory';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import CoachChatContainer from '@/components/coach/CoachChatContainer';
-import StatusIndicator from '@/components/ui/status/StatusIndicator';
-import CoachNavigation from '@/components/coach/CoachNavigation';
+import { Send, ArrowLeft, MenuSquare, RotateCw } from 'lucide-react';
 
-const CoachChatPage = () => {
-  // Get the coach chat functionality
-  const { 
-    messages, 
-    setMessages,
-    userMessage, 
-    setUserMessage, 
-    isLoading: isLoadingChat, 
-    typingIndicator,
-    handleSendMessage, 
-    handleKeyDown, 
-    handleRegenerate,
-    handleUserTyping,
-    resetMessages
-  } = useCoachChat();
+// Mocked coach details
+const coach = {
+  name: 'Coach Emma',
+  avatar: '/coach-avatar.png',
+};
 
-  const location = useLocation();
+// Message interface
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'coach';
+  timestamp: Date;
+}
+
+// Initial greeting message from coach
+const initialMessages: Message[] = [
+  {
+    id: '1',
+    content: "Bonjour ! Je suis Emma, votre coach IA de bien-être émotionnel. Comment puis-je vous aider aujourd'hui ?",
+    sender: 'coach',
+    timestamp: new Date(),
+  },
+];
+
+const CoachChatPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const conversationId = searchParams.get('conversation');
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { 
-    loadMessages, 
-    activeConversationId, 
-    setActiveConversationId,
-    isLoading: isLoadingHistory,
-    error: chatHistoryError,
-    retryLoadConversations
-  } = useChatHistory();
   
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [isLoadingConversation, setIsLoadingConversation] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Watch for active conversation changes
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const endOfMessagesRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom of messages
+  const scrollToBottom = () => {
+    endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   useEffect(() => {
-    if (activeConversationId && activeConversationId !== currentConversationId) {
-      setCurrentConversationId(activeConversationId);
-      handleLoadConversation(activeConversationId);
-    }
-  }, [activeConversationId, currentConversationId]); 
-  
-  // Process any initial question from navigation state
-  useEffect(() => {
-    const state = location.state as { initialQuestion?: string } | undefined;
-    if (state?.initialQuestion) {
-      // Reset conversation state when coming with a new question
-      setActiveConversationId(null);
-      setCurrentConversationId(null);
-      resetMessages();
-      setError(null);
+    scrollToBottom();
+  }, [messages]);
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    // Add user message
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      content: newMessage,
+      sender: 'user',
+      timestamp: new Date(),
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    setNewMessage('');
+
+    // Simulate coach typing
+    setIsTyping(true);
+    setTimeout(() => {
+      // Generate coach response based on user message
+      let response: string;
       
-      // Using setTimeout to ensure state updates complete before sending message
-      setTimeout(() => {
-        handleSendMessage(state.initialQuestion);
-      }, 100);
-      
-      // Clear the state to prevent re-sending on navigation
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state, setActiveConversationId, resetMessages, handleSendMessage]); 
-
-  // Handle loading conversation
-  const handleLoadConversation = async (conversationId: string) => {
-    try {
-      setIsLoadingConversation(true);
-      setError(null);
-      console.log('Loading conversation:', conversationId);
-      const loadedMessages = await loadMessages(conversationId);
-      if (loadedMessages && loadedMessages.length > 0) {
-        console.log('Loaded messages:', loadedMessages.length);
-        setMessages(loadedMessages);
+      if (newMessage.toLowerCase().includes('stress') || newMessage.toLowerCase().includes('anxiété')) {
+        response = "Le stress et l'anxiété sont des réactions normales, mais peuvent devenir problématiques. Avez-vous essayé des techniques de respiration profonde ou de méditation ? Je peux vous guider à travers quelques exercices simples.";
+      } else if (newMessage.toLowerCase().includes('dormir') || newMessage.toLowerCase().includes('sommeil')) {
+        response = "Les problèmes de sommeil peuvent affecter votre bien-être émotionnel. Essayez d'établir une routine régulière avant de vous coucher, limitez les écrans et créez un environnement propice au sommeil. Souhaitez-vous des conseils plus spécifiques ?";
+      } else if (newMessage.toLowerCase().includes('travail') || newMessage.toLowerCase().includes('collègue')) {
+        response = "Les relations au travail peuvent être complexes. Il est important de maintenir une communication ouverte et d'établir des limites saines. Pouvez-vous me décrire plus précisément la situation ?";
       } else {
-        toast({
-          title: "Conversation vide",
-          description: "Cette conversation ne contient pas de messages."
-        });
-        resetMessages();
+        response = "Merci de partager cela avec moi. Comment vous sentez-vous par rapport à cette situation ? Y a-t-il des aspects particuliers sur lesquels vous aimeriez travailler ensemble ?";
       }
-    } catch (error) {
-      console.error('Error loading conversation:', error);
-      setError("Impossible de charger la conversation. Veuillez réessayer.");
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger la conversation.",
-        variant: "destructive"
-      });
-      resetMessages();
-    } finally {
-      setIsLoadingConversation(false);
-    }
+
+      // Add coach response
+      const coachMessage: Message = {
+        id: `coach-${Date.now()}`,
+        content: response,
+        sender: 'coach',
+        timestamp: new Date(),
+      };
+      setMessages((prevMessages) => [...prevMessages, coachMessage]);
+      setIsTyping(false);
+    }, 1500);
   };
 
-  // Function to handle sending a new message or an initial question
-  const handleSendChatMessage = (message?: string) => {
-    try {
-      setError(null);
-      if (message) {
-        handleSendMessage(message);
-      } else {
-        handleSendMessage();
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setError("Impossible d'envoyer votre message. Veuillez réessayer.");
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer votre message.",
-        variant: "destructive"
-      });
-    }
+  // Format timestamp
+  const formatTime = (date: Date) => {
+    return new Intl.DateTimeFormat('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
   };
-  
-  // Function to handle the back button
-  const handleBackClick = () => {
-    navigate('/coach');
-  };
-  
-  const isLoading = isLoadingChat || isLoadingHistory || isLoadingConversation;
 
-  // Convert typingIndicator to string explicitly, handling any potential null values
-  const typingIndicatorString = typingIndicator || '';
+  // Start a new conversation
+  const handleNewConversation = () => {
+    toast({
+      title: 'Nouvelle conversation',
+      description: 'Une nouvelle conversation a été démarrée',
+    });
+    setMessages(initialMessages);
+    navigate('/coach-chat');
+  };
 
   return (
-    <ProtectedLayout>
-      <div className="container mx-auto px-2 md:px-4 py-2 md:py-4 max-w-6xl h-[80vh] flex flex-col">
-        {/* Navigation */}
-        <CoachNavigation onBackClick={handleBackClick} />
-        
-        {/* Loading indicator */}
-        {isLoading && (
-          <StatusIndicator 
-            type="loading"
-            position="fixed"
-          />
-        )}
-
-        {/* Error display */}
-        {error && (
-          <StatusIndicator 
-            type="error"
-            title="Erreur"
-            message={error}
-            className="mb-4"
-            onDismiss={() => setError(null)}
-          />
-        )}
-
-        {/* Chat container */}
-        <CoachChatContainer
-          messages={messages}
-          isLoading={isLoading}
-          typingIndicator={typingIndicatorString}
-          userMessage={userMessage}
-          onUserMessageChange={setUserMessage}
-          onSendMessage={handleSendChatMessage}
-          onRegenerate={handleRegenerate}
-          onKeyDown={handleKeyDown}
-          onUserTyping={handleUserTyping}
-          onBackClick={handleBackClick}
-          error={chatHistoryError}
-          retryLoadConversations={retryLoadConversations}
-        />
+    <div className="flex flex-col h-full max-h-screen">
+      {/* Header */}
+      <div className="border-b p-4 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/coach')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={coach.avatar} alt={coach.name} />
+            <AvatarFallback>AI</AvatarFallback>
+          </Avatar>
+          <div>
+            <h2 className="font-medium text-lg leading-none">{coach.name}</h2>
+            <p className="text-xs text-muted-foreground">Coach IA de bien-être</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="ghost" size="icon" onClick={handleNewConversation}>
+            <MenuSquare className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-    </ProtectedLayout>
+
+      {/* Chat messages */}
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-4 max-w-3xl mx-auto">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex ${
+                message.sender === 'user' ? 'justify-end' : 'justify-start'
+              }`}
+            >
+              <div
+                className={`max-w-[80%] rounded-lg p-3 ${
+                  message.sender === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary'
+                }`}
+              >
+                <p className="whitespace-pre-wrap">{message.content}</p>
+                <p
+                  className={`text-xs mt-1 ${
+                    message.sender === 'user'
+                      ? 'text-primary-foreground/70'
+                      : 'text-muted-foreground'
+                  }`}
+                >
+                  {formatTime(message.timestamp)}
+                </p>
+              </div>
+            </div>
+          ))}
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="max-w-[80%] rounded-lg p-3 bg-secondary">
+                <div className="flex space-x-1 items-center">
+                  <div className="w-2 h-2 rounded-full bg-current animate-bounce" />
+                  <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <div className="w-2 h-2 rounded-full bg-current animate-bounce" style={{ animationDelay: '0.4s' }} />
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={endOfMessagesRef} />
+        </div>
+      </ScrollArea>
+
+      {/* Message input */}
+      <form onSubmit={handleSubmit} className="border-t p-4">
+        <div className="flex gap-2">
+          <Textarea
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Saisissez votre message ici..."
+            className="flex-1 min-h-[60px] max-h-[200px]"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+          />
+          <Button type="submit" size="icon" disabled={isTyping || !newMessage.trim()}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 
-export default CoachChatPage;
+export default function WrappedCoachChatPage() {
+  return (
+    <ProtectedLayoutWrapper>
+      <CoachChatPage />
+    </ProtectedLayoutWrapper>
+  );
+}

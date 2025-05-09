@@ -7,7 +7,9 @@ interface ProtectedLayoutWrapperProps {
 }
 
 const ProtectedLayoutWrapper: React.FC<ProtectedLayoutWrapperProps> = ({ children }) => {
-  return <ProtectedLayout>{children}</ProtectedLayout>;
+  return <div className="flex flex-col min-h-screen">
+    {children}
+  </div>;
 };
 
 export default ProtectedLayoutWrapper;

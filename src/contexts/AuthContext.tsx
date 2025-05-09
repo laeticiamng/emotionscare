@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserPreferences } from '@/types';
+import { User, UserPreferences, UserRole } from '@/types';
 
 interface AuthContextProps {
   user: User | null;
@@ -8,6 +8,7 @@ interface AuthContextProps {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<any>;
   logout: () => void;
+  signOut: () => void; // Alias for logout for compatibility
   updateUser: (updatedUser: User) => Promise<void>;
   setUser: (user: User | null) => void;
 }
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextProps>({
   isLoading: true,
   login: () => Promise.resolve({}),
   logout: () => {},
+  signOut: () => {},
   updateUser: () => Promise.resolve(),
   setUser: () => {},
 });
@@ -46,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: 'user-1',
       email,
       name: email.split('@')[0],
-      role: email.includes('admin') ? 'admin' : 'user',
+      role: email.includes('admin') ? UserRole.ADMIN : UserRole.USER,
       department: 'Engineering',
       position: 'Developer',
       avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
@@ -82,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isLoading,
       login,
       logout,
+      signOut: logout, // Add signOut as an alias for logout
       updateUser,
       setUser 
     }}>

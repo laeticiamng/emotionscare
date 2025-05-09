@@ -14,7 +14,7 @@ const defaultOptions: UseSessionSecurityOptions = {
 };
 
 export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> = {}) => {
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -69,7 +69,7 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
       
       if (timeSinceLastActivity > sessionTimeout) {
         // Session has expired, log user out
-        signOut();
+        logout();
         setShowWarning(false);
       } else if (timeSinceLastActivity > warningThreshold && !showWarning) {
         // Show warning before session expires
@@ -78,7 +78,7 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
     }, 1000);
     
     return () => clearInterval(intervalId);
-  }, [lastActivity, sessionTimeout, warningThreshold, showWarning, signOut]);
+  }, [lastActivity, sessionTimeout, warningThreshold, showWarning, logout]);
 
   return {
     showWarning,

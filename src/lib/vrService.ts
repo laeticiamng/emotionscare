@@ -1,126 +1,84 @@
 
 import { v4 as uuidv4 } from 'uuid';
+import { VRSession, VRSessionTemplate } from '@/types';
 
-interface VRSession {
-  id: string;
-  title: string;
-  description: string;
-  duration: number;  // in seconds
-  date: string;
-  type: string;      // e.g., "relaxation", "focus", "energy"
-  user_id: string;
-  completed: boolean;
-  score?: number;
-  emotion_before?: string;
-  emotion_after?: string;
-}
-
-// Mock VR sessions data
-let mockVRSessions: VRSession[] = [
+// Mock VR session templates
+const vrSessionTemplates: VRSessionTemplate[] = [
   {
-    id: '1',
-    title: 'Session pleine conscience',
-    description: 'Méditation guidée pour la conscience de soi',
-    duration: 600,
-    date: '2023-05-10T14:30:00Z',
-    type: 'relaxation',
-    user_id: 'user-1',
-    completed: true,
-    score: 85,
-    emotion_before: 'stressed',
-    emotion_after: 'calm'
+    id: 'template-1',
+    name: 'Plage calme',
+    description: 'Une plage paisible avec le son des vagues',
+    category: 'relaxation',
+    duration: 5,
+    thumbnail: '/images/vr/beach.jpg',
+    is_audio_only: false,
   },
   {
-    id: '2',
-    title: 'Forêt apaisante',
-    description: 'Immersion dans un environnement naturel relaxant',
-    duration: 900,
-    date: '2023-05-15T10:00:00Z',
-    type: 'relaxation',
-    user_id: 'user-1',
-    completed: true,
-    score: 92,
-    emotion_before: 'anxious',
-    emotion_after: 'peaceful'
-  },
-  {
-    id: '3',
-    title: 'Focus productivity',
-    description: 'Environnement de travail virtuel optimisé',
-    duration: 1800,
-    date: '2023-05-20T09:15:00Z',
-    type: 'focus',
-    user_id: 'user-1',
-    completed: false
+    id: 'template-2',
+    name: 'Forêt apaisante',
+    description: 'Une promenade dans une forêt tranquille',
+    category: 'focus',
+    duration: 10,
+    thumbnail: '/images/vr/forest.jpg',
+    is_audio_only: false,
   }
 ];
 
-// Fetch all VR sessions for a user
-export const fetchVRSessions = async (userId: string): Promise<VRSession[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return mockVRSessions.filter(session => session.user_id === userId);
+// Mock VR sessions
+let vrSessions: VRSession[] = [];
+
+/**
+ * Get all VR session templates
+ */
+export const getVRTemplates = async (): Promise<VRSessionTemplate[]> => {
+  return vrSessionTemplates;
 };
 
-// Fetch a specific VR session
-export const fetchVRSession = async (id: string): Promise<VRSession | undefined> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  return mockVRSessions.find(session => session.id === id);
+/**
+ * Get a VR template by ID
+ */
+export const getVRTemplateById = async (templateId: string): Promise<VRSessionTemplate | undefined> => {
+  return vrSessionTemplates.find(template => template.id === templateId);
 };
 
-// Create a new VR session
+/**
+ * Create a new VR session
+ */
 export const createVRSession = async (sessionData: Partial<VRSession>): Promise<VRSession> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 700));
-
   const newSession: VRSession = {
     id: uuidv4(),
-    title: sessionData.title || 'Session sans titre',
-    description: sessionData.description || '',
-    duration: sessionData.duration || 600,
+    user_id: sessionData.user_id || '',
+    template_id: sessionData.template_id || '',
     date: sessionData.date || new Date().toISOString(),
-    type: sessionData.type || 'relaxation',
-    user_id: sessionData.user_id || 'user-1',
-    completed: sessionData.completed || false,
-    score: sessionData.score,
-    emotion_before: sessionData.emotion_before,
-    emotion_after: sessionData.emotion_after
+    duration: sessionData.duration || 300,
+    completed: sessionData.completed || true,
+    mood_before: sessionData.mood_before || 'neutral',
+    mood_after: sessionData.mood_after,
+    notes: sessionData.notes,
+    is_audio_only: sessionData.is_audio_only || false,
   };
-
-  mockVRSessions.push(newSession);
+  
+  vrSessions.push(newSession);
   return newSession;
 };
 
-// Complete a VR session
-export const completeVRSession = async (id: string, data: { score?: number, emotion_after?: string }): Promise<VRSession | undefined> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  const sessionIndex = mockVRSessions.findIndex(session => session.id === id);
-  if (sessionIndex === -1) return undefined;
-
-  mockVRSessions[sessionIndex] = {
-    ...mockVRSessions[sessionIndex],
-    completed: true,
-    score: data.score || mockVRSessions[sessionIndex].score,
-    emotion_after: data.emotion_after || mockVRSessions[sessionIndex].emotion_after
-  };
-
-  return mockVRSessions[sessionIndex];
+/**
+ * Get VR sessions for a user
+ */
+export const getUserVRSessions = async (userId: string): Promise<VRSession[]> => {
+  return vrSessions.filter(session => session.user_id === userId);
 };
 
-// Save a relaxation session (for backward compatibility)
-export const saveRelaxationSession = async (sessionId: string): Promise<{ success: boolean; sessionId: string }> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 400));
-  
-  const sessionIndex = mockVRSessions.findIndex(session => session.id === sessionId);
-  
-  if (sessionIndex !== -1) {
-    mockVRSessions[sessionIndex].completed = true;
-    return { success: true, sessionId };
-  }
-  
-  return { success: false, sessionId };
+/**
+ * Save a relaxation session
+ */
+export const saveRelaxationSession = async (data: any): Promise<void> => {
+  await createVRSession({
+    user_id: data.userId,
+    template_id: data.templateId,
+    duration: data.duration || 300,
+    mood_before: data.moodBefore || 'neutral',
+    mood_after: data.moodAfter || 'relaxed',
+    is_audio_only: data.isAudioOnly || false
+  });
 };

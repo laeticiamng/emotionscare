@@ -1,203 +1,166 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProtectedLayout from '@/components/ProtectedLayout';
-import { useChatHistory } from '@/hooks/chat/useChatHistory';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { MessageCircle, Trash2, History, CalendarDays } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import CoachNavigation from '@/components/coach/CoachNavigation';
-import StatusIndicator from '@/components/ui/status/StatusIndicator';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Search, MessageSquare } from 'lucide-react';
 
-const ChatHistoryPage = () => {
+interface Conversation {
+  id: string;
+  title: string;
+  lastMessage: string;
+  date: Date;
+  tags: string[];
+  unread?: boolean;
+}
+
+// Mock data
+const mockConversations: Conversation[] = [
+  {
+    id: '1',
+    title: 'Stress au travail',
+    lastMessage: "Voici quelques techniques pour gérer le stress au travail...",
+    date: new Date('2023-03-15T14:30:00'),
+    tags: ['stress', 'travail'],
+    unread: true,
+  },
+  {
+    id: '2',
+    title: 'Améliorer mon sommeil',
+    lastMessage: "Pour améliorer votre sommeil, essayez ces habitudes...",
+    date: new Date('2023-03-10T09:15:00'),
+    tags: ['sommeil', 'détente'],
+  },
+  {
+    id: '3',
+    title: 'Techniques de méditation',
+    lastMessage: "La méditation pleine conscience peut être pratiquée en...",
+    date: new Date('2023-03-05T16:45:00'),
+    tags: ['méditation', 'pleine conscience'],
+  },
+];
+
+const ChatHistoryPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { 
-    conversations,
-    isLoading,
-    error,
-    loadConversations,
-    deleteConversation,
-    setActiveConversationId
-  } = useChatHistory();
-  
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  
-  // Load conversations on mount
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
-  
-  // Group conversations by date
-  const groupedConversations = React.useMemo(() => {
-    const groups: Record<string, typeof conversations> = {};
-    
-    if (conversations) {
-      conversations.forEach(convo => {
-        const date = convo.createdAt;
-        const dateKey = format(date, 'yyyy-MM-dd');
-        
-        if (!groups[dateKey]) {
-          groups[dateKey] = [];
-        }
-        
-        groups[dateKey].push(convo);
-      });
-    }
-    
-    return groups;
-  }, [conversations]);
-  
-  const handleSelectConversation = (conversationId: string) => {
-    setActiveConversationId(conversationId);
-    navigate('/coach-chat');
+    // Simulate data loading
+    setTimeout(() => {
+      setConversations(mockConversations);
+      setLoading(false);
+    }, 800);
+  }, []);
+
+  const filteredConversations = conversations.filter(
+    (conv) =>
+      conv.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      conv.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
   };
-  
-  const handleDeleteConversation = async (conversationId: string) => {
-    try {
-      setIsDeleting(conversationId);
-      await deleteConversation(conversationId);
-      toast({
-        title: "Conversation supprimée",
-        description: "La conversation a été supprimée avec succès."
-      });
-    } catch (error) {
-      console.error('Error deleting conversation:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la conversation.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsDeleting(null);
-    }
-  };
-  
-  const handleBackClick = () => {
-    navigate('/coach');
-  };
-  
+
   return (
-    <ProtectedLayout>
-      <div className="container mx-auto px-4 py-4 max-w-5xl">
-        {/* Navigation */}
-        <CoachNavigation onBackClick={handleBackClick} />
-        
-        {/* Loading or error states */}
-        {isLoading && (
-          <StatusIndicator 
-            type="loading"
-            position="fixed"
-          />
-        )}
-        
-        {error && (
-          <StatusIndicator 
-            type="error"
-            title="Erreur"
-            message="Impossible de charger l'historique des conversations."
-            onRetry={loadConversations}
-          />
-        )}
-        
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold flex items-center gap-2 mb-2">
-            <History className="h-5 w-5" />
-            Historique des conversations
-          </h1>
+    <div className="container mx-auto p-4">
+      <header className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Historique des conversations</h1>
           <p className="text-muted-foreground">
-            Retrouvez toutes vos conversations précédentes avec votre coach IA.
+            Retrouvez et continuez vos échanges avec le coach IA
           </p>
         </div>
-        
-        {/* Empty state */}
-        {!isLoading && conversations && conversations.length === 0 && (
-          <Card className="text-center py-12">
-            <CardContent>
-              <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Aucune conversation</h2>
-              <p className="text-muted-foreground mb-6">
-                Vous n'avez pas encore discuté avec votre coach IA.
-              </p>
-              <Button 
-                onClick={() => navigate('/coach')}
-              >
-                Démarrer une conversation
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-        
-        {/* Conversations list grouped by date */}
-        {!isLoading && groupedConversations && Object.entries(groupedConversations)
-          .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime())
-          .map(([dateString, convos]) => (
-            <div key={dateString} className="mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <CalendarDays className="h-4 w-4 text-muted-foreground" />
-                <h3 className="font-medium">
-                  {format(new Date(dateString), 'EEEE d MMMM yyyy', { locale: fr })}
-                </h3>
+        <Button
+          onClick={() => navigate('/coach-chat')}
+          className="flex items-center gap-2"
+        >
+          <MessageSquare size={18} />
+          <span>Nouvelle conversation</span>
+        </Button>
+      </header>
+
+      <div className="mb-6 relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+        <Input
+          className="pl-10"
+          placeholder="Rechercher par titre ou tag..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center p-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      ) : filteredConversations.length > 0 ? (
+        <div className="space-y-4">
+          {filteredConversations.map((conversation) => (
+            <Card
+              key={conversation.id}
+              className={`p-4 hover:bg-secondary/50 cursor-pointer transition-colors ${
+                conversation.unread ? 'border-l-4 border-l-primary' : ''
+              }`}
+              onClick={() => navigate(`/coach-chat?conversation=${conversation.id}`)}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-medium">{conversation.title}</h3>
+                    {conversation.unread && (
+                      <Badge variant="secondary">Nouveau</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                    {conversation.lastMessage}
+                  </p>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {formatDate(conversation.date)}
+                </div>
               </div>
-              
-              <div className="space-y-3">
-                {convos.map(conversation => (
-                  <Card 
-                    key={conversation.id} 
-                    className={`transition-all duration-200 hover:shadow-md ${isDeleting === conversation.id ? 'opacity-50' : ''}`}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div 
-                          className="flex-1 cursor-pointer"
-                          onClick={() => handleSelectConversation(conversation.id)}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <MessageCircle className="h-4 w-4 text-primary" />
-                            <h4 className="font-medium truncate">
-                              {conversation.title || 'Conversation sans titre'}
-                            </h4>
-                          </div>
-                          
-                          {conversation.lastMessage && (
-                            <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-                              {conversation.lastMessage}
-                            </p>
-                          )}
-                          
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {format(conversation.createdAt, 'HH:mm', { locale: fr })}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-destructive-foreground hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleDeleteConversation(conversation.id)}
-                          disabled={isDeleting === conversation.id}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+              <div className="mt-3 flex flex-wrap gap-1">
+                {conversation.tags.map((tag) => (
+                  <Badge key={tag} variant="outline" className="text-xs">
+                    {tag}
+                  </Badge>
                 ))}
               </div>
-              
-              <Separator className="my-4" />
-            </div>
+            </Card>
           ))}
-      </div>
-    </ProtectedLayout>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+          <h3 className="text-lg font-medium">Aucune conversation trouvée</h3>
+          <p className="text-muted-foreground mb-6">
+            {searchQuery
+              ? "Aucune conversation ne correspond à votre recherche."
+              : "Vous n'avez pas encore de conversations."}
+          </p>
+          <Button onClick={() => navigate('/coach-chat')}>
+            Démarrer une nouvelle conversation
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default ChatHistoryPage;
+export default function WrappedChatHistoryPage() {
+  return (
+    <ProtectedLayoutWrapper>
+      <ChatHistoryPage />
+    </ProtectedLayoutWrapper>
+  );
+}

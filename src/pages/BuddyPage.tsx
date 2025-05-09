@@ -1,192 +1,92 @@
 
-import React, { useEffect, useState } from 'react';
-import ProtectedLayout from '@/components/ProtectedLayout';
+import React, { useState, useEffect } from 'react';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-// Mock data for buddy matches
-const mockBuddies = [
-  {
-    id: '1',
-    name: 'Sophie Martin',
-    department: 'Marketing',
-    interests: ['Yoga', 'Méditation', 'Randonnée'],
-    compatibility: 87,
-    avatar: 'https://i.pravatar.cc/150?u=sophie'
-  },
-  {
-    id: '2',
-    name: 'Thomas Dubois',
-    department: 'Finance',
-    interests: ['Course à pied', 'Lecture', 'Cuisine'],
-    compatibility: 82,
-    avatar: 'https://i.pravatar.cc/150?u=thomas'
-  },
-  {
-    id: '3',
-    name: 'Emma Petit',
-    department: 'Ressources Humaines',
-    interests: ['Natation', 'Jardinage', 'Photographie'],
-    compatibility: 78,
-    avatar: 'https://i.pravatar.cc/150?u=emma'
-  },
-  {
-    id: '4',
-    name: 'Lucas Bernard',
-    department: 'Informatique',
-    interests: ['Musique', 'Cyclisme', 'Échecs'],
-    compatibility: 75,
-    avatar: 'https://i.pravatar.cc/150?u=lucas'
-  }
+interface BuddyProps {
+  id: string;
+  name: string;
+  interests: string[];
+  compatibility?: number;
+}
+
+const mockBuddies: BuddyProps[] = [
+  { id: '1', name: 'Sophie', interests: ['méditation', 'yoga', 'lecture'], compatibility: 85 },
+  { id: '2', name: 'Thomas', interests: ['sport', 'musique', 'cuisine'], compatibility: 72 },
+  { id: '3', name: 'Emilie', interests: ['voyage', 'photographie', 'arts'], compatibility: 68 },
+  { id: '4', name: 'Lucas', interests: ['technologie', 'gaming', 'cinéma'], compatibility: 91 }
 ];
 
-// BuddyCard component (inline for simplicity)
-const BuddyCard = ({ buddy }: { buddy: typeof mockBuddies[0] }) => {
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-3">
-          <img 
-            src={buddy.avatar} 
-            alt={`${buddy.name}`}
-            className="h-12 w-12 rounded-full object-cover"
-          />
-          <div>
-            <CardTitle className="text-lg">{buddy.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{buddy.department}</p>
-          </div>
-          <div className="ml-auto">
-            <span className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">
-              {buddy.compatibility}% compatible
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-3">
-          <h4 className="text-sm font-medium mb-2">Centres d'intérêt</h4>
-          <div className="flex flex-wrap gap-1">
-            {buddy.interests.map((interest, index) => (
-              <span 
-                key={index}
-                className="bg-secondary text-secondary-foreground px-2.5 py-0.5 rounded-full text-xs">
-                {interest}
-              </span>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between pt-2 border-t">
-        <Button variant="outline" size="sm">Message</Button>
-        <Button size="sm">Connecter</Button>
-      </CardFooter>
-    </Card>
-  );
-};
-
 const BuddyPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredBuddies, setFilteredBuddies] = useState(mockBuddies);
-  const [activeTab, setActiveTab] = useState('matches');
-  
-  // Log page visit
-  const { logUserAction } = useActivityLogging('buddy_page');
-  
+  const [buddies, setBuddies] = useState<BuddyProps[]>([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const filtered = mockBuddies.filter(
-      buddy => buddy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               buddy.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-               buddy.interests.some(interest => interest.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-    
-    setFilteredBuddies(filtered);
-  }, [searchTerm]);
-  
+    // Simulate API call
+    setTimeout(() => {
+      setBuddies(mockBuddies);
+      setLoading(false);
+    }, 1000);
+  }, []);
+
   return (
-    <ProtectedLayout>
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">Trouvez votre Buddy</h1>
-          <p className="text-muted-foreground mt-2">
-            Rencontrez des collègues qui partagent vos intérêts et vos objectifs de bien-être
-          </p>
+    <div className="container mx-auto p-4">
+      <header className="mb-8">
+        <h1 className="text-3xl font-bold">Trouvez un Buddy</h1>
+        <p className="text-muted-foreground">
+          Connectez-vous avec des collègues qui partagent des intérêts similaires
+          pour échanger sur le bien-être émotionnel
+        </p>
+      </header>
+
+      {loading ? (
+        <div className="flex justify-center p-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
-        
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle>Connexions de bien-être</CardTitle>
-              
-              <div className="relative w-full sm:w-auto">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher par nom, département..."
-                  className="pl-9"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            
-            <CardDescription>
-              Votre buddy vous aide à maintenir vos engagements de bien-être et partage des intérêts similaires
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <Tabs defaultValue="matches" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-6">
-                <TabsTrigger value="matches">Suggestions</TabsTrigger>
-                <TabsTrigger value="myBuddies">Mes Buddies</TabsTrigger>
-                <TabsTrigger value="requests">Demandes</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="matches">
-                {filteredBuddies.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredBuddies.map(buddy => (
-                      <BuddyCard
-                        key={buddy.id}
-                        buddy={buddy}
-                      />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {buddies.map((buddy) => (
+            <Card key={buddy.id} className="overflow-hidden">
+              <CardHeader className="bg-secondary flex flex-col items-center">
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary mb-2">
+                  {buddy.name.charAt(0)}
+                </div>
+                <h3 className="text-lg font-semibold">{buddy.name}</h3>
+                {buddy.compatibility && (
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                    {buddy.compatibility}% compatible
+                  </span>
+                )}
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold mb-2">Intérêts:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {buddy.interests.map((interest, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded-full"
+                      >
+                        {interest}
+                      </span>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-center py-10">
-                    <p className="text-muted-foreground">Aucun résultat correspondant à votre recherche</p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="myBuddies">
-                <div className="text-center py-10">
-                  <p className="text-muted-foreground">Vous n'avez pas encore de buddies actifs</p>
-                  <Button className="mt-4" onClick={() => setActiveTab('matches')}>
-                    Découvrir des buddies
-                  </Button>
                 </div>
-              </TabsContent>
-              
-              <TabsContent value="requests">
-                <div className="text-center py-10">
-                  <p className="text-muted-foreground">Vous n'avez pas de demandes en attente</p>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-          
-          <CardFooter className="flex justify-between border-t pt-6">
-            <Button variant="outline">Comment ça marche</Button>
-            <Button onClick={() => logUserAction('find_buddy')}>Trouver plus de buddies</Button>
-          </CardFooter>
-        </Card>
-      </div>
-    </ProtectedLayout>
+                <Button className="w-full">Se connecter</Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
-export default BuddyPage;
+export default function WrappedBuddyPage() {
+  return (
+    <ProtectedLayoutWrapper>
+      <BuddyPage />
+    </ProtectedLayoutWrapper>
+  );
+}

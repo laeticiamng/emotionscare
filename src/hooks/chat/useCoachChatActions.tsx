@@ -1,156 +1,103 @@
-import { useCallback } from 'react';
+
+import { useState, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { useQueryClient } from '@tanstack/react-query';
 import { ChatMessage } from '@/types/chat';
-import { useToast } from '@/hooks/use-toast';
-import { useCoach } from '@/hooks/coach/useCoach';
-import { useActivity } from '@/hooks/useActivity';
-import { useChatHistory } from '@/hooks/chat/useChatHistory';
 
-interface CoachChatActionsProps {
-  userMessage: string;
-  messages: ChatMessage[];
-  sendMessage: any;
-  regenerateResponse: any;
-  addMessage: (message: ChatMessage) => void;
-  clearTypingIndicator: () => void;
-  setUserMessage: (message: string) => void;
-}
+export const useCoachChatActions = (conversationId: string) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [responseContent, setResponseContent] = useState<string>('');
+  const queryClient = useQueryClient();
 
-/**
- * Hook to manage coach chat specific actions (send, regenerate)
- */
-export function useCoachChatActions({
-  userMessage,
-  messages,
-  sendMessage,
-  regenerateResponse,
-  addMessage,
-  clearTypingIndicator,
-  setUserMessage
-}: CoachChatActionsProps) {
-  const { toast } = useToast();
-  const { askQuestion } = useCoach();
-  const { logActivity } = useActivity();
-  const { 
-    activeConversationId, 
-    saveMessages
-  } = useChatHistory();
-  
-  // Handle sending a message
-  const handleSendMessage = useCallback((messageText: string = userMessage) => {
-    if (!messageText.trim()) return;
-    
-    const addUserMessage = (message: ChatMessage) => addMessage(message);
-    const addBotMessage = (message: ChatMessage) => addMessage(message);
-    
-    // Log activity
-    const logMessageActivity = () => {
-      logActivity('coach_chat', { message: messageText });
+  // Add user message
+  const addUserMessage = useCallback((content: string) => {
+    const newMessage: ChatMessage = {
+      id: uuidv4(),
+      text: content,
+      sender: 'user',
+      timestamp: new Date(),
     };
     
-    // Process message
-    sendMessage(
-      messageText,
-      addUserMessage,
-      addBotMessage,
-      async (text: string) => {
-        try {
-          // Log activity
-          logMessageActivity();
-          
-          // Get response from coach AI
-          const response = await askQuestion(text);
-          
-          // Save messages after successful response
-          if (activeConversationId) {
-            const chatMessages: ChatMessage[] = [...messages, 
-              {
-                id: Date.now().toString(),
-                text: text,
-                sender: 'user' as const,
-                timestamp: new Date(),
-              },
-              {
-                id: (Date.now() + 1).toString(),
-                text: response,
-                sender: 'bot' as const,
-                timestamp: new Date(),
-              }
-            ];
-            
-            saveMessages(activeConversationId, chatMessages);
-          }
-          
-          return response;
-        } catch (error) {
-          console.error('Error asking coach question:', error);
-          toast({
-            title: "Erreur",
-            description: "Impossible de communiquer avec le coach IA. Veuillez réessayer.",
-            variant: "destructive"
-          });
-          return "Je suis désolé, mais je rencontre des difficultés techniques. Veuillez réessayer plus tard.";
-        }
-      },
-      clearTypingIndicator
-    );
-    
-    // Clear input
-    setUserMessage('');
-  }, [userMessage, sendMessage, addMessage, activeConversationId, saveMessages, messages, logActivity, askQuestion, toast, clearTypingIndicator, setUserMessage]);
+    setMessages(prev => [...prev, newMessage]);
+    return newMessage;
+  }, []);
   
-  // Handle regenerating a response
-  const handleRegenerate = useCallback(() => {
-    const addBotMessage = (message: ChatMessage) => addMessage(message);
+  // Add AI response
+  const addAIResponse = useCallback((content: string) => {
+    const newMessage: ChatMessage = {
+      id: uuidv4(),
+      text: content,
+      sender: 'bot',
+      timestamp: new Date(),
+    };
     
-    regenerateResponse(
-      messages,
-      addBotMessage,
-      async (text: string) => {
-        try {
-          // Log activity
-          logActivity('coach_regenerate', { originalMessage: text });
-          
-          // Get new response
-          const response = await askQuestion(text);
-          
-          // Save regenerated message
-          if (activeConversationId) {
-            const lastUserMessageIndex = [...messages].reverse().findIndex(msg => msg.sender === 'user');
-            if (lastUserMessageIndex !== -1) {
-              // Keep all messages up to the last user message, then add the new bot response
-              const updatedMessages = messages.slice(0, messages.length - lastUserMessageIndex);
-              updatedMessages.push({
-                id: Date.now().toString(),
-                text: response,
-                sender: 'bot' as const,
-                timestamp: new Date(),
-              });
-              
-              saveMessages(activeConversationId, updatedMessages);
-            }
-          }
-          
-          toast({
-            title: "Nouvelle réponse générée",
-            description: "Une nouvelle réponse a été générée pour votre question."
-          });
-          
-          return response;
-        } catch (error) {
-          console.error('Error regenerating response:', error);
-          toast({
-            title: "Erreur",
-            description: "Impossible de générer une nouvelle réponse.",
-            variant: "destructive"
-          });
-          throw error;
-        }
-      }
-    );
-  }, [regenerateResponse, messages, addMessage, activeConversationId, saveMessages, logActivity, askQuestion, toast]);
-  
+    setMessages(prev => [...prev, newMessage]);
+    return newMessage;
+  }, []);
+
+  // This simulates the AI thinking and responding
+  const simulateTyping = useCallback((messagePromise: Promise<string>) => {
+    setIsTyping(true);
+    
+    // Create temporary message object while response is loading
+    const tempMessage: ChatMessage = {
+      id: uuidv4(),
+      text: '...',
+      sender: 'bot',
+      timestamp: new Date(),
+    };
+    
+    // Add temporary message
+    setMessages(prev => [...prev, tempMessage]);
+    
+    // Process the actual response when ready
+    messagePromise.then(response => {
+      // Replace the temporary message with the actual response
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempMessage.id 
+            ? { ...msg, text: response } 
+            : msg
+        )
+      );
+      
+      // Store response content for streaming visualization
+      setResponseContent(response);
+      
+      // Invalidate query cache if needed
+      queryClient.invalidateQueries({ queryKey: ['conversations', conversationId] });
+    })
+    .catch(error => {
+      // Handle error - replace temp message with error
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === tempMessage.id 
+            ? { ...msg, text: `Error: ${error.message || 'Failed to get response'}` } 
+            : msg
+        )
+      );
+    })
+    .finally(() => {
+      setIsTyping(false);
+    });
+    
+    return tempMessage;
+  }, [conversationId, queryClient]);
+
+  // Clear all messages
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    setResponseContent('');
+  }, []);
+
   return {
-    handleSendMessage,
-    handleRegenerate
+    messages,
+    isTyping,
+    responseContent,
+    addUserMessage,
+    addAIResponse,
+    simulateTyping,
+    clearMessages
   };
-}
+};

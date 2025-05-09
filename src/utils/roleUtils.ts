@@ -24,6 +24,16 @@ export const isManagerRole = (role?: string): boolean => {
 };
 
 /**
+ * Check if the role is a user/employee role
+ * @param role User role
+ * @returns True if the role is a regular user/employee
+ */
+export const isUserRole = (role?: string): boolean => {
+  if (!role) return false;
+  return role === UserRole.USER || role === UserRole.EMPLOYEE;
+};
+
+/**
  * Get the access level of a role
  * @param role User role
  * @returns Access level (3 for admin, 2 for manager, 1 for employee, 0 for unknown)

@@ -1,180 +1,215 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ThemeName, User, UserPreferences } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+type FontSizeOption = 'small' | 'medium' | 'large';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useAuth();
+  const { user, updateUser } = useAuth();
   
-  const [name, setName] = useState(user?.name || '');
+  // State for each step
+  const [currentStep, setCurrentStep] = useState(1);
+  const [username, setUsername] = useState(user?.name || '');
   const [department, setDepartment] = useState(user?.department || '');
   const [position, setPosition] = useState(user?.position || '');
-  const [theme, setTheme] = useState<ThemeName>(user?.preferences?.theme || 'light');
-  const [language, setLanguage] = useState(user?.preferences?.language || 'fr');
-  const [fontSize, setFontSize] = useState(user?.preferences?.font_size || 'medium');
-  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(
-    user?.preferences?.notifications_enabled !== undefined 
-      ? user.preferences.notifications_enabled 
-      : true
+  const [theme, setTheme] = useState(user?.preferences?.theme || 'light');
+  const [fontSize, setFontSize] = useState<FontSizeOption>(
+    (user?.preferences?.font_size as FontSizeOption) || 'medium'
+  );
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    user?.preferences?.notifications_enabled !== false
   );
   
-  const handleComplete = () => {
+  const totalSteps = 3;
+  
+  const goToNextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+  
+  const goToPreviousStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+  
+  const handleComplete = async () => {
     if (!user) return;
     
-    const preferences: UserPreferences = {
-      theme: theme === "system" ? "light" : theme, // Handle "system" by defaulting to "light"
-      font_size: fontSize as 'small' | 'medium' | 'large',
-      notifications_enabled: notificationsEnabled,
-      language,
-    };
-    
-    const updatedUser: User = {
-      ...user,
-      name,
-      department,
-      position,
-      preferences,
-      onboarded: true
-    };
-    
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    navigate('/dashboard');
+    try {
+      await updateUser({
+        ...user,
+        name: username,
+        department,
+        position,
+        preferences: {
+          ...user.preferences,
+          theme,
+          font_size: fontSize,
+          notifications_enabled: notificationsEnabled
+        }
+      });
+      
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+    }
+  };
+  
+  // Handler for font size changes
+  const handleFontSizeChange = (val: FontSizeOption) => {
+    setFontSize(val);
   };
   
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Bienvenue sur EmotionsCare</CardTitle>
-          <CardDescription>
-            Configurez votre profil pour une expérience personnalisée
-          </CardDescription>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <h1 className="text-2xl font-bold">Bienvenue sur EmotionsCare</h1>
+          <p className="text-muted-foreground">
+            Étape {currentStep} sur {totalSteps}
+          </p>
         </CardHeader>
         
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Informations personnelles</h3>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="name">Nom complet</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Votre nom"
-              />
+        <CardContent>
+          {currentStep === 1 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Informations personnelles</h2>
+              
+              <div className="space-y-2">
+                <Label htmlFor="username">Nom d'utilisateur</Label>
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="John Doe"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="department">Département</Label>
+                <Select value={department} onValueChange={setDepartment}>
+                  <SelectTrigger id="department">
+                    <SelectValue placeholder="Sélectionner un département" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="engineering">Ingénierie</SelectItem>
+                    <SelectItem value="marketing">Marketing</SelectItem>
+                    <SelectItem value="sales">Ventes</SelectItem>
+                    <SelectItem value="hr">Ressources Humaines</SelectItem>
+                    <SelectItem value="finance">Finance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="position">Poste</Label>
+                <Input
+                  id="position"
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  placeholder="Développeur Senior"
+                />
+              </div>
             </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="department">Département</Label>
-              <Input
-                id="department"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                placeholder="Ex: Ressources humaines, Marketing, etc."
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="position">Poste</Label>
-              <Input
-                id="position"
-                value={position}
-                onChange={(e) => setPosition(e.target.value)}
-                placeholder="Ex: Manager, Développeur, etc."
-              />
-            </div>
-          </div>
+          )}
           
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Préférences d'affichage</h3>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="theme">Thème</Label>
-              <RadioGroup
-                id="theme"
-                value={theme}
-                onValueChange={(value) => setTheme(value as ThemeName)}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="light" id="theme-light" />
-                  <Label htmlFor="theme-light">Clair</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="dark" id="theme-dark" />
-                  <Label htmlFor="theme-dark">Sombre</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pastel" id="theme-pastel" />
-                  <Label htmlFor="theme-pastel">Pastel</Label>
-                </div>
-              </RadioGroup>
+          {currentStep === 2 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Thème et apparence</h2>
+              
+              <div className="space-y-2">
+                <Label>Thème</Label>
+                <RadioGroup value={theme} onValueChange={setTheme} className="flex flex-wrap gap-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="light" id="theme-light" />
+                    <Label htmlFor="theme-light">Clair</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="dark" id="theme-dark" />
+                    <Label htmlFor="theme-dark">Sombre</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pastel" id="theme-pastel" />
+                    <Label htmlFor="theme-pastel">Pastel</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="font-size">Taille de police</Label>
+                <Select 
+                  value={fontSize} 
+                  onValueChange={(value) => handleFontSizeChange(value as FontSizeOption)}
+                >
+                  <SelectTrigger id="font-size">
+                    <SelectValue placeholder="Sélectionner une taille" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="small">Petite</SelectItem>
+                    <SelectItem value="medium">Moyenne</SelectItem>
+                    <SelectItem value="large">Grande</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="font-size">Taille de police</Label>
-              <Select value={fontSize} onValueChange={setFontSize}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez une taille" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="small">Petite</SelectItem>
-                  <SelectItem value="medium">Moyenne</SelectItem>
-                  <SelectItem value="large">Grande</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="language">Langue</Label>
-              <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez une langue" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="notifications">Notifications</Label>
-              <RadioGroup
-                id="notifications"
-                value={notificationsEnabled ? "enabled" : "disabled"}
-                onValueChange={(value) => setNotificationsEnabled(value === "enabled")}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="enabled" id="notifications-enabled" />
-                  <Label htmlFor="notifications-enabled">Activées</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="disabled" id="notifications-disabled" />
-                  <Label htmlFor="notifications-disabled">Désactivées</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </div>
+          )}
           
-          <Button onClick={handleComplete} className="w-full">
-            Terminer la configuration
-          </Button>
+          {currentStep === 3 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Notifications</h2>
+              
+              <div className="space-y-2">
+                <Label>Activer les notifications</Label>
+                <RadioGroup 
+                  value={notificationsEnabled ? "yes" : "no"} 
+                  onValueChange={(value) => setNotificationsEnabled(value === "yes")}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yes" id="notifications-yes" />
+                    <Label htmlFor="notifications-yes">Oui</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="notifications-no" />
+                    <Label htmlFor="notifications-no">Non</Label>
+                  </div>
+                </RadioGroup>
+                
+                {notificationsEnabled && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Vous recevrez des notifications pour les analyses émotionnelles, 
+                    les recommandations et les rappels.
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
+        
+        <CardFooter className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={goToPreviousStep}
+            disabled={currentStep === 1}
+          >
+            Précédent
+          </Button>
+          
+          {currentStep < totalSteps ? (
+            <Button onClick={goToNextStep}>Suivant</Button>
+          ) : (
+            <Button onClick={handleComplete}>Terminer</Button>
+          )}
+        </CardFooter>
       </Card>
     </div>
   );

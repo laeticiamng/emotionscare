@@ -57,11 +57,11 @@ export function useVRSession() {
       const durationSeconds = (activeTemplate.duration || 5) * 60;
       setSessionDuration(durationSeconds);
       
-      // Log session to backend - Fix the arguments mismatch
-      const session = await createVRSession({
+      // Log session to backend
+      await createVRSession({
         user_id: user.id,
-        duration: durationSeconds,
         template_id: activeTemplate.id,
+        duration: durationSeconds,
         is_audio_only: activeTemplate.is_audio_only || false,
         mood_before: 'neutral'
       });

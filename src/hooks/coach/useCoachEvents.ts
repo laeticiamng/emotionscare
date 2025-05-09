@@ -1,106 +1,91 @@
 
-import { useToast } from "@/hooks/use-toast";
-import { useMutation } from "@tanstack/react-query";
-import { completeChallenge } from "@/lib/gamificationService";
-import { createJournalEntry } from "@/lib/journalService";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import { gamificationService } from '@/lib/gamificationService';
+import { saveRelaxationSession } from '@/lib/vrService';
+import { saveJournalEntry } from '@/lib/journalService';
 
-// Mock function for saveRelaxationSession since we don't have it imported correctly
-const saveRelaxationSession = async (sessionId: string) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 400));
-  return { success: true, sessionId };
-};
+export const useCoachEvents = () => {
+  const queryClient = useQueryClient();
 
-export function useCoachEvents() {
-  const { toast } = useToast();
-
-  // Mutation to complete a challenge
-  const completeChallengeMutation = useMutation({
-    mutationFn: completeChallenge,
-    onSuccess: () => {
-      toast({
-        title: "Défi terminé",
-        description: "Félicitations ! Vous avez terminé ce défi.",
-      });
+  // Handle completing a challenge
+  const completeChallengeQuery = useMutation({
+    mutationFn: async (challengeId: string) => {
+      return gamificationService.completeChallenge(challengeId);
     },
-    onError: (error: any) => {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de terminer le défi.",
-        variant: "destructive",
-      });
+    onSuccess: () => {
+      // Invalidate the challenges cache to trigger a refresh
+      queryClient.invalidateQueries({ queryKey: ['challenges'] });
     },
   });
 
-  // Function to handle completing a challenge
-  const handleCompleteChallenge = async (challengeId: string) => {
-    completeChallengeMutation.mutate(challengeId);
-    toast({
-      title: "Défi en cours",
-      description: "Votre défi est en cours de traitement."
-    });
-  };
-
-  // Mutation to save a relaxation session
-  const saveRelaxationSessionMutation = useMutation({
-    mutationFn: saveRelaxationSession,
-    onSuccess: () => {
-      toast({
-        title: "Session sauvegardée",
-        description: "Votre session de relaxation a été sauvegardée avec succès.",
-      });
+  const handleCompleteChallenge = useCallback(
+    async (challengeId: string) => {
+      try {
+        await completeChallengeQuery.mutateAsync(challengeId);
+        return true;
+      } catch (error) {
+        console.error('Failed to complete challenge:', error);
+        return false;
+      }
     },
-    onError: (error: any) => {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de sauvegarder la session.",
-        variant: "destructive",
-      });
+    [completeChallengeQuery]
+  );
+
+  // Handle saving a relaxation session
+  const saveRelaxationQuery = useMutation({
+    mutationFn: async (sessionData: any) => {
+      await saveRelaxationSession(sessionData);
+    },
+    onSuccess: () => {
+      // Invalidate relevant caches
+      queryClient.invalidateQueries({ queryKey: ['vrSessions'] });
     },
   });
 
-  // Function to handle saving a relaxation session
-  const handleSaveRelaxationSession = async (sessionId: string) => {
-    saveRelaxationSessionMutation.mutate(sessionId);
-    toast({
-      title: "Enregistrement terminé",
-      description: "Votre session de relaxation a été sauvegardée avec succès."
-    });
-  };
-
-  // Mutation to save a journal entry
-  const saveJournalEntryMutation = useMutation({
-    mutationFn: createJournalEntry,
-    onSuccess: () => {
-      toast({
-        title: "Journal sauvegardé",
-        description: "Votre entrée de journal a été sauvegardée avec succès.",
-      });
+  const handleSaveRelaxationSession = useCallback(
+    async (sessionData: any) => {
+      try {
+        await saveRelaxationQuery.mutateAsync(sessionData);
+        return true;
+      } catch (error) {
+        console.error('Failed to save relaxation session:', error);
+        return false;
+      }
     },
-    onError: (error: any) => {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de sauvegarder l'entrée de journal.",
-        variant: "destructive",
-      });
+    [saveRelaxationQuery]
+  );
+
+  // Handle saving a journal entry
+  const saveJournalEntryQuery = useMutation({
+    mutationFn: async (entryData: any) => {
+      await saveJournalEntry(entryData);
+    },
+    onSuccess: () => {
+      // Invalidate journal entries cache
+      queryClient.invalidateQueries({ queryKey: ['journalEntries'] });
     },
   });
 
-  // Function to handle saving a journal entry
-  const handleSaveJournalEntry = async (entryData: any) => {
-    saveJournalEntryMutation.mutate(entryData);
-    toast({
-      title: "Journal enregistré",
-      description: "Votre entrée de journal a été sauvegardée avec succès."
-    });
-  };
+  const handleSaveJournalEntry = useCallback(
+    async (entryData: any) => {
+      try {
+        await saveJournalEntryQuery.mutateAsync(entryData);
+        return true;
+      } catch (error) {
+        console.error('Failed to save journal entry:', error);
+        return false;
+      }
+    },
+    [saveJournalEntryQuery]
+  );
 
   return {
     handleCompleteChallenge,
     handleSaveRelaxationSession,
     handleSaveJournalEntry,
-    isCompletingChallenge: completeChallengeMutation.isPending,
-    isSavingRelaxation: saveRelaxationSessionMutation.isPending,
-    isSavingJournalEntry: saveJournalEntryMutation.isPending,
+    isCompletingChallenge: completeChallengeQuery.isPending,
+    isSavingRelaxation: saveRelaxationQuery.isPending,
+    isSavingJournalEntry: saveJournalEntryQuery.isPending,
   };
-}
+};
