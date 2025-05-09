@@ -364,14 +364,13 @@ const GenerateMusicContent: React.FC<GenerateMusicContentProps> = ({
       </CardContent>
     </Card>
     
-    {/* Liste des créations récentes */}
     <div className="mt-6">
       <h3 className="text-lg font-medium mb-4">Vos créations récentes</h3>
       <p className="text-sm text-muted-foreground">
         Accédez à toutes vos créations dans la section Musique.
       </p>
     </div>
-  </>;
+  );
 };
 
 export default MusicDrawer;
