@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import PlayerControls from './PlayerControls';
-import { Music, Waveform } from 'lucide-react';
+import { Music } from 'lucide-react';
 
 interface MiniPlayerProps {
   isPlaying?: boolean;
