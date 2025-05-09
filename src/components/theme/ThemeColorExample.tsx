@@ -7,7 +7,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const ThemeColorExample: React.FC = () => {
-  const { setTheme } = useTheme();
+  const { setThemePreference } = useTheme();
   const { colors } = useThemeColors();
   const [activeTab, setActiveTab] = useState<string>('colors');
 
@@ -54,7 +54,7 @@ const ThemeColorExample: React.FC = () => {
   ];
 
   const handleThemeChange = (themeId: string) => {
-    setTheme(themeId as 'light' | 'dark' | 'pastel');
+    setThemePreference(themeId as 'light' | 'dark' | 'pastel');
   };
 
   return (
