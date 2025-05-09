@@ -18,7 +18,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
   variant = 'compact',
   isLoading = false
 }) => {
-  const { loadPlaylistForEmotion, playTrack, openDrawer } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, openDrawer, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   
   const handlePlayMusic = () => {
@@ -29,7 +29,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
     
     if (playlist && playlist.tracks.length > 0) {
       playTrack(playlist.tracks[0]);
-      openDrawer();
+      setOpenDrawer(true);
       
       toast({
         title: "Musique lancée",

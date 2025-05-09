@@ -1,127 +1,152 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { useToast } from '@/hooks/use-toast';
-import { User, UserPreferences } from '@/types';
-import ThemeSelectionField from './ThemeSelectionField';
-import FontSizeField from './FontSizeField';
-import ColorAccentField from './ColorAccentField';
-import { useAuth } from '@/contexts/AuthContext';
 
-// Match the UserPreferences interface from the types file
-interface ExtendedUserPreferences extends UserPreferences {
-  theme: "light" | "dark" | "system" | "pastel";
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserPreferences, ThemeName } from '@/types';
+
+// Version étendue des préférences utilisateur avec des options supplémentaires
+interface ExtendedUserPreferences extends Omit<UserPreferences, 'theme'> {
+  theme: ThemeName | 'system';
+  marketing_emails?: boolean;
+  feature_announcements?: boolean;
 }
 
-const PreferencesForm = () => {
-  const { user, updateUser } = useAuth();
-  const { toast } = useToast();
-  const [isSaving, setIsSaving] = useState(false);
-  
-  // Create a form with default values that match our UserPreferences type
-  const form = useForm<ExtendedUserPreferences>({
-    defaultValues: {
-      theme: "light",
-      notifications_enabled: true,
-      language: "fr",
-      privacy_level: "private",
-      share_data_with_coach: false,
-      daily_reminder: true,
-      reminder_time: "09:00",
-      notifications: {
-        email: true,
-        push: true,
-        sms: false
-      }
-    }
+const PreferencesForm: React.FC<{
+  onSave: (preferences: UserPreferences) => void;
+  preferences: UserPreferences;
+}> = ({ onSave, preferences }) => {
+  const [saving, setSaving] = useState(false);
+
+  // Adapter les préférences de base pour le formulaire
+  const extendedPreferences: ExtendedUserPreferences = {
+    ...preferences,
+    marketing_emails: preferences.notifications?.email || false,
+    feature_announcements: preferences.notifications?.push || false
+  };
+
+  const { register, handleSubmit, setValue, watch } = useForm<ExtendedUserPreferences>({
+    defaultValues: extendedPreferences
   });
-  
-  // Load user preferences when user data is available
-  useEffect(() => {
-    if (user?.preferences) {
-      const userPrefs = user.preferences;
-      form.reset({
-        theme: userPrefs.theme as "light" | "dark" | "system" | "pastel",
-        notifications_enabled: userPrefs.notifications_enabled,
-        language: userPrefs.language,
-        privacy_level: userPrefs.privacy_level,
-        share_data_with_coach: userPrefs.share_data_with_coach,
-        daily_reminder: userPrefs.daily_reminder,
-        reminder_time: userPrefs.reminder_time,
-        notifications: userPrefs.notifications || {
-          email: true,
-          push: true,
-          sms: false
-        }
-      });
-    }
-  }, [user, form]);
-  
+
   const onSubmit = async (data: ExtendedUserPreferences) => {
-    try {
-      setIsSaving(true);
-      
-      // In a real app, save to backend
-      // await updateUserPreferences(user.id, data);
-      
-      // Update local user state with new preferences
-      if (user) {
-        await updateUser({
-          ...user,
-          preferences: data as UserPreferences
-        });
+    setSaving(true);
+    
+    // Convertir les préférences étendues en préférences standard
+    const standardPreferences: UserPreferences = {
+      ...data,
+      theme: data.theme as ThemeName, // Conversion sécurisée car ThemeName accepte maintenant 'system'
+      notifications: {
+        email: !!data.marketing_emails,
+        push: !!data.feature_announcements,
+        sms: preferences.notifications?.sms || false
       }
-      
-      toast({
-        title: "Préférences sauvegardées",
-        description: "Vos préférences ont été mises à jour avec succès."
-      });
-      
+    };
+    
+    // Retirer les champs non standard
+    delete (standardPreferences as any).marketing_emails;
+    delete (standardPreferences as any).feature_announcements;
+    
+    try {
+      await onSave(standardPreferences);
     } catch (error) {
-      console.error("Error saving preferences:", error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences.",
-        variant: "destructive"
-      });
+      console.error('Error saving preferences:', error);
     } finally {
-      setIsSaving(false);
+      setSaving(false);
     }
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <ThemeSelectionField />
-        <FontSizeField />
-        <ColorAccentField />
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Préférences</CardTitle>
+        <CardDescription>
+          Personnalisez votre expérience Wellbeing
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Thème</label>
+            <Select
+              defaultValue={preferences.theme}
+              onValueChange={(value) => setValue('theme', value as ThemeName)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir un thème" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Clair</SelectItem>
+                <SelectItem value="dark">Sombre</SelectItem>
+                <SelectItem value="pastel">Pastel</SelectItem>
+                <SelectItem value="system">Système</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Langue</label>
+            <Select
+              defaultValue={preferences.language || 'fr'}
+              onValueChange={(value) => setValue('language', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir une langue" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fr">Français</SelectItem>
+                <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-sm font-medium">Notifications</label>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notifications-email"
+                checked={watch('marketing_emails')}
+                onCheckedChange={(checked) => setValue('marketing_emails', !!checked)}
+              />
+              <label htmlFor="notifications-email" className="text-sm">
+                Recevoir des emails marketing
+              </label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notifications-push"
+                checked={watch('feature_announcements')}
+                onCheckedChange={(checked) => setValue('feature_announcements', !!checked)}
+              />
+              <label htmlFor="notifications-push" className="text-sm">
+                Recevoir des annonces de nouvelles fonctionnalités
+              </label>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="reminder-time" className="text-sm font-medium">Heure de rappel quotidien</label>
+            <Input
+              id="reminder-time"
+              type="time"
+              {...register('reminder_time')}
+              defaultValue={preferences.reminder_time || '09:00'}
+            />
+          </div>
+        </CardContent>
         
-        <FormField
-          control={form.control}
-          name="notifications.email"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Notifications par email</FormLabel>
-              </div>
-              <FormControl>
-                <input
-                  type="checkbox"
-                  checked={Boolean(field.value)}
-                  onChange={field.onChange}
-                  className="toggle"
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        
-        <Button type="submit" className="w-full" disabled={isSaving}>
-          {isSaving ? "Sauvegarde en cours..." : "Sauvegarder les préférences"}
-        </Button>
+        <CardFooter>
+          <Button type="submit" disabled={saving}>
+            {saving ? "Enregistrement..." : "Sauvegarder les préférences"}
+          </Button>
+        </CardFooter>
       </form>
-    </Form>
+    </Card>
   );
 };
 

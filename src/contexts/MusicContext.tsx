@@ -15,7 +15,7 @@ interface MusicContextType {
   currentPlaylist: MusicPlaylist | null;
   currentEmotion: string | null;
   loadPlaylistById: (id: string) => void;
-  loadPlaylistForEmotion: (emotion: string) => void;
+  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
   initializeMusicSystem: () => void;
   error: string | null;
   openDrawer: boolean;
@@ -111,6 +111,8 @@ export const useMusicMock = (): MusicContextType => {
     if (mockPlaylist.tracks.length > 0) {
       setCurrentTrack(mockPlaylist.tracks[0]);
     }
+    
+    return mockPlaylist;
   };
 
   const initializeMusicSystem = () => {

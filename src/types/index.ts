@@ -56,6 +56,7 @@ export interface MusicTrack {
   coverUrl?: string;
   coverImage?: string;
   audioUrl?: string;
+  externalUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -99,16 +100,21 @@ export interface Emotion {
   score?: number;
   feedback?: string;
   ai_feedback?: string;
+  emojis?: string[];
 }
 
 // Theme types
-export type ThemeName = 'light' | 'dark' | 'pastel';
+export type ThemeName = 'light' | 'dark' | 'pastel' | 'system';
 
 // Mood data for charts
 export interface MoodData {
   date: string;
   value: number;
   emotion?: string;
+  originalDate?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 // Journal entry
@@ -122,6 +128,9 @@ export interface JournalEntry {
   created_at: string;
   updated_at?: string;
   tags?: string[];
+  date?: string;
+  text?: string;
+  ai_feedback?: string;
 }
 
 // VR Session Template
@@ -136,6 +145,28 @@ export interface VRSessionTemplate {
   benefits: string[];
   emotions: string[];
   popularity: number;
+  template_id?: string;
+  theme?: string;
+  preview_url?: string;
+  is_audio_only?: boolean;
+  audio_url?: string;
+  completion_rate?: number;
+  recommended_mood?: string;
+}
+
+// VR Session
+export interface VRSession {
+  id: string;
+  template_id: string;
+  user_id: string;
+  start_time: string;
+  end_time?: string;
+  duration_seconds: number;
+  heart_rate_before: number;
+  heart_rate_after: number;
+  is_completed: boolean;
+  date?: string;
+  is_audio_only?: boolean;
 }
 
 // Invitation types
@@ -152,6 +183,8 @@ export interface InvitationStats {
   accepted: number;
   rejected: number;
   expired: number;
+  sent?: number;
+  teams?: any;
 }
 
 // Badge type
@@ -165,5 +198,19 @@ export interface Badge {
   progress?: number;
   maxProgress?: number;
   dateEarned?: string;
+  threshold?: number;
+  icon_url?: string;
+  image_url?: string;
 }
 
+// Type pour la carte VR dans le dashboard
+export interface VRCardProps {
+  id: string;
+  template_id: string;
+  theme: string;
+  title: string;
+  duration: number;
+  preview_url: string;
+  description: string;
+  is_audio_only: boolean;
+}
