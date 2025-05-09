@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { MusicTrack, MusicPlaylist, MusicPreferences } from '@/types';
 
@@ -16,12 +15,11 @@ interface MusicContextProps {
   savePlaylist: (name: string, tracks: MusicTrack[]) => MusicPlaylist;
   openDrawer: boolean;
   setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
-  // Add missing properties
   volume: number;
   setVolume: (volume: number) => void;
   playlists: MusicPlaylist[];
   loadPlaylistById: (id: string) => MusicPlaylist | null;
-  error: Error | null;
+  error: Error | null | string;
   initializeMusicSystem: () => Promise<void>;
 }
 
@@ -39,7 +37,6 @@ const MusicContext = createContext<MusicContextProps>({
   savePlaylist: () => ({} as MusicPlaylist),
   openDrawer: false,
   setOpenDrawer: () => {},
-  // Add missing properties to default value
   volume: 0.5,
   setVolume: () => {},
   playlists: [],
@@ -80,7 +77,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<Error | null | string>(null);
   const emotionPlaylists = useMemo(() => initialEmotionPlaylists, []);
   
   // Add this to store all playlists
@@ -205,7 +202,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     savePlaylist,
     openDrawer,
     setOpenDrawer,
-    // Add new properties to context value
     volume,
     setVolume,
     playlists,

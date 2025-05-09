@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MusicTrack } from '@/types/music';
-import { TrackInfoProps } from '@/types/audio-player';
+import { MusicTrack, TrackInfoProps } from '@/types';
 
 const TrackInfo: React.FC<TrackInfoProps> = ({ 
   track,

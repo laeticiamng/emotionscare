@@ -105,6 +105,9 @@ export function EmotionMusicRecommendations({
   const emotionToUse = emotion || (emotionResult?.emotion || 'neutral');
   const musicType = getMusicTypeFromEmotion(emotionToUse);
 
+  // Properly handle displaying errors
+  const errorMessage = error ? (typeof error === 'string' ? error : error instanceof Error ? error.message : String(error)) : '';
+
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
@@ -114,9 +117,9 @@ export function EmotionMusicRecommendations({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {error || localError ? (
+        {(errorMessage || localError) ? (
           <div className="text-destructive text-sm mb-4">
-            {error ? (error instanceof Error ? error.message : String(error)) : ''}
+            {errorMessage}
             {localError && <span>{localError}</span>}
             <Button 
               variant="outline" 
