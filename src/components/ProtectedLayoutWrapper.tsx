@@ -1,15 +1,17 @@
 
-import React from 'react';
-import ProtectedLayout from '@/components/ProtectedLayout';
+import React, { ReactNode } from 'react';
+import ProtectedLayout from './ProtectedLayout';
 
 interface ProtectedLayoutWrapperProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const ProtectedLayoutWrapper: React.FC<ProtectedLayoutWrapperProps> = ({ children }) => {
-  return <div className="flex flex-col min-h-screen">
-    {children}
-  </div>;
+  return (
+    <ProtectedLayout>
+      {children}
+    </ProtectedLayout>
+  );
 };
 
 export default ProtectedLayoutWrapper;

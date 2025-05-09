@@ -1,108 +1,104 @@
 
-import { Badge, Challenge } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
+import { Challenge, Badge } from '@/types';
 
-// Mock badges data
-export const mockBadges: Badge[] = [
+// Mock challenges
+let challenges: Challenge[] = [
   {
-    id: '1',
-    name: 'Explorateur Émotionnel',
+    id: 'challenge-1',
+    title: 'Premier scan émotionnel',
     description: 'Réalisez votre premier scan émotionnel',
-    image_url: '/badges/scanner-badge.png',
-    criteria: 'Effectuer un scan émotionnel',
+    points: 10,
+    completed: false,
+    category: 'scan',
+    difficulty: 'easy',
+    image_url: '/images/badges/first-scan.svg',
+  },
+  {
+    id: 'challenge-2',
+    title: 'Journal régulier',
+    description: 'Écrivez dans votre journal 3 jours de suite',
+    points: 20,
+    completed: false,
+    category: 'journal',
+    difficulty: 'medium',
+    image_url: '/images/badges/journal-streak.svg',
+  }
+];
+
+// Mock badges
+const badges: Badge[] = [
+  {
+    id: 'badge-1',
+    user_id: 'user-1',
+    name: 'Explorer émotionnel',
+    description: 'Vous avez complété votre premier scan émotionnel',
+    image_url: '/images/badges/emotional-explorer.svg',
+    level: 1,
+    progress: 100,
+    threshold: 100,
     unlocked: true,
-    icon_url: '/badges/scanner-badge.png',
-    user_id: 'user-1', // Added required field
-    icon: 'badge', // Added required field
-    level: 1 // Added required field
+    created_at: new Date().toISOString()
   },
   {
-    id: '2',
-    name: 'Journalier Assidu',
-    description: 'Écrivez 7 entrées de journal',
-    image_url: '/badges/journal-badge.png',
-    criteria: 'Écrire 7 entrées de journal',
+    id: 'badge-2',
+    user_id: 'user-1',
+    name: 'Journal extraordinaire',
+    description: 'Vous avez écrit 10 entrées de journal',
+    image_url: '/images/badges/journal-master.svg',
+    level: 1,
+    progress: 60,
+    threshold: 100,
     unlocked: false,
-    progress: 3,
-    maxProgress: 7,
-    icon_url: '/badges/journal-badge.png',
-    user_id: 'user-1', // Added required field
-    icon: 'journal', // Added required field
-    level: 1 // Added required field
-  },
-  {
-    id: '3',
-    name: 'Maître de la Détente',
-    description: 'Complétez 5 sessions de VR',
-    image_url: '/badges/vr-badge.png',
-    criteria: 'Compléter 5 sessions de VR',
-    unlocked: false,
-    progress: 2,
-    maxProgress: 5,
-    icon_url: '/badges/vr-badge.png',
-    user_id: 'user-1', // Added required field
-    icon: 'vr', // Added required field
-    level: 1 // Added required field
-  },
+    created_at: new Date().toISOString()
+  }
 ];
 
-// Mock challenges data
-export const mockChallenges: Challenge[] = [
-  {
-    id: '1',
-    name: 'Scan Quotidien',
-    title: 'Scan Quotidien', // Added required field
-    description: 'Effectuez un scan émotionnel chaque jour pendant une semaine',
-    points: 50,
-    completed: false,
-    progress: 3,
-    maxProgress: 7,
-    target: 7, // Added required field
-    total: 7
-  },
-  {
-    id: '2',
-    name: 'Rédacteur de Journal',
-    title: 'Rédacteur de Journal', // Added required field
-    description: 'Écrivez au moins trois entrées de journal par semaine',
-    points: 75,
-    completed: false,
-    progress: 1,
-    maxProgress: 3,
-    target: 3, // Added required field
-    total: 3
-  },
-  {
-    id: '3',
-    name: 'Explorateur VR',
-    title: 'Explorateur VR', // Added required field
-    description: 'Essayez trois sessions VR différentes ce mois-ci',
-    points: 100,
-    completed: false,
-    progress: 1,
-    maxProgress: 3,
-    target: 3, // Added required field
-    total: 3
-  },
-];
-
-// Add these functions to export the mock data
-export const fetchBadges = async (): Promise<Badge[]> => {
-  return mockBadges;
+/**
+ * Get all challenges
+ */
+export const getChallenges = async (): Promise<Challenge[]> => {
+  return challenges;
 };
 
-export const fetchChallenges = async (): Promise<Challenge[]> => {
-  return mockChallenges;
-};
-
-export const completeChallenge = async (id: string): Promise<Challenge> => {
-  const challenge = mockChallenges.find(c => c.id === id);
+/**
+ * Complete a challenge
+ */
+export const completeChallenge = async (challengeId: string): Promise<Challenge> => {
+  const challenge = challenges.find(c => c.id === challengeId);
+  
   if (!challenge) {
-    throw new Error('Challenge not found');
+    throw new Error(`Challenge with ID ${challengeId} not found`);
   }
   
-  return {
-    ...challenge,
-    completed: true,
-    progress: challenge.target
+  challenge.completed = true;
+  return challenge;
+};
+
+/**
+ * Get user badges
+ */
+export const getUserBadges = async (userId: string): Promise<Badge[]> => {
+  return badges.filter(badge => badge.user_id === userId);
+};
+
+/**
+ * Award a badge to a user
+ */
+export const awardBadge = async (userId: string, badgeData: Partial<Badge>): Promise<Badge> => {
+  const newBadge: Badge = {
+    id: uuidv4(),
+    user_id: userId,
+    name: badgeData.name || 'Badge sans nom',
+    description: badgeData.description || 'Description du badge',
+    image_url: badgeData.image_url || '/images/badges/default.svg',
+    level: badgeData.level || 1,
+    progress: badgeData.progress || 0,
+    threshold: badgeData.threshold || 100,
+    unlocked: badgeData.unlocked || false,
+    created_at: new Date().toISOString()
   };
+  
+  badges.push(newBadge);
+  return newBadge;
 };

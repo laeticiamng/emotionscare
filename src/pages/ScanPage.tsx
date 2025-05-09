@@ -89,7 +89,7 @@ const ScanPage = () => {
             selectedFilter={selectedFilter}
             filterUsers={filterUsers}
             periodFilter={periodFilter}
-            setPeriodFilter={setPeriodFilter as (value: '7' | '30' | '90') => void}
+            setPeriodFilter={setPeriodFilter}
           />
         </TabsContent>
       </Tabs>

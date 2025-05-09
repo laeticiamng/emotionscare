@@ -12,6 +12,7 @@ let journalEntries: JournalEntry[] = [
     mood_score: 3,
     date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     user_id: 'user-1',
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
   },
   {
     id: '2',
@@ -21,6 +22,7 @@ let journalEntries: JournalEntry[] = [
     mood_score: 8,
     date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     user_id: 'user-1',
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
   },
 ];
 
@@ -44,11 +46,12 @@ export const getJournalEntryById = async (entryId: string): Promise<JournalEntry
 /**
  * Create a new journal entry
  */
-export const createJournalEntry = async (entryData: Omit<JournalEntry, 'id'>): Promise<JournalEntry> => {
+export const createJournalEntry = async (entryData: Omit<JournalEntry, 'id' | 'created_at'>): Promise<JournalEntry> => {
   const newEntry: JournalEntry = {
     id: uuidv4(),
     ...entryData,
-    date: entryData.date || new Date().toISOString()
+    date: entryData.date || new Date().toISOString(),
+    created_at: new Date().toISOString()
   };
   
   journalEntries.push(newEntry);
@@ -88,5 +91,5 @@ export const saveJournalEntry = async (entryData: any): Promise<JournalEntry> =>
     if (updated) return updated;
   }
   
-  return createJournalEntry(entryData as Omit<JournalEntry, 'id'>);
+  return createJournalEntry(entryData as Omit<JournalEntry, 'id' | 'created_at'>);
 };

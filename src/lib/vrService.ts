@@ -9,7 +9,6 @@ const vrSessionTemplates: VRSessionTemplate[] = [
     description: 'Une plage paisible avec le son des vagues',
     category: 'relaxation',
     duration: 5,
-    thumbnail: '/images/vr/beach.jpg',
     is_audio_only: false,
   },
   {
@@ -17,7 +16,6 @@ const vrSessionTemplates: VRSessionTemplate[] = [
     description: 'Une promenade dans une forêt tranquille',
     category: 'focus',
     duration: 10,
-    thumbnail: '/images/vr/forest.jpg',
     is_audio_only: false,
   }
 ];
@@ -53,6 +51,7 @@ export const createVRSession = async (sessionData: Partial<VRSession>): Promise<
     mood_before: sessionData.mood_before || 'neutral',
     mood_after: sessionData.mood_after,
     is_audio_only: sessionData.is_audio_only || false,
+    start_time: sessionData.start_time || new Date().toISOString(),
   };
   
   vrSessions.push(newSession);
@@ -83,6 +82,7 @@ export const saveRelaxationSession = async (data: {
     duration: data.duration || 300,
     mood_before: data.moodBefore || 'neutral',
     mood_after: data.moodAfter || 'relaxed',
-    is_audio_only: data.isAudioOnly || false
+    is_audio_only: data.isAudioOnly || false,
+    start_time: new Date().toISOString()
   });
 };
