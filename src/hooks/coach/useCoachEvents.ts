@@ -3,12 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { completeChallenge } from "@/lib/gamificationService";
 import { createJournalEntry } from "@/lib/journalService";
-
-// Mock function for VR service
-const saveRelaxationSession = async (sessionId: string) => {
-  console.log("Saving relaxation session:", sessionId);
-  return { success: true, sessionId };
-};
+import { saveRelaxationSession } from "@/lib/vrService";
 
 export function useCoachEvents() {
   const { toast } = useToast();

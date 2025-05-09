@@ -28,12 +28,20 @@ export function useCoach() {
   
   const { askQuestion } = useCoachQueries();
 
+  // Mock functions for backward compatibility
+  const mockTriggerAfterScan = () => Promise.resolve();
+  const mockTriggerAlert = () => Promise.resolve();
+  const mockTriggerDailyReminder = () => Promise.resolve();
+  const mockSuggestVRSession = () => Promise.resolve();
+
   return {
     // From recommendations
     recommendations,
     lastEmotion,
     sessionScore,
     generateRecommendation,
+    setLastEmotion,
+    setSessionScore,
     
     // From events
     handleCompleteChallenge,
@@ -49,10 +57,10 @@ export function useCoach() {
     // Mock these properties to maintain backward compatibility
     isProcessing: false,
     lastTrigger: null,
-    triggerAfterScan: () => Promise.resolve(),
-    triggerAlert: () => Promise.resolve(),
-    triggerDailyReminder: () => Promise.resolve(),
-    suggestVRSession: () => Promise.resolve()
+    triggerAfterScan: mockTriggerAfterScan,
+    triggerAlert: mockTriggerAlert,
+    triggerDailyReminder: mockTriggerDailyReminder,
+    suggestVRSession: mockSuggestVRSession
   };
 }
 

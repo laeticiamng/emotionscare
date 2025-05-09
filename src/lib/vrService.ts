@@ -1,172 +1,126 @@
 
-import { VRSession, VRSessionTemplate } from '@/types';
-import { mockVRTemplatesData } from '@/data/mockVRTemplates';
+import { v4 as uuidv4 } from 'uuid';
+
+interface VRSession {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;  // in seconds
+  date: string;
+  type: string;      // e.g., "relaxation", "focus", "energy"
+  user_id: string;
+  completed: boolean;
+  score?: number;
+  emotion_before?: string;
+  emotion_after?: string;
+}
 
 // Mock VR sessions data
-const mockVRSessions: VRSession[] = [
+let mockVRSessions: VRSession[] = [
   {
     id: '1',
-    template_id: 'vr-template-1',
+    title: 'Session pleine conscience',
+    description: 'Méditation guidée pour la conscience de soi',
+    duration: 600,
+    date: '2023-05-10T14:30:00Z',
+    type: 'relaxation',
     user_id: 'user-1',
-    start_time: '2023-05-12T14:30:00Z',
-    duration: 600, // 10 minutes in seconds
     completed: true,
-    mood_before: 'stressed',
-    mood_after: 'relaxed',
-    is_audio_only: false
+    score: 85,
+    emotion_before: 'stressed',
+    emotion_after: 'calm'
   },
   {
     id: '2',
-    template_id: 'vr-template-3',
+    title: 'Forêt apaisante',
+    description: 'Immersion dans un environnement naturel relaxant',
+    duration: 900,
+    date: '2023-05-15T10:00:00Z',
+    type: 'relaxation',
     user_id: 'user-1',
-    start_time: '2023-05-14T18:15:00Z',
-    duration: 900, // 15 minutes in seconds
     completed: true,
-    mood_before: 'anxious',
-    mood_after: 'calm',
-    is_audio_only: true
+    score: 92,
+    emotion_before: 'anxious',
+    emotion_after: 'peaceful'
   },
   {
     id: '3',
-    template_id: 'vr-template-2',
+    title: 'Focus productivity',
+    description: 'Environnement de travail virtuel optimisé',
+    duration: 1800,
+    date: '2023-05-20T09:15:00Z',
+    type: 'focus',
     user_id: 'user-1',
-    start_time: '2023-05-16T09:45:00Z',
-    duration: 1200, // 20 minutes in seconds
-    completed: false,
-    mood_before: 'tired',
-    is_audio_only: false
+    completed: false
   }
 ];
 
-// Fetch all VR session templates
-export const fetchVRTemplates = async (): Promise<VRSessionTemplate[]> => {
+// Fetch all VR sessions for a user
+export const fetchVRSessions = async (userId: string): Promise<VRSession[]> => {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  return mockVRTemplatesData;
-};
-
-// Fetch a specific VR template
-export const fetchVRTemplate = async (id: string): Promise<VRSessionTemplate | undefined> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  return mockVRTemplatesData.find(template => template.id === id || template.template_id === id);
-};
-
-// Fetch user's VR sessions
-export const fetchUserVRSessions = async (userId: string): Promise<VRSession[]> => {
-  await new Promise(resolve => setTimeout(resolve, 400));
   return mockVRSessions.filter(session => session.user_id === userId);
 };
 
-// Start a new VR session
-export const startVRSession = async (templateId: string, userId: string, isAudioOnly: boolean): Promise<VRSession> => {
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
+// Fetch a specific VR session
+export const fetchVRSession = async (id: string): Promise<VRSession | undefined> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return mockVRSessions.find(session => session.id === id);
+};
+
+// Create a new VR session
+export const createVRSession = async (sessionData: Partial<VRSession>): Promise<VRSession> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 700));
+
   const newSession: VRSession = {
-    id: `vr-session-${Date.now()}`,
-    template_id: templateId,
-    user_id: userId,
-    start_time: new Date().toISOString(),
-    duration: 0,
-    completed: false,
-    is_audio_only: isAudioOnly
+    id: uuidv4(),
+    title: sessionData.title || 'Session sans titre',
+    description: sessionData.description || '',
+    duration: sessionData.duration || 600,
+    date: sessionData.date || new Date().toISOString(),
+    type: sessionData.type || 'relaxation',
+    user_id: sessionData.user_id || 'user-1',
+    completed: sessionData.completed || false,
+    score: sessionData.score,
+    emotion_before: sessionData.emotion_before,
+    emotion_after: sessionData.emotion_after
   };
-  
+
   mockVRSessions.push(newSession);
   return newSession;
 };
 
 // Complete a VR session
-export const completeVRSession = async (sessionId: string, data: {
-  mood_after?: string;
-  duration?: number;
-  feedback?: string;
-}): Promise<VRSession> => {
+export const completeVRSession = async (id: string, data: { score?: number, emotion_after?: string }): Promise<VRSession | undefined> => {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const sessionIndex = mockVRSessions.findIndex(s => s.id === sessionId);
-  if (sessionIndex === -1) {
-    throw new Error('VR session not found');
-  }
-  
+
+  const sessionIndex = mockVRSessions.findIndex(session => session.id === id);
+  if (sessionIndex === -1) return undefined;
+
   mockVRSessions[sessionIndex] = {
     ...mockVRSessions[sessionIndex],
     completed: true,
-    mood_after: data.mood_after || mockVRSessions[sessionIndex].mood_after,
-    duration: data.duration || mockVRSessions[sessionIndex].duration,
-    feedback: data.feedback
+    score: data.score || mockVRSessions[sessionIndex].score,
+    emotion_after: data.emotion_after || mockVRSessions[sessionIndex].emotion_after
   };
-  
+
   return mockVRSessions[sessionIndex];
 };
 
-// Function to save a relaxation session - used by coach events
-export const saveRelaxationSession = async (sessionId: string): Promise<VRSession> => {
+// Save a relaxation session (for backward compatibility)
+export const saveRelaxationSession = async (sessionId: string): Promise<{ success: boolean; sessionId: string }> => {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 400));
   
-  // Find the session if it exists, or create a placeholder
-  let session = mockVRSessions.find(s => s.id === sessionId);
+  const sessionIndex = mockVRSessions.findIndex(session => session.id === sessionId);
   
-  if (!session) {
-    session = {
-      id: sessionId,
-      template_id: 'auto-generated',
-      user_id: 'user-1',
-      start_time: new Date().toISOString(),
-      duration: 300, // Default 5 minutes
-      completed: true,
-      mood_before: 'unknown',
-      mood_after: 'relaxed',
-      is_audio_only: true
-    };
-    mockVRSessions.push(session);
-  } else {
-    // Mark existing session as completed
-    const index = mockVRSessions.findIndex(s => s.id === sessionId);
-    mockVRSessions[index] = {
-      ...mockVRSessions[index],
-      completed: true,
-      mood_after: mockVRSessions[index].mood_after || 'relaxed'
-    };
+  if (sessionIndex !== -1) {
+    mockVRSessions[sessionIndex].completed = true;
+    return { success: true, sessionId };
   }
   
-  return session;
-};
-
-// Get VR session statistics
-export const getVRSessionStats = async (userId: string): Promise<{
-  total: number;
-  completed: number;
-  totalDuration: number;
-  averageDuration: number;
-  mostUsedTemplate?: string;
-}> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  const userSessions = mockVRSessions.filter(session => session.user_id === userId);
-  
-  const completedSessions = userSessions.filter(session => session.completed);
-  const totalDuration = completedSessions.reduce((sum, session) => sum + session.duration, 0);
-  
-  // Find most used template
-  const templateCounts: Record<string, number> = {};
-  userSessions.forEach(session => {
-    templateCounts[session.template_id] = (templateCounts[session.template_id] || 0) + 1;
-  });
-  
-  let mostUsedTemplate: string | undefined;
-  let maxCount = 0;
-  
-  Object.entries(templateCounts).forEach(([templateId, count]) => {
-    if (count > maxCount) {
-      maxCount = count;
-      mostUsedTemplate = templateId;
-    }
-  });
-  
-  return {
-    total: userSessions.length,
-    completed: completedSessions.length,
-    totalDuration,
-    averageDuration: completedSessions.length > 0 ? totalDuration / completedSessions.length : 0,
-    mostUsedTemplate
-  };
+  return { success: false, sessionId };
 };
