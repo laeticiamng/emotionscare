@@ -1,61 +1,68 @@
 
 // Gamification related types
-import { User, Badge } from './index';
+import { User } from './index';
+
+export interface Badge {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  criteria: string;
+  category?: string;
+  points?: number;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  unlocked_at?: string;
+  progress?: number;
+  user_id?: string;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  progress?: number;
+  total_steps?: number;
+  category?: string;
+  points?: number;
+}
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
+  status: 'active' | 'completed' | 'expired';
   points: number;
-  badge_id?: string;
-  badge?: Badge;
-  start_date: string;
-  end_date?: string;
-  requirements: ChallengeRequirement[];
-  participants?: number;
-  completion_rate?: number;
-  is_featured?: boolean;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  user_progress?: UserChallengeProgress;
-}
-
-export interface ChallengeRequirement {
-  id: string;
-  challenge_id: string;
-  type: 'count' | 'duration' | 'streak' | 'specific';
-  activity: string;
-  target_value: number;
-  description?: string;
-  custom_validation?: string;
-}
-
-export interface UserChallengeProgress {
+  deadline?: Date;
+  requirements: string[];
+  progress?: number;
+  reward_badge_id?: string;
   user_id: string;
-  challenge_id: string;
-  started_at: string;
-  completed_at?: string;
-  current_value: number;
-  target_value: number;
-  percentage: number;
-  last_activity_at?: string;
-  requirements_progress?: Record<string, number>;
 }
 
 export interface Leaderboard {
   id: string;
   title: string;
-  period: 'daily' | 'weekly' | 'monthly' | 'all_time';
-  category?: string;
-  entries: LeaderboardEntry[];
-  last_updated: string;
+  period: 'daily' | 'weekly' | 'monthly' | 'all-time';
+  users: LeaderboardEntry[];
 }
 
 export interface LeaderboardEntry {
-  rank: number;
   user: User;
+  rank: number;
   points: number;
-  change?: number;
-  previous_rank?: number;
-  achievements?: string[];
+  badges_count: number;
+  streak_days: number;
+}
+
+export interface Report {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  data: any;
+  type: string;
+  userId?: string;
+  metadata?: Record<string, any>;
 }

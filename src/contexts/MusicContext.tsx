@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
-import { MusicTrack, MusicPlaylist, MusicPreferences } from '@/types/music';
+import { MusicTrack, MusicPlaylist, MusicPreferences } from '@/types';
 
 interface MusicContextProps {
   currentTrack: MusicTrack | null;
@@ -95,7 +95,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: `emotion-${emotion}`,
         title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Music`,
         tracks: tracks,
-        emotion: emotion,
       }));
       
       setPlaylists(defaultPlaylists);
@@ -139,7 +138,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: `emotion-${emotionType}`,
       title: `${emotionType.charAt(0).toUpperCase() + emotionType.slice(1)} Music`,
       tracks: emotionPlaylists[emotionType] || [],
-      emotion: emotionType,
     };
     
     setCurrentPlaylist(emotionPlaylist);
@@ -169,6 +167,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const newPlaylist: MusicPlaylist = {
       id: `user-${Date.now()}`,
       title: name,
+      name,
       tracks: [],
     };
     
@@ -181,6 +180,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const newPlaylist: MusicPlaylist = {
       id: `saved-${Date.now()}`,
       title: name,
+      name,
       tracks: tracks,
     };
     
