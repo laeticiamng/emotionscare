@@ -9,6 +9,7 @@ interface UseChatResult {
   addMessage: (text: string, sender: 'user' | 'bot') => void;
   isProcessing: boolean;
   processAndAddMessage: (text: string) => Promise<void>;
+  handleSend: (text: string) => Promise<any>; // Add this missing method
 }
 
 const useChat = (): UseChatResult => {
@@ -30,12 +31,21 @@ const useChat = (): UseChatResult => {
     const response = await processMessage(text);
     addMessage(response.message || response.text || 'Je comprends.', 'bot');
   };
+  
+  // Add the handleSend method to match what's used in ChatInterface
+  const handleSend = async (text: string) => {
+    addMessage(text, 'user');
+    const response = await processMessage(text);
+    addMessage(response.message || response.text || 'Je comprends.', 'bot');
+    return response;
+  };
 
   return {
     messages,
     addMessage,
     isProcessing,
     processAndAddMessage,
+    handleSend, // Include the new method in the returned object
   };
 };
 

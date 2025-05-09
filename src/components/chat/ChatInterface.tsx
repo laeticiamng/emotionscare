@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Bot } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -148,7 +147,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ standalone = true, classN
       </CardContent>
       
       {standalone && <Separator />}
-
+      
       <CardFooter className="p-4">
         <div className="flex items-center space-x-4 w-full">
           <Input
