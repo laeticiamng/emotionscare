@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
@@ -67,8 +66,7 @@ const CoachChatPage: React.FC = () => {
   // Welcome message from coach
   useEffect(() => {
     // Initial greeting message customized for user
-    const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 
-                     (user?.email ? user.email.split('@')[0] : 'là');
+    const firstName = user?.email ? user.email.split('@')[0] : 'là';
     
     const initialMessages: Message[] = [
       {
