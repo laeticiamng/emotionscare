@@ -30,5 +30,5 @@ export interface EnhancedEmotionResult {
   };
 }
 
-// Export back the basic types for backward compatibility
+// Export the basic types from index.ts for backward compatibility
 export type { Emotion, EmotionResult } from './index';

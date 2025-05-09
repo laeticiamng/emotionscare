@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { ChatMessage } from '@/types';
+import { ChatMessage } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
 
 // Import the chat processing hook
