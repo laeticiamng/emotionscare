@@ -1,47 +1,41 @@
+import { useState } from 'react';
+import { ChatMessage } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
+import useChatProcessing from './chat/useChatProcessing';
 
-import { useCallback } from 'react';
-import { useChatMessages } from './chat/useChatMessages';
-import { useChatProcessing } from './chat/useChatProcessing';
-import { useSessionManager } from './chat/useSessionManager';
-import { useAuth } from '@/contexts/AuthContext';
-import { useAssistant } from './chat/useAssistant';
+interface UseChatResult {
+  messages: ChatMessage[];
+  addMessage: (text: string, sender: 'user' | 'bot') => void;
+  isProcessing: boolean;
+  processAndAddMessage: (text: string) => Promise<void>;
+}
 
-export function useChat() {
-  const { user } = useAuth();
-  const { messages, addUserMessage, addBotMessage, clearMessages } = useChatMessages();
-  const { sessionId, loadMessageHistory } = useSessionManager();
-  const { isLoading, processMessage } = useChatProcessing(sessionId, user?.id);
+const useChat = (): UseChatResult => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { isProcessing, processMessage } = useChatProcessing();
 
-  const handleSend = useCallback(async (input: string) => {
-    if (input.trim() === '' || isLoading) return null;
+  const addMessage = (text: string, sender: 'user' | 'bot') => {
+    const newMessage: ChatMessage = {
+      id: uuidv4(),
+      text: text,
+      sender: sender,
+      timestamp: new Date(),
+    };
+    setMessages(prevMessages => [...prevMessages, newMessage]);
+  };
 
-    // Add user message
-    addUserMessage(input);
-    
-    try {
-      // Process the message with OpenAI
-      const { response, intent } = await processMessage(input);
-      addBotMessage(response);
-      
-      return { text: response, intent };
-    } catch (error) {
-      console.error('Error in chat processing:', error);
-      return null;
-    }
-  }, [addUserMessage, addBotMessage, processMessage, isLoading]);
+  const processAndAddMessage = async (text: string) => {
+    addMessage(text, 'user');
+    const response = await processMessage(text);
+    addMessage(response.message, 'bot');
+  };
 
   return {
     messages,
-    isLoading,
-    sessionId,
-    addUserMessage,
-    addBotMessage,
-    processMessage,
-    handleSend,
-    clearMessages,
-    loadMessageHistory: () => loadMessageHistory(messages)
+    addMessage,
+    isProcessing,
+    processAndAddMessage,
   };
-}
+};
 
-// Re-export the Assistant hook for convenience
-export { useAssistant } from './chat/useAssistant';
+export default useChat;

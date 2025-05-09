@@ -1,38 +1,64 @@
-
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { UserContext } from '@/types/chat';
 
-export const useUserContext = () => {
-  // Get the user's emotional context
-  const getUserContext = async (userId?: string): Promise<UserContext | null> => {
-    if (!userId) return null;
-    
-    try {
-      const { data: emotions } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('date', { ascending: false })
-        .limit(3);
-      
-      if (!emotions || emotions.length === 0) return null;
-      
-      // Calculate average score
-      const avgScore = emotions.reduce((acc, emotion) => acc + (emotion.score || 50), 0) / emotions.length;
-      
-      // Get recent emotions
-      const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
-      
-      return {
-        recentEmotions,
-        currentScore: Math.round(avgScore),
-        lastEmotionDate: emotions[0].date
-      };
-    } catch (error) {
-      console.error('Error getting user context:', error);
-      return null;
-    }
-  };
+interface UseUserContextResult {
+  userContext: UserContext | null;
+  isLoading: boolean;
+  error: string | null;
+}
 
-  return { getUserContext };
+const useUserContext = (): UseUserContextResult => {
+  const [userContext, setUserContext] = useState<UserContext | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchUserContext = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // Simulate fetching user context from an API
+        // Replace this with your actual API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Mock user context data
+        const mockUserContext: UserContext = {
+          preferences: {
+            theme: 'light',
+            notifications_enabled: true,
+          },
+          recentEmotions: ['happy', 'calm'],
+          recentActivities: ['meditation', 'journaling'],
+          userHistory: {
+            moodTrends: 'positive',
+            activityLevels: 'moderate',
+          },
+        };
+
+        setUserContext(mockUserContext);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch user context');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchUserContext();
+    } else {
+      setIsLoading(false);
+      setError('User not authenticated');
+    }
+  }, [user]);
+
+  return {
+    userContext,
+    isLoading,
+    error,
+  };
 };
+
+export default useUserContext;

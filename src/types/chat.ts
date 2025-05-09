@@ -34,5 +34,12 @@ export interface ChatConversation {
   updatedAt: Date;
 }
 
+export interface UserContext {
+  preferences?: Record<string, any>;
+  recentEmotions?: string[];
+  recentActivities?: string[];
+  userHistory?: Record<string, any>;
+}
+
 // Re-export ChatMessage for backward compatibility
 export type { ChatMessage } from './index';

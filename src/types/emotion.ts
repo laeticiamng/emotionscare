@@ -10,7 +10,7 @@ export interface EnhancedEmotionResult {
   transcript?: string;
   text?: string;
   emojis?: string[];
-  feedback?: string;
+  feedback: string;
   ai_feedback?: string;
   recommendations: string[];
   source?: string;
