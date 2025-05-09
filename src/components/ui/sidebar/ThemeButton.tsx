@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Moon, Sun, Palette } from 'lucide-react';
 
 interface ThemeButtonProps {
   collapsed: boolean;
@@ -12,60 +11,25 @@ interface ThemeButtonProps {
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const { theme, toggleTheme } = useTheme();
 
-  // Get the appropriate theme icon
-  const getThemeIcon = () => {
-    switch (theme) {
-      case 'light':
-        return <Moon className="h-[1.3rem] w-[1.3rem]" />;
-      case 'dark':
-        return <Palette className="h-[1.3rem] w-[1.3rem]" />;
-      case 'pastel':
-        return <Sun className="h-[1.3rem] w-[1.3rem]" />;
-      default:
-        return <Moon className="h-[1.3rem] w-[1.3rem]" />;
-    }
-  };
-
-  // Get theme tooltip text
-  const getThemeTooltipText = () => {
-    switch (theme) {
-      case 'light':
-        return 'Mode sombre';
-      case 'dark':
-        return 'Mode pastel';
-      case 'pastel':
-        return 'Mode clair';
-      default:
-        return 'Changer de thème';
-    }
-  };
-
-  return collapsed ? (
-    <TooltipProvider>
-      <Tooltip delayDuration={300}>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-full h-10 focus-premium hover-lift"
-            onClick={toggleTheme}
-          >
-            {getThemeIcon()}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right" className="font-medium">
-          {getThemeTooltipText()}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  ) : (
+  return (
     <Button
       variant="ghost"
-      className="w-full justify-start px-3 focus-premium hover-lift"
+      size={collapsed ? "icon" : "sm"}
       onClick={toggleTheme}
+      className={`${collapsed ? 'w-10' : 'w-full justify-start'}`}
+      aria-label="Changer le thème"
     >
-      {getThemeIcon()}
-      <span className="ml-2 font-medium">{getThemeTooltipText()}</span>
+      {theme === 'dark' ? (
+        <>
+          <Sun className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">Mode clair</span>}
+        </>
+      ) : (
+        <>
+          <Moon className="h-4 w-4" />
+          {!collapsed && <span className="ml-2">Mode sombre</span>}
+        </>
+      )}
     </Button>
   );
 };

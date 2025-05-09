@@ -20,6 +20,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from '@/hooks/use-toast'
+import MobileNavigation from '@/components/navigation/MobileNavigation'
+import Sidebar from '@/components/ui/sidebar'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 // Composant temporaire pour remplacer MusicDrawer en attendant de résoudre l'import
 const MusicDrawer = ({ open, onClose }: { open: boolean, onClose: () => void }) => {
@@ -43,6 +46,7 @@ const Shell: React.FC = () => {
   const { isAuthenticated, user, signOut } = useAuth()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const isMobile = useIsMobile()
 
   const handleLogout = async () => {
     try {
@@ -73,8 +77,8 @@ const Shell: React.FC = () => {
               </Link>
             </h1>
             
-            {/* Navigation principale visible uniquement si connecté */}
-            {isAuthenticated && (
+            {/* Navigation principale visible uniquement si connecté (format desktop) */}
+            {isAuthenticated && !isMobile && (
               <nav className="hidden md:flex gap-4">
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/" className="flex items-center gap-2">
@@ -92,6 +96,10 @@ const Shell: React.FC = () => {
             )}
           </div>
 
+          {/* Menu mobile pour les petits écrans */}
+          {isMobile && <MobileNavigation />}
+
+          {/* Actions toujours visibles */}
           <div className="flex items-center gap-3">
             <Button
               onClick={() => setMusicOpen(o => !o)}
@@ -144,14 +152,18 @@ const Shell: React.FC = () => {
         </div>
       </header>
 
-      <MusicDrawer
-        open={musicOpen}
-        onClose={() => setMusicOpen(false)}
-      />
-
-      <main className="flex-1">
-        <Outlet />
-      </main>
+      <div className="flex flex-1">
+        {/* Sidebar visible uniquement si connecté */}
+        {isAuthenticated && !isMobile && <Sidebar />}
+        
+        <main className="flex-1">
+          <MusicDrawer
+            open={musicOpen}
+            onClose={() => setMusicOpen(false)}
+          />
+          <Outlet />
+        </main>
+      </div>
 
       <footer className="bg-muted py-6">
         <div className="container mx-auto px-4">

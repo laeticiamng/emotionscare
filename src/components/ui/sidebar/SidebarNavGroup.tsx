@@ -6,7 +6,7 @@ import NavItemButton from './NavItemButton';
 export interface NavItemConfig {
   path: string;
   label: string;
-  icon: React.ReactElement;
+  icon: React.ElementType;
   roles?: string[];
 }
 

@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 interface NavItemButtonProps {
   path: string;
-  icon: React.ReactElement;
+  icon: React.ElementType;
   label: string;
   collapsed: boolean;
 }
@@ -23,6 +23,8 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
     navigate(path);
   };
 
+  const Icon = icon;
+
   // Collapsed version with tooltip
   if (collapsed) {
     return (
@@ -35,7 +37,7 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
               className="w-full h-10"
               onClick={handleNavigation}
             >
-              {React.cloneElement(icon, { className: "h-5 w-5" })}
+              <Icon className="h-5 w-5" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="right">
@@ -53,7 +55,7 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
       className="w-full justify-start px-3"
       onClick={handleNavigation}
     >
-      {icon}
+      <Icon className="h-5 w-5" />
       <span className="ml-2">{label}</span>
     </Button>
   );

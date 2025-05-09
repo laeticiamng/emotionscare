@@ -19,7 +19,7 @@ const MobileNavigation = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = user ? isAdminRole(user.role) : false;
+  const isAdmin = user ? isAdminRole(user?.role) : false;
 
   // Define navigation items directly from the sidebar config
   const navigationItems = isAdmin ? adminSidebarItems : sidebarItems;
@@ -88,7 +88,7 @@ const MobileNavigation = () => {
             {user && (
               <div className="flex items-center gap-3 p-3 mb-2 mx-2 bg-muted/50 rounded-lg">
                 <Avatar>
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={user.avatar_url} alt={user.name} />
                   <AvatarFallback>{user.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -147,7 +147,7 @@ const MobileNavigation = () => {
                   <button 
                     className="flex items-center py-2 px-3 rounded-md transition-colors hover:bg-accent/50 w-full text-left text-sm"
                     onClick={() => {
-                      openDrawer();
+                      openDrawer && openDrawer();
                       setIsOpen(false);
                     }}
                   >

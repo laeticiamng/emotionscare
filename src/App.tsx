@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { MusicProvider } from './contexts/MusicContext'
 import Shell from './components/Shell'
 import ProtectedLayout from './components/ProtectedLayout'
+import DashboardLayout from './components/DashboardLayout'
 
 // Pages publiques
 import Index from './pages/Index'
@@ -41,8 +42,9 @@ function App() {
       <AuthProvider>
         <MusicProvider>
           <Routes>
-            {/* Toutes les routes sont imbriquées sous Shell pour conserver le même layout */}
+            {/* Structure principale avec le Shell */}
             <Route path="/" element={<Shell />}>
+              {/* Page d'accueil */}
               <Route index element={<Index />} />
               
               {/* Pages d'authentification */}
@@ -50,24 +52,31 @@ function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/admin-login" element={<AdminLoginPage />} />
               
-              {/* Redirection automatique du chemin /dashboard vers la page dashboard utilisateur ou admin */}
-              <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
-              <Route path="/admin" element={<ProtectedLayout requireRole="admin"><AdminDashboardPage /></ProtectedLayout>} />
-              
-              {/* Routes protégées pour les utilisateurs */}
-              <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
-              <Route path="/journal" element={<ProtectedLayout><JournalPage /></ProtectedLayout>} />
-              <Route path="/settings" element={<ProtectedLayout><SettingsPage /></ProtectedLayout>} />
-              <Route path="/vr" element={<ProtectedLayout><VRPage /></ProtectedLayout>} />
+              {/* Routes protégées avec sous-navigation Dashboard */}
+              <Route element={<ProtectedLayout />}>
+                <Route element={<DashboardLayout />}>
+                  {/* Dashboard utilisateur/admin basé sur le rôle */}
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  
+                  {/* Routes pour les modules utilisateurs */}
+                  <Route path="/scan" element={<ScanPage />} />
+                  <Route path="/journal" element={<JournalPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/vr" element={<VRPage />} />
 
-              {/* Routes pour les modules de musique */}
-              <Route path="/music" element={<ProtectedLayout><MusicPage /></ProtectedLayout>} />
-              <Route path="/music/create" element={<ProtectedLayout><MusicGenerationPage /></ProtectedLayout>} />
-              <Route path="/music/preferences" element={<ProtectedLayout><MusicPreferencesPage /></ProtectedLayout>} />
+                  {/* Routes pour les modules de musique */}
+                  <Route path="/music" element={<MusicPage />} />
+                  <Route path="/music/create" element={<MusicGenerationPage />} />
+                  <Route path="/music/preferences" element={<MusicPreferencesPage />} />
 
-              {/* Routes pour le coach */}
-              <Route path="/coach" element={<ProtectedLayout><CoachPage /></ProtectedLayout>} />
-              <Route path="/coach-chat" element={<ProtectedLayout><CoachChatPage /></ProtectedLayout>} />
+                  {/* Routes pour le coach */}
+                  <Route path="/coach" element={<CoachPage />} />
+                  <Route path="/coach-chat" element={<CoachChatPage />} />
+                  
+                  {/* Routes admin explicites */}
+                  <Route path="/admin" element={<AdminDashboardPage />} />
+                </Route>
+              </Route>
 
               {/* Fallback 404 */}
               <Route path="*" element={<NotFoundPage />} />

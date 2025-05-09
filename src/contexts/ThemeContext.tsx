@@ -1,124 +1,83 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ThemeName, themes } from '@/themes/theme';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
-type ThemePreference = ThemeName | 'system';
+type ThemeMode = 'light' | 'dark' | 'pastel' | 'system';
 
 interface ThemeContextType {
-  theme: ThemeName;
-  themePreference: ThemePreference;
+  theme: ThemeMode;
   toggleTheme: () => void;
-  setTheme: (theme: ThemeName) => void;
-  setThemePreference: (preference: ThemePreference) => void;
-  isDark: boolean;
-  isPastel: boolean;
+  setTheme: (theme: ThemeMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [themePreference, setThemePreference] = useState<ThemePreference>(() => {
-    // Check for stored theme preference
-    const storedTheme = localStorage.getItem('themePreference');
-    if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'pastel' || storedTheme === 'system') {
-      return storedTheme as ThemePreference;
-    }
-    // Default to system
-    return 'system';
-  });
-  
-  const [theme, setTheme] = useState<ThemeName>(() => {
-    // If preference is system, use browser preference
-    if (themePreference === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    // Otherwise use the explicit preference
-    return themePreference as ThemeName;
-  });
-
-  // Listen for changes in system theme if preference is 'system'
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (themePreference === 'system') {
-        setTheme(e.matches ? 'dark' : 'light');
-      }
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, [themePreference]);
-
-  // Update the theme when preference changes
-  useEffect(() => {
-    if (themePreference === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      setTheme(systemTheme);
-    } else {
-      setTheme(themePreference as ThemeName);
-    }
-    
-    // Store the preference
-    localStorage.setItem('themePreference', themePreference);
-  }, [themePreference]);
-
-  useEffect(() => {
-    // Remove previous theme classes
-    document.documentElement.classList.remove('dark', 'light', 'pastel');
-    
-    // Add the new theme class
-    document.documentElement.classList.add(theme);
-    
-    // Set a data attribute for additional theme-specific styles
-    document.documentElement.setAttribute('data-theme', theme);
-    
-    // Adjust meta theme-color for mobile browsers
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute(
-        'content',
-        theme === 'dark' ? '#1F2430' : 
-        theme === 'pastel' ? '#EDF4FF' : '#ffffff'
-      );
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setThemePreference(prevTheme => {
-      if (prevTheme === 'system') {
-        return theme === 'dark' ? 'light' : theme === 'light' ? 'pastel' : 'dark';
-      } else {
-        return prevTheme === 'dark' ? 'light' : prevTheme === 'light' ? 'pastel' : 'dark';
-      }
-    });
-  };
-
-  const isDark = theme === 'dark';
-  const isPastel = theme === 'pastel';
-
-  return (
-    <ThemeContext.Provider value={{ 
-      theme, 
-      themePreference,
-      toggleTheme, 
-      setTheme, 
-      setThemePreference,
-      isDark,
-      isPastel
-    }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-export const useTheme = () => {
+export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
+};
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  // Récupérer le thème depuis localStorage ou utiliser 'light' par défaut
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('emotionscare-theme') as ThemeMode;
+      return savedTheme || 'light';
+    }
+    return 'light';
+  });
+
+  // Appliquer la classe au document pour le changement de thème
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark', 'pastel');
+    
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(theme);
+    }
+
+    localStorage.setItem('emotionscare-theme', theme);
+  }, [theme]);
+
+  // Surveiller les changements de thème système
+  useEffect(() => {
+    if (theme !== 'system') return;
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      const root = window.document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(mediaQuery.matches ? 'dark' : 'light');
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
+
+  // Toggle simple entre light et dark
+  const toggleTheme = () => {
+    setThemeState(prevTheme => {
+      if (prevTheme === 'light') return 'dark';
+      return 'light';
+    });
+  };
+
+  const setTheme = (newTheme: ThemeMode) => {
+    setThemeState(newTheme);
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };

@@ -1,155 +1,53 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
-import { useMusicState } from '@/hooks/useMusicState';
-import { useMusicPlaylist } from '@/hooks/useMusicPlaylist';
-import { useMusicControls } from '@/hooks/useMusicControls';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  setCurrentTrack: (track: MusicTrack | null) => void;
-  currentPlaylist: MusicPlaylist | null;
-  currentEmotion: string;
   isPlaying: boolean;
-  volume: number;
-  setVolume: (volume: number) => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
-  isDrawerOpen: boolean;
-  openDrawer: () => void;
-  closeDrawer: () => void;
-  
-  // Properties for audio player functionality
-  currentTime: number;
-  duration: number;
-  formatTime: (time: number) => string;
-  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleVolumeChange: (values: number[]) => void;
-  repeat: boolean;
-  toggleRepeat: () => void;
-  shuffle: boolean;
-  toggleShuffle: () => void;
-  loadingTrack: boolean;
-  
-  // Required properties
-  initializeMusicSystem: () => Promise<void>;
-  error: string | null;
-  playlists: MusicPlaylist[];
-  loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
+  currentTrack: string | null;
+  play: (track: string) => void;
+  pause: () => void;
+  openDrawer?: () => void;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
-export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const {
-    currentTrack,
-    setCurrentTrack,
-    currentEmotion,
-    setCurrentEmotion,
-    isDrawerOpen,
-    openDrawer,
-    closeDrawer,
-    error,
-    isInitialized,
-    initializeMusicSystem
-  } = useMusicState();
+export const useMusic = () => {
+  const context = useContext(MusicContext);
+  if (!context) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
+};
 
-  const {
-    currentPlaylist,
-    playlists,
-    loadPlaylistForEmotion,
-    loadPlaylistById
-  } = useMusicPlaylist();
+interface MusicProviderProps {
+  children: ReactNode;
+}
 
-  const {
-    isPlaying,
-    volume,
-    setVolume,
-    playTrack: playTrackControl,
-    pauseTrack,
-    nextTrack: nextTrackControl,
-    previousTrack: previousTrackControl,
-    currentTime,
-    duration,
-    formatTime,
-    handleProgressClick,
-    handleVolumeChange,
-    repeat,
-    toggleRepeat,
-    shuffle,
-    toggleShuffle,
-    loadingTrack
-  } = useMusicControls();
+export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Adapter les fonctions de contrôle pour utiliser les données actuelles
-  const playTrack = (track: MusicTrack) => {
+  const play = (track: string) => {
     setCurrentTrack(track);
-    playTrackControl(track);
+    setIsPlaying(true);
   };
 
-  const nextTrack = () => {
-    if (!currentTrack || !currentPlaylist) return;
-    nextTrackControl(currentTrack, currentPlaylist.tracks);
+  const pause = () => {
+    setIsPlaying(false);
   };
 
-  const previousTrack = () => {
-    if (!currentTrack || !currentPlaylist) return;
-    previousTrackControl(currentTrack, currentPlaylist.tracks);
+  const openDrawer = () => {
+    setIsDrawerOpen(true);
   };
 
-  // Initialiser le système musical au chargement du contexte
-  useEffect(() => {
-    if (!isInitialized) {
-      initializeMusicSystem();
-    }
-  }, [isInitialized, initializeMusicSystem]);
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+  };
 
   return (
-    <MusicContext.Provider value={{
-      currentTrack,
-      setCurrentTrack,
-      currentPlaylist,
-      currentEmotion,
-      isPlaying,
-      volume,
-      setVolume,
-      playTrack,
-      pauseTrack,
-      nextTrack,
-      previousTrack,
-      loadPlaylistForEmotion,
-      isDrawerOpen,
-      openDrawer,
-      closeDrawer,
-      currentTime,
-      duration,
-      formatTime,
-      handleProgressClick,
-      handleVolumeChange,
-      repeat,
-      toggleRepeat,
-      shuffle,
-      toggleShuffle,
-      loadingTrack,
-      initializeMusicSystem,
-      error,
-      playlists,
-      loadPlaylistById
-    }}>
+    <MusicContext.Provider value={{ isPlaying, currentTrack, play, pause, openDrawer }}>
       {children}
     </MusicContext.Provider>
   );
-};
-
-export const useMusic = (): MusicContextType => {
-  const context = useContext(MusicContext);
-  
-  if (context === undefined) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  
-  return context;
 };

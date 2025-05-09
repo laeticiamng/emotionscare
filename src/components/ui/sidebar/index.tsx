@@ -3,7 +3,6 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { sidebarItems, adminSidebarItems, footerNavItems } from '@/components/navigation/navConfig';
 import { isAdminRole } from '@/utils/roleUtils';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarProvider, useSidebar } from './SidebarContext';
 import SidebarNavGroup from './SidebarNavGroup';
 import SidebarFooter from './SidebarFooter';
@@ -76,13 +75,6 @@ const SidebarContent: React.FC = () => {
 
 // Export the main Sidebar component that provides the context
 const Sidebar: React.FC = () => {
-  const isMobile = useIsMobile();
-  
-  // Si on est sur mobile, on ne rend pas du tout le sidebar (géré par MobileNavigation)
-  if (isMobile) {
-    return null;
-  }
-  
   return (
     <SidebarProvider>
       <SidebarContent />
