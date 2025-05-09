@@ -2,9 +2,16 @@
 /** Un défi ou rituel quotidien */
 export interface Challenge {
   id: string;
-  title: string;
+  title?: string;
+  name?: string;
   description: string;
   points: number;        // points gagnés à la réussite
+  completed: boolean;
+  difficulty?: string;
+  image_url?: string;
+  target?: number;
+  progress?: number;
+  maxProgress?: number;
 }
 
 /** La progression d'un utilisateur sur un challenge */

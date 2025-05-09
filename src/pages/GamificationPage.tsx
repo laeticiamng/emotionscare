@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { fetchBadges, fetchChallenges, completeChallenge } from '@/lib/gamificationService';
+import { getChallenges as fetchChallenges, getUserBadges as fetchBadges, completeChallenge } from '@/lib/gamificationService';
 import { Badge, Challenge } from '@/types';
 import BadgeGrid from '@/components/gamification/BadgeGrid';
 import ChallengeItem from '@/components/gamification/ChallengeItem';
@@ -15,24 +16,32 @@ const GamificationPage = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [activeTab, setActiveTab] = useState('badges');
   const [isLoading, setIsLoading] = useState(true);
+  const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
+
+  // Function to calculate progress for badges
+  const calculateProgress = (threshold: number) => {
+    // Mock implementation - in a real app this would use actual user data
+    return Math.floor(Math.random() * threshold);
+  };
 
   useEffect(() => {
     const loadGamificationData = async () => {
       setIsLoading(true);
       try {
         // Load badges and challenges
-        const badgesData = await fetchBadges();
-        const challengesData = await fetchChallenges();
-        
-        // Convert badge data to ensure it's the correct type
-        const typedBadges = badgesData.map(badge => ({
-          ...badge,
-          user_id: badge.user_id || user?.id || 'unknown',
-          icon: badge.icon || 'award'
-        }));
-        
-        setBadges(typedBadges);
-        setChallenges(challengesData);
+        if (user?.id) {
+          const badgesData = await fetchBadges(user.id);
+          const challengesData = await fetchChallenges();
+
+          // Set earned badge IDs
+          const earnedIds = badgesData
+            .filter(badge => badge.unlocked)
+            .map(badge => badge.id);
+
+          setEarnedBadgeIds(earnedIds);
+          setBadges(badgesData);
+          setChallenges(challengesData);
+        }
       } catch (error) {
         console.error('Error loading gamification data:', error);
         toast({
@@ -57,7 +66,7 @@ const GamificationPage = () => {
       // Update challenges
       setChallenges(prev =>
         prev.map(c =>
-          c.id === challengeId ? { ...c, completed: true, progress: c.target || c.maxProgress || 0 } : c
+          c.id === challengeId ? { ...c, completed: true } : c
         )
       );
       
@@ -75,7 +84,6 @@ const GamificationPage = () => {
     }
   };
 
-  // Rest of the component...
   return (
     <div className="container max-w-5xl mx-auto py-6">
       <div className="mb-8">
@@ -97,7 +105,11 @@ const GamificationPage = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <BadgeGrid badges={badges} />
+            <BadgeGrid 
+              badges={badges} 
+              earnedBadgeIds={earnedBadgeIds}
+              progressFunction={calculateProgress}
+            />
           )}
         </TabsContent>
 
@@ -111,7 +123,11 @@ const GamificationPage = () => {
               {challenges.map(challenge => (
                 <ChallengeItem
                   key={challenge.id}
-                  challenge={challenge}
+                  id={challenge.id}
+                  title={challenge.title || challenge.name || ''}
+                  description={challenge.description}
+                  points={challenge.points || 0}
+                  isCompleted={challenge.completed}
                   onComplete={handleCompleteChallenge}
                 />
               ))}

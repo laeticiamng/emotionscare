@@ -6,17 +6,31 @@ import { VRSession, VRSessionTemplate } from '@/types';
 const vrSessionTemplates: VRSessionTemplate[] = [
   {
     id: 'template-1',
+    template_id: 'template-1',
+    theme: 'Plage paisible',
+    title: 'Une plage paisible avec le son des vagues',
     description: 'Une plage paisible avec le son des vagues',
     category: 'relaxation',
     duration: 5,
     is_audio_only: false,
+    preview_url: '/images/vr/beach-preview.jpg',
+    benefits: ['Réduction du stress', 'Amélioration du sommeil'],
+    emotions: ['calm', 'peaceful'],
+    popularity: 85,
   },
   {
     id: 'template-2',
+    template_id: 'template-2',
+    theme: 'Forêt tranquille',
+    title: 'Une promenade dans une forêt tranquille',
     description: 'Une promenade dans une forêt tranquille',
     category: 'focus',
     duration: 10,
     is_audio_only: false,
+    preview_url: '/images/vr/forest-preview.jpg',
+    benefits: ['Concentration améliorée', 'Clarté mentale'],
+    emotions: ['focused', 'inspired'],
+    popularity: 78,
   }
 ];
 

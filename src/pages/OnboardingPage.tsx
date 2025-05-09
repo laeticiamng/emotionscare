@@ -1,14 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type FontSizeOption = 'small' | 'medium' | 'large';
 
@@ -72,16 +74,6 @@ const OnboardingPage: React.FC = () => {
     }
   };
   
-  // Function to handle theme change with proper type casting
-  const handleThemeChange = (value: string) => {
-    setTheme(value as 'light' | 'dark' | 'pastel');
-  };
-  
-  // Function to handle font size change with proper type casting
-  const handleFontSizeChange = (value: string) => {
-    setFontSize(value as 'small' | 'medium' | 'large');
-  };
-  
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -109,7 +101,7 @@ const OnboardingPage: React.FC = () => {
               
               <div className="space-y-2">
                 <Label htmlFor="department">Département</Label>
-                <Select value={department} onValueChange={setDepartment}>
+                <Select value={department} onValueChange={(value) => setDepartment(value)}>
                   <SelectTrigger id="department">
                     <SelectValue placeholder="Sélectionner un département" />
                   </SelectTrigger>
@@ -141,7 +133,7 @@ const OnboardingPage: React.FC = () => {
               
               <div className="space-y-2">
                 <Label>Thème</Label>
-                <RadioGroup value={theme} onValueChange={handleThemeChange} className="flex flex-wrap gap-4">
+                <RadioGroup value={theme} onValueChange={(value: string) => setTheme(value as 'light' | 'dark' | 'pastel')} className="flex flex-wrap gap-4">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="light" id="theme-light" />
                     <Label htmlFor="theme-light">Clair</Label>
@@ -161,7 +153,7 @@ const OnboardingPage: React.FC = () => {
                 <Label htmlFor="font-size">Taille de police</Label>
                 <Select 
                   value={fontSize} 
-                  onValueChange={(value) => handleFontSizeChange(value as FontSizeOption)}
+                  onValueChange={(value: FontSizeOption) => setFontSize(value)}
                 >
                   <SelectTrigger id="font-size">
                     <SelectValue placeholder="Sélectionner une taille" />

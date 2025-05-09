@@ -10,7 +10,8 @@ interface ChallengeItemProps {
   description: string;
   points: number;
   isCompleted: boolean;
-  onComplete: () => void;
+  onComplete: (challengeId: string) => void;
+  id: string;
   isLoading?: boolean;
 }
 
@@ -20,6 +21,7 @@ const ChallengeItem: React.FC<ChallengeItemProps> = ({
   points,
   isCompleted,
   onComplete,
+  id,
   isLoading = false
 }) => {
   return (
@@ -46,7 +48,7 @@ const ChallengeItem: React.FC<ChallengeItemProps> = ({
         <Button
           variant={isCompleted ? "secondary" : "default"}
           size="sm"
-          onClick={onComplete}
+          onClick={() => onComplete(id)}
           disabled={isCompleted || isLoading}
           className="ml-7"
         >

@@ -9,17 +9,44 @@ import ScanTabContent from '@/components/scan/ScanTabContent';
 import HistoryTabContent from '@/components/scan/HistoryTabContent';
 import TeamTabContent from '@/components/scan/TeamTabContent';
 
+// Define the props interfaces for our components
+interface ScanPageHeaderProps {
+  showScanForm: boolean;
+  activeTab: string;
+  setShowScanForm: (show: boolean) => void;
+}
+
+interface ScanTabContentProps {
+  userId: string;
+  showScanForm: boolean;
+  setShowScanForm: (show: boolean) => void;
+  handleScanSaved: () => void;
+  onResultSaved: () => Promise<void>;
+}
+
+interface HistoryTabContentProps {
+  emotions: any[];
+}
+
+interface TeamTabContentProps {
+  filteredUsers: any[];
+  selectedFilter: string;
+  filterUsers: (filter: string) => void;
+  periodFilter: '7' | '30' | '90';
+  setPeriodFilter: (period: '7' | '30' | '90') => void;
+}
+
 const ScanPage = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('scan');
   const [showScanForm, setShowScanForm] = useState(false);
-  const [emotions, setEmotions] = useState([]);
+  const [emotions, setEmotions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [periodFilter, setPeriodFilter] = useState<'7' | '30' | '90'>('30');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
 
   // Function to handle scan saved
   const handleScanSaved = () => {

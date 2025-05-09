@@ -10,7 +10,6 @@ let challenges: Challenge[] = [
     description: 'Réalisez votre premier scan émotionnel',
     points: 10,
     completed: false,
-    category: 'scan',
     difficulty: 'easy',
     image_url: '/images/badges/first-scan.svg',
   },
@@ -20,7 +19,6 @@ let challenges: Challenge[] = [
     description: 'Écrivez dans votre journal 3 jours de suite',
     points: 20,
     completed: false,
-    category: 'journal',
     difficulty: 'medium',
     image_url: '/images/badges/journal-streak.svg',
   }
@@ -38,7 +36,6 @@ const badges: Badge[] = [
     progress: 100,
     threshold: 100,
     unlocked: true,
-    created_at: new Date().toISOString()
   },
   {
     id: 'badge-2',
@@ -50,7 +47,6 @@ const badges: Badge[] = [
     progress: 60,
     threshold: 100,
     unlocked: false,
-    created_at: new Date().toISOString()
   }
 ];
 
@@ -96,9 +92,12 @@ export const awardBadge = async (userId: string, badgeData: Partial<Badge>): Pro
     progress: badgeData.progress || 0,
     threshold: badgeData.threshold || 100,
     unlocked: badgeData.unlocked || false,
-    created_at: new Date().toISOString()
   };
   
   badges.push(newBadge);
   return newBadge;
 };
+
+// Alias for backward compatibility
+export const fetchBadges = getUserBadges;
+export const fetchChallenges = getChallenges;

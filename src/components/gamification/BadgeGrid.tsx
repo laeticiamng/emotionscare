@@ -5,14 +5,14 @@ import BadgeCard from './BadgeCard';
 
 interface BadgeGridProps {
   badges: Badge[];
-  earnedBadgeIds: string[];
-  progressFunction: (threshold: number) => number;
+  earnedBadgeIds?: string[];
+  progressFunction?: (threshold: number) => number;
 }
 
 const BadgeGrid: React.FC<BadgeGridProps> = ({ 
   badges, 
-  earnedBadgeIds, 
-  progressFunction 
+  earnedBadgeIds = [], 
+  progressFunction = () => 0 
 }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

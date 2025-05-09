@@ -1,380 +1,351 @@
+
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import MusicPlayer from '@/components/music/MusicPlayer';
+import { MusicTrack } from '@/types';
+import { useMusicPlayer } from '@/hooks/useMusicPlayer';
 
-// Mock data
-const mockEmotions = ['calm', 'focus', 'energy', 'joy', 'relax'];
-
-const mockPresets = [
-  { id: '1', name: 'Méditation matinale', category: 'calm', duration: 10 },
-  { id: '2', name: 'Focus intense', category: 'focus', duration: 25 },
-  { id: '3', name: 'Boost d\'énergie', category: 'energy', duration: 15 },
-  { id: '4', name: 'Détente complète', category: 'relax', duration: 30 },
-  { id: '5', name: 'Joie et optimisme', category: 'joy', duration: 20 },
-];
-
-const mockTracks = [
-  { id: '101', title: 'Calm Waters', artist: 'Nature Sounds', duration: 183, category: 'calm' },
-  { id: '102', title: 'Deep Focus', artist: 'BrainBeats', duration: 240, category: 'focus' },
-  { id: '103', title: 'Energy Flow', artist: 'BeatMaster', duration: 195, category: 'energy' },
-  { id: '104', title: 'Peaceful Mind', artist: 'Mindfulness', duration: 306, category: 'relax' },
-  { id: '105', title: 'Happy Days', artist: 'PositiveVibes', duration: 210, category: 'joy' },
-];
-
-// Types
-interface Preset {
-  id: string;
-  name: string;
-  category: string;
-  duration: number;
-}
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  category: string;
-}
-
-interface MusicParameters {
-  tempo: number;
-  harmony: number;
-  brightness: number;
-  complexity: number;
-}
-
-const MusicWellbeingPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('presets');
-  const [selectedEmotion, setSelectedEmotion] = useState('calm');
-  const [activePreset, setActivePreset] = useState<Preset | null>(null);
+const MusicWellbeingPage = () => {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('player');
+  const [duration, setDuration] = useState(300); // 5 minutes default
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [parameters, setParameters] = useState<MusicParameters>({
-    tempo: 50,
-    harmony: 70,
-    brightness: 40,
-    complexity: 30,
+  const [currentMusic, setCurrentMusic] = useState<MusicTrack | null>(null);
+  const [musicPreferences, setMusicPreferences] = useState({
+    tempo: 70,
+    energy: 30,
+    complexity: 40,
+    brightness: 60,
   });
   
-  const { toast } = useToast();
-
-  // Filter presets based on selected emotion
-  const filteredPresets = mockPresets.filter(
-    (preset) => preset.category === selectedEmotion
-  );
-
-  // Filter tracks based on selected emotion
-  const filteredTracks = mockTracks.filter(
-    (track) => track.category === selectedEmotion
-  );
-
-  // Play a preset
-  const handlePlayPreset = (preset: Preset) => {
-    setActivePreset(preset);
-    // Find a track that matches the preset category
-    const trackToPlay = mockTracks.find((track) => track.category === preset.category);
-    if (trackToPlay) {
-      setCurrentTrack(trackToPlay);
+  // Music player implementation
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      // Pause logic
+      setIsPlaying(false);
+    } else {
+      // Play logic
       setIsPlaying(true);
+      
+      // Show toast when music starts playing
       toast({
-        title: 'Lecture démarrée',
-        description: `Lecture de "${preset.name}"`,
+        title: "Musique démarrée",
+        description: "Votre session musicale thérapeutique est en cours.",
       });
     }
   };
-
-  // Play a track
-  const handlePlayTrack = (track: Track) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    // Find a preset that matches the track category
-    const matchingPreset = mockPresets.find((p) => p.category === track.category);
-    setActivePreset(matchingPreset || null);
-    toast({
-      title: 'Lecture démarrée',
-      description: `Lecture de "${track.title}"`,
+  
+  const handleGenerateMusic = () => {
+    // AI music generation logic would go here
+    // For the demo, we're just simulating generation
+    setCurrentMusic({
+      id: 'generated-1',
+      title: 'Méditation tranquille',
+      artist: 'EmotionsAI',
+      duration: duration,
+      url: '#',
+      cover: '/images/music/meditation.jpg',
+      mood: 'calm',
+      genre: 'ambient',
     });
-  };
-
-  // Generate custom music based on parameters
-  const handleGenerateCustom = () => {
-    // Simulate music generation
-    const generatedTrack: Track = {
-      id: `generated-${Date.now()}`,
-      title: `Musique personnalisée - ${selectedEmotion}`,
-      artist: 'AI Composer',
-      duration: Math.floor(Math.random() * 300) + 120, // Random duration between 2-7 minutes
-      category: selectedEmotion,
-    };
     
-    setCurrentTrack(generatedTrack);
-    setIsPlaying(true);
+    // Show toast when music is generated
     toast({
-      title: 'Musique générée',
-      description: 'Votre musique personnalisée est prête',
+      title: "Musique générée",
+      description: "Votre musique personnalisée a été créée avec succès.",
     });
   };
-
-  // Format duration in minutes:seconds
-  const formatDuration = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  // Handle parameter change
-  const handleParameterChange = (
-    paramName: keyof MusicParameters,
-    value: number[]
-  ) => {
-    setParameters((prev) => ({
-      ...prev,
-      [paramName]: value[0],
-    }));
+  
+  const handleSaveFavorite = () => {
+    // Save current music to favorites
+    
+    toast({
+      title: "Ajouté aux favoris",
+      description: "Cette musique a été ajoutée à vos favoris.",
+    });
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-6xl">
-      <h1 className="text-3xl font-bold mb-2">Musique & Bien-être</h1>
-      <p className="text-muted-foreground mb-6">
-        Écoutez et générez de la musique adaptée à votre état émotionnel
-      </p>
-
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-3">Choisissez une émotion</h2>
-        <div className="flex flex-wrap gap-2">
-          {mockEmotions.map((emotion) => (
-            <Badge
-              key={emotion}
-              variant={selectedEmotion === emotion ? 'default' : 'outline'}
-              className="cursor-pointer text-sm py-1 px-3 capitalize"
-              onClick={() => setSelectedEmotion(emotion)}
-            >
-              {emotion}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="presets">Préréglages</TabsTrigger>
-              <TabsTrigger value="library">Bibliothèque</TabsTrigger>
-              <TabsTrigger value="custom">Personnaliser</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="presets" className="space-y-4">
-              {filteredPresets.length > 0 ? (
-                filteredPresets.map((preset) => (
-                  <Card key={preset.id} className="overflow-hidden">
-                    <div className="flex">
-                      <div className="w-3 bg-primary" />
-                      <div className="flex-1 p-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h3 className="text-lg font-medium">{preset.name}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {preset.duration} minutes - {preset.category}
-                            </p>
-                          </div>
-                          <Button
-                            onClick={() => handlePlayPreset(preset)}
-                            variant={
-                              activePreset?.id === preset.id && isPlaying
-                                ? 'secondary'
-                                : 'default'
-                            }
+    <ProtectedLayoutWrapper>
+      <div className="container mx-auto py-6">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Musique thérapeutique</h1>
+          <p className="text-muted-foreground">
+            Utilisez la musique pour équilibrer votre état émotionnel et améliorer votre bien-être
+          </p>
+        </header>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="grid grid-cols-3 mb-6">
+            <TabsTrigger value="player">Lecteur</TabsTrigger>
+            <TabsTrigger value="create">Créer</TabsTrigger>
+            <TabsTrigger value="library">Bibliothèque</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="player">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="col-span-2">
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xl font-semibold">Lecteur musical</h2>
+                      {currentMusic && (
+                        <Badge variant="outline" className="bg-blue-50">
+                          {currentMusic.mood}
+                        </Badge>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {currentMusic ? (
+                      <div className="space-y-6">
+                        <div className="aspect-square max-w-xs mx-auto bg-muted rounded-lg overflow-hidden shadow-md">
+                          {currentMusic.cover ? (
+                            <img 
+                              src={currentMusic.cover} 
+                              alt={currentMusic.title} 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+                              <span className="text-3xl text-primary">♪</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="text-center">
+                          <h3 className="text-xl font-medium">{currentMusic.title}</h3>
+                          <p className="text-muted-foreground">{currentMusic.artist}</p>
+                        </div>
+                        
+                        <div className="flex justify-center gap-4">
+                          <Button 
+                            size="lg"
+                            onClick={handlePlayPause}
+                            className="min-w-[120px]"
                           >
-                            {activePreset?.id === preset.id && isPlaying
-                              ? 'En lecture'
-                              : 'Écouter'}
+                            {isPlaying ? 'Pause' : 'Lecture'}
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            onClick={handleSaveFavorite}
+                          >
+                            Ajouter aux favoris
                           </Button>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-10">
-                  <p>Aucun préréglage disponible pour cette émotion</p>
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="library" className="space-y-4">
-              {filteredTracks.length > 0 ? (
-                filteredTracks.map((track) => (
-                  <Card key={track.id}>
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h3 className="font-medium">{track.title}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {track.artist} - {formatDuration(track.duration)}
-                          </p>
-                        </div>
-                        <Button
-                          onClick={() => handlePlayTrack(track)}
-                          variant={
-                            currentTrack?.id === track.id && isPlaying
-                              ? 'secondary'
-                              : 'default'
-                          }
-                          size="sm"
+                    ) : (
+                      <div className="text-center py-12">
+                        <p className="text-muted-foreground mb-6">
+                          Aucune musique sélectionnée. Veuillez créer une nouvelle musique ou choisir dans votre bibliothèque.
+                        </p>
+                        <Button 
+                          onClick={() => setActiveTab('create')}
+                          variant="default"
                         >
-                          {currentTrack?.id === track.id && isPlaying
-                            ? 'En lecture'
-                            : 'Écouter'}
+                          Créer une musique
                         </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <div className="text-center py-10">
-                  <p>Aucun morceau disponible pour cette émotion</p>
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="custom">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Personnaliser votre musique</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label htmlFor="tempo">Tempo</Label>
-                      <span>{parameters.tempo}%</span>
-                    </div>
-                    <Slider
-                      id="tempo"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={[parameters.tempo]}
-                      onValueChange={(value) =>
-                        handleParameterChange('tempo', value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label htmlFor="harmony">Harmonie</Label>
-                      <span>{parameters.harmony}%</span>
-                    </div>
-                    <Slider
-                      id="harmony"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={[parameters.harmony]}
-                      onValueChange={(value) =>
-                        handleParameterChange('harmony', value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label htmlFor="brightness">Luminosité</Label>
-                      <span>{parameters.brightness}%</span>
-                    </div>
-                    <Slider
-                      id="brightness"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={[parameters.brightness]}
-                      onValueChange={(value) =>
-                        handleParameterChange('brightness', value)
-                      }
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label htmlFor="complexity">Complexité</Label>
-                      <span>{parameters.complexity}%</span>
-                    </div>
-                    <Slider
-                      id="complexity"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={[parameters.complexity]}
-                      onValueChange={(value) =>
-                        handleParameterChange('complexity', value)
-                      }
-                    />
-                  </div>
-
-                  <Button
-                    className="w-full"
-                    onClick={handleGenerateCustom}
-                  >
-                    Générer ma musique
-                  </Button>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        <div>
-          <Card className="h-full flex flex-col">
-            <CardHeader>
-              <CardTitle>Lecteur</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow flex flex-col">
-              {currentTrack ? (
-                <div className="flex-grow flex flex-col">
-                  <div className="text-center mb-4 flex-grow flex flex-col items-center justify-center">
-                    <div className="w-32 h-32 bg-muted rounded-full flex items-center justify-center mb-4">
-                      <span className="text-4xl">🎵</span>
-                    </div>
-                    <h3 className="text-xl font-semibold">{currentTrack.title}</h3>
-                    <p className="text-muted-foreground">{currentTrack.artist}</p>
-                  </div>
-                  <MusicPlayer
-                    isPlaying={isPlaying}
-                    onPlayPause={() => setIsPlaying(!isPlaying)}
-                    duration={currentTrack.duration}
-                  />
-                </div>
-              ) : (
-                <div className="flex-grow flex items-center justify-center text-center">
-                  <div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div>
+                <Card>
+                  <CardHeader>
+                    <h2 className="text-xl font-semibold">Recommandations</h2>
+                  </CardHeader>
+                  <CardContent>
                     <p className="text-muted-foreground mb-4">
-                      Sélectionnez un morceau pour commencer
+                      Basé sur votre état émotionnel actuel, nous recommandons:
                     </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        if (filteredPresets.length > 0) {
-                          handlePlayPreset(filteredPresets[0]);
-                        }
-                      }}
-                      disabled={filteredPresets.length === 0}
+                    
+                    <div className="space-y-2">
+                      <Button className="w-full justify-start" variant="outline" onClick={() => {
+                        setCurrentMusic({
+                          id: 'rec-1',
+                          title: 'Méditation du matin',
+                          artist: 'EmotionsAI',
+                          duration: 300,
+                          url: '#',
+                          mood: 'calm',
+                          genre: 'ambient',
+                        });
+                      }}>
+                        Méditation du matin
+                      </Button>
+                      
+                      <Button className="w-full justify-start" variant="outline" onClick={() => {
+                        setCurrentMusic({
+                          id: 'rec-2',
+                          title: 'Focus productif',
+                          artist: 'EmotionsAI',
+                          duration: 600,
+                          url: '#',
+                          mood: 'focused',
+                          genre: 'electronic',
+                        });
+                      }}>
+                        Focus productif
+                      </Button>
+                      
+                      <Button className="w-full justify-start" variant="outline" onClick={() => {
+                        setCurrentMusic({
+                          id: 'rec-3',
+                          title: 'Relaxation profonde',
+                          artist: 'EmotionsAI',
+                          duration: 900,
+                          url: '#',
+                          mood: 'relaxed',
+                          genre: 'nature',
+                        });
+                      }}>
+                        Relaxation profonde
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="create">
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Créer une musique</h2>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-8">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="tempo" className="mb-2 block">Tempo: {musicPreferences.tempo}</Label>
+                      <Slider 
+                        id="tempo"
+                        min={40}
+                        max={180}
+                        step={1}
+                        defaultValue={[musicPreferences.tempo]}
+                        onValueChange={(value) => setMusicPreferences({
+                          ...musicPreferences,
+                          tempo: value[0]
+                        })}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="energy" className="mb-2 block">Énergie: {musicPreferences.energy}%</Label>
+                      <Slider 
+                        id="energy"
+                        min={0}
+                        max={100}
+                        step={1}
+                        defaultValue={[musicPreferences.energy]}
+                        onValueChange={(value) => setMusicPreferences({
+                          ...musicPreferences,
+                          energy: value[0]
+                        })}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="complexity" className="mb-2 block">Complexité: {musicPreferences.complexity}%</Label>
+                      <Slider 
+                        id="complexity"
+                        min={0}
+                        max={100}
+                        step={1}
+                        defaultValue={[musicPreferences.complexity]}
+                        onValueChange={(value) => setMusicPreferences({
+                          ...musicPreferences,
+                          complexity: value[0]
+                        })}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="brightness" className="mb-2 block">Luminosité: {musicPreferences.brightness}%</Label>
+                      <Slider 
+                        id="brightness"
+                        min={0}
+                        max={100}
+                        step={1}
+                        defaultValue={[musicPreferences.brightness]}
+                        onValueChange={(value) => setMusicPreferences({
+                          ...musicPreferences,
+                          brightness: value[0]
+                        })}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Durée</h3>
+                    <div className="flex flex-wrap gap-3">
+                      <Button 
+                        variant={duration === 180 ? "default" : "outline"} 
+                        onClick={() => setDuration(180)}
+                      >
+                        3 minutes
+                      </Button>
+                      <Button 
+                        variant={duration === 300 ? "default" : "outline"} 
+                        onClick={() => setDuration(300)}
+                      >
+                        5 minutes
+                      </Button>
+                      <Button 
+                        variant={duration === 600 ? "default" : "outline"} 
+                        onClick={() => setDuration(600)}
+                      >
+                        10 minutes
+                      </Button>
+                      <Button 
+                        variant={duration === 900 ? "default" : "outline"} 
+                        onClick={() => setDuration(900)}
+                      >
+                        15 minutes
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <Button 
+                      size="lg" 
+                      className="min-w-[200px]"
+                      onClick={handleGenerateMusic}
                     >
-                      Lecture aléatoire
+                      Générer la musique
                     </Button>
                   </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="library">
+            <Card>
+              <CardHeader>
+                <h2 className="text-xl font-semibold">Ma bibliothèque</h2>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center text-muted-foreground py-10">
+                  Votre bibliothèque est vide. Commencez à créer et à enregistrer de la musique!
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
-    </div>
+    </ProtectedLayoutWrapper>
   );
 };
 

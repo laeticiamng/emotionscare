@@ -6,7 +6,7 @@ interface ProtectedLayoutWrapperProps {
   children: ReactNode;
 }
 
-const ProtectedLayoutWrapper: React.FC<ProtectedLayoutWrapperProps> = ({ children }) => {
+const ProtectedLayoutWrapper = ({ children }: ProtectedLayoutWrapperProps) => {
   return (
     <ProtectedLayout>
       {children}
