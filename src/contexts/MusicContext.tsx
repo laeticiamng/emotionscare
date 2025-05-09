@@ -18,6 +18,8 @@ interface MusicContextType {
   loadPlaylistForEmotion: (emotion: string) => void;
   initializeMusicSystem: () => void;
   error: string | null;
+  openDrawer: boolean;
+  setOpenDrawer: (open: boolean) => void;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -31,6 +33,7 @@ export const useMusicMock = (): MusicContextType => {
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   // Simulations des fonctions de lecture
   const playTrack = (track: MusicTrack) => {
@@ -176,7 +179,9 @@ export const useMusicMock = (): MusicContextType => {
     loadPlaylistById,
     loadPlaylistForEmotion,
     initializeMusicSystem,
-    error
+    error,
+    openDrawer,
+    setOpenDrawer
   };
 };
 

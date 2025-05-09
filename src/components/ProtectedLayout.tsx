@@ -1,21 +1,11 @@
 
-import React, { ReactNode, useEffect } from 'react';
+import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface ProtectedLayoutProps {
-  children: ReactNode;
-}
-
-const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
+const ProtectedLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-
-  useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
-      console.log('User not authenticated, redirecting to login');
-    }
-  }, [isAuthenticated, isLoading]);
 
   // Si l'authentification est en cours de chargement, affiche un état de chargement
   if (isLoading) {
@@ -32,7 +22,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
   }
 
   // Si l'utilisateur est authentifié, affiche le contenu protégé
-  return children || <Outlet />;
+  return <Outlet />;
 };
 
 export default ProtectedLayout;

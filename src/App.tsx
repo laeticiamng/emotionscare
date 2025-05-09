@@ -53,7 +53,7 @@ function App() {
               <Route path="/admin-login" element={<AdminLoginPage />} />
               
               {/* Routes protégées avec sous-navigation Dashboard */}
-              <Route element={<ProtectedLayout children={undefined} />}>
+              <Route element={<ProtectedLayout />}>
                 <Route element={<DashboardLayout />}>
                   {/* Dashboard utilisateur/admin basé sur le rôle */}
                   <Route path="/dashboard" element={<DashboardPage />} />
