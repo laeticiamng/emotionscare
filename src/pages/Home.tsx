@@ -9,17 +9,14 @@ import {
   MessageCircle, 
   ArrowRight, 
   BarChart, 
-  Settings,
-  AlertCircle,
   ThumbsUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
 
 export const Home: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const modules = [
     {
@@ -76,103 +73,103 @@ export const Home: React.FC = () => {
   ];
   
   return (
-    <div className="container mx-auto max-w-7xl py-12 px-4 md:px-6">
-      {/* Hero Section */}
-      <section className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
-          Bienvenue sur <span className="text-primary">EmotionsCare</span>
-        </h1>
-        
-        <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10">
-          Votre espace dédié au bien-être et à l'équilibre professionnel.
-        </p>
-        
-        {isAuthenticated ? (
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button asChild size="lg" className="gap-2">
-              <Link to="/dashboard">
-                Voir mon tableau de bord
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="gap-2">
-              <Link to="/scan">
-                Faire un scan émotionnel
-                <Heart className="h-4 w-4" />
-              </Link>
-            </Button>
+    <div className="container mx-auto max-w-7xl py-12 px-4 md:px-8">
+      {/* Hero Section - Améliorée avec un dégradé doux et une mise en page centrée */}
+      <section className="relative py-20 px-4 rounded-3xl bg-gradient-to-br from-white to-[#F0F9FF] mb-16">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMCkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiMzQjgyRjYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')]"
+          opacity="0.4"
+          style={{ mixBlendMode: 'overlay' }}
+          className="rounded-3xl"
+        />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight text-gray-900 animate-fade-in">
+            Prenez soin de votre <span className="text-primary">état émotionnel</span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 animate-fade-in" style={{ animationDelay: "200ms" }}>
+            Votre journal, votre musique, votre calme. Trouvez l'équilibre dont vous avez besoin.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
+            {isAuthenticated ? (
+              <>
+                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all">
+                  <Link to="/dashboard">
+                    Accéder à mon espace
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/scan">
+                    Faire un scan émotionnel
+                    <Heart className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all">
+                  <Link to="/register">
+                    S'inscrire
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/login">
+                    Se connecter
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
-        ) : (
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button asChild size="lg" className="gap-2">
-              <Link to="/login">
-                Se connecter
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="gap-2">
-              <Link to="/register">
-                S'inscrire
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        )}
+        </div>
       </section>
 
-      {/* Modules Section */}
+      {/* Modules Section - Améliorée avec des cartes plus visuelles */}
       <section className="mb-16">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Nos modules</h2>
-          {isAuthenticated && (
-            <Button asChild variant="ghost">
-              <Link to="/dashboard" className="flex items-center gap-1">
-                Tout voir <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          )}
-        </div>
+        <h2 className="text-3xl font-bold mb-8 text-center">Nos modules thérapeutiques</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {modules.map((module) => {
+          {modules.map((module, index) => {
             const ModuleIcon = module.icon;
             
             return (
-              <Card key={module.title} className="transition-all hover:shadow-md">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <div className={`${module.bgColor} p-2 rounded-lg`}>
-                      <ModuleIcon className={`h-6 w-6 ${module.color}`} />
-                    </div>
-                    {module.badge && (
-                      <Badge variant="outline" className="font-normal">
-                        {module.badge}
-                      </Badge>
-                    )}
+              <div 
+                key={module.title}
+                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`${module.bgColor} p-3 rounded-lg`}>
+                    <ModuleIcon className={`h-6 w-6 ${module.color}`} />
                   </div>
-                  <CardTitle className="mt-4">{module.title}</CardTitle>
-                  <CardDescription>{module.description}</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <Button asChild variant="outline" className="w-full">
-                    <Link to={isAuthenticated ? module.path : "/login"}>
-                      {isAuthenticated ? 'Accéder' : 'Connexion requise'}
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+                  {module.badge && (
+                    <Badge variant="outline" className="font-normal">
+                      {module.badge}
+                    </Badge>
+                  )}
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{module.title}</h3>
+                <p className="text-gray-600 mb-4">{module.description}</p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link to={isAuthenticated ? module.path : "/login"}>
+                    {isAuthenticated ? 'Accéder' : 'Connexion requise'}
+                  </Link>
+                </Button>
+              </div>
             );
           })}
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section - Nouveau bloc d'appel à l'action */}
       <section className="bg-primary/10 rounded-2xl p-8 md:p-12 mb-16">
         <div className="flex flex-col md:flex-row gap-8 items-center">
           <div className="flex-1">
-            <h2 className="text-3xl font-bold mb-4">Améliorez votre bien-être aujourd'hui</h2>
-            <p className="text-lg mb-6">
-              Rejoignez notre communauté d'utilisateurs qui ont amélioré leur équilibre émotionnel et leur productivité grâce à EmotionsCare.
+            <h2 className="text-3xl font-bold mb-4">Améliorez votre bien-être dès aujourd'hui</h2>
+            <p className="text-lg mb-6 text-gray-600">
+              Rejoignez notre communauté d'utilisateurs qui ont trouvé un meilleur équilibre émotionnel grâce à EmotionsCare.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg">
@@ -195,7 +192,7 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Présentation des fonctionnalités clés */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold mb-8 text-center">Fonctionnalités clés</h2>
         
@@ -205,7 +202,7 @@ export const Home: React.FC = () => {
               <Heart className="h-8 w-8 text-rose-500" />
             </div>
             <h3 className="text-xl font-medium mb-2">Analyse émotionnelle</h3>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600">
               Analyse avancée par IA de vos émotions à travers le texte et la voix
             </p>
           </div>
@@ -215,7 +212,7 @@ export const Home: React.FC = () => {
               <Headphones className="h-8 w-8 text-blue-500" />
             </div>
             <h3 className="text-xl font-medium mb-2">Musicothérapie</h3>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600">
               Musique adaptative générée en fonction de votre état émotionnel
             </p>
           </div>
@@ -225,44 +222,38 @@ export const Home: React.FC = () => {
               <MessageCircle className="h-8 w-8 text-amber-500" />
             </div>
             <h3 className="text-xl font-medium mb-2">Coaching IA</h3>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600">
               Conseils personnalisés pour améliorer votre bien-être émotionnel
             </p>
           </div>
           
           <div className="text-center">
             <div className="bg-emerald-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4">
-              <Settings className="h-8 w-8 text-emerald-500" />
+              <Video className="h-8 w-8 text-emerald-500" />
             </div>
-            <h3 className="text-xl font-medium mb-2">Personnalisation</h3>
-            <p className="text-muted-foreground">
-              Une expérience entièrement adaptée à vos besoins spécifiques
+            <h3 className="text-xl font-medium mb-2">VR thérapeutique</h3>
+            <p className="text-gray-600">
+              Expériences immersives pour calmer l'esprit et réduire l'anxiété
             </p>
           </div>
         </div>
       </section>
       
-      {/* FAQ Section */}
+      {/* FAQ Section - Ajout d'une section de questions fréquentes */}
       <section className="mb-8">
         <h2 className="text-3xl font-bold mb-8 text-center">Foire aux questions</h2>
         
         <div className="max-w-3xl mx-auto space-y-6">
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-xl font-medium mb-2 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-primary" />
-              Comment fonctionne l'analyse émotionnelle ?
-            </h3>
-            <p className="text-muted-foreground">
-              Notre système utilise des algorithmes d'IA avancés pour analyser votre texte ou votre voix et détecter votre état émotionnel actuel. Il propose ensuite des recommandations adaptées pour améliorer votre bien-être.
+          <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-medium mb-2">Comment fonctionne l'analyse émotionnelle ?</h3>
+            <p className="text-gray-600">
+              Notre système utilise des algorithmes d'intelligence artificielle pour analyser votre texte ou votre voix et détecter votre état émotionnel actuel. Il propose ensuite des recommandations adaptées pour améliorer votre bien-être.
             </p>
           </div>
           
-          <div className="bg-card p-6 rounded-lg border">
-            <h3 className="text-xl font-medium mb-2 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-primary" />
-              Mes données sont-elles sécurisées ?
-            </h3>
-            <p className="text-muted-foreground">
+          <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-medium mb-2">Mes données sont-elles sécurisées ?</h3>
+            <p className="text-gray-600">
               Absolument. Nous prenons la confidentialité très au sérieux. Toutes vos données sont cryptées et ne sont jamais partagées avec des tiers. Vous pouvez également activer le mode confidentiel pour une sécurité renforcée.
             </p>
           </div>

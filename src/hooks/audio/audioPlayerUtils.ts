@@ -37,3 +37,31 @@ export const getTrackAudioUrl = (track: any): string => {
   if (!track) return '';
   return track.url || track.audioUrl || '';
 };
+
+/**
+ * Calculate progress percentage
+ */
+export const calculateProgress = (currentTime: number, duration: number): number => {
+  if (!duration) return 0;
+  const progress = (currentTime / duration) * 100;
+  return isNaN(progress) ? 0 : Math.min(100, Math.max(0, progress));
+};
+
+/**
+ * Map emotions to music genres for better recommendations
+ */
+export const mapEmotionToMusicGenre = (emotion: string): string => {
+  const emotionMusicMap: Record<string, string> = {
+    happy: 'upbeat',
+    sad: 'relaxing',
+    angry: 'empowering',
+    anxious: 'calming',
+    neutral: 'ambient',
+    excited: 'energetic',
+    tired: 'meditation',
+    stressed: 'nature',
+    peaceful: 'classical'
+  };
+  
+  return emotionMusicMap[emotion.toLowerCase()] || 'ambient';
+};
