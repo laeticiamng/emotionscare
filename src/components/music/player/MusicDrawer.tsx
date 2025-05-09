@@ -27,7 +27,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
       padding: 16,
       zIndex: 1000,
     }}>
-      <h2>Stub MusicDrawer OK!</h2>
+      <h2>Stub MusicDrawer OK !</h2>
       <button onClick={onClose}>Fermer</button>
     </div>
   )
