@@ -1,5 +1,5 @@
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +12,11 @@ import { notificationService } from '@/lib/coach/notification-service';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { SegmentProvider } from '@/contexts/SegmentContext';
 import useLogger from '@/hooks/useLogger';
+import { useEmotionScan } from '@/hooks/useEmotionScan';
+import { motion } from 'framer-motion';
+import { Confetti } from '@/components/ui/confetti';
+import { Badge } from '@/components/ui/badge';
+import { Heart } from 'lucide-react';
 
 const DashboardPage: React.FC = () => {
   const logger = useLogger('DashboardPage');
@@ -19,6 +24,10 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { getLatestEmotion, lastEmotion } = useEmotionScan();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [lastLoginDate, setLastLoginDate] = useState<Date | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   
   logger.debug('Component initializing', { 
     data: {
@@ -27,6 +36,39 @@ const DashboardPage: React.FC = () => {
       isLoading 
     }
   });
+  
+  // Get the user's latest emotion on component mount
+  useEffect(() => {
+    if (user && user.id) {
+      getLatestEmotion();
+    }
+  }, [user, getLatestEmotion]);
+  
+  // Show confetti and welcome message for users returning after 24+ hours
+  useEffect(() => {
+    if (user && user.id) {
+      const lastLogin = localStorage.getItem(`lastLogin_${user.id}`);
+      const now = new Date();
+      
+      if (lastLogin) {
+        const lastDate = new Date(lastLogin);
+        setLastLoginDate(lastDate);
+        
+        // If it's been more than 24 hours since last login
+        if ((now.getTime() - lastDate.getTime()) > 24 * 60 * 60 * 1000) {
+          setShowWelcome(true);
+          setShowConfetti(true);
+          
+          setTimeout(() => {
+            setShowConfetti(false);
+          }, 3000);
+        }
+      }
+      
+      // Update last login time
+      localStorage.setItem(`lastLogin_${user.id}`, now.toISOString());
+    }
+  }, [user]);
   
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -104,17 +146,42 @@ const DashboardPage: React.FC = () => {
   
   return (
     <DashboardContainer>
+      {/* Confetti animation for returning users */}
+      {showConfetti && <Confetti duration={3000} />}
+      
+      {/* Welcome back message */}
+      {showWelcome && (
+        <motion.div 
+          className="mb-6 p-4 bg-primary/10 rounded-lg shadow-sm"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="px-2 py-1 flex items-center gap-1 bg-primary/20">
+              <Heart className="h-3 w-3" />
+              Bon retour
+            </Badge>
+            <h3 className="text-lg font-medium">
+              Ravi de vous revoir, {user?.name}! Votre dernière visite était il y a{' '}
+              {lastLoginDate ? Math.floor((new Date().getTime() - lastLoginDate.getTime()) / (1000 * 60 * 60 * 24)) : '?'} jours.
+            </h3>
+          </div>
+        </motion.div>
+      )}
+      
       <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
         <SegmentProvider>
           {isAdmin ? (
             <AdminDashboard />
           ) : (
-            <UserDashboard user={user} />
+            <UserDashboard user={user} latestEmotion={lastEmotion ? { emotion: lastEmotion.emotion, score: lastEmotion.score } : undefined} />
           )}
         </SegmentProvider>
       </div>
     </DashboardContainer>
   );
-};
+}
 
 export default DashboardPage;

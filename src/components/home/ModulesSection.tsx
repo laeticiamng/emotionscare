@@ -1,152 +1,215 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronDown, ChevronUp, BookOpen, Music, VrHeadset, MessagesSquare, Activity, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { Heart, FileText, Headphones, Video, MessageCircle, BarChart, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import ModuleCard from '@/components/home/ModuleCard';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
 
 interface ModulesSectionProps {
   showHeading?: boolean;
   collapsed?: boolean;
   onToggle?: () => void;
+  selectedMood?: string | null;
 }
 
-const ModulesSection: React.FC<ModulesSectionProps> = ({ 
+const ModulesSection: React.FC<ModulesSectionProps> = ({
   showHeading = false,
-  collapsed = false, 
-  onToggle
+  collapsed = false,
+  onToggle,
+  selectedMood
 }) => {
   const { isAuthenticated } = useAuth();
-  const [expanded, setExpanded] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(collapsed);
   
-  const modules = [
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle();
+    } else {
+      setIsCollapsed(prev => !prev);
+    }
+  };
+  
+  // Base modules data
+  const baseModules = [
     {
-      id: 'scan',
-      title: 'Scan émotionnel',
-      description: 'Analysez votre état émotionnel actuel',
-      icon: <Heart className="h-5 w-5" />,
-      path: '/scan',
-      color: 'text-rose-500',
-      bgColor: 'bg-rose-100',
+      title: "Journal émotionnel",
+      description: "Notez vos pensées et suivez votre évolution émotionnelle au fil du temps",
+      icon: <BookOpen className="h-5 w-5" />,
+      to: isAuthenticated ? "/journal" : "/login?redirect=/journal",
+      statIcon: <Activity className="h-4 w-4" />,
+      statText: "Progression",
+      statValue: "7 jours",
+      priority: 5
     },
     {
-      id: 'journal',
-      title: 'Journal',
-      description: 'Suivez votre progression émotionnelle',
-      icon: <FileText className="h-5 w-5" />,
-      path: '/journal',
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-100',
+      title: "Musique thérapeutique",
+      description: "Écoutez ou créez de la musique adaptée à votre état émotionnel",
+      icon: <Music className="h-5 w-5" />,
+      to: isAuthenticated ? "/music" : "/login?redirect=/music",
+      statIcon: <Activity className="h-4 w-4" />,
+      statText: "Pistes écoutées",
+      statValue: "12",
+      priority: 4
     },
     {
-      id: 'music',
-      title: 'Musicothérapie',
-      description: 'Améliorez votre humeur avec la musique',
-      icon: <Headphones className="h-5 w-5" />,
-      path: '/music',
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-100',
+      title: "Coach émotionnel",
+      description: "Discutez avec notre coach IA pour obtenir des conseils personnalisés",
+      icon: <MessagesSquare className="h-5 w-5" />,
+      to: isAuthenticated ? "/coach" : "/login?redirect=/coach",
+      statIcon: <Activity className="h-4 w-4" />,
+      statText: "Dernière session",
+      statValue: "Hier",
+      priority: 3
     },
     {
-      id: 'vr',
-      title: 'VR Thérapie',
-      description: 'Séances immersives de détente',
-      icon: <Video className="h-5 w-5" />,
-      path: '/vr',
-      color: 'text-green-500',
-      bgColor: 'bg-green-100',
+      title: "Séances VR",
+      description: "Immergez-vous dans des expériences relaxantes en réalité virtuelle",
+      icon: <VrHeadset className="h-5 w-5" />,
+      to: isAuthenticated ? "/vr" : "/login?redirect=/vr",
+      statIcon: <Activity className="h-4 w-4" />,
+      statText: "Sessions",
+      statValue: "3",
+      priority: 2
     },
     {
-      id: 'coach',
-      title: 'Coach IA',
-      description: 'Conseils personnalisés pour votre bien-être',
-      icon: <MessageCircle className="h-5 w-5" />,
-      path: '/coach',
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-100',
-    },
-    {
-      id: 'dashboard',
-      title: 'Tableau de bord',
-      description: 'Visualisez vos données et votre progression',
-      icon: <BarChart className="h-5 w-5" />,
-      path: '/dashboard',
-      color: 'text-indigo-500',
-      bgColor: 'bg-indigo-100',
-    },
+      title: "Scan émotionnel",
+      description: "Analysez votre état émotionnel actuel pour des recommandations adaptées",
+      icon: <Brain className="h-5 w-5" />,
+      to: isAuthenticated ? "/scan" : "/login?redirect=/scan",
+      statIcon: <Activity className="h-4 w-4" />,
+      statText: "Dernier scan",
+      statValue: "Aujourd'hui",
+      priority: 1
+    }
   ];
 
-  const visibleModules = expanded ? modules : modules.slice(0, 3);
-  
-  const toggleExpand = () => {
-    setExpanded(!expanded);
+  // Reorder modules based on mood
+  const getModulesByMood = () => {
+    if (!selectedMood) return baseModules;
+    
+    let prioritizedModules = [...baseModules];
+    
+    // Adjust priorities based on mood
+    switch (selectedMood) {
+      case 'calm':
+        // When calm, suggest journal and VR
+        prioritizedModules = prioritizedModules.map(module => ({
+          ...module,
+          priority: module.title.includes("Journal") ? 10 : 
+                    module.title.includes("VR") ? 9 : 
+                    module.priority
+        }));
+        break;
+      case 'energetic':
+        // When energetic, suggest music and coach
+        prioritizedModules = prioritizedModules.map(module => ({
+          ...module,
+          priority: module.title.includes("Musique") ? 10 : 
+                    module.title.includes("Coach") ? 9 : 
+                    module.priority
+        }));
+        break;
+      case 'creative':
+        // When creative, suggest music and journal
+        prioritizedModules = prioritizedModules.map(module => ({
+          ...module,
+          priority: module.title.includes("Musique") ? 10 : 
+                    module.title.includes("Journal") ? 9 : 
+                    module.priority
+        }));
+        break;
+      case 'reflective':
+        // When reflective, suggest journal and coach
+        prioritizedModules = prioritizedModules.map(module => ({
+          ...module,
+          priority: module.title.includes("Journal") ? 10 : 
+                    module.title.includes("Coach") ? 9 : 
+                    module.priority
+        }));
+        break;
+      case 'anxious':
+        // When anxious, suggest scan and VR
+        prioritizedModules = prioritizedModules.map(module => ({
+          ...module,
+          priority: module.title.includes("Scan") ? 10 : 
+                    module.title.includes("VR") ? 9 : 
+                    module.priority
+        }));
+        break;
+      default:
+        // Keep default order
+        break;
+    }
+    
+    // Sort by priority (higher number = higher priority)
+    return prioritizedModules.sort((a, b) => b.priority - a.priority);
   };
-
-  if (collapsed) {
-    return (
-      <div className="my-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Modules</h2>
-          {onToggle && (
-            <Button variant="ghost" size="sm" onClick={onToggle}>
-              <ChevronDown className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
-
+  
+  const modules = getModulesByMood();
+  
   return (
-    <div className="my-8">
-      {(showHeading || onToggle) && (
-        <div className="flex justify-between items-center mb-6">
-          {showHeading && <h2 className="text-2xl font-semibold">Modules</h2>}
-          {onToggle && (
-            <Button variant="ghost" size="sm" onClick={onToggle}>
-              <ChevronUp className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
-      )}
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visibleModules.map((module) => (
-          <Card key={module.id} className="overflow-hidden hover:shadow-md transition-all">
-            <CardHeader className={cn("p-4 flex flex-row items-center gap-3", module.bgColor)}>
-              <div className={cn("p-2 rounded-full", module.bgColor)}>
-                {React.cloneElement(module.icon, { className: cn("h-5 w-5", module.color) })}
-              </div>
-              <div>
-                <CardTitle className="text-lg">{module.title}</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4">
-              <CardDescription>{module.description}</CardDescription>
-            </CardContent>
-            <CardFooter className="p-4">
-              <Button asChild variant="outline" className="w-full">
-                <Link to={isAuthenticated ? module.path : "/login"}>
-                  {isAuthenticated ? 'Accéder' : 'Connexion requise'}
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+    <section className="bg-card rounded-2xl p-6 shadow-sm">
+      <div className="flex justify-between items-center mb-6">
+        {showHeading ? (
+          <h2 className="text-2xl font-semibold">Nos modules</h2>
+        ) : (
+          <h2 className="text-xl font-semibold">Modules recommandés</h2>
+        )}
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleToggle} 
+          className="h-9 w-9 p-0"
+        >
+          {isCollapsed ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+        </Button>
       </div>
       
-      {modules.length > 3 && (
-        <div className="flex justify-center mt-6">
-          <Button variant="outline" onClick={toggleExpand}>
-            {expanded ? 'Voir moins' : 'Voir tous les modules'}
-            {expanded ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
-          </Button>
-        </div>
-      )}
-    </div>
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {modules.map((module, index) => (
+                <motion.div
+                  key={module.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <ModuleCard
+                    title={module.title}
+                    description={module.description}
+                    icon={module.icon}
+                    to={module.to}
+                    statIcon={module.statIcon}
+                    statText={module.statText}
+                    statValue={module.statValue}
+                  />
+                </motion.div>
+              ))}
+            </div>
+            
+            {selectedMood && (
+              <motion.div 
+                className="mt-6 text-center text-sm text-muted-foreground"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                Modules recommandés selon votre humeur actuelle: <span className="font-medium text-primary">{selectedMood}</span>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
   );
 };
 
