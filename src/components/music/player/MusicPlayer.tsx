@@ -14,8 +14,7 @@ const MusicPlayer: React.FC = () => {
     duration, 
     formatTime,
     handleProgressClick,
-    loadingTrack,
-    audioError
+    loadingTrack
   } = useAudioPlayer();
 
   useEffect(() => {
@@ -46,7 +45,6 @@ const MusicPlayer: React.FC = () => {
         <TrackInfo 
           currentTrack={currentTrack} 
           loadingTrack={loadingTrack}
-          audioError={audioError}
         />
         
         <ProgressBar
