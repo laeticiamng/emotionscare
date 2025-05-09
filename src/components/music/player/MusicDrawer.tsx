@@ -8,7 +8,6 @@ import {
   DrawerClose,
 } from '@/components/ui/drawer'
 import MiniPlayer from './MiniPlayer'
-import useLogger from '@/hooks/useLogger'
 
 export interface MusicDrawerProps {
   open: boolean
@@ -16,18 +15,15 @@ export interface MusicDrawerProps {
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  const logger = useLogger('MusicDrawer')
-
   if (!open) return null
 
-  logger.debug('Rendering MusicDrawer', { open })
   return (
     <Drawer open={open} onOpenChange={isOpen => !isOpen && onClose()}>
       <DrawerContent className="max-h-[80vh] focus:outline-none">
         <DrawerHeader className="flex justify-between items-center">
           <DrawerTitle>Lecteur de musique</DrawerTitle>
           <DrawerClose asChild>
-            <button onClick={onClose} type="button">✕</button>
+            <button onClick={onClose} type="button" className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-muted">✕</button>
           </DrawerClose>
         </DrawerHeader>
         <div className="px-4 pb-4">
