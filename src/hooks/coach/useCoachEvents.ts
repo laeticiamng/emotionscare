@@ -51,7 +51,7 @@ export const useCoachEvents = () => {
   );
 
   const handleCompleteChallenge = useCallback(
-    async (challengeId: string) => {
+    async (challengeId: string): Promise<boolean> => {
       try {
         await completeChallengeQuery.mutateAsync(challengeId);
         return true;
@@ -64,7 +64,7 @@ export const useCoachEvents = () => {
   );
 
   const handleSaveRelaxationSession = useCallback(
-    async (sessionData: any) => {
+    async (sessionData: any): Promise<boolean> => {
       try {
         await saveRelaxationQuery.mutateAsync(sessionData);
         return true;
@@ -77,7 +77,7 @@ export const useCoachEvents = () => {
   );
 
   const handleSaveJournalEntry = useCallback(
-    async (entryData: any) => {
+    async (entryData: any): Promise<boolean> => {
       try {
         await saveJournalEntryQuery.mutateAsync(entryData);
         return true;
