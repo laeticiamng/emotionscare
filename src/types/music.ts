@@ -1,45 +1,25 @@
 
-// Music-related types
-import { MusicTrack, MusicPlaylist, MusicEmotion } from './index';
-
-export interface AudioPlayerState {
-  isPlaying: boolean;
-  currentTime: number;
+// Music related types
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
   duration: number;
-  volume: number;
-  muted: boolean;
-  loading: boolean;
-  error: boolean | string;
+  url: string;
+  cover?: string;
+  coverUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
 }
 
-export interface TrackInfoProps {
-  currentTrack: MusicTrack;
-  loadingTrack?: boolean;
-  audioError?: boolean | string;
+export interface Playlist {
+  id: string;
+  name: string;
+  emotion?: string;
+  tracks: Track[];
 }
 
-export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  playlist: MusicPlaylist | null;
-  isPlaying: boolean;
-  volume: number;
-  isMuted: boolean;
-  currentTime: number;
-  duration: number;
-  loading: boolean;
-  error: boolean | string;
-  playTrack: (track: MusicTrack) => void;
-  playPlaylist: (playlist: MusicPlaylist, trackIndex?: number) => void;
-  loadPlaylistForEmotion: (emotion: string) => void;
-  togglePlay: () => void;
-  pause: () => void;
-  resume: () => void;
-  next: () => void;
-  previous: () => void;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-}
+export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
 
 // Re-export types for backward compatibility
-export type { MusicTrack, MusicPlaylist, MusicEmotion };
+export type { MusicTrack, MusicPlaylist } from './index';

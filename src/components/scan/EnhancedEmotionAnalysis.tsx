@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { EnhancedEmotionResult } from '@/types';
+import { EnhancedEmotionResult } from '@/types/emotion';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Check } from 'lucide-react';
 
@@ -28,9 +30,9 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({ resul
   useEffect(() => {
     if (result) {
       setAnalysisResult({
-        emotion: result.emotion,  // Make sure this property exists
+        emotion: result.emotion,
         confidence: result.confidence,
-        feedback: result.feedback || 'No specific feedback available', // Add a fallback value
+        feedback: result.feedback || 'No specific feedback available', 
         recommendations: result.recommendations || [],
       });
     }

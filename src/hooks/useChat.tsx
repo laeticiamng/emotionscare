@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { ChatMessage } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+
+// Import the chat processing hook
 import useChatProcessing from './chat/useChatProcessing';
 
 interface UseChatResult {
@@ -9,7 +11,7 @@ interface UseChatResult {
   addMessage: (text: string, sender: 'user' | 'bot') => void;
   isProcessing: boolean;
   processAndAddMessage: (text: string) => Promise<void>;
-  handleSend: (text: string) => Promise<any>; // Add this missing method
+  handleSend: (text: string) => Promise<any>; 
 }
 
 const useChat = (): UseChatResult => {
@@ -45,7 +47,7 @@ const useChat = (): UseChatResult => {
     addMessage,
     isProcessing,
     processAndAddMessage,
-    handleSend, // Include the new method in the returned object
+    handleSend,
   };
 };
 
