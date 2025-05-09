@@ -1,82 +1,73 @@
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-
-type ThemeMode = 'light' | 'dark' | 'pastel' | 'system';
+import { ThemeName } from '@/types';
 
 interface ThemeContextType {
-  theme: ThemeMode;
+  theme: ThemeName;
   toggleTheme: () => void;
-  setTheme: (theme: ThemeMode) => void;
+  setThemePreference: (theme: ThemeName) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const useTheme = (): ThemeContextType => {
+export function useTheme() {
   const context = useContext(ThemeContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
-};
+}
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  // Récupérer le thème depuis localStorage ou utiliser 'light' par défaut
-  const [theme, setThemeState] = useState<ThemeMode>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('emotionscare-theme') as ThemeMode;
-      return savedTheme || 'light';
-    }
-    return 'light';
-  });
+  const [theme, setTheme] = useState<ThemeName>('light');
 
-  // Appliquer la classe au document pour le changement de thème
+  // Load theme preference from localStorage on mount
   useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark', 'pastel');
-    
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.add(theme);
+    const storedTheme = localStorage.getItem('theme') as ThemeName | null;
+    if (storedTheme && ['light', 'dark', 'pastel'].includes(storedTheme)) {
+      setTheme(storedTheme as ThemeName);
+      document.documentElement.classList.add(storedTheme);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+      document.documentElement.classList.add('dark');
     }
+  }, []);
 
-    localStorage.setItem('emotionscare-theme', theme);
+  // Update HTML class and localStorage when theme changes
+  useEffect(() => {
+    // Remove all theme classes
+    document.documentElement.classList.remove('light', 'dark', 'pastel');
+    // Add current theme class
+    document.documentElement.classList.add(theme);
+    // Save to localStorage
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Surveiller les changements de thème système
-  useEffect(() => {
-    if (theme !== 'system') return;
-    
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      const root = window.document.documentElement;
-      root.classList.remove('light', 'dark');
-      root.classList.add(mediaQuery.matches ? 'dark' : 'light');
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
-
-  // Toggle simple entre light et dark
   const toggleTheme = () => {
-    setThemeState(prevTheme => {
-      if (prevTheme === 'light') return 'dark';
-      return 'light';
+    setTheme(currentTheme => {
+      switch (currentTheme) {
+        case 'light':
+          return 'dark';
+        case 'dark':
+          return 'pastel';
+        case 'pastel':
+          return 'light';
+        default:
+          return 'light';
+      }
     });
   };
-
-  const setTheme = (newTheme: ThemeMode) => {
-    setThemeState(newTheme);
+  
+  const setThemePreference = (newTheme: ThemeName) => {
+    setTheme(newTheme);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setThemePreference }}>
       {children}
     </ThemeContext.Provider>
   );
