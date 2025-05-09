@@ -4,18 +4,18 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
+  duration: number; // Changed from optional to required
   audioUrl?: string;
   coverUrl?: string;
   coverImage?: string;
-  duration?: number;
+  url?: string;
+  cover?: string;
+  externalUrl?: string;
   genre?: string;
   emotion?: string;
   mood?: string;
   year?: number;
-  url?: string;
-  cover?: string;
-  externalUrl?: string;
-  isPlaying?: boolean; // Added missing property
+  isPlaying?: boolean;
 }
 
 export interface MusicPlaylist {

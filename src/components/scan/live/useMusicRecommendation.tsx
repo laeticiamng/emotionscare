@@ -38,8 +38,12 @@ export const useMusicRecommendation = () => {
     const playlist = loadPlaylistForEmotion(emotion.toLowerCase());
 
     if (playlist && playlist.tracks.length > 0) {
-      // Play the first track from the playlist
-      playTrack(playlist.tracks[0]);
+      // Play the first track from the playlist, ensuring it has duration
+      const track = {
+        ...playlist.tracks[0],
+        duration: playlist.tracks[0].duration || 0
+      };
+      playTrack(track);
       
       toast({
         title: "Musique recommandée",

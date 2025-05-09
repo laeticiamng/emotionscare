@@ -13,7 +13,7 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
-  rejected: number; // Added the missing property
+  rejected: number;
   teams: Record<string, number>;
   recent_invites?: {
     email: string;

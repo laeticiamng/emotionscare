@@ -33,7 +33,8 @@ export function useMusicControls(): UseMusicControlsReturn {
     // Ensure track always has a url property
     const trackWithUrl = {
       ...track,
-      url: track.url || track.audioUrl || ''
+      url: track.url || track.audioUrl || '',
+      duration: track.duration || 0 // Ensure duration exists
     };
     playAudioTrack(trackWithUrl);
   }, [playAudioTrack]);

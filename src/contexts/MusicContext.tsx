@@ -39,9 +39,17 @@ export const useMusicMock = (): MusicContextType => {
 
   // Simulations des fonctions de lecture
   const playTrack = (track: MusicTrack) => {
-    setCurrentTrack(track);
+    // Make sure the track has all required properties
+    const validatedTrack: MusicTrack = {
+      ...track,
+      duration: track.duration || 0,
+      title: track.title || 'Unknown',
+      artist: track.artist || 'Unknown',
+      id: track.id || `track-${Date.now()}`
+    };
+    setCurrentTrack(validatedTrack);
     setIsPlaying(true);
-    console.log('Playing track:', track.title);
+    console.log('Playing track:', validatedTrack.title);
   };
 
   const pauseTrack = () => {
@@ -53,14 +61,24 @@ export const useMusicMock = (): MusicContextType => {
     if (!currentPlaylist || !currentTrack) return;
     const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
     const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
-    playTrack(currentPlaylist.tracks[nextIndex]);
+    const nextTrack = currentPlaylist.tracks[nextIndex];
+    // Ensure the track has duration
+    playTrack({
+      ...nextTrack,
+      duration: nextTrack.duration || 0
+    });
   };
 
   const previousTrack = () => {
     if (!currentPlaylist || !currentTrack) return;
     const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
     const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
-    playTrack(currentPlaylist.tracks[prevIndex]);
+    const prevTrack = currentPlaylist.tracks[prevIndex];
+    // Ensure the track has duration
+    playTrack({
+      ...prevTrack,
+      duration: prevTrack.duration || 0
+    });
   };
 
   const loadPlaylistById = (id: string) => {
@@ -68,7 +86,11 @@ export const useMusicMock = (): MusicContextType => {
     if (playlist) {
       setCurrentPlaylist(playlist);
       if (playlist.tracks.length > 0) {
-        setCurrentTrack(playlist.tracks[0]);
+        // Ensure the track has duration
+        playTrack({
+          ...playlist.tracks[0],
+          duration: playlist.tracks[0].duration || 0
+        });
       }
     }
   };
@@ -111,6 +133,7 @@ export const useMusicMock = (): MusicContextType => {
     setPlaylists(prev => [...prev, mockPlaylist]);
     setCurrentPlaylist(mockPlaylist);
     if (mockPlaylist.tracks.length > 0) {
+      // Ensure the track has duration
       setCurrentTrack(mockPlaylist.tracks[0]);
     }
     

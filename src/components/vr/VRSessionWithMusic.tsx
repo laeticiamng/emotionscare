@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,10 +57,10 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
       
       // Autoplay first track if a playlist is loaded
       if (playlist && playlist.tracks.length > 0 && !currentTrack) {
-        // Ensure track has required audioUrl property
-        const track: MusicTrack = {
+        const track = {
           ...playlist.tracks[0],
-          audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].url || ''
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
+          duration: playlist.tracks[0].duration || 0 // Ensure duration is provided
         };
         playTrack(track);
       }
