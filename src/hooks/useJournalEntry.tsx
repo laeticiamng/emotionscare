@@ -3,12 +3,15 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveJournalEntry } from '@/lib/journalService';
 import { useToast } from '@/hooks/use-toast';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 export function useJournalEntry() {
   const [isSaving, setIsSaving] = useState(false);
   const [backgroundGradient, setBackgroundGradient] = useState('');
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
   const setRandomGradient = () => {
     // Set a random gradient from a set of calming gradients
@@ -36,12 +39,25 @@ export function useJournalEntry() {
     try {
       const enrichedData = {
         ...entryData,
-        user_id: user.id
+        user_id: user.id,
+        emotion: entryData.emotion || currentEmotion
       };
       
       const result = await saveJournalEntry(enrichedData);
+      
+      // Suggest music based on the entry's emotion
+      if (enrichedData.emotion) {
+        activateMusicForEmotion({
+          emotion: enrichedData.emotion,
+          intensity: enrichedData.intensity || 50
+        });
+      }
+      
       console.log('Journal entry saved:', result);
-      // We don't navigate away immediately because the form will show the success animation
+      toast({
+        title: "Journal enregistré",
+        description: "Votre note a été sauvegardée avec succès"
+      });
     } catch (error) {
       console.error('Error saving journal entry:', error);
       toast({
@@ -49,6 +65,7 @@ export function useJournalEntry() {
         description: "Impossible d'enregistrer votre entrée de journal",
         variant: "destructive"
       });
+    } finally {
       setIsSaving(false);
     }
   };
@@ -56,6 +73,8 @@ export function useJournalEntry() {
   return {
     isSaving,
     backgroundGradient,
+    currentEmotion,
+    setCurrentEmotion,
     setRandomGradient,
     handleSave
   };

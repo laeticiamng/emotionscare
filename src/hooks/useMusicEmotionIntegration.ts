@@ -2,28 +2,23 @@
 import { useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import type { EmotionResult } from '@/types';
 import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
-import { EmotionToMusicMap } from '@/types/audio-player';
+
+export interface EmotionResult {
+  emotion: string;
+  intensity?: number;
+  confidence?: number;
+}
+
+export interface EmotionToMusicMap {
+  [key: string]: string;
+}
 
 export function useMusicEmotionIntegration() {
-  const { loadPlaylistForEmotion, playTrack, currentPlaylist, currentTrack, isPlaying } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, currentPlaylist, currentTrack, isPlaying, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   
-  // Define emotion to music mapping
-  const EMOTION_TO_MUSIC_MAP: EmotionToMusicMap = {
-    'happy': 'happy',
-    'sad': 'calm',
-    'angry': 'calm',
-    'anxious': 'calm',
-    'neutral': 'neutral',
-    'calm': 'calm',
-    'stressed': 'calm',
-    'energetic': 'energetic',
-    'focused': 'focused',
-    'default': 'neutral'
-  };
-  
+  // Activate music based on detected emotion
   const activateMusicForEmotion = useCallback((emotionResult: EmotionResult) => {
     if (!emotionResult.emotion) return;
     
@@ -33,7 +28,7 @@ export function useMusicEmotionIntegration() {
     const playlist = loadPlaylistForEmotion(musicType);
     
     if (playlist && playlist.tracks.length > 0) {
-      // If no music is playing, start playing, ensuring required properties are provided
+      // If no music is playing, start playing
       if (!currentTrack || !isPlaying) {
         const track = {
           ...playlist.tracks[0],
@@ -43,16 +38,41 @@ export function useMusicEmotionIntegration() {
         playTrack(track);
       }
       
-      // Notify the user
+      // Open the drawer with the music player
+      setOpenDrawer(true);
+      
+      // Notify the user about the music recommendation
       toast({
-        title: "Music adapted to your emotion",
-        description: `Playlist '${musicType}' available in the music player`
+        title: "Musique adaptée à votre émotion",
+        description: `Une playlist "${musicType}" correspondant à votre émotion "${emotionKey}" est disponible.`
       });
+      
+      return playlist;
     }
-  }, [loadPlaylistForEmotion, playTrack, currentTrack, isPlaying, toast]);
+    
+    return null;
+  }, [loadPlaylistForEmotion, playTrack, currentTrack, isPlaying, setOpenDrawer, toast]);
+  
+  // Get a description of how music can help with a specific emotion
+  const getEmotionMusicDescription = useCallback((emotion: string): string => {
+    const descriptions: Record<string, string> = {
+      happy: "Amplifiez votre joie avec des mélodies qui résonnent avec votre énergie positive.",
+      sad: "Des compositions apaisantes pour accompagner vos émotions et transformer la tristesse en réflexion.",
+      calm: "Maintenez votre sérénité avec des sons qui stabilisent votre paix intérieure.",
+      anxious: "Des rythmes doux pour apaiser l'anxiété et ramener l'esprit au moment présent.",
+      energetic: "Des tempos dynamiques pour canaliser votre énergie et maintenir votre enthousiasme.",
+      focused: "Des compositions minimalistes pour augmenter votre concentration et productivité.",
+      stressed: "Des mélodies réconfortantes pour réduire le stress et retrouver l'équilibre.",
+      default: "Une musique adaptée à votre état émotionnel pour vous accompagner dans ce moment."
+    };
+    
+    return descriptions[emotion.toLowerCase()] || descriptions.default;
+  }, []);
   
   return {
     activateMusicForEmotion,
-    EMOTION_TO_MUSIC_MAP
+    getEmotionMusicDescription
   };
 }
+
+export default useMusicEmotionIntegration;
