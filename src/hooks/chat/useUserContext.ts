@@ -1,64 +1,50 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserContext } from '@/types/chat';
 
-interface UseUserContextResult {
-  userContext: UserContext | null;
-  isLoading: boolean;
-  error: string | null;
+interface UserContextData {
+  preferences?: Record<string, any>;
+  recentEmotions?: string[];
+  recentActivities?: string[];
+  userHistory?: Record<string, any>;
 }
 
-const useUserContext = (): UseUserContextResult => {
-  const [userContext, setUserContext] = useState<UserContext | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+const useUserContext = () => {
   const { user } = useAuth();
+  const [userContext, setUserContext] = useState<UserContextData>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserContext = async () => {
-      setIsLoading(true);
-      setError(null);
-
+      setLoading(true);
       try {
-        // Simulate fetching user context from an API
-        // Replace this with your actual API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Mock user context data
-        const mockUserContext: UserContext = {
-          preferences: {
-            theme: 'light',
-            notifications_enabled: true,
-          },
-          recentEmotions: ['happy', 'calm'],
-          recentActivities: ['meditation', 'journaling'],
-          userHistory: {
-            moodTrends: 'positive',
-            activityLevels: 'moderate',
-          },
-        };
-
-        setUserContext(mockUserContext);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch user context');
+        if (user?.id) {
+          // Mock data for now, in a real app this would come from an API
+          setUserContext({
+            preferences: user.preferences || {},
+            recentEmotions: ['calm', 'happy', 'focused'],
+            recentActivities: ['meditation', 'journaling', 'breathing exercise'],
+            userHistory: {
+              lastInteraction: new Date().toISOString(),
+              frequentTopics: ['stress', 'sleep', 'productivity'],
+            }
+          });
+        } else {
+          setUserContext({});
+        }
+      } catch (error) {
+        console.error('Error fetching user context:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    if (user) {
-      fetchUserContext();
-    } else {
-      setIsLoading(false);
-      setError('User not authenticated');
-    }
+    fetchUserContext();
   }, [user]);
 
   return {
     userContext,
-    isLoading,
-    error,
+    loading,
   };
 };
 

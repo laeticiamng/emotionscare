@@ -10,8 +10,8 @@ export interface Post {
   is_anonymous: boolean;
   tags?: string[];
   comments?: Comment[];
-  media_url?: string; // Add missing property
-  image_url?: string; // Add missing property
+  media_url?: string;
+  image_url?: string;
 }
 
 export interface Comment {
@@ -33,8 +33,8 @@ export interface Group {
   members_count: number;
   image_url?: string;
   tags?: string[];
-  topic?: string; // Add missing property
-  members?: User[]; // Add missing property
+  topic?: string;
+  members?: User[];
 }
 
 export interface BuddyRequest {
