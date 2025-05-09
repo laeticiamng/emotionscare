@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThemeName } from '@/themes/theme';
+import { ThemeName } from '@/types';
 
 interface ThemeSwitcherProps {
   variant?: 'default' | 'outline' | 'ghost';
@@ -30,7 +30,16 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   const { theme, setThemePreference } = useTheme();
 
   // Icon to display based on current theme
-  const ThemeIcon = theme === 'dark' ? Moon : theme === 'pastel' ? Palette : Sun;
+  const ThemeIcon = () => {
+    switch (theme) {
+      case 'dark':
+        return <Moon className="h-[1.3rem] w-[1.3rem]" />;
+      case 'pastel':
+        return <Palette className="h-[1.3rem] w-[1.3rem]" />;
+      default: // light
+        return <Sun className="h-[1.3rem] w-[1.3rem]" />;
+    }
+  };
   
   // Text to display based on current theme
   const themeText = theme === 'dark' ? 'Sombre' : theme === 'pastel' ? 'Pastel' : 'Clair';
@@ -48,7 +57,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           size={size} 
           className="focus-premium hover-lift shadow-sm"
         >
-          <ThemeIcon className="h-[1.3rem] w-[1.3rem]" />
+          <ThemeIcon />
           {showLabel && <span className="ml-2 font-medium">{themeText}</span>}
           <span className="sr-only">Changer de thème</span>
         </Button>

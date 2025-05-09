@@ -29,7 +29,7 @@ export interface User {
 
 // User preferences
 export interface UserPreferences {
-  theme: ThemeName;
+  theme: ThemeName | 'system';
   language?: string;
   privacy_level?: string;
   share_data_with_coach?: boolean;
@@ -104,7 +104,7 @@ export interface Emotion {
 }
 
 // Theme types
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'system';
+export type ThemeName = 'light' | 'dark' | 'pastel';
 
 // Mood data for charts
 export interface MoodData {
@@ -185,6 +185,7 @@ export interface InvitationStats {
   expired: number;
   sent?: number;
   teams?: any;
+  recent_invites?: any[];
 }
 
 // Badge type
@@ -201,6 +202,8 @@ export interface Badge {
   threshold?: number;
   icon_url?: string;
   image_url?: string;
+  user_id?: string;
+  category?: string;
 }
 
 // Type pour la carte VR dans le dashboard
@@ -213,4 +216,31 @@ export interface VRCardProps {
   preview_url: string;
   description: string;
   is_audio_only: boolean;
+}
+
+// Challenge type
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  completed: boolean;
+  progress?: number;
+  maxProgress?: number;
+  deadline?: string;
+  category?: string;
+}
+
+// Report type
+export interface Report {
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  status: string;
+  summary: string;
+  downloadUrl?: string;
+  generatedBy?: string;
+  fileSize?: string;
+  lastViewed?: string;
 }

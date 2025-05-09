@@ -35,7 +35,7 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
     const musicType = emotion.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
-    setOpenDrawer(true);
+    safeOpen(setOpenDrawer(true));
     
     toast({
       title: "Musique recommandée activée",

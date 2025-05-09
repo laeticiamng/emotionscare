@@ -6,6 +6,7 @@ import { Music, Loader2, PlayCircle } from 'lucide-react';
 import { EmotionResult } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
+import { safeOpen } from '@/lib/utils';
 
 interface EmotionBasedMusicRecommendationProps {
   emotionResult: EmotionResult;
@@ -18,7 +19,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
   variant = 'compact',
   isLoading = false
 }) => {
-  const { loadPlaylistForEmotion, playTrack, openDrawer, setOpenDrawer } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   
   const handlePlayMusic = () => {
@@ -27,9 +28,9 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
     const emotion = emotionResult.emotion.toLowerCase();
     const playlist = loadPlaylistForEmotion(emotion);
     
-    if (playlist && playlist.tracks.length > 0) {
+    if (playlist && playlist.tracks && playlist.tracks.length > 0) {
       playTrack(playlist.tracks[0]);
-      setOpenDrawer(true);
+      safeOpen(setOpenDrawer(true));
       
       toast({
         title: "Musique lancée",

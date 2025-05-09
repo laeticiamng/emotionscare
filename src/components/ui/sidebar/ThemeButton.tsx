@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Palette } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ThemeButtonProps {
@@ -11,6 +11,29 @@ interface ThemeButtonProps {
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const { theme, toggleTheme } = useTheme();
 
+  // Select the appropriate icon and text based on current theme
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'dark':
+        return <Moon className="h-4 w-4" />;
+      case 'pastel':
+        return <Palette className="h-4 w-4" />;
+      default: // 'light'
+        return <Sun className="h-4 w-4" />;
+    }
+  };
+
+  const getThemeText = () => {
+    switch (theme) {
+      case 'dark':
+        return 'Mode clair';
+      case 'pastel':
+        return 'Mode sombre';
+      default: // 'light'
+        return 'Mode pastel';
+    }
+  };
+
   return (
     <Button
       variant="ghost"
@@ -19,17 +42,8 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
       className={`${collapsed ? 'w-10' : 'w-full justify-start'}`}
       aria-label="Changer le thème"
     >
-      {theme === 'dark' ? (
-        <>
-          <Sun className="h-4 w-4" />
-          {!collapsed && <span className="ml-2">Mode clair</span>}
-        </>
-      ) : (
-        <>
-          <Moon className="h-4 w-4" />
-          {!collapsed && <span className="ml-2">Mode sombre</span>}
-        </>
-      )}
+      {getThemeIcon()}
+      {!collapsed && <span className="ml-2">{getThemeText()}</span>}
     </Button>
   );
 };

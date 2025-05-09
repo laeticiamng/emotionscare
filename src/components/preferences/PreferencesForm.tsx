@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPreferences, ThemeName } from '@/types';
 
-// Version étendue des préférences utilisateur avec des options supplémentaires
-interface ExtendedUserPreferences extends Omit<UserPreferences, 'theme'> {
+// User preferences type for the form
+interface FormPreferences extends Omit<UserPreferences, 'theme'> {
   theme: ThemeName | 'system';
   marketing_emails?: boolean;
   feature_announcements?: boolean;
@@ -22,23 +22,23 @@ const PreferencesForm: React.FC<{
   const [saving, setSaving] = useState(false);
 
   // Adapter les préférences de base pour le formulaire
-  const extendedPreferences: ExtendedUserPreferences = {
+  const formPreferences: FormPreferences = {
     ...preferences,
     marketing_emails: preferences.notifications?.email || false,
     feature_announcements: preferences.notifications?.push || false
   };
 
-  const { register, handleSubmit, setValue, watch } = useForm<ExtendedUserPreferences>({
-    defaultValues: extendedPreferences
+  const { register, handleSubmit, setValue, watch } = useForm<FormPreferences>({
+    defaultValues: formPreferences
   });
 
-  const onSubmit = async (data: ExtendedUserPreferences) => {
+  const onSubmit = async (data: FormPreferences) => {
     setSaving(true);
     
     // Convertir les préférences étendues en préférences standard
     const standardPreferences: UserPreferences = {
       ...data,
-      theme: data.theme as ThemeName, // Conversion sécurisée car ThemeName accepte maintenant 'system'
+      theme: data.theme,
       notifications: {
         email: !!data.marketing_emails,
         push: !!data.feature_announcements,
@@ -73,7 +73,7 @@ const PreferencesForm: React.FC<{
             <label className="text-sm font-medium">Thème</label>
             <Select
               defaultValue={preferences.theme}
-              onValueChange={(value) => setValue('theme', value as ThemeName)}
+              onValueChange={(value) => setValue('theme', value as ThemeName | 'system')}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Choisir un thème" />
