@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react'
 import { Outlet, Link, useNavigate } from 'react-router-dom'
-import MusicDrawer from './components/music/player/MusicDrawer'
+import MusicDrawer from '@/components/music/player/MusicDrawer'
 import { useAuth } from '@/contexts/AuthContext'
-import { Button } from './components/ui/button'
+import { Button } from '@/components/ui/button'
 import { 
   Headphones, 
   Menu, 
