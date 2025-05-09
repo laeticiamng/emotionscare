@@ -7,4 +7,3 @@ export { default as TrackInfo } from './TrackInfo';
 export { default as VolumeControl } from './VolumeControl';
 export { default as MusicDrawer } from './MusicDrawer';
 export { default as MiniPlayer } from './MiniPlayer';
-

@@ -8,7 +8,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from '@/components/ui/drawer'
-import MusicPlayer from './MusicPlayer'
+import MiniPlayer from './MiniPlayer'
 import useLogger from '@/hooks/useLogger'
 
 export interface MusicDrawerProps {
@@ -26,7 +26,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
     console.log('→ DrawerHeader   :', typeof DrawerHeader, DrawerHeader)
     console.log('→ DrawerTitle    :', typeof DrawerTitle, DrawerTitle)
     console.log('→ DrawerClose    :', typeof DrawerClose, DrawerClose)
-    console.log('→ MusicPlayer    :', typeof MusicPlayer, MusicPlayer)
+    console.log('→ MiniPlayer     :', typeof MiniPlayer, MiniPlayer)
     console.groupEnd()
   }, [])
 
@@ -43,7 +43,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
           </DrawerClose>
         </DrawerHeader>
         <div className="px-4 pb-4">
-          <MusicPlayer />
+          <MiniPlayer />
         </div>
       </DrawerContent>
     </Drawer>
