@@ -1,17 +1,15 @@
 
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, MessageCircle, Loader2 } from 'lucide-react';
+import { Sparkles, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useApiConnection } from '@/hooks/dashboard/useApiConnection';
 import { useCoachDashboard } from '@/hooks/dashboard/useCoachDashboard';
 import QuickSuggestions from './coach/QuickSuggestions';
 import CoachRecommendations from './coach/CoachRecommendations';
-
-// Import ChatInterface component using standard import
-import ChatInterface from '@/components/chat/ChatInterface';
+import MiniCoach from '@/components/coach/MiniCoach';
 
 interface CoachAssistantProps {
   className?: string;
@@ -61,13 +59,12 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
       
       <CardContent className="flex-1 p-0 flex flex-col">
         <div className="flex-1 min-h-[200px]">
-          <Suspense fallback={
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            </div>
-          }>
-            <ChatInterface standalone={false} />
-          </Suspense>
+          <MiniCoach 
+            quickQuestions={[
+              "Comment gérer mon stress ?",
+              "Exercice de respiration"
+            ]}
+          />
         </div>
         
         <CoachRecommendations
