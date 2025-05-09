@@ -9,7 +9,7 @@ interface AuthContextProps {
   isAuthenticated: boolean; 
   login: (email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   updateUser?: (userData: Partial<User>) => void;
   setUser?: (user: User | null) => void;
 }
@@ -78,8 +78,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const loadUser = async () => {
       setIsLoading(true);
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
-        setUser(user as unknown as User);
+        // Commenté pour l'instant car non fonctionnel sans backend
+        // const { data: { user }, error } = await supabase.auth.getUser();
+        // setUser(user as unknown as User);
+
+        // Pour la démo, on n'utilise pas le user de Supabase
+        setUser(null);
       } catch (error) {
         console.error("Failed to load user:", error);
       } finally {
@@ -93,11 +97,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
-      // Updated to match current Supabase API
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      setUser(data.user as unknown as User);
-      return data.user as unknown as User;
+      // Simulate authentication for demo
+      let mockUser;
+      
+      if (email === 'admin@example.com' && password === 'admin') {
+        mockUser = MOCK_ADMIN_USER;
+      } else if (email === 'user@example.com' && password === 'password') {
+        mockUser = MOCK_USER;
+      } else {
+        throw new Error("Identifiants invalides. Utilisez admin@example.com/admin ou user@example.com/password");
+      }
+      
+      setUser(mockUser);
+      return mockUser;
+      
+      // Code réel pour Supabase (commenté pour la démo)
+      // const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      // if (error) throw error;
+      // setUser(data.user as unknown as User);
+      // return data.user as unknown as User;
     } catch (error: any) {
       console.error("Login failed:", error);
       throw error;
@@ -109,8 +127,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     setIsLoading(true);
     try {
-      await supabase.auth.signOut();
+      // Pour l'instant on utilise juste un state local
       setUser(null);
+      
+      // Version réelle avec Supabase
+      // await supabase.auth.signOut();
+      // setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
@@ -118,12 +140,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Alias for logout to match the sign-out terminology
+  // Alias pour logout pour correspondre à la terminologie sign-out
   const signOut = async () => {
     await logout();
   };
   
-  // User update function
+  // Fonction de mise à jour de l'utilisateur
   const updateUser = (userData: Partial<User>) => {
     if (user) {
       setUser({ ...user, ...userData });

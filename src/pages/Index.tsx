@@ -4,11 +4,13 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Shield, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 import WelcomeHero from '@/components/home/WelcomeHero';
 import ModulesSection from '@/components/home/ModulesSection';
 
 const Index = () => {
   const { user, isAuthenticated } = useAuth();
+  const isAdmin = user ? isAdminRole(user.role) : false;
   
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -42,6 +44,35 @@ const Index = () => {
         </div>
       )}
       
+      {isAuthenticated && (
+        <div className="my-8 bg-primary/10 rounded-xl p-6 shadow-sm">
+          <div className="text-center mb-4">
+            <h2 className="text-2xl font-bold">Votre espace personnel</h2>
+            <p className="text-muted-foreground mt-2">
+              Accédez à votre tableau de bord pour explorer toutes les fonctionnalités
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
+            <Button asChild size="lg" className="w-full">
+              <Link to={isAdmin ? "/admin" : "/dashboard"} className="flex items-center justify-center gap-2">
+                {isAdmin ? (
+                  <>
+                    <Shield className="h-5 w-5" />
+                    Dashboard Administration
+                  </>
+                ) : (
+                  <>
+                    <User className="h-5 w-5" />
+                    Mon tableau de bord
+                  </>
+                )}
+              </Link>
+            </Button>
+          </div>
+        </div>
+      )}
+      
       <div className="my-16">
         <ModulesSection showHeading={true} />
       </div>
@@ -60,7 +91,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             {isAuthenticated ? (
               <Button asChild size="lg" className="gap-2">
-                <Link to="/dashboard">
+                <Link to={isAdmin ? "/admin" : "/dashboard"}>
                   Accéder au tableau de bord
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Link>
