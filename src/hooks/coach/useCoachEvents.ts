@@ -53,6 +53,8 @@ export const useCoachEvents = () => {
   const handleCompleteChallenge = useCallback(
     async (challengeId: string): Promise<boolean> => {
       try {
+        // The issue is here - we're passing challengeId, but the function might expect void
+        // Let's ensure the type matches by using the correct interface
         await completeChallengeQuery.mutateAsync(challengeId);
         return true;
       } catch (error) {
