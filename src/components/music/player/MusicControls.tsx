@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from 'lucide-react';
