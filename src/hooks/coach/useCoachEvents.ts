@@ -30,21 +30,21 @@ export const useCoachEvents = () => {
 
   // Create safe mutations for each function
   const completeChallengeQuery = createSafeMutation(
-    async (challengeId: string) => {
+    async (challengeId: string): Promise<boolean> => {
       await completeChallenge(challengeId);
       return true; // Return a consistent value for both real and mock mutations
     }
   );
 
   const saveRelaxationQuery = createSafeMutation(
-    async (sessionData: any) => {
+    async (sessionData: any): Promise<boolean> => {
       await saveRelaxationSession(sessionData);
       return true; // Return a consistent value
     }
   );
 
   const saveJournalEntryQuery = createSafeMutation(
-    async (entryData: any) => {
+    async (entryData: any): Promise<boolean> => {
       await saveJournalEntry(entryData);
       return true; // Return a consistent value
     }
