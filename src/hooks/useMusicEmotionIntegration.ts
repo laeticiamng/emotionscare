@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
+import { mapEmotionToMusicType, EMOTION_TO_MUSIC_MAP } from '@/services/music/emotion-music-mapping';
 
 export interface EmotionResult {
   emotion: string;
@@ -71,7 +71,8 @@ export function useMusicEmotionIntegration() {
   
   return {
     activateMusicForEmotion,
-    getEmotionMusicDescription
+    getEmotionMusicDescription,
+    EMOTION_TO_MUSIC_MAP
   };
 }
 

@@ -34,7 +34,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   
   return (
     <DrawerComponent open={isOpen} onOpenChange={handleOpenChange}>
-      <ContentComponent side={isMobile ? undefined : "right"} className="p-0">
+      <ContentComponent className="p-0">
         <SheetHeader className="p-4 border-b">
           <div className="flex items-center justify-between">
             <SheetTitle>

@@ -11,6 +11,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import VRMusicTrackInfo from './VRMusicTrackInfo';
 import { formatTime } from '@/lib/utils';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
 
 interface VRSessionWithMusicProps {
   template: VRSessionTemplate;
@@ -47,13 +48,13 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   
   // Music integration
   const { loadPlaylistForEmotion, currentTrack, playTrack } = useMusic();
-  const { EMOTION_TO_MUSIC_MAP, activateMusicForEmotion } = useMusicEmotionIntegration();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
   
   // Load music based on emotion when component mounts
   useEffect(() => {
     if (emotion) {
       const emotionKey = emotion.toLowerCase();
-      const musicType = EMOTION_TO_MUSIC_MAP[emotionKey] || EMOTION_TO_MUSIC_MAP.default;
+      const musicType = mapEmotionToMusicType(emotionKey);
       const playlist = loadPlaylistForEmotion(musicType);
       
       // Autoplay first track if a playlist is loaded
@@ -66,7 +67,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
         playTrack(track);
       }
     }
-  }, [emotion, loadPlaylistForEmotion, playTrack, EMOTION_TO_MUSIC_MAP, currentTrack]);
+  }, [emotion, loadPlaylistForEmotion, playTrack, currentTrack]);
   
   // Handle video playback
   useEffect(() => {

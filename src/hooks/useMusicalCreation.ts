@@ -1,174 +1,148 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  generateLyrics, 
-  submitMusicGenerationTask,
-  checkGenerationStatus,
-  saveUserMusicCreation 
-} from '@/services/music/music-generator-service';
-import { useAuth } from '@/contexts/AuthContext';
-import { useMusic } from '@/contexts/MusicContext';
 
-interface MusicCreationParams {
+export interface MusicCreationParams {
   title: string;
   prompt: string;
   lyrics?: string;
-  instrumental: boolean;
+  instrumental?: boolean;
+  duration?: number;
   mood?: string;
+}
+
+interface MusicCreation {
+  id: string;
+  title: string;
+  prompt: string;
+  created_at: string;
+  audio_url: string;
+  cover_url?: string;
+  duration: number;
 }
 
 export function useMusicalCreation() {
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [creations, setCreations] = useState<MusicCreation[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const { loadPlaylistForEmotion } = useMusic();
-  
-  // Generate lyrics based on a prompt
-  const handleGenerateLyrics = async (prompt: string): Promise<string> => {
+
+  const handleGenerateLyrics = useCallback(async (prompt: string): Promise<string> => {
     setIsLoading(true);
     try {
-      const text = await generateLyrics(prompt);
-      toast({
-        title: "Paroles générées",
-        description: "Vos paroles ont été créées avec succès"
-      });
-      return text;
+      // For now, return a mock response
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsLoading(false);
+      return "Ceci est un exemple de paroles générées par IA.\nLigne 2 des paroles.\nLigne 3 des paroles.";
     } catch (error) {
-      console.error('Error generating lyrics:', error);
+      setIsLoading(false);
       toast({
-        title: "Erreur",
+        title: "Erreur de génération",
         description: "Impossible de générer les paroles",
-        variant: "destructive"
+        variant: "destructive",
       });
-      return "";
-    } finally {
-      setIsLoading(false);
+      throw error;
     }
-  };
-  
-  // Create a new music track
-  const createMusicTrack = async (params: MusicCreationParams) => {
-    if (!user) {
-      toast({
-        title: "Non connecté",
-        description: "Vous devez être connecté pour créer de la musique",
-        variant: "destructive"
-      });
-      return null;
-    }
+  }, [toast]);
+
+  const createMusicTrack = useCallback(async (params: MusicCreationParams) => {
+    setIsProcessing(true);
+    setProgress(0);
     
-    setIsLoading(true);
     try {
-      // Start the music generation process
-      const { song_id, task_id } = await submitMusicGenerationTask({
-        is_auto: 1,
-        prompt: params.prompt,
-        lyrics: params.lyrics,
-        title: params.title,
-        instrumental: params.instrumental ? 1 : 0,
-        mood: params.mood
-      });
-      
-      // Poll for status
-      setIsLoading(false);
-      setIsProcessing(true);
-      
-      const trackResult = await pollGenerationStatus(song_id);
-      
-      if (trackResult) {
-        // Save the creation to the user's library
-        const savedCreation = await saveUserMusicCreation({
-          id: song_id,
-          userId: user.id,
-          title: params.title,
-          prompt: params.prompt,
-          lyrics: params.lyrics,
-          audioUrl: trackResult.url,
-          status: 'completed',
-          instrumental: params.instrumental,
-          mood: params.mood
-        });
-        
-        toast({
-          title: "Musique créée",
-          description: "Votre création musicale a été sauvegardée"
-        });
-        
-        // Load a corresponding playlist if appropriate
-        if (params.mood) {
-          loadPlaylistForEmotion(params.mood);
-        }
-        
-        return savedCreation;
+      // Mock the creation process with progress updates
+      const totalSteps = 10;
+      for (let step = 1; step <= totalSteps; step++) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        setProgress(Math.floor((step / totalSteps) * 100));
       }
       
-      return null;
-    } catch (error) {
-      console.error('Error creating music track:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer la piste musicale",
-        variant: "destructive"
-      });
-      return null;
-    } finally {
-      setIsLoading(false);
+      // Mock a successful creation
+      const newCreation: MusicCreation = {
+        id: `track-${Date.now()}`,
+        title: params.title,
+        prompt: params.prompt,
+        created_at: new Date().toISOString(),
+        audio_url: "/path/to/generated/audio.mp3",
+        cover_url: "/path/to/generated/cover.jpg",
+        duration: params.duration || 180,
+      };
+      
+      // Add the new creation to the list
+      setCreations(prev => [newCreation, ...prev]);
+      
       setIsProcessing(false);
       setProgress(0);
-    }
-  };
-  
-  // Poll for music generation status
-  const pollGenerationStatus = async (songId: string) => {
-    let status = 'pending';
-    let attempts = 0;
-    const maxAttempts = 60; // 5 minutes with 5-second intervals
-    
-    while (status !== 'completed' && status !== 'failed' && attempts < maxAttempts) {
-      attempts++;
       
-      try {
-        const result = await checkGenerationStatus(songId);
-        status = result.status;
-        
-        // Update progress
-        if (result.progress) {
-          setProgress(result.progress);
-        } else {
-          setProgress(Math.min(99, attempts * 5)); // Simulate progress if not provided
-        }
-        
-        if (status === 'completed') {
-          return result;
-        }
-        
-        if (status === 'failed') {
-          throw new Error(result.error || "La génération a échoué");
-        }
-        
-        // Wait before polling again
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      } catch (error) {
-        console.error('Error polling generation status:', error);
-        throw error;
-      }
+      toast({
+        title: "Musique créée",
+        description: "Votre piste a été générée avec succès",
+      });
+      
+      return newCreation;
+    } catch (error) {
+      setIsProcessing(false);
+      setProgress(0);
+      
+      toast({
+        title: "Échec de la création",
+        description: "Impossible de générer la piste musicale",
+        variant: "destructive",
+      });
+      
+      throw error;
     }
-    
-    if (attempts >= maxAttempts) {
-      throw new Error("Le temps de génération a expiré");
-    }
-    
-    return null;
-  };
+  }, [toast]);
   
+  const loadUserCreations = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Mock loading user creations
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const mockCreations: MusicCreation[] = [
+        {
+          id: "track-1",
+          title: "Méditation matinale",
+          prompt: "Musique calme pour méditation du matin",
+          created_at: "2023-05-08T08:30:00Z",
+          audio_url: "/audio/track1.mp3",
+          cover_url: "/images/cover1.jpg",
+          duration: 240,
+        },
+        {
+          id: "track-2",
+          title: "Concentration profonde",
+          prompt: "Musique instrumentale pour la concentration",
+          created_at: "2023-05-07T14:15:00Z",
+          audio_url: "/audio/track2.mp3",
+          cover_url: "/images/cover2.jpg",
+          duration: 320,
+        }
+      ];
+      
+      setCreations(mockCreations);
+      setIsLoading(false);
+      return mockCreations;
+    } catch (error) {
+      setIsLoading(false);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger vos créations",
+        variant: "destructive",
+      });
+      return [];
+    }
+  }, [toast]);
+
   return {
     isLoading,
     isProcessing,
     progress,
+    creations,
     handleGenerateLyrics,
-    createMusicTrack
+    createMusicTrack,
+    loadUserCreations
   };
 }

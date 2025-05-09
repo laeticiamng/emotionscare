@@ -93,7 +93,7 @@ const JournalNewPage: React.FC = () => {
             <Music className="h-4 w-4" />
           </Button>
         </MusicDrawerTrigger>
-        <MusicDrawerContentComponent side="right" className="sm:max-w-md">
+        <MusicDrawerContentComponent className="sm:max-w-md">
           <div className="p-6">
             <h2 className="text-2xl font-semibold mb-6">Musique Thérapeutique</h2>
             <MusicPlayer />
