@@ -21,7 +21,7 @@ export const useCoachEvents = () => {
       return {
         mutateAsync: async () => {
           console.warn('QueryClient not available, using fallback mode');
-          return true;
+          return true; // Return true instead of undefined to match the return type of the real mutations
         },
         isPending: false,
       };
