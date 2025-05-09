@@ -15,7 +15,7 @@ const MusicPlayer: React.FC = () => {
     formatTime,
     handleProgressClick,
     loadingTrack,
-    error  // On garde le nom original
+    error  // We keep the original error
   } = useAudioPlayer();
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const MusicPlayer: React.FC = () => {
         <TrackInfo 
           currentTrack={currentTrack} 
           loadingTrack={loadingTrack}
-          audioError={!!error}  // Conversion de Error|null en boolean
+          audioError={!!error}  // Convert Error|null to boolean
         />
         
         <ProgressBar
