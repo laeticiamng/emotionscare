@@ -33,6 +33,9 @@ import CoachChatPage from './pages/CoachChatPage'
 // Pages VR
 import VRPage from './pages/VRPage'
 
+// Journal
+import JournalNewPage from './pages/JournalNewPage'
+
 // Admin
 import AdminDashboardPage from './pages/AdminDashboardPage'
 
@@ -43,7 +46,7 @@ function App() {
         <MusicProvider>
           <Routes>
             {/* Structure principale avec le Shell */}
-            <Route path="/" element={<Shell />}>
+            <Route element={<Shell />}>
               {/* Page d'accueil */}
               <Route index element={<Index />} />
               
@@ -61,6 +64,7 @@ function App() {
                   {/* Routes pour les modules utilisateurs */}
                   <Route path="/scan" element={<ScanPage />} />
                   <Route path="/journal" element={<JournalPage />} />
+                  <Route path="/journal/new" element={<JournalNewPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
                   <Route path="/vr" element={<VRPage />} />
 

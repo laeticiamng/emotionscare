@@ -1,236 +1,126 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Calendar, Bell, BellOff } from "lucide-react";
+import React, { useState } from 'react';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
-export const NotificationSettings = () => {
+const NotificationSettings = () => {
   const { toast } = useToast();
   const [settings, setSettings] = useState({
-    enableAllNotifications: true,
-    emailNotifications: true,
-    inAppNotifications: true,
-    dailyDigest: false,
-    weeklyDigest: false,
-    scanReminders: true,
-    journalReminders: true,
-    achievementNotifications: true,
-    teamUpdates: true,
-    silenceMode: false
+    email: true,
+    push: true,
+    sms: false,
+    weeklyReport: true,
+    activityReminders: true,
+    wellbeingTips: true,
+    marketingEmails: false
   });
 
-  // Charger les préférences depuis localStorage au montage
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('notification_preferences');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(prev => ({ ...prev, ...parsed }));
-      } catch (error) {
-        console.error("Erreur lors du chargement des préférences:", error);
-      }
-    }
-    
-    // Synchroniser avec le mode silence global
-    const silencePreference = localStorage.getItem('notification_silence');
-    if (silencePreference) {
-      setSettings(prev => ({ 
-        ...prev, 
-        silenceMode: silencePreference === 'true',
-        enableAllNotifications: silencePreference !== 'true'
-      }));
-    }
-  }, []);
-
-  // Sauvegarder les préférences dans localStorage à chaque changement
-  const updateSettings = (key: string, value: boolean) => {
-    const newSettings = { ...settings, [key]: value };
-    
-    // Si on active le mode silence, désactiver les notifications
-    if (key === 'silenceMode' && value === true) {
-      newSettings.enableAllNotifications = false;
-    }
-    
-    // Si on active toutes les notifications, désactiver le mode silence
-    if (key === 'enableAllNotifications' && value === true) {
-      newSettings.silenceMode = false;
-    }
-    
-    setSettings(newSettings);
-    localStorage.setItem('notification_preferences', JSON.stringify(newSettings));
-    
-    // Mettre à jour la préférence globale de silence
-    if (key === 'silenceMode') {
-      localStorage.setItem('notification_silence', String(value));
-    } else if (key === 'enableAllNotifications') {
-      localStorage.setItem('notification_silence', String(!value));
-    }
+  const handleChange = (key: string, value: boolean) => {
+    setSettings(prev => ({ ...prev, [key]: value }));
   };
 
   const saveSettings = () => {
-    // Simuler un appel API pour sauvegarder les préférences
+    // In a real app, you would save the notification settings here
     toast({
-      title: "Préférences sauvegardées",
-      description: "Vos préférences de notifications ont été mises à jour",
-      duration: 3000
+      title: "Paramètres de notification mis à jour",
+      description: "Vos préférences de notification ont été enregistrées avec succès."
     });
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Préférences de Notifications</CardTitle>
-        <CardDescription>
-          Personnalisez comment et quand vous souhaitez être notifié
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-between py-4">
-          <div className="flex flex-col gap-1">
-            <Label htmlFor="silenceMode" className="text-base font-medium flex items-center">
-              <BellOff className="mr-2 h-4 w-4" />
-              Mode Silence
-            </Label>
-            <span className="text-sm text-muted-foreground">
-              Recevoir uniquement un résumé hebdomadaire
-            </span>
-          </div>
-          <Switch
-            id="silenceMode"
-            checked={settings.silenceMode}
-            onCheckedChange={(checked) => updateSettings('silenceMode', checked)}
-          />
-        </div>
-
-        <Separator />
-
-        <div className="flex items-center justify-between py-4">
-          <div className="flex flex-col gap-1">
-            <Label htmlFor="enableAllNotifications" className="text-base font-medium flex items-center">
-              <Bell className="mr-2 h-4 w-4" />
-              Activer toutes les notifications
-            </Label>
-            <span className="text-sm text-muted-foreground">
-              Contrôlez globalement si vous souhaitez recevoir des notifications
-            </span>
-          </div>
-          <Switch
-            id="enableAllNotifications"
-            checked={settings.enableAllNotifications}
-            onCheckedChange={(checked) => updateSettings('enableAllNotifications', checked)}
-          />
-        </div>
-
-        <div className="space-y-4 pl-6">
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <h3 className="text-lg font-medium">Canaux de notification</h3>
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label htmlFor="emailNotifications" className="cursor-pointer">Notifications par email</Label>
+            <div>
+              <p className="font-medium">Email</p>
+              <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
+            </div>
             <Switch
-              id="emailNotifications"
-              checked={settings.emailNotifications && settings.enableAllNotifications}
-              onCheckedChange={(checked) => updateSettings('emailNotifications', checked)}
-              disabled={!settings.enableAllNotifications}
+              checked={settings.email}
+              onCheckedChange={(checked) => handleChange('email', checked)}
             />
           </div>
-
+          
           <div className="flex items-center justify-between">
-            <Label htmlFor="inAppNotifications" className="cursor-pointer">Notifications dans l'application</Label>
+            <div>
+              <p className="font-medium">Notifications push</p>
+              <p className="text-sm text-muted-foreground">Recevoir des notifications dans le navigateur</p>
+            </div>
             <Switch
-              id="inAppNotifications"
-              checked={settings.inAppNotifications && settings.enableAllNotifications}
-              onCheckedChange={(checked) => updateSettings('inAppNotifications', checked)}
-              disabled={!settings.enableAllNotifications}
+              checked={settings.push}
+              onCheckedChange={(checked) => handleChange('push', checked)}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">SMS</p>
+              <p className="text-sm text-muted-foreground">Recevoir des notifications importantes par SMS</p>
+            </div>
+            <Switch
+              checked={settings.sms}
+              onCheckedChange={(checked) => handleChange('sms', checked)}
             />
           </div>
         </div>
+      </div>
 
-        <Separator />
-
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium flex items-center">
-            <Calendar className="mr-2 h-4 w-4" />
-            Fréquence des récapitulatifs
-          </h3>
+      <div className="space-y-3 pt-4 border-t">
+        <h3 className="text-lg font-medium">Types de notification</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Rapport hebdomadaire</p>
+              <p className="text-sm text-muted-foreground">Résumé hebdomadaire de votre bien-être émotionnel</p>
+            </div>
+            <Switch
+              checked={settings.weeklyReport}
+              onCheckedChange={(checked) => handleChange('weeklyReport', checked)}
+            />
+          </div>
           
-          <div className="space-y-2 pl-6">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="dailyDigest" className="cursor-pointer">Résumé quotidien</Label>
-              <Switch
-                id="dailyDigest"
-                checked={settings.dailyDigest && settings.enableAllNotifications}
-                onCheckedChange={(checked) => updateSettings('dailyDigest', checked)}
-                disabled={!settings.enableAllNotifications}
-              />
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Rappels d'activité</p>
+              <p className="text-sm text-muted-foreground">Rappels pour vos séances VR et scans émotionnels</p>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="weeklyDigest" className="cursor-pointer">Résumé hebdomadaire</Label>
-              <Switch
-                id="weeklyDigest"
-                checked={settings.weeklyDigest || settings.silenceMode}
-                onCheckedChange={(checked) => updateSettings('weeklyDigest', checked)}
-                disabled={settings.silenceMode}
-              />
+            <Switch
+              checked={settings.activityReminders}
+              onCheckedChange={(checked) => handleChange('activityReminders', checked)}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Conseils bien-être</p>
+              <p className="text-sm text-muted-foreground">Conseils personnalisés pour améliorer votre bien-être</p>
             </div>
+            <Switch
+              checked={settings.wellbeingTips}
+              onCheckedChange={(checked) => handleChange('wellbeingTips', checked)}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Emails marketing</p>
+              <p className="text-sm text-muted-foreground">Nouvelles fonctionnalités et offres spéciales</p>
+            </div>
+            <Switch
+              checked={settings.marketingEmails}
+              onCheckedChange={(checked) => handleChange('marketingEmails', checked)}
+            />
           </div>
         </div>
-
-        <Separator />
-        
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium">Types de notifications</h3>
-          
-          <div className="space-y-2 pl-6">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="scanReminders" className="cursor-pointer">Rappels de scan émotionnel</Label>
-              <Switch
-                id="scanReminders"
-                checked={settings.scanReminders && settings.enableAllNotifications}
-                onCheckedChange={(checked) => updateSettings('scanReminders', checked)}
-                disabled={!settings.enableAllNotifications}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="journalReminders" className="cursor-pointer">Rappels de journal</Label>
-              <Switch
-                id="journalReminders"
-                checked={settings.journalReminders && settings.enableAllNotifications}
-                onCheckedChange={(checked) => updateSettings('journalReminders', checked)}
-                disabled={!settings.enableAllNotifications}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="achievementNotifications" className="cursor-pointer">Récompenses et badges</Label>
-              <Switch
-                id="achievementNotifications"
-                checked={settings.achievementNotifications && settings.enableAllNotifications}
-                onCheckedChange={(checked) => updateSettings('achievementNotifications', checked)}
-                disabled={!settings.enableAllNotifications}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="teamUpdates" className="cursor-pointer">Mises à jour de l'équipe</Label>
-              <Switch
-                id="teamUpdates"
-                checked={settings.teamUpdates && settings.enableAllNotifications}
-                onCheckedChange={(checked) => updateSettings('teamUpdates', checked)}
-                disabled={!settings.enableAllNotifications}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-4">
-          <Button onClick={saveSettings}>Enregistrer les préférences</Button>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      <Button onClick={saveSettings}>
+        Enregistrer les préférences
+      </Button>
+    </div>
   );
 };
 

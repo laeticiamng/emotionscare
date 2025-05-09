@@ -7,7 +7,7 @@ import { InvitationStatsCards } from './InvitationStats';
 import InvitationModal from './InvitationModal';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
-import { getInvitationsStats } from '@/services/invitationService';
+import { fetchInvitationStats } from '@/services/invitationService';
 import { InvitationStats } from '@/types';
 
 const InvitationsTab: React.FC = () => {
@@ -27,7 +27,7 @@ const InvitationsTab: React.FC = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const statsData = await getInvitationsStats();
+        const statsData = await fetchInvitationStats();
         setStats({
           ...statsData,
           teams: statsData.teams || {},

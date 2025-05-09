@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InvitationFormData, UserRole } from '@/types';
-import { sendInvitation } from '@/services/invitationService';
+import { sendInvitations } from '@/services/invitationService';
 import { useToast } from '@/hooks/use-toast';
 
 const invitationSchema = z.object({
@@ -34,7 +34,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
   
   const onSubmit = async (data: InvitationFormData) => {
     try {
-      await sendInvitation(data);
+      await sendInvitations([data]);
       toast({
         title: 'Invitation envoyée',
         description: `Une invitation a été envoyée à ${data.email}`,

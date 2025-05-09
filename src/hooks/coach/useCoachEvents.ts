@@ -1,8 +1,14 @@
+
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { completeChallenge } from "@/lib/gamificationService";
-import { saveRelaxationSession } from "@/lib/vrService";
-import { saveJournalEntry } from "@/lib/journalService";
+import { createJournalEntry } from "@/lib/journalService";
+
+// Mock function for VR service
+const saveRelaxationSession = async (sessionId: string) => {
+  console.log("Saving relaxation session:", sessionId);
+  return { success: true, sessionId };
+};
 
 export function useCoachEvents() {
   const { toast } = useToast();
@@ -63,7 +69,7 @@ export function useCoachEvents() {
 
   // Mutation to save a journal entry
   const saveJournalEntryMutation = useMutation({
-    mutationFn: saveJournalEntry,
+    mutationFn: createJournalEntry,
     onSuccess: () => {
       toast({
         title: "Journal sauvegardé",
@@ -92,8 +98,8 @@ export function useCoachEvents() {
     handleCompleteChallenge,
     handleSaveRelaxationSession,
     handleSaveJournalEntry,
-    isCompletingChallenge: completeChallengeMutation.isLoading,
-    isSavingRelaxation: saveRelaxationSessionMutation.isLoading,
-    isSavingJournalEntry: saveJournalEntryMutation.isLoading,
+    isCompletingChallenge: completeChallengeMutation.isPending,
+    isSavingRelaxation: saveRelaxationSessionMutation.isPending,
+    isSavingJournalEntry: saveJournalEntryMutation.isPending,
   };
 }

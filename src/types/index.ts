@@ -1,3 +1,4 @@
+
 // Common types used across the application
 
 // User related types
@@ -91,7 +92,16 @@ export interface Report {
   created_at?: string;
   metrics?: any;
   description?: string;
-  user_id?: string; // Add the missing property
+  user_id?: string;
+  summary?: string;
+  mood_score?: number;
+  categories?: string[];
+  recommendations?: string[];
+  metric?: string;
+  period_start?: string;
+  period_end?: string;
+  value?: number;
+  change_pct?: number;
 }
 
 // Badge related types
@@ -106,12 +116,12 @@ export interface Badge {
   awarded_at?: string;
   threshold?: number;
   icon_url?: string;
-  category?: string; // Added missing property
-  image?: string; // Added missing property
-  unlocked?: boolean; // Added missing property
-  progress?: number; // Added missing property
-  maxProgress?: number; // Added missing property
-  criteria?: string; // Added missing property
+  category?: string;
+  image?: string;
+  unlocked?: boolean;
+  progress?: number;
+  maxProgress?: number;
+  criteria?: string;
 }
 
 // Challenge related types
@@ -124,9 +134,9 @@ export interface Challenge {
   completed: boolean;
   deadline?: string;
   total?: number;
-  title?: string; // Added missing property
-  points?: number; // Added missing property
-  maxProgress?: number; // Added missing property
+  title?: string;
+  points?: number;
+  maxProgress?: number;
 }
 
 // VR related types
@@ -208,14 +218,34 @@ export interface MusicTrack {
   coverUrl?: string;
   coverImage?: string;
   externalUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
+  genre?: string;
+  mood?: string;
+  year?: number;
+  isPlaying?: boolean;
 }
 
-export interface Playlist {
+export interface MusicPlaylist {
   id: string;
   name: string;
   tracks: MusicTrack[];
   emotion?: string;
+  description?: string;
+  coverUrl?: string;
 }
+
+export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
+
+// Backward compatibility
+export type Playlist = {
+  id: string;
+  name: string;
+  tracks: MusicTrack[];
+  emotion?: string;
+};
+
+export type Track = MusicTrack;
 
 // Invitation types
 export interface InvitationStats {
@@ -224,8 +254,8 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
-  rejected?: number;
-  teams?: Record<string, number>;
+  rejected: number;
+  teams: Record<string, number>;
   recent_invites?: any[];
 }
 
@@ -235,6 +265,14 @@ export interface InvitationFormData {
   name?: string;
   team_id?: string;
   message?: string;
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message: string;
+  invitation?: any;
+  email?: string;
+  role?: string;
 }
 
 // Navigation types
@@ -253,14 +291,4 @@ export interface SidebarNavItem extends NavItem {
 
 export interface NavItemWithChildren extends NavItem {
   items: NavItemWithChildren[];
-}
-
-// Adding MusicPlaylist export for backward compatibility
-export { MusicPlaylist, MusicTrack, MusicEmotion } from '@/types/music';
-
-// Add the missing InvitationVerificationResult interface
-export interface InvitationVerificationResult {
-  valid: boolean;
-  message: string;
-  invitation?: any;
 }

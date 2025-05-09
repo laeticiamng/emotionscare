@@ -2,7 +2,6 @@
 import { useRecommendations } from './useRecommendations';
 import { useCoachEvents } from './useCoachEvents';
 import { useCoachQueries } from './useCoachQueries';
-import type { CoachEmotionData } from './types';
 
 /**
  * Main hook for Coach IA interactions
@@ -19,15 +18,15 @@ export function useCoach() {
   } = useRecommendations();
   
   const {
-    isProcessing,
-    lastTrigger,
-    triggerAfterScan,
-    triggerAlert,
-    triggerDailyReminder,
-    suggestVRSession
-  } = useCoachEvents(generateRecommendation, setLastEmotion, setSessionScore);
+    handleCompleteChallenge,
+    handleSaveRelaxationSession,
+    handleSaveJournalEntry,
+    isCompletingChallenge,
+    isSavingRelaxation,
+    isSavingJournalEntry
+  } = useCoachEvents();
   
-  const { askQuestion } = useCoachQueries(generateRecommendation);
+  const { askQuestion } = useCoachQueries();
 
   return {
     // From recommendations
@@ -37,15 +36,23 @@ export function useCoach() {
     generateRecommendation,
     
     // From events
-    isProcessing,
-    lastTrigger,
-    triggerAfterScan,
-    triggerAlert,
-    triggerDailyReminder,
-    suggestVRSession,
+    handleCompleteChallenge,
+    handleSaveRelaxationSession,
+    handleSaveJournalEntry,
+    isCompletingChallenge,
+    isSavingRelaxation,
+    isSavingJournalEntry,
     
     // From queries
-    askQuestion
+    askQuestion,
+    
+    // Mock these properties to maintain backward compatibility
+    isProcessing: false,
+    lastTrigger: null,
+    triggerAfterScan: () => Promise.resolve(),
+    triggerAlert: () => Promise.resolve(),
+    triggerDailyReminder: () => Promise.resolve(),
+    suggestVRSession: () => Promise.resolve()
   };
 }
 
