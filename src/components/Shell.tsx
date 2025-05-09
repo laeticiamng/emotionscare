@@ -6,7 +6,11 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from './ui/button'
 import { Headphones, Menu, User } from 'lucide-react'
 
-const Shell: React.FC = () => {
+interface ShellProps {
+  children?: React.ReactNode;
+}
+
+const Shell: React.FC<ShellProps> = ({ children }) => {
   const [musicOpen, setMusicOpen] = useState(false)
   const { isAuthenticated } = useAuth()
 
@@ -60,7 +64,7 @@ const Shell: React.FC = () => {
       />
 
       <main className="flex-1">
-        <Outlet />
+        {children ?? <Outlet />}
       </main>
 
       <footer className="bg-muted py-6">

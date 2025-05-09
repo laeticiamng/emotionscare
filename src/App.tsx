@@ -44,7 +44,7 @@ function App() {
         <MusicProvider>
           <Routes>
             {/* Route publique racine */}
-            <Route path="/" element={<Shell><Index /></Shell>} />
+            <Route path="/" element={<Shell>{<Index />}</Shell>} />
 
             {/* Authentification */}
             <Route path="/login" element={<LoginPage />} />
