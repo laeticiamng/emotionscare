@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
@@ -56,9 +55,6 @@ const CoachPageContent = () => {
   // Extract first name from user display name or email
   const firstName = React.useMemo(() => {
     if (!user) return '';
-    if (user.user_metadata?.full_name) {
-      return user.user_metadata.full_name.split(' ')[0];
-    }
     if (user.email) {
       return user.email.split('@')[0];
     }

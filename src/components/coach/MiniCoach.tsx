@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,10 +33,8 @@ const MiniCoach: React.FC<MiniCoachProps> = ({
   // Extract first name from user
   const firstName = React.useMemo(() => {
     if (!user) return '';
-    if (user.user_metadata?.full_name) {
-      return user.user_metadata.full_name.split(' ')[0];
-    }
-    if (user.email) {
+    // Safely check for user_metadata
+    if (user?.email) {
       return user.email.split('@')[0];
     }
     return '';

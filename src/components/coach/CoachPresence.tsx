@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -32,10 +31,8 @@ const CoachPresence: React.FC<CoachPresenceProps> = ({
   // Extract first name from user display name or email
   const firstName = React.useMemo(() => {
     if (!user) return '';
-    if (user.user_metadata?.full_name) {
-      return user.user_metadata.full_name.split(' ')[0];
-    }
-    if (user.email) {
+    // Safely check for user email
+    if (user?.email) {
       return user.email.split('@')[0];
     }
     return '';
