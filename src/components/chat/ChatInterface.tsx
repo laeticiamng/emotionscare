@@ -7,7 +7,7 @@ import { Send, Loader2, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useChat } from '@/hooks/useChat';
+import useChat from '@/hooks/useChat';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage } from '@/types';
 import { useApiConnection } from '@/hooks/dashboard/useApiConnection';

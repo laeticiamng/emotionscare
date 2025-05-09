@@ -1,39 +1,45 @@
 
 // Music-related types
+import { MusicTrack, MusicPlaylist, MusicEmotion } from './index';
 
-// Re-export music types from index for backward compatibility
-export type {
-  MusicTrack,
-  MusicPlaylist,
-  MusicEmotion,
-  Track,
-  Playlist
-} from './index';
-
-// Additional music-specific types
-export interface MusicPlayerState {
-  currentTrack: MusicTrack | null;
+export interface AudioPlayerState {
   isPlaying: boolean;
+  currentTime: number;
+  duration: number;
   volume: number;
   muted: boolean;
-  repeat: 'off' | 'track' | 'playlist';
-  shuffle: boolean;
-  queue: MusicTrack[];
+  loading: boolean;
+  error: boolean | string;
 }
 
-export interface MusicAction {
-  type: string;
-  payload?: any;
+export interface TrackInfoProps {
+  currentTrack: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: boolean | string;
 }
 
-export interface MusicPlayerControls {
-  play: () => void;
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  playlist: MusicPlaylist | null;
+  isPlaying: boolean;
+  volume: number;
+  isMuted: boolean;
+  currentTime: number;
+  duration: number;
+  loading: boolean;
+  error: boolean | string;
+  playTrack: (track: MusicTrack) => void;
+  playPlaylist: (playlist: MusicPlaylist, trackIndex?: number) => void;
+  loadPlaylistForEmotion: (emotion: string) => void;
+  togglePlay: () => void;
   pause: () => void;
+  resume: () => void;
   next: () => void;
   previous: () => void;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
 }
+
+// Re-export types for backward compatibility
+export type { MusicTrack, MusicPlaylist, MusicEmotion };

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ChatMessage } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,7 +28,7 @@ const useChat = (): UseChatResult => {
   const processAndAddMessage = async (text: string) => {
     addMessage(text, 'user');
     const response = await processMessage(text);
-    addMessage(response.message, 'bot');
+    addMessage(response.message || response.text || 'Je comprends.', 'bot');
   };
 
   return {

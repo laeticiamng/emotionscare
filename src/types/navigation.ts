@@ -1,38 +1,25 @@
 
-// Navigation related types used throughout the application
-
-export interface NavigationItem {
-  name: string;
-  href: string;
-  icon?: React.ElementType;
-  children?: NavigationItem[];
-  active?: boolean;
-  disabled?: boolean;
-  external?: boolean;
-  badge?: number | string;
-  adminOnly?: boolean;
-  requireAuth?: boolean;
-}
-
-export interface SidebarConfig {
-  title: string;
-  items: NavigationItem[];
-}
-
-// Pour la compatibilité avec les composants existants
+// Navigation related types
 export interface NavItem {
   title: string;
-  href?: string;
+  href: string;
+  icon?: React.ReactNode;
   disabled?: boolean;
   external?: boolean;
-  icon?: React.ReactNode;
   label?: string;
 }
 
 export interface SidebarNavItem extends NavItem {
-  items?: SidebarNavItem[];
+  items?: NavItem[];
+  isActive?: boolean;
+  isCollapsed?: boolean;
 }
 
-export interface NavItemWithChildren extends NavItem {
-  items: NavItemWithChildren[];
+export interface UserNavItem {
+  title: string;
+  href: string;
+  disabled?: boolean;
+  action?: () => void;
 }
+
+export type MainNavItem = NavItem;

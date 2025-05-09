@@ -20,6 +20,7 @@ export interface ChatContext {
 
 export interface ChatResponse {
   message: string;
+  text?: string;
   context?: ChatContext;
   recommendations?: string[];
   follow_up_questions?: string[];
