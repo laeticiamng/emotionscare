@@ -1,7 +1,12 @@
 
 // Chat related types used in chat interfaces
 
-import { ChatMessage } from './index';
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
 
 export interface ChatHistory {
   id: string;
@@ -41,6 +46,3 @@ export interface UserContext {
   recentActivities?: string[];
   userHistory?: Record<string, any>;
 }
-
-// Re-export ChatMessage for backward compatibility
-export type { ChatMessage } from './index';

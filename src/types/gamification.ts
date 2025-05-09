@@ -1,25 +1,25 @@
 
-/** Un défi ou rituel quotidien */
+/** Challenge or daily ritual */
 export interface Challenge {
   id: string;
   title?: string;
   name?: string;
   description: string;
-  points: number;        // points gagnés à la réussite
+  points: number;
   completed: boolean;
-  difficulty: string;    // Added this property - now properly defined
+  difficulty: string;
   image_url?: string;
   target?: number;
   progress?: number;
   maxProgress?: number;
 }
 
-/** La progression d'un utilisateur sur un challenge */
+/** User's progress on a challenge */
 export interface UserChallenge {
   id: string;
   user_id: string;
   challenge_id: string;
-  date: string;          // ISO date du jour
+  date: string;
   completed: boolean;
 }
 
@@ -27,10 +27,10 @@ export interface UserChallenge {
 import { Badge } from './index';
 export type { Badge };
 
-/** L'attribution d'un badge à un utilisateur */
+/** The attribution of a badge to a user */
 export interface UserBadge {
   id: string;
   user_id: string;
   badge_id: string;
-  awarded_on: string;    // date d'attribution
+  awarded_on: string;
 }

@@ -1,17 +1,16 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserContext } from '@/types/chat';
 
-interface UserContextData {
-  preferences?: Record<string, any>;
-  recentEmotions?: string[];
-  recentActivities?: string[];
-  userHistory?: Record<string, any>;
+interface UseUserContextReturn {
+  userContext: UserContext;
+  loading: boolean;
 }
 
-const useUserContext = () => {
+const useUserContext = (): UseUserContextReturn => {
   const { user } = useAuth();
-  const [userContext, setUserContext] = useState<UserContextData>({});
+  const [userContext, setUserContext] = useState<UserContext>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

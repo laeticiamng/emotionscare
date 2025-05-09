@@ -293,7 +293,7 @@ export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral
 export type Track = MusicTrack;
 export type Playlist = MusicPlaylist;
 
-// Export from separate type files
+// Now make sure to export all types from the separate type files
 export * from './emotion';
 export * from './navigation';
 export * from './chat';
