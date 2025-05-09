@@ -96,3 +96,5 @@ export function useAudioPreferences() {
     setAutoplay
   };
 }
+
+export default useAudioPreferences;

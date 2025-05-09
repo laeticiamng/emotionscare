@@ -23,8 +23,8 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  // Make sure we're using React.useState, not just useState
-  const [theme, setTheme] = React.useState<ThemeName>('light');
+  // Use React.useState directly to fix the error
+  const [theme, setTheme] = useState<ThemeName>('light');
 
   // Load theme preference from localStorage on mount
   useEffect(() => {

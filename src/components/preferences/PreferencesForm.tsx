@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPreferences, ThemeName } from '@/types';
+import ThemeSelectionField from './ThemeSelectionField';
 
 interface FormPreferences {
   theme: ThemeName;
@@ -91,6 +92,9 @@ const PreferencesForm: React.FC<{
                 <SelectItem value="system">Système</SelectItem>
               </SelectContent>
             </Select>
+            <p className="text-xs text-muted-foreground mt-1">
+              Modifiez l'apparence visuelle globale de l'application
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -105,6 +109,23 @@ const PreferencesForm: React.FC<{
               <SelectContent>
                 <SelectItem value="fr">Français</SelectItem>
                 <SelectItem value="en">English</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Taille de police</label>
+            <Select
+              defaultValue={preferences.font_size || 'medium'}
+              onValueChange={(value) => setValue('font_size', value as 'small' | 'medium' | 'large')}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choisir une taille" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="small">Petite</SelectItem>
+                <SelectItem value="medium">Moyenne</SelectItem>
+                <SelectItem value="large">Grande</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -143,6 +164,22 @@ const PreferencesForm: React.FC<{
               {...register('reminder_time')}
               defaultValue={preferences.reminder_time || '09:00'}
             />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Couleur d'accent</label>
+            <div className="grid grid-cols-5 gap-2">
+              {['#6E59A5', '#FF5A5F', '#2ecc71', '#3498db', '#f1c40f'].map((color) => (
+                <div 
+                  key={color}
+                  onClick={() => setValue('accent_color', color)}
+                  className={`w-10 h-10 rounded-full cursor-pointer border-2 ${
+                    watch('accent_color') === color ? 'border-primary' : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
           </div>
         </CardContent>
         
