@@ -1,27 +1,19 @@
 
-import { ReactNode } from 'react';
+import React from 'react';
 
-export interface MainNavItem {
+export interface NavItem {
   title: string;
   href?: string;
   disabled?: boolean;
   external?: boolean;
-  icon?: ReactNode;
+  icon?: React.ReactNode;
   label?: string;
 }
 
-export interface SidebarNavItem {
-  title: string;
-  href?: string;
-  disabled?: boolean;
-  external?: boolean;
-  icon?: ReactNode;
-  label?: string;
+export interface SidebarNavItem extends NavItem {
   items?: SidebarNavItem[];
 }
 
-export interface NavItemWithChildren extends MainNavItem {
+export interface NavItemWithChildren extends NavItem {
   items: NavItemWithChildren[];
 }
-
-export interface NavItem extends MainNavItem {}

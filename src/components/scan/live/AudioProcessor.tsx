@@ -132,14 +132,16 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       
       console.log('Audio analysis result:', result);
       
-      // Create emotion object
+      // Create emotion object with expected properties
       const emotion = {
         id: result.id || crypto.randomUUID(),
         user_id: userId,
         date: new Date().toISOString(),
         emotion: result.emotion,
         confidence: result.confidence,
-        text: result.transcript || '',
+        score: result.score || 50,
+        text: result.text || '',
+        transcript: result.transcript || '',
         ai_feedback: result.feedback || '',
         recommendations: result.recommendations || [],
       };

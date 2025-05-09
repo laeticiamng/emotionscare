@@ -19,7 +19,7 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ sessions }) => {
           {sessions.map((session) => {
             // Ensure we have a proper date value, using start_time as fallback
             const sessionDate = session.date ? session.date : session.start_time;
-            const durationMinutes = (session.duration_seconds || 0) / 60;
+            const durationMinutes = (session.duration_seconds || session.duration || 0) / 60;
             
             return (
               <div key={session.id} className="border-b pb-4 last:border-b-0 last:pb-0">
@@ -35,12 +35,16 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ sessions }) => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm">Rythme cardiaque</div>
-                    <div className="flex items-center justify-end gap-2">
-                      <span className="text-red-500">{session.heart_rate_before} bpm</span>
-                      <span className="text-muted-foreground">→</span>
-                      <span className="text-green-500">{session.heart_rate_after} bpm</span>
-                    </div>
+                    {session.heart_rate_before !== undefined && session.heart_rate_after !== undefined && (
+                      <>
+                        <div className="text-sm">Rythme cardiaque</div>
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-red-500">{session.heart_rate_before} bpm</span>
+                          <span className="text-muted-foreground">→</span>
+                          <span className="text-green-500">{session.heart_rate_after} bpm</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

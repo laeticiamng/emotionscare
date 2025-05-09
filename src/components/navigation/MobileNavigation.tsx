@@ -29,12 +29,12 @@ interface MobileNavProps {
 }
 
 const MobileNavigation: React.FC<MobileNavProps> = ({ user, mainNavItems, sidebarNavItems }) => {
-  const { logout } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { setOpenDrawer } = useMusic();
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     navigate('/login');
   };
 

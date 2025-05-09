@@ -1,125 +1,64 @@
 
-import { Emotion, EmotionResult } from '@/types';
-import { mockEmotions } from '@/data/mockEmotions';
+import { EmotionResult } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
-// Create a new emotion entry from user input
-export async function createEmotionEntry(data: { 
-  user_id: string; 
-  text?: string;
-  emojis?: string;
-  audio_url?: string; 
-}): Promise<Emotion> {
-  // Create a mock emotion entry based on the provided data
-  const newEmotion: Emotion = {
-    id: `temp-${Date.now()}`,
-    user_id: data.user_id,
-    emotion: data.text ? 'neutral' : 'happy', // Default or based on text analysis
-    confidence: 0.8,
-    date: new Date().toISOString(),
-    text: data.text,
-    score: 75,
-    emojis: data.emojis ? [data.emojis] : ['😊'],
-    ai_feedback: "Merci pour votre contribution. Votre bien-être est important."
-  };
+// Mocked function for analyzing audio stream
+export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
-  console.log('Created new emotion entry:', newEmotion);
-  return newEmotion;
-}
+  // Return mock emotion analysis
+  return {
+    id: uuidv4(),
+    emotion: ['happy', 'sad', 'neutral', 'anxious', 'calm'][Math.floor(Math.random() * 5)],
+    confidence: Math.random() * 0.5 + 0.5, // 0.5-1.0
+    score: Math.floor(Math.random() * 100),
+    transcript: "This is a simulated transcript from audio analysis.",
+    feedback: "Here is some AI feedback about your emotional state.",
+    recommendations: [
+      "Take a short break",
+      "Practice deep breathing",
+      "Listen to calming music"
+    ],
+  };
+};
 
-// Analyze emotion based on text or audio
-export async function analyzeEmotion(data: {
-  user_id: string;
-  text?: string;
-  audio_url?: string;
-}): Promise<EmotionResult> {
-  // Simulate an analysis
-  const randomEmotions = ['happy', 'calm', 'anxious', 'stressed', 'neutral'];
-  const emotion = randomEmotions[Math.floor(Math.random() * randomEmotions.length)];
-  const confidence = 0.7 + Math.random() * 0.3; // Between 0.7 and 1.0
-  const score = Math.floor(Math.random() * 100);
+// Function to save emotion scan results
+export const saveRealtimeEmotionScan = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
   
   return {
-    user_id: data.user_id,
-    emotion,
-    confidence,
-    score,
-    text: data.text,
-    transcript: data.text,
-    ai_feedback: `Notre analyse détecte que vous vous sentez plutôt ${emotion} aujourd'hui.`,
-    emojis: emotion === 'happy' ? ['😊', '🙂'] : 
-            emotion === 'calm' ? ['😌', '🧘‍♀️'] :
-            emotion === 'anxious' ? ['😰', '😓'] :
-            emotion === 'stressed' ? ['😖', '😣'] : ['😐', '🙂']
+    id: uuidv4(),
+    user_id: emotionData.user_id || 'anonymous',
+    date: new Date().toISOString(),
+    emotion: emotionData.emotion || 'neutral',
+    confidence: emotionData.confidence || 0.75,
+    score: emotionData.score || 50,
+    transcript: emotionData.transcript,
+    text: emotionData.text,
+    feedback: emotionData.feedback,
   };
-}
+};
 
-// Analyze audio stream for real-time emotion detection
-export async function analyzeAudioStream(audioChunk: Blob): Promise<{
-  emotion: string;
-  confidence: number;
-}> {
-  // Simulate real-time analysis
-  const emotions = ['neutral', 'happy', 'calm', 'anxious'];
-  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-  const confidence = 0.6 + Math.random() * 0.4; // Random value between 0.6 and 1.0
-  
-  await new Promise(resolve => setTimeout(resolve, 200)); // Simulate processing time
+// Function to analyze text or emojis for emotion
+export const analyzeEmotion = async (input: { 
+  text?: string; 
+  emojis?: string; 
+  userId?: string;
+}): Promise<EmotionResult> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 800));
   
   return {
-    emotion,
-    confidence
-  };
-}
-
-// Save real-time emotion scan results
-export async function saveRealtimeEmotionScan(data: {
-  user_id: string;
-  emotion: string;
-  confidence: number;
-  audio_url?: string;
-}): Promise<Emotion> {
-  const newEmotion: Emotion = {
-    id: `realtime-${Date.now()}`,
-    user_id: data.user_id,
-    emotion: data.emotion,
-    confidence: data.confidence,
+    id: uuidv4(),
+    user_id: input.userId,
     date: new Date().toISOString(),
-    score: Math.floor(data.confidence * 100),
-    emojis: data.emotion === 'happy' ? ['😊'] : 
-            data.emotion === 'calm' ? ['😌'] :
-            data.emotion === 'anxious' ? ['😰'] : ['😐'],
-    ai_feedback: `Analyse en temps réel: votre état émotionnel est ${data.emotion}.`
+    emotion: ['happy', 'sad', 'neutral', 'anxious', 'calm'][Math.floor(Math.random() * 5)],
+    confidence: Math.random() * 0.5 + 0.5, // 0.5-1.0
+    score: Math.floor(Math.random() * 100),
+    text: input.text,
+    emojis: input.emojis?.split('') || [],
+    feedback: "Here is some AI feedback based on your input.",
   };
-  
-  return newEmotion;
-}
-
-export async function fetchLatestEmotion(userId: string): Promise<Emotion | null> {
-  // Get latest emotion from mock data
-  const userEmotions = mockEmotions
-    .filter(e => e.user_id === userId)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
-  return userEmotions[0] || null;
-}
-
-export async function fetchEmotionHistory(): Promise<Emotion[]> {
-  // Return all mock emotions as history
-  return Promise.resolve(mockEmotions);
-}
-
-// For backwards compatibility
-export async function getLatestEmotion(userId: string): Promise<Emotion | null> {
-  return fetchLatestEmotion(userId);
-}
-
-export async function getEmotionHistory(): Promise<Emotion[]> {
-  return fetchEmotionHistory();
-}
-
-export async function getEmotions(userId?: string): Promise<Emotion[]> {
-  if (userId) {
-    return mockEmotions.filter(emotion => emotion.user_id === userId);
-  }
-  return mockEmotions;
-}
+};

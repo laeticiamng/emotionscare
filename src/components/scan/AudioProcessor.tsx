@@ -28,6 +28,10 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
+  
+  // Délai minimum d'enregistrement en millisecondes pour éviter des analyses trop courtes
+  const MIN_RECORDING_DURATION = 3000;
+  const recordingStartTimeRef = useRef<number | null>(null);
 
   // Setup media recorder
   useEffect(() => {
@@ -47,10 +51,22 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   const startRecording = async () => {
     try {
       setAudioChunks([]);
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordingStartTimeRef.current = Date.now();
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+      
       streamRef.current = stream;
       
-      const recorder = new MediaRecorder(stream);
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
+      });
+      
       setMediaRecorder(recorder);
       
       const chunks: Blob[] = [];
@@ -63,10 +79,18 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       });
       
       recorder.addEventListener('stop', () => {
+        const recordingDuration = recordingStartTimeRef.current ? Date.now() - recordingStartTimeRef.current : 0;
+        
+        if (recordingDuration < MIN_RECORDING_DURATION) {
+          onError('Enregistrement trop court. Veuillez parler plus longtemps pour une analyse précise.');
+          return;
+        }
+        
         processAudio(chunks);
       });
       
       recorder.start(1000); // Collect data every second
+      onProgressUpdate('Enregistrement en cours...');
       
     } catch (error) {
       console.error('Failed to start recording:', error);
@@ -76,10 +100,14 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
 
   const stopRecording = () => {
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-      
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+      try {
+        mediaRecorder.stop();
+        
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+        }
+      } catch (error) {
+        console.error('Error stopping recording:', error);
       }
     }
   };
@@ -93,24 +121,29 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       
       setIsProcessing(true);
       onProcessingChange(true);
-      onProgressUpdate('Analyse en cours...');
+      onProgressUpdate('Traitement de l\'audio...');
       
-      const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+      const audioBlob = new Blob(chunks, { type: chunks[0].type });
+      
+      onProgressUpdate('Analyse émotionnelle en cours...');
       
       // Process audio with serverless function
       const result = await analyzeAudioStream(audioBlob);
       
       console.log('Audio analysis result:', result);
       
-      // Create emotion object
+      // Create emotion object with expected properties
       const emotion = {
         id: result.id || crypto.randomUUID(),
         user_id: userId,
         date: new Date().toISOString(),
         emotion: result.emotion,
         confidence: result.confidence,
-        text: result.transcript || '',
+        score: result.score || 50,
+        text: result.text || '',
+        transcript: result.transcript || '',
         ai_feedback: result.feedback || '',
+        recommendations: result.recommendations || [],
       };
       
       onAnalysisComplete(emotion, result);

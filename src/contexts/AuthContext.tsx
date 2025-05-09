@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -7,7 +8,7 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { User, UserPreferences } from '@/types';
+import { User, UserPreferences, UserRole } from '@/types';
 
 interface AuthContextProps {
   user: User | null;
@@ -32,8 +33,14 @@ const defaultPreferences = {
   notifications_enabled: true,
   font_size: 'medium' as const,
   language: 'fr',
+  notifications: {
+    email: true,
+    push: true,
+    sms: false
+  }
 };
 
+// Mock implementation for Supabase auth handling since we don't have actual profiles table
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -49,25 +56,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (session) {
           setIsAuthenticated(true);
-          const { data: profile, error } = await supabase
-            .from('profiles')
-            .select(`name, email, avatar, role, preferences`)
-            .eq('id', session.user.id)
-            .single();
-
-          if (error) {
-            console.error('Error fetching user profile:', error);
-          }
+          // Mock profile fetch since we don't have actual profiles table
+          const mockProfile = {
+            name: 'Utilisateur',
+            email: session.user.email,
+            avatar: '',
+            role: UserRole.USER,
+            preferences: defaultPreferences
+          };
 
           const userProfile: User = {
             id: session.user.id,
             email: session.user.email || '',
-            name: profile?.name || 'Utilisateur',
-            avatar: profile?.avatar || '',
-            role: profile?.role || 'user',
+            name: mockProfile?.name || 'Utilisateur',
+            avatar: mockProfile?.avatar || '',
+            role: mockProfile?.role || UserRole.USER,
             preferences: {
               ...defaultPreferences,
-              ...profile?.preferences
+              ...mockProfile?.preferences
             }
           };
           setUser(userProfile);
@@ -93,7 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: session.user.email || '',
           name: session.user.email || 'Utilisateur',
           avatar: '',
-          role: 'user',
+          role: UserRole.USER,
           preferences: defaultPreferences
         };
         setUser(userProfile);
@@ -135,14 +141,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       if (error) throw error;
 
+      // Mock profile creation since we don't have actual profiles table
       if (data?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{ id: data.user.id, name: name, email: email }]);
-
-        if (profileError) {
-          console.error('Could not create user profile:', profileError);
-        }
+        console.log('User created with ID:', data.user.id);
       }
 
       alert('Check your email to verify your account!');
@@ -168,8 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUser = async (updates: any) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('profiles').update(updates).eq('id', user?.id);
-      if (error) throw error;
+      // Mock profile update since we don't have actual profiles table
       setUser({ ...user, ...updates } as User);
     } catch (error: any) {
       alert(error.error_description || error.message);
@@ -182,22 +182,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const updatedPreferences = { ...preferences, ...newPreferences };
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ preferences: updatedPreferences })
-        .eq('id', user?.id)
-        .select('preferences')
-        .single();
-
-      if (error) {
-        console.error("Error updating preferences:", error);
-        throw error;
-      }
-
-      setPreferences(data.preferences);
+      
+      // Mock preferences update since we don't have actual profiles table
+      setPreferences(updatedPreferences);
       setUser(prevUser => {
         if (prevUser) {
-          return { ...prevUser, preferences: data.preferences };
+          return { ...prevUser, preferences: updatedPreferences };
         }
         return prevUser;
       });

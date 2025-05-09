@@ -86,7 +86,7 @@ const GlobalNav = () => {
                 <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarImage 
-                      src={user.avatar || user.image || user.avatar_url} 
+                      src={user.avatar || user.avatar_url} 
                       alt={user.name} 
                     />
                     <AvatarFallback>{user.name?.charAt(0).toUpperCase() || '?'}</AvatarFallback>

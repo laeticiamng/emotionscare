@@ -36,38 +36,37 @@ export function EmotionMusicRecommendations({
   const {
     currentTrack,
     isPlaying,
-    loadPlaylistForEmotion,
+    fetchPlaylist,
     playTrack,
+    loading,
+    error
   } = useMusic();
   
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [localLoading, setLocalLoading] = useState(false);
+  const [localError, setLocalError] = useState('');
 
   const handlePlayMusic = async (emotionToPlay: string) => {
     if (!emotionToPlay) return;
     
-    setLoading(true);
-    setError('');
+    setLocalLoading(true);
+    setLocalError('');
     
     try {
       const musicType = EMOTION_TO_MUSIC[emotionToPlay.toLowerCase()] || EMOTION_TO_MUSIC.default;
-      await loadPlaylistForEmotion(musicType);
-      setLoading(false);
+      await fetchPlaylist(musicType);
+      setLocalLoading(false);
     } catch (err) {
       console.error("Error loading music:", err);
-      setError("Impossible de charger la musique pour cette émotion");
-      setLoading(false);
+      setLocalError("Impossible de charger la musique pour cette émotion");
+      setLocalLoading(false);
     }
   };
 
   // Handle play pause toggle
   const togglePlayPause = () => {
-    if (isPlaying) {
+    if (currentTrack) {
       // Use the music context's methods
-      if (typeof playTrack === 'function' && currentTrack) {
-        // Replay the same track to pause it
-        playTrack(currentTrack);
-      }
+      playTrack(currentTrack);
     } else {
       // Play if not playing
       handlePlayMusic(emotion || (emotionResult?.emotion || 'neutral'));
@@ -99,9 +98,9 @@ export function EmotionMusicRecommendations({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {error ? (
+        {error || localError ? (
           <div className="text-destructive text-sm mb-4">
-            {error}
+            {error || localError}
             <Button 
               variant="outline" 
               size="sm" 
@@ -126,10 +125,10 @@ export function EmotionMusicRecommendations({
               variant="outline"
               size="sm"
               onClick={isPlaying ? togglePlayPause : () => handlePlayMusic(emotionToUse)}
-              disabled={loading}
+              disabled={loading || localLoading}
               className="flex items-center gap-2"
             >
-              {loading ? (
+              {loading || localLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Chargement...</span>

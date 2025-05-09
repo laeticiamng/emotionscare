@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -18,7 +19,7 @@ const InvitationsTab: React.FC = () => {
     accepted: 0,
     expired: 0,
     sent: 0,
-    rejected: 0, // Add this field
+    rejected: 0,
     teams: {},
     recent_invites: []
   });

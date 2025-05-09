@@ -38,7 +38,11 @@ export interface UserPreferences {
   language: string;
   accent_color?: string;
   background_color?: string;
-  notifications?: boolean;
+  notifications?: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
   reminder_time?: string;
 }
 
@@ -132,6 +136,7 @@ export interface VRSessionTemplate {
   benefits: string[];
   emotions: string[];
   popularity: number;
+  completion_rate?: number;
 }
 
 export interface VRSession {
@@ -139,11 +144,16 @@ export interface VRSession {
   template_id: string;
   user_id: string;
   start_time: string;
+  date?: string;
   duration: number;
+  duration_seconds?: number;
   completed: boolean;
   feedback?: string;
   mood_before?: string;
   mood_after?: string;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
 }
 
 // Journal related types

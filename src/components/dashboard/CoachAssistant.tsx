@@ -10,10 +10,8 @@ import { useCoachDashboard } from '@/hooks/dashboard/useCoachDashboard';
 import QuickSuggestions from './coach/QuickSuggestions';
 import CoachRecommendations from './coach/CoachRecommendations';
 
-// Import paresseux de l'interface de chat pour améliorer les performances initiales
-const ChatInterface = lazy(() => import('@/components/chat/ChatInterface').then(module => ({ 
-  default: module.default 
-})));
+// Import ChatInterface component using standard import
+import ChatInterface from '@/components/chat/ChatInterface';
 
 interface CoachAssistantProps {
   className?: string;

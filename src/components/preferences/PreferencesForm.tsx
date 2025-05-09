@@ -8,11 +8,16 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPreferences, ThemeName } from '@/types';
 
-// User preferences type for the form
-interface FormPreferences extends Omit<UserPreferences, 'theme'> {
-  theme: ThemeName | 'system';
+interface FormPreferences {
+  theme: ThemeName;
+  notifications_enabled: boolean;
+  font_size: 'small' | 'medium' | 'large';
+  language: string;
+  accent_color?: string;
+  background_color?: string;
   marketing_emails?: boolean;
   feature_announcements?: boolean;
+  reminder_time?: string;
 }
 
 const PreferencesForm: React.FC<{
@@ -35,20 +40,21 @@ const PreferencesForm: React.FC<{
   const onSubmit = async (data: FormPreferences) => {
     setSaving(true);
     
-    // Convertir les préférences étendues en préférences standard
+    // Convert the form data to the UserPreferences format
     const standardPreferences: UserPreferences = {
-      ...data,
-      theme: data.theme,
+      theme: data.theme === 'system' ? 'light' : data.theme as 'light' | 'dark' | 'pastel',
+      notifications_enabled: data.notifications_enabled,
+      font_size: data.font_size,
+      language: data.language,
+      accent_color: data.accent_color,
+      background_color: data.background_color,
       notifications: {
         email: !!data.marketing_emails,
         push: !!data.feature_announcements,
         sms: preferences.notifications?.sms || false
-      }
+      },
+      reminder_time: data.reminder_time
     };
-    
-    // Retirer les champs non standard
-    delete (standardPreferences as any).marketing_emails;
-    delete (standardPreferences as any).feature_announcements;
     
     try {
       await onSave(standardPreferences);
@@ -73,7 +79,7 @@ const PreferencesForm: React.FC<{
             <label className="text-sm font-medium">Thème</label>
             <Select
               defaultValue={preferences.theme}
-              onValueChange={(value) => setValue('theme', value as ThemeName | 'system')}
+              onValueChange={(value) => setValue('theme', value as ThemeName)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Choisir un thème" />
