@@ -40,6 +40,7 @@ export interface UserPreferences {
   font_size?: 'small' | 'medium' | 'large';
   color_accent?: string;
   notifications_enabled?: boolean;
+  backgroundColor?: string; // Added for compatibility with AuthContext
   notifications?: {
     email: boolean;
     push: boolean;
@@ -84,6 +85,7 @@ export interface EmotionResult {
   ai_feedback?: string;
   recommendations?: string[];
   source?: string; // Added source field
+  intensity?: number; // Added intensity for compatibility
 }
 
 // Enhanced emotion result
@@ -105,6 +107,7 @@ export interface Emotion {
   ai_feedback?: string;
   emojis?: string[];
   source?: string; // Added source field
+  intensity?: number; // Added intensity for compatibility
 }
 
 // Theme types
@@ -115,10 +118,10 @@ export interface MoodData {
   date: string;
   value: number;
   emotion?: string;
-  originalDate?: string;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
+  originalDate?: string; // Added for compatibility
+  sentiment?: number;    // Added for compatibility
+  anxiety?: number;      // Added for compatibility
+  energy?: number;       // Added for compatibility
 }
 
 // Journal entry
@@ -132,10 +135,10 @@ export interface JournalEntry {
   created_at: string;
   updated_at?: string;
   tags?: string[];
-  date?: string;
-  text?: string;
-  ai_feedback?: string;
-  is_private?: boolean; // Added is_private field
+  date?: string;         // Added for compatibility
+  text?: string;         // Added for compatibility
+  ai_feedback?: string;  // Added for compatibility
+  is_private?: boolean;  // Added is_private field
 }
 
 // VR Session Template
@@ -209,7 +212,8 @@ export interface Badge {
   image_url?: string;
   user_id?: string;
   category?: string;
-  icon?: string; // Added icon field for compatibility
+  icon?: string;   // Added icon field for compatibility
+  level?: number;  // Added level field for compatibility
 }
 
 // Type pour la carte VR dans le dashboard
@@ -250,5 +254,6 @@ export interface Report {
   generatedBy?: string;
   fileSize?: string;
   lastViewed?: string;
-  created_at?: string; // Added created_at field
+  created_at?: string;  // Added created_at field
+  metrics?: any;        // Added metrics field for compatibility
 }

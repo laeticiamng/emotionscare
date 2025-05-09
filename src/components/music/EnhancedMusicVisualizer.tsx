@@ -5,6 +5,7 @@ import { useMusic } from '@/contexts/MusicContext';
 
 interface EnhancedMusicVisualizerProps {
   emotion?: string;
+  mood?: string; // Added mood prop to match usage in MusicCreator
   showControls?: boolean;
   height?: number;
   className?: string;
@@ -59,6 +60,7 @@ const DEFAULT_VISUALIZER = {
 
 const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
   emotion,
+  mood,
   showControls = true,
   height = 150,
   className = '',
@@ -68,14 +70,15 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
   const { currentTrack, isPlaying } = useMusic();
   const [config, setConfig] = useState(DEFAULT_VISUALIZER);
   
-  // Mettre à jour la configuration en fonction de l'émotion
+  // Mettre à jour la configuration en fonction de l'émotion ou mood
   useEffect(() => {
-    if (emotion) {
-      const emotionKey = emotion.toLowerCase();
+    const emotionToUse = emotion || mood;
+    if (emotionToUse) {
+      const emotionKey = emotionToUse.toLowerCase();
       const visualizerConfig = EMOTION_VISUALIZER_MAP[emotionKey] || DEFAULT_VISUALIZER;
       setConfig(visualizerConfig);
     }
-  }, [emotion]);
+  }, [emotion, mood]);
 
   // Adjust visualizer height based on intensity
   const adjustedHeight = intensity ? Math.max(height * 0.7, Math.min(height * 1.3, height * (intensity / 50))) : height;

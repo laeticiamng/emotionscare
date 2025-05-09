@@ -1,195 +1,77 @@
-import { CoachAction, CoachEvent, AI_MODEL_CONFIG, CoachModule } from './types';
+
 import { supabase } from '@/integrations/supabase/client';
-import { actionExecutor } from './action-executor';
-import { determineActions } from './emotional-data';
-import { routines } from './routines';
-import { budgetMonitor } from '@/lib/ai/budgetMonitor';
+import { AI_MODEL_CONFIG } from './types';
 import { UserContext } from '@/types/chat';
 
 /**
- * Service pour le coach IA
+ * Gets coach recommendations for a specific user
+ * @param userId The user's ID
+ * @returns Array of recommendation strings
  */
-class CoachService {
-  /**
-   * Traiter un événement coach
-   */
-  async processEvent(event: CoachEvent): Promise<void> {
-    console.log(`Coach IA: Processing event ${event.type}`);
-
-    // Obtient les actions à effectuer basées sur l'évènement
-    const actions = await this.getActions(event);
-
-    // Exécute chaque action
-    for (const action of actions) {
-      await actionExecutor.executeAction(action, event);
-    }
-  }
-  
-  /**
-   * Vérifier la connexion à l'API OpenAI
-   */
-  async checkAPIConnection(): Promise<boolean> {
-    try {
-      const { data, error } = await supabase.functions.invoke('check-api-connection', {
-        body: {}
-      });
-      
-      if (error) {
-        console.error('API connection check failed:', error);
-        return false;
-      }
-      
-      return data && data.connected === true;
-    } catch (error) {
-      console.error('API connection check failed:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Déterminer les actions à effectuer en fonction de l'événement
-   */
-  private async getActions(event: CoachEvent): Promise<CoachAction[]> {
-    switch (event.type) {
-      case 'api_check':
-        return [{ type: 'check_api_connection', payload: {} }];
-        
-      case 'scan_completed':
-        return determineActions(event);
-        
-      case 'predictive_alert':
-        return [
-          { type: 'check_trend_alert', payload: event.data || {} },
-          { type: 'suggest_wellness_activity', payload: {} }
-        ];
-        
-      case 'daily_reminder':
-        return routines.getDailyReminder();
-        
-      default:
-        console.warn(`Unknown event type: ${event.type}`);
-        return [];
-    }
-  }
-
-  /**
-   * Sélectionner le modèle approprié en fonction du module et du contexte
-   */
-  async selectModel(module: CoachModule, context?: any): Promise<string> {
-    // Budget control logic
-    const monthlyUsage = await this.getMonthlyUsage();
-    const threshold = 100; // Example threshold in USD
+export async function getCoachRecommendations(userId: string): Promise<string[]> {
+  try {
+    // Try to fetch recent emotional data for context
+    const { data: emotions } = await supabase
+      .from('emotions')
+      .select('emotion, score, date')
+      .eq('user_id', userId)
+      .order('date', { ascending: false })
+      .limit(5);
     
-    // Fallback to cheaper model if budget exceeded
-    if (await budgetMonitor.hasExceededBudget() && module !== 'scan') {
-      return "gpt-4o-mini-2024-07-18";
-    }
+    const recentEmotions = emotions?.map(e => e.emotion).join(', ') || '';
+    const avgScore = emotions?.length ? 
+      Math.round(emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length) : 
+      50;
+      
+    // Create user context object
+    const userContext: UserContext = {
+      recentEmotions,
+      currentScore: avgScore,
+      lastEmotionDate: emotions?.[0]?.date
+    };
     
-    // Use the configured model for the module
-    return AI_MODEL_CONFIG[module].model;
-  }
-  
-  /**
-   * Get estimated monthly usage
-   */
-  private async getMonthlyUsage(): Promise<number> {
-    try {
-      const { data, error } = await supabase.functions.invoke('monitor-api-usage', {
-        body: {}
-      });
-      
-      if (error || !data) {
-        console.error('Error getting monthly usage:', error);
-        return 0;
+    // Using the AI model parameters from the config
+    const modelConfig = AI_MODEL_CONFIG.coach;
+    
+    // Call the AI function with the coach prompt
+    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+      body: {
+        message: "En tenant compte de mon état émotionnel récent, propose-moi 4 recommandations courtes et pratiques pour améliorer mon bien-être aujourd'hui. Format: liste à puces simple.",
+        userContext,
+        model: modelConfig.model,
+        temperature: modelConfig.temperature,
+        max_tokens: modelConfig.max_tokens,
+        top_p: modelConfig.top_p,
+        stream: modelConfig.stream
       }
-      
-      return data.usage?.total || 0;
-    } catch (error) {
-      console.error('Error getting monthly usage:', error);
-      return 0;
-    }
+    });
+    
+    if (error) throw error;
+    
+    // Parse the response to extract recommendations as an array
+    const response = data.response;
+    const recommendations = response
+      .split('\n')
+      .filter((line: string) => line.trim().startsWith('-') || line.trim().startsWith('•'))
+      .map((line: string) => line.trim().replace(/^[•-]\s*/, ''));
+    
+    // Return the parsed recommendations or fallback to default
+    return recommendations.length > 0 ? recommendations : [
+      "Prendre une pause de 5 minutes toutes les heures pour vous étirer",
+      "Pratiquer la respiration profonde pendant 2 minutes en cas de stress",
+      "Boire suffisamment d'eau tout au long de la journée",
+      "Faire une courte promenade de 10 minutes après le déjeuner"
+    ];
+    
+  } catch (error) {
+    console.error('Error getting coach recommendations:', error);
+    return [
+      "Prendre une pause de 5 minutes toutes les heures pour vous étirer",
+      "Pratiquer la respiration profonde pendant 2 minutes en cas de stress",
+      "Boire suffisamment d'eau tout au long de la journée",
+      "Faire une courte promenade de 10 minutes après le déjeuner"
+    ];
   }
-
-  /**
-   * Envoyer une question directement au coach
-   */
-  async askCoachQuestion(userId: string, question: string, userContext?: UserContext): Promise<string> {
-    try {
-      // Get user emotional context if not provided
-      let contextToUse = userContext;
-      
-      if (!contextToUse) {
-        const { data: emotions } = await supabase
-          .from('emotions')
-          .select('*')
-          .eq('user_id', userId)
-          .order('date', { ascending: false })
-          .limit(3);
-        
-        contextToUse = {
-          recentEmotions: null,
-          currentScore: null
-        };
-        
-        if (emotions && emotions.length > 0) {
-          // Use emojis field instead of emotion, or derive the emotion from other fields
-          const recentEmotions = emotions.map(e => e.emojis || '').join(', ');
-          const avgScore = emotions.reduce((acc, e) => acc + (e.score || 50), 0) / emotions.length;
-          
-          contextToUse = {
-            recentEmotions,
-            currentScore: Math.round(avgScore),
-            lastEmotionDate: emotions[0].date
-          };
-        }
-      }
-      
-      // Check budget constraints before selecting model
-      const budgetExceeded = await budgetMonitor.hasExceededBudget("gpt-4.1-2025-04-14");
-      
-      // Determine model based on question length and complexity
-      const model = budgetExceeded ? "gpt-4o-mini-2024-07-18" : 
-                   question.length > 100 ? "gpt-4.1-2025-04-14" : "gpt-4o-mini-2024-07-18";
-      
-      // Send question to OpenAI
-      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-        body: {
-          message: question,
-          userContext: contextToUse,
-          model,
-          temperature: 0.4,
-          max_tokens: 512,
-          module: 'coach'
-        }
-      });
-      
-      if (error) throw error;
-      
-      return data?.response || "Je suis désolé, je n'ai pas pu traiter votre demande.";
-    } catch (error) {
-      console.error('Error asking coach question:', error);
-      return "Je suis désolé, mais je rencontre des difficultés techniques pour répondre à votre question.";
-    }
-  }
-}
-
-export const coachService = new CoachService();
-
-/**
- * Trigger an event for the coach
- */
-export function triggerCoachEvent(
-  eventType: 'scan_completed' | 'predictive_alert' | 'daily_reminder' | 'api_check',
-  userId: string,
-  data?: any
-): Promise<void> {
-  const event: CoachEvent = {
-    type: eventType,
-    user_id: userId,
-    data
-  };
-  
-  return coachService.processEvent(event);
 }
 
 export * from './types';

@@ -7,6 +7,7 @@ import type { Emotion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import AudioVisualizer from '@/components/music/AudioVisualizer';
+import { safeOpen } from '@/lib/utils';
 
 // Enhanced emotion to music type mapping
 const EMOTION_MUSIC_MAP: Record<string, { 
@@ -164,7 +165,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
 
   const handlePlayMusic = () => {
     loadPlaylistForEmotion(musicRecommendation.type);
-    setOpenDrawer(true);
+    openMusicPlayer();
     
     toast({
       title: "Playlist activée",
@@ -180,6 +181,12 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
       title: "Création musicale",
       description: `Créez votre propre musique adaptée à votre humeur "${musicRecommendation.type}"`,
     });
+  };
+
+  const openMusicPlayer = () => {
+    if (setOpenDrawer) {
+      safeOpen(setOpenDrawer);
+    }
   };
 
   return (

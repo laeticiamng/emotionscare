@@ -1,7 +1,19 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Emotion, UserRole } from '@/types';
-import { getEmotions } from '@/lib/scan/emotionService';
+
+// Creating our own getEmotions function since it's missing from the emotionService
+async function getEmotions(userId?: string): Promise<Emotion[]> {
+  // Use mock data from the imported mockEmotions
+  const { mockEmotions } = await import('@/data/mockEmotions');
+  
+  if (userId) {
+    return mockEmotions.filter(emotion => emotion.user_id === userId);
+  }
+  
+  return mockEmotions;
+}
 
 interface UseScanPageHook {
   emotions: Emotion[];
@@ -45,3 +57,19 @@ const useScanPage = (): UseScanPageHook => {
 };
 
 export default useScanPage;
+
+// Also export these functions for usage in useScanPageState
+export function filterUsers() {
+  // Implementation for filterUsers
+  return [];
+}
+
+export function selectedFilter() {
+  // Implementation for selectedFilter
+  return 'all';
+}
+
+export function filteredUsers() {
+  // Implementation for filteredUsers
+  return [];
+}

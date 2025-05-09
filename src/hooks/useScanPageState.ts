@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Emotion, User } from '@/types';
 import { fetchEmotionHistory } from '@/lib/scanService';
-import { useScanPage } from '@/hooks/useScanPage';
+import useScanPage from '@/hooks/useScanPage';
 
 export function useScanPageState(userId?: string) {
   const { filteredUsers, selectedFilter, filterUsers } = useScanPage();

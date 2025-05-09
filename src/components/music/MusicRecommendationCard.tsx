@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
+import { safeOpen } from '@/lib/utils';
 import EmotionBasedMusicRecommendation from './EmotionBasedMusicRecommendation';
 
 interface MusicRecommendationCardProps {
@@ -17,7 +19,7 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   intensity = 50,
   standalone = false,
 }) => {
-  const { loadPlaylistForEmotion, openDrawer } = useMusic();
+  const { loadPlaylistForEmotion, openDrawer, setOpenDrawer } = useMusic();
   const { toast } = useToast();
 
   // Si nous avons une émotion spécifique, utiliser le composant centralisé
@@ -42,7 +44,7 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
     const musicType = emotion.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
-    openDrawer();
+    safeOpen(setOpenDrawer);
     
     toast({
       title: "Musique recommandée activée",

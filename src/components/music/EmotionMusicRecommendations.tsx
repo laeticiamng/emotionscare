@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useMusicRecommendation } from '@/hooks/useMusicRecommendation';
+import useMusicRecommendation from '@/hooks/useMusicRecommendation';
 import { EmotionResult } from '@/types';
 import { Music, PlayCircle, PauseCircle, Loader2 } from 'lucide-react';
 

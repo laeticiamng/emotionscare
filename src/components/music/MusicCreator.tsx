@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMusic } from '@/contexts/MusicContext';
 import MusicPresetCard from './MusicPresetCard';
 import EnhancedMusicVisualizer from './EnhancedMusicVisualizer';
+import { safeOpen } from '@/lib/utils';
 
 interface MusicCreatorProps {
   // Add props if needed
@@ -21,7 +23,7 @@ const MusicCreator: React.FC<MusicCreatorProps> = () => {
   const { toast } = useToast();
   const { setOpenDrawer } = useMusic();
   
-  const [selectedPreset, setSelectedPreset] = useState(null);
+  const [selectedPreset, setSelectedPreset] = useState<any>(null);
 
   const handleTempoChange = (values: number[]) => {
     setTempo(values[0]);
@@ -46,7 +48,7 @@ const MusicCreator: React.FC<MusicCreatorProps> = () => {
       title: "Musique générée",
       description: "Votre musique personnalisée est prête à être écoutée!",
     });
-    setOpenDrawer(true);
+    safeOpen(setOpenDrawer);
   };
   
   const musicPresets = [
@@ -88,7 +90,7 @@ const MusicCreator: React.FC<MusicCreatorProps> = () => {
     },
   ];
   
-  const handlePresetSelect = (preset) => {
+  const handlePresetSelect = (preset: any) => {
     setSelectedPreset(preset);
     setTempo(preset.tempo);
     setMood(preset.mood);
@@ -134,7 +136,7 @@ const MusicCreator: React.FC<MusicCreatorProps> = () => {
         </div>
         
         <EnhancedMusicVisualizer 
-          mood={mood}
+          emotion={mood}
           intensity={volume}
           volume={volume / 100}
         />

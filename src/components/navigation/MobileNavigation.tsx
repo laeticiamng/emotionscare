@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Sheet,
@@ -16,20 +17,21 @@ import { User } from '@/types';
 import ThemeButton from '@/components/ui/sidebar/ThemeButton';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MainNavItem, SidebarNavItem } from "@/types/navigation";
+import { NavItem, SidebarNavItem } from "@/types/navigation";
 import { NavLink } from 'react-router-dom';
 import { useMusic } from '@/contexts/MusicContext';
+import { safeOpen } from '@/lib/utils';
 
 interface MobileNavProps {
   user: User | null;
-  mainNavItems?: MainNavItem[]
+  mainNavItems?: NavItem[]
   sidebarNavItems?: SidebarNavItem[]
 }
 
 const MobileNavigation: React.FC<MobileNavProps> = ({ user, mainNavItems, sidebarNavItems }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const { openDrawer, setOpenDrawer } = useMusic();
+  const { setOpenDrawer } = useMusic();
 
   const handleLogout = async () => {
     await logout();
@@ -102,7 +104,11 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user, mainNavItems, sideba
               Déconnexion
             </Button>
             
-            <Button variant="secondary" onClick={() => setOpenDrawer(true)} className="w-full justify-start">
+            <Button 
+              variant="secondary" 
+              onClick={() => safeOpen(setOpenDrawer)}
+              className="w-full justify-start"
+            >
               Ouvrir lecteur musical
             </Button>
           </div>

@@ -1,8 +1,10 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCoachRecommendations } from '@/lib/coachService';
+import { getCoachRecommendations } from '@/lib/coach/coach-service';
+import { safeOpen } from '@/lib/utils';
 
 const DEFAULT_RECOMMENDATIONS = [
   "Essayez une séance de méditation guidée",
@@ -49,7 +51,7 @@ export const useCoachDashboard = () => {
   }, [loadRecommendations]);
 
   const playRecommendedMusic = (emotion: string) => {
-    setOpenDrawer(true);
+    safeOpen(setOpenDrawer);
     toast({
       title: "Musique recommandée activée",
       description: `Playlist "${emotion}" chargée pour accompagner votre humeur.`,

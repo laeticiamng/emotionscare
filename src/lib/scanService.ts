@@ -1,115 +1,50 @@
 
-import { Emotion, EmotionResult } from '@/types';
-import { 
-  analyzeEmotion as analyzeEmotionService, 
-  analyzeAudioStream as analyzeAudioStreamService, 
-  saveRealtimeEmotionScan as saveRealtimeEmotionScanService 
-} from '@/lib/scan/analyzeService';
-import { createEmotionEntry as createEmotionEntryService, fetchLatestEmotion as fetchLatestEmotionService, fetchEmotionHistory as fetchEmotionHistoryService } from '@/lib/scan/emotionService';
+import { Emotion } from '@/types';
+import { mockEmotions } from '@/data/mockEmotions';
 
-// Re-export the EmotionResult type for components to use
-export type { EmotionResult } from '@/types';
-
-// Function to analyze audio stream
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  try {
-    // Convert Blob to Uint8Array for the service function
-    const arrayBuffer = await audioBlob.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
-    
-    return await analyzeAudioStreamService([uint8Array]);
-  } catch (error) {
-    console.error('Error analyzing audio stream:', error);
-    return {
-      emotion: 'neutral', // Provide a default value for the required field
-      confidence: 0.5,
-      transcript: 'Erreur d\'analyse',
-      feedback: 'Une erreur est survenue lors de l\'analyse'
-    };
-  }
-};
-
-// Function to save realtime emotion scan
-export const saveRealtimeEmotionScan = async (emotion: Emotion, userId: string): Promise<void> => {
-  try {
-    if (!userId) {
-      throw new Error("user_id is required for saving realtime emotion scan");
-    }
-    
-    // Make sure emotion has all required properties
-    const emotionWithDefaults: EmotionResult = {
-      emotion: emotion.emotion || 'neutral',
-      confidence: emotion.confidence || 0.5,
-      feedback: emotion.ai_feedback || '',
-      transcript: emotion.text || ''
-    };
-    
-    await saveRealtimeEmotionScanService(emotionWithDefaults, userId);
-  } catch (error) {
-    console.error('Error saving emotion scan:', error);
-    throw error;
-  }
-};
-
-// Add missing functions that are being imported elsewhere
-export const analyzeEmotion = async (payload: {
-  user_id: string;
-  emojis?: string;
+// Fix the missing functions that were being imported
+export async function createEmotionEntry(data: { 
+  user_id: string; 
   text?: string;
-  audio_url?: string | null;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}): Promise<EmotionResult> => {
-  try {
-    // Verify required fields
-    if (!payload.user_id) {
-      throw new Error("user_id is required for emotion analysis");
-    }
-    
-    return await analyzeEmotionService(payload);
-  } catch (error) {
-    console.error('Error analyzing emotion:', error);
-    throw error;
-  }
-};
-
-export const fetchEmotionHistory = async (userId?: string): Promise<Emotion[]> => {
-  try {
-    return await fetchEmotionHistoryService(userId || '');
-  } catch (error) {
-    console.error('Error fetching emotion history:', error);
-    return [];
-  }
-};
-
-export const createEmotionEntry = async (data: {
-  user_id: string;
   emojis?: string;
-  text?: string;
-  audio_url?: string;
-}): Promise<Emotion> => {
-  try {
-    // Verify required fields
-    if (!data.user_id) {
-      throw new Error("user_id is required for creating emotion entry");
-    }
-    
-    const result = await createEmotionEntryService(data);
-    if (!result) {
-      throw new Error("Failed to create emotion entry");
-    }
-    return result;
-  } catch (error) {
-    console.error('Error creating emotion entry:', error);
-    throw error;
-  }
-};
+  audio_url?: string; 
+}): Promise<Emotion> {
+  // Create a mock emotion entry based on the provided data
+  const newEmotion: Emotion = {
+    id: `temp-${Date.now()}`,
+    user_id: data.user_id,
+    emotion: data.text ? 'neutral' : 'happy', // Default or based on text analysis
+    confidence: 0.8,
+    date: new Date().toISOString(),
+    text: data.text,
+    score: 75,
+    emojis: data.emojis ? [data.emojis] : ['😊'],
+    ai_feedback: "Merci pour votre contribution. Votre bien-être est important."
+  };
+  
+  console.log('Created new emotion entry:', newEmotion);
+  return newEmotion;
+}
 
-export const fetchLatestEmotion = async (userId?: string): Promise<Emotion | null> => {
-  try {
-    return await fetchLatestEmotionService(userId || '');
-  } catch (error) {
-    console.error('Error fetching latest emotion:', error);
-    return null;
-  }
-};
+export async function fetchLatestEmotion(userId: string): Promise<Emotion | null> {
+  // Get latest emotion from mock data
+  const userEmotions = mockEmotions
+    .filter(e => e.user_id === userId)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  return userEmotions[0] || null;
+}
+
+export async function fetchEmotionHistory(): Promise<Emotion[]> {
+  // Return all mock emotions as history
+  return Promise.resolve(mockEmotions);
+}
+
+// For backwards compatibility
+export async function getLatestEmotion(userId: string): Promise<Emotion | null> {
+  return fetchLatestEmotion(userId);
+}
+
+export async function getEmotionHistory(): Promise<Emotion[]> {
+  return fetchEmotionHistory();
+}

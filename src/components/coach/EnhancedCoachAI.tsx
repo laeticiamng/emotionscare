@@ -1,13 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bot, Sparkles, Music, Brain } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types';
-import MusicRecommendationCard from './MusicRecommendationCard';
+import { Emotion, EmotionResult } from '@/types';
+import MusicRecommendationCard from '../music/MusicRecommendationCard';
 import VREmotionRecommendation from '../vr/VREmotionRecommendation';
 import { Separator } from '@/components/ui/separator';
+import { safeOpen } from '@/lib/utils';
 
 interface EnhancedCoachAIProps {
   emotionResult: EmotionResult;
@@ -39,12 +41,27 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
   const handlePlayMusic = () => {
     const emotion = emotionResult.emotion.toLowerCase();
     loadPlaylistForEmotion(emotion);
-    setOpenDrawer(true);
+    safeOpen(setOpenDrawer);
     
     toast({
       title: "Musique activée",
       description: `Playlist adaptée à votre humeur "${emotion}" chargée.`
     });
+  };
+  
+  // Convert EmotionResult to Emotion for VREmotionRecommendation
+  const convertToEmotion = (result: EmotionResult): Emotion => {
+    return {
+      id: result.id || `temp-${Date.now()}`,
+      user_id: result.user_id || 'current-user',
+      emotion: result.emotion,
+      confidence: result.confidence,
+      date: result.date || new Date().toISOString(),
+      text: result.text,
+      score: result.score,
+      ai_feedback: result.ai_feedback,
+      emojis: result.emojis
+    };
   };
   
   return (
@@ -92,7 +109,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
           )}
           
           {showVRRec && (
-            <VREmotionRecommendation emotion={emotionResult} />
+            <VREmotionRecommendation emotion={convertToEmotion(emotionResult)} />
           )}
         </div>
       </CardContent>

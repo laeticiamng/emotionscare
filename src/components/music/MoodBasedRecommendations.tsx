@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
+import { safeOpen } from '@/lib/utils';
 
 interface MoodBasedRecommendationsProps {
   mood?: string;
@@ -24,7 +26,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
     const musicType = mood.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
-    setOpenDrawer(true);
+    safeOpen(setOpenDrawer);
     
     toast({
       title: "Musique recommandée activée",
