@@ -56,8 +56,8 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<Shell><Index /></Shell>} />
-      <Route element={<Shell />}>
+      <Route path="/" element={<Shell />}>
+        <Route index element={<Index />} />
         <Route path="/dashboard" element={<ProtectedLayout><DashboardPage /></ProtectedLayout>} />
         <Route path="/scan" element={<ProtectedLayout><ScanPage /></ProtectedLayout>} />
         <Route path="/vr" element={<ProtectedLayout><VRPage /></ProtectedLayout>} />
