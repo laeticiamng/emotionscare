@@ -34,38 +34,6 @@ export interface User {
 // Theme related types
 export type ThemeName = 'light' | 'dark' | 'pastel' | 'system' | 'nature' | 'deep-night';
 
-// Emotion related types
-export interface Emotion {
-  id: string;
-  user_id: string;
-  emotion: string;
-  confidence: number;
-  date: string;
-  score: number;
-  text?: string;
-  emojis?: string[];
-  ai_feedback?: string;
-  intensity?: number;
-  source?: string;
-  transcript?: string;
-}
-
-export interface EmotionResult {
-  id?: string;
-  user_id?: string;
-  date?: string;
-  emotion: string;
-  confidence: number;
-  score?: number;
-  transcript?: string;
-  text?: string;
-  emojis?: string[];
-  feedback?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  source?: string;
-}
-
 // Report related types
 export interface Report {
   id: string;
@@ -109,21 +77,6 @@ export interface Badge {
   criteria?: string;
 }
 
-// Challenge related types
-export interface Challenge {
-  id: string;
-  name: string;
-  description: string;
-  target: number;
-  progress: number;
-  completed: boolean;
-  deadline?: string;
-  total?: number;
-  title?: string;
-  points?: number;
-  maxProgress?: number;
-}
-
 // VR related types
 export interface VRSessionTemplate {
   id: string;
@@ -158,66 +111,6 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
-}
-
-// Journal related types
-export interface JournalEntry {
-  id: string;
-  user_id: string;
-  content: string;
-  date: string;
-  title: string;
-  mood: string;
-  created_at: string;
-  ai_feedback?: string;
-  text?: string;
-  mood_score: number;
-}
-
-// Chart types
-export interface MoodData {
-  date: string;
-  originalDate?: string;
-  value: number;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
-}
-
-// Chat types
-export interface ChatMessage {
-  id: string;
-  text: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
-
-// Invitation types
-export interface InvitationStats {
-  total: number;
-  sent: number;
-  pending: number;
-  accepted: number;
-  expired: number;
-  rejected: number;
-  teams: Record<string, number>;
-  recent_invites?: any[];
-}
-
-export interface InvitationFormData {
-  email: string;
-  role: string;
-  name?: string;
-  team_id?: string;
-  message?: string;
-}
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  message: string;
-  invitation?: any;
-  email?: string;
-  role?: string;
 }
 
 // User preferences
@@ -259,40 +152,6 @@ export interface UserPreferences {
   };
 }
 
-// Music related types
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  audioUrl?: string;
-  coverUrl?: string;
-  coverImage?: string;
-  cover?: string;
-  externalUrl?: string;
-  genre?: string;
-  emotion?: string;
-  mood?: string;
-  year?: number;
-  isPlaying?: boolean;
-}
-
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  description?: string;
-  coverUrl?: string;
-  emotion?: string;
-  tracks: MusicTrack[];
-}
-
-export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
-
-// For backward compatibility
-export type Track = MusicTrack;
-export type Playlist = MusicPlaylist;
-
 // Now make sure to export all types from the separate type files
 export * from './emotion';
 export * from './navigation';
@@ -303,3 +162,4 @@ export * from './invitation';
 export * from './community';
 export * from './gamification';
 export * from './audio-player';
+export * from './journal';

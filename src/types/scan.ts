@@ -1,45 +1,38 @@
 
-// Import from the main index file
-import { Emotion, User } from './index';
+// Types related to emotion scanning and processing
 
-export interface ScanInput {
-  emojis?: string;
+import { Emotion, EmotionResult } from './emotion';
+import { User } from './index';
+
+export interface ScanFormData {
   text?: string;
+  audio?: File | null;
   audio_url?: string;
-  user_id: string;
-}
-
-export interface ScanResponse {
-  emotion: Emotion;
-  feedback: string;
-  score: number;
-}
-
-// Additional scan-specific types
-export interface EmotionScanConfig {
-  userId: string;
-  includeFeedback: boolean;
-  saveResult: boolean;
-  confidential?: boolean;
-}
-
-export interface EmotionScanResult {
-  id?: string;
-  emotion: string;
-  confidence?: number;
-  score?: number;
   emojis?: string;
-  text?: string;
-  transcript?: string;
-  feedback?: string;
-  recommendations?: string[];
-  ai_feedback?: string;
 }
 
-export interface EmotionHistoryFilter {
-  startDate?: Date;
-  endDate?: Date;
-  emotions?: string[];
-  minScore?: number;
-  maxScore?: number;
+export interface ScanFilterOptions {
+  period: '7' | '30' | '90';
+  service: string;
+  anonymized: boolean;
+}
+
+export interface ScanUserData {
+  user: User;
+  latestEmotion?: Emotion;
+  emotionCount: number;
+  averageScore: number;
+}
+
+export interface EmotionScanResponse {
+  emotion: EmotionResult;
+  recommendations?: string[];
+}
+
+export interface EmotionVisualizerParams {
+  emotion: string;
+  intensity?: number;
+  size?: 'sm' | 'md' | 'lg';
+  withLabel?: boolean;
+  className?: string;
 }

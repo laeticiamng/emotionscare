@@ -1,6 +1,22 @@
 
-// Enhanced emotion types used in more advanced emotion analysis components
-export interface EnhancedEmotionResult {
+// Types related to emotions and emotional analysis
+
+export interface Emotion {
+  id: string;
+  user_id: string;
+  emotion: string;
+  confidence: number;
+  date: string;
+  score: number;
+  text?: string;
+  emojis?: string[];
+  ai_feedback?: string;
+  intensity?: number;
+  source?: string;
+  transcript?: string;
+}
+
+export interface EmotionResult {
   id?: string;
   user_id?: string;
   date?: string;
@@ -10,25 +26,18 @@ export interface EnhancedEmotionResult {
   transcript?: string;
   text?: string;
   emojis?: string[];
-  feedback: string;
+  feedback?: string;
   ai_feedback?: string;
-  recommendations: string[];
+  recommendations?: string[];
   source?: string;
-  intensity?: number;
-  analysis?: {
-    primary_emotion?: string;
-    secondary_emotion?: string;
-    intensity?: number;
-    valence?: number;
-    arousal?: number;
-  };
-  contextual_data?: {
-    time_of_day?: string;
-    activity?: string;
-    location?: string;
-    social_context?: string;
-  };
 }
 
-// Export the basic types from index.ts for backward compatibility
-export type { Emotion, EmotionResult } from './index';
+// Related types for emotion charting
+export interface MoodData {
+  date: string;
+  originalDate?: string;
+  value: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
+}

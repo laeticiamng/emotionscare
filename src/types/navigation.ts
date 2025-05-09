@@ -1,25 +1,31 @@
 
 // Navigation related types
-export interface NavItem {
-  title: string;
+
+export interface NavigationItem {
+  name: string;
   href: string;
-  icon?: React.ReactNode;
+  icon?: React.ComponentType<{ className?: string }>;
+  current?: boolean;
+  children?: NavigationItem[];
+  badge?: number | string;
   disabled?: boolean;
-  external?: boolean;
-  label?: string;
+  admin?: boolean;
 }
 
-export interface SidebarNavItem extends NavItem {
-  items?: NavItem[];
-  isActive?: boolean;
-  isCollapsed?: boolean;
+export interface MobileNavigationProps {
+  items: NavigationItem[];
+  user?: any;
+  onLogout?: () => void;
 }
 
-export interface UserNavItem {
-  title: string;
-  href: string;
-  disabled?: boolean;
-  action?: () => void;
+export interface SidebarProps {
+  items: NavigationItem[];
+  user?: any;
+  onLogout?: () => void;
 }
 
-export type MainNavItem = NavItem;
+export interface NavigationConfig {
+  mainNav: NavigationItem[];
+  sidebarNav: NavigationItem[];
+  adminNav: NavigationItem[];
+}
