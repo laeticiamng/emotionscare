@@ -246,6 +246,27 @@ const config = {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(0)" }
         },
+        "pulse-slow": {
+          "0%": { opacity: "0.5", transform: "scale(1)" },
+          "50%": { opacity: "0.7", transform: "scale(1.05)" },
+          "100%": { opacity: "0.5", transform: "scale(1)" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" }
+        },
+        "gradient-x": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" }
+        },
+        "shimmer": {
+          "0%": { backgroundPosition: "-100% 0" },
+          "100%": { backgroundPosition: "100% 0" }
+        },
+        "breathe": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -254,6 +275,12 @@ const config = {
         "scale-in": "scale-in 0.3s ease-out forwards",
         "slide-in-right": "slide-in-right 0.3s ease-out",
         "slide-in-left": "slide-in-left 0.3s ease-out",
+        "pulse-slow": "pulse-slow 6s ease-in-out infinite",
+        "float": "float 8s ease-in-out infinite",
+        "float-delay": "float 10s ease-in-out 1s infinite",
+        "gradient-x": "gradient-x 4s ease infinite",
+        "shimmer": "shimmer 2s infinite",
+        "breathe": "breathe 4s ease-in-out infinite"
       },
       backgroundImage: {
         'dark-gradient': 'linear-gradient(to bottom right, #1F2430, #353A47)',
@@ -262,6 +289,9 @@ const config = {
         'premium-light': 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(246,249,252,1) 100%)',
         'premium-dark': 'linear-gradient(135deg, rgba(31,36,48,1) 0%, rgba(36,41,56,1) 100%)',
         'premium-pastel': 'linear-gradient(135deg, rgba(237,244,255,1) 0%, rgba(230,240,255,1) 100%)',
+        'emotional-gradient': 'linear-gradient(135deg, #ECF6FF 0%, #FFEEFE 100%)',
+        'calm-gradient': 'linear-gradient(135deg, #E0F7FA 0%, #E8F5E9 100%)',
+        'energy-gradient': 'linear-gradient(135deg, #FFF8E1 0%, #FFEBEE 100%)',
       },
       spacing: {
         '1': '4px',
@@ -278,10 +308,14 @@ const config = {
       },
       transitionTimingFunction: {
         'apple': 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+        'emotional': 'cubic-bezier(0.34, 1.56, 0.64, 1)', // Bouncy, emotional feel
+        'smooth': 'cubic-bezier(0.65, 0, 0.35, 1)', // Smooth, calming transitions
       },
       transitionDuration: {
         '250': '250ms',
         '350': '350ms',
+        '450': '450ms',
+        '650': '650ms',
       },
     },
   },

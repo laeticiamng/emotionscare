@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -73,15 +74,20 @@ export const Home: React.FC = () => {
   
   return (
     <div className="container mx-auto max-w-7xl py-12 px-4 md:px-8">
-      {/* Hero Section - Améliorée avec un dégradé doux et une mise en page centrée */}
-      <section className="relative py-20 px-4 rounded-3xl bg-gradient-to-br from-white to-[#F0F9FF] mb-16">
+      {/* Hero Section - Amélioré avec des animations et transitions */}
+      <section className="relative py-20 px-4 rounded-3xl bg-gradient-to-br from-white to-[#F0F9FF] mb-16 overflow-hidden transform transition-all duration-700 hover:shadow-xl">
         <div 
           className="absolute inset-0 rounded-3xl bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMCkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiMzQjgyRjYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')]"
           style={{ opacity: "0.4", mixBlendMode: "overlay" }}
         />
+        
+        {/* Cercles d'ambiance animés */}
+        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-purple-100/30 to-blue-100/30 blur-[70px] animate-pulse-slow"></div>
+        <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-rose-100/30 to-amber-100/30 blur-[70px] animate-pulse-slow animation-delay-2000"></div>
+        
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight text-gray-900 animate-fade-in">
-            Prenez soin de votre <span className="text-primary">état émotionnel</span>
+            Prenez soin de votre <span className="text-primary animate-gradient-text">état émotionnel</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -91,31 +97,31 @@ export const Home: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
             {isAuthenticated ? (
               <>
-                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all">
+                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
                   <Link to="/dashboard">
                     Accéder à mon espace
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg">
+                <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
                   <Link to="/scan">
                     Faire un scan émotionnel
-                    <Heart className="h-4 w-4 ml-2" />
+                    <Heart className="h-4 w-4 ml-2 transition-all group-hover:scale-110 group-hover:text-rose-500" />
                   </Link>
                 </Button>
               </>
             ) : (
               <>
-                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all">
+                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
                   <Link to="/register">
                     S'inscrire
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg">
+                <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
                   <Link to="/login">
                     Se connecter
-                    <ArrowRight className="h-4 w-4 ml-2" />
+                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               </>
@@ -124,9 +130,9 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Modules Section - Améliorée avec des cartes plus visuelles */}
+      {/* Modules Section - Améliorée avec des animations */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold mb-8 text-center">Nos modules thérapeutiques</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center animate-fade-in">Nos modules thérapeutiques</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {modules.map((module, index) => {
@@ -135,24 +141,25 @@ export const Home: React.FC = () => {
             return (
               <div 
                 key={module.title}
-                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in"
+                className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-500 animate-fade-in hover:-translate-y-2 group"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className={`${module.bgColor} p-3 rounded-lg`}>
-                    <ModuleIcon className={`h-6 w-6 ${module.color}`} />
+                  <div className={`${module.bgColor} p-3 rounded-lg transition-transform duration-300 group-hover:scale-110`}>
+                    <ModuleIcon className={`h-6 w-6 ${module.color} transition-transform duration-300`} />
                   </div>
                   {module.badge && (
-                    <Badge variant="outline" className="font-normal">
+                    <Badge variant="outline" className="font-normal animate-pulse">
                       {module.badge}
                     </Badge>
                   )}
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{module.title}</h3>
+                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">{module.title}</h3>
                 <p className="text-gray-600 mb-4">{module.description}</p>
-                <Button asChild variant="outline" className="w-full">
-                  <Link to={isAuthenticated ? module.path : "/login"}>
+                <Button asChild variant="outline" className="w-full transition-all duration-300 overflow-hidden group-hover:bg-primary/10">
+                  <Link to={isAuthenticated ? module.path : "/login"} className="relative">
                     {isAuthenticated ? 'Accéder' : 'Connexion requise'}
+                    <ArrowRight className="h-4 w-4 ml-2 inline transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </Button>
               </div>
@@ -161,43 +168,47 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section - Nouveau bloc d'appel à l'action */}
-      <section className="bg-primary/10 rounded-2xl p-8 md:p-12 mb-16">
-        <div className="flex flex-col md:flex-row gap-8 items-center">
-          <div className="flex-1">
+      {/* CTA Section - Améliorée avec des animations */}
+      <section className="bg-primary/5 rounded-2xl p-8 md:p-12 mb-16 transform transition-all duration-500 hover:bg-primary/10 hover:shadow-lg overflow-hidden relative">
+        {/* Élément décoratif animé */}
+        <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-primary/10 animate-float"></div>
+        <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full bg-primary/5 animate-float-delay"></div>
+        
+        <div className="flex flex-col md:flex-row gap-8 items-center relative z-10">
+          <div className="flex-1 animate-fade-in">
             <h2 className="text-3xl font-bold mb-4">Améliorez votre bien-être dès aujourd'hui</h2>
             <p className="text-lg mb-6 text-gray-600">
               Rejoignez notre communauté d'utilisateurs qui ont trouvé un meilleur équilibre émotionnel grâce à EmotionsCare.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg">
+              <Button asChild size="lg" className="transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
                 <Link to={isAuthenticated ? "/scan" : "/register"}>
                   Commencer maintenant
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
                 <Link to="/about">
                   En savoir plus
                 </Link>
               </Button>
             </div>
           </div>
-          <div className="flex-1 flex justify-center">
-            <div className="w-full max-w-md aspect-video bg-gradient-to-br from-primary/50 to-primary/30 rounded-xl flex items-center justify-center">
-              <ThumbsUp className="h-16 w-16 text-primary" />
+          <div className="flex-1 flex justify-center animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <div className="w-full max-w-md aspect-video bg-gradient-to-br from-primary/50 to-primary/30 rounded-xl flex items-center justify-center transform transition-all duration-500 hover:scale-[1.03] hover:shadow-lg">
+              <ThumbsUp className="h-16 w-16 text-primary animate-pulse" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section - Présentation des fonctionnalités clés */}
+      {/* Features Section - Améliorée avec des animations */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold mb-8 text-center">Fonctionnalités clés</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center animate-fade-in">Fonctionnalités clés</h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="bg-rose-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4">
-              <Heart className="h-8 w-8 text-rose-500" />
+          <div className="text-center transform transition-all duration-300 hover:-translate-y-2 animate-fade-in" style={{ animationDelay: "100ms" }}>
+            <div className="bg-rose-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4 transition-transform duration-300 hover:scale-110">
+              <Heart className="h-8 w-8 text-rose-500 transition-all duration-300 hover:scale-110" />
             </div>
             <h3 className="text-xl font-medium mb-2">Analyse émotionnelle</h3>
             <p className="text-gray-600">
@@ -205,9 +216,9 @@ export const Home: React.FC = () => {
             </p>
           </div>
           
-          <div className="text-center">
-            <div className="bg-blue-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4">
-              <Headphones className="h-8 w-8 text-blue-500" />
+          <div className="text-center transform transition-all duration-300 hover:-translate-y-2 animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <div className="bg-blue-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4 transition-transform duration-300 hover:scale-110">
+              <Headphones className="h-8 w-8 text-blue-500 transition-all duration-300 hover:scale-110" />
             </div>
             <h3 className="text-xl font-medium mb-2">Musicothérapie</h3>
             <p className="text-gray-600">
@@ -215,9 +226,9 @@ export const Home: React.FC = () => {
             </p>
           </div>
           
-          <div className="text-center">
-            <div className="bg-amber-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4">
-              <MessageCircle className="h-8 w-8 text-amber-500" />
+          <div className="text-center transform transition-all duration-300 hover:-translate-y-2 animate-fade-in" style={{ animationDelay: "300ms" }}>
+            <div className="bg-amber-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4 transition-transform duration-300 hover:scale-110">
+              <MessageCircle className="h-8 w-8 text-amber-500 transition-all duration-300 hover:scale-110" />
             </div>
             <h3 className="text-xl font-medium mb-2">Coaching IA</h3>
             <p className="text-gray-600">
@@ -225,9 +236,9 @@ export const Home: React.FC = () => {
             </p>
           </div>
           
-          <div className="text-center">
-            <div className="bg-emerald-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4">
-              <Video className="h-8 w-8 text-emerald-500" />
+          <div className="text-center transform transition-all duration-300 hover:-translate-y-2 animate-fade-in" style={{ animationDelay: "400ms" }}>
+            <div className="bg-emerald-100 mx-auto w-16 h-16 flex items-center justify-center rounded-full mb-4 transition-transform duration-300 hover:scale-110">
+              <Video className="h-8 w-8 text-emerald-500 transition-all duration-300 hover:scale-110" />
             </div>
             <h3 className="text-xl font-medium mb-2">VR thérapeutique</h3>
             <p className="text-gray-600">
@@ -237,19 +248,19 @@ export const Home: React.FC = () => {
         </div>
       </section>
       
-      {/* FAQ Section - Ajout d'une section de questions fréquentes */}
+      {/* FAQ Section - Améliorée avec des animations */}
       <section className="mb-8">
-        <h2 className="text-3xl font-bold mb-8 text-center">Foire aux questions</h2>
+        <h2 className="text-3xl font-bold mb-8 text-center animate-fade-in">Foire aux questions</h2>
         
         <div className="max-w-3xl mx-auto space-y-6">
-          <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+          <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm animate-fade-in transform transition-all duration-300 hover:shadow-md hover:-translate-y-1" style={{ animationDelay: "100ms" }}>
             <h3 className="text-xl font-medium mb-2">Comment fonctionne l'analyse émotionnelle ?</h3>
             <p className="text-gray-600">
               Notre système utilise des algorithmes d'intelligence artificielle pour analyser votre texte ou votre voix et détecter votre état émotionnel actuel. Il propose ensuite des recommandations adaptées pour améliorer votre bien-être.
             </p>
           </div>
           
-          <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm">
+          <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm animate-fade-in transform transition-all duration-300 hover:shadow-md hover:-translate-y-1" style={{ animationDelay: "200ms" }}>
             <h3 className="text-xl font-medium mb-2">Mes données sont-elles sécurisées ?</h3>
             <p className="text-gray-600">
               Absolument. Nous prenons la confidentialité très au sérieux. Toutes vos données sont cryptées et ne sont jamais partagées avec des tiers. Vous pouvez également activer le mode confidentiel pour une sécurité renforcée.

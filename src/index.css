@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -198,4 +197,62 @@
 
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Transitions améliorées */
+.transition-smooth {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Groupe hover effects for emotional feedback */
+.group-hover-trigger:hover .group-hover-target {
+  @apply transform scale-110 text-primary;
+}
+
+/* Button effects */
+.button-elevation {
+  @apply transition-all duration-300 transform;
+}
+
+.button-elevation:hover {
+  @apply -translate-y-1 shadow-lg;
+}
+
+/* Micro-animations for elements */
+.micro-bounce {
+  animation: microBounce 1s ease infinite;
+}
+
+@keyframes microBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Text animations */
+.text-shimmer {
+  background: linear-gradient(
+    to right,
+    #4F46E5 20%,
+    #818CF8 30%,
+    #4F46E5 70%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 3s ease infinite;
+}
+
+@keyframes textShimmer {
+  to { background-position: 200% center; }
 }
