@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getChallenges as fetchChallenges, getUserBadges as fetchBadges, completeChallenge } from '@/lib/gamificationService';
+import { fetchChallenges, fetchBadges, completeChallenge } from '@/lib/gamificationService';
 import { Badge, Challenge } from '@/types';
 import BadgeGrid from '@/components/gamification/BadgeGrid';
 import ChallengeItem from '@/components/gamification/ChallengeItem';
