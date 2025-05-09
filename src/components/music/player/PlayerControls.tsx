@@ -15,6 +15,9 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
   onPrevious,
   onNext
 }) => {
+  // Log pour vérifier si les props sont bien reçues
+  console.log('PlayerControls: isPlaying=', isPlaying, 'loadingTrack=', loadingTrack);
+  
   return (
     <div className="flex items-center gap-2 justify-center">
       <Button 

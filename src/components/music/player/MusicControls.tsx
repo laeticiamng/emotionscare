@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from 'lucide-react';
 import PlayerControls from './PlayerControls';
@@ -40,6 +40,15 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     previousTrack,
     handleVolumeChange
   } = useAudioPlayer();
+
+  useEffect(() => {
+    console.group('🔍 MusicControls Component Imports');
+    console.log('→ PlayerControls:', typeof PlayerControls, PlayerControls);
+    console.log('→ VolumeControl:', typeof VolumeControl, VolumeControl);
+    console.log('→ useAudioPlayerState returned:', { isPlaying, volume, loadingTrack, repeat, shuffle });
+    console.log('→ useAudioPlayer returned:', { pauseTrack, resumeTrack, nextTrack, previousTrack });
+    console.groupEnd();
+  }, []);
   
   const handlePlay = () => {
     resumeTrack();
