@@ -116,7 +116,7 @@ export function EmotionMusicRecommendations({
       <CardContent>
         {error || localError ? (
           <div className="text-destructive text-sm mb-4">
-            {typeof error === 'string' ? error : error instanceof Error ? error.message : ''}
+            {error ? (error instanceof Error ? error.message : String(error)) : ''}
             {localError && <span>{localError}</span>}
             <Button 
               variant="outline" 

@@ -95,6 +95,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: `emotion-${emotion}`,
         title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Music`,
         tracks: tracks,
+        emotion: emotion
       }));
       
       setPlaylists(defaultPlaylists);
@@ -138,6 +139,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: `emotion-${emotionType}`,
       title: `${emotionType.charAt(0).toUpperCase() + emotionType.slice(1)} Music`,
       tracks: emotionPlaylists[emotionType] || [],
+      emotion: emotionType
     };
     
     setCurrentPlaylist(emotionPlaylist);
@@ -167,7 +169,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const newPlaylist: MusicPlaylist = {
       id: `user-${Date.now()}`,
       title: name,
-      name,
+      name: name,
       tracks: [],
     };
     

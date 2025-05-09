@@ -1,68 +1,69 @@
 
 import React from 'react';
-import { Loader2, Music } from 'lucide-react';
-import { TrackInfoProps } from '@/types/audio-player';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { MusicTrack } from '@/types/music';
+import { TrackInfoProps } from '@/types/audio-player';
 
-/**
- * Display for current track information (title, artist, cover)
- */
-const TrackInfo: React.FC<TrackInfoProps> = ({
+const TrackInfo: React.FC<TrackInfoProps> = ({ 
+  track,
+  showCover = true,
+  showControls = false,
   currentTrack,
   loadingTrack,
   audioError
 }) => {
-  // Get cover URL from different possible properties
-  const getCoverUrl = () => {
-    if (!currentTrack) return null;
-    
-    if (currentTrack.cover_url) {
-      return currentTrack.cover_url;
-    }
-    
-    if (currentTrack.cover) {
-      return currentTrack.cover;
-    }
-    
-    if (currentTrack.coverUrl) {
-      return currentTrack.coverUrl;
-    }
-    
-    if (currentTrack.coverImage) {
-      return currentTrack.coverImage;
-    }
-    
-    return null;
-  };
+  const displayTrack = currentTrack || track;
   
-  const coverUrl = getCoverUrl();
-  
-  return (
-    <div className="flex items-center mb-6 gap-4">
-      <div className="w-16 h-16 bg-muted rounded-md flex items-center justify-center overflow-hidden relative">
-        {coverUrl ? (
-          <img src={coverUrl} alt={currentTrack.title} className="w-full h-full object-cover" />
-        ) : (
-          <Music className="h-8 w-8 text-muted-foreground" />
-        )}
-        
-        {loadingTrack && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        )}
+  if (loadingTrack) {
+    return (
+      <div className="flex items-center space-x-4">
+        {showCover && <Skeleton className="h-12 w-12 rounded-md" />}
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[200px]" />
+          <Skeleton className="h-4 w-[160px]" />
+        </div>
       </div>
+    );
+  }
+
+  if (audioError) {
+    return (
+      <div className="text-sm text-destructive">
+        Erreur de lecture: {audioError.message}
+      </div>
+    );
+  }
+
+  if (!displayTrack) {
+    return (
+      <div className="text-sm text-muted-foreground italic">
+        Aucune piste sélectionnée
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center space-x-4">
+      {showCover && (
+        <div className="flex-shrink-0">
+          <div className="h-12 w-12 rounded-md bg-secondary flex items-center justify-center">
+            {displayTrack.cover_url || displayTrack.coverUrl || displayTrack.cover || displayTrack.coverImage ? (
+              <img 
+                src={displayTrack.cover_url || displayTrack.coverUrl || displayTrack.cover || displayTrack.coverImage} 
+                alt={displayTrack.title}
+                className="h-full w-full object-cover rounded-md"
+              />
+            ) : (
+              <span className="text-xl">🎵</span>
+            )}
+          </div>
+        </div>
+      )}
       
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium leading-tight truncate">
-          {currentTrack.title}
-          {audioError && (
-            <span className="text-destructive text-xs ml-2">(Erreur)</span>
-          )}
-        </h3>
-        <p className="text-sm text-muted-foreground truncate">
-          {currentTrack.artist}
-        </p>
+      <div className="space-y-1">
+        <h3 className="font-medium leading-none">{displayTrack.title}</h3>
+        <p className="text-xs text-muted-foreground">{displayTrack.artist}</p>
       </div>
     </div>
   );
