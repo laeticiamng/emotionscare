@@ -1,64 +1,44 @@
+import React, { useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import MusicDrawer from '@/components/music/player/MusicDrawer'
 
-import React, { memo } from "react";
-import { Toaster } from "./ui/toaster";
-import useDrawerState from "@/hooks/useDrawerState";
-import useLogger from "@/hooks/useLogger";
-
-interface ShellProps {
-  children?: React.ReactNode;
-}
-
-const Shell: React.FC<ShellProps> = () => {
-  const logger = useLogger('Shell-Stub');
-  const { isDrawerOpen, toggleDrawer, closeDrawer } = useDrawerState();
-  
-  logger.debug('Rendering shell stub component', { data: { isDrawerOpen } });
+const Shell: React.FC = () => {
+  const [musicOpen, setMusicOpen] = useState(false)
 
   return (
-    <div style={{ padding: '2rem', background: '#fcf' }}>
-      <h1>Shell Stub</h1>
-      <button 
-        onClick={toggleDrawer} 
-        style={{ 
-          padding: '0.5rem 1rem',
-          background: '#4a8',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer'
-        }}
-      >
-        🎵 Toggle Music Drawer
-      </button>
-      
-      {isDrawerOpen && (
-        <div style={{ marginTop: '1rem', padding: '1rem', background: '#eef' }}>
-          ✅ Shell Stub OK - Drawer State: {isDrawerOpen ? 'OPEN' : 'CLOSED'}
-          <div>
-            <button 
-              onClick={closeDrawer}
-              style={{ 
-                marginTop: '0.5rem',
-                padding: '0.25rem 0.5rem',
-                background: '#e44',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Close
-            </button>
-          </div>
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-background border-b">
+        <div className="container mx-auto py-4 flex items-center justify-between">
+          <h1 className="text-xl font-bold">EmotionsCare</h1>
+          <button
+            onClick={() => setMusicOpen(o => !o)}
+            className="px-3 py-1 bg-green-600 text-white rounded"
+            type="button"
+          >
+            🎵 Musique
+          </button>
         </div>
-      )}
+      </header>
 
-      {/* Toast notification system */}
-      <Toaster />
+      {/* Le tiroir musical */}
+      <MusicDrawer
+        open={musicOpen}
+        onClose={() => setMusicOpen(false)}
+      />
+
+      <main className="flex-1">
+        <div className="container mx-auto py-6">
+          <Outlet />
+        </div>
+      </main>
+
+      <footer className="bg-muted py-4">
+        <div className="container mx-auto text-center text-sm text-muted-foreground">
+          &copy; {new Date().getFullYear()} EmotionsCare
+        </div>
+      </footer>
     </div>
-  );
-};
+  )
+}
 
-// Export named component and default export for flexibility
-export { Shell };
-export default memo(Shell);
+export default Shell
