@@ -1,12 +1,6 @@
 
 // Common types used across the application
 
-// Combining all type exports in one place
-// Import and re-export types from various domain files
-
-// Re-export from types.d.ts
-export * from '../types';
-
 // User related types
 export enum UserRole {
   ADMIN = 'admin',
@@ -226,14 +220,81 @@ export interface InvitationVerificationResult {
   role?: string;
 }
 
-// Export enhanced emotion types
+// User preferences
+export interface UserPreferences {
+  theme: ThemeName;
+  notifications_enabled: boolean;
+  font_size: 'small' | 'medium' | 'large';
+  language: string;
+  accent_color?: string;
+  background_color?: string;
+  notifications?: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+  reminder_time?: string;
+  dynamic_theme?: {
+    enable_time_based?: boolean;
+    enable_emotion_based?: boolean;
+    enable_weather_based?: boolean;
+  };
+  accessibility?: {
+    high_contrast?: boolean;
+    reduced_motion?: boolean;
+    screen_reader_optimized?: boolean;
+    keyboard_navigation?: boolean;
+  };
+  audio?: {
+    volume?: number;
+    continue_playback?: boolean;
+    ambient_sound?: string;
+    context_music?: boolean;
+    immersive_mode?: boolean;
+  };
+  data_preferences?: {
+    export_format?: 'json' | 'pdf';
+    incognito_mode?: boolean;
+    data_retention_period?: number;
+  };
+}
+
+// Music related types
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url: string;
+  audioUrl?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  cover?: string;
+  externalUrl?: string;
+  genre?: string;
+  emotion?: string;
+  mood?: string;
+  year?: number;
+  isPlaying?: boolean;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  description?: string;
+  coverUrl?: string;
+  emotion?: string;
+  tracks: MusicTrack[];
+}
+
+export type MusicEmotion = 'calm' | 'happy' | 'focused' | 'energetic' | 'neutral';
+
+// For backward compatibility
+export type Track = MusicTrack;
+export type Playlist = MusicPlaylist;
+
+// Export from other type files
 export * from './emotion';
-
-// Export navigation types
 export * from './navigation';
-
-// Export chat types
 export * from './chat';
-
-// Export music types
 export * from './music';

@@ -23,6 +23,16 @@ export interface ChatResponse {
   context?: ChatContext;
   recommendations?: string[];
   follow_up_questions?: string[];
+  response?: string; // Pour la compatibilité avec les anciens composants
+}
+
+export interface ChatConversation {
+  id: string;
+  userId: string;
+  title: string;
+  lastMessage: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Re-export ChatMessage for backward compatibility

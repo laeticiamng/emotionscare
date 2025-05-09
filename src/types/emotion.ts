@@ -12,7 +12,7 @@ export interface EnhancedEmotionResult {
   emojis?: string[];
   feedback?: string;
   ai_feedback?: string;
-  recommendations?: string[];
+  recommendations: string[];
   source?: string;
   intensity?: number;
   analysis?: {
