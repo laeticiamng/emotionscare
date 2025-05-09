@@ -31,19 +31,22 @@ export const useCoachEvents = () => {
   // Create safe mutations for each function
   const completeChallengeQuery = createSafeMutation(
     async (challengeId: string) => {
-      return completeChallenge(challengeId);
+      await completeChallenge(challengeId);
+      return true; // Return a consistent value for both real and mock mutations
     }
   );
 
   const saveRelaxationQuery = createSafeMutation(
     async (sessionData: any) => {
       await saveRelaxationSession(sessionData);
+      return true; // Return a consistent value
     }
   );
 
   const saveJournalEntryQuery = createSafeMutation(
     async (entryData: any) => {
       await saveJournalEntry(entryData);
+      return true; // Return a consistent value
     }
   );
 
