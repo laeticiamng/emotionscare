@@ -1,121 +1,140 @@
+import { useState, useEffect, useCallback, useContext } from 'react';
+import { MusicPlaylist, MusicTrack } from '@/types';
+import { MusicContext } from '@/contexts/MusicContext';
 
-import { useCallback, useState } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
-import type { EmotionResult } from '@/types';
-import type { MusicTrack } from '@/types';
+interface UseMusicRecommendationProps {
+  emotion?: string;
+}
 
-// Mapping plus complet des émotions vers les types de musique
-const EMOTION_TO_MUSIC: Record<string, string> = {
-  // États positifs
-  happy: 'happy',
-  excited: 'energetic',
-  joyful: 'happy',
-  satisfied: 'happy',
-  energetic: 'energetic',
-  
-  // États calmes
-  calm: 'calm',
-  relaxed: 'calm',
-  peaceful: 'calm',
-  tranquil: 'calm',
-  
-  // États négatifs - musique apaisante
-  sad: 'calm',
-  anxious: 'calm',
-  stressed: 'calm',
-  angry: 'calm',
-  frustrated: 'calm',
-  overwhelmed: 'calm',
-  tired: 'calm',
-  
-  // États de concentration
-  focused: 'focused',
-  determined: 'focused',
-  concentrated: 'focused',
-  
-  // État neutre
-  neutral: 'neutral',
-  normal: 'neutral',
-  
-  // Valeurs par défaut pour émotions non mappées
-  default: 'neutral'
-};
-
-export function useMusicRecommendation() {
-  const { loadPlaylistForEmotion, openDrawer, setCurrentTrack, isPlaying, pauseTrack, playTrack, currentTrack } = useMusic();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+const useMusicRecommendation = ({ emotion }: UseMusicRecommendationProps = {}) => {
+  const { 
+    currentPlaylist, 
+    setCurrentPlaylist,
+    currentTrack,
+    setCurrentTrack,
+    isPlaying,
+    setIsPlaying,
+    setOpenDrawer
+  } = useContext(MusicContext);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Fix the function causing the error by ensuring proper type compatibility
-  const playTrackWrapper = (track: MusicTrack) => {
-    // Convert track to the expected format if needed
-    const compatibleTrack: MusicTrack = {
-      ...track,
-      url: track.url || track.audioUrl || '',  // Ensure url is defined
-      artist: track.artist || 'Unknown Artist', // Ensure artist is defined
-      // Include other required fields to satisfy the type
-      id: track.id,
-      title: track.title,
-    };
+
+  const fetchPlaylist = useCallback(async (musicType: string) => {
+    setLoading(true);
+    setError(null);
     
-    setCurrentTrack(compatibleTrack);
-    playTrack(compatibleTrack);
-  };
-
-  // Toggle play/pause functionality
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      pauseTrack();
-    } else if (currentTrack) {
-      playTrack(currentTrack);
-    }
-  };
-
-  // Load music for a specific mood/emotion
-  const loadMusicForMood = useCallback((emotion: string) => {
     try {
-      setIsLoading(true);
-      setError(null);
-      
-      const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || EMOTION_TO_MUSIC.default;
-      loadPlaylistForEmotion(musicType);
-      
-      setIsLoading(false);
-    } catch (err) {
-      console.error('Error loading music for mood:', err);
-      setError('Failed to load music for this mood');
-      setIsLoading(false);
-    }
-  }, [loadPlaylistForEmotion]);
+      // Mocked response for demonstration
+      const mockedPlaylists: Record<string, MusicPlaylist> = {
+        happy: {
+          id: 'happy-1',
+          name: 'Happy Hits',
+          emotion: 'happy',
+          tracks: [
+            { id: 'h1', title: 'Walking on Sunshine', artist: 'Katrina & The Waves', duration: 180, url: '/music/sunshine.mp3' },
+            { id: 'h2', title: 'Happy', artist: 'Pharrell Williams', duration: 240, url: '/music/happy.mp3' },
+          ],
+        },
+        calm: {
+          id: 'calm-1',
+          name: 'Calm Vibes',
+          emotion: 'calm',
+          tracks: [
+            { id: 'c1', title: 'Weightless', artist: 'Marconi Union', duration: 300, url: '/music/weightless.mp3' },
+            { id: 'c2', title: 'Watermark', artist: 'Enya', duration: 270, url: '/music/watermark.mp3' },
+          ],
+        },
+        focused: {
+          id: 'focused-1',
+          name: 'Focus Flow',
+          emotion: 'focused',
+          tracks: [
+            { id: 'f1', title: 'Nuvole Bianche', artist: 'Ludovico Einaudi', duration: 210, url: '/music/nuvole.mp3' },
+            { id: 'f2', title: 'Gymnopédie No.1', artist: 'Erik Satie', duration: 200, url: '/music/gymnopédie.mp3' },
+          ],
+        },
+        energetic: {
+          id: 'energetic-1',
+          name: 'Energy Boost',
+          emotion: 'energetic',
+          tracks: [
+            { id: 'e1', title: 'September', artist: 'Earth, Wind & Fire', duration: 220, url: '/music/september.mp3' },
+            { id: 'e2', title: 'Don\'t Stop Me Now', artist: 'Queen', duration: 250, url: '/music/dontstop.mp3' },
+          ],
+        },
+        neutral: {
+          id: 'neutral-1',
+          name: 'Mellow Mix',
+          emotion: 'neutral',
+          tracks: [
+            { id: 'n1', title: 'Kiss the Rain', artist: 'Yiruma', duration: 230, url: '/music/kisstherain.mp3' },
+            { id: 'n2', title: 'Clair de Lune', artist: 'Claude Debussy', duration: 260, url: '/music/clairdelune.mp3' },
+          ],
+        },
+      };
 
-  // Handler pour activer la musique adaptée à l'émotion
-  const handlePlayMusic = useCallback((emotionResult?: EmotionResult | null) => {
-    if (!emotionResult || !emotionResult.emotion) return;
-    
-    const emotionKey = emotionResult.emotion.toLowerCase();
-    const musicType = EMOTION_TO_MUSIC[emotionKey] || EMOTION_TO_MUSIC.default;
-    
-    console.log(`Émotion détectée: ${emotionKey} → Type de musique: ${musicType}`);
-    
-    loadPlaylistForEmotion(musicType);
-    openDrawer();
-    
-    toast({
-      title: "Playlist activée",
-      description: `Votre ambiance musicale "${musicType}" est prête à être écoutée`,
-    });
-  }, [loadPlaylistForEmotion, openDrawer, toast]);
+      const playlist = mockedPlaylists[musicType];
+
+      if (playlist) {
+        setCurrentPlaylist(playlist);
+        setCurrentTrack(playlist.tracks[0]);
+      } else {
+        setError(`No playlist found for emotion: ${musicType}`);
+      }
+    } catch (err) {
+      setError(`Failed to fetch playlist for emotion: ${musicType}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [setCurrentPlaylist, setCurrentTrack]);
+
+  const playTrack = (track: MusicTrack) => {
+    if (currentPlaylist && currentPlaylist.tracks.find(t => t.id === track.id)) {
+      setCurrentTrack(track);
+      setIsPlaying(true);
+    } else {
+      console.warn("Track not in current playlist");
+    }
+  };
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const goToNextTrack = () => {
+    if (!currentPlaylist || !currentTrack) return;
+
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
+    setCurrentTrack(currentPlaylist.tracks[nextIndex]);
+  };
+
+  const goToPreviousTrack = () => {
+    if (!currentPlaylist || !currentTrack) return;
+
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    const previousIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+    setCurrentTrack(currentPlaylist.tracks[previousIndex]);
+  };
+
+  useEffect(() => {
+    if (emotion) {
+      fetchPlaylist(emotion);
+    }
+  }, [emotion, fetchPlaylist]);
 
   return {
-    handlePlayMusic,
-    EMOTION_TO_MUSIC,
-    isLoading,
-    loadMusicForMood,
-    togglePlayPause,
+    currentPlaylist,
     currentTrack,
+    isPlaying,
+    loading,
     error,
-    playTrack: playTrackWrapper
+    fetchPlaylist,
+    playTrack,
+    togglePlay,
+    goToNextTrack,
+    goToPreviousTrack,
   };
-}
+};
+
+export default useMusicRecommendation;

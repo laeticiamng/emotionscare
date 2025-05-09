@@ -1,52 +1,71 @@
 
 import { VRSessionTemplate } from '@/types';
 
-// Mock VR Session Templates
 export const mockVRTemplatesData: VRSessionTemplate[] = [
   {
-    id: '1',
-    template_id: '1',
+    id: 'forest-1',
+    template_id: 'forest-1',
     theme: 'Forêt apaisante',
-    title: 'Promenade en forêt',
+    title: 'Balade en forêt',
     duration: 5,
-    preview_url: 'https://www.youtube.com/embed/BHACKCNDMW8',
-    description: 'Une immersion en forêt pour apaiser l\'esprit et calmer les pensées agitées.',
-    is_audio_only: false, // Added required field
-    recommended_mood: 'calm'
+    preview_url: '/images/vr/forest.jpg',
+    description: 'Une promenade immersive dans une forêt paisible, idéale pour se détendre et retrouver son calme intérieur.',
+    is_audio_only: false,
+    recommended_mood: 'calm',
+    // Add required properties
+    category: 'nature',
+    benefits: ['Réduction du stress', 'Amélioration de la concentration', 'Reconnexion avec la nature'],
+    emotions: ['calm', 'neutral', 'happy'],
+    popularity: 95
   },
   {
-    id: '2',
-    template_id: '2',
+    id: 'beach-1',
+    template_id: 'beach-1',
     theme: 'Plage relaxante',
-    title: 'Bord de mer',
+    title: 'Coucher de soleil sur la plage',
     duration: 7,
-    preview_url: 'https://www.youtube.com/embed/LTZqYzu3jQo',
-    description: 'Écoutez le bruit des vagues et ressentez la brise marine pour une détente profonde.',
-    is_audio_only: false, // Added required field
-    recommended_mood: 'calm'
+    preview_url: '/images/vr/beach.jpg',
+    description: 'Contemplez un magnifique coucher de soleil sur une plage déserte et écoutez le bruit apaisant des vagues.',
+    is_audio_only: false,
+    recommended_mood: 'stressed',
+    // Add required properties
+    category: 'nature',
+    benefits: ['Réduction de l\'anxiété', 'Détente profonde', 'Amélioration de l\'humeur'],
+    emotions: ['stressed', 'sad', 'anxious'],
+    popularity: 88
   },
   {
-    id: '3',
-    template_id: '3',
+    id: 'meditation-1',
+    template_id: 'meditation-1',
     theme: 'Méditation guidée',
     title: 'Méditation pleine conscience',
     duration: 10,
-    preview_url: 'https://www.youtube.com/embed/O-6f5wQXSu8',
+    preview_url: '/images/vr/meditation.jpg',
     is_audio_only: true,
-    audio_url: 'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3',
-    description: 'Une séance de méditation guidée pour développer votre pleine conscience.',
-    recommended_mood: 'focused'
+    audio_url: '/audio/meditation-guidee.mp3',
+    description: 'Une séance de méditation guidée pour vous aider à vous recentrer et à vivre pleinement le moment présent.',
+    recommended_mood: 'anxious',
+    // Add required properties
+    category: 'mindfulness',
+    benefits: ['Concentration améliorée', 'Réduction du stress', 'Clarté mentale'],
+    emotions: ['anxious', 'stressed', 'neutral'],
+    popularity: 92
   },
   {
-    id: '4',
-    template_id: '4',
+    id: 'breathing-1',
+    template_id: 'breathing-1',
     theme: 'Respiration profonde',
     title: 'Exercices de respiration',
     duration: 3,
-    preview_url: '',
+    preview_url: '/images/vr/breathing.jpg',
     is_audio_only: true,
-    audio_url: 'https://assets.mixkit.co/sfx/preview/mixkit-meditation-bell-sound-1821.mp3',
-    description: 'Des exercices de respiration pour réduire le stress et l\'anxiété.',
-    recommended_mood: 'calm'
-  },
+    audio_url: '/audio/respiration-profonde.mp3',
+    description: 'Des exercices de respiration simples et efficaces pour diminuer rapidement votre niveau de stress.',
+    recommended_mood: 'focused',
+    // Add required properties
+    category: 'breathing',
+    benefits: ['Réduction immédiate du stress', 'Oxygénation du cerveau', 'Amélioration de la concentration'],
+    emotions: ['focused', 'stressed', 'anxious'],
+    popularity: 85
+  }
 ];

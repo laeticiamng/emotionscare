@@ -6,7 +6,6 @@ import { Music, Loader2, PlayCircle } from 'lucide-react';
 import { EmotionResult } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { safeOpen } from '@/lib/utils';
 
 interface EmotionBasedMusicRecommendationProps {
   emotionResult: EmotionResult;
@@ -30,7 +29,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
     
     if (playlist && playlist.tracks && playlist.tracks.length > 0) {
       playTrack(playlist.tracks[0]);
-      safeOpen(setOpenDrawer(true));
+      setOpenDrawer(true); // Direct boolean assignment
       
       toast({
         title: "Musique lancée",

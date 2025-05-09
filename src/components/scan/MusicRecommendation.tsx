@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -119,7 +118,7 @@ interface MusicRecommendationProps {
 }
 
 const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) => {
-  const { loadPlaylistForEmotion, openDrawer, currentTrack, isPlaying } = useMusic();
+  const { loadPlaylistForEmotion, setOpenDrawer, currentTrack, isPlaying } = useMusic();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -165,7 +164,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
 
   const handlePlayMusic = () => {
     loadPlaylistForEmotion(musicRecommendation.type);
-    openDrawer();
+    setOpenDrawer(true);
     
     toast({
       title: "Playlist activée",

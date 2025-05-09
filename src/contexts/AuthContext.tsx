@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { User, UserRole } from '@/types';
@@ -30,10 +29,10 @@ const MOCK_ADMIN_USER: User = {
   avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
   preferences: {
     theme: 'light',
+    font_size: 'medium', // Changed fontSize to font_size
     language: 'fr',
     privacy_level: 'private',
     notifications_enabled: true,
-    fontSize: '16px',
     backgroundColor: '#ffffff',
     accentColor: '#0284c7',
     notifications: {
@@ -53,10 +52,10 @@ const MOCK_USER: User = {
   avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
   preferences: {
     theme: 'light',
+    font_size: 'medium', // Changed fontSize to font_size
     language: 'fr',
     privacy_level: 'private',
     notifications_enabled: true,
-    fontSize: '16px',
     backgroundColor: '#ffffff',
     accentColor: '#0284c7',
     notifications: {

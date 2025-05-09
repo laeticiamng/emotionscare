@@ -1,154 +1,222 @@
 import { User, UserRole } from '@/types';
 
-// Mock user data for development and testing
 export const mockUsers: User[] = [
   {
     id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    role: 'user', // Using string literal instead of enum
-    emotional_score: 75,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-    team_id: 'team-1',
-    team_name: 'Marketing',
-    anonymity_code: 'JD123',
-    last_active: '2023-03-15T10:30:00Z'
+    name: 'Alex Dubois',
+    email: 'alex@example.com',
+    role: UserRole.USER, // Fixed: Use enum value instead of string
+    avatar: '/avatars/avatar-1.jpg',
+    created_at: '2023-01-15T09:23:45Z',
+    emotional_score: 72,
+    onboarded: true,
+    team_id: 'team-1' // This is allowed now that we updated the User type
   },
   {
     id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    role: UserRole.USER,
+    name: 'Sophie Lemaire',
+    email: 'sophie@example.com',
+    role: UserRole.EMPLOYEE,
+    avatar: '/avatars/avatar-2.jpg',
+    created_at: '2023-02-28T11:12:30Z',
     emotional_score: 60,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
-    team_id: 'team-2',
-    team_name: 'Sales',
-    anonymity_code: 'JS456',
-    last_active: '2023-03-14T16:45:00Z'
+    onboarded: true,
+    team_id: 'team-1'
   },
   {
     id: '3',
-    name: 'Alice Johnson',
-    email: 'alice.j@example.com',
-    role: UserRole.ADMIN,
-    emotional_score: 90,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alice',
-    team_id: 'team-3',
-    team_name: 'IT',
-    anonymity_code: 'AJ789',
-    last_active: '2023-03-16T09:15:00Z'
+    name: 'Pierre Garnier',
+    email: 'pierre@example.com',
+    role: UserRole.ANALYST,
+    avatar: '/avatars/avatar-3.jpg',
+    created_at: '2023-03-05T16:55:00Z',
+    emotional_score: 55,
+    onboarded: true,
+    team_id: 'team-2'
   },
   {
     id: '4',
-    name: 'Emma Dupont',
-    email: 'emma.d@example.com',
-    role: UserRole.MANAGER, // Use the enum value instead of string literal
-    emotional_score: 82,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma',
-    team_id: 'team-1',
-    team_name: 'Direction',
-    anonymity_code: 'EM89',
-    last_active: '2023-03-10T14:22:00Z'
+    name: 'Léa Martin',
+    email: 'lea@example.com',
+    role: UserRole.MANAGER, // Fixed: Use MANAGER from the enum
+    avatar: '/avatars/avatar-4.jpg',
+    created_at: '2023-03-12T14:45:10Z',
+    emotional_score: 88,
+    onboarded: true,
+    team_id: 'team-2'
   },
   {
     id: '5',
-    name: 'Luc Martin',
-    email: 'luc.m@example.com',
-    role: UserRole.USER,
-    emotional_score: 55,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=luc',
-    team_id: 'team-2',
-    team_name: 'RH',
-    anonymity_code: 'LM234',
-    last_active: '2023-03-12T11:58:00Z'
+    name: 'Gabriel Rossi',
+    email: 'gabriel@example.com',
+    role: UserRole.WELLBEING_MANAGER,
+    avatar: '/avatars/avatar-5.jpg',
+    created_at: '2023-04-01T08:00:00Z',
+    emotional_score: 92,
+    onboarded: true,
+    team_id: 'team-3'
   },
   {
     id: '6',
-    name: 'Chloé Bernard',
-    email: 'chloe.b@example.com',
+    name: 'Manon Leclerc',
+    email: 'manon@example.com',
     role: UserRole.USER,
-    emotional_score: 68,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=chloe',
-    team_id: 'team-3',
-    team_name: 'Comptabilité',
-    anonymity_code: 'CB567',
-    last_active: '2023-03-13T08:05:00Z'
+    avatar: '/avatars/avatar-6.jpg',
+    created_at: '2023-04-18T19:30:00Z',
+    emotional_score: 48,
+    onboarded: true,
+    team_id: 'team-3'
   },
   {
     id: '7',
-    name: 'Gabriel Dubois',
-    email: 'gabriel.d@example.com',
+    name: 'Hugo Bernard',
+    email: 'hugo@example.com',
+    role: UserRole.EMPLOYEE,
+    avatar: '/avatars/avatar-7.jpg',
+    created_at: '2023-05-03T12:20:00Z',
+    emotional_score: 78,
+    onboarded: true,
+    team_id: 'team-1'
+  },
+  {
+    id: '8',
+    name: 'Chloé Fournier',
+    email: 'chloe@example.com',
+    role: UserRole.ANALYST,
+    avatar: '/avatars/avatar-8.jpg',
+    created_at: '2023-05-22T21:05:00Z',
+    emotional_score: 63,
+    onboarded: true,
+    team_id: 'team-2'
+  },
+  {
+    id: '9',
+    name: 'Adam Girard',
+    email: 'adam@example.com',
+    role: UserRole.MANAGER,
+    avatar: '/avatars/avatar-9.jpg',
+    created_at: '2023-06-10T07:40:00Z',
+    emotional_score: 81,
+    onboarded: true,
+    team_id: 'team-3'
+  },
+  {
+    id: '10',
+    name: 'Océane Roux',
+    email: 'oceane@example.com',
+    role: UserRole.WELLBEING_MANAGER,
+    avatar: '/avatars/avatar-10.jpg',
+    created_at: '2023-06-28T13:50:00Z',
+    emotional_score: 95,
+    onboarded: true,
+    team_id: 'team-1'
+  },
+  {
+    id: '11',
+    name: 'Lucas Meunier',
+    email: 'lucas@example.com',
     role: UserRole.USER,
-    emotional_score: 79,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=gabriel',
-    team_id: 'team-1',
-    team_name: 'Juridique',
-    anonymity_code: 'GD890',
-    last_active: '2023-03-11T17:33:00Z'
+    avatar: '/avatars/avatar-11.jpg',
+    created_at: '2023-07-15T17:15:00Z',
+    emotional_score: 58,
+    onboarded: true,
+    team_id: 'team-2'
+  },
+  {
+    id: '12',
+    name: 'Emma Schneider',
+    email: 'emma@example.com',
+    role: UserRole.EMPLOYEE,
+    avatar: '/avatars/avatar-12.jpg',
+    created_at: '2023-08-02T06:30:00Z',
+    emotional_score: 70,
+    onboarded: true,
+    team_id: 'team-3'
+  },
+  {
+    id: '13',
+    name: 'Nathan Moreau',
+    email: 'nathan@example.com',
+    role: UserRole.ANALYST,
+    avatar: '/avatars/avatar-13.jpg',
+    created_at: '2023-08-20T20:00:00Z',
+    emotional_score: 66,
+    onboarded: true,
+    team_id: 'team-1'
+  },
+  {
+    id: '14',
+    name: 'Clara Garcia',
+    email: 'clara@example.com',
+    role: UserRole.MANAGER,
+    avatar: '/avatars/avatar-14.jpg',
+    created_at: '2023-09-07T10:45:00Z',
+    emotional_score: 84,
+    onboarded: true,
+    team_id: 'team-2'
+  },
+  {
+    id: '15',
+    name: 'Théo Chevalier',
+    email: 'theo@example.com',
+    role: UserRole.WELLBEING_MANAGER,
+    avatar: '/avatars/avatar-15.jpg',
+    created_at: '2023-09-25T15:20:00Z',
+    emotional_score: 90,
+    onboarded: true,
+    team_id: 'team-3'
   }
 ];
 
-// Added missing exported functions needed by mockData.ts
-export const currentUser: User | null = null;
-
-export const loginUser = (email: string, password: string): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    const user = mockUsers.find(u => u.email === email);
-    if (user) {
-      resolve(user);
-    } else {
-      reject(new Error('Invalid credentials'));
-    }
-  });
-};
-
-export const logoutUser = (): Promise<void> => {
-  return Promise.resolve();
-};
-
-export const updateUser = (userId: string, data: Partial<User>): Promise<User> => {
-  return new Promise((resolve, reject) => {
-    const userIndex = mockUsers.findIndex(u => u.id === userId);
-    if (userIndex >= 0) {
-      mockUsers[userIndex] = { ...mockUsers[userIndex], ...data };
-      resolve(mockUsers[userIndex]);
-    } else {
-      reject(new Error('User not found'));
-    }
-  });
-};
-
-export const getCurrentUser = (): Promise<User | null> => {
-  return Promise.resolve(null);
-};
-
-export const generateAnonymityCode = (): string => {
-  return Math.random().toString(36).substring(2, 10).toUpperCase();
-};
-
-// Function to generate a random user
-export const generateRandomUser = (): User => {
-  const id = Math.random().toString(36).substring(2, 15);
-  const name = `Random User ${id}`;
-  const email = `random${id}@example.com`;
-  
-  // Map UserRole enum values to string literals
-  const roleOptions: ('user' | 'admin' | 'manager' | 'employee' | 'analyst' | 'wellbeing_manager')[] = [
-    'user', 'admin', 'manager', 'employee', 'analyst', 'wellbeing_manager'
+// Fix line 148 - Convert string roles to enum values
+export const generateMockUsers = (count: number): User[] => {
+  const mockAvatarUrls = [
+    '/avatars/avatar-1.jpg',
+    '/avatars/avatar-2.jpg',
+    '/avatars/avatar-3.jpg',
+    '/avatars/avatar-4.jpg',
+    '/avatars/avatar-5.jpg',
+    '/avatars/avatar-6.jpg',
+    '/avatars/avatar-7.jpg',
+    '/avatars/avatar-8.jpg',
+    '/avatars/avatar-9.jpg',
+    '/avatars/avatar-10.jpg',
+    '/avatars/avatar-11.jpg',
+    '/avatars/avatar-12.jpg',
+    '/avatars/avatar-13.jpg',
+    '/avatars/avatar-14.jpg',
+    '/avatars/avatar-15.jpg',
   ];
-  
-  const role = roleOptions[Math.floor(Math.random() * roleOptions.length)];
-  const emotional_score = Math.floor(Math.random() * 100);
-  const anonymity_code = Math.random().toString(36).substring(2, 10).toUpperCase();
 
-  return {
-    id,
-    name,
-    email,
-    role,
-    emotional_score,
-    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${id}`,
-    anonymity_code,
-    last_active: new Date().toISOString()
-  };
+  return Array.from({ length: count }, (_, i) => {
+    const id = String(i + 16);
+    const name = `Utilisateur ${i + 16}`;
+    const email = `user${i + 16}@example.com`;
+    const roles = [
+      UserRole.ADMIN,
+      UserRole.USER,
+      UserRole.EMPLOYEE,
+      UserRole.ANALYST,
+      UserRole.WELLBEING_MANAGER,
+      UserRole.MANAGER
+    ];
+    const randomRole = roles[Math.floor(Math.random() * roles.length)];
+    const avatar = mockAvatarUrls[i % mockAvatarUrls.length];
+    const created_at = new Date().toISOString();
+    const emotional_score = Math.floor(Math.random() * 101);
+    const onboarded = Math.random() < 0.8;
+    const team_id = `team-${(i % 3) + 1}`;
+
+    return {
+      id,
+      name,
+      email,
+      role: randomRole,
+      avatar,
+      created_at,
+      emotional_score,
+      onboarded,
+      team_id
+    };
+  });
 };

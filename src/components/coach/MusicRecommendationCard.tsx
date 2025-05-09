@@ -35,7 +35,7 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
     const musicType = emotion.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
-    safeOpen(setOpenDrawer(true));
+    setOpenDrawer(true); // No need for safeOpen here since we're directly setting a boolean
     
     toast({
       title: "Musique recommandée activée",

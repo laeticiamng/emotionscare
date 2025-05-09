@@ -17,9 +17,10 @@ const InvitationsTab: React.FC = () => {
     total: 0,
     pending: 0,
     accepted: 0,
+    rejected: 0, // Add the required rejected property
     expired: 0,
     sent: 0,
-    teams: {},  // Added the required teams field
+    teams: {},
     recent_invites: []
   });
 
@@ -29,8 +30,9 @@ const InvitationsTab: React.FC = () => {
         const statsData = await getInvitationsStats();
         setStats({
           ...statsData,
-          teams: statsData.teams || {},  // Ensure teams property exists
-          recent_invites: statsData.recent_invites || []
+          teams: statsData.teams || {},
+          recent_invites: statsData.recent_invites || [],
+          rejected: statsData.rejected || 0 // Ensure rejected field is always present
         });
       } catch (error) {
         console.error('Error fetching invitation stats:', error);

@@ -1,184 +1,98 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Brain, RefreshCw, Music, ArrowRight, Heart } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Bot, Sparkles, Music, Brain } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
-import { useCoach } from '@/hooks/coach/useCoach';
 import { useToast } from '@/hooks/use-toast';
-import { useActivity } from '@/hooks/useActivity';
+import { EmotionResult } from '@/types';
+import MusicRecommendationCard from './MusicRecommendationCard';
+import VREmotionRecommendation from '../vr/VREmotionRecommendation';
+import { Separator } from '@/components/ui/separator';
 
-const EnhancedCoachAI: React.FC = () => {
-  const { user } = useAuth();
-  const { loadPlaylistForEmotion, openDrawer } = useMusic();
-  const { 
-    recommendations, 
-    lastEmotion, 
-    triggerDailyReminder, 
-    isProcessing,
-    askQuestion
-  } = useCoach();
+interface EnhancedCoachAIProps {
+  emotionResult: EmotionResult;
+  onRequestNewScan?: () => void;
+}
+
+const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({ 
+  emotionResult,
+  onRequestNewScan
+}) => {
+  const [showMusicRec, setShowMusicRec] = useState(false);
+  const [showVRRec, setShowVRRec] = useState(false);
+  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
   const { toast } = useToast();
-  const { logActivity } = useActivity();
   
-  const [customQuestion, setCustomQuestion] = useState('');
-  const [response, setResponse] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
-  
+  // Show recommendations based on emotion intensity
   useEffect(() => {
-    if (user?.id) {
-      triggerDailyReminder();
+    if (emotionResult && emotionResult.confidence > 0.7) {
+      setShowMusicRec(true);
+      
+      // Only show VR for certain emotions
+      const vrEmotions = ['stressed', 'anxious', 'sad', 'angry'];
+      if (vrEmotions.includes(emotionResult.emotion.toLowerCase())) {
+        setShowVRRec(true);
+      }
     }
-  }, [user?.id, triggerDailyReminder]);
+  }, [emotionResult]);
   
-  const handleRefresh = () => {
-    triggerDailyReminder();
-    toast({
-      title: "Coach IA",
-      description: "Actualisation des recommandations en cours..."
-    });
-  };
-  
-  const handlePlayMusic = (emotion: string = lastEmotion || 'calm') => {
+  const handlePlayMusic = () => {
+    const emotion = emotionResult.emotion.toLowerCase();
     loadPlaylistForEmotion(emotion);
-    openDrawer();
-    logActivity('play_music', { emotion, source: 'coach' });
-    toast({
-      title: "Musique adaptée",
-      description: `Une playlist adaptée à votre humeur a été lancée.`
-    });
-  };
-  
-  const handleAskQuestion = async () => {
-    if (!customQuestion.trim()) return;
+    setOpenDrawer(true);
     
-    setIsThinking(true);
-    try {
-      const result = await askQuestion(customQuestion);
-      setResponse(result);
-      setCustomQuestion('');
-    } catch (error) {
-      console.error('Error asking AI question:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'obtenir une réponse du coach IA",
-        variant: "destructive"
-      });
-    } finally {
-      setIsThinking(false);
-    }
+    toast({
+      title: "Musique activée",
+      description: `Playlist adaptée à votre humeur "${emotion}" chargée.`
+    });
   };
   
   return (
-    <Card className="shadow-lg border-t-4 border-t-primary h-full flex flex-col">
+    <Card className="mt-6">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
-            <span>Coach IA Personnalisé</span>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isProcessing || isThinking}
-          >
-            <RefreshCw className={`h-4 w-4 ${isProcessing ? 'animate-spin' : ''}`} />
-          </Button>
+        <CardTitle className="flex items-center text-lg">
+          <Brain className="mr-2 h-5 w-5" />
+          Recommandations IA
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
-        {/* Emotional state */}
-        {lastEmotion && (
-          <div className="mb-4 p-3 bg-muted/40 rounded-lg">
-            <p className="text-sm font-medium">État émotionnel détecté: <span className="text-primary">{lastEmotion}</span></p>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="p-4 bg-primary/10 rounded-lg">
+            <h3 className="font-medium flex items-center">
+              <Sparkles className="h-4 w-4 mr-2 text-primary" />
+              Analyse de votre état émotionnel
+            </h3>
+            <p className="mt-2 text-sm">
+              {emotionResult.ai_feedback || 
+                `Votre état émotionnel actuel est "${emotionResult.emotion}" avec une intensité de ${Math.round(emotionResult.confidence * 100)}%. 
+                Voici quelques recommandations personnalisées pour vous aider à optimiser votre bien-être.`
+              }
+            </p>
+            
+            {onRequestNewScan && (
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-xs text-muted-foreground mt-2"
+                onClick={onRequestNewScan}
+              >
+                Refaire un scan
+              </Button>
+            )}
           </div>
-        )}
-        
-        {/* AI recommendations */}
-        <div className="mb-4 flex-1">
-          <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
-            <Heart className="h-4 w-4 text-rose-500" />
-            Recommandations personnalisées
-          </h3>
           
-          {recommendations.length > 0 ? (
-            <div className="space-y-2">
-              {recommendations.map((rec, idx) => (
-                <div 
-                  key={idx} 
-                  className="p-3 bg-muted/30 rounded-md text-sm hover:bg-muted/50 transition-colors"
-                >
-                  {rec}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-8 text-center text-muted-foreground">
-              {isProcessing ? (
-                <div className="flex flex-col items-center">
-                  <RefreshCw className="h-8 w-8 animate-spin mb-2" />
-                  <p>Génération de recommandations en cours...</p>
-                </div>
-              ) : (
-                <p>Aucune recommandation disponible</p>
-              )}
-            </div>
+          {showMusicRec && (
+            <>
+              <Separator />
+              <MusicRecommendationCard 
+                emotion={emotionResult.emotion} 
+                intensity={Math.round(emotionResult.confidence * 100)}
+                standalone={true}
+              />
+            </>
           )}
-        </div>
-        
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <Button 
-            variant="outline" 
-            className="w-full" 
-            onClick={() => handlePlayMusic()}
-          >
-            <Music className="h-4 w-4 mr-2" />
-            Musique adaptée
-          </Button>
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => window.location.href = '/scan'}
-          >
-            <Brain className="h-4 w-4 mr-2" />
-            Scan émotionnel
-          </Button>
-        </div>
-        
-        {/* Ask question */}
-        <div className="mt-auto">
-          <div className="relative">
-            <input
-              type="text"
-              value={customQuestion}
-              onChange={(e) => setCustomQuestion(e.target.value)}
-              placeholder="Posez une question à votre coach..."
-              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              onKeyDown={(e) => e.key === 'Enter' && handleAskQuestion()}
-              disabled={isThinking}
-            />
-            <Button 
-              size="icon"
-              variant="ghost"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-              onClick={handleAskQuestion}
-              disabled={!customQuestion.trim() || isThinking}
-            >
-              {isThinking ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowRight className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
           
-          {response && (
-            <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded-md text-sm">
-              <p>{response}</p>
-            </div>
+          {showVRRec && (
+            <VREmotionRecommendation emotion={emotionResult} />
           )}
         </div>
       </CardContent>

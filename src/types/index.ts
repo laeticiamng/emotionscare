@@ -6,7 +6,8 @@ export enum UserRole {
   GUEST = 'guest',
   EMPLOYEE = 'employee',
   ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager'
+  WELLBEING_MANAGER = 'wellbeing_manager',
+  MANAGER = 'manager' // Added missing MANAGER role
 }
 
 // User type
@@ -25,6 +26,7 @@ export interface User {
   onboarded?: boolean;
   joined_at?: string;
   preferences?: UserPreferences;
+  team_id?: string; // Added missing team_id field
 }
 
 // User preferences
@@ -81,6 +83,7 @@ export interface EmotionResult {
   feedback?: string;
   ai_feedback?: string;
   recommendations?: string[];
+  source?: string; // Added source field
 }
 
 // Enhanced emotion result
@@ -101,6 +104,7 @@ export interface Emotion {
   feedback?: string;
   ai_feedback?: string;
   emojis?: string[];
+  source?: string; // Added source field
 }
 
 // Theme types
@@ -131,6 +135,7 @@ export interface JournalEntry {
   date?: string;
   text?: string;
   ai_feedback?: string;
+  is_private?: boolean; // Added is_private field
 }
 
 // VR Session Template
@@ -184,7 +189,7 @@ export interface InvitationStats {
   rejected: number;
   expired: number;
   sent?: number;
-  teams?: any;
+  teams?: Record<string, any>;
   recent_invites?: any[];
 }
 
@@ -204,6 +209,7 @@ export interface Badge {
   image_url?: string;
   user_id?: string;
   category?: string;
+  icon?: string; // Added icon field for compatibility
 }
 
 // Type pour la carte VR dans le dashboard
@@ -229,6 +235,7 @@ export interface Challenge {
   maxProgress?: number;
   deadline?: string;
   category?: string;
+  total?: number; // Added total field
 }
 
 // Report type
@@ -243,4 +250,5 @@ export interface Report {
   generatedBy?: string;
   fileSize?: string;
   lastViewed?: string;
+  created_at?: string; // Added created_at field
 }

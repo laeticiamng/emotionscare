@@ -1,146 +1,118 @@
+import { JournalEntry } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
-import { supabase } from '@/integrations/supabase/client';
-import type { JournalEntry } from '@/types';
+// Mock data for testing purposes
+export const getMockJournalEntries = (): JournalEntry[] => {
+  return [
+    {
+      id: '1',
+      user_id: 'user1',
+      content: "Aujourd'hui a été une journée pleine de défis mais je me sens satisfait d'avoir pu les relever. J'ai eu une réunion difficile mais qui s'est finalement bien passée.",
+      date: '2023-11-01',
+      title: 'Une journée productive',
+      mood: 'content',
+      mood_score: 75,
+      created_at: '2023-11-01T18:30:00Z',
+      ai_feedback: "Il est formidable que vous ayez pu transformer des défis en réussites. Cette résilience est un trait qui vous servira dans toutes les facettes de votre vie.",
+      text: "Aujourd'hui a été une journée pleine de défis mais je me sens satisfait d'avoir pu les relever.",
+      is_private: false
+    },
+    {
+      id: '2',
+      user_id: 'user1',
+      content: "Je me sens un peu stressé par le travail. J'ai beaucoup de deadlines qui approchent et je ne sais pas si je vais pouvoir tout gérer à temps.",
+      date: '2023-10-31',
+      title: 'Stress au travail',
+      mood: 'stressed',
+      mood_score: 30,
+      created_at: '2023-10-31T15:00:00Z',
+      ai_feedback: "Il est normal de se sentir stressé face à des échéances. Essayez de prioriser vos tâches et de vous concentrer sur une chose à la fois. N'hésitez pas à demander de l'aide si vous en avez besoin.",
+      text: "Je me sens un peu stressé par le travail. J'ai beaucoup de deadlines qui approchent et je ne sais pas si je vais pouvoir tout gérer à temps.",
+      is_private: false
+    },
+    {
+      id: '3',
+      user_id: 'user2',
+      content: "J'ai passé une excellente journée avec ma famille. Nous sommes allés au parc et avons fait un pique-nique. Les enfants étaient très heureux.",
+      date: '2023-10-30',
+      title: 'Journée en famille',
+      mood: 'joyful',
+      mood_score: 90,
+      created_at: '2023-10-30T20:00:00Z',
+      ai_feedback: "Les moments passés en famille sont précieux. Continuez à cultiver ces relations et à profiter de ces instants de bonheur.",
+      text: "J'ai passé une excellente journée avec ma famille. Nous sommes allés au parc et avons fait un pique-nique. Les enfants étaient très heureux.",
+      is_private: false
+    },
+    {
+      id: '4',
+      user_id: 'user2',
+      content: "Je me suis disputé avec mon partenaire. Je suis très triste et en colère. J'ai besoin de temps pour moi.",
+      date: '2023-10-29',
+      title: 'Dispute',
+      mood: 'sad',
+      mood_score: 20,
+      created_at: '2023-10-29T12:00:00Z',
+      ai_feedback: "Les disputes sont difficiles. Prenez le temps de vous calmer et de réfléchir à ce qui s'est passé. Essayez de communiquer avec votre partenaire de manière constructive.",
+      text: "Je me suis disputé avec mon partenaire. Je suis très triste et en colère. J'ai besoin de temps pour moi.",
+      is_private: false
+    },
+  ];
+};
 
-// Fetch all journal entries for a user
-export async function fetchJournalEntries(userId: string): Promise<JournalEntry[]> {
-  try {
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .select('id, user_id, content, date, ai_feedback')
-      .eq('user_id', userId)
-      .order('date', { ascending: false });
+// Helper function to generate a unique ID
+const generateId = (): string => uuidv4();
 
-    if (error) throw error;
+// Function to create a new journal entry
+export const createJournalEntry = async (entry: Partial<JournalEntry>): Promise<JournalEntry> => {
+  // Simulate API call delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Make sure all returned entries conform to the JournalEntry type
-    return (data || []).map(entry => {
-      return {
-        id: entry.id,
-        user_id: entry.user_id,
-        content: entry.content || "",
-        date: entry.date,
-        title: entry.content?.substring(0, 30) || "Journal Entry", // Generate a title from content
-        mood: "neutral", // Default mood
-        created_at: entry.date, // Use date as created_at
-        ai_feedback: entry.ai_feedback || null,
-        text: entry.content || "",  // For compatibility
-        is_private: true // Default value
-      };
-    });
-  } catch (error) {
-    console.error('Error in fetchJournalEntries:', error);
-    throw error;
+  const newEntry: JournalEntry = {
+    id: generateId(),
+    user_id: entry.user_id || 'user1',
+    content: entry.content || '',
+    title: entry.title || 'Sans titre',
+    mood: entry.mood || 'neutral',
+    mood_score: entry.mood_score || 50,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    tags: entry.tags || [],
+    date: new Date().toISOString().split('T')[0],
+    text: entry.text || '',
+    ai_feedback: entry.ai_feedback || '',
+    is_private: entry.is_private || false
+  };
+
+  return newEntry;
+};
+
+// Function to update an existing journal entry
+export const updateJournalEntry = async (id: string, updates: Partial<JournalEntry>): Promise<JournalEntry> => {
+  // Simulate API call delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  // Retrieve existing entry (in a real scenario, this would come from a database)
+  const existingEntry = getMockJournalEntries().find(entry => entry.id === id);
+
+  if (!existingEntry) {
+    throw new Error(`Journal entry with id ${id} not found`);
   }
-}
 
-// Fetch a single journal entry by ID
-export async function fetchJournalEntry(entryId: string): Promise<JournalEntry> {
-  try {
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .select('id, user_id, content, date, ai_feedback')
-      .eq('id', entryId)
-      .single();
+  const updatedEntry = {
+    ...existingEntry,
+    ...updates,
+    mood_score: updates.mood_score || existingEntry.mood_score || 50,
+    updated_at: new Date().toISOString()
+  };
 
-    if (error) throw error;
-    if (!data) throw new Error('Journal entry not found');
+  return updatedEntry;
+};
 
-    // Return the entry with our simplified schema
-    return {
-      id: data.id,
-      user_id: data.user_id,
-      content: data.content || "",
-      title: data.content?.substring(0, 30) || "Journal Entry", // Generate a title from content
-      mood: "neutral", // Default mood
-      created_at: data.date, // Use date as created_at
-      date: data.date,
-      ai_feedback: data.ai_feedback || null,
-      text: data.content || "",  // For compatibility
-      is_private: true // Default value
-    };
-  } catch (error) {
-    console.error('Error in fetchJournalEntry:', error);
-    throw error;
-  }
-}
+// Function to delete a journal entry
+export const deleteJournalEntry = async (id: string): Promise<void> => {
+  // Simulate API call delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
 
-// Create a new journal entry
-export async function createJournalEntry(userId: string, content: string): Promise<JournalEntry> {
-  try {
-    const entry = {
-      user_id: userId,
-      date: new Date().toISOString(),
-      content: content,
-      title: content.substring(0, 30), // Generate a title from content
-      mood: "neutral", // Default mood
-      created_at: new Date().toISOString(),
-      is_private: true // Default value
-    };
-
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .insert([entry])
-      .select('id, user_id, content, date, ai_feedback')
-      .single();
-
-    if (error) throw error;
-
-    // Return the created entry
-    return {
-      id: data.id,
-      user_id: data.user_id,
-      content: data.content || "",
-      title: entry.title,
-      mood: entry.mood,
-      created_at: entry.created_at,
-      date: data.date,
-      ai_feedback: data.ai_feedback || null,
-      text: data.content || "",  // For compatibility
-      is_private: true // Default value
-    };
-  } catch (error) {
-    console.error('Error in createJournalEntry:', error);
-    throw error;
-  }
-}
-
-// Update an existing journal entry
-export async function updateJournalEntry(entryId: string, updates: Partial<JournalEntry>): Promise<JournalEntry> {
-  try {
-    // Only include fields that exist in the database
-    const validUpdates: any = {};
-    if (updates.content !== undefined) validUpdates.content = updates.content;
-    if (updates.ai_feedback !== undefined) validUpdates.ai_feedback = updates.ai_feedback;
-
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .update(validUpdates)
-      .eq('id', entryId)
-      .select('id, user_id, content, date, ai_feedback')
-      .single();
-
-    if (error) throw error;
-    
-    // Get the updated entry
-    return await fetchJournalEntry(entryId);
-  } catch (error) {
-    console.error('Error in updateJournalEntry:', error);
-    throw error;
-  }
-}
-
-// Delete a journal entry
-export async function deleteJournalEntry(entryId: string): Promise<void> {
-  try {
-    const { error } = await supabase
-      .from('journal_entries')
-      .delete()
-      .eq('id', entryId);
-
-    if (error) throw error;
-  } catch (error) {
-    console.error('Error in deleteJournalEntry:', error);
-    throw error;
-  }
-}
+  // In a real scenario, this would remove the entry from a database
+  console.log(`Journal entry with id ${id} deleted`);
+};
