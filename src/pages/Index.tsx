@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Calendar, Cloud, Heart, Moon, Shield, Sun, User } from 'lucide-react';
+import { ArrowRight, Calendar, Cloud, Heart, Moon, Shield, Sun, User, Headset } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
 import WelcomeHero from '@/components/home/WelcomeHero';

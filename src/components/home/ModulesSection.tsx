@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, BookOpen, Music, VrHeadset, MessagesSquare, Activity, Brain } from 'lucide-react';
+import { ChevronDown, ChevronUp, BookOpen, Music, Headset, MessagesSquare, Activity, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ModuleCard from '@/components/home/ModuleCard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -64,7 +64,7 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({
     {
       title: "Séances VR",
       description: "Immergez-vous dans des expériences relaxantes en réalité virtuelle",
-      icon: <VrHeadset className="h-5 w-5" />,
+      icon: <Headset className="h-5 w-5" />,
       to: isAuthenticated ? "/vr" : "/login?redirect=/vr",
       statIcon: <Activity className="h-4 w-4" />,
       statText: "Sessions",
