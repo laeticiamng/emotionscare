@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,8 +60,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
       if (playlist && playlist.tracks.length > 0 && !currentTrack) {
         const track = {
           ...playlist.tracks[0],
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
-          duration: playlist.tracks[0].duration || 0 // Ensure duration is provided
+          duration: playlist.tracks[0].duration || 0,
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
         };
         playTrack(track);
       }

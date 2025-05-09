@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { useAudioPlayerState } from '@/hooks/audio/useAudioPlayerState';
 import { UseMusicControlsReturn } from '@/types/audio-player';
@@ -30,11 +30,11 @@ export function useMusicControls(): UseMusicControlsReturn {
   
   // Track playback control functions
   const playTrack = useCallback((track: MusicTrack) => {
-    // Ensure track always has a url property
+    // Ensure track always has url and duration properties
     const trackWithUrl = {
       ...track,
       url: track.url || track.audioUrl || '',
-      duration: track.duration || 0 // Ensure duration exists
+      duration: track.duration || 0
     };
     playAudioTrack(trackWithUrl);
   }, [playAudioTrack]);

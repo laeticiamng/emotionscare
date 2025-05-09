@@ -38,10 +38,11 @@ export const useMusicRecommendation = () => {
     const playlist = loadPlaylistForEmotion(emotion.toLowerCase());
 
     if (playlist && playlist.tracks.length > 0) {
-      // Play the first track from the playlist, ensuring it has duration
+      // Play the first track from the playlist, ensuring it has duration and url
       const track = {
         ...playlist.tracks[0],
-        duration: playlist.tracks[0].duration || 0
+        duration: playlist.tracks[0].duration || 0,
+        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
       };
       playTrack(track);
       

@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { MusicPlaylist } from '@/types';
+import { MusicPlaylist } from '@/types/music';
 import { usePlaylistManager } from '@/hooks/usePlaylistManager';
 import { convertPlaylistToMusicPlaylist } from '@/services/music/converters';
 import { loadPlaylistById, convertPlaylistsData } from '@/services/music/playlist-utils';

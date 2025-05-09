@@ -55,10 +55,11 @@ export function EmotionMusicRecommendations({
       const musicType = EMOTION_TO_MUSIC[emotionToPlay.toLowerCase()] || EMOTION_TO_MUSIC.default;
       const playlist = loadPlaylistForEmotion(musicType);
       if (playlist && playlist.tracks.length > 0) {
-        // Ensure the track has the required duration field
+        // Ensure the track has the required duration and url fields
         const track = {
           ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0
+          duration: playlist.tracks[0].duration || 0,
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
         };
         playTrack(track);
       }

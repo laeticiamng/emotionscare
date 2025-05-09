@@ -9,7 +9,7 @@ export interface Track {
   cover?: string;
   coverUrl?: string;
   audioUrl?: string;
-  emotion?: string; // Added to match usage
+  emotion?: string;
 }
 
 export interface Playlist {

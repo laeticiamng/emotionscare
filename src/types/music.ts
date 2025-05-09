@@ -1,14 +1,14 @@
 
-// Directly define the types here rather than re-exporting them from index.ts
+// Define the types here rather than re-exporting them from index.ts
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number; // Changed from optional to required
+  duration: number; // Required
+  url: string; // Making this required since it's used extensively
   audioUrl?: string;
   coverUrl?: string;
   coverImage?: string;
-  url?: string;
   cover?: string;
   externalUrl?: string;
   genre?: string;

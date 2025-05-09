@@ -47,7 +47,7 @@ const EmotionScanner: React.FC<Props> = ({ onEmotionDetected }) => {
       const analysisResult = await analyzeEmotion({
         userId: user.id,
         text: text || undefined,
-        audioUrl: audioUrl || undefined, // Changed from audio_url to audioUrl
+        audioUrl: audioUrl || undefined, // Using audioUrl not audio_url
       });
       
       setResult(analysisResult);

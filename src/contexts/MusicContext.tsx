@@ -1,7 +1,6 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { MusicTrack } from '@/types';
-import { MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 interface MusicContextType {
   currentTrack: MusicTrack | null;
@@ -45,7 +44,8 @@ export const useMusicMock = (): MusicContextType => {
       duration: track.duration || 0,
       title: track.title || 'Unknown',
       artist: track.artist || 'Unknown',
-      id: track.id || `track-${Date.now()}`
+      id: track.id || `track-${Date.now()}`,
+      url: track.url || track.audioUrl || ''
     };
     setCurrentTrack(validatedTrack);
     setIsPlaying(true);
@@ -62,10 +62,11 @@ export const useMusicMock = (): MusicContextType => {
     const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
     const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
     const nextTrack = currentPlaylist.tracks[nextIndex];
-    // Ensure the track has duration
+    // Ensure the track has required properties
     playTrack({
       ...nextTrack,
-      duration: nextTrack.duration || 0
+      duration: nextTrack.duration || 0,
+      url: nextTrack.url || nextTrack.audioUrl || ''
     });
   };
 
@@ -74,10 +75,11 @@ export const useMusicMock = (): MusicContextType => {
     const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
     const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
     const prevTrack = currentPlaylist.tracks[prevIndex];
-    // Ensure the track has duration
+    // Ensure the track has required properties
     playTrack({
       ...prevTrack,
-      duration: prevTrack.duration || 0
+      duration: prevTrack.duration || 0,
+      url: prevTrack.url || prevTrack.audioUrl || ''
     });
   };
 
@@ -86,10 +88,11 @@ export const useMusicMock = (): MusicContextType => {
     if (playlist) {
       setCurrentPlaylist(playlist);
       if (playlist.tracks.length > 0) {
-        // Ensure the track has duration
+        // Ensure the track has required properties
         playTrack({
           ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0
+          duration: playlist.tracks[0].duration || 0,
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
         });
       }
     }
@@ -133,8 +136,11 @@ export const useMusicMock = (): MusicContextType => {
     setPlaylists(prev => [...prev, mockPlaylist]);
     setCurrentPlaylist(mockPlaylist);
     if (mockPlaylist.tracks.length > 0) {
-      // Ensure the track has duration
-      setCurrentTrack(mockPlaylist.tracks[0]);
+      // Ensure the track has required properties
+      setCurrentTrack({
+        ...mockPlaylist.tracks[0],
+        url: mockPlaylist.tracks[0].url || mockPlaylist.tracks[0].audioUrl || ''
+      });
     }
     
     return mockPlaylist;

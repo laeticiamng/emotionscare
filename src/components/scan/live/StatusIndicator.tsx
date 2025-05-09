@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { AlertCircle, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 
 export interface StatusIndicatorProps {
   isListening: boolean;
@@ -8,25 +9,30 @@ export interface StatusIndicatorProps {
   error: boolean;
 }
 
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({ 
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   isListening,
   isProcessing,
   statusText,
   error
 }) => {
-  const getStatusColor = () => {
-    if (error) return 'bg-red-500';
-    if (isListening) return 'bg-green-500';
-    if (isProcessing) return 'bg-amber-500';
-    return 'bg-blue-500';
-  };
-
   return (
-    <div className="flex items-center">
-      <div className={`w-3 h-3 rounded-full mr-2 ${getStatusColor()}`}>
-        {isListening && <div className="animate-pulse w-full h-full rounded-full bg-green-400"></div>}
-      </div>
-      <span className="text-sm font-medium">{statusText}</span>
+    <div className="flex items-center gap-2">
+      {error ? (
+        <AlertCircle className="h-5 w-5 text-destructive" />
+      ) : isProcessing ? (
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+      ) : isListening ? (
+        <div className="relative">
+          <div className="absolute -inset-1 bg-primary/25 rounded-full animate-ping"></div>
+          <div className="h-5 w-5 bg-primary rounded-full relative"></div>
+        </div>
+      ) : (
+        <CheckCircle className="h-5 w-5 text-muted-foreground" />
+      )}
+      
+      <span className={error ? "text-destructive" : "text-muted-foreground"}>
+        {statusText}
+      </span>
     </div>
   );
 };

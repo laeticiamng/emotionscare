@@ -29,13 +29,14 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
     const playlist = loadPlaylistForEmotion(emotion);
     
     if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-      // Ensure the track has the required duration field
+      // Ensure the track has the required duration and url fields
       const track = {
         ...playlist.tracks[0],
-        duration: playlist.tracks[0].duration || 0
+        duration: playlist.tracks[0].duration || 0,
+        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
       };
       playTrack(track);
-      safeOpen(setOpenDrawer); // Using safeOpen utility function
+      safeOpen(setOpenDrawer);
       
       toast({
         title: "Musique lancée",

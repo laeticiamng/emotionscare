@@ -33,11 +33,12 @@ export function useMusicEmotionIntegration() {
     const playlist = loadPlaylistForEmotion(musicType);
     
     if (playlist && playlist.tracks.length > 0) {
-      // If no music is playing, start playing, ensuring duration is provided
+      // If no music is playing, start playing, ensuring required properties are provided
       if (!currentTrack || !isPlaying) {
         const track = {
           ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0
+          duration: playlist.tracks[0].duration || 0,
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
         };
         playTrack(track);
       }
