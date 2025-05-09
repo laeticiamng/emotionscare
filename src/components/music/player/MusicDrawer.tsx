@@ -302,73 +302,75 @@ const GenerateMusicContent: React.FC<GenerateMusicContentProps> = ({
   handleGenerateMusic 
 }) => {
   return (
-    <Card className="bg-muted/40">
-      <CardContent className="pt-6">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-medium mb-2">Créer une musique</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Décrivez l'ambiance ou le type de musique que vous souhaitez générer
-            </p>
-            
-            <textarea 
-              className="w-full resize-none border rounded-md p-3 h-24 bg-background focus-visible:ring-1 focus-visible:ring-primary transition-all"
-              placeholder="Ex: Une mélodie relaxante avec des sons de piano et de nature..."
-              value={promptText}
-              onChange={(e) => setPromptText(e.target.value)}
-            />
-            
-            <div className="mt-4 flex items-center justify-between">
-              {isProcessing && (
-                <div className="flex items-center gap-2 flex-1">
-                  <div className="h-2 bg-primary/30 rounded-full flex-1 overflow-hidden">
-                    <motion.div 
-                      className="h-full bg-primary rounded-full" 
-                      initial={{ width: "0%" }}
-                      animate={{ width: `${progress}%` }}
-                      transition={{ ease: "easeOut" }}
-                    />
-                  </div>
-                  <span className="text-xs text-muted-foreground w-8">{progress}%</span>
-                </div>
-              )}
+    <div className="space-y-6">
+      <Card className="bg-muted/40">
+        <CardContent className="pt-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium mb-2">Créer une musique</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Décrivez l'ambiance ou le type de musique que vous souhaitez générer
+              </p>
               
-              <Button 
-                onClick={handleGenerateMusic} 
-                disabled={isLoading || isProcessing || !promptText.trim()}
-                className={`ml-auto bg-[#6366F1] hover:bg-[#4F46E5] transition-all ${isLoading ? "animate-pulse" : ""}`}
-              >
-                {isLoading ? "Chargement..." : "Générer"}
-              </Button>
-            </div>
-          </div>
-          
-          {/* Suggestions rapides */}
-          <div>
-            <h4 className="text-sm font-medium mb-2">Suggestions rapides</h4>
-            <div className="flex flex-wrap gap-2">
-              {["Méditation matinale", "Motivation sportive", "Ambiance de travail", "Sons de nature", "Relaxation"].map((suggestion) => (
+              <textarea 
+                className="w-full resize-none border rounded-md p-3 h-24 bg-background focus-visible:ring-1 focus-visible:ring-primary transition-all"
+                placeholder="Ex: Une mélodie relaxante avec des sons de piano et de nature..."
+                value={promptText}
+                onChange={(e) => setPromptText(e.target.value)}
+              />
+              
+              <div className="mt-4 flex items-center justify-between">
+                {isProcessing && (
+                  <div className="flex items-center gap-2 flex-1">
+                    <div className="h-2 bg-primary/30 rounded-full flex-1 overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-primary rounded-full" 
+                        initial={{ width: "0%" }}
+                        animate={{ width: `${progress}%` }}
+                        transition={{ ease: "easeOut" }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground w-8">{progress}%</span>
+                  </div>
+                )}
+                
                 <Button 
-                  key={suggestion} 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setPromptText(suggestion)}
-                  className="text-xs transition-all hover:bg-primary/10"
+                  onClick={handleGenerateMusic} 
+                  disabled={isLoading || isProcessing || !promptText.trim()}
+                  className={`ml-auto bg-[#6366F1] hover:bg-[#4F46E5] transition-all ${isLoading ? "animate-pulse" : ""}`}
                 >
-                  {suggestion}
+                  {isLoading ? "Chargement..." : "Générer"}
                 </Button>
-              ))}
+              </div>
+            </div>
+            
+            {/* Suggestions rapides */}
+            <div>
+              <h4 className="text-sm font-medium mb-2">Suggestions rapides</h4>
+              <div className="flex flex-wrap gap-2">
+                {["Méditation matinale", "Motivation sportive", "Ambiance de travail", "Sons de nature", "Relaxation"].map((suggestion) => (
+                  <Button 
+                    key={suggestion} 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPromptText(suggestion)}
+                    className="text-xs transition-all hover:bg-primary/10"
+                  >
+                    {suggestion}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-    
-    <div className="mt-6">
-      <h3 className="text-lg font-medium mb-4">Vos créations récentes</h3>
-      <p className="text-sm text-muted-foreground">
-        Accédez à toutes vos créations dans la section Musique.
-      </p>
+        </CardContent>
+      </Card>
+      
+      <div className="mt-6">
+        <h3 className="text-lg font-medium mb-4">Vos créations récentes</h3>
+        <p className="text-sm text-muted-foreground">
+          Accédez à toutes vos créations dans la section Musique.
+        </p>
+      </div>
     </div>
   );
 };
