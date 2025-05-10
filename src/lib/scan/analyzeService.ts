@@ -79,11 +79,11 @@ export async function analyzeAudioEmotion(audioData: Blob): Promise<EmotionResul
     confidence: 0.7 + Math.random() * 0.2,
     score: emotionData.score,
     feedback: emotionData.isPositive
-      ? `D'après votre voix, vous semblez ${randomEmotion}. C'est une émotion positive !`
+      ? `D'après votre voix, vous semblez ${randomEmotion}. C'est une émotion positive!`
       : `D'après votre voix, vous semblez ${randomEmotion}. Prenez un moment pour prendre soin de vous.`,
     recommendations: [
       'Prenez quelques respirations profondes',
-      'Buvez un verre d'eau',
+      'Buvez un verre d\'eau',
       'Écoutez votre chanson préférée'
     ],
     primaryEmotion: {
