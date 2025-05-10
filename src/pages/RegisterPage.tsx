@@ -34,8 +34,8 @@ const RegisterPage: React.FC = () => {
       setLoading(true);
       if (!register) throw new Error('Register function not available');
       
-      const userData = { name };
-      await register(email, password, userData);
+      // Updated to use the correct parameter structure
+      await register(email, password, { name });
       
       toast({
         description: "Inscription réussie! Vous pouvez maintenant vous connecter.",
