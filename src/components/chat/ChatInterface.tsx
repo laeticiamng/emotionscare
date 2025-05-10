@@ -43,12 +43,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ standalone = true, classN
   const { logActivity } = useActivity();
   
   // State for managing the chat session
-  const [startChat, setStartChat] = useState<boolean | (() => void)>(false);
+  const [startChat, setStartChat] = useState<boolean>(false);
   
   // Function to handle the start of the chat
   const handleStartChat = () => {
-    if (startChat) {
-      safeOpen(startChat);
+    if (typeof startChat === 'function') {
+      startChat();
     }
   };
 

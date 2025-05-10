@@ -26,7 +26,8 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
     const musicType = mood.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
-    safeOpen(setOpenDrawer);
+    // Fix: Call setOpenDrawer directly instead of using safeOpen
+    setOpenDrawer(true);
     
     toast({
       title: "Musique recommandée activée",

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
@@ -10,19 +9,12 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import MusicPlayer from '@/components/music/player/MusicPlayer';
 import MusicCreator from '@/components/music/MusicCreator';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MusicTrack, MusicPlaylist } from '@/types';
-
-interface MusicDrawerProps {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  isOpen?: boolean;
-  onClose?: () => void;
-}
+import { MusicDrawerProps } from '@/types';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
   open, 
-  onOpenChange,
   isOpen,
+  onOpenChange,
   onClose
 }) => {
   const { openDrawer, setOpenDrawer, currentTrack } = useMusic();
@@ -31,7 +23,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   
   // Use props if provided, otherwise use context
   const drawerOpen = open !== undefined ? open : (isOpen !== undefined ? isOpen : openDrawer);
-  const handleOpenChange = onOpenChange || ((val) => {
+  const handleOpenChange = onOpenChange || ((val: boolean) => {
     setOpenDrawer(val);
     if (!val && onClose) onClose();
   });

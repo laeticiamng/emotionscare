@@ -46,10 +46,11 @@ export const useMusicRecommendation = (emotionResult: EmotionResult | null) => {
   };
   
   // Handle playing music based on emotion
-  const handlePlayMusic = async (result: EmotionResult) => {
-    if (!result) return;
+  const handlePlayMusic = async (result?: EmotionResult) => {
+    const emotionToUse = result || emotionResult;
+    if (!emotionToUse) return false;
     
-    const emotion = getEmotion(result);
+    const emotion = getEmotion(emotionToUse);
     setIsLoading(true);
     
     try {

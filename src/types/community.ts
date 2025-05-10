@@ -4,14 +4,15 @@ export interface CommunityPost {
   user_id: string;
   title: string;
   content: string;
-  created_at: string | Date;
-  updated_at: string | Date;
+  tags?: string[];
   likes: number;
   comments_count: number;
-  is_anonymous: boolean;
-  tags?: string[];
-  emotion?: string;
-  mood?: number;
+  created_at: string | Date;
+  updated_at: string | Date;
+  author?: {
+    name: string;
+    avatar: string;
+  };
 }
 
 export interface CommunityComment {
@@ -19,16 +20,11 @@ export interface CommunityComment {
   post_id: string;
   user_id: string;
   content: string;
+  likes: number;
   created_at: string | Date;
   updated_at: string | Date;
-  likes: number;
-  is_anonymous: boolean;
-}
-
-export interface CommunityStats {
-  total_posts: number;
-  total_comments: number;
-  active_users: number;
-  trending_tags: string[];
-  most_discussed_emotion: string;
+  author?: {
+    name: string;
+    avatar: string;
+  };
 }

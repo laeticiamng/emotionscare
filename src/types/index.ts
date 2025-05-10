@@ -30,68 +30,7 @@ export interface UserPreferencesState extends UserPreferences {
   emotionalCamouflage?: boolean;
 }
 
-// Export JournalEntry type if missing
-export interface JournalEntry {
-  id: string;
-  user_id: string;
-  title: string;
-  content: string;
-  mood?: number;
-  tags?: string[];
-  emotion?: string;
-  created_at: string | Date;
-  updated_at: string | Date;
-}
-
-// Add EmotionalTeamViewProps
+// EmotionalTeamViewProps
 export interface EmotionalTeamViewProps {
   className?: string;
 }
-
-// Add missing User type
-export interface User {
-  id: string;
-  name?: string;
-  email?: string;
-  avatar?: string;
-  role?: string;
-  created_at?: string | Date;
-  last_login?: string | Date;
-  preferences?: UserPreferences;
-}
-
-// Add missing MoodData type
-export interface MoodData {
-  date: string | Date;
-  value: number;
-  emotion?: string;
-}
-
-// Add missing InvitationStats type
-export interface InvitationStats {
-  sent: number;
-  accepted: number;
-  pending: number;
-  expired: number;
-  conversion_rate: number;
-}
-
-// Add missing Badge type
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image_url: string;
-  unlocked: boolean;
-  unlock_date?: string | Date;
-}
-
-// Add missing InvitationFormData and UserRole types
-export interface InvitationFormData {
-  email: string;
-  role: UserRole;
-  message?: string;
-  expires_in?: number;
-}
-
-export type UserRole = 'user' | 'admin' | 'manager' | 'supervisor';

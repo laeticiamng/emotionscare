@@ -16,9 +16,16 @@ export function formatTime(seconds: number): string {
   return `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-// Safe opener function to handle null/undefined URLs
-export function safeOpen(url?: string | null): void {
-  if (url) {
-    window.open(url, '_blank', 'noopener,noreferrer');
+// Safe opener function with overloads to handle different types of arguments
+export function safeOpen(url?: string | null): void;
+export function safeOpen(callback?: boolean | ((value: boolean) => void)): void;
+export function safeOpen(arg?: string | null | boolean | ((value: boolean) => void)): void {
+  if (typeof arg === 'string' && arg) {
+    window.open(arg, '_blank', 'noopener,noreferrer');
+  } else if (typeof arg === 'function') {
+    arg(true);
+  } else if (typeof arg === 'boolean') {
+    // Just a boolean value, do nothing special
+    return;
   }
 }

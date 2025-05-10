@@ -40,8 +40,8 @@ const MusicLayout: React.FC = () => {
       
       {/* Tiroir pour le lecteur de musique complet */}
       <MusicDrawer 
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
       />
     </div>
   );
