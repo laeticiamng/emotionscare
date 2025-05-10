@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Users, TrendingUp, BarChart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNavigate } from 'react-router-dom';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   userId, 
@@ -14,6 +15,7 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   className,
   onRefresh 
 }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
