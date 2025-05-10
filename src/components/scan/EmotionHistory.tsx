@@ -58,7 +58,7 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ userId }) => {
     );
   }
 
-  const getEmotionColor = (emotion: string) => {
+  const getEmotionColor = (emotionName: string) => {
     const emotionColors: {[key: string]: string} = {
       'calme': 'bg-blue-100 text-blue-800',
       'heureux': 'bg-green-100 text-green-800',
@@ -69,7 +69,7 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ userId }) => {
       'fatigué': 'bg-amber-100 text-amber-800'
     };
     
-    return emotionColors[emotion.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return emotionColors[emotionName.toLowerCase()] || 'bg-gray-100 text-gray-800';
   };
 
   const getScoreColor = (score?: number) => {
@@ -106,8 +106,8 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ userId }) => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEmotionColor(emotion.emotion || '')}`}>
-                      {emotion.emotion}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getEmotionColor(emotion.emotion || emotion.dominant_emotion || '')}`}>
+                      {emotion.emotion || emotion.dominant_emotion}
                     </span>
                     <span className="text-sm px-2 py-1 bg-slate-100 rounded-full">{emotion.score}%</span>
                     <Button 

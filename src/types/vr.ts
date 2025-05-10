@@ -10,8 +10,8 @@ export interface VRSession {
   template_id?: string;
   emotion_before?: string;
   emotion_after?: string;
-  mood_before?: number;
-  mood_after?: number;
+  mood_before?: string;
+  mood_after?: string;
   notes?: string;
   start_time?: string | Date;
   duration_seconds?: number;

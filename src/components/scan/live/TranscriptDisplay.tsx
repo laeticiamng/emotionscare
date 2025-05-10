@@ -1,23 +1,26 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
+import { MessageSquareQuote } from 'lucide-react';
 
-export interface TranscriptDisplayProps {
+interface TranscriptDisplayProps {
   transcript: string;
 }
 
 const TranscriptDisplay: React.FC<TranscriptDisplayProps> = ({ transcript }) => {
+  if (!transcript) return null;
+  
   return (
-    <Card className="border-none bg-accent/30">
-      <CardHeader className="pb-2 pt-4">
-        <CardTitle className="text-sm flex items-center">
-          <FileText className="h-4 w-4 mr-2" />
-          Transcription
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0 px-4 pb-4">
-        <p className="text-sm italic">{transcript}</p>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <MessageSquareQuote className="h-4 w-4 text-muted-foreground" />
+          <h3 className="text-sm font-medium">Transcription</h3>
+        </div>
+        
+        <div className="p-3 bg-muted/30 rounded-md">
+          <p className="text-sm italic">"{transcript}"</p>
+        </div>
       </CardContent>
     </Card>
   );

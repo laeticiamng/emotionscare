@@ -22,7 +22,7 @@ export function useEmotionVisualizer(emotion: Emotion | null) {
       return;
     }
     
-    const emotionName = emotion.emotion || 'neutral';
+    const emotionName = emotion.emotion || emotion.dominant_emotion || 'neutral';
     const score = emotion.score || 50;
     
     setVisualData({

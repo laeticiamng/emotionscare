@@ -61,7 +61,7 @@ export function useVRSession() {
       await createVRSession({
         user_id: user.id,
         template_id: activeTemplate.id,
-        duration: durationSeconds,
+        duration: durationSeconds, // Convert to number explicitly
         is_audio_only: activeTemplate.is_audio_only || false,
         mood_before: 'neutral',
         completed: true

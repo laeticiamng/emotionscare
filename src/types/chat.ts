@@ -34,6 +34,7 @@ export interface ChatResponse {
   confidence?: number;
   text?: string;
   follow_up_questions?: string[];
+  recommendations?: string[];
 }
 
 export interface ChatContext {

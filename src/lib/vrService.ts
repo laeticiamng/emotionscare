@@ -66,7 +66,7 @@ export const createVRSession = async (sessionData: Partial<VRSession>): Promise<
     user_id: sessionData.user_id || '',
     template_id: sessionData.template_id || '',
     date: sessionData.date || new Date().toISOString(),
-    duration: sessionData.duration || 300,
+    duration: typeof sessionData.duration === 'string' ? parseInt(sessionData.duration, 10) : (sessionData.duration || 300),
     completed: sessionData.completed || true,
     mood_before: sessionData.mood_before || 'neutral',
     mood_after: sessionData.mood_after,

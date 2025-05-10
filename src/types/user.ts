@@ -79,4 +79,6 @@ export interface UserPreferencesState {
   email_notifications?: boolean;
   push_notifications?: boolean;
   emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }

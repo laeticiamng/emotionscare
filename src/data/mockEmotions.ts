@@ -10,7 +10,7 @@ export const mockEmotions: Emotion[] = [
     emotion: 'happy',
     confidence: 0.85,
     intensity: 0.7,
-    emojis: ['😊', '😄', '🙂'], // Now supported as string[] in the interface
+    emojis: '😊😄🙂', // Changed from array to string to match the type
     text: "J'ai eu une excellente réunion d'équipe ce matin !",
     score: 0.8
   },
@@ -21,7 +21,7 @@ export const mockEmotions: Emotion[] = [
     emotion: 'stressed',
     confidence: 0.9,
     intensity: 0.6,
-    emojis: ['😓', '😖', '😣'], // Now supported as string[] in the interface
+    emojis: '😓😖😣', // Changed from array to string to match the type
     text: "Beaucoup de deadlines cette semaine, je me sens un peu dépassé.",
     score: 0.3
   },
@@ -32,7 +32,7 @@ export const mockEmotions: Emotion[] = [
     emotion: 'calm',
     confidence: 0.75,
     intensity: 0.5,
-    emojis: ['😌', '🧘', '🌿'], // Now supported as string[] in the interface
+    emojis: '😌🧘🌿', // Changed from array to string to match the type
     text: "J'ai pratiqué la méditation ce matin et je me sens plus centré.",
     score: 0.7
   },
@@ -43,7 +43,7 @@ export const mockEmotions: Emotion[] = [
     emotion: 'tired',
     confidence: 0.8,
     intensity: 0.6,
-    emojis: ['😴', '🥱', '💤'], // Now supported as string[] in the interface
+    emojis: '😴🥱💤', // Changed from array to string to match the type
     text: "Longue journée, j'ai besoin de repos.",
     score: 0.4,
     ai_feedback: "Vous semblez avoir besoin de récupérer. Essayez de vous coucher plus tôt ce soir et prenez 10 minutes pour vous détendre avant le coucher. La musique relaxante peut aider à favoriser un sommeil réparateur."

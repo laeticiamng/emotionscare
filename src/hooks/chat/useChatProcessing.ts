@@ -1,69 +1,61 @@
 
-import { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { ChatResponse } from '@/types/chat';
-import useUserContext from './useUserContext';
 
-interface UseChatProcessingResult {
-  isProcessing: boolean;
-  processMessage: (text: string) => Promise<ChatResponse>;
-}
+export function useChatProcessing() {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [responses, setResponses] = useState<ChatResponse[]>([]);
 
-const useChatProcessing = (): UseChatProcessingResult => {
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const { user } = useAuth();
-  const { userContext } = useUserContext();
-
-  const processMessage = useCallback(async (text: string): Promise<ChatResponse> => {
+  const processMessage = async (message: string): Promise<ChatResponse> => {
     setIsProcessing(true);
     
     try {
-      // Here we would normally make an API call to process the message
-      // For now, we'll just simulate a response
+      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Default response
-      const response: ChatResponse = {
-        message: "Je suis désolé, je ne peux pas traiter votre demande pour le moment.",
-        recommendations: []
-      };
-
-      // Simple keyword-based responses for demo purposes
-      if (text.toLowerCase().includes('bonjour') || text.toLowerCase().includes('salut')) {
-        response.message = `Bonjour${user?.name ? ' ' + user.name : ''}! Comment puis-je vous aider aujourd'hui?`;
-      } else if (text.toLowerCase().includes('stress') || text.toLowerCase().includes('anxiété')) {
-        response.message = "Je détecte que vous parlez de stress. Voici quelques techniques de respiration qui pourraient vous aider.";
-        response.recommendations = [
-          "Respirez profondément pendant 4 secondes, retenez 4 secondes, expirez 4 secondes",
-          "Essayez une courte session de méditation guidée",
-          "Faites une pause de 5 minutes loin de votre écran"
-        ];
-      } else if (text.toLowerCase().includes('fatigue') || text.toLowerCase().includes('épuisé')) {
-        response.message = "La fatigue peut affecter votre bien-être émotionnel. Je vous suggère:";
-        response.recommendations = [
-          "Assurez-vous de dormir 7-8 heures par nuit",
-          "Faites une courte sieste de 20 minutes si possible",
-          "Limitez votre consommation de caféine après midi"
-        ];
-      } else {
-        response.message = "Je comprends votre message. Comment puis-je vous aider davantage?";
-      }
+      // Simulated response generation
+      const emotionalTones = ['neutral', 'happy', 'concerned', 'encouraging'];
+      const randomTone = emotionalTones[Math.floor(Math.random() * emotionalTones.length)];
       
+      const response: ChatResponse = {
+        message: `Here is a response to your message: "${message}"`,
+        emotion: randomTone,
+        confidence: 0.8 + Math.random() * 0.2,
+        text: `Here is a response to your message: "${message}"`,
+        follow_up_questions: [
+          'Would you like to know more about this topic?',
+          'How are you feeling today?',
+          'Would you like some recommendations?'
+        ],
+        recommendations: [
+          'Try a 5-minute mindfulness exercise',
+          'Consider journaling about your feelings',
+          'Take a short walk outside to refresh your mind'
+        ]
+      };
+      
+      setResponses(prev => [...prev, response]);
       return response;
     } catch (error) {
       console.error('Error processing message:', error);
-      return {
-        message: "Une erreur est survenue lors du traitement de votre message. Veuillez réessayer.",
+      
+      const errorResponse: ChatResponse = {
+        message: 'Sorry, I was unable to process your message.',
+        emotion: 'neutral',
+        confidence: 0,
+        recommendations: []
       };
+      
+      return errorResponse;
     } finally {
       setIsProcessing(false);
     }
-  }, [user]);
-  
+  };
+
   return {
     isProcessing,
+    responses,
     processMessage
   };
-};
-
-export default useChatProcessing;
+}

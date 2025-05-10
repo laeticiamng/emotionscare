@@ -1,138 +1,98 @@
 
-import { baseService } from './baseService';
-import { ChatConversation } from '@/types/chat';
+import { v4 as uuidv4 } from 'uuid';
+import type { ChatConversation } from '@/types/chat';
+
+// Mock conversations data
+let conversations: ChatConversation[] = [
+  {
+    id: 'conversation-1',
+    user_id: 'user-1',
+    created_at: new Date('2023-03-01'),
+    updated_at: new Date('2023-03-10'),
+    title: 'Première conversation',
+    last_message: 'Comment puis-je vous aider aujourd\'hui ?',
+    userId: 'user-1',
+    lastMessage: 'Comment puis-je vous aider aujourd\'hui ?',
+    createdAt: new Date('2023-03-01'),
+    updatedAt: new Date('2023-03-10')
+  },
+  {
+    id: 'conversation-2',
+    user_id: 'user-1',
+    created_at: new Date('2023-03-15'),
+    updated_at: new Date('2023-03-15'),
+    title: 'Discussion sur la gestion du stress',
+    last_message: 'Merci pour ces conseils utiles.',
+    userId: 'user-1',
+    lastMessage: 'Merci pour ces conseils utiles.',
+    createdAt: new Date('2023-03-15'),
+    updatedAt: new Date('2023-03-15')
+  }
+];
 
 /**
- * Service for managing conversations
+ * Service for managing chat conversations
  */
 export const conversationsService = {
   /**
-   * Get all conversations for a user
+   * Fetch all conversations for a user
    */
-  async getConversations(userId: string): Promise<ChatConversation[]> {
-    try {
-      if (!userId) {
-        console.error('No user ID provided to getConversations');
-        return [];
-      }
-      
-      console.log('Fetching conversations for user:', userId);
-      const { data, error } = await baseService.supabase
-        .from('chat_conversations')
-        .select('*')
-        .eq('user_id', userId)
-        .order('updated_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching conversations:', error);
-        return [];
-      }
-      
-      console.log('Fetched conversations:', data.length);
-      return data.map(conversation => ({
-        id: conversation.id,
-        userId: conversation.user_id,
-        title: conversation.title,
-        lastMessage: conversation.last_message || '',
-        createdAt: new Date(conversation.created_at),
-        updatedAt: new Date(conversation.updated_at)
-      }));
-    } catch (error) {
-      console.error('Error getting conversations:', error);
-      return [];
-    }
+  fetchAll: async (userId: string): Promise<ChatConversation[]> => {
+    return conversations.filter(conv => conv.user_id === userId || conv.userId === userId);
   },
 
   /**
    * Create a new conversation
    */
-  async createConversation(userId: string, title: string): Promise<string | null> {
-    try {
-      if (!userId) {
-        console.error('No user ID provided to createConversation');
-        return null;
-      }
-      
-      console.log('Creating conversation for user:', userId);
-      const { data, error } = await baseService.supabase
-        .from('chat_conversations')
-        .insert({
-          user_id: userId,
-          title: title || 'Nouvelle conversation'
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating conversation:', error);
-        return null;
-      }
-      
-      console.log('Created conversation:', data.id);
-      return data.id;
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      return null;
-    }
+  create: async (userId: string, title: string): Promise<ChatConversation> => {
+    const now = new Date();
+    const newConv: ChatConversation = {
+      id: uuidv4(),
+      user_id: userId,
+      userId: userId,
+      title: title || 'Nouvelle conversation',
+      created_at: now,
+      updated_at: now,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    conversations.push(newConv);
+    return newConv;
   },
 
   /**
-   * Update conversation title and last message
+   * Update a conversation's title
    */
-  async updateConversation(conversationId: string, title: string, lastMessage: string): Promise<boolean> {
-    try {
-      if (!conversationId) {
-        console.error('No conversation ID provided to updateConversation');
-        return false;
-      }
-      
-      console.log('Updating conversation:', conversationId);
-      const { error } = await baseService.supabase
-        .from('chat_conversations')
-        .update({
-          title,
-          last_message: lastMessage
-        })
-        .eq('id', conversationId);
-      
-      if (error) {
-        console.error('Error updating conversation:', error);
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error updating conversation:', error);
-      return false;
-    }
+  update: async (id: string, title: string): Promise<ChatConversation | null> => {
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return null;
+    
+    conv.title = title;
+    return conv;
   },
 
   /**
    * Delete a conversation
    */
-  async deleteConversation(conversationId: string): Promise<boolean> {
-    try {
-      if (!conversationId) {
-        console.error('No conversation ID provided to deleteConversation');
-        return false;
-      }
-      
-      console.log('Deleting conversation:', conversationId);
-      // Due to cascade delete in the database, we only need to delete the conversation
-      const { error } = await baseService.supabase
-        .from('chat_conversations')
-        .delete()
-        .eq('id', conversationId);
-      
-      if (error) {
-        console.error('Error deleting conversation:', error);
-        return false;
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error deleting conversation:', error);
-      return false;
-    }
-  }
+  delete: async (id: string): Promise<boolean> => {
+    const initialLength = conversations.length;
+    conversations = conversations.filter(conv => conv.id !== id);
+    return conversations.length < initialLength;
+  },
+
+  /**
+   * Update a conversation's last message
+   */
+  updateLastMessage: async (id: string, message: string): Promise<ChatConversation | null> => {
+    const conv = conversations.find(c => c.id === id);
+    if (!conv) return null;
+    
+    conv.last_message = message;
+    conv.lastMessage = message;
+    const now = new Date();
+    conv.updated_at = now;
+    conv.updatedAt = now;
+    return conv;
+  },
 };

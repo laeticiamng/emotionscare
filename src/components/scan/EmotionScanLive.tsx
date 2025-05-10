@@ -90,10 +90,12 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({
     try {
       setStatusText('Enregistrement en cours...');
       // Add userId to the result and save it
-      const result = await saveRealtimeEmotionScan({
+      const resultWithUserId = {
         ...analysisResult,
         user_id: userId
-      });
+      };
+      
+      const result = await saveRealtimeEmotionScan(resultWithUserId);
       
       setIsSaved(true);
       setStatusText('Résultat enregistré');

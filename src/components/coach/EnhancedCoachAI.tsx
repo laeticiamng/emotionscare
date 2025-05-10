@@ -82,7 +82,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
               Analyse de votre état émotionnel
             </h3>
             <p className="mt-2 text-sm">
-              {emotionResult.ai_feedback || 
+              {emotionResult.ai_feedback || emotionResult.feedback || 
                 `Votre état émotionnel actuel est "${emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutre'}" avec une intensité de ${Math.round((emotionResult.intensity || 0.5) * 100)}%. 
                 Voici quelques recommandations personnalisées pour vous aider à optimiser votre bien-être.`
               }
@@ -106,6 +106,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
                 emotion={emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral'} 
                 intensity={Math.round((emotionResult.intensity || 0.5) * 100)}
                 standalone={true}
+                className="mt-4"
               />
             </>
           )}
