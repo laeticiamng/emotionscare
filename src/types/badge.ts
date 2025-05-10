@@ -11,4 +11,6 @@ export interface Badge {
   threshold?: number;
   points?: number;
   user_id?: string;
+  icon_url?: string;
+  total_required?: number;
 }

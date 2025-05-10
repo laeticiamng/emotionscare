@@ -1,5 +1,4 @@
 
-// Add this file if it doesn't exist
 export interface MusicTrack {
   id: string;
   title: string;
@@ -11,6 +10,7 @@ export interface MusicTrack {
   emotion_tag?: string;
   intensity?: number;
   externalUrl?: string;
+  genre?: string;
   
   // Add backward compatibility aliases
   coverUrl?: string;
@@ -18,6 +18,7 @@ export interface MusicTrack {
   audioUrl?: string;
   url?: string;
   mood?: string;
+  coverImage?: string;
 }
 
 export interface MusicPlaylist {
@@ -61,6 +62,8 @@ export interface MusicContextType {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   setCurrentTrack: (track: MusicTrack | null) => void;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
   
   // Additional properties used in the context
   openDrawer?: boolean;

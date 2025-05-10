@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,7 +47,6 @@ const EmotionScanner: React.FC<Props> = ({ onEmotionDetected }) => {
       const analysisResult = await analyzeEmotion({
         userId: user.id,
         text: text || undefined,
-        // Using audioUrl for audio analysis - renamed from audio_url
         audioUrl: audioUrl || undefined, 
       });
       

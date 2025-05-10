@@ -1,18 +1,55 @@
 
-import { ThemeName, FontSize } from './index';
-import { NotificationFrequency, NotificationType, NotificationTone } from './notification';
+export enum NotificationType {
+  ALL = 'all',
+  IMPORTANT = 'important',
+  NONE = 'none'
+}
 
-export interface UserPreferencesState {
-  theme: ThemeName;
-  fontSize: FontSize;
-  language: string;
-  notifications: boolean;
-  emailNotifications: boolean;
-  notificationFrequency: NotificationFrequency;
-  notificationType: NotificationType;
-  notificationTone: NotificationTone;
-  accentColor?: string;
+export enum NotificationFrequency {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  FLEXIBLE = 'flexible',
+  NONE = 'none'
+}
+
+export enum NotificationTone {
+  SILENT = 'silent',
+  MOTIVATING = 'motivating',
+  GENTLE = 'gentle',
+  MINIMALIST = 'minimalist',
+  POETIC = 'poetic',
+  DIRECTIVE = 'directive'
+}
+
+export interface UserPreferences {
+  id?: string;
+  userId?: string;
+  theme?: string;
+  fontSize?: string;
+  fontFamily?: string;
+  language?: string;
+  notificationType?: NotificationType;
+  notificationsEnabled?: boolean;
+  notificationFrequency?: NotificationFrequency;
+  notificationTone?: NotificationTone;
+  reminderTime?: string;
+  darkMode?: boolean;
   highContrast?: boolean;
-  dynamicTheme?: boolean;
+  reducedMotion?: boolean;
+  fontScaling?: number;
+  colorBlindMode?: string;
+  screenReader?: boolean;
+  dataSaving?: boolean;
+  shareEmotionData?: boolean;
+  shareAnonymousData?: boolean;
+  locationTracking?: boolean;
   emotionalCamouflage?: boolean;
+  voiceControl?: boolean;
+  gestures?: boolean;
+}
+
+export interface UserPreferencesState extends UserPreferences {
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
+  isLoading: boolean;
+  error: Error | null;
 }

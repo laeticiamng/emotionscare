@@ -1,130 +1,165 @@
 
+import { ChatConversation, ChatMessage } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatConversation, ChatMessage } from '@/types/chat';
 
-// Mock conversations data
-const mockConversations: ChatConversation[] = [];
+// Mock database for conversations and messages
+const conversations: ChatConversation[] = [];
+const messages: ChatMessage[] = [];
 
-// Get conversations for a specific user
-const getConversationsForUser = async (userId: string): Promise<ChatConversation[]> => {
-  // In a real app, this would be an API call
-  // For now, we'll filter the mock data
-  return mockConversations
-    .filter(conv => conv.user_id === userId)
+// Generate some initial mock data
+function initializeData() {
+  if (conversations.length === 0) {
+    for (let i = 0; i < 5; i++) {
+      const id = uuidv4();
+      const createdAt = new Date();
+      createdAt.setDate(createdAt.getDate() - i);
+      
+      const conversation: ChatConversation = {
+        id,
+        user_id: 'user-1',
+        title: `Conversation ${i + 1}`,
+        created_at: createdAt.toISOString(),
+        updated_at: createdAt.toISOString(),
+        last_message: `Last message from conversation ${i + 1}`
+      };
+      
+      conversations.push(conversation);
+      
+      // Add some messages for this conversation
+      for (let j = 0; j < 3; j++) {
+        const msgTime = new Date(createdAt);
+        msgTime.setHours(msgTime.getHours() + j);
+        
+        messages.push({
+          id: uuidv4(),
+          conversation_id: id,
+          sender: j % 2 === 0 ? 'user' : 'assistant',
+          text: `Sample message ${j + 1} in conversation ${i + 1}`,
+          timestamp: msgTime.toISOString()
+        });
+      }
+    }
+  }
+}
+
+// Get all conversations for a user
+export async function getConversationsForUser(userId: string): Promise<ChatConversation[]> {
+  initializeData();
+  return conversations.filter(c => c.user_id === userId);
+}
+
+// Get a specific conversation by ID
+export async function getConversationById(conversationId: string): Promise<ChatConversation | null> {
+  initializeData();
+  return conversations.find(c => c.id === conversationId) || null;
+}
+
+// Get all messages for a conversation
+export async function getMessagesForConversation(conversationId: string): Promise<ChatMessage[]> {
+  initializeData();
+  return messages
+    .filter(m => m.conversation_id === conversationId)
     .sort((a, b) => {
-      // Sort by the most recent conversation
-      const dateA = typeof a.updated_at === 'string' ? new Date(a.updated_at) : a.updated_at;
-      const dateB = typeof b.updated_at === 'string' ? new Date(b.updated_at) : b.updated_at;
-      return dateB.getTime() - dateA.getTime();
+      const dateA = new Date(a.timestamp).getTime();
+      const dateB = new Date(b.timestamp).getTime();
+      return dateA - dateB;
     });
-};
+}
 
 // Create a new conversation
-const createConversation = async (userId: string, title: string): Promise<ChatConversation> => {
-  const now = new Date();
-  
-  const conversation: ChatConversation = {
+export async function createConversation(userId: string, title: string): Promise<ChatConversation> {
+  const newConversation: ChatConversation = {
     id: uuidv4(),
     user_id: userId,
-    created_at: now,
-    updated_at: now,
     title,
-    last_message: '',
-    // Add backward compatibility fields
-    userId,
-    createdAt: now,
-    updatedAt: now,
-    lastMessage: '',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    last_message: ''
   };
   
-  mockConversations.push(conversation);
-  return conversation;
-};
+  conversations.push(newConversation);
+  return newConversation;
+}
 
-// Update an existing conversation
-const updateConversation = async (conversationId: string, updates: { title?: string; lastMessage?: string }): Promise<ChatConversation> => {
-  const index = mockConversations.findIndex(c => c.id === conversationId);
+// Update conversation properties
+export async function updateConversation(
+  conversationId: string, 
+  updates: { title?: string; lastMessage?: string }
+): Promise<ChatConversation | null> {
+  const conversation = conversations.find(c => c.id === conversationId);
+  if (!conversation) return null;
   
-  if (index === -1) {
-    throw new Error('Conversation not found');
-  }
+  if (updates.title) conversation.title = updates.title;
+  if (updates.lastMessage) conversation.last_message = updates.lastMessage;
+  conversation.updated_at = new Date().toISOString();
   
-  const updatedConversation: ChatConversation = {
-    ...mockConversations[index],
-    ...updates,
-    updated_at: new Date(),
-    // Update backward compatibility field
-    updatedAt: new Date(),
-  };
-  
-  // If lastMessage is provided, update both properties
-  if (updates.lastMessage) {
-    updatedConversation.last_message = updates.lastMessage;
-    updatedConversation.lastMessage = updates.lastMessage;
-  }
-  
-  mockConversations[index] = updatedConversation;
-  return updatedConversation;
-};
+  return conversation;
+}
 
 // Delete a conversation
-const deleteConversation = async (conversationId: string): Promise<void> => {
-  const index = mockConversations.findIndex(c => c.id === conversationId);
+export async function deleteConversation(conversationId: string): Promise<boolean> {
+  const index = conversations.findIndex(c => c.id === conversationId);
+  if (index === -1) return false;
   
-  if (index === -1) {
-    throw new Error('Conversation not found');
-  }
+  conversations.splice(index, 1);
   
-  mockConversations.splice(index, 1);
-};
+  // Delete all messages in this conversation
+  const messagesToDelete = messages.filter(m => m.conversation_id === conversationId);
+  messagesToDelete.forEach(m => {
+    const msgIndex = messages.findIndex(msg => msg.id === m.id);
+    if (msgIndex !== -1) {
+      messages.splice(msgIndex, 1);
+    }
+  });
+  
+  return true;
+}
 
-// Mock messages data (organized by conversation ID)
-const mockMessages: Record<string, ChatMessage[]> = {};
-
-// Get messages for a specific conversation
-const getMessagesForConversation = async (conversationId: string): Promise<ChatMessage[]> => {
-  // In a real app, this would be an API call
-  return mockMessages[conversationId] || [];
-};
-
-// Add a new message to a conversation
-const addMessageToConversation = async (conversationId: string, message: Omit<ChatMessage, 'id'>): Promise<ChatMessage> => {
+// Add a message to a conversation
+export async function addMessageToConversation(
+  conversationId: string,
+  messageData: Omit<ChatMessage, 'id'>
+): Promise<ChatMessage> {
+  // Create new message
   const newMessage: ChatMessage = {
     id: uuidv4(),
-    ...message,
-    timestamp: message.timestamp || new Date(),
+    ...messageData
   };
   
-  if (!mockMessages[conversationId]) {
-    mockMessages[conversationId] = [];
+  messages.push(newMessage);
+  
+  // Update conversation last message and timestamp
+  const conversation = conversations.find(c => c.id === conversationId);
+  if (conversation) {
+    conversation.updated_at = new Date().toISOString();
+    conversation.last_message = messageData.text;
   }
-  
-  mockMessages[conversationId].push(newMessage);
-  
-  // Also update the conversation's last message
-  const text = newMessage.content || newMessage.text || '';
-  await updateConversation(conversationId, { lastMessage: text });
   
   return newMessage;
-};
+}
 
-// Format date for display
-const formatDate = (date: Date | string): string => {
-  if (typeof date === 'string') {
-    date = new Date(date);
-  }
-  return date.toISOString();
-};
+// Clear all messages in a conversation
+export async function clearConversationMessages(conversationId: string): Promise<boolean> {
+  const messagesToRemove = messages.filter(m => m.conversation_id === conversationId);
+  messagesToRemove.forEach(m => {
+    const index = messages.findIndex(msg => msg.id === m.id);
+    if (index !== -1) {
+      messages.splice(index, 1);
+    }
+  });
+  
+  return true;
+}
 
-// Export the service methods
 const chatHistoryService = {
   getConversationsForUser,
+  getConversationById,
+  getMessagesForConversation,
   createConversation,
   updateConversation,
   deleteConversation,
-  getMessagesForConversation,
   addMessageToConversation,
-  formatDate
+  clearConversationMessages
 };
 
 export default chatHistoryService;

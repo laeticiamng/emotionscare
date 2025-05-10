@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { analyzeEmotion } from '@/lib/scan/analyzeService';
+import { analyzeEmotion } from '@/lib/scanService';
 import { useToast } from "@/hooks/use-toast";
 
 export default function useEmotionScanFormState(onScanSaved: () => void, onSaveComplete?: () => void, userId?: string) {

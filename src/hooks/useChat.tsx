@@ -1,73 +1,72 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatResponse, ChatContext } from '@/types/chat';
-import { getChatResponse } from '@/services/chatService';
+import { ChatMessage, ChatResponse } from '@/types';
+import chatService from '@/services/chatService';
 
-export const useChat = (conversationId: string = ''): ChatContext => {
+export const useChat = (conversationId: string, userId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  
-  const addMessage = useCallback((message: Omit<ChatMessage, 'id'>) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSend = async (messageText: string): Promise<ChatResponse> => {
+    setIsLoading(true);
+
+    try {
+      // Save user message
+      const userMessage: ChatMessage = {
+        id: uuidv4(),
+        conversation_id: conversationId,
+        sender: 'user',
+        sender_id: userId,
+        text: messageText,
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, userMessage]);
+
+      // Get AI response
+      const response = await chatService.sendChatMessage(messageText);
+
+      // Save AI message
+      const aiMessage: ChatMessage = {
+        id: uuidv4(),
+        conversation_id: conversationId,
+        sender: 'assistant',
+        text: response.message,
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+      return response;
+    } catch (error) {
+      console.error('Error sending message:', error);
+      return {
+        message: 'Sorry, I encountered an error. Please try again.',
+        emotion: 'error'
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addMessage = (messageData: Omit<ChatMessage, 'id'>) => {
     const newMessage: ChatMessage = {
-      ...message,
       id: uuidv4(),
+      ...messageData
     };
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  }, []);
-  
-  const handleSend = useCallback(
-    async (message: string): Promise<ChatResponse> => {
-      try {
-        setIsLoading(true);
-        
-        // Add user message to the chat
-        addMessage({
-          sender: 'user',
-          sender_id: 'user-1',
-          conversation_id: conversationId,
-          text: message,
-          content: message,
-          is_read: true,
-          timestamp: new Date(),
-        });
-        
-        // Get response from the chat API
-        const response = await getChatResponse(message);
-        
-        // Add bot message to the chat
-        addMessage({
-          sender: 'bot',
-          sender_id: 'bot-1',
-          conversation_id: conversationId,
-          text: response.message,
-          content: response.message,
-          is_read: true,
-          timestamp: new Date(),
-        });
-        
-        return response;
-      } catch (error) {
-        console.error('Error sending message:', error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [conversationId, addMessage]
-  );
-  
-  const clearMessages = useCallback(() => {
+    setMessages(prev => [...prev, newMessage]);
+  };
+
+  const clearMessages = () => {
     setMessages([]);
-  }, []);
-  
+  };
+
   return {
     messages,
     isLoading,
     handleSend,
     addMessage,
-    clearMessages,
+    clearMessages
   };
 };
 

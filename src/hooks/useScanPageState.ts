@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Emotion } from '@/types';
-import { fetchEmotionHistory } from '@/lib/scanService';
+import { getEmotionHistory } from '@/lib/scanService';
 import useScanPage from '@/hooks/useScanPage';
 
 export function useScanPageState(userId?: string) {
@@ -21,7 +21,7 @@ export function useScanPageState(userId?: string) {
         try {
           setLoading(true);
           console.log("Fetching emotion history for user:", userId);
-          const history = await fetchEmotionHistory();
+          const history = await getEmotionHistory();
           setEmotions(history);
           console.log("Emotion history loaded:", history.length, "entries");
         } catch (error) {
@@ -39,13 +39,13 @@ export function useScanPageState(userId?: string) {
   const handleScanSaved = () => {
     setShowScanForm(false);
     // Refresh data after saving
-    fetchEmotionHistory().then(setEmotions);
+    getEmotionHistory().then(setEmotions);
   };
 
   const refreshEmotionHistory = async (): Promise<void> => {
     setLoading(true);
     try {
-      const data = await fetchEmotionHistory();
+      const data = await getEmotionHistory();
       setEmotions(data);
     } catch (error) {
       console.error("Error refreshing emotion history:", error);

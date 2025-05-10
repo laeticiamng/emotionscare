@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
-// Fixed import statement
 import chatHistoryService from '@/lib/chat/chatHistoryService';
 
 export const useMessages = (conversationId: string | null) => {

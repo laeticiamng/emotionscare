@@ -19,7 +19,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
       {badges.map((badge) => {
         const isEarned = earnedBadgeIds.includes(badge.id);
         // Use the default threshold if not provided
-        const threshold = badge.threshold || badge.total_required || 100;
+        const threshold = badge.threshold || 100;
         const progress = progressFunction(threshold);
         
         return (
@@ -27,7 +27,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
             key={badge.id}
             name={badge.name}
             description={badge.description}
-            iconUrl={badge.icon_url || badge.image_url || badge.icon}
+            iconUrl={badge.image_url || badge.icon}
             isEarned={isEarned}
             progress={progress}
             threshold={threshold}

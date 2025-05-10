@@ -13,15 +13,14 @@ interface VRPromptWidgetProps {
 const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
   const { toast } = useToast();
   const { 
-    activeTemplate,
-    isSessionActive, 
+    isActive: isSessionActive,
     startSession,
     completeSession 
   } = useVRSession();
   
   const handleStartSession = () => {
     if (template) {
-      startSession(template);
+      startSession(template.id);
       toast({
         title: 'Session VR démarrée',
         description: `Votre session de ${template.duration} minutes a commencé`
@@ -37,7 +36,7 @@ const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
       <CardContent>
         {isSessionActive ? (
           <Button 
-            onClick={completeSession} 
+            onClick={() => completeSession()}
             variant="destructive"
             className="w-full"
           >

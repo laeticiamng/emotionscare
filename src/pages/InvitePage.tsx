@@ -65,7 +65,7 @@ const InvitePage: React.FC = () => {
   }, [token]);
 
   const onSubmit = async (data: SignupFormData) => {
-    if (!invitationData?.email) {
+    if (!invitationData?.data?.email) {
       toast({
         title: "Erreur",
         description: "Données d'invitation invalides",
@@ -79,12 +79,12 @@ const InvitePage: React.FC = () => {
     try {
       // Register the user with Supabase Auth
       const { error: signUpError } = await supabase.auth.signUp({
-        email: invitationData.email,
+        email: invitationData.data.email,
         password: data.password,
         options: {
           data: {
             name: data.name,
-            role: invitationData.role,
+            role: invitationData.data.role,
             anonymity_code: Math.random().toString(36).substring(2, 10)
           }
         }
@@ -174,7 +174,7 @@ const InvitePage: React.FC = () => {
                 <Label htmlFor="email">Email</Label>
                 <Input 
                   id="email"
-                  value={invitationData?.email || ''} 
+                  value={invitationData?.data?.email || ''} 
                   disabled 
                   readOnly
                 />

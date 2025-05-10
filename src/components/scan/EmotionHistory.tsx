@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { Emotion } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-import { fetchEmotionHistory } from '@/lib/scanService';
+import { getEmotionHistory } from '@/lib/scanService';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -24,7 +24,7 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ userId }) => {
     const fetchEmotions = async () => {
       try {
         setLoading(true);
-        const userEmotions = await fetchEmotionHistory();
+        const userEmotions = await getEmotionHistory();
         setEmotions(userEmotions);
       } catch (error) {
         console.error('Error fetching emotion history:', error);
