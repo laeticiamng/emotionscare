@@ -17,6 +17,7 @@ export * from './navigation';
 export * from './progress-bar';
 export * from './track-info';
 export * from './group';
+export * from './vr-session-music';
 
 // Basic shared types
 export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';

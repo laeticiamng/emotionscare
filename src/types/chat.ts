@@ -20,4 +20,5 @@ export interface ChatConversation {
   user_id?: string;
   summary?: string;
   status?: 'active' | 'archived' | 'deleted';
+  last_message?: ChatMessage;
 }
