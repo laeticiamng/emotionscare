@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import TrendCharts from './TrendCharts';
 import EmotionScanSection from './EmotionScanSection';
-import CoachRecommendations from './CoachRecommendations';
+import CoachRecommendations from '../coach/CoachRecommendations';
 import GamificationWidget from './GamificationWidget';
 import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
