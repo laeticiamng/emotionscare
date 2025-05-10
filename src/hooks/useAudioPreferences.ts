@@ -8,12 +8,6 @@ export interface AudioPreference {
   currentEqualizer: string;
   equalizerEnabled: boolean;
   equalizerPresets: string[];
-  
-  // Add the missing methods
-  setVolume?: (volume: number) => void;
-  setAutoplay?: (enabled: boolean) => void;
-  toggleEqualizer?: () => void;
-  setEqualizerPreset?: (preset: string) => void;
 }
 
 export default function useAudioPreferences() {

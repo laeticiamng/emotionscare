@@ -1,5 +1,5 @@
 
-// Add or update this file as needed
+// Ajouter ou mettre à jour ce fichier si nécessaire
 export enum UserRole {
   ADMIN = 'admin',
   EMPLOYEE = 'employee',
@@ -30,7 +30,7 @@ export interface User {
   position?: string;
   joined_at?: string;
   onboarded?: boolean;
-  preferences?: UserPreferences; // Add this property to fix User type errors
+  preferences?: UserPreferences; // Ajout de cette propriété pour résoudre les erreurs User type
 }
 
 export interface UserPreferences {
@@ -43,7 +43,7 @@ export interface UserPreferences {
   privacyLevel: string;
   dataCollection: boolean;
   
-  // Additional properties needed
+  // Propriétés supplémentaires nécessaires
   font_size?: string;
   reminder_time?: string;
   marketing_emails?: boolean;
@@ -53,7 +53,7 @@ export interface UserPreferences {
   push_notifications?: boolean;
   accent_color?: string;
   
-  // Premium features
+  // Fonctionnalités premium
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
@@ -76,8 +76,9 @@ export interface UserPreferencesState {
   privacyLevel: string;
   dataCollection: boolean;
   
-  // Additional properties needed
+  // Propriétés supplémentaires nécessaires
   notificationsEnabled?: boolean;
+  notifications_enabled?: boolean;
   notificationFrequency?: string;
   notificationType?: string;
   notificationTone?: string;
@@ -86,4 +87,7 @@ export interface UserPreferencesState {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
+  error?: Error | null;
+  reminderTime?: string;
+  reminder_time?: string;
 }

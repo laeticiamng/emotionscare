@@ -2,7 +2,11 @@
 export enum NotificationType {
   ALL = 'all',
   IMPORTANT = 'important',
-  NONE = 'none'
+  NONE = 'none',
+  // Types supplémentaires pour la compatibilité
+  MINIMAL = 'minimal',
+  DETAILED = 'detailed',
+  FULL = 'full'
 }
 
 export enum NotificationFrequency {
@@ -47,12 +51,12 @@ export interface UserPreferences {
   voiceControl?: boolean;
   gestures?: boolean;
   
-  // Backward compatibility fields
+  // Champs pour la compatibilité
   font_size?: string;
   notifications_enabled?: boolean;
   reminder_time?: string;
   
-  // Fields from UserPreferences in user.ts
+  // Champs de UserPreferences dans user.ts
   notifications?: boolean;
   autoplayVideos?: boolean;
   showEmotionPrompts?: boolean;
@@ -73,7 +77,7 @@ export interface UserPreferencesState extends UserPreferences {
   error: Error | null;
   preferences?: UserPreferences;
   
-  // Add properties needed in ImmersiveSettingsPage
+  // Propriétés nécessaires dans ImmersiveSettingsPage
   notificationsEnabled?: boolean;
   notificationFrequency?: NotificationFrequency;
   notificationType?: NotificationType;

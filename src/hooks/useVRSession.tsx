@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { VRSession } from '@/types/vr';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 import { useToast } from './use-toast';
 
 interface UseVRSessionProps {
@@ -13,17 +13,26 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
   const [isActive, setIsActive] = useState<boolean>(false);
   const [duration, setDuration] = useState<number>(0);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [heartRate, setHeartRate] = useState({ before: 75, after: 65 });
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
-  const startSession = useCallback((templateId?: string, emotionBefore?: string) => {
+  const startSession = useCallback((templateId?: string | VRSessionTemplate, emotionBefore?: string) => {
+    setIsLoading(true);
+    
+    // Si templateId est un objet VRSessionTemplate, extraire son ID
+    const actualTemplateId = typeof templateId === 'string' ? templateId : templateId?.id;
+    
     const newSession: VRSession = {
       id: `session-${Date.now()}`,
-      user_id: 'current-user', // In a real app, this would be the actual user ID
+      user_id: 'current-user', // Dans une app réelle, ce serait l'ID utilisateur réel
       date: new Date(),
-      duration: 0,
-      template_id: templateId,
-      emotion_before: emotionBefore,
+      started_at: new Date(),
       start_time: new Date(),
+      duration: 0,
+      template_id: actualTemplateId,
+      emotion_before: emotionBefore,
+      mood_before: emotionBefore,
       is_audio_only: false
     };
     
@@ -31,6 +40,7 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
     setIsActive(true);
     setStartTime(new Date());
     setDuration(0);
+    setIsLoading(false);
     
     toast({
       title: 'Session démarrée',
@@ -43,17 +53,19 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
   const completeSession = useCallback((emotionAfter?: string) => {
     if (!session || !isActive) return null;
     
-    // Calculate final duration
+    // Calculer la durée finale
     const endTime = new Date();
     const startTimeDate = startTime || new Date();
-    const durationSeconds = Math.floor((endTime.getTime() - startTimeDate.getTime()) / 1000); // Convert to seconds
+    const durationSeconds = Math.floor((endTime.getTime() - startTimeDate.getTime()) / 1000); // Convertir en secondes
     
     const completedSession: VRSession = {
       ...session,
       emotion_after: emotionAfter,
+      mood_after: emotionAfter,
       duration_seconds: durationSeconds,
-      duration: durationSeconds, // Make sure it's a number
-      completed: true
+      duration: durationSeconds, // S'assurer que c'est un nombre
+      completed: true,
+      completed_at: endTime
     };
     
     setSession(completedSession);
@@ -94,6 +106,10 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
     session,
     isActive,
     duration,
+    heartRate,
+    isLoading,
+    isSessionActive: isActive,
+    activeTemplate: typeof session?.template_id === 'object' ? session?.template_id : null,
     startSession,
     completeSession,
     cancelSession,

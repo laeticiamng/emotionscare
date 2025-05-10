@@ -2,7 +2,7 @@
 import { Track, Playlist } from './types';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-// Convert Track to MusicTrack
+// Convertir Track en MusicTrack
 export function convertTrackToMusicTrack(track: Track): MusicTrack {
   return {
     id: track.id,
@@ -11,14 +11,15 @@ export function convertTrackToMusicTrack(track: Track): MusicTrack {
     url: track.url,
     duration: track.duration,
     audioUrl: track.audioUrl,
-    audio_url: track.audioUrl || track.url, // Ensure audio_url is set
+    audio_url: track.audioUrl || track.url, // S'assurer que audio_url est défini
     coverUrl: track.coverUrl || track.cover,
+    cover_url: track.coverUrl || track.cover,
     cover: track.cover,
     emotion: track.emotion
   };
 }
 
-// Convert MusicTrack to Track
+// Convertir MusicTrack en Track
 export function convertMusicTrackToTrack(track: MusicTrack): Track {
   return {
     id: track.id,
@@ -33,7 +34,7 @@ export function convertMusicTrackToTrack(track: MusicTrack): Track {
   };
 }
 
-// Convert MusicPlaylist to Playlist
+// Convertir MusicPlaylist en Playlist
 export function convertMusicPlaylistToPlaylist(musicPlaylist: MusicPlaylist): Playlist {
   return {
     id: musicPlaylist.id,
@@ -43,12 +44,12 @@ export function convertMusicPlaylistToPlaylist(musicPlaylist: MusicPlaylist): Pl
   };
 }
 
-// Convert Playlist to MusicPlaylist
+// Convertir Playlist en MusicPlaylist
 export function convertPlaylistToMusicPlaylist(playlist: Playlist): MusicPlaylist {
   return {
     id: playlist.id,
     name: playlist.name,
-    title: playlist.name, // Ensure title is set
+    title: playlist.name, // S'assurer que title est défini
     emotion: playlist.emotion,
     tracks: playlist.tracks.map(convertTrackToMusicTrack)
   };

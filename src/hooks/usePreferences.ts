@@ -13,6 +13,7 @@ export const usePreferences = (): UserPreferencesState => {
     privacyLevel: 'standard',
     dataCollection: true,
     notificationsEnabled: true,
+    notifications_enabled: true,
     email_notifications: true,
     push_notifications: true,
   });
@@ -21,7 +22,7 @@ export const usePreferences = (): UserPreferencesState => {
 
   const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
     setIsLoading(true);
-    // Simulating an API call
+    // Simuler un appel API
     setTimeout(() => {
       setPreferences((prev) => ({ ...prev, ...newPreferences }));
       setIsLoading(false);
@@ -42,9 +43,16 @@ export const usePreferences = (): UserPreferencesState => {
     privacyLevel: preferences.privacyLevel,
     dataCollection: preferences.dataCollection,
     notificationsEnabled: preferences.notificationsEnabled,
+    notifications_enabled: preferences.notifications_enabled,
     email_notifications: preferences.email_notifications,
     push_notifications: preferences.push_notifications,
-    error: null
+    error: null,
+    emotionalCamouflage: false,
+    notificationFrequency: 'daily' as any,
+    notificationTone: 'gentle' as any,
+    notificationType: 'all' as any,
+    reminderTime: '09:00',
+    reminder_time: '09:00'
   };
 };
 

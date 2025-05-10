@@ -6,13 +6,13 @@ export interface MusicTrack {
   album?: string;
   duration: number;
   cover_url?: string;
-  audio_url?: string; // Make it optional when url or audioUrl is provided
+  audio_url?: string;
   emotion_tag?: string;
   intensity?: number;
   externalUrl?: string;
   genre?: string;
   
-  // Backward compatibility aliases
+  // Alias pour la compatibilité
   coverUrl?: string;
   cover?: string;
   audioUrl?: string;
@@ -20,19 +20,19 @@ export interface MusicTrack {
   mood?: string;
   coverImage?: string;
   
-  // For backward compatibility
-  [key: string]: any; // To allow dynamic properties
+  // Pour la compatibilité
+  [key: string]: any;
 }
 
 export interface MusicPlaylist {
   id: string;
-  title?: string; // Make it optional when name is provided
+  title?: string;
   description?: string;
   emotion?: string;
   tracks: MusicTrack[];
   cover_url?: string;
   
-  // Backward compatibility
+  // Pour la compatibilité
   name?: string;
   coverUrl?: string;
 }
@@ -45,16 +45,16 @@ export interface MusicRecommendationCardProps {
 }
 
 export interface MusicDrawerProps {
-  // Standard property
+  // Propriété standard
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   
-  // For backward compatibility
+  // Pour la compatibilité
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-// Define MusicContextType for MusicContext
+// Définir MusicContextType pour MusicContext
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
@@ -68,7 +68,7 @@ export interface MusicContextType {
   toggleRepeat?: () => void;
   toggleShuffle?: () => void;
   
-  // Additional properties used in the context
+  // Propriétés supplémentaires utilisées dans le contexte
   openDrawer?: boolean;
   setOpenDrawer?: (open: boolean) => void;
   currentPlaylist?: MusicPlaylist | null;

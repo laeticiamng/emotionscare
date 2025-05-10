@@ -2,7 +2,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { VRSession, VRSessionTemplate } from '@/types';
 
-// Mock VR session templates
+// Templates de session VR simulés
 const vrSessionTemplates: VRSessionTemplate[] = [
   {
     id: 'template-1',
@@ -40,38 +40,41 @@ const vrSessionTemplates: VRSessionTemplate[] = [
   }
 ];
 
-// Mock VR sessions
+// Sessions VR simulées
 let vrSessions: VRSession[] = [];
 
 /**
- * Get all VR session templates
+ * Récupérer tous les templates de session VR
  */
 export const getVRTemplates = async (): Promise<VRSessionTemplate[]> => {
   return vrSessionTemplates;
 };
 
 /**
- * Get a VR template by ID
+ * Récupérer un template VR par ID
  */
 export const getVRTemplateById = async (templateId: string): Promise<VRSessionTemplate | undefined> => {
   return vrSessionTemplates.find(template => template.id === templateId);
 };
 
 /**
- * Create a new VR session
+ * Créer une nouvelle session VR
  */
 export const createVRSession = async (sessionData: Partial<VRSession>): Promise<VRSession> => {
   const newSession: VRSession = {
     id: uuidv4(),
     user_id: sessionData.user_id || '',
     template_id: sessionData.template_id || '',
-    date: sessionData.date || new Date().toISOString(),
+    date: sessionData.date ? sessionData.date : new Date().toISOString(),
+    start_time: sessionData.start_time ? sessionData.start_time : new Date().toISOString(),
     duration: typeof sessionData.duration === 'string' ? parseInt(sessionData.duration, 10) : (sessionData.duration || 300),
-    completed: sessionData.completed || true,
-    mood_before: sessionData.mood_before || 'neutral',
-    mood_after: sessionData.mood_after,
-    is_audio_only: sessionData.is_audio_only || false,
-    start_time: sessionData.start_time || new Date().toISOString(),
+    completed: sessionData.completed || false,
+    completed_at: sessionData.completed_at,
+    mood_before: sessionData.mood_before || sessionData.emotion_before || 'neutral',
+    mood_after: sessionData.mood_after || sessionData.emotion_after,
+    emotion_before: sessionData.emotion_before || sessionData.mood_before || 'neutral',
+    emotion_after: sessionData.emotion_after || sessionData.mood_after,
+    is_audio_only: sessionData.is_audio_only || false
   };
   
   vrSessions.push(newSession);
@@ -79,14 +82,14 @@ export const createVRSession = async (sessionData: Partial<VRSession>): Promise<
 };
 
 /**
- * Get VR sessions for a user
+ * Récupérer les sessions VR d'un utilisateur
  */
 export const getUserVRSessions = async (userId: string): Promise<VRSession[]> => {
   return vrSessions.filter(session => session.user_id === userId);
 };
 
 /**
- * Save a relaxation session
+ * Sauvegarder une session de relaxation
  */
 export const saveRelaxationSession = async (data: {
   userId: string;
@@ -100,8 +103,10 @@ export const saveRelaxationSession = async (data: {
     user_id: data.userId,
     template_id: data.templateId,
     duration: data.duration || 300,
-    mood_before: data.moodBefore || 'neutral',
-    mood_after: data.moodAfter || 'relaxed',
+    emotion_before: data.moodBefore,
+    emotion_after: data.moodAfter,
+    mood_before: data.moodBefore,
+    mood_after: data.moodAfter,
     is_audio_only: data.isAudioOnly || false,
     start_time: new Date().toISOString()
   });

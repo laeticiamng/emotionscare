@@ -21,6 +21,16 @@ export interface VRSession {
   audio_url?: string;
   progress?: number;
   template_id?: string;
+  
+  // Champs nécessaires pour la compatibilité
+  date?: string | Date;
+  start_time?: string | Date;
+  duration_seconds?: number;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  mood_before?: string;
+  mood_after?: string;
+  completed?: boolean;
 }
 
 export interface VRSessionTemplate {
@@ -41,6 +51,17 @@ export interface VRSessionTemplate {
   level?: 'beginner' | 'intermediate' | 'advanced';
   rating?: number;
   created_at?: Date;
+  
+  // Champs supplémentaires pour la compatibilité
+  name?: string;
+  theme?: string;
+  template_id?: string;
+  completion_rate?: number;
+  recommended_mood?: string;
+  emotions?: string[];
+  benefits?: string[];
+  popularity?: number;
+  difficulty?: string;
 }
 
 export interface VRSessionWithMusicProps {
@@ -51,22 +72,25 @@ export interface VRSessionWithMusicProps {
   videoUrl?: string;
   audioUrl?: string;
   emotion?: string;
-  template?: VRSessionTemplate; // Add missing property
-  onCompleteSession?: () => void; // Add missing property
+  template?: VRSessionTemplate; // Propriété manquante
+  onCompleteSession?: () => void; // Propriété manquante
 }
 
 export interface VREmotionRecommendationProps {
-  emotion: any; // Fix for required emotion prop
+  emotion: any; // Correction pour la propriété emotion requise
 }
 
-// Add the properties used in VRPage.tsx
+// Ajout des propriétés utilisées dans VRPage.tsx
 export interface VRSessionHookReturn {
   session: VRSession;
   isActive: boolean;
   duration: number;
   activeTemplate?: VRSessionTemplate;
   isSessionActive?: boolean;
-  heartRate?: number;
+  heartRate?: {
+    before: number;
+    after: number;
+  };
   isLoading?: boolean;
   startSession: (templateId?: string | VRSessionTemplate, emotionBefore?: string) => VRSession;
   completeSession: (emotionAfter?: string) => VRSession;

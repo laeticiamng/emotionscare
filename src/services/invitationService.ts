@@ -2,7 +2,7 @@
 import { InvitationStats, InvitationFormData } from '@/types';
 
 class InvitationService {
-  // Generate invitation statistics
+  // Générer les statistiques d'invitation
   getInvitationStats(): InvitationStats {
     return {
       total: 50,
@@ -11,17 +11,16 @@ class InvitationService {
       accepted: 30,
       expired: 3,
       rejected: 9,
-      completed: 30, // Added required property
-      conversionRate: 0.71, // Added required property
-      averageTimeToAccept: 14.5, // Added required property in hours
-      recent_invites: [], // Added required property
-      teams: {}
+      completed: 30,
+      conversionRate: 0.71,
+      averageTimeToAccept: 14.5,
+      recent_invites: []
     };
   }
 
-  // Send invitation
+  // Envoi d'invitation
   async sendInvitation(data: InvitationFormData): Promise<boolean> {
-    // Mock API call
+    // Simulation d'appel API
     return new Promise((resolve) => {
       setTimeout(() => {
         console.log('Sending invitation to:', data.email);
@@ -30,13 +29,20 @@ class InvitationService {
     });
   }
 
-  // Get list of pending invitations
+  // Récupérer la liste des invitations en attente
   async getPendingInvitations(): Promise<any[]> {
     return [
       { id: '1', email: 'john@example.com', role: 'user', sent: new Date() },
       { id: '2', email: 'jane@example.com', role: 'admin', sent: new Date() }
     ];
   }
+  
+  // Pour la compatibilité avec InvitationsTab
+  async fetchInvitationStats(): Promise<InvitationStats> {
+    return this.getInvitationStats();
+  }
 }
 
 export default new InvitationService();
+// Exporter également la méthode fetchInvitationStats pour la compatibilité
+export const fetchInvitationStats = () => new InvitationService().getInvitationStats();

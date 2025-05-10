@@ -20,4 +20,9 @@ export interface JournalEntry {
   sleep_hours?: number;
   gratitude_items?: string[];
   insights?: string[];
+  
+  // Champs supplémentaires pour la compatibilité
+  created_at?: string | Date;
+  mood_score?: number;
+  text?: string; // Pour la compatibilité avec JournalCalendarView et JournalListView
 }

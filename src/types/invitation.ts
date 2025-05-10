@@ -3,6 +3,7 @@ export interface InvitationFormData {
   email: string;
   role: string;
   message?: string;
+  expires_in_days?: number;
 }
 
 export interface InvitationStats {
@@ -12,9 +13,9 @@ export interface InvitationStats {
   accepted: number;
   expired: number;
   rejected: number;
-  completed: number; // Add missing property
-  conversionRate: number; // Add missing property
-  averageTimeToAccept: number; // Add missing property
-  recent_invites: any[]; // Add missing property
+  completed: number;
+  conversionRate: number;
+  averageTimeToAccept: number;
+  recent_invites: any[];
   teams?: Record<string, any>;
 }
