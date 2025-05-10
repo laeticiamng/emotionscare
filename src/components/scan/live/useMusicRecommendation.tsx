@@ -20,7 +20,7 @@ export const EMOTION_TO_MUSIC: Record<string, string> = {
 export function useMusicRecommendation(emotionResult?: EmotionResult) {
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { loadPlaylistForEmotion, playTrack } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, getTracksForEmotion } = useMusic();
   
   useEffect(() => {
     if (emotionResult?.emotion) {
