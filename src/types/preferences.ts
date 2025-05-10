@@ -1,24 +1,35 @@
 
-// Define basic shared types for preferences
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
-export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
-export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export interface UserPreferences {
-  theme: ThemeName;
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  autoTheme: boolean;
-  dynamicThemeMode: DynamicThemeMode;
-  notifications: {
-    enabled: boolean;
-    sound: boolean;
-    email: boolean;
-    frequency: 'immediate' | 'daily' | 'weekly';
-  };
-  privacy: {
-    shareEmotionalData: boolean;
-    anonymousAnalytics: boolean;
-  };
+  theme?: string;
+  font?: FontFamily;
+  fontSize?: FontSize;
+  highContrast?: boolean;
+  reducedAnimations?: boolean;
+  keyboardNavigation?: boolean;
+  screenReader?: boolean;
+  audioGuidance?: boolean;
+  notificationFrequency?: 'daily' | 'weekly' | 'flexible' | 'none';
+  notificationTone?: 'minimalist' | 'poetic' | 'directive' | 'silent';
+  notifications_enabled?: boolean;
+  reminder_time?: string;
+  incognitoMode?: boolean;
+  dataExport?: 'pdf' | 'json';
+  emotionalCamouflage?: boolean;
+  duoModeEnabled?: boolean;
+  trustedContact?: string;
+  displayName?: string;
+  pronouns?: 'il' | 'elle' | 'iel' | 'autre';
+  biography?: string;
+  avatarUrl?: string;
+  customBackground?: string;
+  lockJournals?: boolean;
+}
+
+export interface UserPreferencesState {
+  preferences: UserPreferences;
+  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<boolean>;
+  resetPreferences: () => void;
 }
