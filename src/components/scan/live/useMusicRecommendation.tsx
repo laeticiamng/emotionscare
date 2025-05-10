@@ -20,7 +20,7 @@ export const EMOTION_TO_MUSIC: Record<string, string> = {
 export function useMusicRecommendation(emotionResult?: EmotionResult) {
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { getTracksForEmotion, playTrack } = useMusic();
+  const { loadPlaylistForEmotion, playTrack } = useMusic();
   
   useEffect(() => {
     if (emotionResult?.emotion) {
@@ -32,8 +32,8 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const tracks = await getTracksForEmotion(musicType);
-      setRecommendedTracks(tracks || []);
+      const playlist = await loadPlaylistForEmotion(musicType);
+      setRecommendedTracks(playlist?.tracks || []);
     } catch (error) {
       console.error('Error loading music recommendations:', error);
       setRecommendedTracks([]);

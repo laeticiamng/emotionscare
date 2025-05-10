@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, PlayCircle, Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types';
+import { EmotionResult, MusicPlaylist } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { MusicPlaylist } from '@/types';
 
 interface EmotionMusicRecommendationsProps {
   emotionResult?: EmotionResult;

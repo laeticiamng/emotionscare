@@ -44,10 +44,14 @@ export interface MusicContextType {
   progress: number;
   duration: number;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  getTracksForEmotion?: (emotion: string) => Promise<MusicTrack[]>;
   playTrack: (track: MusicTrack) => void;
+  play?: (track?: MusicTrack) => void;
   pauseTrack: () => void;
+  pause?: () => void;
   resumeTrack: () => void;
   nextTrack: () => void;
+  prevTrack?: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   openDrawer: boolean;
@@ -59,4 +63,5 @@ export interface MusicContextType {
   loadPlaylistById: (id: string) => void;
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
+  currentEmotion?: string;
 }

@@ -17,12 +17,12 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
 }) => {
   const { 
     loadPlaylistForEmotion, 
-    play, 
-    pause, 
+    playTrack,
+    pauseTrack,
     isPlaying, 
     currentTrack,
     nextTrack,
-    prevTrack,
+    previousTrack,
     volume,
     setVolume
   } = useMusic();
@@ -43,7 +43,7 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
           
           // Autoplay if needed
           if (autoplay && result.tracks && result.tracks.length > 0) {
-            play(result.tracks[0]);
+            playTrack(result.tracks[0]);
           }
         }
       } catch (error) {
@@ -54,15 +54,15 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
     };
     
     fetchPlaylist();
-  }, [emotion, loadPlaylistForEmotion, autoplay, play]);
+  }, [emotion, loadPlaylistForEmotion, autoplay, playTrack]);
 
   const togglePlay = () => {
     if (isPlaying) {
-      pause();
+      pauseTrack();
     } else if (currentTrack) {
-      play();
+      playTrack(currentTrack);
     } else if (playlist?.tracks && playlist.tracks.length > 0) {
-      play(playlist.tracks[0]);
+      playTrack(playlist.tracks[0]);
     }
   };
 
@@ -90,7 +90,7 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
       
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={prevTrack} disabled={loading || !playlist?.tracks?.length}>
+          <Button variant="outline" size="icon" onClick={() => previousTrack()} disabled={loading || !playlist?.tracks?.length}>
             <SkipBack className="h-4 w-4" />
           </Button>
           
@@ -103,7 +103,7 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
             {isPlaying ? "Pause" : "Play"}
           </Button>
           
-          <Button variant="outline" size="icon" onClick={nextTrack} disabled={loading || !playlist?.tracks?.length}>
+          <Button variant="outline" size="icon" onClick={() => nextTrack()} disabled={loading || !playlist?.tracks?.length}>
             <SkipForward className="h-4 w-4" />
           </Button>
         </div>
