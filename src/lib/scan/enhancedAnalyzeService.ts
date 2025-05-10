@@ -24,7 +24,7 @@ const EMOTION_TIPS: Record<string, string[]> = {
   happy: ['Share your joy with someone', 'Express gratitude', 'Document this feeling'],
   joyful: ['Savor this moment', 'Keep a joy journal', 'Share your happiness'],
   excited: ['Channel this energy into something creative', 'Share your excitement', 'Set new goals'],
-  content: ['Practice mindfulness', 'Enjoy the peace', 'Reflect on what's working well'],
+  content: ['Practice mindfulness', 'Enjoy the peace', 'Reflect on what\'s working well'],
   neutral: ['Try something new', 'Connect with nature', 'Engage in a hobby'],
   sad: ['Reach out to someone', 'Practice self-compassion', 'Allow yourself to feel'],
   anxious: ['Practice deep breathing', 'List your worries then reframe them', 'Move your body'],
