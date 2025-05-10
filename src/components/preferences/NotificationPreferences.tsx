@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { UserPreferencesState, UserPreferences } from '@/types';
+import { UserPreferencesState, NotificationFrequency, NotificationType, NotificationTone } from '@/types';
 
 interface NotificationPreferencesProps {
   preferences: UserPreferencesState;
