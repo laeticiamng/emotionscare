@@ -44,3 +44,4 @@ export { NotificationFrequency, NotificationType, NotificationTone } from './typ
 export { ProgressBarProps } from './types/progress-bar';
 export { TrackInfoProps, VolumeControlProps } from './types/track-info';
 export { Report } from './types/report';
+export { UseAudioPlayerReturn, UseAudioPlayerStateReturn } from './types/audio-player';

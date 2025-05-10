@@ -8,6 +8,8 @@ export interface ChatMessage {
   content?: string;
   sender_id?: string;
   is_read?: boolean;
+  sender_type?: string;
+  role?: string;
 }
 
 export interface ChatConversation {

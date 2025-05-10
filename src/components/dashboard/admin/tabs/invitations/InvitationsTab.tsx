@@ -16,15 +16,15 @@ const InvitationsTab: React.FC = () => {
   const [stats, setStats] = useState<InvitationStats>({
     total: 0,
     pending: 0,
-    accepted: 0,
     expired: 0,
-    sent: 0,
-    rejected: 0,
-    teams: {},
-    recent_invites: [],
     completed: 0,
     conversionRate: 0,
-    averageTimeToAccept: 0
+    averageTimeToAccept: 0,
+    sent: 0,
+    accepted: 0,
+    rejected: 0,
+    teams: {},
+    recent_invites: []
   });
 
   useEffect(() => {
@@ -35,7 +35,9 @@ const InvitationsTab: React.FC = () => {
           ...statsData,
           teams: statsData.teams || {},
           recent_invites: statsData.recent_invites || [],
-          rejected: statsData.rejected || 0 // Ensure rejected field is always present
+          rejected: statsData.rejected || 0,
+          sent: statsData.sent || 0,
+          accepted: statsData.accepted || 0
         });
       } catch (error) {
         console.error('Error fetching invitation stats:', error);

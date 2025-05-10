@@ -32,7 +32,7 @@ export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 export { UserRole } from './user';
 export { EmotionalTeamViewProps, EnhancedEmotionResult } from './emotion';
 export { Emotion, EmotionResult } from './emotion';
-export { ChatMessage, ChatConversation, ChatResponse, ChatContext } from './chat';
+export { ChatMessage, ChatConversation } from './chat';
 export { JournalEntry } from './journal';
 export { MoodData } from './mood';
 export { VRSession, VRSessionTemplate, VRSessionWithMusicProps } from './vr';

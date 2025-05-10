@@ -1,53 +1,42 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ThemeName } from '@/types';
-import { MoonIcon, SunIcon, Palette, Laptop } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { usePreferences } from '@/hooks/usePreferences';
+import { ThemeName } from '@/types';
 
-interface ThemeSettingsFormProps {
-  onUpdate?: (key: string, value: any) => void;
-}
-
-const ThemeSettingsForm: React.FC<ThemeSettingsFormProps> = ({
-  onUpdate
-}) => {
-  const { preferences, theme = 'light', updatePreferences } = usePreferences();
-
-  const handleThemeChange = (selectedTheme: ThemeName) => {
-    updatePreferences({ theme: selectedTheme });
-    if (onUpdate) {
-      onUpdate('theme', selectedTheme);
-    }
+const ThemeSettingsForm: React.FC = () => {
+  const { preferences, updatePreferences } = usePreferences();
+  
+  const handleThemeChange = (theme: ThemeName) => {
+    updatePreferences({ theme });
   };
-
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Thème de l'application</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Tabs defaultValue={theme} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="light" onClick={() => handleThemeChange('light')}>
-              <SunIcon className="mr-2 h-4 w-4" />
-              Clair
-            </TabsTrigger>
-            <TabsTrigger value="dark" onClick={() => handleThemeChange('dark')}>
-              <MoonIcon className="mr-2 h-4 w-4" />
-              Sombre
-            </TabsTrigger>
-            <TabsTrigger value="system" onClick={() => handleThemeChange('system')}>
-              <Laptop className="mr-2 h-4 w-4" />
-              Système
-            </TabsTrigger>
-            <TabsTrigger value="pastel" onClick={() => handleThemeChange('pastel')}>
-              <Palette className="mr-2 h-4 w-4" />
-              Pastel
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+    <Card className="w-full max-w-md">
+      <CardContent className="pt-6 space-y-4">
+        <div>
+          <h3 className="font-medium mb-4">Apparence</h3>
+          <RadioGroup 
+            defaultValue={preferences.theme} 
+            onValueChange={(value) => handleThemeChange(value as ThemeName)}
+            className="space-y-3"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="light" id="light" />
+              <Label htmlFor="light">Light</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="dark" id="dark" />
+              <Label htmlFor="dark">Dark</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="system" id="system" />
+              <Label htmlFor="system">System</Label>
+            </div>
+          </RadioGroup>
+        </div>
       </CardContent>
     </Card>
   );

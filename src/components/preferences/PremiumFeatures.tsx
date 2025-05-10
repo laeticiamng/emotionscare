@@ -1,43 +1,50 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { usePreferences } from '@/hooks/usePreferences';
 
-const PremiumFeatures = () => {
-  const { 
-    preferences, 
-    updatePreferences, 
-    emotionalCamouflage = false 
-  } = usePreferences();
-
-  const handleEmotionalCamouflageChange = async (checked: boolean) => {
-    await updatePreferences({ emotionalCamouflage: checked });
-  };
-
+const PremiumFeatures: React.FC = () => {
+  const { preferences, updatePreferences } = usePreferences();
+  
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Fonctionnalités Premium</CardTitle>
-        <CardDescription>
-          Débloquez des options avancées pour une expérience personnalisée
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="emotional-camouflage"
-              checked={!!emotionalCamouflage}
-              onCheckedChange={(checked) => handleEmotionalCamouflageChange(!!checked)}
+    <Card>
+      <CardContent className="p-6 space-y-4">
+        <h3 className="font-medium">Fonctionnalités premium</h3>
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p>Camouflage émotionnel</p>
+              <p className="text-sm text-muted-foreground">Masquer vos émotions pour les autres utilisateurs</p>
+            </div>
+            <Switch 
+              checked={preferences.emotionalCamouflage || false}
+              onCheckedChange={(checked) => updatePreferences({ emotionalCamouflage: checked })}
             />
-            <label htmlFor="emotional-camouflage" className="text-sm font-medium">
-              Camouflage émotionnel
-            </label>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            Masquez vos émotions aux autres utilisateurs pour plus de confidentialité
-          </p>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p>Suggestions avancées</p>
+              <p className="text-sm text-muted-foreground">Recevoir des recommandations basées sur l'IA</p>
+            </div>
+            <Switch 
+              checked={preferences.aiSuggestions || false}
+              onCheckedChange={(checked) => updatePreferences({ aiSuggestions: checked })}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p>Anonymat complet</p>
+              <p className="text-sm text-muted-foreground">Masquer votre identité dans les interactions</p>
+            </div>
+            <Switch 
+              checked={preferences.fullAnonymity || false}
+              onCheckedChange={(checked) => updatePreferences({ fullAnonymity: checked })}
+            />
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -1,215 +1,138 @@
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPreferences, ThemeName } from '@/types';
-import ThemeSelectionField from './ThemeSelectionField';
+import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { UserPreferences, ThemeName, FontSize } from '@/types';
 
-interface FormPreferences {
-  theme: ThemeName;
-  notifications_enabled: boolean;
-  font_size: 'small' | 'medium' | 'large';
-  language: string;
-  accent_color?: string;
-  background_color?: string;
-  marketing_emails?: boolean;
-  feature_announcements?: boolean;
-  reminder_time?: string;
+interface PreferencesFormProps {
+  preferences: UserPreferences;
+  onSave: (preferences: UserPreferences) => void;
 }
 
-const PreferencesForm: React.FC<{
-  onSave: (preferences: UserPreferences) => void;
-  preferences: UserPreferences;
-}> = ({ onSave, preferences }) => {
-  const [saving, setSaving] = useState(false);
-
-  // Adapter les préférences de base pour le formulaire
-  const formPreferences: FormPreferences = {
-    theme: preferences.theme as ThemeName || 'light',
-    notifications_enabled: preferences.notifications_enabled || false,
-    font_size: preferences.fontSize as 'small' | 'medium' | 'large' || 'medium',
-    language: preferences.language || 'fr', // Valeur par défaut pour résoudre l'erreur
-    marketing_emails: preferences.notifications?.email || false,
-    feature_announcements: preferences.notifications?.push || false,
-    accent_color: preferences.accent_color || '',
-    reminder_time: preferences.reminder_time || ''
-  };
-
-  const { register, handleSubmit, setValue, watch } = useForm<FormPreferences>({
-    defaultValues: formPreferences
+const PreferencesForm: React.FC<PreferencesFormProps> = ({ 
+  preferences, 
+  onSave 
+}) => {
+  const [formData, setFormData] = useState<UserPreferences>({
+    ...preferences
   });
-
-  const onSubmit = async (data: FormPreferences) => {
-    setSaving(true);
-    
-    // Convert the form data to the UserPreferences format
-    const standardPreferences: UserPreferences = {
-      theme: data.theme,
-      fontSize: data.font_size,
-      language: data.language,
-      accent_color: data.accent_color,
-      notifications: {
-        email: !!data.marketing_emails,
-        push: !!data.feature_announcements,
-        sms: false
-      },
-      notifications_enabled: data.notifications_enabled,
-      reminder_time: data.reminder_time,
-      // Add required properties from UserPreferences 
-      autoplayVideos: preferences.autoplayVideos || false,
-      showEmotionPrompts: preferences.showEmotionPrompts || false,
-      privacyLevel: preferences.privacyLevel || 'medium',
-      dataCollection: preferences.dataCollection || false
-    };
+  
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const handleChange = (key: keyof UserPreferences, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+  
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
     
     try {
-      await onSave(standardPreferences);
+      // Ensure type safety for theme and fontSize
+      const safeFormData = {
+        ...formData,
+        theme: formData.theme as ThemeName,
+        fontSize: formData.fontSize as FontSize,
+      };
+      
+      // Setup notifications object with correct types
+      const notifications = {
+        email: formData.email_notifications || false,
+        push: formData.push_notifications || false,
+        sms: false
+      };
+      
+      await onSave(safeFormData);
     } catch (error) {
       console.error('Error saving preferences:', error);
     } finally {
-      setSaving(false);
+      setIsSaving(false);
     }
   };
-
+  
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Préférences</CardTitle>
-        <CardDescription>
-          Personnalisez votre expérience Wellbeing
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Thème</label>
-            <Select
-              defaultValue={preferences.theme}
-              onValueChange={(value) => setValue('theme', value as ThemeName)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir un thème" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Clair</SelectItem>
-                <SelectItem value="dark">Sombre</SelectItem>
-                <SelectItem value="pastel">Pastel</SelectItem>
-                <SelectItem value="system">Système</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">
-              Modifiez l'apparence visuelle globale de l'application
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Langue</label>
-            <Select
-              defaultValue={preferences.language || 'fr'}
-              onValueChange={(value) => setValue('language', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir une langue" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fr">Français</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-              </SelectContent>
-            </Select>
+    <form onSubmit={handleSave}>
+      <Card className="mb-4">
+        <CardContent className="pt-6 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block font-medium">Thème</label>
+              <select
+                className="w-full border rounded p-2"
+                value={formData.theme}
+                onChange={(e) => handleChange('theme', e.target.value)}
+              >
+                <option value="light">Clair</option>
+                <option value="dark">Sombre</option>
+                <option value="system">Système</option>
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="block font-medium">Taille de police</label>
+              <select
+                className="w-full border rounded p-2"
+                value={formData.fontSize}
+                onChange={(e) => handleChange('fontSize', e.target.value)}
+              >
+                <option value="small">Petite</option>
+                <option value="medium">Moyenne</option>
+                <option value="large">Grande</option>
+              </select>
+            </div>
           </div>
           
-          <div className="space-y-2">
-            <label htmlFor="font-size" className="text-sm font-medium">Taille de police</label>
-            <Select
-              defaultValue={preferences.fontSize || preferences.font_size || 'medium'}
-              onValueChange={(value) => setValue('font_size', value as 'small' | 'medium' | 'large')}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir une taille" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="small">Petite</SelectItem>
-                <SelectItem value="medium">Moyenne</SelectItem>
-                <SelectItem value="large">Grande</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="space-y-4">
-            <label className="text-sm font-medium">Notifications</label>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="notifications-enabled"
-                checked={watch('notifications_enabled')}
-                onCheckedChange={(checked) => setValue('notifications_enabled', !!checked)}
+            <div className="flex items-center justify-between">
+              <span>Notifications</span>
+              <Switch
+                checked={formData.notifications_enabled || false}
+                onCheckedChange={(checked) => handleChange('notifications_enabled', checked)}
               />
-              <label htmlFor="notifications-enabled" className="text-sm">
-                Activer toutes les notifications
-              </label>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="notifications-email"
-                checked={watch('marketing_emails')}
-                onCheckedChange={(checked) => setValue('marketing_emails', !!checked)}
+            <div className="flex items-center justify-between">
+              <span>Notifications par email</span>
+              <Switch
+                checked={formData.email_notifications || false}
+                onCheckedChange={(checked) => handleChange('email_notifications', checked)}
               />
-              <label htmlFor="notifications-email" className="text-sm">
-                Recevoir des emails marketing
-              </label>
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="notifications-push"
-                checked={watch('feature_announcements')}
-                onCheckedChange={(checked) => setValue('feature_announcements', !!checked)}
+            <div className="flex items-center justify-between">
+              <span>Notifications push</span>
+              <Switch
+                checked={formData.push_notifications || false}
+                onCheckedChange={(checked) => handleChange('push_notifications', checked)}
               />
-              <label htmlFor="notifications-push" className="text-sm">
-                Recevoir des annonces de nouvelles fonctionnalités
-              </label>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="reminder-time" className="text-sm font-medium">Heure de rappel quotidien</label>
-            <Input
-              id="reminder-time"
-              type="time"
-              {...register('reminder_time')}
-              defaultValue={preferences.reminder_time || '09:00'}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Couleur d'accent</label>
-            <div className="grid grid-cols-5 gap-2">
-              {['#6E59A5', '#FF5A5F', '#2ecc71', '#3498db', '#f1c40f'].map((color) => (
-                <div 
-                  key={color}
-                  onClick={() => setValue('accent_color', color)}
-                  className={`w-10 h-10 rounded-full cursor-pointer border-2 ${
-                    watch('accent_color') === color ? 'border-primary' : 'border-transparent'
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
+            
+            <div className="flex items-center justify-between">
+              <span>Autoplay des vidéos</span>
+              <Switch
+                checked={formData.autoplayVideos}
+                onCheckedChange={(checked) => handleChange('autoplayVideos', checked)}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span>Collecte de données</span>
+              <Switch
+                checked={formData.dataCollection}
+                onCheckedChange={(checked) => handleChange('dataCollection', checked)}
+              />
             </div>
           </div>
         </CardContent>
-        
-        <CardFooter>
-          <Button type="submit" disabled={saving}>
-            {saving ? "Enregistrement..." : "Sauvegarder les préférences"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
+      </Card>
+      
+      <div className="flex justify-end">
+        <Button type="submit" disabled={isSaving}>
+          {isSaving ? 'Enregistrement...' : 'Enregistrer les préférences'}
+        </Button>
+      </div>
+    </form>
   );
 };
 

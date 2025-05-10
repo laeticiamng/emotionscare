@@ -13,6 +13,11 @@ export interface VRSession {
   mood_before?: number;
   mood_after?: number;
   notes?: string;
+  start_time?: string | Date;
+  duration_seconds?: number;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
 }
 
 export interface VRSessionTemplate {
@@ -30,6 +35,11 @@ export interface VRSessionTemplate {
   guided?: boolean;
   is_audio_only?: boolean;
   emotion_target?: string;
+  template_id?: string;
+  theme?: string;
+  title?: string;
+  completion_rate?: number;
+  recommended_mood?: string;
 }
 
 export interface VRSessionWithMusicProps {
@@ -39,4 +49,5 @@ export interface VRSessionWithMusicProps {
   videoUrl?: string;
   audioUrl?: string;
   emotion?: string;
+  musicTracks?: MusicTrack[];
 }

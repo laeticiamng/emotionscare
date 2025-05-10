@@ -1,6 +1,15 @@
 
 // Add or update this file as needed
-export type UserRole = 'admin' | 'employee' | 'manager' | 'guest' | 'user' | 'staff' | 'therapist' | 'hrmanager';
+export enum UserRole {
+  ADMIN = 'admin',
+  EMPLOYEE = 'employee',
+  MANAGER = 'manager',
+  GUEST = 'guest',
+  USER = 'user',
+  STAFF = 'staff',
+  THERAPIST = 'therapist',
+  HRMANAGER = 'hrmanager'
+}
 
 export interface User {
   id: string;
@@ -36,9 +45,16 @@ export interface UserPreferences {
   reminder_time?: string;
   marketing_emails?: boolean;
   feature_announcements?: boolean;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  accent_color?: string;
 }
 
 export interface UserPreferencesState {
+  preferences: UserPreferences;
+  isLoading: boolean;
+  updatePreferences: (preferences: Partial<UserPreferences>) => void;
   theme: string;
   fontSize: string;
   language: string;
