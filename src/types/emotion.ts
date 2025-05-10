@@ -17,3 +17,32 @@ export interface EmotionAnalysisResponse {
   feedback?: string;
   recommendations?: string[];
 }
+
+export interface Emotion {
+  id: string;
+  name: string;
+  category: 'positive' | 'negative' | 'neutral';
+  intensity: number;
+  color: string;
+  icon?: string;
+}
+
+export interface EmotionResult {
+  id: string;
+  userId: string;
+  emotion: string;
+  intensity: number;
+  timestamp: string | Date;
+  source: 'text' | 'audio' | 'image' | 'combined';
+  confidence: number;
+  recommendations?: string[];
+  feedback?: string;
+  relatedMusic?: string[];
+  relatedActivities?: string[];
+}
+
+export interface MoodData {
+  date: string;
+  value: number;
+  emotion: string;
+}

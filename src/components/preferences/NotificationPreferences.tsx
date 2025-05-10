@@ -1,175 +1,210 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Bell, Calendar, Music, Wind } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { motion } from 'framer-motion';
 
 const NotificationPreferences = () => {
   const { toast } = useToast();
-  const [settings, setSettings] = useState({
-    journalReminders: true,
-    breathingReminders: true,
-    musicSuggestions: false,
-    emailNotifications: true,
-    frequency: 'daily',
-    tone: 'gentle',
-  });
-
-  const handleChange = (key: string, value: any) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
-
+  const { preferences, updatePreferences } = useUserPreferences();
+  
+  // Handle saving notification settings
   const saveSettings = () => {
     toast({
-      title: "Préférences de notification mises à jour",
-      description: "Vos paramètres de notifications ont été enregistrés."
+      title: "Paramètres des notifications mis à jour",
+      description: "Vos préférences de notification ont été enregistrées avec succès."
     });
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 flex items-center gap-2">
-            <Calendar className="text-primary h-5 w-5" />
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="space-y-3"
+      >
+        <h3 className="text-lg font-medium">Canaux de notification</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <Label>Rappels de journal</Label>
-              <p className="text-sm text-muted-foreground">Recevez un rappel pour écrire dans votre journal</p>
+              <p className="font-medium">Email</p>
+              <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
             </div>
-          </div>
-          <Switch 
-            checked={settings.journalReminders}
-            onCheckedChange={(checked) => handleChange('journalReminders', checked)}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 flex items-center gap-2">
-            <Wind className="text-primary h-5 w-5" />
-            <div>
-              <Label>Rappels de respiration</Label>
-              <p className="text-sm text-muted-foreground">Recevez un rappel pour prendre un moment de respiration</p>
-            </div>
-          </div>
-          <Switch 
-            checked={settings.breathingReminders}
-            onCheckedChange={(checked) => handleChange('breathingReminders', checked)}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 flex items-center gap-2">
-            <Music className="text-primary h-5 w-5" />
-            <div>
-              <Label>Suggestions musicales</Label>
-              <p className="text-sm text-muted-foreground">Recevez des suggestions de musique adaptées à votre humeur</p>
-            </div>
-          </div>
-          <Switch 
-            checked={settings.musicSuggestions}
-            onCheckedChange={(checked) => handleChange('musicSuggestions', checked)}
-          />
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5 flex items-center gap-2">
-            <Bell className="text-primary h-5 w-5" />
-            <div>
-              <Label>Notifications par email</Label>
-              <p className="text-sm text-muted-foreground">Recevez des résumés hebdomadaires par email</p>
-            </div>
-          </div>
-          <Switch 
-            checked={settings.emailNotifications}
-            onCheckedChange={(checked) => handleChange('emailNotifications', checked)}
-          />
-        </div>
-      </div>
-      
-      <div className="border-t pt-4 space-y-3">
-        <h3 className="font-medium">Fréquence des rappels</h3>
-        <RadioGroup 
-          value={settings.frequency}
-          onValueChange={(value) => handleChange('frequency', value)}
-          className="flex flex-wrap gap-2"
-        >
-          <div className="relative">
-            <RadioGroupItem 
-              value="daily" 
-              id="freq-daily" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
+            <Switch
+              checked={preferences.notifications?.email || false}
+              onCheckedChange={(checked) => updatePreferences({ 
+                notifications: { ...preferences.notifications, email: checked } 
+              })}
             />
-            <Label 
-              htmlFor="freq-daily" 
-              className="px-3 py-1.5 border rounded-full peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground cursor-pointer flex items-center justify-center text-sm"
-            >
-              Quotidien
-            </Label>
           </div>
-          <div className="relative">
-            <RadioGroupItem 
-              value="weekly" 
-              id="freq-weekly" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Notifications push</p>
+              <p className="text-sm text-muted-foreground">Recevoir des notifications dans le navigateur</p>
+            </div>
+            <Switch
+              checked={preferences.notifications?.push || false}
+              onCheckedChange={(checked) => updatePreferences({ 
+                notifications: { ...preferences.notifications, push: checked } 
+              })}
             />
-            <Label 
-              htmlFor="freq-weekly" 
-              className="px-3 py-1.5 border rounded-full peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground cursor-pointer flex items-center justify-center text-sm"
-            >
-              Hebdomadaire
-            </Label>
           </div>
-          <div className="relative">
-            <RadioGroupItem 
-              value="flexible" 
-              id="freq-flexible" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">SMS</p>
+              <p className="text-sm text-muted-foreground">Recevoir des notifications importantes par SMS</p>
+            </div>
+            <Switch
+              checked={preferences.notifications?.sms || false}
+              onCheckedChange={(checked) => updatePreferences({ 
+                notifications: { ...preferences.notifications, sms: checked } 
+              })}
             />
-            <Label 
-              htmlFor="freq-flexible" 
-              className="px-3 py-1.5 border rounded-full peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground cursor-pointer flex items-center justify-center text-sm"
-            >
-              Flexible
-            </Label>
           </div>
-        </RadioGroup>
-      </div>
+        </div>
+      </motion.div>
 
-      <div className="border-t pt-4 space-y-3">
-        <h3 className="font-medium">Style de notification</h3>
-        <div className="grid grid-cols-3 gap-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="space-y-3 pt-4 border-t"
+      >
+        <h3 className="text-lg font-medium">Style de communication</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div 
-            className={`border rounded-md p-3 cursor-pointer hover:bg-accent ${settings.tone === 'gentle' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => handleChange('tone', 'gentle')}
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationTone === 'minimalist' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationTone: 'minimalist' })}
           >
-            <h4 className="font-medium">Douce</h4>
-            <p className="text-xs text-muted-foreground">Notifications calmes et discrètes</p>
+            <div className="font-medium mb-1">Minimaliste</div>
+            <p className="text-sm text-muted-foreground">Juste une icône et une indication succincte</p>
           </div>
+          
           <div 
-            className={`border rounded-md p-3 cursor-pointer hover:bg-accent ${settings.tone === 'motivating' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => handleChange('tone', 'motivating')}
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationTone === 'poetic' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationTone: 'poetic' })}
           >
-            <h4 className="font-medium">Motivante</h4>
-            <p className="text-xs text-muted-foreground">Encouragements positifs</p>
+            <div className="font-medium mb-1">Poétique</div>
+            <p className="text-sm text-muted-foreground">"Un moment de silence intérieur t'attend ici."</p>
           </div>
+          
           <div 
-            className={`border rounded-md p-3 cursor-pointer hover:bg-accent ${settings.tone === 'silent' ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => handleChange('tone', 'silent')}
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationTone === 'directive' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationTone: 'directive' })}
           >
-            <h4 className="font-medium">Silencieuse</h4>
-            <p className="text-xs text-muted-foreground">Visuelles uniquement</p>
+            <div className="font-medium mb-1">Directif doux</div>
+            <p className="text-sm text-muted-foreground">"C'est l'heure de ta pause."</p>
+          </div>
+          
+          <div 
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationTone === 'silent' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationTone: 'silent' })}
+          >
+            <div className="font-medium mb-1">Silence émotionnel</div>
+            <p className="text-sm text-muted-foreground">Mode "ne pas déranger" émotionnel</p>
           </div>
         </div>
-      </div>
+      </motion.div>
       
-      <Button onClick={saveSettings} className="w-full">
-        Enregistrer les préférences
-      </Button>
-    </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="space-y-3 pt-4 border-t"
+      >
+        <h3 className="text-lg font-medium">Fréquence</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div 
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationFrequency === 'daily' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationFrequency: 'daily' })}
+          >
+            <div className="font-medium mb-1">Quotidienne</div>
+            <p className="text-sm text-muted-foreground">Chaque jour à l'heure que vous préférez</p>
+          </div>
+          
+          <div 
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationFrequency === 'weekly' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationFrequency: 'weekly' })}
+          >
+            <div className="font-medium mb-1">Hebdomadaire</div>
+            <p className="text-sm text-muted-foreground">En début de semaine, avec un résumé</p>
+          </div>
+          
+          <div 
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationFrequency === 'flexible' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationFrequency: 'flexible' })}
+          >
+            <div className="font-medium mb-1">Adaptative</div>
+            <p className="text-sm text-muted-foreground">En fonction de vos habitudes et besoins</p>
+          </div>
+          
+          <div 
+            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
+              preferences.notificationFrequency === 'none' ? 'border-primary bg-primary/5' : 'border-border'
+            }`}
+            onClick={() => updatePreferences({ notificationFrequency: 'none' })}
+          >
+            <div className="font-medium mb-1">Aucune</div>
+            <p className="text-sm text-muted-foreground">Désactiver tous les rappels récurrents</p>
+          </div>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="space-y-3 pt-4 border-t"
+      >
+        <h3 className="text-lg font-medium">Timing</h3>
+        <div className="flex flex-col space-y-2">
+          <label className="text-sm font-medium">Heure de rappel préférée</label>
+          <Input
+            type="time"
+            value={preferences.reminder_time || "09:00"}
+            onChange={(e) => updatePreferences({ reminder_time: e.target.value })}
+          />
+          <p className="text-xs text-muted-foreground">
+            Cette heure sera utilisée pour vos rappels quotidiens et notifications importantes
+          </p>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <Button onClick={saveSettings} className="w-full">
+          Enregistrer les préférences
+        </Button>
+      </motion.div>
+    </motion.div>
   );
 };
 

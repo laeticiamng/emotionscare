@@ -10,3 +10,33 @@ export interface VRSessionStats {
   byCategory: Record<string, number>;
   byEmotion?: Record<string, number>;
 }
+
+export interface VRSession {
+  id: string;
+  user_id: string;
+  template_id: string;
+  started_at: Date | string;
+  completed_at?: Date | string;
+  duration: number;
+  rating?: number;
+  notes?: string;
+  emotion_before?: string;
+  emotion_after?: string;
+  music_track_id?: string;
+}
+
+export interface VRSessionTemplate {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  duration: number;
+  image_url?: string;
+  recommended_emotions?: string[];
+  recommended_music?: string[];
+  instructions?: string[];
+  coach_guidance?: string;
+  session_prompts?: string[];
+  isNew?: boolean;
+  isRecommended?: boolean;
+}

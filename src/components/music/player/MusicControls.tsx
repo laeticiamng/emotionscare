@@ -1,112 +1,165 @@
 
-import React, { useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from 'lucide-react';
-import PlayerControls from './PlayerControls';
-import VolumeControl from './VolumeControl';
-import { useAudioPlayerState } from '@/hooks/audio/useAudioPlayerState';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { 
+  Play, Pause, SkipBack, SkipForward, 
+  Volume, Volume2, VolumeX, Repeat, Shuffle 
+} from 'lucide-react';
+import { useMusic } from '@/contexts/MusicContext';
+import { AudioPlayerState } from '@/types';
 
 interface MusicControlsProps {
+  minimal?: boolean;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
   showVolume?: boolean;
-  showRepeat?: boolean;
-  showShuffle?: boolean;
-  compact?: boolean;
 }
 
-/**
- * Flexible music control component that can be configured with different options
- */
-const MusicControls: React.FC<MusicControlsProps> = ({
-  showVolume = true,
-  showRepeat = false,
-  showShuffle = false,
-  compact = false
+const MusicControls: React.FC<MusicControlsProps> = ({ 
+  minimal = false,
+  onPlay,
+  onPause,
+  onNext,
+  onPrevious,
+  showVolume = true
 }) => {
-  const {
-    isPlaying,
-    volume,
-    loadingTrack,
-    repeat,
-    shuffle,
-    toggleRepeat,
-    toggleShuffle
-  } = useAudioPlayerState();
+  const { 
+    play, pause, next, previous, 
+    audioState, setAudioState, setVolume, setMuted 
+  } = useMusic();
   
-  const {
-    pauseTrack,
-    resumeTrack,
-    nextTrack,
-    previousTrack,
-    handleVolumeChange
-  } = useAudioPlayer();
-
-  useEffect(() => {
-    console.group('🔍 MusicControls Component Imports');
-    console.log('→ PlayerControls:', typeof PlayerControls, PlayerControls);
-    console.log('→ VolumeControl:', typeof VolumeControl, VolumeControl);
-    console.log('→ useAudioPlayerState returned:', { isPlaying, volume, loadingTrack, repeat, shuffle });
-    console.log('→ useAudioPlayer returned:', { pauseTrack, resumeTrack, nextTrack, previousTrack });
-    console.groupEnd();
-  }, []);
+  const { isPlaying, volume, muted, repeat, shuffle } = audioState;
   
-  const handlePlay = () => {
-    resumeTrack();
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      pause();
+      onPause?.();
+    } else {
+      play();
+      onPlay?.();
+    }
   };
   
-  const handlePause = () => {
-    pauseTrack();
+  const handleNext = () => {
+    next();
+    onNext?.();
   };
-
+  
+  const handlePrevious = () => {
+    previous();
+    onPrevious?.();
+  };
+  
+  const toggleMute = () => {
+    setMuted(!muted);
+  };
+  
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
+  };
+  
+  const toggleRepeat = () => {
+    const modes: ('none' | 'all' | 'one')[] = ['none', 'all', 'one'];
+    const currentIndex = modes.indexOf(repeat);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    setAudioState({ repeat: modes[nextIndex] });
+  };
+  
+  const toggleShuffle = () => {
+    setAudioState({ shuffle: !shuffle });
+  };
+  
+  const getVolumeIcon = () => {
+    if (muted || volume === 0) return <VolumeX />;
+    if (volume < 0.5) return <Volume />;
+    return <Volume2 />;
+  };
+  
+  if (minimal) {
+    return (
+      <div className="flex items-center justify-center space-x-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-8 h-8 p-0 rounded-full"
+          onClick={handlePlayPause}
+        >
+          {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </Button>
+      </div>
+    );
+  }
+  
   return (
-    <div className={`flex ${compact ? 'flex-row' : 'flex-col'} gap-2`}>
-      <div className="flex items-center justify-center gap-2">
-        <PlayerControls
-          isPlaying={isPlaying}
-          loadingTrack={loadingTrack}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onPrevious={previousTrack}
-          onNext={nextTrack}
-        />
+    <div className="space-y-2">
+      <div className="flex items-center justify-center space-x-2">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className={`rounded-full ${repeat !== 'none' ? 'text-primary' : ''}`}
+          onClick={toggleRepeat}
+          title={`Repeat: ${repeat}`}
+        >
+          <Repeat className="h-4 w-4" />
+        </Button>
         
-        {showRepeat && (
-          <Button 
-            variant={repeat ? "secondary" : "ghost"} 
-            size="icon"
-            onClick={toggleRepeat}
-            className="rounded-full"
-            title="Répéter"
-          >
-            <Repeat className="h-4 w-4" />
-          </Button>
-        )}
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="rounded-full"
+          onClick={handlePrevious}
+        >
+          <SkipBack className="h-5 w-5" />
+        </Button>
         
-        {showShuffle && (
-          <Button 
-            variant={shuffle ? "secondary" : "ghost"} 
-            size="icon"
-            onClick={toggleShuffle}
-            className="rounded-full"
-            title="Lecture aléatoire"
-          >
-            <Shuffle className="h-4 w-4" />
-          </Button>
-        )}
+        <Button 
+          variant="default" 
+          size="icon"
+          className="rounded-full w-10 h-10"
+          onClick={handlePlayPause}
+        >
+          {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="rounded-full"
+          onClick={handleNext}
+        >
+          <SkipForward className="h-5 w-5" />
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className={`rounded-full ${shuffle ? 'text-primary' : ''}`}
+          onClick={toggleShuffle}
+        >
+          <Shuffle className="h-4 w-4" />
+        </Button>
       </div>
       
       {showVolume && (
-        <div className={`${compact ? 'ml-auto' : 'mt-2'} flex justify-center`}>
-          <VolumeControl 
-            volume={volume} 
-            onVolumeChange={handleVolumeChange} 
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="p-1"
+            onClick={toggleMute}
+          >
+            {getVolumeIcon()}
+          </Button>
+          <Slider
+            defaultValue={[volume]}
+            max={1}
+            step={0.01}
+            onValueChange={handleVolumeChange}
+            className="w-24"
           />
-        </div>
-      )}
-      
-      {!compact && (
-        <div className="text-xs text-center text-muted-foreground mt-1">
-          {isPlaying ? "En cours de lecture" : "En pause"}
         </div>
       )}
     </div>

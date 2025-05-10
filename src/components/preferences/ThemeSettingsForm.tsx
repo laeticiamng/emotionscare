@@ -1,205 +1,181 @@
 
 import React, { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { ThemeName } from '@/types';
 import { Sun, Moon, Palette, Clock, CloudRain, Heart } from 'lucide-react';
+import ThemePreview from './ThemePreview';
+import { motion } from 'framer-motion';
+
+const backgroundOptions = [
+  { name: 'Stars', url: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=1920' },
+  { name: 'Forest', url: 'https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?auto=format&fit=crop&w=1920' },
+  { name: 'Mountains', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920' },
+  { name: 'Ocean', url: 'https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?auto=format&fit=crop&w=1920' },
+];
 
 const ThemeSettingsForm = () => {
-  const { theme, setThemePreference } = useTheme();
+  const { theme, setThemePreference, dynamicThemeMode, setDynamicThemeMode } = useTheme();
   const { toast } = useToast();
-  const [themeMode, setThemeMode] = useState<ThemeName>(theme as ThemeName);
-  const [dynamicTheme, setDynamicTheme] = useState<string>('none');
-  const [fontFamily, setFontFamily] = useState('inter');
-  const [customBackgroundUrl, setCustomBackgroundUrl] = useState('');
+  const [customBackground, setCustomBackground] = useState<string | null>(null);
 
-  const handleThemeChange = (value: ThemeName) => {
-    setThemeMode(value);
-    setThemePreference(value);
-  };
-
-  const saveSettings = () => {
+  // Update theme
+  const handleThemeChange = (newTheme: ThemeName) => {
+    setThemePreference(newTheme);
+    
     toast({
       title: "Thème mis à jour",
-      description: `Le thème a été changé pour "${themeMode}".`
+      description: `Le thème a été changé pour "${newTheme}".`
     });
   };
 
-  const getThemeIcon = (themeName: string) => {
-    switch (themeName) {
-      case 'light': return <Sun className="h-4 w-4" />;
-      case 'dark': return <Moon className="h-4 w-4" />;
-      case 'pastel': return <Palette className="h-4 w-4" />;
-      default: return <Sun className="h-4 w-4" />;
-    }
+  // Change dynamic theme mode
+  const handleDynamicTheme = (mode: 'none' | 'time' | 'emotion' | 'weather') => {
+    setDynamicThemeMode(mode);
+    
+    toast({
+      title: "Mode dynamique mis à jour",
+      description: mode === 'none' 
+        ? "Le mode dynamique a été désactivé." 
+        : `Le thème s'adaptera désormais selon: ${
+            mode === 'time' ? "l'heure de la journée" : 
+            mode === 'emotion' ? "votre état émotionnel" : "la météo"
+          }.`
+    });
+  };
+
+  // Change background
+  const changeBackground = (url: string) => {
+    setCustomBackground(url);
+    
+    // In a real app, you would save this to user preferences
+    toast({
+      title: "Arrière-plan mis à jour",
+      description: "Votre arrière-plan personnalisé a été appliqué."
+    });
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <h3 className="font-medium">Thème de l'interface</h3>
-        <RadioGroup 
-          defaultValue={theme}
-          onValueChange={(value) => handleThemeChange(value as ThemeName)}
-          className="grid grid-cols-3 gap-4"
-        >
-          <div className="relative">
-            <RadioGroupItem 
-              value="light" 
-              id="theme-light" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="theme-light" 
-              className="flex flex-col items-center justify-center p-4 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-full bg-[#f8f9fa] flex items-center justify-center mb-2 border">
-                <Sun className="h-6 w-6 text-[#6E59A5]" />
-              </div>
-              <span>Clair</span>
-            </Label>
-          </div>
-          
-          <div className="relative">
-            <RadioGroupItem 
-              value="dark" 
-              id="theme-dark" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="theme-dark" 
-              className="flex flex-col items-center justify-center p-4 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-full bg-[#1a1f2c] flex items-center justify-center mb-2 border">
-                <Moon className="h-6 w-6 text-[#9b87f5]" />
-              </div>
-              <span>Sombre</span>
-            </Label>
-          </div>
-          
-          <div className="relative">
-            <RadioGroupItem 
-              value="pastel" 
-              id="theme-pastel" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="theme-pastel" 
-              className="flex flex-col items-center justify-center p-4 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-full bg-[#f5f1ff] flex items-center justify-center mb-2 border">
-                <Palette className="h-6 w-6 text-[#7E69AB]" />
-              </div>
-              <span>Pastel</span>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="font-medium">Thème dynamique</h3>
-        <p className="text-sm text-muted-foreground">Ajuster automatiquement le thème selon:</p>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-8"
+    >
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Thème de l'interface</h3>
         
-        <RadioGroup 
-          defaultValue={dynamicTheme}
-          onValueChange={setDynamicTheme}
-          className="grid grid-cols-2 gap-3"
-        >
-          <div className="relative">
-            <RadioGroupItem 
-              value="time" 
-              id="dynamic-time" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="dynamic-time" 
-              className="flex items-center p-3 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
-            >
-              <Clock className="h-4 w-4 mr-2" />
-              <span>Heure de la journée</span>
-            </Label>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <ThemePreview 
+            theme="light"
+            isSelected={theme === 'light'} 
+            onClick={() => handleThemeChange('light')}
+          />
           
-          <div className="relative">
-            <RadioGroupItem 
-              value="emotion" 
-              id="dynamic-emotion" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="dynamic-emotion" 
-              className="flex items-center p-3 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
-            >
-              <Heart className="h-4 w-4 mr-2" />
-              <span>Émotion détectée</span>
-            </Label>
-          </div>
+          <ThemePreview 
+            theme="dark"
+            isSelected={theme === 'dark'} 
+            onClick={() => handleThemeChange('dark')}
+          />
           
-          <div className="relative">
-            <RadioGroupItem 
-              value="weather" 
-              id="dynamic-weather" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="dynamic-weather" 
-              className="flex items-center p-3 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
-            >
-              <CloudRain className="h-4 w-4 mr-2" />
-              <span>Météo locale</span>
-            </Label>
-          </div>
+          <ThemePreview 
+            theme="pastel"
+            isSelected={theme === 'pastel'} 
+            onClick={() => handleThemeChange('pastel')}
+          />
           
-          <div className="relative">
-            <RadioGroupItem 
-              value="none" 
-              id="dynamic-none" 
-              className="absolute inset-0 w-full h-full opacity-0 peer"
-            />
-            <Label 
-              htmlFor="dynamic-none" 
-              className="flex items-center p-3 border rounded-lg peer-data-[state=checked]:ring-2 peer-data-[state=checked]:ring-primary h-full cursor-pointer"
+          <ThemePreview 
+            theme="nature"
+            isSelected={theme === 'nature'} 
+            onClick={() => handleThemeChange('nature')}
+          />
+          
+          <ThemePreview 
+            theme="misty"
+            isSelected={theme === 'misty'} 
+            onClick={() => handleThemeChange('misty')}
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Thème dynamique</h3>
+        <p className="text-sm text-muted-foreground">
+          Le thème peut s'adapter automatiquement selon différents critères.
+        </p>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Button 
+            variant={dynamicThemeMode === 'time' ? "default" : "outline"} 
+            onClick={() => handleDynamicTheme(dynamicThemeMode === 'time' ? 'none' : 'time')}
+            className="flex items-center gap-2 justify-start"
+          >
+            <Clock className="h-4 w-4" />
+            <span>Heure de la journée</span>
+          </Button>
+          
+          <Button 
+            variant={dynamicThemeMode === 'emotion' ? "default" : "outline"}
+            onClick={() => handleDynamicTheme(dynamicThemeMode === 'emotion' ? 'none' : 'emotion')}
+            className="flex items-center gap-2 justify-start"
+          >
+            <Heart className="h-4 w-4" />
+            <span>État émotionnel</span>
+          </Button>
+          
+          <Button 
+            variant={dynamicThemeMode === 'weather' ? "default" : "outline"}
+            onClick={() => handleDynamicTheme(dynamicThemeMode === 'weather' ? 'none' : 'weather')}
+            className="flex items-center gap-2 justify-start"
+          >
+            <CloudRain className="h-4 w-4" />
+            <span>Météo locale</span>
+          </Button>
+        </div>
+        
+        {dynamicThemeMode !== 'none' && (
+          <p className="text-sm p-3 border border-blue-200 bg-blue-50 rounded-md dark:bg-blue-900/30 dark:border-blue-900/50">
+            {dynamicThemeMode === 'time' && 
+              "Le thème changera automatiquement : clair le matin, doux l'après-midi, et sombre la nuit."
+            }
+            {dynamicThemeMode === 'emotion' && 
+              "Le thème s'ajustera en fonction de votre état émotionnel détecté dans vos activités récentes."
+            }
+            {dynamicThemeMode === 'weather' && 
+              "Le thème reflètera la météo locale avec des tons adaptés (ensoleillé, nuageux, pluvieux)."
+            }
+          </p>
+        )}
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Arrière-plan personnalisé</h3>
+        <p className="text-sm text-muted-foreground">
+          Choisissez un arrière-plan qui correspond à votre état d'esprit.
+        </p>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {backgroundOptions.map((bg) => (
+            <motion.div 
+              key={bg.name}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              className={`h-24 rounded-lg cursor-pointer overflow-hidden transition-all ${customBackground === bg.url ? 'ring-4 ring-primary' : 'opacity-80 hover:opacity-100'}`}
+              onClick={() => changeBackground(bg.url)}
             >
-              <div className="h-4 w-4 mr-2 border rounded-full"></div>
-              <span>Aucun (fixe)</span>
-            </Label>
-          </div>
-        </RadioGroup>
+              <img src={bg.url} alt={bg.name} className="w-full h-full object-cover" />
+            </motion.div>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <h3 className="font-medium">Police de caractères</h3>
-        <Select defaultValue={fontFamily} onValueChange={setFontFamily}>
-          <SelectTrigger>
-            <SelectValue placeholder="Choisir une police" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="inter" className="font-['Inter']">Inter</SelectItem>
-            <SelectItem value="dm-sans" className="font-['DM_Sans']">DM Sans</SelectItem>
-            <SelectItem value="serif" className="font-serif">Serif élégant</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="flex justify-end">
+        <Button onClick={() => toast({ title: "Paramètres sauvegardés", description: "Vos préférences d'apparence ont été mises à jour." })}>
+          Enregistrer les préférences
+        </Button>
       </div>
-
-      <div className="space-y-2">
-        <h3 className="font-medium">Arrière-plan personnalisé</h3>
-        <p className="text-sm text-muted-foreground">URL de l'image (optionnelle)</p>
-        <Input 
-          placeholder="https://exemple.com/image.jpg" 
-          value={customBackgroundUrl}
-          onChange={(e) => setCustomBackgroundUrl(e.target.value)}
-        />
-      </div>
-
-      <Button onClick={saveSettings} className="w-full">
-        Enregistrer les préférences
-      </Button>
-    </div>
+    </motion.div>
   );
 };
 

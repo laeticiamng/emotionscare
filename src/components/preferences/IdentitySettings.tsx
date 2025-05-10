@@ -1,130 +1,152 @@
-
 import React, { useState } from 'react';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
+import { Upload } from 'lucide-react';
 
 const IdentitySettings = () => {
+  const { preferences, updatePreferences } = useUserPreferences();
   const { toast } = useToast();
-  const [identity, setIdentity] = useState({
-    displayName: 'Utilisateur',
-    firstName: '',
-    lastName: '',
-    pronouns: 'il',
-    biography: '',
-    avatarUrl: '',
-  });
+  
+  const [avatarUrl, setAvatarUrl] = useState(preferences.avatarUrl || '');
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
 
-  const handleChange = (key: string, value: string) => {
-    setIdentity(prev => ({ ...prev, [key]: value }));
+  // Handle avatar file selection
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setPreviewFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
   };
 
-  const saveSettings = () => {
+  // Save identity settings
+  const saveIdentity = () => {
+    // In a real app, you would upload the image to storage here
+    // and get back a URL to save to user preferences
+    
+    updatePreferences({
+      avatarUrl: previewUrl || avatarUrl,
+      // Other fields are updated immediately via the onChange events
+    });
+    
     toast({
       title: "Identité mise à jour",
       description: "Vos informations personnelles ont été enregistrées."
     });
   };
 
-  const getInitials = () => {
-    if (identity.firstName && identity.lastName) {
-      return `${identity.firstName[0]}${identity.lastName[0]}`.toUpperCase();
-    } else if (identity.displayName) {
-      return identity.displayName[0].toUpperCase();
-    }
-    return 'U';
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row gap-6 items-start">
-        <div className="flex flex-col items-center space-y-3">
-          <Avatar className="w-24 h-24 text-2xl">
-            <AvatarImage src={identity.avatarUrl} />
-            <AvatarFallback className="bg-primary/20">{getInitials()}</AvatarFallback>
-          </Avatar>
-          <Button variant="outline" size="sm">
-            Changer l'avatar
-          </Button>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex flex-col items-center"
+      >
+        <Avatar className="w-24 h-24 mb-4">
+          <AvatarImage src={previewUrl || avatarUrl} alt="Avatar" />
+          <AvatarFallback className="bg-primary/20">
+            {preferences.displayName?.charAt(0) || 'U'}
+          </AvatarFallback>
+        </Avatar>
+        
+        <Button variant="outline" className="mb-2">
+          <Upload className="mr-2 h-4 w-4" />
+          <label htmlFor="avatar-upload" className="cursor-pointer">
+            Choisir une image
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+          </label>
+        </Button>
+        
+        <p className="text-xs text-muted-foreground text-center max-w-xs">
+          Votre avatar est visible dans vos journaux, conversations et partages communautaires
+        </p>
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="grid gap-4"
+      >
+        <div className="grid gap-2">
+          <Label htmlFor="displayName">Nom affiché</Label>
+          <Input 
+            id="displayName" 
+            value={preferences.displayName || ''} 
+            onChange={(e) => updatePreferences({ displayName: e.target.value })} 
+            placeholder="Comment souhaitez-vous être appelé?" 
+          />
         </div>
         
-        <div className="flex-1 space-y-4">
-          <div className="grid gap-3">
-            <Label htmlFor="displayName">Nom d'affichage</Label>
-            <Input
-              id="displayName"
-              value={identity.displayName}
-              onChange={(e) => handleChange('displayName', e.target.value)}
-              placeholder="Comment souhaitez-vous être appelé(e) ?"
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">Prénom</Label>
-              <Input
-                id="firstName"
-                value={identity.firstName}
-                onChange={(e) => handleChange('firstName', e.target.value)}
-                placeholder="Prénom"
-              />
-            </div>
-            <div>
-              <Label htmlFor="lastName">Nom</Label>
-              <Input
-                id="lastName"
-                value={identity.lastName}
-                onChange={(e) => handleChange('lastName', e.target.value)}
-                placeholder="Nom"
-              />
-            </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="pronouns">Pronom préféré</Label>
-            <Select
-              value={identity.pronouns}
-              onValueChange={(value) => handleChange('pronouns', value)}
-            >
-              <SelectTrigger id="pronouns">
-                <SelectValue placeholder="Choisir un pronom" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="il">Il / Lui</SelectItem>
-                <SelectItem value="elle">Elle / Elle</SelectItem>
-                <SelectItem value="iel">Iel / Ellui</SelectItem>
-                <SelectItem value="autre">Autre / Neutre</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">
-              Ce pronom sera utilisé dans les modules empathiques de l'application
-            </p>
-          </div>
+        <div className="grid gap-2">
+          <Label htmlFor="pronouns">Pronoms</Label>
+          <Select 
+            defaultValue={preferences.pronouns || 'autre'}
+            onValueChange={(value) => updatePreferences({ pronouns: value as 'il' | 'elle' | 'iel' | 'autre' })}
+          >
+            <SelectTrigger id="pronouns">
+              <SelectValue placeholder="Choisir vos pronoms" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="il">Il (He/Him)</SelectItem>
+              <SelectItem value="elle">Elle (She/Her)</SelectItem>
+              <SelectItem value="iel">Iel (They/Them)</SelectItem>
+              <SelectItem value="autre">Autre/Préfère ne pas préciser</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
+      </motion.div>
       
-      <div className="space-y-2">
-        <Label htmlFor="biography">Biographie</Label>
-        <Textarea
-          id="biography"
-          value={identity.biography}
-          onChange={(e) => handleChange('biography', e.target.value)}
-          placeholder="Comment souhaitez-vous qu'on vous accueille ici ?"
-          rows={4}
-        />
-        <p className="text-xs text-muted-foreground">
-          Cette information aide le coach virtuel à mieux personnaliser ses interactions avec vous
-        </p>
-      </div>
-      
-      <Button onClick={saveSettings} className="w-full">
-        Enregistrer les informations
-      </Button>
-    </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="grid gap-2">
+          <Label htmlFor="biography">Biographie intérieure</Label>
+          <Textarea 
+            id="biography" 
+            value={preferences.biography || ''} 
+            onChange={(e) => updatePreferences({ biography: e.target.value })}
+            placeholder="Comment souhaitez-vous qu'on vous parle ici?"
+            className="min-h-[100px]"
+          />
+          <p className="text-xs text-muted-foreground">
+            Cette description aide notre IA à s'adapter à votre style de communication préféré
+          </p>
+        </div>
+      </motion.div>
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="flex justify-end"
+      >
+        <Button onClick={saveIdentity}>Enregistrer les changements</Button>
+      </motion.div>
+    </motion.div>
   );
 };
 
