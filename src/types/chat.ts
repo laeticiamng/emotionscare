@@ -27,3 +27,19 @@ export interface ChatConversation {
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
+
+export interface ChatResponse {
+  message: string;
+  emotion?: string;
+  confidence?: number;
+  text?: string;
+  follow_up_questions?: string[];
+}
+
+export interface ChatContext {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  handleSend: (message: string) => Promise<ChatResponse>;
+  addMessage: (message: Omit<ChatMessage, 'id'>) => void;
+  clearMessages: () => void;
+}

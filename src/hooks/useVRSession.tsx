@@ -63,7 +63,8 @@ export function useVRSession() {
         template_id: activeTemplate.id,
         duration: durationSeconds,
         is_audio_only: activeTemplate.is_audio_only || false,
-        mood_before: 'neutral'
+        mood_before: 'neutral',
+        completed: true
       });
       
       toast({

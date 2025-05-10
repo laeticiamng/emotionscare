@@ -8,7 +8,9 @@ export enum UserRole {
   USER = 'user',
   STAFF = 'staff',
   THERAPIST = 'therapist',
-  HRMANAGER = 'hrmanager'
+  HRMANAGER = 'hrmanager',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager'
 }
 
 export interface User {
@@ -49,6 +51,11 @@ export interface UserPreferences {
   email_notifications?: boolean;
   push_notifications?: boolean;
   accent_color?: string;
+  
+  // Premium features
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }
 
 export interface UserPreferencesState {

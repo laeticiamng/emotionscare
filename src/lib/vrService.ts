@@ -17,6 +17,9 @@ const vrSessionTemplates: VRSessionTemplate[] = [
     benefits: ['Réduction du stress', 'Amélioration du sommeil'],
     emotions: ['calm', 'peaceful'],
     popularity: 85,
+    tags: [],
+    difficulty: 'easy',
+    name: 'Plage paisible'
   },
   {
     id: 'template-2',
@@ -31,6 +34,9 @@ const vrSessionTemplates: VRSessionTemplate[] = [
     benefits: ['Concentration améliorée', 'Clarté mentale'],
     emotions: ['focused', 'inspired'],
     popularity: 78,
+    tags: [],
+    difficulty: 'easy',
+    name: 'Forêt tranquille'
   }
 ];
 

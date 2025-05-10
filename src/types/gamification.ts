@@ -7,6 +7,14 @@ export interface Badge {
   unlocked_at?: Date | string;
   progress?: number;
   total?: number;
+  user_id?: string;
+  icon?: string;
+  icon_url?: string;
+  level?: number;
+  awarded_at?: string | Date;
+  category?: string;
+  unlocked?: boolean;
+  threshold?: number;
 }
 
 export interface Challenge {
@@ -17,6 +25,10 @@ export interface Challenge {
   total: number;
   completion_date?: Date | string;
   difficulty?: 'easy' | 'medium' | 'hard';
+  title?: string;
+  points?: number;
+  completed?: boolean;
+  image_url?: string;
 }
 
 export interface Level {

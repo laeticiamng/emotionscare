@@ -18,6 +18,7 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
+  completed?: boolean;
 }
 
 export interface VRSessionTemplate {
@@ -40,6 +41,9 @@ export interface VRSessionTemplate {
   title?: string;
   completion_rate?: number;
   recommended_mood?: string;
+  benefits?: string[];
+  emotions?: string[];
+  popularity?: number;
 }
 
 export interface VRSessionWithMusicProps {

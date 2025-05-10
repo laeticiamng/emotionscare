@@ -34,6 +34,7 @@ export function useChat(): ChatContext {
       sender: 'user',
       sender_id: 'user-1',
       conversation_id: 'conversation-1',
+      text: message,
       content: message,
       is_read: true,
       timestamp: new Date()
@@ -59,6 +60,7 @@ export function useChat(): ChatContext {
         sender: 'bot',
         sender_id: 'coach-ai',
         conversation_id: 'conversation-1',
+        text: response.message,
         content: response.message,
         is_read: true,
         timestamp: new Date()

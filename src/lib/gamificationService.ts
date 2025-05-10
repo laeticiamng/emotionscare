@@ -6,8 +6,11 @@ import { Challenge, Badge } from '@/types/gamification';
 let challenges: Challenge[] = [
   {
     id: 'challenge-1',
+    name: 'Premier scan émotionnel',
     title: 'Premier scan émotionnel',
     description: 'Réalisez votre premier scan émotionnel',
+    progress: 0,
+    total: 1,
     points: 10,
     completed: false,
     difficulty: 'easy',
@@ -15,8 +18,11 @@ let challenges: Challenge[] = [
   },
   {
     id: 'challenge-2',
+    name: 'Journal régulier',
     title: 'Journal régulier',
     description: 'Écrivez dans votre journal 3 jours de suite',
+    progress: 0,
+    total: 3,
     points: 20,
     completed: false,
     difficulty: 'medium',
@@ -36,6 +42,8 @@ const badges: Badge[] = [
     progress: 100,
     threshold: 100,
     unlocked: true,
+    icon: 'award',
+    icon_url: '/images/badges/emotional-explorer.svg',
   },
   {
     id: 'badge-2',
@@ -47,6 +55,8 @@ const badges: Badge[] = [
     progress: 60,
     threshold: 100,
     unlocked: false,
+    icon: 'book',
+    icon_url: '/images/badges/journal-master.svg',
   }
 ];
 
@@ -92,6 +102,7 @@ export const awardBadge = async (userId: string, badgeData: Partial<Badge>): Pro
     progress: badgeData.progress || 0,
     threshold: badgeData.threshold || 100,
     unlocked: badgeData.unlocked || false,
+    icon: badgeData.icon || 'award',
   };
   
   badges.push(newBadge);
