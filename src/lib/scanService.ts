@@ -1,6 +1,8 @@
+
 import { supabase } from './supabase-client';
 import { Emotion, EmotionResult } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { mockEmotions } from '@/data/mockEmotions';
 
 export const createEmotionEntry = async (data: {
   user_id: string;
@@ -68,18 +70,18 @@ export const fetchEmotionHistory = async (userId: string): Promise<Emotion[]> =>
       
     if (error) throw new Error(error.message);
     
-    return data as Emotion[];
+    if (data && data.length > 0) {
+      return data as Emotion[];
+    }
+    
+    // Si aucune donnée n'est trouvée, utiliser les données de mock
+    console.log("No emotion data found for user, using mock data");
+    return mockEmotions;
   } catch (error) {
     console.error('Error fetching emotion history:', error);
     
     // Fallback pour la démo - retourne des données simulées
-    return Array.from({ length: 10 }, (_, i) => ({
-      id: `mock-${i}`,
-      user_id: userId,
-      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-      score: Math.floor(Math.random() * 10) + 1,
-      emotion: ['joy', 'sadness', 'fear', 'anger', 'surprise'][Math.floor(Math.random() * 5)],
-    }));
+    return mockEmotions;
   }
 };
 
@@ -107,11 +109,9 @@ export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null
     console.error('Error fetching latest emotion:', error);
     
     // Fallback pour la démo - retourne une entrée simulée ou null
-    return null;
+    return mockEmotions[0] || null;
   }
 };
-
-// Nouvelles fonctions pour l'analyse des émotions
 
 // Analyser le texte pour détecter l'émotion
 export const analyzeText = async (text: string): Promise<Emotion> => {
@@ -324,9 +324,6 @@ export const saveEmotion = async (emotion: Emotion): Promise<Emotion> => {
   }
 };
 
-// Fonction pour obtenir l'historique des émotions (alias pour fetchEmotionHistory)
-export const getEmotionHistory = fetchEmotionHistory;
-
 // Fonction pour analyser l'émotion basée sur différentes entrées
 export const analyzeEmotion = async (data: {
   user_id: string;
@@ -367,3 +364,6 @@ export const analyzeEmotion = async (data: {
     };
   }
 };
+
+// Alias pour compatibilité
+export const getEmotionHistory = fetchEmotionHistory;

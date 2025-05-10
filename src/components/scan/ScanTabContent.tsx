@@ -21,15 +21,22 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
   handleScanSaved,
   onResultSaved
 }) => {
-  const { emotions, isLoading, error } = useScanPage();
+  const { emotions, isLoading, error, refreshEmotions } = useScanPage();
   
   return (
     <div className="space-y-4">
-      <EmotionHistory 
-        emotions={emotions} 
-        isLoading={isLoading} 
-        error={error} 
-      />
+      {showScanForm ? (
+        <EmotionScanForm 
+          onScanSaved={handleScanSaved}
+          onClose={() => setShowScanForm(false)}
+        />
+      ) : (
+        <EmotionHistory 
+          emotions={emotions} 
+          isLoading={isLoading} 
+          error={error} 
+        />
+      )}
     </div>
   );
 };

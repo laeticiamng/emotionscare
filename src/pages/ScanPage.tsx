@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useScanPage } from '@/hooks/useScanPage';
 import EmotionScanner from '@/components/scan/EmotionScanner';
 import ScanTabContent from '@/components/scan/ScanTabContent';
+import { useToast } from '@/components/ui/use-toast';
 
 const ScanPage: React.FC = () => {
   const { user } = useAuth();
@@ -17,22 +18,50 @@ const ScanPage: React.FC = () => {
   const [scanEmojis, setScanEmojis] = useState<string>('');
   const [scanAudio, setScanAudio] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("new");
+  const { toast } = useToast();
 
-  const handleScanSaved = () => {
+  const handleScanSaved = useCallback(() => {
     setShowScanForm(false);
     scanHook.refreshEmotions();
-  };
+    
+    toast({
+      title: "Scan complété",
+      description: "Votre état émotionnel a été enregistré avec succès.",
+    });
+    
+    // Réinitialiser les champs
+    setScanText('');
+    setScanEmojis('');
+    setScanAudio(null);
+  }, [scanHook, toast]);
 
   const handleAnalyze = async () => {
+    if (!scanText && !scanEmojis && !scanAudio) {
+      toast({
+        title: "Information manquante",
+        description: "Veuillez saisir du texte, sélectionner des emojis ou enregistrer un audio pour l'analyse.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsAnalyzing(true);
+    
     // Ici, nous simulons une analyse pour la démonstration
-    setTimeout(() => {
-      setIsAnalyzing(false);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
       handleScanSaved();
-      setScanText('');
-      setScanEmojis('');
-      setScanAudio(null);
-    }, 1500);
+    } catch (error) {
+      console.error("Erreur lors de l'analyse:", error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Une erreur s'est produite lors de l'analyse. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   return (
@@ -50,7 +79,12 @@ const ScanPage: React.FC = () => {
         </Button>
       </div>
 
-      <Tabs defaultValue="new" className="w-full">
+      <Tabs 
+        defaultValue="new" 
+        value={activeTab} 
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
         <TabsList className="grid grid-cols-2 mb-8 w-full max-w-md mx-auto">
           <TabsTrigger value="new">Nouveau scan</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -70,6 +104,14 @@ const ScanPage: React.FC = () => {
                   onAnalyze={handleAnalyze}
                   isAnalyzing={isAnalyzing}
                 />
+                <div className="mt-4 flex justify-end">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowScanForm(false)}
+                  >
+                    Annuler
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (

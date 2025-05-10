@@ -49,11 +49,15 @@ export interface EmotionalTeamViewProps {
   onRefresh?: () => void;
 }
 
-export interface EnhancedEmotionResult extends EmotionResult {
+export interface EnhancedEmotionResult extends Omit<EmotionResult, 'recommendations'> {
   recommendations?: {
     activities?: string[];
     music?: string[];
     breathing?: string[];
   };
   timestamp: Date;
+  analysis?: string;
+  color?: string;
+  insights?: string[];
+  triggers?: string[];
 }

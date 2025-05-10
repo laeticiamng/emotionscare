@@ -46,7 +46,7 @@ export async function analyzeEmotion(text: string): Promise<EmotionResult> {
 
   return {
     emotion: detectedEmotion,
-    score: emotionData.score, 
+    score: emotionData.score / 10, // Convert to 0-10 scale
     confidence: 0.7 + Math.random() * 0.2, // Random confidence between 0.7 and 0.9
     feedback,
     recommendations: [
@@ -78,7 +78,7 @@ export async function analyzeAudioEmotion(audioData: Blob): Promise<EmotionResul
     transcript: "Voici une transcription simulée de l'audio. Dans une application réelle, ce serait le texte converti de votre enregistrement.",
     emotion: randomEmotion,
     confidence: 0.7 + Math.random() * 0.2,
-    score: emotionData.score,
+    score: emotionData.score / 10, // Convert to 0-10 scale
     feedback: emotionData.isPositive
       ? `D'après votre voix, vous semblez ${randomEmotion}. C'est une émotion positive!`
       : `D'après votre voix, vous semblez ${randomEmotion}. Prenez un moment pour prendre soin de vous.`,

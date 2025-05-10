@@ -1,70 +1,133 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Emotion } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { CalendarIcon, ClockIcon } from 'lucide-react';
+import { CalendarIcon, ClockIcon, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EmotionHistoryProps {
   emotions: Emotion[];
   isLoading?: boolean;
   error?: string | null;
+  onRefresh?: () => void;
 }
 
-const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, isLoading = false, error = null }) => {
-  if (isLoading) {
-    return (
-      <div className="p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-6 text-center">
-        <p className="text-red-500">Erreur: {error}</p>
-        <p className="text-muted-foreground mt-2">Impossible de charger l'historique des émotions.</p>
-      </div>
-    );
-  }
-
-  if (emotions.length === 0) {
-    return (
-      <div className="p-6 text-center">
-        <p className="text-muted-foreground">Aucune émotion enregistrée. Complétez un scan pour commencer à voir votre historique.</p>
-      </div>
-    );
-  }
-
+const EmotionHistory: React.FC<EmotionHistoryProps> = ({ 
+  emotions, 
+  isLoading = false, 
+  error = null,
+  onRefresh 
+}) => {
   // Fonction pour mapper un score à un emoji
   const getEmotionEmoji = (emotion: string) => {
     const emojiMap: {[key: string]: string} = {
       'joy': '😊',
+      'happy': '😊',
       'sadness': '😔',
+      'sad': '😔',
       'anger': '😡',
+      'angry': '😡',
       'fear': '😨',
+      'anxious': '😰',
       'surprise': '😲',
       'disgust': '🤢',
       'neutral': '😐',
+      'calm': '😌',
+      'relaxed': '☺️',
+      'stressed': '😫',
+      'excited': '😃',
     };
 
     return emojiMap[emotion.toLowerCase()] || '❓';
   };
 
   // Afficher un maximum de 10 entrées dans l'historique
-  const displayEmotions = emotions.slice(0, 10);
+  const displayEmotions = useMemo(() => {
+    return emotions.slice(0, 10);
+  }, [emotions]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Historique des scans</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Historique des scans</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-6 text-center">
+            <p className="text-red-500 mb-4">Erreur: {error}</p>
+            <p className="text-muted-foreground mb-6">Impossible de charger l'historique des émotions.</p>
+            {onRefresh && (
+              <Button onClick={onRefresh} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Réessayer
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (emotions.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Historique des scans</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-6 text-center">
+            <p className="text-muted-foreground mb-6">Aucune émotion enregistrée. Complétez un scan pour commencer à voir votre historique.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const formatDate = (dateStr: string | Date) => {
+    try {
+      return format(new Date(dateStr), 'PPP', { locale: fr });
+    } catch (e) {
+      return "Date invalide";
+    }
+  };
+
+  const formatTime = (dateStr: string | Date) => {
+    try {
+      return format(new Date(dateStr), 'HH:mm', { locale: fr });
+    } catch (e) {
+      return "--:--";
+    }
+  };
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xl">Historique des scans</CardTitle>
+        {onRefresh && (
+          <Button onClick={onRefresh} variant="ghost" size="sm">
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <ul className="space-y-4 divide-y">
           {displayEmotions.map((emotion) => (
-            <li key={emotion.id} className="pt-4 first:pt-0">
+            <li key={emotion.id || `${emotion.date}-${emotion.emotion}`} className="pt-4 first:pt-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="text-3xl">{getEmotionEmoji(emotion.emotion)}</div>
@@ -73,11 +136,11 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, isLoading = f
                     <div className="flex items-center text-sm text-muted-foreground gap-3">
                       <span className="flex items-center gap-1">
                         <CalendarIcon className="h-3 w-3" />
-                        {format(new Date(emotion.date || Date.now()), 'PPP', { locale: fr })}
+                        {formatDate(emotion.date || Date.now())}
                       </span>
                       <span className="flex items-center gap-1">
                         <ClockIcon className="h-3 w-3" />
-                        {format(new Date(emotion.date || Date.now()), 'HH:mm', { locale: fr })}
+                        {formatTime(emotion.date || Date.now())}
                       </span>
                     </div>
                   </div>
@@ -89,6 +152,11 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, isLoading = f
               {emotion.text && (
                 <div className="mt-2 text-sm border-l-2 border-muted pl-3 italic">
                   "{emotion.text}"
+                </div>
+              )}
+              {emotion.ai_feedback && (
+                <div className="mt-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+                  <strong>Feedback IA:</strong> {emotion.ai_feedback}
                 </div>
               )}
             </li>

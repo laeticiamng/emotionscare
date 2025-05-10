@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionalTeamViewProps } from '@/types/emotion';
 
-const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ userId, period, teamId, className }) => {
+const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ userId, period, teamId, className, onRefresh }) => {
   return (
     <Card className={className}>
       <CardHeader>

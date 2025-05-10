@@ -48,12 +48,13 @@ export async function analyzeEmotionEnhanced(text: string): Promise<EnhancedEmot
     recommendations: {
       activities: getImprovementTips(basicResult.emotion),
       music: ['Relaxing playlist', 'Focus music', 'Nature sounds'],
-      breathingExercises: ['4-7-8 breathing', 'Box breathing', 'Deep belly breathing']
+      breathing: ['4-7-8 breathing', 'Box breathing', 'Deep belly breathing']
     },
     insights: ['Your emotion may be affecting your decision-making', 'Consider taking a short break'],
     triggers: ['Work stress', 'Relationship dynamics'],
     score: basicResult.score || 50, // Ensure score is set
-    feedback: basicResult.feedback
+    feedback: basicResult.feedback,
+    timestamp: new Date()
   };
   
   return enhanced;
@@ -72,13 +73,14 @@ export async function analyzeAudioEmotionEnhanced(audioData: Blob): Promise<Enha
     recommendations: {
       activities: getImprovementTips(basicResult.emotion),
       music: ['Relaxing playlist', 'Focus music', 'Nature sounds'],
-      breathingExercises: ['4-7-8 breathing', 'Box breathing', 'Deep belly breathing']
+      breathing: ['4-7-8 breathing', 'Box breathing', 'Deep belly breathing']
     },
     insights: ['Your speech patterns indicate your emotional state', 'You can improve your well-being by practicing vocal awareness'],
     triggers: ['Speaking speed', 'Tone variations'],
     score: basicResult.score || 50, // Ensure score is set
     feedback: basicResult.feedback,
-    transcript: basicResult.transcript
+    transcript: basicResult.transcript,
+    timestamp: new Date()
   };
   
   return enhanced;
