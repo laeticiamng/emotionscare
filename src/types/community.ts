@@ -25,4 +25,9 @@ export interface Group {
   is_private: boolean;
   created_at: string | Date;
   owner_id: string;
+  
+  // Additional properties needed by components
+  topic?: string;
+  members?: Array<{ id: string; name: string; avatar?: string }>;
+  member_count?: number;
 }

@@ -21,6 +21,8 @@ export interface ChatMessage {
   timestamp: Date | string;
   emotion?: string;
   metadata?: Record<string, any>;
+  sender?: 'user' | 'assistant' | 'system'; // Added for backward compatibility
+  text?: string; // Added for backward compatibility
 }
 
 export interface ChatConversation {
@@ -30,4 +32,6 @@ export interface ChatConversation {
   messages: ChatMessage[];
   created_at: Date | string;
   last_message?: string;
+  lastMessage?: string; // Added for backward compatibility
+  updated_at?: Date | string; // Added for backward compatibility
 }

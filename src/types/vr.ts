@@ -27,11 +27,19 @@ export interface VRSession {
 
 export interface VRSessionTemplate {
   id: string;
+  template_id?: string;
   title: string;
   description: string;
   category: string;
   duration: number;
   image_url?: string;
+  preview_url?: string;
+  theme?: string;
+  audio_url?: string;
+  is_audio_only?: boolean;
+  benefits?: string[];
+  emotions?: string[];
+  popularity?: number;
   recommended_emotions?: string[];
   recommended_music?: string[];
   instructions?: string[];

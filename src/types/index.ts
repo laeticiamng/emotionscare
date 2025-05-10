@@ -75,3 +75,13 @@ export interface UserPreferences {
   trustedContact?: string;
   emotionalCamouflage?: boolean;
 }
+
+// Add MoodData type which is missing
+export interface MoodData {
+  date: string;
+  value: number;
+  emotion: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
+}

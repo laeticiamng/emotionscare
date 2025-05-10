@@ -1,53 +1,60 @@
-// Music related types
+
+// Types for music-related components
+export * from './index';
 
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;
+  album?: string;
+  artwork?: string;
   url: string;
-  cover_url?: string;
+  audioUrl?: string;
+  duration: number;
   cover?: string;
   coverUrl?: string;
-  coverImage?: string;
-  audioUrl?: string;
   emotion?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  title: string;
-  name?: string;
-  tracks: MusicTrack[];
-  emotion?: string;
+  name: string;
   description?: string;
+  tracks: MusicTrack[];
+  coverImage?: string;
+  emotion?: string;
+  duration?: number;
+  createdBy?: string;
 }
 
 export interface MusicPreferences {
-  autoplay: boolean;
   volume: number;
-  repeat_mode: 'none' | 'all' | 'one';
+  autoplay: boolean;
+  crossfade: boolean;
+  crossfadeDuration: number;
   shuffle: boolean;
-  favorite_genres: string[];
-  favorite_tracks: string[];
-  favorite_emotions?: string[];
+  repeat: 'none' | 'one' | 'all';
+  emotionSync: boolean;
+  preferredGenres?: string[];
+  audioQuality?: 'low' | 'medium' | 'high';
 }
 
-export interface MusicAnalysisResult {
-  tempo: number;
-  key: string;
-  energy: number;
-  valence: number;
-  danceability: number;
-  acousticness: number;
-  instrumentalness: number;
+export interface MusicProviderOptions {
+  autoInit?: boolean;
+  defaultVolume?: number;
+  emotionSyncEnabled?: boolean;
+  onTrackChange?: (track: MusicTrack | null) => void;
+  onError?: (error: Error) => void;
 }
 
-export interface MusicGeneration {
-  id: string;
-  prompt: string;
-  created_at: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  url?: string;
-  error?: string;
+// For audio visualizers
+export interface AudioVisualizerConfig {
+  sensitivity: number;
+  barCount: number;
+  barWidth?: number;
+  barGap?: number;
+  barColor?: string;
+  barColorEnd?: string;
+  smoothing?: number;
+  animate?: boolean;
 }
