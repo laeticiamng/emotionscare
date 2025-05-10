@@ -21,6 +21,7 @@ export interface Emotion {
     name: string;
     score: number;
   }>;
+  emojis?: string;
 }
 
 export interface EmotionResult {
@@ -36,6 +37,7 @@ export interface EmotionResult {
   recommendations?: string[];
   transcript?: string;
   text?: string;
+  emojis?: string;
   primaryEmotion?: {
     name: string;
     score: number;
@@ -51,4 +53,8 @@ export interface EnhancedEmotionResult extends EmotionResult {
   trend?: 'improving' | 'stable' | 'declining';
   detailedAnalysis?: string;
   recommendations?: string[];
+}
+
+export interface EmotionalTeamViewProps {
+  className?: string;
 }

@@ -1,342 +1,151 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Slider } from '@/components/ui/slider';
-import { AlertCircle, Pause, Play, Volume2, VolumeX, PictureInPicture, Maximize, Minimize, Clock } from 'lucide-react';
-import { VRSessionTemplate, MusicTrack } from '@/types';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Play, Pause, SkipBack, SkipForward, Clock } from "lucide-react";
 import { useMusic } from '@/contexts/MusicContext';
-import VRMusicTrackInfo from './VRMusicTrackInfo';
+import { VRSessionTemplate, MusicTrack } from '@/types';
+import ProgressBar from '@/components/music/player/ProgressBar';
 import { formatTime } from '@/lib/utils';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
 
 interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
-  onCompleteSession: () => void;
-  isAudioOnly: boolean;
-  videoUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
+  session: VRSessionTemplate;
+  onSessionComplete?: () => void;
 }
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
-  template,
-  onCompleteSession,
-  isAudioOnly = false,
-  videoUrl = '',
-  audioUrl = '',
-  emotion = 'calm'
+  session,
+  onSessionComplete
 }) => {
-  // References
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [inFullscreen, setInFullscreen] = useState(false);
-  
-  // Playback state
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(80);
-  const [isMuted, setIsMuted] = useState(false);
-  const [sessionCompleted, setSessionCompleted] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [sessionTracks, setSessionTracks] = useState<MusicTrack[]>([]);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   
-  // Music integration
-  const { loadPlaylistForEmotion, currentTrack, playTrack } = useMusic();
-  const { activateMusicForEmotion } = useMusicEmotionIntegration();
+  const { loadPlaylistForEmotion, playTrack, pauseTrack } = useMusic();
   
-  // Load music based on emotion when component mounts
+  // Load music that matches the session's emotional target
   useEffect(() => {
-    if (emotion) {
-      const emotionKey = emotion.toLowerCase();
-      const musicType = mapEmotionToMusicType(emotionKey);
-      const playlist = loadPlaylistForEmotion(musicType);
-      
-      // Autoplay first track if a playlist is loaded
-      if (playlist && playlist.tracks.length > 0 && !currentTrack) {
-        const track = {
-          ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
-        };
-        playTrack(track);
-      }
-    }
-  }, [emotion, loadPlaylistForEmotion, playTrack, currentTrack]);
-  
-  // Handle video playback
-  useEffect(() => {
-    const videoElement = videoRef.current;
-    if (!videoElement) return;
-    
-    const handleTimeUpdate = () => {
-      const current = videoElement.currentTime;
-      const videoDuration = videoElement.duration;
-      
-      if (videoDuration) {
-        setCurrentTime(current);
-        setProgress((current / videoDuration) * 100);
-        
-        // Mark session as completed when it reaches the end
-        if (current >= videoDuration - 1) {
-          setSessionCompleted(true);
-          setIsPlaying(false);
-          onCompleteSession();
+    const loadSessionMusic = async () => {
+      if (session.emotion_target) {
+        try {
+          const playlist = await loadPlaylistForEmotion(session.emotion_target);
+          
+          if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+            setSessionTracks(playlist.tracks);
+          }
+        } catch (error) {
+          console.error('Error loading music for session:', error);
         }
       }
     };
     
-    const handleLoadedMetadata = () => {
-      setDuration(videoElement.duration);
-    };
-    
-    const handleError = () => {
-      setError('Erreur lors du chargement de la vidéo. Veuillez réessayer.');
-    };
-    
-    videoElement.addEventListener('timeupdate', handleTimeUpdate);
-    videoElement.addEventListener('loadedmetadata', handleLoadedMetadata);
-    videoElement.addEventListener('error', handleError);
-    
-    return () => {
-      videoElement.removeEventListener('timeupdate', handleTimeUpdate);
-      videoElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      videoElement.removeEventListener('error', handleError);
-    };
-  }, [onCompleteSession]);
+    loadSessionMusic();
+  }, [session.emotion_target, loadPlaylistForEmotion]);
   
-  // Update video element when volume changes
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.volume = volume / 100;
-      videoRef.current.muted = isMuted;
-    }
-  }, [volume, isMuted]);
-  
-  // Handle play/pause
+  // Handle playing and pausing the current track
   const togglePlayPause = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    
-    if (!hasStarted) {
-      setHasStarted(true);
-    }
+    if (sessionTracks.length === 0) return;
     
     if (isPlaying) {
-      video.pause();
+      pauseTrack();
+      setIsPlaying(false);
     } else {
-      video.play().catch(err => {
-        console.error('Error playing video:', err);
-        setError('Erreur de lecture. Veuillez vérifier vos paramètres de navigateur.');
-      });
-    }
-    
-    setIsPlaying(!isPlaying);
-  };
-  
-  // Handle seeking
-  const handleSeek = (newValue: number[]) => {
-    const video = videoRef.current;
-    if (!video) return;
-    
-    const seekTime = (newValue[0] / 100) * duration;
-    video.currentTime = seekTime;
-    setCurrentTime(seekTime);
-    setProgress(newValue[0]);
-  };
-  
-  // Toggle mute
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
-  
-  // Toggle fullscreen
-  const toggleFullscreen = () => {
-    if (!contentRef.current) return;
-    
-    if (!document.fullscreenElement) {
-      contentRef.current.requestFullscreen().then(() => {
-        setInFullscreen(true);
-      }).catch(err => {
-        console.error('Error attempting to enable fullscreen:', err);
-      });
-    } else {
-      document.exitFullscreen().then(() => {
-        setInFullscreen(false);
-      }).catch(err => {
-        console.error('Error attempting to exit fullscreen:', err);
-      });
+      const currentTrack = sessionTracks[currentTrackIndex];
+      playTrack(currentTrack);
+      setIsPlaying(true);
     }
   };
   
-  // Handle fullscreen change
+  // Skip to the next track
+  const nextTrack = () => {
+    if (sessionTracks.length === 0) return;
+    
+    const nextIndex = (currentTrackIndex + 1) % sessionTracks.length;
+    setCurrentTrackIndex(nextIndex);
+    playTrack(sessionTracks[nextIndex]);
+    setIsPlaying(true);
+  };
+  
+  // Go to the previous track
+  const previousTrack = () => {
+    if (sessionTracks.length === 0) return;
+    
+    const prevIndex = currentTrackIndex === 0 ? sessionTracks.length - 1 : currentTrackIndex - 1;
+    setCurrentTrackIndex(prevIndex);
+    playTrack(sessionTracks[prevIndex]);
+    setIsPlaying(true);
+  };
+  
+  // Update the progress bar as the session progresses
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setInFullscreen(!!document.fullscreenElement);
-    };
+    let interval: NodeJS.Timeout;
     
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-
-  return (
-    <Card className="overflow-hidden">
-      <div ref={contentRef} className="relative">
-        {/* Video or Audio Only Container */}
-        <div className={`relative ${isAudioOnly ? 'aspect-[16/9] bg-gradient-to-b from-primary/10 to-primary/5 flex items-center justify-center' : ''}`}>
-          {isAudioOnly ? (
-            <div className="text-center p-8">
-              <h3 className="text-xl font-medium mb-3">{template.title || 'Session audio guidée'}</h3>
-              <p className="text-muted-foreground mb-6">
-                Fermez les yeux et laissez-vous guider par cette séance audio.
-              </p>
-              {audioUrl && (
-                <audio
-                  ref={videoRef as React.RefObject<HTMLAudioElement>} 
-                  src={audioUrl}
-                  className="w-full"
-                  preload="metadata"
-                />
-              )}
-              <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center">
-                <Clock className="h-10 w-10 text-primary" />
-              </div>
-            </div>
-          ) : (
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              className="w-full h-auto"
-              preload="metadata"
-              poster={template.preview_url}
-            />
-          )}
+    if (isPlaying) {
+      interval = setInterval(() => {
+        setCurrentTime(prev => {
+          const newTime = prev + 1;
           
-          {/* Play button overlay when not started */}
-          {!hasStarted && (
-            <div 
-              className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer"
-              onClick={togglePlayPause}
-            >
-              <div className="bg-white/10 backdrop-blur-sm p-5 rounded-full">
-                <Play className="h-12 w-12 text-white" />
-              </div>
-            </div>
-          )}
+          // Check if session is complete
+          if (newTime >= session.duration) {
+            clearInterval(interval);
+            setIsPlaying(false);
+            onSessionComplete?.();
+            return session.duration;
+          }
+          
+          return newTime;
+        });
+      }, 1000);
+    }
+    
+    return () => clearInterval(interval);
+  }, [isPlaying, session.duration, onSessionComplete]);
+  
+  return (
+    <Card>
+      <CardContent className="space-y-4 p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-lg font-semibold">Session Audio</h3>
+            <p className="text-sm text-muted-foreground flex items-center mt-1">
+              <Clock className="w-4 h-4 mr-1" /> {formatTime(session.duration)}
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={previousTrack} disabled={sessionTracks.length === 0}>
+              <SkipBack className="h-4 w-4" />
+            </Button>
+            
+            <Button onClick={togglePlayPause} variant={isPlaying ? "secondary" : "default"} disabled={sessionTracks.length === 0}>
+              {isPlaying ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
+              {isPlaying ? 'Pause' : 'Play'}
+            </Button>
+            
+            <Button variant="outline" size="icon" onClick={nextTrack} disabled={sessionTracks.length === 0}>
+              <SkipForward className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
-        {/* Controls */}
-        <CardContent className="p-4 bg-background">
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Erreur</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <div className="space-y-4">
-            {/* Progress bar */}
-            <div className="space-y-1">
-              <Slider 
-                value={[progress]} 
-                onValueChange={handleSeek}
-                max={100}
-                step={0.1}
-                className="cursor-pointer"
-              />
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <div>{formatTime(currentTime)}</div>
-                <div>{formatTime(duration)}</div>
-              </div>
-            </div>
-            
-            {/* Playback controls */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={togglePlayPause}
-                  size="icon"
-                  variant="ghost"
-                >
-                  {isPlaying ? (
-                    <Pause className="h-5 w-5" />
-                  ) : (
-                    <Play className="h-5 w-5" />
-                  )}
-                </Button>
-                
-                <Button
-                  onClick={toggleMute}
-                  size="icon"
-                  variant="ghost"
-                >
-                  {isMuted ? (
-                    <VolumeX className="h-5 w-5" />
-                  ) : (
-                    <Volume2 className="h-5 w-5" />
-                  )}
-                </Button>
-                
-                <div className="w-24 hidden md:block">
-                  <Slider
-                    value={[isMuted ? 0 : volume]}
-                    onValueChange={(newValue) => setVolume(newValue[0])}
-                    max={100}
-                    step={1}
-                    className="cursor-pointer"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={toggleFullscreen}
-                  size="icon"
-                  variant="ghost"
-                  className="hidden md:flex"
-                >
-                  {inFullscreen ? (
-                    <Minimize className="h-5 w-5" />
-                  ) : (
-                    <Maximize className="h-5 w-5" />
-                  )}
-                </Button>
-                
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="hidden md:flex"
-                >
-                  <PictureInPicture className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-            
-            {/* Music track info */}
-            {currentTrack && (
-              <div className="border-t pt-3 mt-3">
-                <VRMusicTrackInfo currentTrack={currentTrack} />
-              </div>
-            )}
-            
-            {/* Status indicator */}
-            {sessionCompleted && (
-              <div className="bg-green-100 text-green-800 p-3 rounded-md text-sm">
-                Session terminée ! Vous avez complété cette séance avec succès.
-              </div>
-            )}
+        <ProgressBar
+          currentTime={currentTime}
+          duration={session.duration}
+          onSeek={(time) => setCurrentTime(time)}
+        />
+        
+        {sessionTracks.length > 0 && (
+          <div className="bg-muted/20 p-3 rounded-md">
+            <p className="text-sm font-medium">
+              Now Playing: {sessionTracks[currentTrackIndex]?.title || 'Unknown Track'}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              By {sessionTracks[currentTrackIndex]?.artist || 'Unknown Artist'}
+            </p>
           </div>
-        </CardContent>
-      </div>
+        )}
+      </CardContent>
     </Card>
   );
 };

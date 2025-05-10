@@ -38,7 +38,7 @@ export const useMusicRecommendation = () => {
       const { emotion } = emotionResult;
       const playlist = await loadPlaylistForEmotion(emotion.toLowerCase());
       
-      if (playlist && playlist.tracks.length > 0) {
+      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
         // Play the first track from the playlist, ensuring it has duration and url
         const track = {
           ...playlist.tracks[0],

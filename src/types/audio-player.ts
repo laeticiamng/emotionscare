@@ -1,85 +1,20 @@
 
-import { MusicTrack } from './music';
-
-export interface AudioPlayerState {
-  isPlaying: boolean;
-  currentTime: number;
-  duration: number;
-  volume: number;
-  repeat: boolean;
-  shuffle: boolean;
-  error: Error | null;
-}
-
-export interface VolumeControlProps {
-  volume: number;
-  onVolumeChange: (value: number) => void;
-  showLabel?: boolean;
-  className?: string;
-}
-
-export interface TrackInfoProps {
-  track?: MusicTrack | null;
-  showCover?: boolean;
-  showControls?: boolean;
-  currentTrack?: MusicTrack | null;
-  loadingTrack?: boolean;
-  audioError?: Error | null;
-}
-
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
-  onSeek?: (time: number) => void;
+  onSeek?: (value: number) => void;
   showTimestamps?: boolean;
+  formatTime?: (seconds: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   className?: string;
-  formatTime?: (time: number) => string;
-  handleProgressClick?: (value: number) => void;
 }
 
-export interface UseMusicControlsReturn {
+export interface AudioPlayerState {
   isPlaying: boolean;
   volume: number;
-  setVolume: (value: number) => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: (currentTrack: MusicTrack | null, currentPlaylist: MusicTrack[] | null) => void;
-  previousTrack: (currentTrack: MusicTrack | null, currentPlaylist: MusicTrack[] | null) => void;
-  currentTime: number;
-  duration: number;
-  formatTime: (time: number) => string;
-  handleProgressClick: (value: number) => void;
-  handleVolumeChange: (value: number[]) => void;
-  repeat: boolean;
-  toggleRepeat: () => void;
-  shuffle: boolean;
-  toggleShuffle: () => void;
-  loadingTrack: boolean;
-}
-
-export interface UseAudioPlayerReturn {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  volume: number;
+  muted: boolean;
   repeat: boolean;
   shuffle: boolean;
-  progress: number;
-  duration: number;
-  loading: boolean;
-  error: Error | null;
   currentTime: number;
-  loadingTrack: boolean;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  resumeTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  seekTo: (time: number) => void;
-  setVolume: (value: number) => void;
-  setCurrentTrack: (track: MusicTrack | null) => void;
-  formatTime: (time: number) => string;
-  handleProgressClick: (value: number) => void;
-  handleVolumeChange: (values: number[]) => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
+  duration: number;
 }

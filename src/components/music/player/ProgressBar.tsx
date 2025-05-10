@@ -22,10 +22,17 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
   const timeFormatter = formatTime || defaultFormatTime;
   
+  // Fix the event handler to properly convert click to time
+  const handleProgressClickInternal = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (handleProgressClick) {
+      handleProgressClick(e);
+    }
+  };
+  
   return (
     <div 
       className={`w-full space-y-1 ${className || ''}`}
-      onClick={handleProgressClick ? (e) => handleProgressClick(e) : undefined}
+      onClick={handleProgressClick ? handleProgressClickInternal : undefined}
     >
       <Slider
         value={[percent]}

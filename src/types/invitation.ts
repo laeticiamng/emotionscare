@@ -5,22 +5,17 @@ export interface Invitation {
   name?: string;
   role: string;
   status: 'pending' | 'accepted' | 'expired';
-  created_at: string | Date;
-  expires_at: string | Date;
-  accepted_at?: string | Date;
+  created_at: string;
+  expires_at: string;
   message?: string;
-  created_by: string;
-  code: string;
+  accepted_at?: string;
+  used_count?: number;
 }
 
 export interface InvitationStats {
   total: number;
-  pending: number;
   accepted: number;
+  pending: number;
   expired: number;
   conversion_rate: number;
-  last_week: {
-    sent: number;
-    accepted: number;
-  }
 }

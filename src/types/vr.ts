@@ -18,3 +18,17 @@ export interface VRSessionTemplate {
   image_urls?: string[];
   environment_id?: string;
 }
+
+export interface VRSession {
+  id: string;
+  template_id: string;
+  user_id: string;
+  started_at: string | Date;
+  completed_at?: string | Date;
+  duration: number;
+  emotion_before?: string;
+  emotion_after?: string;
+  rating?: number;
+  feedback?: string;
+  template?: VRSessionTemplate;
+}

@@ -1,19 +1,13 @@
 
 export interface MoodData {
-  id?: string;
-  userId?: string;
   date: string;
-  value: number;
-  label?: string;
-  notes?: string;
-  tags?: string[];
+  score: number;
   emotion?: string;
+  label?: string;
 }
 
 export interface MoodStats {
-  average: number;
-  highest: MoodData;
-  lowest: MoodData;
-  trend: 'improving' | 'declining' | 'stable';
-  weeklyAverage: number[];
+  avgScore: number;
+  trend: 'up' | 'down' | 'stable';
+  deltaPercent: number;
 }
