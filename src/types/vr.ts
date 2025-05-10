@@ -31,6 +31,7 @@ export interface VRSession {
   mood_before?: string;
   mood_after?: string;
   completed?: boolean;
+  recommended_mood?: string;
 }
 
 export interface VRSessionTemplate {
@@ -77,7 +78,7 @@ export interface VRSessionWithMusicProps {
 }
 
 export interface VREmotionRecommendationProps {
-  emotion: any; // Correction pour la propriété emotion requise
+  emotion: string; // Correction pour la propriété emotion requise
 }
 
 // Ajout des propriétés utilisées dans VRPage.tsx

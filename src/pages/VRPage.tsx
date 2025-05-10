@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
@@ -26,9 +27,10 @@ const VRPage: React.FC = () => {
   
   const { toast } = useToast();
   const { 
+    session,
     activeTemplate,
     isSessionActive,
-    heartRate,
+    heartRate = { before: 80, after: 70 },
     isLoading: sessionLoading,
     startSession,
     completeSession
@@ -121,7 +123,7 @@ const VRPage: React.FC = () => {
         </TabsList>
         
         <TabsContent value="discover" className="space-y-6">
-          <VREmotionRecommendation />
+          <VREmotionRecommendation emotion="calm" />
           <VRTemplateGrid templates={templates} onSelectTemplate={handleSelectTemplate} />
         </TabsContent>
         
@@ -142,6 +144,7 @@ const VRPage: React.FC = () => {
               <VRSessionWithMusic
                 template={activeTemplate}
                 onCompleteSession={handleCompleteSession}
+                onSessionComplete={handleCompleteSession}
                 isAudioOnly={activeTemplate.is_audio_only}
                 audioUrl={activeTemplate.audio_url || ''}
                 emotion={activeTemplate.recommended_mood || 'calm'}

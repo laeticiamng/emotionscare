@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
-import { NotificationFrequency, NotificationTone, FontFamily, FontSize } from '@/types/preferences';
+import { NotificationFrequency, NotificationTone, FontFamily, FontSize, ThemeName } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 // Types for user preferences
@@ -76,8 +76,8 @@ const defaultPreferences: UserPreferencesState = {
     breathing: true,
     music: false,
   },
-  notificationFrequency: 'daily',
-  notificationTone: 'gentle',
+  notificationFrequency: NotificationFrequency.DAILY,
+  notificationTone: NotificationTone.GENTLE,
   reminderTime: '09:00',
   
   dataExport: 'pdf',
@@ -118,7 +118,7 @@ export function useUserPreferences() {
       
       // Synchronize with other contexts if needed
       if (newPreferences.theme) {
-        setThemePreference(newPreferences.theme);
+        setThemePreference(newPreferences.theme as ThemeName);
       }
       
       toast({
@@ -162,7 +162,7 @@ export function useUserPreferences() {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
-    setThemePreference(preset.theme);
+    setThemePreference(preset.theme as ThemeName);
     audioPrefs.setEqualizerPreset?.(preset.audioPreset);
     
     toast({

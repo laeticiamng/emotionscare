@@ -14,7 +14,8 @@ class InvitationService {
       completed: 30,
       conversionRate: 0.71,
       averageTimeToAccept: 14.5,
-      recent_invites: []
+      recent_invites: [],
+      teams: {}
     };
   }
 

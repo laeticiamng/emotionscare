@@ -1,7 +1,7 @@
 
 export type NotificationFrequency = 'daily' | 'weekly' | 'flexible' | 'none';
-export type NotificationType = 'minimal' | 'detailed' | 'full';
-export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';
+export type NotificationType = 'minimal' | 'detailed' | 'full' | 'all' | 'important' | 'none';
+export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent' | 'motivating' | 'gentle';
 
 export interface NotificationPreferencesProps {
   frequency: NotificationFrequency;

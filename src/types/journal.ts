@@ -1,7 +1,7 @@
 
 export interface JournalEntry {
   id: string;
-  user_id?: string;
+  user_id: string; // Changed from optional to required to fix the type inconsistency
   date: string | Date;
   title?: string;
   content: string;

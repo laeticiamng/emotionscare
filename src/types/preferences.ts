@@ -3,7 +3,6 @@ export enum NotificationType {
   ALL = 'all',
   IMPORTANT = 'important',
   NONE = 'none',
-  // Types supplémentaires pour la compatibilité
   MINIMAL = 'minimal',
   DETAILED = 'detailed',
   FULL = 'full'
@@ -32,10 +31,10 @@ export interface UserPreferences {
   fontSize?: string;
   fontFamily?: string;
   language?: string;
-  notificationType?: NotificationType;
+  notificationType?: NotificationType | string;
   notificationsEnabled?: boolean;
-  notificationFrequency?: NotificationFrequency;
-  notificationTone?: NotificationTone;
+  notificationFrequency?: NotificationFrequency | string;
+  notificationTone?: NotificationTone | string;
   reminderTime?: string;
   darkMode?: boolean;
   highContrast?: boolean;
@@ -57,7 +56,11 @@ export interface UserPreferences {
   reminder_time?: string;
   
   // Champs de UserPreferences dans user.ts
-  notifications?: boolean;
+  notifications?: boolean | {
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+  };
   autoplayVideos?: boolean;
   showEmotionPrompts?: boolean;
   privacyLevel?: string;
@@ -73,15 +76,16 @@ export interface UserPreferences {
 
 export interface UserPreferencesState extends UserPreferences {
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
+  resetPreferences?: () => Promise<void>;
   isLoading: boolean;
   error: Error | null;
   preferences?: UserPreferences;
   
   // Propriétés nécessaires dans ImmersiveSettingsPage
   notificationsEnabled?: boolean;
-  notificationFrequency?: NotificationFrequency;
-  notificationType?: NotificationType;
-  notificationTone?: NotificationTone;
+  notificationFrequency?: NotificationFrequency | string;
+  notificationType?: NotificationType | string;
+  notificationTone?: NotificationTone | string;
   emotionalCamouflage?: boolean;
   reminderTime?: string;
   notifications_enabled?: boolean;

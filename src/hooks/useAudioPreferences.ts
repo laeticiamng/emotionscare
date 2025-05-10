@@ -1,5 +1,4 @@
 
-// Create a new file for AudioPreference types
 import { useState, useEffect } from 'react';
 
 export interface AudioPreference {
@@ -8,6 +7,10 @@ export interface AudioPreference {
   currentEqualizer: string;
   equalizerEnabled: boolean;
   equalizerPresets: string[];
+  setVolume?: (volume: number) => void;
+  setAutoplay?: (enabled: boolean) => void;
+  toggleEqualizer?: (enabled?: boolean) => void;
+  setEqualizerPreset?: (preset: string) => void;
 }
 
 export default function useAudioPreferences() {
@@ -27,8 +30,11 @@ export default function useAudioPreferences() {
     setPreferences(prev => ({ ...prev, autoplay: enabled }));
   };
 
-  const toggleEqualizer = () => {
-    setPreferences(prev => ({ ...prev, equalizerEnabled: !prev.equalizerEnabled }));
+  const toggleEqualizer = (enabled?: boolean) => {
+    setPreferences(prev => ({ 
+      ...prev, 
+      equalizerEnabled: enabled !== undefined ? enabled : !prev.equalizerEnabled 
+    }));
   };
 
   const setEqualizerPreset = (preset: string) => {
@@ -40,6 +46,12 @@ export default function useAudioPreferences() {
     setVolume,
     setAutoplay,
     toggleEqualizer,
-    setEqualizerPreset
+    setEqualizerPreset,
+    // Also expose these properties directly for backward compatibility
+    volume: preferences.volume,
+    autoplay: preferences.autoplay,
+    currentEqualizer: preferences.currentEqualizer,
+    equalizerEnabled: preferences.equalizerEnabled,
+    equalizerPresets: preferences.equalizerPresets
   };
 }

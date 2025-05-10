@@ -12,13 +12,14 @@ export const usePreferences = (): UserPreferencesState => {
     showEmotionPrompts: true,
     privacyLevel: 'standard',
     dataCollection: true,
-    notificationsEnabled: true,
     notifications_enabled: true,
+    notificationsEnabled: true,
     email_notifications: true,
     push_notifications: true,
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
     setIsLoading(true);
@@ -42,15 +43,15 @@ export const usePreferences = (): UserPreferencesState => {
     showEmotionPrompts: preferences.showEmotionPrompts,
     privacyLevel: preferences.privacyLevel,
     dataCollection: preferences.dataCollection,
-    notificationsEnabled: preferences.notificationsEnabled,
+    notificationsEnabled: preferences.notifications_enabled,
     notifications_enabled: preferences.notifications_enabled,
     email_notifications: preferences.email_notifications,
     push_notifications: preferences.push_notifications,
-    error: null,
+    error,
     emotionalCamouflage: false,
-    notificationFrequency: 'daily' as any,
-    notificationTone: 'gentle' as any,
-    notificationType: 'all' as any,
+    notificationFrequency: 'daily',
+    notificationTone: 'gentle',
+    notificationType: 'all',
     reminderTime: '09:00',
     reminder_time: '09:00'
   };
