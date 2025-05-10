@@ -1,13 +1,16 @@
 
-import { VRSessionTemplate } from './vr';
 import { MusicTrack } from './music';
+import { VRSession } from './vr';
 
-export interface VRSessionMusic {
+export interface VRSessionMusicAssociation {
   id: string;
-  session_id: string;
-  track_id: string;
-  played_at: string | Date;
-  duration: number;
-  user_id: string;
-  track_data?: MusicTrack;
+  vr_session_id: string;
+  music_track_id: string;
+  position: number;
+  start_time?: number;
+  end_time?: number;
+}
+
+export interface VRSessionWithMusic extends VRSession {
+  musicTracks: MusicTrack[];
 }

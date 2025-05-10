@@ -1,74 +1,57 @@
 
-// Define the MusicTrack interface
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  url?: string;
-  audioUrl?: string;
-  coverUrl?: string;
-  cover?: string; // Add missing property
-  coverImage?: string; // Add missing property
+  album?: string;
   duration: number;
-  emotion?: string;
+  url?: string;
+  audioUrl?: string; // Alternative URL property
+  imageUrl?: string;
+  cover?: string; // Alternative cover property
+  coverImage?: string; // Another alternative cover property
+  externalUrl?: string; // External URL for opening in music players
+  mood?: string;
   genre?: string;
-  intensity?: number;
-  isPlaying?: boolean;
+  releaseDate?: string;
+  bpm?: number;
+  key?: string;
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  is_favorite?: boolean;
+  plays?: number;
+  is_playing?: boolean;
 }
 
-// Define the MusicPlaylist interface
 export interface MusicPlaylist {
   id: string;
-  name: string;
+  title: string;
   description?: string;
+  cover?: string;
+  coverImage?: string;
   tracks: MusicTrack[];
-  coverUrl?: string;
-  emotion?: string;
-  createdAt?: string;
-  userId?: string;
-  isRecommended?: boolean;
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  mood?: string;
+  user_id?: string;
+  track_count?: number;
+  duration?: number;
+  is_public?: boolean;
+  is_favorite?: boolean;
 }
 
-// Define MusicContextType
-export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null;
-  isPlaying: boolean;
-  volume: number;
-  openDrawer: boolean;
-  setOpenDrawer: (open: boolean) => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
-  getTracksForEmotion: (emotion: string) => MusicTrack[];
-  currentEmotion: string;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
-  initializeMusicSystem: () => Promise<void>;
-  error: string | null;
-  playlists: MusicPlaylist[];
-  loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
-}
-
-// Define MusicRecommendationCardProps interface
 export interface MusicRecommendationCardProps {
-  emotion: string;
+  title: string;
+  description: string;
+  emotion?: string;
+  onPlay?: () => void;
   tracks?: MusicTrack[];
-  onTrackSelect?: (track: MusicTrack) => void;
-  isLoading?: boolean;
-  intensity?: number;
-  standalone?: boolean;
-  className?: string; // Add missing property
+  onClick?: () => void;
+  className?: string;
 }
 
-// Define MusicDrawerProps interface
 export interface MusicDrawerProps {
-  isOpen?: boolean;
-  open?: boolean;
-  onClose?: () => void;
-  onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  emotion?: string;
 }

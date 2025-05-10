@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ChatConversation } from '@/types';
+import { ChatConversation } from '@/types/chat';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { PlusCircle, Trash2 } from 'lucide-react';
@@ -27,9 +27,6 @@ const ConversationList: React.FC<ConversationListProps> = ({
     // Get the last message text from the messages array
     if (conversation.messages && conversation.messages.length > 0) {
       const lastMessage = conversation.messages[conversation.messages.length - 1];
-      if (typeof lastMessage === 'string') {
-        return lastMessage;
-      }
       return lastMessage?.content || lastMessage?.text || "Aucun message";
     }
     

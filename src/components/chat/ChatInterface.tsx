@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, Plus, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { ChatMessage } from '@/types';
+import { ChatMessage } from '@/types/chat';
 
 interface ChatInterfaceProps {
   messages: ChatMessage[];

@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -32,7 +33,7 @@ export function useMusicControls(): UseMusicControlsReturn {
     // Ensure track always has url and duration properties
     const trackWithUrl = {
       ...track,
-      url: track.url || track.audioUrl || '',  // Fixed to use optional chaining
+      url: track.url || track.audioUrl || '',
       duration: track.duration || 0
     };
     playAudioTrack(trackWithUrl);

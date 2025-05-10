@@ -1,12 +1,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { User } from '@/types/user';
-import { UserData } from '@/components/dashboard/admin/types/tableTypes';
+import { UserData, SortDirection } from '@/components/dashboard/admin/types/tableTypes';
 
 interface UserTableDataOptions {
   defaultPageSize?: number;
   defaultSortField?: string;
-  defaultSortDirection?: 'asc' | 'desc' | null;
+  defaultSortDirection?: SortDirection;
 }
 
 // Helper to convert User to UserData
@@ -15,7 +15,7 @@ const convertUserToUserData = (user: User): UserData => {
     id: user.id,
     name: user.name || '',
     email: user.email || '',
-    role: user.role || '',
+    role: user.role || 'user',
     department: user.department || '',
     location: '', // Default value since User doesn't have location
     status: 'active', // Default value
@@ -39,7 +39,7 @@ export function useUserTableData({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortField, setSortField] = useState(defaultSortField);
-  const [sortDirection, setSortDirection] = useState(defaultSortDirection);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultSortDirection);
 
   // Calculate total pages
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
@@ -50,7 +50,7 @@ export function useUserTableData({
     page: number = 1,
     size: number = pageSize,
     field: string = sortField,
-    direction: string | null = sortDirection
+    direction: SortDirection = sortDirection
   ) => {
     setIsLoading(true);
     setError(null);

@@ -68,7 +68,7 @@ export function useAudioPlayerCore() {
   };
   
   const handleError = (error: Error) => {
-    setError(error);
+    setError(error.message);
     setLoadingTrack(false);
     setIsPlaying(false);
   };

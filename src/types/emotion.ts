@@ -11,7 +11,7 @@ export interface Emotion {
   text?: string;
   ai_feedback?: string;
   score?: number;
-  name?: string; // Add this property
+  name?: string;
 }
 
 export interface EmotionResult {
@@ -37,7 +37,7 @@ export interface EmotionResult {
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
-  className?: string; // Add className property
+  className?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

@@ -1,14 +1,21 @@
 
-import { UseAudioPlayerReturn } from '@/types/audio-player';
+import { ChangeEvent } from 'react';
+import { MusicTrack } from '@/types/music';
 import { useAudioPlayerCore } from './audio/useAudioPlayerCore';
 import { formatTime } from './audio/audioPlayerUtils';
 
 /**
  * Centralized hook for managing audio playback throughout the application
  */
-export function useAudioPlayer(): UseAudioPlayerReturn {
+export function useAudioPlayer() {
   // Use our core implementation
   const audioPlayer = useAudioPlayerCore();
+  
+  // Add adapter for volume change handler
+  const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    audioPlayer.setVolume(newVolume);
+  };
   
   // Return the public API interface
   return {
@@ -38,7 +45,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     setCurrentTrack: audioPlayer.setCurrentTrack,
     formatTime,
     handleProgressClick: audioPlayer.handleProgressClick,
-    handleVolumeChange: audioPlayer.handleVolumeChange,
+    handleVolumeChange,
     toggleRepeat: audioPlayer.toggleRepeat,
     toggleShuffle: audioPlayer.toggleShuffle
   };

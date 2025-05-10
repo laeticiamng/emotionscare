@@ -1,15 +1,36 @@
 
+// Create a file for mood-related types
 export interface MoodData {
-  date: string | Date;
+  date: string;
+  originalDate: string;
   value: number;
-  emotion?: string;
-  notes?: string;
-  id?: string;
-  user_id?: string;
-  originalDate?: string | Date;
-  
-  // Chart properties
   sentiment?: number;
   anxiety?: number;
   energy?: number;
+}
+
+export interface MoodTrend {
+  period: string;
+  average: number;
+  change: number;
+  changePercent: number;
+}
+
+export interface MoodInsight {
+  title: string;
+  description: string;
+  type: 'improvement' | 'decline' | 'neutral' | 'insight';
+  score?: number;
+  trigger?: string;
+  actionable?: boolean;
+  recommendation?: string;
+}
+
+export interface MoodStatistics {
+  average: number;
+  highest: number;
+  lowest: number;
+  trends: MoodTrend[];
+  insights: MoodInsight[];
+  completionRate: number;
 }

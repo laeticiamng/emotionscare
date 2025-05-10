@@ -1,72 +1,36 @@
 
+export type UserRole = 'admin' | 'user' | 'manager' | 'employee' | 'guest';
+
 export interface User {
   id: string;
-  name: string;
-  email: string;
-  role: UserRole | string;
+  name?: string;
+  email?: string;
   avatar?: string;
   avatar_url?: string;
   image?: string;
-  created_at?: Date | string;
-  joined_at?: Date | string;
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  role?: UserRole;
+  department?: string;
   emotional_score?: number;
   anonymity_code?: string;
-  onboarded?: boolean;
-  position?: string;
-  department?: string;
-  team_id?: string;
-  preferences?: UserPreferences;
-}
-
-// UserRole comme enum
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-  COACH = 'coach',
-  THERAPIST = 'therapist',
-  HR = 'hr',
-  EMPLOYEE = 'employee',
-  ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager',
-  MANAGER = 'manager'
 }
 
 export interface UserPreferences {
-  theme: ThemeName;
-  font_size: FontSize;
-  notifications_enabled: boolean;
+  theme: string;
+  notifications: boolean;
   language: string;
-  notifications?: {
-    email?: boolean;
-    push?: boolean;
-    sms?: boolean;
-  };
-  accent_color?: string;
-  reminder_time?: string;
+  fontSize: string;
+  autoplayVideos: boolean;
+  showEmotionPrompts: boolean;
+  privacyLevel: string;
+  dataCollection: boolean;
 }
 
 export interface UserPreferencesState {
-  theme: ThemeName;
-  fontSize: FontSize;
-  language: string;
-  notifications: boolean;
-  emailNotifications: boolean;
-  notificationFrequency: NotificationFrequency;
-  notificationType: NotificationType;
-  notificationTone: NotificationTone;
-  accentColor?: string;
-  highContrast?: boolean;
-  dynamicTheme?: boolean;
-  emotionalCamouflage?: boolean;
-  push_notifications?: boolean;
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  notification_frequency?: string;
-  notification_type?: string;
-  notification_tone?: string;
+  preferences: UserPreferences;
+  isLoading: boolean;
+  error: string | null;
+  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<void>;
+  resetPreferences: () => void;
 }
-
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
-export type FontSize = 'small' | 'medium' | 'large';
-
-import { NotificationFrequency, NotificationType, NotificationTone } from './notification';

@@ -1,33 +1,39 @@
 
+// Create a file for journal types
 export interface JournalEntry {
   id: string;
   user_id: string;
-  title: string;
+  date: string | Date;
   content: string;
+  mood: string;
+  mood_score: number;
+  emotions: string[];
   created_at: string | Date;
-  updated_at?: string | Date;
-  labels?: string[];
-  emotion?: string;
-  emotion_score?: number;
-  ai_feedback?: string;
-  date?: string | Date; // Add this property
-  text?: string; // Add this property
+  updated_at: string | Date;
+  tags?: string[];
+  is_private?: boolean;
+  weather?: string;
+  location?: string;
+  title?: string;
+  media_urls?: string[];
+  image_url?: string;
 }
 
-export interface JournalStats {
+export interface JournalStatistics {
   total: number;
   this_week: number;
   this_month: number;
+  average_mood: number;
+  mood_trend: 'up' | 'down' | 'stable';
+  top_emotions: string[];
   streak_days: number;
-  emotions: {
-    name: string;
-    count: number;
-  }[];
 }
 
 export interface JournalFilter {
-  period?: 'day' | 'week' | 'month' | 'year';
-  emotion?: string;
-  label?: string;
+  startDate?: Date;
+  endDate?: Date;
+  mood?: string[];
+  emotions?: string[];
+  tags?: string[];
   search?: string;
 }

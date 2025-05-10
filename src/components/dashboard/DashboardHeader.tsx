@@ -14,7 +14,7 @@ interface DashboardHeaderProps {
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
   user, 
   isAdmin = false,
-  onRefresh = async () => { return null; } 
+  onRefresh = async () => Promise.resolve(null)
 }) => {
   const {
     enabled: autoRefreshEnabled,

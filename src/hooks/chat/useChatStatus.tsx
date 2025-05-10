@@ -22,7 +22,11 @@ export function useChatStatus() {
       const userMessage: ChatMessage = {
         id: Date.now().toString(),
         text,
+        content: text,
         sender: 'user',
+        sender_id: 'user-1',
+        conversation_id: 'default',
+        is_read: true,
         timestamp: new Date()
       };
       addUserMessage(userMessage);
@@ -37,7 +41,11 @@ export function useChatStatus() {
           const botMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             text: response,
+            content: response,
             sender: 'bot',
+            sender_id: 'bot-1',
+            conversation_id: 'default',
+            is_read: true,
             timestamp: new Date()
           };
           addBotMessage(botMessage);
@@ -50,7 +58,11 @@ export function useChatStatus() {
           const errorMessage: ChatMessage = {
             id: (Date.now() + 1).toString(),
             text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
+            content: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
             sender: 'bot',
+            sender_id: 'bot-1',
+            conversation_id: 'default',
+            is_read: true,
             timestamp: new Date()
           };
           addBotMessage(errorMessage);
@@ -84,13 +96,17 @@ export function useChatStatus() {
       setIsLoading(true);
       setError(null);
       
-      processMessage(lastUserMessage.text)
+      processMessage(lastUserMessage.text || lastUserMessage.content)
         .then((response) => {
           // Add bot response
           const botMessage: ChatMessage = {
             id: Date.now().toString(),
             text: response,
+            content: response,
             sender: 'bot',
+            sender_id: 'bot-1',
+            conversation_id: 'default',
+            is_read: true,
             timestamp: new Date()
           };
           addBotMessage(botMessage);
@@ -103,7 +119,11 @@ export function useChatStatus() {
           const errorMessage: ChatMessage = {
             id: Date.now().toString(),
             text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
+            content: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
             sender: 'bot',
+            sender_id: 'bot-1',
+            conversation_id: 'default',
+            is_read: true,
             timestamp: new Date()
           };
           addBotMessage(errorMessage);

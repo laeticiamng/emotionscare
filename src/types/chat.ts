@@ -12,7 +12,7 @@ export interface ChatMessage {
   content: string;
   is_read: boolean;
   sender_type?: string;
-  role?: string; // Add this property
+  role?: string;
 }
 
 export interface ChatConversation {
@@ -35,8 +35,8 @@ export interface ChatResponse {
   emotion?: string;
   confidence?: number;
   recommendations?: string[];
-  text?: string; // Add this property
-  follow_up_questions?: string[]; // Add this property
+  text?: string;
+  follow_up_questions?: string[];
 }
 
 export interface ChatConversationStats {

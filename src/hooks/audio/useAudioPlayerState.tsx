@@ -16,12 +16,21 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loadingTrack, setLoadingTrack] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setErrorState] = useState<string | null>(null);
   
   // Wrapper for setVolume to ensure volume is within bounds
   const setVolume = useCallback((value: number) => {
     const clampedValue = Math.max(0, Math.min(1, value));
     setVolumeState(clampedValue);
+  }, []);
+  
+  // Wrapper for setError to handle Error objects
+  const setError = useCallback((err: string | null) => {
+    if (err instanceof Error) {
+      setErrorState(err.message);
+    } else {
+      setErrorState(err);
+    }
   }, []);
   
   // Toggle repeat mode

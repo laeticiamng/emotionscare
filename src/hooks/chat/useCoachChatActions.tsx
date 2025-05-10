@@ -15,24 +15,32 @@ export const useCoachChatActions = (conversationId: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       text: content,
+      content: content,
       sender: 'user',
+      sender_id: 'user-1',
+      conversation_id: conversationId,
+      is_read: true,
       timestamp: new Date(),
     };
     
     return newMessage;
-  }, []);
+  }, [conversationId]);
   
   // Add AI response
   const addAIResponse = useCallback((content: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       text: content,
+      content: content,
       sender: 'bot',
+      sender_id: 'bot-1',
+      conversation_id: conversationId,
+      is_read: true,
       timestamp: new Date(),
     };
     
     return newMessage;
-  }, []);
+  }, [conversationId]);
 
   // This simulates the AI thinking and responding
   const simulateTyping = useCallback((messagePromise: Promise<string>) => {
@@ -42,7 +50,11 @@ export const useCoachChatActions = (conversationId: string) => {
     const tempMessage: ChatMessage = {
       id: uuidv4(),
       text: '...',
+      content: '...',
       sender: 'bot',
+      sender_id: 'bot-1',
+      conversation_id: conversationId,
+      is_read: true,
       timestamp: new Date(),
     };
     
