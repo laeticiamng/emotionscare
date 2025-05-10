@@ -50,6 +50,7 @@ export interface EmotionResult {
   audio_url?: string;
 }
 
+// Corrected interface to properly extend EmotionResult
 export interface EnhancedEmotionResult extends Omit<EmotionResult, 'recommendations'> {
   analysis: string;
   recommendations: {
@@ -59,8 +60,6 @@ export interface EnhancedEmotionResult extends Omit<EmotionResult, 'recommendati
   };
   insights: string[];
   triggers: string[];
-  description?: string;
-  improvement_tips?: string[];
 }
 
 export interface EmotionalTeamViewProps {

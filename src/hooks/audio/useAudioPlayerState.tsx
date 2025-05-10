@@ -64,7 +64,6 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     setRepeat,
     setShuffle,
     setProgress,
-    setCurrentTime,
     setDuration,
     setLoadingTrack,
     setError,

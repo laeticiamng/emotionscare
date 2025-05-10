@@ -1,163 +1,110 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Mic, StopCircle } from 'lucide-react';
-import { EmotionResult } from '@/types';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Mic, MicOff, Trash } from 'lucide-react';
 
 interface AudioEmotionScannerProps {
-  onScan: (audioUrl: string) => Promise<EmotionResult>;
+  audioUrl: string | null;
+  onAudioChange: (url: string | null) => void;
+  className?: string;
 }
 
-const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({ onScan }) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const [isScanning, setIsScanning] = useState(false);
-  
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<number | null>(null);
-  
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) window.clearInterval(timerRef.current);
-      if (audioUrl) URL.revokeObjectURL(audioUrl);
-    };
-  }, [audioUrl]);
+const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
+  audioUrl,
+  onAudioChange,
+  className
+}) => {
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const startRecording = async () => {
     try {
-      audioChunksRef.current = [];
+      setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const audioChunks: BlobPart[] = [];
       
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
+      recorder.addEventListener('dataavailable', (event) => {
+        audioChunks.push(event.data);
+      });
       
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-      
-      mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+      recorder.addEventListener('stop', () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
         const url = URL.createObjectURL(audioBlob);
-        setAudioUrl(url);
+        onAudioChange(url);
         
-        // Stop all audio tracks
-        stream.getAudioTracks().forEach(track => track.stop());
-      };
+        stream.getTracks().forEach(track => track.stop());
+      });
       
-      mediaRecorder.start();
-      setIsRecording(true);
-      setRecordingDuration(0);
-      
-      // Start timer
-      timerRef.current = window.setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
-      }, 1000);
+      recorder.start();
+      setRecording(true);
+      setMediaRecorder(recorder);
     } catch (error) {
-      console.error("Error accessing microphone:", error);
+      console.error('Error accessing microphone:', error);
+      setError("Impossible d'accéder au microphone. Vérifiez les permissions de votre navigateur.");
     }
   };
   
   const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      
-      if (timerRef.current) {
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      mediaRecorder.stop();
+      setRecording(false);
     }
   };
   
-  const handleScan = async () => {
-    if (!audioUrl) return;
-    
-    try {
-      setIsScanning(true);
-      await onScan(audioUrl);
-    } catch (error) {
-      console.error("Error analyzing audio:", error);
-    } finally {
-      setIsScanning(false);
+  const deleteRecording = () => {
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      onAudioChange(null);
     }
-  };
-  
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const secs = (seconds % 60).toString().padStart(2, '0');
-    return `${mins}:${secs}`;
   };
   
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="space-y-6">
-          <div className="flex flex-col items-center justify-center p-6 bg-muted/30 rounded-lg">
-            {isRecording ? (
-              <>
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center">
-                    <div className="absolute inset-0 bg-red-500/20 rounded-full animate-ping"></div>
-                    <StopCircle className="w-10 h-10 text-red-500" />
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-bold">{formatTime(recordingDuration)}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Enregistrement en cours...</p>
-                </div>
-                <Button 
-                  variant="destructive" 
-                  className="mt-4" 
-                  onClick={stopRecording}
-                >
-                  Arrêter l'enregistrement
-                </Button>
-              </>
-            ) : (
-              <>
-                {audioUrl ? (
-                  <div className="w-full space-y-4">
-                    <audio src={audioUrl} controls className="w-full" />
-                    <div className="flex justify-between">
-                      <Button variant="outline" onClick={() => setAudioUrl(null)}>
-                        Supprimer
-                      </Button>
-                      <Button 
-                        onClick={handleScan}
-                        disabled={isScanning}
-                      >
-                        {isScanning ? 'Analyse en cours...' : 'Analyser'}
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="mb-4">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="w-20 h-20 rounded-full"
-                        onClick={startRecording}
-                      >
-                        <Mic className="w-10 h-10 text-primary" />
-                      </Button>
-                    </div>
-                    <p className="text-center text-sm text-muted-foreground">
-                      Appuyez pour enregistrer votre voix
-                    </p>
-                  </>
-                )}
-              </>
-            )}
-          </div>
+    <div className={`space-y-4 ${className}`}>
+      {error && (
+        <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+          {error}
         </div>
-      </CardContent>
-    </Card>
+      )}
+      
+      <div className="flex justify-center">
+        {!recording ? (
+          <Button 
+            onClick={startRecording} 
+            disabled={!!audioUrl}
+            className="gap-2"
+          >
+            <Mic className="h-4 w-4" />
+            {audioUrl ? "Enregistrement terminé" : "Commencer l'enregistrement"}
+          </Button>
+        ) : (
+          <Button 
+            onClick={stopRecording}
+            variant="destructive"
+            className="gap-2 animate-pulse"
+          >
+            <MicOff className="h-4 w-4" />
+            Arrêter l'enregistrement
+          </Button>
+        )}
+      </div>
+      
+      {audioUrl && (
+        <div className="border rounded-md p-4">
+          <audio src={audioUrl} controls className="w-full mb-2" />
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={deleteRecording}
+            className="w-full gap-2"
+          >
+            <Trash className="h-4 w-4" />
+            Supprimer l'enregistrement
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 

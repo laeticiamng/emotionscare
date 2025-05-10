@@ -1,114 +1,79 @@
 
 import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TextEmotionScanner from './TextEmotionScanner';
 import EmojiEmotionScanner from './EmojiEmotionScanner';
 import AudioEmotionScanner from './AudioEmotionScanner';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card } from '@/components/ui/card';
-import { EmotionResult } from '@/types';
-import { analyzeEmotion } from '@/lib/scanService';
+import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
 
 interface EmotionScannerProps {
-  userId: string;
-  onScanComplete?: (emotion: EmotionResult) => void;
-  onShowResult?: () => void;
+  text: string;
+  emojis: string;
+  audioUrl: string | null;
+  onTextChange: (text: string) => void;
+  onEmojiChange: (emojis: string) => void;
+  onAudioChange: (url: string | null) => void;
+  onAnalyze: () => void;
+  isAnalyzing?: boolean;
+  className?: string;
 }
 
 const EmotionScanner: React.FC<EmotionScannerProps> = ({
-  userId,
-  onScanComplete,
-  onShowResult
+  text,
+  emojis,
+  audioUrl,
+  onTextChange,
+  onEmojiChange,
+  onAudioChange,
+  onAnalyze,
+  isAnalyzing = false,
+  className
 }) => {
   const [activeTab, setActiveTab] = useState<string>('text');
+  const hasContent = !!text || !!emojis || !!audioUrl;
 
-  const handleTextScan = async (text: string) => {
-    try {
-      const result = await analyzeEmotion({
-        user_id: userId, // Utiliser user_id au lieu de userId
-        text
-      });
-      
-      if (onScanComplete) {
-        onScanComplete(result);
-      }
-      
-      if (onShowResult) {
-        onShowResult();
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error analyzing text emotion:', error);
-      throw error;
-    }
-  };
-
-  const handleEmojiScan = async (emojis: string) => {
-    try {
-      const result = await analyzeEmotion({
-        user_id: userId, // Utiliser user_id au lieu de userId
-        emojis
-      });
-      
-      if (onScanComplete) {
-        onScanComplete(result);
-      }
-      
-      if (onShowResult) {
-        onShowResult();
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error analyzing emoji emotion:', error);
-      throw error;
-    }
-  };
-
-  const handleAudioScan = async (audioUrl: string) => {
-    try {
-      const result = await analyzeEmotion({
-        user_id: userId, // Utiliser user_id au lieu de userId
-        audio_url: audioUrl
-      });
-      
-      if (onScanComplete) {
-        onScanComplete(result);
-      }
-      
-      if (onShowResult) {
-        onShowResult();
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error analyzing audio emotion:', error);
-      throw error;
-    }
-  };
-  
   return (
-    <Card className="w-full">
+    <div className={`space-y-6 ${className}`}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-6">
+        <TabsList className="w-full grid grid-cols-3">
           <TabsTrigger value="text">Texte</TabsTrigger>
-          <TabsTrigger value="emoji">Émoji</TabsTrigger>
+          <TabsTrigger value="emoji">Emojis</TabsTrigger>
           <TabsTrigger value="audio">Audio</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="text">
-          <TextEmotionScanner onScan={handleTextScan} />
+        <TabsContent value="text" className="mt-4">
+          <TextEmotionScanner
+            text={text}
+            onTextChange={onTextChange}
+          />
         </TabsContent>
         
-        <TabsContent value="emoji">
-          <EmojiEmotionScanner onScan={handleEmojiScan} />
+        <TabsContent value="emoji" className="mt-4">
+          <EmojiEmotionScanner
+            selectedEmojis={emojis}
+            onEmojiSelect={(emoji) => onEmojiChange(emojis + emoji)}
+            onClearEmojis={() => onEmojiChange('')}
+          />
         </TabsContent>
         
-        <TabsContent value="audio">
-          <AudioEmotionScanner onScan={handleAudioScan} />
+        <TabsContent value="audio" className="mt-4">
+          <AudioEmotionScanner
+            audioUrl={audioUrl}
+            onAudioChange={onAudioChange}
+          />
         </TabsContent>
       </Tabs>
-    </Card>
+      
+      <Button 
+        onClick={onAnalyze}
+        disabled={isAnalyzing || !hasContent}
+        className="w-full"
+      >
+        <Sparkles className="mr-2 h-4 w-4" />
+        {isAnalyzing ? "Analyse en cours..." : "Analyser mon état émotionnel"}
+      </Button>
+    </div>
   );
 };
 

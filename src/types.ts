@@ -23,12 +23,6 @@ export * from './types/notification';
 export * from './types/preferences';
 export * from './types/report';
 
-// Basic shared types
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
-export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
-
 // Re-export additional specific types
 export { UserRole } from './types/user';
 export type { EmotionalTeamViewProps, EnhancedEmotionResult } from './types/emotion';
