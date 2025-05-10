@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -48,16 +49,15 @@ const AdminLoginPage = () => {
     },
   });
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     setError(null);
 
     try {
       // Changement de l'appel à login pour n'utiliser qu'un seul argument
       const success = await login({
-        email,
-        password,
+        email: data.email,
+        password: data.password,
         isAdmin: true
       });
 

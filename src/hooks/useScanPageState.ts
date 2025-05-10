@@ -17,19 +17,17 @@ export function useScanPageState(userId?: string) {
 
   useEffect(() => {
     const loadEmotionHistory = async () => {
-      if (userId) {
-        try {
-          setLoading(true);
-          console.log("Fetching emotion history for user:", userId);
-          const history = await getEmotionHistory();
-          setEmotions(history);
-          console.log("Emotion history loaded:", history.length, "entries");
-        } catch (error) {
-          console.error("Error loading emotion history:", error);
-        } finally {
-          // Add a small delay to ensure loading state is visible
-          setTimeout(() => setLoading(false), 600); 
-        }
+      try {
+        setLoading(true);
+        console.log("Fetching emotion history for user:", userId);
+        const history = await getEmotionHistory(userId);
+        setEmotions(history);
+        console.log("Emotion history loaded:", history.length, "entries");
+      } catch (error) {
+        console.error("Error loading emotion history:", error);
+      } finally {
+        // Add a small delay to ensure loading state is visible
+        setTimeout(() => setLoading(false), 600); 
       }
     };
 
@@ -39,13 +37,13 @@ export function useScanPageState(userId?: string) {
   const handleScanSaved = () => {
     setShowScanForm(false);
     // Refresh data after saving
-    getEmotionHistory().then(setEmotions);
+    getEmotionHistory(userId).then(setEmotions);
   };
 
   const refreshEmotionHistory = async (): Promise<void> => {
     setLoading(true);
     try {
-      const data = await getEmotionHistory();
+      const data = await getEmotionHistory(userId);
       setEmotions(data);
     } catch (error) {
       console.error("Error refreshing emotion history:", error);

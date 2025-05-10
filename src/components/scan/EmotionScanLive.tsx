@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
 import EmotionScanner from './EmotionScanner';
 import { analyzeText, analyzeEmojis, analyzeAudio, saveEmotion } from '@/lib/scanService';
 import { Emotion } from '@/types';
@@ -31,35 +30,63 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({
     setIsAnalyzing(true);
     
     try {
-      let emotion: Emotion;
+      let emotion: Emotion | undefined;
       
       if (text) {
         emotion = await analyzeText(text);
+        emotion.user_id = userId;
       } else if (emojis) {
-        emotion = await analyzeEmojis(emojis);
-      } else {
-        emotion = await analyzeAudio(audioUrl!);
+        const result = await analyzeEmojis(emojis, userId);
+        // Convertir EmotionResult en Emotion
+        emotion = {
+          id: result.id || crypto.randomUUID(),
+          user_id: userId,
+          date: result.date?.toString() || new Date().toISOString(),
+          emotion: result.emotion,
+          confidence: result.confidence,
+          score: result.score,
+          text: result.text,
+          name: result.emotion,
+          intensity: 5,
+          category: 'Basic'
+        };
+      } else if (audioUrl) {
+        const result = await analyzeAudio(audioUrl, userId);
+        // Convertir EmotionResult en Emotion
+        emotion = {
+          id: result.id || crypto.randomUUID(),
+          user_id: userId,
+          date: result.date?.toString() || new Date().toISOString(),
+          emotion: result.emotion,
+          confidence: result.confidence,
+          score: result.score,
+          text: result.text,
+          audio_url: audioUrl,
+          name: result.emotion,
+          intensity: 5,
+          category: 'Basic'
+        };
       }
       
-      // Ajouter des informations supplémentaires à l'émotion
-      const enhancedEmotion: Emotion = {
-        ...emotion,
-        user_id: userId,
-        date: new Date().toISOString(),
-        score: emotion.score || 0,
-      };
-      
-      // Sauvegarder l'émotion
-      await saveEmotion(enhancedEmotion);
-      
-      // Réinitialiser les champs
-      setText('');
-      setEmojis('');
-      setAudioUrl(null);
-      
-      // Notifier les composants parents
-      onResultSaved();
-      onScanComplete();
+      if (emotion) {
+        // Ajouter des informations supplémentaires à l'émotion
+        const enhancedEmotion: Emotion = {
+          ...emotion,
+          is_confidential: isConfidential,
+        };
+        
+        // Sauvegarder l'émotion
+        await saveEmotion(enhancedEmotion);
+        
+        // Réinitialiser les champs
+        setText('');
+        setEmojis('');
+        setAudioUrl(null);
+        
+        // Notifier les composants parents
+        await onResultSaved();
+        onScanComplete();
+      }
       
     } catch (error) {
       console.error('Error analyzing emotion:', error);

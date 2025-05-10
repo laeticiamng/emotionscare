@@ -1,97 +1,159 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User } from '@/types';
 
-interface AuthContextType {
+export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (credentials: any) => Promise<boolean>;
-  logout: () => void;
-  signOut: () => void; // Added for compatibility
-  updateUser: (user: User) => Promise<boolean>;
-}
-
-const defaultUser: User = {
-  id: '1',
-  name: 'Demo User',
-  email: 'demo@example.com',
-  role: 'user',
-  preferences: {
-    theme: 'light',
-    fontSize: 'medium',
-    font: 'inter',
-  }
+  isInitializing: boolean;
+  login: (credentials: { email: string; password: string; isAdmin?: boolean }) => Promise<boolean>;
+  register: (userData: { email: string; password: string; name: string }) => Promise<boolean>;
+  logout: () => Promise<void>;
+  updateUser: (user: User) => Promise<User>;
+  signOut: () => Promise<void>; // Ajouté pour compatibilité
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  isLoading: true,
+  isInitializing: true,
   login: async () => false,
-  logout: () => {},
-  signOut: () => {}, // Added for compatibility
-  updateUser: async () => false
+  register: async () => false,
+  logout: async () => {},
+  updateUser: async (user) => user,
+  signOut: async () => {}, // Ajouté pour compatibilité
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(defaultUser); // Pour la démo, on utilise defaultUser
-  const [isLoading, setIsLoading] = useState(false);
-
-  const login = async (credentials: any): Promise<boolean> => {
-    setIsLoading(true);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  
+  useEffect(() => {
+    // Simuler la vérification de l'authentification au chargement
+    const checkAuth = async () => {
+      try {
+        // Vérifier si l'utilisateur est déjà connecté
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+  
+  const login = async ({ email, password, isAdmin = false }: { email: string; password: string; isAdmin?: boolean }) => {
+    // Simulation d'un appel API pour la connexion
     try {
-      // Simulation d'authentification
-      setUser(defaultUser);
-      return true;
-    } catch (error) {
-      console.error('Error logging in:', error);
+      // Simulation delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Mock de la vérification d'authentification
+      if (email && password.length >= 6) {
+        // Pour la démo, on crée un utilisateur factice
+        const mockUser: User = {
+          id: 'user-123',
+          name: 'John Doe',
+          email: email,
+          role: isAdmin ? 'admin' : 'user',
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          avatar_url: 'https://i.pravatar.cc/150?u=user123'
+        };
+        
+        setUser(mockUser);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        
+        return true;
+      }
+      
       return false;
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
   };
-
-  const logout = (): void => {
+  
+  const register = async ({ email, password, name }: { email: string; password: string; name: string }) => {
+    // Simulation d'un appel API pour l'inscription
+    try {
+      // Simulation delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (email && password.length >= 6) {
+        // Pour la démo, on crée un utilisateur factice
+        const mockUser: User = {
+          id: `user-${Date.now()}`,
+          name: name,
+          email: email,
+          role: 'user',
+          createdAt: new Date().toISOString(),
+          isActive: true,
+          avatar_url: `https://i.pravatar.cc/150?u=${Date.now()}`
+        };
+        
+        setUser(mockUser);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Register error:', error);
+      return false;
+    }
+  };
+  
+  const logout = async () => {
+    // Simulation d'un appel API pour la déconnexion
+    localStorage.removeItem('user');
     setUser(null);
   };
-
-  // Adding signOut as an alias for logout for compatibility
-  const signOut = (): void => {
-    logout();
-  };
-
-  const updateUser = async (updatedUser: User): Promise<boolean> => {
+  
+  // Alias pour compatibility
+  const signOut = logout;
+  
+  const updateUser = async (updatedUser: User): Promise<User> => {
     try {
-      setUser(updatedUser);
-      return true;
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const newUser = { ...user, ...updatedUser };
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+      
+      return newUser;
     } catch (error) {
-      console.error('Error updating user:', error);
-      return false;
+      console.error('Update user error:', error);
+      throw new Error('Failed to update user');
     }
   };
-
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    logout,
-    signOut, // Added for compatibility
-    updateUser
-  };
-
+  
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated: !!user, 
+        isInitializing,
+        login,
+        register,
+        logout,
+        updateUser,
+        signOut
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export default AuthProvider;
+export default AuthContext;

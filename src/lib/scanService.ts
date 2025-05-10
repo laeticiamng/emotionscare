@@ -12,7 +12,7 @@ export const createEmotionEntry = async (data: Partial<Emotion>): Promise<Emotio
     confidence: data.confidence || 0.8,
     score: data.score || 50,
     text: data.text || '',
-    name: 'Emotion Name', // Added missing properties
+    name: 'Emotion Name',
     intensity: 5,
     category: 'Basic',
     is_confidential: data.is_confidential
@@ -30,7 +30,7 @@ export const fetchLatestEmotion = async (userId: string): Promise<Emotion> => {
     confidence: 0.9,
     score: 85,
     text: '',
-    name: 'Happy', // Added missing properties
+    name: 'Happy',
     intensity: 7,
     category: 'Positive'
   };
@@ -48,7 +48,7 @@ export const fetchEmotionHistory = async (userId: string): Promise<Emotion[]> =>
       confidence: 0.9,
       score: 85,
       text: 'J\'ai passé une excellente journée!',
-      name: 'Happy', // Added missing properties
+      name: 'Happy',
       intensity: 7,
       category: 'Positive'
     },
@@ -60,7 +60,7 @@ export const fetchEmotionHistory = async (userId: string): Promise<Emotion[]> =>
       confidence: 0.8,
       score: 70,
       text: 'Journée tranquille et productive.',
-      name: 'Calm', // Added missing properties
+      name: 'Calm',
       intensity: 5,
       category: 'Positive'
     },
@@ -72,14 +72,14 @@ export const fetchEmotionHistory = async (userId: string): Promise<Emotion[]> =>
       confidence: 0.75,
       score: 30,
       text: 'Beaucoup de pression au travail aujourd\'hui.',
-      name: 'Stressed', // Added missing properties
+      name: 'Stressed',
       intensity: 6,
       category: 'Negative'
     }
   ];
 };
 
-// Ajout de la méthode analyzeEmotion manquante
+// Ajoutons les autres fonctions manquantes
 export const analyzeEmotion = async (data: {
   user_id: string;
   emojis?: string;
@@ -148,7 +148,7 @@ export const analyzeEmotion = async (data: {
   };
 };
 
-// Ajout de la méthode analyzeAudioStream manquante
+// Fonction analyzeAudioStream manquante
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
   console.log('Analyzing audio stream with size:', audioBlob.size);
   
@@ -173,8 +173,86 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
   };
 };
 
+// Ajouter fonction analyzeText manquante
+export const analyzeText = async (text: string): Promise<Emotion> => {
+  console.log('Analyzing text:', text);
+  
+  // Simulate API call with a delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Mock result based on text
+  let emotion = 'neutral';
+  let score = 50;
+  
+  if (text.toLowerCase().includes('heureux') || text.toLowerCase().includes('content')) {
+    emotion = 'joyeux';
+    score = 80;
+  } else if (text.toLowerCase().includes('triste') || text.toLowerCase().includes('déprimé')) {
+    emotion = 'triste';
+    score = 25;
+  }
+  
+  return {
+    id: crypto.randomUUID(),
+    user_id: '',
+    date: new Date().toISOString(),
+    emotion,
+    confidence: 0.8,
+    score,
+    text,
+    name: emotion,
+    intensity: 5,
+    category: emotion === 'joyeux' ? 'Positive' : emotion === 'triste' ? 'Negative' : 'Neutral'
+  };
+};
+
+// Ajouter fonction saveEmotion manquante
+export const saveEmotion = async (emotion: Emotion): Promise<boolean> => {
+  console.log('Saving emotion:', emotion);
+  
+  // Simulate API call with a delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  return true;
+};
+
+// Ajouter fonction getEmotions manquante
+export const getEmotions = async (userId: string): Promise<Emotion[]> => {
+  console.log('Getting emotions for user:', userId);
+  
+  // Simulate API call with a delay
+  await new Promise(resolve => setTimeout(resolve, 700));
+  
+  return [
+    {
+      id: crypto.randomUUID(),
+      user_id: userId,
+      date: new Date().toISOString(),
+      emotion: 'happy',
+      confidence: 0.9,
+      score: 85,
+      text: 'J\'ai passé une excellente journée!',
+      name: 'Happy',
+      intensity: 7,
+      category: 'Positive'
+    },
+    {
+      id: crypto.randomUUID(),
+      user_id: userId,
+      date: new Date(Date.now() - 86400000).toISOString(),
+      emotion: 'calm',
+      confidence: 0.8,
+      score: 70,
+      text: 'Journée tranquille et productive.',
+      name: 'Calm',
+      intensity: 5,
+      category: 'Positive'
+    }
+  ];
+};
+
 // Ajout de la méthode analyzeEmojis pour compatibilité
-export const analyzeEmojis = async (emojis: string, userId: string): Promise<EmotionResult> => {
+export const analyzeEmojis = async (emojis: string, userId?: string): Promise<EmotionResult> => {
   console.log('Analyzing emojis:', emojis);
   
   // Simulate API call with a delay
@@ -202,13 +280,13 @@ export const analyzeEmojis = async (emojis: string, userId: string): Promise<Emo
       'Continuez à exprimer vos émotions',
       'Réfléchissez à ce qui vous fait ressentir cette émotion'
     ],
-    user_id: userId,
+    user_id: userId || '',
     date: new Date().toISOString()
   };
 };
 
 // Ajout de la méthode analyzeAudio pour compatibilité
-export const analyzeAudio = async (audioUrl: string, userId: string): Promise<EmotionResult> => {
+export const analyzeAudio = async (audioUrl: string, userId?: string): Promise<EmotionResult> => {
   console.log('Analyzing audio:', audioUrl);
   
   // Simulate API call with a delay
@@ -216,7 +294,7 @@ export const analyzeAudio = async (audioUrl: string, userId: string): Promise<Em
   
   return {
     id: crypto.randomUUID(),
-    user_id: userId,
+    user_id: userId || '',
     date: new Date().toISOString(),
     emotion: 'calm',
     score: 70,
@@ -224,8 +302,10 @@ export const analyzeAudio = async (audioUrl: string, userId: string): Promise<Em
     audio_url: audioUrl,
     feedback: 'Votre voix indique un état de calme.',
     name: 'Calm',
-    intensity: 5,
-    category: 'Positive'
+    recommendations: [
+      'Continuez dans cette voie',
+      'Partagez votre calme avec les autres'
+    ]
   };
 };
 
@@ -252,4 +332,51 @@ export const getEmotionStats = async (userId: string, period: 'day' | 'week' | '
     },
     trendDirection: 'improving'
   };
+};
+
+// Correction de getEmotionHistory pour compatibilité
+export const getEmotionHistory = async (userId?: string): Promise<Emotion[]> => {
+  console.log('Getting emotion history for user:', userId);
+  
+  // Simulate API call with a delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  return [
+    {
+      id: crypto.randomUUID(),
+      user_id: userId || '',
+      date: new Date().toISOString(),
+      emotion: 'happy',
+      confidence: 0.9,
+      score: 85,
+      text: 'J\'ai passé une excellente journée!',
+      name: 'Happy',
+      intensity: 7,
+      category: 'Positive'
+    },
+    {
+      id: crypto.randomUUID(),
+      user_id: userId || '',
+      date: new Date(Date.now() - 86400000).toISOString(),
+      emotion: 'calm',
+      confidence: 0.8,
+      score: 70,
+      text: 'Journée tranquille et productive.',
+      name: 'Calm',
+      intensity: 5,
+      category: 'Positive'
+    },
+    {
+      id: crypto.randomUUID(),
+      user_id: userId || '',
+      date: new Date(Date.now() - 172800000).toISOString(),
+      emotion: 'stressed',
+      confidence: 0.75,
+      score: 30,
+      text: 'Beaucoup de pression au travail aujourd\'hui.',
+      name: 'Stressed',
+      intensity: 6,
+      category: 'Negative'
+    }
+  ];
 };

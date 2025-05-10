@@ -32,3 +32,20 @@ export interface UserPreferences {
   dataCollection?: boolean;
   notificationsEnabled?: boolean;
 }
+
+export interface UserPreferencesState {
+  preferences: UserPreferences;
+  isLoading?: boolean;
+  error?: string | null;
+  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<boolean>;
+  resetPreferences: () => void;
+  theme?: string;
+  fontSize?: string;
+  notifications_enabled?: boolean;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  emotionalCamouflage?: boolean;
+}

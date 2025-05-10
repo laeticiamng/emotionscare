@@ -1,7 +1,7 @@
 
-
 // Export all types from various modules using "export type"
-export type { UserRole, User, UserPreferences, UserPreferencesState } from './user';
+export type { UserRole, User, UserPreferencesState } from './user';
+export type { UserPreferences } from './preferences';
 export type { Emotion, EmotionResult, EnhancedEmotionResult, EmotionalTeamViewProps } from './emotion';
 export type { ChatMessage, ChatConversation } from './chat';
 export type { JournalEntry } from './journal';
@@ -18,4 +18,3 @@ export type { Report } from './report';
 
 // Export explicitly for ThemeName, FontSize, FontFamily and DynamicThemeMode
 export type { ThemeName, FontSize, FontFamily, DynamicThemeMode } from './preferences';
-

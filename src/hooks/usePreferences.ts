@@ -1,12 +1,11 @@
 
 import { useState, useCallback } from 'react';
-import { UserPreferences, UserPreferencesState } from '@/types';
+import { UserPreferences, UserPreferencesState, FontSize, ThemeName } from '@/types';
 
 export const usePreferences = (): UserPreferencesState => {
   const [preferences, setPreferences] = useState<UserPreferences>({
     theme: 'light',
     fontSize: 'medium',
-    language: 'fr',
     notifications: true,
     autoplayVideos: true,
     showEmotionPrompts: true,
@@ -16,6 +15,9 @@ export const usePreferences = (): UserPreferencesState => {
     notificationsEnabled: true,
     email_notifications: true,
     push_notifications: true,
+    emotionalCamouflage: false,
+    aiSuggestions: false,
+    fullAnonymity: false
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +43,6 @@ export const usePreferences = (): UserPreferencesState => {
     setPreferences({
       theme: 'light',
       fontSize: 'medium',
-      language: 'fr',
       notifications: true,
       autoplayVideos: true,
       showEmotionPrompts: true,
@@ -50,6 +51,9 @@ export const usePreferences = (): UserPreferencesState => {
       notifications_enabled: true,
       email_notifications: true,
       push_notifications: true,
+      emotionalCamouflage: false,
+      aiSuggestions: false,
+      fullAnonymity: false
     });
     setError(null);
   }, []);
@@ -62,7 +66,6 @@ export const usePreferences = (): UserPreferencesState => {
     resetPreferences,
     theme: preferences.theme,
     fontSize: preferences.fontSize,
-    language: preferences.language,
     notifications_enabled: preferences.notifications_enabled,
     notification_frequency: preferences.notification_frequency,
     notification_type: preferences.notification_type,

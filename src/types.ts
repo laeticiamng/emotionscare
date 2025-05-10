@@ -33,7 +33,8 @@ export type { VRSession, VRSessionTemplate, VRSessionWithMusicProps } from './ty
 export type { InvitationStats, InvitationFormData } from './types/invitation';
 export type { Badge } from './types/badge';
 export type { MusicTrack, MusicPlaylist, MusicRecommendationCardProps, MusicDrawerProps, MusicContextType } from './types/music';
-export type { User, UserPreferences, UserPreferencesState } from './types/user';
+export type { User, UserPreferencesState } from './types/user';
+export type { UserPreferences } from './types/preferences';
 export type { NotificationFrequency, NotificationType, NotificationTone } from './types/notification';
 export type { ProgressBarProps } from './types/progress-bar';
 export type { TrackInfoProps, VolumeControlProps } from './types/track-info';

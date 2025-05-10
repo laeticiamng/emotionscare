@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getEmotions } from '@/lib/scanService';
-import { Emotion, User } from '@/types';
+import type { Emotion, User } from '@/types';
 
 export function useScanPage() {
   const { user } = useAuth();
