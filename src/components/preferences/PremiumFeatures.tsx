@@ -19,7 +19,6 @@ const PremiumFeatures: React.FC<PremiumFeaturesProps> = ({
   const handleToggleEmotionalCamouflage = (checked: boolean) => {
     onUpdate('emotionalCamouflage', checked);
   };
-
   
   return (
     <Card>
@@ -42,8 +41,6 @@ const PremiumFeatures: React.FC<PremiumFeaturesProps> = ({
             onCheckedChange={handleToggleEmotionalCamouflage}
           />
         </div>
-
-        
       </CardContent>
     </Card>
   );

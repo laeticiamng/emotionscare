@@ -35,3 +35,22 @@ export interface MusicDrawerProps {
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
 }
+
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  currentPlaylist: MusicPlaylist | null;
+  isPlaying: boolean;
+  volume: number;
+  progress: number;
+  duration: number;
+  loadPlaylistForEmotion: (emotion: string) => Promise<void>;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  openDrawer: boolean;
+  setOpenDrawer: (open: boolean) => void;
+  loadingTrack: boolean;
+}
