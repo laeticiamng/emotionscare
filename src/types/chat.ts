@@ -1,6 +1,5 @@
 
-import { ChatMessage, ChatConversation } from './index';
-
+// Re-exporting from index to fix circular dependencies
 export interface ChatResponse {
   text: string;
   metadata?: Record<string, any>;

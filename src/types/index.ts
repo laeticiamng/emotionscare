@@ -40,7 +40,7 @@ export interface UserPreferences {
   
   // Notifications
   notifications_enabled: boolean;
-  notifications?: {
+  notificationTypes?: {
     email: boolean;
     push: boolean;
     sms: boolean;

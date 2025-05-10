@@ -1,3 +1,5 @@
+@import './components.css';
+@import './premium-admin.css';
 
 @tailwind base;
 @tailwind components;
@@ -133,22 +135,22 @@
   }
   
   h1 {
-    @apply text-h1;
+    @apply text-4xl;
     letter-spacing: -0.03em;
   }
   
   h2 {
-    @apply text-h2;
+    @apply text-3xl;
     letter-spacing: -0.02em;
   }
   
   h3 {
-    @apply text-h3;
+    @apply text-2xl;
     letter-spacing: -0.015em;
   }
   
   h4 {
-    @apply text-h4;
+    @apply text-xl;
     letter-spacing: -0.01em;
   }
   

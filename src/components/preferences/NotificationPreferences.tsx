@@ -1,210 +1,196 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { motion } from 'framer-motion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BellOff, Bell, Clock } from 'lucide-react';
+import { NotificationTone } from '@/types';
 
 const NotificationPreferences = () => {
-  const { toast } = useToast();
   const { preferences, updatePreferences } = useUserPreferences();
-  
-  // Handle saving notification settings
-  const saveSettings = () => {
-    toast({
-      title: "Paramètres des notifications mis à jour",
-      description: "Vos préférences de notification ont été enregistrées avec succès."
+
+  const handleNotificationsToggle = (enabled: boolean) => {
+    updatePreferences({ notifications_enabled: enabled });
+  };
+
+  const handleTimeChange = (value: string) => {
+    updatePreferences({ reminder_time: value });
+  };
+
+  const handleFrequencyChange = (value: string) => {
+    updatePreferences({ 
+      notificationFrequency: value as any
+    });
+  };
+
+  const handleToneChange = (value: NotificationTone) => {
+    updatePreferences({ 
+      notificationTone: value
+    });
+  };
+
+  const handleEmailToggle = (checked: boolean) => {
+    updatePreferences({
+      notificationTypes: {
+        ...preferences.notificationTypes,
+        email: checked
+      }
+    });
+  };
+
+  const handlePushToggle = (checked: boolean) => {
+    updatePreferences({
+      notificationTypes: {
+        ...preferences.notificationTypes,
+        push: checked
+      }
+    });
+  };
+
+  const handleSmsToggle = (checked: boolean) => {
+    updatePreferences({
+      notificationTypes: {
+        ...preferences.notificationTypes,
+        sms: checked
+      }
     });
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="space-y-3"
-      >
-        <h3 className="text-lg font-medium">Canaux de notification</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Email</p>
-              <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
-            </div>
-            <Switch
-              checked={preferences.notifications?.email || false}
-              onCheckedChange={(checked) => updatePreferences({ 
-                notifications: { ...preferences.notifications, email: checked } 
-              })}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Notifications push</p>
-              <p className="text-sm text-muted-foreground">Recevoir des notifications dans le navigateur</p>
-            </div>
-            <Switch
-              checked={preferences.notifications?.push || false}
-              onCheckedChange={(checked) => updatePreferences({ 
-                notifications: { ...preferences.notifications, push: checked } 
-              })}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">SMS</p>
-              <p className="text-sm text-muted-foreground">Recevoir des notifications importantes par SMS</p>
-            </div>
-            <Switch
-              checked={preferences.notifications?.sms || false}
-              onCheckedChange={(checked) => updatePreferences({ 
-                notifications: { ...preferences.notifications, sms: checked } 
-              })}
-            />
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="space-y-3 pt-4 border-t"
-      >
-        <h3 className="text-lg font-medium">Style de communication</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationTone === 'minimalist' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationTone: 'minimalist' })}
-          >
-            <div className="font-medium mb-1">Minimaliste</div>
-            <p className="text-sm text-muted-foreground">Juste une icône et une indication succincte</p>
-          </div>
-          
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationTone === 'poetic' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationTone: 'poetic' })}
-          >
-            <div className="font-medium mb-1">Poétique</div>
-            <p className="text-sm text-muted-foreground">"Un moment de silence intérieur t'attend ici."</p>
-          </div>
-          
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationTone === 'directive' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationTone: 'directive' })}
-          >
-            <div className="font-medium mb-1">Directif doux</div>
-            <p className="text-sm text-muted-foreground">"C'est l'heure de ta pause."</p>
-          </div>
-          
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationTone === 'silent' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationTone: 'silent' })}
-          >
-            <div className="font-medium mb-1">Silence émotionnel</div>
-            <p className="text-sm text-muted-foreground">Mode "ne pas déranger" émotionnel</p>
-          </div>
-        </div>
-      </motion.div>
-      
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="space-y-3 pt-4 border-t"
-      >
-        <h3 className="text-lg font-medium">Fréquence</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationFrequency === 'daily' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationFrequency: 'daily' })}
-          >
-            <div className="font-medium mb-1">Quotidienne</div>
-            <p className="text-sm text-muted-foreground">Chaque jour à l'heure que vous préférez</p>
-          </div>
-          
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationFrequency === 'weekly' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationFrequency: 'weekly' })}
-          >
-            <div className="font-medium mb-1">Hebdomadaire</div>
-            <p className="text-sm text-muted-foreground">En début de semaine, avec un résumé</p>
-          </div>
-          
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationFrequency === 'flexible' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationFrequency: 'flexible' })}
-          >
-            <div className="font-medium mb-1">Adaptative</div>
-            <p className="text-sm text-muted-foreground">En fonction de vos habitudes et besoins</p>
-          </div>
-          
-          <div 
-            className={`rounded-lg p-4 cursor-pointer border-2 transition-all ${
-              preferences.notificationFrequency === 'none' ? 'border-primary bg-primary/5' : 'border-border'
-            }`}
-            onClick={() => updatePreferences({ notificationFrequency: 'none' })}
-          >
-            <div className="font-medium mb-1">Aucune</div>
-            <p className="text-sm text-muted-foreground">Désactiver tous les rappels récurrents</p>
-          </div>
-        </div>
-      </motion.div>
-      
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-3 pt-4 border-t"
-      >
-        <h3 className="text-lg font-medium">Timing</h3>
-        <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium">Heure de rappel préférée</label>
-          <Input
-            type="time"
-            value={preferences.reminder_time || "09:00"}
-            onChange={(e) => updatePreferences({ reminder_time: e.target.value })}
-          />
-          <p className="text-xs text-muted-foreground">
-            Cette heure sera utilisée pour vos rappels quotidiens et notifications importantes
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label className="text-base">Notifications</Label>
+          <p className="text-sm text-muted-foreground">
+            Configurez comment et quand vous souhaitez recevoir des notifications.
           </p>
         </div>
-      </motion.div>
-      
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        <Button onClick={saveSettings} className="w-full">
-          Enregistrer les préférences
-        </Button>
-      </motion.div>
-    </motion.div>
+        <Switch 
+          checked={preferences.notifications_enabled}
+          onCheckedChange={handleNotificationsToggle}
+        />
+      </div>
+
+      {preferences.notifications_enabled && (
+        <>
+          <Separator />
+          
+          <div className="space-y-4">
+            <Label className="text-base">Types de notifications</Label>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-notifications" className="flex items-center gap-2">
+                  Email
+                </Label>
+                <Switch 
+                  id="email-notifications" 
+                  checked={preferences.notificationTypes?.email}
+                  onCheckedChange={handleEmailToggle}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="push-notifications" className="flex items-center gap-2">
+                  Notifications push
+                </Label>
+                <Switch 
+                  id="push-notifications" 
+                  checked={preferences.notificationTypes?.push}
+                  onCheckedChange={handlePushToggle}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="sms-notifications" className="flex items-center gap-2">
+                  SMS
+                </Label>
+                <Switch 
+                  id="sms-notifications" 
+                  checked={preferences.notificationTypes?.sms}
+                  onCheckedChange={handleSmsToggle}
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+          
+          <div className="space-y-4">
+            <Label className="text-base">Style de notification</Label>
+            <RadioGroup 
+              value={preferences.notificationTone || 'minimalist'}
+              onValueChange={(value) => handleToneChange(value as NotificationTone)}
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="minimalist" id="tone-minimalist" />
+                <Label htmlFor="tone-minimalist">Minimaliste</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="poetic" id="tone-poetic" />
+                <Label htmlFor="tone-poetic">Poétique</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="directive" id="tone-directive" />
+                <Label htmlFor="tone-directive">Directif</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="silent" id="tone-silent" />
+                <Label htmlFor="tone-silent">Silencieux (visuel uniquement)</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <Separator />
+          
+          <div className="space-y-4">
+            <Label className="text-base">Fréquence</Label>
+            <Select 
+              value={preferences.notificationFrequency || 'daily'}
+              onValueChange={handleFrequencyChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez une fréquence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Quotidienne</SelectItem>
+                <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                <SelectItem value="flexible">Flexible (selon votre activité)</SelectItem>
+                <SelectItem value="none">Aucune</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Separator />
+          
+          <div className="space-y-4">
+            <Label htmlFor="reminder-time" className="text-base flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Heure de rappel préférée
+            </Label>
+            <Select 
+              value={preferences.reminder_time || '09:00'}
+              onValueChange={handleTimeChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez une heure" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="08:00">08:00 (Matin)</SelectItem>
+                <SelectItem value="09:00">09:00 (Matin)</SelectItem>
+                <SelectItem value="12:00">12:00 (Midi)</SelectItem>
+                <SelectItem value="15:00">15:00 (Après-midi)</SelectItem>
+                <SelectItem value="18:00">18:00 (Soir)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 
