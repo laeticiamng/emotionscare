@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import ProtectedLayout from './ProtectedLayout';
 import { SegmentProvider } from '@/contexts/SegmentContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import SessionTimeoutAlert from './SessionTimeoutAlert';
 
 interface ProtectedLayoutWrapperProps {
   children: ReactNode;
@@ -16,6 +17,7 @@ const ProtectedLayoutWrapper = ({ children }: ProtectedLayoutWrapperProps) => {
     <QueryClientProvider client={queryClient}>
       <SegmentProvider>
         <div className="protected-layout-container">
+          <SessionTimeoutAlert />
           {children}
         </div>
       </SegmentProvider>

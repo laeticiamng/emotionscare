@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Bell, Shield, User, Palette, Smartphone } from 'lucide-react';
+import { Settings, Bell, Shield, User, Palette, Smartphone, Lock } from 'lucide-react';
 import NotificationPreferences from './NotificationPreferences';
 import PersonalProfile from './PersonalProfile';
 import DisplayPreferences from './DisplayPreferences';
 import MobilePreferences from './MobilePreferences';
 import PrivacySettings from './PrivacySettings';
+import SecuritySettings from './SecuritySettings';
 
 const UserSettings: React.FC = () => {
   return (
@@ -26,7 +27,7 @@ const UserSettings: React.FC = () => {
       </div>
       
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid grid-cols-5 mb-8">
+        <TabsList className="grid grid-cols-6 mb-8">
           <TabsTrigger value="profile" className="flex flex-col items-center gap-1 py-3">
             <User className="h-5 w-5" />
             <span className="text-xs">Profil</span>
@@ -42,6 +43,10 @@ const UserSettings: React.FC = () => {
           <TabsTrigger value="mobile" className="flex flex-col items-center gap-1 py-3">
             <Smartphone className="h-5 w-5" />
             <span className="text-xs">Mobile</span>
+          </TabsTrigger>
+          <TabsTrigger value="security" className="flex flex-col items-center gap-1 py-3">
+            <Lock className="h-5 w-5" />
+            <span className="text-xs">Sécurité</span>
           </TabsTrigger>
           <TabsTrigger value="privacy" className="flex flex-col items-center gap-1 py-3">
             <Shield className="h-5 w-5" />
@@ -63,6 +68,10 @@ const UserSettings: React.FC = () => {
         
         <TabsContent value="mobile">
           <MobilePreferences />
+        </TabsContent>
+        
+        <TabsContent value="security">
+          <SecuritySettings />
         </TabsContent>
         
         <TabsContent value="privacy">

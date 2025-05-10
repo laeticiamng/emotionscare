@@ -16,7 +16,11 @@ import {
   Lock, 
   FileWarning, 
   HeartHandshake,
-  Database
+  Database,
+  FileDigit,
+  UserX,
+  RefreshCw,
+  BarChart
 } from 'lucide-react';
 
 const PrivacySettings: React.FC = () => {
@@ -27,6 +31,10 @@ const PrivacySettings: React.FC = () => {
   const [privacyLevel, setPrivacyLevel] = useState<'low' | 'medium' | 'high'>('medium');
   const [journalLock, setJournalLock] = useState(false);
   const [usageAnalytics, setUsageAnalytics] = useState(true);
+  const [differentialPrivacy, setDifferentialPrivacy] = useState(true);
+  const [autoDelete, setAutoDelete] = useState(false);
+  const [dataPortability, setDataPortability] = useState(false);
+  const [dataPurgeInterval, setDataPurgeInterval] = useState('never');
 
   const handleSave = () => {
     toast({
@@ -94,6 +102,24 @@ const PrivacySettings: React.FC = () => {
               id="anonymize-data"
               checked={anonymizeData}
               onCheckedChange={setAnonymizeData}
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <Label htmlFor="differential-privacy" className="flex-1">
+              <div className="flex items-center gap-2">
+                <BarChart className="h-4 w-4 text-muted-foreground" />
+                <span>Confidentialité différentielle</span>
+                <Badge className="bg-primary/20 text-primary text-xs">Premium</Badge>
+              </div>
+              <div className="text-sm text-muted-foreground ml-6">
+                Protection avancée avec ajout de bruit statistique aux données agrégées
+              </div>
+            </Label>
+            <Switch
+              id="differential-privacy"
+              checked={differentialPrivacy}
+              onCheckedChange={setDifferentialPrivacy}
             />
           </div>
 
@@ -179,6 +205,67 @@ const PrivacySettings: React.FC = () => {
               onCheckedChange={setJournalLock}
             />
           </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <Label htmlFor="data-portability" className="flex-1">
+              <div className="flex items-center gap-2">
+                <FileDigit className="h-4 w-4 text-muted-foreground" />
+                <span>Portabilité des données (RGPD)</span>
+              </div>
+              <div className="text-sm text-muted-foreground ml-6">
+                Génération de rapports structurés pour transfert vers d'autres services
+              </div>
+            </Label>
+            <Switch
+              id="data-portability"
+              checked={dataPortability}
+              onCheckedChange={setDataPortability}
+            />
+          </div>
+        </div>
+
+        {/* Suppression automatique des données */}
+        <div className="space-y-4">
+          <h3 className="font-medium">Cycle de vie des données</h3>
+          
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <Label htmlFor="auto-delete" className="flex-1">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                <span>Suppression automatique</span>
+              </div>
+              <div className="text-sm text-muted-foreground ml-6">
+                Suppression périodique des données selon l'intervalle choisi
+              </div>
+            </Label>
+            <Switch
+              id="auto-delete"
+              checked={autoDelete}
+              onCheckedChange={setAutoDelete}
+            />
+          </div>
+
+          {autoDelete && (
+            <div className="pl-6">
+              <Select 
+                value={dataPurgeInterval} 
+                onValueChange={setDataPurgeInterval}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Intervalle de suppression" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30days">Après 30 jours</SelectItem>
+                  <SelectItem value="90days">Après 90 jours</SelectItem>
+                  <SelectItem value="1year">Après 1 an</SelectItem>
+                  <SelectItem value="never">Jamais (conserver)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                Les données plus anciennes que cette période seront automatiquement effacées
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Options d'exportation et de suppression */}
