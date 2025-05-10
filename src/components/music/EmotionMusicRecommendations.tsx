@@ -1,187 +1,131 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EmotionResult } from '@/types/emotion';
-import { Music, PlayCircle, PauseCircle, Loader2 } from 'lucide-react';
+import { Music, PlayCircle, Loader2 } from 'lucide-react';
+import { EmotionResult } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface EmotionMusicRecommendationsProps {
-  emotion?: string;
-  onPlayMusic?: (emotion: string) => void;
   emotionResult?: EmotionResult;
 }
 
-// Define emotion to music mapping locally
-const EMOTION_TO_MUSIC: Record<string, string> = {
-  'happy': 'energetic',
-  'sad': 'calm',
-  'angry': 'calm',
-  'anxious': 'calm',
-  'neutral': 'neutral',
-  'calm': 'calm',
-  'stressed': 'calm',
-  'energetic': 'energetic',
-  'bored': 'energetic',
-  'tired': 'calm',
-  'fearful': 'calm',
-  'default': 'neutral'
+const EMOTION_TO_GENRE: Record<string, string> = {
+  'happy': 'Positive et énergisante',
+  'calm': 'Relaxante et apaisante',
+  'focused': 'Concentrée et productive',
+  'energetic': 'Dynamique et motivante',
+  'creative': 'Inspirante et imaginative',
+  'sad': 'Mélancolique et réconfortante',
+  'anxious': 'Apaisante et rassurante',
+  'angry': 'Calmante et stabilisante',
+  'neutral': 'Équilibrée et harmonieuse'
 };
 
-export function EmotionMusicRecommendations({
-  emotion,
-  onPlayMusic,
-  emotionResult
-}: EmotionMusicRecommendationsProps) {
-  const {
-    currentTrack,
-    isPlaying,
-    playTrack,
-    loadPlaylistForEmotion,
-    initializeMusicSystem,
-    error: musicError
-  } = useMusic();
+const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = ({ 
+  emotionResult 
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [recommendedGenre, setRecommendedGenre] = useState<string>('');
+  const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
+  const { toast } = useToast();
   
-  const [localLoading, setLocalLoading] = useState(false);
-  const [localError, setLocalError] = useState('');
-
-  const handlePlayMusic = async (emotionToPlay: string) => {
-    if (!emotionToPlay) return;
-    
-    setLocalLoading(true);
-    setLocalError('');
-    
-    try {
-      const musicType = EMOTION_TO_MUSIC[emotionToPlay.toLowerCase()] || EMOTION_TO_MUSIC.default;
-      const playlist = await loadPlaylistForEmotion(musicType);
-      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-        // Ensure the track has the required duration and url fields
-        const track = {
-          ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
-        };
-        playTrack(track);
-      }
-    } catch (err) {
-      console.error("Error loading music:", err);
-      setLocalError("Impossible de charger la musique pour cette émotion");
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
-  // Handle play pause toggle
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      // Pause if playing
-      playTrack(currentTrack!);
-    } else if (currentTrack) {
-      // Resume if paused
-      playTrack(currentTrack);
-    } else {
-      // Play if not playing
-      handlePlayMusic(emotion || (emotionResult?.emotion || 'neutral'));
-    }
-  };
-
   useEffect(() => {
-    initializeMusicSystem();
-  }, [initializeMusicSystem]);
-
-  useEffect(() => {
-    if (emotionResult) {
-      handlePlayMusic(emotionResult.emotion);
+    if (emotionResult && emotionResult.emotion) {
+      const emotion = emotionResult.emotion.toLowerCase();
+      const genre = EMOTION_TO_GENRE[emotion] || EMOTION_TO_GENRE.neutral;
+      setRecommendedGenre(genre);
     }
   }, [emotionResult]);
-
-  // Déterminer le type de musique à partir de l'émotion
-  const getMusicTypeFromEmotion = (emotionName: string): string => {
-    const normalizedEmotion = emotionName.toLowerCase();
-    return EMOTION_TO_MUSIC[normalizedEmotion] || EMOTION_TO_MUSIC.default;
+  
+  const handlePlayMusic = async () => {
+    if (!emotionResult || !emotionResult.emotion) {
+      toast({
+        title: "Information manquante",
+        description: "Impossible de déterminer votre état émotionnel",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      const emotion = emotionResult.emotion.toLowerCase();
+      const playlist = await loadPlaylistForEmotion(emotion);
+      
+      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+        // Play first track
+        playTrack(playlist.tracks[0]);
+        // Open drawer
+        setOpenDrawer(true);
+        
+        toast({
+          title: "Musique thérapeutique",
+          description: `Playlist "${emotion}" chargée pour accompagner votre humeur`
+        });
+      } else {
+        toast({
+          title: "Playlist non disponible",
+          description: "Aucune musique disponible pour cette émotion",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      // Handle error safely with type checking
+      let errorMessage = "Une erreur est survenue";
+      if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = (error as Error).message;
+      }
+      
+      toast({
+        title: "Erreur",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  // Determiner si l'UI doit montrer la musique en cours de lecture
-  const emotionToUse = emotion || (emotionResult?.emotion || 'neutral');
-  const musicType = getMusicTypeFromEmotion(emotionToUse);
-
-  // Properly handle displaying errors
-  const errorMessage = musicError ? 
-    (typeof musicError === 'string' ? musicError : 
-      (musicError instanceof Error ? musicError.message : String(musicError))) 
-    : '';
+  
+  if (!emotionResult) {
+    return null;
+  }
 
   return (
-    <Card className="w-full">
+    <Card className="mt-6">
       <CardHeader className="pb-3">
-        <CardTitle>Musique Thérapeutique</CardTitle>
-        <CardHeader className="pb-0 pt-0">
-          <p className="text-sm text-muted-foreground">
-            Musique adaptée à votre état émotionnel
-          </p>
-        </CardHeader>
+        <CardTitle className="text-lg flex items-center">
+          <Music className="h-5 w-5 mr-2" />
+          Musique thérapeutique recommandée
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        {(errorMessage || localError) ? (
-          <div className="text-destructive text-sm mb-4">
-            {errorMessage}
-            {localError && <span>{localError}</span>}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => handlePlayMusic(emotionToUse)}
-              className="ml-2"
-            >
-              Réessayer
-            </Button>
-          </div>
-        ) : null}
-
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Music className="h-5 w-5 text-primary" />
-              <span className="font-medium">
-                Ambiance: <span className="text-primary">{musicType}</span>
-              </span>
-            </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={isPlaying ? togglePlayPause : () => handlePlayMusic(emotionToUse)}
-              disabled={localLoading}
-              className="flex items-center gap-2"
-            >
-              {localLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Chargement...</span>
-                </>
-              ) : isPlaying ? (
-                <>
-                  <PauseCircle className="h-4 w-4" />
-                  <span>En lecture</span>
-                </>
-              ) : (
-                <>
-                  <PlayCircle className="h-4 w-4" />
-                  <span>Écouter</span>
-                </>
-              )}
-            </Button>
+          <div>
+            <p className="mb-1 text-sm font-medium">Basé sur votre humeur: {emotionResult.emotion}</p>
+            <p className="text-sm text-muted-foreground">
+              Nous vous recommandons d'écouter une musique {recommendedGenre.toLowerCase()} 
+              pour optimiser votre bien-être émotionnel.
+            </p>
           </div>
-
-          {currentTrack && (
-            <div className="p-3 bg-accent rounded-md text-sm">
-              <p className="font-medium">{currentTrack.title}</p>
-              <p className="text-muted-foreground">{currentTrack.artist}</p>
-            </div>
-          )}
+          
+          <Button 
+            onClick={handlePlayMusic} 
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <PlayCircle className="h-4 w-4" />
+            )}
+            <span>{isLoading ? "Chargement..." : "Écouter la musique recommandée"}</span>
+          </Button>
         </div>
       </CardContent>
     </Card>
   );
-}
+};
 
 export default EmotionMusicRecommendations;

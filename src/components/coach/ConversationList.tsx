@@ -23,6 +23,15 @@ const ConversationList: React.FC<ConversationListProps> = ({
 }) => {
   const isMobile = useIsMobile();
   
+  const getLastMessageText = (conversation: ChatConversation) => {
+    // Get the last message text from the messages array
+    const lastMessage = conversation.messages && conversation.messages.length > 0
+      ? conversation.messages[conversation.messages.length - 1]
+      : null;
+    
+    return lastMessage?.text || "Aucun message";
+  };
+  
   return (
     <div className="w-full md:w-64 h-full flex flex-col bg-background border-r">
       <div className="p-3 border-b">
@@ -55,7 +64,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 <div className="truncate flex-grow">
                   <p className="font-medium truncate">{conversation.title || "Nouvelle conversation"}</p>
                   <p className="text-xs text-muted-foreground truncate">
-                    {conversation.lastMessage || "Aucun message"}
+                    {getLastMessageText(conversation)}
                   </p>
                   <p className="text-xs mt-1">
                     {conversation.updated_at instanceof Date 

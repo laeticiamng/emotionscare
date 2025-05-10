@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Music, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { safeOpen } from '@/lib/utils';
 
 interface MusicRecommendationCardProps {
   emotion?: string;
@@ -30,12 +29,16 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
   const { toast } = useToast();
 
-  const handlePlayRecommendedMusic = () => {
+  const handlePlayRecommendedMusic = async () => {
     // Map emotion to music type if needed
     const musicType = emotion.toLowerCase();
     
-    loadPlaylistForEmotion(musicType);
-    setOpenDrawer(true); // No need for safeOpen here since we're directly setting a boolean
+    await loadPlaylistForEmotion(musicType);
+    
+    // Make sure we use setOpenDrawer as a function call
+    if (setOpenDrawer) {
+      setOpenDrawer(true);
+    }
     
     toast({
       title: "Musique recommandée activée",

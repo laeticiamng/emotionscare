@@ -1,65 +1,76 @@
 
 import { useState, useEffect } from 'react';
 
-export type Theme = 'light' | 'dark' | 'system';
+type Theme = 'light' | 'dark' | 'system';
 
-export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Get theme from localStorage or default to system
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    return savedTheme || 'system';
-  });
+export interface UseThemeReturn {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  resolvedTheme: 'light' | 'dark';
+}
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
-    // If theme is system, determine based on user's system preference
-    if (theme === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+export const useTheme = (): UseThemeReturn => {
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme') as Theme;
+      return savedTheme || 'system';
     }
-    return theme as 'light' | 'dark';
+    return 'system';
   });
+  
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
-  // Update theme in localStorage and document when it changes
   useEffect(() => {
-    localStorage.setItem('theme', theme);
-
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-      setResolvedTheme(systemTheme);
-    } else {
-      root.classList.add(theme);
-      setResolvedTheme(theme);
-    }
-  }, [theme]);
-
-  // Listen for system theme changes if using system theme
-  useEffect(() => {
-    if (theme !== 'system') return;
-
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
-    const handleChange = () => {
-      const newTheme = mediaQuery.matches ? 'dark' : 'light';
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(newTheme);
-      setResolvedTheme(newTheme);
+    const updateResolvedTheme = () => {
+      if (theme === 'system') {
+        setResolvedTheme(mediaQuery.matches ? 'dark' : 'light');
+      } else {
+        setResolvedTheme(theme === 'dark' ? 'dark' : 'light');
+      }
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    updateResolvedTheme();
+    
+    // Listen for changes to the prefers-color-scheme media query
+    const listener = (e: MediaQueryListEvent) => {
+      if (theme === 'system') {
+        setResolvedTheme(e.matches ? 'dark' : 'light');
+      }
+    };
+    
+    try {
+      mediaQuery.addEventListener('change', listener);
+    } catch (e) {
+      // Fallback for Safari
+      mediaQuery.addListener(listener);
+    }
+    
+    return () => {
+      try {
+        mediaQuery.removeEventListener('change', listener);
+      } catch (e) {
+        // Fallback for Safari
+        mediaQuery.removeListener(listener);
+      }
+    };
   }, [theme]);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(resolvedTheme);
+  }, [resolvedTheme]);
+
+  const setTheme = (newTheme: Theme) => {
+    localStorage.setItem('theme', newTheme);
+    setThemeState(newTheme);
+  };
 
   return {
     theme,
     setTheme,
-    resolvedTheme,
-    toggleTheme: () => setTheme(prevTheme => 
-      prevTheme === 'dark' ? 'light' : prevTheme === 'light' ? 'system' : 'dark'
-    )
+    resolvedTheme
   };
-}
-
-export default useTheme;
+};

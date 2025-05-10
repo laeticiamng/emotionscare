@@ -27,8 +27,9 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   showVolume = true
 }) => {
   const { 
+    isPlaying, volume, setVolume, currentTrack,
     playTrack, pauseTrack, nextTrack, previousTrack,
-    isPlaying, volume, toggleRepeat, toggleShuffle, setVolume
+    toggleRepeat, toggleShuffle
   } = useMusic();
   
   // Mock audioState for backwards compatibility
@@ -42,8 +43,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     duration: 0
   };
   
-  const setAudioState = () => {};
-  const setMuted = () => {};
+  const [muted, setMuted] = React.useState(false);
   
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -51,7 +51,9 @@ const MusicControls: React.FC<MusicControlsProps> = ({
       onPause?.();
     } else {
       // For now, we'll just assume it resumes the current track
-      // In a real implementation, we'd have play() vs playTrack()
+      if (currentTrack) {
+        playTrack(currentTrack);
+      }
       onPlay?.();
     }
   };
@@ -67,7 +69,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   };
   
   const toggleMute = () => {
-    setMuted(!audioState.muted);
+    setMuted(!muted);
   };
   
   const handleVolumeChange = (value: number[]) => {
@@ -75,7 +77,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   };
   
   const getVolumeIcon = () => {
-    if (audioState.muted || audioState.volume === 0) return <VolumeX />;
+    if (muted || audioState.volume === 0) return <VolumeX />;
     if (audioState.volume < 0.5) return <Volume />;
     return <Volume2 />;
   };
@@ -103,7 +105,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           size="sm"
           className="rounded-full"
           onClick={toggleRepeat}
-          title={`Repeat: ${audioState.repeat}`}
+          title="Repeat"
         >
           <Repeat className="h-4 w-4" />
         </Button>

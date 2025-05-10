@@ -21,6 +21,7 @@ export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'mis
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
 export type NotificationFrequency = 'daily' | 'weekly' | 'flexible' | 'none';
+export type NotificationType = 'minimal' | 'detailed' | 'full';
 export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 
@@ -50,12 +51,47 @@ export interface InvitationStats {
   conversion_rate: number;
 }
 
-// Add UserRole which was missing
-export type UserRole = 'user' | 'admin' | 'coach' | 'premium';
+// Add UserRole enum
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  COACH = 'coach',
+  PREMIUM = 'premium'
+}
 
 export interface InvitationFormData {
   email: string;
-  role?: UserRole;
+  role?: UserRole | string;
   message?: string;
   expires_at?: Date;
+}
+
+// Audio player types
+export interface TrackInfoProps {
+  track?: any;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: any;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (value: number) => void;
+  showLabel?: boolean;
+  className?: string;
+}
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek?: (time: number) => void;
+  showTimestamps?: boolean;
+  className?: string;
+}
+
+// For EmotionalTeamView component
+export interface EmotionalTeamViewProps {
+  className?: string;
 }

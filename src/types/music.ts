@@ -45,10 +45,20 @@ export interface MusicContextType {
   toggleRepeat: () => void;
   toggleShuffle: () => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
-  initializeMusicSystem: () => void;
+  initializeMusicSystem: () => Promise<void>;
   error: Error | null;
   currentEmotion?: string;
   togglePlay: () => void;
   play: () => void;
   pause: () => void;
+}
+
+export interface AudioPlayerState {
+  isPlaying: boolean;
+  volume: number;
+  muted: boolean;
+  repeat: boolean;
+  shuffle: boolean;
+  currentTime: number;
+  duration: number;
 }
