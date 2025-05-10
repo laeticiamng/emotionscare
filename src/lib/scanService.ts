@@ -223,6 +223,12 @@ export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null
   };
 };
 
+// Add the missing getEmotions function
+export const getEmotions = async (userId?: string): Promise<Emotion[]> => {
+  // Re-use existing getEmotionHistory function for compatibility
+  return getEmotionHistory(userId);
+};
+
 // Helper function to generate recommendations based on emotion
 function generateRecommendations(emotion: string): string[] {
   switch(emotion) {

@@ -8,7 +8,8 @@ export * from './types/mood';
 export * from './types/vr';
 export * from './types/invitation';
 export * from './types/badge';
-export * from './types/audio-player';
+// Fix the ambiguous export by being specific with what we export
+export type { UseAudioPlayerReturn, UseAudioPlayerStateReturn, AudioPlayerState } from './types/audio-player';
 export * from './types/music';
 export * from './types/scan';
 export * from './types/gamification';
@@ -44,4 +45,4 @@ export type { NotificationFrequency, NotificationType, NotificationTone } from '
 export type { ProgressBarProps } from './types/progress-bar';
 export type { TrackInfoProps, VolumeControlProps } from './types/track-info';
 export type { Report } from './types/report';
-export type { UseAudioPlayerReturn, UseAudioPlayerStateReturn } from './types/audio-player';
+export type { AudioPreference } from './types/audio-player';
