@@ -1,4 +1,3 @@
-
 export interface AudioPlayerState {
   isPlaying: boolean;
   duration: number;
@@ -18,33 +17,32 @@ export interface AudioPlayerControls {
 
 // Corrected UseAudioPlayerStateReturn interface
 export interface UseAudioPlayerStateReturn {
-  currentTrack: any;
+  currentTrack: any | null;
   isPlaying: boolean;
   volume: number;
   repeat: boolean;
   shuffle: boolean;
-  progress: number;
-  currentTime: number;
   duration: number;
+  currentTime: number;
+  loading: boolean;
   loadingTrack: boolean;
-  error: Error | null;
-  setCurrentTrack: (track: any) => void;
+  
+  // Add missing properties
+  progress: number;
+  error: string | null;
+  setError: (error: string | null) => void;
+  setLoadingTrack: (loading: boolean) => void;
+  setProgress: (progress: number) => void;
+  setDuration: (duration: number) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setVolume: (volume: number) => void;
-  setRepeat: (repeat: boolean) => void;
-  setShuffle: (shuffle: boolean) => void;
-  setProgress: (progress: number) => void;
-  setCurrentTime: (currentTime: number) => void;
-  setDuration: (duration: number) => void;
-  setLoadingTrack: (loadingTrack: boolean) => void;
-  setError: (error: Error | null) => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
+  setCurrentTrack: (track: any) => void;
 }
 
 // Add UseAudioPlayerReturn interface
 export interface UseAudioPlayerReturn {
-  currentTrack: any;
+  // State
+  currentTrack: any | null;
   isPlaying: boolean;
   volume: number;
   repeat: boolean;
@@ -52,22 +50,24 @@ export interface UseAudioPlayerReturn {
   progress: number;
   duration: number;
   loading: boolean;
-  error: Error | null;
+  error: string | null;
   currentTime: number;
   loadingTrack: boolean;
   
+  // Track operations
   playTrack: (track: any) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
   
-  seekTo: (seconds: number) => void;
+  // Player controls
+  seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
   setCurrentTrack: (track: any) => void;
-  formatTime: (seconds: number) => string;
+  formatTime: (time: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleVolumeChange: (values: number[]) => void;
+  handleVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
 }

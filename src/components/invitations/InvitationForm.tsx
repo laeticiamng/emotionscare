@@ -1,111 +1,103 @@
 
 import React from 'react';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { UserRole } from '@/types/user';
+import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InvitationFormData, UserRole } from '@/types';
-import { sendInvitations } from '@/services/invitationService';
 import { useToast } from '@/hooks/use-toast';
 
-const invitationSchema = z.object({
-  email: z.string().email("L'adresse email n'est pas valide"),
-  role: z.string()
-});
-
-interface InvitationFormProps {
-  onInvitationSent?: () => void;
-}
-
-const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => {
+const InvitationForm = () => {
+  const [email, setEmail] = React.useState('');
+  const [message, setMessage] = React.useState('');
+  const [role, setRole] = React.useState<UserRole>(UserRole.EMPLOYEE);
+  const [isLoading, setIsLoading] = React.useState(false);
+  
   const { toast } = useToast();
-  const form = useForm<InvitationFormData>({
-    resolver: zodResolver(invitationSchema),
-    defaultValues: {
-      email: '',
-      role: 'employee' // Use string value
-    }
-  });
   
-  const isSubmitting = form.formState.isSubmitting;
-  
-  const onSubmit = async (data: InvitationFormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
     try {
-      await sendInvitations([data]);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       toast({
-        title: 'Invitation envoyée',
-        description: `Une invitation a été envoyée à ${data.email}`,
+        title: "Invitation envoyée",
+        description: `Une invitation a été envoyée à ${email}`,
       });
-      form.reset();
-      if (onInvitationSent) {
-        onInvitationSent();
-      }
-    } catch (error: any) {
+      
+      // Reset form
+      setEmail('');
+      setMessage('');
+      setRole(UserRole.EMPLOYEE);
+    } catch (error) {
       toast({
-        title: "Erreur lors de l'envoi de l'invitation",
-        description: error.message || "Une erreur s'est produite. Veuillez réessayer.",
-        variant: "destructive"
+        title: "Erreur",
+        description: "Impossible d'envoyer l'invitation",
+        variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email du collaborateur</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="collaborateur@example.com"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Un email d'invitation sera envoyé à cette adresse.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <Card className="p-6">
+      <h2 className="text-xl font-semibold mb-4">Inviter un nouveau membre</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
+            Adresse email
+          </label>
+          <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email@example.com"
+            required
+          />
+        </div>
         
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Rôle</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez un rôle" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="employee">Employé Classique</SelectItem>
-                  <SelectItem value="analyst">Analyste (Direction - anonymisé)</SelectItem>
-                  <SelectItem value="wellbeing_manager">Responsable Bien-être</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                Détermine les permissions et l'accès de l'utilisateur sur la plateforme.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div>
+          <label htmlFor="role" className="block text-sm font-medium mb-1">
+            Rôle
+          </label>
+          <Select value={role} onValueChange={(value) => setRole(value as UserRole)}>
+            <SelectTrigger id="role">
+              <SelectValue placeholder="Sélectionner un rôle" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={UserRole.EMPLOYEE}>Employé</SelectItem>
+              <SelectItem value={UserRole.MANAGER}>Manager</SelectItem>
+              <SelectItem value={UserRole.HR}>RH</SelectItem>
+              <SelectItem value={UserRole.WELLBEING_MANAGER}>Responsable bien-être</SelectItem>
+              <SelectItem value={UserRole.ADMIN}>Administrateur</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Envoi en cours...' : 'Envoyer l\'invitation'}
+        <div>
+          <label htmlFor="message" className="block text-sm font-medium mb-1">
+            Message personnalisé (optionnel)
+          </label>
+          <Textarea
+            id="message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Ajoutez un message personnalisé à l'invitation"
+            className="h-24"
+          />
+        </div>
+        
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Envoi en cours..." : "Envoyer l'invitation"}
         </Button>
       </form>
-    </Form>
+    </Card>
   );
 };
 

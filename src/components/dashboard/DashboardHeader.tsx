@@ -8,13 +8,13 @@ import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 interface DashboardHeaderProps {
   user: User | null;
   isAdmin?: boolean;
-  onRefresh?: () => void;
+  onRefresh?: () => Promise<any>;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
   user, 
   isAdmin = false,
-  onRefresh = () => {} 
+  onRefresh = async () => { return null; } 
 }) => {
   const {
     enabled: autoRefreshEnabled,

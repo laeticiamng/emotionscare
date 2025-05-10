@@ -1,168 +1,139 @@
 
-import { useState, useCallback } from 'react';
-import { ChatMessage, ChatConversation } from '@/types';
-import { v4 as uuidv4 } from 'uuid';
-
-interface UseChatHistoryResult {
-  conversations: ChatConversation[];
-  currentConversation: ChatConversation | null;
-  messages: ChatMessage[];
-  addUserMessage: (text: string) => void;
-  addBotMessage: (text: string) => void;
-  addSystemMessage: (text: string) => void;
-  createNewConversation: () => void;
-  setCurrentConversationId: (id: string | null) => void;
-  deleteConversation: (id: string) => void;
-}
-
-// Mock initial data
-const mockInitialConversation: ChatConversation = {
-  id: uuidv4(),
-  title: 'Nouvelle conversation',
-  created_at: new Date(),
-  updated_at: new Date(),
-  user_id: 'user-1',
-  messages: []
-};
+import { useState, useEffect, useCallback } from 'react';
+import { ChatConversation, ChatMessage } from '@/types/chat';
+import { useToast } from '@/hooks/use-toast';
+import { UseChatHistoryResult } from './types/useChatHistoryResult';
 
 export function useChatHistory(): UseChatHistoryResult {
-  const [conversations, setConversations] = useState<ChatConversation[]>([mockInitialConversation]);
-  const [currentConversationId, setCurrentConversationId] = useState<string>(mockInitialConversation.id);
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Get current conversation
-  const currentConversation = conversations.find(c => c.id === currentConversationId) || null;
-  
-  // Get messages from current conversation
-  const messages = currentConversation?.messages || [];
-
-  // Create a new conversation
-  const createNewConversation = useCallback(() => {
-    const newConversation: ChatConversation = {
-      id: uuidv4(),
-      title: 'Nouvelle conversation',
-      created_at: new Date(),
-      updated_at: new Date(),
-      user_id: 'user-1',
-      messages: []
+  // Load conversations from storage or mock data
+  useEffect(() => {
+    const loadConversations = async () => {
+      try {
+        // Simulate API call
+        const mockConversations: ChatConversation[] = [
+          {
+            id: 'conv-1',
+            title: 'Discussion avec Coach IA',
+            created_at: new Date(Date.now() - 86400000), // 1 day ago
+            updated_at: new Date(),
+            user_id: 'user-1',
+            messages: [],
+            last_message: 'Comment puis-je vous aider aujourd\'hui?'
+          },
+          {
+            id: 'conv-2',
+            title: 'Stress au travail',
+            created_at: new Date(Date.now() - 172800000), // 2 days ago
+            updated_at: new Date(Date.now() - 86400000),
+            user_id: 'user-1',
+            messages: [],
+            last_message: 'Voici quelques techniques pour gérer votre stress.'
+          }
+        ];
+        
+        setConversations(mockConversations);
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les conversations.",
+          variant: "destructive"
+        });
+      }
     };
     
-    setConversations(prev => [newConversation, ...prev]);
-    setCurrentConversationId(newConversation.id);
-    
-    return newConversation;
-  }, []);
+    loadConversations();
+  }, [toast]);
 
-  // Add a user message
-  const addUserMessage = useCallback((text: string) => {
-    if (!currentConversationId) {
-      const newConversation = createNewConversation();
-      setCurrentConversationId(newConversation.id);
-    }
-    
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text: text,
-      content: text,
-      sender: 'user',
-      sender_id: 'user-1',
-      conversation_id: currentConversationId,
-      timestamp: new Date(),
-      is_read: true
-    };
-    
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === currentConversationId
-          ? { 
-              ...conv, 
-              messages: [...conv.messages, newMessage],
-              updated_at: new Date(),
-              last_message: text
-            }
-          : conv
-      )
-    );
-  }, [currentConversationId, createNewConversation]);
-
-  // Add a bot message
-  const addBotMessage = useCallback((text: string) => {
-    if (!currentConversationId) return;
-    
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text: text,
-      content: text,
-      sender: 'bot',
-      sender_id: 'bot-1',
-      conversation_id: currentConversationId,
-      timestamp: new Date(),
-      is_read: true
-    };
-    
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === currentConversationId
-          ? { 
-              ...conv, 
-              messages: [...conv.messages, newMessage],
-              updated_at: new Date(),
-              last_message: text
-            }
-          : conv
-      )
-    );
-  }, [currentConversationId]);
-
-  // Add a system message
-  const addSystemMessage = useCallback((text: string) => {
-    if (!currentConversationId) return;
-    
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text: text,
-      content: text,
-      sender: 'system',
-      sender_id: 'system',
-      conversation_id: currentConversationId,
-      timestamp: new Date(),
-      is_read: true
-    };
-    
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === currentConversationId
-          ? { 
-              ...conv, 
-              messages: [...conv.messages, newMessage],
-              updated_at: new Date()
-            }
-          : conv
-      )
-    );
-  }, [currentConversationId]);
-
-  // Delete a conversation
-  const deleteConversation = useCallback((id: string) => {
-    setConversations(prev => prev.filter(conv => conv.id !== id));
-    
-    // If we deleted the current conversation, set the most recent one as current
-    if (id === currentConversationId) {
-      setCurrentConversationId(prev => {
-        const remainingConvs = conversations.filter(c => c.id !== id);
-        return remainingConvs.length > 0 ? remainingConvs[0].id : null;
+  // Delete conversation
+  const deleteConversation = useCallback(async (conversationId: string) => {
+    try {
+      // Remove conversation from state
+      setConversations(prevConversations => 
+        prevConversations.filter(conv => conv.id !== conversationId)
+      );
+      
+      // If the deleted conversation was active, clear active conversation
+      if (activeConversationId === conversationId) {
+        setActiveConversationId(null);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la conversation.",
+        variant: "destructive"
       });
+      return false;
     }
-  }, [conversations, currentConversationId]);
+  }, [activeConversationId, toast]);
+
+  // Load messages for a conversation
+  const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
+    try {
+      // Simulate API call
+      const mockMessages: ChatMessage[] = [
+        {
+          id: 'msg-1',
+          sender: 'bot',
+          sender_id: 'coach-ai',
+          conversation_id: conversationId,
+          content: 'Bonjour, comment puis-je vous aider aujourd\'hui?',
+          is_read: true,
+          timestamp: new Date(Date.now() - 3600000) // 1 hour ago
+        },
+        {
+          id: 'msg-2',
+          sender: 'user',
+          sender_id: 'user-1',
+          conversation_id: conversationId,
+          content: 'Je me sens stressé au travail',
+          is_read: true,
+          timestamp: new Date(Date.now() - 3540000) // 59 minutes ago
+        },
+        {
+          id: 'msg-3',
+          sender: 'bot',
+          sender_id: 'coach-ai',
+          conversation_id: conversationId,
+          content: 'Je comprends. Pouvez-vous m\'en dire plus sur ce qui vous stresse précisément?',
+          is_read: true,
+          timestamp: new Date(Date.now() - 3480000) // 58 minutes ago
+        }
+      ];
+      
+      // Update the conversation in state with messages
+      setConversations(prevConversations => 
+        prevConversations.map(conv =>
+          conv.id === conversationId ? { ...conv, messages: mockMessages } : conv
+        )
+      );
+      
+      setActiveConversationId(conversationId);
+      
+      return mockMessages;
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les messages.",
+        variant: "destructive"
+      });
+      return [];
+    }
+  }, [toast]);
 
   return {
     conversations,
-    currentConversation,
-    messages,
-    addUserMessage,
-    addBotMessage,
-    addSystemMessage,
-    createNewConversation,
-    setCurrentConversationId,
-    deleteConversation
+    activeConversationId,
+    deleteConversation,
+    loadMessages,
+    setActiveConversationId
   };
 }

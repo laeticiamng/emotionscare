@@ -1,74 +1,91 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage, ChatResponse } from '@/types';
-import { useToast } from './use-toast';
 import { v4 as uuidv4 } from 'uuid';
+import { useToast } from '@/hooks/use-toast';
+import { ChatMessage, ChatResponse, ChatContext } from '@/types/chat';
 
-interface UseChatOptions {
-  initialMessages?: ChatMessage[];
-  onError?: (error: Error) => void;
-}
-
-const useChat = (options: UseChatOptions = {}) => {
-  const { initialMessages = [] } = options;
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+export function useChat(): ChatContext {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Function to handle sending a message to the AI
-  const handleSend = useCallback(async (message: string) => {
-    try {
-      setIsLoading(true);
-      
-      // Here you would typically make an API call to your AI service
-      // This is a mock implementation
-      const response: ChatResponse = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            message: `This is a response to: "${message}"`,
-            recommendations: ["Try meditation", "Listen to calming music"],
-            follow_up_questions: ["How are you feeling now?", "Would you like some music recommendations?"]
-          });
-        }, 1000);
-      });
-
-      return response;
-    } catch (error) {
-      console.error('Error sending chat message:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to send message. Please try again.',
-      });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
+  // Add a message to the chat
   const addMessage = useCallback((message: Omit<ChatMessage, 'id'>) => {
-    setMessages((prev) => [...prev, { 
-      ...message, 
-      id: uuidv4(),
-      // Ensure all required properties are present
-      sender_id: message.sender_id || 'user',
-      conversation_id: message.conversation_id || 'default',
-      content: message.content || message.text || '',
-      is_read: message.is_read !== undefined ? message.is_read : true
-    }]);
+    setMessages(prevMessages => [
+      ...prevMessages,
+      {
+        id: uuidv4(),
+        ...message
+      }
+    ]);
   }, []);
 
+  // Clear all messages
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
+
+  // Send a message and get a response
+  const handleSend = useCallback(async (message: string): Promise<ChatResponse> => {
+    setIsLoading(true);
+    
+    // Add user message
+    addMessage({
+      sender: 'user',
+      sender_id: 'user-1',
+      conversation_id: 'conversation-1',
+      content: message,
+      is_read: true,
+      timestamp: new Date()
+    });
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const response: ChatResponse = {
+        message: "Voici une réponse simulée du coach IA.",
+        emotion: "neutral",
+        confidence: 0.9,
+        text: "Voici une réponse simulée du coach IA.",
+        follow_up_questions: [
+          "Comment vous sentez-vous aujourd'hui ?",
+          "Avez-vous pratiqué une activité relaxante récemment ?"
+        ]
+      };
+      
+      // Add AI response
+      addMessage({
+        sender: 'bot',
+        sender_id: 'coach-ai',
+        conversation_id: 'conversation-1',
+        content: response.message,
+        is_read: true,
+        timestamp: new Date()
+      });
+      
+      return response;
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'obtenir une réponse du coach IA.",
+        variant: "destructive"
+      });
+      
+      return {
+        message: "Désolé, une erreur s'est produite."
+      };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [addMessage, toast]);
 
   return {
     messages,
     isLoading,
     handleSend,
     addMessage,
-    clearMessages,
+    clearMessages
   };
-};
-
-export default useChat;
+}

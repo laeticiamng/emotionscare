@@ -25,7 +25,7 @@ const AdminPremiumInterface: React.FC<AdminPremiumInterfaceProps> = ({ user }) =
         <SocialMetricsCard />
         <GamificationCard />
         <ReportGenerator />
-        <EmotionalTeamView className="md:col-span-2" />
+        <EmotionalTeamView className="md:col-span-2" teamId="team-1" />
       </div>
     </div>
   );

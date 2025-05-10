@@ -5,7 +5,7 @@ import { Table } from '@/components/ui/table';
 import InfiniteScroll from '@/components/ui/data-table/InfiniteScroll';
 import { useSortableTable } from '@/hooks/useSortableTable';
 import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField, SortableTableOptions } from './types/tableTypes';
+import { SortableField } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
 import { useSelectedUsers } from '@/hooks/useSelectedUsers';
@@ -50,7 +50,7 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
     clearSelection,
     allSelected,
     hasSelectedUsers
-  } = useSelectedUsers(users);
+  } = useSelectedUsers(users.map(u => u.id));
   
   // Fetch users when sorting changes
   React.useEffect(() => {
@@ -91,7 +91,7 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
             <UserTableBody 
               users={users} 
               isLoading={isLoading} 
-              error={error} 
+              error={error || ''} 
               hasData={users.length > 0}
               onRetry={handleRetry}
               isLoadingMore={false}

@@ -26,6 +26,12 @@ export interface EmotionResult {
   id?: string;
   user_id?: string;
   ai_feedback?: string;
+  text?: string;
+  transcript?: string;
+  feedback?: string;
+  recommendations?: string[];
+  date?: string | Date;
+  emojis?: string | string[];
 }
 
 export interface EmotionalTeamViewProps {

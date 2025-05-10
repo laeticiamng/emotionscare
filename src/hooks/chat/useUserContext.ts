@@ -1,50 +1,48 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserContext } from '@/types/chat';
+import { UserContext } from '@/types/user-context';
 
-interface UseUserContextReturn {
-  userContext: UserContext;
-  loading: boolean;
-}
-
-const useUserContext = (): UseUserContextReturn => {
-  const { user } = useAuth();
+export function useUserContext(userId?: string) {
   const [userContext, setUserContext] = useState<UserContext>({});
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserContext = async () => {
-      setLoading(true);
+    const loadUserContext = async () => {
+      setIsLoading(true);
+      
       try {
-        if (user?.id) {
-          // Mock data for now, in a real app this would come from an API
-          setUserContext({
-            preferences: user.preferences || {},
-            recentEmotions: ['calm', 'happy', 'focused'],
-            recentActivities: ['meditation', 'journaling', 'breathing exercise'],
-            userHistory: {
-              lastInteraction: new Date().toISOString(),
-              frequentTopics: ['stress', 'sleep', 'productivity'],
-            }
-          });
-        } else {
-          setUserContext({});
-        }
+        // Simulate loading user context from an API
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const mockUserContext: UserContext = {
+          id: userId || 'user-1',
+          name: 'John Doe',
+          preferences: {
+            dailyReminders: true,
+            notificationsEnabled: true
+          },
+          recentEmotions: ['stressed', 'calm', 'happy'],
+          recentActivities: ['meditation', 'deep breathing', 'journaling'],
+          userHistory: {
+            lastInteraction: new Date(Date.now() - 86400000).toISOString(),
+            frequentTopics: ['stress management', 'sleep', 'work-life balance']
+          }
+        };
+        
+        setUserContext(mockUserContext);
       } catch (error) {
-        console.error('Error fetching user context:', error);
+        console.error('Error loading user context:', error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
+    
+    if (userId) {
+      loadUserContext();
+    }
+  }, [userId]);
 
-    fetchUserContext();
-  }, [user]);
-
-  return {
-    userContext,
-    loading,
-  };
-};
+  return { userContext, isLoading };
+}
 
 export default useUserContext;

@@ -7,6 +7,8 @@ export interface MusicTrack {
   url?: string;
   audioUrl?: string;
   coverUrl?: string;
+  cover?: string; // Add missing property
+  coverImage?: string; // Add missing property
   duration: number;
   emotion?: string;
   genre?: string;
@@ -59,6 +61,7 @@ export interface MusicRecommendationCardProps {
   isLoading?: boolean;
   intensity?: number;
   standalone?: boolean;
+  className?: string; // Add missing property
 }
 
 // Define MusicDrawerProps interface

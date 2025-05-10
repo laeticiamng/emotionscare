@@ -46,6 +46,7 @@ export interface VRSessionTemplate {
   emotions?: string[]; // Add this property for UserDashboardSections
   completion_rate?: number;
   recommended_mood?: string;
+  popularity?: number; // Add missing property
 }
 
 export interface VRSessionWithMusicProps {

@@ -66,6 +66,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     scrollToBottom();
   }, [messages, isTyping]);
 
+  // Helper to determine message sender type
+  const getSenderType = (msg: ChatMessage) => {
+    // Check sender property first
+    if (msg.sender === "user" || msg.sender_type === "user" || msg.role === "user") {
+      return "user";
+    }
+    // Default to non-user (bot)
+    return "non-user";
+  };
+
   return (
     <Card className={cn("flex flex-col h-full overflow-hidden", className)}>
       <CardContent className="flex flex-col h-full p-0">
@@ -86,7 +96,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 key={msg.id}
                 className={cn(
                   "flex max-w-[80%] rounded-lg p-4",
-                  msg.sender === "user" || msg.sender_type === "user"
+                  getSenderType(msg) === "user"
                     ? "bg-primary/10 ml-auto"
                     : "bg-muted mr-auto"
                 )}

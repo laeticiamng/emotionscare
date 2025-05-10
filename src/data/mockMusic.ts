@@ -1,81 +1,73 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 
 // Mock music tracks
 export const mockTracks: MusicTrack[] = [
   {
     id: '1',
-    title: 'Meditation Ambient',
-    artist: 'Calm Studio',
-    url: 'https://example.com/music/meditation.mp3',
-    audioUrl: 'https://example.com/music/meditation.mp3',
-    coverUrl: 'https://example.com/covers/meditation.jpg',
+    title: 'Calm Ocean',
+    artist: 'Nature Sounds',
     duration: 180,
-    emotion: 'calm',
-    genre: 'ambient'
+    coverUrl: '/images/music/ocean.jpg',
+    audioUrl: '/audio/calm-ocean.mp3',
+    emotion: 'calm'
   },
   {
     id: '2',
-    title: 'Uplifting Energy',
-    artist: 'Happy Vibe',
-    url: 'https://example.com/music/uplifting.mp3',
-    audioUrl: 'https://example.com/music/uplifting.mp3',
-    coverUrl: 'https://example.com/covers/uplifting.jpg',
-    duration: 210,
-    emotion: 'happy',
-    genre: 'electronic'
+    title: 'Morning Motivation',
+    artist: 'Upbeat Studio',
+    duration: 240,
+    coverUrl: '/images/music/morning.jpg',
+    audioUrl: '/audio/morning-motivation.mp3',
+    emotion: 'happy'
   },
   {
     id: '3',
-    title: 'Focus Zone',
-    artist: 'Deep Concentration',
-    url: 'https://example.com/music/focus.mp3',
-    audioUrl: 'https://example.com/music/focus.mp3',
-    coverUrl: 'https://example.com/covers/focus.jpg',
-    duration: 240,
-    emotion: 'focused',
-    genre: 'instrumental'
+    title: 'Deep Focus',
+    artist: 'Concentration Wave',
+    duration: 320,
+    coverUrl: '/images/music/focus.jpg',
+    audioUrl: '/audio/deep-focus.mp3',
+    emotion: 'focused'
   },
   {
     id: '4',
-    title: 'Relaxation Waves',
-    artist: 'Ocean Sounds',
-    url: 'https://example.com/music/relaxation.mp3',
-    audioUrl: 'https://example.com/music/relaxation.mp3',
-    coverUrl: 'https://example.com/covers/relaxation.jpg',
-    duration: 300,
-    emotion: 'relaxed',
-    genre: 'nature'
+    title: 'Tension Release',
+    artist: 'Relax Mode',
+    duration: 290,
+    coverUrl: '/images/music/release.jpg',
+    audioUrl: '/audio/tension-release.mp3',
+    emotion: 'stressed'
   }
 ];
 
 // Mock music playlists
-export const mockPlaylists: MusicPlaylist[] = [
+export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '1',
-    name: 'Calme & Sérénité',
-    description: 'Une sélection de pistes pour vous aider à vous détendre',
-    tracks: mockTracks.filter(track => ['calm', 'relaxed'].includes(track.emotion || '')),
-    coverUrl: 'https://example.com/playlists/calm.jpg',
+    name: 'Calming Sounds',
+    description: 'Perfect for relaxation and stress relief',
+    tracks: [mockTracks[0], mockTracks[3]],
     emotion: 'calm',
-    createdAt: new Date().toISOString()
+    coverUrl: '/images/playlists/calm.jpg'
   },
   {
     id: '2',
-    name: 'Énergie & Motivation',
-    description: 'Des pistes stimulantes pour vous donner un coup de boost',
-    tracks: mockTracks.filter(track => ['happy', 'energetic'].includes(track.emotion || '')),
-    coverUrl: 'https://example.com/playlists/energy.jpg',
+    name: 'Energy Boost',
+    description: 'Get motivated and energized',
+    tracks: [mockTracks[1]],
     emotion: 'happy',
-    createdAt: new Date().toISOString()
+    coverUrl: '/images/playlists/energy.jpg'
   },
   {
     id: '3',
-    name: 'Concentration Profonde',
-    description: 'Améliorez votre focus et votre productivité',
-    tracks: mockTracks.filter(track => ['focused'].includes(track.emotion || '')),
-    coverUrl: 'https://example.com/playlists/focus.jpg',
+    name: 'Work Concentration',
+    description: 'Enhance your focus and productivity',
+    tracks: [mockTracks[2]],
     emotion: 'focused',
-    createdAt: new Date().toISOString()
+    coverUrl: '/images/playlists/focus.jpg'
   }
 ];
+
+// Convenience export for backward compatibility
+export const mockPlaylists = mockMusicPlaylists;

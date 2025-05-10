@@ -5,7 +5,7 @@ import { Table } from '@/components/ui/table';
 import Pagination from '@/components/ui/data-table/Pagination';
 import { useSortableTable } from '@/hooks/useSortableTable';
 import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField, SortableTableOptions } from './types/tableTypes';
+import { SortableField } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
 import { useSelectedUsers } from '@/hooks/useSelectedUsers';
@@ -59,7 +59,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
     clearSelection,
     allSelected,
     hasSelectedUsers
-  } = useSelectedUsers(users);
+  } = useSelectedUsers(users.map(u => u.id));
   
   // Fetch users when sort, page or page size changes
   React.useEffect(() => {
@@ -94,7 +94,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
           <UserTableBody 
             users={users} 
             isLoading={isLoading} 
-            error={error} 
+            error={error || ''} 
             hasData={users.length > 0}
             onRetry={handleRetry}
             isLoadingMore={isLoading && users.length > 0}

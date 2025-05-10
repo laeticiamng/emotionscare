@@ -11,6 +11,8 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ teamId, period, c
       </CardHeader>
       <CardContent>
         <p>Visualisation de l'état émotionnel de l'équipe en temps réel.</p>
+        <p>Identifiant d'équipe: {teamId}</p>
+        {period && <p>Période: {period}</p>}
         {/* Team emotional state visualization would go here */}
       </CardContent>
     </Card>

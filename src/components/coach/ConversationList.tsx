@@ -27,7 +27,10 @@ const ConversationList: React.FC<ConversationListProps> = ({
     // Get the last message text from the messages array
     if (conversation.messages && conversation.messages.length > 0) {
       const lastMessage = conversation.messages[conversation.messages.length - 1];
-      return lastMessage?.content || (typeof lastMessage === 'object' && lastMessage?.text) || "Aucun message";
+      if (typeof lastMessage === 'string') {
+        return lastMessage;
+      }
+      return lastMessage?.content || lastMessage?.text || "Aucun message";
     }
     
     // Or use the last_message field if available
