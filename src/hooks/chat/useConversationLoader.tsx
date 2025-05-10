@@ -26,7 +26,22 @@ export const useConversationLoader = (userId: string) => {
     }
   }, [userId]);
 
-  return { conversations, isLoading, error };
+  const loadConversations = async (): Promise<ChatConversation[]> => {
+    try {
+      setIsLoading(true);
+      const userConversations = await chatHistoryService.getConversationsForUser(userId);
+      setConversations(userConversations);
+      return userConversations;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to load conversations');
+      setError(error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { conversations, isLoading, error, loadConversations };
 };
 
 export default useConversationLoader;

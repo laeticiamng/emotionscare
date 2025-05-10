@@ -46,10 +46,35 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   voiceControl?: boolean;
   gestures?: boolean;
+  
+  // Backward compatibility fields
+  font_size?: string;
+  notifications_enabled?: boolean;
+  reminder_time?: string;
+  
+  // Fields from UserPreferences in user.ts
+  notifications?: boolean;
+  autoplayVideos?: boolean;
+  showEmotionPrompts?: boolean;
+  privacyLevel?: string;
+  dataCollection?: boolean;
+  marketing_emails?: boolean;
+  feature_announcements?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  accent_color?: string;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }
 
 export interface UserPreferencesState extends UserPreferences {
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   isLoading: boolean;
   error: Error | null;
+  
+  // Extra compatibility properties
+  notifications_enabled?: boolean;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
 }

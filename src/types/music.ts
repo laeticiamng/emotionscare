@@ -19,6 +19,9 @@ export interface MusicTrack {
   url?: string;
   mood?: string;
   coverImage?: string;
+  
+  // For backward compatibility, mark audio_url as optional when url is available
+  [key: string]: any; // To allow dynamic properties
 }
 
 export interface MusicPlaylist {

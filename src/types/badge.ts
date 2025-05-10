@@ -13,4 +13,6 @@ export interface Badge {
   user_id?: string;
   icon_url?: string;
   total_required?: number;
+  // Add category to the Badge interface to prevent TypeScript errors
+  category?: string;
 }

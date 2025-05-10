@@ -5,30 +5,28 @@ import { Badge } from '../types';
 export const mockBadges: Badge[] = [
   {
     id: '1',
-    user_id: 'user-1', // Now supported by the Badge interface
+    user_id: 'user-1',
     name: 'Premier pas',
     description: 'Première session de VR complétée',
     image_url: '/badges/first-step.svg',
     icon: 'award',
-    icon_url: '/badges/first-step.svg', // Add this property
+    icon_url: '/badges/first-step.svg',
     level: 1,
-    awarded_at: '2023-04-15T14:30:00Z', // Now supported by the Badge interface
-    category: 'achievement',
+    awarded_at: '2023-04-15T14:30:00Z',
     unlocked: true,
-    threshold: 1 // Add threshold property
+    threshold: 1
   },
   {
     id: '2',
-    user_id: 'user-1', // Now supported by the Badge interface
+    user_id: 'user-1',
     name: 'Journal assidu',
     description: '5 entrées de journal consécutives',
     image_url: '/badges/journal-master.svg',
     icon: 'book',
-    icon_url: '/badges/journal-master.svg', // Add this property
+    icon_url: '/badges/journal-master.svg',
     level: 1,
-    awarded_at: '2023-04-18T09:15:00Z', // Now supported by the Badge interface
-    category: 'consistency',
+    awarded_at: '2023-04-18T09:15:00Z',
     unlocked: true,
-    threshold: 5 // Add threshold property
+    threshold: 5
   },
 ];

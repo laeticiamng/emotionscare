@@ -15,13 +15,13 @@ export function useConversations() {
   const { user } = useAuth();
   
   // Compose functionality from smaller hooks
-  const { loadConversations, isLoading: isLoadingConversations } = useConversationLoader(user?.id);
+  const { loadConversations, isLoading: isLoadingConversations } = useConversationLoader(user?.id || '');
   const { 
     createConversation: createConversationAction, 
     deleteConversation: deleteConversationAction,
     updateConversation,
-    isLoading: isProcessingAction 
-  } = useConversationManagement(user?.id);
+    isProcessing: isProcessingAction 
+  } = useConversationManagement(user?.id || '');
   
   // Combined loading state
   const isLoading = isLoadingConversations || isProcessingAction;
@@ -47,17 +47,21 @@ export function useConversations() {
   
   // Create conversation wrapper that also updates state
   const createConversation = async (title?: string): Promise<string | null> => {
-    const conversationId = await createConversationAction(title);
+    const conversation = await createConversationAction(title || '');
     
-    if (conversationId) {
+    if (conversation) {
+      const conversationId = conversation.id;
+      
       // Reload conversations to update the list
       await loadAndSetConversations();
       
       // Set the new conversation as active
       setActiveConversationId(conversationId);
+      
+      return conversationId;
     }
     
-    return conversationId;
+    return null;
   };
   
   // Delete conversation wrapper that also updates state
@@ -72,9 +76,11 @@ export function useConversations() {
       
       // Reload conversations to update the list
       await loadAndSetConversations();
+      
+      return true;
     }
     
-    return success;
+    return false;
   };
   
   // Update conversation wrapper that also updates local state
@@ -82,7 +88,8 @@ export function useConversations() {
     conversationId: string, 
     lastMessage: string
   ): Promise<boolean> => {
-    const success = await updateConversation(conversationId, lastMessage);
+    const updates = { lastMessage };
+    const success = await updateConversation(conversationId, updates);
     
     if (success) {
       // Update local state to reflect the changes without fetching the whole list again
@@ -93,9 +100,11 @@ export function useConversations() {
             : conv
         )
       );
+      
+      return true;
     }
     
-    return success;
+    return false;
   };
 
   return {

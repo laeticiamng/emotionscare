@@ -12,9 +12,13 @@ const UserPreferencesPage: React.FC = () => {
   const { user, updateUser } = useAuth();
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({
     theme: 'light',
-    notifications_enabled: true,
-    font_size: 'medium',
+    fontSize: 'medium',
     language: 'en',
+    notifications: true,
+    autoplayVideos: false,
+    showEmotionPrompts: true,
+    privacyLevel: 'standard',
+    dataCollection: true
   });
 
   useEffect(() => {
@@ -25,6 +29,7 @@ const UserPreferencesPage: React.FC = () => {
 
   const handleSavePreferences = async (preferences: UserPreferences) => {
     if (user && updateUser) {
+      // Make sure we create a new user object instead of modifying the existing one
       await updateUser({ ...user, preferences });
       setUserPreferences(preferences);
       navigate('/dashboard');

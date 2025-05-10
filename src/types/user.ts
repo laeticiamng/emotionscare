@@ -30,6 +30,7 @@ export interface User {
   position?: string;
   joined_at?: string;
   onboarded?: boolean;
+  preferences?: UserPreferences; // Add this property to fix User type errors
 }
 
 export interface UserPreferences {
@@ -56,6 +57,10 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
+  notificationType?: string;
+  notificationFrequency?: string;
+  notificationTone?: string;
+  reminderTime?: string;
 }
 
 export interface UserPreferencesState {
@@ -72,10 +77,10 @@ export interface UserPreferencesState {
   dataCollection: boolean;
   
   // Additional properties needed
-  notifications_enabled?: boolean;
-  notification_frequency?: string;
-  notification_type?: string;
-  notification_tone?: string;
+  notificationsEnabled?: boolean;
+  notificationFrequency?: string;
+  notificationType?: string;
+  notificationTone?: string;
   email_notifications?: boolean;
   push_notifications?: boolean;
   emotionalCamouflage?: boolean;

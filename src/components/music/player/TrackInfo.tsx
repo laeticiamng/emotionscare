@@ -49,21 +49,20 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   }
 
   // Get the cover URL from the track object, considering multiple property names
-  const getCoverUrl = () => {
+  const getCoverUrl = (): string | null => {
     if (!displayTrack) return null;
     
     // Check all possible cover image property names
-    if ('coverUrl' in displayTrack && displayTrack.coverUrl) return displayTrack.coverUrl;
-    if ('cover' in displayTrack && displayTrack.cover) return displayTrack.cover;
+    if ('coverUrl' in displayTrack && displayTrack.coverUrl) return displayTrack.coverUrl as string;
+    if ('cover' in displayTrack && displayTrack.cover) return displayTrack.cover as string;
     if ('cover_url' in displayTrack && displayTrack.cover_url) return displayTrack.cover_url;
-    if ('coverImage' in displayTrack && displayTrack.coverImage) return displayTrack.coverImage;
-    if ('imageUrl' in displayTrack && displayTrack.imageUrl) return displayTrack.imageUrl;
+    if ('coverImage' in displayTrack && displayTrack.coverImage) return displayTrack.coverImage as string;
+    if ('imageUrl' in displayTrack && displayTrack.imageUrl) return displayTrack.imageUrl as string;
     
     return null;
   };
   
   const trackCoverUrl = getCoverUrl();
-  // Ensure we explicitly define the return type as string | null
   const safeTrackCoverUrl: string | null = trackCoverUrl || null;
 
   return (
