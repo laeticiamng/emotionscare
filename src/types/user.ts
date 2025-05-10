@@ -1,6 +1,21 @@
 
+export interface User {
+  id: string;
+  name?: string;
+  email: string;
+  avatar_url?: string;
+  created_at?: string | Date;
+  updated_at?: string | Date;
+  role?: string;
+  preferences?: UserPreferences;
+  teams?: string[];
+  team_id?: string;
+  supervisor_id?: string;
+  status?: 'active' | 'inactive' | 'pending';
+}
+
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'pastel' | 'system' | 'nature' | 'deep-night';
+  theme: ThemeName;
   notifications_enabled: boolean;
   font_size: 'small' | 'medium' | 'large';
   language: string;
@@ -35,17 +50,6 @@ export interface UserPreferences {
     incognito_mode?: boolean;
     data_retention_period?: number;
   };
-}
-
-export interface User {
-  id: string;
-  name?: string;
-  email?: string;
-  avatar?: string;
-  role?: string;
-  created_at?: string | Date;
-  last_login?: string | Date;
-  preferences?: UserPreferences;
 }
 
 export interface UserPreferencesState extends UserPreferences {

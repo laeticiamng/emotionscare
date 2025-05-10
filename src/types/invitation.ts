@@ -25,6 +25,9 @@ export interface InvitationStats {
   accepted: number;
   pending: number;
   expired: number;
+  rejected?: number;
   conversion_rate: number;
   total: number;
+  teams?: Record<string, any>;
+  recent_invites?: any[];
 }

@@ -66,6 +66,9 @@ export interface ProgressBarProps {
   duration: number;
   formatTime: (seconds: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onSeek?: (time: number) => void;
+  showTimestamps?: boolean;
+  className?: string;
 }
 
 export interface EmotionToMusicMap {

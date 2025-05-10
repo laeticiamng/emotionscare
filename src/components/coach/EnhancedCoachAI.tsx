@@ -42,7 +42,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
   const handlePlayMusic = async () => {
     const emotion = emotionResult.primaryEmotion?.name.toLowerCase() || 'neutral';
     await loadPlaylistForEmotion(emotion);
-    // Use our safeOpen utility with a boolean true value directly
+    // Use our safeOpen utility properly
     setOpenDrawer(true);
     
     toast({

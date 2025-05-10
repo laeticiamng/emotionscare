@@ -35,4 +35,3 @@ export interface MusicDrawerProps {
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
 }
-

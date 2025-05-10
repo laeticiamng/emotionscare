@@ -1,11 +1,10 @@
 
-export interface ProgressProps {
-  value: number;
-  max?: number;
-  size?: 'sm' | 'md' | 'lg';
-  showLabel?: boolean;
-  label?: string;
-  color?: string;
-  animate?: boolean;
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  formatTime: (seconds: number) => string;
+  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onSeek?: (time: number) => void;
+  showTimestamps?: boolean;
   className?: string;
 }

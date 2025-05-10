@@ -24,21 +24,26 @@ export interface VRSession {
 export interface VRSessionTemplate {
   id: string;
   template_id: string;
-  name: string;
+  name?: string;
   theme: string;
+  title?: string;
   description: string;
   duration: number;
-  type: 'guided' | 'meditation' | 'visualization' | 'relaxation';
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  type?: 'guided' | 'meditation' | 'visualization' | 'relaxation';
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
   video_url?: string;
   audio_url?: string;
   image_url?: string;
   preview_url?: string;
   emotion_tags?: string[];
+  emotions?: string[];
   emotion_target?: string;
-  created_at: string | Date;
+  created_at?: string | Date;
   completion_rate?: number;
   is_audio_only?: boolean;
+  category?: string;
+  benefits?: string[];
+  popularity?: number;
 }
 
 export interface VRSessionWithMusicProps {

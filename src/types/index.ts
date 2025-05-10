@@ -37,4 +37,3 @@ export interface UserPreferencesState extends UserPreferences {
 export interface EmotionalTeamViewProps {
   className?: string;
 }
-

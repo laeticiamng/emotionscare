@@ -1,10 +1,13 @@
 
-export interface TrackInfo {
-  title: string;
-  artist: string;
-  album?: string;
-  duration: number;
-  progress?: number;
+export interface TrackInfoProps {
+  title?: string;
+  artist?: string;
   coverUrl?: string;
-  genre?: string;
+  track?: MusicTrack;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+  className?: string;
 }

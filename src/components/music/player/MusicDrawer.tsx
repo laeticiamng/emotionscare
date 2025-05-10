@@ -14,14 +14,14 @@ import { X } from "lucide-react";
 import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types';
 import MusicPlayer from "./MusicPlayer";
 
-// Assurez-vous que les props acceptent à la fois open et isOpen pour la compatibilité
+// Make sure the component accepts both open and isOpen for compatibility
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
   open, 
   isOpen, 
   onOpenChange, 
   onClose 
 }) => {
-  // Utiliser open si fourni, sinon isOpen (pour la rétrocompatibilité)
+  // Use open if provided, otherwise isOpen (for backwards compatibility)
   const isDrawerOpen = open !== undefined ? open : isOpen;
   
   const handleOpenChange = (open: boolean) => {
