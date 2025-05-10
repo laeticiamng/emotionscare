@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { mockMusicPlaylists } from '@/data/mockMusic';
+import { mockPlaylists } from '@/data/mockMusic';
 import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types/music';
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -45,9 +44,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Simulate API call with a delay
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    const playlist = mockMusicPlaylists.find(p => 
+    const playlist = mockPlaylists.find(p => 
       p.emotion?.toLowerCase() === emotion.toLowerCase()
-    ) || mockMusicPlaylists[0];
+    ) || mockPlaylists[0];
 
     if (playlist) {
       setCurrentPlaylist(playlist);
@@ -61,7 +60,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [currentTrack]);
 
   const getTracksForEmotion = useCallback((emotion: string): MusicTrack[] => {
-    const playlist = mockMusicPlaylists.find(p => 
+    const playlist = mockPlaylists.find(p => 
       p.emotion?.toLowerCase() === emotion.toLowerCase()
     );
     
@@ -80,12 +79,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
   
   // Add initializeMusicSystem function
-  const initializeMusicSystem = useCallback(async () => {
+  const initializeMusicSystem = useCallback(async (): Promise<void> => {
     try {
       // Simulate initialization
       await new Promise(resolve => setTimeout(resolve, 500));
       console.log("Music system initialized");
-      return true;
     } catch (err) {
       setError("Failed to initialize music system");
       throw err;
@@ -98,7 +96,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      const playlist = mockMusicPlaylists.find(p => p.id === id);
+      const playlist = mockPlaylists.find(p => p.id === id);
       if (playlist) {
         setCurrentPlaylist(playlist);
         if (playlist.tracks.length > 0) {
@@ -133,7 +131,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     toggleShuffle,
     initializeMusicSystem,
     error,
-    playlists: mockMusicPlaylists,
+    playlists: mockPlaylists,
     loadPlaylistById
   };
 

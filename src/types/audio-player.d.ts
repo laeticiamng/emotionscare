@@ -27,6 +27,28 @@ export interface UseAudioPlayerStateReturn {
   setError: (error: Error | null) => void;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
+  
+  // Adding audioRef for useAudioEvents hook compatibility
+  audioRef?: React.RefObject<HTMLAudioElement>;
+  state?: {
+    isPlaying: boolean;
+    duration: number;
+    currentTime: number;
+    volume: number;
+    muted: boolean;
+  };
+  controls?: {
+    play: () => void;
+    pause: () => void;
+    togglePlay: () => void;
+    seek: (time: number) => void;
+    setVolume: (volume: number) => void;
+    toggleMute: () => void;
+  };
+  timeFormatted?: {
+    currentTime: string;
+    duration: string;
+  };
 }
 
 // Types for the audio player main hook
@@ -89,17 +111,36 @@ export interface ProgressBarProps {
   duration: number;
   formatTime: (seconds: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  value?: number;
+  max?: number;
+  showLabel?: boolean;
+  className?: string;
+  variant?: 'default' | 'success' | 'warning' | 'danger';
+  progress?: number;
+  onSeek?: (percentage: number) => void;
+  showTimestamps?: boolean;
 }
 
 export interface TrackInfoProps {
   currentTrack: MusicTrack;
   loadingTrack?: boolean;
   audioError?: Error | null;
+  track?: MusicTrack;
+  className?: string;
+  compact?: boolean;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
   onVolumeChange: (values: number[]) => void;
+  className?: string;
+  onChange?: (volume: number) => void;
+  showLabel?: boolean;
 }
 
 export interface EmotionToMusicMap {

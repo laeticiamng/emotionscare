@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -49,7 +48,6 @@ const PreferencesForm: React.FC<{
       font_size: data.font_size,
       language: data.language,
       accent_color: data.accent_color,
-      background_color: data.background_color,
       notifications: {
         email: !!data.marketing_emails,
         push: !!data.feature_announcements,

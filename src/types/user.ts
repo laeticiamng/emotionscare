@@ -1,18 +1,21 @@
+
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
   avatar?: string;
-  avatar_url?: string;
-  image?: string;
+  avatar_url?: string;  // Added property
+  image?: string;       // Added property
   created_at?: Date | string;
-  joined_at?: Date | string;
+  joined_at?: Date | string;  // Added property
   emotional_score?: number;
   anonymity_code?: string;
-  onboarded?: boolean;
-  position?: string;
-  department?: string;
+  onboarded?: boolean;   // Added property
+  position?: string;     // Added property
+  department?: string;   // Added property
+  team_id?: string;      // Added property
+  preferences?: UserPreferences; // Added property
 }
 
 // UserRole as an enum so it can be used as a value
@@ -24,7 +27,8 @@ export enum UserRole {
   HR = 'hr',
   EMPLOYEE = 'employee',
   ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager'
+  WELLBEING_MANAGER = 'wellbeing_manager',
+  MANAGER = 'manager'  // Added missing role
 }
 
 export interface UserPreferences {
@@ -32,7 +36,11 @@ export interface UserPreferences {
   font_size: FontSize;
   notifications_enabled: boolean;
   language: string;
-  notifications?: boolean;
+  notifications?: {  // Changed to object with nested properties
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+  };
   accent_color?: string;
   reminder_time?: string;
 }

@@ -26,7 +26,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
     resolver: zodResolver(invitationSchema),
     defaultValues: {
       email: '',
-      role: 'employee' // Use string value from enum
+      role: UserRole.EMPLOYEE // Use string value from enum
     }
   });
   
@@ -88,9 +88,9 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="employee">Employé Classique</SelectItem>
-                  <SelectItem value="analyst">Analyste (Direction - anonymisé)</SelectItem>
-                  <SelectItem value="wellbeing_manager">Responsable Bien-être</SelectItem>
+                  <SelectItem value={UserRole.EMPLOYEE}>Employé Classique</SelectItem>
+                  <SelectItem value={UserRole.ANALYST}>Analyste (Direction - anonymisé)</SelectItem>
+                  <SelectItem value={UserRole.WELLBEING_MANAGER}>Responsable Bien-être</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>

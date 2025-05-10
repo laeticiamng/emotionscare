@@ -6,7 +6,7 @@ export interface MoodData {
   notes?: string;
   id?: string;
   user_id?: string;
-  originalDate?: string | Date;
+  originalDate?: string | Date;  // Added property
   
   // Add chart properties
   sentiment?: number;

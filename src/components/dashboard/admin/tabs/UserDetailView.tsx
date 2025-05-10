@@ -81,7 +81,8 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
                 </thead>
                 <tbody>
                   {moodData.map((data) => {
-                    const dateKey = String(data.originalDate || data.date);
+                    // Generate a string key from the date to avoid using Date object directly as a key
+                    const dateKey = `mood-${String(data.id || data.originalDate || data.date)}`;
                     return (
                     <tr key={dateKey}>
                       <td>{new Date(data.originalDate || data.date).toLocaleDateString()}</td>
