@@ -51,8 +51,8 @@ export interface UseAudioPlayerStateReturn {
   };
 }
 
-// Types for the audio player main hook
-export interface UseAudioPlayerReturn {
+// Types for the audio player main hook - rename to match what's used
+export type UseAudioPlayerReturn = {
   // State
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
@@ -105,7 +105,7 @@ export interface UseMusicControlsReturn {
   loadingTrack: boolean;
 }
 
-// Add the missing interfaces
+// Progress bar props
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
@@ -121,6 +121,7 @@ export interface ProgressBarProps {
   showTimestamps?: boolean;
 }
 
+// Track info props
 export interface TrackInfoProps {
   currentTrack: MusicTrack;
   loadingTrack?: boolean;
@@ -135,6 +136,7 @@ export interface TrackInfoProps {
   showControls?: boolean;
 }
 
+// Volume control props
 export interface VolumeControlProps {
   volume: number;
   onVolumeChange: (values: number[]) => void;

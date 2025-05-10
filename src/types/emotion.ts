@@ -1,58 +1,35 @@
+
+// Update the Emotion interface to allow for string arrays in emojis
 export interface Emotion {
   id: string;
   user_id: string;
   date: string | Date;
   emotion: string;
-  score?: number;
-  confidence?: number;
-  text?: string;
-  transcript?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  emojis?: string;
-  primaryEmotion?: {
-    name: string;
-  };
+  confidence: number;
   intensity?: number;
-  name?: string; // Added property for compatibility
+  emojis?: string | string[]; // Allow both string and string array
+  text?: string;
+  ai_feedback?: string;
+  score?: number;
+  name?: string; // Add this property
 }
 
 export interface EmotionResult {
-  id: string;
-  user_id?: string;
-  date?: string | Date;
   emotion: string;
-  confidence: number;
-  score: number;
-  feedback?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  transcript?: string;
-  text?: string;
-  emojis?: string;
   intensity?: number;
-  primaryEmotion?: {
-    name: string;
-    id?: string;
-    user_id?: string;
-    date?: string | Date;
-  };
+  confidence?: number;
+  score?: number;
 }
 
 export interface EmotionalTeamViewProps {
-  className?: string;
-  teamId?: string;
-  viewMode?: 'summary' | 'detailed';
+  teamId: string;
+  period?: 'day' | 'week' | 'month';
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  detailedAnalysis?: {
-    strengths?: string[];
-    challenges?: string[];
-    recommendations?: string[];
-  };
-  historicalContext?: {
-    trends?: string;
-    compareToLastWeek?: number;
-  };
+  displayName: string;
+  color: string;
+  icon: string;
+  description: string;
+  musicType: string;
 }

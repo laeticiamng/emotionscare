@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { mockPlaylists } from '@/data/mockMusic';
 import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types/music';
@@ -78,7 +79,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     console.log("Toggle shuffle functionality");
   }, []);
   
-  // Add initializeMusicSystem function
+  // Add initializeMusicSystem function - modify to return void instead of boolean
   const initializeMusicSystem = useCallback(async (): Promise<void> => {
     try {
       // Simulate initialization

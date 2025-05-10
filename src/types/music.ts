@@ -1,51 +1,33 @@
 
+// Define the MusicTrack interface
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;
-  url: string;
+  url?: string;
+  audioUrl?: string;
   coverUrl?: string;
-  cover?: string;  
-  coverImage?: string;  
-  externalUrl?: string;
-  mood?: string;
+  duration: number;
+  emotion?: string;
   genre?: string;
   intensity?: number;
-  bpm?: number;
-  tags?: string[];
-  audioUrl?: string;
-  emotion?: string;
+  isPlaying?: boolean;
 }
 
+// Define the MusicPlaylist interface
 export interface MusicPlaylist {
   id: string;
-  name: string;  
+  name: string;
   description?: string;
   tracks: MusicTrack[];
   coverUrl?: string;
   emotion?: string;
-  createdAt?: Date | string;
+  createdAt?: string;
+  userId?: string;
+  isRecommended?: boolean;
 }
 
-export interface MusicRecommendationCardProps {
-  emotion: string;
-  intensity: number;
-  standalone?: boolean;
-  className?: string;
-  track?: MusicTrack;
-  recommendationReason?: string;
-}
-
-export interface MusicDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  isOpen?: boolean;
-  currentTrack?: MusicTrack;
-  onClose?: () => void;
-}
-
-// Add the MusicContextType interface
+// Define MusicContextType
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   currentPlaylist: MusicPlaylist | null;
@@ -60,11 +42,26 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   getTracksForEmotion: (emotion: string) => MusicTrack[];
-  currentEmotion?: string;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
-  initializeMusicSystem?: () => Promise<void>;
-  error?: string | null;
-  playlists?: MusicPlaylist[];
-  loadPlaylistById?: (id: string) => Promise<MusicPlaylist | null>;
+  currentEmotion: string;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+  initializeMusicSystem: () => Promise<void>;
+  error: string | null;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
+}
+
+// Define MusicRecommendationCardProps interface
+export interface MusicRecommendationCardProps {
+  emotion: string;
+  tracks: MusicTrack[];
+  onTrackSelect: (track: MusicTrack) => void;
+  isLoading?: boolean;
+}
+
+// Define MusicDrawerProps interface
+export interface MusicDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children?: React.ReactNode;
 }

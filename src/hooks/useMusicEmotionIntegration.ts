@@ -19,35 +19,44 @@ export function useMusicEmotionIntegration() {
   const { toast } = useToast();
   
   // Activate music based on detected emotion
-  const activateMusicForEmotion = useCallback((emotionResult: EmotionResult) => {
+  const activateMusicForEmotion = useCallback(async (emotionResult: EmotionResult) => {
     if (!emotionResult.emotion) return;
     
     const emotionKey = emotionResult.emotion.toLowerCase();
     const musicType = mapEmotionToMusicType(emotionKey);
     
-    const playlist = loadPlaylistForEmotion(musicType);
-    
-    if (playlist && playlist.tracks.length > 0) {
-      // If no music is playing, start playing
-      if (!currentTrack || !isPlaying) {
-        const track = {
-          ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
-        };
-        playTrack(track);
+    try {
+      const playlist = await loadPlaylistForEmotion(musicType);
+      
+      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+        // If no music is playing, start playing
+        if (!currentTrack || !isPlaying) {
+          const track = {
+            ...playlist.tracks[0],
+            duration: playlist.tracks[0].duration || 0,
+            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
+          };
+          playTrack(track);
+        }
+        
+        // Open the drawer with the music player
+        setOpenDrawer(true);
+        
+        // Notify the user about the music recommendation
+        toast({
+          title: "Musique adaptée à votre émotion",
+          description: `Une playlist "${musicType}" correspondant à votre émotion "${emotionKey}" est disponible.`
+        });
+        
+        return playlist;
       }
-      
-      // Open the drawer with the music player
-      setOpenDrawer(true);
-      
-      // Notify the user about the music recommendation
+    } catch (error) {
+      console.error('Error activating music for emotion:', error);
       toast({
-        title: "Musique adaptée à votre émotion",
-        description: `Une playlist "${musicType}" correspondant à votre émotion "${emotionKey}" est disponible.`
+        title: "Erreur",
+        description: "Impossible de charger la musique correspondante à votre émotion.",
+        variant: "destructive"
       });
-      
-      return playlist;
     }
     
     return null;

@@ -6,12 +6,13 @@ export interface ChatMessage {
   sender: string;
   timestamp: Date | string;
   
-  // Add required properties that were missing
+  // Required properties
   sender_id: string;
   conversation_id: string;
   content: string;
   is_read: boolean;
   sender_type?: string;
+  role?: string; // Add this property
 }
 
 export interface ChatConversation {
@@ -34,6 +35,8 @@ export interface ChatResponse {
   emotion?: string;
   confidence?: number;
   recommendations?: string[];
+  text?: string; // Add this property
+  follow_up_questions?: string[]; // Add this property
 }
 
 export interface ChatConversationStats {
@@ -48,4 +51,20 @@ export interface ChatNotification {
   message: string;
   read: boolean;
   timestamp: Date | string;
+}
+
+// Add ChatContext interface
+export interface ChatContext {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  handleSend: (message: string) => Promise<ChatResponse>;
+  addMessage: (message: Omit<ChatMessage, 'id'>) => void;
+  clearMessages: () => void;
+}
+
+// Add UserContext interface
+export interface UserContext {
+  id: string;
+  name: string;
+  preferences?: Record<string, any>;
 }

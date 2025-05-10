@@ -15,6 +15,9 @@ export interface Badge {
   xp_reward?: number;
   user_id?: string;  // Added missing property
   created_at?: Date | string;
+  awarded_at?: string | Date; // Add this property
+  icon_url?: string; // Add this property
+  threshold?: number; // Add this property for badge progress tracking
 }
 
 export interface BadgeGroup {

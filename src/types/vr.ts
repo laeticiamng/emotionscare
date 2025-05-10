@@ -1,59 +1,53 @@
 
+// Update VRSession interface
 export interface VRSession {
   id: string;
+  title: string;
+  description: string;
+  duration: number;
   user_id: string;
+  started_at?: Date | string;
+  completed?: boolean;
+  completed_at?: Date | string;
   template_id?: string;
-  started_at: string | Date;
-  ended_at?: string | Date;
-  duration?: number;
-  emotions?: string[];
-  completed: boolean;
-  notes?: string;
-  rating?: number;
-  title?: string;
-  
-  // Added properties
-  date?: string | Date;
-  start_time?: string | Date;
-  duration_seconds?: number;
   is_audio_only?: boolean;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
+  preview_url?: string;
+  audio_url?: string;
+  emotion_target?: string;
+  status?: 'pending' | 'completed' | 'in_progress';
+  benefits?: string[];
+  instructions?: string;
+  date?: Date | string; // Add this property
+  start_time?: Date | string; // Add this property
+  duration_seconds?: number; // Add this property
+  heart_rate_before?: number; // Add this property
+  heart_rate_after?: number; // Add this property
+  mood_before?: string; // Add this property
 }
 
 export interface VRSessionTemplate {
   id: string;
   title: string;
   description: string;
-  image_url?: string;
-  duration?: number;
+  duration: number;
+  benefits?: string[];
+  instructions?: string;
+  thumbnail?: string;
+  thumbnail_url?: string;
   category?: string;
-  guided?: boolean;
-  voice?: string;
-  music_included?: boolean;
-  difficulty?: string;
-  emotions?: string[]; 
-  
-  // Added properties
-  theme?: string;
+  tags?: string[];
   is_audio_only?: boolean;
   preview_url?: string;
   audio_url?: string;
   emotion_target?: string;
+  template_id?: string;
+  theme?: string;
   completion_rate?: number;
   recommended_mood?: string;
-  template_id?: string;
-  popularity?: number;
-  benefits?: string[];
 }
 
 export interface VRSessionWithMusicProps {
-  session?: VRSession | VRSessionTemplate;
-  template?: VRSessionTemplate;
-  onComplete?: (feedback: any) => void;
-  autoStart?: boolean;
-  
-  // Added properties
+  session: VRSession | VRSessionTemplate;
   musicTracks?: any[];
   onSessionComplete?: () => void;
   isAudioOnly?: boolean;

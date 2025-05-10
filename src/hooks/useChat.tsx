@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage, ChatResponse, ChatContext } from '@/types';
+import { ChatMessage, ChatResponse } from '@/types';
 import { useToast } from './use-toast';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -26,7 +26,6 @@ const useChat = (options: UseChatOptions = {}) => {
         setTimeout(() => {
           resolve({
             message: `This is a response to: "${message}"`,
-            text: `This is a response to: "${message}"`,
             recommendations: ["Try meditation", "Listen to calming music"],
             follow_up_questions: ["How are you feeling now?", "Would you like some music recommendations?"]
           });
@@ -48,7 +47,15 @@ const useChat = (options: UseChatOptions = {}) => {
   }, [toast]);
 
   const addMessage = useCallback((message: Omit<ChatMessage, 'id'>) => {
-    setMessages((prev) => [...prev, { ...message, id: uuidv4() }]);
+    setMessages((prev) => [...prev, { 
+      ...message, 
+      id: uuidv4(),
+      // Ensure all required properties are present
+      sender_id: message.sender_id || 'user',
+      conversation_id: message.conversation_id || 'default',
+      content: message.content || message.text || '',
+      is_read: message.is_read !== undefined ? message.is_read : true
+    }]);
   }, []);
 
   const clearMessages = useCallback(() => {

@@ -20,6 +20,7 @@ export * from './types/group';
 export * from './types/vr-session-music';
 export * from './types/notification';
 export * from './types/preferences';
+export * from './types/report';
 
 // Basic shared types
 export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
@@ -42,3 +43,4 @@ export { User, UserPreferences, UserPreferencesState } from './types/user';
 export { NotificationFrequency, NotificationType, NotificationTone } from './types/notification';
 export { ProgressBarProps } from './types/progress-bar';
 export { TrackInfoProps, VolumeControlProps } from './types/track-info';
+export { Report } from './types/report';

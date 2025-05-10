@@ -25,11 +25,13 @@ const ConversationList: React.FC<ConversationListProps> = ({
   
   const getLastMessageText = (conversation: ChatConversation) => {
     // Get the last message text from the messages array
-    const lastMessage = conversation.messages && conversation.messages.length > 0
-      ? conversation.messages[conversation.messages.length - 1]
-      : conversation.last_message;
+    if (conversation.messages && conversation.messages.length > 0) {
+      const lastMessage = conversation.messages[conversation.messages.length - 1];
+      return lastMessage?.content || lastMessage?.text || "Aucun message";
+    }
     
-    return lastMessage?.text || lastMessage?.content || "Aucun message";
+    // Or use the last_message field if available
+    return conversation.last_message || "Aucun message";
   };
   
   return (

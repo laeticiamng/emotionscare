@@ -86,7 +86,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 key={msg.id}
                 className={cn(
                   "flex max-w-[80%] rounded-lg p-4",
-                  msg.sender === "user" || msg.role === "user"
+                  msg.sender === "user" || msg.sender_type === "user"
                     ? "bg-primary/10 ml-auto"
                     : "bg-muted mr-auto"
                 )}

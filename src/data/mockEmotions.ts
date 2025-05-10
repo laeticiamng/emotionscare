@@ -11,7 +11,7 @@ export const mockEmotions: Emotion[] = [
     date: '2023-11-01T10:00:00Z',
     score: 85,
     text: "Je me sens très heureux aujourd'hui, ma journée a bien commencé.",
-    emojis: ['😊', '🌞'], // Array of strings instead of a single string
+    emojis: ['😊', '🌞'], // This is now allowed since the Emotion interface supports string[]
     ai_feedback: "Votre état de joie est remarquable ! Profitez de cette énergie positive pour accomplir quelque chose qui vous tient à cœur aujourd'hui."
   },
   {
@@ -22,7 +22,7 @@ export const mockEmotions: Emotion[] = [
     date: '2023-10-28T15:30:00Z',
     score: 40,
     text: "Je me sens un peu anxieux à propos de ma présentation de demain.",
-    emojis: ['😰', '😓'], // Array of strings instead of a single string
+    emojis: ['😰', '😓'], // This is now allowed since the Emotion interface supports string[]
     ai_feedback: "L'anxiété est normale avant une présentation importante. Essayez de pratiquer des exercices de respiration et de visualiser un résultat positif."
   },
   {
@@ -30,23 +30,25 @@ export const mockEmotions: Emotion[] = [
     user_id: '1',
     date: '2023-04-14T10:20:00Z',
     emotion: 'calm',
-    confidence: 0.8, // Added required confidence field
+    confidence: 0.8,
     intensity: 8,
-    emojis: ['😊', '😌'], // Array of strings instead of a single string
+    emojis: ['😊', '😌'], // This is now allowed since the Emotion interface supports string[]
     text: 'Je me sens bien aujourd\'hui, journée productive',
     ai_feedback: 'Votre humeur semble positive. Continuez à cultiver cette énergie positive!',
     score: 82,
+    name: 'Calm' // Add name property
   },
   {
     id: '4',
     user_id: '1',
     date: '2023-04-13T11:30:00Z',
     emotion: 'stress',
-    confidence: 0.7, // Added required confidence field
+    confidence: 0.7,
     intensity: 6,
-    emojis: ['😓', '😔'], // Array of strings instead of a single string
+    emojis: ['😓', '😔'], // This is now allowed since the Emotion interface supports string[]
     text: 'Journée difficile, beaucoup de stress',
     ai_feedback: 'Vous semblez ressentir du stress. Une pause VR de 5 minutes pourrait vous aider.',
     score: 45,
+    name: 'Stress' // Add name property
   },
 ];
