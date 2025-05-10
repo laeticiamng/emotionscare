@@ -1,7 +1,8 @@
 
-import { MusicTrack } from './music';
-
-export interface TrackInfoProps {
-  track: MusicTrack | null;
-  isCompact?: boolean;
+export interface TrackInfo {
+  title: string;
+  artist: string;
+  duration: number;
+  coverArt: string;
+  audioSrc: string;
 }

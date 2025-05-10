@@ -1,11 +1,17 @@
 
-// Types for scan-related components
-export * from './index';
+// Define basic types for the scan functionality
+export interface ScanResult {
+  id: string;
+  user_id: string;
+  type: 'emotion' | 'stress' | 'focus';
+  score: number;
+  created_at: Date | string;
+  details?: Record<string, any>;
+}
 
-export interface ScanOptions {
-  text?: string;
-  audio?: string;
-  emojis?: string;
-  isConfidential?: boolean;
-  shareWithCoach?: boolean;
+export interface ScanHistory {
+  results: ScanResult[];
+  average: number;
+  trend: 'improving' | 'declining' | 'stable';
+  recommendations?: string[];
 }

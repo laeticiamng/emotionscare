@@ -1,38 +1,38 @@
 
-// Types for gamification-related components
-export * from './index';
-
-export interface BadgeProgress {
-  currentValue: number;
-  threshold: number;
-  percentage: number;
+export interface GamificationStats {
+  points: number;
+  level: number;
+  badges_earned: number;
+  total_badges: number;
+  current_streak: number;
+  longest_streak: number;
+  challenges_completed: number;
+  next_challenge?: Challenge;
 }
 
-export interface UserAchievement {
-  badge_id: string;
-  user_id: string;
-  earned_at: string;
-  progress?: number;
-}
-
-export interface Badge {
+export interface Challenge {
   id: string;
   title: string;
   description: string;
-  icon: string;
-  type: 'milestone' | 'achievement' | 'challenge' | 'streak';
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  threshold: number;
-  category: string;
-  color: string;
+  points: number;
+  progress?: number;
+  total?: number;
+  completed: boolean;
+  deadline?: string | Date;
+  badge_reward?: string;
 }
 
-export interface Report {
-  id: string;
+export interface Leaderboard {
+  timeframe: 'weekly' | 'monthly' | 'all_time';
+  entries: LeaderboardEntry[];
+}
+
+export interface LeaderboardEntry {
   user_id: string;
-  type: 'daily' | 'weekly' | 'monthly';
-  date: string | Date;
-  data: Record<string, any>;
-  insights: string[];
-  recommendations: string[];
+  username: string;
+  avatar?: string;
+  points: number;
+  rank: number;
+  badges?: number;
+  is_current_user?: boolean;
 }

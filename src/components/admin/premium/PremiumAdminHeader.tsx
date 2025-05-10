@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Bell, 
@@ -7,10 +6,10 @@ import {
   VolumeX, 
   Settings, 
   Download, 
-  LayoutPresentationAnalytics,
   PanelLeftClose,
   PanelLeftOpen,
-  Palette
+  Palette,
+  LayoutPanelTop
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -18,7 +17,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { motion } from 'framer-motion';
 import { SegmentSelector } from '@/components/dashboard/admin/SegmentSelector';
 import { Badge } from '@/components/ui/badge';
-import type { User } from '@/types';
+import type { User } from '@/types/user';
 
 interface PremiumAdminHeaderProps {
   user: User | null;
@@ -140,7 +139,7 @@ export const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
                   size="icon"
                   onClick={() => handleButtonClick(onPresentationMode)}
                 >
-                  <LayoutPresentationAnalytics />
+                  <LayoutPanelTop />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>

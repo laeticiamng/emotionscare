@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { WeatherCloudy, CloudRain, CloudSun, Cloud, Sun, ThermometerSun } from 'lucide-react';
+import { Cloud, CloudRain, CloudSun, Sun, ThermometerSun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface EmotionalClimateAnalyticsProps {
@@ -33,7 +32,7 @@ const getWeatherIcon = (score: number) => {
   if (score >= 80) return <Sun className="text-yellow-400" />;
   if (score >= 70) return <CloudSun className="text-yellow-300" />;
   if (score >= 60) return <Cloud className="text-blue-300" />;
-  if (score >= 50) return <WeatherCloudy className="text-gray-400" />;
+  if (score >= 50) return <Cloud className="text-gray-400" />;
   return <CloudRain className="text-gray-500" />;
 };
 

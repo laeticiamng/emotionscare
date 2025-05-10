@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/contexts/ThemeContext';
 import { PremiumAdminHeader } from './PremiumAdminHeader';
 import { EmotionalClimateAnalytics } from './EmotionalClimateAnalytics';
@@ -11,7 +10,7 @@ import { PremiumDashVideoSection } from './PremiumDashVideoSection';
 import { RhSelfCare } from './RhSelfCare';
 import { AdminPresentationMode } from './AdminPresentationMode';
 import useSound from '@/hooks/useSound';
-import type { User } from '@/types';
+import type { User } from '@/types/user';
 
 interface AdminPremiumInterfaceProps {
   user: User | null;
