@@ -1,124 +1,104 @@
 
-import React from 'react';
-import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { PlusCircle, HistoryIcon, RefreshCw } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { motion } from 'framer-motion';
-import ScanPageHeader from '@/components/scan/ScanPageHeader';
+import { useScanPage } from '@/hooks/useScanPage';
+import EmotionScanner from '@/components/scan/EmotionScanner';
 import ScanTabContent from '@/components/scan/ScanTabContent';
-import HistoryTabContent from '@/components/scan/HistoryTabContent';
-import TeamTabContent from '@/components/scan/TeamTabContent';
-import { useScanPageState } from '@/hooks/useScanPageState';
-import { useScanBackground } from '@/hooks/useScanBackground';
-import TabBackgroundAnimation from '@/components/scan/animation/TabBackgroundAnimation';
 
-const ScanPage = () => {
+const ScanPage: React.FC = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const {
-    activeTab,
-    setActiveTab,
-    showScanForm,
-    setShowScanForm,
-    emotions,
-    filteredUsers,
-    selectedFilter,
-    filterUsers,
-    periodFilter,
-    setPeriodFilter,
-    handleScanSaved,
-    refreshEmotionHistory
-  } = useScanPageState(user?.id);
-  
-  const { backgroundAnimation, getBackgroundStyle } = useScanBackground(activeTab);
+  const scanHook = useScanPage();
+  const [showScanForm, setShowScanForm] = useState<boolean>(false);
+  const [scanText, setScanText] = useState<string>('');
+  const [scanEmojis, setScanEmojis] = useState<string>('');
+  const [scanAudio, setScanAudio] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
 
-  const handleResultSaved = async () => {
-    await refreshEmotionHistory();
-    toast({
-      title: "Scan enregistré",
-      description: "Votre analyse émotionnelle a été sauvegardée avec succès.",
-    });
+  const handleScanSaved = () => {
+    setShowScanForm(false);
+    scanHook.refreshEmotions();
+  };
+
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    // Ici, nous simulons une analyse pour la démonstration
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      handleScanSaved();
+      setScanText('');
+      setScanEmojis('');
+      setScanAudio(null);
+    }, 1500);
   };
 
   return (
-    <div className={`min-h-[80vh] pb-12 relative ${getBackgroundStyle()}`}>
-      {/* Animated background */}
-      <TabBackgroundAnimation backgroundAnimation={backgroundAnimation} />
-      
-      <div className="container mx-auto py-8 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+    <div className="container mx-auto py-8 max-w-4xl animate-fade-in">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Scan émotionnel</h1>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={scanHook.refreshEmotions}
+          className="flex items-center gap-2"
         >
-          <ScanPageHeader 
-            showScanForm={showScanForm}
-            activeTab={activeTab}
-            setShowScanForm={setShowScanForm}
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-        >
-          <Tabs defaultValue="scan" value={activeTab} onValueChange={setActiveTab} className="mb-8">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="scan" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-                Scanner
-              </TabsTrigger>
-              <TabsTrigger value="history" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-                Historique
-              </TabsTrigger>
-              <TabsTrigger value="team" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-                Vue Équipe
-              </TabsTrigger>
-            </TabsList>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-            >
-              <TabsContent value="scan">
-                <ScanTabContent 
-                  userId={user?.id || ''}
-                  showScanForm={showScanForm}
-                  setShowScanForm={setShowScanForm}
-                  handleScanSaved={handleScanSaved}
-                  onResultSaved={handleResultSaved}
-                />
-              </TabsContent>
-
-              <TabsContent value="history">
-                <HistoryTabContent 
-                  emotions={emotions}
-                />
-              </TabsContent>
-
-              <TabsContent value="team">
-                <TeamTabContent 
-                  filteredUsers={filteredUsers}
-                  selectedFilter={selectedFilter}
-                  filterUsers={filterUsers}
-                  periodFilter={periodFilter}
-                  setPeriodFilter={setPeriodFilter}
-                />
-              </TabsContent>
-            </motion.div>
-          </Tabs>
-        </motion.div>
+          <RefreshCw className="h-4 w-4" />
+          Actualiser
+        </Button>
       </div>
+
+      <Tabs defaultValue="new" className="w-full">
+        <TabsList className="grid grid-cols-2 mb-8 w-full max-w-md mx-auto">
+          <TabsTrigger value="new">Nouveau scan</TabsTrigger>
+          <TabsTrigger value="history">Historique</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="new" className="space-y-4">
+          {showScanForm ? (
+            <Card className="shadow-md rounded-xl overflow-hidden">
+              <CardContent className="p-6">
+                <EmotionScanner
+                  text={scanText}
+                  emojis={scanEmojis}
+                  audioUrl={scanAudio}
+                  onTextChange={setScanText}
+                  onEmojiChange={setScanEmojis}
+                  onAudioChange={setScanAudio}
+                  onAnalyze={handleAnalyze}
+                  isAnalyzing={isAnalyzing}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="text-center py-12">
+              <div className="mb-6 text-2xl">Prêt pour un nouveau scan émotionnel?</div>
+              <Button
+                size="lg"
+                onClick={() => setShowScanForm(true)}
+                className="gap-2"
+              >
+                <PlusCircle className="h-5 w-5" />
+                Commencer un scan
+              </Button>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="history">
+          <ScanTabContent
+            userId={user?.id || ''}
+            showScanForm={showScanForm}
+            setShowScanForm={setShowScanForm}
+            handleScanSaved={handleScanSaved}
+            onResultSaved={scanHook.refreshEmotions}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
 
-export default function WrappedScanPage() {
-  return (
-    <ProtectedLayoutWrapper>
-      <ScanPage />
-    </ProtectedLayoutWrapper>
-  );
-}
+export default ScanPage;

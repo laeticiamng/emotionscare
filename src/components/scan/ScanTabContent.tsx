@@ -3,6 +3,8 @@ import React from 'react';
 import { Card } from '@/components/ui/card';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import EmotionScanLive from '@/components/scan/EmotionScanLive';
+import { useScanPage } from '@/hooks/useScanPage';
+import EmotionHistory from './EmotionHistory';
 
 interface ScanTabContentProps {
   userId: string;
@@ -19,23 +21,15 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
   handleScanSaved,
   onResultSaved
 }) => {
+  const { emotions, loading, error } = useScanPage();
+  
   return (
     <div className="space-y-4">
-      {showScanForm ? (
-        <Card className="p-6 shadow-md rounded-3xl">
-          <EmotionScanForm
-            onScanSaved={handleScanSaved}
-            onClose={() => setShowScanForm(false)}
-          />
-        </Card>
-      ) : (
-        <EmotionScanLive 
-          userId={userId} 
-          isConfidential={false}
-          onScanComplete={() => {}}
-          onResultSaved={onResultSaved} 
-        />
-      )}
+      <EmotionHistory 
+        emotions={emotions} 
+        loading={loading} 
+        error={error} 
+      />
     </div>
   );
 };

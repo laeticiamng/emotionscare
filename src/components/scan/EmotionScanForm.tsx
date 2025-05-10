@@ -1,104 +1,58 @@
 
-import React from 'react';
-import { useAuth } from "@/contexts/AuthContext";
-import AnalysisDialog from './AnalysisDialog';
-import FormHeader from './form/FormHeader';
-import QuickModeForm from './form/QuickModeForm';
-import StandardModeForm from './form/StandardModeForm';
-import EmotionScanAnalysisResult from './form/EmotionScanAnalysisResult';
-import useEmotionScanFormState from './form/useEmotionScanFormState';
+import React, { useState } from 'react';
+import EmotionScanner from './EmotionScanner';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
-export interface EmotionScanFormProps {
+interface EmotionScanFormProps {
   onScanSaved: () => void;
-  onClose?: () => void;
-  onSaveComplete?: () => void; // Added for ScanPage.tsx compatibility
+  onClose: () => void;
 }
 
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ 
-  onScanSaved, 
-  onClose, 
-  onSaveComplete 
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
+  onScanSaved,
+  onClose
 }) => {
-  const { user } = useAuth();
+  const [text, setText] = useState('');
+  const [emojis, setEmojis] = useState('');
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
-  const {
-    activeTab,
-    setActiveTab,
-    emojis,
-    setEmojis,
-    text,
-    audioUrl,
-    setAudioUrl,
-    analyzing,
-    setAnalyzing,
-    isConfidential,
-    setIsConfidential,
-    shareWithCoach,
-    setShareWithCoach,
-    charCount,
-    analysisResult,
-    quickMode,
-    setQuickMode,
-    skipDay,
-    setSkipDay,
-    MAX_CHARS,
-    handleEmojiClick,
-    handleTextChange,
-    handleSubmit,
-    handleCorrection
-  } = useEmotionScanFormState(onScanSaved, onSaveComplete, user?.id);
-
+  const handleAnalyze = async () => {
+    if (!text && !emojis && !audioUrl) return;
+    
+    setIsAnalyzing(true);
+    
+    // Simulation d'analyse
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      onScanSaved();
+    }, 1500);
+  };
+  
   return (
-    <div className="space-y-6">
-      <FormHeader 
-        quickMode={quickMode}
-        setQuickMode={setQuickMode}
-        skipDay={skipDay}
-        setSkipDay={setSkipDay}
-        onClose={onClose}
-      />
-
-      {analysisResult ? (
-        <EmotionScanAnalysisResult 
-          analysisResult={analysisResult}
-          onCorrection={handleCorrection}
-        />
-      ) : (
-        <>
-          {quickMode ? (
-            <QuickModeForm 
-              emojis={emojis}
-              onEmojiClick={handleEmojiClick}
-              onClear={() => setEmojis('')}
-            />
-          ) : (
-            <StandardModeForm 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              text={text}
-              charCount={charCount}
-              maxChars={MAX_CHARS}
-              emojis={emojis}
-              audioUrl={audioUrl}
-              onTextChange={handleTextChange}
-              onEmojiClick={handleEmojiClick}
-              onClearEmojis={() => setEmojis('')}
-              setAudioUrl={setAudioUrl}
-              isConfidential={isConfidential}
-              setIsConfidential={setIsConfidential}
-              shareWithCoach={shareWithCoach}
-              setShareWithCoach={setShareWithCoach}
-              onSubmit={handleSubmit}
-              analyzing={analyzing}
-              onClose={onClose}
-            />
-          )}
-        </>
-      )}
-
-      <AnalysisDialog 
-        open={analyzing} 
-        onOpenChange={(open) => !open && setAnalyzing(false)} 
+    <div className="relative">
+      <div className="absolute top-0 right-0">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      <h2 className="text-2xl font-semibold mb-6">Scanner mon émotion</h2>
+      
+      <EmotionScanner
+        text={text}
+        emojis={emojis}
+        audioUrl={audioUrl}
+        onTextChange={setText}
+        onEmojiChange={setEmojis}
+        onAudioChange={setAudioUrl}
+        onAnalyze={handleAnalyze}
+        isAnalyzing={isAnalyzing}
       />
     </div>
   );

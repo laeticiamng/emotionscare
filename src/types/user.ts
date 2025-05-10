@@ -1,94 +1,54 @@
 
-// Ajouter ou mettre à jour ce fichier si nécessaire
+import { UserPreferences } from './preferences';
+
 export enum UserRole {
-  ADMIN = 'admin',
-  EMPLOYEE = 'employee',
-  MANAGER = 'manager',
-  GUEST = 'guest',
   USER = 'user',
-  STAFF = 'staff',
-  THERAPIST = 'therapist',
-  HRMANAGER = 'hrmanager',
-  ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager'
+  ADMIN = 'admin',
+  HR = 'hr',
+  MANAGER = 'manager',
+  GUEST = 'guest'
 }
 
 export interface User {
   id: string;
   name?: string;
   email?: string;
-  image?: string;
+  role?: string;
+  preferences?: UserPreferences;
+  createdAt?: string;
+  updatedAt?: string;
   avatar?: string;
-  avatar_url?: string;
   department?: string;
-  role?: UserRole;
-  created_at?: string;
-  updated_at?: string;
-  emotional_score?: number;
-  anonymity_code?: string;
-  team_id?: string;
   position?: string;
-  joined_at?: string;
-  onboarded?: boolean;
-  preferences?: UserPreferences; // Ajout de cette propriété pour résoudre les erreurs User type
-}
-
-export interface UserPreferences {
-  theme: string;
-  fontSize: string;
-  language: string;
-  notifications: boolean;
-  autoplayVideos: boolean;
-  showEmotionPrompts: boolean;
-  privacyLevel: string;
-  dataCollection: boolean;
-  
-  // Propriétés supplémentaires nécessaires
-  font_size?: string;
-  reminder_time?: string;
-  marketing_emails?: boolean;
-  feature_announcements?: boolean;
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  accent_color?: string;
-  notificationsEnabled?: boolean;
-  
-  // Fonctionnalités premium
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
-  notificationType?: string;
-  notificationFrequency?: string;
-  notificationTone?: string;
-  reminderTime?: string;
+  bio?: string;
+  isActive?: boolean;
+  lastLogin?: string;
+  team_id?: string;
+  team_role?: string;
+  isAnonymous?: boolean;
+  manager_id?: string;
+  phone?: string;
+  badges?: string[];
+  level?: number;
+  points?: number;
+  personal_data?: {
+    [key: string]: any;
+  }
 }
 
 export interface UserPreferencesState {
   preferences: UserPreferences;
-  isLoading: boolean;
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
-  theme: string;
-  fontSize: string;
-  language: string;
-  notifications: boolean;
-  autoplayVideos: boolean;
-  showEmotionPrompts: boolean;
-  privacyLevel: string;
-  dataCollection: boolean;
-  
-  // Propriétés supplémentaires nécessaires
-  notificationsEnabled?: boolean;
+  isLoading?: boolean;
+  error?: string | null;
+  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<boolean>;
+  resetPreferences: () => void;
+  theme?: string;
+  fontSize?: string;
   notifications_enabled?: boolean;
-  notificationFrequency?: string;
-  notificationType?: string;
-  notificationTone?: string;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
   email_notifications?: boolean;
   push_notifications?: boolean;
   emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
-  error?: Error | null;
-  reminderTime?: string;
-  reminder_time?: string;
 }
