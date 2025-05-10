@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { User } from '@/types/user';
+import { User, UserRole } from '@/types/user';
 import { UserData, SortDirection } from '@/components/dashboard/admin/types/tableTypes';
 
 interface UserTableDataOptions {
@@ -15,7 +15,7 @@ const convertUserToUserData = (user: User): UserData => {
     id: user.id,
     name: user.name || '',
     email: user.email || '',
-    role: user.role || 'user',
+    role: user.role || ('user' as UserRole), // Cast to UserRole
     department: user.department || '',
     location: '', // Default value since User doesn't have location
     status: 'active', // Default value
@@ -64,7 +64,7 @@ export function useUserTableData({
         id: `user-${i + 1}`,
         name: `User ${i + 1}`,
         email: `user${i + 1}@example.com`,
-        role: i % 3 === 0 ? 'admin' : 'user',
+        role: (i % 3 === 0 ? 'admin' : 'user') as UserRole,
         department: i % 4 === 0 ? 'HR' : 'Engineering',
         emotional_score: Math.floor(Math.random() * 100)
       }));

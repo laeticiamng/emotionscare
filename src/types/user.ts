@@ -1,68 +1,54 @@
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  MANAGER = 'manager',
-  EMPLOYEE = 'employee',
-  GUEST = 'guest',
-  ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager'
-}
+// Add or update this file as needed
+export type UserRole = 'admin' | 'employee' | 'manager' | 'guest' | 'user' | 'staff' | 'therapist' | 'hrmanager';
 
 export interface User {
   id: string;
   name?: string;
   email?: string;
+  image?: string;
   avatar?: string;
   avatar_url?: string;
-  image?: string;
-  created_at?: string | Date;
-  updated_at?: string | Date;
-  role?: UserRole;
   department?: string;
+  role?: UserRole;
+  created_at?: string;
+  updated_at?: string;
   emotional_score?: number;
   anonymity_code?: string;
-  position?: string;
-  joined_at?: string | Date;
-  onboarded?: boolean;
   team_id?: string;
+  position?: string;
+  joined_at?: string;
+  onboarded?: boolean;
 }
 
 export interface UserPreferences {
   theme: string;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    sms?: boolean;
-  };
-  language: string;
   fontSize: string;
+  language: string;
+  notifications: boolean;
   autoplayVideos: boolean;
   showEmotionPrompts: boolean;
   privacyLevel: string;
   dataCollection: boolean;
-  font_size?: string; // For backward compatibility
-  notifications_enabled?: boolean; // For backward compatibility
-  reminder_time?: string; // For reminder time property
-  accent_color?: string; // For accent color property
-  emotionalCamouflage?: boolean; // For premium feature
-  notificationFrequency?: string; // For notification frequency
-  notificationType?: string; // For notification type
-  notificationTone?: string; // For notification tone
+  
+  // Additional properties needed
+  font_size?: string;
+  reminder_time?: string;
+  marketing_emails?: boolean;
+  feature_announcements?: boolean;
 }
 
 export interface UserPreferencesState {
-  preferences: UserPreferences;
-  isLoading: boolean;
-  error: string | null;
-  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<void>;
-  resetPreferences: () => void;
-  theme?: string;
-  fontSize?: string;
-  notifications?: boolean;
-  notificationFrequency?: string;
-  notificationType?: string;
-  notificationTone?: string;
+  theme: string;
+  fontSize: string;
+  language: string;
+  notifications: boolean;
+  autoplayVideos: boolean;
+  showEmotionPrompts: boolean;
+  privacyLevel: string;
+  dataCollection: boolean;
+  
+  // Additional properties needed
   notifications_enabled?: boolean;
   notification_frequency?: string;
   notification_type?: string;

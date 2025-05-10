@@ -11,6 +11,7 @@ export interface MusicTrack {
   coverImage?: string;
   imageUrl?: string;
   emotion?: string;
+  externalUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -30,6 +31,7 @@ export interface MusicRecommendationCardProps {
   onPlayMusic?: () => void;
   size?: 'small' | 'medium' | 'large';
   showControls?: boolean;
+  className?: string;
 }
 
 export interface MusicDrawerProps {
@@ -59,4 +61,6 @@ export interface MusicContextType {
   currentEmotion?: string;
   initializeMusicSystem?: () => Promise<void>;
   error?: Error | null;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
 }

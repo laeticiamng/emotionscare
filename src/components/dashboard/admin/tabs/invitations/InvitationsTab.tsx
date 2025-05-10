@@ -21,7 +21,10 @@ const InvitationsTab: React.FC = () => {
     sent: 0,
     rejected: 0,
     teams: {},
-    recent_invites: []
+    recent_invites: [],
+    completed: 0,
+    conversionRate: 0,
+    averageTimeToAccept: 0
   });
 
   useEffect(() => {

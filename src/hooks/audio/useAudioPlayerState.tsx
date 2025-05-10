@@ -25,11 +25,15 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   }, []);
   
   // Wrapper for setError to handle Error objects
-  const setError = useCallback((err: string | null) => {
-    if (err instanceof Error) {
+  const setError = useCallback((err: Error | string | null) => {
+    if (err === null) {
+      setErrorState(null);
+    } else if (typeof err === 'string') {
+      setErrorState(err);
+    } else if (err && typeof err === 'object' && 'message' in err) {
       setErrorState(err.message);
     } else {
-      setErrorState(err);
+      setErrorState("Unknown error");
     }
   }, []);
   

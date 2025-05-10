@@ -1,60 +1,40 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack } from './music';
 
-export interface AudioPlayerState {
+export interface UseAudioPlayerStateReturn {
+  currentTrack: MusicTrack | null;
   isPlaying: boolean;
-  currentTime: number;
-  duration: number;
   volume: number;
   repeat: boolean;
   shuffle: boolean;
-  currentTrack: MusicTrack | null;
+  currentTime: number;
+  duration: number;
   loadingTrack: boolean;
-  audioError: Error | null;
-}
-
-export interface UseAudioPlayerStateReturn extends AudioPlayerState {
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
+  progress: number;
+  error: string | null;
   setCurrentTrack: (track: MusicTrack | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
+  setVolume: (volume: number) => void;
+  setRepeat: (repeat: boolean) => void;
+  setShuffle: (shuffle: boolean) => void;
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
-  setVolume: (volume: number) => void;
-  setLoadingTrack: (isLoading: boolean) => void;
-  setAudioError: (error: Error | null) => void;
+  setLoadingTrack: (loading: boolean) => void;
+  setProgress: (progress: number) => void;
+  setError: (error: string | null) => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
 }
 
-export interface UseAudioPlayerReturn {
-  play: () => void;
-  pause: () => void;
-  toggle: () => void;
-  stop: () => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleVolumeChange: (value: number) => void;
-  formatTime: (time: number) => string;
-}
-
-export interface UseMusicControlsReturn {
+export interface AudioPlayerState {
+  currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  setVolume: (volume: number) => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: (currentTrack: MusicTrack | null, currentPlaylist: MusicTrack[] | null) => void;
-  previousTrack: (currentTrack: MusicTrack | null, currentPlaylist: MusicTrack[] | null) => void;
-  currentTime: number;
-  duration: number;
-  formatTime: (time: number) => string;
-  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  handleVolumeChange: (value: number) => void;
   repeat: boolean;
-  toggleRepeat: () => void;
   shuffle: boolean;
-  toggleShuffle: () => void;
-  loadingTrack: boolean;
+  progress: number;
+  duration: number;
+  currentTime: number;
+  loading: boolean;
+  error: string | null;
 }

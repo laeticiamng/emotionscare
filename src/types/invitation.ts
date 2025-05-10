@@ -8,6 +8,13 @@ export interface InvitationStats {
   completed: number;
   conversionRate: number;
   averageTimeToAccept: number;
+  
+  // Adding missing properties
+  sent: number;
+  accepted: number;
+  rejected: number;
+  teams: Record<string, any>;
+  recent_invites: any[];
 }
 
 export interface InvitationFormData {

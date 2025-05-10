@@ -1,41 +1,16 @@
 
-// Create a file for journal types
+// Add or update this file
 export interface JournalEntry {
   id: string;
   user_id: string;
   date: string | Date;
   content: string;
-  mood: string;
-  mood_score: number;
-  emotions: string[];
-  created_at: string | Date;
-  updated_at: string | Date;
-  tags?: string[];
-  is_private?: boolean;
-  weather?: string;
-  location?: string;
-  title?: string;
-  media_urls?: string[];
-  image_url?: string;
-  text?: string; // Add text field
-  ai_feedback?: string; // Add ai_feedback field
-}
-
-export interface JournalStatistics {
-  total: number;
-  this_week: number;
-  this_month: number;
-  average_mood: number;
-  mood_trend: 'up' | 'down' | 'stable';
-  top_emotions: string[];
-  streak_days: number;
-}
-
-export interface JournalFilter {
-  startDate?: Date;
-  endDate?: Date;
-  mood?: string[];
+  ai_feedback?: string;
   emotions?: string[];
-  tags?: string[];
-  search?: string;
+  updated_at?: string | Date;
+  title?: string;
+  mood?: string;
+  mood_score?: number;
+  created_at?: string;
+  text?: string; // Some components use text instead of content
 }
