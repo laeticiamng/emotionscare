@@ -29,6 +29,9 @@ export interface UserPreferences {
     email: boolean;
     push: boolean;
     sms: boolean;
+    journal?: boolean;
+    breathing?: boolean;
+    music?: boolean;
   };
   reminder_time?: string;
   dynamic_theme?: {
@@ -54,6 +57,7 @@ export interface UserPreferences {
     incognito_mode?: boolean;
     data_retention_period?: number;
   };
+  emotionalCamouflage?: boolean;
 }
 
 export interface UserPreferencesState {
@@ -67,6 +71,9 @@ export interface UserPreferencesState {
     journal: boolean;
     breathing: boolean;
     music: boolean;
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
   };
   reminderTime?: string;
   dynamicTheme?: {
@@ -92,6 +99,7 @@ export interface UserPreferencesState {
     incognitoMode?: boolean;
     dataRetentionPeriod?: number;
   };
+  emotionalCamouflage?: boolean;
 }
 
 export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';

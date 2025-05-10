@@ -17,3 +17,20 @@ export interface JournalEntry {
     [key: string]: any;
   };
 }
+
+export interface JournalTag {
+  id: string;
+  name: string;
+  color: string;
+  user_id: string;
+}
+
+export interface JournalStats {
+  total: number;
+  this_week: number;
+  this_month: number;
+  streak_days: number;
+  most_used_tags: string[];
+  most_common_emotion: string;
+  average_mood: number;
+}

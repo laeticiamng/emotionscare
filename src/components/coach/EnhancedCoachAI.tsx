@@ -32,7 +32,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
       
       // Only show VR for certain emotions
       const vrEmotions = ['stressed', 'anxious', 'sad', 'angry'];
-      const primaryEmotion = emotionResult.primaryEmotion?.name.toLowerCase() || '';
+      const primaryEmotion = emotionResult.primaryEmotion?.name?.toLowerCase() || '';
       if (vrEmotions.includes(primaryEmotion)) {
         setShowVRRec(true);
       }
@@ -68,7 +68,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
             </h3>
             <p className="mt-2 text-sm">
               {emotionResult.ai_feedback || 
-                `Votre état émotionnel actuel est "${emotionResult.primaryEmotion?.name}" avec une intensité de ${Math.round(emotionResult.intensity * 100)}%. 
+                `Votre état émotionnel actuel est "${emotionResult.primaryEmotion?.name || emotionResult.emotion}" avec une intensité de ${Math.round((emotionResult.intensity || 0.5) * 100)}%. 
                 Voici quelques recommandations personnalisées pour vous aider à optimiser votre bien-être.`
               }
             </p>
@@ -88,8 +88,8 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
             <>
               <Separator />
               <MusicRecommendationCard 
-                emotion={emotionResult.primaryEmotion?.name} 
-                intensity={Math.round(emotionResult.intensity * 100)}
+                emotion={emotionResult.primaryEmotion?.name || emotionResult.emotion} 
+                intensity={Math.round((emotionResult.intensity || 0.5) * 100)}
                 standalone={true}
               />
             </>

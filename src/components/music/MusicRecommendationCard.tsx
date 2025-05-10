@@ -1,89 +1,49 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, PauseCircle, Music2 } from 'lucide-react';
+import { Play, Music } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
-import { MusicTrack } from '@/types/music';
 
 interface MusicRecommendationCardProps {
-  title: string;
-  emotion: string;
-  description?: string;
-  onSelect?: () => void;
+  emotion?: string;
+  intensity?: number;
+  standalone?: boolean;
 }
 
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
-  title,
-  emotion,
-  description,
-  onSelect
+  emotion = 'calm',
+  intensity = 50,
+  standalone = false
 }) => {
-  const { isPlaying, currentTrack, playTrack, pauseTrack, loadPlaylistForEmotion, setOpenDrawer } = useMusic();
-  
-  // Determine if this recommendation is currently playing
-  const isCurrentEmotion = currentTrack?.emotion?.toLowerCase() === emotion.toLowerCase();
-  const isCurrentlyPlaying = isPlaying && isCurrentEmotion;
-  
-  // Handle play/pause of recommendation
-  const handleTogglePlay = () => {
-    if (isCurrentlyPlaying) {
-      pauseTrack();
-    } else {
-      const playlist = loadPlaylistForEmotion(emotion);
-      if (playlist && playlist.tracks?.length > 0) {
-        playTrack(playlist.tracks[0]);
-      }
+  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
+
+  const handlePlayMusic = async () => {
+    try {
+      await loadPlaylistForEmotion(emotion.toLowerCase());
+      setOpenDrawer(true); // using the function directly, not returning a value
+    } catch (error) {
+      console.error('Error loading music:', error);
     }
   };
-  
-  // Function to open player drawer
-  const handleOpenPlayer = () => {
-    setOpenDrawer(true);
-  };
-  
+
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <Music2 className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="font-medium text-base">{title}</h3>
-              <p className="text-xs text-muted-foreground">Pour l'émotion: {emotion}</p>
-            </div>
-          </div>
-          
-          <Button
-            variant={isCurrentlyPlaying ? "secondary" : "default"}
-            size="sm"
-            className="gap-1 h-9"
-            onClick={handleTogglePlay}
-          >
-            {isCurrentlyPlaying ? <PauseCircle className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            <span>{isCurrentlyPlaying ? "Pause" : "Écouter"}</span>
-          </Button>
-        </div>
-        
-        {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        )}
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full text-xs"
-          onClick={() => {
-            if (onSelect) {
-              onSelect();
-            } else {
-              handleOpenPlayer();
-            }
-          }}
-        >
-          Voir plus
+    <Card className={standalone ? '' : 'mt-4'}>
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center text-lg">
+          <Music className="mr-2 h-5 w-5" />
+          Musique recommandée
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm mb-4">
+          {intensity > 75
+            ? `Votre état émotionnel "${emotion}" est intense. Une musique adaptée pourrait vous aider à vous équilibrer.`
+            : `Basée sur votre état émotionnel "${emotion}", voici une suggestion musicale pour accompagner votre moment.`}
+        </p>
+        <Button onClick={handlePlayMusic} className="w-full">
+          <Play className="mr-2 h-4 w-4" />
+          Écouter la playlist adaptée
         </Button>
       </CardContent>
     </Card>

@@ -15,3 +15,11 @@ export interface ScanHistory {
   trend: 'improving' | 'declining' | 'stable';
   recommendations?: string[];
 }
+
+export interface EnhancedEmotionResult {
+  emotion: string;
+  confidence: number;
+  feedback?: string;
+  recommendations?: string[];
+  transcript?: string;
+}

@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect } from 'react';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface ChatMessageListProps {
@@ -38,12 +38,12 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({
             key={message.id}
             className={cn(
               "flex max-w-[85%] md:max-w-[75%] rounded-lg p-4",
-              message.sender === 'user' 
+              (message.sender === 'user' || message.sender_type === 'user')
                 ? "bg-primary/10 ml-auto" 
                 : "bg-muted mr-auto"
             )}
           >
-            <span className="whitespace-pre-wrap">{message.text}</span>
+            <span className="whitespace-pre-wrap">{message.text || message.content}</span>
           </div>
         ))
       )}
