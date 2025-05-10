@@ -22,3 +22,10 @@ export type NotificationFrequency = 'daily' | 'weekly' | 'flexible' | 'none';
 export type NotificationType = 'minimal' | 'detailed' | 'full';
 export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
+
+// User preferences state for components
+export interface UserPreferencesState extends UserPreferences {
+  loading: boolean;
+  error: string | null;
+  emotionalCamouflage?: boolean;
+}

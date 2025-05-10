@@ -38,9 +38,9 @@ export interface MusicContextType {
   error?: string | null;
   currentEmotion?: string;
   playlists?: MusicPlaylist[];
-  currentPlaylist?: MusicTrack[];
+  currentPlaylist?: MusicPlaylist;
   setOpenDrawer: (open: boolean) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | void>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   loadPlaylistById?: (id: string) => Promise<void>;
   play: (track?: MusicTrack) => void;
   playTrack: (track: MusicTrack) => void;

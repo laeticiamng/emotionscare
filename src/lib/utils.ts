@@ -21,7 +21,7 @@ export function safeOpen(target: string | boolean | ((arg?: any) => void), arg?:
   } else if (typeof target === 'string' && target.startsWith('http')) {
     window.open(target, '_blank', 'noopener,noreferrer');
   } else if (typeof target === 'boolean') {
-    // For boolean values, use as is (used in some components to set state)
+    // For boolean values, return as is
     return target;
   }
   

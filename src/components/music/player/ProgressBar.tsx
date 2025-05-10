@@ -9,7 +9,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   onSeek,
   showTimestamps = true,
   formatTime,
-  handleProgressClick
+  handleProgressClick,
+  className
 }) => {
   const percent = duration > 0 ? (currentTime / duration) * 100 : 0;
   
@@ -23,8 +24,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   
   return (
     <div 
-      className="w-full space-y-1" 
-      onClick={handleProgressClick ? handleProgressClick : undefined}
+      className={`w-full space-y-1 ${className || ''}`}
+      onClick={handleProgressClick ? (e) => handleProgressClick(e) : undefined}
     >
       <Slider
         value={[percent]}

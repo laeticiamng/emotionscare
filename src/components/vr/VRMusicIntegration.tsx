@@ -7,6 +7,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { Badge } from '@/components/ui/badge';
 import MusicControls from '../music/page/MusicControls';
 import { Slider } from '@/components/ui/slider';
+import { MusicPlaylist } from '@/types';
 
 interface VRMusicIntegrationProps {
   emotion?: string;
@@ -119,7 +120,6 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
         )}
       </CardContent>
       
-      {/* Correction du style - suppression de jsx:true */}
       <style>
         {`
         @keyframes pulse {

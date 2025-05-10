@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import MusicPlayer from './MusicPlayer';
+import { MusicTrack, MusicPlaylist } from '@/types';
 
 interface MusicDrawerProps {
   open: boolean;
@@ -44,7 +45,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
     };
   }, [open, onClose]);
   
-  const handlePlayTrack = (track: any) => {
+  const handlePlayTrack = (track: MusicTrack) => {
     playTrack(track);
   };
 

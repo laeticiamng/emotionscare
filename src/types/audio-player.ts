@@ -1,4 +1,6 @@
 
+import { MusicTrack } from './music';
+
 export interface AudioPlayerState {
   isPlaying: boolean;
   currentTime: number;
@@ -7,21 +9,6 @@ export interface AudioPlayerState {
   repeat: boolean;
   shuffle: boolean;
   error: Error | null;
-}
-
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  album?: string;
-  duration: number;
-  url: string;
-  coverImage?: string;
-  emotion?: string;
-  tags?: string[];
-  cover?: string;
-  coverUrl?: string;
-  audioUrl?: string;
 }
 
 export interface VolumeControlProps {
@@ -46,6 +33,8 @@ export interface ProgressBarProps {
   onSeek?: (time: number) => void;
   showTimestamps?: boolean;
   className?: string;
+  formatTime?: (time: number) => string;
+  handleProgressClick?: (value: number) => void;
 }
 
 export interface UseMusicControlsReturn {

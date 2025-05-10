@@ -1,51 +1,54 @@
 
 export interface Emotion {
-  name: string;
-  value: number;
-  color: string;
-  icon?: string;
-  category?: string;
-  intensity?: number;
-  id?: string;
+  id: string;
   user_id?: string;
-  date?: string;
-  emotion?: string;
+  date: string;
+  emotion: string;
   score?: number;
+  confidence?: number;
   text?: string;
   transcript?: string;
   ai_feedback?: string;
   recommendations?: string[];
-  emojis?: string;
-  confidence?: number;
+  intensity?: number;
+  sentiment?: number;
+  timestamp?: string | Date;
+  primaryEmotion?: {
+    name: string;
+    score: number;
+  };
+  secondaryEmotions?: Array<{
+    name: string;
+    score: number;
+  }>;
 }
 
 export interface EmotionResult {
   id?: string;
   user_id?: string;
+  date?: string;
   emotion: string;
-  intensity?: number;
-  confidence?: number;
-  timestamp?: string | Date;
-  metadata?: Record<string, any>;
   score?: number;
-  text?: string;
-  transcript?: string;
+  confidence?: number;
+  intensity?: number;
   feedback?: string;
   ai_feedback?: string;
   recommendations?: string[];
-  emojis?: string;
-  date?: string;
-  primaryEmotion?: Emotion;
-}
-
-export interface EnhancedEmotionResult {
-  emotion: string;
-  confidence: number;
-  feedback?: string;
-  recommendations?: string[];
   transcript?: string;
+  text?: string;
+  primaryEmotion?: {
+    name: string;
+    score: number;
+  };
+  secondaryEmotions?: Array<{
+    name: string;
+    score: number;
+  }>;
 }
 
-export interface EmotionalTeamViewProps {
-  className?: string;
+export interface EnhancedEmotionResult extends EmotionResult {
+  history?: Emotion[];
+  trend?: 'improving' | 'stable' | 'declining';
+  detailedAnalysis?: string;
+  recommendations?: string[];
 }

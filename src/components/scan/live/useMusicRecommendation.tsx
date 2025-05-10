@@ -24,7 +24,7 @@ export const useMusicRecommendation = () => {
     'default': 'Musique apaisante'
   };
 
-  const handlePlayMusic = useCallback((emotionResult: EmotionResult) => {
+  const handlePlayMusic = useCallback(async (emotionResult: EmotionResult) => {
     if (!emotionResult || !emotionResult.emotion) {
       toast({
         title: "Pas d'émotion détectée",
@@ -34,27 +34,36 @@ export const useMusicRecommendation = () => {
       return;
     }
 
-    const { emotion } = emotionResult;
-    const playlist = loadPlaylistForEmotion(emotion.toLowerCase());
-
-    if (playlist && playlist.tracks.length > 0) {
-      // Play the first track from the playlist, ensuring it has duration and url
-      const track = {
-        ...playlist.tracks[0],
-        duration: playlist.tracks[0].duration || 0,
-        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
-      };
-      playTrack(track);
+    try {
+      const { emotion } = emotionResult;
+      const playlist = await loadPlaylistForEmotion(emotion.toLowerCase());
       
+      if (playlist && playlist.tracks.length > 0) {
+        // Play the first track from the playlist, ensuring it has duration and url
+        const track = {
+          ...playlist.tracks[0],
+          duration: playlist.tracks[0].duration || 0,
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
+        };
+        playTrack(track);
+        
+        toast({
+          title: "Musique recommandée",
+          description: `Nous vous suggérons d'écouter une ${EMOTION_TO_MUSIC[emotion.toLowerCase()] || EMOTION_TO_MUSIC.default}`,
+        });
+      } else {
+        toast({
+          title: "Aucune recommandation disponible",
+          description: "Nous n'avons pas de musique à vous recommander pour le moment",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la recommandation musicale:", error);
       toast({
-        title: "Musique recommandée",
-        description: `Nous vous suggérons d'écouter une ${EMOTION_TO_MUSIC[emotion.toLowerCase()] || EMOTION_TO_MUSIC.default}`,
-      });
-    } else {
-      toast({
-        title: "Aucune recommandation disponible",
-        description: "Nous n'avons pas de musique à vous recommander pour le moment",
-        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de charger la musique recommandée",
+        variant: "destructive"
       });
     }
   }, [toast, loadPlaylistForEmotion, playTrack]);

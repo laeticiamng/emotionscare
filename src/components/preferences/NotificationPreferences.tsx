@@ -1,14 +1,13 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { TimeInput } from "@/components/ui/time-input";
-import { Button } from "@/components/ui/button";
+import TimeInput from "@/components/ui/time-input";
 import { Bell } from "lucide-react";
-import { NotificationTone, UserPreferencesState } from '@/types';
+import { NotificationFrequency, NotificationType, NotificationTone, UserPreferencesState } from "@/types";
 
 interface NotificationPreferencesProps {
   preferences: UserPreferencesState;
@@ -16,73 +15,53 @@ interface NotificationPreferencesProps {
   isUpdating?: boolean;
 }
 
-const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
-  preferences,
+const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ 
+  preferences, 
   onUpdate,
   isUpdating = false,
 }) => {
-  // Initialize notification settings if they don't exist
-  useEffect(() => {
-    if (!preferences.notifications) {
-      onUpdate({
-        notifications: {
-          journal: false,
-          breathing: false,
-          music: false,
-        }
-      });
-    }
-  }, [preferences, onUpdate]);
-
+  // Update notification enabled state
   const handleToggleNotifications = (enabled: boolean) => {
-    onUpdate({ notificationsEnabled: enabled });
-  };
-
-  const handleToggleJournalNotification = (enabled: boolean) => {
     onUpdate({
-      notifications: {
-        ...(preferences.notifications || { journal: false, breathing: false, music: false }),
-        journal: enabled,
-      },
+      notificationsEnabled: enabled
     });
   };
 
-  const handleToggleBreathingNotification = (enabled: boolean) => {
-    onUpdate({
-      notifications: {
-        ...(preferences.notifications || { journal: false, breathing: false, music: false }),
-        breathing: enabled,
-      },
-    });
-  };
-
-  const handleToggleMusicNotification = (enabled: boolean) => {
-    onUpdate({
-      notifications: {
-        ...(preferences.notifications || { journal: false, breathing: false, music: false }),
-        music: enabled,
-      },
-    });
-  };
-
+  // Update reminder time
   const handleReminderTimeChange = (time: string) => {
-    onUpdate({ reminderTime: time });
-  };
-
-  const handleToneChange = (tone: NotificationTone) => {
-    onUpdate({ notificationTone: tone });
-  };
-
-  const handleResetNotifications = () => {
     onUpdate({
-      notificationsEnabled: true,
-      notifications: {
-        journal: true,
-        breathing: false,
-        music: true,
-      },
-      reminderTime: "09:00",
-      notificationTone: "minimalist"
+      reminderTime: time
+    });
+  };
+
+  // Update notification frequency
+  const handleFrequencyChange = (value: NotificationFrequency) => {
+    onUpdate({
+      notificationFrequency: value
+    });
+  };
+
+  // Update notification type
+  const handleTypeChange = (value: NotificationType) => {
+    onUpdate({
+      notificationType: value
+    });
+  };
+
+  // Update notification tone
+  const handleToneChange = (value: NotificationTone) => {
+    onUpdate({
+      notificationTone: value
+    });
+  };
+
+  // Toggle channel settings
+  const handleChannelToggle = (channel: keyof UserPreferences['channels'], enabled: boolean) => {
+    onUpdate({
+      channels: {
+        ...preferences.channels,
+        [channel]: enabled
+      }
     });
   };
 
@@ -94,19 +73,17 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
           Préférences de notifications
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-8">
-        {/* Main notification toggle */}
+      <CardContent className="space-y-6">
+        {/* Enable/disable notifications */}
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="notification-toggle" className="text-base font-medium">
-              Activer les notifications
-            </Label>
+            <Label htmlFor="notifications-toggle" className="text-base font-medium">Notifications</Label>
             <p className="text-sm text-muted-foreground mt-1">
-              Recevez des rappels personnalisés selon votre activité
+              Activez ou désactivez toutes les notifications
             </p>
           </div>
           <Switch
-            id="notification-toggle"
+            id="notifications-toggle"
             checked={preferences.notificationsEnabled}
             onCheckedChange={handleToggleNotifications}
             disabled={isUpdating}
@@ -115,107 +92,78 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
 
         {preferences.notificationsEnabled && (
           <>
-            {/* Activities notifications section */}
+            {/* Notification channels */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Activités</h3>
-
-              <div className="space-y-3">
+              <h3 className="text-sm font-medium">Canaux de notification</h3>
+              
+              <div className="grid gap-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="journal-notification" className="cursor-pointer">
-                    Journal émotionnel
-                  </Label>
+                  <Label htmlFor="email-toggle" className="cursor-pointer">Email</Label>
                   <Switch
-                    id="journal-notification"
-                    checked={preferences.notifications?.journal}
-                    onCheckedChange={handleToggleJournalNotification}
+                    id="email-toggle"
+                    checked={preferences.channels.email}
+                    onCheckedChange={(checked) => handleChannelToggle("email", checked)}
                     disabled={isUpdating}
                   />
                 </div>
-
+                
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="breathing-notification" className="cursor-pointer">
-                    Exercices de respiration
-                  </Label>
+                  <Label htmlFor="push-toggle" className="cursor-pointer">Notifications push</Label>
                   <Switch
-                    id="breathing-notification"
-                    checked={preferences.notifications?.breathing}
-                    onCheckedChange={handleToggleBreathingNotification}
+                    id="push-toggle"
+                    checked={preferences.channels.push}
+                    onCheckedChange={(checked) => handleChannelToggle("push", checked)}
                     disabled={isUpdating}
                   />
                 </div>
-
+                
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="music-notification" className="cursor-pointer">
-                    Suggestions musicales
-                  </Label>
+                  <Label htmlFor="sms-toggle" className="cursor-pointer">SMS</Label>
                   <Switch
-                    id="music-notification"
-                    checked={preferences.notifications?.music}
-                    onCheckedChange={handleToggleMusicNotification}
+                    id="sms-toggle"
+                    checked={preferences.channels.sms}
+                    onCheckedChange={(checked) => handleChannelToggle("sms", checked)}
                     disabled={isUpdating}
                   />
                 </div>
               </div>
             </div>
-
-            {/* Reminder time section */}
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="reminder-time" className="text-sm font-medium text-muted-foreground">
-                  Heure de rappel quotidien
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Choisissez l'heure à laquelle vous souhaitez être rappelé pour votre check-in émotionnel
-                </p>
-              </div>
+            
+            {/* Notification frequency */}
+            <div className="space-y-2">
+              <Label htmlFor="frequency-select">Fréquence des notifications</Label>
+              <Select
+                value={preferences.notificationFrequency}
+                onValueChange={(value) => handleFrequencyChange(value as NotificationFrequency)}
+                disabled={isUpdating}
+              >
+                <SelectTrigger id="frequency-select">
+                  <SelectValue placeholder="Fréquence des notifications" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="daily">Quotidienne</SelectItem>
+                  <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                  <SelectItem value="flexible">Flexible</SelectItem>
+                  <SelectItem value="none">Aucune</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                À quelle fréquence souhaitez-vous recevoir des notifications?
+              </p>
+            </div>
+            
+            {/* Notification time */}
+            <div className="space-y-2">
+              <Label htmlFor="reminder-time">Heure de rappel préférée</Label>
               <TimeInput
                 id="reminder-time"
-                value={preferences.reminderTime || "09:00"}
+                value={preferences.reminderTime}
                 onChange={handleReminderTimeChange}
                 disabled={isUpdating}
               />
-            </div>
-
-            {/* Notification tone section */}
-            <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium text-muted-foreground">
-                  Tonalité des notifications
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Choisissez le style de langage utilisé dans vos notifications
-                </p>
-              </div>
-
-              <RadioGroup
-                value={preferences.notificationTone || "minimalist"}
-                onValueChange={(value) => handleToneChange(value as NotificationTone)}
-                className="grid grid-cols-1 md:grid-cols-2 gap-3"
-              >
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="minimalist" id="tone-minimalist" />
-                  <Label htmlFor="tone-minimalist">Minimaliste</Label>
-                </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="poetic" id="tone-poetic" />
-                  <Label htmlFor="tone-poetic">Poétique</Label>
-                </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="directive" id="tone-directive" />
-                  <Label htmlFor="tone-directive">Directive</Label>
-                </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3">
-                  <RadioGroupItem value="silent" id="tone-silent" />
-                  <Label htmlFor="tone-silent">Silencieuse</Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            {/* Reset button */}
-            <div className="pt-4 text-right">
-              <Button variant="outline" onClick={handleResetNotifications} disabled={isUpdating}>
-                Réinitialiser les notifications
-              </Button>
+              <p className="text-xs text-muted-foreground mt-1">
+                À quelle heure préférez-vous recevoir les notifications?
+              </p>
             </div>
           </>
         )}

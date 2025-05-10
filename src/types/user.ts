@@ -25,6 +25,7 @@ export interface UserPreferences {
   notificationTone: NotificationTone;
   reminderTime: string;
   dynamicTheme: DynamicThemeMode;
+  emotionalCamouflage?: boolean;
   channels: {
     journal: boolean;
     breathing: boolean;
@@ -33,12 +34,6 @@ export interface UserPreferences {
     push: boolean;
     sms: boolean;
   };
-  emotionalCamouflage?: boolean;
-}
-
-export interface UserPreferencesState extends UserPreferences {
-  loading: boolean;
-  error: string | null;
 }
 
 export interface InvitationFormData {
@@ -47,26 +42,4 @@ export interface InvitationFormData {
   role: UserRole;
   message?: string;
   expiresAt?: Date;
-}
-
-export interface InvitationStats {
-  total: number;
-  pending: number;
-  accepted: number;
-  expired: number;
-  conversion_rate: number;
-  last_week: {
-    sent: number;
-    accepted: number;
-  }
-}
-
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-  date_unlocked?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
 }

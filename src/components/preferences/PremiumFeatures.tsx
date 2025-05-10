@@ -20,7 +20,6 @@ const PremiumFeatures: React.FC<PremiumFeaturesProps> = ({
   onUpdate,
   isUpdating = false,
 }) => {
-  // Use extended UserPreferencesState that includes emotionalCamouflage
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   // Handle toggle of premium feature when user is not premium
