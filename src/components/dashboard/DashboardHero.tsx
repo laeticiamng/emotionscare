@@ -39,6 +39,22 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
 }) => {
   const navigate = useNavigate();
   
+  // Helper function to determine trend direction
+  const getTrendDirection = (trend: number | { value: number; direction: 'up' | 'down' | 'neutral' }) => {
+    if (typeof trend === 'number') {
+      return trend > 0 ? 'up' : trend < 0 ? 'down' : 'neutral';
+    }
+    return trend.direction;
+  };
+  
+  // Helper function to get trend value
+  const getTrendValue = (trend: number | { value: number; direction: 'up' | 'down' | 'neutral' }) => {
+    if (typeof trend === 'number') {
+      return Math.abs(trend);
+    }
+    return trend.value;
+  };
+  
   return (
     <div className="bg-primary-50 dark:bg-primary-900/20 p-6 rounded-2xl mb-8 animate-fade-in">
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
@@ -90,16 +106,16 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
                   </div>
                   {kpi.trend && (
                     <div className={`text-xs flex items-center ${
-                      kpi.trend.direction === 'up' 
+                      getTrendDirection(kpi.trend) === 'up' 
                         ? 'text-success-600 dark:text-success-400' 
-                        : kpi.trend.direction === 'down' 
+                        : getTrendDirection(kpi.trend) === 'down' 
                           ? 'text-destructive-600 dark:text-destructive-400' 
                           : 'text-muted-foreground'
                     }`}>
-                      {kpi.trend.direction === 'up' && '↑ '}
-                      {kpi.trend.direction === 'down' && '↓ '}
-                      {kpi.trend.direction === 'neutral' && '• '}
-                      {kpi.trend.value}%
+                      {getTrendDirection(kpi.trend) === 'up' && '↑ '}
+                      {getTrendDirection(kpi.trend) === 'down' && '↓ '}
+                      {getTrendDirection(kpi.trend) === 'neutral' && '• '}
+                      {getTrendValue(kpi.trend)}%
                     </div>
                   )}
                 </div>
