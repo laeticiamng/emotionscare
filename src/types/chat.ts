@@ -11,6 +11,7 @@ export interface ChatMessage {
   sender_name?: string;
   is_ai?: boolean;
   sender?: string;
+  sender_type?: string;
   role?: string;
   text?: string;
 }

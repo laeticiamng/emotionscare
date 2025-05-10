@@ -11,6 +11,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
+  const [error, setError] = useState<string | null>(null);
 
   const playTrack = useCallback((track: MusicTrack) => {
     setCurrentTrack(track);
@@ -52,6 +54,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (playlist.tracks.length > 0 && !currentTrack) {
         setCurrentTrack(playlist.tracks[0]);
       }
+      setCurrentEmotion(emotion);
     }
 
     return playlist;
@@ -64,8 +67,54 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     return playlist?.tracks || [];
   }, []);
+  
+  // Add toggleRepeat and toggleShuffle functions
+  const toggleRepeat = useCallback(() => {
+    // Implementation would go here
+    console.log("Toggle repeat functionality");
+  }, []);
+  
+  const toggleShuffle = useCallback(() => {
+    // Implementation would go here
+    console.log("Toggle shuffle functionality");
+  }, []);
+  
+  // Add initializeMusicSystem function
+  const initializeMusicSystem = useCallback(async () => {
+    try {
+      // Simulate initialization
+      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("Music system initialized");
+      return true;
+    } catch (err) {
+      setError("Failed to initialize music system");
+      throw err;
+    }
+  }, []);
+  
+  // Add loadPlaylistById function
+  const loadPlaylistById = useCallback(async (id: string) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const playlist = mockMusicPlaylists.find(p => p.id === id);
+      if (playlist) {
+        setCurrentPlaylist(playlist);
+        if (playlist.tracks.length > 0) {
+          setCurrentTrack(playlist.tracks[0]);
+          setIsPlaying(true);
+        }
+        return playlist;
+      }
+      return null;
+    } catch (err) {
+      console.error("Error loading playlist by ID:", err);
+      return null;
+    }
+  }, []);
 
-  const value = {
+  const value: MusicContextType = {
     currentTrack,
     currentPlaylist,
     isPlaying,
@@ -78,7 +127,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     previousTrack,
     setVolume,
     loadPlaylistForEmotion,
-    getTracksForEmotion
+    getTracksForEmotion,
+    currentEmotion,
+    toggleRepeat,
+    toggleShuffle,
+    initializeMusicSystem,
+    error,
+    playlists: mockMusicPlaylists,
+    loadPlaylistById
   };
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;

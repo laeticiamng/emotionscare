@@ -33,6 +33,9 @@ export interface EmotionResult {
   intensity?: number;
   primaryEmotion?: {
     name: string;
+    id?: string;
+    user_id?: string;
+    date?: string | Date;
   };
 }
 

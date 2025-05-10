@@ -15,7 +15,7 @@ export interface MusicTrack {
   bpm?: number;
   tags?: string[];
   audioUrl?: string;
-  emotion?: string; // Added emotion property that was missing
+  emotion?: string; // Added emotion property
 }
 
 export interface MusicPlaylist {
@@ -45,7 +45,7 @@ export interface MusicDrawerProps {
   onClose?: () => void;
 }
 
-// Add the missing MusicContextType interface
+// Add the MusicContextType interface
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   currentPlaylist: MusicPlaylist | null;
@@ -60,4 +60,11 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   getTracksForEmotion: (emotion: string) => MusicTrack[];
+  currentEmotion?: string;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+  initializeMusicSystem?: () => Promise<void>;
+  error?: string | null;
+  playlists?: MusicPlaylist[];
+  loadPlaylistById?: (id: string) => Promise<MusicPlaylist | null>;
 }

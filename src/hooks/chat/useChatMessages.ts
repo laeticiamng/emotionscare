@@ -2,21 +2,8 @@
 import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types';
 
-// Define an interface for the messages used in this hook
-// that aligns with the ChatMessage type but with the fields we actually use
-interface LocalChatMessage {
-  id: string;
-  text: string;
-  sender: string;
-  timestamp: Date;
-  sender_id?: string;
-  conversation_id?: string;
-  content?: string;
-  is_read?: boolean;
-}
-
 export function useChatMessages() {
-  const [messages, setMessages] = useState<LocalChatMessage[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       text: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
@@ -30,7 +17,7 @@ export function useChatMessages() {
   ]);
 
   const addUserMessage = useCallback((text: string) => {
-    const message: LocalChatMessage = {
+    const message: ChatMessage = {
       id: Date.now().toString(),
       text,
       sender: 'user',
@@ -46,7 +33,7 @@ export function useChatMessages() {
   }, []);
 
   const addBotMessage = useCallback((text: string) => {
-    const message: LocalChatMessage = {
+    const message: ChatMessage = {
       id: Date.now().toString(),
       text,
       sender: 'bot',

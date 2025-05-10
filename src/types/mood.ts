@@ -2,8 +2,9 @@
 export interface MoodData {
   date: string | Date;
   value: number;
-  label?: string;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
+  emotion?: string;
+  notes?: string;
+  id?: string;
+  user_id?: string;
+  originalDate?: string | Date; // Added originalDate property
 }

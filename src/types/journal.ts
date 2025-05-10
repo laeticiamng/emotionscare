@@ -10,4 +10,7 @@ export interface JournalEntry {
   created_at: string | Date;
   updated_at: string | Date;
   is_private: boolean;
+  date?: string | Date; // Added date property
+  text?: string; // Added text property
+  ai_feedback?: string; // Added ai_feedback property
 }

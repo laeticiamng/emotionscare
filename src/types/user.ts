@@ -5,12 +5,23 @@ export interface User {
   email: string;
   role: UserRole;
   avatar?: string;
+  avatar_url?: string;
+  image?: string;
   created_at?: Date | string;
+  joined_at?: Date | string;
   emotional_score?: number;
   anonymity_code?: string;
+  onboarded?: boolean;
 }
 
-export type UserRole = 'user' | 'admin' | 'coach' | 'therapist' | 'hr';
+// UserRole as an enum so it can be used as a value
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  COACH = 'coach',
+  THERAPIST = 'therapist',
+  HR = 'hr'
+}
 
 export interface UserPreferences {
   theme: ThemeName;
@@ -34,21 +45,13 @@ export interface UserPreferencesState {
   emotionalCamouflage?: boolean;
   push_notifications?: boolean;
   notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
 }
 
-export interface ThemeName {
-  light: 'light';
-  dark: 'dark';
-  system: 'system';
-  pastel: 'pastel';
-  nature: 'nature';
-  'deep-night': 'deep-night';
-  starry: 'starry';
-  misty: 'misty';
-}
+export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
+export type FontSize = 'small' | 'medium' | 'large';
 
-export interface FontSize {
-  small: 'small';
-  medium: 'medium';
-  large: 'large';
-}
+import { NotificationFrequency, NotificationType, NotificationTone } from './notification';

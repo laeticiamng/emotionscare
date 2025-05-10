@@ -7,4 +7,9 @@ export interface ProgressBarProps {
   variant?: 'default' | 'success' | 'warning' | 'danger';
   progress?: number;
   onSeek?: (percentage: number) => void;
+  currentTime?: number;
+  duration?: number;
+  formatTime?: (seconds: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  showTimestamps?: boolean;
 }
