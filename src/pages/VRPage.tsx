@@ -86,7 +86,7 @@ const VRPage: React.FC = () => {
     
     toast({
       title: "Session démarrée",
-      description: `Votre session "${selectedTemplate.title || selectedTemplate.theme}" a commencé`
+      description: `Votre session "${selectedTemplate.title || selectedTemplate.name}" a commencé`
     });
   };
   
@@ -147,9 +147,9 @@ const VRPage: React.FC = () => {
               <VRSessionWithMusic
                 session={activeTemplate}
                 onSessionComplete={handleCompleteSession}
-                isAudioOnly={!!activeTemplate.is_audio_only}
+                isAudioOnly={true}
                 audioUrl={activeTemplate.audio_url || ''}
-                emotion={activeTemplate.recommended_mood || 'calm'}
+                emotion={activeTemplate.emotion_target || 'calm'}
               />
             ) : (
               <VRSessionView

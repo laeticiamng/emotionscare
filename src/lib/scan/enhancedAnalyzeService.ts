@@ -43,12 +43,17 @@ export async function analyzeEmotionEnhanced(text: string): Promise<EnhancedEmot
   // Then enhance it with additional information
   const enhanced: EnhancedEmotionResult = {
     ...basicResult,
-    description: getEmotionDescription(basicResult.emotion),
+    analysis: getEmotionDescription(basicResult.emotion),
     color: getEmotionColor(basicResult.emotion),
-    improvement_tips: getImprovementTips(basicResult.emotion),
+    recommendations: {
+      activities: getImprovementTips(basicResult.emotion),
+      music: ['Relaxing playlist', 'Focus music', 'Nature sounds'],
+      breathingExercises: ['4-7-8 breathing', 'Box breathing', 'Deep belly breathing']
+    },
+    insights: ['Your emotion may be affecting your decision-making', 'Consider taking a short break'],
+    triggers: ['Work stress', 'Relationship dynamics'],
     score: basicResult.score || 50, // Ensure score is set
-    feedback: basicResult.feedback,
-    recommendations: basicResult.recommendations
+    feedback: basicResult.feedback
   };
   
   return enhanced;
@@ -62,12 +67,17 @@ export async function analyzeAudioEmotionEnhanced(audioData: Blob): Promise<Enha
   // Then enhance it with additional information
   const enhanced: EnhancedEmotionResult = {
     ...basicResult,
-    description: getEmotionDescription(basicResult.emotion),
+    analysis: getEmotionDescription(basicResult.emotion),
     color: getEmotionColor(basicResult.emotion),
-    improvement_tips: getImprovementTips(basicResult.emotion),
+    recommendations: {
+      activities: getImprovementTips(basicResult.emotion),
+      music: ['Relaxing playlist', 'Focus music', 'Nature sounds'],
+      breathingExercises: ['4-7-8 breathing', 'Box breathing', 'Deep belly breathing']
+    },
+    insights: ['Your speech patterns indicate your emotional state', 'You can improve your well-being by practicing vocal awareness'],
+    triggers: ['Speaking speed', 'Tone variations'],
     score: basicResult.score || 50, // Ensure score is set
     feedback: basicResult.feedback,
-    recommendations: basicResult.recommendations,
     transcript: basicResult.transcript
   };
   

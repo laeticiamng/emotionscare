@@ -17,6 +17,8 @@ export interface Emotion {
   transcript?: string;
   ai_feedback?: string;
   emojis?: string;
+  source?: string;
+  audio_url?: string;
 }
 
 export interface EmotionResult {
@@ -41,6 +43,11 @@ export interface EmotionResult {
   user_id?: string;
   recommendations?: string[];
   emojis?: string;
+  source?: string;
+  dominant_emotion?: string;
+  description?: string;
+  improvement_tips?: string[];
+  audio_url?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -52,6 +59,8 @@ export interface EnhancedEmotionResult extends EmotionResult {
   };
   insights: string[];
   triggers: string[];
+  description?: string;
+  improvement_tips?: string[];
 }
 
 export interface EmotionalTeamViewProps {
@@ -60,5 +69,5 @@ export interface EmotionalTeamViewProps {
   groupBy?: 'department' | 'location' | 'role';
   showDetails?: boolean;
   onUserClick?: (userId: string) => void;
-  className?: string; // Added className prop
+  className?: string;
 }

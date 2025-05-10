@@ -34,8 +34,8 @@ export interface UserPreferencesState {
     breathing: boolean;
     music: boolean;
   };
-  notificationFrequency: NotificationFrequency;
-  notificationTone: NotificationTone;
+  notificationFrequency: string;
+  notificationTone: string;
   reminderTime?: string;
   
   // Backwards compatibility
@@ -76,8 +76,8 @@ const defaultPreferences: UserPreferencesState = {
     breathing: true,
     music: false,
   },
-  notificationFrequency: NotificationFrequency.DAILY,
-  notificationTone: NotificationTone.GENTLE,
+  notificationFrequency: 'daily',
+  notificationTone: 'gentle',
   reminderTime: '09:00',
   
   dataExport: 'pdf',

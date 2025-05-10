@@ -1,7 +1,28 @@
 
-export type NotificationFrequency = 'daily' | 'weekly' | 'flexible' | 'none';
-export type NotificationType = 'minimal' | 'detailed' | 'full' | 'all' | 'important' | 'none';
-export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent' | 'motivating' | 'gentle';
+export enum NotificationFrequency {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  FLEXIBLE = 'flexible',
+  NONE = 'none'
+}
+
+export enum NotificationType {
+  MINIMAL = 'minimal',
+  DETAILED = 'detailed',
+  FULL = 'full',
+  ALL = 'all',
+  IMPORTANT = 'important',
+  NONE = 'none'
+}
+
+export enum NotificationTone {
+  MINIMALIST = 'minimalist',
+  POETIC = 'poetic',
+  DIRECTIVE = 'directive',
+  SILENT = 'silent',
+  MOTIVATING = 'motivating',
+  GENTLE = 'gentle'
+}
 
 export interface NotificationPreferencesProps {
   frequency: NotificationFrequency;

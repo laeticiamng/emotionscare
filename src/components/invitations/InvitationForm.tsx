@@ -16,7 +16,7 @@ interface InvitationFormProps {
 const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => {
   const [inviteData, setInviteData] = useState<InvitationFormData>({
     email: '',
-    role: UserRole.EMPLOYEE,
+    role: 'employee',
     message: '',
     expires_in_days: 7
   });
@@ -34,7 +34,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
   };
   
   const handleRoleChange = (value: string) => {
-    setInviteData(prev => ({ ...prev, role: value as UserRole }));
+    setInviteData(prev => ({ ...prev, role: value }));
     
     // Clear error when user makes a selection
     if (error) setError(null);
@@ -79,7 +79,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
       setSuccess(true);
       setInviteData({
         email: '',
-        role: UserRole.EMPLOYEE,
+        role: 'employee',
         message: '',
         expires_in_days: 7
       });
@@ -140,10 +140,10 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
             <SelectValue placeholder="Sélectionner un rôle" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={UserRole.EMPLOYEE}>Employé</SelectItem>
-            <SelectItem value={UserRole.MANAGER}>Manager</SelectItem>
-            <SelectItem value={UserRole.ADMIN}>Administrateur</SelectItem>
-            <SelectItem value={UserRole.USER}>Utilisateur Standard</SelectItem>
+            <SelectItem value="employee">Employé</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+            <SelectItem value="admin">Administrateur</SelectItem>
+            <SelectItem value="user">Utilisateur Standard</SelectItem>
           </SelectContent>
         </Select>
       </div>

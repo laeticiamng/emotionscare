@@ -1,4 +1,6 @@
 
+import { type Emotion } from '@/types/emotion';
+
 export interface VRSession {
   id: string;
   user_id?: string;

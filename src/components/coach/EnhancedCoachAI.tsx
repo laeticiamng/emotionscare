@@ -57,12 +57,14 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
     
     return {
       id: emotionResult.id || 'temp-id',
+      name: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
       user_id: emotionResult.user_id || 'user-id',
       date: new Date(),
       emotion: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
-      name: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
       score: emotionResult.score || 0,
-      confidence: emotionResult.confidence || 0
+      confidence: emotionResult.confidence || 0,
+      intensity: emotionResult.intensity || 0.5,
+      category: "emotion"
     };
   };
   

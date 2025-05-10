@@ -52,6 +52,7 @@ export interface UserPreferences {
   email_notifications?: boolean;
   push_notifications?: boolean;
   accent_color?: string;
+  notificationsEnabled?: boolean;
   
   // Fonctionnalités premium
   emotionalCamouflage?: boolean;

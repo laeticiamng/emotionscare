@@ -1,92 +1,141 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserPreferences, UserRole } from '@/types';
+import { User, UserRole } from '@/types/user';
 
 interface AuthContextProps {
   user: User | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<any>;
-  logout: () => void;
-  signOut: () => void; // Alias for logout for compatibility
-  updateUser: (updatedUser: User) => Promise<void>;
-  setUser: (user: User | null) => void;
+  error: Error | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   user: null,
+  isLoading: false,
+  error: null,
   isAuthenticated: false,
-  isLoading: true,
-  login: () => Promise.resolve({}),
-  logout: () => {},
-  signOut: () => {},
-  updateUser: () => Promise.resolve(),
-  setUser: () => {},
+  login: async () => {},
+  register: async () => {},
+  logout: async () => {},
+  resetPassword: async () => {},
 });
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Load user from localStorage on initial render
+    // Check if user is already logged in (e.g. from localStorage)
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Error parsing stored user', error);
+      } catch (e) {
+        console.error('Failed to parse stored user:', e);
         localStorage.removeItem('user');
       }
     }
-    setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<User> => {
-    // Mock login logic
-    const mockUser: User = {
-      id: '1',
-      name: 'John Doe',
-      email: 'john@example.com',
-      role: UserRole.ADMIN,
-      department: 'Engineering',
-      avatar: '/avatars/user1.png',
-      position: 'Senior Developer',
-      joined_at: new Date('2023-01-15').toISOString(),
-      onboarded: true
-    };
-
-    // Store user in localStorage
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    setUser(mockUser);
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
     
-    return mockUser;
+    try {
+      // For demo purposes, simulate successful login with mock data
+      // In a real app, this would verify credentials with a backend API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockUser: User = {
+        id: 'user-1',
+        name: 'Demo User',
+        email: email,
+        role: 'employee',
+        team_id: 'team-1',
+        department: 'Product',
+        joined_at: new Date().toISOString(),
+        avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=demo'
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem('user');
+  const register = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // For demo purposes, simulate successful registration
+      // In a real app, this would create a new user via API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const newUser: User = {
+        id: `user-${Date.now()}`,
+        name: name,
+        email: email,
+        role: 'user',
+        joined_at: new Date().toISOString(),
+        avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+      };
+      
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    // Clear user data and local storage
     setUser(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
-  const updateUser = async (updatedUser: User): Promise<void> => {
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    setUser(updatedUser);
+  const resetPassword = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate password reset email
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In a real app, this would trigger a password reset email
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      isLoading,
-      login,
-      logout,
-      signOut: logout, // Add signOut as an alias for logout
-      updateUser,
-      setUser 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        error,
+        isAuthenticated: !!user,
+        login,
+        register,
+        logout,
+        resetPassword,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

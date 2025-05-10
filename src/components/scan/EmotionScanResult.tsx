@@ -17,13 +17,16 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
   // Convert EmotionResult to compatible Emotion object when needed
   const emotionCompatible: Emotion = {
     id: data.id || `emotion-${Date.now()}`,
+    name: data.emotion,
     user_id: data.user_id || '',
     date: data.date || new Date().toISOString(),
     emotion: data.emotion,
     score: data.score !== undefined ? data.score : (data.confidence ? Math.round(data.confidence * 100) : 50),
     text: data.text || data.transcript || '',
     emojis: data.emojis || '',
-    ai_feedback: data.feedback || data.ai_feedback || ''
+    ai_feedback: data.feedback || data.ai_feedback || '',
+    intensity: data.intensity || 0.5,
+    category: "emotion"
   };
   
   return (
@@ -92,7 +95,7 @@ function getEmotionLabel(emotion: EmotionResult | Partial<Emotion>): string {
   }
   
   // If it has emojis, try to derive emotion
-  if ('emojis' in emotion && emotion.emojis) {
+  if ('emojis' in emotion && emotion.emojis && typeof emotion.emojis === 'string') {
     if (emotion.emojis.includes('😊') || emotion.emojis.includes('😄')) return 'Heureux';
     if (emotion.emojis.includes('😢') || emotion.emojis.includes('😭')) return 'Triste';
     if (emotion.emojis.includes('😡') || emotion.emojis.includes('😠')) return 'En colère';
@@ -101,7 +104,7 @@ function getEmotionLabel(emotion: EmotionResult | Partial<Emotion>): string {
   }
   
   // Try to derive from text
-  if ('text' in emotion && emotion.text) {
+  if ('text' in emotion && emotion.text && typeof emotion.text === 'string') {
     const text = emotion.text.toLowerCase();
     if (text.includes('heureux') || text.includes('joie')) return 'Heureux';
     if (text.includes('triste') || text.includes('peine')) return 'Triste';

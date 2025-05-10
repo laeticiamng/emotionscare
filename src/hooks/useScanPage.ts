@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Emotion, UserRole } from '@/types';
+import { Emotion } from '@/types';
 import { getEmotions } from '@/lib/scanService';
 
 interface UseScanPageHook {
@@ -26,7 +26,7 @@ const useScanPage = (): UseScanPageHook => {
       try {
         if (user) {
           let emotionsData: Emotion[];
-          if (user?.role === UserRole.MANAGER || user?.role === UserRole.ADMIN) {
+          if (user?.role === 'manager' || user?.role === 'admin') {
             // Fetch all emotions for admin/manager
             emotionsData = await getEmotions();
           } else {

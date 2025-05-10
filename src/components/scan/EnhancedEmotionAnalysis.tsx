@@ -31,9 +31,9 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({ resul
     if (result) {
       setAnalysisResult({
         emotion: result.emotion,
-        confidence: result.confidence,
-        feedback: result.feedback || result.description || 'No specific feedback available', 
-        recommendations: result.recommendations || result.improvement_tips || [],
+        confidence: result.confidence || 50,
+        feedback: result.feedback || result.ai_feedback || 'No specific feedback available', 
+        recommendations: result.recommendations || [],
       });
     }
   }, [result]);
