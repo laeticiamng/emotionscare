@@ -28,7 +28,7 @@ export type NotificationType = 'minimal' | 'detailed' | 'full';
 export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 
-// Add UserPreferencesState that components are looking for
+// User preferences state that components are looking for
 export interface UserPreferencesState extends UserPreferences {
   loading: boolean;
   error: string | null;
@@ -40,12 +40,12 @@ export interface UserPreferencesState extends UserPreferences {
   push_notifications?: boolean;
 }
 
-// EmotionalTeamViewProps
+// Add EmotionalTeamViewProps that is needed by EmotionalTeamView component
 export interface EmotionalTeamViewProps {
   className?: string;
 }
 
-// Let's ensure MusicContextType has all required properties
+// Make sure MusicContextType is complete
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   currentPlaylist: MusicPlaylist | null;
@@ -54,14 +54,14 @@ export interface MusicContextType {
   progress: number;
   duration: number;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
-  getTracksForEmotion?: (emotion: string) => Promise<MusicTrack[]>;
+  getTracksForEmotion: (emotion: string) => Promise<MusicTrack[]>;
   playTrack: (track: MusicTrack) => void;
-  play?: (track?: MusicTrack) => void;
+  play: (track?: MusicTrack) => void;
   pauseTrack: () => void;
-  pause?: () => void;
+  pause: () => void;
   resumeTrack: () => void;
   nextTrack: () => void;
-  prevTrack?: () => void;
+  prevTrack: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   openDrawer: boolean;
@@ -74,4 +74,78 @@ export interface MusicContextType {
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
   currentEmotion?: string;
+}
+
+// Now let's update any other files with import errors
+<lov-write file_path="src/components/scan/live/useMusicRecommendation.tsx">
+import { useState, useEffect } from 'react';
+import { useMusic } from '@/contexts/MusicContext';
+import { EmotionResult, MusicTrack } from '@/types';
+
+export const EMOTION_TO_MUSIC: Record<string, string> = {
+  joy: 'upbeat',
+  happy: 'upbeat',
+  calm: 'ambient',
+  relaxed: 'ambient',
+  anxious: 'calming',
+  stressed: 'calming',
+  sad: 'gentle',
+  melancholic: 'gentle',
+  energetic: 'dance',
+  excited: 'dance',
+  neutral: 'focus',
+};
+
+export function useMusicRecommendation(emotionResult?: EmotionResult) {
+  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { loadPlaylistForEmotion, playTrack, getTracksForEmotion } = useMusic();
+  
+  useEffect(() => {
+    if (emotionResult?.emotion) {
+      loadRecommendations(emotionResult.emotion);
+    }
+  }, [emotionResult]);
+  
+  const loadRecommendations = async (emotion: string) => {
+    setIsLoading(true);
+    try {
+      const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
+      const playlist = await loadPlaylistForEmotion(musicType);
+      setRecommendedTracks(playlist?.tracks || []);
+    } catch (error) {
+      console.error('Error loading music recommendations:', error);
+      setRecommendedTracks([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const playRecommendedTrack = (track: MusicTrack) => {
+    if (track) {
+      playTrack(track);
+    }
+  };
+  
+  const playFirstRecommendation = () => {
+    if (recommendedTracks.length > 0) {
+      playRecommendedTrack(recommendedTracks[0]);
+      return true;
+    }
+    return false;
+  };
+  
+  const handlePlayMusic = (emotion: string) => {
+    const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
+    return playFirstRecommendation();
+  };
+  
+  return {
+    recommendedTracks,
+    isLoading,
+    playRecommendedTrack,
+    playFirstRecommendation,
+    handlePlayMusic,
+    EMOTION_TO_MUSIC
+  };
 }
