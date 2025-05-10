@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Card,
@@ -14,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { UserPreferencesState, NotificationFrequency, NotificationType, NotificationTone } from '@/types';
+import { UserPreferencesState, UserPreferences } from '@/types';
 
 interface NotificationPreferencesProps {
   preferences: UserPreferencesState;

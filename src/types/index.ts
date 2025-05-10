@@ -28,14 +28,50 @@ export type NotificationType = 'minimal' | 'detailed' | 'full';
 export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 
-// User preferences state for components
+// Add UserPreferencesState that components are looking for
 export interface UserPreferencesState extends UserPreferences {
   loading: boolean;
   error: string | null;
   emotionalCamouflage?: boolean;
+  notification_frequency?: NotificationFrequency;
+  notification_type?: NotificationType;
+  notification_tone?: NotificationTone;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
 }
 
 // EmotionalTeamViewProps
 export interface EmotionalTeamViewProps {
   className?: string;
+}
+
+// Let's ensure MusicContextType has all required properties
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  currentPlaylist: MusicPlaylist | null;
+  isPlaying: boolean;
+  volume: number;
+  progress: number;
+  duration: number;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  getTracksForEmotion?: (emotion: string) => Promise<MusicTrack[]>;
+  playTrack: (track: MusicTrack) => void;
+  play?: (track?: MusicTrack) => void;
+  pauseTrack: () => void;
+  pause?: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  prevTrack?: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  openDrawer: boolean;
+  setOpenDrawer: (open: boolean) => void;
+  loadingTrack: boolean;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => void;
+  initializeMusicSystem: () => Promise<void>;
+  error: string | null;
+  currentEmotion?: string;
 }

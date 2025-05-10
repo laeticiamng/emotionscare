@@ -18,7 +18,12 @@ export interface InvitationFormData {
   expires_in?: number;
 }
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'supervisor';
+export enum UserRole {
+  EMPLOYEE = 'employee',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager',
+  ADMIN = 'admin'
+}
 
 export interface InvitationStats {
   sent: number;
