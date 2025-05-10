@@ -11,4 +11,6 @@ export interface Badge {
   progress?: number;
   total_required?: number;
   image_url?: string;
+  icon_url?: string;
+  threshold?: number;
 }

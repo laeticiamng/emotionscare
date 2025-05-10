@@ -38,6 +38,8 @@ export interface EmotionResult {
 
 export interface EmotionalTeamViewProps {
   className?: string;
+  teamId?: string;
+  viewMode?: 'summary' | 'detailed';
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

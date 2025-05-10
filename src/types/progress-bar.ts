@@ -5,4 +5,6 @@ export interface ProgressBarProps {
   showLabel?: boolean;
   className?: string;
   variant?: 'default' | 'success' | 'warning' | 'danger';
+  progress?: number;
+  onSeek?: (percentage: number) => void;
 }

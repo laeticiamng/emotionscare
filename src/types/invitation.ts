@@ -10,6 +10,7 @@ export interface InvitationStats {
   rejected?: number;
   teams?: Record<string, number>;
   recent_invites?: InvitationData[];
+  totalInvitations?: number;
 }
 
 export interface InvitationData {
@@ -27,4 +28,5 @@ export interface InvitationFormData {
   message?: string;
   team_id?: string;
   expires_in_days?: number;
+  inviteeEmail?: string;
 }

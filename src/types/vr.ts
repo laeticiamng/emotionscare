@@ -18,6 +18,9 @@ export interface VRSession {
   date?: string | Date;
   start_time?: string | Date;
   duration_seconds?: number;
+  templateId?: string;
+  startedAt?: string;
+  completedAt?: string;
 }
 
 export interface VRSessionTemplate {
@@ -39,6 +42,9 @@ export interface VRSessionTemplate {
   completion_rate?: number;
   is_audio_only?: boolean;
   preview_url?: string;
+  audio_url?: string;
+  emotion_target?: string;
+  name?: string;
 }
 
 export interface VRSessionWithMusicProps {

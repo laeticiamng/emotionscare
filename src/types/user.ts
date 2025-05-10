@@ -19,6 +19,23 @@ export interface UserPreferences {
   language: string;
 }
 
+export interface UserPreferencesState {
+  theme: ThemeName;
+  fontSize: FontSize;
+  language: string;
+  notifications: boolean;
+  emailNotifications: boolean;
+  notificationFrequency: NotificationFrequency;
+  notificationType: NotificationType;
+  notificationTone: NotificationTone;
+  accentColor?: string;
+  highContrast?: boolean;
+  dynamicTheme?: boolean;
+  emotionalCamouflage?: boolean;
+  push_notifications?: boolean;
+  notifications_enabled?: boolean;
+}
+
 export interface ThemeName {
   light: 'light';
   dark: 'dark';

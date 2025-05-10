@@ -11,4 +11,5 @@ export interface VolumeControlProps {
   volume: number;
   onVolumeChange: (value: number) => void;
   className?: string;
+  onChange?: (volume: number) => void;
 }

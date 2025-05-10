@@ -6,19 +6,20 @@ export interface MusicTrack {
   duration: number;
   url: string;
   coverUrl?: string;
-  cover?: string;  // Added missing property
-  coverImage?: string;  // Added missing property
+  cover?: string;  
+  coverImage?: string;  
   externalUrl?: string;  // For external player links
   mood?: string;
   genre?: string;
   intensity?: number;
   bpm?: number;
   tags?: string[];
+  audioUrl?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  name: string;  // Ensure name property exists
+  name: string;  
   description?: string;
   tracks: MusicTrack[];
   coverUrl?: string;
@@ -31,9 +32,14 @@ export interface MusicRecommendationCardProps {
   intensity: number;
   standalone?: boolean;
   className?: string;
+  track?: MusicTrack;
+  recommendationReason?: string;
 }
 
 export interface MusicDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isOpen?: boolean;
+  currentTrack?: MusicTrack;
+  onClose?: () => void;
 }
