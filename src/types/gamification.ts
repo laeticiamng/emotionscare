@@ -1,40 +1,29 @@
 
 export interface Achievement {
   id: string;
-  name: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-  unlock_date?: string | Date;
-  progress?: number;
-  total?: number;
-  category: 'journal' | 'mindfulness' | 'community' | 'streak' | 'exploration';
-}
-
-export interface Challenge {
-  id: string;
   title: string;
   description: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  duration_days: number;
-  start_date?: string | Date;
-  end_date?: string | Date;
-  status: 'not_started' | 'active' | 'completed' | 'failed';
-  progress: number;
-  reward_points: number;
-  category: 'mindfulness' | 'social' | 'journaling' | 'emotion' | 'physical';
+  image_url?: string;
+  category: string;
+  unlocked: boolean;
+  progress?: number;
+  unlocked_at?: Date | string;
+}
+
+export interface Level {
+  id: number;
+  name: string;
+  min_points: number;
+  max_points: number;
+  image_url?: string;
 }
 
 export interface UserProgress {
   user_id: string;
-  xp: number;
+  points: number;
   level: number;
-  next_level_xp: number;
-  total_journal_entries: number;
-  total_mindfulness_minutes: number;
-  longest_streak_days: number;
-  current_streak_days: number;
-  achievements_unlocked: number;
-  total_achievements: number;
-  challenges_completed: number;
+  achievements: string[]; // achievement ids
+  current_streak: number;
+  longest_streak: number;
+  last_activity?: Date | string;
 }

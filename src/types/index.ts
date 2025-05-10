@@ -29,3 +29,21 @@ export interface UserPreferencesState extends UserPreferences {
   error: string | null;
   emotionalCamouflage?: boolean;
 }
+
+// Export JournalEntry type if missing
+export interface JournalEntry {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  mood?: number;
+  tags?: string[];
+  emotion?: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+}
+
+// Add missing EmotionalTeamViewProps
+export interface EmotionalTeamViewProps {
+  className?: string;
+}

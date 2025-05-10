@@ -11,11 +11,19 @@ import { formatTime } from '@/lib/utils';
 interface VRSessionWithMusicProps {
   session: VRSessionTemplate;
   onSessionComplete?: () => void;
+  isAudioOnly?: boolean;
+  videoUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
 }
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   session,
-  onSessionComplete
+  onSessionComplete,
+  isAudioOnly,
+  videoUrl,
+  audioUrl,
+  emotion
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -27,9 +35,9 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   // Load music that matches the session's emotional target
   useEffect(() => {
     const loadSessionMusic = async () => {
-      if (session.emotion_target) {
+      if (emotion || session.emotion_target) {
         try {
-          const playlist = await loadPlaylistForEmotion(session.emotion_target);
+          const playlist = await loadPlaylistForEmotion(emotion || session.emotion_target || 'calm');
           
           if (playlist && playlist.tracks && playlist.tracks.length > 0) {
             setSessionTracks(playlist.tracks);
@@ -41,7 +49,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
     };
     
     loadSessionMusic();
-  }, [session.emotion_target, loadPlaylistForEmotion]);
+  }, [emotion, session.emotion_target, loadPlaylistForEmotion]);
   
   // Handle playing and pausing the current track
   const togglePlayPause = () => {
@@ -133,6 +141,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
           currentTime={currentTime}
           duration={session.duration}
           onSeek={(time) => setCurrentTime(time)}
+          formatTime={formatTime}
         />
         
         {sessionTracks.length > 0 && (

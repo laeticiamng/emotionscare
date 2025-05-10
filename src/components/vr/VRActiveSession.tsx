@@ -11,12 +11,12 @@ interface VRActiveSessionProps {
 const VRActiveSession: React.FC<VRActiveSessionProps> = ({ template, onComplete }) => {
   return (
     <VRSessionWithMusic
-      template={template}
-      onCompleteSession={onComplete}
+      session={template}
+      onSessionComplete={onComplete}
       isAudioOnly={template.is_audio_only}
       videoUrl={template.preview_url}
       audioUrl={template.audio_url}
-      emotion={template.recommended_mood || 'calm'}
+      emotion={template.emotion_target || 'calm'}
     />
   );
 };

@@ -1,170 +1,171 @@
 
-import React, { useEffect, useRef } from 'react';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerClose,
-} from "@/components/ui/drawer";
+import React, { useState, useEffect } from 'react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { X, Music2, Play, Pause, SkipBack, SkipForward, Clock, ListMusic } from 'lucide-react';
+import { Disc3, SkipForward, SkipBack, Play, Pause, Volume } from 'lucide-react';
+import ProgressBar from './ProgressBar';
 import { useMusic } from '@/contexts/MusicContext';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import MusicPlayer from './MusicPlayer';
+import VolumeControl from './VolumeControl';
 import { MusicTrack, MusicPlaylist } from '@/types';
 
 interface MusicDrawerProps {
-  open: boolean;
-  onClose: () => void;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
 }
 
-const MusicDrawer: React.FC<MusicDrawerProps> = ({ open, onClose }) => {
-  const { currentTrack, playTrack, isPlaying, pauseTrack, nextTrack, currentPlaylist } = useMusic();
-  const drawerRef = useRef<HTMLDivElement>(null);
-  
-  // Format time from seconds to MM:SS
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
-  // Close drawer when escape key is pressed
+const MusicDrawer: React.FC<MusicDrawerProps> = ({ isOpen, onOpenChange }) => {
+  const {
+    currentTrack,
+    isPlaying,
+    play,
+    pause,
+    nextTrack,
+    prevTrack,
+    progress,
+    duration,
+    seek,
+    volume,
+    setVolume,
+    playlist
+  } = useMusic();
+
+  const [localVolume, setLocalVolume] = useState(volume * 100);
+  const [showPlaylist, setShowPlaylist] = useState(false);
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) onClose();
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open, onClose]);
-  
-  const handlePlayTrack = (track: MusicTrack) => {
-    playTrack(track);
+    setLocalVolume(volume * 100);
+  }, [volume]);
+
+  const handleVolumeChange = (value: number) => {
+    setLocalVolume(value);
+    setVolume(value / 100);
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  };
+
+  const getTrackImage = (track: MusicTrack | null) => {
+    if (!track) return "";
+    return track.coverUrl || track.cover || "https://via.placeholder.com/80";
   };
 
   return (
-    <Drawer open={open} onOpenChange={onClose}>
-      <DrawerContent className="max-h-[90vh]" ref={drawerRef}>
-        <div className="mx-auto w-full max-w-lg">
-          <DrawerHeader className="flex flex-row items-center justify-between px-4">
-            <DrawerTitle className="flex items-center gap-2">
-              <Music2 className="h-5 w-5" /> Lecteur musical
-            </DrawerTitle>
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <X className="h-4 w-4" />
-              </Button>
-            </DrawerClose>
-          </DrawerHeader>
-          
-          {/* Player component */}
-          <div className="px-4 pb-2">
-            <MusicPlayer />
-          </div>
-          
-          {/* Playlist section */}
-          {currentPlaylist && currentPlaylist.tracks && currentPlaylist.tracks.length > 0 && (
-            <div className="px-4 pb-8">
-              <div className="flex items-center justify-between py-2">
-                <h3 className="text-sm font-medium flex items-center gap-1.5">
-                  <ListMusic className="h-4 w-4 text-muted-foreground" />
-                  {currentPlaylist.name || "Playlist actuelle"}
-                </h3>
-                <span className="text-xs text-muted-foreground">
-                  {currentPlaylist.tracks.length} pistes
-                </span>
+    <Drawer open={isOpen} onOpenChange={onOpenChange}>
+      <DrawerContent className="max-h-[70vh]">
+        <DrawerHeader>
+          <DrawerTitle className="flex items-center">
+            <Disc3 className="mr-2 h-5 w-5" /> Lecteur Audio
+          </DrawerTitle>
+        </DrawerHeader>
+        <div className="px-4 pb-4">
+          <div className="flex flex-col space-y-4">
+            {currentTrack ? (
+              <div className="flex items-center space-x-4">
+                <div 
+                  className="h-20 w-20 rounded-md bg-cover bg-center bg-no-repeat" 
+                  style={{ backgroundImage: `url(${getTrackImage(currentTrack)})` }}
+                />
+                <div className="flex-1">
+                  <h3 className="font-medium">{currentTrack.title}</h3>
+                  <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="h-20 flex items-center justify-center bg-muted rounded-md">
+                <p className="text-muted-foreground">Aucun titre en cours de lecture</p>
+              </div>
+            )}
+
+            <ProgressBar 
+              currentTime={progress} 
+              duration={duration} 
+              onSeek={seek} 
+              formatTime={formatTime}
+            />
+            
+            <div className="flex justify-between items-center">
+              <div className="flex-1 flex justify-center space-x-4">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={prevTrack}
+                  disabled={!currentTrack}
+                >
+                  <SkipBack className="h-5 w-5" />
+                </Button>
+                
+                <Button 
+                  variant={isPlaying ? "secondary" : "default"}
+                  size="icon"
+                  onClick={togglePlayPause}
+                  disabled={!currentTrack}
+                >
+                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={nextTrack}
+                  disabled={!currentTrack}
+                >
+                  <SkipForward className="h-5 w-5" />
+                </Button>
               </div>
               
-              <Separator className="my-2" />
-              
-              <ScrollArea className="h-[200px] pr-2">
-                <ul className="space-y-1">
-                  {currentPlaylist.tracks.map((track, index) => {
-                    const isCurrentTrack = currentTrack && currentTrack.id === track.id;
-                    
-                    return (
-                      <li 
-                        key={`${track.id}-${index}`} 
-                        className={cn(
-                          "flex items-center justify-between rounded-md p-2 transition-colors",
-                          isCurrentTrack 
-                            ? "bg-primary/10 text-primary" 
-                            : "hover:bg-muted/50 cursor-pointer"
-                        )}
-                        onClick={() => handlePlayTrack(track)}
-                      >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-8 h-8 bg-muted flex items-center justify-center rounded overflow-hidden">
-                            {track.cover || track.coverUrl || track.coverImage ? (
-                              <img 
-                                src={track.cover || track.coverUrl || track.coverImage} 
-                                alt={track.title} 
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Music2 className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </div>
-                          
-                          <div className="overflow-hidden flex-1">
-                            <p className={cn(
-                              "truncate text-sm",
-                              isCurrentTrack ? "font-medium" : ""
-                            )}>
-                              {track.title}
-                            </p>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {track.artist}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          {isCurrentTrack && isPlaying ? (
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-8 w-8 text-primary"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                pauseTrack();
-                              }}
-                            >
-                              <Pause className="h-3.5 w-3.5" />
-                            </Button>
-                          ) : (
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className={cn("h-8 w-8", isCurrentTrack ? "text-primary" : "")}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePlayTrack(track);
-                              }}
-                            >
-                              <Play className="h-3.5 w-3.5" />
-                            </Button>
-                          )}
-                          
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatTime(track.duration || 0)}
-                          </span>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </ScrollArea>
+              <VolumeControl
+                volume={localVolume}
+                onVolumeChange={handleVolumeChange}
+                className="w-24"
+              />
             </div>
-          )}
+            
+            {playlist.length > 0 && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium">En lecture</h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowPlaylist(!showPlaylist)}
+                  >
+                    {showPlaylist ? 'Masquer' : 'Afficher'}
+                  </Button>
+                </div>
+                
+                {showPlaylist && (
+                  <div className="max-h-40 overflow-y-auto mt-2">
+                    {playlist.map((track, index) => (
+                      <div 
+                        key={track.id || index}
+                        className={`flex items-center p-2 rounded-md cursor-pointer ${
+                          currentTrack?.id === track.id ? 'bg-primary/10' : 'hover:bg-accent'
+                        }`}
+                        onClick={() => play(track)}
+                      >
+                        <div className="w-6 text-sm text-muted-foreground mr-2">{index + 1}</div>
+                        <div className="flex-1">
+                          <div className="font-medium truncate">{track.title}</div>
+                          <div className="text-xs text-muted-foreground">{track.artist}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </DrawerContent>
     </Drawer>

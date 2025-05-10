@@ -2,6 +2,7 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/audio-player';
+import { formatTime as defaultFormatTime } from '@/lib/utils';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ 
   currentTime,
@@ -14,12 +15,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 }) => {
   const percent = duration > 0 ? (currentTime / duration) * 100 : 0;
   
-  const defaultFormatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const timeFormatter = formatTime || defaultFormatTime;
   
   // Fix the event handler to properly convert click to time

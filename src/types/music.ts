@@ -12,6 +12,7 @@ export interface MusicTrack {
   cover?: string;
   coverUrl?: string;
   audioUrl?: string;
+  externalUrl?: string;
 }
 
 export interface MusicPlaylist {

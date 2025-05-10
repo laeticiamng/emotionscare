@@ -4,14 +4,25 @@ export interface JournalEntry {
   user_id: string;
   title: string;
   content: string;
-  emotion?: string;
-  mood_score?: number;
-  created_at: string | Date;
-  updated_at?: string | Date;
+  mood?: number;
   tags?: string[];
-  is_private?: boolean;
-  location?: string;
-  weather?: string;
-  visibility?: 'private' | 'public' | 'friends';
-  media_urls?: string[];
+  emotion?: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+}
+
+export interface JournalFilter {
+  tag?: string;
+  emotion?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  searchTerm?: string;
+}
+
+export interface JournalStats {
+  totalEntries: number;
+  avgMood: number;
+  topEmotion?: string;
+  mostUsedTag?: string;
+  streakDays: number;
 }
