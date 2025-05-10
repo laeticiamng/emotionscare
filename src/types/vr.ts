@@ -12,6 +12,12 @@ export interface VRSession {
   rating?: number;
   emotions_before?: string[];
   emotions_after?: string[];
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  is_audio_only?: boolean;
+  date?: string | Date;
+  start_time?: string | Date;
+  duration_seconds?: number;
 }
 
 export interface VRSessionTemplate {
@@ -28,10 +34,25 @@ export interface VRSessionTemplate {
   created_at?: string | Date;
   user_count?: number;
   rating?: number;
+  template_id?: string;
+  theme?: string;
+  completion_rate?: number;
+  is_audio_only?: boolean;
+  preview_url?: string;
 }
 
 export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
+  template?: VRSessionTemplate;
+  session?: {
+    title?: string;
+    duration?: number;
+  };
+  musicTracks?: MusicTrack[];
+  onSessionComplete?: () => void;
+  isAudioOnly?: boolean;
+  videoUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
+  onComplete?: (duration: number) => void;
   tracks?: MusicTrack[];
-  onComplete: (duration: number) => void;
 }

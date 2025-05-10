@@ -8,7 +8,7 @@ export interface Group {
   created_at: Date | string;
   members: User[];
   owner_id: string;
-  image_url?: string;
-  members_count?: number;
-  topic?: string;
+  image_url?: string;  // Added missing property
+  members_count?: number;  // Added missing property
+  topic?: string;  // Added missing property
 }

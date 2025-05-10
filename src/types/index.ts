@@ -1,5 +1,5 @@
 
-// Export all types from various modules
+// Re-export all types from various modules
 export * from './user';
 export * from './emotion';
 export * from './chat';
@@ -27,10 +27,12 @@ export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 
-// Additional type re-exports
+// Re-export additional specific types
 export { UserRole } from './user';
 export { EmotionalTeamViewProps, EnhancedEmotionResult } from './emotion';
 export type { ProgressBarProps } from './progress-bar';
 export type { TrackInfoProps, VolumeControlProps } from './track-info';
 export type { MusicRecommendationCardProps, MusicDrawerProps } from './music';
 export type { UserPreferencesState } from './preferences';
+export type { NotificationFrequency, NotificationType, NotificationTone } from './notification';
+export type { VRSessionWithMusicProps } from './vr';
