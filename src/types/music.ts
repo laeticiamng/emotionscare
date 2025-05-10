@@ -12,6 +12,13 @@ export interface MusicTrack {
   bpm?: number;
   mood?: string;
   intensity?: number;
+  
+  // Add missing properties
+  audio_url?: string;
+  audioUrl?: string;
+  emotion?: string;
+  emotion_tag?: string;
+  externalUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -22,17 +29,29 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   mood?: string;
   cover_url?: string;
+  
+  // Add missing properties
+  emotion?: string;
 }
 
 export interface MusicRecommendationCardProps {
-  title: string;
+  title?: string;
   emotion?: string;
   onSelect?: () => void;
+  
+  // Add missing properties
+  intensity?: number;
+  standalone?: boolean;
+  className?: string;
 }
 
 export interface MusicDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  
+  // Add for backward compatibility
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export interface MusicContextType {
@@ -49,12 +68,13 @@ export interface MusicContextType {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   setOpenDrawer: (open: boolean) => void;
-  // Ajout des propriétés manquantes
+  initializeMusicSystem: () => Promise<void>;
+  
+  // Add missing properties
   playlists?: MusicPlaylist[];
   loadPlaylistById?: (id: string) => Promise<MusicPlaylist | null>;
   currentEmotion?: string;
   toggleRepeat?: () => void;
   toggleShuffle?: () => void;
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
-  initializeMusicSystem: () => Promise<void>;
 }

@@ -1,44 +1,55 @@
 
 import React from 'react';
-import { Music, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ExternalLink } from 'lucide-react';
 import { MusicTrack } from '@/types';
 
 interface VRMusicTrackInfoProps {
   currentTrack: MusicTrack;
-  className?: string;
 }
 
-const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ 
-  currentTrack,
-  className = '' 
-}) => {
+const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => {
+  // Format duration from seconds to MM:SS
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <div className="w-12 h-12 bg-primary/10 flex items-center justify-center rounded-md">
-        <Music className="h-5 w-5 text-primary" />
+    <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30">
+      <div className="w-12 h-12 rounded overflow-hidden bg-primary/10">
+        {currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover ? (
+          <img 
+            src={currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover} 
+            alt={currentTrack.title} 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-xl">♪</span>
+          </div>
+        )}
       </div>
       
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium truncate" title={currentTrack.title}>
-          {currentTrack.title || "Titre inconnu"}
-        </h3>
-        <p className="text-sm text-muted-foreground truncate">
-          {currentTrack.artist || "Artiste inconnu"}
+        <div className="flex items-center">
+          <h4 className="font-medium text-sm truncate">{currentTrack.title}</h4>
+          {currentTrack.url && (
+            <a 
+              href={currentTrack.url} 
+              className="ml-2 text-muted-foreground" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground flex items-center justify-between">
+          <span>{currentTrack.artist}</span>
+          {currentTrack.duration && <span>{formatDuration(currentTrack.duration)}</span>}
         </p>
       </div>
-      
-      {currentTrack.externalUrl && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="h-8 w-8"
-          title="Ouvrir dans le lecteur de musique"
-          onClick={() => window.open(currentTrack.externalUrl, '_blank')}
-        >
-          <ExternalLink className="h-4 w-4" />
-        </Button>
-      )}
     </div>
   );
 };

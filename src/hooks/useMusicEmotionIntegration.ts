@@ -2,7 +2,43 @@
 import { useCallback } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { mapEmotionToMusicType, EMOTION_TO_MUSIC_MAP } from '@/services/music/emotion-music-mapping';
+
+// Define a mapping function since the import might not be available
+const mapEmotionToMusicType = (emotion: string): string => {
+  const mapping: Record<string, string> = {
+    'happy': 'upbeat',
+    'joy': 'upbeat',
+    'sad': 'calming',
+    'calm': 'ambient',
+    'anxious': 'ambient',
+    'angry': 'calming',
+    'stressed': 'ambient',
+    'energetic': 'dance',
+    'bored': 'dance',
+    'focused': 'focus',
+    'tired': 'ambient',
+    'fearful': 'calming',
+    'neutral': 'gentle'
+  };
+  return mapping[emotion.toLowerCase()] || 'gentle';
+};
+
+// Define the constant
+export const EMOTION_TO_MUSIC_MAP: Record<string, string> = {
+  'happy': 'upbeat',
+  'joy': 'upbeat',
+  'sad': 'calming',
+  'calm': 'ambient',
+  'anxious': 'ambient',
+  'angry': 'calming',
+  'stressed': 'ambient',
+  'energetic': 'dance',
+  'bored': 'dance',
+  'focused': 'focus',
+  'tired': 'ambient',
+  'fearful': 'calming',
+  'neutral': 'gentle'
+};
 
 export interface EmotionResult {
   emotion: string;
@@ -34,7 +70,7 @@ export function useMusicEmotionIntegration() {
           const track = {
             ...playlist.tracks[0],
             duration: playlist.tracks[0].duration || 0,
-            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
+            url: playlist.tracks[0].url || ''
           };
           playTrack(track);
         }

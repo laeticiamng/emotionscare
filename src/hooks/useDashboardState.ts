@@ -5,6 +5,22 @@ export interface DashboardSectionState {
   [key: string]: boolean;
 }
 
+// Define the missing DashboardKpi and DashboardShortcut interfaces
+export interface DashboardKpi {
+  key: string;
+  value: string | number;
+  label: string;
+  trend?: number;
+  icon: React.ComponentType<any>;
+}
+
+export interface DashboardShortcut {
+  name: string;
+  icon: React.ComponentType<any>;
+  to: string;
+  description?: string;
+}
+
 const useDashboardState = () => {
   const [minimalView, setMinimalView] = useState(() => {
     const stored = localStorage.getItem('dashboard_minimal_view');

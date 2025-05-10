@@ -70,7 +70,7 @@ export const getRelativeTimeString = (date: Date | string): string => {
   }
 };
 
-// Fonction pour obtenir le message de salutation selon l'heure
+// Add missing functions
 export const getGreeting = (): string => {
   const hour = new Date().getHours();
   
@@ -83,7 +83,6 @@ export const getGreeting = (): string => {
   }
 };
 
-// Fonction pour formater la date en français
 export const formatDateFr = (date: Date | string): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   

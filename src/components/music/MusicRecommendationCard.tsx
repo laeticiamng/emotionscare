@@ -7,14 +7,21 @@ import { useMusic } from '@/contexts/MusicContext';
 import { MusicRecommendationCardProps } from '@/types/music';
 
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ 
-  emotion,
+  title,
+  emotion = 'neutral',
   intensity = 50,
   standalone = false,
-  className = ''
+  className = '',
+  onSelect
 }) => {
   const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
 
   const handlePlayMusic = async () => {
+    if (onSelect) {
+      onSelect();
+      return;
+    }
+    
     await loadPlaylistForEmotion(emotion);
     setOpenDrawer(true);
   };
@@ -70,6 +77,11 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
           description: "Des morceaux sans paroles pour améliorer votre concentration."
         };
         break;
+    }
+
+    // If title is provided, override the generated one
+    if (title) {
+      recommendation.title = title;
     }
 
     return recommendation;

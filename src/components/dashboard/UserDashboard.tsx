@@ -8,7 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDashboardHero } from '@/hooks/useDashboardHero';
 import DashboardViewToggle from './DashboardViewToggle';
 import DashboardContent from './DashboardContent';
-import useDashboardState from '@/hooks/useDashboardState';
+import useDashboardState, { DashboardKpi, DashboardShortcut } from '@/hooks/useDashboardState';
 import useLogger from '@/hooks/useLogger';
 
 interface UserDashboardProps {
@@ -38,6 +38,22 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
 
   logger.debug('Rendering UserDashboard component');
   
+  // Convert KPI and Shortcut types to required DashboardKpi and DashboardShortcut types
+  const typedKpis: DashboardKpi[] = kpis ? kpis.map((kpi: any) => ({
+    key: kpi.id || kpi.label,
+    value: kpi.value,
+    label: kpi.label,
+    trend: kpi.trend,
+    icon: kpi.icon
+  })) : [];
+
+  const typedShortcuts: DashboardShortcut[] = shortcuts ? shortcuts.map((shortcut: any) => ({
+    name: shortcut.name,
+    icon: shortcut.icon,
+    to: shortcut.url || shortcut.route || '/',
+    description: shortcut.description
+  })) : [];
+  
   return (
     <div className="animate-fade-in w-full">
       <div className="flex justify-between items-center flex-wrap gap-2 mb-6">
@@ -56,8 +72,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
       {/* Hero Section */}
       <DashboardHero 
         userName={user?.name || 'Utilisateur'}
-        kpis={kpis}
-        shortcuts={shortcuts}
+        kpis={typedKpis}
+        shortcuts={typedShortcuts}
         isLoading={isLoading}
       />
       

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Button } from '@/components/ui/button';
@@ -50,10 +49,8 @@ const MusicWellbeingPage = () => {
       artist: 'EmotionsAI',
       duration: duration,
       url: '#',
-      audio_url: '#', // Added required field
       cover: '/images/music/meditation.jpg',
       mood: 'calm',
-      genre: 'ambient',
     });
     
     // Show toast when music is generated
@@ -178,7 +175,6 @@ const MusicWellbeingPage = () => {
                           artist: 'EmotionsAI',
                           duration: 300,
                           url: '#',
-                          audio_url: '#', // Added required field
                           mood: 'calm',
                           genre: 'ambient',
                         });
@@ -193,7 +189,6 @@ const MusicWellbeingPage = () => {
                           artist: 'EmotionsAI',
                           duration: 600,
                           url: '#',
-                          audio_url: '#', // Added required field
                           mood: 'focused',
                           genre: 'electronic',
                         });
@@ -208,7 +203,6 @@ const MusicWellbeingPage = () => {
                           artist: 'EmotionsAI',
                           duration: 900,
                           url: '#',
-                          audio_url: '#', // Added required field
                           mood: 'relaxed',
                           genre: 'nature',
                         });

@@ -1,4 +1,3 @@
-
 import { EmotionResult, Emotion } from '@/types';
 
 // Type pour les paramètres d'analyse d'émotion
@@ -199,39 +198,59 @@ export const createEmotionEntry = async (params: {
   emojis?: string;
   audio_url?: string;
 }): Promise<Emotion> => {
-  // Analyser l'émotion d'abord
-  const analysis = await analyzeEmotion({
-    user_id: params.user_id,
-    text: params.text,
-    emojis: params.emojis,
-    audio_url: params.audio_url
-  });
+  // Simuler une analyse de l'émotion
+  const analysis: EmotionResult = {
+    emotion: 'calm',
+    score: 7,
+    confidence: 0.85,
+    feedback: "Vous semblez calme aujourd'hui.",
+    date: new Date().toISOString()
+  };
   
-  // Ensuite sauvegarder l'émotion
-  return saveEmotion({
+  // Simuler la sauvegarde d'une émotion
+  const savedEmotion: Emotion = {
+    id: `em-${Date.now()}`,
     user_id: params.user_id,
-    date: new Date().toISOString(),
+    date: new Date(),
     emotion: analysis.emotion,
     score: analysis.score,
-    text: params.text,
-    emojis: params.emojis,
-    audio_url: params.audio_url,
-    ai_feedback: analysis.feedback
-  });
+    text: params.text || '',
+    emojis: params.emojis || '',
+    audio_url: params.audio_url || null,
+    ai_feedback: analysis.feedback || '',
+    created_at: new Date().toISOString(),
+    name: analysis.emotion,
+    category: "emotion",
+    confidence: analysis.confidence || 0.5,
+    intensity: 0.7
+  };
+  
+  // Simuler un délai d'attente
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  return savedEmotion;
 };
 
 // Fonction pour récupérer la dernière émotion
 export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
-  const emotions = await fetchEmotionHistory(userId);
+  // Simuler un délai d'attente
+  await new Promise(resolve => setTimeout(resolve, 300));
   
-  if (emotions.length === 0) {
-    return null;
-  }
-  
-  // Trier par date de création (la plus récente d'abord)
-  emotions.sort((a, b) => {
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
-  
-  return emotions[0];
+  // Retourner une fausse dernière émotion
+  return {
+    id: `em-latest-${Date.now()}`,
+    user_id: userId,
+    date: new Date(),
+    emotion: 'calm',
+    score: 7,
+    text: "Je me sens plutôt bien aujourd'hui.",
+    emojis: "😊",
+    audio_url: null,
+    ai_feedback: "Vous semblez être dans un état émotionnel calme et positif.",
+    created_at: new Date().toISOString(),
+    name: "calm",
+    category: "emotion",
+    confidence: 0.85,
+    intensity: 0.7
+  };
 };

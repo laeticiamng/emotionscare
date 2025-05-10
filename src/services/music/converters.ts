@@ -10,12 +10,16 @@ export function convertTrackToMusicTrack(track: Track): MusicTrack {
     artist: track.artist,
     url: track.url,
     duration: track.duration,
-    audioUrl: track.audioUrl,
-    audio_url: track.audioUrl || track.url, // S'assurer que audio_url est défini
     coverUrl: track.coverUrl || track.cover,
     cover_url: track.coverUrl || track.cover,
     cover: track.cover,
-    emotion: track.emotion
+    
+    // Add properties for compatibility
+    audioUrl: track.audioUrl,
+    audio_url: track.audioUrl,
+    emotion: track.emotion,
+    emotion_tag: track.emotion,
+    mood: track.emotion
   };
 }
 
@@ -25,8 +29,10 @@ export function convertMusicTrackToTrack(track: MusicTrack): Track {
     id: track.id,
     title: track.title,
     artist: track.artist,
-    url: track.url || track.audio_url || track.audioUrl || '',
+    url: track.url || '',
     duration: track.duration,
+    
+    // Handle various field names for compatibility
     audioUrl: track.audioUrl || track.audio_url || track.url || '',
     cover: track.cover || track.coverUrl || track.cover_url || '',
     coverUrl: track.coverUrl || track.cover_url || track.cover || '',
@@ -39,7 +45,7 @@ export function convertMusicPlaylistToPlaylist(musicPlaylist: MusicPlaylist): Pl
   return {
     id: musicPlaylist.id,
     name: musicPlaylist.name || musicPlaylist.title || '',
-    emotion: musicPlaylist.emotion,
+    emotion: musicPlaylist.emotion || musicPlaylist.mood || '',
     tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
   };
 }
@@ -51,6 +57,7 @@ export function convertPlaylistToMusicPlaylist(playlist: Playlist): MusicPlaylis
     name: playlist.name,
     title: playlist.name, // S'assurer que title est défini
     emotion: playlist.emotion,
+    mood: playlist.emotion, // For backward compatibility
     tracks: playlist.tracks.map(convertTrackToMusicTrack)
   };
 }

@@ -61,7 +61,7 @@ export const fetchTrendData = async (userId: string, period: string = 'month'): 
   return data;
 };
 
-// Ajout des fonctions manquantes pour l'admin dashboard
+// Add missing functions for fetching reports, scores, and user status
 export const fetchReports = async (
   reportTypes: string[], 
   days: number, 

@@ -55,7 +55,7 @@ const useMusicRecommendation = ({ emotion }: UseMusicRecommendationProps = {}) =
     const nextTrack = {
       ...currentPlaylist.tracks[nextIndex],
       duration: currentPlaylist.tracks[nextIndex].duration || 0,
-      url: currentPlaylist.tracks[nextIndex].url || currentPlaylist.tracks[nextIndex].audioUrl || ''
+      url: currentPlaylist.tracks[nextIndex].url || ''
     };
     playTrack(nextTrack);
   };
@@ -68,7 +68,7 @@ const useMusicRecommendation = ({ emotion }: UseMusicRecommendationProps = {}) =
     const prevTrack = {
       ...currentPlaylist.tracks[previousIndex],
       duration: currentPlaylist.tracks[previousIndex].duration || 0,
-      url: currentPlaylist.tracks[previousIndex].url || currentPlaylist.tracks[previousIndex].audioUrl || ''
+      url: currentPlaylist.tracks[previousIndex].url || ''
     };
     playTrack(prevTrack);
   };

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import { Music, Loader2, PlayCircle } from 'lucide-react';
 import { EmotionResult, MusicPlaylist, MusicTrack } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { safeOpen } from '@/lib/utils';
 
 interface EmotionBasedMusicRecommendationProps {
   emotionResult: EmotionResult;
@@ -35,7 +35,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
         const track = {
           ...playlist.tracks[0],
           duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
+          url: playlist.tracks[0].url || playlist.tracks[0].cover_url || ''
         };
         playTrack(track);
         setOpenDrawer(true);
