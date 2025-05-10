@@ -16,6 +16,7 @@ export * from './community';
 export * from './navigation';
 export * from './progress-bar';
 export * from './track-info';
+export * from './group';
 
 // Basic shared types
 export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';

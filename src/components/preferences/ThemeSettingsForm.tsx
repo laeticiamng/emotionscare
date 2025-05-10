@@ -1,143 +1,51 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
-import { MoonStar, SunMedium, Palette, Sparkles } from "lucide-react";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ThemeName, UserPreferencesState } from '@/types';
+import { MoonIcon, SunIcon, Palette, Laptop } from 'lucide-react';
 
 interface ThemeSettingsFormProps {
   preferences: UserPreferencesState;
-  onUpdate: (preferences: Partial<UserPreferencesState>) => void;
-  isUpdating?: boolean;
+  onUpdate: (key: string, value: any) => void;
 }
 
 const ThemeSettingsForm: React.FC<ThemeSettingsFormProps> = ({
   preferences,
-  onUpdate,
-  isUpdating = false,
+  onUpdate
 }) => {
-  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(preferences.theme || 'system');
-  const [enableDynamicTheme, setEnableDynamicTheme] = useState(
-    preferences.dynamicTheme?.enableEmotionBased || false
-  );
-
-  // Update the theme when the preferences change
-  useEffect(() => {
-    setSelectedTheme(preferences.theme || 'system');
-    setEnableDynamicTheme(preferences.dynamicTheme?.enableEmotionBased || false);
-  }, [preferences]);
-
   const handleThemeChange = (theme: ThemeName) => {
-    setSelectedTheme(theme);
-    onUpdate({ 
-      theme: theme,
-      dynamicTheme: {
-        ...preferences.dynamicTheme,
-        enableEmotionBased: enableDynamicTheme
-      } 
-    });
-  };
-
-  const handleDynamicThemeToggle = (enabled: boolean) => {
-    setEnableDynamicTheme(enabled);
-    onUpdate({
-      dynamicTheme: {
-        ...preferences.dynamicTheme,
-        enableEmotionBased: enabled
-      }
-    });
+    onUpdate('theme', theme);
   };
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <Palette className="h-5 w-5 mr-2" />
-          Paramètres d'apparence
-        </CardTitle>
+        <CardTitle>Thème de l'application</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Theme selection */}
-        <div className="space-y-3">
-          <Label className="text-base">Thème visuel</Label>
-          <RadioGroup 
-            value={selectedTheme} 
-            onValueChange={(value: string) => handleThemeChange(value as ThemeName)} 
-            className="grid grid-cols-2 gap-4"
-          >
-            <div className="flex flex-col items-center space-y-2">
-              <div className="border rounded-xl p-4 w-full aspect-square flex items-center justify-center bg-background transition-all hover:border-primary">
-                <Label 
-                  htmlFor="theme-light" 
-                  className="cursor-pointer w-full h-full flex flex-col items-center justify-center space-y-2"
-                >
-                  <SunMedium className="h-8 w-8" />
-                  <span>Clair</span>
-                  <RadioGroupItem value="light" id="theme-light" className="sr-only" />
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center space-y-2">
-              <div className="border rounded-xl p-4 w-full aspect-square flex items-center justify-center bg-background transition-all hover:border-primary">
-                <Label 
-                  htmlFor="theme-dark" 
-                  className="cursor-pointer w-full h-full flex flex-col items-center justify-center space-y-2"
-                >
-                  <MoonStar className="h-8 w-8" />
-                  <span>Sombre</span>
-                  <RadioGroupItem value="dark" id="theme-dark" className="sr-only" />
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center space-y-2">
-              <div className="border rounded-xl p-4 w-full aspect-square flex items-center justify-center bg-background transition-all hover:border-primary">
-                <Label 
-                  htmlFor="theme-pastel" 
-                  className="cursor-pointer w-full h-full flex flex-col items-center justify-center space-y-2"
-                >
-                  <Palette className="h-8 w-8" />
-                  <span>Pastel</span>
-                  <RadioGroupItem value="pastel" id="theme-pastel" className="sr-only" />
-                </Label>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center space-y-2">
-              <div className="border rounded-xl p-4 w-full aspect-square flex items-center justify-center bg-background transition-all hover:border-primary">
-                <Label 
-                  htmlFor="theme-nature" 
-                  className="cursor-pointer w-full h-full flex flex-col items-center justify-center space-y-2"
-                >
-                  <Sparkles className="h-8 w-8" />
-                  <span>Nature</span>
-                  <RadioGroupItem value="nature" id="theme-nature" className="sr-only" />
-                </Label>
-              </div>
-            </div>
-          </RadioGroup>
-        </div>
-
-        {/* Dynamic theme option */}
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="dynamic-theme-toggle" className="text-base font-medium">
-              Thème dynamique émotionnel
-            </Label>
-            <p className="text-sm text-muted-foreground mt-1">
-              Adapte automatiquement les couleurs et l'ambiance à votre état émotionnel
-            </p>
-          </div>
-          <Switch
-            id="dynamic-theme-toggle"
-            checked={enableDynamicTheme}
-            onCheckedChange={handleDynamicThemeToggle}
-            disabled={isUpdating}
-          />
-        </div>
+        <Tabs defaultValue={preferences.theme} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="light" onClick={() => handleThemeChange('light')}>
+              <SunIcon className="mr-2 h-4 w-4" />
+              Clair
+            </TabsTrigger>
+            <TabsTrigger value="dark" onClick={() => handleThemeChange('dark')}>
+              <MoonIcon className="mr-2 h-4 w-4" />
+              Sombre
+            </TabsTrigger>
+            <TabsTrigger value="system" onClick={() => handleThemeChange('system')}>
+              <Laptop className="mr-2 h-4 w-4" />
+              Système
+            </TabsTrigger>
+            <TabsTrigger value="pastel" onClick={() => handleThemeChange('pastel')}>
+              <Palette className="mr-2 h-4 w-4" />
+              Pastel
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </CardContent>
     </Card>
   );
