@@ -1,21 +1,24 @@
 
 export interface ChatMessage {
   id: string;
-  text?: string;
-  content?: string;
-  sender: 'user' | 'bot' | 'system' | 'coach';
-  sender_type?: 'user' | 'bot' | 'system' | 'coach';
-  timestamp: Date;
-  emotionContext?: string;
+  user_id?: string;
+  conversation_id: string;
+  content: string;
+  role: 'user' | 'assistant' | 'system';
+  created_at: string | Date;
+  emotion?: string;
+  sentiment?: number;
+  attachments?: string[];
 }
 
 export interface ChatConversation {
   id: string;
+  user_id: string;
   title: string;
-  user_id?: string;
   created_at: string | Date;
   updated_at: string | Date;
-  last_message?: ChatMessage;
-  messages?: ChatMessage[];
+  last_message?: string;
+  messages_count?: number;
+  pinned?: boolean;
   emotion_context?: string;
 }

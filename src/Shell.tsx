@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import MusicDrawer from '@/components/music/player/MusicDrawer'
+import MusicDrawer from '@/components/music/MusicDrawer'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from './components/ui/button'
 import { Clock, Headphones, Menu, Search, User } from 'lucide-react'
@@ -205,7 +204,7 @@ const Shell: React.FC = () => {
 
       {/* Music Drawer */}
       <MusicDrawer
-        open={musicOpen}
+        isOpen={musicOpen}
         onClose={() => setMusicOpen(false)}
       />
 

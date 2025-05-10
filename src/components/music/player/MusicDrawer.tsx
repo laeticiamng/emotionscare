@@ -1,174 +1,115 @@
 
-import React, { useState, useEffect } from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
-import { Disc3, SkipForward, SkipBack, Play, Pause, Volume } from 'lucide-react';
-import ProgressBar from './ProgressBar';
+import React, { useState } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
-import VolumeControl from './VolumeControl';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
+import { X, Music } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MusicPlayer from '@/components/music/player/MusicPlayer';
+import MusicCreator from '@/components/music/MusicCreator';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MusicTrack, MusicPlaylist } from '@/types';
 
 interface MusicDrawerProps {
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
-const MusicDrawer: React.FC<MusicDrawerProps> = ({ isOpen, onOpenChange }) => {
-  const {
-    currentTrack,
-    isPlaying,
-    play,
-    pause,
-    nextTrack,
-    prevTrack,
-    progress,
-    duration,
-    seek,
-    volume,
-    setVolume,
-    playlist
-  } = useMusic();
-
-  const [localVolume, setLocalVolume] = useState(volume * 100);
-  const [showPlaylist, setShowPlaylist] = useState(false);
-
-  useEffect(() => {
-    setLocalVolume(volume * 100);
-  }, [volume]);
-
-  const handleVolumeChange = (value: number) => {
-    setLocalVolume(value);
-    setVolume(value / 100);
-  };
-
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
-
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      pause();
-    } else {
-      play();
-    }
-  };
-
-  const getTrackImage = (track: MusicTrack | null) => {
-    if (!track) return "";
-    return track.coverUrl || track.cover || "https://via.placeholder.com/80";
-  };
-
+const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
+  open, 
+  onOpenChange,
+  isOpen,
+  onClose
+}) => {
+  const { openDrawer, setOpenDrawer, currentTrack } = useMusic();
+  const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState('player');
+  
+  // Use props if provided, otherwise use context
+  const drawerOpen = open !== undefined ? open : (isOpen !== undefined ? isOpen : openDrawer);
+  const handleOpenChange = onOpenChange || ((val) => {
+    setOpenDrawer(val);
+    if (!val && onClose) onClose();
+  });
+  
+  // Use different components based on device type
+  const DrawerComponent = isMobile ? Drawer : Sheet;
+  const ContentComponent = isMobile ? DrawerContent : SheetContent;
+  
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[70vh]">
-        <DrawerHeader>
-          <DrawerTitle className="flex items-center">
-            <Disc3 className="mr-2 h-5 w-5" /> Lecteur Audio
-          </DrawerTitle>
-        </DrawerHeader>
-        <div className="px-4 pb-4">
-          <div className="flex flex-col space-y-4">
-            {currentTrack ? (
-              <div className="flex items-center space-x-4">
-                <div 
-                  className="h-20 w-20 rounded-md bg-cover bg-center bg-no-repeat" 
-                  style={{ backgroundImage: `url(${getTrackImage(currentTrack)})` }}
-                />
-                <div className="flex-1">
-                  <h3 className="font-medium">{currentTrack.title}</h3>
-                  <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="h-20 flex items-center justify-center bg-muted rounded-md">
-                <p className="text-muted-foreground">Aucun titre en cours de lecture</p>
-              </div>
-            )}
-
-            <ProgressBar 
-              currentTime={progress} 
-              duration={duration} 
-              onSeek={seek} 
-              formatTime={formatTime}
-            />
-            
-            <div className="flex justify-between items-center">
-              <div className="flex-1 flex justify-center space-x-4">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={prevTrack}
-                  disabled={!currentTrack}
-                >
-                  <SkipBack className="h-5 w-5" />
-                </Button>
-                
-                <Button 
-                  variant={isPlaying ? "secondary" : "default"}
-                  size="icon"
-                  onClick={togglePlayPause}
-                  disabled={!currentTrack}
-                >
-                  {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={nextTrack}
-                  disabled={!currentTrack}
-                >
-                  <SkipForward className="h-5 w-5" />
-                </Button>
-              </div>
-              
-              <VolumeControl
-                volume={localVolume}
-                onVolumeChange={handleVolumeChange}
-                className="w-24"
-              />
-            </div>
-            
-            {playlist.length > 0 && (
-              <div className="mt-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-medium">En lecture</h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setShowPlaylist(!showPlaylist)}
-                  >
-                    {showPlaylist ? 'Masquer' : 'Afficher'}
-                  </Button>
-                </div>
-                
-                {showPlaylist && (
-                  <div className="max-h-40 overflow-y-auto mt-2">
-                    {playlist.map((track, index) => (
-                      <div 
-                        key={track.id || index}
-                        className={`flex items-center p-2 rounded-md cursor-pointer ${
-                          currentTrack?.id === track.id ? 'bg-primary/10' : 'hover:bg-accent'
-                        }`}
-                        onClick={() => play(track)}
-                      >
-                        <div className="w-6 text-sm text-muted-foreground mr-2">{index + 1}</div>
-                        <div className="flex-1">
-                          <div className="font-medium truncate">{track.title}</div>
-                          <div className="text-xs text-muted-foreground">{track.artist}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+    <DrawerComponent open={drawerOpen} onOpenChange={handleOpenChange}>
+      <ContentComponent className="p-0">
+        <SheetHeader className="p-4 border-b">
+          <div className="flex items-center justify-between">
+            <SheetTitle>
+              <span className="flex items-center">
+                <Music className="mr-2 h-5 w-5 text-primary" />
+                Musique Thérapeutique
+              </span>
+            </SheetTitle>
+            <SheetClose asChild>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Fermer</span>
+              </Button>
+            </SheetClose>
           </div>
+        </SheetHeader>
+        
+        <div className="p-4">
+          <Tabs defaultValue="player" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-2 mb-4">
+              <TabsTrigger value="player">Lecteur</TabsTrigger>
+              <TabsTrigger value="create">Créer</TabsTrigger>
+            </TabsList>
+            
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <TabsContent value="player" className="space-y-4">
+                  <MusicPlayer />
+                </TabsContent>
+                
+                <TabsContent value="create" className="space-y-4">
+                  <MusicCreator />
+                </TabsContent>
+              </motion.div>
+            </AnimatePresence>
+          </Tabs>
         </div>
-      </DrawerContent>
-    </Drawer>
+        
+        {/* Mini Player at the bottom when drawer is open */}
+        <AnimatePresence>
+          {currentTrack && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="border-t p-3"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-muted/50 rounded-md flex items-center justify-center">
+                  <Music className="h-5 w-5 text-primary/70" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{currentTrack.title}</p>
+                  <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </ContentComponent>
+    </DrawerComponent>
   );
 };
 

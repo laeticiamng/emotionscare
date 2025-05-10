@@ -13,7 +13,7 @@ interface MusicEmotionRecommendationProps {
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   emotionResult
 }) => {
-  const { handlePlayMusic, EMOTION_TO_MUSIC } = useMusicRecommendation();
+  const { handlePlayMusic, EMOTION_TO_MUSIC } = useMusicRecommendation(emotionResult);
   
   // Déterminer le type de musique pour cette émotion
   const musicType = emotionResult?.emotion 

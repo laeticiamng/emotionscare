@@ -4,9 +4,10 @@ export interface Badge {
   name: string;
   description: string;
   image_url: string;
-  category: string;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  unlock_requirements: string;
-  unlocked_at?: string;
+  unlocked: boolean;
+  unlock_date?: string | Date;
+  category?: string;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  criteria?: string;
   progress?: number;
 }

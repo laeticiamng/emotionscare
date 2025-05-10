@@ -11,6 +11,17 @@ export const useMusicRecommendation = (emotionResult: EmotionResult | null) => {
   const { loadPlaylistForEmotion, playTrack } = useMusic();
   const { toast } = useToast();
   
+  // Mapping emotions to music types
+  const EMOTION_TO_MUSIC: Record<string, string> = {
+    'happy': 'positive',
+    'sad': 'melancholic',
+    'calm': 'relaxing',
+    'anxious': 'soothing',
+    'angry': 'calming',
+    'neutral': 'balanced',
+    'default': 'relaxing'
+  };
+  
   // Get emotion from result
   const getEmotion = (result: EmotionResult | null): string => {
     if (!result) return 'neutral';
@@ -34,6 +45,43 @@ export const useMusicRecommendation = (emotionResult: EmotionResult | null) => {
     return 'neutral';
   };
   
+  // Handle playing music based on emotion
+  const handlePlayMusic = async (result: EmotionResult) => {
+    if (!result) return;
+    
+    const emotion = getEmotion(result);
+    setIsLoading(true);
+    
+    try {
+      const playlist = await loadPlaylistForEmotion(emotion);
+      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+        playTrack(playlist.tracks[0]);
+        toast({
+          title: 'Musique adaptée',
+          description: `Lecture de musique pour accompagner votre état émotionnel: ${emotion}`
+        });
+        return true;
+      } else {
+        toast({
+          title: 'Aucune musique disponible',
+          description: 'Aucune musique trouvée pour cet état émotionnel',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Error playing emotion music:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de jouer la musique recommandée',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+    
+    return false;
+  };
+  
   // Load music recommendations when emotion changes
   useEffect(() => {
     const loadRecommendations = async () => {
@@ -44,12 +92,14 @@ export const useMusicRecommendation = (emotionResult: EmotionResult | null) => {
       
       try {
         const playlist = await loadPlaylistForEmotion(emotion);
-        if (playlist) {
-          const tracks = playlist.tracks;
-          setRecommendedTracks(tracks);
+        if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+          setRecommendedTracks(playlist.tracks);
+        } else {
+          setRecommendedTracks([]);
         }
       } catch (error) {
         console.error('Error loading music recommendations:', error);
+        setRecommendedTracks([]);
       } finally {
         setIsLoading(false);
       }
@@ -80,6 +130,10 @@ export const useMusicRecommendation = (emotionResult: EmotionResult | null) => {
     recommendedTracks,
     isLoading,
     playRecommendedTrack,
-    playFirstRecommendation
+    playFirstRecommendation,
+    handlePlayMusic,
+    EMOTION_TO_MUSIC
   };
 };
+
+export default useMusicRecommendation;

@@ -1,13 +1,27 @@
 
 export interface MoodData {
-  date: string;
-  score: number;
+  date: string | Date;
+  value: number;
   emotion?: string;
-  label?: string;
+  note?: string;
+  id?: string;
+  user_id?: string;
 }
 
 export interface MoodStats {
-  avgScore: number;
+  average: number;
+  highest: number;
+  lowest: number;
   trend: 'up' | 'down' | 'stable';
-  deltaPercent: number;
+  mostFrequentEmotion?: string;
+}
+
+export interface MoodEntry {
+  id: string;
+  user_id: string;
+  value: number;
+  date: string | Date;
+  emotion?: string;
+  note?: string;
+  created_at: string | Date;
 }

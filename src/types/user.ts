@@ -1,60 +1,55 @@
 
-import { ThemeName, FontSize, FontFamily, NotificationFrequency, NotificationType, NotificationTone, DynamicThemeMode } from './index';
-
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  avatar_url?: string;
-  created_at?: string;
-  updated_at?: string;
-  preferences?: UserPreferences;
-  role?: UserRole;
-  is_premium?: boolean;
-  last_login?: string;
-  streak_days?: number;
-  emotional_score?: number;
-  anonymity_code?: string;
-  avatar?: string;
-}
-
-export type UserRole = 'user' | 'admin' | 'coach' | 'premium' | 'employee' | 'analyst' | 'wellbeing_manager';
-
-export const UserRole = {
-  USER: 'user' as UserRole,
-  ADMIN: 'admin' as UserRole,
-  COACH: 'coach' as UserRole,
-  PREMIUM: 'premium' as UserRole,
-  EMPLOYEE: 'employee' as UserRole,
-  ANALYST: 'analyst' as UserRole,
-  WELLBEING_MANAGER: 'wellbeing_manager' as UserRole
-};
-
 export interface UserPreferences {
-  theme: ThemeName;
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  notificationsEnabled: boolean;
-  notificationFrequency: NotificationFrequency;
-  notificationType: NotificationType; 
-  notificationTone: NotificationTone;
-  reminderTime: string;
-  dynamicTheme: DynamicThemeMode;
-  emotionalCamouflage?: boolean;
-  channels: {
-    journal: boolean;
-    breathing: boolean;
-    music: boolean;
+  theme: 'light' | 'dark' | 'pastel' | 'system' | 'nature' | 'deep-night';
+  notifications_enabled: boolean;
+  font_size: 'small' | 'medium' | 'large';
+  language: string;
+  accent_color?: string;
+  background_color?: string;
+  notifications?: {
     email: boolean;
     push: boolean;
     sms: boolean;
   };
+  reminder_time?: string;
+  dynamic_theme?: {
+    enable_time_based?: boolean;
+    enable_emotion_based?: boolean;
+    enable_weather_based?: boolean;
+  };
+  accessibility?: {
+    high_contrast?: boolean;
+    reduced_motion?: boolean;
+    screen_reader_optimized?: boolean;
+    keyboard_navigation?: boolean;
+  };
+  audio?: {
+    volume?: number;
+    continue_playback?: boolean;
+    ambient_sound?: string;
+    context_music?: boolean;
+    immersive_mode?: boolean;
+  };
+  data_preferences?: {
+    export_format?: 'json' | 'pdf';
+    incognito_mode?: boolean;
+    data_retention_period?: number;
+  };
 }
 
-export interface InvitationFormData {
-  email: string;
+export interface User {
+  id: string;
   name?: string;
-  role: UserRole;
-  message?: string;
-  expiresAt?: Date;
+  email?: string;
+  avatar?: string;
+  role?: string;
+  created_at?: string | Date;
+  last_login?: string | Date;
+  preferences?: UserPreferences;
+}
+
+export interface UserPreferencesState extends UserPreferences {
+  loading: boolean;
+  error: string | null;
+  emotionalCamouflage?: boolean;
 }

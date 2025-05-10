@@ -58,3 +58,7 @@ export interface EnhancedEmotionResult extends EmotionResult {
 export interface EmotionalTeamViewProps {
   className?: string;
 }
+
+export interface EmotionToMusicMap {
+  [key: string]: string;
+}

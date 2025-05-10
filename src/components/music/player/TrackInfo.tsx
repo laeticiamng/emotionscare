@@ -2,21 +2,29 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Music } from 'lucide-react';
-import { TrackInfoProps } from '@/types/audio-player';
-import { MusicTrack } from '@/types/music';
+import { TrackInfoProps } from '@/types';
+import { MusicTrack } from '@/types';
 
 const TrackInfo: React.FC<TrackInfoProps> = ({ 
+  title,
+  artist,
+  coverUrl,
   track, 
   showCover = true,
   showControls = false,
   currentTrack,
   loadingTrack = false,
-  audioError = null
+  audioError = null,
+  className = '',
 }) => {
-  // Use the provided track or fall back to currentTrack
-  const displayTrack = track || currentTrack;
+  // Use the provided track or fall back to currentTrack or title/artist props
+  const displayTrack = track || currentTrack || { 
+    title: title, 
+    artist: artist,
+    coverUrl: coverUrl
+  } as MusicTrack;
   
-  if (!displayTrack) {
+  if (!displayTrack && !title) {
     return (
       <div className="flex items-center gap-3">
         <div className="bg-muted h-12 w-12 rounded-md flex items-center justify-center">
@@ -35,20 +43,23 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
     if (displayTrack.coverUrl) return displayTrack.coverUrl;
     if (displayTrack.cover) return displayTrack.cover;
     if (displayTrack.coverImage) return displayTrack.coverImage;
+    if (coverUrl) return coverUrl;
     
     return null;
   };
   
-  const coverUrl = getCoverUrl();
+  const trackCoverUrl = getCoverUrl();
+  const trackTitle = displayTrack.title || title;
+  const trackArtist = displayTrack.artist || artist;
   
   return (
-    <div className="flex items-center gap-3">
+    <div className={`flex items-center gap-3 ${className}`}>
       {showCover && (
         <div className="bg-muted h-12 w-12 rounded-md flex-shrink-0 overflow-hidden">
-          {coverUrl ? (
+          {trackCoverUrl ? (
             <img 
-              src={coverUrl} 
-              alt={displayTrack.title} 
+              src={trackCoverUrl} 
+              alt={trackTitle} 
               className="h-full w-full object-cover"
             />
           ) : (
@@ -59,9 +70,9 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="font-medium truncate">{displayTrack.title}</p>
+        <p className="font-medium truncate">{trackTitle}</p>
         <p className="text-sm text-muted-foreground truncate">
-          {displayTrack.artist}
+          {trackArtist}
           {audioError && (
             <span className="text-destructive ml-2">Erreur: {audioError.message}</span>
           )}
