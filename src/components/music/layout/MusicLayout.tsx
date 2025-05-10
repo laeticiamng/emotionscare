@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useMusic } from '@/contexts/MusicContext';
@@ -40,7 +39,7 @@ const MusicLayout: React.FC = () => {
       
       {/* Tiroir pour le lecteur de musique complet */}
       <MusicDrawer 
-        open={drawerOpen}
+        isOpen={drawerOpen}
         onOpenChange={setDrawerOpen}
       />
     </div>

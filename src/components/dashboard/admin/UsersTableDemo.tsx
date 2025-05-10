@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Table } from '@/components/ui/table';
@@ -92,9 +91,9 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
             hasSelectionEnabled={true}
           />
           <UserTableBody 
-            users={users} 
+            users={users as unknown as UserData[]} 
             isLoading={isLoading} 
-            error={error || ''} 
+            error={error?.message || ''} 
             hasData={users.length > 0}
             onRetry={handleRetry}
             isLoadingMore={isLoading && users.length > 0}

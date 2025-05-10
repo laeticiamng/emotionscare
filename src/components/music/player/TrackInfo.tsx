@@ -47,12 +47,26 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
     );
   }
 
+  // Get the cover URL from the track object, considering multiple property names
+  const getCoverUrl = () => {
+    if (!displayTrack) return null;
+    
+    if ('coverUrl' in displayTrack && displayTrack.coverUrl) return displayTrack.coverUrl;
+    if ('cover' in displayTrack && displayTrack.cover) return displayTrack.cover;
+    if ('coverImage' in displayTrack && displayTrack.coverImage) return displayTrack.coverImage;
+    if ('imageUrl' in displayTrack && displayTrack.imageUrl) return displayTrack.imageUrl;
+    
+    return null;
+  };
+  
+  const trackCoverUrl = getCoverUrl();
+
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      {showCover && displayTrack && displayTrack.coverUrl && (
+      {showCover && trackCoverUrl && (
         <img 
-          src={displayTrack.coverUrl} 
-          alt={`${displayTrack.title} cover`} 
+          src={trackCoverUrl} 
+          alt={`${displayTrack?.title} cover`} 
           className="h-12 w-12 rounded-md object-cover"
           onError={(e) => {
             // If image fails to load, hide it

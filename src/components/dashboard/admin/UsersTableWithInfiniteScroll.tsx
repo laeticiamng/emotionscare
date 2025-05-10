@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Table } from '@/components/ui/table';
@@ -89,9 +88,9 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
               hasSelectionEnabled={true}
             />
             <UserTableBody 
-              users={users} 
+              users={users as unknown as UserData[]} 
               isLoading={isLoading} 
-              error={error || ''} 
+              error={error?.message || ''} 
               hasData={users.length > 0}
               onRetry={handleRetry}
               isLoadingMore={false}
@@ -107,7 +106,7 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
       {error && users.length > 0 && (
         <div className="p-4 border-t flex justify-center">
           <div className="flex flex-col items-center">
-            <p className="text-destructive mb-2">{error}</p>
+            <p className="text-destructive mb-2">{error.message}</p>
             <button
               onClick={handleRetry}
               className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90"

@@ -204,7 +204,7 @@ const Shell: React.FC = () => {
 
       {/* Music Drawer */}
       <MusicDrawer 
-        open={musicDrawerOpen} 
+        isOpen={musicDrawerOpen} 
         onOpenChange={setMusicDrawerOpen}
       />
 

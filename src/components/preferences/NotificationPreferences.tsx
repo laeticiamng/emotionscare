@@ -1,154 +1,125 @@
-
 import React from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { UserPreferencesState, NotificationFrequency, NotificationType, NotificationTone } from '@/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { usePreferences } from '@/hooks/usePreferences';
 
-interface NotificationPreferencesProps {
-  preferences: UserPreferencesState;
-  onUpdate: (key: string, value: any) => void;
-}
+const NotificationPreferences = () => {
+  const {
+    preferences,
+    isLoading,
+    updatePreferences,
+    notifications_enabled = preferences.notifications_enabled || false,
+    notification_frequency = 'daily',
+    notification_type = 'all',
+    notification_tone = 'gentle',
+    email_notifications = preferences.notifications?.email || false,
+    push_notifications = preferences.notifications?.push || false
+  } = usePreferences();
 
-const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
-  preferences,
-  onUpdate,
-}) => {
-  const handleChange = (key: string, value: any) => {
-    onUpdate(key, value);
+  const handleUpdatePreferences = async (newPrefs: Partial<typeof preferences>) => {
+    await updatePreferences(newPrefs);
   };
 
   return (
-    <Card>
+    <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Préférences de notifications</CardTitle>
+        <CardTitle>Notifications</CardTitle>
+        <CardDescription>
+          Gérez vos préférences de notification
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="notifications_enabled" className="text-base">
-                Activer les notifications
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Recevoir des notifications sur votre état émotionnel
-              </p>
-            </div>
-            <Switch
-              id="notifications_enabled"
-              checked={preferences.notifications_enabled}
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="notifications-enabled"
+              checked={notifications_enabled}
+              onCheckedChange={(checked) => handleUpdatePreferences({ notifications_enabled: checked })}
+            />
+            <label htmlFor="notifications-enabled" className="text-sm">
+              Activer toutes les notifications
+            </label>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Fréquence des notifications</label>
+          <Select
+            defaultValue={notification_frequency}
+            onValueChange={(value) => handleUpdatePreferences({ notificationFrequency: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choisir une fréquence" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="daily">Quotidiennement</SelectItem>
+              <SelectItem value="weekly">Chaque semaine</SelectItem>
+              <SelectItem value="monthly">Mensuellement</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Type de notifications</label>
+          <Select
+            defaultValue={notification_type}
+            onValueChange={(value) => handleUpdatePreferences({ notificationType: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choisir un type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tout</SelectItem>
+              <SelectItem value="important">Important uniquement</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Tonalité des notifications</label>
+          <Select
+            defaultValue={notification_tone}
+            onValueChange={(value) => handleUpdatePreferences({ notificationTone: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Choisir une tonalité" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gentle">Douce</SelectItem>
+              <SelectItem value="assertive">Assurée</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="email-notifications"
+              checked={email_notifications}
               onCheckedChange={(checked) =>
-                handleChange('notifications_enabled', checked)
+                handleUpdatePreferences({ notifications: { ...preferences.notifications, email: checked } })
               }
             />
+            <label htmlFor="email-notifications" className="text-sm">
+              Recevoir des notifications par email
+            </label>
           </div>
+        </div>
 
-          {preferences.notifications_enabled && (
-            <div className="space-y-6 pt-2">
-              <div className="space-y-2">
-                <Label htmlFor="notification_frequency">Fréquence</Label>
-                <Select
-                  value={preferences.notification_frequency || 'daily'}
-                  onValueChange={(value) =>
-                    handleChange('notification_frequency', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir fréquence" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Quotidienne</SelectItem>
-                    <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                    <SelectItem value="flexible">Flexible</SelectItem>
-                    <SelectItem value="none">Aucune</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notification_type">Type de notifications</Label>
-                <Select
-                  value={preferences.notification_type || 'minimal'}
-                  onValueChange={(value) =>
-                    handleChange('notification_type', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="minimal">Minimalistes</SelectItem>
-                    <SelectItem value="detailed">Détaillées</SelectItem>
-                    <SelectItem value="full">Complètes</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notification_tone">Ton des messages</Label>
-                <Select
-                  value={preferences.notification_tone || 'minimalist'}
-                  onValueChange={(value) =>
-                    handleChange('notification_tone', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisir ton" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="minimalist">Minimaliste</SelectItem>
-                    <SelectItem value="poetic">Poétique</SelectItem>
-                    <SelectItem value="directive">Directif</SelectItem>
-                    <SelectItem value="silent">Sans texte</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="pt-2 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="email_notifications" className="cursor-pointer">
-                      Notifications par e-mail
-                    </Label>
-                  </div>
-                  <Switch
-                    id="email_notifications"
-                    checked={preferences.email_notifications || false}
-                    onCheckedChange={(checked) =>
-                      handleChange('email_notifications', checked)
-                    }
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="push_notifications" className="cursor-pointer">
-                      Notifications push
-                    </Label>
-                  </div>
-                  <Switch
-                    id="push_notifications"
-                    checked={preferences.push_notifications || false}
-                    onCheckedChange={(checked) =>
-                      handleChange('push_notifications', checked)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          )}
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="push-notifications"
+              checked={push_notifications}
+              onCheckedChange={(checked) =>
+                handleUpdatePreferences({ notifications: { ...preferences.notifications, push: checked } })
+              }
+            />
+            <label htmlFor="push-notifications" className="text-sm">
+              Recevoir des notifications push
+            </label>
+          </div>
         </div>
       </CardContent>
     </Card>

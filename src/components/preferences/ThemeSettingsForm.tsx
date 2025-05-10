@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -7,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ThemeName, UserPreferencesState } from '@/types';
 import { MoonIcon, SunIcon, Palette, Laptop } from 'lucide-react';
+import { usePreferences } from '@/hooks/usePreferences';
 
 interface ThemeSettingsFormProps {
   preferences: UserPreferencesState;
@@ -17,8 +17,10 @@ const ThemeSettingsForm: React.FC<ThemeSettingsFormProps> = ({
   preferences,
   onUpdate
 }) => {
+  const { preferences, theme = preferences.theme || 'light', updatePreferences } = usePreferences();
+
   const handleThemeChange = (theme: ThemeName) => {
-    onUpdate('theme', theme);
+    updatePreferences({ theme });
   };
 
   return (
@@ -27,7 +29,7 @@ const ThemeSettingsForm: React.FC<ThemeSettingsFormProps> = ({
         <CardTitle>Thème de l'application</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <Tabs defaultValue={preferences.theme} className="w-full">
+        <Tabs defaultValue={theme} className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="light" onClick={() => handleThemeChange('light')}>
               <SunIcon className="mr-2 h-4 w-4" />

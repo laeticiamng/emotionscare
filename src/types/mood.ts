@@ -1,6 +1,7 @@
 
 // Create a file for mood-related types
 export interface MoodData {
+  id?: string; // Add id property
   date: string;
   originalDate: string;
   value: number;

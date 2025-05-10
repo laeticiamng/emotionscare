@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UserPreferences } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -68,7 +67,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
 
         <FormField
           control={form.control}
-          name="font_size"
+          name="fontSize"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Taille de police</FormLabel>
@@ -117,7 +116,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
 
         <FormField
           control={form.control}
-          name="notifications_enabled"
+          name="notifications"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
@@ -128,7 +127,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
               </div>
               <FormControl>
                 <Switch
-                  checked={field.value}
+                  checked={Boolean(field.value)}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserPreferences, UserRole } from '@/types';
 
@@ -45,20 +44,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<User> => {
     // Mock login logic
     const mockUser: User = {
-      id: 'user-1',
-      email,
-      name: email.split('@')[0],
-      role: email.includes('admin') ? 'admin' as UserRole : 'user' as UserRole,
-      created_at: new Date().toISOString(),
+      id: '1',
+      name: 'John Doe',
+      email: 'john@example.com',
+      role: 'admin',
       department: 'Engineering',
-      position: 'Developer',
-      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-      preferences: {
-        theme: 'light',
-        notifications_enabled: true,
-        font_size: 'medium',
-        language: 'fr',
-      }
+      avatar: '/avatars/user1.png',
+      position: 'Senior Developer',
+      joined_at: new Date('2023-01-15').toISOString(),
+      onboarded: true
     };
 
     // Store user in localStorage

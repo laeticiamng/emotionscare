@@ -9,6 +9,7 @@ export interface MusicTrack {
   audioUrl?: string; // Alternative URL property
   imageUrl?: string;
   cover?: string; // Alternative cover property
+  coverUrl?: string; // Adding coverUrl property
   coverImage?: string; // Another alternative cover property
   externalUrl?: string; // External URL for opening in music players
   mood?: string;
@@ -33,6 +34,7 @@ export interface MusicPlaylist {
   created_at?: string | Date;
   updated_at?: string | Date;
   mood?: string;
+  emotion?: string; // Adding emotion property 
   user_id?: string;
   track_count?: number;
   duration?: number;
@@ -41,9 +43,11 @@ export interface MusicPlaylist {
 }
 
 export interface MusicRecommendationCardProps {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   emotion?: string;
+  intensity?: number; // Adding intensity property
+  standalone?: boolean; // Adding standalone property
   onPlay?: () => void;
   tracks?: MusicTrack[];
   onClick?: () => void;
@@ -51,7 +55,31 @@ export interface MusicRecommendationCardProps {
 }
 
 export interface MusicDrawerProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen?: boolean;
+  open?: boolean; // Add open as alternative to isOpen
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void; // Add onClose prop
   emotion?: string;
 }
+
+// Adding MusicContextType for MusicContext
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  setCurrentTrack: (track: MusicTrack | null) => void;
+  openDrawer?: () => void;
+  closeDrawer?: () => void;
+  isDrawerOpen?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<any>;
+  currentPlaylist?: MusicPlaylist | null;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+}
+

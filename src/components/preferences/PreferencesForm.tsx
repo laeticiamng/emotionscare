@@ -28,10 +28,14 @@ const PreferencesForm: React.FC<{
 
   // Adapter les préférences de base pour le formulaire
   const formPreferences: FormPreferences = {
-    ...preferences,
+    theme: preferences.theme || 'light',
+    notifications_enabled: preferences.notifications_enabled || false,
+    font_size: preferences.fontSize || preferences.font_size || 'medium',
+    language: preferences.language || 'fr', // Valeur par défaut pour résoudre l'erreur
     marketing_emails: preferences.notifications?.email || false,
     feature_announcements: preferences.notifications?.push || false,
-    language: preferences.language || 'fr' // Valeur par défaut pour résoudre l'erreur
+    accent_color: preferences.accent_color || '',
+    reminder_time: preferences.reminder_time || ''
   };
 
   const { register, handleSubmit, setValue, watch } = useForm<FormPreferences>({
@@ -44,16 +48,21 @@ const PreferencesForm: React.FC<{
     // Convert the form data to the UserPreferences format
     const standardPreferences: UserPreferences = {
       theme: data.theme as 'light' | 'dark' | 'pastel', // Gestion du système
-      notifications_enabled: data.notifications_enabled,
-      font_size: data.font_size,
+      fontSize: data.font_size,
       language: data.language,
       accent_color: data.accent_color,
       notifications: {
         email: !!data.marketing_emails,
         push: !!data.feature_announcements,
-        sms: preferences.notifications?.sms || false
+        sms: false
       },
-      reminder_time: data.reminder_time
+      notifications_enabled: data.notifications_enabled,
+      reminder_time: data.reminder_time,
+      // Add required properties from UserPreferences 
+      autoplayVideos: preferences.autoplayVideos || false,
+      showEmotionPrompts: preferences.showEmotionPrompts || false,
+      privacyLevel: preferences.privacyLevel || 'medium',
+      dataCollection: preferences.dataCollection || false
     };
     
     try {
@@ -113,9 +122,9 @@ const PreferencesForm: React.FC<{
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium">Taille de police</label>
+            <label htmlFor="font-size" className="text-sm font-medium">Taille de police</label>
             <Select
-              defaultValue={preferences.font_size || 'medium'}
+              defaultValue={preferences.fontSize || preferences.font_size || 'medium'}
               onValueChange={(value) => setValue('font_size', value as 'small' | 'medium' | 'large')}
             >
               <SelectTrigger>
@@ -131,6 +140,17 @@ const PreferencesForm: React.FC<{
 
           <div className="space-y-4">
             <label className="text-sm font-medium">Notifications</label>
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="notifications-enabled"
+                checked={watch('notifications_enabled')}
+                onCheckedChange={(checked) => setValue('notifications_enabled', !!checked)}
+              />
+              <label htmlFor="notifications-enabled" className="text-sm">
+                Activer toutes les notifications
+              </label>
+            </div>
             
             <div className="flex items-center space-x-2">
               <Checkbox

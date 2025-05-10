@@ -17,6 +17,8 @@ export interface JournalEntry {
   title?: string;
   media_urls?: string[];
   image_url?: string;
+  text?: string; // Add text field
+  ai_feedback?: string; // Add ai_feedback field
 }
 
 export interface JournalStatistics {

@@ -1,45 +1,42 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { UserPreferencesState } from '@/types';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { usePreferences } from '@/hooks/usePreferences';
 
-interface PremiumFeaturesProps {
-  preferences: UserPreferencesState;
-  onUpdate: (key: string, value: any) => void;
-}
+const PremiumFeatures = () => {
+  const { 
+    preferences, 
+    updatePreferences, 
+    emotionalCamouflage = false 
+  } = usePreferences();
 
-const PremiumFeatures: React.FC<PremiumFeaturesProps> = ({
-  preferences,
-  onUpdate
-}) => {
-  const handleToggleEmotionalCamouflage = (checked: boolean) => {
-    onUpdate('emotionalCamouflage', checked);
+  const handleEmotionalCamouflageChange = async (checked: boolean) => {
+    await updatePreferences({ emotionalCamouflage: checked });
   };
-  
+
   return (
-    <Card>
+    <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Fonctionnalités premium</CardTitle>
+        <CardTitle>Fonctionnalités Premium</CardTitle>
+        <CardDescription>
+          Débloquez des options avancées pour une expérience personnalisée
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="camouflage" className="block mb-1">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="emotional-camouflage"
+              checked={emotionalCamouflage}
+              onCheckedChange={handleEmotionalCamouflageChange}
+            />
+            <label htmlFor="emotional-camouflage" className="text-sm font-medium">
               Camouflage émotionnel
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              Masque vos émotions réelles aux autres utilisateurs
-            </p>
+            </label>
           </div>
-          <Switch
-            id="camouflage"
-            checked={preferences.emotionalCamouflage || false}
-            onCheckedChange={handleToggleEmotionalCamouflage}
-          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Masquez vos émotions aux autres utilisateurs pour plus de confidentialité
+          </p>
         </div>
       </CardContent>
     </Card>
