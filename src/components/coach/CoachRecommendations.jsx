@@ -9,7 +9,7 @@ interface CoachRecommendationsProps {
   onToggle?: () => void;
 }
 
-const CoachRecommendations = ({ emotion, collapsed, onToggle }) => {
+const CoachRecommendations = ({ emotion, collapsed, onToggle }: CoachRecommendationsProps) => {
   // Sample recommendations based on emotion
   const getRecommendations = () => {
     switch (emotion) {

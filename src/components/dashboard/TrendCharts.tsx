@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { lineChartData } from "@/data/line-chart-data";
+import { emotionalClimateData } from "@/data/line-chart-data";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Define proper TypeScript props interface
@@ -23,7 +23,7 @@ const TrendCharts: React.FC<TrendChartsProps> = ({
   isLoading = false 
 }) => {
   // Sample chart data - normally would be fetched based on userId
-  const data = lineChartData;
+  const data = emotionalClimateData;
 
   return (
     <Card className="shadow-sm">
@@ -46,9 +46,9 @@ const TrendCharts: React.FC<TrendChartsProps> = ({
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="énergie" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="calme" stroke="#82ca9d" />
-              <Line type="monotone" dataKey="humeur" stroke="#ffc658" />
+              <Line type="monotone" dataKey="happy" name="Énergie" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="neutral" name="Calme" stroke="#82ca9d" />
+              <Line type="monotone" dataKey="sad" name="Humeur" stroke="#ffc658" />
             </LineChart>
           </ResponsiveContainer>
         </div>

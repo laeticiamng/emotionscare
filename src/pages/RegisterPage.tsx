@@ -35,7 +35,7 @@ const RegisterPage: React.FC = () => {
       if (!register) throw new Error('Register function not available');
       
       // Updated to use the correct parameter structure
-      await register(email, password, { name });
+      await register({ email, password, name });
       
       toast({
         description: "Inscription réussie! Vous pouvez maintenant vous connecter.",

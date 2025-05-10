@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,8 +27,8 @@ const LoginPage: React.FC = () => {
       setLoading(true);
       if (!login) throw new Error('Login function not available');
       
-      // Updated to use a single argument
-      await login(email, password);
+      // Updated to use the correct parameter structure
+      await login({ email, password });
       
       toast({
         description: "Connexion réussie!",
