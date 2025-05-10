@@ -29,7 +29,7 @@ export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 
 // Re-export additional specific types
-export type { UserRole } from './user';
+export { UserRole } from './user';
 export type { EmotionalTeamViewProps, EnhancedEmotionResult } from './emotion';
 export type { Emotion, EmotionResult } from './emotion';
 export type { ChatMessage, ChatConversation } from './chat';

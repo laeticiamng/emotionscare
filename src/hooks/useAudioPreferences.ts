@@ -7,10 +7,10 @@ export interface AudioPreference {
   currentEqualizer: string;
   equalizerEnabled: boolean;
   equalizerPresets: string[];
-  setVolume?: (volume: number) => void;
-  setAutoplay?: (enabled: boolean) => void;
-  toggleEqualizer?: (enabled?: boolean) => void;
-  setEqualizerPreset?: (preset: string) => void;
+  setVolume: (volume: number) => void;
+  setAutoplay: (enabled: boolean) => void;
+  toggleEqualizer: (enabled?: boolean) => void;
+  setEqualizerPreset: (preset: string) => void;
 }
 
 export default function useAudioPreferences() {
@@ -19,7 +19,11 @@ export default function useAudioPreferences() {
     autoplay: true,
     currentEqualizer: 'default',
     equalizerEnabled: false,
-    equalizerPresets: ['default', 'bass', 'vocal', 'ambient']
+    equalizerPresets: ['default', 'bass', 'vocal', 'ambient'],
+    setVolume: () => {}, // Initial dummy functions, will be replaced below
+    setAutoplay: () => {},
+    toggleEqualizer: () => {},
+    setEqualizerPreset: () => {}
   });
 
   const setVolume = (volume: number) => {
@@ -40,6 +44,17 @@ export default function useAudioPreferences() {
   const setEqualizerPreset = (preset: string) => {
     setPreferences(prev => ({ ...prev, currentEqualizer: preset }));
   };
+  
+  // Update preferences with the actual implementations
+  useEffect(() => {
+    setPreferences(prev => ({
+      ...prev,
+      setVolume,
+      setAutoplay,
+      toggleEqualizer,
+      setEqualizerPreset
+    }));
+  }, []);
 
   return {
     preferences,

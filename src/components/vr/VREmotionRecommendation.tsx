@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { Emotion } from '@/types';
 
 interface VREmotionRecommendationProps {
-  emotion: Emotion | null;
+  emotion: Emotion | null | string;
 }
 
 const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emotion }) => {
@@ -15,8 +15,10 @@ const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emoti
   
   if (!emotion) return null;
   
-  // Get the emotion name safely
-  const emotionName = emotion.name || emotion.emotion || emotion.dominant_emotion || 'neutral';
+  // Get the emotion name safely depending on whether we received a string or an Emotion object
+  const emotionName = typeof emotion === 'string' 
+    ? emotion
+    : emotion.name || emotion.emotion || emotion.dominant_emotion || 'neutral';
   
   // Determine if this is a stressful emotion
   const isStressfulEmotion = ['stressed', 'anxious', 'overwhelmed', 'angry', 'sad'].includes(emotionName.toLowerCase());

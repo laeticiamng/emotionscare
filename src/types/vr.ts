@@ -73,12 +73,12 @@ export interface VRSessionWithMusicProps {
   videoUrl?: string;
   audioUrl?: string;
   emotion?: string;
-  template?: VRSessionTemplate; // Propriété manquante
-  onCompleteSession?: () => void; // Propriété manquante
+  template?: VRSessionTemplate;
+  onCompleteSession?: () => void;
 }
 
 export interface VREmotionRecommendationProps {
-  emotion: string; // Correction pour la propriété emotion requise
+  emotion: string | Emotion | null;
 }
 
 // Ajout des propriétés utilisées dans VRPage.tsx
