@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Group } from '@/types';
+import { Group } from '@/types/group';
 
 interface GroupItemProps {
   group: Group;

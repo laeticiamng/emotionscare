@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Group } from '@/types';
+import { Group } from '@/types/group';
 import GroupItem from './GroupItem';
 
 interface GroupListProps {

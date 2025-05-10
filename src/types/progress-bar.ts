@@ -1,10 +1,11 @@
 
-export interface ProgressBarProps {
+export interface ProgressProps {
   value: number;
   max?: number;
-  showValue?: boolean;
-  className?: string;
-  valueClassName?: string;
   size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  showLabel?: boolean;
+  label?: string;
+  color?: string;
+  animate?: boolean;
+  className?: string;
 }

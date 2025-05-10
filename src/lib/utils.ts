@@ -1,44 +1,50 @@
 
-import { ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-/**
- * Combines Tailwind CSS classes with proper merging of overrides
- */
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+ 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
-/**
- * Safe open helper to handle various drawer/modal open functions
- * Supports boolean values, parameterless functions and functions that take a boolean parameter
- */
-export function safeOpen(value: boolean | (() => void) | ((open: boolean) => void)): void {
-  if (typeof value === 'function') {
-    try {
-      // Try to call with true parameter for functions that take a boolean
-      (value as (open: boolean) => void)(true);
-    } catch (e) {
-      // Fallback to calling without parameter for parameterless functions
-      (value as () => void)();
-    }
+// Safely open a drawer by handling both boolean and function cases
+export function safeOpen(setOpenDrawer: boolean | ((open: boolean) => void)) {
+  if (typeof setOpenDrawer === 'function') {
+    setOpenDrawer(true);
   }
-  // If value is boolean, no action needed as it's just a passive value
+  return true;
 }
 
-/**
- * Formats seconds to minutes:seconds display (MM:SS)
- * @param seconds - Number of seconds to format
- * @returns Formatted time string
- */
-export function formatTime(seconds: number): string {
-  if (!seconds && seconds !== 0) return '00:00';
+// Format duration in seconds to MM:SS
+export function formatDuration(seconds: number): string {
+  if (isNaN(seconds) || seconds === 0) {
+    return '0:00';
+  }
   
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
   
-  const formattedMinutes = String(minutes).padStart(2, '0');
-  const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Safe JSON parse with default value
+export function safeJsonParse<T>(json: string | null | undefined, defaultValue: T): T {
+  if (!json) return defaultValue;
   
-  return `${formattedMinutes}:${formattedSeconds}`;
+  try {
+    return JSON.parse(json) as T;
+  } catch (e) {
+    console.error('Error parsing JSON:', e);
+    return defaultValue;
+  }
+}
+
+// Generate a random ID (useful for non-production temporary IDs)
+export function generateId(prefix = ''): string {
+  return `${prefix}${Math.random().toString(36).substring(2, 9)}`;
+}
+
+// Truncate text with ellipsis
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 }

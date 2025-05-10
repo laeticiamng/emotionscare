@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import { Music, PlayCircle, PauseCircle, Loader2 } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 
@@ -63,10 +63,10 @@ export function EmotionMusicRecommendations({
         };
         playTrack(track);
       }
-      setLocalLoading(false);
     } catch (err) {
       console.error("Error loading music:", err);
       setLocalError("Impossible de charger la musique pour cette émotion");
+    } finally {
       setLocalLoading(false);
     }
   };
@@ -115,9 +115,11 @@ export function EmotionMusicRecommendations({
     <Card className="w-full">
       <CardHeader className="pb-3">
         <CardTitle>Musique Thérapeutique</CardTitle>
-        <CardDescription>
-          Musique adaptée à votre état émotionnel
-        </CardDescription>
+        <CardHeader className="pb-0 pt-0">
+          <p className="text-sm text-muted-foreground">
+            Musique adaptée à votre état émotionnel
+          </p>
+        </CardHeader>
       </CardHeader>
       <CardContent>
         {(errorMessage || localError) ? (

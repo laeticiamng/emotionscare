@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Loader2, PlayCircle } from 'lucide-react';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { safeOpen } from '@/lib/utils';
@@ -21,33 +21,46 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
 }) => {
   const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
   const { toast } = useToast();
+  const [isLoadingMusic, setIsLoadingMusic] = useState(false);
   
   const handlePlayMusic = async () => {
     if (!emotionResult.emotion) return;
     
-    const emotion = emotionResult.emotion.toLowerCase();
-    const playlist = await loadPlaylistForEmotion(emotion);
-    
-    if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-      // Ensure the track has the required duration and url fields
-      const track = {
-        ...playlist.tracks[0],
-        duration: playlist.tracks[0].duration || 0,
-        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
-      };
-      playTrack(track);
-      safeOpen(setOpenDrawer);
+    setIsLoadingMusic(true);
+    try {
+      const emotion = emotionResult.emotion.toLowerCase();
+      const playlist = await loadPlaylistForEmotion(emotion);
       
+      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
+        // Ensure the track has the required duration and url fields
+        const track = {
+          ...playlist.tracks[0],
+          duration: playlist.tracks[0].duration || 0,
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
+        };
+        playTrack(track);
+        setOpenDrawer(true);
+        
+        toast({
+          title: "Musique lancée",
+          description: `Lecture de '${playlist.tracks[0].title}' démarrée`,
+        });
+      } else {
+        toast({
+          title: "Aucune musique disponible",
+          description: `Aucune playlist n'a été trouvée pour l'émotion ${emotionResult.emotion}`,
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement de la musique:", error);
       toast({
-        title: "Musique lancée",
-        description: `Lecture de '${playlist.tracks[0].title}' démarrée`,
-      });
-    } else {
-      toast({
-        title: "Aucune musique disponible",
-        description: `Aucune playlist n'a été trouvée pour l'émotion ${emotionResult.emotion}`,
+        title: "Erreur",
+        description: "Impossible de charger la musique",
         variant: "destructive"
       });
+    } finally {
+      setIsLoadingMusic(false);
     }
   };
 
@@ -73,11 +86,11 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
           </div>
           <Button 
             onClick={handlePlayMusic} 
-            disabled={isLoading}
+            disabled={isLoading || isLoadingMusic}
             variant={isStandalone ? "default" : "outline"}
             className="flex-shrink-0 flex items-center gap-2"
           >
-            {isLoading ? (
+            {isLoading || isLoadingMusic ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>

@@ -34,6 +34,8 @@ export interface MusicContextType {
   currentPlaylist: MusicPlaylist | null; 
   isPlaying: boolean;
   volume: number;
+  openDrawer: boolean;
+  setOpenDrawer: (open: boolean) => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
@@ -42,8 +44,6 @@ export interface MusicContextType {
   setProgress: (progress: number) => void;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
-  openDrawer: boolean;
-  setOpenDrawer: (open: boolean) => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   initializeMusicSystem: () => void;
   error: Error | null;

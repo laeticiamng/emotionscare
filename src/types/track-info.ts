@@ -2,7 +2,9 @@
 export interface TrackInfo {
   title: string;
   artist: string;
+  album?: string;
   duration: number;
-  coverArt: string;
-  audioSrc: string;
+  progress?: number;
+  coverUrl?: string;
+  genre?: string;
 }

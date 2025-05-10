@@ -1,38 +1,30 @@
 
-export interface GamificationStats {
-  points: number;
-  level: number;
-  badges_earned: number;
-  total_badges: number;
-  current_streak: number;
-  longest_streak: number;
-  challenges_completed: number;
-  next_challenge?: Challenge;
-}
-
-export interface Challenge {
+export interface Achievement {
   id: string;
   title: string;
   description: string;
+  icon: string;
   points: number;
+  earned: boolean;
+  earned_at?: Date;
   progress?: number;
   total?: number;
-  completed: boolean;
-  deadline?: string | Date;
-  badge_reward?: string;
 }
 
-export interface Leaderboard {
-  timeframe: 'weekly' | 'monthly' | 'all_time';
-  entries: LeaderboardEntry[];
+export interface Level {
+  level: number;
+  title: string;
+  points_required: number;
+  benefits: string[];
+  icon: string;
 }
 
-export interface LeaderboardEntry {
+export interface UserGameStats {
   user_id: string;
-  username: string;
-  avatar?: string;
   points: number;
-  rank: number;
-  badges?: number;
-  is_current_user?: boolean;
+  level: number;
+  achievements_earned: number;
+  streak_days: number;
+  badges: string[];
+  last_activity: Date;
 }
