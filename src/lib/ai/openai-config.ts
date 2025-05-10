@@ -6,7 +6,11 @@ export type AIModule =
   | 'emotion-analysis'
   | 'content-moderation'
   | 'journal-assistant'
-  | 'security';
+  | 'security'
+  | 'journal'
+  | 'coach'
+  | 'buddy'
+  | 'scan';
 
 export interface OpenAIModelParams {
   model: string;
@@ -22,7 +26,7 @@ export interface OpenAIModelParams {
 
 export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
   'chat': {
-    model: 'gpt-4-turbo',
+    model: 'gpt-4o-mini',
     temperature: 0.7,
     max_tokens: 1000,
     top_p: 1,
@@ -32,13 +36,13 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
     cacheEnabled: false
   },
   'emotion-analysis': {
-    model: 'gpt-4-turbo',
-    temperature: 0.2, // Plus bas pour des analyses plus cohérentes
+    model: 'gpt-4o-mini',
+    temperature: 0.2, 
     max_tokens: 800,
     top_p: 1,
     stream: false,
     cacheEnabled: true,
-    cacheTTL: 3600 // 1 heure
+    cacheTTL: 3600 // 1 hour
   },
   'content-moderation': {
     model: 'text-moderation-latest',
@@ -50,7 +54,7 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
     cacheTTL: 300 // 5 minutes
   },
   'journal-assistant': {
-    model: 'gpt-4-turbo',
+    model: 'gpt-4o-mini',
     temperature: 0.5,
     max_tokens: 1500,
     top_p: 1,
@@ -58,12 +62,47 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
     cacheEnabled: false
   },
   'security': {
-    model: 'gpt-4-turbo',
-    temperature: 0.1, // Très bas pour maximiser la précision
+    model: 'gpt-4o-mini',
+    temperature: 0.1, 
     max_tokens: 500,
     top_p: 1,
     stream: false,
     cacheEnabled: false
+  },
+  // Add the missing module types
+  'journal': {
+    model: 'gpt-4o-mini',
+    temperature: 0.5,
+    max_tokens: 1500,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: false
+  },
+  'coach': {
+    model: 'gpt-4o-mini',
+    temperature: 0.6,
+    max_tokens: 1200,
+    top_p: 1,
+    stream: true,
+    cacheEnabled: false
+  },
+  'buddy': {
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    max_tokens: 800,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 1800 // 30 minutes
+  },
+  'scan': {
+    model: 'gpt-4o-mini',
+    temperature: 0.3,
+    max_tokens: 600,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 3600 // 1 hour
   }
 };
 
@@ -82,4 +121,18 @@ export const PROMPT_TEMPLATES = {
     `Evaluate if the following content contains any inappropriate material according to these categories:
     hate speech, violence, self-harm, sexual content, harassment, or other harmful content.
     If detected, explain why without repeating the problematic content.`
+};
+
+// Budget controls and thresholds
+export const BUDGET_THRESHOLDS = {
+  'gpt-4o': 100, // $100 monthly budget
+  'gpt-4o-mini': 50, // $50 monthly budget
+  'default': 200 // Overall budget cap
+};
+
+// Fallback models for budget control
+export const BUDGET_FALLBACKS = {
+  'gpt-4o': 'gpt-4o-mini',
+  'gpt-4-turbo': 'gpt-4o-mini',
+  'default': 'gpt-4o-mini'
 };

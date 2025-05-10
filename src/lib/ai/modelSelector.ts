@@ -13,13 +13,6 @@ interface ModelSelectionCriteria {
 
 /**
  * Sélecteur de modèle intelligent basé sur les critères de la requête
- * 
- * Cela implémente la spécification issue du prompt:
- * - Chat/FAQ: gpt-4o-mini (avec cache 24h)
- * - Coach init: gpt-4o → puis suivi avec gpt-4o-mini
- * - Journal batch: gpt-4o
- * - Buddy & Scan: gpt-4o-mini
- * - Garde-fous budgétaires pour rétrograder les modèles si nécessaire
  */
 export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<OpenAIModelParams> {
   // Cloner la configuration par défaut pour le module
@@ -41,7 +34,8 @@ export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<O
       temperature: 0.4,
       max_tokens: 512,
       top_p: 1.0,
-      stream: true
+      stream: true,
+      cacheEnabled: false
     };
   }
   
@@ -52,7 +46,8 @@ export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<O
       temperature: 0.3,
       max_tokens: 1024,
       top_p: 1.0,
-      stream: false
+      stream: false,
+      cacheEnabled: false
     };
   }
   
