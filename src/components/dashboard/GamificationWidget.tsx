@@ -9,9 +9,18 @@ import { Progress } from "@/components/ui/progress";
 interface GamificationWidgetProps {
   className?: string;
   style?: React.CSSProperties;
+  collapsed?: boolean;
+  onToggle?: () => void;
+  userId?: string;
 }
 
-const GamificationWidget: React.FC<GamificationWidgetProps> = ({ className, style }) => {
+const GamificationWidget: React.FC<GamificationWidgetProps> = ({ 
+  className, 
+  style,
+  collapsed,
+  onToggle,
+  userId
+}) => {
   const navigate = useNavigate();
   
   // Sample data for challenges and badges

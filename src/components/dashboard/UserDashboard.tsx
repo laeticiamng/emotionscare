@@ -13,6 +13,9 @@ import useLogger from '@/hooks/useLogger';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { LucideIcon } from 'lucide-react';
 
+// Import the types from DashboardHero
+import type { DashboardKpi, DashboardShortcut } from './DashboardHero';
+
 interface UserDashboardProps {
   user: User | null;
   latestEmotion?: {
@@ -42,7 +45,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   logger.debug('Rendering UserDashboard component');
   
   // Map the KPI and shortcut types correctly between different interfaces
-  const typedKpis: DashboardHero["props"]["kpis"] = kpis ? kpis.map((kpi: any) => ({
+  const typedKpis: DashboardKpi[] = kpis ? kpis.map((kpi: any) => ({
     key: kpi.id || kpi.key || kpi.label,
     value: kpi.value,
     label: kpi.label,
@@ -50,7 +53,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
     icon: kpi.icon as LucideIcon
   })) : [];
 
-  const typedShortcuts: DashboardHero["props"]["shortcuts"] = shortcuts ? shortcuts.map((shortcut: any) => ({
+  const typedShortcuts: DashboardShortcut[] = shortcuts ? shortcuts.map((shortcut: any) => ({
     name: shortcut.name || shortcut.label,
     label: shortcut.label || shortcut.name,
     icon: shortcut.icon as LucideIcon,

@@ -34,10 +34,11 @@ const RegisterPage: React.FC = () => {
       setLoading(true);
       if (!register) throw new Error('Register function not available');
       
-      await register(email, password, { name });
+      const userData = { name };
+      await register(email, password, userData);
+      
       toast({
         description: "Inscription réussie! Vous pouvez maintenant vous connecter.",
-        variant: "success",
       });
       
       // After registration, redirect to the mode selection page

@@ -30,7 +30,6 @@ const LoginPage: React.FC = () => {
       await login(email, password);
       toast({
         description: "Connexion réussie!",
-        variant: "success",
       });
       
       // Redirect to user mode selection or the previous page they were trying to access

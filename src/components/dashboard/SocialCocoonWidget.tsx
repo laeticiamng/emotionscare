@@ -9,9 +9,18 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 interface SocialCocoonWidgetProps {
   className?: string;
   style?: React.CSSProperties;
+  collapsed?: boolean;
+  onToggle?: () => void;
+  userId?: string;
 }
 
-const SocialCocoonWidget: React.FC<SocialCocoonWidgetProps> = ({ className, style }) => {
+const SocialCocoonWidget: React.FC<SocialCocoonWidgetProps> = ({ 
+  className, 
+  style, 
+  collapsed,
+  onToggle,
+  userId
+}) => {
   const navigate = useNavigate();
 
   // Sample data for recent posts
