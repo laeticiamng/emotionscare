@@ -43,7 +43,7 @@ export interface MusicContextType {
   volume: number;
   progress: number;
   duration: number;
-  loadPlaylistForEmotion: (emotion: string) => Promise<void>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
@@ -53,4 +53,10 @@ export interface MusicContextType {
   openDrawer: boolean;
   setOpenDrawer: (open: boolean) => void;
   loadingTrack: boolean;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => void;
+  initializeMusicSystem: () => Promise<void>;
+  error: string | null;
 }

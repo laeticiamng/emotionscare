@@ -7,6 +7,7 @@ import { EmotionResult } from '@/types/emotion';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { safeOpen } from '@/lib/utils';
+import { MusicPlaylist } from '@/types';
 
 interface EmotionBasedMusicRecommendationProps {
   emotionResult: EmotionResult;

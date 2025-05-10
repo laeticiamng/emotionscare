@@ -6,6 +6,7 @@ import { Music, PlayCircle, Loader2 } from 'lucide-react';
 import { EmotionResult } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
+import { MusicPlaylist } from '@/types';
 
 interface EmotionMusicRecommendationsProps {
   emotionResult?: EmotionResult;
