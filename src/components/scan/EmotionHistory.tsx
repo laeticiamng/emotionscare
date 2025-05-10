@@ -59,7 +59,7 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, loading, erro
               <div>
                 <div className="font-medium capitalize">{emotion.emotion}</div>
                 <div className="text-sm text-muted-foreground">
-                  {new Date(emotion.date).toLocaleDateString()}
+                  {new Date(emotion.date as string).toLocaleDateString()}
                 </div>
                 {emotion.text && (
                   <p className="mt-1 text-sm">{emotion.text}</p>
@@ -68,8 +68,8 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, loading, erro
               <div className="flex items-center">
                 <span 
                   className={`inline-flex items-center justify-center h-8 w-8 rounded-full font-medium ${
-                    emotion.score >= 70 ? 'bg-green-100 text-green-800' : 
-                    emotion.score >= 40 ? 'bg-yellow-100 text-yellow-800' : 
+                    emotion.score && emotion.score >= 70 ? 'bg-green-100 text-green-800' : 
+                    emotion.score && emotion.score >= 40 ? 'bg-yellow-100 text-yellow-800' : 
                     'bg-red-100 text-red-800'
                   }`}
                 >

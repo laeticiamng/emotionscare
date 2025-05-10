@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +34,7 @@ const AdminLoginPage = () => {
   const { toast } = useToast();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const {
     register,
@@ -48,43 +48,31 @@ const AdminLoginPage = () => {
     },
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
+    setError(null);
+
     try {
-      await login(data.email, data.password);
-      
-      // Si la connexion réussit, nous simulons la vérification du rôle administrateur
-      // Dans un vrai cas d'utilisation, cette logique serait dans le contexte d'authentification
-      const mockAdminCheck = async () => {
-        // Simule une vérification de rôle admin
-        return {
-          role: UserRole.ADMIN,
-          name: 'Admin User'
-        };
-      };
-      
-      const adminResult = await mockAdminCheck();
-      
-      if (adminResult.role === UserRole.ADMIN) {
-        toast({
-          title: 'Connexion réussie',
-          description: `Bienvenue ${adminResult.name}`,
-        });
-        navigate('/admin/dashboard');
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Accès refusé',
-          description: 'Vous n\'avez pas les droits administrateur nécessaires.',
-        });
-      }
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Erreur de connexion',
-        description: 'Identifiants invalides ou problème de connexion.',
+      // Changement de l'appel à login pour n'utiliser qu'un seul argument
+      const success = await login({
+        email,
+        password,
+        isAdmin: true
       });
+
+      if (success) {
+        toast({
+          title: "Connexion administrateur réussie",
+          description: "Vous êtes maintenant connecté au tableau de bord administrateur.",
+        });
+        navigate('/admin');
+      } else {
+        setError("Échec de la connexion. Veuillez vérifier vos informations d'identification.");
+      }
+    } catch (err) {
+      setError("Une erreur s'est produite lors de la connexion. Veuillez réessayer.");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }

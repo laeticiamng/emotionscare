@@ -1,5 +1,5 @@
 
-export type ThemeName = 'light' | 'dark' | 'system';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
 export type FontFamily = 'inter' | 'roboto' | 'montserrat' | 'open-sans';
 export type DynamicThemeMode = 'default' | 'dynamic' | 'mood-based';
@@ -24,4 +24,11 @@ export interface UserPreferences {
   push_notifications?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
+  language?: string;
+  notifications?: boolean;
+  autoplayVideos?: boolean;
+  showEmotionPrompts?: boolean;
+  privacyLevel?: string;
+  dataCollection?: boolean;
+  notificationsEnabled?: boolean;
 }

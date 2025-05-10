@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,6 +33,8 @@ const RegisterPage: React.FC = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Validation functions
   const validateName = (name: string) => {
@@ -117,71 +118,37 @@ const RegisterPage: React.FC = () => {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Final validation before submission
-    const nameValid = validateName(formData.name) === 'success';
-    const emailValid = validateEmail(formData.email) === 'success';
-    const passwordValid = validatePassword(formData.password) === 'success';
-    const confirmPasswordValid = validateConfirmPassword(formData.confirmPassword) === 'success';
-    
-    if (!nameValid || !emailValid || !passwordValid || !confirmPasswordValid) {
-      setValidationState({
-        name: validateName(formData.name),
-        email: validateEmail(formData.email),
-        password: validatePassword(formData.password),
-        confirmPassword: validateConfirmPassword(formData.confirmPassword)
-      });
-      
-      toast({
-        title: "Formulaire incomplet",
-        description: "Veuillez remplir correctement tous les champs",
-        variant: "destructive"
-      });
+    setIsLoading(true);
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
+      setIsLoading(false);
       return;
     }
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Mots de passe différents",
-        description: "Les mots de passe ne correspondent pas",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+
     try {
-      // This is just a mock registration function
-      // In a real app, you would call a registration API endpoint
-      
-      setTimeout(() => {
-        // Show success animation and message
-        toast({
-          title: "Inscription réussie",
-          description: "Votre compte a été créé avec succès !",
-        });
-        
-        // Auto login after registration
-        login(formData.email, formData.password)
-          .then(() => {
-            // Navigate to dashboard after successful login
-            navigate('/dashboard');
-          })
-          .catch(error => {
-            console.error("Error during auto-login:", error);
-            navigate('/login');
-          });
-      }, 1500);
-      
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      toast({
-        title: "Erreur lors de l'inscription",
-        description: error.message || "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive"
+      // Changement de l'appel à login pour n'utiliser qu'un seul argument
+      const success = await login({
+        email,
+        password,
+        name
       });
-      setIsSubmitting(false);
+
+      if (success) {
+        toast({
+          title: "Compte créé avec succès",
+          description: "Vous êtes maintenant connecté à votre nouveau compte.",
+        });
+        navigate('/onboarding');
+      } else {
+        setError("Impossible de créer le compte. Veuillez réessayer.");
+      }
+    } catch (err) {
+      setError("Une erreur s'est produite lors de la création du compte. Veuillez réessayer.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -554,7 +521,7 @@ const RegisterPage: React.FC = () => {
                     </svg>
                   </Button>
                   <Button variant="outline" type="button" className="h-10 px-2 flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#1877F2]" xmlns="http://www.w3.org/2000/svg">
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
                       <path d="M24 12.073c0-5.97-4.854-10.825-10.825-10.825-5.97 0-10.824 4.854-10.824 10.825 0 5.402 3.954 9.879 9.12 10.695v-7.562h-2.744v-3.133h2.744V9.412c0-2.707 1.614-4.203 4.079-4.203 1.183 0 2.421.211 2.421.211v2.657h-1.363c-1.343 0-1.76.833-1.76 1.688v2.027h2.998l-.48 3.13h-2.518v7.563c5.167-.815 9.122-5.293 9.122-10.694z" fill="currentColor"/>
                     </svg>
                   </Button>

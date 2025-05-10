@@ -1,219 +1,161 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/components/ui/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-type FontSizeOption = 'small' | 'medium' | 'large';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
+import { Moon, Sun, Palette } from 'lucide-react';
+import { ThemeName } from '@/types';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, updateUser } = useAuth();
   const { toast } = useToast();
-  
-  // State for each step
-  const [currentStep, setCurrentStep] = useState(1);
-  const [username, setUsername] = useState(user?.name || '');
-  const [department, setDepartment] = useState(user?.department || '');
-  const [position, setPosition] = useState(user?.position || '');
-  const [theme, setTheme] = useState(user?.preferences?.theme || 'light');
-  const [fontSize, setFontSize] = useState<FontSizeOption>(
-    (user?.preferences?.font_size as FontSizeOption) || 'medium'
-  );
-  const [notificationsEnabled, setNotificationsEnabled] = useState(
-    user?.preferences?.notifications_enabled !== false
-  );
-  
-  const totalSteps = 3;
-  
-  const goToNextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
+  const { user, updateUser } = useAuth();
+
+  const [selectedTheme, setSelectedTheme] = useState<ThemeName>('light');
+  const [selectedFontSize, setSelectedFontSize] = useState('medium');
+  const [selectedFont, setSelectedFont] = useState('inter');
+  const [profileName, setProfileName] = useState(user?.name || '');
+
+  // Modifier les références à font_size pour utiliser fontSize
+  const initialPreferences = {
+    theme: 'light' as ThemeName,
+    fontSize: 'medium', // Utiliser fontSize au lieu de font_size
+    font: 'inter',
+    notifications_enabled: true,
+    email_notifications: true,
+    push_notifications: true,
   };
-  
-  const goToPreviousStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-  
-  const handleComplete = async () => {
-    if (!user) return;
-    
-    try {
-      await updateUser({
-        ...user,
-        name: username,
-        department,
-        position,
-        preferences: {
-          ...user.preferences,
-          theme,
-          font_size: fontSize,
-          notifications_enabled: notificationsEnabled
-        }
-      });
-      
+
+  useEffect(() => {
+    if (user && user.onboarded) {
       navigate('/dashboard');
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Une erreur s\'est produite lors de la mise à jour du profil utilisateur.',
-        variant: 'destructive',
-      });
+    }
+  }, [user, navigate]);
+
+  const getThemeIcon = (theme: string) => {
+    switch (theme) {
+      case 'dark':
+        return <Moon className="h-4 w-4" />;
+      case 'pastel':
+        return <Palette className="h-4 w-4" />;
+      default:
+        return <Sun className="h-4 w-4" />;
     }
   };
-  
+
+  const getThemeLabel = (theme: string) => {
+    switch (theme) {
+      case 'dark':
+        return 'Sombre';
+      case 'pastel':
+        return 'Pastel';
+      default:
+        return 'Clair';
+    }
+  };
+
+  // Dans le handleSubmit, utiliser fontSize au lieu de font_size
+  const handleSubmit = () => {
+    const userPreferences = {
+      theme: selectedTheme,
+      fontSize: selectedFontSize, // Utiliser fontSize au lieu de font_size
+      font: selectedFont,
+      notifications_enabled: true,
+      email_notifications: true,
+      push_notifications: true,
+    };
+
+    const updatedUser = {
+      ...user,
+      name: profileName,
+      preferences: userPreferences,
+      onboarded: true,
+    };
+
+    updateUser(updatedUser).then(() => {
+      toast({
+        title: "Bienvenue !",
+        description: "Vos préférences ont été enregistrées.",
+      });
+      navigate('/dashboard');
+    });
+  };
+
+  // Dans le rendu, corriger l'endroit où setSelectedTheme est appelé avec 'pastel'
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <h1 className="text-2xl font-bold">Bienvenue sur EmotionsCare</h1>
-          <p className="text-muted-foreground">
-            Étape {currentStep} sur {totalSteps}
-          </p>
+    <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>Personnalisez votre expérience</CardTitle>
+          <CardDescription>Choisissez vos préférences pour une expérience optimale.</CardDescription>
         </CardHeader>
-        
-        <CardContent>
-          {currentStep === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Informations personnelles</h2>
-              
-              <div className="space-y-2">
-                <Label htmlFor="username">Nom d'utilisateur</Label>
-                <Input
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="John Doe"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="department">Département</Label>
-                <Select value={department} onValueChange={(value) => setDepartment(value)}>
-                  <SelectTrigger id="department">
-                    <SelectValue placeholder="Sélectionner un département" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="engineering">Ingénierie</SelectItem>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="sales">Ventes</SelectItem>
-                    <SelectItem value="hr">Ressources Humaines</SelectItem>
-                    <SelectItem value="finance">Finance</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="position">Poste</Label>
-                <Input
-                  id="position"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  placeholder="Développeur Senior"
-                />
-              </div>
-            </div>
-          )}
-          
-          {currentStep === 2 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Thème et apparence</h2>
-              
-              <div className="space-y-2">
-                <Label>Thème</Label>
-                <RadioGroup value={theme} onValueChange={(value: string) => setTheme(value as 'light' | 'dark' | 'pastel')} className="flex flex-wrap gap-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="light" id="theme-light" />
-                    <Label htmlFor="theme-light">Clair</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="dark" id="theme-dark" />
-                    <Label htmlFor="theme-dark">Sombre</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="pastel" id="theme-pastel" />
-                    <Label htmlFor="theme-pastel">Pastel</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="font-size">Taille de police</Label>
-                <Select 
-                  value={fontSize} 
-                  onValueChange={(value: FontSizeOption) => setFontSize(value)}
+        <CardContent className="space-y-6">
+          <div>
+            <Label htmlFor="profileName">Nom du profil</Label>
+            <Input
+              id="profileName"
+              placeholder="Votre nom"
+              value={profileName}
+              onChange={(e) => setProfileName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <Label>Thème</Label>
+            <div className="flex space-x-4">
+              {['light', 'dark', 'pastel'].map((theme) => (
+                <Button
+                  key={theme}
+                  variant={selectedTheme === theme ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setSelectedTheme(theme as ThemeName)}
                 >
-                  <SelectTrigger id="font-size">
-                    <SelectValue placeholder="Sélectionner une taille" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="small">Petite</SelectItem>
-                    <SelectItem value="medium">Moyenne</SelectItem>
-                    <SelectItem value="large">Grande</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  {getThemeIcon(theme)}
+                  <span className="ml-2">{getThemeLabel(theme)}</span>
+                </Button>
+              ))}
             </div>
-          )}
-          
-          {currentStep === 3 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Notifications</h2>
-              
-              <div className="space-y-2">
-                <Label>Activer les notifications</Label>
-                <RadioGroup 
-                  value={notificationsEnabled ? "yes" : "no"} 
-                  onValueChange={(value) => setNotificationsEnabled(value === "yes")}
+          </div>
+
+          <div>
+            <Label>Taille de la police</Label>
+            <div className="flex space-x-4">
+              {['small', 'medium', 'large'].map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedFontSize === size ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setSelectedFontSize(size)}
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="notifications-yes" />
-                    <Label htmlFor="notifications-yes">Oui</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="notifications-no" />
-                    <Label htmlFor="notifications-no">Non</Label>
-                  </div>
-                </RadioGroup>
-                
-                {notificationsEnabled && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Vous recevrez des notifications pour les analyses émotionnelles, 
-                    les recommandations et les rappels.
-                  </p>
-                )}
-              </div>
+                  {size}
+                </Button>
+              ))}
             </div>
-          )}
-        </CardContent>
-        
-        <CardFooter className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={goToPreviousStep}
-            disabled={currentStep === 1}
-          >
-            Précédent
+          </div>
+
+          <div>
+            <Label>Police</Label>
+            <div className="flex space-x-4">
+              {['inter', 'roboto', 'montserrat'].map((font) => (
+                <Button
+                  key={font}
+                  variant={selectedFont === font ? "default" : "outline"}
+                  className="flex-1"
+                  onClick={() => setSelectedFont(font)}
+                >
+                  {font}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <Button className="w-full" onClick={handleSubmit}>
+            Enregistrer et continuer
           </Button>
-          
-          {currentStep < totalSteps ? (
-            <Button onClick={goToNextStep}>Suivant</Button>
-          ) : (
-            <Button onClick={handleComplete}>Terminer</Button>
-          )}
-        </CardFooter>
+        </CardContent>
       </Card>
     </div>
   );

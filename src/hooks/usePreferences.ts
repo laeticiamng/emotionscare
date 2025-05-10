@@ -19,41 +19,57 @@ export const usePreferences = (): UserPreferencesState => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
+  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>): Promise<boolean> => {
     setIsLoading(true);
-    // Simuler un appel API
-    setTimeout(() => {
+    try {
+      // Simuler un appel API
+      await new Promise(resolve => setTimeout(resolve, 500));
       setPreferences((prev) => ({ ...prev, ...newPreferences }));
       setIsLoading(false);
-    }, 500);
-    return Promise.resolve();
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Une erreur est survenue";
+      setError(errorMessage);
+      setIsLoading(false);
+      return false;
+    }
+  }, []);
+
+  const resetPreferences = useCallback(() => {
+    setPreferences({
+      theme: 'light',
+      fontSize: 'medium',
+      language: 'fr',
+      notifications: true,
+      autoplayVideos: true,
+      showEmotionPrompts: true,
+      privacyLevel: 'standard',
+      dataCollection: true,
+      notifications_enabled: true,
+      email_notifications: true,
+      push_notifications: true,
+    });
+    setError(null);
   }, []);
 
   return {
     preferences,
     isLoading,
+    error,
     updatePreferences,
+    resetPreferences,
     theme: preferences.theme,
     fontSize: preferences.fontSize,
     language: preferences.language,
-    notifications: preferences.notifications,
-    autoplayVideos: preferences.autoplayVideos,
-    showEmotionPrompts: preferences.showEmotionPrompts,
-    privacyLevel: preferences.privacyLevel,
-    dataCollection: preferences.dataCollection,
-    notificationsEnabled: preferences.notifications_enabled,
     notifications_enabled: preferences.notifications_enabled,
+    notification_frequency: preferences.notification_frequency,
+    notification_type: preferences.notification_type,
+    notification_tone: preferences.notification_tone,
     email_notifications: preferences.email_notifications,
     push_notifications: preferences.push_notifications,
-    error,
-    emotionalCamouflage: false,
-    notificationFrequency: 'daily',
-    notificationTone: 'gentle',
-    notificationType: 'all',
-    reminderTime: '09:00',
-    reminder_time: '09:00'
+    emotionalCamouflage: preferences.emotionalCamouflage
   };
 };
 

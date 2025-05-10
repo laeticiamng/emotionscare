@@ -36,7 +36,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       const storedTheme = localStorage.getItem('theme') as ThemeName | null;
       const storedDynamicMode = localStorage.getItem('dynamicThemeMode') as 'none' | 'time' | 'emotion' | 'weather' | null;
       
-      if (storedTheme && ['light', 'dark', 'pastel'].includes(storedTheme)) {
+      if (storedTheme && ['light', 'dark', 'system', 'pastel'].includes(storedTheme)) {
         setTheme(storedTheme);
         document.documentElement.classList.add(storedTheme);
       } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -103,7 +103,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Update HTML class and localStorage when theme changes
   useEffect(() => {
     // Remove all theme classes
-    document.documentElement.classList.remove('light', 'dark', 'pastel');
+    document.documentElement.classList.remove('light', 'dark', 'system', 'pastel');
     // Add current theme class
     document.documentElement.classList.add(theme);
     // Save to localStorage
@@ -117,16 +117,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const toggleTheme = () => {
     setTheme(currentTheme => {
-      switch (currentTheme) {
-        case 'light':
-          return 'dark';
-        case 'dark':
-          return 'pastel';
-        case 'pastel':
-          return 'light';
-        default:
-          return 'light';
-      }
+      if (currentTheme === 'light') return 'dark';
+      if (currentTheme === 'dark') return 'pastel';
+      if (currentTheme === 'pastel') return 'light';
+      return 'light';
     });
   };
   

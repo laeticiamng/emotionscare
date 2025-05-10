@@ -1,9 +1,8 @@
-
 export interface Emotion {
   id: string;
-  name: string;
-  intensity: number;
-  category: string;
+  name?: string;
+  intensity?: number;
+  category?: string;
   color?: string;
   icon?: string;
   recommendations?: string[];
@@ -19,6 +18,8 @@ export interface Emotion {
   emojis?: string;
   source?: string;
   audio_url?: string;
+  is_confidential?: boolean;
+  share_with_coach?: boolean;
 }
 
 export interface EmotionResult {
