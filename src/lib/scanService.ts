@@ -111,7 +111,7 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
 };
 
 // Get emotion history for a user or all users
-export const getEmotions = async (userId?: string): Promise<Emotion[]> => {
+export const getEmotionHistory = async (userId?: string): Promise<Emotion[]> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 800));
   

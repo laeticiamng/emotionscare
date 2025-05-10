@@ -8,7 +8,7 @@ export type { MoodData } from './mood';
 export type { VRSession, VRSessionTemplate, VRSessionWithMusicProps } from './vr';
 export type { InvitationStats, InvitationFormData } from './invitation';
 export type { Badge } from './badge';
-export type { AudioPreference, UseAudioPlayerReturn, UseAudioPlayerStateReturn } from './audio-player';
+export type { UseAudioPlayerReturn, UseAudioPlayerStateReturn } from './audio-player';
 export type { MusicTrack, MusicPlaylist, MusicRecommendationCardProps, MusicDrawerProps, MusicContextType } from './music';
 export type { NotificationFrequency, NotificationType, NotificationTone } from './notification';
 export type { ProgressBarProps } from './progress-bar';

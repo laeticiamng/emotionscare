@@ -3,9 +3,9 @@ export interface JournalEntry {
   id: string;
   user_id: string;
   date: string;
-  title: string; // Le rendre requis pour correspondre à l'utilisation dans JournalEntryPage
+  title: string;
   content: string;
-  mood?: string;
+  mood: string;
   emotion?: string;
   tags?: string[];
   images?: string[];
@@ -24,5 +24,5 @@ export interface JournalEntry {
   // Champs supplémentaires pour la compatibilité
   created_at?: string | Date;
   mood_score?: number;
-  text?: string; // Pour la compatibilité avec JournalCalendarView et JournalListView
+  text?: string;
 }

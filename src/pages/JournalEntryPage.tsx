@@ -3,19 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getJournalEntries } from '@/lib/journalService';
-
-interface JournalEntry {
-  id: string;
-  user_id: string;
-  content: string;
-  date: string;
-  title: string;
-  mood: string;
-  created_at: string;
-  ai_feedback?: string;
-  text?: string;
-  mood_score: number;
-}
+import { JournalEntry } from '@/types';
 
 const JournalEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +20,8 @@ const JournalEntryPage: React.FC = () => {
         const entry = entries.find(e => e.id === id);
         
         if (entry) {
-          setJournalEntry(entry);
+          // Cast to match expected type
+          setJournalEntry(entry as unknown as JournalEntry);
         } else {
           console.error('Journal entry not found');
         }
@@ -89,24 +78,24 @@ const JournalEntryPage: React.FC = () => {
       </Button>
       <Card>
         <CardHeader>
-          <CardTitle>{journalEntry.title}</CardTitle>
+          <CardTitle>{journalEntry?.title}</CardTitle>
           <div className="text-sm text-muted-foreground">
-            {formatDate(journalEntry.date)}
+            {journalEntry && formatDate(journalEntry.date)}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="prose">
-            <p>{journalEntry.content}</p>
+            <p>{journalEntry?.content}</p>
           </div>
           
-          {journalEntry.mood && (
+          {journalEntry?.mood && (
             <div className="flex items-center space-x-2 text-sm">
               <span className="font-medium">Humeur:</span>
               <span>{journalEntry.mood}</span>
             </div>
           )}
           
-          {journalEntry.ai_feedback && (
+          {journalEntry?.ai_feedback && (
             <div className="bg-secondary/20 p-4 rounded-md mt-6">
               <h3 className="font-medium mb-2">Analyse IA</h3>
               <p className="text-sm">{journalEntry.ai_feedback}</p>

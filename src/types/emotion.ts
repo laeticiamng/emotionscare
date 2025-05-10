@@ -50,7 +50,7 @@ export interface EmotionResult {
   audio_url?: string;
 }
 
-export interface EnhancedEmotionResult extends EmotionResult {
+export interface EnhancedEmotionResult extends Omit<EmotionResult, 'recommendations'> {
   analysis: string;
   recommendations: {
     activities: string[];
@@ -69,5 +69,5 @@ export interface EmotionalTeamViewProps {
   groupBy?: 'department' | 'location' | 'role';
   showDetails?: boolean;
   onUserClick?: (userId: string) => void;
-  className?: string; // Ajout de className
+  className?: string;
 }
