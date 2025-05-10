@@ -1,63 +1,59 @@
 
 import React from 'react';
-import { Group } from '@/types/community';
-import { Card } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Group } from '@/types';
 import GroupItem from './GroupItem';
-import { Users } from 'lucide-react';
 
-interface GroupListComponentProps {
+interface GroupListProps {
   groups: Group[];
-  userHasJoined?: (group: Group) => boolean;
-  handleJoin?: (groupId: string) => void;
-  joining?: string | null;
-  loading: boolean;
+  loading?: boolean;
+  onGroupSelect?: (group: Group) => void;
 }
 
-const GroupListComponent: React.FC<GroupListComponentProps> = ({ 
+const GroupList: React.FC<GroupListProps> = ({ 
   groups, 
-  userHasJoined = () => false, 
-  handleJoin = () => {}, 
-  joining = null,
-  loading = false
+  loading = false,
+  onGroupSelect 
 }) => {
+  const navigate = useNavigate();
+  
+  const handleGroupClick = (group: Group) => {
+    if (onGroupSelect) {
+      onGroupSelect(group);
+    } else {
+      navigate(`/community/groups/${group.id}`);
+    }
+  };
+  
   if (loading) {
     return (
-      <Card className="p-6 text-center">
-        <div className="flex flex-col items-center gap-2 py-8">
-          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-          <p className="text-muted-foreground">Chargement des groupes...</p>
-        </div>
-      </Card>
+      <div className="space-y-3">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-20 rounded-md bg-muted animate-pulse" />
+        ))}
+      </div>
     );
   }
-
+  
   if (groups.length === 0) {
     return (
-      <Card className="p-6 text-center">
-        <div className="flex flex-col items-center gap-2 py-8">
-          <Users className="h-12 w-12 text-muted-foreground" />
-          <h3 className="text-lg font-medium mt-2">Aucun groupe disponible</h3>
-          <p className="text-muted-foreground">
-            Créez le premier groupe pour commencer la discussion !
-          </p>
-        </div>
-      </Card>
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">Aucun groupe trouvé</p>
+      </div>
     );
   }
-
+  
   return (
-    <div className="space-y-4">
-      {groups.map((group) => (
-        <GroupItem
-          key={group.id}
-          group={group}
-          userHasJoined={userHasJoined(group)}
-          onJoin={() => handleJoin(group.id)}
-          isJoining={joining === group.id}
+    <div className="space-y-3">
+      {groups.map(group => (
+        <GroupItem 
+          key={group.id} 
+          group={group} 
+          onClick={() => handleGroupClick(group)}
         />
       ))}
     </div>
   );
 };
 
-export default GroupListComponent;
+export default GroupList;

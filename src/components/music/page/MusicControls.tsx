@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -85,7 +86,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={previousTrack}
+            onClick={() => previousTrack()}
             className="h-8 w-8"
           >
             <SkipBack className="h-4 w-4" />
@@ -107,7 +108,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           <Button 
             variant="ghost" 
             size="icon"
-            onClick={nextTrack}
+            onClick={() => nextTrack()}
             className="h-8 w-8"
           >
             <SkipForward className="h-4 w-4" />

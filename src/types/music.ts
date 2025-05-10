@@ -5,12 +5,17 @@ export interface MusicTrack {
   artist: string;
   duration: number;
   url: string;
-  coverImage: string;
+  coverImage?: string;
   emotion?: string;
   intensity?: number;
   bpm?: number;
   genre?: string;
   isExclusive?: boolean;
+  // Backward compatibility properties
+  cover?: string;
+  coverUrl?: string;
+  audioUrl?: string;
+  audioSrc?: string;
 }
 
 export interface MusicPlaylist {
@@ -26,8 +31,9 @@ export interface MusicPlaylist {
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null;
+  currentPlaylist: MusicPlaylist | null; 
   isPlaying: boolean;
+  volume: number;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
@@ -38,7 +44,11 @@ export interface MusicContextType {
   toggleShuffle: () => void;
   openDrawer: boolean;
   setOpenDrawer: (open: boolean) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   initializeMusicSystem: () => void;
   error: Error | null;
+  currentEmotion?: string;
+  togglePlay: () => void;
+  play: () => void;
+  pause: () => void;
 }

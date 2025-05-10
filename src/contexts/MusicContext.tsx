@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { MusicTrack, MusicPlaylist, MusicPreferences } from '@/types/music';
 
@@ -38,12 +37,13 @@ export interface MusicContextType {
   // Playlist operations
   loadPlaylist: (playlist: MusicPlaylist) => void;
   loadPlaylistById: (id: string) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<void>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   
   // UI controls
   setOpenDrawer: (open: boolean) => void;
   initializeMusicSystem: () => void;
   setAudioState: (state: any) => void;
+  openDrawer: boolean;
 }
 
 const defaultPreferences: MusicPreferences = {
@@ -92,12 +92,13 @@ export const MusicContext = createContext<MusicContextType>({
   // Playlist operations
   loadPlaylist: () => {},
   loadPlaylistById: () => {},
-  loadPlaylistForEmotion: async () => {},
+  loadPlaylistForEmotion: async () => null,
   
   // UI controls
   setOpenDrawer: () => {},
   initializeMusicSystem: () => {},
   setAudioState: () => {},
+  openDrawer: false,
 });
 
 export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -180,7 +181,7 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [playlists, loadPlaylist]);
 
-  const loadPlaylistForEmotion = useCallback(async (emotion: string) => {
+  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
     try {
       setLoading(true);
       setError(null);
@@ -210,9 +211,11 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       
       loadPlaylist(mockPlaylist);
       setOpenDrawer(true);
+      return mockPlaylist;
     } catch (err) {
       console.error("Error loading playlist for emotion:", err);
       setError("Failed to load music for this emotion");
+      return null;
     } finally {
       setLoading(false);
     }
@@ -238,6 +241,7 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     currentEmotion,
     preferences,
     previousTrack,
+    openDrawer,
     
     // Player controls
     play,

@@ -22,11 +22,11 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
   const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   
-  const handlePlayMusic = () => {
+  const handlePlayMusic = async () => {
     if (!emotionResult.emotion) return;
     
     const emotion = emotionResult.emotion.toLowerCase();
-    const playlist = loadPlaylistForEmotion(emotion);
+    const playlist = await loadPlaylistForEmotion(emotion);
     
     if (playlist && playlist.tracks && playlist.tracks.length > 0) {
       // Ensure the track has the required duration and url fields

@@ -61,7 +61,7 @@ const MusicPlayer: React.FC = () => {
             variant="outline" 
             size="icon" 
             className="h-10 w-10"
-            onClick={previousTrack}
+            onClick={() => previousTrack()}
             disabled={!currentTrack}
           >
             <SkipBack className="h-5 w-5" />
@@ -85,7 +85,7 @@ const MusicPlayer: React.FC = () => {
             variant="outline" 
             size="icon" 
             className="h-10 w-10"
-            onClick={nextTrack}
+            onClick={() => nextTrack()}
             disabled={!currentTrack}
           >
             <SkipForward className="h-5 w-5" />

@@ -27,43 +27,28 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
   
   // Show recommendations based on emotion intensity
   useEffect(() => {
-    if (emotionResult && emotionResult.confidence > 0.7) {
+    if (emotionResult && emotionResult.intensity > 0.7) {
       setShowMusicRec(true);
       
       // Only show VR for certain emotions
       const vrEmotions = ['stressed', 'anxious', 'sad', 'angry'];
-      if (vrEmotions.includes(emotionResult.emotion.toLowerCase())) {
+      const primaryEmotion = emotionResult.primaryEmotion?.name.toLowerCase() || '';
+      if (vrEmotions.includes(primaryEmotion)) {
         setShowVRRec(true);
       }
     }
   }, [emotionResult]);
   
-  const handlePlayMusic = () => {
-    const emotion = emotionResult.emotion.toLowerCase();
-    loadPlaylistForEmotion(emotion);
+  const handlePlayMusic = async () => {
+    const emotion = emotionResult.primaryEmotion?.name.toLowerCase() || 'neutral';
+    await loadPlaylistForEmotion(emotion);
     // Use our safeOpen utility with a boolean true value directly
-    // This avoids the parameter type mismatch
-    safeOpen(true);
+    setOpenDrawer(true);
     
     toast({
       title: "Musique activée",
       description: `Playlist adaptée à votre humeur "${emotion}" chargée.`
     });
-  };
-  
-  // Convert EmotionResult to Emotion for VREmotionRecommendation
-  const convertToEmotion = (result: EmotionResult): Emotion => {
-    return {
-      id: result.id || `temp-${Date.now()}`,
-      user_id: result.user_id || 'current-user',
-      emotion: result.emotion,
-      confidence: result.confidence,
-      date: result.date || new Date().toISOString(),
-      text: result.text || '',
-      score: result.score || 50,
-      ai_feedback: result.ai_feedback || '',
-      emojis: result.emojis || []
-    };
   };
   
   return (
@@ -83,7 +68,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
             </h3>
             <p className="mt-2 text-sm">
               {emotionResult.ai_feedback || 
-                `Votre état émotionnel actuel est "${emotionResult.emotion}" avec une intensité de ${Math.round(emotionResult.confidence * 100)}%. 
+                `Votre état émotionnel actuel est "${emotionResult.primaryEmotion?.name}" avec une intensité de ${Math.round(emotionResult.intensity * 100)}%. 
                 Voici quelques recommandations personnalisées pour vous aider à optimiser votre bien-être.`
               }
             </p>
@@ -103,15 +88,15 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
             <>
               <Separator />
               <MusicRecommendationCard 
-                emotion={emotionResult.emotion} 
-                intensity={Math.round(emotionResult.confidence * 100)}
+                emotion={emotionResult.primaryEmotion?.name} 
+                intensity={Math.round(emotionResult.intensity * 100)}
                 standalone={true}
               />
             </>
           )}
           
           {showVRRec && (
-            <VREmotionRecommendation emotion={convertToEmotion(emotionResult)} />
+            <VREmotionRecommendation emotion={emotionResult.primaryEmotion} />
           )}
         </div>
       </CardContent>

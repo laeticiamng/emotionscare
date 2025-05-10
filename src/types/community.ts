@@ -1,16 +1,16 @@
 
-export interface Community {
+export interface Group {
   id: string;
   name: string;
   description: string;
-  members_count: number;
-  is_private: boolean;
-  created_at: string | Date;
+  topic: string;
   image_url?: string;
+  created_at: string | Date;
+  members_count: number;
+  members: string[];
+  is_private: boolean;
   tags?: string[];
-  category?: string;
-  owner_id: string;
-  admins?: string[];
+  last_activity?: string | Date;
 }
 
 export interface CommunityMember {

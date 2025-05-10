@@ -40,10 +40,10 @@ const MusicMiniPlayer: React.FC = () => {
     previousTrack();
   };
   
-  const handleRecommendedPlaylist = () => {
+  const handleRecommendedPlaylist = async () => {
     if (!currentEmotion) return;
     
-    const playlist = loadPlaylistForEmotion(currentEmotion);
+    const playlist = await loadPlaylistForEmotion(currentEmotion);
     
     toast({
       title: "Playlist recommandée",

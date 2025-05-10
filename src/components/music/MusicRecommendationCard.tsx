@@ -19,16 +19,23 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   intensity = 50,
   standalone = false,
 }) => {
-  const { loadPlaylistForEmotion, openDrawer, setOpenDrawer } = useMusic();
+  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
   const { toast } = useToast();
 
   // Si nous avons une émotion spécifique, utiliser le composant centralisé
   if (emotion) {
     // Créer un objet EmotionResult simulé pour le composant EmotionBasedMusicRecommendation
     const emotionResult = {
-      emotion: emotion,
-      confidence: intensity / 100,
-      transcript: ""
+      primaryEmotion: {
+        id: 'simulated',
+        name: emotion,
+        value: intensity,
+        color: '#8884d8'
+      },
+      intensity: intensity / 100,
+      sentiment: 0,
+      timestamp: new Date().toISOString(),
+      emotion: emotion // For compatibility
     };
 
     return (
@@ -40,11 +47,11 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   }
   
   // Fallback au comportement original (ne devrait plus être utilisé)
-  const handlePlayRecommendedMusic = () => {
+  const handlePlayRecommendedMusic = async () => {
     const musicType = emotion.toLowerCase();
     
-    loadPlaylistForEmotion(musicType);
-    safeOpen(setOpenDrawer);
+    const playlist = await loadPlaylistForEmotion(musicType);
+    safeOpen(setOpenDrawer(true));
     
     toast({
       title: "Musique recommandée activée",

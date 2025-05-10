@@ -33,3 +33,29 @@ export interface MoodData {
   anxiety?: number;
   energy?: number;
 }
+
+// Admin UI types
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  rejected: number;
+  expired: number;
+  recent_invitations: {
+    id: string;
+    email: string;
+    status: string;
+    created_at: string;
+  }[];
+  conversion_rate: number;
+}
+
+// Add UserRole which was missing
+export type UserRole = 'user' | 'admin' | 'coach' | 'premium';
+
+export interface InvitationFormData {
+  email: string;
+  role?: UserRole;
+  message?: string;
+  expires_at?: Date;
+}

@@ -1,73 +1,68 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Heart, Clock, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Heart, ArrowUpRight } from "lucide-react";
 
-interface RhSelfCareProps {
-  onClose: () => void;
-  playSound?: () => void;
-}
-
-export const RhSelfCare: React.FC<RhSelfCareProps> = ({ onClose, playSound }) => {
+const RhSelfCare: React.FC = () => {
+  const [energyLevel, setEnergyLevel] = useState(72);
+  const [showBreathingExercise, setShowBreathingExercise] = useState(false);
+  
+  // Function to simulate a breathing exercise for self-care
+  const startBreathingExercise = () => {
+    setShowBreathingExercise(true);
+    
+    // Simulate energy increase after exercise
+    setTimeout(() => {
+      setEnergyLevel(Math.min(energyLevel + 10, 100));
+      setShowBreathingExercise(false);
+    }, 5000);
+  };
+  
+  if (showBreathingExercise) {
+    return (
+      <div className="p-2 text-center">
+        <h4 className="text-sm mb-2">Respirez...</h4>
+        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-full mx-auto mb-2 animate-pulse flex items-center justify-center">
+          <Heart className="h-6 w-6 text-blue-500" />
+        </div>
+        <p className="text-xs text-muted-foreground">Inspirez... Expirez...</p>
+      </div>
+    );
+  }
+  
   return (
-    <Card className="w-full max-w-md shadow-lg border-primary/20">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg flex items-center">
-            <Heart className="mr-2 text-rose-500" size={18} />
-            Auto-soin RH
-          </CardTitle>
-          <Button variant="ghost" size="icon" onClick={() => {
-            if (playSound) playSound();
-            onClose();
-          }}>
-            <X size={18} />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Vous consultez de nombreuses données émotionnelles aujourd'hui. Prenez un moment pour vous-même.
-          </p>
-
-          <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
-            <h3 className="font-medium mb-2 text-sm">Exercice de respiration (2 min)</h3>
-            <p className="text-sm text-muted-foreground mb-3">
-              Respirez profondément en suivant le cercle ci-dessous.
-            </p>
-            <div className="flex justify-center py-2">
-              <motion.div
-                className="w-16 h-16 rounded-full border-2 border-primary"
-                animate={{ scale: [1, 1.2, 1.2, 1, 1] }}
-                transition={{
-                  duration: 8,
-                  times: [0, 0.25, 0.5, 0.75, 1],
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between pt-2">
-        <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => {
-          if (playSound) playSound();
-          onClose();
-        }}>
-          <Clock size={14} />
-          <span>Plus tard</span>
+    <div className="p-2">
+      <h3 className="text-sm font-medium mb-1 flex items-center">
+        <Heart className="h-3.5 w-3.5 text-rose-500 mr-1.5" />
+        Votre bien-être RH
+      </h3>
+      
+      <div className="flex items-center gap-1 mb-1.5">
+        <Progress value={energyLevel} className="h-2" />
+        <span className="text-xs text-muted-foreground">{energyLevel}%</span>
+      </div>
+      
+      <div className="flex gap-1">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs h-7 px-2 w-full"
+          onClick={startBreathingExercise}
+        >
+          Respiration
         </Button>
-        <Button size="sm" className="text-xs" onClick={() => {
-          if (playSound) playSound();
-          onClose();
-        }}>
-          J'ai pris une pause
+        
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-xs h-7 px-2"
+        >
+          <ArrowUpRight className="h-3 w-3" />
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
+
+export default RhSelfCare;

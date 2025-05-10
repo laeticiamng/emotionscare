@@ -53,8 +53,8 @@ export function EmotionMusicRecommendations({
     
     try {
       const musicType = EMOTION_TO_MUSIC[emotionToPlay.toLowerCase()] || EMOTION_TO_MUSIC.default;
-      const playlist = loadPlaylistForEmotion(musicType);
-      if (playlist && playlist.tracks.length > 0) {
+      const playlist = await loadPlaylistForEmotion(musicType);
+      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
         // Ensure the track has the required duration and url fields
         const track = {
           ...playlist.tracks[0],
@@ -106,7 +106,10 @@ export function EmotionMusicRecommendations({
   const musicType = getMusicTypeFromEmotion(emotionToUse);
 
   // Properly handle displaying errors
-  const errorMessage = musicError ? (typeof musicError === 'string' ? musicError : musicError instanceof Error ? musicError.message : String(musicError)) : '';
+  const errorMessage = musicError ? 
+    (typeof musicError === 'string' ? musicError : 
+      (musicError instanceof Error ? musicError.message : String(musicError))) 
+    : '';
 
   return (
     <Card className="w-full">

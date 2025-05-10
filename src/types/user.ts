@@ -1,86 +1,33 @@
 
-// Types for user-related components
 export interface User {
   id: string;
-  name: string;
   email: string;
-  role?: UserRole;
-  avatar?: string;
-  created_at?: string | Date;
+  name?: string;
+  avatar_url?: string;
+  created_at: string | Date;
+  last_login?: string | Date;
   preferences?: UserPreferences;
-  department?: string;
-  position?: string;
-  last_active?: string | Date;
+  role?: UserRole;
   status?: 'active' | 'inactive' | 'pending';
+  profile?: {
+    bio?: string;
+    location?: string;
+    profession?: string;
+    interests?: string[];
+  };
 }
 
-export enum UserRole {
-  ADMIN = 'admin',
-  MANAGER = 'manager',
-  USER = 'user',
-  GUEST = 'guest'
-}
+export type UserRole = 'user' | 'admin' | 'coach' | 'premium';
 
 export interface UserPreferences {
-  // Appearance
-  theme: ThemeName;
-  dynamicTheme?: DynamicThemeMode;
-  highContrast?: boolean;
-  reducedAnimations?: boolean;
-  fontSize: FontSize;
-  font?: FontFamily;
-  customBackground?: string;
-  
-  // Identity
-  displayName?: string;
-  pronouns?: 'il' | 'elle' | 'iel' | 'autre';
-  biography?: string;
-  avatarUrl?: string;
-  
-  // Notifications
-  notifications_enabled: boolean;
-  notificationTypes?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  notificationFrequency?: NotificationFrequency;
-  notificationTone?: NotificationTone;
-  reminder_time?: string;
-  
-  // Language
+  theme?: string;
+  notifications_enabled?: boolean;
   language?: string;
-  
-  // Audio & Sensorial
-  ambientSound?: 'none' | 'piano' | 'forest' | 'river' | 'fire' | 'ai';
-  adaptiveSound?: boolean;
-  
-  // Accessibility
-  screenReader?: boolean;
-  keyboardNavigation?: boolean;
-  audioGuidance?: boolean;
-  
-  // Data
-  dataExport?: 'pdf' | 'json';
-  incognitoMode?: boolean;
-  lockJournals?: boolean;
-  
-  // Accent colors
-  accent_color?: string;
-  background_color?: string;
-  
-  // Premium features
-  duoModeEnabled?: boolean;
-  trustedContact?: string;
-  emotionalCamouflage?: boolean;
+  timezone?: string;
+  email_frequency?: 'daily' | 'weekly' | 'monthly' | 'none';
+  privacy_level?: 'private' | 'friends' | 'public';
+  sound_enabled?: boolean;
+  animations_enabled?: boolean;
+  font_size?: 'small' | 'medium' | 'large';
+  high_contrast?: boolean;
 }
-
-// Import needed types
-import { 
-  ThemeName, 
-  FontSize, 
-  FontFamily, 
-  NotificationFrequency, 
-  NotificationTone, 
-  DynamicThemeMode 
-} from './index';

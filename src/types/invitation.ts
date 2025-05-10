@@ -1,29 +1,28 @@
 
-// Types for invitation-related components
-export type InvitationStatus = 'pending' | 'accepted' | 'expired' | 'cancelled';
+export interface InvitationFormData {
+  email: string;
+  role?: UserRole;
+  message?: string;
+  expires_at?: Date;
+}
 
 export interface Invitation {
   id: string;
   email: string;
-  status: InvitationStatus;
   role: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'expired';
   created_at: string | Date;
   expires_at: string | Date;
   accepted_at?: string | Date;
-}
-
-export interface InvitationFormData {
-  email: string;
-  role: string;
-  expiresIn: number;
-  message?: string;
+  token: string;
 }
 
 export interface InvitationStats {
   total: number;
   pending: number;
   accepted: number;
+  rejected: number;
   expired: number;
-  acceptanceRate: number;
-  averageTimeToAccept: number;
+  recent_invitations: Invitation[];
+  conversion_rate: number;
 }
