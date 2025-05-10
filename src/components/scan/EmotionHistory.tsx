@@ -9,13 +9,23 @@ import { CalendarIcon, ClockIcon } from 'lucide-react';
 interface EmotionHistoryProps {
   emotions: Emotion[];
   isLoading?: boolean;
+  error?: string | null;
 }
 
-const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, isLoading = false }) => {
+const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, isLoading = false, error = null }) => {
   if (isLoading) {
     return (
       <div className="p-6 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-red-500">Erreur: {error}</p>
+        <p className="text-muted-foreground mt-2">Impossible de charger l'historique des émotions.</p>
       </div>
     );
   }

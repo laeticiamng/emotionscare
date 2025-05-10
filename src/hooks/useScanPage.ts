@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Emotion } from '@/types';
 import { fetchEmotionHistory } from '@/lib/scanService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,11 +29,11 @@ export function useScanPage() {
   }, [user?.id]);
   
   // Charger l'historique d'émotions au montage
-  useState(() => {
+  useEffect(() => {
     if (user?.id) {
       refreshEmotions();
     }
-  });
+  }, [user?.id, refreshEmotions]);
 
   return {
     emotions,

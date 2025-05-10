@@ -21,13 +21,13 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
   handleScanSaved,
   onResultSaved
 }) => {
-  const { emotions, loading, error } = useScanPage();
+  const { emotions, isLoading, error } = useScanPage();
   
   return (
     <div className="space-y-4">
       <EmotionHistory 
         emotions={emotions} 
-        loading={loading} 
+        isLoading={isLoading} 
         error={error} 
       />
     </div>

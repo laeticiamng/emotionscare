@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Emotion, EmotionResult } from '@/types';
 
@@ -60,7 +61,7 @@ export const detectEmotion = async (text: string): Promise<EmotionResult> => {
     id: uuidv4(),
     emotion: detectedEmotion,
     confidence,
-    score,
+    score: Math.round(score * 10),
     intensity: confidence * 0.8,
     feedback,
     text,
@@ -85,7 +86,7 @@ export const detectEmotionFromAudio = async (audioBlob: Blob): Promise<EmotionRe
   const confidence = 0.7 + Math.random() * 0.25; // Between 0.7 and 0.95
   
   // Calculate score
-  const score = Math.max(0.3, Math.min(0.9, confidence * (Math.random() * 0.5 + 0.5)));
+  const score = Math.max(3, Math.min(9, Math.round(confidence * 10)));
   
   // Generate feedback
   const feedback = generateFeedback(emotion);
@@ -109,7 +110,7 @@ export const detectEmotionFromAudio = async (audioBlob: Blob): Promise<EmotionRe
     source: 'audio-analysis',
     primaryEmotion: {
       name: emotion,
-      score
+      score: confidence
     }
   };
 };
@@ -123,11 +124,10 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
       id: '1',
       user_id: userId,
       date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
-      dominant_emotion: 'happy',
       emotion: 'happy',
       name: 'happy',
       category: 'positive',
-      score: 0.85,
+      score: 8,
       confidence: 0.9,
       emojis: '😊',
       text: "J'ai eu une journée très productive !",
@@ -138,11 +138,10 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
       id: '2',
       user_id: userId,
       date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
-      dominant_emotion: 'stressed',
       emotion: 'stressed',
       name: 'stressed',
       category: 'negative',
-      score: 0.35,
+      score: 3,
       confidence: 0.8,
       emojis: '😫',
       text: "Beaucoup de deadlines cette semaine...",
@@ -153,11 +152,10 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
       id: '3',
       user_id: userId,
       date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-      dominant_emotion: 'calm',
       emotion: 'calm',
       name: 'calm',
       category: 'positive',
-      score: 0.6,
+      score: 6,
       confidence: 0.75,
       emojis: '😌',
       text: "La méditation m'aide beaucoup.",
@@ -176,15 +174,14 @@ export const saveEmotion = async (emotion: Partial<Emotion>): Promise<Emotion> =
     id: emotion.id || uuidv4(),
     user_id: emotion.user_id || 'unknown-user',
     date: emotion.date || new Date(),
-    score: emotion.score || 0.5,
-    emotion: emotion.emotion || emotion.dominant_emotion || 'neutral',
-    dominant_emotion: emotion.emotion || emotion.dominant_emotion || 'neutral',
+    score: emotion.score || 5,
+    emotion: emotion.emotion || 'neutral',
+    name: emotion.name || emotion.emotion || 'neutral',
     confidence: emotion.confidence || 0.5,
     emojis: emotion.emojis || '😐',
     text: emotion.text || '',
     source: emotion.source || 'manual-entry',
     intensity: emotion.intensity || 0.5,
-    name: emotion.name || emotion.emotion || 'neutral',
     category: emotion.category || 'emotion'
   };
   

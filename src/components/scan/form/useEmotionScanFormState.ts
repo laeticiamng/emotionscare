@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { analyzeEmotion } from '@/lib/scanService';
 import { useToast } from "@/hooks/use-toast";

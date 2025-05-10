@@ -46,8 +46,8 @@ export async function analyzeEmotion(text: string): Promise<EmotionResult> {
 
   return {
     emotion: detectedEmotion,
+    score: emotionData.score, 
     confidence: 0.7 + Math.random() * 0.2, // Random confidence between 0.7 and 0.9
-    score: emotionData.score, // Use score from emotions map
     feedback,
     recommendations: [
       'Practice deep breathing for 5 minutes',
@@ -58,7 +58,8 @@ export async function analyzeEmotion(text: string): Promise<EmotionResult> {
     primaryEmotion: {
       name: detectedEmotion,
       score: emotionData.score / 100
-    }
+    },
+    intensity: Math.random() * 0.7 + 0.3 // Random intensity between 0.3 and 1.0
   };
 }
 

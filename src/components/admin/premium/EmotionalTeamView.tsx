@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionalTeamViewProps } from '@/types/emotion';
 
-const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ teamId, period, className }) => {
+const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ userId, period, teamId, className }) => {
   return (
     <Card className={className}>
       <CardHeader>
@@ -11,7 +11,7 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ teamId, period, c
       </CardHeader>
       <CardContent>
         <p>Visualisation de l'état émotionnel de l'équipe en temps réel.</p>
-        <p>Identifiant d'équipe: {teamId}</p>
+        <p>Identifiant d'équipe: {teamId || userId}</p>
         {period && <p>Période: {period}</p>}
         {/* Team emotional state visualization would go here */}
       </CardContent>

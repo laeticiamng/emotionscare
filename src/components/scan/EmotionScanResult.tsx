@@ -17,14 +17,14 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
   // Convert EmotionResult to compatible Emotion object when needed
   const emotionCompatible: Emotion = {
     id: data.id || `emotion-${Date.now()}`,
-    name: data.emotion,
     user_id: data.user_id || '',
     date: data.date || new Date().toISOString(),
     emotion: data.emotion,
-    score: data.score !== undefined ? data.score : (data.confidence ? Math.round(data.confidence * 100) : 50),
+    name: data.emotion,
+    score: data.score !== undefined ? data.score : (data.confidence ? Math.round((data.confidence * 100)) : 50),
     text: data.text || data.transcript || '',
     emojis: data.emojis || '',
-    ai_feedback: data.feedback || data.ai_feedback || '',
+    ai_feedback: data.feedback || '',
     intensity: data.intensity || 0.5,
     category: "emotion"
   };
@@ -37,7 +37,7 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
       <CardContent>
         <Tabs defaultValue="recommendations" className="w-full">
           <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+            <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
             <TabsTrigger value="details">Détails</TabsTrigger>
           </TabsList>
           
@@ -73,10 +73,10 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
                 </div>
               )}
               
-              {(data.ai_feedback || data.feedback) && (
+              {(data.feedback || data.ai_feedback) && (
                 <div>
                   <h3 className="font-medium mb-1">Analyse IA</h3>
-                  <p className="text-muted-foreground">{data.ai_feedback || data.feedback}</p>
+                  <p className="text-muted-foreground">{data.feedback || data.ai_feedback}</p>
                 </div>
               )}
             </div>

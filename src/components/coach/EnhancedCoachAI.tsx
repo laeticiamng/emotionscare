@@ -57,13 +57,13 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
     
     return {
       id: emotionResult.id || 'temp-id',
-      name: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
       user_id: emotionResult.user_id || 'user-id',
       date: new Date(),
       emotion: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
       score: emotionResult.score || 0,
-      confidence: emotionResult.confidence || 0,
+      confidence: emotionResult.confidence || 0.5,
       intensity: emotionResult.intensity || 0.5,
+      name: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
       category: "emotion"
     };
   };
@@ -84,7 +84,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
               Analyse de votre état émotionnel
             </h3>
             <p className="mt-2 text-sm">
-              {emotionResult.ai_feedback || emotionResult.feedback || 
+              {emotionResult.feedback || emotionResult.ai_feedback || 
                 `Votre état émotionnel actuel est "${emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutre'}" avec une intensité de ${Math.round((emotionResult.intensity || 0.5) * 100)}%. 
                 Voici quelques recommandations personnalisées pour vous aider à optimiser votre bien-être.`
               }

@@ -18,7 +18,7 @@ const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emoti
   // Get the emotion name safely depending on whether we received a string or an Emotion object
   const emotionName = typeof emotion === 'string' 
     ? emotion
-    : emotion.name || emotion.emotion || emotion.dominant_emotion || 'neutral';
+    : emotion.name || emotion.emotion || '';
   
   // Determine if this is a stressful emotion
   const isStressfulEmotion = ['stressed', 'anxious', 'overwhelmed', 'angry', 'sad'].includes(emotionName.toLowerCase());
