@@ -7,6 +7,8 @@ import CoachRecommendations from '../coach/CoachRecommendations';
 import GamificationWidget from './GamificationWidget';
 import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
+import FeatureHub from '../features/FeatureHub';
+import SecurityCertifications from '../features/SecurityCertifications';
 import { UserMode } from '@/contexts/UserModeContext';
 
 interface DashboardContentProps {
@@ -98,6 +100,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           emotion={latestEmotion?.emotion}
         />
         
+        <FeatureHub />
+        
         {userMode === 'b2c' && (
           <GamificationWidget
             collapsed={collapsedSections.gamification}
@@ -113,6 +117,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
             userId={userId}
           />
         )}
+        
+        <SecurityCertifications />
       </div>
     );
   }
@@ -138,6 +144,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           onToggle={() => toggleSection('recommendations')}
           emotion={latestEmotion?.emotion}
         />
+        
+        <FeatureHub />
         
         {userMode === 'b2c' && (
           <GamificationWidget
@@ -166,6 +174,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           userId={userId}
         />
         
+        <FeatureHub />
+        
         <CoachRecommendations 
           collapsed={collapsedSections.recommendations}
           onToggle={() => toggleSection('recommendations')}
@@ -181,13 +191,15 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         )}
       </div>
       
-      <div>
+      <div className="space-y-6">
         <UserSidePanel
           collapsed={collapsedSections.sidePanel}
           onToggle={() => toggleSection('sidePanel')}
           userId={userId}
           userMode={userMode}
         />
+        
+        <SecurityCertifications />
       </div>
     </div>
   );
