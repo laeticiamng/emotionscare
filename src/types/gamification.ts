@@ -1,15 +1,20 @@
 
-export interface Badge {
+import { Badge } from './badge';
+
+export interface GamificationProgress {
+  user_id: string;
+  total_points: number;
+  level: number;
+  badges: Badge[];
+  streak_days: number;
+  last_activity: Date | string;
+}
+
+export interface Challenge {
   id: string;
   title: string;
   description: string;
-  image_url: string;
-  category: string;
-  level?: number;
-  unlocked?: boolean;
-  unlocked_at?: string | Date;
-  progress?: number;
-  total_required?: number;
-  xp_reward?: number;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  points: number;
+  completed: boolean;
+  deadline?: Date | string;
 }

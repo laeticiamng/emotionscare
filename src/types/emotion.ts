@@ -1,8 +1,8 @@
 
 export interface Emotion {
   id: string;
-  user_id?: string;
-  date: string;
+  user_id: string;
+  date: string | Date;
   emotion: string;
   score?: number;
   confidence?: number;
@@ -10,56 +10,32 @@ export interface Emotion {
   transcript?: string;
   ai_feedback?: string;
   recommendations?: string[];
-  intensity?: number;
-  sentiment?: number;
-  timestamp?: string | Date;
+  emojis?: string;
   primaryEmotion?: {
     name: string;
-    score: number;
   };
-  secondaryEmotions?: Array<{
-    name: string;
-    score: number;
-  }>;
-  emojis?: string;
-  name?: string;
+  intensity?: number;
 }
 
 export interface EmotionResult {
-  id?: string;
+  id: string;
   user_id?: string;
-  date?: string;
+  date?: string | Date;
   emotion: string;
-  score?: number;
-  confidence?: number;
-  intensity?: number;
+  confidence: number;
+  score: number;
   feedback?: string;
   ai_feedback?: string;
   recommendations?: string[];
   transcript?: string;
   text?: string;
   emojis?: string;
+  intensity?: number;
   primaryEmotion?: {
     name: string;
-    score: number;
   };
-  secondaryEmotions?: Array<{
-    name: string;
-    score: number;
-  }>;
-}
-
-export interface EnhancedEmotionResult extends EmotionResult {
-  history?: Emotion[];
-  trend?: 'improving' | 'stable' | 'declining';
-  detailedAnalysis?: string;
-  recommendations?: string[];
 }
 
 export interface EmotionalTeamViewProps {
   className?: string;
-}
-
-export interface EmotionToMusicMap {
-  [key: string]: string;
 }

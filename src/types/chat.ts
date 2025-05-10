@@ -1,24 +1,27 @@
 
+import { User } from './user';
+
 export interface ChatMessage {
   id: string;
-  content?: string;
-  text?: string;
+  sender_id: string;
+  conversation_id: string;
+  content: string;
+  timestamp: string | Date;
+  is_read: boolean;
+  sender_name?: string;
+  is_ai?: boolean;
   sender?: string;
-  sender_type?: 'user' | 'assistant' | 'system';
-  role?: 'user' | 'assistant' | 'system';
-  timestamp?: string | Date;
-  type?: string;
-  metadata?: Record<string, any>;
+  role?: string;
+  text?: string;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  messages: ChatMessage[];
+  user_id: string;
   created_at: string | Date;
   updated_at: string | Date;
-  user_id?: string;
-  summary?: string;
-  status?: 'active' | 'archived' | 'deleted';
-  last_message?: ChatMessage;
+  last_message?: string;
+  last_message_time?: string | Date;
+  messages?: ChatMessage[];
 }

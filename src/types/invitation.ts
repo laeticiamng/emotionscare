@@ -1,4 +1,6 @@
 
+import { UserRole } from './user';
+
 export interface Invitation {
   id: string;
   email: string;
@@ -16,13 +18,6 @@ export interface InvitationFormData {
   role: UserRole;
   message?: string;
   expires_in?: number;
-}
-
-export enum UserRole {
-  EMPLOYEE = 'employee',
-  ANALYST = 'analyst',
-  WELLBEING_MANAGER = 'wellbeing_manager',
-  ADMIN = 'admin'
 }
 
 export interface InvitationStats {

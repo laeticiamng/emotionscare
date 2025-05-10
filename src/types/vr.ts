@@ -1,57 +1,39 @@
 
-import { MusicTrack } from './music';
-
 export interface VRSession {
   id: string;
   user_id: string;
   template_id: string;
-  start_time: string | Date;
-  end_time?: string | Date;
-  duration?: number;
-  duration_seconds?: number;
+  started_at: string | Date;
+  ended_at?: string | Date;
+  duration: number;
   completed: boolean;
-  feedback?: string;
-  emotion_before?: string;
-  emotion_after?: string;
-  score_before?: number;
-  score_after?: number;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
-  is_audio_only?: boolean;
-  date?: string | Date;
+  emotional_state_before?: string;
+  emotional_state_after?: string;
+  emotional_score_before?: number;
+  emotional_score_after?: number;
+  notes?: string;
+  template?: VRSessionTemplate;
 }
 
 export interface VRSessionTemplate {
   id: string;
   template_id: string;
-  name?: string;
+  title: string;
   theme: string;
-  title?: string;
   description: string;
   duration: number;
-  type?: 'guided' | 'meditation' | 'visualization' | 'relaxation';
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
-  video_url?: string;
-  audio_url?: string;
-  image_url?: string;
-  preview_url?: string;
-  emotion_tags?: string[];
-  emotions?: string[];
-  emotion_target?: string;
-  created_at?: string | Date;
-  completion_rate?: number;
+  preview_url: string;
   is_audio_only?: boolean;
-  category?: string;
-  benefits?: string[];
+  category: string;
+  benefits: string[];
+  emotions: string[];
   popularity?: number;
+  audio_url?: string;
 }
 
 export interface VRSessionWithMusicProps {
-  session?: VRSessionTemplate;
-  musicTracks?: MusicTrack[];
-  onSessionComplete: () => void;
-  isAudioOnly?: boolean;
-  videoUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
+  template: VRSessionTemplate;
+  onComplete?: (session: VRSession) => void;
+  onExit?: () => void;
+  initialTrack?: MusicTrack;
 }

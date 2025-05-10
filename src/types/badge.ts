@@ -3,11 +3,12 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image_url: string;
-  unlocked: boolean;
-  unlock_date?: string | Date;
-  category?: string;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  criteria?: string;
+  icon: string;
+  category: string;
+  level: number;
+  requirements: string[];
+  awarded_at?: string | Date;
   progress?: number;
+  total_required?: number;
+  image_url?: string;
 }

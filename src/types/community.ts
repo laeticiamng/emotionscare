@@ -1,18 +1,14 @@
 
+import { User } from './user';
+
 export interface CommunityPost {
   id: string;
   user_id: string;
-  title: string;
   content: string;
-  tags?: string[];
+  created_at: Date | string;
   likes: number;
-  comments_count: number;
-  created_at: string | Date;
-  updated_at: string | Date;
-  author?: {
-    name: string;
-    avatar: string;
-  };
+  comments: number;
+  author?: User;
 }
 
 export interface CommunityComment {
@@ -20,11 +16,6 @@ export interface CommunityComment {
   post_id: string;
   user_id: string;
   content: string;
-  likes: number;
-  created_at: string | Date;
-  updated_at: string | Date;
-  author?: {
-    name: string;
-    avatar: string;
-  };
+  created_at: Date | string;
+  author?: User;
 }

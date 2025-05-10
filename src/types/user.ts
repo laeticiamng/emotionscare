@@ -2,58 +2,18 @@
 export interface User {
   id: string;
   name?: string;
-  email: string;
-  avatar_url?: string;
+  email?: string;
+  avatar?: string;
+  role?: UserRole;
+  anonymity_code?: string;
+  emotional_score?: number;
+  last_activity?: string | Date;
   created_at?: string | Date;
-  updated_at?: string | Date;
-  role?: string;
-  preferences?: UserPreferences;
-  teams?: string[];
-  team_id?: string;
-  supervisor_id?: string;
-  status?: 'active' | 'inactive' | 'pending';
 }
 
-export interface UserPreferences {
-  theme: ThemeName;
-  notifications_enabled: boolean;
-  font_size: 'small' | 'medium' | 'large';
-  language: string;
-  accent_color?: string;
-  background_color?: string;
-  notifications?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  reminder_time?: string;
-  dynamic_theme?: {
-    enable_time_based?: boolean;
-    enable_emotion_based?: boolean;
-    enable_weather_based?: boolean;
-  };
-  accessibility?: {
-    high_contrast?: boolean;
-    reduced_motion?: boolean;
-    screen_reader_optimized?: boolean;
-    keyboard_navigation?: boolean;
-  };
-  audio?: {
-    volume?: number;
-    continue_playback?: boolean;
-    ambient_sound?: string;
-    context_music?: boolean;
-    immersive_mode?: boolean;
-  };
-  data_preferences?: {
-    export_format?: 'json' | 'pdf';
-    incognito_mode?: boolean;
-    data_retention_period?: number;
-  };
-}
-
-export interface UserPreferencesState extends UserPreferences {
-  loading: boolean;
-  error: string | null;
-  emotionalCamouflage?: boolean;
+export enum UserRole {
+  EMPLOYEE = 'employee',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager',
+  ADMIN = 'admin'
 }
