@@ -43,6 +43,7 @@ export interface EmotionResult {
   recommendations?: string[];
 }
 
+// Add the missing EmotionalTeamViewProps interface
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: string;
