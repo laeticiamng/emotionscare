@@ -1,23 +1,44 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage } from '@/types';
+
+// Define an interface for the messages used in this hook
+// that aligns with the ChatMessage type but with the fields we actually use
+interface LocalChatMessage {
+  id: string;
+  text: string;
+  sender: string;
+  timestamp: Date;
+  sender_id?: string;
+  conversation_id?: string;
+  content?: string;
+  is_read?: boolean;
+}
 
 export function useChatMessages() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<LocalChatMessage[]>([
     {
       id: '1',
       text: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
       sender: 'bot',
-      timestamp: new Date()
+      timestamp: new Date(),
+      sender_id: 'system',
+      conversation_id: 'initial',
+      content: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
+      is_read: true
     }
   ]);
 
   const addUserMessage = useCallback((text: string) => {
-    const message: ChatMessage = {
+    const message: LocalChatMessage = {
       id: Date.now().toString(),
       text,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      sender_id: 'user',
+      conversation_id: 'current',
+      content: text,
+      is_read: true
     };
     
     setMessages(prev => [...prev, message]);
@@ -25,11 +46,15 @@ export function useChatMessages() {
   }, []);
 
   const addBotMessage = useCallback((text: string) => {
-    const message: ChatMessage = {
+    const message: LocalChatMessage = {
       id: Date.now().toString(),
       text,
       sender: 'bot',
-      timestamp: new Date()
+      timestamp: new Date(),
+      sender_id: 'system',
+      conversation_id: 'current',
+      content: text,
+      is_read: true
     };
     
     setMessages(prev => [...prev, message]);
@@ -41,7 +66,11 @@ export function useChatMessages() {
       id: '1',
       text: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
       sender: 'bot',
-      timestamp: new Date()
+      timestamp: new Date(),
+      sender_id: 'system',
+      conversation_id: 'initial',
+      content: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
+      is_read: true
     }]);
   }, []);
 

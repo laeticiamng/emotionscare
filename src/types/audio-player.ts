@@ -15,3 +15,14 @@ export interface AudioPlayerControls {
   setVolume: (volume: number) => void;
   toggleMute: () => void;
 }
+
+// Add the missing UseAudioPlayerStateReturn interface
+export interface UseAudioPlayerStateReturn {
+  audioRef: React.RefObject<HTMLAudioElement>;
+  state: AudioPlayerState;
+  controls: AudioPlayerControls;
+  timeFormatted: {
+    currentTime: string;
+    duration: string;
+  };
+}
