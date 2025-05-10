@@ -39,3 +39,15 @@ export interface EmotionResult {
 export interface EmotionalTeamViewProps {
   className?: string;
 }
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  detailedAnalysis?: {
+    strengths?: string[];
+    challenges?: string[];
+    recommendations?: string[];
+  };
+  historicalContext?: {
+    trends?: string;
+    compareToLastWeek?: number;
+  };
+}

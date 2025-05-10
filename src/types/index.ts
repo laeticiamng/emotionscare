@@ -26,3 +26,11 @@ export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'mis
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
 export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
+
+// Additional type re-exports
+export { UserRole } from './user';
+export { EmotionalTeamViewProps, EnhancedEmotionResult } from './emotion';
+export type { ProgressBarProps } from './progress-bar';
+export type { TrackInfoProps, VolumeControlProps } from './track-info';
+export type { MusicRecommendationCardProps, MusicDrawerProps } from './music';
+export type { UserPreferencesState } from './preferences';

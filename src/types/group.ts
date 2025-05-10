@@ -8,4 +8,7 @@ export interface Group {
   created_at: Date | string;
   members: User[];
   owner_id: string;
+  image_url?: string;
+  members_count?: number;
+  topic?: string;
 }

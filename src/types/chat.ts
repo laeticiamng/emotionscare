@@ -21,7 +21,7 @@ export interface ChatConversation {
   user_id: string;
   created_at: string | Date;
   updated_at: string | Date;
-  last_message?: string;
+  last_message?: ChatMessage;
   last_message_time?: string | Date;
   messages?: ChatMessage[];
 }
