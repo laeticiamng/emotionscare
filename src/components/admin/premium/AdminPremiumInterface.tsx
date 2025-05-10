@@ -8,7 +8,7 @@ import SocialMetricsCard from './SocialMetricsCard';
 import GamificationCard from './GamificationCard';
 import ReportGenerator from './ReportGenerator';
 import EmotionalTeamView from './EmotionalTeamView';
-import type { User } from '@/types';
+import { User } from '@/types/user';
 
 interface AdminPremiumInterfaceProps {
   user?: User | null;

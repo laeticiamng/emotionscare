@@ -148,7 +148,7 @@ const MusicPlayer: React.FC = () => {
           <Button 
             variant="ghost" 
             size={isMobile ? "icon" : "default"}
-            onClick={previousTrack}
+            onClick={() => previousTrack()}
             disabled={!currentTrack}
             className="h-10 w-10 sm:h-11 sm:w-11 rounded-full opacity-90 hover:opacity-100 transition-opacity"
           >
@@ -189,7 +189,7 @@ const MusicPlayer: React.FC = () => {
           <Button 
             variant="ghost" 
             size={isMobile ? "icon" : "default"} 
-            onClick={nextTrack}
+            onClick={() => nextTrack()}
             disabled={!currentTrack}
             className="h-10 w-10 sm:h-11 sm:w-11 rounded-full opacity-90 hover:opacity-100 transition-opacity"
           >

@@ -2,7 +2,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipForward, SkipBack, Volume2, List } from 'lucide-react';
+import { 
+  Play, Pause, SkipBack, SkipForward, 
+  Volume, Volume2, VolumeX, List 
+} from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 
 interface MusicControlsProps {
@@ -25,7 +28,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     setVolume 
   } = useMusic();
   
-  // Fix: Accepter un tableau de valeurs et utiliser le premier élément
+  // Fix: Accept an array of values and use the first element
   const handleVolumeChange = (values: number[]) => {
     setVolume(values[0] / 100);
   };
@@ -46,7 +49,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     ) : null;
   }
   
-  // Déterminer l'URL de la couverture de la piste
+  // Determine the URL of the track cover
   const getCoverUrl = () => {
     if (!currentTrack) return null;
     

@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionalTeamViewProps } from '@/types';
+import { EmotionalTeamViewProps } from '@/types/emotion';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ className }) => {
   return (

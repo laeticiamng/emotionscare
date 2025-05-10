@@ -1,42 +1,38 @@
 
-import { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { logActivity } from '@/lib/activity/activityLogService';
+import { useCallback } from 'react';
+
+type ActivityCategory = 'music' | 'journal' | 'meditation' | 'scan' | 'chat' | 'general';
+type ActivityAction = string;
 
 /**
- * Hook for recording user activity
- * @param pageOrFeature - The page or feature being accessed
- * @param details - Additional details about the activity
+ * Hook for logging user activities throughout the app
  */
-export function useActivityLogging(
-  pageOrFeature: string, 
-  details: Record<string, any> = {}
-) {
-  const { user, isAuthenticated } = useAuth();
-  
-  useEffect(() => {
-    if (isAuthenticated && user?.id) {
-      const activityType = `visit_${pageOrFeature}`;
-      logActivity(user.id, activityType, {
-        ...details,
-        timestamp: new Date().toISOString(),
-      });
-      
-      console.log(`Activity logged: ${activityType} for user ${user.id}`);
-    }
-  }, [user?.id, isAuthenticated, pageOrFeature, details]);
-  
-  const logUserAction = (action: string, actionDetails: Record<string, any> = {}) => {
-    if (isAuthenticated && user?.id) {
-      const activityType = `${pageOrFeature}_${action}`;
-      logActivity(user.id, activityType, {
-        ...actionDetails,
-        timestamp: new Date().toISOString(),
-      });
-      
-      console.log(`User action logged: ${activityType} for user ${user.id}`);
-    }
+export function useActivityLogging(category: ActivityCategory = 'general') {
+  /**
+   * Log a user action for analytics or activity tracking
+   */
+  const logUserAction = useCallback((action: ActivityAction, details?: Record<string, any>) => {
+    // In a real app, this would send to an analytics service or backend
+    console.log(`[Activity Log] ${category}:${action}`, details || {});
+    
+    // Example implementation if you had a backend:
+    // try {
+    //   fetch('/api/activity-log', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ 
+    //       category, 
+    //       action, 
+    //       timestamp: new Date().toISOString(),
+    //       details 
+    //     })
+    //   });
+    // } catch (error) {
+    //   console.error('Failed to log activity:', error);
+    // }
+  }, [category]);
+
+  return {
+    logUserAction
   };
-  
-  return { logUserAction };
 }

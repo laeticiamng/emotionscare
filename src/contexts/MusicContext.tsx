@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { MusicTrack, MusicPlaylist, MusicPreferences } from '@/types/music';
 
@@ -8,6 +9,7 @@ export interface MusicContextType {
   muted: boolean;
   playlists: MusicPlaylist[];
   playlist: MusicPlaylist | null;
+  currentPlaylist: MusicPlaylist | null;
   currentTime: number;
   duration: number;
   loading: boolean;
@@ -32,12 +34,16 @@ export interface MusicContextType {
   
   // Track operations
   playTrack: (track: MusicTrack) => void;
-  previousTrack: MusicTrack | null;
+  pauseTrack: () => void; 
+  nextTrack: () => void;
+  previousTrack: () => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
   
   // Playlist operations
   loadPlaylist: (playlist: MusicPlaylist) => void;
   loadPlaylistById: (id: string) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
   
   // UI controls
   setOpenDrawer: (open: boolean) => void;
@@ -64,6 +70,7 @@ export const MusicContext = createContext<MusicContextType>({
   muted: false,
   playlists: [],
   playlist: null,
+  currentPlaylist: null,
   currentTime: 0,
   duration: 0,
   loading: false,
@@ -87,12 +94,16 @@ export const MusicContext = createContext<MusicContextType>({
   
   // Track operations
   playTrack: () => {},
-  previousTrack: null,
+  pauseTrack: () => {},
+  nextTrack: () => {},
+  previousTrack: () => {},
+  toggleRepeat: () => {},
+  toggleShuffle: () => {},
   
   // Playlist operations
   loadPlaylist: () => {},
   loadPlaylistById: () => {},
-  loadPlaylistForEmotion: async () => null,
+  loadPlaylistForEmotion: () => null,
   
   // UI controls
   setOpenDrawer: () => {},
@@ -103,12 +114,12 @@ export const MusicContext = createContext<MusicContextType>({
 
 export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [previousTrack, setPreviousTrack] = useState<MusicTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(0.7);
   const [muted, setMutedState] = useState(false);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -138,12 +149,14 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const next = useCallback(() => {
     console.log("Next track");
     // Implementation would go here
-  }, [playlist]);
+    nextTrack();
+  }, []);
 
   const previous = useCallback(() => {
     console.log("Previous track");
     // Implementation would go here
-  }, [playlist]);
+    previousTrack();
+  }, []);
 
   const setVolume = useCallback((value: number) => {
     setVolumeState(value);
@@ -159,14 +172,50 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Track operations
   const playTrack = useCallback((track: MusicTrack) => {
-    setPreviousTrack(currentTrack);
     setCurrentTrack(track);
     setIsPlaying(true);
-  }, [currentTrack]);
+  }, []);
+  
+  const pauseTrack = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+  
+  // More robust implementations would handle playlist navigation
+  const nextTrack = useCallback(() => {
+    if (!currentPlaylist || !currentPlaylist.tracks || !currentTrack) return;
+    
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex === -1 || currentPlaylist.tracks.length === 0) return;
+    
+    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
+    playTrack(currentPlaylist.tracks[nextIndex]);
+  }, [currentTrack, currentPlaylist]);
+  
+  const previousTrack = useCallback(() => {
+    if (!currentPlaylist || !currentPlaylist.tracks || !currentTrack) return;
+    
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex === -1 || currentPlaylist.tracks.length === 0) return;
+    
+    const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+    playTrack(currentPlaylist.tracks[prevIndex]);
+  }, [currentTrack, currentPlaylist]);
+  
+  const [repeat, setRepeat] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  
+  const toggleRepeat = useCallback(() => {
+    setRepeat(prev => !prev);
+  }, []);
+  
+  const toggleShuffle = useCallback(() => {
+    setShuffle(prev => !prev);
+  }, []);
 
   // Playlist operations
   const loadPlaylist = useCallback((newPlaylist: MusicPlaylist) => {
     setPlaylist(newPlaylist);
+    setCurrentPlaylist(newPlaylist);
     if (newPlaylist.tracks.length > 0) {
       setCurrentTrack(newPlaylist.tracks[0]);
     }
@@ -181,45 +230,37 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [playlists, loadPlaylist]);
 
-  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
-    try {
-      setLoading(true);
-      setError(null);
-      setCurrentEmotion(emotion);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Mock data for demonstration
-      const mockPlaylist: MusicPlaylist = {
-        id: `emotion-${emotion}-${Date.now()}`,
-        name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Music`,
-        description: `Music tailored for ${emotion} emotion`,
-        tracks: [
-          {
-            id: `track-${Date.now()}-1`,
-            title: `${emotion} Melody`,
-            artist: "Emotion Artist",
-            album: "Emotion Album",
-            artwork: "/music/cover.jpg",
-            url: "/music/track1.mp3",
-            duration: 180,
-          }
-        ],
-        emotion: emotion,
-      };
-      
-      loadPlaylist(mockPlaylist);
-      setOpenDrawer(true);
-      return mockPlaylist;
-    } catch (err) {
-      console.error("Error loading playlist for emotion:", err);
-      setError("Failed to load music for this emotion");
-      return null;
-    } finally {
-      setLoading(false);
+  const loadPlaylistForEmotion = useCallback((emotion: string): MusicPlaylist | null => {
+    // Find an existing playlist for this emotion
+    const found = playlists.find(p => p.emotion?.toLowerCase() === emotion.toLowerCase());
+    if (found) {
+      loadPlaylist(found);
+      return found;
     }
-  }, [loadPlaylist]);
+    
+    // Create a mock playlist if none exists
+    const mockPlaylist: MusicPlaylist = {
+      id: `emotion-${emotion}-${Date.now()}`,
+      name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Music`,
+      description: `Music tailored for ${emotion} emotion`,
+      tracks: [
+        {
+          id: `track-${Date.now()}-1`,
+          title: `${emotion} Melody`,
+          artist: "Emotion Artist",
+          album: "Emotion Album",
+          artwork: "/music/cover.jpg",
+          url: "/music/track1.mp3",
+          duration: 180,
+        }
+      ],
+      emotion: emotion,
+    };
+    
+    loadPlaylist(mockPlaylist);
+    setOpenDrawer(true);
+    return mockPlaylist;
+  }, [playlists, loadPlaylist]);
 
   const initializeMusicSystem = useCallback(() => {
     console.log("Music system initialized");
@@ -233,6 +274,7 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     muted,
     playlists,
     playlist,
+    currentPlaylist,
     currentTime,
     duration,
     loading,
@@ -240,8 +282,8 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     audioState,
     currentEmotion,
     preferences,
-    previousTrack,
-    openDrawer,
+    repeat,
+    shuffle,
     
     // Player controls
     play,
@@ -255,6 +297,11 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     
     // Track operations
     playTrack,
+    pauseTrack,
+    nextTrack,
+    previousTrack,
+    toggleRepeat,
+    toggleShuffle,
     
     // Playlist operations
     loadPlaylist,
@@ -265,6 +312,7 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setOpenDrawer,
     initializeMusicSystem,
     setAudioState,
+    openDrawer,
   };
 
   return (

@@ -1,38 +1,21 @@
 
 export interface Emotion {
-  id: string;
   name: string;
   value: number;
   color: string;
+  icon?: string;
+  category?: string;
+  intensity?: number;
 }
 
 export interface EmotionResult {
-  id?: string;
-  user_id?: string;
-  primaryEmotion?: Emotion;
-  secondaryEmotion?: Emotion;
   emotion: string;
   intensity?: number;
-  sentiment?: number;
-  timestamp?: string;
-  ai_feedback?: string;
+  confidence?: number;
+  timestamp?: string | Date;
+  metadata?: Record<string, any>;
 }
 
-export interface EmotionScanResult {
-  id: string;
-  user_id: string;
-  timestamp: string;
-  emotion: string;
-  intensity: number;
-  text?: string;
-  audio_url?: string;
-  confidential?: boolean;
-  ai_feedback?: string;
-}
-
-export interface EmotionTrend {
-  emotion: string;
-  count: number;
-  percentage: number;
-  trend: 'up' | 'down' | 'stable';
+export interface EmotionalTeamViewProps {
+  className?: string;
 }

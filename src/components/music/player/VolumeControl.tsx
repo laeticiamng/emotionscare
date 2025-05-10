@@ -3,7 +3,7 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Volume, Volume2, VolumeX } from 'lucide-react';
-import { VolumeControlProps } from '@/types';
+import { VolumeControlProps } from '@/types/audio-player';
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,

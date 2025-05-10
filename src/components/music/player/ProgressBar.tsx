@@ -1,12 +1,13 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types';
+import { ProgressBarProps } from '@/types/audio-player';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ 
   currentTime,
   duration,
   onSeek,
+  showTimestamps = true,
   formatTime,
   handleProgressClick
 }) => {
@@ -21,18 +22,23 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const timeFormatter = formatTime || defaultFormatTime;
   
   return (
-    <div className="w-full space-y-1" onClick={handleProgressClick}>
+    <div 
+      className="w-full space-y-1" 
+      onClick={handleProgressClick ? handleProgressClick : undefined}
+    >
       <Slider
         value={[percent]}
         max={100}
         step={0.1}
-        onValueChange={(values) => onSeek((values[0] / 100) * duration)}
+        onValueChange={onSeek ? (values) => onSeek((values[0] / 100) * duration) : undefined}
         className="w-full"
       />
-      <div className="flex justify-between text-xs text-muted-foreground px-0.5">
-        <span>{timeFormatter(currentTime)}</span>
-        <span>{timeFormatter(duration)}</span>
-      </div>
+      {showTimestamps && (
+        <div className="flex justify-between text-xs text-muted-foreground px-0.5">
+          <span>{timeFormatter(currentTime)}</span>
+          <span>{timeFormatter(duration)}</span>
+        </div>
+      )}
     </div>
   );
 };

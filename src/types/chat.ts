@@ -1,28 +1,32 @@
 
 export interface ChatMessage {
   id: string;
-  text: string;
-  sender: 'user' | 'bot' | 'system';
-  timestamp: Date;
-  isLoading?: boolean;
-  type?: 'text' | 'image' | 'audio' | 'video';
-  metadata?: Record<string, any>;
+  content: string;
+  sender_id: string;
+  sender_type: 'user' | 'coach' | 'system';
+  timestamp: string | Date;
+  conversation_id: string;
+  metadata?: {
+    emotion?: string;
+    intensity?: number;
+    tags?: string[];
+    [key: string]: any;
+  };
+  read?: boolean;
+  delivered?: boolean;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  messages: ChatMessage[];
-  created_at: Date;
-  updated_at: Date;
-  tags?: string[];
-  emotion?: string;
   user_id: string;
-}
-
-export interface ChatSettings {
-  tone?: 'formal' | 'casual' | 'friendly' | 'professional';
-  responseLength?: 'concise' | 'detailed' | 'comprehensive';
-  language?: string;
-  aiModel?: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+  messages: ChatMessage[];
+  last_message?: ChatMessage;
+  metadata?: {
+    topic?: string;
+    emotion_summary?: string;
+    [key: string]: any;
+  };
 }

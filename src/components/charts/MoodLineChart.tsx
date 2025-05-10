@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { MoodData } from '@/types';
+import { MoodData } from '@/types/mood';
 
 interface MoodLineChartProps {
   data: MoodData[];

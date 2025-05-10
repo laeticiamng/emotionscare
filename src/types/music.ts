@@ -16,6 +16,8 @@ export interface MusicTrack {
   coverUrl?: string;
   audioUrl?: string;
   audioSrc?: string;
+  album?: string;
+  artwork?: string;
 }
 
 export interface MusicPlaylist {
@@ -29,36 +31,62 @@ export interface MusicPlaylist {
   isCustom?: boolean;
 }
 
+export interface MusicPreferences {
+  volume: number;
+  autoplay: boolean;
+  crossfade: boolean;
+  crossfadeDuration: number;
+  shuffle: boolean;
+  repeat: 'none' | 'one' | 'all';
+  emotionSync: boolean;
+}
+
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null; 
   isPlaying: boolean;
   volume: number;
-  openDrawer: boolean;
-  setOpenDrawer: (open: boolean) => void;
+  muted: boolean;
+  playlists: MusicPlaylist[];
+  playlist: MusicPlaylist | null;
+  currentPlaylist: MusicPlaylist | null;
+  currentTime: number;
+  duration: number;
+  loading: boolean;
+  error: string | null;
+  audioState: {
+    isPlaying: boolean;
+    currentTime: number;
+    duration: number;
+  };
+  currentEmotion?: string;
+  preferences: MusicPreferences;
+  
+  // Player controls
+  play: () => void;
+  pause: () => void;
+  togglePlay: () => void;
+  next: () => void;
+  previous: () => void;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  seekTo: (time: number) => void;
+  
+  // Track operations
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  setProgress: (progress: number) => void;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
-  initializeMusicSystem: () => Promise<void>;
-  error: Error | null;
-  currentEmotion?: string;
-  togglePlay: () => void;
-  play: () => void;
-  pause: () => void;
-}
-
-export interface AudioPlayerState {
-  isPlaying: boolean;
-  volume: number;
-  muted: boolean;
-  repeat: boolean;
-  shuffle: boolean;
-  currentTime: number;
-  duration: number;
+  
+  // Playlist operations
+  loadPlaylist: (playlist: MusicPlaylist) => void;
+  loadPlaylistById: (id: string) => void;
+  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
+  
+  // UI controls
+  setOpenDrawer: (open: boolean) => void;
+  initializeMusicSystem: () => void;
+  setAudioState: (state: any) => void;
+  openDrawer: boolean;
 }

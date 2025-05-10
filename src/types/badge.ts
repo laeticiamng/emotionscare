@@ -4,10 +4,10 @@ export interface Badge {
   name: string;
   description: string;
   image_url: string;
-  category: 'engagement' | 'achievement' | 'milestone' | 'special';
+  category: string;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
   criteria: string;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  earned_at?: Date;
+  earned_at?: string | Date;
   progress?: number;
-  total?: number;
+  user_id?: string;
 }

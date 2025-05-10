@@ -7,7 +7,7 @@ import {
   Volume, Volume2, VolumeX, Repeat, Shuffle 
 } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
-import { AudioPlayerState } from '@/types';
+import { AudioPlayerState } from '@/types/audio-player';
 
 interface MusicControlsProps {
   minimal?: boolean;

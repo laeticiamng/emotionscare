@@ -1,117 +1,52 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipForward, SkipBack } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Play, Pause, SkipForward } from 'lucide-react';
+import { useMusic } from '@/contexts/MusicContext';
 
-const MusicMiniPlayer: React.FC = () => {
+interface MusicMiniPlayerProps {
+  onOpen: () => void;
+}
+
+const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ onOpen }) => {
   const { 
     currentTrack, 
     isPlaying, 
-    currentPlaylist,
-    currentEmotion,
     playTrack, 
     pauseTrack, 
     nextTrack,
-    previousTrack,
-    loadPlaylistForEmotion
+    currentPlaylist 
   } = useMusic();
-  
-  const { toast } = useToast();
-  
-  if (!currentTrack) {
-    return null;
-  }
-  
-  const handlePlayPause = () => {
+
+  const handleTogglePlay = () => {
     if (isPlaying) {
       pauseTrack();
-    } else {
+    } else if (currentTrack) {
       playTrack(currentTrack);
     }
   };
-  
-  const handleNext = () => {
-    nextTrack();
-  };
-  
-  const handlePrevious = () => {
-    previousTrack();
-  };
-  
-  const handleRecommendedPlaylist = async () => {
-    if (!currentEmotion) return;
-    
-    const playlist = await loadPlaylistForEmotion(currentEmotion);
-    
-    toast({
-      title: "Playlist recommandée",
-      description: `Playlist pour l'émotion "${currentEmotion}" chargée`
-    });
-  };
-  
-  // Trouver l'URL de couverture
-  const getCoverImage = () => {
-    if (!currentTrack) return null;
-    
-    if (currentTrack.cover) return currentTrack.cover;
-    if (currentTrack.coverUrl) return currentTrack.coverUrl;
-    if (currentTrack.coverImage) return currentTrack.coverImage;
-    
+
+  if (!currentTrack) {
     return null;
-  };
-  
-  const coverImage = getCoverImage();
-  
-  // Gestionnaire d'événements pour clic sur cover
-  const handleCoverClick = () => {
-    // Navigation ou autre action
-    console.log('Cover clicked');
-  };
-  
+  }
+
   return (
-    <div className="flex items-center justify-between gap-3 p-2 bg-background border rounded-lg shadow-sm">
-      {/* Cover image */}
-      <div 
-        className="w-10 h-10 rounded bg-muted flex-shrink-0 overflow-hidden cursor-pointer"
-        onClick={handleCoverClick}
-      >
-        {coverImage ? (
-          <img 
-            src={coverImage} 
-            alt={currentTrack.title} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-primary/10 flex items-center justify-center text-xs text-muted-foreground">
-            No Cover
-          </div>
-        )}
+    <div className="fixed bottom-16 right-4 p-3 bg-background border shadow-md rounded-lg flex items-center gap-3 z-50">
+      <div onClick={onOpen} className="flex-1 cursor-pointer">
+        <p className="text-sm font-medium truncate max-w-[120px]">
+          {currentTrack.title}
+        </p>
+        <p className="text-xs text-muted-foreground truncate">
+          {currentTrack.artist}
+        </p>
       </div>
-      
-      {/* Track info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{currentTrack.title}</p>
-        <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-      </div>
-      
-      {/* Controls */}
-      <div className="flex items-center gap-1">
+
+      <div className="flex items-center">
         <Button 
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7"
-          onClick={handlePrevious}
-        >
-          <SkipBack className="h-4 w-4" />
-        </Button>
-        
-        <Button 
-          size="icon" 
-          variant={isPlaying ? "secondary" : "default"}
-          className="h-7 w-7"
-          onClick={handlePlayPause}
+          variant="ghost" 
+          size="sm" 
+          className="h-8 w-8" 
+          onClick={handleTogglePlay}
         >
           {isPlaying ? (
             <Pause className="h-4 w-4" />
@@ -119,12 +54,12 @@ const MusicMiniPlayer: React.FC = () => {
             <Play className="h-4 w-4" />
           )}
         </Button>
-        
+
         <Button 
-          size="icon"
-          variant="ghost"
-          className="h-7 w-7"
-          onClick={handleNext}
+          variant="ghost" 
+          size="sm" 
+          className="h-8 w-8" 
+          onClick={() => nextTrack()}
         >
           <SkipForward className="h-4 w-4" />
         </Button>
