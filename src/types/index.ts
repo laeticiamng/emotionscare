@@ -15,5 +15,5 @@ export type { ProgressBarProps } from './progress-bar';
 export type { TrackInfoProps, VolumeControlProps } from './track-info';
 export type { Report } from './report';
 
-// Export explicitly for FontSize and FontFamily
+// Export explicitly for ThemeName, FontSize and FontFamily and DynamicThemeMode
 export type { ThemeName, FontSize, FontFamily, DynamicThemeMode } from './preferences';

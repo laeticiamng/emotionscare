@@ -40,4 +40,4 @@ export type { ProgressBarProps } from './types/progress-bar';
 export type { TrackInfoProps, VolumeControlProps } from './types/track-info';
 export type { Report } from './types/report';
 export type { AudioPreference } from './types/audio-player';
-export type { FontFamily, FontSize } from './types/preferences';
+export type { FontFamily, FontSize, ThemeName, DynamicThemeMode } from './types/preferences';
