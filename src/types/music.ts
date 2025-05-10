@@ -10,6 +10,7 @@ export interface MusicTrack {
   audioUrl?: string;
   url?: string;
   emotion?: string;
+  externalUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -34,3 +35,4 @@ export interface MusicDrawerProps {
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
 }
+

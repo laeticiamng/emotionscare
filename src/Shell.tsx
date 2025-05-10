@@ -12,7 +12,7 @@ import ThemeSwitcher from '@/components/ui/ThemeSwitcher'
 
 const Shell: React.FC = () => {
   // State management
-  const [musicOpen, setMusicOpen] = useState(false)
+  const [musicDrawerOpen, setMusicDrawerOpen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isScrolled, setIsScrolled] = useState(false)
   const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning')
@@ -60,7 +60,7 @@ const Shell: React.FC = () => {
   
   // Toggle music drawer
   const toggleMusicDrawer = () => {
-    setMusicOpen(prev => !prev)
+    setMusicDrawerOpen(prev => !prev)
   }
   
   // Toggle history drawer
@@ -159,15 +159,15 @@ const Shell: React.FC = () => {
             <motion.div whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={toggleMusicDrawer}
-                variant={musicOpen ? "secondary" : "outline"}
+                variant={musicDrawerOpen ? "secondary" : "outline"}
                 size="sm"
                 className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9 transition-all ${
-                  musicOpen ? "bg-primary/10" : ""
+                  musicDrawerOpen ? "bg-primary/10" : ""
                 }`}
                 type="button"
                 aria-label="Ouvrir le lecteur musical"
               >
-                <Headphones className={`h-4 w-4 ${musicOpen ? "text-primary" : ""}`} />
+                <Headphones className={`h-4 w-4 ${musicDrawerOpen ? "text-primary" : ""}`} />
                 <span className="hidden sm:inline">Musique</span>
               </Button>
             </motion.div>
@@ -203,9 +203,9 @@ const Shell: React.FC = () => {
       </header>
 
       {/* Music Drawer */}
-      <MusicDrawer
-        open={musicOpen}
-        onOpenChange={setMusicOpen}
+      <MusicDrawer 
+        open={musicDrawerOpen} 
+        onOpenChange={setMusicDrawerOpen}
       />
 
       {/* Main Content with Page Transitions */}

@@ -1,200 +1,141 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Play, Pause, SkipForward, Volume2 } from 'lucide-react';
-import { VRSessionTemplate, MusicTrack } from '@/types';
-import { formatTime } from '@/lib/utils';
-
-interface VRSessionWithMusicProps {
-  session: VRSessionTemplate;
-  onSessionComplete: () => void;
-  isAudioOnly?: boolean;
-  videoUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
-}
+import { useMusic } from '@/contexts/MusicContext';
+import { useToast } from '@/hooks/use-toast';
+import VRSessionProgress from './VRSessionProgress';
+import VRSessionControls from './VRSessionControls';
+import { VRSessionTemplate, MusicTrack, VRSessionWithMusicProps } from '@/types';
+import VRAudioSession from './VRAudioSession';
+import YoutubeEmbed from './YoutubeEmbed';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   session,
+  musicTracks = [],
   onSessionComplete,
   isAudioOnly = false,
   videoUrl,
   audioUrl,
   emotion = 'calm'
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [sessionCompleted, setSessionCompleted] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const { playTrack, pauseTrack, currentTrack } = useMusic();
+  const { toast } = useToast();
   
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const intervalRef = useRef<number | null>(null);
+  // Convertir la durée en secondes
+  const sessionDuration = (session?.duration || 5) * 60;
   
-  const { loadPlaylistForEmotion, currentTrack } = useMusic();
-  const [sessionMusic, setSessionMusic] = useState<MusicTrack | null>(null);
-
-  // Load music for session
+  // Timer pour le suivi de la session
   useEffect(() => {
-    const loadMusic = async () => {
-      try {
-        if (!emotion) return;
-
-        const playlist = await loadPlaylistForEmotion(emotion);
-        if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-          setSessionMusic(playlist.tracks[0]);
-        }
-      } catch (err) {
-        console.error('Error loading VR session music:', err);
-      }
-    };
+    let timer: NodeJS.Timeout;
     
-    loadMusic();
-  }, [emotion, loadPlaylistForEmotion]);
-
-  // Handle play/pause
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      if (videoRef.current) videoRef.current.pause();
-      if (audioRef.current) audioRef.current.pause();
-      clearInterval(intervalRef.current || undefined);
-      intervalRef.current = null;
-    } else {
-      if (videoRef.current) videoRef.current.play();
-      if (audioRef.current) audioRef.current.play();
-      
-      intervalRef.current = window.setInterval(() => {
-        const media = isAudioOnly ? audioRef.current : videoRef.current;
-        if (media) {
-          const newCurrentTime = media.currentTime;
-          const newProgress = (newCurrentTime / media.duration) * 100;
-          setCurrentTime(newCurrentTime);
+    if (!isPaused) {
+      timer = setInterval(() => {
+        setElapsedTime(prev => {
+          const newTime = prev + 1;
+          const newProgress = Math.min((newTime / sessionDuration) * 100, 100);
           setProgress(newProgress);
           
+          // Si la session est terminée
           if (newProgress >= 100) {
-            setSessionCompleted(true);
-            setIsPlaying(false);
-            clearInterval(intervalRef.current || undefined);
+            clearInterval(timer);
             onSessionComplete();
+            return sessionDuration;
           }
-        }
+          
+          return newTime;
+        });
       }, 1000);
     }
     
-    setIsPlaying(!isPlaying);
-  };
-
-  // Handle session end
-  const handleEndSession = () => {
-    setSessionCompleted(true);
-    setIsPlaying(false);
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    onSessionComplete();
-  };
-
-  // Clean up on component unmount
-  useEffect(() => {
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timer) clearInterval(timer);
     };
-  }, []);
-
+  }, [isPaused, sessionDuration, onSessionComplete]);
+  
+  // Gestion de la musique
+  const toggleMusic = () => {
+    if (isMusicPlaying) {
+      pauseTrack();
+      setIsMusicPlaying(false);
+    } else {
+      if (musicTracks.length > 0 && !currentTrack) {
+        // Jouer la première piste
+        playTrack(musicTracks[0]);
+      } else if (currentTrack) {
+        // Reprendre la lecture
+        playTrack(currentTrack);
+      } else {
+        // Pas de pistes disponibles
+        toast({
+          title: "Aucune musique disponible",
+          description: "Aucune piste audio n'est disponible pour cette session."
+        });
+        return;
+      }
+      setIsMusicPlaying(true);
+    }
+  };
+  
+  const handleTogglePause = () => {
+    setIsPaused(prev => !prev);
+  };
+  
   return (
-    <div className="relative">
-      <div className="aspect-video rounded-lg overflow-hidden bg-black">
-        {!isAudioOnly && videoUrl && (
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            className="w-full h-full object-cover"
-            onEnded={handleEndSession}
-          />
-        )}
+    <Card className="overflow-hidden">
+      <div className="p-6">
+        <h2 className="text-2xl font-semibold mb-4">
+          {session?.name || 'Session VR'}
+        </h2>
         
-        {isAudioOnly && audioUrl && (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/30">
-            <audio
-              ref={audioRef}
-              src={audioUrl}
-              onEnded={handleEndSession}
+        <div className="mb-8">
+          <VRSessionProgress percentComplete={progress} />
+        </div>
+        
+        <div className="space-y-8">
+          {isAudioOnly ? (
+            <VRAudioSession
+              template={{
+                id: session?.id || '1',
+                template_id: session?.template_id || '1',
+                name: session?.name || 'Audio Session',
+                theme: session?.theme || emotion,
+                description: session?.description || '',
+                duration: session?.duration || 5,
+                type: 'meditation',
+                difficulty: 'beginner',
+                audio_url: audioUrl,
+                created_at: new Date(),
+                is_audio_only: true
+              }}
+              isPaused={isPaused}
+              onTogglePause={handleTogglePause}
+              onComplete={onSessionComplete}
             />
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">{session.name}</h2>
-              <p className="text-muted-foreground mb-4">{session.description}</p>
+          ) : (
+            <div className="aspect-video rounded-lg overflow-hidden">
+              <YoutubeEmbed 
+                videoUrl={videoUrl || ''} 
+                autoplay={!isPaused}
+                controls={true}
+              />
             </div>
-          </div>
-        )}
+          )}
+          
+          <VRSessionControls 
+            isPaused={isPaused}
+            isAudioOnly={isAudioOnly}
+            isMusicPlaying={isMusicPlaying}
+            onTogglePause={handleTogglePause}
+            onToggleMusic={toggleMusic}
+            onComplete={onSessionComplete}
+          />
+        </div>
       </div>
-      
-      {/* Session Controls */}
-      <Card className="mt-4 p-4">
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <span className="text-sm text-muted-foreground">
-                {formatTime(currentTime)} / {formatTime(session.duration)}
-              </span>
-            </div>
-            <div className="text-sm font-medium">
-              {sessionCompleted ? 'Session terminée' : 'En cours...'}
-            </div>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
-        
-        <div className="flex justify-between items-center">
-          <Button
-            onClick={togglePlayPause}
-            variant={isPlaying ? "outline" : "default"}
-            size="sm"
-            className="gap-2"
-          >
-            {isPlaying ? (
-              <>
-                <Pause className="h-4 w-4" />
-                <span>Pause</span>
-              </>
-            ) : (
-              <>
-                <Play className="h-4 w-4" />
-                <span>Démarrer</span>
-              </>
-            )}
-          </Button>
-          
-          <Button
-            onClick={handleEndSession}
-            variant="ghost"
-            size="sm"
-          >
-            <SkipForward className="h-4 w-4 mr-2" />
-            <span>Terminer</span>
-          </Button>
-          
-          <div className="flex items-center gap-2 text-sm">
-            <Volume2 className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">Audio {sessionMusic ? 'actif' : 'inactif'}</span>
-          </div>
-        </div>
-      </Card>
-      
-      {/* Music Info */}
-      {sessionMusic && (
-        <Card className="mt-4 p-4 bg-primary/5">
-          <div className="flex items-center gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium">Musique: {sessionMusic.title}</p>
-              <p className="text-xs text-muted-foreground">
-                Adaptée pour: {emotion}
-              </p>
-            </div>
-          </div>
-        </Card>
-      )}
-    </div>
+    </Card>
   );
 };
 

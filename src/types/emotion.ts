@@ -22,6 +22,7 @@ export interface Emotion {
     score: number;
   }>;
   emojis?: string;
+  name?: string;
 }
 
 export interface EmotionResult {

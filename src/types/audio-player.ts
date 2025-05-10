@@ -47,3 +47,27 @@ export interface UseAudioPlayerReturn {
   toggleRepeat: () => void;
   toggleShuffle: () => void;
 }
+
+export interface AudioPlayerState {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  repeat: boolean;
+  shuffle: boolean;
+  progress: number;
+  duration: number;
+  currentTime: number;
+  loadingTrack: boolean;
+  error: Error | null;
+}
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  formatTime: (seconds: number) => string;
+  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export interface EmotionToMusicMap {
+  [key: string]: string;
+}

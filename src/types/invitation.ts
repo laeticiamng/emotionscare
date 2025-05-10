@@ -26,4 +26,5 @@ export interface InvitationStats {
   pending: number;
   expired: number;
   conversion_rate: number;
+  total: number;
 }

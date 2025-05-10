@@ -16,10 +16,10 @@ export function formatTime(seconds: number): string {
   return `${min}:${sec.toString().padStart(2, '0')}`;
 }
 
-// Safe opener function with overloads to handle different types of arguments
+// Safe opener function that handles multiple types of arguments
 export function safeOpen(url?: string | null): void;
-export function safeOpen(callback?: boolean | ((value: boolean) => void)): void;
-export function safeOpen(arg?: string | null | boolean | ((value: boolean) => void)): void {
+export function safeOpen(callback?: ((value: boolean) => void) | boolean): void;
+export function safeOpen(arg?: string | null | ((value: boolean) => void) | boolean): void {
   if (typeof arg === 'string' && arg) {
     window.open(arg, '_blank', 'noopener,noreferrer');
   } else if (typeof arg === 'function') {

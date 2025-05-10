@@ -1,180 +1,150 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Send, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import useChat from '@/hooks/useChat';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChatMessage } from '@/types';
-import { useApiConnection } from '@/hooks/dashboard/useApiConnection';
-import { Separator } from '@/components/ui/separator';
-import { useActivity } from '@/hooks/useActivity';
-import { safeOpen } from '@/lib/utils';
 
-// Default welcome message
-const DEFAULT_CHAT_MESSAGE = {
-  id: 'welcome',
-  text: 'Bonjour! Je suis votre coach IA. Comment puis-je vous aider aujourd\'hui?',
-  sender: 'bot' as 'bot',
-  timestamp: new Date(),
-};
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Send, Plus, ArrowDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ChatMessage } from '@/types';
 
 interface ChatInterfaceProps {
-  standalone?: boolean;
+  messages: ChatMessage[];
+  sendMessage: (message: string) => void;
+  isTyping?: boolean;
+  typingMessage?: string;
   className?: string;
 }
 
-/**
- * Chat Interface Component
- * Affiche une interface de chat interactive avec OpenAI API (GPT-4)
- * Fournit des réponses contextualisées basées sur l'état émotionnel de l'utilisateur
- */
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ standalone = true, className = '' }) => {
-  const [message, setMessage] = useState<string>('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([DEFAULT_CHAT_MESSAGE]);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const { handleSend } = useChat();
-  const { apiReady, apiCheckInProgress } = useApiConnection();
-  const { logActivity } = useActivity();
-  
-  // State for managing the chat session
-  const [startChat, setStartChat] = useState<boolean>(false);
-  
-  // Function to handle the start of the chat
-  const handleStartChat = () => {
-    if (typeof startChat === 'function') {
-      startChat();
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  messages,
+  sendMessage,
+  isTyping = false,
+  typingMessage = "L'IA est en train d'écrire...",
+  className,
+}) => {
+  const [message, setMessage] = useState('');
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleSend = () => {
+    if (message.trim()) {
+      sendMessage(message);
+      setMessage('');
     }
   };
 
-  // Scroll to bottom on new messages
-  const scrollToBottom = useCallback(() => {
-    const chatContainer = document.getElementById('chat-container');
-    if (chatContainer) {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Gérer l'autoscroll et l'affichage du bouton de défilement
+  useEffect(() => {
+    if (messageContainerRef.current) {
+      const container = messageContainerRef.current;
+      const handleScroll = () => {
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+        setShowScrollButton(!isNearBottom);
+      };
+      
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
     }
   }, []);
 
+  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
-  }, [chatMessages, scrollToBottom]);
-
-  // Handle sending a message
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
-    if (!user?.id) {
-      toast({
-        title: "Non connecté",
-        description: "Veuillez vous connecter pour envoyer un message.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      text: message,
-      sender: 'user',
-      timestamp: new Date(),
-    };
-
-    // Optimistically update the chat messages
-    setChatMessages(prevMessages => [...prevMessages, userMessage]);
-    setMessage('');
-    setIsTyping(true);
-
-    try {
-      // Log activity
-      logActivity('coach_interaction', { type: 'question', content: message });
-      
-      // Send the message and get response
-      const response = await handleSend(message);
-
-      const botMessage: ChatMessage = {
-        id: Date.now().toString(),
-        text: response?.text || "Je ne comprends pas votre demande. Pouvez-vous reformuler?",
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-
-      setChatMessages(prevMessages => [...prevMessages, botMessage]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer le message. Veuillez réessayer plus tard.",
-        variant: "destructive",
-      });
-      // Revert the optimistic update on error
-      setChatMessages(prevMessages => prevMessages.filter(msg => msg.id !== userMessage.id));
-    } finally {
-      setIsTyping(false);
-    }
-  };
+  }, [messages, isTyping]);
 
   return (
-    <Card className={cn("w-full", className)}>
-      <CardContent className="h-[300px] flex flex-col">
-        <ScrollArea id="chat-container" className="flex-1 p-4">
-          <div className="space-y-4">
-            {chatMessages.map((msg) => (
-              <div key={msg.id} className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                <div className={cn(
-                  "rounded-lg px-3 py-2 text-sm max-w-[75%] shadow-sm",
-                  msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                )}>
-                  {msg.text}
-                </div>
-                <span className="text-xs text-muted-foreground mt-1">
-                  {msg.sender === 'user' ? 'Vous' : 'Coach IA'} - {msg.timestamp.toLocaleTimeString()}
-                </span>
+    <Card className={cn("flex flex-col h-full overflow-hidden", className)}>
+      <CardContent className="flex flex-col h-full p-0">
+        {/* Messages Container */}
+        <div
+          ref={messageContainerRef}
+          className="flex-1 overflow-y-auto p-4 space-y-4"
+        >
+          {messages.length === 0 ? (
+            <div className="flex h-full items-center justify-center">
+              <p className="text-muted-foreground text-center">
+                Démarrer une nouvelle conversation
+              </p>
+            </div>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={cn(
+                  "flex max-w-[80%] rounded-lg p-4",
+                  msg.sender === "user" || msg.role === "user"
+                    ? "bg-primary/10 ml-auto"
+                    : "bg-muted mr-auto"
+                )}
+              >
+                <span className="whitespace-pre-wrap">{msg.content || msg.text}</span>
               </div>
-            ))}
-            {isTyping && (
-              <div className="flex items-start">
-                <div className="rounded-lg px-3 py-2 text-sm max-w-[75%] shadow-sm bg-muted">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </div>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-      
-      {standalone && <Separator />}
-      
-      <CardFooter className="p-4">
-        <div className="flex items-center space-x-4 w-full">
-          <Input
-            type="text"
-            placeholder="Écrivez votre message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSendMessage();
-              }
-            }}
-            disabled={!apiReady || apiCheckInProgress}
-          />
-          <Button 
-            onClick={handleSendMessage} 
-            disabled={!apiReady || apiCheckInProgress}
-          >
-            {apiCheckInProgress ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="mr-2 h-4 w-4" />
-            )}
-            Envoyer
-          </Button>
+            ))
+          )}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="bg-muted rounded-lg p-4 max-w-[80%] animate-pulse">
+              <span className="text-sm text-muted-foreground">{typingMessage}</span>
+            </div>
+          )}
+
+          {/* Element to scroll to */}
+          <div ref={messagesEndRef} />
         </div>
-      </CardFooter>
+
+        {/* Scroll to bottom button */}
+        {showScrollButton && (
+          <Button
+            size="icon"
+            variant="outline"
+            className="absolute bottom-24 right-6 rounded-full shadow-md"
+            onClick={scrollToBottom}
+          >
+            <ArrowDown className="h-4 w-4" />
+          </Button>
+        )}
+
+        {/* Input Area */}
+        <div className="p-4 border-t">
+          <div className="flex space-x-2">
+            <Button variant="outline" size="icon" className="shrink-0">
+              <Plus className="h-5 w-5" />
+            </Button>
+            <div className="relative flex-1">
+              <Textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Saisissez votre message..."
+                className="pr-12 min-h-[80px] resize-none"
+              />
+              <Button
+                className="absolute bottom-2 right-2"
+                size="icon"
+                disabled={!message.trim()}
+                onClick={handleSend}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
     </Card>
   );
 };

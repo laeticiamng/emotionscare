@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Music, Sparkles } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { safeOpen } from '@/lib/utils';
 
 interface MoodBasedRecommendationsProps {
   mood?: string;
@@ -26,7 +25,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
     const musicType = mood.toLowerCase();
     
     loadPlaylistForEmotion(musicType);
-    // Fix: Call setOpenDrawer directly instead of using safeOpen
+    // Appeler directement la fonction setOpenDrawer
     setOpenDrawer(true);
     
     toast({

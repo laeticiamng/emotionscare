@@ -13,6 +13,9 @@ export * from './music';
 export * from './scan';
 export * from './gamification';
 export * from './community';
+export * from './navigation';
+export * from './progress-bar';
+export * from './track-info';
 
 // Basic shared types
 export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
@@ -34,3 +37,4 @@ export interface UserPreferencesState extends UserPreferences {
 export interface EmotionalTeamViewProps {
   className?: string;
 }
+
