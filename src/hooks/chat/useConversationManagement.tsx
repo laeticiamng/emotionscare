@@ -1,111 +1,56 @@
 
-import { useState, useCallback } from 'react';
-import { chatHistoryService } from '@/lib/chat/chatHistoryService';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+// Fixed import statement
+import chatHistoryService from '@/lib/chat/chatHistoryService';
+import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Hook for managing conversation operations (create, update, delete)
- */
-export function useConversationManagement(userId?: string) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+export const useConversationManagement = (userId: string) => {
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Create a new conversation
-  const createConversation = useCallback(async (title: string = "Nouvelle conversation"): Promise<string | null> => {
-    if (!userId) {
-      console.error('Cannot create conversation: No user logged in');
-      toast({
-        title: "Erreur d'authentification",
-        description: "Vous devez être connecté pour créer une conversation.",
-        variant: "destructive"
-      });
-      return null;
-    }
-    
-    setIsLoading(true);
+  const createConversation = async (title: string) => {
+    setIsProcessing(true);
     try {
-      console.log('Creating conversation with title:', title);
-      const conversationId = await chatHistoryService.createConversation(userId, title);
-      
-      if (!conversationId) {
-        console.error('Failed to create conversation');
-        toast({
-          title: "Erreur",
-          description: "Impossible de créer une nouvelle conversation.",
-          variant: "destructive"
-        });
-        return null;
-      }
-      
-      return conversationId;
+      const conversation = await chatHistoryService.createConversation(userId, title);
+      return conversation;
     } catch (error) {
       console.error('Error creating conversation:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer une nouvelle conversation.",
-        variant: "destructive"
-      });
-      return null;
+      throw error;
     } finally {
-      setIsLoading(false);
+      setIsProcessing(false);
     }
-  }, [userId, toast]);
+  };
 
-  // Delete a conversation
-  const deleteConversation = useCallback(async (conversationId: string): Promise<boolean> => {
-    if (!conversationId) {
-      console.error('No conversation ID provided to deleteConversation');
-      return false;
-    }
-    
-    setIsLoading(true);
+  const updateConversation = async (conversationId: string, updates: { title?: string; lastMessage?: string }) => {
+    setIsProcessing(true);
     try {
-      console.log('Deleting conversation:', conversationId);
-      await chatHistoryService.deleteConversation(conversationId);
-      
-      toast({
-        title: "Conversation supprimée",
-        description: "La conversation a été supprimée avec succès."
-      });
-      return true;
-    } catch (error) {
-      console.error('Error deleting conversation:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la conversation.",
-        variant: "destructive"
-      });
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast]);
-
-  // Update conversation title and last message
-  const updateConversation = useCallback(async (
-    conversationId: string, 
-    lastMessage: string
-  ): Promise<boolean> => {
-    if (!conversationId) {
-      console.error('No conversation ID provided to updateConversation');
-      return false;
-    }
-    
-    try {
-      console.log('Updating conversation:', conversationId, 'last message:', lastMessage);
-      await chatHistoryService.updateConversation(conversationId, lastMessage);
-      
-      return true;
+      const updatedConversation = await chatHistoryService.updateConversation(conversationId, updates);
+      return updatedConversation;
     } catch (error) {
       console.error('Error updating conversation:', error);
-      return false;
+      throw error;
+    } finally {
+      setIsProcessing(false);
     }
-  }, []);
+  };
+
+  const deleteConversation = async (conversationId: string) => {
+    setIsProcessing(true);
+    try {
+      await chatHistoryService.deleteConversation(conversationId);
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      throw error;
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return {
     createConversation,
-    deleteConversation,
     updateConversation,
-    isLoading
+    deleteConversation,
+    isProcessing
   };
-}
+};
+
+export default useConversationManagement;

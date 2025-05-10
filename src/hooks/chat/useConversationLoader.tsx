@@ -1,45 +1,33 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatConversation } from '@/types/chat';
-import { chatHistoryService } from '@/lib/chat/chatHistoryService';
-import { useToast } from '@/hooks/use-toast';
+// Fixed import statement
+import chatHistoryService from '@/lib/chat/chatHistoryService';
 
-/**
- * Hook for loading user conversations
- */
-export function useConversationLoader(userId?: string) {
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+export const useConversationLoader = (userId: string) => {
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Load user conversations
-  const loadConversations = useCallback(async (): Promise<ChatConversation[]> => {
-    if (!userId) {
-      console.warn('Cannot load conversations: No user logged in');
-      return [];
+  useEffect(() => {
+    const loadConversations = async () => {
+      try {
+        setIsLoading(true);
+        const userConversations = await chatHistoryService.getConversationsForUser(userId);
+        setConversations(userConversations);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to load conversations'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (userId) {
+      loadConversations();
     }
-    
-    setIsLoading(true);
-    try {
-      console.log('Loading conversations for user:', userId);
-      const userConversations = await chatHistoryService.getConversations(userId);
-      console.log('Loaded conversations:', userConversations.length);
-      
-      return userConversations;
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les conversations.",
-        variant: "destructive"
-      });
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, toast]);
+  }, [userId]);
 
-  return {
-    loadConversations,
-    isLoading
-  };
-}
+  return { conversations, isLoading, error };
+};
+
+export default useConversationLoader;

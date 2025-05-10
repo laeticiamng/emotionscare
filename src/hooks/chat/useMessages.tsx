@@ -1,95 +1,51 @@
 
-import { useCallback, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { chatHistoryService } from '@/lib/chat/chatHistoryService';
-import { useToast } from '@/hooks/use-toast';
+// Fixed import statement
+import chatHistoryService from '@/lib/chat/chatHistoryService';
 
-/**
- * Hook for managing messages within a conversation
- */
-export function useMessages() {
-  const { toast } = useToast();
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  const [isSavingMessages, setIsSavingMessages] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const useMessages = (conversationId: string | null) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Load messages for a conversation
-  const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
-    if (!conversationId) {
-      console.error('No conversation ID provided to loadMessages');
-      setError('Identifiant de conversation manquant');
-      return [];
-    }
-    
-    setIsLoadingMessages(true);
-    setError(null);
+  useEffect(() => {
+    const loadMessages = async () => {
+      if (!conversationId) {
+        setMessages([]);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const conversationMessages = await chatHistoryService.getMessagesForConversation(conversationId);
+        setMessages(conversationMessages);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to load messages'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, [conversationId]);
+
+  const addMessage = async (message: Omit<ChatMessage, 'id'>) => {
     try {
-      console.log('Loading messages for conversation:', conversationId);
-      const messages = await chatHistoryService.getMessages(conversationId);
-      console.log('Loaded messages:', messages.length);
-      return messages;
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      const errorMessage = 'Impossible de charger les messages.';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return [];
-    } finally {
-      setIsLoadingMessages(false);
+      const newMessage = await chatHistoryService.addMessageToConversation(
+        message.conversation_id,
+        message
+      );
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      return newMessage;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to add message'));
+      throw err;
     }
-  }, [toast]);
-
-  // Save messages for a conversation
-  const saveMessages = useCallback(async (
-    conversationId: string, 
-    messages: ChatMessage[]
-  ): Promise<boolean> => {
-    if (!conversationId) {
-      console.error('No conversation ID provided to saveMessages');
-      setError('Identifiant de conversation manquant');
-      return false;
-    }
-    
-    if (!messages || messages.length === 0) {
-      console.warn('No messages to save');
-      return false;
-    }
-    
-    setIsSavingMessages(true);
-    setError(null);
-    try {
-      console.log('Saving messages for conversation:', conversationId, 'count:', messages.length);
-      await chatHistoryService.saveMessages(conversationId, messages);
-      return true;
-    } catch (error) {
-      console.error('Error saving messages:', error);
-      const errorMessage = 'Impossible de sauvegarder les messages.';
-      setError(errorMessage);
-      toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
-      });
-      return false;
-    } finally {
-      setIsSavingMessages(false);
-    }
-  }, [toast]);
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  return {
-    loadMessages,
-    saveMessages,
-    isLoadingMessages,
-    isSavingMessages,
-    error,
-    clearError
   };
-}
+
+  return { messages, isLoading, error, addMessage };
+};
+
+export default useMessages;

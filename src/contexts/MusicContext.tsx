@@ -58,8 +58,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (audioElement) {
       setCurrentTrack(track);
       
-      // In a real app we would load the actual audio file
-      audioElement.src = track.audioUrl || track.url || '';
+      // Access audio source considering both naming conventions
+      const audioSource = track.audio_url || track.audioUrl || track.url || '';
+      audioElement.src = audioSource;
       audioElement.play().catch(err => {
         console.error('Error playing track:', err);
       });

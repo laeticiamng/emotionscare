@@ -1,208 +1,100 @@
-// import { Configuration, OpenAIApi } from 'openai'; - This will be mocked
-import { Emotion, EmotionResult } from '@/types';
-import { mockAnalysis } from '@/mocks/aiFallback';
-import { supabase } from '@/lib/supabase-client';
-import { getEmotionEmoji } from './emotionUtilService';
 
-const useMocks = true; // Always use mocks until OpenAI is properly configured
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY || '';
+import { v4 as uuidv4 } from 'uuid';
+import { EmotionResult } from '@/types';
 
-// Mock OpenAI client instead of actual initialization
-const openai = {
-  createChatCompletion: async () => {
-    return {
-      data: {
-        choices: [
-          {
-            message: {
-              content: JSON.stringify(mockAnalysis)
-            }
-          }
-        ]
-      }
-    };
-  }
+// Simple emotions with positive/negative categorization
+const EMOTIONS_MAP: Record<string, { name: string; score: number; isPositive: boolean }> = {
+  happy: { name: 'happy', score: 80, isPositive: true },
+  joyful: { name: 'joyful', score: 85, isPositive: true },
+  excited: { name: 'excited', score: 75, isPositive: true },
+  content: { name: 'content', score: 70, isPositive: true },
+  neutral: { name: 'neutral', score: 50, isPositive: false },
+  sad: { name: 'sad', score: 30, isPositive: false },
+  anxious: { name: 'anxious', score: 25, isPositive: false },
+  stressed: { name: 'stressed', score: 20, isPositive: false },
+  angry: { name: 'angry', score: 15, isPositive: false },
+  frustrated: { name: 'frustrated', score: 25, isPositive: false },
+  calm: { name: 'calm', score: 60, isPositive: true },
+  relaxed: { name: 'relaxed', score: 65, isPositive: true }
 };
 
-interface AnalyzeEmotionParams {
-  user_id: string;
-  emojis?: string;
-  text?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
+// Mock analyze function to simulate emotion detection
+export async function analyzeEmotion(text: string): Promise<EmotionResult> {
+  await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate processing time
+
+  // Simple analysis: check for keywords in the text
+  const emotions = Object.keys(EMOTIONS_MAP);
+  let detectedEmotion = 'neutral';
+  let maxScore = 0;
+  
+  emotions.forEach(emotion => {
+    if (text.toLowerCase().includes(emotion)) {
+      const emotionData = EMOTIONS_MAP[emotion];
+      if (emotionData.score > maxScore) {
+        detectedEmotion = emotion;
+        maxScore = emotionData.score;
+      }
+    }
+  });
+
+  const emotionData = EMOTIONS_MAP[detectedEmotion];
+  
+  // Simulate a feedback response
+  const feedback = emotionData.isPositive
+    ? `Great to see you're feeling ${detectedEmotion}! Keep up those positive emotions.`
+    : `I notice you're feeling ${detectedEmotion}. Consider trying some relaxation techniques or doing something enjoyable to lift your mood.`;
+
+  return {
+    emotion: detectedEmotion,
+    confidence: 0.7 + Math.random() * 0.2, // Random confidence between 0.7 and 0.9
+    score: emotionData.score, // Use score from emotions map
+    feedback,
+    recommendations: [
+      'Practice deep breathing for 5 minutes',
+      'Take a short walk outside',
+      'Listen to your favorite music'
+    ],
+    transcript: text,
+    primaryEmotion: {
+      name: detectedEmotion,
+      score: emotionData.score / 100
+    }
+  };
 }
 
-export const analyzeEmotion = async (params: AnalyzeEmotionParams): Promise<EmotionResult> => {
-  if (useMocks) {
-    console.log('Mocks activés: Analyse émotionnelle simulée.');
-    return mockAnalysis;
-  }
-
-  try {
-    let transcript = '';
-    if (params.audio_url) {
-      transcript = await transcribeAudio(params.audio_url);
-    }
-
-    const prompt = constructPrompt({
-      emojis: params.emojis,
-      text: params.text,
-      transcript: transcript
-    });
-
-    // Use the mock openai client
-    const response = await openai.createChatCompletion();
-
-    const analysis = parseAnalysis(response.data.choices[0].message?.content);
-    const emotionEntry = await saveEmotionEntry({
-      ...params,
-      ...analysis,
-      transcript: transcript
-    });
-
-    return {
-      ...analysis,
-      transcript: transcript,
-      id: emotionEntry.id
-    };
-
-  } catch (error: any) {
-    console.error('Erreur lors de l\'analyse émotionnelle:', error);
-    throw new Error(handleError(error));
-  }
-};
-
-// Added to be used by scanService.ts
-export const analyzeAudioStream = async (audioData: Uint8Array[]): Promise<EmotionResult> => {
-  console.log('Analyse audio simulée avec mocks');
+// Analyze audio data to determine emotion
+export async function analyzeAudioEmotion(audioData: Blob): Promise<EmotionResult> {
+  // This is a mock function since we can't actually analyze audio
+  await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing time
+  
+  // Randomly select an emotion for demonstration purposes
+  const emotions = Object.keys(EMOTIONS_MAP);
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const emotionData = EMOTIONS_MAP[randomEmotion];
+  
   return {
-    ...mockAnalysis,
-    transcript: "Transcription audio simulée",
-    id: `audio-${Date.now()}`
+    id: uuidv4(),
+    transcript: "Voici une transcription simulée de l'audio. Dans une application réelle, ce serait le texte converti de votre enregistrement.",
+    emotion: randomEmotion,
+    confidence: 0.7 + Math.random() * 0.2,
+    score: emotionData.score,
+    feedback: emotionData.isPositive
+      ? `D'après votre voix, vous semblez ${randomEmotion}. C'est une émotion positive !`
+      : `D'après votre voix, vous semblez ${randomEmotion}. Prenez un moment pour prendre soin de vous.`,
+    recommendations: [
+      'Prenez quelques respirations profondes',
+      'Buvez un verre d'eau',
+      'Écoutez votre chanson préférée'
+    ],
+    primaryEmotion: {
+      name: randomEmotion,
+      score: emotionData.score / 100
+    },
+    intensity: Math.random() * 0.7 + 0.3 // Random intensity between 0.3 and 1.0
   };
-};
+}
 
-// Added to be used by scanService.ts
-export const saveRealtimeEmotionScan = async (result: EmotionResult, userId: string): Promise<void> => {
-  console.log('Sauvegarde de scan en temps réel simulée pour utilisateur:', userId);
-  // Simulation of saving - no actual implementation needed for mock
-};
-
-const constructPrompt = (input: { emojis?: string; text?: string; transcript?: string }): string => {
-  let prompt = "Analyse l'état émotionnel de l'utilisateur basé sur les informations suivantes.\n";
-
-  if (input.emojis) {
-    prompt += `Émojis: ${input.emojis}\n`;
-  }
-  if (input.text) {
-    prompt += `Texte: ${input.text}\n`;
-  }
-  if (input.transcript) {
-    prompt += `Transcription audio: ${input.transcript}\n`;
-  }
-
-  prompt += `\nFournis une réponse JSON structurée avec les clés suivantes:
-   - emotion (string): L'émotion principale ressentie par l'utilisateur.
-   - confidence (number): Un score de confiance de 0 à 1 indiquant la certitude de l'analyse.
-   - feedback (string): Un court paragraphe donnant du feedback sur l'état émotionnel de l'utilisateur.
-   - recommendations (string[]): Une liste de recommandations pour aider l'utilisateur à gérer son état émotionnel.
-
-   Exemple de réponse:
-   \`\`\`json
-   {
-     "emotion": "joyeux",
-     "confidence": 0.85,
-     "feedback": "Vous semblez être de bonne humeur. Continuez à profiter de votre journée!",
-     "recommendations": ["Écoutez de la musique entraînante", "Passez du temps avec des amis"]
-   }
-   \`\`\`
-   `;
-
-  return prompt;
-};
-
-const parseAnalysis = (rawAnalysis: string | undefined): {
-  emotion: string;
-  confidence: number;
-  feedback: string;
-  recommendations: string[];
-} => {
-  if (!rawAnalysis) {
-    console.warn('Aucune analyse brute à parser.');
-    return mockAnalysis;
-  }
-
-  try {
-    const analysis = JSON.parse(rawAnalysis);
-    return {
-      emotion: analysis.emotion || mockAnalysis.emotion,
-      confidence: analysis.confidence !== undefined ? parseFloat(analysis.confidence) : mockAnalysis.confidence,
-      feedback: analysis.feedback || mockAnalysis.feedback,
-      recommendations: analysis.recommendations || mockAnalysis.recommendations,
-    };
-  } catch (error) {
-    console.error('Erreur lors du parsing de l\'analyse JSON:', error);
-    return mockAnalysis;
-  }
-};
-
-const transcribeAudio = async (audioUrl: string): Promise<string> => {
-  try {
-    // Simuler la transcription audio pour le moment
-    console.log('Début de la transcription audio simulée...');
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simuler un délai de traitement
-
-    const transcription = "Ceci est une transcription simulée de l'audio.";
-    console.log('Transcription simulée réussie.');
-    return transcription;
-  } catch (error) {
-    console.error('Erreur lors de la transcription audio:', error);
-    return '';
-  }
-};
-
-const saveEmotionEntry = async (params: AnalyzeEmotionParams & {
-  emotion: string;
-  confidence: number;
-  feedback: string;
-  recommendations: string[];
-  transcript: string;
-}): Promise<Emotion> => {
-  try {
-    const emotionEntry = {
-      user_id: params.user_id,
-      date: new Date().toISOString(),
-      emotion: params.emotion,
-      score: Math.round(params.confidence * 100),
-      text: params.text,
-      emojis: params.emojis || getEmotionEmoji(params.emotion),
-      ai_feedback: params.feedback,
-      confidence: params.confidence,
-      source: 'scan',
-      is_confidential: params.is_confidential,
-    };
-
-    const { data, error } = await supabase
-      .from('emotions')
-      .insert([emotionEntry])
-      .select('*')
-      .single();
-
-    if (error) {
-      throw error;
-    }
-
-    return data as Emotion;
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde de l\'entrée émotionnelle:', error);
-    throw error;
-  }
-};
-
-export const handleError = (error: unknown): string => {
-  if (error && typeof error === 'object' && 'message' in error) {
-    return (error as Error).message;
-  }
-  return 'An unknown error occurred';
+export default {
+  analyzeEmotion,
+  analyzeAudioEmotion
 };

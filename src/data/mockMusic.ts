@@ -8,36 +8,36 @@ export const mockTracks: MusicTrack[] = [
     title: 'Calm Ocean',
     artist: 'Nature Sounds',
     duration: 180,
-    coverUrl: '/images/music/ocean.jpg',
-    audioUrl: '/audio/calm-ocean.mp3',
-    emotion: 'calm'
+    cover_url: '/images/music/ocean.jpg',
+    audio_url: '/audio/calm-ocean.mp3',
+    emotion_tag: 'calm'
   },
   {
     id: '2',
     title: 'Morning Motivation',
     artist: 'Upbeat Studio',
     duration: 240,
-    coverUrl: '/images/music/morning.jpg',
-    audioUrl: '/audio/morning-motivation.mp3',
-    emotion: 'happy'
+    cover_url: '/images/music/morning.jpg',
+    audio_url: '/audio/morning-motivation.mp3',
+    emotion_tag: 'happy'
   },
   {
     id: '3',
     title: 'Deep Focus',
     artist: 'Concentration Wave',
     duration: 320,
-    coverUrl: '/images/music/focus.jpg',
-    audioUrl: '/audio/deep-focus.mp3',
-    emotion: 'focused'
+    cover_url: '/images/music/focus.jpg',
+    audio_url: '/audio/deep-focus.mp3',
+    emotion_tag: 'focused'
   },
   {
     id: '4',
     title: 'Tension Release',
     artist: 'Relax Mode',
     duration: 290,
-    coverUrl: '/images/music/release.jpg',
-    audioUrl: '/audio/tension-release.mp3',
-    emotion: 'stressed'
+    cover_url: '/images/music/release.jpg',
+    audio_url: '/audio/tension-release.mp3',
+    emotion_tag: 'stressed'
   }
 ];
 
@@ -45,30 +45,30 @@ export const mockTracks: MusicTrack[] = [
 export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '1',
-    name: 'Calming Sounds',
     title: 'Calming Sounds',
+    name: 'Calming Sounds', // For backward compatibility
     description: 'Perfect for relaxation and stress relief',
     tracks: [mockTracks[0], mockTracks[3]],
     emotion: 'calm',
-    coverUrl: '/images/playlists/calm.jpg'
+    cover_url: '/images/playlists/calm.jpg'
   },
   {
     id: '2',
-    name: 'Energy Boost',
     title: 'Energy Boost',
+    name: 'Energy Boost', // For backward compatibility
     description: 'Get motivated and energized',
     tracks: [mockTracks[1]],
     emotion: 'happy',
-    coverUrl: '/images/playlists/energy.jpg'
+    cover_url: '/images/playlists/energy.jpg'
   },
   {
     id: '3',
-    name: 'Work Concentration',
     title: 'Work Concentration',
+    name: 'Work Concentration', // For backward compatibility
     description: 'Enhance your focus and productivity',
     tracks: [mockTracks[2]],
     emotion: 'focused',
-    coverUrl: '/images/playlists/focus.jpg'
+    cover_url: '/images/playlists/focus.jpg'
   }
 ];
 

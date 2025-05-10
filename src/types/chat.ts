@@ -44,3 +44,13 @@ export interface ChatContext {
   addMessage: (message: Omit<ChatMessage, 'id'>) => void;
   clearMessages: () => void;
 }
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message: string;
+  data?: {
+    email?: string;
+    role?: string;
+    token?: string;
+  }
+}

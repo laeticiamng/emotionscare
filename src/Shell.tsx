@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import MusicDrawer from '@/components/music/player/MusicDrawer'
@@ -204,7 +205,7 @@ const Shell: React.FC = () => {
 
       {/* Music Drawer */}
       <MusicDrawer 
-        isOpen={musicDrawerOpen} 
+        open={musicDrawerOpen} 
         onOpenChange={setMusicDrawerOpen}
       />
 

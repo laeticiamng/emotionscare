@@ -11,6 +11,13 @@ export interface MusicTrack {
   emotion_tag?: string;
   intensity?: number;
   externalUrl?: string;
+  
+  // Add backward compatibility aliases
+  coverUrl?: string;
+  cover?: string;
+  audioUrl?: string;
+  url?: string;
+  mood?: string;
 }
 
 export interface MusicPlaylist {
@@ -20,6 +27,10 @@ export interface MusicPlaylist {
   emotion?: string;
   tracks: MusicTrack[];
   cover_url?: string;
+  
+  // Backward compatibility
+  name?: string;
+  coverUrl?: string;
 }
 
 export interface MusicRecommendationCardProps {
@@ -30,6 +41,36 @@ export interface MusicRecommendationCardProps {
 }
 
 export interface MusicDrawerProps {
+  // Standard property
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  
+  // For backward compatibility
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+// Define MusicContextType for MusicContext
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  setCurrentTrack: (track: MusicTrack | null) => void;
+  
+  // Additional properties used in the context
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
+  currentPlaylist?: MusicPlaylist | null;
+  playlists?: MusicPlaylist[];
+  loadPlaylistForEmotion?: (emotion: string) => MusicPlaylist | null;
+  loadPlaylistById?: (id: string) => MusicPlaylist | null;
+  getTracksForEmotion?: (emotion: string) => MusicTrack[];
+  currentEmotion?: string;
+  initializeMusicSystem?: () => Promise<void>;
+  error?: Error | null;
 }

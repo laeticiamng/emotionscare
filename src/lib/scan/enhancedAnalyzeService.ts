@@ -1,132 +1,117 @@
 
-import { Emotion, EmotionResult } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
-import { createFallbackEmotion } from '@/mocks/aiFallback';
+import { v4 as uuidv4 } from 'uuid';
+import { EmotionResult, EnhancedEmotionResult } from '@/types';
+import { analyzeEmotion, analyzeAudioEmotion } from './analyzeService';
 
-export interface EnhancedEmotionResult extends EmotionResult {
-  confidence: number;
-  recommendations: string[];
-}
-
-/**
- * Service amélioré pour l'analyse émotionnelle
- */
-export const enhancedEmotionalAnalysis = async (
-  userId: string,
-  text?: string,
-  emojis?: string,
-  audioUrl?: string,
-  userContext?: {
-    recent_emotions?: string;
-    emotional_trend?: string;
-    job_role?: string;
-  }
-): Promise<EnhancedEmotionResult> => {
-  try {
-    console.log('Analyzing emotion with enhanced service for user:', userId);
-    
-    // Appel à la fonction Edge améliorée pour l'analyse émotionnelle
-    const { data, error } = await supabase.functions.invoke('enhanced-emotion-analyze', {
-      body: {
-        text,
-        emojis,
-        audio_url: audioUrl,
-        user_id: userId,
-        user_context: userContext
-      }
-    });
-
-    if (error) {
-      console.error('Error calling enhanced-emotion-analyze function:', error);
-      throw error;
-    }
-
-    console.log('Enhanced emotion analysis result:', data);
-    
-    // Convertir la réponse au format EnhancedEmotionResult
-    const result: EnhancedEmotionResult = {
-      emotion: data.emotion || 'neutral',
-      confidence: data.confidence || 0.5,
-      feedback: data.feedback || '',
-      recommendations: Array.isArray(data.recommendations) ? data.recommendations : [],
-      transcript: text
-    };
-
-    // Enregistrer l'émotion analysée dans la base de données
-    await saveEnhancedEmotionToDatabase(userId, result, text, emojis, audioUrl);
-
-    return result;
-  } catch (error) {
-    console.error('Error in enhancedEmotionalAnalysis:', error);
-    
-    // En cas d'erreur, utiliser un résultat par défaut
-    return {
-      emotion: 'neutral',
-      confidence: 0.5,
-      feedback: 'Une erreur est survenue lors de l\'analyse. Veuillez réessayer plus tard.',
-      recommendations: [
-        'Prenez quelques respirations profondes',
-        'Hydratez-vous',
-        'Faites une courte pause'
-      ],
-      transcript: text
-    };
-  }
+// Emotion to color mapping
+const EMOTION_COLORS: Record<string, string> = {
+  happy: '#FFD700', // Gold
+  joyful: '#FFA500', // Orange
+  excited: '#FF4500', // OrangeRed
+  content: '#90EE90', // LightGreen
+  neutral: '#A9A9A9', // DarkGray
+  sad: '#6495ED', // CornflowerBlue
+  anxious: '#DA70D6', // Orchid
+  stressed: '#FF6347', // Tomato
+  angry: '#DC143C', // Crimson
+  frustrated: '#FF4500', // OrangeRed
+  calm: '#87CEEB', // SkyBlue
+  relaxed: '#98FB98', // PaleGreen
 };
 
-/**
- * Sauvegarder l'émotion analysée dans la base de données
- */
-async function saveEnhancedEmotionToDatabase(
-  userId: string,
-  result: EnhancedEmotionResult,
-  text?: string,
-  emojis?: string,
-  audioUrl?: string
-): Promise<void> {
-  try {
-    const emotionData = {
-      user_id: userId,
-      date: new Date().toISOString(),
-      emotion: result.emotion,
-      score: calculateScoreFromEmotion(result.emotion),
-      text,
-      emojis,
-      audio_url: audioUrl,
-      ai_feedback: result.feedback,
-      confidence: result.confidence,
-      recommendations: result.recommendations,
-      source: 'enhanced_api'
-    };
+// Improvement tips by emotion
+const EMOTION_TIPS: Record<string, string[]> = {
+  happy: ['Share your joy with someone', 'Express gratitude', 'Document this feeling'],
+  joyful: ['Savor this moment', 'Keep a joy journal', 'Share your happiness'],
+  excited: ['Channel this energy into something creative', 'Share your excitement', 'Set new goals'],
+  content: ['Practice mindfulness', 'Enjoy the peace', 'Reflect on what's working well'],
+  neutral: ['Try something new', 'Connect with nature', 'Engage in a hobby'],
+  sad: ['Reach out to someone', 'Practice self-compassion', 'Allow yourself to feel'],
+  anxious: ['Practice deep breathing', 'List your worries then reframe them', 'Move your body'],
+  stressed: ['Take a break', 'Prioritize your tasks', 'Practice progressive muscle relaxation'],
+  angry: ['Count to ten before reacting', 'Express your feelings appropriately', 'Find physical outlet'],
+  frustrated: ['Take a step back', 'Break problems into smaller parts', 'Ask for help if needed'],
+  calm: ['Continue mindfulness practices', 'Establish regular meditation', 'Notice what brings you peace'],
+  relaxed: ['Appreciate this state', 'Create more moments like this', 'Share relaxing activities with others']
+};
 
-    const { error } = await supabase
-      .from('emotions')
-      .insert(emotionData);
-
-    if (error) {
-      console.error('Error saving enhanced emotion to database:', error);
-    }
-  } catch (error) {
-    console.error('Error in saveEnhancedEmotionToDatabase:', error);
-  }
-}
-
-/**
- * Calculer un score basé sur l'émotion
- */
-function calculateScoreFromEmotion(emotion: string): number {
-  const emotionScores: Record<string, number> = {
-    happy: 85,
-    calm: 70,
-    focused: 75,
-    anxious: 35,
-    sad: 25,
-    angry: 20,
-    frustrated: 30,
-    tired: 40,
-    energetic: 80,
-    neutral: 50
+// Analyze text with enhanced results
+export async function analyzeEmotionEnhanced(text: string): Promise<EnhancedEmotionResult> {
+  // First get the basic emotion analysis
+  const basicResult = await analyzeEmotion(text);
+  
+  // Then enhance it with additional information
+  const enhanced: EnhancedEmotionResult = {
+    ...basicResult,
+    description: getEmotionDescription(basicResult.emotion),
+    color: getEmotionColor(basicResult.emotion),
+    improvement_tips: getImprovementTips(basicResult.emotion),
+    score: basicResult.score || 50, // Ensure score is set
+    feedback: basicResult.feedback,
+    recommendations: basicResult.recommendations
   };
-
-  return emotionScores[emotion.toLowerCase()] || 50;
+  
+  return enhanced;
 }
+
+// Analyze audio with enhanced results
+export async function analyzeAudioEmotionEnhanced(audioData: Blob): Promise<EnhancedEmotionResult> {
+  // First get the basic audio emotion analysis
+  const basicResult = await analyzeAudioEmotion(audioData);
+  
+  // Then enhance it with additional information
+  const enhanced: EnhancedEmotionResult = {
+    ...basicResult,
+    description: getEmotionDescription(basicResult.emotion),
+    color: getEmotionColor(basicResult.emotion),
+    improvement_tips: getImprovementTips(basicResult.emotion),
+    score: basicResult.score || 50, // Ensure score is set
+    feedback: basicResult.feedback,
+    recommendations: basicResult.recommendations,
+    transcript: basicResult.transcript
+  };
+  
+  return enhanced;
+}
+
+// Helper function to get emotion description
+function getEmotionDescription(emotion: string): string {
+  const descriptions: Record<string, string> = {
+    happy: "Happiness is a state of well-being characterized by emotions ranging from contentment to intense joy.",
+    joyful: "Joy is a feeling of great pleasure and happiness that comes from success or good fortune.",
+    excited: "Excitement is a feeling of great enthusiasm and eagerness.",
+    content: "Contentment is a state of satisfaction and ease.",
+    neutral: "A neutral emotional state is balanced, neither particularly positive nor negative.",
+    sad: "Sadness is an emotional pain associated with feelings of disadvantage, loss, helplessness, and sorrow.",
+    anxious: "Anxiety is characterized by feelings of tension, worried thoughts and physical changes.",
+    stressed: "Stress is your body's reaction to pressure from a certain situation or event.",
+    angry: "Anger is a strong feeling of annoyance, displeasure, or hostility.",
+    frustrated: "Frustration is the feeling of being upset or annoyed as a result of being unable to achieve something.",
+    calm: "Calmness is the state of being free from agitation or disturbance.",
+    relaxed: "Being relaxed means being free from tension and anxiety."
+  };
+  
+  return descriptions[emotion] || "This emotion reflects your current state of mind.";
+}
+
+// Helper function to get color associated with an emotion
+function getEmotionColor(emotion: string): string {
+  return EMOTION_COLORS[emotion] || '#A9A9A9'; // Default to dark gray if not found
+}
+
+// Helper function to get improvement tips for an emotion
+function getImprovementTips(emotion: string): string[] {
+  return EMOTION_TIPS[emotion] || [
+    'Practice mindfulness',
+    'Connect with others',
+    'Engage in physical activity'
+  ];
+}
+
+export default {
+  analyzeEmotionEnhanced,
+  analyzeAudioEmotionEnhanced,
+  getEmotionColor,
+  getEmotionDescription,
+  getImprovementTips
+};

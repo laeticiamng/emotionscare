@@ -8,6 +8,7 @@ export const mockEmotions: Emotion[] = [
     user_id: 'user-1',
     date: '2023-04-10T09:00:00Z',
     emotion: 'happy',
+    dominant_emotion: 'happy',
     confidence: 0.85,
     intensity: 0.7,
     emojis: '😊😄🙂', // Changed from array to string to match the type
@@ -19,6 +20,7 @@ export const mockEmotions: Emotion[] = [
     user_id: 'user-1',
     date: '2023-04-11T15:30:00Z',
     emotion: 'stressed',
+    dominant_emotion: 'stressed',
     confidence: 0.9,
     intensity: 0.6,
     emojis: '😓😖😣', // Changed from array to string to match the type
@@ -30,6 +32,7 @@ export const mockEmotions: Emotion[] = [
     user_id: 'user-1',
     date: '2023-04-12T10:15:00Z',
     emotion: 'calm',
+    dominant_emotion: 'calm',
     confidence: 0.75,
     intensity: 0.5,
     emojis: '😌🧘🌿', // Changed from array to string to match the type
@@ -41,6 +44,7 @@ export const mockEmotions: Emotion[] = [
     user_id: 'user-1',
     date: '2023-04-13T18:45:00Z',
     emotion: 'tired',
+    dominant_emotion: 'tired',
     confidence: 0.8,
     intensity: 0.6,
     emojis: '😴🥱💤', // Changed from array to string to match the type

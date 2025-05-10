@@ -1,93 +1,74 @@
 
 import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useToast } from '@/hooks/use-toast';
 import { ChatMessage, ChatResponse, ChatContext } from '@/types/chat';
+import { getChatResponse } from '@/services/chatService';
 
-export function useChat(): ChatContext {
+export const useChat = (conversationId: string = ''): ChatContext => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  // Add a message to the chat
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
   const addMessage = useCallback((message: Omit<ChatMessage, 'id'>) => {
-    setMessages(prevMessages => [
-      ...prevMessages,
-      {
-        id: uuidv4(),
-        ...message
-      }
-    ]);
+    const newMessage: ChatMessage = {
+      ...message,
+      id: uuidv4(),
+    };
+    setMessages((prev) => [...prev, newMessage]);
+    return newMessage;
   }, []);
-
-  // Clear all messages
+  
+  const handleSend = useCallback(
+    async (message: string): Promise<ChatResponse> => {
+      try {
+        setIsLoading(true);
+        
+        // Add user message to the chat
+        addMessage({
+          sender: 'user',
+          sender_id: 'user-1',
+          conversation_id: conversationId,
+          text: message,
+          content: message,
+          is_read: true,
+          timestamp: new Date(),
+        });
+        
+        // Get response from the chat API
+        const response = await getChatResponse(message);
+        
+        // Add bot message to the chat
+        addMessage({
+          sender: 'bot',
+          sender_id: 'bot-1',
+          conversation_id: conversationId,
+          text: response.message,
+          content: response.message,
+          is_read: true,
+          timestamp: new Date(),
+        });
+        
+        return response;
+      } catch (error) {
+        console.error('Error sending message:', error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [conversationId, addMessage]
+  );
+  
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
-
-  // Send a message and get a response
-  const handleSend = useCallback(async (message: string): Promise<ChatResponse> => {
-    setIsLoading(true);
-    
-    // Add user message
-    addMessage({
-      sender: 'user',
-      sender_id: 'user-1',
-      conversation_id: 'conversation-1',
-      text: message,
-      content: message,
-      is_read: true,
-      timestamp: new Date()
-    });
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const response: ChatResponse = {
-        message: "Voici une réponse simulée du coach IA.",
-        emotion: "neutral",
-        confidence: 0.9,
-        text: "Voici une réponse simulée du coach IA.",
-        follow_up_questions: [
-          "Comment vous sentez-vous aujourd'hui ?",
-          "Avez-vous pratiqué une activité relaxante récemment ?"
-        ]
-      };
-      
-      // Add AI response
-      addMessage({
-        sender: 'bot',
-        sender_id: 'coach-ai',
-        conversation_id: 'conversation-1',
-        text: response.message,
-        content: response.message,
-        is_read: true,
-        timestamp: new Date()
-      });
-      
-      return response;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'obtenir une réponse du coach IA.",
-        variant: "destructive"
-      });
-      
-      return {
-        message: "Désolé, une erreur s'est produite."
-      };
-    } finally {
-      setIsLoading(false);
-    }
-  }, [addMessage, toast]);
-
+  
   return {
     messages,
     isLoading,
     handleSend,
     addMessage,
-    clearMessages
+    clearMessages,
   };
-}
+};
+
+export default useChat;
