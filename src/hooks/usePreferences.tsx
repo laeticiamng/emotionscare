@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserPreferences, UserPreferencesState } from '@/types';
 
-export function usePreferences(): UserPreferencesState {
+export const usePreferences = (): UserPreferencesState => {
   const { user, updateUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -11,22 +11,25 @@ export function usePreferences(): UserPreferencesState {
   // Get preferences from user or set defaults
   const defaultPreferences: UserPreferences = {
     theme: 'light',
-    notifications: {
-      email: false,
-      push: false
-    },
-    language: 'fr',
     fontSize: 'medium',
+    language: 'fr',
+    notifications: true,
     autoplayVideos: true,
     showEmotionPrompts: true,
     privacyLevel: 'medium',
-    dataCollection: true
+    dataCollection: true,
+    notifications_enabled: true,
+    email_notifications: true,
+    push_notifications: true,
+    emotionalCamouflage: false,
+    aiSuggestions: false,
+    fullAnonymity: false
   };
 
   const preferences = user?.preferences || defaultPreferences;
 
-  const updatePreferences = useCallback(async (newPrefs: Partial<UserPreferences>) => {
-    if (!user) return;
+  const updatePreferences = useCallback(async (newPrefs: Partial<UserPreferences>): Promise<boolean> => {
+    if (!user) return false;
     
     setIsLoading(true);
     setError(null);
@@ -41,42 +44,41 @@ export function usePreferences(): UserPreferencesState {
         ...user,
         preferences: updatedPreferences
       });
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update preferences');
       console.error('Error updating preferences:', err);
+      return false;
     } finally {
       setIsLoading(false);
     }
   }, [user, preferences, updateUser]);
 
-  const resetPreferences = useCallback(async () => {
+  const resetPreferences = useCallback(() => {
     if (!user) return;
     
     setIsLoading(true);
     setError(null);
     
     try {
-      await updateUser({
-        ...user,
-        preferences: defaultPreferences
-      });
+      updatePreferences(defaultPreferences);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reset preferences');
       console.error('Error resetting preferences:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [user, updateUser]);
+  }, [user, updatePreferences, defaultPreferences]);
 
   // Derive legacy properties for backward compatibility
   const theme = preferences.theme;
-  const fontSize = preferences.fontSize || preferences.font_size;
-  const notifications_enabled = preferences.notifications_enabled;
-  const notification_frequency = preferences.notificationFrequency;
-  const notification_type = preferences.notificationType;
-  const notification_tone = preferences.notificationTone;
-  const email_notifications = preferences.notifications?.email;
-  const push_notifications = preferences.notifications?.push;
+  const fontSize = preferences.fontSize;
+  const notifications_enabled = preferences.notifications_enabled || preferences.notifications;
+  const notification_frequency = preferences.notification_frequency || preferences.notificationFrequency;
+  const notification_type = preferences.notification_type || preferences.notificationType;
+  const notification_tone = preferences.notification_tone || preferences.notificationTone;
+  const email_notifications = preferences.email_notifications;
+  const push_notifications = preferences.push_notifications;
   const emotionalCamouflage = preferences.emotionalCamouflage;
 
   return {
@@ -95,6 +97,6 @@ export function usePreferences(): UserPreferencesState {
     push_notifications,
     emotionalCamouflage
   };
-}
+};
 
 export default usePreferences;

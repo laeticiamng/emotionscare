@@ -5,30 +5,34 @@ import { User } from '@/types';
 export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
-  isInitializing: boolean;
+  isLoading: boolean; // Ajout de isLoading explicitement dans le type
   login: (credentials: { email: string; password: string; isAdmin?: boolean }) => Promise<boolean>;
   register: (userData: { email: string; password: string; name: string }) => Promise<boolean>;
   logout: () => Promise<void>;
   updateUser: (user: User) => Promise<User>;
-  signOut: () => Promise<void>; // Ajouté pour compatibilité
+  signOut: () => Promise<void>; // Ajout de signOut pour compatibilité
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  isInitializing: true,
+  isLoading: true, // Ajout de isLoading avec sa valeur par défaut
   login: async () => false,
   register: async () => false,
   logout: async () => {},
   updateUser: async (user) => user,
-  signOut: async () => {}, // Ajouté pour compatibilité
+  signOut: async () => {}, // Ajout de signOut pour compatibilité
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     // Simuler la vérification de l'authentification au chargement
@@ -43,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error) {
         console.error('Auth initialization error:', error);
       } finally {
-        setIsInitializing(false);
+        setIsLoading(false);
       }
     };
     
@@ -53,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async ({ email, password, isAdmin = false }: { email: string; password: string; isAdmin?: boolean }) => {
     // Simulation d'un appel API pour la connexion
     try {
+      setIsLoading(true);
       // Simulation delay
       await new Promise(resolve => setTimeout(resolve, 800));
       
@@ -79,12 +84,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Login error:', error);
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
   
   const register = async ({ email, password, name }: { email: string; password: string; name: string }) => {
     // Simulation d'un appel API pour l'inscription
     try {
+      setIsLoading(true);
       // Simulation delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -110,6 +118,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Register error:', error);
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -124,6 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const updateUser = async (updatedUser: User): Promise<User> => {
     try {
+      setIsLoading(true);
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
@@ -135,6 +146,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error('Update user error:', error);
       throw new Error('Failed to update user');
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -143,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{ 
         user, 
         isAuthenticated: !!user, 
-        isInitializing,
+        isLoading,
         login,
         register,
         logout,
@@ -156,4 +169,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export default AuthContext;
+export default AuthProvider;

@@ -21,7 +21,6 @@ const UserPreferencesPage: React.FC = () => {
     showEmotionPrompts: true,
     privacyLevel: 'standard',
     dataCollection: true,
-    font_size: 'medium',
     notifications_enabled: true,
   });
 
@@ -43,7 +42,6 @@ const UserPreferencesPage: React.FC = () => {
           preferences: {
             ...preferences,
             // Assurer la compatibilité entre les deux formats
-            font_size: preferences.fontSize,
             notifications_enabled: preferences.notifications,
           }
         });

@@ -20,10 +20,9 @@ type ThemeOption = 'light' | 'dark' | 'pastel';
 const preferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'pastel']),
   notifications_enabled: z.boolean(),
-  font_size: z.enum(['small', 'medium', 'large']),
-  language: z.string(),
   fontSize: z.enum(['small', 'medium', 'large']),
-  notifications: z.boolean(),
+  language: z.string(),
+  notifications: z.boolean().optional(),
   autoplayVideos: z.boolean().optional(),
   showEmotionPrompts: z.boolean().optional(),
   privacyLevel: z.string().optional(),
@@ -36,14 +35,13 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
   // Assurer la présence de tous les champs requis
   const defaultValues: UserPreferences = {
     theme: preferences.theme || 'light',
-    fontSize: preferences.fontSize || preferences.font_size || 'medium',
+    fontSize: preferences.fontSize || 'medium',
     language: preferences.language || 'fr',
     notifications: preferences.notifications || preferences.notifications_enabled || false,
     autoplayVideos: preferences.autoplayVideos || false,
     showEmotionPrompts: preferences.showEmotionPrompts || true,
     privacyLevel: preferences.privacyLevel || 'standard',
     dataCollection: preferences.dataCollection || true,
-    font_size: preferences.font_size || preferences.fontSize || 'medium',
     notifications_enabled: preferences.notifications_enabled || preferences.notifications || false,
   };
 

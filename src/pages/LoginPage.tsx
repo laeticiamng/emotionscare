@@ -1,62 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
-const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [remember, setRemember] = useState(false);
+const formSchema = z.object({
+  email: z.string().email('Email invalide'),
+  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
+});
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
+
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
 
-  // Extract redirect URL from query parameters
-  const redirectTo = new URLSearchParams(location.search).get("redirect");
-  const isAdmin = location.pathname.includes('admin');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-  useEffect(() => {
-    document.title = "Connexion - EmotionsCare";
-  }, []);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Changement de l'appel à login pour n'utiliser qu'un seul argument
       const success = await login({
-        email,
-        password,
-        remember
+        email: data.email,
+        password: data.password,
+        isAdmin: false
       });
 
       if (success) {
         toast({
           title: "Connexion réussie",
-          description: "Vous êtes maintenant connecté à votre compte.",
+          description: "Vous êtes maintenant connecté.",
         });
-        
-        if (redirectTo) {
-          navigate(redirectTo);
-        } else {
-          navigate(isAdmin ? '/admin' : '/dashboard');
-        }
+        navigate('/dashboard');
       } else {
         setError("Échec de la connexion. Veuillez vérifier vos informations d'identification.");
       }
@@ -69,99 +77,74 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <img src="/logo.svg" alt="EmotionsCare Logo" className="h-8 w-auto mr-2" />
-          EmotionsCare
-        </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              "La plus grande découverte de tous les temps est qu'une personne peut changer son avenir simplement en changeant son attitude."
-            </p>
-            <footer className="text-sm">Oprah Winfrey</footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold">
-              {isAdmin ? "Connexion Administrateur" : "Connexion"}
-            </h1>
-            <p className="text-muted-foreground">
-              Entrez vos identifiants pour accéder à votre compte
-            </p>
-          </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl">Connexion</CardTitle>
+          <CardDescription>
+            Connectez-vous à votre compte pour accéder à votre tableau de bord
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <CardContent className="space-y-4">
+            {error && (
+              <div className="p-3 rounded-md bg-red-50 text-red-800 border border-red-200">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                placeholder="exemple@email.com"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                placeholder="utilisateur@example.com"
+                {...register('email')}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  placeholder="********"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Mot de passe</Label>
                 <Button
+                  variant="link"
+                  className="h-auto p-0 text-sm"
                   type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2"
-                  onClick={togglePasswordVisibility}
+                  onClick={() => navigate('/forgot-password')}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">Afficher le mot de passe</span>
+                  Mot de passe oublié?
                 </Button>
               </div>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                {...register('password')}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password.message}</p>
+              )}
             </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={remember}
-                  onCheckedChange={(checked) => setRemember(!!checked)}
-                />
-                <Label htmlFor="remember">Se souvenir de moi</Label>
-              </div>
-              <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary">
-                Mot de passe oublié?
-              </Link>
-            </div>
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
-            <Button disabled={isLoading} className="w-full" type="submit">
-              {isLoading ? "Connexion..." : "Se connecter"}
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Connexion...' : 'Se connecter'}
             </Button>
-          </form>
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            Pas de compte?{" "}
-            <Link to="/register" className="hover:text-primary underline underline-offset-4">
-              Créer un compte
-            </Link>
-          </p>
-        </div>
-      </div>
+            <div className="text-center text-sm">
+              Vous n'avez pas de compte?{' '}
+              <Button
+                variant="link"
+                className="h-auto p-0"
+                type="button"
+                onClick={() => navigate('/register')}
+              >
+                S'inscrire
+              </Button>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
     </div>
   );
 };

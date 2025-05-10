@@ -31,6 +31,10 @@ export interface UserPreferences {
   privacyLevel?: string;
   dataCollection?: boolean;
   notificationsEnabled?: boolean;
+  // Champs pour la compatibilité
+  notificationFrequency?: string;
+  notificationType?: string;
+  notificationTone?: string;
 }
 
 export interface UserPreferencesState {

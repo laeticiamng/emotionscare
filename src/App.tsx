@@ -8,7 +8,7 @@ import UserPreferencesPage from './pages/UserPreferences';
 import Shell from './components/Shell';
 import ScanPage from './pages/ScanPage';
 import AdminLoginPage from './pages/AdminLoginPage';
-import AuthProvider from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Index from './pages/Index';
 
 function App() {
