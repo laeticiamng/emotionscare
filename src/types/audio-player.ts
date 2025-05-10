@@ -16,25 +16,60 @@ export interface AudioPlayerControls {
   toggleMute: () => void;
 }
 
-// Add the missing UseAudioPlayerStateReturn interface
+// Corrected UseAudioPlayerStateReturn interface
 export interface UseAudioPlayerStateReturn {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  state: AudioPlayerState;
-  controls: AudioPlayerControls;
-  timeFormatted: {
-    currentTime: string;
-    duration: string;
-  };
-  currentTrack?: any;
-  isPlaying?: boolean;
-  currentTime?: number;
-  duration?: number;
-  repeat?: boolean;
-  shuffle?: boolean;
-  loadingTrack?: boolean;
-  volume?: number;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
+  currentTrack: any;
+  isPlaying: boolean;
+  volume: number;
+  repeat: boolean;
+  shuffle: boolean;
+  progress: number;
+  currentTime: number;
+  duration: number;
+  loadingTrack: boolean;
+  error: Error | null;
+  setCurrentTrack: (track: any) => void;
+  setIsPlaying: (isPlaying: boolean) => void;
+  setVolume: (volume: number) => void;
+  setRepeat: (repeat: boolean) => void;
+  setShuffle: (shuffle: boolean) => void;
+  setProgress: (progress: number) => void;
+  setCurrentTime: (currentTime: number) => void;
+  setDuration: (duration: number) => void;
+  setLoadingTrack: (loadingTrack: boolean) => void;
+  setError: (error: Error | null) => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+}
+
+// Add UseAudioPlayerReturn interface
+export interface UseAudioPlayerReturn {
+  currentTrack: any;
+  isPlaying: boolean;
+  volume: number;
+  repeat: boolean;
+  shuffle: boolean;
+  progress: number;
+  duration: number;
+  loading: boolean;
+  error: Error | null;
+  currentTime: number;
+  loadingTrack: boolean;
+  
+  playTrack: (track: any) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  
+  seekTo: (seconds: number) => void;
+  setVolume: (volume: number) => void;
+  setCurrentTrack: (track: any) => void;
+  formatTime: (seconds: number) => string;
+  handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleVolumeChange: (values: number[]) => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
 }
 
 // Add types for the music controls hook

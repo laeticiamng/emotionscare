@@ -23,6 +23,7 @@ export interface VRSession {
   heart_rate_before?: number; // Add this property
   heart_rate_after?: number; // Add this property
   mood_before?: string; // Add this property
+  theme?: string; // Add this property
 }
 
 export interface VRSessionTemplate {
@@ -42,6 +43,7 @@ export interface VRSessionTemplate {
   emotion_target?: string;
   template_id?: string;
   theme?: string;
+  emotions?: string[]; // Add this property for UserDashboardSections
   completion_rate?: number;
   recommended_mood?: string;
 }

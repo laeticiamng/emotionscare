@@ -1,79 +1,95 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface UseAutoRefreshOptions {
-  interval?: number; // in milliseconds
-  enabled?: boolean;
-  onRefresh?: () => Promise<any>;
-  immediate?: boolean;
+  onRefresh: () => Promise<any>;
+  defaultEnabled?: boolean;
+  defaultInterval?: number;
+}
+
+interface UseAutoRefreshResult {
+  enabled: boolean;
+  interval: number;
+  refreshing: boolean;
+  lastRefreshed: Date;
+  error: Error | null;
+  toggleAutoRefresh: () => void;
+  changeInterval: (newInterval: number) => void;
+  refresh: () => Promise<any>;
+  setEnabled: (value: boolean) => void;
+  isRefreshing: boolean;
 }
 
 export function useAutoRefresh({
-  interval = 60000, // default 1 minute
-  enabled = true,
   onRefresh,
-  immediate = false,
-}: UseAutoRefreshOptions = {}) {
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  defaultEnabled = false,
+  defaultInterval = 60000, // 1 minute
+}: UseAutoRefreshOptions): UseAutoRefreshResult {
+  const [enabled, setEnabled] = useState<boolean>(defaultEnabled);
+  const [interval, setInterval] = useState<number>(defaultInterval);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
   const [error, setError] = useState<Error | null>(null);
   
-  // Use a ref to keep track of the timer
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
+  // Function to refresh data
   const refresh = useCallback(async () => {
-    if (isRefreshing || !onRefresh) return;
-    
-    setIsRefreshing(true);
-    setError(null);
+    if (refreshing) return;
     
     try {
+      setRefreshing(true);
+      setError(null);
       await onRefresh();
       setLastRefreshed(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error during refresh'));
-      console.error('Error during auto-refresh:', err);
+      setError(err instanceof Error ? err : new Error('An error occurred'));
+      console.error('Auto refresh error:', err);
     } finally {
-      setIsRefreshing(false);
+      setRefreshing(false);
     }
-  }, [isRefreshing, onRefresh]);
+  }, [onRefresh, refreshing]);
   
-  // Start or stop the auto-refresh timer
+  // Toggle auto refresh feature
+  const toggleAutoRefresh = useCallback(() => {
+    setEnabled(prev => !prev);
+  }, []);
+  
+  // Change interval duration
+  const changeInterval = useCallback((newInterval: number) => {
+    setInterval(newInterval);
+  }, []);
+  
+  // Set up or clear the timer when enabled or interval changes
   useEffect(() => {
-    // Clear any existing timer
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
     
-    // If enabled, start a new timer
-    if (enabled && interval > 0) {
-      // Run immediately if requested
-      if (immediate) {
-        refresh();
-      }
-      
-      // Set up the interval
-      timerRef.current = setInterval(() => {
-        refresh();
-      }, interval);
+    if (enabled) {
+      timerRef.current = setInterval(refresh, interval);
     }
     
-    // Clean up on unmount
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     };
-  }, [enabled, interval, refresh, immediate]);
+  }, [enabled, interval, refresh]);
   
   return {
-    isRefreshing,
+    enabled,
+    interval,
+    refreshing,
     lastRefreshed,
     error,
+    toggleAutoRefresh,
+    changeInterval,
     refresh,
-    setEnabled: (value: boolean) => {
-      // This would need to be implemented with additional state if needed
-    }
+    setEnabled,
+    isRefreshing: refreshing,
   };
 }
 

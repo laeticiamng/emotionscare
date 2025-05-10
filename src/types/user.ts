@@ -3,7 +3,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  role: UserRole | string;
   avatar?: string;
   avatar_url?: string;
   image?: string;
@@ -18,7 +18,7 @@ export interface User {
   preferences?: UserPreferences;
 }
 
-// UserRole as an enum so it can be used as a value
+// UserRole comme enum
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',

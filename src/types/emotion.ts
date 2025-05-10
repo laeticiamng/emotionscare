@@ -19,11 +19,19 @@ export interface EmotionResult {
   intensity?: number;
   confidence?: number;
   score?: number;
+  primaryEmotion?: {
+    name: string;
+    confidence: number;
+  };
+  id?: string;
+  user_id?: string;
+  ai_feedback?: string;
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
+  className?: string; // Add className property
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

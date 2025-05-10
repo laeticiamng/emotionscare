@@ -2,7 +2,7 @@
 // Create this file if it doesn't exist
 export interface ChatMessage {
   id: string;
-  text: string;
+  text?: string;
   sender: string;
   timestamp: Date | string;
   
@@ -64,7 +64,13 @@ export interface ChatContext {
 
 // Add UserContext interface
 export interface UserContext {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   preferences?: Record<string, any>;
+  recentEmotions?: string[];
+  recentActivities?: string[];
+  userHistory?: {
+    lastInteraction?: string;
+    frequentTopics?: string[];
+  };
 }

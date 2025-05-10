@@ -54,14 +54,18 @@ export interface MusicContextType {
 // Define MusicRecommendationCardProps interface
 export interface MusicRecommendationCardProps {
   emotion: string;
-  tracks: MusicTrack[];
-  onTrackSelect: (track: MusicTrack) => void;
+  tracks?: MusicTrack[];
+  onTrackSelect?: (track: MusicTrack) => void;
   isLoading?: boolean;
+  intensity?: number;
+  standalone?: boolean;
 }
 
 // Define MusicDrawerProps interface
 export interface MusicDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  open?: boolean;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
 }

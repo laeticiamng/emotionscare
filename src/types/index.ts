@@ -20,6 +20,7 @@ export * from './group';
 export * from './vr-session-music';
 export * from './notification';
 export * from './preferences';
+export * from './report';
 
 // Basic shared types
 export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
@@ -31,7 +32,7 @@ export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
 export { UserRole } from './user';
 export { EmotionalTeamViewProps, EnhancedEmotionResult } from './emotion';
 export { Emotion, EmotionResult } from './emotion';
-export { ChatMessage, ChatConversation } from './chat';
+export { ChatMessage, ChatConversation, ChatResponse, ChatContext } from './chat';
 export { JournalEntry } from './journal';
 export { MoodData } from './mood';
 export { VRSession, VRSessionTemplate, VRSessionWithMusicProps } from './vr';
@@ -42,3 +43,5 @@ export { User, UserPreferences, UserPreferencesState } from './user';
 export { NotificationFrequency, NotificationType, NotificationTone } from './notification';
 export { ProgressBarProps } from './progress-bar';
 export { TrackInfoProps, VolumeControlProps } from './track-info';
+export { Report } from './report';
+export { UseAudioPlayerReturn, UseAudioPlayerStateReturn } from './audio-player';
