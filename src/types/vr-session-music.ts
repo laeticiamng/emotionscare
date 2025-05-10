@@ -1,15 +1,13 @@
 
-import { VRSession, VRSessionTemplate } from './vr';
+import { VRSessionTemplate } from './vr';
 import { MusicTrack } from './music';
 
-export interface VRSessionWithMusic extends VRSession {
-  music_track_id?: string;
-  music_track?: MusicTrack;
-}
-
-export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
-  onComplete?: (session: VRSession) => void;
-  onExit?: () => void;
-  initialTrack?: MusicTrack;
+export interface VRSessionMusic {
+  id: string;
+  session_id: string;
+  track_id: string;
+  played_at: string | Date;
+  duration: number;
+  user_id: string;
+  track_data?: MusicTrack;
 }

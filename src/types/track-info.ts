@@ -2,21 +2,13 @@
 import { MusicTrack } from './music';
 
 export interface TrackInfoProps {
-  title?: string;
-  artist?: string;
-  coverUrl?: string;
-  track?: MusicTrack;
-  showCover?: boolean;
-  showControls?: boolean;
-  currentTrack?: MusicTrack;
-  loadingTrack?: boolean;
-  audioError?: Error | null;
+  track: MusicTrack;
   className?: string;
+  compact?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (volume: number) => void;
-  showLabel?: boolean;
+  onVolumeChange: (value: number) => void;
   className?: string;
 }
