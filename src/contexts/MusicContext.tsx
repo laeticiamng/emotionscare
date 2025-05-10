@@ -1,28 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { MusicTrack } from '@/types/audio-player';
-
-export interface MusicContextType {
-  isPlaying: boolean;
-  currentTrack: MusicTrack | null;
-  playlist: MusicTrack[];
-  progress: number;
-  duration: number;
-  volume: number;
-  isOpen: boolean;
-  setOpenDrawer: (open: boolean) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<void>;
-  play: (track?: MusicTrack) => void;
-  pause: () => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  prevTrack: () => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
-  setVolume: (value: number) => void;
-  seek: (time: number) => void;
-  currentPlaylist?: MusicTrack[];
-}
+import { MusicTrack, MusicContextType, MusicPlaylist } from '@/types/music';
 
 const MusicContext = createContext<MusicContextType>({
   isPlaying: false,
@@ -32,13 +10,17 @@ const MusicContext = createContext<MusicContextType>({
   duration: 0,
   volume: 80,
   isOpen: false,
+  openDrawer: false,
+  currentEmotion: 'neutral',
   setOpenDrawer: () => {},
   loadPlaylistForEmotion: async () => {},
   play: () => {},
+  playTrack: () => {},
   pause: () => {},
   pauseTrack: () => {},
   nextTrack: () => {},
   prevTrack: () => {},
+  previousTrack: () => {},
   toggleRepeat: () => {},
   toggleShuffle: () => {},
   setVolume: () => {},
@@ -54,11 +36,15 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(80);
   const [isOpen, setIsOpen] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   const [repeat, setRepeat] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentEmotion, setCurrentEmotion] = useState('neutral');
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   
   // Mock implementation of required functions
-  const loadPlaylistForEmotion = async (emotion: string) => {
+  const loadPlaylistForEmotion = async (emotion: string): Promise<MusicPlaylist | void> => {
     console.log(`Loading playlist for emotion: ${emotion}`);
     // In a real app, this would make an API call to get tracks for the emotion
     const mockTracks: MusicTrack[] = [
@@ -73,16 +59,35 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // More tracks would be here...
     ];
     
+    const mockPlaylist: MusicPlaylist = {
+      id: '1',
+      name: `${emotion} Playlist`,
+      tracks: mockTracks,
+      emotion: emotion
+    };
+    
     setPlaylist(mockTracks);
     if (mockTracks.length > 0) {
       setCurrentTrack(mockTracks[0]);
     }
+    
+    return mockPlaylist;
+  };
+  
+  const loadPlaylistById = async (id: string): Promise<void> => {
+    console.log(`Loading playlist by ID: ${id}`);
+    // Implementation would be similar to loadPlaylistForEmotion
   };
   
   const play = (track?: MusicTrack) => {
     if (track) {
       setCurrentTrack(track);
     }
+    setIsPlaying(true);
+  };
+  
+  const playTrack = (track: MusicTrack) => {
+    setCurrentTrack(track);
     setIsPlaying(true);
   };
   
@@ -118,6 +123,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
   
+  // Alias for prevTrack for backward compatibility
+  const previousTrack = prevTrack;
+  
   const toggleRepeat = () => {
     setRepeat(prev => !prev);
   };
@@ -131,8 +139,16 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // In a real app, this would update the audio element's currentTime
   };
   
-  const setOpenDrawer = (open: boolean) => {
-    setIsOpen(open);
+  const initializeMusicSystem = async (): Promise<void> => {
+    try {
+      // Mock initialization
+      console.log("Initializing music system...");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setError(null);
+    } catch (err) {
+      setError("Failed to initialize music system");
+      console.error("Error initializing music system:", err);
+    }
   };
   
   return (
@@ -145,18 +161,26 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         duration,
         volume,
         isOpen,
+        openDrawer,
+        error,
+        currentEmotion,
+        playlists,
         setOpenDrawer,
         loadPlaylistForEmotion,
+        loadPlaylistById,
         play,
+        playTrack,
         pause,
         pauseTrack,
         nextTrack,
         prevTrack,
+        previousTrack,
         toggleRepeat,
         toggleShuffle,
         setVolume,
         seek,
-        currentPlaylist: playlist
+        currentPlaylist: playlist,
+        initializeMusicSystem
       }}
     >
       {children}

@@ -9,6 +9,21 @@ export interface MusicTrack {
   coverImage?: string;
   emotion?: string;
   tags?: string[];
+  cover?: string;
+  coverUrl?: string;
+  audioUrl?: string;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  tracks: MusicTrack[];
+  coverImage?: string;
+  emotion?: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string;
 }
 
 export interface MusicContextType {
@@ -19,18 +34,26 @@ export interface MusicContextType {
   duration: number;
   volume: number;
   isOpen: boolean;
+  openDrawer?: boolean;
+  error?: string | null;
+  currentEmotion?: string;
+  playlists?: MusicPlaylist[];
+  currentPlaylist?: MusicTrack[];
   setOpenDrawer: (open: boolean) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<void>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | void>;
+  loadPlaylistById?: (id: string) => Promise<void>;
   play: (track?: MusicTrack) => void;
+  playTrack: (track: MusicTrack) => void;
   pause: () => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
+  previousTrack: () => void;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
   setVolume: (value: number) => void;
   seek: (time: number) => void;
-  currentPlaylist?: MusicTrack[];
+  initializeMusicSystem?: () => Promise<void>;
 }
 
 export interface MusicRecommendationCardProps {

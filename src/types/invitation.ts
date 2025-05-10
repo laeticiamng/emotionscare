@@ -1,22 +1,26 @@
 
+export interface Invitation {
+  id: string;
+  email: string;
+  name?: string;
+  role: string;
+  status: 'pending' | 'accepted' | 'expired';
+  created_at: string | Date;
+  expires_at: string | Date;
+  accepted_at?: string | Date;
+  message?: string;
+  created_by: string;
+  code: string;
+}
+
 export interface InvitationStats {
   total: number;
   pending: number;
   accepted: number;
-  rejected: number;
   expired: number;
-  recent_invitations: {
-    id: string;
-    email: string;
-    status: string;
-    created_at: string;
-  }[];
   conversion_rate: number;
-}
-
-export interface InvitationFormData {
-  email: string;
-  role?: string;
-  message?: string;
-  expires_at?: Date;
+  last_week: {
+    sent: number;
+    accepted: number;
+  }
 }

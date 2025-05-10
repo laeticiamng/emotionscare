@@ -3,103 +3,70 @@ export interface User {
   id: string;
   email: string;
   name?: string;
-  avatar?: string;
-  role?: UserRole;
-  created_at?: string | Date;
-  last_login?: string | Date;
+  avatar_url?: string;
+  created_at?: string;
+  updated_at?: string;
   preferences?: UserPreferences;
-  metadata?: Record<string, any>;
+  role?: UserRole;
+  is_premium?: boolean;
+  last_login?: string;
+  streak_days?: number;
 }
 
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-  COACH = 'coach',
-  PREMIUM = 'premium'
-}
+export type UserRole = 'user' | 'admin' | 'coach' | 'premium';
 
 export interface UserPreferences {
   theme: ThemeName;
-  notifications_enabled: boolean;
-  font_size: 'small' | 'medium' | 'large';
-  language: string;
-  accent_color?: string;
-  background_color?: string;
-  notifications?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-    journal?: boolean;
-    breathing?: boolean;
-    music?: boolean;
-  };
-  reminder_time?: string;
-  dynamic_theme?: {
-    enable_time_based?: boolean;
-    enable_emotion_based?: boolean;
-    enable_weather_based?: boolean;
-  };
-  accessibility?: {
-    high_contrast?: boolean;
-    reduced_motion?: boolean;
-    screen_reader_optimized?: boolean;
-    keyboard_navigation?: boolean;
-  };
-  audio?: {
-    volume?: number;
-    continue_playback?: boolean;
-    ambient_sound?: string;
-    context_music?: boolean;
-    immersive_mode?: boolean;
-  };
-  data_preferences?: {
-    export_format?: 'json' | 'pdf';
-    incognito_mode?: boolean;
-    data_retention_period?: number;
-  };
-  emotionalCamouflage?: boolean;
-}
-
-export interface UserPreferencesState {
-  theme: ThemeName;
+  fontSize: FontSize;
+  fontFamily: FontFamily;
   notificationsEnabled: boolean;
-  fontSize: 'small' | 'medium' | 'large';
-  language: string;
-  accentColor?: string;
-  backgroundColor?: string;
-  notifications?: {
+  notificationFrequency: NotificationFrequency;
+  notificationType: NotificationType; 
+  notificationTone: NotificationTone;
+  reminderTime: string;
+  dynamicTheme: DynamicThemeMode;
+  channels: {
     journal: boolean;
     breathing: boolean;
     music: boolean;
-    email?: boolean;
-    push?: boolean;
-    sms?: boolean;
-  };
-  reminderTime?: string;
-  dynamicTheme?: {
-    enableTimeBased?: boolean;
-    enableEmotionBased?: boolean;
-    enableWeatherBased?: boolean;
-  };
-  accessibility?: {
-    highContrast?: boolean;
-    reducedMotion?: boolean;
-    screenReaderOptimized?: boolean;
-    keyboardNavigation?: boolean;
-  };
-  audio?: {
-    volume?: number;
-    continuePlayback?: boolean;
-    ambientSound?: string;
-    contextMusic?: boolean;
-    immersiveMode?: boolean;
-  };
-  dataPreferences?: {
-    exportFormat?: 'json' | 'pdf';
-    incognitoMode?: boolean;
-    dataRetentionPeriod?: number;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
   };
   emotionalCamouflage?: boolean;
 }
 
-export type NotificationTone = 'minimalist' | 'poetic' | 'directive' | 'silent';
+export interface UserPreferencesState extends UserPreferences {
+  loading: boolean;
+  error: string | null;
+}
+
+export interface InvitationFormData {
+  email: string;
+  name?: string;
+  role: UserRole;
+  message?: string;
+  expiresAt?: Date;
+}
+
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  conversion_rate: number;
+  last_week: {
+    sent: number;
+    accepted: number;
+  }
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  date_unlocked?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+}

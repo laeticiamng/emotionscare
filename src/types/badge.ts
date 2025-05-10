@@ -3,11 +3,11 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image_url: string;
-  category: string;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-  criteria: string;
-  earned_at?: string | Date;
-  progress?: number;
-  user_id?: string;
+  icon: string;
+  image_url?: string;
+  unlocked: boolean;
+  unlock_date?: Date | string;
+  requirements?: string;
+  category?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
 }
