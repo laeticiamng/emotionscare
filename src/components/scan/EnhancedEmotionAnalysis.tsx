@@ -1,105 +1,64 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { EnhancedEmotionResult } from '@/types/emotion';
-import { useToast } from '@/hooks/use-toast';
-import { Copy, Check } from 'lucide-react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { EmotionResult } from '@/types';
 
 interface EnhancedEmotionAnalysisProps {
-  result: EnhancedEmotionResult;
+  result: EmotionResult;
+  className?: string;
 }
 
-const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({ result }) => {
-  const [analysisResult, setAnalysisResult] = useState<{
-    emotion: string;
-    confidence: number;
-    feedback: string;
-    recommendations: string[];
-  }>({
-    emotion: 'Neutral',
-    confidence: 50,
-    feedback: 'No specific feedback available',
-    recommendations: [],
-  });
-  const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (result) {
-      setAnalysisResult({
-        emotion: result.emotion,
-        confidence: result.confidence || 50,
-        feedback: result.feedback || result.ai_feedback || 'No specific feedback available', 
-        recommendations: result.recommendations || [],
-      });
-    }
-  }, [result]);
-
-  const handleCopyFeedback = () => {
-    navigator.clipboard.writeText(analysisResult.feedback);
-    setCopied(true);
-    toast({
-      title: "Copié!",
-      description: "Le feedback a été copié dans le presse-papiers.",
-    });
-
-    setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({ result, className }) => {
+  // Assurons-nous que recommendations est bien un tableau de chaînes
+  const recommendations = result.recommendations || [];
+  
+  // Vous pouvez aussi structurer les recommandations si nécessaire
+  const structuredRecommendations = {
+    activities: recommendations.filter(r => r.includes('activité') || r.includes('exercice')),
+    music: recommendations.filter(r => r.includes('musique') || r.includes('son')),
+    breathingExercises: recommendations.filter(r => r.includes('respiration') || r.includes('souffle'))
   };
 
   return (
-    <Card className="w-full">
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Analyse Émotionnelle Avancée</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Émotion Détectée</h2>
-          <Badge variant="secondary">{analysisResult.emotion}</Badge>
-        </div>
+      <CardContent className="space-y-4">
         <div>
-          <h2 className="text-lg font-semibold">Niveau de Confiance</h2>
-          <div className="flex items-center space-x-2">
-            <Slider
-              defaultValue={[analysisResult.confidence]}
-              max={100}
-              step={1}
-              disabled
-            />
-            <span>{analysisResult.confidence}%</span>
+          <h3 className="text-lg font-medium">Émotion Primaire</h3>
+          <div className="flex gap-2 mt-1">
+            <Badge variant="outline" className="text-base py-1 px-3">
+              {result.primaryEmotion?.name || result.emotion}
+            </Badge>
+            <Badge variant="secondary" className="text-base py-1 px-3">
+              {Math.round((result.intensity || 0.5) * 100)}% d'intensité
+            </Badge>
           </div>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Feedback</h2>
-          <div className="relative">
-            <p className="text-sm text-muted-foreground">{analysisResult.feedback}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-0 right-0 rounded-full"
-              onClick={handleCopyFeedback}
-              disabled={copied}
-            >
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            </Button>
-          </div>
+
+        <Separator />
+
+        <div>
+          <h3 className="text-lg font-medium">Recommandations</h3>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            {recommendations.map((rec, index) => (
+              <li key={index} className="text-muted-foreground">{rec}</li>
+            ))}
+          </ul>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Recommandations</h2>
-          {analysisResult.recommendations.length > 0 ? (
-            <ul className="list-disc pl-5 text-sm text-muted-foreground">
-              {analysisResult.recommendations.map((recommendation, index) => (
-                <li key={index}>{recommendation}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">Aucune recommandation spécifique.</p>
-          )}
-        </div>
+
+        {result.feedback && (
+          <>
+            <Separator />
+            <div>
+              <h3 className="text-lg font-medium">Feedback IA</h3>
+              <p className="mt-2 text-muted-foreground">{result.feedback}</p>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

@@ -69,5 +69,5 @@ export interface EmotionalTeamViewProps {
   groupBy?: 'department' | 'location' | 'role';
   showDetails?: boolean;
   onUserClick?: (userId: string) => void;
-  className?: string;
+  className?: string; // Ajout de className
 }

@@ -11,6 +11,8 @@ interface AuthContextProps {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  signOut: () => Promise<void>; // Ajout de la fonction signOut
+  updateUser?: (user: User) => Promise<void>; // Ajout de updateUser
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -22,6 +24,8 @@ const AuthContext = createContext<AuthContextProps>({
   register: async () => {},
   logout: async () => {},
   resetPassword: async () => {},
+  signOut: async () => {},
+  updateUser: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -57,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: 'user-1',
         name: 'Demo User',
         email: email,
-        role: 'employee',
+        role: UserRole.EMPLOYEE,  // Utilisation de l'enum
         team_id: 'team-1',
         department: 'Product',
         joined_at: new Date().toISOString(),
@@ -86,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: `user-${Date.now()}`,
         name: name,
         email: email,
-        role: 'user',
+        role: UserRole.USER,  // Utilisation de l'enum
         joined_at: new Date().toISOString(),
         avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
       };
@@ -107,6 +111,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('token');
   };
 
+  // Ajout de la fonction signOut comme alias de logout
+  const signOut = async () => {
+    await logout();
+  };
+
   const resetPassword = async (email: string) => {
     setIsLoading(true);
     setError(null);
@@ -115,6 +124,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Simulate password reset email
       await new Promise(resolve => setTimeout(resolve, 1000));
       // In a real app, this would trigger a password reset email
+    } catch (error: any) {
+      setError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Ajout de la fonction updateUser
+  const updateUser = async (updatedUser: User) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate API call to update user
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
     } catch (error: any) {
       setError(error);
     } finally {
@@ -133,6 +159,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         register,
         logout,
         resetPassword,
+        signOut,
+        updateUser,
       }}
     >
       {children}

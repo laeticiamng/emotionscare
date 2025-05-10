@@ -1,123 +1,114 @@
 
-import React, { useState, useCallback } from 'react';
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScanIcon, Mic, FileText } from "lucide-react";
-import AudioRecorder from "./AudioRecorder";
-import EmotionScanResult from "./EmotionScanResult";
-import { useAuth } from '@/contexts/AuthContext';
-import { analyzeEmotion } from '@/lib/scanService';
+import React, { useState } from 'react';
+import TextEmotionScanner from './TextEmotionScanner';
+import EmojiEmotionScanner from './EmojiEmotionScanner';
+import AudioEmotionScanner from './AudioEmotionScanner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
 import { EmotionResult } from '@/types';
+import { analyzeEmotion } from '@/lib/scanService';
 
-interface Props {
-  onEmotionDetected?: (emotion: string) => void;
+interface EmotionScannerProps {
+  userId: string;
+  onScanComplete?: (emotion: EmotionResult) => void;
+  onShowResult?: () => void;
 }
 
-const EmotionScanner: React.FC<Props> = ({ onEmotionDetected }) => {
-  const [activeTab, setActiveTab] = useState<string>("text");
-  const [text, setText] = useState<string>("");
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const { user } = useAuth();
+const EmotionScanner: React.FC<EmotionScannerProps> = ({
+  userId,
+  onScanComplete,
+  onShowResult
+}) => {
+  const [activeTab, setActiveTab] = useState<string>('text');
 
-  const resetForm = () => {
-    setText("");
-    setAudioUrl(null);
-    setResult(null);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!user) {
-      console.error("User not authenticated");
-      return;
-    }
-    
-    if (!text && !audioUrl) {
-      // No input to analyze
-      return;
-    }
-    
-    setLoading(true);
-    
+  const handleTextScan = async (text: string) => {
     try {
-      const analysisResult = await analyzeEmotion({
-        userId: user.id,
-        text: text || undefined,
-        audioUrl: audioUrl || undefined, 
+      const result = await analyzeEmotion({
+        user_id: userId, // Utiliser user_id au lieu de userId
+        text
       });
       
-      setResult(analysisResult);
-      
-      if (onEmotionDetected) {
-        onEmotionDetected(analysisResult.emotion);
+      if (onScanComplete) {
+        onScanComplete(result);
       }
+      
+      if (onShowResult) {
+        onShowResult();
+      }
+      
+      return result;
     } catch (error) {
-      console.error("Error analyzing emotion:", error);
-    } finally {
-      setLoading(false);
+      console.error('Error analyzing text emotion:', error);
+      throw error;
     }
   };
 
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  }, []);
+  const handleEmojiScan = async (emojis: string) => {
+    try {
+      const result = await analyzeEmotion({
+        user_id: userId, // Utiliser user_id au lieu de userId
+        emojis
+      });
+      
+      if (onScanComplete) {
+        onScanComplete(result);
+      }
+      
+      if (onShowResult) {
+        onShowResult();
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error analyzing emoji emotion:', error);
+      throw error;
+    }
+  };
 
+  const handleAudioScan = async (audioUrl: string) => {
+    try {
+      const result = await analyzeEmotion({
+        user_id: userId, // Utiliser user_id au lieu de userId
+        audio_url: audioUrl
+      });
+      
+      if (onScanComplete) {
+        onScanComplete(result);
+      }
+      
+      if (onShowResult) {
+        onShowResult();
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error analyzing audio emotion:', error);
+      throw error;
+    }
+  };
+  
   return (
-    <div className="space-y-6">
-      {!result ? (
-        <form onSubmit={handleSubmit}>
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-2">
-              <TabsTrigger value="text" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span>Texte</span>
-              </TabsTrigger>
-              <TabsTrigger value="audio" className="flex items-center gap-2">
-                <Mic className="h-4 w-4" />
-                <span>Audio</span>
-              </TabsTrigger>
-            </TabsList>
-            <div className="mt-4">
-              <TabsContent value="text" className="space-y-4">
-                <Textarea 
-                  placeholder="Décrivez votre état émotionnel actuel..."
-                  value={text}
-                  onChange={handleTextChange}
-                  rows={5}
-                />
-              </TabsContent>
-              <TabsContent value="audio" className="space-y-4">
-                <AudioRecorder audioUrl={audioUrl} setAudioUrl={setAudioUrl} />
-              </TabsContent>
-            </div>
-          </Tabs>
-          
-          <div className="mt-6 flex justify-end">
-            <Button 
-              type="submit" 
-              disabled={loading || (!text && !audioUrl)}
-              className="flex items-center gap-2"
-            >
-              <ScanIcon className="h-4 w-4" />
-              {loading ? "Analyse en cours..." : "Analyser"}
-            </Button>
-          </div>
-        </form>
-      ) : (
-        <div className="space-y-6">
-          <EmotionScanResult data={result} />
-          <div className="flex justify-end">
-            <Button onClick={resetForm} variant="outline">
-              Nouvelle analyse
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+    <Card className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-6">
+          <TabsTrigger value="text">Texte</TabsTrigger>
+          <TabsTrigger value="emoji">Émoji</TabsTrigger>
+          <TabsTrigger value="audio">Audio</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="text">
+          <TextEmotionScanner onScan={handleTextScan} />
+        </TabsContent>
+        
+        <TabsContent value="emoji">
+          <EmojiEmotionScanner onScan={handleEmojiScan} />
+        </TabsContent>
+        
+        <TabsContent value="audio">
+          <AudioEmotionScanner onScan={handleAudioScan} />
+        </TabsContent>
+      </Tabs>
+    </Card>
   );
 };
 

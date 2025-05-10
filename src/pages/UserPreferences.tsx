@@ -6,47 +6,80 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserPreferences } from '@/types';
 import PreferencesForm from './PreferencesForm';
+import { useToast } from '@/hooks/use-toast';
 
 const UserPreferencesPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, updateUser } = useAuth();
+  const { toast } = useToast();
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({
     theme: 'light',
     fontSize: 'medium',
-    language: 'en',
+    language: 'fr',
     notifications: true,
     autoplayVideos: false,
     showEmotionPrompts: true,
     privacyLevel: 'standard',
-    dataCollection: true
+    dataCollection: true,
+    font_size: 'medium',
+    notifications_enabled: true,
   });
 
   useEffect(() => {
     if (user && user.preferences) {
-      setUserPreferences(user.preferences);
+      setUserPreferences({
+        ...userPreferences,
+        ...user.preferences
+      });
     }
   }, [user]);
 
   const handleSavePreferences = async (preferences: UserPreferences) => {
     if (user && updateUser) {
-      // Make sure we create a new user object instead of modifying the existing one
-      await updateUser({ ...user, preferences });
-      setUserPreferences(preferences);
-      navigate('/dashboard');
+      try {
+        // Make sure we create a new user object instead of modifying the existing one
+        await updateUser({
+          ...user,
+          preferences: {
+            ...preferences,
+            // Assurer la compatibilité entre les deux formats
+            font_size: preferences.fontSize,
+            notifications_enabled: preferences.notifications,
+          }
+        });
+        setUserPreferences(preferences);
+        toast({
+          title: "Préférences mises à jour",
+          description: "Vos préférences ont été enregistrées avec succès.",
+        });
+        navigate('/dashboard');
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour des préférences:", error);
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors de la sauvegarde des préférences.",
+          variant: "destructive"
+        });
+      }
     } else {
-      console.error("User or updateUser not available");
+      console.error("User ou updateUser non disponibles");
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour modifier vos préférences.",
+        variant: "destructive"
+      });
     }
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>Chargement...</div>;
   }
 
   return (
     <div className="container mx-auto p-4">
       <Card>
         <CardHeader>
-          <CardTitle>User Preferences</CardTitle>
+          <CardTitle>Préférences Utilisateur</CardTitle>
         </CardHeader>
         <CardContent>
           <PreferencesForm 

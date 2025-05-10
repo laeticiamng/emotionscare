@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Emotion, EmotionResult } from '@/types';
 
@@ -126,6 +125,8 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
       date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
       dominant_emotion: 'happy',
       emotion: 'happy',
+      name: 'happy',
+      category: 'positive',
       score: 0.85,
       confidence: 0.9,
       emojis: '😊',
@@ -139,6 +140,8 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
       date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
       dominant_emotion: 'stressed',
       emotion: 'stressed',
+      name: 'stressed',
+      category: 'negative',
       score: 0.35,
       confidence: 0.8,
       emojis: '😫',
@@ -152,6 +155,8 @@ export const getEmotionHistory = async (userId: string): Promise<Emotion[]> => {
       date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
       dominant_emotion: 'calm',
       emotion: 'calm',
+      name: 'calm',
+      category: 'positive',
       score: 0.6,
       confidence: 0.75,
       emojis: '😌',
@@ -178,7 +183,9 @@ export const saveEmotion = async (emotion: Partial<Emotion>): Promise<Emotion> =
     emojis: emotion.emojis || '😐',
     text: emotion.text || '',
     source: emotion.source || 'manual-entry',
-    intensity: emotion.intensity || 0.5
+    intensity: emotion.intensity || 0.5,
+    name: emotion.name || emotion.emotion || 'neutral',
+    category: emotion.category || 'emotion'
   };
   
   // Simulate API success

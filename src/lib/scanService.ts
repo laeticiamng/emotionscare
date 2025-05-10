@@ -1,4 +1,3 @@
-
 import { Emotion, EmotionResult } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -112,7 +111,7 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
 };
 
 // Get emotion history for a user or all users
-export const getEmotionHistory = async (userId?: string): Promise<Emotion[]> => {
+export const getEmotions = async (userId?: string): Promise<Emotion[]> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 800));
   
@@ -176,6 +175,52 @@ export const saveRealtimeEmotionScan = async (result: EmotionResult): Promise<Em
   
   // In a real app, this would save to a database
   return result;
+};
+
+// Nouvelles fonctions pour résoudre les erreurs
+export const createEmotionEntry = async (data: Partial<Emotion>): Promise<Emotion> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1200));
+  
+  const newEmotion: Emotion = {
+    id: data.id || uuidv4(),
+    user_id: data.user_id || 'unknown',
+    date: data.date || new Date().toISOString(),
+    name: data.name || data.emotion || 'neutral',
+    category: data.category || 'emotion',
+    intensity: data.intensity || 0.5,
+    emotion: data.emotion || 'neutral',
+    dominant_emotion: data.dominant_emotion || data.emotion || 'neutral',
+    score: data.score || 50,
+    confidence: data.confidence || 0.5,
+    text: data.text || '',
+    emojis: data.emojis || '',
+    ai_feedback: data.ai_feedback || ''
+  };
+  
+  return newEmotion;
+};
+
+export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Return mock data
+  return {
+    id: uuidv4(),
+    user_id: userId,
+    date: new Date().toISOString(),
+    name: 'calm',
+    category: 'positive',
+    intensity: 0.7,
+    emotion: 'calm',
+    dominant_emotion: 'calm',
+    score: 65,
+    confidence: 0.8,
+    text: "Je me sens calme après ma séance de méditation",
+    emojis: '😌',
+    ai_feedback: "La méditation régulière vous aide à maintenir votre équilibre émotionnel. Continuez ainsi!"
+  };
 };
 
 // Helper function to generate recommendations based on emotion

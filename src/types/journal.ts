@@ -3,7 +3,7 @@ export interface JournalEntry {
   id: string;
   user_id: string;
   date: string;
-  title?: string;
+  title: string; // Le rendre requis pour correspondre à l'utilisation dans JournalEntryPage
   content: string;
   mood?: string;
   emotion?: string;
