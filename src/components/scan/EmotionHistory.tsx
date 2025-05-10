@@ -1,84 +1,89 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Emotion } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { CalendarIcon, ClockIcon } from 'lucide-react';
 
-export interface EmotionHistoryProps {
+interface EmotionHistoryProps {
   emotions: Emotion[];
-  loading: boolean;
-  error: string | null;
+  isLoading?: boolean;
 }
 
-const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, loading, error }) => {
-  if (loading) {
+const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, isLoading = false }) => {
+  if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex justify-center items-center h-40">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-destructive">
-            <p>Une erreur est survenue: {error}</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
   if (emotions.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-muted-foreground">
-            <p>Aucune donnée d'émotion disponible</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="p-6 text-center">
+        <p className="text-muted-foreground">Aucune émotion enregistrée. Complétez un scan pour commencer à voir votre historique.</p>
+      </div>
     );
   }
 
+  // Fonction pour mapper un score à un emoji
+  const getEmotionEmoji = (emotion: string) => {
+    const emojiMap: {[key: string]: string} = {
+      'joy': '😊',
+      'sadness': '😔',
+      'anger': '😡',
+      'fear': '😨',
+      'surprise': '😲',
+      'disgust': '🤢',
+      'neutral': '😐',
+    };
+
+    return emojiMap[emotion.toLowerCase()] || '❓';
+  };
+
+  // Afficher un maximum de 10 entrées dans l'historique
+  const displayEmotions = emotions.slice(0, 10);
+
   return (
     <Card>
-      <CardContent className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Historique des émotions</h3>
-        <div className="space-y-4">
-          {emotions.map((emotion) => (
-            <div 
-              key={emotion.id} 
-              className="p-4 border rounded-md flex justify-between items-center"
-            >
-              <div>
-                <div className="font-medium capitalize">{emotion.emotion}</div>
-                <div className="text-sm text-muted-foreground">
-                  {new Date(emotion.date as string).toLocaleDateString()}
+      <CardHeader>
+        <CardTitle className="text-xl">Historique des scans</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-4 divide-y">
+          {displayEmotions.map((emotion) => (
+            <li key={emotion.id} className="pt-4 first:pt-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="text-3xl">{getEmotionEmoji(emotion.emotion)}</div>
+                  <div>
+                    <p className="font-medium">{emotion.emotion.charAt(0).toUpperCase() + emotion.emotion.slice(1)}</p>
+                    <div className="flex items-center text-sm text-muted-foreground gap-3">
+                      <span className="flex items-center gap-1">
+                        <CalendarIcon className="h-3 w-3" />
+                        {format(new Date(emotion.date || Date.now()), 'PPP', { locale: fr })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <ClockIcon className="h-3 w-3" />
+                        {format(new Date(emotion.date || Date.now()), 'HH:mm', { locale: fr })}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                {emotion.text && (
-                  <p className="mt-1 text-sm">{emotion.text}</p>
-                )}
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{emotion.score}/10</span>
+                </div>
               </div>
-              <div className="flex items-center">
-                <span 
-                  className={`inline-flex items-center justify-center h-8 w-8 rounded-full font-medium ${
-                    emotion.score && emotion.score >= 70 ? 'bg-green-100 text-green-800' : 
-                    emotion.score && emotion.score >= 40 ? 'bg-yellow-100 text-yellow-800' : 
-                    'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {emotion.score}
-                </span>
-              </div>
-            </div>
+              {emotion.text && (
+                <div className="mt-2 text-sm border-l-2 border-muted pl-3 italic">
+                  "{emotion.text}"
+                </div>
+              )}
+            </li>
           ))}
-        </div>
+        </ul>
       </CardContent>
     </Card>
   );

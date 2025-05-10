@@ -10,6 +10,7 @@ import ScanPage from './pages/ScanPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import { AuthProvider } from './contexts/AuthContext';
 import Index from './pages/Index';
+import LoginPage from './pages/LoginPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="/onboarding" element={<OnboardingPage />} />
           </Route>
           <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </AuthProvider>
     </Router>

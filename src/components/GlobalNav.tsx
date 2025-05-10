@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +23,11 @@ const GlobalNav = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = '/login';
   };
   
   return (
@@ -105,7 +109,7 @@ const GlobalNav = () => {
                   <span>Paramètres</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signOut}>Déconnexion</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Déconnexion</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -160,7 +164,7 @@ const GlobalNav = () => {
                     </NavLink>
                   </li>
                   <li>
-                    <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={signOut}>
+                    <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={handleLogout}>
                       Déconnexion
                     </Button>
                   </li>

@@ -1,67 +1,45 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { Emotion } from '@/types';
+import { fetchEmotionHistory } from '@/lib/scanService';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { getEmotions } from '@/lib/scanService';
-import type { Emotion, User } from '@/types';
 
 export function useScanPage() {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [emotions, setEmotions] = useState<Emotion[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
-  
-  const fetchEmotions = async () => {
+  const { user } = useAuth();
+
+  const refreshEmotions = useCallback(async () => {
     if (!user?.id) return;
     
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      setError(null);
-      const data = await getEmotions(user.id);
-      setEmotions(data);
+      const history = await fetchEmotionHistory(user.id);
+      setEmotions(history);
     } catch (err) {
-      console.error('Error fetching emotions:', err);
-      setError('Impossible de charger les données émotionnelles');
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger vos données émotionnelles",
-        variant: "destructive",
-      });
+      const message = err instanceof Error ? err.message : "Une erreur est survenue";
+      setError(message);
+      console.error("Error refreshing emotions:", err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
-  
-  useEffect(() => {
-    fetchEmotions();
   }, [user?.id]);
   
-  const refreshEmotions = async () => {
-    await fetchEmotions();
-    toast({
-      title: "Données actualisées",
-      description: "Vos données émotionnelles ont été mises à jour",
-    });
-  };
-  
-  // Add team filtering functionality
-  const filterUsers = (filter: string) => {
-    setSelectedFilter(filter);
-    // In a real app, this would filter the users based on criteria
-    // For now, we're just setting the filter value
-  };
-  
+  // Charger l'historique d'émotions au montage
+  useState(() => {
+    if (user?.id) {
+      refreshEmotions();
+    }
+  });
+
   return {
     emotions,
-    loading,
+    isLoading,
     error,
-    refreshEmotions,
-    filteredUsers,
-    selectedFilter,
-    filterUsers
+    refreshEmotions
   };
 }
 
