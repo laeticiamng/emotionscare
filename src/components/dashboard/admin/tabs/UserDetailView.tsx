@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -79,13 +80,15 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {moodData.map((data) => (
-                    <tr key={data.originalDate || data.date}>
+                  {moodData.map((data) => {
+                    const dateKey = String(data.originalDate || data.date);
+                    return (
+                    <tr key={dateKey}>
                       <td>{new Date(data.originalDate || data.date).toLocaleDateString()}</td>
                       <td>{data.value}</td>
                       <td>{renderMoodTrend(data.value)}</td>
                     </tr>
-                  ))}
+                  )})}
                 </tbody>
               </table>
             </ScrollArea>

@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -12,6 +11,8 @@ export interface User {
   emotional_score?: number;
   anonymity_code?: string;
   onboarded?: boolean;
+  position?: string;
+  department?: string;
 }
 
 // UserRole as an enum so it can be used as a value
@@ -20,7 +21,10 @@ export enum UserRole {
   ADMIN = 'admin',
   COACH = 'coach',
   THERAPIST = 'therapist',
-  HR = 'hr'
+  HR = 'hr',
+  EMPLOYEE = 'employee',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager'
 }
 
 export interface UserPreferences {
@@ -28,6 +32,9 @@ export interface UserPreferences {
   font_size: FontSize;
   notifications_enabled: boolean;
   language: string;
+  notifications?: boolean;
+  accent_color?: string;
+  reminder_time?: string;
 }
 
 export interface UserPreferencesState {

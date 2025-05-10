@@ -134,18 +134,17 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
   // Find a suitable VR template based on the latest emotion
   const recommendedTemplate: VRSessionTemplate = latestEmotion ? {
     id: 'recommended',
-    template_id: 'recommended',
-    theme: 'Méditation guidée',
     title: 'Session recommandée',
-    duration: 5,
-    preview_url: '',
     description: 'Session recommandée basée sur votre état émotionnel',
+    duration: 5,
+    theme: 'Méditation guidée',
     is_audio_only: true,
+    preview_url: '',
+    audio_url: '/audio/meditation-guided.mp3',
     category: 'recommended',
     benefits: ['Réduction du stress', 'Amélioration de la concentration'],
     emotions: [latestEmotion.emotion],
-    popularity: 100,
-    audio_url: '/audio/meditation-guidee.mp3'
+    popularity: 100
   } : undefined;
   
   return (

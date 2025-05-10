@@ -1,4 +1,3 @@
-
 export interface Emotion {
   id: string;
   user_id: string;
@@ -15,6 +14,7 @@ export interface Emotion {
     name: string;
   };
   intensity?: number;
+  name?: string; // Added property for compatibility
 }
 
 export interface EmotionResult {

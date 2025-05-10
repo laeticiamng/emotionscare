@@ -8,14 +8,14 @@ export interface MusicTrack {
   coverUrl?: string;
   cover?: string;  
   coverImage?: string;  
-  externalUrl?: string;  // For external player links
+  externalUrl?: string;
   mood?: string;
   genre?: string;
   intensity?: number;
   bpm?: number;
   tags?: string[];
   audioUrl?: string;
-  emotion?: string; // Added emotion property
+  emotion?: string;
 }
 
 export interface MusicPlaylist {

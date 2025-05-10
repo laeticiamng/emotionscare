@@ -12,7 +12,8 @@ export function useChatMessages() {
       sender_id: 'system',
       conversation_id: 'initial',
       content: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
-      is_read: true
+      is_read: true,
+      sender_type: 'system'
     }
   ]);
 
@@ -25,7 +26,8 @@ export function useChatMessages() {
       sender_id: 'user',
       conversation_id: 'current',
       content: text,
-      is_read: true
+      is_read: true,
+      sender_type: 'user'
     };
     
     setMessages(prev => [...prev, message]);
@@ -41,7 +43,8 @@ export function useChatMessages() {
       sender_id: 'system',
       conversation_id: 'current',
       content: text,
-      is_read: true
+      is_read: true,
+      sender_type: 'system'
     };
     
     setMessages(prev => [...prev, message]);
@@ -57,7 +60,8 @@ export function useChatMessages() {
       sender_id: 'system',
       conversation_id: 'initial',
       content: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
-      is_read: true
+      is_read: true,
+      sender_type: 'system'
     }]);
   }, []);
 

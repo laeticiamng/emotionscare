@@ -50,6 +50,21 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
       description: `Playlist adaptée à votre humeur "${emotion}" chargée.`
     });
   };
+
+  // Create a valid Emotion object from primaryEmotion
+  const createEmotionFromPrimary = (): Emotion | null => {
+    if (!emotionResult.primaryEmotion) return null;
+    
+    return {
+      id: emotionResult.id || 'temp-id',
+      user_id: emotionResult.user_id || 'user-id',
+      date: new Date(),
+      emotion: emotionResult.primaryEmotion.name || emotionResult.emotion,
+      name: emotionResult.primaryEmotion.name || emotionResult.emotion,
+      score: emotionResult.score || 0,
+      confidence: emotionResult.confidence || 0
+    };
+  };
   
   return (
     <Card className="mt-6">
@@ -96,7 +111,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
           )}
           
           {showVRRec && (
-            <VREmotionRecommendation emotion={emotionResult.primaryEmotion} />
+            <VREmotionRecommendation emotion={createEmotionFromPrimary()} />
           )}
         </div>
       </CardContent>
