@@ -1,5 +1,13 @@
 
-export type UserRole = 'admin' | 'user' | 'manager' | 'employee' | 'guest';
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  MANAGER = 'manager',
+  EMPLOYEE = 'employee',
+  GUEST = 'guest',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager'
+}
 
 export interface User {
   id: string;
@@ -14,9 +22,10 @@ export interface User {
   department?: string;
   emotional_score?: number;
   anonymity_code?: string;
-  position?: string; // Add position prop
-  joined_at?: string | Date; // Add joined_at
-  onboarded?: boolean; // Add onboarded prop
+  position?: string;
+  joined_at?: string | Date;
+  onboarded?: boolean;
+  team_id?: string; // Add team_id property
 }
 
 export interface UserPreferences {
@@ -44,18 +53,17 @@ export interface UserPreferencesState {
   error: string | null;
   updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<void>;
   resetPreferences: () => void;
-  theme?: string; // Add theme
-  fontSize?: string; // Add fontSize
-  notifications?: boolean; // Add notifications
-  notificationFrequency?: string; // Add notificationFrequency
-  notificationType?: string; // Add notificationType
-  notificationTone?: string; // Add notificationTone
-  notifications_enabled?: boolean; // Add notifications_enabled
-  notification_frequency?: string; // Add notification_frequency
-  notification_type?: string; // Add notification_type
-  notification_tone?: string; // Add notification_tone
-  email_notifications?: boolean; // Add email_notifications
-  push_notifications?: boolean; // Add push_notifications
-  emotionalCamouflage?: boolean; // Add emotionalCamouflage
+  theme?: string;
+  fontSize?: string;
+  notifications?: boolean;
+  notificationFrequency?: string;
+  notificationType?: string;
+  notificationTone?: string;
+  notifications_enabled?: boolean;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  emotionalCamouflage?: boolean;
 }
-

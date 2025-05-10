@@ -65,7 +65,7 @@ const presets: PresetProps[] = [
 ];
 
 const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({ onSelectPreset, emotion }) => {
-  const { currentEmotion } = useMusic();
+  const { currentEmotion = 'neutral' } = useMusic();
   const [activePreset, setActivePreset] = useState<string | null>(null);
   
   // You can use the emotion prop here to customize presets if needed

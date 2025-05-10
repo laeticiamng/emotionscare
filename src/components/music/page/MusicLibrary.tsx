@@ -7,15 +7,17 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 
 const MusicLibrary: React.FC = () => {
-  const { playlists, loadPlaylistById } = useMusic();
+  const { playlists = [], loadPlaylistById } = useMusic();
   const { toast } = useToast();
   
   const handlePlayPlaylist = (id: string) => {
-    loadPlaylistById(id);
-    toast({
-      title: "Playlist chargée",
-      description: "Lecture de la playlist démarrée",
-    });
+    if (loadPlaylistById) {
+      loadPlaylistById(id);
+      toast({
+        title: "Playlist chargée",
+        description: "Lecture de la playlist démarrée",
+      });
+    }
   };
   
   return (

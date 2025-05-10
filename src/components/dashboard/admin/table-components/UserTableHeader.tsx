@@ -59,8 +59,6 @@ const UserTableHeader: React.FC<UserTableHeaderProps> = ({
         </SortableTableHead>
         
         <SortableTableHead 
-          isSorted={isSorted('anonymity_code')}
-          onSort={() => onSort('anonymity_code')}
           className="text-right"
           ariaLabel="Code d'anonymisation"
         >

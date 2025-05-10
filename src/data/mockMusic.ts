@@ -1,5 +1,5 @@
 
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Mock music tracks
 export const mockTracks: MusicTrack[] = [
@@ -46,6 +46,7 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '1',
     name: 'Calming Sounds',
+    title: 'Calming Sounds',
     description: 'Perfect for relaxation and stress relief',
     tracks: [mockTracks[0], mockTracks[3]],
     emotion: 'calm',
@@ -54,6 +55,7 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '2',
     name: 'Energy Boost',
+    title: 'Energy Boost',
     description: 'Get motivated and energized',
     tracks: [mockTracks[1]],
     emotion: 'happy',
@@ -62,6 +64,7 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '3',
     name: 'Work Concentration',
+    title: 'Work Concentration',
     description: 'Enhance your focus and productivity',
     tracks: [mockTracks[2]],
     emotion: 'focused',

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Music } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
-import { MusicRecommendationCardProps } from '@/types';
+import { MusicRecommendationCardProps } from '@/types/music';
 
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   emotion,
@@ -19,13 +19,22 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   const handlePlayMusic = async () => {
     if (!emotion) return;
     
-    await loadPlaylistForEmotion(emotion.toLowerCase());
-    setOpenDrawer(true);
-    
-    toast({
-      title: "Musique activée",
-      description: `Playlist adaptée à votre humeur ${emotion} chargée.`,
-    });
+    try {
+      await loadPlaylistForEmotion?.(emotion.toLowerCase());
+      setOpenDrawer?.(true);
+      
+      toast({
+        title: "Musique activée",
+        description: `Playlist adaptée à votre humeur ${emotion} chargée.`,
+      });
+    } catch (error) {
+      console.error("Error loading playlist:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la playlist.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (

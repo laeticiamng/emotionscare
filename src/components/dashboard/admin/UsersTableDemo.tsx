@@ -1,14 +1,26 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Table } from '@/components/ui/table';
 import Pagination from '@/components/ui/data-table/Pagination';
 import { useSortableTable } from '@/hooks/useSortableTable';
 import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField } from './types/tableTypes';
+import { SortableField, UserData } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
 import { useSelectedUsers } from '@/hooks/useSelectedUsers';
 import BulkActionsBar from './table-components/BulkActionsBar';
+import { User } from '@/types/user';
+
+// Helper function to convert User to UserData
+const convertUserToUserData = (user: User): UserData => {
+  return {
+    ...user,
+    location: user.department || 'Non spécifié',
+    status: user.onboarded ? 'active' : 'pending',
+    createdAt: user.created_at?.toString() || new Date().toISOString()
+  };
+};
 
 interface UsersTableDemoProps {
   defaultPageSize?: number;
@@ -29,7 +41,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
     defaultDirection: 'asc'
   });
   
-  // Table data management
+  // Table data management with extended properties
   const {
     users,
     isLoading,
@@ -50,6 +62,12 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
     defaultSortDirection: sortDirection
   });
   
+  // Convert users to UserData format
+  const userDataItems: UserData[] = React.useMemo(() => 
+    users.map(convertUserToUserData), 
+    [users]
+  );
+  
   // Selected users management
   const {
     selectedUsers,
@@ -58,7 +76,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
     clearSelection,
     allSelected,
     hasSelectedUsers
-  } = useSelectedUsers(users.map(u => u.id));
+  } = useSelectedUsers(userDataItems.map(u => u.id));
   
   // Fetch users when sort, page or page size changes
   React.useEffect(() => {
@@ -91,9 +109,9 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
             hasSelectionEnabled={true}
           />
           <UserTableBody 
-            users={users as unknown as UserData[]} 
+            users={userDataItems} 
             isLoading={isLoading} 
-            error={error?.message || ''} 
+            error={error ? error.message : ''} 
             hasData={users.length > 0}
             onRetry={handleRetry}
             isLoadingMore={isLoading && users.length > 0}

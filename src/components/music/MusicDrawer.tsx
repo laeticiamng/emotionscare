@@ -12,12 +12,14 @@ import MusicCreator from '@/components/music/MusicCreator';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface MusicDrawerProps {
+  isOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
   open, 
+  isOpen,
   onOpenChange 
 }) => {
   const { openDrawer, setOpenDrawer, currentTrack } = useMusic();
@@ -25,15 +27,21 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   const [activeTab, setActiveTab] = useState('player');
   
   // Use props if provided, otherwise use context
-  const isOpen = open !== undefined ? open : openDrawer;
-  const handleOpenChange = onOpenChange || setOpenDrawer;
+  const isDrawerOpen = open !== undefined ? open : isOpen !== undefined ? isOpen : openDrawer;
+  const handleOpenChange = (value: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(value);
+    } else if (setOpenDrawer) {
+      setOpenDrawer(value);
+    }
+  };
   
   // Use different components based on device type
   const DrawerComponent = isMobile ? Drawer : Sheet;
   const ContentComponent = isMobile ? DrawerContent : SheetContent;
   
   return (
-    <DrawerComponent open={isOpen} onOpenChange={handleOpenChange}>
+    <DrawerComponent open={isDrawerOpen} onOpenChange={handleOpenChange}>
       <ContentComponent className="p-0">
         <SheetHeader className="p-4 border-b">
           <div className="flex items-center justify-between">

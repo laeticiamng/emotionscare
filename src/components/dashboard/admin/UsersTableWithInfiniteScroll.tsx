@@ -1,14 +1,26 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Table } from '@/components/ui/table';
 import InfiniteScroll from '@/components/ui/data-table/InfiniteScroll';
 import { useSortableTable } from '@/hooks/useSortableTable';
 import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField } from './types/tableTypes';
+import { SortableField, UserData } from './types/tableTypes';
 import UserTableHeader from './table-components/UserTableHeader';
 import UserTableBody from './table-components/UserTableBody';
 import { useSelectedUsers } from '@/hooks/useSelectedUsers';
 import BulkActionsBar from './table-components/BulkActionsBar';
+import { User } from '@/types/user';
+
+// Helper function to convert User to UserData
+const convertUserToUserData = (user: User): UserData => {
+  return {
+    ...user,
+    location: user.department || 'Non spécifié',
+    status: user.onboarded ? 'active' : 'pending',
+    createdAt: user.created_at?.toString() || new Date().toISOString()
+  };
+};
 
 interface UsersTableWithInfiniteScrollProps {
   pageSize?: number;
@@ -41,6 +53,12 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
     defaultSortDirection: sortDirection
   });
   
+  // Convert users to UserData format
+  const userDataItems: UserData[] = React.useMemo(() => 
+    users.map(convertUserToUserData), 
+    [users]
+  );
+  
   // Selected users management
   const {
     selectedUsers,
@@ -49,7 +67,7 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
     clearSelection,
     allSelected,
     hasSelectedUsers
-  } = useSelectedUsers(users.map(u => u.id));
+  } = useSelectedUsers(userDataItems.map(u => u.id));
   
   // Fetch users when sorting changes
   React.useEffect(() => {
@@ -88,9 +106,9 @@ const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> 
               hasSelectionEnabled={true}
             />
             <UserTableBody 
-              users={users as unknown as UserData[]} 
+              users={userDataItems} 
               isLoading={isLoading} 
-              error={error?.message || ''} 
+              error={error ? error.message : ''}
               hasData={users.length > 0}
               onRetry={handleRetry}
               isLoadingMore={false}

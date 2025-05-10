@@ -1,205 +1,197 @@
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { mockPlaylists } from '@/data/mockMusic';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { mockTracks, mockMusicPlaylists } from '@/data/mockMusic';
 import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types/music';
+import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
 
-// Create the context with default values
 const MusicContext = createContext<MusicContextType>({
   currentTrack: null,
-  currentPlaylist: null,
   isPlaying: false,
-  volume: 0.7,
-  openDrawer: false,
-  setOpenDrawer: () => {},
+  volume: 0.5,
   playTrack: () => {},
   pauseTrack: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
   setVolume: () => {},
-  loadPlaylistForEmotion: async () => null,
-  getTracksForEmotion: () => [],
-  currentEmotion: '',
-  toggleRepeat: () => {},
-  toggleShuffle: () => {},
-  initializeMusicSystem: async () => {},
-  error: null,
-  playlists: [],
-  loadPlaylistById: async () => null,
+  setCurrentTrack: () => {},
+  openDrawer: false,
+  setOpenDrawer: () => {},
 });
 
-// Create a provider component
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolume] = useState(0.5);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState('');
-  const [repeat, setRepeat] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
 
-  // Initialize music system
-  const initializeMusicSystem = useCallback(async () => {
-    try {
-      // In a real app, fetch from API
-      setPlaylists(mockPlaylists);
-      return true;
-    } catch (err) {
-      setError('Failed to initialize music system');
-      console.error(err);
-      return false;
+  // Initialize the music system
+  useEffect(() => {
+    const initializeMusicSystem = async () => {
+      try {
+        // In a real app, this would load from an API
+        setPlaylists(mockMusicPlaylists);
+        
+        // Create audio element
+        const audio = new Audio();
+        audio.volume = volume;
+        setAudioElement(audio);
+        
+        setIsInitialized(true);
+      } catch (err) {
+        console.error('Error initializing music system:', err);
+        setError(err instanceof Error ? err : new Error('Failed to initialize music system'));
+      }
+    };
+
+    if (!isInitialized) {
+      initializeMusicSystem();
     }
-  }, []);
+  }, [isInitialized, volume]);
 
-  // Track control functions
-  const playTrack = useCallback((track: MusicTrack) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    
-    // Open drawer automatically when playing
-    setOpenDrawer(true);
-  }, []);
-
-  const pauseTrack = useCallback(() => {
-    setIsPlaying(false);
-  }, []);
-
-  const nextTrack = useCallback(() => {
-    if (!currentPlaylist || !currentTrack) return;
-    
-    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex >= 0 && currentIndex < currentPlaylist.tracks.length - 1) {
-      playTrack(currentPlaylist.tracks[currentIndex + 1]);
-    } else if (currentIndex === currentPlaylist.tracks.length - 1 && repeat) {
-      // When repeat is on, go back to the first track
-      playTrack(currentPlaylist.tracks[0]);
-    }
-  }, [currentPlaylist, currentTrack, playTrack, repeat]);
-
-  const previousTrack = useCallback(() => {
-    if (!currentPlaylist || !currentTrack) return;
-    
-    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex > 0) {
-      playTrack(currentPlaylist.tracks[currentIndex - 1]);
-    } else if (currentIndex === 0 && repeat) {
-      // When repeat is on, go to the last track
-      playTrack(currentPlaylist.tracks[currentPlaylist.tracks.length - 1]);
-    }
-  }, [currentPlaylist, currentTrack, playTrack, repeat]);
-
-  // Toggle functions
-  const toggleRepeat = useCallback(() => {
-    setRepeat(prev => !prev);
-  }, []);
-
-  const toggleShuffle = useCallback(() => {
-    setShuffle(prev => !prev);
-  }, []);
-
-  // Load playlist for a specific emotion
-  const loadPlaylistForEmotion = useCallback(async (emotion: string) => {
-    try {
-      // In a real app, fetch from API based on emotion
-      const playlist = mockPlaylists.find(
-        p => p.emotion?.toLowerCase() === emotion.toLowerCase()
-      );
+  // Play a track
+  const playTrack = (track: MusicTrack) => {
+    if (audioElement) {
+      setCurrentTrack(track);
       
-      if (playlist) {
-        setCurrentPlaylist(playlist);
+      // In a real app we would load the actual audio file
+      audioElement.src = track.audioUrl || track.url || '';
+      audioElement.play().catch(err => {
+        console.error('Error playing track:', err);
+      });
+      
+      setIsPlaying(true);
+    }
+  };
+
+  // Pause playback
+  const pauseTrack = () => {
+    if (audioElement && isPlaying) {
+      audioElement.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  // Resume playback
+  const resumeTrack = () => {
+    if (audioElement && !isPlaying && currentTrack) {
+      audioElement.play().catch(err => console.error('Error resuming track:', err));
+      setIsPlaying(true);
+    }
+  };
+
+  // Play next track in playlist
+  const nextTrack = () => {
+    if (!currentPlaylist || !currentTrack) return;
+    
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1 || currentIndex === currentPlaylist.tracks.length - 1) return;
+    
+    playTrack(currentPlaylist.tracks[currentIndex + 1]);
+  };
+
+  // Play previous track in playlist
+  const previousTrack = () => {
+    if (!currentPlaylist || !currentTrack) return;
+    
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex <= 0) return;
+    
+    playTrack(currentPlaylist.tracks[currentIndex - 1]);
+  };
+
+  // Load a playlist by its ID
+  const loadPlaylistById = (id: string) => {
+    const playlist = playlists.find(p => p.id === id);
+    if (playlist && playlist.tracks.length > 0) {
+      setCurrentPlaylist(playlist);
+      playTrack(playlist.tracks[0]);
+      return playlist;
+    }
+    return null;
+  };
+
+  // Load playlist based on emotion
+  const loadPlaylistForEmotion = async (emotion: string) => {
+    const musicType = mapEmotionToMusicType(emotion);
+    
+    // In a real app, this would load from an API
+    const emotionPlaylist = playlists.find(p => p.emotion?.toLowerCase() === musicType);
+    
+    if (emotionPlaylist) {
+      setCurrentPlaylist(emotionPlaylist);
+      setCurrentEmotion(emotion);
+      if (emotionPlaylist.tracks.length > 0) {
+        playTrack(emotionPlaylist.tracks[0]);
+      }
+      return emotionPlaylist;
+    } else {
+      // Fallback to first playlist
+      if (playlists.length > 0) {
+        setCurrentPlaylist(playlists[0]);
         setCurrentEmotion(emotion);
-        
-        // Auto play the first track
-        if (playlist.tracks.length > 0) {
-          playTrack(playlist.tracks[0]);
+        if (playlists[0].tracks.length > 0) {
+          playTrack(playlists[0].tracks[0]);
         }
-        
-        return playlist;
+        return playlists[0];
       }
-      
-      // Default playlist if no match
-      const defaultPlaylist = mockPlaylists[0];
-      setCurrentPlaylist(defaultPlaylist);
-      
-      if (defaultPlaylist?.tracks.length > 0) {
-        playTrack(defaultPlaylist.tracks[0]);
-      }
-      
-      return defaultPlaylist;
-    } catch (err) {
-      setError('Failed to load playlist for emotion: ' + emotion);
-      console.error(err);
-      return null;
     }
-  }, [playTrack]);
-
-  // Load playlist by ID
-  const loadPlaylistById = useCallback(async (id: string) => {
-    try {
-      // In a real app, fetch from API based on ID
-      const playlist = mockPlaylists.find(p => p.id === id);
-      
-      if (playlist) {
-        setCurrentPlaylist(playlist);
-        if (playlist.emotion) {
-          setCurrentEmotion(playlist.emotion);
-        }
-        return playlist;
-      }
-      
-      setError('Playlist not found');
-      return null;
-    } catch (err) {
-      setError('Failed to load playlist by ID');
-      console.error(err);
-      return null;
-    }
-  }, []);
+    
+    return null;
+  };
 
   // Get tracks for a specific emotion
-  const getTracksForEmotion = useCallback((emotion: string) => {
-    const matchingPlaylist = mockPlaylists.find(
-      p => p.emotion?.toLowerCase() === emotion.toLowerCase()
-    );
+  const getTracksForEmotion = (emotion: string): MusicTrack[] => {
+    const musicType = mapEmotionToMusicType(emotion);
+    const emotionPlaylist = playlists.find(p => p.emotion?.toLowerCase() === musicType);
     
-    return matchingPlaylist?.tracks || [];
-  }, []);
-
-  // Provide the context value
-  const contextValue: MusicContextType = {
-    currentTrack,
-    currentPlaylist,
-    isPlaying,
-    volume,
-    openDrawer,
-    setOpenDrawer,
-    playTrack,
-    pauseTrack,
-    nextTrack,
-    previousTrack,
-    setVolume,
-    loadPlaylistForEmotion,
-    getTracksForEmotion,
-    currentEmotion,
-    toggleRepeat,
-    toggleShuffle,
-    initializeMusicSystem,
-    error,
-    playlists,
-    loadPlaylistById,
+    if (emotionPlaylist) {
+      return emotionPlaylist.tracks;
+    }
+    
+    return [];
   };
 
   return (
-    <MusicContext.Provider value={contextValue}>
+    <MusicContext.Provider
+      value={{
+        currentTrack,
+        isPlaying,
+        volume,
+        playTrack,
+        pauseTrack,
+        nextTrack,
+        previousTrack,
+        setVolume,
+        setCurrentTrack,
+        currentPlaylist,
+        loadPlaylistForEmotion,
+        loadPlaylistById,
+        playlists,
+        openDrawer,
+        setOpenDrawer,
+        getTracksForEmotion,
+        currentEmotion,
+        initializeMusicSystem: async () => {
+          try {
+            // In a real app, this would initialize the system
+            setIsInitialized(true);
+          } catch (err) {
+            setError(err instanceof Error ? err : new Error('Failed to initialize music system'));
+            throw err;
+          }
+        },
+        error
+      }}
+    >
       {children}
     </MusicContext.Provider>
   );
 };
 
-// Custom hook to use the music context
 export const useMusic = () => useContext(MusicContext);
-
-// Make the provider available via named export
-export default MusicProvider;

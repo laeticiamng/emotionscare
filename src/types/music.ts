@@ -6,14 +6,15 @@ export interface MusicTrack {
   album?: string;
   duration: number;
   url?: string;
-  audioUrl?: string; // Alternative URL property
+  audioUrl?: string;
   imageUrl?: string;
-  cover?: string; // Alternative cover property
-  coverUrl?: string; // Adding coverUrl property
-  coverImage?: string; // Another alternative cover property
-  externalUrl?: string; // External URL for opening in music players
+  cover?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  externalUrl?: string;
   mood?: string;
   genre?: string;
+  emotion?: string; // Adding emotion property
   releaseDate?: string;
   bpm?: number;
   key?: string;
@@ -26,15 +27,17 @@ export interface MusicTrack {
 
 export interface MusicPlaylist {
   id: string;
-  title: string;
+  name: string;
+  title?: string; // For compatibility
   description?: string;
   cover?: string;
   coverImage?: string;
+  coverUrl?: string;
   tracks: MusicTrack[];
   created_at?: string | Date;
   updated_at?: string | Date;
   mood?: string;
-  emotion?: string; // Adding emotion property 
+  emotion?: string;
   user_id?: string;
   track_count?: number;
   duration?: number;
@@ -46,8 +49,8 @@ export interface MusicRecommendationCardProps {
   title?: string;
   description?: string;
   emotion?: string;
-  intensity?: number; // Adding intensity property
-  standalone?: boolean; // Adding standalone property
+  intensity?: number;
+  standalone?: boolean;
   onPlay?: () => void;
   tracks?: MusicTrack[];
   onClick?: () => void;
@@ -56,13 +59,13 @@ export interface MusicRecommendationCardProps {
 
 export interface MusicDrawerProps {
   isOpen?: boolean;
-  open?: boolean; // Add open as alternative to isOpen
+  open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onClose?: () => void; // Add onClose prop
+  onClose?: () => void;
   emotion?: string;
 }
 
-// Adding MusicContextType for MusicContext
+// Music context type definition
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
@@ -73,7 +76,7 @@ export interface MusicContextType {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   setCurrentTrack: (track: MusicTrack | null) => void;
-  openDrawer?: () => void;
+  openDrawer?: boolean;
   closeDrawer?: () => void;
   isDrawerOpen?: boolean;
   setOpenDrawer?: (open: boolean) => void;
@@ -81,5 +84,10 @@ export interface MusicContextType {
   currentPlaylist?: MusicPlaylist | null;
   toggleRepeat?: () => void;
   toggleShuffle?: () => void;
+  initializeMusicSystem?: () => Promise<void>;
+  error?: Error | null;
+  playlists?: MusicPlaylist[];
+  loadPlaylistById?: (id: string) => void;
+  getTracksForEmotion?: (emotion: string) => MusicTrack[];
+  currentEmotion?: string;
 }
-

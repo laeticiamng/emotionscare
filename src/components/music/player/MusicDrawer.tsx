@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-import { MusicDrawerProps } from '@/types';
+import { MusicDrawerProps } from '@/types/music';
 import MusicPlayer from "./MusicPlayer";
 
 // Make sure the component accepts both open and isOpen for compatibility
