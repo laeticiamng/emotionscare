@@ -71,10 +71,18 @@ export interface UserPreferencesState extends UserPreferences {
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   isLoading: boolean;
   error: Error | null;
+  preferences?: UserPreferences;
   
-  // Extra compatibility properties
+  // Add properties needed in ImmersiveSettingsPage
+  notificationsEnabled?: boolean;
+  notificationFrequency?: NotificationFrequency;
+  notificationType?: NotificationType;
+  notificationTone?: NotificationTone;
+  emotionalCamouflage?: boolean;
+  reminderTime?: string;
   notifications_enabled?: boolean;
-  notification_frequency?: string;
-  notification_type?: string;
-  notification_tone?: string;
+  reminder_time?: string;
 }
+
+export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
+export type FontSize = 'small' | 'medium' | 'large';

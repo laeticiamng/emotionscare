@@ -1,16 +1,23 @@
 
-// Add or update this file
 export interface JournalEntry {
   id: string;
-  user_id: string;
+  user_id?: string;
   date: string | Date;
-  content: string;
-  ai_feedback?: string;
-  emotions?: string[];
-  updated_at?: string | Date;
   title?: string;
+  content: string;
   mood?: string;
-  mood_score?: number;
-  created_at?: string;
-  text?: string; // Some components use text instead of content
+  emotion?: string;
+  tags?: string[];
+  images?: string[];
+  is_private?: boolean;
+  ai_feedback?: string;
+  location?: string;
+  weather?: string;
+  highlights?: string[];
+  featured_quote?: string;
+  word_count?: number;
+  activity_level?: number;
+  sleep_hours?: number;
+  gratitude_items?: string[];
+  insights?: string[];
 }

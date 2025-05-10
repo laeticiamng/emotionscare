@@ -1,53 +1,42 @@
-import { InvitationStats } from '@/types';
 
-// Simulate fetching invitation stats
-export const fetchInvitationStats = async (): Promise<InvitationStats> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+import { InvitationStats, InvitationFormData } from '@/types';
 
-  return {
-    total: 10,
-    sent: 8,
-    pending: 3,
-    accepted: 4,
-    expired: 1,
-    rejected: 0, // Add this missing property
-    teams: {}
-  };
-};
+class InvitationService {
+  // Generate invitation statistics
+  getInvitationStats(): InvitationStats {
+    return {
+      total: 50,
+      sent: 42,
+      pending: 8,
+      accepted: 30,
+      expired: 3,
+      rejected: 9,
+      completed: 30, // Added required property
+      conversionRate: 0.71, // Added required property
+      averageTimeToAccept: 14.5, // Added required property in hours
+      recent_invites: [], // Added required property
+      teams: {}
+    };
+  }
 
-export const sendInvitations = async (invitations: any[]): Promise<any> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Send invitation
+  async sendInvitation(data: InvitationFormData): Promise<boolean> {
+    // Mock API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log('Sending invitation to:', data.email);
+        resolve(true);
+      }, 1000);
+    });
+  }
 
-  return {
-    success: true,
-    message: 'Invitations sent successfully',
-    invitations
-  };
-};
+  // Get list of pending invitations
+  async getPendingInvitations(): Promise<any[]> {
+    return [
+      { id: '1', email: 'john@example.com', role: 'user', sent: new Date() },
+      { id: '2', email: 'jane@example.com', role: 'admin', sent: new Date() }
+    ];
+  }
+}
 
-export const verifyInvitation = async (token: string): Promise<any> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  return {
-    valid: true,
-    message: 'Invitation is valid',
-    invitation: {
-      id: '123',
-      email: 'test@example.com',
-      role: 'employee'
-    }
-  };
-};
-
-export const acceptInvitation = async (token: string): Promise<any> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  return {
-    success: true,
-    message: 'Invitation accepted successfully'
-  };
-};
+export default new InvitationService();

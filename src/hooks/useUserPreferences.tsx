@@ -2,27 +2,27 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
-import { ThemeName } from '@/types';
+import { NotificationFrequency, NotificationTone, FontFamily, FontSize } from '@/types/preferences';
 import { useToast } from '@/hooks/use-toast';
 
-// Types pour les préférences utilisateur
+// Types for user preferences
 export interface UserPreferencesState {
-  // Apparence
-  theme: ThemeName;
+  // Appearance
+  theme: string;
   dynamicTheme: 'none' | 'time' | 'emotion' | 'weather';
   highContrast: boolean;
   reducedAnimations: boolean;
-  fontSize: 'small' | 'medium' | 'large';
-  font: 'inter' | 'dm-sans' | 'serif';
+  fontSize: FontSize;
+  font: FontFamily;
   customBackground?: string;
   
-  // Identité
+  // Identity
   displayName?: string;
   pronouns?: 'il' | 'elle' | 'iel' | 'autre';
   biography?: string;
   avatarUrl?: string;
   
-  // Accessibilité
+  // Accessibility
   screenReader: boolean;
   keyboardNavigation: boolean;
   audioGuidance: boolean;
@@ -34,21 +34,26 @@ export interface UserPreferencesState {
     breathing: boolean;
     music: boolean;
   };
-  notificationFrequency: 'daily' | 'weekly' | 'flexible';
-  notificationTone: 'motivating' | 'gentle' | 'silent';
+  notificationFrequency: NotificationFrequency;
+  notificationTone: NotificationTone;
   reminderTime?: string;
+  
+  // Backwards compatibility
+  notifications_enabled?: boolean;
+  reminder_time?: string;
   
   // Données
   dataExport: 'pdf' | 'json';
   incognitoMode: boolean;
   lockJournals: boolean;
   
-  // Préférences premium
+  // Premium features
+  emotionalCamouflage: boolean;
   duoModeEnabled?: boolean;
   trustedContact?: string;
   customPresets: {
     name: string;
-    theme: ThemeName;
+    theme: string;
     audioPreset: string;
   }[];
 }
@@ -78,6 +83,7 @@ const defaultPreferences: UserPreferencesState = {
   dataExport: 'pdf',
   incognitoMode: false,
   lockJournals: false,
+  emotionalCamouflage: false,
   
   customPresets: []
 };
@@ -89,7 +95,7 @@ export function useUserPreferences() {
   const audioPrefs = useAudioPreferences();
   const { toast } = useToast();
 
-  // Charger les préférences depuis le localStorage au montage
+  // Load preferences from localStorage on mount
   useEffect(() => {
     try {
       const savedPreferences = localStorage.getItem('userPreferences');
@@ -97,36 +103,36 @@ export function useUserPreferences() {
         setPreferences(JSON.parse(savedPreferences));
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des préférences:', error);
+      console.error('Error loading preferences:', error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Mettre à jour les préférences
+  // Update preferences
   const updatePreferences = (newPreferences: Partial<UserPreferencesState>) => {
     try {
       const updatedPreferences = { ...preferences, ...newPreferences };
       setPreferences(updatedPreferences);
       localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
-      // Synchroniser avec d'autres contextes si nécessaire
+      // Synchronize with other contexts if needed
       if (newPreferences.theme) {
         setThemePreference(newPreferences.theme);
       }
       
       toast({
-        title: "Préférences mises à jour",
-        description: "Vos paramètres ont été enregistrés avec succès."
+        title: "Preferences updated",
+        description: "Your settings have been successfully saved."
       });
       
       return true;
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des préférences:', error);
+      console.error('Error saving preferences:', error);
       
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences.",
+        title: "Error",
+        description: "Unable to save your preferences.",
         variant: "destructive"
       });
       
@@ -134,11 +140,11 @@ export function useUserPreferences() {
     }
   };
 
-  // Créer un preset personnalisé
+  // Create a custom preset
   const createPreset = (name: string) => {
     const newPreset = {
       name,
-      theme: theme as ThemeName,
+      theme: theme,
       audioPreset: audioPrefs.preferences.currentEqualizer
     };
     
@@ -146,59 +152,59 @@ export function useUserPreferences() {
     updatePreferences({ customPresets: updatedPresets });
     
     toast({
-      title: "Nouveau preset créé",
-      description: `Le preset "${name}" a été enregistré.`
+      title: "New preset created",
+      description: `Preset "${name}" has been saved.`
     });
   };
 
-  // Appliquer un preset personnalisé
+  // Apply a custom preset
   const applyPreset = (name: string) => {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
     setThemePreference(preset.theme);
-    audioPrefs.setEqualizerPreset(preset.audioPreset);
+    audioPrefs.setEqualizerPreset?.(preset.audioPreset);
     
     toast({
-      title: "Preset appliqué",
-      description: `Le preset "${name}" a été activé.`
+      title: "Preset applied",
+      description: `Preset "${name}" has been activated.`
     });
     
     return true;
   };
 
-  // Réinitialiser toutes les préférences
+  // Reset all preferences
   const resetPreferences = () => {
     setPreferences(defaultPreferences);
     localStorage.removeItem('userPreferences');
     
-    // Réinitialiser également les contextes associés
+    // Also reset associated contexts
     setThemePreference('light');
     
     toast({
-      title: "Réinitialisation effectuée",
-      description: "Tous vos paramètres ont été remis à zéro."
+      title: "Reset completed",
+      description: "All your settings have been reset to defaults."
     });
   };
 
-  // Activer le mode incognito
+  // Toggle incognito mode
   const toggleIncognitoMode = (enabled: boolean) => {
     updatePreferences({ incognitoMode: enabled });
     
     if (enabled) {
-      // Logique supplémentaire pour le mode incognito
+      // Additional logic for incognito mode
       sessionStorage.setItem('incognito', 'true');
       
       toast({
-        title: "Mode incognito activé",
-        description: "Aucune donnée ne sera sauvegardée pendant cette session."
+        title: "Incognito mode enabled",
+        description: "No data will be saved during this session."
       });
     } else {
       sessionStorage.removeItem('incognito');
       
       toast({
-        title: "Mode incognito désactivé",
-        description: "Vos données seront à nouveau sauvegardées normalement."
+        title: "Incognito mode disabled",
+        description: "Your data will be saved normally again."
       });
     }
   };

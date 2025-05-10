@@ -6,13 +6,13 @@ export interface MusicTrack {
   album?: string;
   duration: number;
   cover_url?: string;
-  audio_url: string;
+  audio_url?: string; // Make it optional when url or audioUrl is provided
   emotion_tag?: string;
   intensity?: number;
   externalUrl?: string;
   genre?: string;
   
-  // Add backward compatibility aliases
+  // Backward compatibility aliases
   coverUrl?: string;
   cover?: string;
   audioUrl?: string;
@@ -20,13 +20,13 @@ export interface MusicTrack {
   mood?: string;
   coverImage?: string;
   
-  // For backward compatibility, mark audio_url as optional when url is available
+  // For backward compatibility
   [key: string]: any; // To allow dynamic properties
 }
 
 export interface MusicPlaylist {
   id: string;
-  title: string;
+  title?: string; // Make it optional when name is provided
   description?: string;
   emotion?: string;
   tracks: MusicTrack[];

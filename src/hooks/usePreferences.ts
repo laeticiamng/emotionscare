@@ -12,20 +12,21 @@ export const usePreferences = (): UserPreferencesState => {
     showEmotionPrompts: true,
     privacyLevel: 'standard',
     dataCollection: true,
-    notifications_enabled: true,
+    notificationsEnabled: true,
     email_notifications: true,
     push_notifications: true,
   });
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const updatePreferences = useCallback((newPreferences: Partial<UserPreferences>) => {
+  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
     setIsLoading(true);
     // Simulating an API call
     setTimeout(() => {
       setPreferences((prev) => ({ ...prev, ...newPreferences }));
       setIsLoading(false);
     }, 500);
+    return Promise.resolve();
   }, []);
 
   return {
@@ -40,9 +41,10 @@ export const usePreferences = (): UserPreferencesState => {
     showEmotionPrompts: preferences.showEmotionPrompts,
     privacyLevel: preferences.privacyLevel,
     dataCollection: preferences.dataCollection,
-    notifications_enabled: preferences.notifications_enabled,
+    notificationsEnabled: preferences.notificationsEnabled,
     email_notifications: preferences.email_notifications,
     push_notifications: preferences.push_notifications,
+    error: null
   };
 };
 

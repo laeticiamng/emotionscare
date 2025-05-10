@@ -1,25 +1,20 @@
 
-import { UserRole } from './user';
+export interface InvitationFormData {
+  email: string;
+  role: string;
+  message?: string;
+}
 
 export interface InvitationStats {
   total: number;
-  pending: number;
-  expired: number;
-  completed: number;
-  conversionRate: number;
-  averageTimeToAccept: number;
-  
-  // Adding missing properties
   sent: number;
+  pending: number;
   accepted: number;
+  expired: number;
   rejected: number;
-  teams: Record<string, any>;
-  recent_invites: any[];
-}
-
-export interface InvitationFormData {
-  email: string;
-  role: UserRole;
-  message: string;
-  expires_in_days: number;
+  completed: number; // Add missing property
+  conversionRate: number; // Add missing property
+  averageTimeToAccept: number; // Add missing property
+  recent_invites: any[]; // Add missing property
+  teams?: Record<string, any>;
 }
