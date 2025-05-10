@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,12 +10,12 @@ const NotificationPreferences = () => {
     preferences,
     isLoading,
     updatePreferences,
-    notifications_enabled = preferences.notifications_enabled || false,
+    notifications_enabled = false,
     notification_frequency = 'daily',
     notification_type = 'all',
     notification_tone = 'gentle',
-    email_notifications = preferences.notifications?.email || false,
-    push_notifications = preferences.notifications?.push || false
+    email_notifications = false,
+    push_notifications = false
   } = usePreferences();
 
   const handleUpdatePreferences = async (newPrefs: Partial<typeof preferences>) => {
@@ -34,8 +35,10 @@ const NotificationPreferences = () => {
           <div className="flex items-center space-x-2">
             <Checkbox
               id="notifications-enabled"
-              checked={notifications_enabled}
-              onCheckedChange={(checked) => handleUpdatePreferences({ notifications_enabled: checked })}
+              checked={!!notifications_enabled}
+              onCheckedChange={(checked) => handleUpdatePreferences({ 
+                notifications_enabled: !!checked 
+              })}
             />
             <label htmlFor="notifications-enabled" className="text-sm">
               Activer toutes les notifications
@@ -47,7 +50,9 @@ const NotificationPreferences = () => {
           <label className="text-sm font-medium">Fréquence des notifications</label>
           <Select
             defaultValue={notification_frequency}
-            onValueChange={(value) => handleUpdatePreferences({ notificationFrequency: value })}
+            onValueChange={(value) => handleUpdatePreferences({ 
+              notificationFrequency: value 
+            })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Choisir une fréquence" />
@@ -64,7 +69,9 @@ const NotificationPreferences = () => {
           <label className="text-sm font-medium">Type de notifications</label>
           <Select
             defaultValue={notification_type}
-            onValueChange={(value) => handleUpdatePreferences({ notificationType: value })}
+            onValueChange={(value) => handleUpdatePreferences({ 
+              notificationType: value 
+            })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Choisir un type" />
@@ -80,7 +87,9 @@ const NotificationPreferences = () => {
           <label className="text-sm font-medium">Tonalité des notifications</label>
           <Select
             defaultValue={notification_tone}
-            onValueChange={(value) => handleUpdatePreferences({ notificationTone: value })}
+            onValueChange={(value) => handleUpdatePreferences({ 
+              notificationTone: value 
+            })}
           >
             <SelectTrigger>
               <SelectValue placeholder="Choisir une tonalité" />
@@ -96,9 +105,14 @@ const NotificationPreferences = () => {
           <div className="flex items-center space-x-2">
             <Checkbox
               id="email-notifications"
-              checked={email_notifications}
+              checked={!!email_notifications}
               onCheckedChange={(checked) =>
-                handleUpdatePreferences({ notifications: { ...preferences.notifications, email: checked } })
+                handleUpdatePreferences({ 
+                  notifications: { 
+                    ...preferences.notifications, 
+                    email: !!checked 
+                  } 
+                })
               }
             />
             <label htmlFor="email-notifications" className="text-sm">
@@ -111,9 +125,14 @@ const NotificationPreferences = () => {
           <div className="flex items-center space-x-2">
             <Checkbox
               id="push-notifications"
-              checked={push_notifications}
+              checked={!!push_notifications}
               onCheckedChange={(checked) =>
-                handleUpdatePreferences({ notifications: { ...preferences.notifications, push: checked } })
+                handleUpdatePreferences({ 
+                  notifications: { 
+                    ...preferences.notifications, 
+                    push: !!checked 
+                  } 
+                })
               }
             />
             <label htmlFor="push-notifications" className="text-sm">

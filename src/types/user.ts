@@ -25,7 +25,7 @@ export interface User {
   position?: string;
   joined_at?: string | Date;
   onboarded?: boolean;
-  team_id?: string; // Add team_id property
+  team_id?: string;
 }
 
 export interface UserPreferences {
@@ -45,6 +45,10 @@ export interface UserPreferences {
   notifications_enabled?: boolean; // For backward compatibility
   reminder_time?: string; // For reminder time property
   accent_color?: string; // For accent color property
+  emotionalCamouflage?: boolean; // For premium feature
+  notificationFrequency?: string; // For notification frequency
+  notificationType?: string; // For notification type
+  notificationTone?: string; // For notification tone
 }
 
 export interface UserPreferencesState {

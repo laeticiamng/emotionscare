@@ -16,7 +16,7 @@ interface InvitationFormProps {
 const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => {
   const [inviteData, setInviteData] = useState<InvitationFormData>({
     email: '',
-    role: 'employee',
+    role: UserRole.EMPLOYEE,
     message: '',
     expires_in_days: 7
   });
@@ -79,7 +79,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
       setSuccess(true);
       setInviteData({
         email: '',
-        role: 'employee',
+        role: UserRole.EMPLOYEE,
         message: '',
         expires_in_days: 7
       });
@@ -140,10 +140,10 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
             <SelectValue placeholder="Sélectionner un rôle" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="employee">Employé</SelectItem>
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="admin">Administrateur</SelectItem>
-            <SelectItem value="user">Utilisateur Standard</SelectItem>
+            <SelectItem value={UserRole.EMPLOYEE}>Employé</SelectItem>
+            <SelectItem value={UserRole.MANAGER}>Manager</SelectItem>
+            <SelectItem value={UserRole.ADMIN}>Administrateur</SelectItem>
+            <SelectItem value={UserRole.USER}>Utilisateur Standard</SelectItem>
           </SelectContent>
         </Select>
       </div>

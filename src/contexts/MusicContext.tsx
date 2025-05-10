@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockTracks, mockMusicPlaylists } from '@/data/mockMusic';
 import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types/music';
-import { mapEmotionToMusicType } from '@/services/music/emotion-music-mapping';
 
 const MusicContext = createContext<MusicContextType>({
   currentTrack: null,
@@ -106,7 +105,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // Load a playlist by its ID
-  const loadPlaylistById = (id: string) => {
+  const loadPlaylistById = (id: string): MusicPlaylist | null => {
     const playlist = playlists.find(p => p.id === id);
     if (playlist && playlist.tracks.length > 0) {
       setCurrentPlaylist(playlist);
@@ -117,11 +116,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   // Load playlist based on emotion
-  const loadPlaylistForEmotion = async (emotion: string) => {
-    const musicType = mapEmotionToMusicType(emotion);
-    
-    // In a real app, this would load from an API
-    const emotionPlaylist = playlists.find(p => p.emotion?.toLowerCase() === musicType);
+  const loadPlaylistForEmotion = (emotion: string): MusicPlaylist | null => {
+    // Find a playlist with matching emotion
+    const emotionPlaylist = playlists.find(p => p.emotion?.toLowerCase() === emotion.toLowerCase());
     
     if (emotionPlaylist) {
       setCurrentPlaylist(emotionPlaylist);
@@ -147,14 +144,34 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Get tracks for a specific emotion
   const getTracksForEmotion = (emotion: string): MusicTrack[] => {
-    const musicType = mapEmotionToMusicType(emotion);
-    const emotionPlaylist = playlists.find(p => p.emotion?.toLowerCase() === musicType);
+    // Find a playlist with matching emotion
+    const emotionPlaylist = playlists.find(p => p.emotion?.toLowerCase() === emotion.toLowerCase());
     
     if (emotionPlaylist) {
       return emotionPlaylist.tracks;
     }
     
     return [];
+  };
+
+  // Initialize music system
+  const initializeMusicSystem = async () => {
+    try {
+      setPlaylists(mockMusicPlaylists);
+      
+      // Create audio element if needed
+      if (!audioElement) {
+        const audio = new Audio();
+        audio.volume = volume;
+        setAudioElement(audio);
+      }
+      
+      setIsInitialized(true);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to initialize music system');
+      setError(error);
+      throw error;
+    }
   };
 
   return (
@@ -177,15 +194,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setOpenDrawer,
         getTracksForEmotion,
         currentEmotion,
-        initializeMusicSystem: async () => {
-          try {
-            // In a real app, this would initialize the system
-            setIsInitialized(true);
-          } catch (err) {
-            setError(err instanceof Error ? err : new Error('Failed to initialize music system'));
-            throw err;
-          }
-        },
+        initializeMusicSystem,
         error
       }}
     >

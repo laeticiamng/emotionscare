@@ -1,98 +1,105 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SortableTableOptions } from '@/components/dashboard/admin/types/tableTypes';
+import { SortDirection } from '@/components/dashboard/admin/types/tableTypes';
 
-export type SortDirection = 'asc' | 'desc' | null;
+interface SortableTableOptions<T extends string> {
+  storageKey?: string;
+  persistInUrl?: boolean;
+  defaultField: T;
+  defaultDirection: SortDirection;
+}
 
-export function useSortableTable<T extends string>(options: SortableTableOptions<T>) {
-  const {
-    storageKey,
-    persistInUrl = false,
-    defaultField,
-    defaultDirection = null
-  } = options;
-  
+export function useSortableTable<T extends string>({
+  storageKey,
+  persistInUrl = false,
+  defaultField,
+  defaultDirection = 'asc'
+}: SortableTableOptions<T>) {
+  // URL state management
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Initialize sort state from URL or localStorage or defaults
-  const initSortField = (): T | undefined => {
+  // Initialize from URL or localStorage or defaults
+  const initField = (): T => {
     if (persistInUrl) {
-      const urlField = searchParams.get('sort');
+      const urlField = searchParams.get('sortField');
       if (urlField) return urlField as T;
     }
     
     if (storageKey) {
-      const savedSort = localStorage.getItem(`${storageKey}-field`);
-      if (savedSort) return savedSort as T;
+      const savedSort = localStorage.getItem(storageKey);
+      if (savedSort) {
+        const { field } = JSON.parse(savedSort);
+        if (field) return field as T;
+      }
     }
     
     return defaultField;
   };
   
-  const initSortDirection = (): SortDirection => {
+  const initDirection = (): SortDirection => {
     if (persistInUrl) {
-      const urlDirection = searchParams.get('direction');
+      const urlDirection = searchParams.get('sortDir');
       if (urlDirection && (urlDirection === 'asc' || urlDirection === 'desc')) {
-        return urlDirection as SortDirection;
+        return urlDirection;
       }
     }
     
     if (storageKey) {
-      const savedDirection = localStorage.getItem(`${storageKey}-direction`);
-      if (savedDirection && (savedDirection === 'asc' || savedDirection === 'desc' || savedDirection === 'null')) {
-        return savedDirection === 'null' ? null : savedDirection as SortDirection;
+      const savedSort = localStorage.getItem(storageKey);
+      if (savedSort) {
+        const { direction } = JSON.parse(savedSort);
+        if (direction) return direction as SortDirection;
       }
     }
     
     return defaultDirection;
   };
   
-  const [sortField, setSortField] = useState<T | undefined>(initSortField());
-  const [sortDirection, setSortDirection] = useState<SortDirection>(initSortDirection());
+  // State for current sorting
+  const [sortField, setSortField] = useState<T>(initField);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(initDirection);
   
-  // Update storage when sort changes
+  // Save sorting when it changes
   useEffect(() => {
-    if (sortField) {
-      if (storageKey) {
-        localStorage.setItem(`${storageKey}-field`, sortField as string);
-        localStorage.setItem(`${storageKey}-direction`, sortDirection === null ? 'null' : sortDirection);
-      }
-      
-      if (persistInUrl) {
-        const newParams = new URLSearchParams(searchParams);
-        newParams.set('sort', sortField as string);
-        if (sortDirection) {
-          newParams.set('direction', sortDirection);
-        } else {
-          newParams.delete('direction');
-        }
-        setSearchParams(newParams);
-      }
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify({ field: sortField, direction: sortDirection }));
     }
-  }, [sortField, sortDirection, storageKey, persistInUrl, searchParams, setSearchParams]);
+    
+    if (persistInUrl) {
+      setSearchParams(prev => {
+        const newParams = new URLSearchParams(prev);
+        newParams.set('sortField', sortField);
+        newParams.set('sortDir', sortDirection || 'asc');
+        return newParams;
+      });
+    }
+  }, [sortField, sortDirection, storageKey, persistInUrl, setSearchParams]);
   
-  // Handler for column sort clicks
+  // Handle sort request
   const handleSort = useCallback((field: T) => {
     setSortField(prevField => {
-      setSortDirection(prevDirection => {
-        if (prevField !== field) {
-          return 'asc'; // New column, start with ascending
-        } else {
-          // Toggle through: asc -> desc -> null (if 3-state sorting) -> asc
-          if (prevDirection === 'asc') return 'desc';
-          if (prevDirection === 'desc') return null;
-          return 'asc';
-        }
-      });
-      return field;
+      if (prevField === field) {
+        // Toggle direction if same field
+        setSortDirection(prevDir => (prevDir === 'asc' ? 'desc' : 'asc'));
+        return field;
+      } else {
+        // Default to ascending for new field
+        setSortDirection('asc');
+        return field;
+      }
     });
   }, []);
   
-  // Helper to check if a column is sorted
+  // Check if a column is sorted
   const isSorted = useCallback((field: T): SortDirection => {
-    return field === sortField ? sortDirection : null;
+    return sortField === field ? sortDirection : null;
   }, [sortField, sortDirection]);
   
-  return { sortField, sortDirection, handleSort, isSorted };
+  return {
+    sortField,
+    sortDirection,
+    handleSort,
+    isSorted
+  };
 }

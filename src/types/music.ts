@@ -3,58 +3,33 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  album?: string;
   duration: number;
-  url?: string;
   audioUrl?: string;
-  imageUrl?: string;
-  cover?: string;
+  url?: string;
   coverUrl?: string;
+  cover?: string;
   coverImage?: string;
-  externalUrl?: string;
-  mood?: string;
-  genre?: string;
-  emotion?: string; // Adding emotion property
-  releaseDate?: string;
-  bpm?: number;
-  key?: string;
-  created_at?: string | Date;
-  updated_at?: string | Date;
-  is_favorite?: boolean;
-  plays?: number;
-  is_playing?: boolean;
+  imageUrl?: string;
+  emotion?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  name: string;
-  title?: string; // For compatibility
-  description?: string;
-  cover?: string;
-  coverImage?: string;
-  coverUrl?: string;
+  title: string;
+  description: string;
   tracks: MusicTrack[];
-  created_at?: string | Date;
-  updated_at?: string | Date;
-  mood?: string;
+  coverUrl?: string;
+  name?: string;
   emotion?: string;
-  user_id?: string;
-  track_count?: number;
-  duration?: number;
-  is_public?: boolean;
-  is_favorite?: boolean;
 }
 
 export interface MusicRecommendationCardProps {
-  title?: string;
-  description?: string;
-  emotion?: string;
+  emotion: string;
   intensity?: number;
   standalone?: boolean;
-  onPlay?: () => void;
-  tracks?: MusicTrack[];
-  onClick?: () => void;
-  className?: string;
+  onPlayMusic?: () => void;
+  size?: 'small' | 'medium' | 'large';
+  showControls?: boolean;
 }
 
 export interface MusicDrawerProps {
@@ -62,10 +37,8 @@ export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
-  emotion?: string;
 }
 
-// Music context type definition
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
@@ -74,20 +47,16 @@ export interface MusicContextType {
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  setVolume: (volume: number) => void;
+  setVolume: (value: number) => void;
   setCurrentTrack: (track: MusicTrack | null) => void;
-  openDrawer?: boolean;
-  closeDrawer?: () => void;
-  isDrawerOpen?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
-  loadPlaylistForEmotion?: (emotion: string) => Promise<any>;
   currentPlaylist?: MusicPlaylist | null;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
-  initializeMusicSystem?: () => Promise<void>;
-  error?: Error | null;
+  loadPlaylistForEmotion?: (emotion: string) => MusicPlaylist | null;
+  loadPlaylistById?: (id: string) => MusicPlaylist | null;
   playlists?: MusicPlaylist[];
-  loadPlaylistById?: (id: string) => void;
+  openDrawer: boolean;
+  setOpenDrawer: (open: boolean) => void;
   getTracksForEmotion?: (emotion: string) => MusicTrack[];
   currentEmotion?: string;
+  initializeMusicSystem?: () => Promise<void>;
+  error?: Error | null;
 }

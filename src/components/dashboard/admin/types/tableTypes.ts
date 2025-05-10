@@ -16,3 +16,10 @@ export interface BulkActionProps {
   selectedUsers: string[];
   onClearSelection: () => void;
 }
+
+export interface SortableTableOptions<T> {
+  storageKey?: string;
+  persistInUrl?: boolean;
+  defaultField: T;
+  defaultDirection: SortDirection;
+}

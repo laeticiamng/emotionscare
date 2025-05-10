@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, UserPreferences, UserRole } from '@/types';
 
@@ -47,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: '1',
       name: 'John Doe',
       email: 'john@example.com',
-      role: 'admin',
+      role: UserRole.ADMIN,
       department: 'Engineering',
       avatar: '/avatars/user1.png',
       position: 'Senior Developer',

@@ -1,11 +1,12 @@
-import { User } from '@/types/user';
+
+import { User, UserRole } from '@/types/user';
 
 export const mockUsers: User[] = [
   {
     id: '1',
     name: 'Alex Dubois',
     email: 'alex@example.com',
-    role: 'user',
+    role: UserRole.USER,
     avatar: '/avatars/avatar-1.jpg',
     created_at: '2023-01-15T09:23:45Z',
     emotional_score: 72,
@@ -16,7 +17,7 @@ export const mockUsers: User[] = [
     id: '2',
     name: 'Sophie Lemaire',
     email: 'sophie@example.com',
-    role: 'employee',
+    role: UserRole.EMPLOYEE,
     avatar: '/avatars/avatar-2.jpg',
     created_at: '2023-02-28T11:12:30Z',
     emotional_score: 60,
@@ -27,7 +28,7 @@ export const mockUsers: User[] = [
     id: '3',
     name: 'Pierre Garnier',
     email: 'pierre@example.com',
-    role: 'analyst',
+    role: UserRole.ANALYST,
     avatar: '/avatars/avatar-3.jpg',
     created_at: '2023-03-05T16:55:00Z',
     emotional_score: 55,
@@ -38,7 +39,7 @@ export const mockUsers: User[] = [
     id: '4',
     name: 'Léa Martin',
     email: 'lea@example.com',
-    role: 'manager',
+    role: UserRole.MANAGER,
     avatar: '/avatars/avatar-4.jpg',
     created_at: '2023-03-12T14:45:10Z',
     emotional_score: 88,
@@ -49,7 +50,7 @@ export const mockUsers: User[] = [
     id: '5',
     name: 'Gabriel Rossi',
     email: 'gabriel@example.com',
-    role: 'wellbeing_manager',
+    role: UserRole.WELLBEING_MANAGER,
     avatar: '/avatars/avatar-5.jpg',
     created_at: '2023-04-01T08:00:00Z',
     emotional_score: 92,
@@ -60,7 +61,7 @@ export const mockUsers: User[] = [
     id: '6',
     name: 'Manon Leclerc',
     email: 'manon@example.com',
-    role: 'user',
+    role: UserRole.USER,
     avatar: '/avatars/avatar-6.jpg',
     created_at: '2023-04-18T19:30:00Z',
     emotional_score: 48,
@@ -71,7 +72,7 @@ export const mockUsers: User[] = [
     id: '7',
     name: 'Hugo Bernard',
     email: 'hugo@example.com',
-    role: 'employee',
+    role: UserRole.EMPLOYEE,
     avatar: '/avatars/avatar-7.jpg',
     created_at: '2023-05-03T12:20:00Z',
     emotional_score: 78,
@@ -82,7 +83,7 @@ export const mockUsers: User[] = [
     id: '8',
     name: 'Chloé Fournier',
     email: 'chloe@example.com',
-    role: 'analyst',
+    role: UserRole.ANALYST,
     avatar: '/avatars/avatar-8.jpg',
     created_at: '2023-05-22T21:05:00Z',
     emotional_score: 63,
@@ -93,7 +94,7 @@ export const mockUsers: User[] = [
     id: '9',
     name: 'Adam Girard',
     email: 'adam@example.com',
-    role: 'manager',
+    role: UserRole.MANAGER,
     avatar: '/avatars/avatar-9.jpg',
     created_at: '2023-06-10T07:40:00Z',
     emotional_score: 81,
@@ -104,7 +105,7 @@ export const mockUsers: User[] = [
     id: '10',
     name: 'Océane Roux',
     email: 'oceane@example.com',
-    role: 'wellbeing_manager',
+    role: UserRole.WELLBEING_MANAGER,
     avatar: '/avatars/avatar-10.jpg',
     created_at: '2023-06-28T13:50:00Z',
     emotional_score: 95,
@@ -115,7 +116,7 @@ export const mockUsers: User[] = [
     id: '11',
     name: 'Lucas Meunier',
     email: 'lucas@example.com',
-    role: 'user',
+    role: UserRole.USER,
     avatar: '/avatars/avatar-11.jpg',
     created_at: '2023-07-15T17:15:00Z',
     emotional_score: 58,
@@ -126,7 +127,7 @@ export const mockUsers: User[] = [
     id: '12',
     name: 'Emma Schneider',
     email: 'emma@example.com',
-    role: 'employee',
+    role: UserRole.EMPLOYEE,
     avatar: '/avatars/avatar-12.jpg',
     created_at: '2023-08-02T06:30:00Z',
     emotional_score: 70,
@@ -137,7 +138,7 @@ export const mockUsers: User[] = [
     id: '13',
     name: 'Nathan Moreau',
     email: 'nathan@example.com',
-    role: 'analyst',
+    role: UserRole.ANALYST,
     avatar: '/avatars/avatar-13.jpg',
     created_at: '2023-08-20T20:00:00Z',
     emotional_score: 66,
@@ -148,7 +149,7 @@ export const mockUsers: User[] = [
     id: '14',
     name: 'Clara Garcia',
     email: 'clara@example.com',
-    role: 'manager',
+    role: UserRole.MANAGER,
     avatar: '/avatars/avatar-14.jpg',
     created_at: '2023-09-07T10:45:00Z',
     emotional_score: 84,
@@ -159,7 +160,7 @@ export const mockUsers: User[] = [
     id: '15',
     name: 'Théo Chevalier',
     email: 'theo@example.com',
-    role: 'wellbeing_manager',
+    role: UserRole.WELLBEING_MANAGER,
     avatar: '/avatars/avatar-15.jpg',
     created_at: '2023-09-25T15:20:00Z',
     emotional_score: 90,
@@ -168,7 +169,7 @@ export const mockUsers: User[] = [
   }
 ];
 
-// Fix line 148 - Convert string roles to enum values
+// Fix generateMockUsers function to use the UserRole enum
 export const generateMockUsers = (count: number): User[] => {
   const mockAvatarUrls = [
     '/avatars/avatar-1.jpg',
@@ -193,13 +194,13 @@ export const generateMockUsers = (count: number): User[] => {
     const name = `Utilisateur ${i + 16}`;
     const email = `user${i + 16}@example.com`;
     const roles = [
-      'admin',
-      'user',
-      'employee',
-      'analyst',
-      'wellbeing_manager',
-      'manager'
-    ] as const;
+      UserRole.ADMIN,
+      UserRole.USER,
+      UserRole.EMPLOYEE,
+      UserRole.ANALYST,
+      UserRole.WELLBEING_MANAGER,
+      UserRole.MANAGER
+    ];
     const randomRole = roles[Math.floor(Math.random() * roles.length)];
     const avatar = mockAvatarUrls[i % mockAvatarUrls.length];
     const created_at = new Date().toISOString();

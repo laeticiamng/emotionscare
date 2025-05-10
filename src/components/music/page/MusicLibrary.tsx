@@ -31,7 +31,7 @@ const MusicLibrary: React.FC = () => {
                   <Music className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1 p-4">
-                  <h3 className="font-medium">{playlist.name}</h3>
+                  <h3 className="font-medium">{playlist.name || playlist.title}</h3>
                   <p className="text-sm text-muted-foreground">{playlist.tracks.length} morceaux</p>
                 </div>
                 <div className="pr-4">

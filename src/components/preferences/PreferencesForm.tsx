@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -28,9 +29,9 @@ const PreferencesForm: React.FC<{
 
   // Adapter les préférences de base pour le formulaire
   const formPreferences: FormPreferences = {
-    theme: preferences.theme || 'light',
+    theme: preferences.theme as ThemeName || 'light',
     notifications_enabled: preferences.notifications_enabled || false,
-    font_size: preferences.fontSize || preferences.font_size || 'medium',
+    font_size: preferences.fontSize as 'small' | 'medium' | 'large' || 'medium',
     language: preferences.language || 'fr', // Valeur par défaut pour résoudre l'erreur
     marketing_emails: preferences.notifications?.email || false,
     feature_announcements: preferences.notifications?.push || false,
@@ -47,7 +48,7 @@ const PreferencesForm: React.FC<{
     
     // Convert the form data to the UserPreferences format
     const standardPreferences: UserPreferences = {
-      theme: data.theme as 'light' | 'dark' | 'pastel', // Gestion du système
+      theme: data.theme,
       fontSize: data.font_size,
       language: data.language,
       accent_color: data.accent_color,

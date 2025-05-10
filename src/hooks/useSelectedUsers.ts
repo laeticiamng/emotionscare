@@ -1,50 +1,44 @@
-import { useState, useCallback } from 'react';
-import { UserData } from '@/components/dashboard/admin/types/tableTypes';
 
-export const useSelectedUsers = (users: UserData[]) => {
+import { useState, useCallback } from 'react';
+
+export const useSelectedUsers = (userIds: string[]) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  
+
   // Toggle selection for a single user
-  const toggleUserSelection = useCallback((userId: string, isSelected: boolean) => {
-    setSelectedUsers(prev => {
-      if (isSelected) {
-        return [...prev, userId];
-      } else {
-        return prev.filter(id => id !== userId);
-      }
-    });
+  const toggleUserSelection = useCallback((userId: string) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
   }, []);
-  
+
   // Toggle selection for all users
   const toggleSelectAll = useCallback(() => {
-    setSelectedUsers(prev => {
-      // If all users are currently selected, clear the selection
-      if (users.length > 0 && prev.length === users.length) {
-        return [];
-      }
-      // Otherwise, select all users
-      return users.map(user => user.id);
-    });
-  }, [users]);
-  
+    setSelectedUsers(prev => 
+      prev.length === userIds.length ? [] : [...userIds]
+    );
+  }, [userIds]);
+
   // Clear all selections
   const clearSelection = useCallback(() => {
     setSelectedUsers([]);
   }, []);
+
+  // Check if all visible users are selected
+  const allSelected = userIds.length > 0 && selectedUsers.length === userIds.length;
   
-  // Check if all users are selected
-  const allSelected = users.length > 0 && selectedUsers.length === users.length;
-  
-  // Check if some users are selected (for indeterminate state)
-  const someSelected = selectedUsers.length > 0 && selectedUsers.length < users.length;
-  
+  // Check if at least one user is selected
+  const hasSelectedUsers = selectedUsers.length > 0;
+
   return {
     selectedUsers,
     toggleUserSelection,
     toggleSelectAll,
     clearSelection,
     allSelected,
-    someSelected,
-    hasSelectedUsers: selectedUsers.length > 0
+    hasSelectedUsers
   };
 };
+
+export default useSelectedUsers;

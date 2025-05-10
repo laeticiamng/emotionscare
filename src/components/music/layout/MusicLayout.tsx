@@ -6,7 +6,7 @@ import MusicControls from '../page/MusicControls';
 import MusicDrawer from '../MusicDrawer';
 
 const MusicLayout: React.FC = () => {
-  const { currentTrack } = useMusic();
+  const { currentTrack, initializeMusicSystem, error } = useMusic();
   const [isLoading, setIsLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
@@ -14,8 +14,12 @@ const MusicLayout: React.FC = () => {
     // Initialize music system
     const initialize = async () => {
       try {
-        // We'll use a simple timeout to simulate initialization
-        await new Promise(resolve => setTimeout(resolve, 500));
+        if (initializeMusicSystem) {
+          await initializeMusicSystem();
+        } else {
+          // Fallback initialization if the function is not available
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
       } catch (err) {
         console.error('Error initializing music system:', err);
       } finally {
@@ -24,7 +28,7 @@ const MusicLayout: React.FC = () => {
     };
     
     initialize();
-  }, []);
+  }, [initializeMusicSystem]);
   
   return (
     <div className="flex flex-col min-h-screen">

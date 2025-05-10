@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -27,8 +28,8 @@ const PremiumFeatures = () => {
           <div className="flex items-center space-x-2">
             <Checkbox
               id="emotional-camouflage"
-              checked={emotionalCamouflage}
-              onCheckedChange={handleEmotionalCamouflageChange}
+              checked={!!emotionalCamouflage}
+              onCheckedChange={(checked) => handleEmotionalCamouflageChange(!!checked)}
             />
             <label htmlFor="emotional-camouflage" className="text-sm font-medium">
               Camouflage émotionnel

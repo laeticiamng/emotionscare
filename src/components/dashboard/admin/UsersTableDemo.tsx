@@ -111,7 +111,7 @@ const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
           <UserTableBody 
             users={userDataItems} 
             isLoading={isLoading} 
-            error={error ? error.message : ''} 
+            error={error ? String(error) : ''} 
             hasData={users.length > 0}
             onRetry={handleRetry}
             isLoadingMore={isLoading && users.length > 0}

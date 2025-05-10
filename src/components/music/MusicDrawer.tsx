@@ -1,115 +1,70 @@
 
-import React, { useState } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
-import { Button } from '@/components/ui/button';
-import { X, Music } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useIsMobile } from '@/hooks/use-mobile';
-import MusicPlayer from '@/components/music/player/MusicPlayer';
-import MusicCreator from '@/components/music/MusicCreator';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface MusicDrawerProps {
-  isOpen?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}
+import React from 'react';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerClose,
+  DrawerFooter,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { MusicDrawerProps } from '@/types/music';
+import MusicPlayer from "./MusicPlayer";
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
   open, 
-  isOpen,
-  onOpenChange 
+  isOpen, 
+  onOpenChange, 
+  onClose 
 }) => {
-  const { openDrawer, setOpenDrawer, currentTrack } = useMusic();
-  const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState('player');
+  // Use open if provided, otherwise isOpen (for backwards compatibility)
+  const isDrawerOpen = open !== undefined ? open : isOpen;
   
-  // Use props if provided, otherwise use context
-  const isDrawerOpen = open !== undefined ? open : isOpen !== undefined ? isOpen : openDrawer;
-  const handleOpenChange = (value: boolean) => {
+  const handleOpenChange = (newOpen: boolean) => {
     if (onOpenChange) {
-      onOpenChange(value);
-    } else if (setOpenDrawer) {
-      setOpenDrawer(value);
+      onOpenChange(newOpen);
+    } else if (!newOpen && onClose) {
+      onClose();
     }
   };
   
-  // Use different components based on device type
-  const DrawerComponent = isMobile ? Drawer : Sheet;
-  const ContentComponent = isMobile ? DrawerContent : SheetContent;
-  
   return (
-    <DrawerComponent open={isDrawerOpen} onOpenChange={handleOpenChange}>
-      <ContentComponent className="p-0">
-        <SheetHeader className="p-4 border-b">
+    <Drawer open={isDrawerOpen} onOpenChange={handleOpenChange}>
+      <DrawerContent className="h-[85vh]">
+        <DrawerHeader className="border-b pb-4">
           <div className="flex items-center justify-between">
-            <SheetTitle>
-              <span className="flex items-center">
-                <Music className="mr-2 h-5 w-5 text-primary" />
-                Musique Thérapeutique
-              </span>
-            </SheetTitle>
-            <SheetClose asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <div>
+              <DrawerTitle>Lecteur de musique</DrawerTitle>
+              <DrawerDescription>
+                Une expérience musicale adaptée à votre état émotionnel
+              </DrawerDescription>
+            </div>
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon">
                 <X className="h-4 w-4" />
-                <span className="sr-only">Fermer</span>
               </Button>
-            </SheetClose>
+            </DrawerClose>
           </div>
-        </SheetHeader>
+        </DrawerHeader>
         
-        <div className="p-4">
-          <Tabs defaultValue="player" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 mb-4">
-              <TabsTrigger value="player">Lecteur</TabsTrigger>
-              <TabsTrigger value="create">Créer</TabsTrigger>
-            </TabsList>
-            
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.2 }}
-              >
-                <TabsContent value="player" className="space-y-4">
-                  <MusicPlayer />
-                </TabsContent>
-                
-                <TabsContent value="create" className="space-y-4">
-                  <MusicCreator />
-                </TabsContent>
-              </motion.div>
-            </AnimatePresence>
-          </Tabs>
+        <div className="flex-1 overflow-auto">
+          <MusicPlayer />
         </div>
         
-        {/* Mini Player at the bottom when drawer is open */}
-        <AnimatePresence>
-          {currentTrack && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="border-t p-3"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-muted/50 rounded-md flex items-center justify-center">
-                  <Music className="h-5 w-5 text-primary/70" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{currentTrack.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </ContentComponent>
-    </DrawerComponent>
+        <DrawerFooter className="border-t pt-4 pb-6">
+          <Button 
+            onClick={() => handleOpenChange(false)}
+            variant="outline" 
+            className="w-full"
+          >
+            Réduire le lecteur
+          </Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

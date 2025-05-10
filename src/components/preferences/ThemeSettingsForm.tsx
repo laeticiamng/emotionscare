@@ -1,26 +1,25 @@
+
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ThemeName, UserPreferencesState } from '@/types';
+import { ThemeName } from '@/types';
 import { MoonIcon, SunIcon, Palette, Laptop } from 'lucide-react';
 import { usePreferences } from '@/hooks/usePreferences';
 
 interface ThemeSettingsFormProps {
-  preferences: UserPreferencesState;
-  onUpdate: (key: string, value: any) => void;
+  onUpdate?: (key: string, value: any) => void;
 }
 
 const ThemeSettingsForm: React.FC<ThemeSettingsFormProps> = ({
-  preferences,
   onUpdate
 }) => {
-  const { preferences, theme = preferences.theme || 'light', updatePreferences } = usePreferences();
+  const { preferences, theme = 'light', updatePreferences } = usePreferences();
 
-  const handleThemeChange = (theme: ThemeName) => {
-    updatePreferences({ theme });
+  const handleThemeChange = (selectedTheme: ThemeName) => {
+    updatePreferences({ theme: selectedTheme });
+    if (onUpdate) {
+      onUpdate('theme', selectedTheme);
+    }
   };
 
   return (

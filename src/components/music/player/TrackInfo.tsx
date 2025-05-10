@@ -51,6 +51,7 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   const getCoverUrl = () => {
     if (!displayTrack) return null;
     
+    // Check all possible cover image property names
     if ('coverUrl' in displayTrack && displayTrack.coverUrl) return displayTrack.coverUrl;
     if ('cover' in displayTrack && displayTrack.cover) return displayTrack.cover;
     if ('coverImage' in displayTrack && displayTrack.coverImage) return displayTrack.coverImage;
