@@ -19,6 +19,7 @@ export interface MusicTrack {
   emotion?: string;
   emotion_tag?: string;
   externalUrl?: string;
+  genre?: string; // Added genre property to fix MusicWellbeingPage errors
 }
 
 export interface MusicPlaylist {

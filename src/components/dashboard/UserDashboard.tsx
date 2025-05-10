@@ -39,18 +39,20 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   logger.debug('Rendering UserDashboard component');
   
   // Convert KPI and Shortcut types to required DashboardKpi and DashboardShortcut types
+  // Updated to ensure correct type mapping including the label property
   const typedKpis: DashboardKpi[] = kpis ? kpis.map((kpi: any) => ({
-    key: kpi.id || kpi.label,
+    key: kpi.id || kpi.key || kpi.label,
     value: kpi.value,
     label: kpi.label,
-    trend: kpi.trend,
+    trend: kpi.trend || kpi.change,
     icon: kpi.icon
   })) : [];
 
   const typedShortcuts: DashboardShortcut[] = shortcuts ? shortcuts.map((shortcut: any) => ({
-    name: shortcut.name,
+    name: shortcut.name || shortcut.label,
+    label: shortcut.label || shortcut.name, // Ensure label is always set
     icon: shortcut.icon,
-    to: shortcut.url || shortcut.route || '/',
+    to: shortcut.to || shortcut.url || shortcut.route || '/',
     description: shortcut.description
   })) : [];
   

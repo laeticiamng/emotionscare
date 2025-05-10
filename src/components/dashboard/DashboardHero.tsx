@@ -13,13 +13,15 @@ export interface DashboardKpi {
   trend?: {
     value: number;
     direction: 'up' | 'down' | 'neutral';
-  };
+  } | number;
 }
 
 export interface DashboardShortcut {
   label: string;
+  name?: string; // Made optional for compatibility
   icon: LucideIcon;
   to: string;
+  description?: string;
 }
 
 interface DashboardHeroProps {

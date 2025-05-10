@@ -1,22 +1,25 @@
 
 import { useState, useCallback, useEffect } from 'react';
+import { LucideIcon } from 'lucide-react';
 
 export interface DashboardSectionState {
   [key: string]: boolean;
 }
 
-// Define the missing DashboardKpi and DashboardShortcut interfaces
+// Define the DashboardKpi interface using LucideIcon to match DashboardHero
 export interface DashboardKpi {
   key: string;
   value: string | number;
   label: string;
-  trend?: number;
-  icon: React.ComponentType<any>;
+  trend?: number | { value: number; direction: 'up' | 'down' | 'neutral' };
+  icon: LucideIcon;
 }
 
+// Updated DashboardShortcut to include label property
 export interface DashboardShortcut {
   name: string;
-  icon: React.ComponentType<any>;
+  label: string; // Added to match DashboardHero's requirement
+  icon: LucideIcon;
   to: string;
   description?: string;
 }

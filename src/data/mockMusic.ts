@@ -10,7 +10,8 @@ export const mockTracks: MusicTrack[] = [
     duration: 180,
     cover_url: '/images/music/ocean.jpg',
     audio_url: '/audio/calm-ocean.mp3',
-    emotion_tag: 'calm'
+    emotion_tag: 'calm',
+    url: '/audio/calm-ocean.mp3' // Added required url property
   },
   {
     id: '2',
@@ -19,7 +20,8 @@ export const mockTracks: MusicTrack[] = [
     duration: 240,
     cover_url: '/images/music/morning.jpg',
     audio_url: '/audio/morning-motivation.mp3',
-    emotion_tag: 'happy'
+    emotion_tag: 'happy',
+    url: '/audio/morning-motivation.mp3' // Added required url property
   },
   {
     id: '3',
@@ -28,7 +30,8 @@ export const mockTracks: MusicTrack[] = [
     duration: 320,
     cover_url: '/images/music/focus.jpg',
     audio_url: '/audio/deep-focus.mp3',
-    emotion_tag: 'focused'
+    emotion_tag: 'focused',
+    url: '/audio/deep-focus.mp3' // Added required url property
   },
   {
     id: '4',
@@ -37,7 +40,8 @@ export const mockTracks: MusicTrack[] = [
     duration: 290,
     cover_url: '/images/music/release.jpg',
     audio_url: '/audio/tension-release.mp3',
-    emotion_tag: 'stressed'
+    emotion_tag: 'stressed',
+    url: '/audio/tension-release.mp3' // Added required url property
   }
 ];
 
