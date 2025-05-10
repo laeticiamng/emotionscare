@@ -1,25 +1,23 @@
 
 import { useState, useEffect } from 'react';
 
-export function useIsMobile(breakpoint: number = 768) {
-  const [isMobile, setIsMobile] = useState<boolean>(false);
-
+export const useIsMobile = (): boolean => {
+  const [isMobile, setIsMobile] = useState(false);
+  
   useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < breakpoint);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
     };
-
-    // Initial check
-    checkIsMobile();
-
-    // Add event listener to window resize
-    window.addEventListener('resize', checkIsMobile);
-
-    // Cleanup listener on component unmount
-    return () => {
-      window.removeEventListener('resize', checkIsMobile);
-    };
-  }, [breakpoint]);
-
+    
+    // Vérifier au chargement
+    checkMobile();
+    
+    // Ajouter l'écouteur pour les changements de taille
+    window.addEventListener('resize', checkMobile);
+    
+    // Nettoyer l'écouteur
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   return isMobile;
-}
+};

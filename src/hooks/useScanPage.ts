@@ -1,63 +1,44 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Emotion } from '@/types';
-import { fetchEmotionHistory } from '@/lib/scanService';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from './use-toast';
+import { fetchEmotionHistory } from '@/lib/scanService';
+import { Emotion } from '@/types';
 
-export function useScanPage() {
-  const [emotions, setEmotions] = useState<Emotion[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+export const useScanPage = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
+  const [emotions, setEmotions] = useState<Emotion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const refreshEmotions = useCallback(async () => {
-    if (!user?.id) {
-      console.warn("Attempting to refresh emotions without a user ID");
-      return;
-    }
+  const fetchData = useCallback(async () => {
+    if (!user?.id) return;
     
     setIsLoading(true);
     setError(null);
     
     try {
-      console.log("Fetching emotion history for user:", user.id);
-      const history = await fetchEmotionHistory(user.id);
-      console.log("Fetched emotions:", history.length);
-      setEmotions(history);
-      
-      return history;
+      const emotionHistory = await fetchEmotionHistory(user.id);
+      setEmotions(emotionHistory);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Une erreur est survenue lors du chargement de votre historique émotionnel";
-      setError(message);
-      console.error("Error refreshing emotions:", err);
-      
-      toast({
-        title: "Erreur de chargement",
-        description: message,
-        variant: "destructive",
-      });
-      
-      return [];
+      console.error('Error fetching emotion history:', err);
+      setError('Impossible de charger votre historique d\'émotions');
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id, toast]);
-  
-  // Charger l'historique d'émotions au montage
+  }, [user?.id]);
+
   useEffect(() => {
-    if (user?.id) {
-      refreshEmotions();
-    }
-  }, [user?.id, refreshEmotions]);
+    fetchData();
+  }, [fetchData]);
+
+  const refreshEmotions = useCallback(async () => {
+    await fetchData();
+  }, [fetchData]);
 
   return {
     emotions,
     isLoading,
     error,
-    refreshEmotions
+    refreshEmotions,
   };
-}
-
-export default useScanPage;
+};

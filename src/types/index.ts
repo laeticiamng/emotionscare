@@ -1,20 +1,69 @@
 
-// Export all types from various modules using "export type"
-export type { UserRole, User, UserPreferencesState } from './user';
-export type { UserPreferences } from './preferences';
-export type { Emotion, EmotionResult, EnhancedEmotionResult, EmotionalTeamViewProps } from './emotion';
-export type { ChatMessage, ChatConversation } from './chat';
-export type { JournalEntry } from './journal';
-export type { MoodData } from './mood';
-export type { VRSession, VRSessionTemplate, VRSessionWithMusicProps } from './vr';
-export type { InvitationStats, InvitationFormData } from './invitation';
-export type { Badge } from './badge';
-export type { UseAudioPlayerReturn, UseAudioPlayerStateReturn, AudioPlayerState } from './audio-player';
-export type { MusicTrack, MusicPlaylist, MusicRecommendationCardProps, MusicDrawerProps, MusicContextType } from './music';
-export type { NotificationFrequency, NotificationType, NotificationTone } from './notification';
-export type { ProgressBarProps } from './progress-bar';
-export type { TrackInfoProps, VolumeControlProps } from './track-info';
-export type { Report } from './report';
+// Types utilisateur
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  isActive: boolean;
+  avatar_url?: string;
+}
 
-// Export explicitly for ThemeName, FontSize, FontFamily and DynamicThemeMode
-export type { ThemeName, FontSize, FontFamily, DynamicThemeMode } from './preferences';
+export type UserRole = 'user' | 'admin' | 'coach';
+
+// Types liés aux émotions
+export interface Emotion {
+  id: string;
+  user_id: string;
+  date: string;
+  emotion: string;
+  score: number;
+  text: string;
+  emojis: string;
+  audio_url: string | null;
+  ai_feedback: string;
+  created_at: string;
+}
+
+export interface EmotionResult {
+  emotion: string;
+  score: number;
+  confidence: number;
+  feedback?: string;
+  date: string;
+  text?: string;
+  emojis?: string;
+  ai_feedback?: string;
+}
+
+// Types liés à la musique
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url: string;
+  cover_url?: string;
+  bpm?: number;
+  mood?: string;
+  intensity?: number;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  description?: string;
+  tracks: MusicTrack[];
+  mood?: string;
+  cover_url?: string;
+}
+
+// Type pour les équipes et les émotions d'équipe
+export interface EmotionalTeamViewProps {
+  userId?: string;
+  period?: string;
+  teamId?: string;
+  className?: string;
+  onRefresh?: () => Promise<void>;
+}

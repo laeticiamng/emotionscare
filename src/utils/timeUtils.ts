@@ -1,12 +1,5 @@
 
-/**
- * Utility functions related to time
- */
-
-/**
- * Returns the time of day (morning, afternoon, evening) based on the current hour
- */
-export function getTimeOfDay(): 'morning' | 'afternoon' | 'evening' {
+export const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' => {
   const hour = new Date().getHours();
   
   if (hour >= 5 && hour < 12) {
@@ -16,64 +9,63 @@ export function getTimeOfDay(): 'morning' | 'afternoon' | 'evening' {
   } else {
     return 'evening';
   }
-}
+};
 
-/**
- * Returns a greeting based on the time of day
- */
-export function getGreeting(): string {
-  const timeOfDay = getTimeOfDay();
-  
-  switch (timeOfDay) {
-    case 'morning':
-      return 'Bonjour';
-    case 'afternoon':
-      return 'Bon après-midi';
-    case 'evening':
-      return 'Bonsoir';
-    default:
-      return 'Bonjour';
-  }
-}
-
-/**
- * Formats a date in French locale (e.g., "lundi 12 mai 2023")
- */
-export function formatDateFr(date: Date): string {
-  return date.toLocaleDateString('fr-FR', {
-    weekday: 'long',
+export const formatDate = (date: Date | string): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
-}
+};
 
-/**
- * Returns whether two dates are the same day
- */
-export function isSameDay(date1: Date, date2: Date): boolean {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
-}
+export const formatTime = (date: Date | string): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleTimeString('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
 
-/**
- * Returns a relative time string (e.g., "il y a 3 jours", "aujourd'hui")
- */
-export function getRelativeTime(date: Date): string {
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+export const formatDateTime = (date: Date | string): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return `${formatDate(d)} à ${formatTime(d)}`;
+};
+
+export const getDaysDifference = (date1: Date, date2: Date): number => {
+  const diffTime = Math.abs(date2.getTime() - date1.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
+export const isToday = (date: Date | string): boolean => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const today = new Date();
   
-  if (isSameDay(now, date)) {
-    return "aujourd'hui";
-  } else if (diffDays === 1) {
-    return date < now ? "hier" : "demain";
-  } else if (diffDays < 7) {
-    return date < now ? `il y a ${diffDays} jours` : `dans ${diffDays} jours`;
+  return d.getDate() === today.getDate() &&
+    d.getMonth() === today.getMonth() &&
+    d.getFullYear() === today.getFullYear();
+};
+
+export const isYesterday = (date: Date | string): boolean => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  return d.getDate() === yesterday.getDate() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getFullYear() === yesterday.getFullYear();
+};
+
+export const getRelativeTimeString = (date: Date | string): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const now = new Date();
+  
+  if (isToday(d)) {
+    return `Aujourd'hui à ${formatTime(d)}`;
+  } else if (isYesterday(d)) {
+    return `Hier à ${formatTime(d)}`;
   } else {
-    return formatDateFr(date);
+    return formatDateTime(d);
   }
-}
+};
