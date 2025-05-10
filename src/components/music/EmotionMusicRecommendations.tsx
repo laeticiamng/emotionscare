@@ -39,7 +39,7 @@ export function EmotionMusicRecommendations({
     playTrack,
     loadPlaylistForEmotion,
     initializeMusicSystem,
-    error
+    error: musicError
   } = useMusic();
   
   const [localLoading, setLocalLoading] = useState(false);
@@ -106,7 +106,7 @@ export function EmotionMusicRecommendations({
   const musicType = getMusicTypeFromEmotion(emotionToUse);
 
   // Properly handle displaying errors
-  const errorMessage = error ? (typeof error === 'string' ? error : error instanceof Error ? error.message : String(error)) : '';
+  const errorMessage = musicError ? (typeof musicError === 'string' ? musicError : musicError instanceof Error ? musicError.message : String(musicError)) : '';
 
   return (
     <Card className="w-full">

@@ -17,6 +17,9 @@ export interface User {
   metadata?: Record<string, any>;
   department?: string;
   position?: string;
+  avatar?: string;
+  emotional_score?: number;
+  anonymity_code?: string;
 }
 
 export interface UserPreferences {
@@ -97,8 +100,8 @@ export interface Emotion {
   user_id: string;
   emotion: string;
   confidence: number;
-  timestamp: string;
-  created_at: string;
+  timestamp?: string;
+  created_at?: string;
   intensity?: number;
   feedback?: string;
   tags?: string[];
@@ -331,7 +334,7 @@ export interface TrackInfoProps {
   audioError?: Error | null;
 }
 
-// Export specific type files - these might contain additional types beyond what's defined here
+// Export specific type files - these files contain additional types beyond what's defined here
 export * from './audio-player';
 export * from './chat';
 export * from './community';

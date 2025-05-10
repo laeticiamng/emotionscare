@@ -1,4 +1,3 @@
-
 // Music related types
 
 export interface MusicTrack {
@@ -32,4 +31,23 @@ export interface MusicPreferences {
   favorite_genres: string[];
   favorite_tracks: string[];
   favorite_emotions?: string[];
+}
+
+export interface MusicAnalysisResult {
+  tempo: number;
+  key: string;
+  energy: number;
+  valence: number;
+  danceability: number;
+  acousticness: number;
+  instrumentalness: number;
+}
+
+export interface MusicGeneration {
+  id: string;
+  prompt: string;
+  created_at: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  url?: string;
+  error?: string;
 }
