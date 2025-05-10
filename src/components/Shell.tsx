@@ -2,8 +2,9 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Headphones, Menu, User } from 'lucide-react';
+import { Headphones, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import AuthButton from '@/components/auth/AuthButton';
 
 // Define the props interface
 interface ShellProps {
@@ -36,21 +37,7 @@ const Shell: React.FC<ShellProps> = ({ children }) => {
               <span className="hidden sm:inline">Musique</span>
             </Button>
 
-            {isAuthenticated ? (
-              <Button variant="default" size="sm" asChild>
-                <Link to="/dashboard" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Tableau de bord</span>
-                </Link>
-              </Button>
-            ) : (
-              <Button variant="default" size="sm" asChild>
-                <Link to="/login" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Connexion</span>
-                </Link>
-              </Button>
-            )}
+            <AuthButton />
           </div>
         </div>
       </header>

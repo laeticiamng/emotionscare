@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 export interface DashboardKpi {
   key: string;
@@ -38,6 +39,7 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
   isLoading = false 
 }) => {
   const navigate = useNavigate();
+  const { userMode } = useUserMode();
   
   // Helper function to determine trend direction
   const getTrendDirection = (trend: number | { value: number; direction: 'up' | 'down' | 'neutral' }) => {
@@ -54,17 +56,41 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
     }
     return trend.value;
   };
+
+  // Get greeting based on user mode
+  const getGreeting = () => {
+    switch(userMode) {
+      case 'b2b-admin':
+        return "Tableau RH";
+      case 'b2b-collaborator':
+        return "Bonjour";
+      case 'b2c':
+        return "Bienvenue";
+      default:
+        return "Bonjour";
+    }
+  };
   
   return (
-    <div className="bg-primary-50 dark:bg-primary-900/20 p-6 rounded-2xl mb-8 animate-fade-in">
+    <div className={`p-6 rounded-2xl mb-8 animate-fade-in ${
+      userMode === 'b2b-collaborator' ? 'bg-blue-50 dark:bg-blue-900/20' : 
+      userMode === 'b2b-admin' ? 'bg-purple-50 dark:bg-purple-900/20' : 
+      'bg-primary-50 dark:bg-primary-900/20'
+    }`}>
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         {/* Welcome message */}
         <div>
-          <h1 className="text-h1 text-primary-700 dark:text-primary-300 mb-1">
-            Bonjour, {userName} 👋
+          <h1 className={`text-h1 mb-1 ${
+            userMode === 'b2b-collaborator' ? 'text-blue-700 dark:text-blue-300' : 
+            userMode === 'b2b-admin' ? 'text-purple-700 dark:text-purple-300' : 
+            'text-primary-700 dark:text-primary-300'
+          }`}>
+            {getGreeting()}, {userName} 👋
           </h1>
           <p className="text-muted-foreground">
-            Voici un aperçu de votre journée
+            {userMode === 'b2b-admin' 
+              ? "Aperçu du bien-être collectif de l'équipe"
+              : "Voici un aperçu de votre journée"}
           </p>
         </div>
         
@@ -96,8 +122,16 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
           return (
             <Card key={kpi.key} className="border border-primary-100 dark:border-primary-800 transition-all duration-300 hover:shadow-md">
               <CardContent className="flex items-center p-4">
-                <div className="p-2 rounded-full bg-primary-100 dark:bg-primary-800/50 mr-4">
-                  <Icon className="w-6 h-6 text-primary-500 dark:text-primary-300" />
+                <div className={`p-2 rounded-full mr-4 ${
+                  userMode === 'b2b-collaborator' ? 'bg-blue-100 dark:bg-blue-800/50' : 
+                  userMode === 'b2b-admin' ? 'bg-purple-100 dark:bg-purple-800/50' : 
+                  'bg-primary-100 dark:bg-primary-800/50'
+                }`}>
+                  <Icon className={`w-6 h-6 ${
+                    userMode === 'b2b-collaborator' ? 'text-blue-500 dark:text-blue-300' : 
+                    userMode === 'b2b-admin' ? 'text-purple-500 dark:text-purple-300' : 
+                    'text-primary-500 dark:text-primary-300'
+                  }`} />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{kpi.label}</div>

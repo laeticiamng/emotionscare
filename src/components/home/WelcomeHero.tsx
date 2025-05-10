@@ -1,89 +1,119 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { HeartHandshake, Smile } from 'lucide-react';
-import { getGreeting, formatDateFr } from '@/utils/timeUtils';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserMode } from "@/contexts/UserModeContext";
 
 interface WelcomeHeroProps {
   userName?: string;
-  timeOfDay?: 'morning' | 'afternoon' | 'evening';
+  timeOfDay?: "morning" | "afternoon" | "evening";
   onMoodSelect?: () => void;
 }
 
-const WelcomeHero: React.FC<WelcomeHeroProps> = ({ 
-  userName, 
-  timeOfDay = 'morning',
-  onMoodSelect
+const WelcomeHero: React.FC<WelcomeHeroProps> = ({
+  userName,
+  timeOfDay = "morning",
+  onMoodSelect,
 }) => {
-  const today = new Date();
-  const formattedDate = formatDateFr(today);
-  const greeting = getGreeting();
-  
-  // Animations for staggered children
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { userMode } = useUserMode();
+
+  const getTimeOfDayMessage = () => {
+    switch (timeOfDay) {
+      case "morning":
+        return "Bon matin";
+      case "afternoon":
+        return "Bon après-midi";
+      case "evening":
+        return "Bonne soirée";
+      default:
+        return "Bienvenue";
     }
   };
-  
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
+
+  const getGreeting = () => {
+    if (userName) {
+      return `${getTimeOfDayMessage()}, ${userName} !`;
+    }
+
+    if (isAuthenticated) {
+      return `${getTimeOfDayMessage()} !`;
+    }
+
+    return "Bienvenue sur EmotionsCare";
+  };
+
+  const getTagline = () => {
+    if (isAuthenticated) {
+      if (userMode === 'b2b-admin') {
+        return "Découvrez l'état émotionnel global de votre équipe";
+      } else if (userMode === 'b2b-collaborator') {
+        return "Suivez votre bien-être émotionnel professionnel";
+      } else {
+        return "Comment vous sentez-vous aujourd'hui ?";
+      }
+    }
+
+    return "Votre partenaire pour le bien-être émotionnel";
   };
 
   return (
-    <motion.div 
-      className="text-center my-8 md:my-12"
-      variants={container}
-      initial="hidden"
-      animate="show"
-    >
-      <motion.div
-        variants={item}
-        className="inline-block"
-      >
-        <div className="inline-flex items-center justify-center p-2 mb-4 rounded-full bg-primary/10 text-primary backdrop-blur-sm">
-          <HeartHandshake className="w-5 h-5 mr-2" />
-          <span className="text-sm font-medium">{formattedDate}</span>
-        </div>
-      </motion.div>
-      
-      <motion.h1 
-        className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 tracking-tight"
-        variants={item}
-      >
-        {greeting}, <span className="text-primary">{userName || 'bienvenue'}</span>
-      </motion.h1>
-      
-      <motion.p 
-        className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8"
-        variants={item}
-      >
-        {userName 
-          ? "Que souhaitez-vous explorer aujourd'hui ?" 
-          : "Explorez votre bien-être émotionnel avec EmotionsCare"}
-      </motion.p>
-      
-      {/* Mood selection button - only shows for authenticated users */}
-      {userName && onMoodSelect && (
-        <motion.div variants={item}>
-          <Button 
-            onClick={onMoodSelect}
-            size="lg" 
-            variant="outline"
-            className="group hover:bg-primary/10 transition-all duration-300"
-          >
-            <Smile className="w-5 h-5 mr-2 group-hover:text-primary transition-colors" />
-            Comment vous sentez-vous aujourd'hui ?
-          </Button>
-        </motion.div>
-      )}
-    </motion.div>
+    <div className="relative z-10 text-center md:text-left">
+      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+        {getGreeting()}
+      </h1>
+      <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
+        {getTagline()}
+      </p>
+
+      <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+        {isAuthenticated ? (
+          <>
+            <Button
+              size="lg"
+              onClick={() => navigate("/dashboard")}
+              className="shadow-md"
+            >
+              {userMode === 'b2b-admin' 
+                ? "Voir le tableau de bord RH"
+                : "Accéder à mon espace"
+              }
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={onMoodSelect}
+              className="flex items-center gap-2"
+            >
+              Comment je me sens ? 
+              <span role="img" aria-label="mood">
+                🤔
+              </span>
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              size="lg"
+              onClick={() => navigate("/login")}
+              className="shadow-md"
+            >
+              Se connecter
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate("/register")}
+            >
+              Créer un compte
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 

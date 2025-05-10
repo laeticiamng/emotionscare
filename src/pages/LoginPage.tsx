@@ -1,149 +1,118 @@
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
-const formSchema = z.object({
-  email: z.string().email('Email invalide'),
-  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
-});
-
-interface LoginForm {
-  email: string;
-  password: string;
-}
-
-const LoginPage = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
+const LoginPage: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { toast } = useToast();
+  
+  // Get the redirect path from the location state, or default to "/choose-mode"
+  const from = location.state?.from?.pathname || '/choose-mode';
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  const onSubmit = async (data: LoginForm) => {
-    setIsLoading(true);
-    setError(null);
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
-      const success = await login({
-        email: data.email,
-        password: data.password,
-        isAdmin: false
+      setLoading(true);
+      if (!login) throw new Error('Login function not available');
+      
+      await login(email, password);
+      toast({
+        description: "Connexion réussie!",
+        variant: "success",
       });
-
-      if (success) {
-        toast({
-          title: "Connexion réussie",
-          description: "Vous êtes maintenant connecté.",
-        });
-        navigate('/dashboard');
-      } else {
-        setError("Échec de la connexion. Veuillez vérifier vos informations d'identification.");
-      }
-    } catch (err) {
-      setError("Une erreur s'est produite lors de la connexion. Veuillez réessayer.");
-      console.error(err);
+      
+      // Redirect to user mode selection or the previous page they were trying to access
+      navigate(from);
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: "Erreur de connexion",
+        description: "Email ou mot de passe incorrect.",
+        variant: "destructive",
+      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="flex items-center justify-center min-h-screen bg-muted/20 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Connexion</CardTitle>
-          <CardDescription>
-            Connectez-vous à votre compte pour accéder à votre tableau de bord
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl text-center">Connexion</CardTitle>
+          <CardDescription className="text-center">
+            Entrez vos identifiants pour accéder à votre espace
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 rounded-md bg-red-50 text-red-800 border border-red-200">
-                {error}
+        <CardContent className="grid gap-4">
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="exemple@mail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="utilisateur@example.com"
-                {...register('email')}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Button
-                  variant="link"
-                  className="h-auto p-0 text-sm"
-                  type="button"
-                  onClick={() => navigate('/forgot-password')}
-                >
-                  Mot de passe oublié?
-                </Button>
+              <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-primary underline-offset-4 hover:underline"
+                  >
+                    Mot de passe oublié?
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="********"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                {...register('password')}
-              />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Connexion...' : 'Se connecter'}
-            </Button>
-            <div className="text-center text-sm">
-              Vous n'avez pas de compte?{' '}
-              <Button
-                variant="link"
-                className="h-auto p-0"
-                type="button"
-                onClick={() => navigate('/register')}
-              >
-                S'inscrire
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Connexion en cours...' : 'Se connecter'}
               </Button>
             </div>
-          </CardFooter>
-        </form>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-4">
+          <div className="text-center text-sm text-muted-foreground mt-2">
+            <span>Vous n'avez pas de compte? </span>
+            <Link 
+              to="/register" 
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Créer un compte
+            </Link>
+          </div>
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => navigate('/')}
+          >
+            Retour à l'accueil
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

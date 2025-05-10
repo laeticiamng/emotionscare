@@ -8,8 +8,10 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDashboardHero } from '@/hooks/useDashboardHero';
 import DashboardViewToggle from './DashboardViewToggle';
 import DashboardContent from './DashboardContent';
-import useDashboardState, { DashboardKpi, DashboardShortcut } from '@/hooks/useDashboardState';
+import useDashboardState from '@/hooks/useDashboardState';
 import useLogger from '@/hooks/useLogger';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { LucideIcon } from 'lucide-react';
 
 interface UserDashboardProps {
   user: User | null;
@@ -29,6 +31,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
     toggleSection, 
     toggleMinimalView 
   } = useDashboardState();
+  const { userMode } = useUserMode();
   
   // Refresh all user dashboard data
   const refreshDashboardData = useCallback(async () => {
@@ -38,20 +41,19 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
 
   logger.debug('Rendering UserDashboard component');
   
-  // Convert KPI and Shortcut types to required DashboardKpi and DashboardShortcut types
-  // Updated to ensure correct type mapping including the label property
-  const typedKpis: DashboardKpi[] = kpis ? kpis.map((kpi: any) => ({
+  // Map the KPI and shortcut types correctly between different interfaces
+  const typedKpis: DashboardHero["props"]["kpis"] = kpis ? kpis.map((kpi: any) => ({
     key: kpi.id || kpi.key || kpi.label,
     value: kpi.value,
     label: kpi.label,
     trend: kpi.trend || kpi.change,
-    icon: kpi.icon
+    icon: kpi.icon as LucideIcon
   })) : [];
 
-  const typedShortcuts: DashboardShortcut[] = shortcuts ? shortcuts.map((shortcut: any) => ({
+  const typedShortcuts: DashboardHero["props"]["shortcuts"] = shortcuts ? shortcuts.map((shortcut: any) => ({
     name: shortcut.name || shortcut.label,
-    label: shortcut.label || shortcut.name, // Ensure label is always set
-    icon: shortcut.icon,
+    label: shortcut.label || shortcut.name,
+    icon: shortcut.icon as LucideIcon,
     to: shortcut.to || shortcut.url || shortcut.route || '/',
     description: shortcut.description
   })) : [];
@@ -79,11 +81,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         isLoading={isLoading}
       />
       
-      {/* Modules Section - Using our reusable component */}
-      <ModulesSection 
-        collapsed={collapsedSections.modules} 
-        onToggle={() => toggleSection('modules')} 
-      />
+      {/* Only show modules section for non-admin users */}
+      {userMode !== 'b2b-admin' && (
+        <ModulesSection 
+          collapsed={collapsedSections.modules} 
+          onToggle={() => toggleSection('modules')} 
+          selectedMood={latestEmotion?.emotion}
+        />
+      )}
       
       {/* Main Dashboard Content */}
       <DashboardContent
@@ -93,6 +98,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
         toggleSection={toggleSection}
         userId={user?.id || ''}
         latestEmotion={latestEmotion}
+        userMode={userMode}
       />
     </div>
   );
