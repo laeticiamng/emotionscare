@@ -11,23 +11,35 @@ import AdminLoginPage from './pages/AdminLoginPage';
 import { AuthProvider } from './contexts/AuthContext';
 import Index from './pages/Index';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import ProtectedLayout from './components/ProtectedLayout';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Shell />}>
-            <Route index element={<Index />} />
-            <Route path="/settings" element={<ImmersiveSettingsPage />} />
+          {/* Pages publiques */}
+          <Route path="/admin-login" element={<AdminLoginPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          
+          {/* Pages protégées (nécessitent une authentification) */}
+          <Route element={<ProtectedLayout />}>
             <Route path="/admin/premium" element={<AdminPremiumDashboard />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/scan" element={<ScanPage />} />
-            <Route path="/dashboard" element={<AdminPremiumDashboard />} />
+            <Route path="/settings" element={<ImmersiveSettingsPage />} />
             <Route path="/preferences" element={<UserPreferencesPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
           </Route>
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Page d'accueil */}
+          <Route path="/" element={<Shell />}>
+            <Route index element={<Index />} />
+          </Route>
         </Routes>
       </AuthProvider>
     </Router>

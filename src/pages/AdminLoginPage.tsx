@@ -66,7 +66,8 @@ const AdminLoginPage = () => {
           title: "Connexion administrateur réussie",
           description: "Vous êtes maintenant connecté au tableau de bord administrateur.",
         });
-        navigate('/admin');
+        // Rediriger vers le dashboard admin après une connexion réussie
+        navigate('/admin/premium');
       } else {
         setError("Échec de la connexion. Veuillez vérifier vos informations d'identification.");
       }
@@ -89,6 +90,11 @@ const AdminLoginPage = () => {
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
+            {error && (
+              <div className="p-3 rounded-md bg-red-50 text-red-800 border border-red-200">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
