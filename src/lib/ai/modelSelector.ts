@@ -8,6 +8,7 @@ interface ModelSelectionCriteria {
   isComplex?: boolean;
   isFrequentRequest?: boolean;
   isBatchOperation?: boolean;
+  isPremiumSupport?: boolean;
   moduleType: AIModule;
 }
 
@@ -25,6 +26,18 @@ export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<O
   if (budgetExceeded && criteria.moduleType !== 'scan') {
     console.log(`Budget dépassé pour ${config.model}, passage à gpt-4o-mini`);
     config.model = "gpt-4o-mini";
+  }
+  
+  // Support premium - toujours utiliser le meilleur modèle disponible
+  if (criteria.isPremiumSupport && !budgetExceeded) {
+    return {
+      model: "gpt-4o",
+      temperature: 0.5,
+      max_tokens: 1024,
+      top_p: 1.0,
+      stream: true,
+      cacheEnabled: false
+    };
   }
   
   // Pour les sessions de coach initiales, utiliser le modèle plus puissant

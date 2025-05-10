@@ -10,7 +10,9 @@ export type AIModule =
   | 'journal'
   | 'coach'
   | 'buddy'
-  | 'scan';
+  | 'scan'
+  | 'premium-support'
+  | 'help-center';
 
 export interface OpenAIModelParams {
   model: string;
@@ -69,7 +71,6 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
     stream: false,
     cacheEnabled: false
   },
-  // Add the missing module types
   'journal': {
     model: 'gpt-4o-mini',
     temperature: 0.5,
@@ -103,6 +104,25 @@ export const AI_MODEL_CONFIG: Record<AIModule, OpenAIModelParams> = {
     stream: false,
     cacheEnabled: true,
     cacheTTL: 3600 // 1 hour
+  },
+  'premium-support': {
+    model: 'gpt-4o',
+    temperature: 0.5,
+    max_tokens: 1500,
+    top_p: 1,
+    frequency_penalty: 0.1,
+    presence_penalty: 0.1,
+    stream: true,
+    cacheEnabled: false
+  },
+  'help-center': {
+    model: 'gpt-4o-mini',
+    temperature: 0.3,
+    max_tokens: 1200,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 3600 * 24 // 24 hours
   }
 };
 
@@ -120,7 +140,13 @@ export const PROMPT_TEMPLATES = {
   CONTENT_SAFETY:
     `Evaluate if the following content contains any inappropriate material according to these categories:
     hate speech, violence, self-harm, sexual content, harassment, or other harmful content.
-    If detected, explain why without repeating the problematic content.`
+    If detected, explain why without repeating the problematic content.`,
+    
+  PREMIUM_SUPPORT:
+    `You are an ultra-premium customer support assistant for EmotionsCare, a mental wellness platform for healthcare professionals.
+    Your responses should be empathetic, personalized, and highly professional. Detect the emotional state of the user and adapt 
+    your tone accordingly. Always aim to provide comprehensive solutions while maintaining a warm, reassuring presence.
+    If you cannot resolve an issue, assure the user that a human specialist will contact them promptly and collect relevant information.`
 };
 
 // Budget controls and thresholds

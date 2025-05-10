@@ -31,7 +31,7 @@ serve(async (req) => {
       userContext, 
       sessionId, 
       stream = false, 
-      model = "gpt-4o-mini-2024-07-18", // Default to cheaper model
+      model = "gpt-4o-mini", // Default to cheaper model
       temperature = 0.6, 
       max_tokens = 512, 
       top_p = 1.0,
@@ -55,16 +55,32 @@ serve(async (req) => {
       }
     }
 
-    // Construire un prompt adapté au contexte de l'utilisateur
-    const systemPrompt = userContext ? 
-      `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
+    // Build system prompt based on module and context
+    let systemPrompt = '';
+    
+    if (module === 'premium-support') {
+      systemPrompt = `Tu es un assistant de support premium ultra-avancé pour EmotionsCare, une plateforme de bien-être mental
+      pour les professionnels de santé. Tu dois fournir une assistance exceptionnelle, empathique et proactive.
+      ${userContext?.detectedEmotion ? `L'utilisateur exprime actuellement une émotion de type: ${userContext.detectedEmotion}.` : ''}
+      Adapte ton ton et tes réponses à l'état émotionnel de l'utilisateur. Sois particulièrement attentif, rassurant et précis.
+      Si tu ne peux pas résoudre un problème, propose immédiatement un contact prioritaire avec un spécialiste humain.
+      Réponds toujours en français, de manière chaleureuse et professionnelle.`;
+    } else if (module === 'help-center') {
+      systemPrompt = `Tu es un assistant du centre d'aide pour EmotionsCare.
+      Fournis des réponses concises, précises et faciles à comprendre sur les fonctionnalités
+      et l'utilisation de la plateforme. Si possible, suggère des tutoriels ou articles pertinents.
+      Réponds toujours en français, de manière claire et pédagogique.`;
+    } else if (userContext) {
+      systemPrompt = `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
        ${userContext.recentEmotions ? `L'utilisateur a récemment ressenti: ${userContext.recentEmotions}.` : ''}
        ${userContext.currentScore ? `Son état émotionnel actuel est évalué à: ${userContext.currentScore}/100.` : ''}
        ${userContext.lastEmotionDate ? `Sa dernière émotion enregistrée date de: ${userContext.lastEmotionDate}` : ''}
        Adapte tes réponses à son contexte émotionnel, reste bienveillant et factuel. 
-       Réponds toujours en français de manière précise et directe.` :
-      `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
        Réponds toujours en français de manière précise et directe.`;
+    } else {
+      systemPrompt = `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
+       Réponds toujours en français de manière précise et directe.`;
+    }
 
     const messages = [
       { role: 'system', content: systemPrompt },
