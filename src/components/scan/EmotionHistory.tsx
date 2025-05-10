@@ -100,7 +100,8 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({
 
   const formatDate = (dateStr: string | Date) => {
     try {
-      return format(new Date(dateStr), 'PPP', { locale: fr });
+      const date = typeof dateStr === 'string' || dateStr instanceof Date ? new Date(dateStr) : new Date();
+      return format(date, 'PPP', { locale: fr });
     } catch (e) {
       return "Date invalide";
     }
@@ -108,7 +109,8 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({
 
   const formatTime = (dateStr: string | Date) => {
     try {
-      return format(new Date(dateStr), 'HH:mm', { locale: fr });
+      const date = typeof dateStr === 'string' || dateStr instanceof Date ? new Date(dateStr) : new Date();
+      return format(date, 'HH:mm', { locale: fr });
     } catch (e) {
       return "--:--";
     }
@@ -136,11 +138,11 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({
                     <div className="flex items-center text-sm text-muted-foreground gap-3">
                       <span className="flex items-center gap-1">
                         <CalendarIcon className="h-3 w-3" />
-                        {formatDate(emotion.date || Date.now())}
+                        {formatDate(emotion.date || new Date())}
                       </span>
                       <span className="flex items-center gap-1">
                         <ClockIcon className="h-3 w-3" />
-                        {formatTime(emotion.date || Date.now())}
+                        {formatTime(emotion.date || new Date())}
                       </span>
                     </div>
                   </div>

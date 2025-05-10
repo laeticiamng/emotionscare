@@ -1,7 +1,8 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, Square, Play, Trash2, Loader2 } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Mic, Square, Trash, PlayCircle, PauseCircle } from 'lucide-react';
 
 interface AudioEmotionScannerProps {
   audioUrl: string | null;
@@ -9,153 +10,175 @@ interface AudioEmotionScannerProps {
   disabled?: boolean;
 }
 
-const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({ 
-  audioUrl, 
+const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
+  audioUrl,
   onAudioChange,
-  disabled = false 
+  disabled = false
 }) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<number | null>(null);
+  const [timerInterval, setTimerInterval] = useState<number | null>(null);
 
-  // Start recording
-  const handleStartRecording = async () => {
+  const startRecording = async () => {
     try {
-      setIsLoading(true);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
-      });
+      const recorder = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
       
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        chunks.push(e.data);
+      };
       
-      mediaRecorder.addEventListener('dataavailable', (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      });
-      
-      mediaRecorder.addEventListener('stop', () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        onAudioChange(audioUrl);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        onAudioChange(url);
         
-        // Stop all tracks
+        // Créer un élément audio pour la lecture
+        const audio = new Audio(url);
+        setAudioElement(audio);
+        
+        // Arrêter tous les tracks dans le stream pour libérer le micro
         stream.getTracks().forEach(track => track.stop());
-      });
+        
+        // Arrêter le timer
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          setTimerInterval(null);
+        }
+      };
       
-      // Start recording
-      mediaRecorder.start();
+      setMediaRecorder(recorder);
+      recorder.start();
       setIsRecording(true);
-      setIsLoading(false);
       
-      // Start timer
-      setRecordingTime(0);
-      timerRef.current = window.setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+      // Démarrer le timer
+      const interval = window.setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
+      setTimerInterval(interval);
       
     } catch (error) {
-      console.error('Error starting recording:', error);
-      setIsLoading(false);
-      alert('Impossible d\'accéder au microphone. Vérifiez les permissions de votre navigateur.');
+      console.error('Error accessing microphone:', error);
+      alert('Impossible d\'accéder au microphone. Veuillez vérifier vos permissions.');
     }
   };
 
-  // Stop recording
-  const handleStopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
       setIsRecording(false);
-      
-      // Clear timer
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
+    }
+  };
+
+  const clearRecording = () => {
+    if (audioElement) {
+      audioElement.pause();
+      setIsPlaying(false);
+    }
+    onAudioChange(null);
+    setAudioElement(null);
+    setRecordingTime(0);
+  };
+
+  const togglePlayback = () => {
+    if (audioElement) {
+      if (isPlaying) {
+        audioElement.pause();
+      } else {
+        audioElement.play();
+        audioElement.onended = () => setIsPlaying(false);
       }
+      setIsPlaying(!isPlaying);
     }
   };
 
-  // Delete recording
-  const handleDeleteRecording = () => {
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      onAudioChange(null);
-    }
-  };
-
-  // Format time as mm:ss
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const secs = (seconds % 60).toString().padStart(2, '0');
-    return `${mins}:${secs}`;
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
     <div className="space-y-4">
-      <p className="text-sm">
-        Enregistrez votre voix pour analyser votre état émotionnel :
-      </p>
+      <div>
+        <Label className="text-sm font-medium">
+          Enregistrez votre voix pour analyser vos émotions
+        </Label>
+        <p className="text-xs text-muted-foreground mt-1">
+          Exprimez librement votre état émotionnel dans un message vocal
+        </p>
+      </div>
       
-      <div className="flex flex-col items-center gap-4">
-        {!audioUrl ? (
-          <div className="flex flex-col items-center gap-3">
-            {isRecording ? (
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center animate-pulse">
-                  <div className="w-6 h-6 bg-red-500 rounded-full"></div>
-                </div>
-                <p className="text-sm font-medium">{formatTime(recordingTime)}</p>
-                <Button 
-                  variant="outline" 
-                  onClick={handleStopRecording}
-                  disabled={disabled}
-                >
-                  <Square className="h-4 w-4 mr-2" /> Arrêter l'enregistrement
-                </Button>
+      {!audioUrl ? (
+        <div className="flex flex-col items-center justify-center py-6 border-2 border-dashed border-muted-foreground/20 rounded-lg">
+          {isRecording ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                <span className="text-sm font-medium">Enregistrement en cours</span>
               </div>
-            ) : (
-              <Button
-                onClick={handleStartRecording}
-                disabled={disabled || isLoading}
-                className="flex items-center gap-2"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Mic className="h-4 w-4" />
-                )}
-                {isLoading ? "Préparation..." : "Commencer l'enregistrement"}
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="w-full space-y-4">
-            <div className="p-4 border rounded-md bg-muted/20">
-              <audio src={audioUrl} controls className="w-full"></audio>
-            </div>
-            
-            <div className="flex justify-center gap-2">
+              <div className="text-2xl font-semibold">{formatTime(recordingTime)}</div>
               <Button 
-                variant="outline"
-                onClick={handleDeleteRecording}
+                onClick={stopRecording} 
+                variant="secondary"
+                size="lg"
+                className="flex items-center gap-2"
                 disabled={disabled}
               >
-                <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                <Square className="h-4 w-4" />
+                Arrêter
               </Button>
             </div>
+          ) : (
+            <Button 
+              onClick={startRecording} 
+              variant="secondary"
+              size="lg"
+              className="flex items-center gap-2"
+              disabled={disabled}
+            >
+              <Mic className="h-4 w-4" />
+              Commencer l'enregistrement
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="bg-muted/30 p-4 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={togglePlayback}
+                disabled={disabled}
+                className="h-10 w-10"
+                title={isPlaying ? "Pause" : "Lecture"}
+              >
+                {isPlaying ? (
+                  <PauseCircle className="h-6 w-6" />
+                ) : (
+                  <PlayCircle className="h-6 w-6" />
+                )}
+              </Button>
+              <span className="text-sm">Enregistrement ({formatTime(recordingTime)})</span>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={clearRecording}
+              disabled={disabled}
+              title="Supprimer l'enregistrement"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

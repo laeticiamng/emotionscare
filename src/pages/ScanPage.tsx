@@ -64,6 +64,12 @@ const ScanPage: React.FC = () => {
     }
   };
 
+  // Fonction d'actualisation adaptée pour retourner void comme attendu
+  const onResultSaved = async (): Promise<void> => {
+    await scanHook.refreshEmotions();
+    return;
+  };
+
   return (
     <div className="container mx-auto py-8 max-w-4xl animate-fade-in">
       <div className="flex items-center justify-between mb-8">
@@ -135,7 +141,7 @@ const ScanPage: React.FC = () => {
             showScanForm={showScanForm}
             setShowScanForm={setShowScanForm}
             handleScanSaved={handleScanSaved}
-            onResultSaved={scanHook.refreshEmotions}
+            onResultSaved={onResultSaved}
           />
         </TabsContent>
       </Tabs>

@@ -8,9 +8,13 @@ import { Emotion } from '@/types';
 
 interface VREmotionRecommendationProps {
   emotion: Emotion | null | string;
+  className?: string;
 }
 
-const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emotion }) => {
+const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ 
+  emotion,
+  className
+}) => {
   const navigate = useNavigate();
   
   if (!emotion) return null;
@@ -21,7 +25,7 @@ const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emoti
     : emotion.name || emotion.emotion || '';
   
   // Determine if this is a stressful emotion
-  const isStressfulEmotion = ['stressed', 'anxious', 'overwhelmed', 'angry', 'sad'].includes(emotionName.toLowerCase());
+  const isStressfulEmotion = ['stressed', 'anxious', 'overwhelmed', 'angry', 'sad', 'sadness', 'anger', 'fear', 'anxiety'].includes(emotionName.toLowerCase());
   
   // Recommend different VR sessions based on emotion type
   const recommendedSession = isStressfulEmotion
@@ -37,7 +41,7 @@ const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emoti
       };
   
   return (
-    <Card className="mt-4">
+    <Card className={className}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-lg">
           <Calendar className="mr-2 h-5 w-5" />

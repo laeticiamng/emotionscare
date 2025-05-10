@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 interface EmojiEmotionScannerProps {
   selectedEmojis: string;
@@ -11,66 +11,69 @@ interface EmojiEmotionScannerProps {
 }
 
 const EMOTION_EMOJIS = [
-  { emoji: '😊', emotion: 'happy' },
-  { emoji: '😃', emotion: 'excited' },
-  { emoji: '😌', emotion: 'calm' },
-  { emoji: '😐', emotion: 'neutral' },
-  { emoji: '😢', emotion: 'sad' },
-  { emoji: '😡', emotion: 'angry' },
-  { emoji: '😰', emotion: 'anxious' },
-  { emoji: '😫', emotion: 'stressed' },
-  { emoji: '😴', emotion: 'tired' },
-  { emoji: '🤔', emotion: 'pensive' },
-  { emoji: '😍', emotion: 'love' },
-  { emoji: '😎', emotion: 'cool' }
+  { emoji: '😊', name: 'heureux' },
+  { emoji: '😃', name: 'excité' },
+  { emoji: '😌', name: 'calme' },
+  { emoji: '☺️', name: 'détendu' },
+  { emoji: '😐', name: 'neutre' },
+  { emoji: '😔', name: 'triste' },
+  { emoji: '😢', name: 'déçu' },
+  { emoji: '😰', name: 'anxieux' },
+  { emoji: '😫', name: 'stressé' },
+  { emoji: '😡', name: 'énervé' },
+  { emoji: '😤', name: 'frustré' },
+  { emoji: '🥱', name: 'fatigué' },
+  { emoji: '😴', name: 'endormi' },
+  { emoji: '🤒', name: 'malade' },
+  { emoji: '🤔', name: 'pensif' },
+  { emoji: '🥳', name: 'festif' },
 ];
 
-const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ 
-  selectedEmojis, 
-  onEmojiSelect, 
+const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
+  selectedEmojis,
+  onEmojiSelect,
   onClearEmojis,
   disabled = false
 }) => {
   return (
     <div className="space-y-4">
-      <p className="text-sm">
-        Sélectionnez les émojis qui représentent le mieux votre état émotionnel actuel :
-      </p>
-      
-      <div className="grid grid-cols-6 gap-2">
-        {EMOTION_EMOJIS.map(({ emoji, emotion }) => (
-          <Button
-            key={emotion}
-            variant="outline"
-            className="text-2xl h-12"
-            onClick={() => onEmojiSelect(emoji)}
-            disabled={disabled}
-            title={emotion}
-          >
-            {emoji}
-          </Button>
-        ))}
+      <div>
+        <Label className="text-sm font-medium">
+          Sélectionnez les emojis qui représentent votre humeur
+        </Label>
+        <p className="text-xs text-muted-foreground mt-1">
+          Cliquez sur plusieurs emojis pour décrire votre état émotionnel complet
+        </p>
       </div>
       
       {selectedEmojis && (
-        <div className="mt-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium">Émojis sélectionnés :</p>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onClearEmojis} 
-              disabled={disabled}
-              className="h-8 px-2"
-            >
-              <X className="h-4 w-4" /> Effacer
-            </Button>
-          </div>
-          <div className="p-3 border rounded-md mt-1 min-h-[50px] text-2xl">
-            {selectedEmojis || <span className="text-muted-foreground text-sm">Aucun emoji sélectionné</span>}
-          </div>
+        <div className="bg-muted/50 p-3 rounded-md flex items-center justify-between">
+          <div className="text-xl">{selectedEmojis}</div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClearEmojis}
+            disabled={disabled}
+          >
+            Effacer
+          </Button>
         </div>
       )}
+      
+      <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+        {EMOTION_EMOJIS.map((item) => (
+          <Button
+            key={item.emoji}
+            variant="outline"
+            className="h-12 text-2xl"
+            onClick={() => onEmojiSelect(item.emoji)}
+            disabled={disabled}
+            title={item.name}
+          >
+            {item.emoji}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 };
