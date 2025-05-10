@@ -1,151 +1,247 @@
+import { Emotion, EmotionResult } from '@/types';
 
-import { Emotion } from '@/types';
-
-// Données de démonstration pour les émotions
-const demoEmotions: Emotion[] = [
+// Mock emotion history data
+const mockEmotions: Emotion[] = [
   {
     id: '1',
-    name: 'Joie',
-    intensity: 0.8,
-    category: 'positive',
-    color: '#FFD700',
-    icon: '😊',
-    date: new Date().toISOString(),
-    emotion: 'joy',
-    dominant_emotion: 'joy',
-    score: 0.8,
+    user_id: '1',
+    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(),
+    emotion: 'happy',
     confidence: 0.85,
-    text: "J'ai passé une excellente journée aujourd'hui!",
+    score: 75,
+    text: 'Having a great day!',
   },
   {
     id: '2',
-    name: 'Calme',
-    intensity: 0.6,
-    category: 'positive',
-    color: '#4682B4',
-    icon: '😌',
-    date: new Date(Date.now() - 86400000).toISOString(), // Hier
-    emotion: 'calm',
-    dominant_emotion: 'calm',
-    score: 0.6,
-    confidence: 0.75,
-    text: "Je me sens tranquille et serein.",
+    user_id: '1',
+    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+    emotion: 'anxious',
+    confidence: 0.72,
+    score: 35,
+    text: 'Feeling stressed about the project deadline',
   },
   {
     id: '3',
-    name: 'Stress',
-    intensity: 0.4,
-    category: 'negative',
-    color: '#FF6347',
-    icon: '😰',
-    date: new Date(Date.now() - 172800000).toISOString(), // Il y a 2 jours
-    emotion: 'stress',
-    dominant_emotion: 'stress',
-    score: 0.4,
-    confidence: 0.65,
-    text: "Beaucoup de choses à gérer aujourd'hui...",
+    user_id: '1',
+    date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
+    emotion: 'calm',
+    confidence: 0.9,
+    score: 65,
+    text: 'Meditation really helps with focusing',
   }
 ];
 
-/**
- * Récupère les données émotionnelles d'un utilisateur
- * @param userId - L'ID de l'utilisateur
- */
-export const getEmotions = async (userId: string): Promise<Emotion[]> => {
-  // Simulation d'une requête API
+// Get emotion history
+export const getEmotionHistory = async (): Promise<Emotion[]> => {
+  // Simulate API call delay
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(demoEmotions);
-    }, 500);
-  });
-};
-
-/**
- * Analyse un texte pour détecter les émotions
- */
-export const analyzeText = async (text: string): Promise<Emotion> => {
-  // Simulation d'une analyse de texte
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: Date.now().toString(),
-        name: 'Joie',
-        intensity: 0.7,
-        category: 'positive',
-        color: '#FFD700',
-        icon: '😊',
-        date: new Date().toISOString(),
-        emotion: 'joy',
-        dominant_emotion: 'joy',
-        score: 0.7,
-        confidence: 0.8,
-        text: text,
-      });
-    }, 1000);
-  });
-};
-
-/**
- * Analyse des émojis pour détecter l'émotion
- */
-export const analyzeEmojis = async (emojis: string): Promise<Emotion> => {
-  // Simulation d'une analyse d'émojis
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: Date.now().toString(),
-        name: 'Enthousiasme',
-        intensity: 0.8,
-        category: 'positive',
-        color: '#FFA500',
-        icon: '🤩',
-        date: new Date().toISOString(),
-        emotion: 'enthusiasm',
-        dominant_emotion: 'enthusiasm',
-        score: 0.8,
-        confidence: 0.85,
-        emojis: emojis,
-      });
+      resolve(mockEmotions);
     }, 800);
   });
 };
 
-/**
- * Analyse audio pour détecter l'émotion
- */
-export const analyzeAudio = async (audioUrl: string): Promise<Emotion> => {
-  // Simulation d'une analyse audio
+// Get all emotions for a user
+export const getEmotions = async (userId: string): Promise<Emotion[]> => {
+  // Simulate API call delay
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({
-        id: Date.now().toString(),
-        name: 'Calme',
-        intensity: 0.6,
-        category: 'positive',
-        color: '#4682B4',
-        icon: '😌',
+      resolve(mockEmotions.filter(e => e.user_id === userId));
+    }, 800);
+  });
+};
+
+// Create a new emotion entry
+export const createEmotionEntry = async (data: Partial<Emotion>): Promise<Emotion> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newEmotion: Emotion = {
+        id: Math.random().toString(36).substring(2, 11),
+        user_id: data.user_id || '',
         date: new Date().toISOString(),
-        emotion: 'calm',
-        dominant_emotion: 'calm',
-        score: 0.6,
-        confidence: 0.7,
-        audio_url: audioUrl,
+        emotion: data.emotion || 'neutral',
+        confidence: data.confidence || 0.5,
+        score: data.score || 50,
+        text: data.text || '',
+        // Add any other fields you need
+      };
+      
+      mockEmotions.push(newEmotion);
+      resolve(newEmotion);
+    }, 800);
+  });
+};
+
+// Get the latest emotion for a user
+export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const userEmotions = mockEmotions.filter(e => e.user_id === userId);
+      if (userEmotions.length === 0) {
+        resolve(null);
+        return;
+      }
+      
+      // Sort by date, newest first
+      userEmotions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      resolve(userEmotions[0]);
+    }, 800);
+  });
+};
+
+// Adding the required analyzeEmotion function that was missing
+export const analyzeEmotion = async (data: {
+  user_id: string,
+  emojis?: string,
+  text?: string,
+  audio_url?: string,
+  is_confidential?: boolean,
+  share_with_coach?: boolean
+}): Promise<EmotionResult> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const emotions = ['happy', 'sad', 'anxious', 'calm', 'excited', 'frustrated', 'neutral'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const score = Math.floor(Math.random() * 100);
+      
+      const result: EmotionResult = {
+        id: Math.random().toString(36).substring(2, 11),
+        emotion,
+        confidence: Math.random() * 0.5 + 0.5, // Between 0.5 and 1.0
+        score,
+        feedback: `You seem to be feeling ${emotion} today.`,
+        recommendations: [
+          'Take a break if needed',
+          'Try deep breathing exercises',
+          'Consider talking to a colleague'
+        ]
+      };
+      
+      // Create an emotion entry in our mock database
+      createEmotionEntry({
+        user_id: data.user_id,
+        emotion,
+        score,
+        text: data.text,
+        is_confidential: data.is_confidential
       });
+      
+      resolve(result);
     }, 1500);
   });
 };
 
-/**
- * Sauvegarde une nouvelle émotion
- */
-export const saveEmotion = async (emotion: Emotion): Promise<Emotion> => {
-  // Simulation de sauvegarde d'émotion
+// Adding the required analyzeAudioStream function that was missing
+export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
+  // Simulate API call delay
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve({
-        ...emotion,
-        id: Date.now().toString(),
-      });
+      const emotions = ['happy', 'sad', 'anxious', 'calm', 'excited', 'frustrated', 'neutral'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const score = Math.floor(Math.random() * 100);
+      
+      const result: EmotionResult = {
+        id: Math.random().toString(36).substring(2, 11),
+        emotion,
+        confidence: Math.random() * 0.5 + 0.5, // Between 0.5 and 1.0
+        score,
+        text: "Transcribed text from audio would appear here.",
+        transcript: "Full transcript would appear here.",
+        feedback: `Based on your voice, you seem to be feeling ${emotion}.`,
+        recommendations: [
+          'Consider expressing yourself through music',
+          'Try vocal exercises to release tension',
+          'Record and reflect on your emotional state'
+        ]
+      };
+      
+      resolve(result);
+    }, 2000);
+  });
+};
+
+// Analyze text function
+export const analyzeText = async (text: string): Promise<Emotion> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const emotions = ['happy', 'sad', 'anxious', 'calm', 'excited', 'frustrated', 'neutral'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const score = Math.floor(Math.random() * 100);
+      
+      const result: Emotion = {
+        id: Math.random().toString(36).substring(2, 11),
+        user_id: '1', // Default user ID
+        date: new Date().toISOString(),
+        emotion,
+        confidence: Math.random() * 0.5 + 0.5, // Between 0.5 and 1.0
+        score,
+        text
+      };
+      
+      resolve(result);
+    }, 1000);
+  });
+};
+
+// Analyze emojis function
+export const analyzeEmojis = async (emojis: string): Promise<Emotion> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const emotions = ['happy', 'sad', 'anxious', 'calm', 'excited', 'frustrated', 'neutral'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const score = Math.floor(Math.random() * 100);
+      
+      const result: Emotion = {
+        id: Math.random().toString(36).substring(2, 11),
+        user_id: '1', // Default user ID
+        date: new Date().toISOString(),
+        emotion,
+        confidence: Math.random() * 0.5 + 0.5, // Between 0.5 and 1.0
+        score,
+        text: emojis
+      };
+      
+      resolve(result);
+    }, 800);
+  });
+};
+
+// Analyze audio function
+export const analyzeAudio = async (audioUrl: string): Promise<Emotion> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const emotions = ['happy', 'sad', 'anxious', 'calm', 'excited', 'frustrated', 'neutral'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const score = Math.floor(Math.random() * 100);
+      
+      const result: Emotion = {
+        id: Math.random().toString(36).substring(2, 11),
+        user_id: '1', // Default user ID
+        date: new Date().toISOString(),
+        emotion,
+        confidence: Math.random() * 0.5 + 0.5, // Between 0.5 and 1.0
+        score,
+        audio_url: audioUrl
+      };
+      
+      resolve(result);
+    }, 1500);
+  });
+};
+
+// Save emotion function
+export const saveEmotion = async (emotion: Emotion): Promise<boolean> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      mockEmotions.push(emotion);
+      resolve(true);
     }, 500);
   });
 };

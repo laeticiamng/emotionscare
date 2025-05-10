@@ -1,37 +1,27 @@
 
-export type FontFamily = 'inter' | 'dm-sans' | 'atkinson' | 'serif';
-export type FontSize = 'small' | 'medium' | 'large';
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'nature' | 'starry' | 'misty' | 'system' | 'deep-night';
-export type DynamicThemeMode = 'none' | 'time' | 'emotion' | 'weather';
+export type ThemeName = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
+export type FontFamily = 'inter' | 'roboto' | 'montserrat' | 'open-sans';
+export type DynamicThemeMode = 'default' | 'dynamic' | 'mood-based';
 
 export interface UserPreferences {
-  theme?: string;
-  font?: FontFamily;
+  theme?: ThemeName;
   fontSize?: FontSize;
-  highContrast?: boolean;
-  reducedAnimations?: boolean;
-  keyboardNavigation?: boolean;
-  screenReader?: boolean;
-  audioGuidance?: boolean;
-  notificationFrequency?: 'daily' | 'weekly' | 'flexible' | 'none';
-  notificationTone?: 'minimalist' | 'poetic' | 'directive' | 'silent';
+  font?: FontFamily;
   notifications_enabled?: boolean;
-  reminder_time?: string;
-  incognitoMode?: boolean;
-  dataExport?: 'pdf' | 'json';
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
+  color_blind_mode?: boolean;
+  high_contrast?: boolean;
+  reduce_motion?: boolean;
+  immersiveMode?: boolean;
+  moodBasedTheme?: boolean;
+  dynamicThemeMode?: DynamicThemeMode;
+  customCSS?: string;
   emotionalCamouflage?: boolean;
-  duoModeEnabled?: boolean;
-  trustedContact?: string;
-  displayName?: string;
-  pronouns?: 'il' | 'elle' | 'iel' | 'autre';
-  biography?: string;
-  avatarUrl?: string;
-  customBackground?: string;
-  lockJournals?: boolean;
-}
-
-export interface UserPreferencesState {
-  preferences: UserPreferences;
-  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<boolean>;
-  resetPreferences: () => void;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }

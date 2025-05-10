@@ -9,6 +9,8 @@ export interface UserData extends User {
   status: 'active' | 'inactive' | 'pending' | 'blocked';
   createdAt: string;
   lastActivity?: string;
+  emotional_score?: number;
+  anonymity_code?: string;
 }
 
 // Add BulkActionProps interface

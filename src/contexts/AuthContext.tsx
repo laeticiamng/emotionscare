@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (credentials: any) => Promise<boolean>;
   logout: () => void;
+  signOut: () => void; // Added for compatibility
   updateUser: (user: User) => Promise<boolean>;
 }
 
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => false,
   logout: () => {},
+  signOut: () => {}, // Added for compatibility
   updateUser: async () => false
 });
 
@@ -60,6 +62,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  // Adding signOut as an alias for logout for compatibility
+  const signOut = (): void => {
+    logout();
+  };
+
   const updateUser = async (updatedUser: User): Promise<boolean> => {
     try {
       setUser(updatedUser);
@@ -76,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     logout,
+    signOut, // Added for compatibility
     updateUser
   };
 

@@ -6,18 +6,23 @@ export enum UserRole {
   ADMIN = 'admin',
   HR = 'hr',
   MANAGER = 'manager',
-  GUEST = 'guest'
+  GUEST = 'guest',
+  EMPLOYEE = 'employee',
+  ANALYST = 'analyst',
+  WELLBEING_MANAGER = 'wellbeing_manager'
 }
 
 export interface User {
   id: string;
   name?: string;
   email?: string;
-  role?: string;
+  role?: UserRole | string;
   preferences?: UserPreferences;
   createdAt?: string;
   updatedAt?: string;
   avatar?: string;
+  avatar_url?: string; // Added for compatibility
+  image?: string; // Added for compatibility
   department?: string;
   position?: string;
   bio?: string;
@@ -33,7 +38,13 @@ export interface User {
   points?: number;
   personal_data?: {
     [key: string]: any;
-  }
+  };
+  // Added missing fields
+  emotional_score?: number;
+  anonymity_code?: string;
+  created_at?: string; // Keeping both versions for compatibility
+  joined_at?: string;
+  onboarded?: boolean;
 }
 
 export interface UserPreferencesState {
