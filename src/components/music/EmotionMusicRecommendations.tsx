@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [recommendedGenre, setRecommendedGenre] = useState<string>('');
+  const [recommendedPlaylist, setRecommendedPlaylist] = useState<MusicPlaylist | null>(null);
   const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   
@@ -35,92 +37,78 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       const emotion = emotionResult.emotion.toLowerCase();
       const genre = EMOTION_TO_GENRE[emotion] || EMOTION_TO_GENRE.neutral;
       setRecommendedGenre(genre);
+      
+      // Charger la playlist selon l'émotion
+      const loadPlaylist = async () => {
+        if (loadPlaylistForEmotion) {
+          setIsLoading(true);
+          try {
+            const playlist = await loadPlaylistForEmotion(emotion);
+            setRecommendedPlaylist(playlist);
+          } catch (err) {
+            console.error('Erreur lors du chargement de la playlist:', err);
+          } finally {
+            setIsLoading(false);
+          }
+        }
+      };
+      
+      loadPlaylist();
     }
-  }, [emotionResult]);
+  }, [emotionResult, loadPlaylistForEmotion]);
   
-  const handlePlayMusic = async () => {
-    if (!emotionResult || !emotionResult.emotion) {
-      toast({
-        title: "Information manquante",
-        description: "Impossible de déterminer votre état émotionnel",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      const emotion = emotionResult.emotion.toLowerCase();
-      const playlist = await loadPlaylistForEmotion(emotion);
-      
-      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-        // Play first track
-        playTrack(playlist.tracks[0]);
-        // Open drawer
-        setOpenDrawer(true);
-        
-        toast({
-          title: "Musique thérapeutique",
-          description: `Playlist "${emotion}" chargée pour accompagner votre humeur`
-        });
-      } else {
-        toast({
-          title: "Playlist non disponible",
-          description: "Aucune musique disponible pour cette émotion",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      // Handle error safely with type checking
-      let errorMessage = "Une erreur est survenue";
-      if (error && typeof error === 'object' && 'message' in error) {
-        errorMessage = (error as Error).message;
-      }
+  const handlePlay = () => {
+    if (recommendedPlaylist && recommendedPlaylist.tracks.length > 0) {
+      playTrack(recommendedPlaylist.tracks[0]);
+      setOpenDrawer(true);
       
       toast({
-        title: "Erreur",
-        description: errorMessage,
-        variant: "destructive"
+        title: "Lecture en cours",
+        description: `Playlist "${recommendedPlaylist.name}" basée sur votre humeur`,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
   
   if (!emotionResult) {
     return null;
   }
-
+  
   return (
-    <Card className="mt-6">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center">
-          <Music className="h-5 w-5 mr-2" />
-          Musique thérapeutique recommandée
+    <Card className="shadow-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center">
+          <Music className="mr-2 h-5 w-5 text-primary" />
+          Recommandation musicale
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div>
-            <p className="mb-1 text-sm font-medium">Basé sur votre humeur: {emotionResult.emotion}</p>
-            <p className="text-sm text-muted-foreground">
-              Nous vous recommandons d'écouter une musique {recommendedGenre.toLowerCase()} 
-              pour optimiser votre bien-être émotionnel.
+        <div className="text-sm">
+          <p>Selon votre humeur actuelle, nous vous proposons :</p>
+          
+          <div className="mt-3 p-3 bg-muted/30 rounded-md">
+            <div className="font-medium">{recommendedGenre}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Musique adaptée pour {emotionResult.emotion === "joy" ? "amplifier" : "équilibrer"} votre état émotionnel
             </p>
           </div>
           
-          <Button 
-            onClick={handlePlayMusic} 
-            disabled={isLoading}
-            className="w-full flex items-center justify-center gap-2"
-          >
+          <div className="mt-4">
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <div className="flex items-center justify-center py-2">
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <span className="text-xs">Chargement de la playlist...</span>
+              </div>
             ) : (
-              <PlayCircle className="h-4 w-4" />
+              <Button 
+                className="w-full"
+                onClick={handlePlay}
+                disabled={!recommendedPlaylist}
+              >
+                <PlayCircle className="mr-2 h-4 w-4" />
+                Écouter la playlist recommandée
+              </Button>
             )}
-            <span>{isLoading ? "Chargement..." : "Écouter la musique recommandée"}</span>
-          </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -3,80 +3,58 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  album?: string;
   duration: number;
+  url: string;
   cover_url?: string;
-  audio_url?: string;
-  emotion_tag?: string;
-  intensity?: number;
-  externalUrl?: string;
-  genre?: string;
-  
-  // Alias pour la compatibilité
   coverUrl?: string;
   cover?: string;
-  audioUrl?: string;
-  url?: string;
-  mood?: string;
   coverImage?: string;
-  
-  // Pour la compatibilité
-  [key: string]: any;
+  bpm?: number;
+  mood?: string;
+  intensity?: number;
 }
 
 export interface MusicPlaylist {
   id: string;
+  name: string;
   title?: string;
   description?: string;
-  emotion?: string;
   tracks: MusicTrack[];
+  mood?: string;
   cover_url?: string;
-  
-  // Pour la compatibilité
-  name?: string;
-  coverUrl?: string;
 }
 
 export interface MusicRecommendationCardProps {
-  emotion: string;
-  intensity?: number;
-  standalone?: boolean;
-  className?: string;
+  title: string;
+  emotion?: string;
+  onSelect?: () => void;
 }
 
 export interface MusicDrawerProps {
-  // Propriété standard
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  
-  // Pour la compatibilité
-  isOpen?: boolean;
-  onClose?: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-// Définir MusicContextType pour MusicContext
 export interface MusicContextType {
-  currentTrack: MusicTrack | null;
   isPlaying: boolean;
+  currentTrack: MusicTrack | null;
+  currentPlaylist: MusicPlaylist | null;
   volume: number;
+  openDrawer: boolean;
+  error: string | null;
+  togglePlay: () => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
-  setCurrentTrack: (track: MusicTrack | null) => void;
+  setOpenDrawer: (open: boolean) => void;
+  // Ajout des propriétés manquantes
+  playlists?: MusicPlaylist[];
+  loadPlaylistById?: (id: string) => Promise<MusicPlaylist | null>;
+  currentEmotion?: string;
   toggleRepeat?: () => void;
   toggleShuffle?: () => void;
-  
-  // Propriétés supplémentaires utilisées dans le contexte
-  openDrawer?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
-  currentPlaylist?: MusicPlaylist | null;
-  playlists?: MusicPlaylist[];
-  loadPlaylistForEmotion?: (emotion: string) => MusicPlaylist | null;
-  loadPlaylistById?: (id: string) => MusicPlaylist | null;
-  getTracksForEmotion?: (emotion: string) => MusicTrack[];
-  currentEmotion?: string;
-  initializeMusicSystem?: () => Promise<void>;
-  error?: Error | null;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  initializeMusicSystem: () => Promise<void>;
 }

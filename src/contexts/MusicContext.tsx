@@ -1,24 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
-
-interface MusicContextType {
-  isPlaying: boolean;
-  currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null;
-  volume: number;
-  openDrawer: boolean;
-  error: string | null;
-  togglePlay: () => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  setOpenDrawer: (open: boolean) => void;
-  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
-  initializeMusicSystem: () => Promise<void>;
-}
+import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types';
 
 const initialContext: MusicContextType = {
   isPlaying: false,
@@ -34,7 +16,13 @@ const initialContext: MusicContextType = {
   previousTrack: () => {},
   setVolume: () => {},
   setOpenDrawer: () => {},
-  initializeMusicSystem: async () => {}
+  initializeMusicSystem: async () => {},
+  playlists: [],
+  currentEmotion: 'neutral',
+  toggleRepeat: () => {},
+  toggleShuffle: () => {},
+  loadPlaylistById: async () => null,
+  loadPlaylistForEmotion: async () => null
 };
 
 const MusicContext = createContext<MusicContextType>(initialContext);
@@ -113,6 +101,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [openDrawer, setOpenDrawer] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [repeat, setRepeat] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState('neutral');
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(Object.values(mockPlaylists));
 
   // Initialisation du système musical
   const initializeMusicSystem = useCallback(async () => {
@@ -136,6 +128,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       const playlist = mockPlaylists[emotion] || mockPlaylists.focus;
       setCurrentPlaylist(playlist);
+      setCurrentEmotion(emotion);
       return playlist;
     } catch (err) {
       console.error('Error loading playlist for emotion:', err);
@@ -143,6 +136,30 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       return null;
     }
   }, []);
+
+  // Charger une playlist par ID
+  const loadPlaylistById = useCallback(async (id: string): Promise<MusicPlaylist | null> => {
+    try {
+      // Simuler un chargement
+      await new Promise(resolve => setTimeout(resolve, 600));
+      
+      const playlist = playlists.find(p => p.id === id) || null;
+      
+      if (playlist) {
+        setCurrentPlaylist(playlist);
+        if (playlist.tracks.length > 0) {
+          setCurrentTrack(playlist.tracks[0]);
+          setIsPlaying(true);
+        }
+      }
+      
+      return playlist;
+    } catch (err) {
+      console.error('Error loading playlist by id:', err);
+      setError('Erreur lors du chargement de la playlist');
+      return null;
+    }
+  }, [playlists]);
 
   const togglePlay = useCallback(() => {
     if (currentTrack) {
@@ -195,6 +212,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setVolumeState(value);
   }, []);
 
+  const toggleRepeat = useCallback(() => {
+    setRepeat(prev => !prev);
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    setShuffle(prev => !prev);
+  }, []);
+
   // Effet pour gérer l'audio en fonction de l'état de lecture
   useEffect(() => {
     // Effet simulé pour le lecteur audio
@@ -222,7 +247,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setVolume,
         setOpenDrawer,
         loadPlaylistForEmotion,
-        initializeMusicSystem
+        initializeMusicSystem,
+        playlists,
+        loadPlaylistById,
+        currentEmotion,
+        toggleRepeat,
+        toggleShuffle
       }}
     >
       {children}

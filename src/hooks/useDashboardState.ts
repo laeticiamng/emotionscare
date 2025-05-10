@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
-interface CollapsedSections {
+export interface DashboardSectionState {
   [key: string]: boolean;
 }
 
@@ -11,13 +11,18 @@ const useDashboardState = () => {
     return stored ? JSON.parse(stored) : false;
   });
 
-  const [collapsedSections, setCollapsedSections] = useState<CollapsedSections>(() => {
+  const [collapsedSections, setCollapsedSections] = useState<DashboardSectionState>(() => {
     const stored = localStorage.getItem('dashboard_collapsed_sections');
     return stored ? JSON.parse(stored) : {
       modules: false,
       emotions: false,
       charts: false,
-      recommendations: false
+      recommendations: false,
+      emotionScan: false,
+      social: false,
+      sidePanel: false,
+      vr: false,
+      gamification: false
     };
   });
 

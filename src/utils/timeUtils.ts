@@ -69,3 +69,30 @@ export const getRelativeTimeString = (date: Date | string): string => {
     return formatDateTime(d);
   }
 };
+
+// Fonction pour obtenir le message de salutation selon l'heure
+export const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  
+  if (hour >= 5 && hour < 12) {
+    return 'Bonjour';
+  } else if (hour >= 12 && hour < 18) {
+    return 'Bon après-midi';
+  } else {
+    return 'Bonsoir';
+  }
+};
+
+// Fonction pour formater la date en français
+export const formatDateFr = (date: Date | string): string => {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  };
+  
+  return d.toLocaleDateString('fr-FR', options);
+};
