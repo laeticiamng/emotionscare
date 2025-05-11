@@ -33,6 +33,22 @@ export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'default' | 'serif' | 'mono';
 
+export interface VRSession {
+  id: string;
+  user_id: string;
+  template_id: string;
+  start_time: string;
+  end_time?: string;
+  duration_seconds: number;
+  completed: boolean;
+  template?: VRSessionTemplate;
+  date?: string;
+  duration?: number;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+}
+
 export interface VRSessionTemplate {
   id: string;
   name: string;
@@ -52,22 +68,6 @@ export interface VRSessionTemplate {
   template_id?: string;
   completion_rate?: number;
   emotion_target?: string;
-}
-
-export interface VRSession {
-  id: string;
-  user_id: string;
-  template_id: string;
-  start_time: string;
-  end_time?: string;
-  duration_seconds: number;
-  completed: boolean;
-  template?: VRSessionTemplate;
-  date?: string;
-  duration?: number;
-  is_audio_only?: boolean;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
 }
 
 export interface ChatMessage {

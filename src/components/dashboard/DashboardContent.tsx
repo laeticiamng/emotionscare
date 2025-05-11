@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import TrendCharts from './TrendCharts';
@@ -234,7 +233,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           emotion={latestEmotion?.emotion}
         />
         
-        {userMode === 'b2c' && (
+        {/* Conditionally render based on userMode */}
+        {(userMode === 'personal' || userMode === 'b2c') && (
           <GamificationWidget
             collapsed={collapsedSections.gamification}
             onToggle={() => toggleSection('gamification')}

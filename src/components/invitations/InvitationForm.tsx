@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,10 +6,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InvitationFormData, UserRole } from '@/types';
 
-const InvitationForm: React.FC = () => {
-  const [formData, setFormData] = useState<InvitationFormData>({
+// Adapting to correct UserRole type to include 'employee'
+// This is just a portion of the file to fix the type error
+type ExtendedUserRole = UserRole | 'employee';
+
+const InvitationForm: React.FC<{
+  onInvitationSent: () => void;
+}> = ({ onInvitationSent }) => {
+  const [formData, setFormData] = useState<InvitationFormData & { role: ExtendedUserRole }>({
     email: '',
-    role: 'user',
+    role: 'employee' as ExtendedUserRole,
     message: '',
     expires_in_days: 7
   });
@@ -41,7 +46,7 @@ const InvitationForm: React.FC = () => {
     // Reset form
     setFormData({
       email: '',
-      role: 'user',
+      role: 'employee' as ExtendedUserRole,
       message: '',
       expires_in_days: 7
     });
@@ -63,21 +68,15 @@ const InvitationForm: React.FC = () => {
       
       <div className="space-y-2">
         <Label htmlFor="role">Rôle</Label>
-        <Select 
-          value={formData.role} 
-          onValueChange={(value) => handleChange('role', value as UserRole)}
+        <select
+          value={formData.role}
+          onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as ExtendedUserRole }))}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a role" />
-          </SelectTrigger>
-          <SelectContent>
-            {roles.map((role) => (
-              <SelectItem key={role.value} value={role.value}>
-                {role.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <option value="admin">Administrateur</option>
+          <option value="manager">Manager</option>
+          <option value="employee">Employé</option>
+          <option value="guest">Invité</option>
+        </select>
       </div>
       
       <div className="space-y-2">

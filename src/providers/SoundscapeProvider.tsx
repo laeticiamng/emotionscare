@@ -11,7 +11,8 @@ interface SoundscapeContextType {
   setVolume: (volume: SoundVolume) => void;
   isPlaying: boolean;
   togglePlay: () => void;
-  playFunctionalSound: (soundType: 'success' | 'error' | 'notification' | 'click') => void;
+  playFunctionalSound: (soundType: 'success' | 'error' | 'notification' | 'click' | 'transition') => void;
+  updateSoundscapeForEmotion?: (emotion: string) => void;
 }
 
 const SoundscapeContext = createContext<SoundscapeContextType>({
@@ -33,9 +34,23 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setIsPlaying(prev => !prev);
   };
   
-  const playFunctionalSound = (soundType: 'success' | 'error' | 'notification' | 'click') => {
+  const playFunctionalSound = (soundType: 'success' | 'error' | 'notification' | 'click' | 'transition') => {
     // Mock implementation - would play a sound based on type
     console.log(`Playing ${soundType} sound`);
+  };
+  
+  const updateSoundscapeForEmotion = (emotion: string) => {
+    console.log(`Updating soundscape for emotion: ${emotion}`);
+    // Map emotions to soundscape types
+    const emotionToSoundscape: Record<string, SoundscapeType> = {
+      'happy': 'nature',
+      'calm': 'meditation',
+      'focused': 'focus',
+      'neutral': 'nature'
+    };
+    
+    const newType = emotionToSoundscape[emotion.toLowerCase()] || 'nature';
+    setSoundscapeType(newType);
   };
   
   return (
@@ -46,7 +61,8 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setVolume,
       isPlaying,
       togglePlay,
-      playFunctionalSound
+      playFunctionalSound,
+      updateSoundscapeForEmotion
     }}>
       {children}
     </SoundscapeContext.Provider>

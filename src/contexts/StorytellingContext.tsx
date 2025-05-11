@@ -7,6 +7,9 @@ interface StorytellingContextType {
   activeStory: Story | null;
   showStory: (storyId: string) => void;
   dismissStory: (storyId: string) => void;
+  storyQueue: Story[];
+  addStory: (story: Partial<Story> | any) => void;
+  markStorySeen: (storyId: string) => void;
 }
 
 const defaultStories: Story[] = [
@@ -15,14 +18,16 @@ const defaultStories: Story[] = [
     title: 'Bienvenue sur notre plateforme',
     content: 'Découvrez comment nous pouvons vous aider à améliorer votre bien-être émotionnel.',
     type: 'onboarding',
-    seen: false
+    seen: false,
+    emotion: 'neutral'
   },
   {
     id: '2',
     title: 'Nouvelle fonctionnalité: Scan émotionnel',
     content: 'Utilisez notre nouvelle fonctionnalité pour scanner et analyser vos émotions.',
     type: 'feature',
-    seen: false
+    seen: false,
+    emotion: 'neutral'
   }
 ];
 
@@ -30,12 +35,16 @@ const StorytellingContext = createContext<StorytellingContextType>({
   stories: [],
   activeStory: null,
   showStory: () => {},
-  dismissStory: () => {}
+  dismissStory: () => {},
+  storyQueue: [],
+  addStory: () => {},
+  markStorySeen: () => {}
 });
 
 export const StorytellingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [stories, setStories] = useState<Story[]>(defaultStories);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
+  const [storyQueue, setStoryQueue] = useState<Story[]>([]);
 
   const showStory = (storyId: string) => {
     const story = stories.find(s => s.id === storyId);
@@ -52,9 +61,46 @@ export const StorytellingProvider: React.FC<{ children: React.ReactNode }> = ({ 
     );
     setActiveStory(null);
   };
+  
+  const addStory = (storyData: Partial<Story> | any) => {
+    const newStory: Story = {
+      id: `story-${Date.now()}`,
+      title: storyData.title || 'New Story',
+      content: storyData.content || '',
+      type: storyData.type || 'general',
+      seen: false,
+      emotion: storyData.emotion || 'neutral',
+      image: storyData.image,
+      cta: storyData.cta ? {
+        label: storyData.cta.text || 'View',
+        route: storyData.cta.action || '/',
+        text: storyData.cta.text || 'View',
+        action: storyData.cta.action || '/'
+      } : undefined
+    };
+    
+    setStories(prev => [...prev, newStory]);
+    setStoryQueue(prev => [...prev, newStory]);
+  };
+  
+  const markStorySeen = (storyId: string) => {
+    setStories(prevStories => 
+      prevStories.map(story => 
+        story.id === storyId ? { ...story, seen: true } : story
+      )
+    );
+  };
 
   return (
-    <StorytellingContext.Provider value={{ stories, activeStory, showStory, dismissStory }}>
+    <StorytellingContext.Provider value={{ 
+      stories, 
+      activeStory, 
+      showStory, 
+      dismissStory,
+      storyQueue,
+      addStory,
+      markStorySeen
+    }}>
       {children}
     </StorytellingContext.Provider>
   );

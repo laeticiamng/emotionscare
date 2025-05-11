@@ -119,6 +119,4 @@ export {
   ToastAction,
 };
 
-export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
-export type ToastActionProps = React.ComponentPropsWithoutRef<typeof ToastAction>;
-export type { ToastActionElement };
+export type { ToastProps, ToastActionElement };

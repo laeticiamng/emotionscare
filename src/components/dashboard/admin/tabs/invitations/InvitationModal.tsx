@@ -1,41 +1,27 @@
 
+// Need to modify the InvitationForm import to accept the onInvitationSent prop
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import InvitationForm from '@/components/invitations/InvitationForm';
 
 interface InvitationModalProps {
   open: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   onInvitationSent: () => void;
 }
 
-const InvitationModal: React.FC<InvitationModalProps> = ({
-  open,
-  onClose,
-  onInvitationSent,
+const InvitationModal: React.FC<InvitationModalProps> = ({ 
+  open, 
+  onOpenChange,
+  onInvitationSent
 }) => {
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[525px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Inviter un nouveau collaborateur</DialogTitle>
-          <DialogDescription>
-            Envoyez une invitation sécurisée à un collaborateur pour rejoindre la plateforme EmotionsCare.
-          </DialogDescription>
+          <DialogTitle>Inviter un collaborateur</DialogTitle>
         </DialogHeader>
-        <div className="py-4">
-          <InvitationForm 
-            onInvitationSent={() => {
-              onInvitationSent();
-            }}
-          />
-        </div>
+        <InvitationForm onInvitationSent={onInvitationSent} />
       </DialogContent>
     </Dialog>
   );

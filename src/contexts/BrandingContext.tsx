@@ -18,6 +18,7 @@ interface BrandingContextType {
   setBrandingTheme: (theme: BrandingTheme) => void;
   setEmotionalTone: (tone: EmotionalTone) => void;
   setColors: (colors: Partial<BrandingColors>) => void;
+  applyEmotionalBranding?: (emotion: string) => void;
 }
 
 const defaultColors: BrandingColors = {
@@ -45,6 +46,46 @@ export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setColorsState(prev => ({ ...prev, ...newColors }));
   };
   
+  const applyEmotionalBranding = (emotion: string) => {
+    // Map emotions to visual branding tones
+    const emotionToTone: Record<string, EmotionalTone> = {
+      'happy': 'energetic',
+      'calm': 'calm',
+      'focused': 'focused',
+      'creative': 'creative',
+      'neutral': 'neutral'
+    };
+    
+    const tone = emotionToTone[emotion.toLowerCase()] || 'neutral';
+    setEmotionalTone(tone);
+    
+    // Apply color palette based on tone
+    const emotionColors: Record<EmotionalTone, Partial<BrandingColors>> = {
+      'energetic': {
+        primary: '#ef4444',
+        highlight: '#f97316'
+      },
+      'calm': {
+        primary: '#3b82f6',
+        highlight: '#06b6d4'
+      },
+      'focused': {
+        primary: '#8b5cf6',
+        highlight: '#6366f1'
+      },
+      'creative': {
+        primary: '#ec4899',
+        highlight: '#d946ef'
+      },
+      'neutral': {
+        primary: '#4f46e5',
+        highlight: '#ec4899'
+      }
+    };
+    
+    setColors(emotionColors[tone]);
+  };
+  
   return (
     <BrandingContext.Provider value={{
       brandingTheme,
@@ -52,7 +93,8 @@ export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       colors,
       setBrandingTheme,
       setEmotionalTone,
-      setColors
+      setColors,
+      applyEmotionalBranding
     }}>
       {children}
     </BrandingContext.Provider>
