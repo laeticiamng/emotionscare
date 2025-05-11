@@ -1,15 +1,15 @@
 
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Shell from '@/Shell';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
-import { Link } from 'react-router-dom';
+import { ReloadIcon } from '@radix-ui/react-icons';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -19,8 +19,18 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { setUserMode } = useUserMode();
-  const { login, error: authError } = useAuth();
-  const { toast } = useToast();
+  const { login, error: authError, clearError, isAuthenticated } = useAuth();
+  
+  // Rediriger si déjà connecté
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from);
+    }
+    
+    // Nettoyer les erreurs quand la page est chargée/déchargée
+    return () => clearError();
+  }, [isAuthenticated, navigate, location.state, clearError]);
   
   const from = location.state?.from?.pathname || '/dashboard';
   
@@ -30,21 +40,25 @@ const LoginPage: React.FC = () => {
     
     try {
       await login(email, password);
-      setUserMode('b2c');
-      toast({
-        title: "Connexion réussie",
+      setUserMode('b2c'); // Mode par défaut pour les nouveaux utilisateurs
+      toast.success("Connexion réussie", {
         description: "Bienvenue sur EmotionsCare",
       });
       navigate(from);
     } catch (error: any) {
-      toast({
-        title: "Erreur de connexion",
+      toast.error("Erreur de connexion", {
         description: error.message || "Veuillez vérifier vos identifiants",
-        variant: "destructive",
       });
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Pour faciliter les démonstrations
+  const handleDemoLogin = (userType: 'user' | 'admin') => {
+    setEmail(userType === 'admin' ? 'admin@example.com' : 'user@example.com');
+    setPassword('password123');
   };
 
   return (
@@ -71,6 +85,7 @@ const LoginPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  autoComplete="email"
                 />
               </div>
               <div className="space-y-2">
@@ -81,6 +96,7 @@ const LoginPage: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoComplete="current-password"
                 />
               </div>
               <div className="text-sm text-right">
@@ -90,14 +106,48 @@ const LoginPage: React.FC = () => {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Connexion en cours..." : "Se connecter"}
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion en cours...
+                  </>
+                ) : "Se connecter"}
               </Button>
+              
               <div className="text-sm text-center">
                 Vous n'avez pas de compte?{' '}
                 <Link to="/register" className="text-primary hover:underline">
                   S'inscrire
                 </Link>
+              </div>
+              
+              <div className="border-t pt-4 mt-2">
+                <p className="text-sm text-center mb-2 text-muted-foreground">Accès rapide pour démonstration</p>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleDemoLogin('user')}
+                  >
+                    Utilisateur démo
+                  </Button>
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleDemoLogin('admin')}
+                  >
+                    Admin démo
+                  </Button>
+                </div>
               </div>
             </CardFooter>
           </form>

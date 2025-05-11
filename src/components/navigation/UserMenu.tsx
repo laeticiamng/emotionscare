@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User as UserIcon, Settings, Briefcase, BarChart2, Building } from 'lucide-react';
+import { Lock, User as UserIcon, Settings, Briefcase, BarChart2, Building, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,12 +19,11 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole, getRoleDisplayName } from '@/utils/roleUtils';
 
 interface UserMenuProps {
-  badgesCount: number;
+  badgesCount?: number;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ badgesCount = 0 }) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user, logout } = useAuth();
   const { userMode, setUserMode } = useUserMode();
   
@@ -32,13 +32,13 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast({
-        title: 'Déconnexion réussie',
+      toast.success('Déconnexion réussie', {
         description: 'Vous avez été déconnecté de votre compte.',
       });
       navigate('/');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
+      toast.error('Erreur lors de la déconnexion');
     }
   };
 
@@ -80,15 +80,16 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
+        <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+          <BarChart2 className="mr-2 h-4 w-4" />
+          <span>Mon tableau de bord</span>
+        </DropdownMenuItem>
+        
         {isAdmin && (
           <>
             <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
-              <BarChart2 className="mr-2 h-4 w-4" />
-              <span>Tableau de bord admin</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate('/admin/users')}>
               <Building className="mr-2 h-4 w-4" />
-              <span>Gestion d'entreprise</span>
+              <span>Tableau de bord admin</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
@@ -100,14 +101,18 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate('/settings')}>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span>Paramètres</span>
         </DropdownMenuItem>
         
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="font-normal text-xs">Mode utilisateur</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setUserMode(userMode === 'b2b-admin' ? 'b2c' : 'b2b-admin')}>
+            <DropdownMenuItem onClick={() => {
+              const newMode = userMode === 'b2b-admin' ? 'b2c' : 'b2b-admin';
+              setUserMode(newMode);
+              toast.success(`Mode changé: ${newMode === 'b2c' ? 'Utilisateur' : 'Administrateur'}`)
+            }}>
               <Briefcase className="mr-2 h-4 w-4" />
               <span>{userMode === 'b2b-admin' ? 'Vue utilisateur' : 'Vue administrateur'}</span>
             </DropdownMenuItem>
@@ -116,7 +121,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
         
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
-          <Lock className="mr-2 h-4 w-4" />
+          <LogOut className="mr-2 h-4 w-4" />
           <span>Se déconnecter</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

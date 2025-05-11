@@ -11,6 +11,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
   error: string | null;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   updateUser: async () => {},
   error: null,
+  clearError: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -41,8 +43,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
+          console.log("User found in localStorage:", parsedUser);
           setUser(parsedUser);
           setIsAuthenticated(true);
+        } else {
+          console.log("No user found in localStorage");
         }
       } catch (error) {
         console.error('Auth check error:', error);
@@ -54,25 +59,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
+  const clearError = () => setError(null);
+
   const login = async (email: string, password: string) => {
     // Simulation d'une API de connexion
     setIsLoading(true);
     setError(null);
     
     try {
-      // Simulation de délai réseau
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Attempting login with:", { email });
       
+      // Validation simple
       if (!email || !password) {
         throw new Error("L'email et le mot de passe sont requis");
       }
+      
+      // Simulation de délai réseau
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Créer un utilisateur de demo (en production, cela viendrait de l'API)
       const mockUser: User = {
         id: '1',
         name: 'Utilisateur Test',
         email: email,
-        role: 'user',
+        role: email.includes('admin') ? 'admin' : 'user',
         avatar_url: '',
         preferences: {
           theme: 'system',
@@ -87,9 +97,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Stocker l'utilisateur
       localStorage.setItem('user', JSON.stringify(mockUser));
+      console.log("User stored in localStorage:", mockUser);
       
       setUser(mockUser);
       setIsAuthenticated(true);
+      return mockUser;
     } catch (error: any) {
       console.error('Login error:', error);
       setError(error.message || "Erreur de connexion");
@@ -105,6 +117,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // En production, cela enverrait une requête à l'API
       localStorage.removeItem('user');
+      console.log("User removed from localStorage");
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {
@@ -120,12 +133,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
     
     try {
-      // Simulation d'enregistrement
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Attempting registration with:", { email, name });
       
+      // Validation simple
       if (!email || !password || !name) {
         throw new Error("Tous les champs sont requis");
       }
+      
+      // Simulation d'enregistrement
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       const newUser: User = {
         id: Date.now().toString(),
@@ -136,9 +152,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
       
       localStorage.setItem('user', JSON.stringify(newUser));
+      console.log("New user stored in localStorage:", newUser);
       
       setUser(newUser);
       setIsAuthenticated(true);
+      return newUser;
     } catch (error: any) {
       console.error('Register error:', error);
       setError(error.message || "Erreur d'enregistrement");
@@ -160,6 +178,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
         
         localStorage.setItem('user', JSON.stringify(updatedUser));
+        console.log("User updated in localStorage:", updatedUser);
         setUser(updatedUser);
       }
     } catch (error) {
@@ -180,7 +199,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         register,
         updateUser,
-        error
+        error,
+        clearError
       }}
     >
       {children}

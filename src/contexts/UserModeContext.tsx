@@ -28,14 +28,19 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Initialiser le mode utilisateur depuis localStorage
   useEffect(() => {
     const storedMode = localStorage.getItem('userMode') as UserMode | null;
-    if (storedMode) {
+    if (storedMode && (storedMode === 'b2c' || storedMode === 'b2b-collaborator' || storedMode === 'b2b-admin' || storedMode === 'personal')) {
+      console.log("UserMode loaded from localStorage:", storedMode);
       setUserModeState(storedMode);
+    } else {
+      console.log("Using default userMode: b2c");
+      localStorage.setItem('userMode', 'b2c');
     }
     setIsLoading(false);
   }, []);
   
   // Mettre à jour localStorage lorsque le mode change
   const setUserMode = (mode: UserMode) => {
+    console.log("Setting userMode to:", mode);
     setUserModeState(mode);
     localStorage.setItem('userMode', mode);
   };
