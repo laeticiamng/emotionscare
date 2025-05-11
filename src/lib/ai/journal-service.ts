@@ -7,10 +7,14 @@
 import { chatCompletion } from './openai-client';
 import { toast } from '@/hooks/use-toast';
 
-interface EmotionalJournalResponse {
+export interface EmotionalJournalResponse {
   message: string;
   detectedEmotion?: string;
   advice?: string;
+  emotion?: string; // Adding the missing property
+  intensity?: number; // Adding the missing property
+  confidence?: number;
+  analysis?: string;
 }
 
 /**
@@ -37,6 +41,7 @@ export async function analyzeEmotionalJournal(
       ${contextPrompt}
       ${languagePrompt}
       Format ta réponse en deux paragraphes séparés: d'abord l'identification de l'émotion, puis le conseil.
+      Retourne également l'émotion identifiée en tant que valeur distincte et une intensité entre 0 et 1.
     `;
     
     const response = await chatCompletion(
@@ -54,10 +59,41 @@ export async function analyzeEmotionalJournal(
     const detectedEmotion = paragraphs[0];
     const advice = paragraphs.length > 1 ? paragraphs[1] : '';
     
+    // Mock implementation for emotional analysis
+    // In a real implementation, these would be parsed from the AI response
+    let primaryEmotion = 'neutral';
+    let emotionIntensity = 0.5;
+    
+    // Simple detection logic for demo purposes
+    const lowerContent = content.toLowerCase();
+    if (lowerContent.includes('joie') || lowerContent.includes('heureux')) {
+      primaryEmotion = 'joy';
+      emotionIntensity = 0.8;
+    } else if (lowerContent.includes('calme') || lowerContent.includes('serein')) {
+      primaryEmotion = 'calm';
+      emotionIntensity = 0.7;
+    } else if (lowerContent.includes('triste') || lowerContent.includes('déprimé')) {
+      primaryEmotion = 'sad';
+      emotionIntensity = 0.6;
+    } else if (lowerContent.includes('anxie') || lowerContent.includes('inquiet')) {
+      primaryEmotion = 'anxiety';
+      emotionIntensity = 0.7;
+    } else if (lowerContent.includes('stress') || lowerContent.includes('tendu')) {
+      primaryEmotion = 'stress';
+      emotionIntensity = 0.8;
+    } else if (lowerContent.includes('énerg') || lowerContent.includes('dynamique')) {
+      primaryEmotion = 'energetic';
+      emotionIntensity = 0.9;
+    }
+    
     return {
       message: content,
       detectedEmotion,
-      advice
+      advice,
+      emotion: primaryEmotion,
+      intensity: emotionIntensity,
+      confidence: 0.8,
+      analysis: `Analyse basée sur le texte: "${journalEntry.substring(0, 50)}..."`
     };
   } catch (error) {
     console.error('Error analyzing emotional journal:', error);
@@ -68,7 +104,10 @@ export async function analyzeEmotionalJournal(
     });
     
     return {
-      message: "Je suis désolé, mais je rencontre des difficultés pour analyser votre journal émotionnel. Veuillez réessayer plus tard."
+      message: "Je suis désolé, mais je rencontre des difficultés pour analyser votre journal émotionnel. Veuillez réessayer plus tard.",
+      emotion: "neutral",
+      intensity: 0.5,
+      confidence: 0.5
     };
   }
 }

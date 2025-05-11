@@ -9,6 +9,7 @@ import { useOpenAI } from '@/hooks/ai/useOpenAI';
 import { useMusic } from '@/contexts/MusicContext';
 import useMusicEmotionIntegration from '@/hooks/useMusicEmotionIntegration';
 import { useToast } from '@/hooks/use-toast';
+import { EmotionalJournalResponse } from '@/lib/ai/journal-service';
 
 // Onboarding sections
 import WelcomeSection from '@/components/onboarding/WelcomeSection';

@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { checkApiConnection } from '@/lib/ai/openai-client';
@@ -10,6 +9,7 @@ import * as moderationService from '@/lib/ai/moderation-service';
 import * as challengeService from '@/lib/ai/challenge-service';
 import * as analyticsService from '@/lib/ai/analytics-service';
 import * as hrService from '@/lib/ai/hr-insights-service';
+import { EmotionalJournalResponse } from '@/lib/ai/journal-service';
 
 /**
  * Hook permettant d'utiliser les fonctionnalités OpenAI dans les composants React

@@ -1,4 +1,3 @@
-
 import { UserPreferences } from './preferences';
 
 export enum UserRole {
@@ -45,6 +44,11 @@ export interface User {
   created_at?: string; // Keeping both versions for compatibility
   joined_at?: string;
   onboarded?: boolean;
+  emotional_profile?: { // Adding the missing property
+    primary_emotion?: string;
+    intensity?: number;
+    analysis?: any;
+  };
 }
 
 export interface UserPreferencesState {

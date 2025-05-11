@@ -9,7 +9,7 @@ import {
   Brain, 
   Music, 
   HeadphonesIcon, 
-  VrHeadset, 
+  Headset, 
   MessageSquare, 
   BookOpenText,
   Activity
