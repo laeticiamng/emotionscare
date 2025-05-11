@@ -5,7 +5,7 @@ export interface ChatMessage {
   content?: string;
   sender: string;
   sender_type?: string;
-  timestamp?: string | Date;
+  timestamp?: string; // Changed from string | Date to just string
   is_read?: boolean;
   conversation_id?: string;
   role?: string;
@@ -17,15 +17,15 @@ export interface ChatConversation {
   id: string;
   title: string;
   user_id: string;
-  created_at: string | Date;
-  updated_at: string | Date;
+  created_at: string; // Changed from string | Date to just string
+  updated_at: string; // Changed from string | Date to just string
   lastMessage?: string;
   last_message?: string;
   messages?: ChatMessage[];
   // For backwards compatibility
   userId?: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ChatResponseType {
@@ -43,7 +43,7 @@ export type ChatResponse = ChatResponseType;
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
-  playlist?: MusicPlaylist | null;
+  playlist?: import('./music').MusicPlaylist | null;
   onOpenChange: (open: boolean) => void;
   isOpen: boolean;
 }

@@ -1,6 +1,6 @@
 
-import { ChatConversation, ChatMessage } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 
 // Mock database for conversations and messages
 const conversations: ChatConversation[] = [];
@@ -60,8 +60,8 @@ export async function getMessagesForConversation(conversationId: string): Promis
   return messages
     .filter(m => m.conversation_id === conversationId)
     .sort((a, b) => {
-      const dateA = new Date(a.timestamp).getTime();
-      const dateB = new Date(b.timestamp).getTime();
+      const dateA = new Date(a.timestamp || '').getTime();
+      const dateB = new Date(b.timestamp || '').getTime();
       return dateA - dateB;
     });
 }
@@ -132,7 +132,7 @@ export async function addMessageToConversation(
   const conversation = conversations.find(c => c.id === conversationId);
   if (conversation) {
     conversation.updated_at = new Date().toISOString();
-    conversation.last_message = messageData.text;
+    conversation.last_message = messageData.text || messageData.content || '';
   }
   
   return newMessage;
@@ -161,5 +161,9 @@ const chatHistoryService = {
   addMessageToConversation,
   clearConversationMessages
 };
+
+// For backward compatibility
+export const fetchConversations = getConversationsForUser;
+export const fetchMessages = getMessagesForConversation;
 
 export default chatHistoryService;

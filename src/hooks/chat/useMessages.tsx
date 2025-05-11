@@ -32,9 +32,17 @@ export const useMessages = (conversationId: string | null) => {
 
   const addMessage = async (message: Omit<ChatMessage, 'id'>) => {
     try {
+      // Convert any Date to string if needed
+      const messageWithStringTimestamp = {
+        ...message,
+        timestamp: typeof message.timestamp === 'object' && message.timestamp instanceof Date
+          ? message.timestamp.toISOString()
+          : message.timestamp
+      };
+      
       const newMessage = await chatHistoryService.addMessageToConversation(
-        message.conversation_id,
-        message
+        messageWithStringTimestamp.conversation_id!,
+        messageWithStringTimestamp
       );
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       return newMessage;

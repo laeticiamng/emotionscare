@@ -6,24 +6,20 @@ import { JournalEntry } from '@/types';
 let journalEntries: JournalEntry[] = [
   {
     id: '1',
-    title: 'Jour de stress',
     content: 'Journée difficile avec beaucoup de pression au travail.',
-    mood: 'stressed',
+    emotion: 'stressed',
     mood_score: 3,
     date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     user_id: 'user-1',
-    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     text: 'Journée difficile avec beaucoup de pression au travail.' // Pour compatibility
   },
   {
     id: '2',
-    title: 'Détente à la plage',
     content: 'Superbe journée à la plage avec les amis. Très reposant!',
-    mood: 'happy',
+    emotion: 'happy',
     mood_score: 8,
     date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     user_id: 'user-1',
-    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     text: 'Superbe journée à la plage avec les amis. Très reposant!' // Pour compatibility
   },
 ];
@@ -48,13 +44,11 @@ export const getJournalEntryById = async (entryId: string): Promise<JournalEntry
 /**
  * Créer une nouvelle entrée de journal
  */
-export const createJournalEntry = async (entryData: Omit<JournalEntry, 'id' | 'created_at'>): Promise<JournalEntry> => {
+export const createJournalEntry = async (entryData: Omit<JournalEntry, 'id'>): Promise<JournalEntry> => {
   const newEntry: JournalEntry = {
     id: uuidv4(),
     ...entryData,
-    date: entryData.date || new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    text: entryData.content // Pour compatibility
+    date: entryData.date || new Date().toISOString()
   };
   
   journalEntries.push(newEntry);
@@ -95,5 +89,5 @@ export const saveJournalEntry = async (entryData: any): Promise<JournalEntry> =>
     if (updated) return updated;
   }
   
-  return createJournalEntry(entryData as Omit<JournalEntry, 'id' | 'created_at'>);
+  return createJournalEntry(entryData as Omit<JournalEntry, 'id'>);
 };

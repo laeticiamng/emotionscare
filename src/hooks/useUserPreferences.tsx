@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
-import { NotificationFrequency, NotificationTone, FontFamily, FontSize, ThemeName } from '@/types';
+import { FontSize, ThemeName } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
 
 // Types for user preferences
@@ -13,7 +13,7 @@ export interface UserPreferencesState {
   highContrast: boolean;
   reducedAnimations: boolean;
   fontSize: FontSize;
-  font: FontFamily;
+  font: string;
   customBackground?: string;
   
   // Identity
@@ -91,7 +91,7 @@ const defaultPreferences: UserPreferencesState = {
 export function useUserPreferences() {
   const [preferences, setPreferences] = useState<UserPreferencesState>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
-  const { theme, setThemePreference } = useTheme();
+  const theme = useTheme();
   const audioPrefs = useAudioPreferences();
   const { toast } = useToast();
 
@@ -117,8 +117,8 @@ export function useUserPreferences() {
       localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
       // Synchronize with other contexts if needed
-      if (newPreferences.theme) {
-        setThemePreference(newPreferences.theme as ThemeName);
+      if (newPreferences.theme && theme.setTheme) {
+        theme.setTheme(newPreferences.theme as ThemeName);
       }
       
       toast({

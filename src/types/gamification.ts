@@ -9,6 +9,9 @@ export interface Badge {
   user_id?: string;
   unlocked_at?: string;
   progress?: number;
+  unlocked?: boolean;
+  icon_url?: string;
+  level?: number;
 }
 
 export interface Challenge {
@@ -22,6 +25,8 @@ export interface Challenge {
   icon?: string;
   image_url?: string;
   total?: number;
+  category?: string;
+  difficulty?: string;
 }
 
 export interface UserScore {
@@ -52,3 +57,4 @@ export interface GamificationAction {
   description: string;
   max_daily?: number;
 }
+

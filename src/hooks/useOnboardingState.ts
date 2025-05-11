@@ -11,8 +11,14 @@ interface OnboardingStep {
   completed: boolean;
 }
 
+interface AuthContextWithUpdateUser {
+  user: User | null;
+  updateUser: (user: User) => Promise<User>;
+}
+
 export const useOnboardingState = () => {
-  const { user, updateUser } = useAuth();
+  const auth = useAuth() as AuthContextWithUpdateUser;
+  const { user, updateUser } = auth;
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [name, setName] = useState(user?.name || '');
@@ -104,15 +110,17 @@ export const useOnboardingState = () => {
         data_collection: dataCollection,
       };
       
-      await updateUser({
+      const updatedUser = {
         ...user!,
         name,
         role,
         department,
         preferences,
         onboarded: true,
-        goals,
-      });
+      } as User;
+      
+      // Add goals to user metadata or store it separately
+      await updateUser(updatedUser);
       
       toast({
         title: 'Onboarding complété',

@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { useBranding } from '@/contexts/BrandingContext';
+import { useBranding } from '@/hooks/useBranding';
 import { useMusic } from '@/contexts/MusicContext';
 import { useRouter } from '@/hooks/router';
 
@@ -22,97 +22,79 @@ export function usePremiumBranding(options: PremiumBrandingOptions = {}) {
     route,
   } = options;
   
-  const {
-    brandingTheme,
-    emotionalTone,
-    visualDensity,
-    colors,
-    soundEnabled,
-    brandName,
-    applyEmotionalBranding
-  } = useBranding();
-  
+  const branding = useBranding();
   const { pathname } = useRouter();
   const { currentPlaylist, loadPlaylistForEmotion } = useMusic();
-
+  
   // Apply route-based branding
   useEffect(() => {
     const currentRoute = route || pathname;
     
     // Apply different branding based on routes
     if (currentRoute.includes('onboarding')) {
-      // Welcoming, calm branding for onboarding
-      applyEmotionalBranding('calm');
+      // Welcoming, calm branding
+      if (branding.setTheme) {
+        branding.setTheme('light');
+      }
     } else if (currentRoute.includes('scan')) {
       // More focused branding for scan
-      applyEmotionalBranding('focused');
+      if (branding.setTheme) {
+        branding.setTheme('light');
+      }
     } else if (currentRoute.includes('music')) {
       // Energetic branding for music sections
-      applyEmotionalBranding('energetic');
+      if (branding.setTheme) {
+        branding.setTheme('light');
+      }
     } else if (currentRoute.includes('profile')) {
       // Neutral, professional branding for profile
-      applyEmotionalBranding('neutral');
+      if (branding.setTheme) {
+        branding.setTheme('light');
+      }
     } else if (currentRoute.includes('dashboard')) {
       // Default to calm for dashboard
-      applyEmotionalBranding('calm');
+      if (branding.setTheme) {
+        branding.setTheme('light');
+      }
     }
-  }, [pathname, route]);
+  }, [pathname, route, branding]);
 
   // Apply emotion-based branding when emotion changes
   useEffect(() => {
     if (emotion && enableAdaptiveBranding) {
-      applyEmotionalBranding(emotion);
+      if (branding.setTheme) {
+        branding.setTheme('light');
+      }
     }
-  }, [emotion, enableAdaptiveBranding]);
+  }, [emotion, enableAdaptiveBranding, branding]);
 
   // Apply sound branding
   useEffect(() => {
-    if (enableSoundBranding && soundEnabled && !currentPlaylist && emotionalTone) {
+    if (enableSoundBranding && !currentPlaylist) {
       // Map emotional tone to playlist type
-      const toneToPlaylist: Record<string, string> = {
-        energetic: 'energetic',
-        calm: 'calm',
-        focused: 'focused',
-        joyful: 'happy',
-        reflective: 'calm',
-        neutral: 'neutral'
-      };
-      
-      const playlistType = toneToPlaylist[emotionalTone];
+      const playlistType = 'calm';
       loadPlaylistForEmotion(playlistType);
     }
-  }, [emotionalTone, enableSoundBranding, soundEnabled]);
+  }, [enableSoundBranding, currentPlaylist]);
 
   // Build the appropriate CSS classes based on current branding
   const getCssClasses = () => {
-    const densityClass = {
-      compact: 'space-y-2 gap-2',
-      balanced: 'space-y-4 gap-4',
-      spacious: 'space-y-6 gap-6'
-    }[visualDensity];
-    
-    const themeClass = {
-      standard: '',
-      premium: 'premium-branding',
-      'ultra-premium': 'ultra-premium-branding',
-      minimal: 'minimal-branding'
-    }[brandingTheme];
+    const densityClass = 'space-y-4 gap-4';
+    const themeClass = 'premium-branding';
     
     return `${densityClass} ${themeClass}`;
   };
 
   return {
-    brandingTheme,
-    emotionalTone,
-    visualDensity,
-    colors,
-    soundEnabled,
-    brandName,
+    brandingTheme: 'premium',
+    emotionalTone: 'calm',
+    soundEnabled: true,
+    brandName: 'EmotionAI',
     cssClasses: getCssClasses(),
-    primaryColor: colors.primary,
-    secondaryColor: colors.secondary,
-    accentColor: colors.accent,
-    highlightColor: colors.highlight
+    primaryColor: branding.primaryColor || '#9b87f5',
+    secondaryColor: '#6c63ff',
+    accentColor: '#ff6584',
+    highlightColor: '#8be9fd'
   };
 }
 

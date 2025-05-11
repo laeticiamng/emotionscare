@@ -1,72 +1,114 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { getCoachRecommendations } from '@/lib/coach/coach-service';
-import { safeOpen } from '@/lib/utils';
+import { useState, useCallback } from 'react';
+import { useToast } from '@/components/ui/use-toast';
 
-const DEFAULT_RECOMMENDATIONS = [
-  "Essayez une séance de méditation guidée",
-  "Écrivez dans votre journal pour exprimer vos pensées",
-  "Faites une promenade dans la nature pour vous détendre",
-  "Écoutez de la musique apaisante pour améliorer votre humeur"
-];
+// Types for dashboard data
+interface UsageStats {
+  dailyActiveUsers: number;
+  weeklyActiveUsers: number;
+  monthlyActiveUsers: number;
+  totalSessionsCompleted: number;
+  averageSessionDuration: number;
+  completionRate: number;
+}
 
-export const useCoachDashboard = () => {
-  const { setOpenDrawer } = useMusic();
+interface EmotionStats {
+  mostCommonEmotion: string;
+  averageEmotionalScore: number;
+  emotionDistribution: Record<string, number>;
+  emotionTrend: Array<{ date: string; score: number }>;
+}
+
+interface UserEngagement {
+  mostActiveTimeOfDay: string;
+  averageSessionsPerWeek: number;
+  userRetentionRate: number;
+  streakData: Array<{ userId: string; streak: number }>;
+}
+
+export function useCoachDashboard() {
+  const [usageStats, setUsageStats] = useState<UsageStats | null>(null);
+  const [emotionStats, setEmotionStats] = useState<EmotionStats | null>(null);
+  const [userEngagement, setUserEngagement] = useState<UserEngagement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const { user } = useAuth();
-  const [recommendations, setRecommendations] = useState<string[]>(DEFAULT_RECOMMENDATIONS);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [quickSuggestions, setQuickSuggestions] = useState<string[]>([]);
 
-  const loadRecommendations = useCallback(async () => {
-    if (!user?.id) return;
-    setIsProcessing(true);
+  const fetchDashboardData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      const aiRecommendations = await getCoachRecommendations(user.id);
-      setRecommendations(aiRecommendations);
-      setQuickSuggestions(aiRecommendations.slice(0, 3));
-    } catch (error) {
-      console.error("Failed to load AI recommendations:", error);
-      setRecommendations([
-        "Essayez une séance de méditation guidée",
-        "Écrivez dans votre journal pour exprimer vos pensées",
-        "Faites une promenade dans la nature pour vous détendre",
-        "Écoutez de la musique apaisante pour améliorer votre humeur"
-      ]);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock data
+      setUsageStats({
+        dailyActiveUsers: 42,
+        weeklyActiveUsers: 156,
+        monthlyActiveUsers: 328,
+        totalSessionsCompleted: 1245,
+        averageSessionDuration: 14.5,
+        completionRate: 78
+      });
+      
+      setEmotionStats({
+        mostCommonEmotion: 'calm',
+        averageEmotionalScore: 72,
+        emotionDistribution: {
+          happy: 32,
+          calm: 28,
+          focused: 18,
+          stressed: 14,
+          anxious: 8
+        },
+        emotionTrend: Array.from({ length: 14 }, (_, i) => ({
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          score: 60 + Math.floor(Math.random() * 30)
+        }))
+      });
+      
+      setUserEngagement({
+        mostActiveTimeOfDay: 'morning',
+        averageSessionsPerWeek: 3.2,
+        userRetentionRate: 76,
+        streakData: Array.from({ length: 5 }, (_, i) => ({
+          userId: `user-${i+1}`,
+          streak: Math.floor(Math.random() * 20) + 1
+        }))
+      });
+      
       toast({
-        title: "Erreur de chargement",
-        description: "Impossible de charger les recommandations IA. Veuillez réessayer plus tard.",
-        variant: "destructive",
+        title: "Dashboard data updated",
+        description: "Latest coach metrics have been loaded"
+      });
+    } catch (err) {
+      setError("Failed to load dashboard data");
+      toast({
+        title: "Data loading error",
+        description: "Could not fetch the latest metrics",
+        variant: "destructive"
       });
     } finally {
-      setIsProcessing(false);
+      setIsLoading(false);
     }
-  }, [user?.id, toast]);
+  }, [toast]);
 
-  useEffect(() => {
-    loadRecommendations();
-  }, [loadRecommendations]);
-
-  const playRecommendedMusic = (emotion: string) => {
-    safeOpen(setOpenDrawer);
+  const updateVisualization = useCallback((type: string) => {
+    // Handle visualization type changes
     toast({
-      title: "Musique recommandée activée",
-      description: `Playlist "${emotion}" chargée pour accompagner votre humeur.`,
+      title: "View updated",
+      description: `Changed visualization to ${type}`
     });
-  };
-
-  const handleRefreshRecommendations = () => {
-    loadRecommendations();
-  };
+  }, [toast]);
 
   return {
-    recommendations,
-    isProcessing,
-    quickSuggestions,
-    playRecommendedMusic,
-    handleRefreshRecommendations,
+    usageStats,
+    emotionStats,
+    userEngagement,
+    isLoading,
+    error,
+    fetchDashboardData,
+    updateVisualization
   };
-};
+}

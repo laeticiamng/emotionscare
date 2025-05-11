@@ -13,7 +13,7 @@ let challenges: Challenge[] = [
     total: 1,
     points: 10,
     completed: false,
-    difficulty: 'easy',
+    category: 'scan',
     image_url: '/images/badges/first-scan.svg',
   },
   {
@@ -25,7 +25,7 @@ let challenges: Challenge[] = [
     total: 3,
     points: 20,
     completed: false,
-    difficulty: 'medium',
+    category: 'journal',
     image_url: '/images/badges/journal-streak.svg',
   }
 ];
@@ -42,8 +42,8 @@ const badges: Badge[] = [
     progress: 100,
     threshold: 100,
     unlocked: true,
+    unlocked_at: new Date().toISOString(),
     icon: 'award',
-    icon_url: '/images/badges/emotional-explorer.svg',
   },
   {
     id: 'badge-2',
@@ -56,7 +56,6 @@ const badges: Badge[] = [
     threshold: 100,
     unlocked: false,
     icon: 'book',
-    icon_url: '/images/badges/journal-master.svg',
   }
 ];
 
@@ -98,11 +97,12 @@ export const awardBadge = async (userId: string, badgeData: Partial<Badge>): Pro
     name: badgeData.name || 'Badge sans nom',
     description: badgeData.description || 'Description du badge',
     image_url: badgeData.image_url || '/images/badges/default.svg',
-    level: badgeData.level || 1,
     progress: badgeData.progress || 0,
     threshold: badgeData.threshold || 100,
     unlocked: badgeData.unlocked || false,
     icon: badgeData.icon || 'award',
+    level: badgeData.level || 1,
+    unlocked_at: badgeData.unlocked ? new Date().toISOString() : undefined
   };
   
   badges.push(newBadge);

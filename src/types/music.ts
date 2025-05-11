@@ -61,3 +61,7 @@ export interface MusicDrawerProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+export interface MusicControlsProps {
+  showDrawer: () => void;
+}

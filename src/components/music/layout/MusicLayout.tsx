@@ -30,6 +30,12 @@ const MusicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
   }
   
+  const handleShowDrawer = () => {
+    if (setOpenDrawer) {
+      setOpenDrawer(!openDrawer);
+    }
+  };
+  
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex-1">
@@ -38,7 +44,7 @@ const MusicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       
       <div className="sticky bottom-0 left-0 right-0 bg-background py-2">
         <Card className="mx-auto max-w-4xl">
-          <MusicControls showDrawer={() => setOpenDrawer && setOpenDrawer(!openDrawer)} />
+          <MusicControls showDrawer={handleShowDrawer} />
         </Card>
       </div>
     </div>

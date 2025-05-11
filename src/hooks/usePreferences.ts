@@ -1,18 +1,17 @@
 
 import { useState, useCallback } from 'react';
-import { UserPreferences, UserPreferencesState, FontSize, ThemeName } from '@/types';
+import { User, UserPreferences } from '@/types/user';
 
-export const usePreferences = (): UserPreferencesState => {
+export const usePreferences = () => {
   const [preferences, setPreferences] = useState<UserPreferences>({
     theme: 'light',
     fontSize: 'medium',
     notifications: true,
     autoplayVideos: true,
     showEmotionPrompts: true,
-    privacyLevel: 'standard',
+    privacy: 'private',
     dataCollection: true,
     notifications_enabled: true,
-    notificationsEnabled: true,
     email_notifications: true,
     push_notifications: true,
     emotionalCamouflage: false,
@@ -46,7 +45,7 @@ export const usePreferences = (): UserPreferencesState => {
       notifications: true,
       autoplayVideos: true,
       showEmotionPrompts: true,
-      privacyLevel: 'standard',
+      privacy: 'private',
       dataCollection: true,
       notifications_enabled: true,
       email_notifications: true,

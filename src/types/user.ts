@@ -15,6 +15,7 @@ export interface User {
   team_id?: string;
   emotional_score?: number;
   anonymity_code?: string;
+  goals?: string[];
 }
 
 export interface UserPreferences {
@@ -33,6 +34,8 @@ export interface UserPreferences {
   notification_frequency?: string;
   notification_tone?: string;
   emotionalCamouflage?: boolean;
+  notifications_enabled?: boolean;
+  privacyLevel?: string;
 }
 
 export enum UserRole {
@@ -51,3 +54,4 @@ export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional'
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export type UserPreferencesState = UserPreferences;
+

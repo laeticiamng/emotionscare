@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { ChatMessage, ChatConversation } from '@/types/chat';
-import { fetchConversations, fetchMessages, deleteConversation as apiDeleteConversation } from '@/lib/chat/chatHistoryService';
+import chatHistoryService from '@/lib/chat/chatHistoryService';
 
 export function useChatHistory() {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
@@ -12,7 +12,7 @@ export function useChatHistory() {
   const loadConversations = useCallback(async (userId: string) => {
     setIsLoading(true);
     try {
-      const fetchedConversations = await fetchConversations(userId);
+      const fetchedConversations = await chatHistoryService.getConversationsForUser(userId);
       setConversations(fetchedConversations);
       return fetchedConversations;
     } catch (error) {
@@ -26,7 +26,7 @@ export function useChatHistory() {
   const loadMessages = useCallback(async (conversationId: string) => {
     setIsLoading(true);
     try {
-      const messages = await fetchMessages(conversationId);
+      const messages = await chatHistoryService.getMessagesForConversation(conversationId);
       setHistory(messages);
       setActiveConversationId(conversationId);
       return messages;
@@ -40,7 +40,7 @@ export function useChatHistory() {
 
   const deleteConversation = useCallback(async (conversationId: string) => {
     try {
-      await apiDeleteConversation(conversationId);
+      await chatHistoryService.deleteConversation(conversationId);
       setConversations(prev => prev.filter(conv => conv.id !== conversationId));
       if (activeConversationId === conversationId) {
         setActiveConversationId(null);
