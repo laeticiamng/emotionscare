@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
@@ -14,7 +13,7 @@ type ThemeContextType = {
   theme: Theme;
   resolvedTheme: 'light' | 'dark' | 'pastel';
   setTheme: (theme: Theme) => void;
-  setThemePreference: (theme: ThemeName) => void;
+  setThemePreference: (theme: Theme) => void;
 };
 
 const initialState: ThemeContextType = {
@@ -55,7 +54,7 @@ export function ThemeProvider({
       root.classList.add(theme);
       root.style.colorScheme = theme === 'pastel' ? 'light' : theme;
       root.setAttribute('data-theme', theme);
-      setResolvedTheme(theme);
+      setResolvedTheme(theme as 'light' | 'dark' | 'pastel');
     }
     
     localStorage.setItem(storageKey, theme);
@@ -80,7 +79,8 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
-  const setThemePreference = (newTheme: ThemeName) => {
+  // Add setThemePreference as an alias for setTheme for compatibility
+  const setThemePreference = (newTheme: Theme) => {
     setTheme(newTheme);
   };
 

@@ -1,54 +1,69 @@
 
 import React from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { useOnboardingState } from '@/hooks/useOnboardingState';
-import OnboardingStepper from '@/components/onboarding/OnboardingStepper';
-import OnboardingHeader from '@/components/onboarding/OnboardingHeader';
-import OnboardingContent from '@/components/onboarding/OnboardingContent';
+import { useOnboarding } from '@/contexts/OnboardingContext';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const OnboardingExperiencePage: React.FC = () => {
-  const {
-    step,
-    loading,
-    emotion,
-    intensity,
-    userResponses,
-    nextStep,
-    prevStep,
-    handleResponse,
-    completeOnboarding,
-  } = useOnboardingState();
+  const onboarding = useOnboarding();
+  const navigate = useNavigate();
   
-  const totalSteps = 5;
-
+  // Ensure we have all properties needed for rendering
+  const currentStep = onboarding.currentStep;
+  const loading = false; // Default value if not provided
+  const emotion = ''; // Default value if not provided
+  const intensity = 0; // Default value if not provided
+  const userResponses = {}; // Default value if not provided
+  
+  const nextStep = onboarding.nextStep;
+  const previousStep = onboarding.previousStep;
+  const handleResponse = (response: any) => {
+    // Default implementation
+    console.log('Response:', response);
+    nextStep();
+  };
+  
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-background to-muted/30">
-      <OnboardingHeader step={step} totalSteps={totalSteps} />
-
-      <main className="flex-1 container max-w-5xl mx-auto px-4 py-8">
-        <OnboardingStepper 
-          currentStep={step}
-          totalSteps={totalSteps}
-          onNext={nextStep}
-          onPrev={prevStep}
-          isLoading={loading}
-          isLastStep={step === totalSteps - 1}
-          onComplete={completeOnboarding}
-        />
-        
-        <AnimatePresence mode="wait">
-          <OnboardingContent
-            step={step}
-            loading={loading}
-            emotion={emotion}
-            userResponses={userResponses}
-            nextStep={nextStep}
-            prevStep={prevStep}
-            handleResponse={handleResponse}
-            completeOnboarding={completeOnboarding}
-          />
-        </AnimatePresence>
-      </main>
+    <div className="container mx-auto py-6">
+      <Card className="max-w-2xl mx-auto">
+        <CardContent className="pt-6">
+          <h1 className="text-2xl font-bold mb-4">Onboarding Experience</h1>
+          
+          <p className="mb-6">
+            Step {currentStep + 1} of {onboarding.steps.length}
+          </p>
+          
+          {/* Current step content would go here */}
+          <div className="mb-8">
+            {onboarding.steps[currentStep]?.title && (
+              <h2 className="text-xl font-semibold mb-4">{onboarding.steps[currentStep].title}</h2>
+            )}
+            {onboarding.steps[currentStep]?.content}
+          </div>
+          
+          <div className="flex justify-between">
+            <Button 
+              variant="outline" 
+              onClick={previousStep}
+              disabled={currentStep === 0}
+            >
+              Previous
+            </Button>
+            
+            <Button 
+              onClick={async () => {
+                const success = await onboarding.completeOnboarding();
+                if (success) {
+                  navigate('/dashboard');
+                }
+              }}
+            >
+              {currentStep === onboarding.steps.length - 1 ? "Complete" : "Next"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

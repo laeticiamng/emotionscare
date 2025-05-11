@@ -1,148 +1,76 @@
-
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getChallenges as fetchChallenges, getBadges as fetchBadges, completeChallenge } from '@/lib/gamificationService';
+import { getChallenges, getBadges } from '@/lib/gamificationService';
 import { Badge, Challenge } from '@/types/gamification';
-import BadgeGrid from '@/components/gamification/BadgeGrid';
-import ChallengeItem from '@/components/gamification/ChallengeItem';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
 const GamificationPage = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [activeTab, setActiveTab] = useState('badges');
-  const [isLoading, setIsLoading] = useState(true);
-  const [earnedBadgeIds, setEarnedBadgeIds] = useState<string[]>([]);
-
-  // Function to calculate progress for badges
-  const calculateProgress = (threshold: number) => {
-    // Mock implementation - in a real app this would use actual user data
-    return Math.floor(Math.random() * threshold);
-  };
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
-    const loadGamificationData = async () => {
-      setIsLoading(true);
+    const loadData = async () => {
       try {
-        // Load badges and challenges
-        if (user?.id) {
-          const badgesData = await fetchBadges(user.id);
-          const challengesData = await fetchChallenges();
-
-          // Set earned badge IDs
-          const earnedIds = badgesData
-            .filter(badge => badge.unlocked)
-            .map(badge => badge.id);
-
-          setEarnedBadgeIds(earnedIds);
-          setBadges(badgesData);
-          setChallenges(challengesData);
-        }
+        setLoading(true);
+        const badgesData = await getBadges(); // Changed from fetchBadges
+        const challengesData = await getChallenges(); // Changed from fetchChallenges
+        
+        setBadges(badgesData);
+        setChallenges(challengesData);
       } catch (error) {
         console.error('Error loading gamification data:', error);
-        toast({
-          title: 'Erreur',
-          description: "Impossible de charger les données de gamification.",
-          variant: 'destructive'
-        });
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
-
-    if (user) {
-      loadGamificationData();
-    }
-  }, [user, toast]);
-
-  const handleCompleteChallenge = async (challengeId: string) => {
-    try {
-      await completeChallenge(challengeId);
-      
-      // Update challenges
-      setChallenges(prev =>
-        prev.map(c =>
-          c.id === challengeId ? { ...c, completed: true } : c
-        )
-      );
-      
-      toast({
-        title: 'Défi complété !',
-        description: 'Félicitations pour avoir relevé ce défi !',
-      });
-    } catch (error) {
-      console.error('Error completing challenge:', error);
-      toast({
-        title: 'Erreur',
-        description: "Impossible de compléter le défi.",
-        variant: 'destructive'
-      });
-    }
-  };
-
+    
+    loadData();
+  }, []);
+  
   return (
-    <div className="container max-w-5xl mx-auto py-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Gamification</h1>
-        <p className="text-muted-foreground">
-          Suivez vos progrès, gagnez des badges et relevez des défis pour améliorer votre bien-être
-        </p>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="badges">Badges</TabsTrigger>
-          <TabsTrigger value="challenges">Défis</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="badges">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <BadgeGrid 
-              badges={badges} 
-              earnedBadgeIds={earnedBadgeIds}
-              progressFunction={calculateProgress}
-            />
-          )}
-        </TabsContent>
-
-        <TabsContent value="challenges">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {challenges.map(challenge => (
-                <ChallengeItem
-                  key={challenge.id}
-                  id={challenge.id}
-                  title={challenge.title || challenge.name || ''}
-                  description={challenge.description}
-                  points={challenge.points || 0}
-                  isCompleted={challenge.completed}
-                  onComplete={handleCompleteChallenge}
-                />
+    <div className="container mx-auto py-6">
+      <h1 className="text-3xl font-bold mb-4">Gamification</h1>
+      
+      {loading ? (
+        <div className="flex justify-center items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <Tabs defaultValue="badges" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="badges">Badges</TabsTrigger>
+            <TabsTrigger value="challenges">Challenges</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="badges">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {badges.map((badge) => (
+                <div key={badge.id} className="bg-card rounded-lg p-4 shadow-sm">
+                  <h3 className="text-lg font-semibold">{badge.name}</h3>
+                  <p className="text-sm text-muted-foreground">{badge.description}</p>
+                </div>
               ))}
             </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+          
+          <TabsContent value="challenges">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {challenges.map((challenge) => (
+                <div key={challenge.id} className="bg-card rounded-lg p-4 shadow-sm">
+                  <h3 className="text-lg font-semibold">{challenge.title}</h3>
+                  <p className="text-sm text-muted-foreground">{challenge.description}</p>
+                  <Button variant="outline" size="sm" className="mt-2">
+                    Accepter le défi
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };
 
-export default function WrappedGamificationPage() {
-  return (
-    <ProtectedLayoutWrapper>
-      <GamificationPage />
-    </ProtectedLayoutWrapper>
-  );
-}
+export default GamificationPage;

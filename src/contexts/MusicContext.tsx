@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types';
 
@@ -10,6 +9,7 @@ export interface MusicContextType {
   queue: MusicTrack[];
   currentPlaylist: MusicPlaylist | null;
   currentEmotion: string;
+  isInitialized: boolean;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   togglePlay: () => void;
@@ -40,6 +40,7 @@ const defaultMusicContext: MusicContextType = {
   queue: [],
   currentPlaylist: null,
   currentEmotion: 'neutral',
+  isInitialized: false,
   playTrack: () => {},
   pauseTrack: () => {},
   togglePlay: () => {},
@@ -76,6 +77,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
@@ -208,6 +210,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Mock initialization
       await new Promise(resolve => setTimeout(resolve, 500));
       console.log('Music system initialized successfully');
+      setIsInitialized(true);
     } catch (err) {
       console.error('Failed to initialize music system:', err);
       setError('Failed to initialize music system');
@@ -223,6 +226,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       queue,
       currentPlaylist,
       currentEmotion,
+      isInitialized,
       playTrack,
       pauseTrack,
       togglePlay,

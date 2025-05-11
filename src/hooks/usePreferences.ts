@@ -41,11 +41,11 @@ export const usePreferences = () => {
     
     const currentPreferences = user.preferences || {};
     
-    // Update the spread operations to handle object types properly
+    // Fixed spread operation
     const updatedPreferences = {
       ...currentPreferences,
       ...newPreferences
-    };
+    } as UserPreferences;
     
     try {
       await updateUser({

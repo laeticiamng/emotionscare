@@ -241,6 +241,11 @@ export interface MusicTrack {
   cover?: string;
   coverUrl?: string;
   cover_url?: string;
+  mood?: string;
+  audioUrl?: string;
+  emotion?: string;
+  emotion_tag?: string;
+  audio_url?: string;
 }
 
 export interface MusicPlaylist {

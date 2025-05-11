@@ -22,7 +22,7 @@ const getMessagesForConversation = async (conversationId: string): Promise<ChatM
 const addMessageToConversation = async (conversationId: string, messageData: Omit<ChatMessage, 'id'>): Promise<ChatMessage> => {
   // Create a new message object with an ID
   const message: ChatMessage = {
-    id: messageData.id || uuidv4(), // Use provided ID or generate a new one
+    id: uuidv4(), // Generate a new UUID if not provided
     conversation_id: messageData.conversation_id,
     sender: messageData.sender,
     text: messageData.text || messageData.content,

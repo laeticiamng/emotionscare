@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -54,12 +53,8 @@ const AdminLoginPage = () => {
     setError(null);
 
     try {
-      // Changement de l'appel à login pour n'utiliser qu'un seul argument
-      const success = await login({
-        email: data.email,
-        password: data.password,
-        isAdmin: true
-      });
+      // Updated login call with the correct parameters
+      const success = await login(data.email, data.password, true);
 
       if (success) {
         toast({

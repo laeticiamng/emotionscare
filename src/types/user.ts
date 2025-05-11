@@ -43,6 +43,7 @@ export interface UserPreferences {
   fullAnonymity?: boolean;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
+  font?: string; // Add font property
 }
 
 export enum UserRole {

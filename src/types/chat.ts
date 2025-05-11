@@ -1,4 +1,3 @@
-
 export interface ChatMessage {
   id: string;
   text?: string;
@@ -37,6 +36,7 @@ export interface ChatResponse {
   role?: string;
   timestamp?: string;
   emotion?: string;
+  follow_up_questions?: string[];
 }
 
 // Add this for compatibility with useChatProcessing.ts and useChat.tsx
