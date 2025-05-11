@@ -38,3 +38,12 @@ export interface ChatResponseType {
 }
 
 export type ChatResponse = ChatResponseType;
+
+// Add MusicDrawerProps interface
+export interface MusicDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  playlist?: MusicPlaylist | null;
+  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+}

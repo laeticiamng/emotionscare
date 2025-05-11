@@ -39,7 +39,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   };
   
   // Use avatar as fallback if image is not available
-  const userImage = user?.image || user?.avatar;
+  const userImage = user?.image || user?.avatar || user?.avatar_url;
 
   return (
     <DropdownMenu>

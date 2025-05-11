@@ -9,7 +9,8 @@ const MusicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     isInitialized, 
     initializeMusicSystem, 
     error,
-    setOpenDrawer
+    setOpenDrawer,
+    openDrawer
   } = useMusic();
   
   useEffect(() => {
@@ -37,7 +38,7 @@ const MusicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       
       <div className="sticky bottom-0 left-0 right-0 bg-background py-2">
         <Card className="mx-auto max-w-4xl">
-          <MusicControls showDrawer={() => setOpenDrawer && setOpenDrawer(true)} />
+          <MusicControls showDrawer={() => setOpenDrawer && setOpenDrawer(!openDrawer)} />
         </Card>
       </div>
     </div>

@@ -5,9 +5,9 @@ export interface User {
   email?: string;
   role?: string;
   avatar?: string;
-  image?: string;
+  image?: string; // Adding image property
+  avatar_url?: string; // Adding avatar_url property
   preferences?: UserPreferences;
-  // Add missing properties
   createdAt?: string;
   created_at?: string;
   onboarded?: boolean;

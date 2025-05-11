@@ -1,45 +1,54 @@
 
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  points: number;
-  completed: boolean;
-  progress?: number;
-  category: string;
-  icon?: string;
-  requirements?: string[];
-  completedAt?: string;
-  name?: string;
-  total?: number;
-  difficulty?: string;
-}
-
 export interface Badge {
   id: string;
   name: string;
   description: string;
   image_url?: string;
-  category: string;
-  level: number;
-  unlocked: boolean;
-  unlocked_at?: string;
+  icon?: string;
+  threshold?: number;
   user_id?: string;
+  unlocked_at?: string;
   progress?: number;
 }
 
-export interface AchievementStat {
+export interface Challenge {
+  id: string;
   name: string;
-  value: number;
-  max?: number;
-  unit?: string;
-  percentage?: number;
+  title: string;
+  description: string;
+  points: number;
+  progress?: number;
+  completed?: boolean;
+  icon?: string;
+  image_url?: string;
+  total?: number;
 }
 
-export interface LevelInfo {
-  current: number;
-  next: number;
-  progress: number;
-  pointsToNextLevel: number;
-  totalPoints: number;
+export interface UserScore {
+  id: string;
+  user_id: string;
+  score: number;
+  level: number;
+  streak_days: number;
+  longest_streak: number;
+  badges_count: number;
+  challenges_completed: number;
+  last_activity: string;
+}
+
+export interface Reward {
+  id: string;
+  name: string;
+  description: string;
+  points_required: number;
+  icon: string;
+  available: boolean;
+}
+
+export interface GamificationAction {
+  id: string;
+  name: string;
+  points: number;
+  description: string;
+  max_daily?: number;
 }

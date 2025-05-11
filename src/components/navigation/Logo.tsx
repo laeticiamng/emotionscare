@@ -1,44 +1,49 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useBranding, BrandingOptions } from '@/hooks/useBranding';
+import { BrandingOptions } from '@/types/branding';
+import { useBranding } from '@/hooks/useBranding';
 
 interface LogoProps {
-  isAdmin?: boolean;
-  homePath?: string;
-  size?: BrandingOptions['size'];
-  variant?: BrandingOptions['variant'];
+  size?: 'small' | 'medium' | 'large';
+  variant?: 'light' | 'dark' | 'default';
+  href?: string;
+  className?: string;
+  options?: BrandingOptions;
 }
 
-const Logo: React.FC<LogoProps> = ({ 
-  isAdmin = false, 
-  homePath = "/",
-  size = 'md',
-  variant = 'default'
+const Logo: React.FC<LogoProps> = ({
+  size = 'medium',
+  variant = 'default',
+  href = '/',
+  className = '',
+  options,
 }) => {
-  const { primaryColor } = useBranding();
-  const showText = variant !== 'minimal';
+  const branding = useBranding();
   
-  return (
-    <Link to={homePath} className="flex items-center gap-2.5 transition-all duration-300 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary/20 rounded-md group">
-      <div className="flex items-center">
-        {showText && (
-          <div className="font-semibold text-xl tracking-tight">
-            <span className="group-hover:opacity-90 transition-opacity">
-              Emotions<span className="text-primary font-semibold">Care</span>
-            </span>
-            <span className="text-xs align-super ml-0.5 text-primary/80">™</span>
-          </div>
-        )}
-        
-        {isAdmin && (
-          <div className="bg-primary/10 text-primary text-xs px-2.5 py-0.5 rounded-full font-medium ml-2">
-            Admin
-          </div>
-        )}
-      </div>
-    </Link>
+  const logoStyles = {
+    small: 'text-lg font-bold',
+    medium: 'text-xl font-bold',
+    large: 'text-2xl font-bold',
+  };
+  
+  const logo = (
+    <div className={`${logoStyles[size]} ${className}`}>
+      <span
+        className={variant === 'light' ? 'text-white' : 'text-primary'}
+        style={branding.primaryColor ? { color: branding.primaryColor } : {}}
+      >
+        Emotion
+      </span>
+      <span className={variant === 'light' ? 'text-white font-light' : 'font-light'}>AI</span>
+    </div>
   );
+  
+  if (href) {
+    return <Link to={href}>{logo}</Link>;
+  }
+  
+  return logo;
 };
 
 export default Logo;

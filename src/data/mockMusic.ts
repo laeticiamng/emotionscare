@@ -11,7 +11,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/music/ocean.jpg',
     audioUrl: '/audio/calm-ocean.mp3',
     emotion: 'calm',
-    url: '/audio/calm-ocean.mp3' // Added required url property
+    url: '/audio/calm-ocean.mp3'
   },
   {
     id: '2',
@@ -21,7 +21,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/music/morning.jpg',
     audioUrl: '/audio/morning-motivation.mp3',
     emotion: 'happy',
-    url: '/audio/morning-motivation.mp3' // Added required url property
+    url: '/audio/morning-motivation.mp3'
   },
   {
     id: '3',
@@ -31,7 +31,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/music/focus.jpg',
     audioUrl: '/audio/deep-focus.mp3',
     emotion: 'focused',
-    url: '/audio/deep-focus.mp3' // Added required url property
+    url: '/audio/deep-focus.mp3'
   },
   {
     id: '4',
@@ -41,7 +41,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/music/release.jpg',
     audioUrl: '/audio/tension-release.mp3',
     emotion: 'stressed',
-    url: '/audio/tension-release.mp3' // Added required url property
+    url: '/audio/tension-release.mp3'
   }
 ];
 
@@ -50,7 +50,6 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '1',
     name: 'Calming Sounds',
-    title: 'Calming Sounds', // For backward compatibility
     description: 'Perfect for relaxation and stress relief',
     tracks: [mockTracks[0], mockTracks[3]],
     emotion: 'calm',
@@ -59,7 +58,6 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '2',
     name: 'Energy Boost',
-    title: 'Energy Boost', // For backward compatibility
     description: 'Get motivated and energized',
     tracks: [mockTracks[1]],
     emotion: 'happy',
@@ -68,7 +66,6 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '3',
     name: 'Work Concentration',
-    title: 'Work Concentration', // For backward compatibility
     description: 'Enhance your focus and productivity',
     tracks: [mockTracks[2]],
     emotion: 'focused',

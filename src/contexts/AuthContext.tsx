@@ -1,32 +1,25 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User } from '@/types/user';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-  avatar_url?: string;
-  onboarded?: boolean;
-}
-
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  updateUser: (user: User) => Promise<void>;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  signOut: () => void; // Add signOut property
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
+  updateUser: async () => {},
   login: async () => false,
   logout: () => {},
-  signOut: () => {} // Initialize signOut function
+  signOut: () => {}
 });
 
 interface AuthProviderProps {
@@ -59,6 +52,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
+  const updateUser = async (userData: User) => {
+    try {
+      // In a real application, we would send this to an API
+      setUser(prevUser => ({
+        ...prevUser,
+        ...userData
+      }));
+      
+      // Update local storage
+      if (userData.id) {
+        const currentUser = localStorage.getItem('user');
+        if (currentUser) {
+          const parsedUser = JSON.parse(currentUser);
+          localStorage.setItem('user', JSON.stringify({
+            ...parsedUser,
+            ...userData
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  };
+
   const login = async (email: string, password: string) => {
     try {
       // Simuler un délai d'authentification
@@ -73,7 +91,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         role: email.includes('admin') ? 'admin' : 'user',
         avatar: '/images/avatar.png',
         avatar_url: '/images/avatar.png',
-        onboarded: true
+        onboarded: true,
+        preferences: {
+          theme: 'light',
+          notifications: {
+            email: true,
+            push: true,
+            sms: false
+          }
+        }
       };
       
       setUser(mockUser);
@@ -101,6 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         user,
         isAuthenticated: !!user,
         isLoading,
+        updateUser,
         login,
         logout,
         signOut

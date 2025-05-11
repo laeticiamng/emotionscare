@@ -58,4 +58,6 @@ export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
   playlist?: MusicPlaylist | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }

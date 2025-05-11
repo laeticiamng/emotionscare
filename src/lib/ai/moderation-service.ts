@@ -82,7 +82,6 @@ export const showModerationWarning = (message: string) => {
   toast({
     title: "Content Warning",
     description: message,
-    variant: "default",
-    duration: 5000,
+    variant: "default"
   });
 };

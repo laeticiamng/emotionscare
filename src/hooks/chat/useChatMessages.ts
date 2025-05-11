@@ -1,75 +1,81 @@
 
-import { useState, useCallback } from 'react';
-import { ChatMessage } from '@/types';
+import { useState } from 'react';
+import { ChatMessage } from '@/types/chat';
+import { v4 as uuidv4 } from 'uuid';
 
-export function useChatMessages() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      text: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
-      sender: 'bot',
-      timestamp: new Date().toISOString(),
-      sender_id: 'system',
-      conversation_id: 'initial',
-      content: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
-      is_read: true,
-      sender_type: 'system'
-    }
-  ]);
+export const useChatMessages = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const addUserMessage = useCallback((text: string) => {
+  const addUserMessage = (text: string): ChatMessage => {
     const message: ChatMessage = {
-      id: Date.now().toString(),
+      id: uuidv4(),
       text,
       sender: 'user',
-      timestamp: new Date().toISOString(),
-      sender_id: 'user',
-      conversation_id: 'current',
-      content: text,
-      is_read: true,
-      sender_type: 'user'
+      timestamp: new Date().toISOString(), // Convert Date to string
+      is_read: true
     };
-    
+
     setMessages(prev => [...prev, message]);
     return message;
-  }, []);
+  };
 
-  const addBotMessage = useCallback((text: string) => {
+  const addBotMessage = (text: string): ChatMessage => {
     const message: ChatMessage = {
-      id: Date.now().toString(),
+      id: uuidv4(),
       text,
       sender: 'bot',
-      timestamp: new Date().toISOString(),
-      sender_id: 'system',
-      conversation_id: 'current',
-      content: text,
-      is_read: true,
-      sender_type: 'system'
+      timestamp: new Date().toISOString(), // Convert Date to string
+      is_read: true
     };
-    
+
     setMessages(prev => [...prev, message]);
     return message;
-  }, []);
+  };
 
-  const clearMessages = useCallback(() => {
-    setMessages([{
-      id: '1',
-      text: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
-      sender: 'bot',
-      timestamp: new Date().toISOString(),
-      sender_id: 'system',
-      conversation_id: 'initial',
-      content: "Bonjour ! Je suis l'assistant EmotionsCare prêt à vous aider. Que puis-je faire pour vous aujourd'hui ?",
-      is_read: true,
-      sender_type: 'system'
-    }]);
-  }, []);
+  const addSystemMessage = (text: string): ChatMessage => {
+    const message: ChatMessage = {
+      id: uuidv4(),
+      text,
+      sender: 'system',
+      timestamp: new Date().toISOString(), // Convert Date to string
+      is_read: true
+    };
+
+    setMessages(prev => [...prev, message]);
+    return message;
+  };
+
+  const addCoachMessage = (text: string): ChatMessage => {
+    const message: ChatMessage = {
+      id: uuidv4(),
+      text,
+      sender: 'coach',
+      timestamp: new Date().toISOString(), // Convert Date to string
+      is_read: true
+    };
+
+    setMessages(prev => [...prev, message]);
+    return message;
+  };
+
+  const removeMessage = (id: string) => {
+    setMessages(prev => prev.filter(message => message.id !== id));
+  };
+
+  const clearMessages = () => {
+    setMessages([]);
+  };
 
   return {
     messages,
     setMessages,
     addUserMessage,
     addBotMessage,
-    clearMessages
+    addSystemMessage,
+    addCoachMessage,
+    removeMessage,
+    clearMessages,
   };
-}
+};
+
+export default useChatMessages;
