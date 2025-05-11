@@ -29,8 +29,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                   <StorytellingProvider>
                     <UserModeProvider>
                       <PredictiveAnalyticsProvider>
-                        <App />
-                        <Toaster />
+                        <AuthProvider>
+                          <App />
+                          <Toaster />
+                        </AuthProvider>
                       </PredictiveAnalyticsProvider>
                     </UserModeProvider>
                   </StorytellingProvider>

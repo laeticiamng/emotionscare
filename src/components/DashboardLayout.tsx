@@ -7,6 +7,8 @@ import Shell from '@/Shell';
 
 const DashboardLayout: React.FC = () => {
   const isMobile = useIsMobile();
+  
+  console.log("DashboardLayout rendering, isMobile:", isMobile);
 
   return (
     <Shell>
