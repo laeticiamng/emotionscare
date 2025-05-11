@@ -21,12 +21,12 @@ interface UserMenuProps {
 const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   
   if (!user) return null;
 
   const handleLogout = () => {
-    signOut();
+    logout();
     toast({
       title: 'Déconnexion réussie',
       description: 'Vous avez été déconnecté de votre compte.',

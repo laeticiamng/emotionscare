@@ -22,11 +22,11 @@ interface MobileNavProps {
 }
 
 const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    await signOut?.();
+    await logout?.();
     navigate('/login');
   };
 

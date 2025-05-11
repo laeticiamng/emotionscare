@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const GlobalNav = () => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -26,7 +27,7 @@ const GlobalNav = () => {
   };
 
   const handleLogout = async () => {
-    await signOut();
+    await logout();
     window.location.href = '/login';
   };
   
