@@ -7,8 +7,6 @@ import Shell from '@/Shell';
 const Index = () => {
   const navigate = useNavigate();
   
-  // Suppression de la redirection automatique
-
   return (
     <Shell>
       <div className="container px-4 py-12 mx-auto">

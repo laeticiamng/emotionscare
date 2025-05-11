@@ -11,18 +11,12 @@ const Home: React.FC = () => {
   const { setUserMode } = useUserMode();
   
   const handleUserAccess = () => {
-    // Pour les utilisateurs personnels/B2C
     setUserMode('b2c');
     localStorage.setItem('userMode', 'b2c');
-    toast({
-      title: "Accès personnel",
-      description: "Bienvenue dans votre espace personnel"
-    });
     navigate('/dashboard');
   };
   
   const handleBusinessAccess = () => {
-    // Redirection vers la page de sélection d'entreprise
     navigate('/business');
   };
   

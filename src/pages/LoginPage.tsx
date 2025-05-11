@@ -1,47 +1,20 @@
 
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 import { useUserMode } from '@/contexts/UserModeContext';
 import Shell from '@/Shell';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
   const { setUserMode } = useUserMode();
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Déterminer le type d'accès en fonction du chemin
-    const isAdminLogin = location.pathname.includes('admin');
-    
-    // Définir le mode utilisateur approprié
-    if (isAdminLogin) {
-      setUserMode('b2b-admin');
-      localStorage.setItem('userMode', 'b2b-admin');
-      console.log('Setting user mode to b2b-admin from login');
-      
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre tableau de bord administrateur"
-      });
-      navigate('/admin/dashboard');
-    } else {
-      setUserMode('b2c');
-      localStorage.setItem('userMode', 'b2c');
-      console.log('Setting user mode to b2c from login');
-      
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre tableau de bord personnel"
-      });
-      navigate('/dashboard');
-    }
+    setUserMode('b2c');
+    navigate('/dashboard');
   };
 
   return (
