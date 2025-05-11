@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { UserPreferences, ThemeName, FontFamily, FontSize, NotificationFrequency, NotificationTone } from '@/types/user';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,6 +24,7 @@ const defaultPreferences: UserPreferences = {
 export const usePreferences = () => {
   const { user, updateUser } = useAuth();
   const [preferences, setPreferences] = useState<UserPreferences>(user?.preferences || defaultPreferences);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   
   useEffect(() => {
     if (user?.preferences) {
@@ -32,23 +34,31 @@ export const usePreferences = () => {
     }
   }, [user?.preferences]);
   
-  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences> | boolean) => {
+  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
     if (!user) return;
     
-    const currentPreferences = user.preferences;
+    setIsLoading(true);
     
-    // Update the spread operations to handle object and boolean types
-    const updatedPreferences = typeof currentPreferences === 'object' ? {
-      ...(currentPreferences || {}),
+    const currentPreferences = user.preferences || {};
+    
+    // Update the spread operations to handle object types properly
+    const updatedPreferences = {
+      ...currentPreferences,
       ...newPreferences
-    } : newPreferences;
+    };
     
-    await updateUser({
-      ...user,
-      preferences: updatedPreferences
-    });
-    
-    setPreferences(updatedPreferences as UserPreferences);
+    try {
+      await updateUser({
+        ...user,
+        preferences: updatedPreferences
+      });
+      
+      setPreferences(updatedPreferences);
+    } catch (error) {
+      console.error('Failed to update preferences:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [user, updateUser]);
   
   const setTheme = (theme: ThemeName) => {
@@ -73,6 +83,7 @@ export const usePreferences = () => {
   
   return {
     preferences,
+    isLoading,
     setTheme,
     setFontSize,
     setFontFamily,
