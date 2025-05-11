@@ -4,7 +4,7 @@ export interface VRSessionTemplate {
   name: string;
   description: string;
   thumbnail: string; // Making this required
-  title?: string; // Making this optional
+  title: string; // Making this required
   category: string;
   duration: number;
   intensity: 'low' | 'medium' | 'high'; // Making this required

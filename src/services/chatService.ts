@@ -7,6 +7,6 @@ export const getChatResponse = async (message: string): Promise<ChatResponse> =>
   
   return {
     content: `This is a response to your message: "${message}"`,
-    sentiment: 'neutral'
+    emotion: 'neutral' // Using emotion instead of sentiment
   };
 };

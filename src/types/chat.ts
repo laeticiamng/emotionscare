@@ -19,6 +19,8 @@ export interface ChatResponse {
   timestamp?: string;
   emotion?: string;
   text?: string;
+  sentiment?: string;
+  recommendations?: string[];
 }
 
 // Adding this type to fix the ChatResponseType errors

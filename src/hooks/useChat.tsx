@@ -38,7 +38,8 @@ export const useChat = (conversationId: string, userId: string) => {
       setMessages(prev => [...prev, aiMessage]);
       return {
         content: response.text,
-        emotion: response.sentiment || 'neutral'
+        emotion: response.emotion || 'neutral'
+        // No more sentiment here
       };
     } catch (error) {
       console.error('Error sending message:', error);

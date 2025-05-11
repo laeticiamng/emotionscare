@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,7 +22,7 @@ const VRPage: React.FC = () => {
   
   const [activeTemplate, setActiveTemplate] = useState<VRSessionTemplate | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { startSession, completeSession } = useVRSession();
+  const { startSession, completeSession } = useVRSession({});
   
   // Effect to load recommended template if specified in URL
   useEffect(() => {
@@ -35,7 +34,8 @@ const VRPage: React.FC = () => {
         const completeTemplate: VRSessionTemplate = {
           ...template,
           thumbnail: template.thumbnail || '/images/default-thumbnail.jpg',
-          intensity: template.intensity || 'medium'
+          intensity: template.intensity || 'medium',
+          title: template.title || template.name
         };
         setActiveTemplate(completeTemplate);
       }

@@ -2,7 +2,7 @@
 import { MusicPlaylist, MusicTrack } from '@/types';
 import { getPlaylist } from '@/services/music/playlist-service';
 import { useToast } from '@/hooks/use-toast';
-import { convertPlaylistToMusicPlaylist } from '@/services/music/converters';
+import { playlistToMusicPlaylist } from '@/services/music/converters'; // Fixed function name
 
 /**
  * Loads a playlist by ID from the service
@@ -11,7 +11,7 @@ export const loadPlaylistById = async (id: string, onError?: (message: string) =
   try {
     const playlist = await getPlaylist(id);
     if (playlist) {
-      return convertPlaylistToMusicPlaylist(playlist);
+      return playlistToMusicPlaylist(playlist); // Fixed function call
     }
     return null;
   } catch (err) {
@@ -28,6 +28,6 @@ export const loadPlaylistById = async (id: string, onError?: (message: string) =
  */
 export const convertPlaylistsData = (playlistsData: Record<string, any>): MusicPlaylist[] => {
   return Object.values(playlistsData).map(playlist => 
-    convertPlaylistToMusicPlaylist(playlist)
+    playlistToMusicPlaylist(playlist) // Fixed function call
   );
 };

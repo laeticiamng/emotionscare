@@ -2,8 +2,8 @@
 export interface User {
   id: string;
   name: string;
-  email: string; // Making this required
-  role?: string;
+  email: string; // Required
+  role: string;  // Required
   avatar?: string;
   image?: string; 
   avatar_url?: string;
@@ -21,7 +21,7 @@ export interface User {
 
 export interface UserPreferences {
   theme?: ThemeName;
-  notifications?: boolean; // Keeping this as boolean only
+  notifications?: boolean;
   soundEnabled?: boolean;
   language?: string;
   fontFamily?: string; // Adding fontFamily

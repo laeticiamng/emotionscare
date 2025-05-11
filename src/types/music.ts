@@ -3,19 +3,15 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  url: string;
+  url: string; // Required
   duration: number;
-  coverUrl?: string;
-  coverImage?: string;
-  genre?: string;
-  mood?: string;
-  emotion?: string;
-  audioUrl?: string;
-  audio_url?: string;
-  cover_url?: string;
   cover?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  emotion?: string;
   emotion_tag?: string;
-  album?: string;
+  audio_url?: string;
+  audioUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -23,63 +19,38 @@ export interface MusicPlaylist {
   name: string;
   title?: string;
   description: string;
-  coverUrl: string;
-  emotion?: string;
-  mood?: string;
   tracks: MusicTrack[];
+  coverUrl: string; // Required
+  category?: string;
+  emotion?: string; // Support for emotion
 }
 
 export interface MusicContextType {
-  isPlaying: boolean;
-  currentTrack: MusicTrack | null;
-  queue: MusicTrack[];
   playlists: MusicPlaylist[];
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
   volume: number;
-  isInitialized: boolean;
-  error: string | null;
-  openDrawer?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
-  currentTime: number;
-  duration: number;
-  shuffle: boolean;
-  repeat: boolean;
-  currentPlaylist?: MusicPlaylist | null;
-  
-  // Playback controls
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
-  togglePlay: () => void;
-  resumeTrack?: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
-  seek?: (time: number) => void;
-  seekTo?: (time: number) => void;
-  toggleShuffle?: () => void;
-  toggleRepeat?: () => void;
-  
-  // Playlist management
-  addToQueue: (track: MusicTrack) => void;
-  clearQueue: () => void;
-  loadPlaylist: (playlist: MusicPlaylist) => void;
+  loadPlaylist: (id: string) => Promise<MusicPlaylist | null>;
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
-  shufflePlaylist: () => void;
-  
-  // Initialization
-  initializeMusicSystem?: () => Promise<void>;
 }
 
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
-  onOpenChange?: (open: boolean) => void;
-  playlist?: MusicPlaylist;
 }
 
 export interface Toast {
-  title: string;
+  id: string;
+  title?: string;
   description?: string;
-  variant?: 'default' | 'destructive';
   action?: React.ReactNode;
-  duration?: number; // Added duration
+  variant?: 'default' | 'destructive' | 'success';
 }
+
+// Re-export all types to make them available from this module
+export type { MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps, Toast };
