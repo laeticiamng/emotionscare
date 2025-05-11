@@ -51,12 +51,14 @@ interface EmotionSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   isMobile: boolean;
+  userId?: string;
 }
 
 export const EmotionDashboardSection: React.FC<EmotionSectionProps> = ({ 
   collapsed, 
   onToggle, 
-  isMobile 
+  isMobile,
+  userId
 }) => {
   return (
     <DashboardSection 
@@ -65,7 +67,7 @@ export const EmotionDashboardSection: React.FC<EmotionSectionProps> = ({
       onToggle={onToggle}
       isMobile={isMobile}
     >
-      <EmotionScanSection />
+      <EmotionScanSection collapsed={collapsed} onToggle={onToggle} userId={userId} />
     </DashboardSection>
   );
 };
@@ -74,12 +76,14 @@ interface SocialSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   isMobile: boolean;
+  userId?: string;
 }
 
 export const SocialDashboardSection: React.FC<SocialSectionProps> = ({ 
   collapsed, 
   onToggle, 
-  isMobile 
+  isMobile,
+  userId
 }) => {
   return (
     <DashboardSection 
@@ -88,7 +92,7 @@ export const SocialDashboardSection: React.FC<SocialSectionProps> = ({
       onToggle={onToggle}
       isMobile={isMobile}
     >
-      <SocialCocoonWidget />
+      <SocialCocoonWidget collapsed={collapsed} onToggle={onToggle} userId={userId} />
     </DashboardSection>
   );
 };
@@ -97,12 +101,14 @@ interface ProfileSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   isMobile: boolean;
+  userId?: string;
 }
 
 export const ProfileDashboardSection: React.FC<ProfileSectionProps> = ({ 
   collapsed, 
   onToggle, 
-  isMobile 
+  isMobile,
+  userId
 }) => {
   return (
     <DashboardSection 
@@ -111,7 +117,7 @@ export const ProfileDashboardSection: React.FC<ProfileSectionProps> = ({
       onToggle={onToggle}
       isMobile={isMobile}
     >
-      <UserSidePanel />
+      <UserSidePanel collapsed={collapsed} onToggle={onToggle} userId={userId} />
     </DashboardSection>
   );
 };
@@ -167,12 +173,14 @@ interface GamificationSectionProps {
   collapsed: boolean;
   onToggle: () => void;
   isMobile: boolean;
+  userId?: string;
 }
 
 export const GamificationDashboardSection: React.FC<GamificationSectionProps> = ({ 
   collapsed, 
   onToggle, 
-  isMobile 
+  isMobile,
+  userId
 }) => {
   return (
     <DashboardSection 
@@ -181,7 +189,7 @@ export const GamificationDashboardSection: React.FC<GamificationSectionProps> = 
       onToggle={onToggle}
       isMobile={isMobile}
     >
-      <GamificationWidget />
+      <GamificationWidget collapsed={collapsed} onToggle={onToggle} userId={userId} />
     </DashboardSection>
   );
 };

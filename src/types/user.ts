@@ -1,3 +1,4 @@
+
 import { UserPreferences } from './preferences';
 
 export enum UserRole {
@@ -20,8 +21,8 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
   avatar?: string;
-  avatar_url?: string; // Added for compatibility
-  image?: string; // Added for compatibility
+  avatar_url?: string;
+  image?: string;
   department?: string;
   position?: string;
   bio?: string;
@@ -38,13 +39,12 @@ export interface User {
   personal_data?: {
     [key: string]: any;
   };
-  // Added missing fields
   emotional_score?: number;
   anonymity_code?: string;
-  created_at?: string; // Keeping both versions for compatibility
+  created_at?: string;
   joined_at?: string;
   onboarded?: boolean;
-  emotional_profile?: { // Adding the missing property
+  emotional_profile?: {
     primary_emotion?: string;
     intensity?: number;
     analysis?: any;

@@ -95,4 +95,7 @@ export interface MoodData {
   originalDate?: Date | string;
   value: number;
   label?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }

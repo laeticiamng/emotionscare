@@ -10,16 +10,31 @@ interface Recommendation {
   icon?: string;
 }
 
+export interface PredictionResult {
+  confidence: number;
+  emotion: string;
+  trends: {
+    engagement: number;
+    wellbeing: number;
+  };
+}
+
 interface PredictiveAnalyticsContextType {
   recommendations: Recommendation[];
   setRecommendations: (recs: Recommendation[]) => void;
   generatePredictions: () => Promise<void>;
+  isEnabled: boolean;
+  setEnabled: (enabled: boolean) => void;
+  currentPredictions: PredictionResult | null;
 }
 
 const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType>({
   recommendations: [],
   setRecommendations: () => {},
-  generatePredictions: async () => {}
+  generatePredictions: async () => {},
+  isEnabled: false,
+  setEnabled: () => {},
+  currentPredictions: null
 });
 
 interface PredictiveAnalyticsProviderProps {
@@ -28,6 +43,8 @@ interface PredictiveAnalyticsProviderProps {
 
 export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderProps> = ({ children }) => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [isEnabled, setEnabled] = useState<boolean>(true);
+  const [currentPredictions, setCurrentPredictions] = useState<PredictionResult | null>(null);
 
   const generatePredictions = async () => {
     // Mock function to generate predictions
@@ -51,6 +68,16 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
     ];
     
     setRecommendations(mockRecommendations);
+    
+    // Set mock current predictions
+    setCurrentPredictions({
+      confidence: 0.89,
+      emotion: 'calme',
+      trends: {
+        engagement: 0.76,
+        wellbeing: 0.82
+      }
+    });
   };
 
   return (
@@ -58,7 +85,10 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
       value={{
         recommendations,
         setRecommendations,
-        generatePredictions
+        generatePredictions,
+        isEnabled,
+        setEnabled,
+        currentPredictions
       }}
     >
       {children}

@@ -1,33 +1,42 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface SegmentOption {
+export interface SegmentOption {
   key: string;
   label: string;
 }
 
-interface SegmentDimension {
+export interface SegmentDimension {
   key: string;
   label: string;
   options: SegmentOption[];
 }
 
+export interface SegmentValue {
+  dimensionKey: string | null;
+  optionKey: string | null;
+}
+
 interface SegmentContextType {
-  segment: string | null;
-  setSegment: (segment: string | null) => void;
+  segment: SegmentValue;
+  setSegment: (segment: SegmentValue) => void;
   activeDimension: SegmentDimension | null;
   setActiveDimension: (dimension: SegmentDimension | null) => void;
   activeOption: SegmentOption | null;
   setActiveOption: (option: SegmentOption | null) => void;
+  dimensions: SegmentDimension[];
+  isLoading: boolean;
 }
 
 const SegmentContext = createContext<SegmentContextType>({
-  segment: null,
+  segment: { dimensionKey: null, optionKey: null },
   setSegment: () => {},
   activeDimension: null,
   setActiveDimension: () => {},
   activeOption: null,
-  setActiveOption: () => {}
+  setActiveOption: () => {},
+  dimensions: [],
+  isLoading: false
 });
 
 interface SegmentProviderProps {
@@ -35,9 +44,42 @@ interface SegmentProviderProps {
 }
 
 export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) => {
-  const [segment, setSegment] = useState<string | null>(null);
+  const [segment, setSegment] = useState<SegmentValue>({ dimensionKey: null, optionKey: null });
   const [activeDimension, setActiveDimension] = useState<SegmentDimension | null>(null);
   const [activeOption, setActiveOption] = useState<SegmentOption | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Mock dimensions data
+  const dimensions: SegmentDimension[] = [
+    {
+      key: 'department',
+      label: 'Département',
+      options: [
+        { key: 'marketing', label: 'Marketing' },
+        { key: 'sales', label: 'Ventes' },
+        { key: 'engineering', label: 'Ingénierie' },
+        { key: 'hr', label: 'Ressources Humaines' }
+      ]
+    },
+    {
+      key: 'location',
+      label: 'Localisation',
+      options: [
+        { key: 'paris', label: 'Paris' },
+        { key: 'lyon', label: 'Lyon' },
+        { key: 'marseille', label: 'Marseille' }
+      ]
+    },
+    {
+      key: 'team',
+      label: 'Équipe',
+      options: [
+        { key: 'alpha', label: 'Alpha' },
+        { key: 'beta', label: 'Beta' },
+        { key: 'gamma', label: 'Gamma' }
+      ]
+    }
+  ];
 
   return (
     <SegmentContext.Provider
@@ -47,7 +89,9 @@ export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) =>
         activeDimension,
         setActiveDimension,
         activeOption,
-        setActiveOption
+        setActiveOption,
+        dimensions,
+        isLoading
       }}
     >
       {children}

@@ -4,44 +4,32 @@ export interface Badge {
   name: string;
   description: string;
   image_url?: string;
-  unlocked_at?: Date | string;
-  progress?: number;
-  total?: number;
+  awarded_at?: Date | string;
   user_id?: string;
-  icon?: string;
-  icon_url?: string;
+  criteria?: string;
   level?: number;
-  awarded_at?: string | Date;
   category?: string;
-  unlocked?: boolean;
-  threshold?: number;
+  icon?: string;
 }
 
-export interface Challenge {
+export interface Achievement {
   id: string;
   name: string;
   description: string;
   progress: number;
-  total: number;
-  completion_date?: Date | string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  title?: string;
-  points?: number;
-  completed?: boolean;
-  image_url?: string;
+  completed: boolean;
+  icon?: string;
 }
 
-export interface Level {
-  level: number;
-  name: string;
-  points_required: number;
-  benefits: string[];
-}
-
-export interface UserProgress {
-  current_points: number;
-  current_level: number;
-  points_to_next_level: number;
-  badges: Badge[];
-  challenges: Challenge[];
+export interface GamificationData {
+  activeUsersPercent: number;
+  totalBadges: number;
+  badgeLevels: {
+    level: string;
+    count: number;
+  }[];
+  topChallenges: {
+    name: string;
+    completions: number;
+  }[];
 }

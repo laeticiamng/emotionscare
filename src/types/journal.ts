@@ -1,28 +1,34 @@
 
 export interface JournalEntry {
   id: string;
-  user_id: string;
-  date: string;
-  title: string;
+  user_id?: string;
+  date: Date | string;
   content: string;
-  mood: string;
-  emotion?: string;
+  mood?: number;
   tags?: string[];
-  images?: string[];
-  is_private?: boolean;
+  title?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
   ai_feedback?: string;
-  location?: string;
-  weather?: string;
-  highlights?: string[];
-  featured_quote?: string;
-  word_count?: number;
-  activity_level?: number;
-  sleep_hours?: number;
-  gratitude_items?: string[];
-  insights?: string[];
-  
-  // Champs supplémentaires pour la compatibilité
-  created_at?: string | Date;
-  mood_score?: number;
-  text?: string;
+  created_at?: string;
+}
+
+export interface MoodFilter {
+  from?: Date;
+  to?: Date;
+  minMood?: number;
+  maxMood?: number;
+  tags?: string[];
+}
+
+export interface MoodStats {
+  average: number;
+  trend: 'up' | 'down' | 'stable';
+  trendValue: number;
+  periods: {
+    morning: number;
+    afternoon: number;
+    evening: number;
+  };
 }
