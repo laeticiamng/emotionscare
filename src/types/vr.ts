@@ -8,7 +8,7 @@ export interface VRSessionTemplate {
   theme: string;
   is_audio_only: boolean;
   preview_url: string;
-  audio_url: string;
+  audio_url: string; // Required field
   category: string;
   difficulty: 'easy' | 'medium' | 'hard';
   tags: string[];
@@ -36,12 +36,12 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
-  started_at?: string;
-  completed_at?: string;
-  emotion_before?: string;
-  emotion_after?: string;
-  mood_before?: string;
-  mood_after?: string;
+  started_at?: string; // Added to support useVRSession.tsx
+  completed_at?: string; // Added to support vrService.ts
+  emotion_before?: string; // Added to support vrService.ts
+  emotion_after?: string; // Added to support vrService.ts
+  mood_before?: string; // Added to support vrService.ts
+  mood_after?: string; // Added to support vrService.ts
 }
 
 export interface VRSessionWithMusicProps {

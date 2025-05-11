@@ -1,131 +1,134 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { ChatConversation } from '@/types/chat';
+import { ChatConversation, ChatMessage } from '@/types/chat';
 
-// Mock conversations data
-const mockConversations: ChatConversation[] = [];
+// Mock conversations data (in a real app, this would be stored in a database)
+const mockConversations: ChatConversation[] = [
+  {
+    id: '1',
+    user_id: 'user-1',
+    created_at: '2023-01-15T10:30:00Z',
+    updated_at: '2023-01-15T11:45:00Z',
+    title: 'Initial Consultation',
+    last_message: 'Thank you for your time today.',
+    userId: 'user-1',
+    createdAt: '2023-01-15T10:30:00Z',
+    updatedAt: '2023-01-15T11:45:00Z',
+    lastMessage: 'Thank you for your time today.'
+  }
+];
 
-/**
- * Get all conversations for a specific user
- * @param userId - The ID of the user
- */
+// Get all conversations for a user
 const getConversationsForUser = async (userId: string): Promise<ChatConversation[]> => {
   // In a real app, this would be an API call
-  // For now, we'll filter and transform the mock data
-  return mockConversations
-    .filter(conv => conv.user_id === userId || conv.userId === userId)
-    .map(conv => ({
-      id: conv.id,
-      user_id: conv.user_id || conv.userId || userId,
-      created_at: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : (conv.created_at || new Date().toISOString()),
-      updated_at: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : (conv.updated_at || new Date().toISOString()),
-      title: conv.title,
-      last_message: conv.last_message || conv.lastMessage || '',
-      // Add in legacy fields for compatibility
-      userId: conv.user_id || conv.userId || userId,
-      createdAt: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : (conv.created_at || new Date().toISOString()),
-      updatedAt: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : (conv.updated_at || new Date().toISOString()),
-      lastMessage: conv.last_message || conv.lastMessage || '',
-    }))
-    .sort((a, b) => {
-      // Sort by the most recent conversation
-      const dateA = new Date(a.updated_at);
-      const dateB = new Date(b.updated_at);
-      return dateB.getTime() - dateA.getTime();
-    });
+  // Filter conversations for the specified user
+  const userConversations = mockConversations.filter(conv => conv.user_id === userId || conv.userId === userId);
+  
+  // Map to ensure consistent object structure
+  return userConversations.map(conv => ({
+    id: conv.id,
+    user_id: conv.user_id || conv.userId || '',
+    created_at: (conv.created_at || conv.createdAt || '').toString(),
+    updated_at: (conv.updated_at || conv.updatedAt || '').toString(),
+    title: conv.title,
+    last_message: conv.last_message || conv.lastMessage || '',
+    // These are for backward compatibility
+    userId: conv.user_id || conv.userId || '',
+    createdAt: (conv.created_at || conv.createdAt || '').toString(),
+    updatedAt: (conv.updated_at || conv.updatedAt || '').toString(),
+    lastMessage: conv.last_message || conv.lastMessage || ''
+  }));
 };
 
-/**
- * Create a new conversation
- * @param userId - The ID of the user creating the conversation
- * @param title - The title of the conversation
- */
-const createConversation = async (userId: string, title: string): Promise<ChatConversation> => {
-  const now = new Date().toISOString();
-  
-  const conversation: ChatConversation = {
-    id: uuidv4(),
-    user_id: userId,
-    created_at: now,
-    updated_at: now,
-    title,
-    last_message: '',
-    // Add legacy fields for compatibility
-    userId,
-    createdAt: now,
-    updatedAt: now,
-    lastMessage: '',
-  };
-  
-  mockConversations.push(conversation);
-  return conversation;
-};
-
-/**
- * Get a conversation by its ID
- * @param conversationId - The ID of the conversation
- */
-const getConversationById = async (conversationId: string): Promise<ChatConversation | null> => {
-  const conversation = mockConversations.find(c => c.id === conversationId);
+// Get a specific conversation by ID
+const getConversation = async (conversationId: string): Promise<ChatConversation | null> => {
+  // In a real app, this would be an API call
+  const conversation = mockConversations.find(conv => conv.id === conversationId);
   return conversation || null;
 };
 
-/**
- * Update an existing conversation
- * @param conversationId - The ID of the conversation to update
- * @param updates - The updates to apply
- */
-const updateConversation = async (
-  conversationId: string, 
-  updates: { title?: string; lastMessage?: string }
-): Promise<ChatConversation> => {
-  const index = mockConversations.findIndex(c => c.id === conversationId);
+// Create a new conversation
+const createConversation = async (userId: string, title: string): Promise<ChatConversation> => {
+  const timestamp = new Date().toISOString();
   
-  if (index === -1) {
-    throw new Error('Conversation not found');
-  }
-  
-  const now = new Date().toISOString();
-  
-  const updatedConversation: ChatConversation = {
-    ...mockConversations[index],
-    updated_at: now,
-    updatedAt: now,
+  const newConversation: ChatConversation = {
+    id: uuidv4(),
+    user_id: userId,
+    created_at: timestamp,
+    updated_at: timestamp,
+    title,
+    last_message: '',
+    // These are for backward compatibility
+    userId,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    lastMessage: '',
   };
   
-  if (updates.title) {
-    updatedConversation.title = updates.title;
+  mockConversations.push(newConversation);
+  return newConversation;
+};
+
+// Update a conversation
+const updateConversation = async (conversationId: string, updates: Partial<ChatConversation>): Promise<ChatConversation | null> => {
+  // In a real app, this would be an API call
+  const index = mockConversations.findIndex(conv => conv.id === conversationId);
+  
+  if (index === -1) {
+    return null;
   }
   
-  if (updates.lastMessage) {
-    updatedConversation.last_message = updates.lastMessage;
-    updatedConversation.lastMessage = updates.lastMessage;
+  const timestamp = new Date().toISOString();
+  
+  // Create an updated conversation object
+  const updatedConversation: ChatConversation = {
+    ...mockConversations[index],
+    ...updates,
+    updated_at: timestamp,
+    updatedAt: timestamp
+  };
+  
+  // Ensure last_message is present and is a string
+  if (!updatedConversation.last_message && updatedConversation.lastMessage) {
+    updatedConversation.last_message = updatedConversation.lastMessage;
+  } else if (!updatedConversation.last_message) {
+    updatedConversation.last_message = '';
   }
   
+  if (!updatedConversation.lastMessage && updatedConversation.last_message) {
+    updatedConversation.lastMessage = updatedConversation.last_message;
+  } else if (!updatedConversation.lastMessage) {
+    updatedConversation.lastMessage = '';
+  }
+  
+  // Update the conversation in the array
   mockConversations[index] = updatedConversation;
+  
   return updatedConversation;
 };
 
-/**
- * Delete a conversation
- * @param conversationId - The ID of the conversation to delete
- */
-const deleteConversation = async (conversationId: string): Promise<void> => {
-  const index = mockConversations.findIndex(c => c.id === conversationId);
+// Delete a conversation
+const deleteConversation = async (conversationId: string): Promise<boolean> => {
+  // In a real app, this would be an API call
+  const initialLength = mockConversations.length;
+  const filteredConversations = mockConversations.filter(conv => conv.id !== conversationId);
   
-  if (index === -1) {
-    throw new Error('Conversation not found');
+  // Update the mock data if a conversation was removed
+  if (filteredConversations.length < initialLength) {
+    mockConversations.length = 0;
+    mockConversations.push(...filteredConversations);
+    return true;
   }
   
-  mockConversations.splice(index, 1);
+  return false;
 };
 
 export const conversationsService = {
   getConversationsForUser,
+  getConversation,
   createConversation,
-  getConversationById,
   updateConversation,
-  deleteConversation,
+  deleteConversation
 };
 
 export default conversationsService;

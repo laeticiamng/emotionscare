@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { MusicDrawerProps } from '@/types/music';
+import { MusicDrawerProps, MusicPlaylist } from '@/types/music';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
   isOpen, 

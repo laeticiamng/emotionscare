@@ -24,7 +24,7 @@ const addMessageToConversation = async (conversationId: string, message: Omit<Ch
   const newMessage: ChatMessage = {
     id: uuidv4(),
     ...message,
-    timestamp: typeof message.timestamp === 'object' ? message.timestamp.toISOString() : (message.timestamp || new Date().toISOString()),
+    timestamp: typeof message.timestamp === 'object' ? message.timestamp?.toISOString() || new Date().toISOString() : (message.timestamp || new Date().toISOString()),
     conversation_id: conversationId,
   };
   

@@ -1,6 +1,5 @@
 
-import { Emotion } from '@/types';
-import { EnhancedEmotionResult } from '@/types/emotion';
+import { Emotion, EnhancedEmotionResult } from '@/types/emotion';
 
 export async function analyzeEmotionEnhanced(emotionData: Partial<Emotion>): Promise<EnhancedEmotionResult> {
   // Mock implementation for enhanced emotion analysis

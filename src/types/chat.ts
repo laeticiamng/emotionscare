@@ -19,7 +19,7 @@ export interface ChatConversation {
   created_at: string;
   updated_at: string;
   title: string;
-  last_message: string;
+  last_message: string; // Required based on errors
   last_message_time?: string;
   messages?: ChatMessage[];
   
@@ -38,3 +38,6 @@ export interface ChatResponse {
   timestamp?: string;
   emotion?: string;
 }
+
+// Add this for compatibility with useChatProcessing.ts and useChat.tsx
+export type ChatResponseType = ChatResponse;

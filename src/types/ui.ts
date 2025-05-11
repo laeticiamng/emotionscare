@@ -5,7 +5,7 @@ export interface Toast {
   description?: string;
   action?: React.ReactNode;
   variant?: 'default' | 'destructive' | 'success';
-  duration?: number;
+  duration?: number; // Added to support CompliancePage.tsx and MyDataPage.tsx
 }
 
 export interface ToastAction {
@@ -16,7 +16,7 @@ export interface ToastAction {
 
 export interface ThemeSwitcherProps {
   size?: 'default' | 'sm' | 'lg';
-  showLabel?: boolean;
+  showLabel?: boolean; // Added to support DesignSystemPage.tsx
 }
 
 export interface InvitationVerificationResult {

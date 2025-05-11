@@ -1,7 +1,8 @@
+
 import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { completeChallenge } from '@/lib/gamificationService';
-import { saveRelaxationSession } from '@/lib/vrService';
+import { saveRelaxationSession } from '@/lib/vrService'; // This import should work now that we've added the function
 import { saveJournalEntry } from '@/lib/journalService';
 
 export const useCoachEvents = () => {

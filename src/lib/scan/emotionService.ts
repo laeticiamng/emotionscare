@@ -1,171 +1,249 @@
 
+import { Emotion, EmotionPrediction } from '@/types/emotion';
 import { v4 as uuidv4 } from 'uuid';
-import { Emotion } from '@/types/emotion';
 
-// Mock emotion data
-const mockEmotions: Emotion[] = [];
+// Mock database of emotions
+let emotions: Emotion[] = [];
 
-/**
- * Get all emotions for a user
- * @param userId The user ID
- * @param limit Optional limit on the number of results
- */
-export async function getEmotions(userId: string, limit?: number): Promise<Emotion[]> {
-  const userEmotions = mockEmotions.filter(e => e.user_id === userId);
+// Get all emotions for a user
+export const getEmotionsForUser = async (userId: string): Promise<Emotion[]> => {
+  return emotions.filter(e => e.user_id === userId);
+};
+
+// Get a specific emotion by ID
+export const getEmotion = async (emotionId: string): Promise<Emotion | null> => {
+  return emotions.find(e => e.id === emotionId) || null;
+};
+
+// Add a new emotion record
+export const recordEmotion = async (
+  userId: string,
+  emotionData: Partial<Emotion>
+): Promise<Emotion> => {
+  const now = new Date().toISOString();
   
-  // Sort by date, newest first
-  const sortedEmotions = userEmotions.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateB.getTime() - dateA.getTime();
-  });
-  
-  return limit ? sortedEmotions.slice(0, limit) : sortedEmotions;
-}
-
-/**
- * Get a specific emotion by ID
- * @param emotionId The emotion ID
- */
-export async function getEmotionById(emotionId: string): Promise<Emotion | null> {
-  const emotion = mockEmotions.find(e => e.id === emotionId);
-  return emotion || null;
-}
-
-/**
- * Create a new emotion record
- * @param emotion The emotion data
- */
-export async function createEmotion(emotion: Partial<Emotion>): Promise<Emotion> {
   const newEmotion: Emotion = {
-    id: emotion.id || uuidv4(),
-    user_id: emotion.user_id || '',
-    date: emotion.date || new Date().toISOString(),
-    emotion: emotion.emotion || 'neutral',
-    score: emotion.score || 0.5,
-    text: emotion.text,
-    emojis: emotion.emojis,
-    audio_url: emotion.audio_url,
-    ai_feedback: emotion.ai_feedback,
-    created_at: new Date().toISOString(),
-    confidence: emotion.confidence,
-    intensity: emotion.intensity,
-    category: emotion.category,
-    source: emotion.source,
-    primaryEmotion: emotion.primaryEmotion || {
-      name: emotion.emotion || 'neutral',
-      intensity: emotion.intensity || 0.5,
-      score: emotion.score || 0.5
-    }
+    id: uuidv4(),
+    user_id: userId,
+    date: now,
+    emotion: emotionData.emotion || 'neutral',
+    score: emotionData.score !== undefined ? emotionData.score : 50,
+    created_at: now,
+    ...emotionData,
+    source: emotionData.source || 'manual' // Source property is now supported
   };
   
-  mockEmotions.push(newEmotion);
+  emotions.push(newEmotion);
   return newEmotion;
-}
+};
 
-/**
- * Get the latest emotion for a user
- * @param userId The user ID
- */
-export async function getLatestEmotion(userId: string): Promise<Emotion | null> {
-  const userEmotions = await getEmotions(userId, 1);
-  return userEmotions.length > 0 ? userEmotions[0] : null;
-}
+// Delete an emotion record
+export const deleteEmotion = async (emotionId: string): Promise<boolean> => {
+  const initialLength = emotions.length;
+  emotions = emotions.filter(e => e.id !== emotionId);
+  return emotions.length < initialLength;
+};
 
-/**
- * Create a positive emotion
- * @param userId The user ID
- * @param text Optional text
- */
-export async function createPositiveEmotion(userId: string, text?: string): Promise<Emotion> {
-  return createEmotion({
-    user_id: userId,
-    emotion: 'joy',
-    score: 0.8,
-    text,
-    confidence: 0.9,
-    intensity: 0.75,
-    source: 'manual',
-    primaryEmotion: {
-      name: 'joy',
-      intensity: 0.75,
-      score: 0.8
-    }
-  });
-}
-
-/**
- * Create a negative emotion
- * @param userId The user ID
- * @param text Optional text
- */
-export async function createNegativeEmotion(userId: string, text?: string): Promise<Emotion> {
-  return createEmotion({
-    user_id: userId,
-    emotion: 'sadness',
-    score: 0.3,
-    text,
-    confidence: 0.85,
-    intensity: 0.6,
-    source: 'manual',
-    primaryEmotion: {
-      name: 'sadness',
-      intensity: 0.6,
-      score: 0.3
-    }
-  });
-}
-
-/**
- * Create a neutral emotion
- * @param userId The user ID
- * @param text Optional text
- */
-export async function createNeutralEmotion(userId: string, text?: string): Promise<Emotion> {
-  return createEmotion({
-    user_id: userId,
-    emotion: 'neutral',
-    score: 0.5,
-    text,
-    confidence: 0.7,
-    intensity: 0.3,
-    source: 'manual',
-    primaryEmotion: {
-      name: 'neutral',
-      intensity: 0.3,
-      score: 0.5
-    }
-  });
-}
-
-/**
- * Update an emotion
- * @param emotionId The emotion ID
- * @param updates The updates to apply
- */
-export async function updateEmotion(emotionId: string, updates: Partial<Emotion>): Promise<Emotion | null> {
-  const index = mockEmotions.findIndex(e => e.id === emotionId);
+// Update an emotion record
+export const updateEmotion = async (
+  emotionId: string,
+  updates: Partial<Emotion>
+): Promise<Emotion | null> => {
+  const index = emotions.findIndex(e => e.id === emotionId);
   
   if (index === -1) {
     return null;
   }
   
-  mockEmotions[index] = {
-    ...mockEmotions[index],
+  const updatedEmotion: Emotion = {
+    ...emotions[index],
     ...updates,
-    source: updates.source || mockEmotions[index].source
   };
   
-  return mockEmotions[index];
-}
+  emotions[index] = updatedEmotion;
+  return updatedEmotion;
+};
+
+// Get emotions for a user in a specific date range
+export const getEmotionsInDateRange = async (
+  userId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<Emotion[]> => {
+  return emotions.filter(e => {
+    const emotionDate = new Date(e.date);
+    return (
+      e.user_id === userId &&
+      emotionDate >= startDate &&
+      emotionDate <= endDate
+    );
+  });
+};
+
+// Predict emotions based on historical data and context
+export const predictEmotion = async (
+  userId: string,
+  context: {
+    time?: string;
+    activity?: string;
+    location?: string;
+  }
+): Promise<EmotionPrediction> => {
+  // In a real app, this would use ML models
+  // For this mock, return a simple prediction
+  
+  // Get the most common emotion for this user
+  const userEmotions = await getEmotionsForUser(userId);
+  
+  if (userEmotions.length === 0) {
+    return {
+      predictedEmotion: 'neutral',
+      probability: 0.5,
+      triggers: ['Not enough data'],
+      recommendations: ['Record more emotions to improve predictions']
+    };
+  }
+  
+  // Count emotions
+  const emotionCounts: Record<string, number> = {};
+  userEmotions.forEach(e => {
+    emotionCounts[e.emotion] = (emotionCounts[e.emotion] || 0) + 1;
+  });
+  
+  // Find the most common emotion
+  let mostCommonEmotion = 'neutral';
+  let maxCount = 0;
+  
+  Object.entries(emotionCounts).forEach(([emotion, count]) => {
+    if (count > maxCount) {
+      maxCount = count;
+      mostCommonEmotion = emotion;
+    }
+  });
+  
+  // Calculate probability
+  const probability = maxCount / userEmotions.length;
+  
+  return {
+    predictedEmotion: mostCommonEmotion,
+    probability,
+    triggers: ['Historical pattern', context.activity || 'Current activity'],
+    recommendations: [
+      'Take a moment to reflect on your emotions',
+      'Consider journaling about your feelings'
+    ]
+  };
+};
+
+// Record an emotion prediction (was it accurate?)
+export const recordEmotionPredictionAccuracy = async (
+  userId: string,
+  predictionId: string,
+  wasAccurate: boolean,
+  actualEmotion?: string
+): Promise<void> => {
+  // In a real app, this would update a database
+  console.log(`Prediction ${predictionId} was ${wasAccurate ? 'accurate' : 'inaccurate'}`);
+  if (actualEmotion) {
+    console.log(`Actual emotion was ${actualEmotion}`);
+  }
+};
+
+// Save a scanned emotion from text, video, or audio
+export const saveScannedEmotion = async (
+  userId: string,
+  emotionData: {
+    emotion: string;
+    score: number;
+    confidence?: number;
+    source: string;
+    text?: string;
+    audio_url?: string;
+    emojis?: string;
+    primaryEmotion?: {
+      name: string;
+      intensity?: number;
+      score?: number;
+    };
+  }
+): Promise<Emotion> => {
+  const now = new Date().toISOString();
+  
+  const newEmotion: Emotion = {
+    id: uuidv4(),
+    user_id: userId,
+    date: now,
+    emotion: emotionData.emotion,
+    score: emotionData.score,
+    text: emotionData.text,
+    audio_url: emotionData.audio_url,
+    emojis: emotionData.emojis,
+    confidence: emotionData.confidence,
+    created_at: now,
+    primaryEmotion: emotionData.primaryEmotion,
+    source: emotionData.source // Source property is now supported
+  };
+  
+  emotions.push(newEmotion);
+  return newEmotion;
+};
+
+// Generate mock AI feedback for an emotion
+export const generateAIFeedback = async (emotion: Partial<Emotion>): Promise<string> => {
+  // In a real app, this would call a language model API
+  const feedbackTemplates: Record<string, string[]> = {
+    happy: [
+      "It's great to see you're feeling happy! This positive energy can help you tackle challenges.",
+      "Your happiness today is something to cherish. Try to identify what contributed to this feeling."
+    ],
+    sad: [
+      "I notice you're feeling sad. Remember it's okay to experience this emotion - it's part of being human.",
+      "Sadness is a natural response. Consider talking to someone you trust about these feelings."
+    ],
+    angry: [
+      "I see you're experiencing anger. Try taking a few deep breaths to help process this emotion.",
+      "Anger often points to something important to us. What boundaries might need attention?"
+    ],
+    anxious: [
+      "Anxiety can be challenging. Grounding techniques like focusing on your five senses might help.",
+      "Your anxiety is acknowledged. Remember that this feeling will pass with time."
+    ],
+    neutral: [
+      "A neutral emotional state can be a good time for reflection and planning.",
+      "Emotional neutrality offers balance. Consider using this energy for mindfulness practice."
+    ]
+  };
+  
+  const emotionType = emotion.emotion?.toLowerCase() || 'neutral';
+  const templates = feedbackTemplates[emotionType] || feedbackTemplates.neutral;
+  const randomIndex = Math.floor(Math.random() * templates.length);
+  
+  return templates[randomIndex];
+};
+
+// Update an emotion with AI feedback
+export const addAIFeedbackToEmotion = async (emotionId: string): Promise<Emotion | null> => {
+  const emotion = await getEmotion(emotionId);
+  
+  if (!emotion) {
+    return null;
+  }
+  
+  const feedback = await generateAIFeedback(emotion);
+  
+  return updateEmotion(emotionId, { ai_feedback: feedback });
+};
 
 export default {
-  getEmotions,
-  getEmotionById,
-  createEmotion,
-  getLatestEmotion,
-  createPositiveEmotion,
-  createNegativeEmotion,
-  createNeutralEmotion,
-  updateEmotion
+  getEmotionsForUser,
+  getEmotion,
+  recordEmotion,
+  deleteEmotion,
+  updateEmotion,
+  getEmotionsInDateRange,
+  predictEmotion,
+  recordEmotionPredictionAccuracy,
+  saveScannedEmotion,
+  generateAIFeedback,
+  addAIFeedbackToEmotion
 };

@@ -5,7 +5,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import PageTitle from '@/components/ui/page-title';
-import MusicDrawer from '@/components/music/MusicDrawer';
+import MusicDrawer from '@/components/music/player/MusicDrawer';
 
 const MusicPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('player');
@@ -78,8 +78,12 @@ const MusicPage: React.FC = () => {
         <MusicTabs activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
       
-      {/* Music Drawer (shown when openDrawer is true) */}
-      <MusicDrawer open={openDrawer} onOpenChange={setOpenDrawer} />
+      {/* Music Drawer (shown when openDrawer is true) - fixed props to match MusicDrawerProps interface */}
+      <MusicDrawer 
+        isOpen={openDrawer || false} 
+        onClose={() => setOpenDrawer && setOpenDrawer(false)}
+        onOpenChange={(open) => setOpenDrawer && setOpenDrawer(open)}
+      />
     </div>
   );
 };

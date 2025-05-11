@@ -1,106 +1,119 @@
 
 import { useState, useCallback } from 'react';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatConversation, ChatMessage } from '@/types/chat';
 
-interface UseConversationStateOptions {
-  initialConversations?: ChatConversation[];
+interface UseConversationStateProps {
+  initialConversation?: ChatConversation;
+  userId?: string;
 }
 
-export function useConversationState({ initialConversations = [] }: UseConversationStateOptions = {}) {
-  const [conversations, setConversations] = useState<ChatConversation[]>(initialConversations);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(
-    initialConversations.length > 0 ? initialConversations[0].id : null
+export const useConversationState = ({
+  initialConversation,
+  userId = 'current-user',
+}: UseConversationStateProps = {}) => {
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(
+    initialConversation || null
   );
-  
-  // Get all conversations
-  const getConversations = useCallback(() => {
-    return conversations;
-  }, [conversations]);
-  
-  // Get a specific conversation by ID
-  const getConversation = useCallback((id: string) => {
-    return conversations.find(conv => conv.id === id) || null;
-  }, [conversations]);
-  
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   // Create a new conversation
-  const createConversation = useCallback((title = 'Nouvelle conversation') => {
-    const now = new Date().toISOString();
-    const newConversationId = uuidv4();
-    const newConversation: ChatConversation = {
-      id: newConversationId,
-      title,
-      user_id: 'user-1',
-      messages: [],
-      created_at: now,
-      updated_at: now
-    };
-    
-    setConversations(prev => [newConversation, ...prev]);
-    setActiveConversationId(newConversationId);
-    
-    return newConversationId;
-  }, []);
-  
-  // Update conversation details
-  const updateConversation = useCallback((id: string, data: Partial<ChatConversation>) => {
-    const now = new Date().toISOString();
-    
-    setConversations(prev => 
-      prev.map(conv => 
-        conv.id === id ? { 
-          ...conv, 
-          ...data, 
-          updated_at: now
-        } : conv
+  const createNewConversation = useCallback(
+    (title = 'New conversation') => {
+      const timestamp = new Date().toISOString();
+      const conversation: ChatConversation = {
+        id: uuidv4(),
+        title,
+        user_id: userId,
+        messages: [],
+        created_at: timestamp,
+        updated_at: timestamp,
+        last_message: '',  // Added required field
+      };
+      
+      setConversations((prev) => [conversation, ...prev]);
+      setCurrentConversation(conversation);
+      
+      return conversation;
+    },
+    [userId]
+  );
+
+  // Update a conversation
+  const updateConversation = useCallback((conversationId: string, updates: Partial<ChatConversation>) => {
+    setConversations((prev) => 
+      prev.map((conv) => 
+        conv.id === conversationId
+          ? { 
+              ...conv, 
+              ...updates, 
+              updated_at: updates.updated_at || new Date().toISOString(),
+              last_message: updates.last_message || conv.last_message || '',
+            }
+          : conv
       )
     );
-  }, []);
-  
-  // Delete a conversation
-  const deleteConversation = useCallback((id: string) => {
-    setConversations(prev => prev.filter(conv => conv.id !== id));
-    
-    // If the active conversation was deleted, set to the first available one or null
-    if (activeConversationId === id) {
-      setActiveConversationId(prev => 
-        prev === id 
-          ? (conversations.filter(c => c.id !== id)[0]?.id || null)
-          : prev
+
+    if (currentConversation?.id === conversationId) {
+      setCurrentConversation((prev) =>
+        prev ? { 
+          ...prev, 
+          ...updates, 
+          updated_at: updates.updated_at || new Date().toISOString(),
+          last_message: updates.last_message || prev.last_message || '',
+        } : prev
       );
     }
-  }, [activeConversationId, conversations]);
-  
-  // Add message to a conversation
-  const addMessage = useCallback((conversationId: string, message: ChatMessage) => {
-    const now = new Date().toISOString();
-    
-    setConversations(prevConversations => 
-      prevConversations.map(conv => {
-        if (conv.id !== conversationId) return conv;
-        
-        return {
-          ...conv,
-          messages: [...(conv.messages || []), message],
-          last_message: message.text || message.content || '',
-          last_message_time: message.timestamp,
-          updated_at: now
-        };
-      })
-    );
-  }, []);
+  }, [currentConversation]);
+
+  // Add a message to the current conversation
+  const addMessageToConversation = useCallback(
+    (message: ChatMessage) => {
+      if (!currentConversation) return;
+
+      const lastMessageText = message.content || message.text || '';
+      
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === currentConversation.id
+            ? {
+                ...conv,
+                messages: [...(conv.messages || []), message],
+                last_message: lastMessageText,
+                last_message_time: message.timestamp,
+                updated_at: new Date().toISOString(),
+              }
+            : conv
+        )
+      );
+
+      setCurrentConversation((prev) =>
+        prev
+          ? {
+              ...prev,
+              messages: [...(prev.messages || []), message],
+              last_message: lastMessageText,
+              last_message_time: message.timestamp,
+              updated_at: new Date().toISOString(),
+            }
+          : prev
+      );
+    },
+    [currentConversation]
+  );
 
   return {
     conversations,
-    activeConversationId,
-    getConversations,
-    getConversation,
-    createConversation,
+    setConversations,
+    currentConversation,
+    setCurrentConversation,
+    isLoading,
+    setIsLoading,
+    createNewConversation,
     updateConversation,
-    deleteConversation,
-    addMessage,
-    setActiveConversationId
+    addMessageToConversation,
   };
-}
+};
 
 export default useConversationState;

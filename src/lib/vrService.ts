@@ -14,7 +14,7 @@ const vrTemplates: VRSessionTemplate[] = [
     duration: 5,
     is_audio_only: false,
     preview_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    audio_url: "https://example.com/audio/ocean.mp3",
+    audio_url: "https://example.com/audio/ocean.mp3", // Added required field
     benefits: ["Stress reduction", "Improved focus"],
     emotions: ["calm", "peaceful"],
     popularity: 95,
@@ -32,7 +32,7 @@ const vrTemplates: VRSessionTemplate[] = [
     duration: 10,
     is_audio_only: false,
     preview_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    audio_url: "https://example.com/audio/forest.mp3",
+    audio_url: "https://example.com/audio/forest.mp3", // Added required field
     benefits: ["Reduced anxiety", "Increased mindfulness"],
     emotions: ["peaceful", "grounded"],
     popularity: 88,
@@ -80,7 +80,6 @@ export const startVRSession = async (
     duration_seconds: template.duration * 60,
     completed: false,
     template,
-    started_at: now,
     is_audio_only: template.is_audio_only,
     emotion_before: emotionBefore,
     mood_before: moodBefore
@@ -153,4 +152,35 @@ export const recommendVRSessionForEmotion = async (emotion: string): Promise<VRS
   
   // If no specific match is found, return a calming template by default
   return vrTemplates.find(t => t.emotions.includes('calm')) || vrTemplates[0];
+};
+
+// Add the missing saveRelaxationSession function
+export const saveRelaxationSession = async (sessionData: Partial<VRSession>): Promise<VRSession> => {
+  const sessionId = sessionData.id || uuidv4();
+  const existingIndex = activeSessions.findIndex(s => s.id === sessionId);
+  
+  if (existingIndex !== -1) {
+    // Update existing session
+    const updatedSession = {
+      ...activeSessions[existingIndex],
+      ...sessionData,
+      completed: true,
+      end_time: sessionData.end_time || new Date().toISOString()
+    };
+    activeSessions[existingIndex] = updatedSession as VRSession;
+    return updatedSession as VRSession;
+  } else {
+    // Create new session
+    const newSession: VRSession = {
+      id: sessionId,
+      user_id: sessionData.user_id || 'anonymous',
+      template_id: sessionData.template_id || 'default',
+      start_time: sessionData.start_time || new Date().toISOString(),
+      duration_seconds: sessionData.duration_seconds || 0,
+      completed: sessionData.completed || true,
+      ...sessionData
+    };
+    activeSessions.push(newSession);
+    return newSession;
+  }
 };

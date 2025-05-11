@@ -1,7 +1,7 @@
 
 export interface User {
   id: string;
-  name?: string;
+  name?: string; // Made optional to allow compatibility with both types
   email?: string;
   role?: string;
   avatar?: string;
@@ -24,7 +24,7 @@ export interface UserPreferences {
     email: boolean;
     push: boolean;
     sms: boolean;
-  };
+  } | boolean; // Allow boolean for backward compatibility
   soundEnabled?: boolean;
   language?: string;
   fontFamily?: string;
@@ -34,14 +34,14 @@ export interface UserPreferences {
   showEmotionPrompts?: boolean;
   notification_frequency?: string;
   notification_tone?: string;
-  notification_type?: string;
+  notification_type?: string; // Added to support usePreferences.ts
   emotionalCamouflage?: boolean;
   notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
-  autoplayVideos?: boolean;
+  email_notifications?: boolean; // Added for NotificationPreferences.tsx
+  push_notifications?: boolean; // Added for NotificationPreferences.tsx
+  aiSuggestions?: boolean; // Added for PremiumFeatures.tsx
+  fullAnonymity?: boolean; // Added for PremiumFeatures.tsx
+  autoplayVideos?: boolean; // Added for usePreferences.ts
   dataCollection?: boolean;
 }
 

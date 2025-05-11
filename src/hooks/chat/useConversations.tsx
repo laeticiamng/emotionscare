@@ -1,171 +1,127 @@
 
-import { useState, useEffect } from 'react';
-import { ChatConversation } from '@/types/chat';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useCallback, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { ChatConversation, ChatMessage } from '@/types/chat';
 
-/**
- * Hook composite pour la gestion des conversations de chat
- * Combine le chargement et la gestion des conversations
- */
-export function useConversations() {
+// Mock initial conversations for demonstration
+const initialConversations: ChatConversation[] = [
+  {
+    id: '1',
+    title: 'Conversation with AI Assistant',
+    lastMessage: 'Hello! How can I help you today?',
+    user_id: 'user-1',
+    created_at: '2023-03-15T12:00:00Z',
+    updated_at: '2023-03-15T12:05:00Z',
+    last_message: 'Hello! How can I help you today?',  // Added required field
+  },
+  {
+    id: '2',
+    title: 'Emotional Support',
+    lastMessage: 'Remember to take breaks during your workday.',
+    user_id: 'user-1',
+    created_at: '2023-03-14T09:30:00Z',
+    updated_at: '2023-03-14T09:35:00Z',
+    last_message: 'Remember to take breaks during your workday.',  // Added required field
+  }
+];
+
+export const useConversations = (userId = 'user-1') => {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProcessingAction, setIsProcessingAction] = useState(false);
-  const { user } = useAuth();
-  
-  // État de chargement combiné
-  const isLoadingState = isLoading || isProcessingAction;
-  
-  // Charger les conversations au montage ou lorsque l'utilisateur change
+  const [selectedConversation, setSelectedConversation] = useState<ChatConversation | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load conversations (simulated API call)
   useEffect(() => {
-    if (user?.id) {
-      loadAndSetConversations();
-    }
-  }, [user?.id]);
-  
-  // Fonction simulée pour charger les conversations
-  const loadConversations = async (): Promise<ChatConversation[]> => {
-    setIsLoading(true);
-    try {
-      // Simulation d'un appel API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Données simulées
-      const mockConversations: ChatConversation[] = [
-        {
-          id: 'conv-1',
-          title: 'Discussion sur le bien-être',
-          lastMessage: 'Comment puis-je améliorer mon sommeil ?',
-          user_id: user?.id || '',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ];
-      
-      return mockConversations;
-    } catch (error) {
-      console.error('Erreur lors du chargement des conversations:', error);
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Charger les conversations et mettre à jour l'état
-  const loadAndSetConversations = async () => {
-    const userConversations = await loadConversations();
-    setConversations(userConversations);
-    
-    // Si aucune conversation active n'est définie mais que nous avons des conversations, définir la première comme active
-    if (!activeConversationId && userConversations.length > 0) {
-      console.log('Définition de la première conversation comme active:', userConversations[0].id);
-      setActiveConversationId(userConversations[0].id);
-    }
-  };
-  
-  // Créer une conversation (simulation)
-  const createConversation = async (title?: string): Promise<string | null> => {
-    setIsProcessingAction(true);
-    try {
-      // Simuler un délai d'API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const now = new Date().toISOString();
-      const newConversation: ChatConversation = {
-        id: `conv-${Date.now()}`,
-        title: title || 'Nouvelle conversation',
-        user_id: user?.id || '',
-        created_at: now,
-        updated_at: now,
-        lastMessage: ''
-      };
-      
-      // Ajouter la conversation à notre état
-      setConversations(prev => [...prev, newConversation]);
-      
-      // Définir la nouvelle conversation comme active
-      setActiveConversationId(newConversation.id);
-      
-      return newConversation.id;
-    } catch (error) {
-      console.error('Erreur lors de la création de la conversation:', error);
-      return null;
-    } finally {
-      setIsProcessingAction(false);
-    }
-  };
-  
-  // Supprimer une conversation (simulation)
-  const deleteConversation = async (conversationId: string): Promise<boolean> => {
-    setIsProcessingAction(true);
-    try {
-      // Simuler un délai d'API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Supprimer la conversation de notre état
-      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-      
-      // Effacer la conversation active si la supprimée était active
-      if (activeConversationId === conversationId) {
-        setActiveConversationId(prev => 
-          prev === conversationId 
-            ? (conversations.filter(c => c.id !== conversationId)[0]?.id || null)
-            : prev
+    const loadConversations = async () => {
+      setLoading(true);
+      try {
+        // In a real app, this would be an API call
+        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+        const userConversations = initialConversations.filter(
+          conv => conv.user_id === userId
         );
+        setConversations(userConversations);
+        
+        // Set the most recent conversation as selected by default
+        if (userConversations.length > 0 && !selectedConversation) {
+          setSelectedConversation(userConversations[0]);
+        }
+      } catch (error) {
+        console.error('Failed to load conversations:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      return true;
-    } catch (error) {
-      console.error('Erreur lors de la suppression de la conversation:', error);
-      return false;
-    } finally {
-      setIsProcessingAction(false);
+    };
+
+    loadConversations();
+  }, [userId]);
+
+  // Create a new conversation
+  const createConversation = useCallback(async (title: string) => {
+    const timestamp = new Date().toISOString();
+    const newConversation: ChatConversation = {
+      id: uuidv4(),
+      title,
+      user_id: userId,
+      created_at: timestamp,
+      updated_at: timestamp,
+      lastMessage: '',
+      last_message: '',  // Added required field
+    };
+
+    setConversations(prev => [newConversation, ...prev]);
+    setSelectedConversation(newConversation);
+    return newConversation;
+  }, [userId]);
+
+  // Delete a conversation
+  const deleteConversation = useCallback(async (conversationId: string) => {
+    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+    
+    if (selectedConversation?.id === conversationId) {
+      setSelectedConversation(null);
     }
-  };
-  
-  // Mettre à jour une conversation (simulation)
-  const updateConversation = async (
+  }, [selectedConversation]);
+
+  // Add a message to a conversation
+  const addMessageToConversation = useCallback(async (
     conversationId: string, 
-    updates: { title?: string, lastMessage?: string }
-  ): Promise<boolean> => {
-    setIsProcessingAction(true);
-    try {
-      // Simuler un délai d'API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const now = new Date().toISOString();
-      
-      // Mettre à jour la conversation dans notre état
-      setConversations(prevConversations => 
-        prevConversations.map(conv => 
-          conv.id === conversationId 
-            ? {
-                ...conv, 
-                ...updates,
-                updated_at: now
-              } 
-            : conv
-        )
-      );
-      
-      return true;
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour de la conversation:', error);
-      return false;
-    } finally {
-      setIsProcessingAction(false);
-    }
-  };
+    message: Omit<ChatMessage, 'id' | 'timestamp' | 'conversation_id'>
+  ) => {
+    const timestamp = new Date().toISOString();
+    const newMessage: ChatMessage = {
+      id: uuidv4(),
+      timestamp,
+      conversation_id: conversationId,
+      ...message
+    };
+
+    // Find and update the conversation
+    setConversations(prevConversations => 
+      prevConversations.map(conv => 
+        conv.id === conversationId ? {
+          ...conv,
+          updatedAt: timestamp,
+          updated_at: timestamp,
+          title: conv.title,
+          lastMessage: message.content || message.text || '',
+          last_message: message.content || message.text || '',
+        } : conv
+      )
+    );
+
+    return newMessage;
+  }, []);
 
   return {
     conversations,
-    activeConversationId,
-    isLoading: isLoadingState,
-    setActiveConversationId,
-    loadConversations: loadAndSetConversations,
+    selectedConversation,
+    setSelectedConversation,
+    loading,
     createConversation,
     deleteConversation,
-    updateConversation
+    addMessageToConversation
   };
-}
+};
+
+export default useConversations;
