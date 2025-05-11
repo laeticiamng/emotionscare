@@ -130,8 +130,8 @@ export function useUserPreferences() {
       }
       
       toast({
-        title: "Preferences updated",
-        description: "Your settings have been successfully saved."
+        title: "Préférences mises à jour",
+        description: "Vos paramètres ont été enregistrés avec succès."
       });
       
       return true;
@@ -139,8 +139,8 @@ export function useUserPreferences() {
       console.error('Error saving preferences:', error);
       
       toast({
-        title: "Error",
-        description: "Unable to save your preferences.",
+        title: "Erreur",
+        description: "Impossible d'enregistrer vos préférences.",
         variant: "destructive"
       });
       
@@ -160,8 +160,8 @@ export function useUserPreferences() {
     updatePreferences({ customPresets: updatedPresets });
     
     toast({
-      title: "New preset created",
-      description: `Preset "${name}" has been saved.`
+      title: "Nouveau préréglage créé",
+      description: `Le préréglage "${name}" a été enregistré.`
     });
   }, [preferences, audioPrefs, updatePreferences, toast]);
 
@@ -181,8 +181,8 @@ export function useUserPreferences() {
     }
     
     toast({
-      title: "Preset applied",
-      description: `Preset "${name}" has been activated.`
+      title: "Préréglage appliqué",
+      description: `Le préréglage "${name}" a été activé.`
     });
     
     return true;
@@ -199,8 +199,8 @@ export function useUserPreferences() {
     }
     
     toast({
-      title: "Reset completed",
-      description: "All your settings have been reset to defaults."
+      title: "Réinitialisation terminée",
+      description: "Tous vos paramètres ont été réinitialisés aux valeurs par défaut."
     });
   }, [themeContext, toast]);
 
@@ -213,15 +213,15 @@ export function useUserPreferences() {
       sessionStorage.setItem('incognito', 'true');
       
       toast({
-        title: "Incognito mode enabled",
-        description: "No data will be saved during this session."
+        title: "Mode incognito activé",
+        description: "Aucune donnée ne sera enregistrée pendant cette session."
       });
     } else {
       sessionStorage.removeItem('incognito');
       
       toast({
-        title: "Incognito mode disabled",
-        description: "Your data will be saved normally again."
+        title: "Mode incognito désactivé",
+        description: "Vos données seront à nouveau enregistrées normalement."
       });
     }
   }, [updatePreferences, toast]);

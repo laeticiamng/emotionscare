@@ -38,5 +38,5 @@ export interface ThemeProviderProps {
   defaultTheme?: ThemeName;
 }
 
-// Export type from ThemeContext
+// Export des types depuis ThemeContext
 export type { Theme, FontSize, FontFamily };
