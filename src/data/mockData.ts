@@ -3,7 +3,7 @@
 import { mockBadges } from './mockBadges';
 import { mockEmotions } from './mockEmotions';
 import { mockReports } from './mockReports';
-import { mockVRTemplatesData } from './mockVRTemplates';
+import { mockVRTemplates } from './mockVRTemplates';
 
 export { 
   // Badges
@@ -16,5 +16,5 @@ export {
   mockReports,
   
   // VR Templates
-  mockVRTemplatesData as mockVRTemplates
+  mockVRTemplates
 };

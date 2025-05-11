@@ -3,13 +3,18 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  album?: string;
   duration: number;
   coverUrl?: string;
   audioUrl: string;
   genre?: string;
   emotion?: string;
   lyrics?: string;
+  // For backwards compatibility
+  cover_url?: string;
+  audio_url?: string;
+  url?: string;
+  emotion_tag?: string;
+  cover?: string;
 }
 
 export interface MusicPlaylist {
@@ -20,6 +25,9 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   emotion?: string;
   category?: string;
+  // For backwards compatibility
+  title?: string;
+  cover_url?: string;
 }
 
 export interface MusicContextType {
@@ -37,13 +45,17 @@ export interface MusicContextType {
   loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
   loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
   setOpenDrawer?: (open: boolean) => void;
-  openDrawer?: () => void;
-  closeDrawer?: () => void;
-  toggleDrawer?: () => void;
-  toggleRepeat: () => void;
-  toggleShuffle: () => void;
-  error?: string | null;
+  openDrawer?: boolean;
   isInitialized?: boolean;
   initializeMusicSystem?: () => Promise<void>;
+  error?: string | null;
   currentEmotion?: string;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+}
+
+export interface MusicDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  playlist?: MusicPlaylist | null;
 }

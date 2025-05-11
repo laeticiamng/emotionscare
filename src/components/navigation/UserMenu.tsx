@@ -35,15 +35,18 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   };
 
   const getAvatarFallback = () => {
-    return user?.name?.charAt(0).toUpperCase() || '?';
+    return user?.name?.charAt(0)?.toUpperCase() || '?';
   };
+  
+  // Use avatar as fallback if image is not available
+  const userImage = user?.image || user?.avatar;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="group flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={user?.image || user?.avatar} alt={user?.name || 'Profile'} />
+            <AvatarImage src={userImage} alt={user?.name || 'Profile'} />
             <AvatarFallback>{getAvatarFallback()}</AvatarFallback>
           </Avatar>
           <span className="text-left">

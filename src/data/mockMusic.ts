@@ -8,9 +8,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Calm Ocean',
     artist: 'Nature Sounds',
     duration: 180,
-    cover_url: '/images/music/ocean.jpg',
-    audio_url: '/audio/calm-ocean.mp3',
-    emotion_tag: 'calm',
+    coverUrl: '/images/music/ocean.jpg',
+    audioUrl: '/audio/calm-ocean.mp3',
+    emotion: 'calm',
     url: '/audio/calm-ocean.mp3' // Added required url property
   },
   {
@@ -18,9 +18,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Morning Motivation',
     artist: 'Upbeat Studio',
     duration: 240,
-    cover_url: '/images/music/morning.jpg',
-    audio_url: '/audio/morning-motivation.mp3',
-    emotion_tag: 'happy',
+    coverUrl: '/images/music/morning.jpg',
+    audioUrl: '/audio/morning-motivation.mp3',
+    emotion: 'happy',
     url: '/audio/morning-motivation.mp3' // Added required url property
   },
   {
@@ -28,9 +28,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Deep Focus',
     artist: 'Concentration Wave',
     duration: 320,
-    cover_url: '/images/music/focus.jpg',
-    audio_url: '/audio/deep-focus.mp3',
-    emotion_tag: 'focused',
+    coverUrl: '/images/music/focus.jpg',
+    audioUrl: '/audio/deep-focus.mp3',
+    emotion: 'focused',
     url: '/audio/deep-focus.mp3' // Added required url property
   },
   {
@@ -38,9 +38,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Tension Release',
     artist: 'Relax Mode',
     duration: 290,
-    cover_url: '/images/music/release.jpg',
-    audio_url: '/audio/tension-release.mp3',
-    emotion_tag: 'stressed',
+    coverUrl: '/images/music/release.jpg',
+    audioUrl: '/audio/tension-release.mp3',
+    emotion: 'stressed',
     url: '/audio/tension-release.mp3' // Added required url property
   }
 ];
@@ -49,30 +49,30 @@ export const mockTracks: MusicTrack[] = [
 export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: '1',
-    title: 'Calming Sounds',
-    name: 'Calming Sounds', // For backward compatibility
+    name: 'Calming Sounds',
+    title: 'Calming Sounds', // For backward compatibility
     description: 'Perfect for relaxation and stress relief',
     tracks: [mockTracks[0], mockTracks[3]],
     emotion: 'calm',
-    cover_url: '/images/playlists/calm.jpg'
+    coverUrl: '/images/playlists/calm.jpg'
   },
   {
     id: '2',
-    title: 'Energy Boost',
-    name: 'Energy Boost', // For backward compatibility
+    name: 'Energy Boost',
+    title: 'Energy Boost', // For backward compatibility
     description: 'Get motivated and energized',
     tracks: [mockTracks[1]],
     emotion: 'happy',
-    cover_url: '/images/playlists/energy.jpg'
+    coverUrl: '/images/playlists/energy.jpg'
   },
   {
     id: '3',
-    title: 'Work Concentration',
-    name: 'Work Concentration', // For backward compatibility
+    name: 'Work Concentration',
+    title: 'Work Concentration', // For backward compatibility
     description: 'Enhance your focus and productivity',
     tracks: [mockTracks[2]],
     emotion: 'focused',
-    cover_url: '/images/playlists/focus.jpg'
+    coverUrl: '/images/playlists/focus.jpg'
   }
 ];
 

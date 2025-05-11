@@ -4,12 +4,13 @@ export interface ChatMessage {
   text?: string;
   content?: string;
   sender: string;
-  sender_id?: string;
+  sender_type?: string;
   timestamp?: string | Date;
   is_read?: boolean;
   conversation_id?: string;
   role?: string;
-  sender_type?: string;
+  // For backwards compatibility
+  sender_id?: string;
 }
 
 export interface ChatConversation {
@@ -21,6 +22,10 @@ export interface ChatConversation {
   lastMessage?: string;
   last_message?: string;
   messages?: ChatMessage[];
+  // For backwards compatibility
+  userId?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 export interface ChatResponseType {
