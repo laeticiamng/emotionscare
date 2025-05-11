@@ -23,7 +23,7 @@ const BusinessPage = () => {
         
         <div className="space-y-4">
           <Button 
-            onClick={() => navigate('/login')} 
+            onClick={() => navigate('/dashboard')} 
             className="w-full h-16 text-lg bg-blue-500 hover:bg-blue-600 shadow-md transition-all duration-300"
           >
             <User className="mr-3 h-6 w-6" />
@@ -32,7 +32,7 @@ const BusinessPage = () => {
           </Button>
           
           <Button 
-            onClick={() => navigate('/admin-login')} 
+            onClick={() => navigate('/admin/dashboard')} 
             className="w-full h-16 text-lg bg-gray-800 hover:bg-gray-900 shadow-md transition-all duration-300"
             variant="default"
           >

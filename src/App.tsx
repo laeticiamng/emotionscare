@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
 import DashboardPage from '@/pages/DashboardPage';
 import AdminDashboardPage from '@/pages/AdminDashboardPage';
@@ -10,11 +10,14 @@ import PredictiveBurnoutPage from '@/pages/admin/PredictiveBurnoutPage';
 import CustomReportsPage from '@/pages/admin/CustomReportsPage';
 import BusinessPage from '@/pages/BusinessPage';
 import LoginPage from '@/pages/LoginPage';
+import PredictiveDashboardPage from '@/pages/PredictiveDashboardPage';
+import Index from '@/pages/Index';
 
 const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/index" element={<Index />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
       <Route path="/admin/premium" element={<AdminPremiumDashboard />} />
@@ -24,7 +27,7 @@ const App: React.FC = () => {
       <Route path="/business" element={<BusinessPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/admin-login" element={<LoginPage />} />
-      {/* Add additional routes as needed */}
+      <Route path="/predictive" element={<PredictiveDashboardPage />} />
     </Routes>
   );
 };
