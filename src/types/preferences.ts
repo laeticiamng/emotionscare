@@ -54,4 +54,5 @@ export interface UserPreferences {
   font?: string;
   onboardingCompleted?: boolean;
   dashboardLayout?: string;
+  soundEnabled?: boolean;
 }
