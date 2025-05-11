@@ -2,54 +2,76 @@
 import React, { createContext, useContext, useState } from 'react';
 
 export type Segment = {
-  dimensionKey: string;
-  optionKey: string;
-} | string;
+  dimensionKey: string | null;
+  optionKey: string | null;
+};
 
-interface SegmentContextType {
-  segment: Segment | null;
-  setSegment: (segment: Segment | null) => void;
-  dimensions: Array<{
+export interface SegmentDimension {
+  key: string;
+  name: string;
+  label: string;
+  options: Array<{ 
     key: string;
     name: string;
-    options: Array<{ key: string; name: string }>
+    label: string;
   }>;
-  isLoading: boolean;
 }
 
-const defaultDimensions = [
+interface SegmentContextType {
+  segment: Segment;
+  setSegment: (segment: Segment) => void;
+  dimensions: SegmentDimension[];
+  isLoading: boolean;
+  activeDimension: SegmentDimension | null;
+  activeOption: { key: string; name: string; label: string } | null;
+}
+
+const defaultDimensions: SegmentDimension[] = [
   {
     key: 'department',
     name: 'Département',
+    label: 'Département',
     options: [
-      { key: 'marketing', name: 'Marketing' },
-      { key: 'sales', name: 'Ventes' },
-      { key: 'engineering', name: 'Ingénierie' },
-      { key: 'hr', name: 'Ressources Humaines' }
+      { key: 'marketing', name: 'Marketing', label: 'Marketing' },
+      { key: 'sales', name: 'Ventes', label: 'Ventes' },
+      { key: 'engineering', name: 'Ingénierie', label: 'Ingénierie' },
+      { key: 'hr', name: 'Ressources Humaines', label: 'Ressources Humaines' }
     ]
   },
   {
     key: 'location',
     name: 'Localisation',
+    label: 'Localisation',
     options: [
-      { key: 'paris', name: 'Paris' },
-      { key: 'lyon', name: 'Lyon' },
-      { key: 'marseille', name: 'Marseille' },
-      { key: 'remote', name: 'Télétravail' }
+      { key: 'paris', name: 'Paris', label: 'Paris' },
+      { key: 'lyon', name: 'Lyon', label: 'Lyon' },
+      { key: 'marseille', name: 'Marseille', label: 'Marseille' },
+      { key: 'remote', name: 'Télétravail', label: 'Télétravail' }
     ]
   }
 ];
 
 const SegmentContext = createContext<SegmentContextType>({
-  segment: null,
+  segment: { dimensionKey: null, optionKey: null },
   setSegment: () => {},
   dimensions: [],
-  isLoading: false
+  isLoading: false,
+  activeDimension: null,
+  activeOption: null
 });
 
 export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [segment, setSegment] = useState<Segment | null>(null);
+  const [segment, setSegment] = useState<Segment>({ dimensionKey: null, optionKey: null });
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Compute active dimension and option based on segment state
+  const activeDimension = segment.dimensionKey 
+    ? defaultDimensions.find(d => d.key === segment.dimensionKey) || null 
+    : null;
+    
+  const activeOption = activeDimension && segment.optionKey
+    ? activeDimension.options.find(o => o.key === segment.optionKey) || null
+    : null;
 
   return (
     <SegmentContext.Provider 
@@ -57,7 +79,9 @@ export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         segment, 
         setSegment, 
         dimensions: defaultDimensions,
-        isLoading 
+        isLoading,
+        activeDimension,
+        activeOption
       }}
     >
       {children}

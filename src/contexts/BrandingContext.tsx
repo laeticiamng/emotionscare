@@ -9,6 +9,7 @@ interface BrandingContextType {
     primary: string;
     secondary: string;
     accent: string;
+    highlight: string;
   };
   setBrandingTheme: (theme: string) => void;
   setEmotionalTone: (tone: string) => void;
@@ -16,13 +17,15 @@ interface BrandingContextType {
     primary: string;
     secondary: string;
     accent: string;
+    highlight: string;
   }) => void;
 }
 
 const defaultColors = {
   primary: '#6366f1',
   secondary: '#a855f7',
-  accent: '#ec4899'
+  accent: '#ec4899',
+  highlight: '#22c55e'
 };
 
 const BrandingContext = createContext<BrandingContextType>({

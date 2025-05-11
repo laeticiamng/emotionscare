@@ -1,9 +1,11 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Recommendation } from '@/types';
 
 interface EmotionPrediction {
   emotion: string;
   probability: number;
+  confidence?: number;
   triggers?: string[];
   recommendations?: string[];
 }
@@ -14,7 +16,7 @@ interface PredictiveAnalyticsContextType {
   isEnabled: boolean;
   setEnabled: (enabled: boolean) => void;
   currentPredictions: EmotionPrediction;
-  recommendations: string[];
+  recommendations: Recommendation[];
   availableFeatures: string[];
   predictionEnabled: boolean;
   setPredictionEnabled: (enabled: boolean) => void;
@@ -28,7 +30,7 @@ const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType>
   error: '',
   isEnabled: false,
   setEnabled: () => {},
-  currentPredictions: { emotion: '', probability: 0 },
+  currentPredictions: { emotion: '', probability: 0, confidence: 0 },
   recommendations: [],
   availableFeatures: [],
   predictionEnabled: false,
@@ -49,9 +51,10 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
   const [predictionEnabled, setPredictionEnabled] = useState(false);
   const [currentPredictions, setCurrentPredictions] = useState<EmotionPrediction>({ 
     emotion: '', 
-    probability: 0 
+    probability: 0,
+    confidence: 0
   });
-  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   
   const availableFeatures = [
     'predictive-mood',
@@ -70,10 +73,12 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
       const emotions = ['calm', 'happy', 'anxious', 'sad', 'energetic'];
       const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
       const randomProbability = Math.round((Math.random() * 40 + 60) * 100) / 100; // 60-100%
+      const randomConfidence = Math.round((Math.random() * 30 + 70) * 100) / 100; // 70-100%
       
       const prediction: EmotionPrediction = {
         emotion: randomEmotion,
         probability: randomProbability,
+        confidence: randomConfidence,
         triggers: ['work stress', 'lack of sleep', 'physical activity'],
         recommendations: [
           'Take a short break',
@@ -83,7 +88,26 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
       };
       
       setCurrentPredictions(prediction);
-      setRecommendations(prediction.recommendations || []);
+      
+      // Create mock Recommendation objects
+      const mockRecommendations: Recommendation[] = [
+        {
+          id: '1',
+          title: 'Take a short break',
+          description: 'Step away from your work for 5-10 minutes',
+          category: 'wellness',
+          priority: 1
+        },
+        {
+          id: '2',
+          title: 'Practice deep breathing',
+          description: 'Try 4-7-8 breathing technique for relaxation',
+          category: 'wellness',
+          priority: 2
+        }
+      ];
+      
+      setRecommendations(mockRecommendations);
       
     } catch (err) {
       console.error('Error generating predictions:', err);
@@ -101,10 +125,12 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
       const emotions = ['calm', 'happy', 'anxious', 'sad', 'energetic'];
       const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
       const randomProbability = Math.round((Math.random() * 40 + 60) * 100) / 100; // 60-100%
+      const randomConfidence = Math.round((Math.random() * 30 + 70) * 100) / 100; // 70-100%
       
       return {
         emotion: randomEmotion,
         probability: randomProbability,
+        confidence: randomConfidence,
         triggers: ['work stress', 'lack of sleep', 'physical activity'],
         recommendations: [
           'Take a short break',
@@ -115,12 +141,12 @@ export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderPr
       
     } catch (error) {
       console.error('Error in generatePrediction:', error);
-      return { emotion: 'neutral', probability: 50 };
+      return { emotion: 'neutral', probability: 50, confidence: 50 };
     }
   };
 
   const resetPredictions = () => {
-    setCurrentPredictions({ emotion: '', probability: 0 });
+    setCurrentPredictions({ emotion: '', probability: 0, confidence: 0 });
     setRecommendations([]);
   };
 

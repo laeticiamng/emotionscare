@@ -161,6 +161,7 @@ export interface JournalEntry {
   user_id: string;
   date: string | Date;
   content: string;
+  text?: string;
   emotion?: string;
   mood_score?: number;
   tags?: string[];

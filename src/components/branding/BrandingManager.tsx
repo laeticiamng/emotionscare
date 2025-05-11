@@ -9,6 +9,7 @@ import { useStorytelling } from '@/providers/StorytellingProvider';
 import { useNavigate } from 'react-router-dom';
 import { usePredictiveAnalytics } from '@/providers/PredictiveAnalyticsProvider';
 import PredictiveInsightToast from '@/components/predictive/PredictiveInsightToast';
+import { Recommendation } from '@/types';
 
 interface BrandingManagerProps {
   children: React.ReactNode;
@@ -32,7 +33,7 @@ const BrandingManager: React.FC<BrandingManagerProps> = ({ children }) => {
     root.style.setProperty('--color-brand-primary', colors.primary);
     root.style.setProperty('--color-brand-secondary', colors.secondary);
     root.style.setProperty('--color-brand-accent', colors.accent);
-    root.style.setProperty('--color-brand-highlight', colors.highlight);
+    root.style.setProperty('--color-brand-highlight', colors.highlight || '#22c55e');
     
     // Set additional variables based on theme
     root.setAttribute('data-branding', brandingTheme);
@@ -59,7 +60,7 @@ const BrandingManager: React.FC<BrandingManagerProps> = ({ children }) => {
   useEffect(() => {
     if (recommendations && recommendations.length > 0) {
       // Only show toast for high confidence recommendations
-      const highConfidenceRecs = recommendations.filter(rec => rec.confidence > 0.85);
+      const highConfidenceRecs = recommendations.filter(rec => rec.priority > 0);
       if (highConfidenceRecs.length > 0) {
         setShowPredictiveToast(true);
         

@@ -1,8 +1,9 @@
 
 export interface InvitationFormData {
   email: string;
-  role: string;
+  role: UserRole;
   message?: string;
+  expires_in_days: number;
   expiresIn?: number;
 }
 
@@ -10,12 +11,12 @@ export interface InvitationStats {
   total: number;
   pending: number;
   expired: number;
+  accepted: number;
+  rejected: number;
+  sent: number;
   completed: number;
   conversionRate: number;
   averageTimeToAccept: number;
-  sent: number;
-  accepted: number;
-  rejected: number;
   teams: Record<string, number>;
   recent_invites: InvitationData[];
 }
@@ -29,3 +30,5 @@ export interface InvitationData {
   accepted_at?: string;
   role: string;
 }
+
+export type UserRole = 'admin' | 'manager' | 'user' | 'therapist' | 'coach' | 'guest' | 'employee';

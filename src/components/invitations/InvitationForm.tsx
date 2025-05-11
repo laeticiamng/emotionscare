@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { InvitationFormData, UserRole } from '@/types';
+import { InvitationFormData, UserRole } from '@/types/invitations';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -16,7 +16,7 @@ interface InvitationFormProps {
 const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => {
   const [inviteData, setInviteData] = useState<InvitationFormData>({
     email: '',
-    role: 'employee',
+    role: 'employee' as UserRole,
     message: '',
     expires_in_days: 7
   });
@@ -34,7 +34,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
   };
   
   const handleRoleChange = (value: string) => {
-    setInviteData(prev => ({ ...prev, role: value }));
+    setInviteData(prev => ({ ...prev, role: value as UserRole }));
     
     // Clear error when user makes a selection
     if (error) setError(null);
@@ -79,7 +79,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({ onInvitationSent }) => 
       setSuccess(true);
       setInviteData({
         email: '',
-        role: 'employee',
+        role: 'employee' as UserRole,
         message: '',
         expires_in_days: 7
       });

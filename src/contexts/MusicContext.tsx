@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types';
 
@@ -15,6 +14,7 @@ interface MusicContextType {
   togglePlay: () => void;
   currentTrack: Track | null;
   playTrack: (track: Track) => void;
+  pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
   volume: number;
@@ -28,6 +28,8 @@ interface MusicContextType {
   currentEmotion: string | null;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
+  openDrawer: boolean;
+  setOpenDrawer: (open: boolean) => void;
 }
 
 const defaultTracks: Track[] = [
@@ -71,6 +73,7 @@ const MusicContext = createContext<MusicContextType>({
   togglePlay: () => {},
   currentTrack: null,
   playTrack: () => {},
+  pauseTrack: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
   volume: 50,
@@ -83,7 +86,9 @@ const MusicContext = createContext<MusicContextType>({
   error: null,
   currentEmotion: null,
   toggleRepeat: () => {},
-  toggleShuffle: () => {}
+  toggleShuffle: () => {},
+  openDrawer: false,
+  setOpenDrawer: () => {}
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -94,6 +99,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [playlists] = useState<Playlist[]>(defaultPlaylists);
   const [error, setError] = useState<string | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
@@ -102,6 +108,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const playTrack = (track: Track) => {
     setCurrentTrack(track);
     setIsPlaying(true);
+  };
+
+  const pauseTrack = () => {
+    setIsPlaying(false);
   };
 
   const nextTrack = () => {
@@ -149,11 +159,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const toggleRepeat = () => {
-    console.log('Toggle repeat mode');
+    // Implementation would go here
+    console.log('Toggle repeat');
   };
 
   const toggleShuffle = () => {
-    console.log('Toggle shuffle mode');
+    // Implementation would go here
+    console.log('Toggle shuffle');
   };
 
   return (
@@ -163,6 +175,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         togglePlay,
         currentTrack,
         playTrack,
+        pauseTrack,
         nextTrack,
         previousTrack,
         volume,
@@ -175,7 +188,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         error,
         currentEmotion,
         toggleRepeat,
-        toggleShuffle
+        toggleShuffle,
+        openDrawer,
+        setOpenDrawer
       }}
     >
       {children}

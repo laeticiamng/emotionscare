@@ -32,8 +32,7 @@ export const SegmentSelector: React.FC = () => {
     
     toast({
       title: "Segment mis à jour",
-      description: `Les données sont maintenant filtrées par ce segment.`,
-      duration: 3000,
+      description: `Les données sont maintenant filtrées par ce segment.`
     });
   };
 
@@ -46,8 +45,7 @@ export const SegmentSelector: React.FC = () => {
     
     toast({
       title: "Filtre réinitialisé",
-      description: "Toutes les données sont maintenant affichées sans filtrage.",
-      duration: 3000,
+      description: "Toutes les données sont maintenant affichées sans filtrage."
     });
   };
 

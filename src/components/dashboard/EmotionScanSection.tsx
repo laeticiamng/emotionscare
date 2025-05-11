@@ -9,13 +9,15 @@ export interface EmotionScanSectionProps {
     emotion: string;
     score: number;
   };
+  userMode?: string;
 }
 
 const EmotionScanSection: React.FC<EmotionScanSectionProps> = ({ 
   collapsed, 
   onToggle, 
   userId,
-  latestEmotion 
+  latestEmotion,
+  userMode
 }) => {
   return (
     <div>
@@ -26,6 +28,7 @@ const EmotionScanSection: React.FC<EmotionScanSectionProps> = ({
           <p>Score: {latestEmotion.score}</p>
         </div>
       )}
+      {userMode && <p>User Mode: {userMode}</p>}
     </div>
   );
 };
