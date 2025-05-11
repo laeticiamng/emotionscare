@@ -6,6 +6,7 @@ import { useOpenAI } from '@/hooks/ai/useOpenAI';
 import { useToast } from '@/hooks/use-toast';
 import { EMOTION_TO_MUSIC_MAP } from '@/services/music/emotion-music-mapping';
 import { usePredictiveIntelligence } from '@/hooks/usePredictiveIntelligence';
+import { Button } from '@/components/ui/button';
 
 export interface CommunityAmbienceOptions {
   autoAdjust?: boolean;
@@ -203,10 +204,15 @@ export function useCommunityAmbience(options: CommunityAmbienceOptions = {}) {
         toast({
           title: "Recommandation d'amélioration",
           description: "L'ambiance sonore pourrait être rafraîchie pour maintenir l'engagement optimal",
-          action: {
-            label: "Ajuster",
-            onClick: () => adjustAmbience(currentMood)
-          }
+          action: (
+            <Button 
+              onClick={() => adjustAmbience(currentMood)}
+              size="sm"
+              variant="outline"
+            >
+              Ajuster
+            </Button>
+          )
         });
       }
     }, 5 * 60 * 1000); // Évaluation toutes les 5 minutes
@@ -224,10 +230,15 @@ export function useCommunityAmbience(options: CommunityAmbienceOptions = {}) {
       toast({
         title: "Amélioration proactive disponible",
         description: `Une adaptation sonore optimisée pour l'ambiance prévue "${currentPredictions.emotion}" est disponible`,
-        action: {
-          label: "Appliquer",
-          onClick: () => adjustAmbience(blendEmotions(currentMood, currentPredictions.emotion))
-        }
+        action: (
+          <Button
+            onClick={() => adjustAmbience(blendEmotions(currentMood, currentPredictions.emotion))}
+            size="sm"
+            variant="outline"
+          >
+            Appliquer
+          </Button>
+        )
       });
     }
   }, [proactiveImprovement, currentPredictions, currentMood, toast, adjustAmbience]);
