@@ -9,6 +9,7 @@ import OrganizationPage from '@/pages/admin/OrganizationPage';
 import PredictiveBurnoutPage from '@/pages/admin/PredictiveBurnoutPage';
 import CustomReportsPage from '@/pages/admin/CustomReportsPage';
 import BusinessPage from '@/pages/BusinessPage';
+import LoginPage from '@/pages/LoginPage';
 
 const App: React.FC = () => {
   return (
@@ -21,6 +22,8 @@ const App: React.FC = () => {
       <Route path="/admin/burnout" element={<PredictiveBurnoutPage />} />
       <Route path="/admin/reports" element={<CustomReportsPage />} />
       <Route path="/business" element={<BusinessPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/admin-login" element={<LoginPage />} />
       {/* Add additional routes as needed */}
     </Routes>
   );
