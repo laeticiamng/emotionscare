@@ -25,17 +25,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [theme, setTheme] = useState<Theme>(() => {
     // Récupérer le thème du localStorage s'il existe
     const savedTheme = localStorage.getItem('theme') as Theme;
-    return savedTheme || 'system';
+    return (savedTheme && ['light', 'dark', 'system', 'pastel'].includes(savedTheme)) 
+      ? savedTheme 
+      : 'system';
   });
 
   const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
     const savedFontFamily = localStorage.getItem('fontFamily') as FontFamily;
-    return savedFontFamily || 'inter';
+    return (savedFontFamily && ['inter', 'serif', 'mono', 'roboto', 'poppins', 'montserrat', 'default'].includes(savedFontFamily))
+      ? savedFontFamily
+      : 'inter';
   });
 
   const [fontSize, setFontSize] = useState<FontSize>(() => {
     const savedFontSize = localStorage.getItem('fontSize') as FontSize;
-    return savedFontSize || 'medium';
+    return (savedFontSize && ['small', 'medium', 'large'].includes(savedFontSize))
+      ? savedFontSize
+      : 'medium';
   });
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark' | 'pastel'>(
@@ -71,7 +77,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       root.classList.remove('dark');
     }
-  }, [theme]);
+
+    console.log('Theme updated:', theme, 'Resolved theme:', resolvedTheme);
+  }, [theme, resolvedTheme]);
 
   // Écouter les changements de préférence système
   useEffect(() => {
@@ -128,6 +136,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         root.classList.add('font-inter');
         break;
     }
+    console.log('Font family updated:', fontFamily);
   }, [fontFamily]);
 
   useEffect(() => {
@@ -137,6 +146,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     const root = window.document.documentElement;
     root.classList.remove('text-small', 'text-medium', 'text-large');
     root.classList.add(`text-${fontSize}`);
+    console.log('Font size updated:', fontSize);
   }, [fontSize]);
 
   // Create setThemePreference as an alias for setTheme for backward compatibility
@@ -144,9 +154,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     setTheme(newTheme);
   };
 
+  // Validate theme value before returning context
+  const validatedTheme: Theme = ['light', 'dark', 'system', 'pastel'].includes(theme as string) 
+    ? theme as Theme 
+    : 'system';
+
   return (
     <ThemeContext.Provider value={{ 
-      theme, 
+      theme: validatedTheme, 
       resolvedTheme,
       setTheme, 
       setThemePreference, 

@@ -61,6 +61,14 @@ const FontSettings: React.FC<FontSettingsProps> = ({
               <RadioGroupItem value="roboto" id="roboto" />
               <Label htmlFor="roboto">Roboto</Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="poppins" id="poppins" />
+              <Label htmlFor="poppins">Poppins</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="montserrat" id="montserrat" />
+              <Label htmlFor="montserrat">Montserrat</Label>
+            </div>
           </RadioGroup>
         </div>
 

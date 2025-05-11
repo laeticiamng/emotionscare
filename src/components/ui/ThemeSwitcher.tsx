@@ -24,14 +24,17 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   showLabel = false 
 }) => {
   const themeContext = useTheme();
-  const theme = themeContext?.theme || 'system';
-  const resolvedTheme = themeContext?.resolvedTheme || 'light';
+  
+  if (!themeContext) {
+    console.error('ThemeContext not available in ThemeSwitcher');
+    return null;
+  }
+  
+  const { theme, resolvedTheme, setTheme } = themeContext;
   
   // Function to handle theme changes
   const handleThemeChange = (newTheme: Theme) => {
-    if (themeContext?.setTheme) {
-      themeContext.setTheme(newTheme);
-    }
+    setTheme(newTheme);
   };
 
   // Icons based on current theme

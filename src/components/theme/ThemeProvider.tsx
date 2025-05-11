@@ -4,10 +4,12 @@ import {
   ThemeProvider, 
   useTheme, 
   Theme,
-  ThemeContextType
+  ThemeContextType,
+  FontFamily,
+  FontSize
 } from '@/contexts/ThemeContext';
 
 export type ThemeName = Theme;
 
 export { ThemeProvider, useTheme };
-export type { Theme, ThemeContextType };
+export type { Theme, ThemeContextType, FontFamily, FontSize };

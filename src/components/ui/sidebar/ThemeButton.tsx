@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Laptop } from 'lucide-react';
 import { useTheme, Theme } from '@/contexts/ThemeContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -16,8 +16,8 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   
   const toggleTheme = () => {
     if (themeContext?.setTheme) {
-      // Cycle through themes: light -> dark -> system
-      const themeOrder: Theme[] = ['light', 'dark', 'system'];
+      // Cycle through themes: light -> dark -> system -> pastel -> light
+      const themeOrder: Theme[] = ['light', 'dark', 'system', 'pastel'];
       const currentIndex = themeOrder.indexOf(theme as Theme);
       const nextIndex = (currentIndex + 1) % themeOrder.length;
       const newTheme = themeOrder[nextIndex];
@@ -25,9 +25,31 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
     }
   };
   
-  // Determine if the current theme is dark
-  // This works with both direct 'dark' theme and system preference resulting in dark
-  const isDark = theme === 'dark' || (theme === 'system' && resolvedTheme === 'dark');
+  // Determine the current theme state for displaying the correct icon
+  const getThemeIcon = () => {
+    if (theme === 'system') {
+      return <Laptop className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
+    }
+    
+    // For light theme or system preference resulting in light
+    if (theme === 'light' || (theme === 'system' && resolvedTheme === 'light')) {
+      return <Sun className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
+    }
+    
+    // Default to dark theme icon
+    return <Moon className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
+  };
+  
+  // Get label text based on current theme
+  const getThemeLabel = () => {
+    switch (theme) {
+      case 'light': return 'Mode sombre';
+      case 'dark': return 'Mode système';
+      case 'system': return theme === 'system' && resolvedTheme === 'dark' ? 'Mode clair' : 'Mode pastel';
+      case 'pastel': return 'Mode clair';
+      default: return 'Changer de thème';
+    }
+  };
   
   if (collapsed) {
     return (
@@ -39,12 +61,12 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
             className="w-full h-10"
             onClick={toggleTheme}
           >
-            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {getThemeIcon()}
             <span className="sr-only">Changer de thème</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent side="right">
-          {isDark ? 'Mode clair' : 'Mode sombre'}
+          {getThemeLabel()}
         </TooltipContent>
       </Tooltip>
     );
@@ -56,8 +78,8 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
       className="w-full justify-start px-3"
       onClick={toggleTheme}
     >
-      {isDark ? <Sun className="h-5 w-5 mr-2" /> : <Moon className="h-5 w-5 mr-2" />}
-      <span>{isDark ? 'Mode clair' : 'Mode sombre'}</span>
+      {getThemeIcon()}
+      <span>{getThemeLabel()}</span>
     </Button>
   );
 };
