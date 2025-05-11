@@ -1,67 +1,61 @@
+import { MusicTrack, MusicPlaylist } from '@/types';
 
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;
-  coverUrl?: string;
-  audioUrl: string;
-  genre?: string;
-  emotion?: string;
-  lyrics?: string;
-  // For backwards compatibility
-  cover_url?: string;
-  audio_url?: string;
+  duration?: number;
   url?: string;
-  emotion_tag?: string;
   cover?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  audioUrl?: string;
+  mood?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
-  description: string;
-  coverUrl?: string;
-  tracks: MusicTrack[];
-  emotion?: string;
-  category?: string;
-  // For backwards compatibility
   title?: string;
-  cover_url?: string;
+  description: string;
+  tracks: MusicTrack[];
+  coverImage?: string;
+  category?: string;
+}
+
+export interface MusicDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
+  queue: MusicTrack[];
+  playlists: MusicPlaylist[];
   volume: number;
+  isInitialized: boolean;
+  error: string | null;
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
+  
+  // Playback controls
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
-  togglePlay: () => void;
+  resumeTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
+  togglePlay: () => void;
   setVolume: (volume: number) => void;
-  playlists: MusicPlaylist[];
-  currentPlaylist: MusicPlaylist | null;
-  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
-  loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
-  setOpenDrawer?: (open: boolean) => void;
-  openDrawer?: boolean;
-  isInitialized?: boolean;
+  
+  // Playlist management
+  addToQueue: (track: MusicTrack) => void;
+  clearQueue: () => void;
+  loadPlaylist: (playlist: MusicPlaylist) => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  shufflePlaylist: () => void;
+  
+  // Initialization
   initializeMusicSystem?: () => Promise<void>;
-  error?: string | null;
-  currentEmotion?: string;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
-}
-
-export interface MusicDrawerProps {
-  open: boolean;
-  onClose: () => void;
-  playlist?: MusicPlaylist | null;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export interface MusicControlsProps {
-  showDrawer: () => void;
 }

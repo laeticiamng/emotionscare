@@ -17,14 +17,14 @@ const getConversationsForUser = async (userId: string): Promise<ChatConversation
     .map(conv => ({
       id: conv.id,
       user_id: conv.user_id || conv.userId || userId,
-      created_at: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : conv.created_at || new Date().toISOString(),
-      updated_at: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : conv.updated_at || new Date().toISOString(),
+      created_at: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : (conv.created_at || new Date().toISOString()),
+      updated_at: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : (conv.updated_at || new Date().toISOString()),
       title: conv.title,
       last_message: conv.last_message || conv.lastMessage || '',
       // Add in legacy fields for compatibility
       userId: conv.user_id || conv.userId || userId,
-      createdAt: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : conv.created_at || new Date().toISOString(),
-      updatedAt: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : conv.updated_at || new Date().toISOString(),
+      createdAt: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : (conv.created_at || new Date().toISOString()),
+      updatedAt: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : (conv.updated_at || new Date().toISOString()),
       lastMessage: conv.last_message || conv.lastMessage || '',
     }))
     .sort((a, b) => {

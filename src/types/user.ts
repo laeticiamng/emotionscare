@@ -41,6 +41,8 @@ export interface UserPreferences {
   push_notifications?: boolean;
   aiSuggestions?: boolean;
   fullAnonymity?: boolean;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
 }
 
 export enum UserRole {

@@ -67,3 +67,11 @@ export interface EnhancedEmotionResult extends EmotionResult {
     description: string;
   }[];
 }
+
+export interface EmotionalTeamViewProps {
+  userId?: string;
+  period?: string;
+  teamId?: string;
+  className?: string;
+  onRefresh?: () => Promise<void>;
+}

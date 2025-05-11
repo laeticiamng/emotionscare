@@ -1,6 +1,6 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type VisualDensity = 'compact' | 'balanced' | 'spacious';
+export type VisualDensity = 'compact' | 'balanced' | 'spacious' | 'comfortable';
 
 export interface BrandingOptions {
   primaryColor: string;

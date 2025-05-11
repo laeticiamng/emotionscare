@@ -22,7 +22,6 @@ export interface VRSessionTemplate {
   recommended_mood?: string;
 }
 
-// Define and export the VRSession interface
 export interface VRSession {
   id: string;
   user_id: string;

@@ -9,52 +9,31 @@ export interface Badge {
   user_id?: string;
   unlocked_at?: string;
   progress?: number;
-  unlocked?: boolean;
-  icon_url?: string;
   level?: number;
-  category?: string;
+  unlocked?: boolean;
 }
 
 export interface Challenge {
   id: string;
-  name: string;
   title: string;
   description: string;
   points: number;
-  progress?: number;
+  requirements: string[];
   completed?: boolean;
-  icon?: string;
-  image_url?: string;
-  total?: number;
+  progress?: number;
+  deadline?: string;
   category?: string;
-  difficulty?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  level?: number;
 }
 
-export interface UserScore {
-  id: string;
-  user_id: string;
-  score: number;
-  level: number;
-  streak_days: number;
-  longest_streak: number;
-  badges_count: number;
-  challenges_completed: number;
-  last_activity: string;
-}
-
-export interface Reward {
+export interface Achievement {
   id: string;
   name: string;
   description: string;
-  points_required: number;
   icon: string;
-  available: boolean;
-}
-
-export interface GamificationAction {
-  id: string;
-  name: string;
-  points: number;
-  description: string;
-  max_daily?: number;
+  unlockedAt?: string;
+  progress?: number;
+  total?: number;
+  completed?: boolean;
 }

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
-import { ThemeName, Theme } from '@/types/user';
+import { Theme } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
 
 // Types for user preferences
@@ -118,6 +118,7 @@ export function useUserPreferences() {
       
       // Synchronize with other contexts if needed
       if (newPreferences.theme && theme.setTheme) {
+        // Convert string theme to Theme type to avoid type errors
         theme.setTheme(newPreferences.theme as Theme);
       }
       
@@ -162,7 +163,8 @@ export function useUserPreferences() {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
-    updatePreferences({ theme: preset.theme as ThemeName });
+    // Use as string first, then convert to Theme
+    updatePreferences({ theme: preset.theme });
     audioPrefs.setEqualizerPreset?.(preset.audioPreset);
     
     toast({
