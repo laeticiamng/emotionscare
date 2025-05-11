@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,7 +48,7 @@ const OnboardingPage = () => {
         preferences: {
           theme,
           fontSize,
-          font: 'inter',
+          fontFamily: 'inter',
           notifications_enabled: notificationsEnabled,
           email_notifications: emailNotifications,
           push_notifications: true

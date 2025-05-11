@@ -10,8 +10,8 @@ export const trackToMusicTrack = (track: Track): MusicTrack => {
     id: track.id,
     title: track.title,
     artist: track.artist,
-    url: track.url,
-    duration: track.duration,
+    url: track.url || '',
+    duration: track.duration || 0, // Ensure duration is always provided
     coverUrl: track.coverUrl || track.cover,
     emotion: track.emotion,
     // Inclure les autres propriétés pour compatibilité
@@ -63,3 +63,9 @@ export const musicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist 
     tracks: musicPlaylist.tracks.map(musicTrackToTrack)
   };
 };
+
+// Aliases for backward compatibility
+export const convertTrackToMusicTrack = trackToMusicTrack;
+export const convertMusicTrackToTrack = musicTrackToTrack; 
+export const convertPlaylistToMusicPlaylist = playlistToMusicPlaylist;
+export const convertMusicPlaylistToPlaylist = musicPlaylistToPlaylist;

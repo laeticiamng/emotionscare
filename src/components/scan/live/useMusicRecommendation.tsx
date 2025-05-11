@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { EmotionResult, MusicTrack } from '@/types';
@@ -33,10 +34,11 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
       const playlist = await loadPlaylistForEmotion?.(musicType);
       if (playlist?.tracks) {
-        // Make sure all tracks have a url property
+        // Make sure all tracks have required properties
         const tracksWithUrl = playlist.tracks.map(track => ({
           ...track,
-          url: track.url || track.audioUrl || track.audio_url || ''
+          url: track.url || track.audioUrl || track.audio_url || '',
+          duration: track.duration || 0
         }));
         setRecommendedTracks(tracksWithUrl);
       } else {
@@ -52,10 +54,11 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {
-      // Ensure track has url
+      // Ensure track has required fields
       const trackWithUrl = {
         ...track,
-        url: track.url || track.audioUrl || track.audio_url || ''
+        url: track.url || track.audioUrl || track.audio_url || '',
+        duration: track.duration || 0
       };
       playTrack(trackWithUrl);
     }

@@ -29,6 +29,10 @@ export interface VRSessionTemplate {
 export interface VRHistoryListProps {
   onSelect: (template: VRSessionTemplate) => void;
   limit?: number;
+  templates?: VRSessionTemplate[];
+  title?: string;
+  emptyMessage?: string;
+  className?: string;
 }
 
 export interface VRSession {

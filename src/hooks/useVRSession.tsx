@@ -3,11 +3,14 @@ import { useState, useCallback } from 'react';
 import { VRSession, VRSessionTemplate } from '@/types/vr';
 import { saveVRSession, getVRSessionHistory } from '@/lib/vrService';
 
-export const useVRSession = (userId: string) => {
+export const useVRSession = (userId: string = '') => {
   const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
   const [sessionHistory, setSessionHistory] = useState<VRSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+  
+  // Check if there's an active session
+  const isActive = currentSession !== null;
   
   // Commencer une nouvelle session VR
   const startSession = useCallback((template: VRSessionTemplate, emotionBefore?: string) => {
@@ -84,6 +87,7 @@ export const useVRSession = (userId: string) => {
     sessionHistory,
     isLoading,
     historyLoading,
+    isActive,
     startSession,
     completeSession,
     loadSessionHistory,

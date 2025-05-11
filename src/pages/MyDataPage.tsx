@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -76,8 +75,7 @@ const MyDataPage = () => {
   const requestFullDataExport = () => {
     toast({
       title: "Demande envoyée",
-      description: "Votre export de données sera disponible sous 48h et vous sera envoyé par email",
-      duration: 5000
+      description: "Votre export de données sera disponible sous 48h et vous sera envoyé par email"
     });
   };
   
@@ -85,8 +83,7 @@ const MyDataPage = () => {
     toast({
       title: "Demande reçue",
       description: "Votre demande de suppression de compte a été enregistrée et sera traitée sous 30 jours",
-      variant: "destructive",
-      duration: 8000
+      variant: "destructive"
     });
   };
 

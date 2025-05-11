@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UserPreferences, FontSize, ThemeName } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ const preferencesSchema = z.object({
   notifications: z.boolean().optional(),
   autoplayVideos: z.boolean().optional(),
   showEmotionPrompts: z.boolean().optional(),
-  privacyLevel: z.string().optional(),
+  privacy: z.string().optional(),
   dataCollection: z.boolean().optional(),
 });
 
@@ -40,7 +39,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
     notifications: preferences.notifications || preferences.notifications_enabled || false,
     autoplayVideos: preferences.autoplayVideos || false,
     showEmotionPrompts: preferences.showEmotionPrompts || true,
-    privacyLevel: preferences.privacyLevel || 'standard',
+    privacy: preferences.privacy || preferences.privacyLevel || 'standard',
     dataCollection: preferences.dataCollection || true,
     notifications_enabled: preferences.notifications_enabled || preferences.notifications || false,
   };

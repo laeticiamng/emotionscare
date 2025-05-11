@@ -4,7 +4,7 @@ export interface MusicTrack {
   title: string;
   artist: string;
   url: string;
-  duration: number;  // Obligatoire pour la cohérence
+  duration: number;  // Required field
   coverUrl?: string;
   coverImage?: string;
   genre?: string;
@@ -43,6 +43,7 @@ export interface MusicContextType {
   duration: number;
   shuffle: boolean;
   repeat: boolean;
+  currentPlaylist?: MusicPlaylist | null;
   
   // Playback controls
   playTrack: (track: MusicTrack) => void;
@@ -66,7 +67,6 @@ export interface MusicContextType {
   
   // Initialization
   initializeMusicSystem?: () => Promise<void>;
-  currentPlaylist?: MusicPlaylist;
 }
 
 export interface MusicDrawerProps {

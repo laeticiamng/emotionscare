@@ -8,7 +8,7 @@ import VRSessionsList from '@/components/vr/VRSessionsList';
 import VRSessionPlayer from '@/components/vr/VRSessionPlayer';
 import VRRecommendations from '@/components/vr/VRRecommendations';
 import VRHistoryList from '@/components/vr/VRHistoryList';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/vr';
 import { useVRSession } from '@/hooks/useVRSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ArrowLeft } from 'lucide-react';
@@ -23,7 +23,7 @@ const VRPage: React.FC = () => {
   
   const [activeTemplate, setActiveTemplate] = useState<VRSessionTemplate | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { startSession, completeSession } = useVRSession();
+  const { startSession, completeSession } = useVRSession('user-id'); // Pass a userId
   
   // Effect to load recommended template if specified in URL
   useEffect(() => {
@@ -94,7 +94,7 @@ const VRPage: React.FC = () => {
                   <div className="rounded-lg overflow-hidden bg-muted aspect-video mb-4">
                     <img 
                       src={activeTemplate.preview_url} 
-                      alt={activeTemplate.title} 
+                      alt={activeTemplate.title || ''} 
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -115,7 +115,7 @@ const VRPage: React.FC = () => {
                   </div>
                   <div className="col-span-2 md:col-span-3">
                     <h4 className="text-sm font-medium text-muted-foreground">Bénéfices</h4>
-                    <p>{activeTemplate.benefits.join(', ')}</p>
+                    <p>{(activeTemplate.benefits || []).join(', ')}</p>
                   </div>
                 </div>
               </div>
@@ -129,7 +129,7 @@ const VRPage: React.FC = () => {
                   Commencer la session
                 </Button>
                 
-                {activeTemplate.tags.length > 0 && (
+                {activeTemplate.tags && activeTemplate.tags.length > 0 && (
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-muted-foreground mb-2">Tags</h4>
                     <div className="flex flex-wrap gap-2">
@@ -178,7 +178,10 @@ const VRPage: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="history">
-            <VRHistoryList onSelect={handleSelectTemplate} />
+            <VRHistoryList 
+              onSelect={handleSelectTemplate}
+              templates={[]}
+            />
           </TabsContent>
         </Tabs>
       )}

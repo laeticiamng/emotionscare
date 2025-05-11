@@ -1,93 +1,144 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserPreferences } from '@/types';
-import PreferencesForm from './PreferencesForm';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { useUser } from '@/hooks/useUser';
+import { UserPreferences as UserPreferencesType, UserPreferencesState, ThemeName, FontSize, FontFamily } from '@/types/user';
+import { defaultUserPreferences } from '@/types/preferences';
+import { usePreferences } from '@/hooks/usePreferences';
 
-const UserPreferencesPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { user, updateUser } = useAuth();
+const UserPreferences: React.FC = () => {
+  const { user, isLoading: isUserLoading } = useUser();
+  const { preferences, updatePreferences, isLoading: isPreferencesLoading } = usePreferences();
   const { toast } = useToast();
-  const [userPreferences, setUserPreferences] = useState<UserPreferences>({
-    theme: 'light',
-    fontSize: 'medium',
-    language: 'fr',
-    notifications: true,
-    autoplayVideos: false,
-    showEmotionPrompts: true,
-    privacyLevel: 'standard',
-    dataCollection: true,
-    notifications_enabled: true,
-  });
+
+  const [userPreferences, setUserPreferences] = useState<UserPreferencesType>(defaultUserPreferences);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (user && user.preferences) {
+    if (user && preferences) {
       setUserPreferences({
-        ...userPreferences,
-        ...user.preferences
+        ...defaultUserPreferences,
+        ...preferences,
       });
     }
-  }, [user]);
+  }, [user, preferences]);
 
-  const handleSavePreferences = async (preferences: UserPreferences) => {
-    if (user && updateUser) {
-      try {
-        // Make sure we create a new user object instead of modifying the existing one
-        await updateUser({
-          ...user,
-          preferences: {
-            ...preferences,
-            // Assurer la compatibilité entre les deux formats
-            notifications_enabled: preferences.notifications,
-          }
-        });
-        setUserPreferences(preferences);
-        toast({
-          title: "Préférences mises à jour",
-          description: "Vos préférences ont été enregistrées avec succès.",
-        });
-        navigate('/dashboard');
-      } catch (error) {
-        console.error("Erreur lors de la mise à jour des préférences:", error);
-        toast({
-          title: "Erreur",
-          description: "Une erreur est survenue lors de la sauvegarde des préférences.",
-          variant: "destructive"
-        });
-      }
-    } else {
-      console.error("User ou updateUser non disponibles");
+  const handlePreferenceChange = useCallback(
+    (key: keyof UserPreferencesState, value: string | boolean) => {
+      setUserPreferences((prevPreferences) => ({
+        ...prevPreferences,
+        [key]: value,
+      }));
+    },
+    []
+  );
+
+  const handleSavePreferences = async () => {
+    setIsSaving(true);
+    try {
+      await updatePreferences(userPreferences);
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour modifier vos préférences.",
-        variant: "destructive"
+        title: 'Préférences sauvegardées',
+        description: 'Vos préférences ont été mises à jour avec succès.',
       });
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error?.message || 'Une erreur est survenue lors de la sauvegarde des préférences.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  if (!user) {
+  if (isUserLoading || isPreferencesLoading) {
     return <div>Chargement...</div>;
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Préférences Utilisateur</CardTitle>
+          <CardTitle>Préférences utilisateur</CardTitle>
         </CardHeader>
-        <CardContent>
-          <PreferencesForm 
-            preferences={userPreferences} 
-            onSave={handleSavePreferences} 
-          />
+        <CardContent className="grid gap-6">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="theme">Thème</Label>
+              <Select value={userPreferences.theme as string} onValueChange={(value) => handlePreferenceChange('theme', value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner un thème" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Clair</SelectItem>
+                  <SelectItem value="dark">Sombre</SelectItem>
+                  <SelectItem value="system">Système</SelectItem>
+                  <SelectItem value="pastel">Pastel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="fontSize">Taille de la police</Label>
+              <Select value={userPreferences.fontSize as string} onValueChange={(value) => handlePreferenceChange('fontSize', value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner une taille" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="small">Petite</SelectItem>
+                  <SelectItem value="medium">Moyenne</SelectItem>
+                  <SelectItem value="large">Grande</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="fontFamily">Police</Label>
+              <Select value={userPreferences.fontFamily as string} onValueChange={(value) => handlePreferenceChange('fontFamily', value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner une police" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Par défaut</SelectItem>
+                  <SelectItem value="serif">Serif</SelectItem>
+                  <SelectItem value="mono">Mono</SelectItem>
+                  <SelectItem value="inter">Inter</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="language">Langue</Label>
+            <Input
+              id="language"
+              type="text"
+              value={userPreferences.language || ''}
+              onChange={(e) => handlePreferenceChange('language', e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+            <Label htmlFor="notifications">Notifications</Label>
+            <Switch
+              id="notifications"
+              checked={userPreferences.notifications || false}
+              onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)}
+            />
+          </div>
+
+          <Button onClick={handleSavePreferences} disabled={isSaving}>
+            {isSaving ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
+          </Button>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default UserPreferencesPage;
+export default UserPreferences;

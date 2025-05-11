@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,8 +36,7 @@ const CompliancePage: React.FC = () => {
     // Simuler l'envoi de la demande
     toast({
       title: "Demande envoyée",
-      description: "Votre demande a été enregistrée et sera traitée dans les 30 jours.",
-      duration: 5000
+      description: "Votre demande a été enregistrée et sera traitée dans les 30 jours."
     });
     
     setRequestSubmitted(true);

@@ -1,5 +1,5 @@
 
-import { VRSessionTemplate, VRSession } from '@/types';
+import { VRSessionTemplate, VRSession } from '@/types/vr';
 
 // Fonction pour obtenir les sessions recommandées
 export const getRecommendedSessions = (): VRSessionTemplate[] => {
@@ -87,7 +87,18 @@ export const getVRSessionHistory = async (userId: string): Promise<VRSession[]> 
       completed: true,
       emotion_before: "stressé",
       emotion_after: "calme",
-      emotions: ["calme", "serein"]
+      emotions: ["calme", "serein"],
+      template: {
+        id: "1",
+        name: "Méditation Guidée",
+        title: "Méditation Guidée pour la Sérénité",
+        description: "Une méditation guidée pour retrouver calme et sérénité",
+        category: "meditation",
+        duration: 600,
+        intensity: "low",
+        tags: ["calme", "meditation", "respiration"],
+        thumbnail: "/images/vr/meditation-thumbnail.jpg"
+      }
     },
     {
       id: "session-2",
@@ -99,7 +110,18 @@ export const getVRSessionHistory = async (userId: string): Promise<VRSession[]> 
       completed: true,
       emotion_before: "anxieux",
       emotion_after: "apaisé",
-      emotions: ["apaisé", "confiant"]
+      emotions: ["apaisé", "confiant"],
+      template: {
+        id: "2", 
+        name: "Forêt Apaisante",
+        title: "Immersion en Forêt Relaxante",
+        description: "Évadez-vous dans une forêt apaisante pour retrouver votre équilibre naturel",
+        category: "nature",
+        duration: 900,
+        intensity: "medium",
+        tags: ["nature", "forêt", "relaxation"],
+        thumbnail: "/images/vr/forest-thumbnail.jpg"
+      }
     }
   ];
 };

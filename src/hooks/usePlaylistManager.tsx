@@ -13,8 +13,8 @@ export const usePlaylistManager = () => {
       id: track.id,
       title: track.title,
       artist: track.artist,
-      duration: track.duration || 0, // S'assurer que duration est définie
-      url: track.url || track.audioUrl || track.audio_url || '', // S'assurer que url est définie
+      duration: track.duration || 0,
+      url: track.url || track.audioUrl || track.audio_url || '', 
       coverUrl: track.coverUrl || track.cover_url || track.cover || '',
       emotion: track.emotion || track.emotion_tag || '',
     };
@@ -50,7 +50,6 @@ export const usePlaylistManager = () => {
       
       // Si aucune playlist ne correspond exactement, créer une playlist personnalisée
       // avec des tracks qui correspondent à l'émotion
-      const tracks: MusicTrack[] = [];
       
       // Dans une vraie application, nous ferions un appel API ici
       // pour obtenir des pistes adaptées à l'émotion
