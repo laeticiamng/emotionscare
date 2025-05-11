@@ -3,29 +3,29 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Import pages
-import HomePage from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import JournalPage from './pages/Journal';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ProtectedRoute from './components/ProtectedRoute';
-import NotFound from './pages/NotFound';
-import ResetPassword from './pages/ResetPassword';
-import Profile from './pages/Profile';
-import AdminDashboardPage from './pages/AdminDashboard';
-import ScanPage from './pages/Scan';
-import MusicPage from './pages/Music';
-import AccountSettingsPage from './pages/AccountSettings';
-import TeamPage from './pages/Team';
-import CoachPage from './pages/Coach';
-import CoachChatPage from './pages/CoachChat';
-import DocsPage from './pages/Docs';
-import BuddyPage from './pages/Buddy';
-import VRPage from './pages/VR';
-import UserSettingsPage from './pages/UserSettings';
-import SupportPage from './pages/Support';
+import HomePage from '@/pages/Home';
+import Dashboard from '@/pages/DashboardPage';
+import JournalPage from '@/pages/JournalPage';
+import Login from '@/pages/LoginPage';
+import Register from '@/pages/RegisterPage';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import NotFound from '@/pages/NotFound';
+import ResetPassword from '@/pages/ResetPassword';
+import Profile from '@/pages/Profile';
+import AdminDashboardPage from '@/pages/AdminDashboard';
+import ScanPage from '@/pages/ScanPage';
+import MusicPage from '@/pages/MusicPage';
+import AccountSettingsPage from '@/pages/AccountSettings';
+import TeamPage from '@/pages/TeamPage';
+import CoachPage from '@/pages/CoachPage';
+import CoachChatPage from '@/pages/CoachChatPage';
+import DocsPage from '@/pages/Docs';
+import BuddyPage from '@/pages/BuddyPage';
+import VRPage from '@/pages/VRPage';
+import UserSettingsPage from '@/pages/UserSettingsPage';
+import SupportPage from '@/pages/Support';
 
-import ProtectedLayoutWrapper from './components/ProtectedLayoutWrapper';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
 // Import styles
 import './App.css';

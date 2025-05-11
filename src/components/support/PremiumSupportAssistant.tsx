@@ -98,7 +98,7 @@ const PremiumSupportAssistant: React.FC = () => {
       
       for (let i = 0; i < words.length; i++) {
         displayedText += words[i] + ' ';
-        const partialMessage = {
+        const partialMessage: Message = {
           id: response.id,
           content: displayedText,
           sender: 'assistant',
