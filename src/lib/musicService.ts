@@ -6,10 +6,10 @@ import { MusicTrack, MusicPlaylist } from '@/types/music';
 export { getPlaylist } from '@/services/music/playlist-service';
 export { saveUserCurrentTrack, getUserListeningHistory } from '@/services/music/user-service';
 export { 
-  musicTrackToTrack as convertMusicTrackToTrack,
-  trackToMusicTrack as convertTrackToMusicTrack,
-  musicPlaylistToPlaylist as convertMusicPlaylistToPlaylist,
-  playlistToMusicPlaylist as convertPlaylistToMusicPlaylist
+  musicTrackToTrack, 
+  trackToMusicTrack, 
+  musicPlaylistToPlaylist, 
+  playlistToMusicPlaylist 
 } from '@/services/music/converters';
 export type { Track, Playlist } from '@/services/music/types';
 

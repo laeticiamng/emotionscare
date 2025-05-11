@@ -35,12 +35,12 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
       const playlist = await loadPlaylistForEmotion?.(musicType);
       if (playlist?.tracks) {
         // Make sure all tracks have required properties
-        const tracksWithUrl = playlist.tracks.map(track => ({
+        const tracksWithRequiredProps = playlist.tracks.map(track => ({
           ...track,
           url: track.url || track.audioUrl || track.audio_url || '',
           duration: track.duration || 0
         }));
-        setRecommendedTracks(tracksWithUrl);
+        setRecommendedTracks(tracksWithRequiredProps);
       } else {
         setRecommendedTracks([]);
       }
@@ -55,12 +55,12 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {
       // Ensure track has required fields
-      const trackWithUrl = {
+      const trackWithRequiredProps: MusicTrack = {
         ...track,
         url: track.url || track.audioUrl || track.audio_url || '',
         duration: track.duration || 0
       };
-      playTrack(trackWithUrl);
+      playTrack(trackWithRequiredProps);
     }
   };
   

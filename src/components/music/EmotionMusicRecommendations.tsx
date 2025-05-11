@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, PlayCircle, Loader2 } from 'lucide-react';
-import { EmotionResult, MusicPlaylist } from '@/types';
+import { EmotionResult } from '@/types';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -60,12 +61,13 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   const handlePlay = () => {
     if (recommendedPlaylist && recommendedPlaylist.tracks.length > 0) {
       // Ensure track has required fields
-      const trackWithUrl = {
+      const trackWithRequiredProps: MusicTrack = {
         ...recommendedPlaylist.tracks[0],
         url: recommendedPlaylist.tracks[0].url || recommendedPlaylist.tracks[0].audioUrl || recommendedPlaylist.tracks[0].audio_url || '',
         duration: recommendedPlaylist.tracks[0].duration || 0
       };
-      playTrack(trackWithUrl);
+      
+      playTrack(trackWithRequiredProps);
       setOpenDrawer?.(true);
       
       toast({

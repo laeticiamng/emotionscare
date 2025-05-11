@@ -4,7 +4,7 @@ export interface MusicTrack {
   title: string;
   artist: string;
   url: string;
-  duration: number;  // Required field
+  duration: number;
   coverUrl?: string;
   coverImage?: string;
   genre?: string;
@@ -83,13 +83,3 @@ export interface Toast {
   action?: React.ReactNode;
   duration?: number;
 }
-
-export interface ChatResponse {
-  text: string;
-  follow_up_questions?: string[];
-  suggestions?: string[];
-  sentiment?: string;
-}
-
-// Export other types that might be needed
-export type { MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps };

@@ -1,7 +1,7 @@
 
 export interface User {
   id: string;
-  name?: string;
+  name: string;
   email?: string;
   role?: string;
   avatar?: string;
@@ -16,20 +16,17 @@ export interface User {
   emotional_score?: number;
   anonymity_code?: string;
   goals?: string[];
+  position?: string;
 }
 
 export interface UserPreferences {
-  theme?: string;
-  notifications?: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  } | boolean;
+  theme?: ThemeName;
+  notifications?: boolean;
   soundEnabled?: boolean;
   language?: string;
-  fontFamily?: string;
-  fontSize?: string;
-  privacyLevel?: string; // Added for compatibility
+  fontFamily?: string; 
+  fontSize?: FontSize;
+  privacyLevel?: string;
   privacy?: 'public' | 'private' | 'friends';
   showEmotionPrompts?: boolean;
   notification_frequency?: string;
@@ -43,7 +40,7 @@ export interface UserPreferences {
   fullAnonymity?: boolean;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
-  font?: string; // Added missing property
+  font?: string;
 }
 
 export enum UserRole {
@@ -56,11 +53,18 @@ export enum UserRole {
   ANALYST = 'analyst'
 }
 
-export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | string; // Updated to accept string
-export type FontSize = 'small' | 'medium' | 'large' | string; // Updated to accept string
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | string;
+export type FontSize = 'small' | 'medium' | 'large' | string;
 export type NotificationFrequency = 'high' | 'medium' | 'low' | 'none';
 export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type Theme = ThemeName;
 
 export type UserPreferencesState = UserPreferences;
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  email?: string;
+  invitationId?: string;
+  error?: string;
+}

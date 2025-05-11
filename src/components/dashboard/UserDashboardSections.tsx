@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -7,7 +6,8 @@ import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import GamificationWidget from './GamificationWidget';
-import { User, VRSessionTemplate } from '@/types';
+import { User } from '@/types/user';
+import { VRSessionTemplate } from '@/types/vr';
 
 interface SectionProps {
   title: string;
@@ -154,7 +154,9 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
     tags: [],
     benefits: ['Réduction du stress', 'Amélioration de la concentration'],
     emotions: [latestEmotion.emotion],
-    popularity: 100
+    popularity: 100,
+    thumbnail: '/images/thumbnail-default.jpg',
+    intensity: 'low'
   } : undefined;
   
   return (

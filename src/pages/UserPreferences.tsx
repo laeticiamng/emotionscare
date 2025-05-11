@@ -1,31 +1,35 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useUser } from '@/hooks/useUser';
-import { UserPreferences as UserPreferencesType, UserPreferencesState, ThemeName, FontSize, FontFamily } from '@/types/user';
-import { defaultUserPreferences } from '@/types/preferences';
+import { UserPreferences as UserPreferencesType, UserPreferencesState, ThemeName, FontSize } from '@/types/user';
 import { usePreferences } from '@/hooks/usePreferences';
 
 const UserPreferences: React.FC = () => {
-  const { user, isLoading: isUserLoading } = useUser();
   const { preferences, updatePreferences, isLoading: isPreferencesLoading } = usePreferences();
   const { toast } = useToast();
 
-  const [userPreferences, setUserPreferences] = useState<UserPreferencesType>(defaultUserPreferences);
+  const [userPreferences, setUserPreferences] = useState<UserPreferencesType>({
+    theme: 'system',
+    notifications: false,
+    fontSize: 'medium',
+    language: 'fr'
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (user && preferences) {
+    if (preferences) {
       setUserPreferences({
-        ...defaultUserPreferences,
+        ...userPreferences,
         ...preferences,
       });
     }
-  }, [user, preferences]);
+  }, [preferences]);
 
   const handlePreferenceChange = useCallback(
     (key: keyof UserPreferencesState, value: string | boolean) => {
@@ -56,7 +60,7 @@ const UserPreferences: React.FC = () => {
     }
   };
 
-  if (isUserLoading || isPreferencesLoading) {
+  if (isPreferencesLoading) {
     return <div>Chargement...</div>;
   }
 
@@ -70,7 +74,10 @@ const UserPreferences: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="theme">Thème</Label>
-              <Select value={userPreferences.theme as string} onValueChange={(value) => handlePreferenceChange('theme', value)}>
+              <Select 
+                value={userPreferences.theme as string} 
+                onValueChange={(value) => handlePreferenceChange('theme', value)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Sélectionner un thème" />
                 </SelectTrigger>
@@ -85,7 +92,10 @@ const UserPreferences: React.FC = () => {
 
             <div>
               <Label htmlFor="fontSize">Taille de la police</Label>
-              <Select value={userPreferences.fontSize as string} onValueChange={(value) => handlePreferenceChange('fontSize', value)}>
+              <Select 
+                value={userPreferences.fontSize as string} 
+                onValueChange={(value) => handlePreferenceChange('fontSize', value)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Sélectionner une taille" />
                 </SelectTrigger>
@@ -93,21 +103,6 @@ const UserPreferences: React.FC = () => {
                   <SelectItem value="small">Petite</SelectItem>
                   <SelectItem value="medium">Moyenne</SelectItem>
                   <SelectItem value="large">Grande</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="fontFamily">Police</Label>
-              <Select value={userPreferences.fontFamily as string} onValueChange={(value) => handlePreferenceChange('fontFamily', value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner une police" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="default">Par défaut</SelectItem>
-                  <SelectItem value="serif">Serif</SelectItem>
-                  <SelectItem value="mono">Mono</SelectItem>
-                  <SelectItem value="inter">Inter</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -127,7 +122,7 @@ const UserPreferences: React.FC = () => {
             <Label htmlFor="notifications">Notifications</Label>
             <Switch
               id="notifications"
-              checked={userPreferences.notifications || false}
+              checked={Boolean(userPreferences.notifications)}
               onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)}
             />
           </div>

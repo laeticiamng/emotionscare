@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { Confetti } from '@/components/ui/confetti';
 import { Badge } from '@/components/ui/badge';
 import { Heart } from 'lucide-react';
+import { User } from '@/types/user';
 
 const DashboardPage: React.FC = () => {
   const logger = useLogger('DashboardPage');
@@ -144,6 +145,9 @@ const DashboardPage: React.FC = () => {
     data: { isAdmin, isUser, role: user?.role }
   });
   
+  // Cast user to User type from user.ts for compatibility
+  const typedUser = user as User;
+  
   return (
     <DashboardContainer>
       {/* Confetti animation for returning users */}
@@ -164,7 +168,7 @@ const DashboardPage: React.FC = () => {
               Bon retour
             </Badge>
             <h3 className="text-lg font-medium">
-              Ravi de vous revoir, {user?.name}! Votre dernière visite était il y a{' '}
+              Ravi de vous revoir, {typedUser?.name}! Votre dernière visite était il y a{' '}
               {lastLoginDate ? Math.floor((new Date().getTime() - lastLoginDate.getTime()) / (1000 * 60 * 60 * 24)) : '?'} jours.
             </h3>
           </div>
@@ -176,7 +180,7 @@ const DashboardPage: React.FC = () => {
           {isAdmin ? (
             <AdminDashboard />
           ) : (
-            <UserDashboard user={user} latestEmotion={lastEmotion ? { emotion: lastEmotion.emotion, score: lastEmotion.score } : undefined} />
+            <UserDashboard user={typedUser} latestEmotion={lastEmotion ? { emotion: lastEmotion.emotion, score: lastEmotion.score } : undefined} />
           )}
         </SegmentProvider>
       </div>

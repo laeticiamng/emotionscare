@@ -1,5 +1,4 @@
-
-import { MusicPlaylist } from '@/types';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 
 // Données de playlists pour diverses émotions
 export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
@@ -7,14 +6,16 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     id: 'calm-playlist',
     name: 'Sérénité',
     emotion: 'calm',
+    description: 'Musique calme et relaxante',
+    coverUrl: '/images/ocean-waves.jpg',
     tracks: [
       {
         id: 'calm-1',
         title: 'Ocean Waves',
         artist: 'Ambient Nature',
         duration: 240,
-        audioUrl: 'https://example.com/calm1.mp3',
         url: 'https://example.com/calm1.mp3',
+        audioUrl: 'https://example.com/calm1.mp3',
         coverUrl: '/images/ocean-waves.jpg',
         emotion: 'calm'
       },
@@ -23,8 +24,8 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Forest Meditation',
         artist: 'Nature Sounds',
         duration: 300,
-        audioUrl: 'https://example.com/calm2.mp3',
         url: 'https://example.com/calm2.mp3',
+        audioUrl: 'https://example.com/calm2.mp3',
         coverUrl: '/images/forest-meditation.jpg',
         emotion: 'calm'
       },
@@ -33,8 +34,8 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Gentle Rain',
         artist: 'Sleep Harmony',
         duration: 320,
-        audioUrl: 'https://example.com/calm3.mp3',
         url: 'https://example.com/calm3.mp3',
+        audioUrl: 'https://example.com/calm3.mp3',
         coverUrl: '/images/gentle-rain.jpg',
         emotion: 'calm'
       }
@@ -44,14 +45,16 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     id: 'focused-playlist',
     name: 'Concentration',
     emotion: 'focused',
+    description: 'Musique pour se concentrer',
+    coverUrl: '/images/deep-focus.jpg',
     tracks: [
       {
         id: 'focused-1',
         title: 'Deep Focus',
         artist: 'Study Music',
         duration: 280,
-        audioUrl: 'https://example.com/focus1.mp3',
         url: 'https://example.com/focus1.mp3',
+        audioUrl: 'https://example.com/focus1.mp3',
         coverUrl: '/images/deep-focus.jpg',
         emotion: 'focused'
       },
@@ -60,8 +63,8 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Brain Waves',
         artist: 'Concentration',
         duration: 320,
-        audioUrl: 'https://example.com/focus2.mp3',
         url: 'https://example.com/focus2.mp3',
+        audioUrl: 'https://example.com/focus2.mp3',
         coverUrl: '/images/brain-waves.jpg',
         emotion: 'focused'
       },
@@ -70,8 +73,8 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Productivity Flow',
         artist: 'Mind Works',
         duration: 300,
-        audioUrl: 'https://example.com/focus3.mp3',
         url: 'https://example.com/focus3.mp3',
+        audioUrl: 'https://example.com/focus3.mp3',
         coverUrl: '/images/productivity.jpg',
         emotion: 'focused'
       }

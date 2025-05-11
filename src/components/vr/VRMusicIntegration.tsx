@@ -20,20 +20,20 @@ export function VRMusicIntegration({ emotion }: { emotion: string }) {
   
   const playMusic = (track?: MusicTrack) => {
     if (track) {
-      // Assurer que track a les propriétés requises
-      const trackWithUrl = {
+      // Make sure the track has all required properties
+      const trackWithRequiredProps: MusicTrack = {
         ...track,
         url: track.url || track.audioUrl || track.audio_url || '',
         duration: track.duration || 0
       };
-      musicContext.playTrack(trackWithUrl);
+      musicContext.playTrack(trackWithRequiredProps);
     } else if (playlist?.tracks?.length) {
-      const trackWithUrl = {
+      const trackWithRequiredProps: MusicTrack = {
         ...playlist.tracks[0],
         url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || '',
         duration: playlist.tracks[0].duration || 0
       };
-      musicContext.playTrack(trackWithUrl);
+      musicContext.playTrack(trackWithRequiredProps);
     }
   };
   

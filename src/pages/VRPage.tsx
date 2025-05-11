@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -23,7 +22,7 @@ const VRPage: React.FC = () => {
   
   const [activeTemplate, setActiveTemplate] = useState<VRSessionTemplate | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { startSession, completeSession } = useVRSession('user-id'); // Pass a userId
+  const { startSession, completeSession, isActive } = useVRSession('user-id'); // Pass a userId
   
   // Effect to load recommended template if specified in URL
   useEffect(() => {
@@ -31,7 +30,13 @@ const VRPage: React.FC = () => {
     if (templateId) {
       const template = mockVRTemplates.find(t => t.id === templateId);
       if (template) {
-        setActiveTemplate(template);
+        // Ensure we have the required properties
+        const completeTemplate: VRSessionTemplate = {
+          ...template,
+          thumbnail: template.thumbnail || '/images/default-thumbnail.jpg',
+          intensity: template.intensity || 'medium'
+        };
+        setActiveTemplate(completeTemplate);
       }
     }
   }, [searchParams]);
@@ -41,7 +46,13 @@ const VRPage: React.FC = () => {
   };
   
   const handleSelectTemplate = (template: VRSessionTemplate) => {
-    setActiveTemplate(template);
+    // Ensure we have the required properties
+    const completeTemplate: VRSessionTemplate = {
+      ...template,
+      thumbnail: template.thumbnail || '/images/default-thumbnail.jpg',
+      intensity: template.intensity || 'medium'
+    };
+    setActiveTemplate(completeTemplate);
     setIsPlaying(false);
   };
   
@@ -62,6 +73,15 @@ const VRPage: React.FC = () => {
   const handleBackToList = () => {
     setActiveTemplate(null);
     setIsPlaying(false);
+  };
+  
+  // Function to ensure all VRSessionTemplate[] arrays have required properties
+  const ensureCompleteTemplates = (templates: any[]): VRSessionTemplate[] => {
+    return templates.map(t => ({
+      ...t,
+      thumbnail: t.thumbnail || '/images/default-thumbnail.jpg',
+      intensity: t.intensity || 'medium'
+    }));
   };
   
   if (isPlaying && activeTemplate) {
@@ -150,7 +170,7 @@ const VRPage: React.FC = () => {
             <VRRecommendations 
               currentTemplateId={activeTemplate.id}
               onSelect={handleSelectTemplate}
-              templates={mockVRTemplates}
+              templates={ensureCompleteTemplates(mockVRTemplates)}
             />
           </div>
         </div>
@@ -164,7 +184,7 @@ const VRPage: React.FC = () => {
           
           <TabsContent value="discover">
             <VRSessionsList 
-              templates={mockVRTemplates} 
+              templates={ensureCompleteTemplates(mockVRTemplates)} 
               onSelect={handleSelectTemplate}
             />
           </TabsContent>
@@ -172,7 +192,7 @@ const VRPage: React.FC = () => {
           <TabsContent value="recommended">
             <VRRecommendations 
               onSelect={handleSelectTemplate}
-              templates={mockVRTemplates.filter(t => t.category === 'relaxation')}
+              templates={ensureCompleteTemplates(mockVRTemplates.filter(t => t.category === 'relaxation'))}
               showHeading={false}
             />
           </TabsContent>
