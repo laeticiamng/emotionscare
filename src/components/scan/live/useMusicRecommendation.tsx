@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { EmotionResult, MusicTrack } from '@/types';
@@ -33,7 +32,16 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
       const playlist = await loadPlaylistForEmotion?.(musicType);
-      setRecommendedTracks(playlist?.tracks || []);
+      if (playlist?.tracks) {
+        // Make sure all tracks have a url property
+        const tracksWithUrl = playlist.tracks.map(track => ({
+          ...track,
+          url: track.url || track.audioUrl || track.audio_url || ''
+        }));
+        setRecommendedTracks(tracksWithUrl);
+      } else {
+        setRecommendedTracks([]);
+      }
     } catch (error) {
       console.error('Error loading music recommendations:', error);
       setRecommendedTracks([]);
@@ -44,7 +52,12 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {
-      playTrack(track);
+      // Ensure track has url
+      const trackWithUrl = {
+        ...track,
+        url: track.url || track.audioUrl || track.audio_url || ''
+      };
+      playTrack(trackWithUrl);
     }
   };
   

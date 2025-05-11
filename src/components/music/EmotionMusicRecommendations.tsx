@@ -59,7 +59,12 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   
   const handlePlay = () => {
     if (recommendedPlaylist && recommendedPlaylist.tracks.length > 0) {
-      playTrack(recommendedPlaylist.tracks[0]);
+      // Ensure track has url
+      const trackWithUrl = {
+        ...recommendedPlaylist.tracks[0],
+        url: recommendedPlaylist.tracks[0].url || recommendedPlaylist.tracks[0].audioUrl || recommendedPlaylist.tracks[0].audio_url || ''
+      };
+      playTrack(trackWithUrl);
       setOpenDrawer(true);
       
       toast({

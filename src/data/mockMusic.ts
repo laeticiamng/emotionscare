@@ -10,6 +10,7 @@ export const mockTracks: MusicTrack[] = [
     duration: 180,
     coverUrl: '/images/music/ocean.jpg',
     url: '/audio/calm-ocean.mp3',
+    audioUrl: '/audio/calm-ocean.mp3',
     emotion: 'calm'
   },
   {
@@ -19,6 +20,7 @@ export const mockTracks: MusicTrack[] = [
     duration: 240,
     coverUrl: '/images/music/morning.jpg',
     url: '/audio/morning-motivation.mp3',
+    audioUrl: '/audio/morning-motivation.mp3',
     emotion: 'happy'
   },
   {
@@ -28,6 +30,7 @@ export const mockTracks: MusicTrack[] = [
     duration: 320,
     coverUrl: '/images/music/focus.jpg',
     url: '/audio/deep-focus.mp3',
+    audioUrl: '/audio/deep-focus.mp3',
     emotion: 'focused'
   },
   {
@@ -37,6 +40,7 @@ export const mockTracks: MusicTrack[] = [
     duration: 290,
     coverUrl: '/images/music/release.jpg',
     url: '/audio/tension-release.mp3',
+    audioUrl: '/audio/tension-release.mp3',
     emotion: 'stressed'
   }
 ];

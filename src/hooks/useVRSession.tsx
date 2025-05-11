@@ -34,7 +34,8 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
       emotion_before: emotionBefore,
       mood_before: emotionBefore,
       is_audio_only: false,
-      completed: false
+      completed: false,
+      emotions: emotionBefore ? [emotionBefore] : undefined
     };
     
     setSession(newSession);
@@ -66,8 +67,14 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
       duration_seconds: durationSeconds,
       duration: durationSeconds, // S'assurer que c'est un nombre
       completed: true,
-      end_time: endTime.toISOString()
+      end_time: endTime.toISOString(),
+      emotions: session.emotions || []
     };
+    
+    // Add the emotion_after to the emotions array if it's not already there
+    if (emotionAfter && completedSession.emotions && !completedSession.emotions.includes(emotionAfter)) {
+      completedSession.emotions.push(emotionAfter);
+    }
     
     setSession(completedSession);
     setIsActive(false);

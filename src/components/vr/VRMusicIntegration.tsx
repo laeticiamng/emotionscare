@@ -20,9 +20,18 @@ export function VRMusicIntegration({ emotion }: { emotion: string }) {
   
   const playMusic = (track?: MusicTrack) => {
     if (track) {
-      musicContext.playTrack(track);
+      // Ensure track has url
+      const trackWithUrl = {
+        ...track,
+        url: track.url || track.audioUrl || track.audio_url || ''
+      };
+      musicContext.playTrack(trackWithUrl);
     } else if (playlist?.tracks?.length) {
-      musicContext.playTrack(playlist.tracks[0]);
+      const trackWithUrl = {
+        ...playlist.tracks[0],
+        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
+      };
+      musicContext.playTrack(trackWithUrl);
     }
   };
   

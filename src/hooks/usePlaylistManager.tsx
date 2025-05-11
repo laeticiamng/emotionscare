@@ -20,6 +20,7 @@ const convertTrackToMusicTrack = (track: Track): MusicTrack => ({
   title: track.title,
   artist: track.artist,
   duration: track.duration,
+  url: track.url || '',
   audioUrl: track.url || '',
   coverUrl: track.cover || track.coverUrl,
   emotion: track.emotion
@@ -47,12 +48,14 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     id: 'calm-playlist',
     name: 'Calm Music',
     description: 'Relaxing tunes to help you find peace',
+    coverUrl: '/images/music/calm.jpg',
     tracks: [
       {
         id: 'calm-1',
         title: 'Ocean Waves',
         artist: 'Nature Sounds',
         duration: 180,
+        url: '/audio/calm1.mp3',
         audioUrl: '/audio/calm1.mp3'
       },
       {
@@ -60,6 +63,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Forest Rain',
         artist: 'Nature Sounds',
         duration: 210,
+        url: '/audio/calm2.mp3',
         audioUrl: '/audio/calm2.mp3'
       }
     ]
@@ -68,12 +72,14 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     id: 'happy-playlist',
     name: 'Happy Vibes',
     description: 'Upbeat music to boost your mood',
+    coverUrl: '/images/music/happy.jpg',
     tracks: [
       {
         id: 'happy-1',
         title: 'Summer Joy',
         artist: 'Good Times',
         duration: 160,
+        url: '/audio/happy1.mp3',
         audioUrl: '/audio/happy1.mp3'
       },
       {
@@ -81,6 +87,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Celebration',
         artist: 'Party Band',
         duration: 190,
+        url: '/audio/happy2.mp3',
         audioUrl: '/audio/happy2.mp3'
       }
     ]
@@ -89,12 +96,14 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     id: 'neutral-playlist',
     name: 'Background Focus',
     description: 'Neutral tunes for focus and concentration',
+    coverUrl: '/images/music/neutral.jpg',
     tracks: [
       {
         id: 'neutral-1',
         title: 'Deep Focus',
         artist: 'Study Music',
         duration: 220,
+        url: '/audio/neutral1.mp3',
         audioUrl: '/audio/neutral1.mp3'
       },
       {
@@ -102,6 +111,7 @@ const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Ambient Work',
         artist: 'Productivity',
         duration: 240,
+        url: '/audio/neutral2.mp3',
         audioUrl: '/audio/neutral2.mp3'
       }
     ]

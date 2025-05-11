@@ -55,6 +55,11 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
+  emotion_before?: string;
+  emotion_after?: string;
+  mood_before?: string;
+  mood_after?: string;
+  emotions?: string[];
 }
 
 export interface VRSessionTemplate {

@@ -63,8 +63,8 @@ export async function getChatResponse(query: string): Promise<ChatResponse> {
 }
 
 // Export the ChatService
-const ChatService = {
+export const ChatService = {
   getChatResponse
 };
 
-export { ChatService };
+export default ChatService;

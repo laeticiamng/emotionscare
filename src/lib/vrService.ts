@@ -97,3 +97,16 @@ export async function recordVRSession(
     return null;
   }
 }
+
+// Add the missing function
+export async function saveRelaxationSession(sessionData: any): Promise<boolean> {
+  try {
+    // Mock implementation for now
+    console.log("Saving relaxation session:", sessionData);
+    await new Promise(resolve => setTimeout(resolve, 300));
+    return true;
+  } catch (error) {
+    console.error("Error saving relaxation session:", error);
+    return false;
+  }
+}
