@@ -137,5 +137,3 @@ export const useTheme = () => {
   }
   return context;
 };
-
-// Remove the duplicate export that was causing the conflict

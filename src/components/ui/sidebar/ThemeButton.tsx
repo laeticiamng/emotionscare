@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme, Theme } from '@/contexts/ThemeContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ThemeButtonProps {
@@ -12,7 +12,7 @@ interface ThemeButtonProps {
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const themeContext = useTheme();
   const theme = themeContext?.theme || 'light';
-  const setTheme = themeContext?.setTheme || ((t: any) => console.log('Theme would change to:', t));
+  const setTheme = themeContext?.setTheme || ((t: Theme) => console.log('Theme would change to:', t));
   
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';

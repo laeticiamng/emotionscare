@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme, Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
 import { useToast } from '@/hooks/use-toast';
@@ -55,7 +55,7 @@ export interface UserPreferencesState {
   trustedContact?: string;
   customPresets: {
     name: string;
-    theme: string;
+    theme: Theme;
     audioPreset: string;
   }[];
 }
@@ -113,7 +113,7 @@ export function useUserPreferences() {
   }, []);
 
   // Update preferences
-  const updatePreferences = (newPreferences: Partial<UserPreferencesState>) => {
+  const updatePreferences = useCallback((newPreferences: Partial<UserPreferencesState>) => {
     try {
       // Fix: ensure theme value is compatible with Theme type before updating
       const updatedPreferences = { ...preferences, ...newPreferences };
@@ -146,10 +146,10 @@ export function useUserPreferences() {
       
       return false;
     }
-  };
+  }, [preferences, themeContext, toast]);
 
   // Create a custom preset
-  const createPreset = (name: string) => {
+  const createPreset = useCallback((name: string) => {
     const newPreset = {
       name,
       theme: preferences.theme,
@@ -163,15 +163,15 @@ export function useUserPreferences() {
       title: "New preset created",
       description: `Preset "${name}" has been saved.`
     });
-  };
+  }, [preferences, audioPrefs, updatePreferences, toast]);
 
   // Apply a custom preset
-  const applyPreset = (name: string) => {
+  const applyPreset = useCallback((name: string) => {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
     // Check if the preset theme is a valid Theme type
-    const presetTheme = preset.theme as Theme;
+    const presetTheme = preset.theme;
     if (['light', 'dark', 'system', 'pastel'].includes(presetTheme)) {
       updatePreferences({ theme: presetTheme });
     }
@@ -184,10 +184,10 @@ export function useUserPreferences() {
     });
     
     return true;
-  };
+  }, [preferences, audioPrefs, updatePreferences, toast]);
 
   // Reset all preferences
-  const resetPreferences = () => {
+  const resetPreferences = useCallback(() => {
     setPreferences(defaultPreferences);
     localStorage.removeItem('userPreferences');
     
@@ -200,10 +200,10 @@ export function useUserPreferences() {
       title: "Reset completed",
       description: "All your settings have been reset to defaults."
     });
-  };
+  }, [themeContext, toast]);
 
   // Toggle incognito mode
-  const toggleIncognitoMode = (enabled: boolean) => {
+  const toggleIncognitoMode = useCallback((enabled: boolean) => {
     updatePreferences({ incognitoMode: enabled });
     
     if (enabled) {
@@ -222,7 +222,7 @@ export function useUserPreferences() {
         description: "Your data will be saved normally again."
       });
     }
-  };
+  }, [updatePreferences, toast]);
   
   return {
     preferences,
