@@ -94,7 +94,6 @@ export function usePredictiveIntelligence(userMode: 'b2c' | 'b2b' | 'b2b-admin' 
         // Only apply high-confidence predictions
         if (confidence > 0.85) {
           // 1. Update soundscape subtly based on predicted emotion
-          // Fix: Remove the second argument as it's not expected
           updateSoundscapeForEmotion(emotion);
           
           // 2. Apply subtle branding changes
