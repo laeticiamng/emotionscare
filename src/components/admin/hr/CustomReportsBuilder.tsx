@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DateRange } from '@/components/ui/date-range';
-import { DatePickerWithRange } from '@/components/ui/date-range-picker';
+import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Download, FileSpreadsheet, LineChart, BarChart2, FileText, PieChart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { DateRange } from 'react-day-picker';
 
 const CustomReportsBuilder = () => {
   const { toast } = useToast();

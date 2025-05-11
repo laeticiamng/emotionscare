@@ -3,6 +3,7 @@
 
 import * as React from "react"
 import { addDays, format } from "date-fns"
+import { fr } from "date-fns/locale"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { DateRange } from "react-day-picker"
 
@@ -17,24 +18,34 @@ import {
 
 interface DatePickerWithRangeProps {
   className?: string
-  onDateChange?: (range: { from?: Date; to?: Date }) => void
+  date?: DateRange
+  setDate?: (date: DateRange) => void
 }
 
 export function DatePickerWithRange({
   className,
-  onDateChange,
+  date,
+  setDate,
 }: DatePickerWithRangeProps) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
-    from: undefined,
-    to: undefined,
-  })
-
-  // Call the parent's onDateChange handler when our internal state changes
-  React.useEffect(() => {
-    if (onDateChange) {
-      onDateChange(date || { from: undefined, to: undefined });
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
+    date || {
+      from: new Date(),
+      to: addDays(new Date(), 7),
     }
-  }, [date, onDateChange]);
+  )
+
+  React.useEffect(() => {
+    if (date) {
+      setDateRange(date)
+    }
+  }, [date])
+
+  const handleSelect = (range: DateRange | undefined) => {
+    setDateRange(range)
+    if (setDate) {
+      setDate(range || { from: undefined, to: undefined })
+    }
+  }
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -45,18 +56,18 @@ export function DatePickerWithRange({
             variant={"outline"}
             className={cn(
               "w-full justify-start text-left font-normal",
-              !date && "text-muted-foreground"
+              !dateRange && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {date?.from ? (
-              date.to ? (
+            {dateRange?.from ? (
+              dateRange.to ? (
                 <>
-                  {format(date.from, "dd/MM/yyyy")} -{" "}
-                  {format(date.to, "dd/MM/yyyy")}
+                  {format(dateRange.from, "dd/MM/yyyy", { locale: fr })} -{" "}
+                  {format(dateRange.to, "dd/MM/yyyy", { locale: fr })}
                 </>
               ) : (
-                format(date.from, "dd/MM/yyyy")
+                format(dateRange.from, "dd/MM/yyyy", { locale: fr })
               )
             ) : (
               <span>Sélectionner une période</span>
@@ -67,10 +78,11 @@ export function DatePickerWithRange({
           <Calendar
             initialFocus
             mode="range"
-            defaultMonth={date?.from}
-            selected={date}
-            onSelect={setDate}
+            defaultMonth={dateRange?.from}
+            selected={dateRange}
+            onSelect={handleSelect}
             numberOfMonths={2}
+            locale={fr}
             className="pointer-events-auto"
           />
         </PopoverContent>
@@ -78,3 +90,5 @@ export function DatePickerWithRange({
     </div>
   )
 }
+
+export default DatePickerWithRange
