@@ -1,62 +1,59 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { Recommendation } from '@/types';
 
-interface BrandingContextType {
-  brandingTheme: string;
-  emotionalTone: string;
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    highlight: string;
-  };
-  setBrandingTheme: (theme: string) => void;
-  setEmotionalTone: (tone: string) => void;
-  updateColors: (colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    highlight: string;
-  }) => void;
+type EmotionalTone = 'neutral' | 'calm' | 'energetic' | 'focused' | 'creative';
+type BrandingTheme = 'standard' | 'premium' | 'ultra-premium' | 'minimal';
+
+interface BrandingColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  highlight: string;
 }
 
-const defaultColors = {
-  primary: '#6366f1',
-  secondary: '#a855f7',
-  accent: '#ec4899',
-  highlight: '#22c55e'
+interface BrandingContextType {
+  brandingTheme: BrandingTheme;
+  emotionalTone: EmotionalTone;
+  colors: BrandingColors;
+  setBrandingTheme: (theme: BrandingTheme) => void;
+  setEmotionalTone: (tone: EmotionalTone) => void;
+  setColors: (colors: Partial<BrandingColors>) => void;
+}
+
+const defaultColors: BrandingColors = {
+  primary: '#4f46e5',
+  secondary: '#10b981',
+  accent: '#f59e0b',
+  highlight: '#ec4899'
 };
 
 const BrandingContext = createContext<BrandingContextType>({
-  brandingTheme: 'modern',
-  emotionalTone: 'positive',
+  brandingTheme: 'standard',
+  emotionalTone: 'neutral',
   colors: defaultColors,
   setBrandingTheme: () => {},
   setEmotionalTone: () => {},
-  updateColors: () => {}
+  setColors: () => {}
 });
 
 export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [brandingTheme, setBrandingTheme] = useState('modern');
-  const [emotionalTone, setEmotionalTone] = useState('positive');
-  const [colors, setColors] = useState(defaultColors);
-
-  const updateColors = (newColors: typeof defaultColors) => {
-    setColors(newColors);
+  const [brandingTheme, setBrandingTheme] = useState<BrandingTheme>('standard');
+  const [emotionalTone, setEmotionalTone] = useState<EmotionalTone>('neutral');
+  const [colors, setColorsState] = useState<BrandingColors>(defaultColors);
+  
+  const setColors = (newColors: Partial<BrandingColors>) => {
+    setColorsState(prev => ({ ...prev, ...newColors }));
   };
-
+  
   return (
-    <BrandingContext.Provider 
-      value={{ 
-        brandingTheme, 
-        emotionalTone, 
-        colors,
-        setBrandingTheme,
-        setEmotionalTone,
-        updateColors
-      }}
-    >
+    <BrandingContext.Provider value={{
+      brandingTheme,
+      emotionalTone,
+      colors,
+      setBrandingTheme,
+      setEmotionalTone,
+      setColors
+    }}>
       {children}
     </BrandingContext.Provider>
   );

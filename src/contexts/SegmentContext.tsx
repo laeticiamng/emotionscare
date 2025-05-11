@@ -1,58 +1,41 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
-export interface Segment {
-  dimensionKey: string | null;
-  optionKey: string | null;
-}
-
 export interface SegmentDimension {
   key: string;
-  name: string;
   label: string;
-  options: Array<{ 
+  options: Array<{
     key: string;
-    name: string;
     label: string;
   }>;
 }
 
-interface SegmentContextType {
-  segment: Segment;
-  setSegment: (segment: Segment) => void;
+export interface SegmentOption {
+  key: string;
+  label: string;
+}
+
+export interface SegmentData {
+  dimensionKey: string | null;
+  optionKey: string | null;
+}
+
+export interface SegmentContextType {
+  segment: SegmentData;
+  setSegment: (segment: SegmentData) => void;
   dimensions: SegmentDimension[];
   isLoading: boolean;
   activeDimension: SegmentDimension | null;
-  activeOption: { key: string; name: string; label: string } | null;
+  activeOption: SegmentOption | null;
 }
 
-const defaultDimensions: SegmentDimension[] = [
-  {
-    key: 'department',
-    name: 'Département',
-    label: 'Département',
-    options: [
-      { key: 'marketing', name: 'Marketing', label: 'Marketing' },
-      { key: 'sales', name: 'Ventes', label: 'Ventes' },
-      { key: 'engineering', name: 'Ingénierie', label: 'Ingénierie' },
-      { key: 'hr', name: 'Ressources Humaines', label: 'Ressources Humaines' }
-    ]
-  },
-  {
-    key: 'location',
-    name: 'Localisation',
-    label: 'Localisation',
-    options: [
-      { key: 'paris', name: 'Paris', label: 'Paris' },
-      { key: 'lyon', name: 'Lyon', label: 'Lyon' },
-      { key: 'marseille', name: 'Marseille', label: 'Marseille' },
-      { key: 'remote', name: 'Télétravail', label: 'Télétravail' }
-    ]
-  }
-];
+const defaultSegment: SegmentData = {
+  dimensionKey: null,
+  optionKey: null
+};
 
 const SegmentContext = createContext<SegmentContextType>({
-  segment: { dimensionKey: null, optionKey: null },
+  segment: defaultSegment,
   setSegment: () => {},
   dimensions: [],
   isLoading: false,
@@ -61,29 +44,59 @@ const SegmentContext = createContext<SegmentContextType>({
 });
 
 export const SegmentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [segment, setSegment] = useState<Segment>({ dimensionKey: null, optionKey: null });
+  const [segment, setSegment] = useState<SegmentData>(defaultSegment);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Compute active dimension and option based on segment state
+  const dimensions: SegmentDimension[] = [
+    {
+      key: 'department',
+      label: 'Département',
+      options: [
+        { key: 'marketing', label: 'Marketing' },
+        { key: 'engineering', label: 'Ingénierie' },
+        { key: 'sales', label: 'Ventes' },
+        { key: 'hr', label: 'Ressources Humaines' }
+      ]
+    },
+    {
+      key: 'role',
+      label: 'Fonction',
+      options: [
+        { key: 'manager', label: 'Manager' },
+        { key: 'individual', label: 'Collaborateur' },
+        { key: 'executive', label: 'Dirigeant' }
+      ]
+    },
+    {
+      key: 'location',
+      label: 'Localisation',
+      options: [
+        { key: 'paris', label: 'Paris' },
+        { key: 'lyon', label: 'Lyon' },
+        { key: 'marseille', label: 'Marseille' },
+        { key: 'remote', label: 'Télétravail' }
+      ]
+    }
+  ];
+  
+  // Find the active dimension and option
   const activeDimension = segment.dimensionKey 
-    ? defaultDimensions.find(d => d.key === segment.dimensionKey) || null 
+    ? dimensions.find(dim => dim.key === segment.dimensionKey) || null 
     : null;
     
-  const activeOption = activeDimension && segment.optionKey
-    ? activeDimension.options.find(o => o.key === segment.optionKey) || null
+  const activeOption = segment.optionKey && activeDimension
+    ? activeDimension.options.find(opt => opt.key === segment.optionKey) || null
     : null;
 
   return (
-    <SegmentContext.Provider 
-      value={{ 
-        segment, 
-        setSegment, 
-        dimensions: defaultDimensions,
-        isLoading,
-        activeDimension,
-        activeOption
-      }}
-    >
+    <SegmentContext.Provider value={{
+      segment,
+      setSegment,
+      dimensions,
+      isLoading,
+      activeDimension,
+      activeOption
+    }}>
       {children}
     </SegmentContext.Provider>
   );

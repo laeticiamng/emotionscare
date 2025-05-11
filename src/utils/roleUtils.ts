@@ -54,3 +54,29 @@ export const getRoleDisplayName = (role: string): string => {
       return role;
   }
 };
+
+/**
+ * Get user role name (camelCase version)
+ */
+export const getRoleName = (role: string): string => {
+  switch (role) {
+    case 'admin':
+      return 'admin';
+    case 'superadmin':
+      return 'superAdmin';
+    case 'therapist':
+      return 'therapist';
+    case 'coach':
+      return 'coach';
+    case 'manager':
+      return 'manager';
+    case 'user':
+      return 'user';
+    case 'employee':
+      return 'employee';
+    case 'guest':
+      return 'guest';
+    default:
+      return role;
+  }
+};

@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -18,7 +17,7 @@ export interface User {
 }
 
 export interface UserPreferences {
-  theme?: 'light' | 'dark' | 'system';
+  theme?: ThemeName;
   notifications?: boolean;
   language?: string;
   privacy?: 'public' | 'private' | 'friends';
@@ -32,6 +31,7 @@ export interface UserPreferences {
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'default' | 'serif' | 'mono';
 
 export interface VRSessionTemplate {
   id: string;
@@ -51,6 +51,7 @@ export interface VRSessionTemplate {
   popularity: number;
   template_id?: string;
   completion_rate?: number;
+  emotion_target?: string;
 }
 
 export interface VRSession {
@@ -62,6 +63,11 @@ export interface VRSession {
   duration_seconds: number;
   completed: boolean;
   template?: VRSessionTemplate;
+  date?: string;
+  duration?: number;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
 }
 
 export interface ChatMessage {
@@ -118,6 +124,7 @@ export interface EmotionResult {
 
 export interface EmotionPrediction {
   predictedEmotion: string;
+  emotion?: string;
   probability: number;
   confidence?: number;
   triggers?: string[];

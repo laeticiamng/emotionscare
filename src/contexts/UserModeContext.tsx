@@ -1,45 +1,40 @@
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
-export type UserMode = 'personal' | 'professional' | 'anonymous' | 'b2b-admin' | 'b2b-collaborator' | 'b2c';
+export type UserMode = 'personal' | 'professional' | 'anonymous' | 'b2b-collaborator';
 
 interface UserModeContextType {
-  userMode: UserMode | null;
+  userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
-  isLoading: boolean;
+  isB2C: boolean;
+  isB2B: boolean;
+  isAdmin: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType>({
-  userMode: null,
+  userMode: 'personal',
   setUserMode: () => {},
-  isLoading: true
+  isB2C: true,
+  isB2B: false,
+  isAdmin: false
 });
 
-interface UserModeProviderProps {
-  children: ReactNode;
-}
-
-export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserMode | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Try to load user mode from localStorage
-    const savedMode = localStorage.getItem('user-mode');
-    if (savedMode && ['personal', 'professional', 'anonymous', 'b2b-admin', 'b2b-collaborator', 'b2c'].includes(savedMode)) {
-      setUserModeState(savedMode as UserMode);
-    }
-    setIsLoading(false);
-  }, []);
-
-  const setUserMode = (mode: UserMode) => {
-    setUserModeState(mode);
-    // Save to localStorage for persistence
-    localStorage.setItem('user-mode', mode);
-  };
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserMode>('personal');
+  
+  // Derived values
+  const isB2C = userMode === 'personal';
+  const isB2B = userMode === 'professional' || userMode === 'b2b-collaborator';
+  const isAdmin = userMode === 'professional';
 
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode, isLoading }}>
+    <UserModeContext.Provider value={{
+      userMode,
+      setUserMode,
+      isB2C,
+      isB2B,
+      isAdmin
+    }}>
       {children}
     </UserModeContext.Provider>
   );

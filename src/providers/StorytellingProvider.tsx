@@ -1,114 +1,80 @@
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Story } from '@/types';
 
 interface StorytellingContextType {
   activeStory: Story | null;
-  storyQueue: Story[];
   setActiveStory: (story: Story | null) => void;
-  addStory: (story: Story) => void;
-  addStories: (stories: Story[]) => void;
-  dismissStory: (id: string) => void;
-  resetStories: () => void;
-  markStorySeen: (id: string) => void;
+  stories: Story[];
+  hasUnreadStories: boolean;
+  markStoryAsSeen: (storyId: string) => void;
+  loadStories: () => void;
 }
 
 const StorytellingContext = createContext<StorytellingContextType>({
   activeStory: null,
-  storyQueue: [],
   setActiveStory: () => {},
-  addStory: () => {},
-  addStories: () => {},
-  dismissStory: () => {},
-  resetStories: () => {},
-  markStorySeen: () => {}
+  stories: [],
+  hasUnreadStories: false,
+  markStoryAsSeen: () => {},
+  loadStories: () => {}
 });
 
-export const StorytellingProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+export const StorytellingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeStory, setActiveStory] = useState<Story | null>(null);
-  const [storyQueue, setStoryQueue] = useState<Story[]>([]);
+  const [stories, setStories] = useState<Story[]>([]);
   
-  // Load stories from local storage on mount
-  useEffect(() => {
-    const savedStories = localStorage.getItem('storytelling_queue');
-    if (savedStories) {
-      try {
-        const parsedStories = JSON.parse(savedStories);
-        setStoryQueue(parsedStories);
-      } catch (error) {
-        console.error('Error loading saved stories:', error);
-      }
-    }
-  }, []);
+  // Check if we have any unread stories
+  const hasUnreadStories = stories.some(story => !story.seen);
   
-  // Save stories to local storage when queue changes
-  useEffect(() => {
-    localStorage.setItem('storytelling_queue', JSON.stringify(storyQueue));
-  }, [storyQueue]);
-
-  const addStory = (story: Story) => {
-    // Don't add duplicate stories
-    if (storyQueue.some(s => s.id === story.id)) {
-      return;
-    }
-    
-    // Add seen property if it doesn't exist
-    const storyWithSeen = {
-      ...story,
-      seen: story.seen !== undefined ? story.seen : false
-    };
-    
-    setStoryQueue(prev => [...prev, storyWithSeen]);
-  };
-
-  const addStories = (stories: Story[]) => {
-    // Filter out duplicates
-    const newStories = stories.filter(
-      story => !storyQueue.some(s => s.id === story.id)
-    );
-    
-    // Add seen property to each story
-    const storiesWithSeen = newStories.map(story => ({
-      ...story,
-      seen: story.seen !== undefined ? story.seen : false
-    }));
-    
-    setStoryQueue(prev => [...prev, ...storiesWithSeen]);
-  };
-
-  const dismissStory = (id: string) => {
-    setStoryQueue(prev => prev.filter(story => story.id !== id));
-    if (activeStory && activeStory.id === id) {
-      setActiveStory(null);
-    }
-  };
-
-  const resetStories = () => {
-    setStoryQueue([]);
-    setActiveStory(null);
-  };
-
-  const markStorySeen = (id: string) => {
-    setStoryQueue(prev => 
+  // Mark a story as seen
+  const markStoryAsSeen = (storyId: string) => {
+    setStories(prev => 
       prev.map(story => 
-        story.id === id ? { ...story, seen: true } : story
+        story.id === storyId ? { ...story, seen: true } : story
       )
     );
   };
-
+  
+  // Load stories from API (mock implementation)
+  const loadStories = () => {
+    // Mock data
+    setStories([
+      {
+        id: '1',
+        title: 'Découvrez la nouvelle fonctionnalité de méditation',
+        content: 'Notre nouvelle fonctionnalité de méditation guidée est maintenant disponible...',
+        type: 'feature',
+        seen: false,
+        image: '/images/meditation.jpg',
+        cta: {
+          label: 'Essayer maintenant',
+          route: '/meditation'
+        }
+      },
+      {
+        id: '2',
+        title: 'Votre rapport hebdomadaire',
+        content: 'Voici votre résumé des activités de la semaine...',
+        type: 'report',
+        seen: true,
+        cta: {
+          label: 'Voir le rapport',
+          route: '/report'
+        }
+      }
+    ]);
+  };
+  
   return (
-    <StorytellingContext.Provider 
-      value={{
-        activeStory,
-        storyQueue,
-        setActiveStory,
-        addStory,
-        addStories,
-        dismissStory,
-        resetStories,
-        markStorySeen
-      }}
-    >
+    <StorytellingContext.Provider value={{
+      activeStory,
+      setActiveStory,
+      stories,
+      hasUnreadStories,
+      markStoryAsSeen,
+      loadStories
+    }}>
       {children}
     </StorytellingContext.Provider>
   );

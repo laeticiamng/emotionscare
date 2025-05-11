@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { EmotionPrediction } from '@/types';
+import { EmotionPrediction, Recommendation } from '@/types';
 
 interface PredictiveAnalyticsContextType {
   isLoading: boolean;
@@ -19,10 +19,13 @@ interface PredictiveAnalyticsContextType {
   }>;
   predictionEnabled: boolean;
   setPredictionEnabled: (enabled: boolean) => void;
+  generatePredictions: () => void;
+  recommendations: Recommendation[];
 }
 
 const defaultPrediction: EmotionPrediction = {
   predictedEmotion: '',
+  emotion: '',
   probability: 0,
   confidence: 0,
   triggers: [],
@@ -39,7 +42,9 @@ const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType>
   setEnabled: () => {},
   availableFeatures: [],
   predictionEnabled: false,
-  setPredictionEnabled: () => {}
+  setPredictionEnabled: () => {},
+  generatePredictions: () => {},
+  recommendations: []
 });
 
 export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -48,6 +53,7 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
   const [currentPredictions, setCurrentPredictions] = useState<EmotionPrediction>(defaultPrediction);
   const [isEnabled, setIsEnabled] = useState(true);
   const [predictionEnabled, setPredictionEnabled] = useState(true);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   
   const availableFeatures = [
     {
@@ -83,6 +89,7 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
       
       const mockPrediction: EmotionPrediction = {
         predictedEmotion: 'calm',
+        emotion: 'calm',
         probability: 0.85,
         confidence: 0.82,
         triggers: ['work deadline', 'lack of sleep'],
@@ -103,6 +110,30 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
     setCurrentPredictions(defaultPrediction);
   };
 
+  const generatePredictions = () => {
+    generatePrediction().then(() => {
+      // Generate some mock recommendations
+      setRecommendations([
+        {
+          id: '1',
+          title: 'Prendre une pause méditative',
+          description: 'Prenez 5 minutes pour vous recentrer et respirer profondément',
+          category: 'wellbeing',
+          priority: 9,
+          confidence: 0.92
+        },
+        {
+          id: '2',
+          title: 'Écouter un podcast inspirant',
+          description: 'Découvrez notre sélection de contenus audio pour vous motiver',
+          category: 'content',
+          priority: 8,
+          confidence: 0.85
+        }
+      ]);
+    });
+  };
+
   return (
     <PredictiveAnalyticsContext.Provider 
       value={{ 
@@ -115,7 +146,9 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
         setEnabled: setIsEnabled,
         availableFeatures,
         predictionEnabled,
-        setPredictionEnabled
+        setPredictionEnabled,
+        generatePredictions,
+        recommendations
       }}
     >
       {children}
