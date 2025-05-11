@@ -40,6 +40,15 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     );
   }
 
+  // Handle volume change with mute toggle consideration
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0] / 100);
+    // If user changes volume, unmute if currently muted
+    if (isMuted && value[0] > 0) {
+      toggleMute?.();
+    }
+  };
+
   return (
     <div className={`p-2 ${compact ? 'space-y-1' : 'space-y-2'}`}>
       <div className="flex items-center justify-between">
@@ -115,7 +124,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
               value={[isMuted ? 0 : volume * 100]}
               max={100}
               step={1}
-              onValueChange={(value) => setVolume(value[0] / 100)}
+              onValueChange={(value) => handleVolumeChange(value)}
               className="w-full"
               aria-label="Volume"
             />

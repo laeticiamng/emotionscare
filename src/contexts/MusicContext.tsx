@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
@@ -38,6 +37,8 @@ export interface MusicContextType {
   shufflePlaylist: () => void;
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 const defaultMusicContext: MusicContextType = {
@@ -74,7 +75,9 @@ const defaultMusicContext: MusicContextType = {
   shuffle: false,
   repeat: false,
   initializeMusicSystem: async () => {},
-  error: null
+  error: null,
+  isMuted: false,
+  toggleMute: () => {}
 };
 
 const MusicContext = createContext<MusicContextType>(defaultMusicContext);
@@ -94,6 +97,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isInitialized, setIsInitialized] = useState(false);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   
   const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
@@ -112,6 +116,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   const togglePlay = () => {
     setIsPlaying(prev => !prev);
+  };
+  
+  const toggleMute = () => {
+    setIsMuted(prev => !prev);
   };
   
   const nextTrack = () => {
@@ -301,7 +309,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       shuffle,
       repeat,
       initializeMusicSystem,
-      error
+      error,
+      isMuted,
+      toggleMute
     }}>
       {children}
     </MusicContext.Provider>

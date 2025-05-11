@@ -41,6 +41,8 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   loadPlaylist: (id: string) => Promise<MusicPlaylist | null>;
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  isMuted?: boolean; // Added missing property
+  toggleMute?: () => void; // Added missing property
 }
 
 export interface MusicDrawerProps {
