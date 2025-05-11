@@ -1,61 +1,64 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ThemeName, FontFamily, FontSize } from '@/types/user';
-import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
 
-const ImmersiveSettingsPage = () => {
-  const { theme, setTheme } = useTheme();
-  const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
-  const [fontSize, setFontSize] = useState<FontSize>('medium');
+const ImmersiveSettingsPage: React.FC = () => {
+  const { 
+    theme, 
+    setTheme, 
+    fontFamily, 
+    setFontFamily, 
+    fontSize, 
+    setFontSize 
+  } = useTheme();
   
-  // Convertir en types corrects pour la sécurité TypeScript
   const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme as ThemeName);
-  };
-  
-  const handleFontFamilyChange = (newFont: string) => {
-    setFontFamily(newFont as FontFamily);
-  };
-  
-  const handleFontSizeChange = (newSize: string) => {
-    setFontSize(newSize as FontSize);
+    setTheme(newTheme as any);
   };
   
   return (
-    <ProtectedLayoutWrapper>
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-8">Paramètres d'immersion</h1>
+    <div className="container mx-auto py-8 max-w-5xl">
+      <h1 className="text-3xl font-bold mb-8">Paramètres d'expérience</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <ThemeSelector 
+          currentTheme={theme} 
+          onChange={handleThemeChange}
+        />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <ThemeSelector 
-              currentTheme={theme} 
-              onChange={handleThemeChange}
-            />
-            
-            <FontSettings 
-              currentFont={fontFamily}
-              currentSize={fontSize}
-              onFontChange={handleFontFamilyChange}
-              onSizeChange={handleFontSizeChange}
-            />
-          </div>
-          
-          <div className="bg-card p-8 rounded-lg border">
-            <h3 className="text-xl font-medium mb-4">Aperçu</h3>
-            <div className="space-y-4">
-              <p className="text-lg">Ceci est un exemple de texte avec les paramètres actuels.</p>
-              <p>Thème: <span className="font-medium">{theme}</span></p>
-              <p>Police: <span className="font-medium">{fontFamily}</span></p>
-              <p>Taille: <span className="font-medium">{fontSize}</span></p>
-            </div>
-          </div>
-        </div>
+        <FontSettings 
+          currentFontFamily={fontFamily}
+          onChangeFontFamily={setFontFamily}
+          currentFontSize={fontSize}
+          onChangeFontSize={setFontSize}
+        />
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Animation & Effets</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Les paramètres d'animation seront bientôt disponibles.
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Accessibilité</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Les paramètres d'accessibilité seront bientôt disponibles.
+            </p>
+          </CardContent>
+        </Card>
       </div>
-    </ProtectedLayoutWrapper>
+    </div>
   );
 };
 

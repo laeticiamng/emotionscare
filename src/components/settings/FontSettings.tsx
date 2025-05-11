@@ -1,61 +1,81 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { FontFamily, FontSize } from "@/types/user";
 
 interface FontSettingsProps {
-  currentFont: FontFamily;
-  currentSize: FontSize;
-  onFontChange: (font: string) => void;
-  onSizeChange: (size: string) => void;
+  currentFontFamily: FontFamily;
+  onChangeFontFamily: (font: FontFamily) => void;
+  currentFontSize: FontSize;
+  onChangeFontSize: (size: FontSize) => void;
 }
 
-const FontSettings: React.FC<FontSettingsProps> = ({ 
-  currentFont,
-  currentSize,
-  onFontChange,
-  onSizeChange
+const FontSettings: React.FC<FontSettingsProps> = ({
+  currentFontFamily,
+  onChangeFontFamily,
+  currentFontSize,
+  onChangeFontSize
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Police d'écriture</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Famille de police</label>
-          <Select value={currentFont} onValueChange={onFontChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choisir une police" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="inter">Inter</SelectItem>
-              <SelectItem value="roboto">Roboto</SelectItem>
-              <SelectItem value="poppins">Poppins</SelectItem>
-              <SelectItem value="montserrat">Montserrat</SelectItem>
-              <SelectItem value="sans">Sans-Serif</SelectItem>
-              <SelectItem value="serif">Serif</SelectItem>
-              <SelectItem value="mono">Mono</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Taille de police</label>
-          <Select value={currentSize} onValueChange={onSizeChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choisir une taille" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="small">Petite</SelectItem>
-              <SelectItem value="medium">Moyenne</SelectItem>
-              <SelectItem value="large">Grande</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Famille de police</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={currentFontFamily}
+            onValueChange={(value) => onChangeFontFamily(value as FontFamily)}
+            className="grid grid-cols-2 gap-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="inter" id="inter" />
+              <Label htmlFor="inter" className="font-inter">Inter</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="roboto" id="roboto" />
+              <Label htmlFor="roboto" className="font-roboto">Roboto</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="poppins" id="poppins" />
+              <Label htmlFor="poppins" className="font-poppins">Poppins</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="montserrat" id="montserrat" />
+              <Label htmlFor="montserrat" className="font-montserrat">Montserrat</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Taille de police</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={currentFontSize}
+            onValueChange={(value) => onChangeFontSize(value as FontSize)}
+            className="grid grid-cols-3 gap-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="small" id="small" />
+              <Label htmlFor="small" className="text-sm">Petit</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="medium" id="medium" />
+              <Label htmlFor="medium" className="text-base">Moyen</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="large" id="large" />
+              <Label htmlFor="large" className="text-lg">Grand</Label>
+            </div>
+          </RadioGroup>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

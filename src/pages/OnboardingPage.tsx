@@ -2,134 +2,116 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useUser } from '@/hooks/useUser';
+import OnboardingContent from '@/components/onboarding/OnboardingContent';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { FontFamily, FontSize, ThemeName, UserPreferences } from '@/types/user';
-
-const steps = [
-  { id: 'welcome', title: 'Bienvenue', description: 'Bienvenue sur notre plateforme de bien-être émotionnel' },
-  { id: 'preferences', title: 'Préférences', description: 'Personnalisez votre expérience' },
-  { id: 'goals', title: 'Objectifs', description: 'Définissez vos objectifs de bien-être' },
-  { id: 'complete', title: 'Terminé', description: 'Vous êtes prêt à commencer' },
-];
+import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/user';
 
 const OnboardingPage: React.FC = () => {
-  const { user, updateUser } = useUser();
   const navigate = useNavigate();
+  const { user, updateUserPreferences } = useAuth();
   const { toast } = useToast();
   
-  const [currentStep, setCurrentStep] = useState(0);
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    theme: 'light' as ThemeName,
-    language: 'fr',
-    fontSize: 'medium' as FontSize,
-    fontFamily: 'inter' as FontFamily,
-    notifications: true,
-  });
+  const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [emotion, setEmotion] = useState('neutral');
+  const [userResponses, setUserResponses] = useState<Record<string, any>>({});
   
-  const [goals, setGoals] = useState<string[]>([
-    'Réduire le stress',
-    'Améliorer le sommeil'
-  ]);
-
-  const handleNext = async () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      try {
-        // Update the user profile with onboarding information
-        if (user) {
-          await updateUser({
-            onboarded: true,
-            preferences: {
-              ...user.preferences,
-              ...preferences
-            }
-          });
-        }
-        
-        toast({
-          title: "Onboarding terminé",
-          description: "Votre profil a été mis à jour avec succès."
-        });
-        
-        navigate('/dashboard');
-      } catch (error) {
-        console.error("Error completing onboarding:", error);
-        toast({
-          title: "Erreur",
-          description: "Une erreur est survenue lors de la mise à jour de votre profil.",
-          variant: "destructive"
-        });
+  const handleResponse = (key: string, value: any) => {
+    setUserResponses(prev => ({ ...prev, [key]: value }));
+    
+    if (key === 'emotion') {
+      setEmotion(value);
+    }
+  };
+  
+  const nextStep = () => {
+    setStep(s => s + 1);
+  };
+  
+  const prevStep = () => {
+    setStep(s => Math.max(0, s - 1));
+  };
+  
+  const completeOnboarding = async () => {
+    setLoading(true);
+    try {
+      // Save user preferences
+      const preferences: UserPreferences = {
+        theme: userResponses.theme as ThemeName || 'light',
+        language: userResponses.language || 'fr',
+        fontSize: userResponses.fontSize as FontSize || 'medium',
+        fontFamily: userResponses.fontFamily as FontFamily || 'inter',
+        notifications: !!userResponses.notifications,
+        soundEnabled: !!userResponses.soundEnabled,
+        privacyLevel: userResponses.privacyLevel || 'private',
+        emotionalInsightsEnabled: !!userResponses.emotionalInsightsEnabled,
+        onboardingCompleted: true,
+        dashboardLayout: userResponses.dashboardLayout || 'standard',
+        musicPreferences: userResponses.musicPreferences || [],
+        emotionalGoals: userResponses.emotionalGoals || [],
+        wellbeingPreferences: userResponses.wellbeingPreferences || {},
+        recentModules: [],
+      };
+      
+      if (user?.id) {
+        await updateUserPreferences(user.id, preferences);
       }
+      
+      toast({
+        title: "Bienvenue!",
+        description: "Votre expérience est maintenant personnalisée."
+      });
+      
+      // Navigate to dashboard
+      navigate('/dashboard');
+      
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la configuration.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
   
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-  
-  const renderStepContent = () => {
-    switch (steps[currentStep].id) {
-      case 'welcome':
-        return (
-          <div className="space-y-4">
-            <p>Nous sommes ravis de vous accueillir sur notre plateforme dédiée au bien-être émotionnel.</p>
-            <p>Suivez ces quelques étapes pour personnaliser votre expérience.</p>
-          </div>
-        );
-      case 'preferences':
-        return (
-          <div className="space-y-4">
-            {/* Préférences UI - simplifié pour l'exemple */}
-            <p>Choisissez vos préférences d'interface pour une expérience personnalisée.</p>
-          </div>
-        );
-      case 'goals':
-        return (
-          <div className="space-y-4">
-            <p>Quels sont vos objectifs de bien-être ?</p>
-            {/* Sélection d'objectifs - simplifié pour l'exemple */}
-          </div>
-        );
-      case 'complete':
-        return (
-          <div className="space-y-4 text-center">
-            <p className="text-xl">Félicitations !</p>
-            <p>Votre profil est configuré et vous êtes prêt à commencer votre parcours de bien-être.</p>
-          </div>
-        );
-      default:
-        return <p>Étape inconnue</p>;
-    }
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{steps[currentStep].title}</CardTitle>
-          <CardDescription>{steps[currentStep].description}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {renderStepContent()}
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={handlePrevious}
-            disabled={currentStep === 0}
-          >
-            Précédent
-          </Button>
-          <Button onClick={handleNext}>
-            {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
-          </Button>
-        </CardFooter>
-      </Card>
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex-1 container max-w-5xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold">Configuration de votre espace</h1>
+            
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/dashboard')}
+            >
+              Ignorer
+            </Button>
+          </div>
+          
+          <div className="w-full bg-muted h-2 mt-6 rounded-full overflow-hidden">
+            <div 
+              className="bg-primary h-full transition-all"
+              style={{ width: `${((step + 1) / 5) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+        
+        <OnboardingContent
+          step={step}
+          loading={loading}
+          emotion={emotion}
+          userResponses={userResponses}
+          nextStep={nextStep}
+          prevStep={prevStep}
+          handleResponse={handleResponse}
+          completeOnboarding={completeOnboarding}
+        />
+      </div>
     </div>
   );
 };

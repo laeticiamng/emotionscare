@@ -18,7 +18,7 @@ const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
     currentSession 
   } = useVRSession('user-id'); // Provide a default user ID for now
   
-  const isActive = !!currentSession?.id && !currentSession?.completed;
+  const isSessionActive = !!currentSession?.id && !currentSession?.completed;
   
   const handleStartSession = () => {
     if (template) {
@@ -36,7 +36,7 @@ const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
         <CardTitle>Session VR</CardTitle>
       </CardHeader>
       <CardContent>
-        {isActive ? (
+        {isSessionActive ? (
           <Button 
             onClick={() => completeSession(currentSession.id)}
             variant="destructive"
