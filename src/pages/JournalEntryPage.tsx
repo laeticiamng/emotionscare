@@ -1,110 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import JournalEntryForm from '@/components/journal/JournalEntryForm';
+import JournalPageHeader from '@/components/journal/JournalPageHeader';
+import BackgroundAnimation from '@/components/journal/BackgroundAnimation';
+import { useJournalEntry } from '@/hooks/useJournalEntry';
+import { useMusic } from '@/contexts/MusicContext';
+import { Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getJournalEntries } from '@/lib/journalService';
-import { JournalEntry } from '@/types';
+import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MusicPlayer from '@/components/music/player/MusicPlayer';
 
-const JournalEntryPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [journalEntry, setJournalEntry] = useState<JournalEntry | null>(null);
-  const [loading, setLoading] = useState(true);
+const JournalNewPage: React.FC = () => {
+  const { 
+    isSaving, 
+    backgroundGradient, 
+    setRandomGradient, 
+    handleSave,
+    currentEmotion,
+    setCurrentEmotion
+  } = useJournalEntry();
+  
+  const { 
+    openDrawer, 
+    setOpenDrawer, 
+    currentTrack, 
+    loadPlaylistForEmotion 
+  } = useMusic();
+  
+  const [musicEnabled, setMusicEnabled] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
-    const getEntry = async () => {
-      try {
-        setLoading(true);
-        // Fix the usage to fetch a specific entry from the entries
-        const entries = await getJournalEntries('user-1');
-        const entry = entries.find(e => e.id === id);
-        
-        if (entry) {
-          // Cast to match expected type
-          setJournalEntry(entry as unknown as JournalEntry);
-        } else {
-          console.error('Journal entry not found');
-        }
-      } catch (error) {
-        console.error('Error fetching journal entry:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    setRandomGradient();
+  }, []);
 
-    if (id) {
-      getEntry();
+  const handleEnableMusic = () => {
+    setMusicEnabled(true);
+    setOpenDrawer(true);
+    
+    // If we have a detected emotion, load an appropriate playlist
+    if (currentEmotion) {
+      loadPlaylistForEmotion(currentEmotion);
     }
-  }, [id]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto py-8 text-center">
-        <p>Chargement de l'entrée de journal...</p>
-      </div>
-    );
-  }
-
-  if (!journalEntry) {
-    return (
-      <div className="container mx-auto py-8">
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-          Retour
-        </Button>
-        <Card>
-          <CardContent className="py-8 text-center">
-            <p>Entrée de journal non trouvée</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Determine which component to use based on device
+  const MusicDrawerComponent = isMobile ? Drawer : Sheet;
+  const MusicDrawerTrigger = isMobile ? DrawerTrigger : SheetTrigger;
+  const MusicDrawerContentComponent = isMobile ? DrawerContent : SheetContent;
 
   return (
-    <div className="container mx-auto py-8">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-        Retour
-      </Button>
-      <Card>
-        <CardHeader>
-          <CardTitle>{journalEntry?.title}</CardTitle>
-          <div className="text-sm text-muted-foreground">
-            {journalEntry && formatDate(journalEntry.date)}
+    <div className={`container mx-auto py-8 min-h-[80vh] relative ${backgroundGradient}`}>
+      <BackgroundAnimation 
+        musicEnabled={musicEnabled || !!currentTrack} 
+        emotion={currentEmotion || 'neutral'}
+      />
+
+      <JournalPageHeader title="Nouvelle Entrée de Journal">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="text-muted-foreground hover:text-primary transition-colors" 
+          onClick={handleEnableMusic}
+        >
+          <Music className="mr-2 h-4 w-4" />
+          {musicEnabled ? "Musique activée" : "Ajouter musique"}
+        </Button>
+      </JournalPageHeader>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <JournalEntryForm 
+          onSubmit={handleSave} 
+          isSaving={isSaving} 
+          onEmotionSelect={setCurrentEmotion}
+        />
+      </motion.div>
+
+      <MusicDrawerComponent open={openDrawer} onOpenChange={setOpenDrawer}>
+        <MusicDrawerTrigger asChild>
+          <Button 
+            className="fixed bottom-4 right-4 rounded-full shadow-lg"
+            size="icon"
+            variant={currentTrack ? "secondary" : "outline"}
+          >
+            <Music className="h-4 w-4" />
+          </Button>
+        </MusicDrawerTrigger>
+        <MusicDrawerContentComponent className="sm:max-w-md">
+          <div className="p-6">
+            <h2 className="text-2xl font-semibold mb-6">Musique Thérapeutique</h2>
+            <MusicPlayer />
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="prose">
-            <p>{journalEntry?.content}</p>
-          </div>
-          
-          {journalEntry?.mood && (
-            <div className="flex items-center space-x-2 text-sm">
-              <span className="font-medium">Humeur:</span>
-              <span>{journalEntry.mood}</span>
-            </div>
-          )}
-          
-          {journalEntry?.ai_feedback && (
-            <div className="bg-secondary/20 p-4 rounded-md mt-6">
-              <h3 className="font-medium mb-2">Analyse IA</h3>
-              <p className="text-sm">{journalEntry.ai_feedback}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </MusicDrawerContentComponent>
+      </MusicDrawerComponent>
     </div>
   );
 };
 
-export default JournalEntryPage;
+export default JournalNewPage;

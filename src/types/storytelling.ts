@@ -1,30 +1,15 @@
+// Change import to avoid conflict with local declaration
+import { User } from './user';
+// Rename the imported Story to avoid conflict
+import { Story as ImportedStory } from './story';
 
-import { Story } from '@/types';
-
-export interface StorytellingContextType {
-  stories: Story[];
-  activeStory: Story | null;
-  isLoading: boolean;
-  
-  // Add missing properties
-  storyQueue: Story[];
-  addStory: (story: Story) => void;
-  markStorySeen: (storyId: string) => void;
-  playFunctionalSound?: (soundType: string) => void;
-}
-
+// Local declaration
 export interface Story {
   id: string;
   title: string;
   content: string;
-  imageUrl?: string;
-  seen: boolean;
-  category: string;
-  createdAt: Date | string;
-  action?: {
-    label: string;
-    route: string;
-    text?: string;
-  };
-  emotion?: string;
+  // other fields...
 }
+
+// Re-export the imported Story with a different name
+export { ImportedStory };

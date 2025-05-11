@@ -1,60 +1,29 @@
 
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration?: number;
-  url?: string;
-  cover?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  audioUrl?: string;
-  audio_url?: string;
-  mood?: string; // Added for compatibility
-  emotion?: string;
-  emotion_tag?: string;
-  genre?: string; // Added for compatibility
-}
-
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  title?: string;
-  description: string;
-  tracks: MusicTrack[];
-  coverImage?: string;
-  category?: string;
-  coverUrl?: string;
-  emotion?: string;
-  mood?: string; // Added for compatibility
-}
-
-export interface MusicDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onOpenChange?: (open: boolean) => void;
-  playlist?: MusicPlaylist;
-}
-
 export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
   queue: MusicTrack[];
   playlists: MusicPlaylist[];
   volume: number;
-  isInitialized: boolean; // Missing property added
+  isInitialized: boolean;
   error: string | null;
   openDrawer?: boolean;
   setOpenDrawer?: (open: boolean) => void;
+  currentTime: number; // Added missing property
+  duration: number; // Added missing property
+  shuffle?: boolean; // Added missing property
+  repeat?: boolean; // Added missing property
   
   // Playback controls
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
-  resumeTrack: () => void;
+  togglePlay: () => void; // Used instead of resumeTrack
   nextTrack: () => void;
   previousTrack: () => void;
-  togglePlay: () => void;
   setVolume: (volume: number) => void;
+  seek?: (time: number) => void; // Added missing property (used instead of seekTo)
+  toggleShuffle?: () => void;
+  toggleRepeat?: () => void;
   
   // Playlist management
   addToQueue: (track: MusicTrack) => void;

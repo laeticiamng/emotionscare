@@ -31,18 +31,18 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     isPlaying, 
     currentTrack, 
     pauseTrack, 
-    resumeTrack, 
+    togglePlay, // Use togglePlay instead of resumeTrack
     nextTrack,
     previousTrack,
-    seekTo,
+    seek, // Use seek instead of seekTo
     currentTime,
     duration,
     volume,
     setVolume,
     toggleShuffle,
     toggleRepeat,
-    isShuffled,
-    isRepeating
+    shuffle: isShuffled, // Use shuffle instead of isShuffled
+    repeat: isRepeating  // Use repeat instead of isRepeating
   } = useMusic();
 
   // Format time in MM:SS format
@@ -58,7 +58,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
         <div className="mb-4">
           <TrackInfo
             track={currentTrack}
-            coverUrl={currentTrack?.coverImage || currentTrack?.coverUrl}
+            coverUrl={currentTrack?.coverUrl || currentTrack?.cover} // Use existing properties
           />
         </div>
       )}
@@ -68,7 +68,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           <ProgressBar
             currentTime={currentTime}
             duration={duration}
-            onSeek={seekTo}
+            onSeek={seek} // Use seek instead of seekTo
             formatTime={formatTime}
           />
         </div>
@@ -102,7 +102,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
             variant={compact ? "ghost" : "outline"}
             size={compact ? "icon" : "default"}
             className={compact ? "" : "h-10 w-10 rounded-full"}
-            onClick={() => isPlaying ? pauseTrack() : resumeTrack()}
+            onClick={togglePlay} // Use togglePlay instead of conditional call
             disabled={!currentTrack}
           >
             {isPlaying ? (

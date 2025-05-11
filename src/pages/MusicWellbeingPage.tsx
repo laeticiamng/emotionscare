@@ -177,7 +177,7 @@ const MusicWellbeingPage = () => {
                           url: '#',
                           mood: 'calm',
                           genre: 'ambient',
-                        });
+                        } as MusicTrack);
                       }}>
                         Méditation du matin
                       </Button>
@@ -191,7 +191,7 @@ const MusicWellbeingPage = () => {
                           url: '#',
                           mood: 'focused',
                           genre: 'electronic',
-                        });
+                        } as MusicTrack);
                       }}>
                         Focus productif
                       </Button>
@@ -205,7 +205,7 @@ const MusicWellbeingPage = () => {
                           url: '#',
                           mood: 'relaxed',
                           genre: 'nature',
-                        });
+                        } as MusicTrack);
                       }}>
                         Relaxation profonde
                       </Button>

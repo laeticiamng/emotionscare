@@ -1,14 +1,15 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState } from 'react';
 
+// Define the step structure
 export interface OnboardingStep {
   id: string;
   title: string;
   content: React.ReactNode;
-  completed?: boolean;
+  required?: boolean;
 }
 
+// Define the context type
 interface OnboardingContextType {
   currentStep: number;
   steps: OnboardingStep[];
@@ -16,38 +17,47 @@ interface OnboardingContextType {
   previousStep: () => boolean;
   goToStep: (step: number) => boolean;
   isStepCompleted: (step: number) => boolean;
-  markStepCompleted: (step: number) => void;
+  completeOnboarding: () => Promise<boolean>;
+  // Added properties that were causing errors
+  loading: boolean;
   emotion: string;
   intensity: number;
-  handleResponse: (key: string, value: any) => void;
   userResponses: Record<string, any>;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-  completeOnboarding: () => Promise<boolean>;
+  handleResponse: (key: string, value: any) => void;
 }
 
-const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
+// Create context with default values
+const OnboardingContext = createContext<OnboardingContextType>({
+  currentStep: 0,
+  steps: [],
+  nextStep: () => false,
+  previousStep: () => false,
+  goToStep: () => false,
+  isStepCompleted: () => false,
+  completeOnboarding: async () => false,
+  loading: false,
+  emotion: '',
+  intensity: 0,
+  userResponses: {},
+  handleResponse: () => {},
+});
 
-export interface OnboardingProviderProps {
-  children: ReactNode;
-  initialSteps?: OnboardingStep[];
-}
-
-export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
-  children,
-  initialSteps = []
-}) => {
-  const navigate = useNavigate();
+// Provider component
+export const OnboardingProvider: React.FC<{
+  children: React.ReactNode;
+  steps: OnboardingStep[];
+}> = ({ children, steps }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [steps, setSteps] = useState<OnboardingStep[]>(initialSteps);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [userResponses, setUserResponses] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
   const [emotion, setEmotion] = useState('');
-  const [intensity, setIntensity] = useState(50);
+  const [intensity, setIntensity] = useState(0);
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+      setCompletedSteps([...completedSteps, currentStep]);
       return true;
     }
     return false;
@@ -70,40 +80,25 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   };
 
   const isStepCompleted = (step: number) => {
-    return steps[step]?.completed || false;
-  };
-
-  const markStepCompleted = (step: number) => {
-    const updatedSteps = [...steps];
-    if (updatedSteps[step]) {
-      updatedSteps[step].completed = true;
-      setSteps(updatedSteps);
-    }
+    return completedSteps.includes(step);
   };
 
   const handleResponse = (key: string, value: any) => {
-    setUserResponses(prev => ({
-      ...prev,
-      [key]: value
-    }));
-    
-    if (key === 'emotion') {
-      setEmotion(value);
-    }
-    
-    if (key === 'intensity') {
-      setIntensity(value);
-    }
+    setUserResponses({
+      ...userResponses,
+      [key]: value,
+    });
   };
 
-  const completeOnboarding = async (): Promise<boolean> => {
+  const completeOnboarding = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      // Simulate API call to save onboarding data
+      // Here you would typically save the onboarding data to your backend
+      console.log('Onboarding completed with responses:', userResponses);
+      
+      // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Navigate to dashboard after completion
-      navigate('/dashboard');
       return true;
     } catch (error) {
       console.error('Error completing onboarding:', error);
@@ -114,31 +109,28 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   };
 
   return (
-    <OnboardingContext.Provider value={{
-      currentStep,
-      steps,
-      nextStep,
-      previousStep,
-      goToStep,
-      isStepCompleted,
-      markStepCompleted,
-      emotion,
-      intensity,
-      handleResponse,
-      userResponses,
-      loading,
-      setLoading,
-      completeOnboarding
-    }}>
+    <OnboardingContext.Provider
+      value={{
+        currentStep,
+        steps,
+        nextStep,
+        previousStep,
+        goToStep,
+        isStepCompleted,
+        completeOnboarding,
+        loading,
+        emotion,
+        intensity,
+        userResponses,
+        handleResponse,
+      }}
+    >
       {children}
     </OnboardingContext.Provider>
   );
 };
 
-export const useOnboarding = () => {
-  const context = useContext(OnboardingContext);
-  if (!context) {
-    throw new Error('useOnboarding must be used within an OnboardingProvider');
-  }
-  return context;
-};
+// Hook for using the onboarding context
+export const useOnboarding = () => useContext(OnboardingContext);
+
+export default OnboardingContext;

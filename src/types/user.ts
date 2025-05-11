@@ -29,7 +29,7 @@ export interface UserPreferences {
   language?: string;
   fontFamily?: string;
   fontSize?: string;
-  privacyLevel?: string; // Added missing property
+  privacyLevel?: string; // Added for compatibility
   privacy?: 'public' | 'private' | 'friends';
   showEmotionPrompts?: boolean;
   notification_frequency?: string;

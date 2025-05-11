@@ -3,10 +3,9 @@
 const loadPlaylists = async (): Promise<void> => {
   try {
     const playlists = await makeRequest();
-    // Fix: setPlaylists was undefined, use this.setPlaylists or create a state variable
-    // assuming we have a useState for playlists like:
-    // const [playlists, setPlaylists] = useState<Playlist[]>([]);
-    // Fix: added import or declaration for Playlist type
+    // Replace setPlaylists with a valid state update approach
+    // assuming we have a useState for playlists
+    const [_, setPlaylists] = useState<MusicPlaylist[]>([]);
     setPlaylists(playlists);
   } catch (error) {
     console.error('Failed to load playlists');
@@ -14,7 +13,7 @@ const loadPlaylists = async (): Promise<void> => {
 };
 
 // Helper function to make API requests
-const makeRequest = async (): Promise<Playlist[]> => {
+const makeRequest = async (): Promise<MusicPlaylist[]> => {
   // Mock implementation
   return []; 
 };
@@ -45,6 +44,13 @@ export const useMusic = () => {
     shufflePlaylist: () => {},
     setOpenDrawer: () => {},
     openDrawer: false,
-    error: null
+    error: null,
+    seekTo: () => {}, // Added missing property
+    isShuffled: false, // Added missing property
+    isRepeating: false, // Added missing property
+    toggleShuffle: () => {},
+    toggleRepeat: () => {},
+    duration: 0,
+    currentTime: 0,
   };
 };

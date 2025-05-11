@@ -9,7 +9,12 @@ export interface VRRecommendationsProps {
   onSelect: (template: VRSessionTemplate) => void; // Added property
 }
 
-const VRRecommendations: React.FC<VRRecommendationsProps> = ({ templates, onSelect, currentTemplateId, showHeading = true }) => {
+const VRRecommendations: React.FC<VRRecommendationsProps> = ({ 
+  templates, 
+  onSelect, 
+  currentTemplateId, 
+  showHeading = true 
+}) => {
   return (
     <div>
       {showHeading && <h2>VR Recommendations</h2>}

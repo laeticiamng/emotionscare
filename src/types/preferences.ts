@@ -2,7 +2,7 @@
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'default' | 'serif' | 'mono' | 'inter';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type Theme = ThemeName; // Make them the same type to avoid assignment errors
 
 export interface UserPreferencesState {
   theme: ThemeName;
@@ -18,6 +18,7 @@ export interface UserPreferencesState {
   notification_type: 'email' | 'push' | 'both' | 'none';
   notification_tone: 'formal' | 'friendly' | 'energetic';
   emotionalCamouflage: boolean;
+  font?: string; // Added for compatibility
 }
 
 // Export notification types for compatibility
