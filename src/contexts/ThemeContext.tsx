@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 // Définition unifiée des types de thème
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | 'roboto' | 'poppins' | 'montserrat';
+export type FontFamily = 'inter' | 'serif' | 'mono' | 'roboto' | 'poppins' | 'montserrat' | 'default';
 
 export interface ThemeContextType {
   theme: Theme;
@@ -71,8 +71,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       root.classList.remove('dark');
     }
-    
-    console.log('Theme updated:', theme, 'Resolved theme:', resolvedTheme);
   }, [theme]);
 
   // Écouter les changements de préférence système
@@ -101,12 +99,44 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   // Save font preferences to localStorage when they change
   useEffect(() => {
     localStorage.setItem('fontFamily', fontFamily);
-    console.log('Font family updated:', fontFamily);
+    
+    // Appliquer la famille de police au document
+    const root = window.document.documentElement;
+    root.classList.remove(
+      'font-inter', 'font-serif', 'font-mono', 'font-roboto', 
+      'font-poppins', 'font-montserrat'
+    );
+    
+    switch (fontFamily) {
+      case 'serif':
+        root.classList.add('font-serif');
+        break;
+      case 'mono':
+        root.classList.add('font-mono');
+        break;
+      case 'roboto':
+        root.classList.add('font-roboto');
+        break;
+      case 'poppins':
+        root.classList.add('font-poppins');
+        break;
+      case 'montserrat':
+        root.classList.add('font-montserrat');
+        break;
+      case 'inter':
+      default:
+        root.classList.add('font-inter');
+        break;
+    }
   }, [fontFamily]);
 
   useEffect(() => {
     localStorage.setItem('fontSize', fontSize);
-    console.log('Font size updated:', fontSize);
+    
+    // Appliquer la taille de police au document
+    const root = window.document.documentElement;
+    root.classList.remove('text-small', 'text-medium', 'text-large');
+    root.classList.add(`text-${fontSize}`);
   }, [fontSize]);
 
   // Create setThemePreference as an alias for setTheme for backward compatibility

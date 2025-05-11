@@ -12,20 +12,22 @@ interface ThemeButtonProps {
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const themeContext = useTheme();
   const theme = themeContext?.theme || 'light';
-  const setTheme = themeContext?.setTheme || ((t: Theme) => console.log('Theme would change to:', t));
+  const resolvedTheme = themeContext?.resolvedTheme;
   
   const toggleTheme = () => {
-    // Cycle through themes: light -> dark -> system
-    const themeOrder: Theme[] = ['light', 'dark', 'system'];
-    const currentIndex = themeOrder.indexOf(theme as Theme);
-    const nextIndex = (currentIndex + 1) % themeOrder.length;
-    const newTheme = themeOrder[nextIndex];
-    setTheme(newTheme);
+    if (themeContext?.setTheme) {
+      // Cycle through themes: light -> dark -> system
+      const themeOrder: Theme[] = ['light', 'dark', 'system'];
+      const currentIndex = themeOrder.indexOf(theme as Theme);
+      const nextIndex = (currentIndex + 1) % themeOrder.length;
+      const newTheme = themeOrder[nextIndex];
+      themeContext.setTheme(newTheme);
+    }
   };
   
   // Determine if the current theme is dark
   // This works with both direct 'dark' theme and system preference resulting in dark
-  const isDark = theme === 'dark' || (theme === 'system' && themeContext?.resolvedTheme === 'dark');
+  const isDark = theme === 'dark' || (theme === 'system' && resolvedTheme === 'dark');
   
   if (collapsed) {
     return (

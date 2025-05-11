@@ -7,9 +7,9 @@ import { FontFamily, FontSize } from '@/contexts/ThemeContext';
 
 interface FontSettingsProps {
   currentFontFamily: FontFamily;
-  onChangeFontFamily: (value: string) => void;
+  onChangeFontFamily: (value: FontFamily) => void;
   currentFontSize: FontSize;
-  onChangeFontSize: (value: string) => void;
+  onChangeFontSize: (value: FontSize) => void;
 }
 
 const FontSettings: React.FC<FontSettingsProps> = ({
@@ -18,6 +18,20 @@ const FontSettings: React.FC<FontSettingsProps> = ({
   currentFontSize,
   onChangeFontSize
 }) => {
+  const handleFontFamilyChange = (value: string) => {
+    // Validate the value is a valid FontFamily
+    if (['inter', 'serif', 'mono', 'roboto', 'poppins', 'montserrat', 'default'].includes(value)) {
+      onChangeFontFamily(value as FontFamily);
+    }
+  };
+
+  const handleFontSizeChange = (value: string) => {
+    // Validate the value is a valid FontSize
+    if (['small', 'medium', 'large'].includes(value)) {
+      onChangeFontSize(value as FontSize);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -28,7 +42,7 @@ const FontSettings: React.FC<FontSettingsProps> = ({
           <h3 className="text-sm font-medium mb-3">Famille de police</h3>
           <RadioGroup
             value={currentFontFamily}
-            onValueChange={onChangeFontFamily}
+            onValueChange={handleFontFamilyChange}
             className="grid grid-cols-2 gap-2 mb-4"
           >
             <div className="flex items-center space-x-2">
@@ -54,7 +68,7 @@ const FontSettings: React.FC<FontSettingsProps> = ({
           <h3 className="text-sm font-medium mb-3">Taille de police</h3>
           <RadioGroup
             value={currentFontSize}
-            onValueChange={onChangeFontSize}
+            onValueChange={handleFontSizeChange}
             className="grid grid-cols-3 gap-2"
           >
             <div className="flex items-center space-x-2">

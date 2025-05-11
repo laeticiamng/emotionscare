@@ -3,10 +3,11 @@
 import { 
   ThemeProvider, 
   useTheme, 
-  Theme
+  Theme,
+  ThemeContextType
 } from '@/contexts/ThemeContext';
 
 export type ThemeName = Theme;
 
 export { ThemeProvider, useTheme };
-export type { Theme };
+export type { Theme, ThemeContextType };

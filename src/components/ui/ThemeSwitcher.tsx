@@ -17,13 +17,20 @@ interface ThemeSwitcherProps {
   showLabel?: boolean;
 }
 
-const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showLabel = false }: ThemeSwitcherProps) => {
-  const { theme = 'system', resolvedTheme = 'light', setTheme } = useTheme() || {};
-
+const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ 
+  size = 'icon', 
+  variant = 'ghost', 
+  className = '', 
+  showLabel = false 
+}) => {
+  const themeContext = useTheme();
+  const theme = themeContext?.theme || 'system';
+  const resolvedTheme = themeContext?.resolvedTheme || 'light';
+  
   // Function to handle theme changes
   const handleThemeChange = (newTheme: Theme) => {
-    if (setTheme) {
-      setTheme(newTheme);
+    if (themeContext?.setTheme) {
+      themeContext.setTheme(newTheme);
     }
   };
 

@@ -12,7 +12,7 @@ export interface UserPreferencesState {
   highContrast: boolean;
   reducedAnimations: boolean;
   fontSize: FontSize;
-  font: FontFamily | string;
+  font: FontFamily;
   customBackground?: string;
   
   // Identity
@@ -115,18 +115,29 @@ export function useUserPreferences() {
   // Update preferences
   const updatePreferences = useCallback((newPreferences: Partial<UserPreferencesState>) => {
     try {
-      // Fix: ensure theme value is compatible with Theme type before updating
+      // Ensure theme value is compatible with Theme type before updating
       const updatedPreferences = { ...preferences, ...newPreferences };
       setPreferences(updatedPreferences);
       localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
       // Synchronize with other contexts if needed
       if (newPreferences.theme && themeContext?.setTheme) {
-        // Fix: Ensure theme is one of the allowed values
+        // Ensure theme is one of the allowed values
         const themeValue = newPreferences.theme;
         if (['light', 'dark', 'system', 'pastel'].includes(themeValue)) {
           themeContext.setTheme(themeValue);
         }
+      }
+      
+      // Synchronize font settings
+      if (newPreferences.font && themeContext?.setFontFamily) {
+        const fontValue = newPreferences.font;
+        themeContext.setFontFamily(fontValue);
+      }
+      
+      if (newPreferences.fontSize && themeContext?.setFontSize) {
+        const fontSizeValue = newPreferences.fontSize;
+        themeContext.setFontSize(fontSizeValue);
       }
       
       toast({
@@ -153,7 +164,7 @@ export function useUserPreferences() {
     const newPreset = {
       name,
       theme: preferences.theme,
-      audioPreset: audioPrefs.preferences?.currentEqualizer || "standard"
+      audioPreset: audioPrefs?.preferences?.currentEqualizer || "standard"
     };
     
     const updatedPresets = [...preferences.customPresets, newPreset];
@@ -176,7 +187,7 @@ export function useUserPreferences() {
       updatePreferences({ theme: presetTheme });
     }
     
-    if (audioPrefs.setEqualizerPreset) {
+    if (audioPrefs?.setEqualizerPreset) {
       audioPrefs.setEqualizerPreset(preset.audioPreset);
     }
     
@@ -196,6 +207,14 @@ export function useUserPreferences() {
     // Also reset associated contexts
     if (themeContext?.setTheme) {
       themeContext.setTheme('light');
+    }
+    
+    if (themeContext?.setFontFamily) {
+      themeContext.setFontFamily('inter');
+    }
+    
+    if (themeContext?.setFontSize) {
+      themeContext.setFontSize('medium');
     }
     
     toast({
