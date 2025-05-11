@@ -49,13 +49,21 @@ export function VRMusicIntegration({ emotion }: { emotion: string }) {
     musicContext.previousTrack();
   };
   
+  const toggleMute = () => {
+    musicContext.toggleMute();
+  };
+  
   return {
     playlist,
     playMusic,
     pauseMusic,
     nextTrack,
     prevTrack,
+    toggleMute,
+    isMuted: musicContext.isMuted,
     isPlaying: musicContext.isPlaying,
-    currentTrack: musicContext.currentTrack
+    currentTrack: musicContext.currentTrack,
+    volume: musicContext.volume,
+    setVolume: musicContext.setVolume
   };
 }

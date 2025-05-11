@@ -51,7 +51,16 @@ export interface EmotionToMusicMap {
 }
 
 export function useMusicEmotionIntegration() {
-  const { loadPlaylistForEmotion, playTrack, currentPlaylist, currentTrack, isPlaying, setOpenDrawer } = useMusic();
+  const { 
+    loadPlaylistForEmotion, 
+    playTrack, 
+    currentPlaylist, 
+    currentTrack, 
+    isPlaying, 
+    setOpenDrawer, 
+    isMuted, 
+    toggleMute 
+  } = useMusic();
   const { toast } = useToast();
   
   // Activate music based on detected emotion
@@ -117,7 +126,9 @@ export function useMusicEmotionIntegration() {
   return {
     activateMusicForEmotion,
     getEmotionMusicDescription,
-    EMOTION_TO_MUSIC_MAP
+    EMOTION_TO_MUSIC_MAP,
+    isMuted,
+    toggleMute
   };
 }
 

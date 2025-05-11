@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useMusic } from '@/contexts/MusicContext';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat, Music } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat, Music, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -17,7 +17,9 @@ const MusicPlayer: React.FC = () => {
     nextTrack, 
     previousTrack, 
     volume,
-    setVolume
+    setVolume,
+    isMuted,
+    toggleMute
   } = useMusic();
   
   const [progress, setProgress] = useState(0);
@@ -47,6 +49,10 @@ const MusicPlayer: React.FC = () => {
   
   const handleVolumeChange = (values: number[]) => {
     setVolume(values[0] / 100);
+    // If user increases volume while muted, unmute
+    if (isMuted && values[0] > 0) {
+      toggleMute();
+    }
   };
   
   const handleProgressChange = (values: number[]) => {
@@ -220,9 +226,20 @@ const MusicPlayer: React.FC = () => {
         
         {/* Volume control */}
         <div className="flex items-center gap-3 pt-2">
-          <Volume2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <Button 
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 p-0"
+            onClick={toggleMute}
+          >
+            {isMuted || volume === 0 ? (
+              <VolumeX className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Volume2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            )}
+          </Button>
           <Slider
-            value={[volume * 100]}
+            value={[isMuted ? 0 : volume * 100]}
             max={100}
             step={1}
             onValueChange={handleVolumeChange}

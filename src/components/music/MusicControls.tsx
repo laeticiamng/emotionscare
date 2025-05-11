@@ -45,6 +45,18 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
   
+  // Handle volume changes with mute consideration
+  const handleVolumeChange = (values: number[]) => {
+    if (onVolumeChange) {
+      onVolumeChange(values[0]);
+      
+      // If volume is increased and audio is muted, unmute it
+      if (isMuted && values[0] > 0 && onToggleMute) {
+        onToggleMute();
+      }
+    }
+  };
+  
   return (
     <div className={`flex flex-col w-full gap-2 ${className}`}>
       {/* Slider de progression */}
@@ -87,7 +99,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
                 max={100}
                 step={1}
                 className="w-24"
-                onValueChange={(values) => onVolumeChange(values[0])}
+                onValueChange={handleVolumeChange}
                 aria-label="Volume"
               />
             </div>

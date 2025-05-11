@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipForward, SkipBack, Volume2, Music } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Volume2, Music, VolumeX } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
 import { useActivityLogging } from '@/hooks/useActivityLogging';
@@ -16,12 +16,43 @@ const MusicPlayer: React.FC = () => {
     nextTrack, 
     previousTrack,
     volume,
-    setVolume
+    setVolume,
+    isMuted,
+    toggleMute
   } = useMusic();
+  
   const { logUserAction } = useActivityLogging('music');
+  const [progress, setProgress] = useState(0);
+  
+  // Simulate track playback for demo purposes
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (isPlaying && currentTrack) {
+      interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval!);
+            return 0;
+          }
+          return prev + 0.5;
+        });
+      }, 500);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, currentTrack]);
   
   const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0] / 100);
+    const newVolume = value[0] / 100;
+    setVolume(newVolume);
+    
+    // If user increases volume while muted, unmute
+    if (isMuted && newVolume > 0) {
+      toggleMute();
+    }
   };
   
   const togglePlayPause = () => {
@@ -38,7 +69,15 @@ const MusicPlayer: React.FC = () => {
     <div className="flex flex-col md:flex-row">
       <div className="w-full md:w-1/3 bg-muted/20 p-6 flex flex-col justify-center items-center">
         <div className="rounded-full h-32 w-32 bg-primary/10 flex items-center justify-center mb-4">
-          <Music className="h-12 w-12 text-primary/80" />
+          {currentTrack?.coverUrl ? (
+            <img 
+              src={currentTrack.coverUrl} 
+              alt={currentTrack.title} 
+              className="h-full w-full object-cover rounded-full"
+            />
+          ) : (
+            <Music className="h-12 w-12 text-primary/80" />
+          )}
         </div>
         <h2 className="text-xl font-medium text-center">
           {currentTrack?.title || "Aucune piste sélectionnée"}
@@ -55,6 +94,28 @@ const MusicPlayer: React.FC = () => {
             height={180}
           />
         </div>
+        
+        {/* Progress bar */}
+        {currentTrack && (
+          <div className="mb-4">
+            <Slider
+              value={[progress]}
+              max={100}
+              step={0.1}
+              className="mb-1"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>
+                {Math.floor((progress / 100) * (currentTrack?.duration || 0) / 60)}:
+                {String(Math.floor((progress / 100) * (currentTrack?.duration || 0) % 60)).padStart(2, '0')}
+              </span>
+              <span>
+                {Math.floor((currentTrack?.duration || 0) / 60)}:
+                {String(Math.floor((currentTrack?.duration || 0) % 60)).padStart(2, '0')}
+              </span>
+            </div>
+          </div>
+        )}
         
         <div className="flex justify-center space-x-2 mb-4">
           <Button 
@@ -93,9 +154,20 @@ const MusicPlayer: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-2">
-          <Volume2 className="h-4 w-4 text-muted-foreground" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8"
+            onClick={toggleMute}
+          >
+            {isMuted || volume === 0 ? (
+              <VolumeX className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Volume2 className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
           <Slider
-            defaultValue={[volume * 100]}
+            value={[isMuted ? 0 : volume * 100]}
             max={100}
             step={1}
             onValueChange={handleVolumeChange}

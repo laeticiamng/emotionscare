@@ -45,7 +45,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     setVolume(value[0] / 100);
     // If user changes volume, unmute if currently muted
     if (isMuted && value[0] > 0) {
-      toggleMute?.();
+      toggleMute();
     }
   };
 

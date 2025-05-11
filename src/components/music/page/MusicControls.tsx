@@ -16,11 +16,13 @@ interface MusicControlsProps {
   track?: MusicTrack;
   isPlaying: boolean;
   volume: number;
+  isMuted?: boolean;
   onPlay: () => void;
   onPause: () => void;
   onNext: () => void;
   onPrevious: () => void;
   onVolumeChange: (value: number) => void;
+  onToggleMute?: () => void;
   progress?: number;
   onSeek?: (position: number) => void;
   duration?: number;
@@ -31,11 +33,13 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   track,
   isPlaying,
   volume,
+  isMuted = false,
   onPlay,
   onPause,
   onNext,
   onPrevious,
   onVolumeChange,
+  onToggleMute,
   progress = 0,
   onSeek,
   duration = 0,
@@ -50,6 +54,16 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Handle volume changes with mute consideration
+  const handleVolumeChange = (values: number[]) => {
+    onVolumeChange(values[0]);
+    
+    // If user increases volume while muted, unmute
+    if (isMuted && values[0] > 0 && onToggleMute) {
+      onToggleMute();
+    }
   };
 
   return (
@@ -104,16 +118,16 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onVolumeChange(volume > 0 ? 0 : 100)}
+            onClick={onToggleMute || (() => onVolumeChange(volume > 0 ? 0 : 100))}
           >
-            {volume > 0 ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </Button>
           <Slider
-            value={[volume]}
+            value={[isMuted ? 0 : volume]}
             max={100}
             step={1}
             className="w-24"
-            onValueChange={(values) => onVolumeChange(values[0])}
+            onValueChange={(values) => handleVolumeChange(values)}
           />
         </div>
         
