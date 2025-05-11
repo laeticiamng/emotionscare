@@ -22,7 +22,7 @@ export interface User {
   updatedAt?: string;
   avatar?: string;
   avatar_url?: string;
-  image?: string;
+  image?: string; // Added image property
   department?: string;
   position?: string;
   bio?: string;
@@ -49,6 +49,7 @@ export interface User {
     intensity?: number;
     analysis?: any;
   };
+  updateUser?: (user: User) => Promise<void>; // Added for compatibility
 }
 
 export interface UserPreferencesState {

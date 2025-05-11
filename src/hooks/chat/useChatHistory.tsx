@@ -1,135 +1,118 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { ChatConversation, ChatMessage } from '@/types/chat';
-import { useToast } from '@/hooks/use-toast';
-import { UseChatHistoryResult } from './types/useChatHistoryResult';
+
+export interface UseChatHistoryResult {
+  history: ChatMessage[];
+  isLoading: boolean;
+  conversations: ChatConversation[];
+  activeConversationId: string | null;
+  deleteConversation: (conversationId: string) => Promise<boolean>;
+  loadMessages: (conversationId: string) => Promise<ChatMessage[]>;
+  setActiveConversationId: (id: string | null) => void;
+}
 
 export function useChatHistory(): UseChatHistoryResult {
+  const [history, setHistory] = useState<ChatMessage[]>([]);
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Load conversations from storage or mock data
   useEffect(() => {
-    const loadConversations = async () => {
-      try {
-        // Simulate API call
-        const mockConversations: ChatConversation[] = [
-          {
-            id: 'conv-1',
-            title: 'Discussion avec Coach IA',
-            created_at: new Date(Date.now() - 86400000), // 1 day ago
-            updated_at: new Date(),
-            user_id: 'user-1',
-            messages: [],
-            last_message: 'Comment puis-je vous aider aujourd\'hui?'
-          },
-          {
-            id: 'conv-2',
-            title: 'Stress au travail',
-            created_at: new Date(Date.now() - 172800000), // 2 days ago
-            updated_at: new Date(Date.now() - 86400000),
-            user_id: 'user-1',
-            messages: [],
-            last_message: 'Voici quelques techniques pour gérer votre stress.'
-          }
-        ];
-        
-        setConversations(mockConversations);
-      } catch (error) {
-        console.error('Error loading conversations:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les conversations.",
-          variant: "destructive"
-        });
-      }
-    };
-    
+    // Load conversations on init
     loadConversations();
-  }, [toast]);
+  }, []);
 
-  // Delete conversation
-  const deleteConversation = useCallback(async (conversationId: string) => {
+  const loadConversations = async () => {
+    setIsLoading(true);
     try {
-      // Remove conversation from state
+      // Mock conversations
+      const mockConversations: ChatConversation[] = [
+        {
+          id: 'conv-1',
+          title: 'Conversation 1',
+          user_id: 'user-1',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          lastMessage: 'How can I improve my well-being?'
+        },
+        {
+          id: 'conv-2',
+          title: 'Conversation 2',
+          user_id: 'user-1',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          lastMessage: 'Techniques for better sleep'
+        }
+      ];
+      
+      setConversations(mockConversations);
+      return mockConversations;
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadMessages = async (conversationId: string): Promise<ChatMessage[]> => {
+    setIsLoading(true);
+    try {
+      // Mock loading messages
+      const mockMessages: ChatMessage[] = [
+        {
+          id: uuidv4(),
+          content: 'Hello, how can I help you today?',
+          text: 'Hello, how can I help you today?',
+          sender: 'bot',
+          timestamp: new Date().toISOString(),
+          conversation_id: conversationId
+        },
+        {
+          id: uuidv4(),
+          content: 'I want to improve my wellbeing',
+          text: 'I want to improve my wellbeing',
+          sender: 'user',
+          timestamp: new Date().toISOString(),
+          conversation_id: conversationId
+        }
+      ];
+      
+      setHistory(mockMessages);
+      return mockMessages;
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteConversation = async (conversationId: string): Promise<boolean> => {
+    try {
+      // Remove from state
       setConversations(prevConversations => 
         prevConversations.filter(conv => conv.id !== conversationId)
       );
       
-      // If the deleted conversation was active, clear active conversation
+      // If we deleted the active conversation, clear it
       if (activeConversationId === conversationId) {
         setActiveConversationId(null);
+        setHistory([]);
       }
       
       return true;
     } catch (error) {
       console.error('Error deleting conversation:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la conversation.",
-        variant: "destructive"
-      });
       return false;
     }
-  }, [activeConversationId, toast]);
-
-  // Load messages for a conversation
-  const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
-    try {
-      // Simulate API call
-      const mockMessages: ChatMessage[] = [
-        {
-          id: 'msg-1',
-          sender: 'bot',
-          sender_id: 'coach-ai',
-          conversation_id: conversationId,
-          content: 'Bonjour, comment puis-je vous aider aujourd\'hui?',
-          is_read: true,
-          timestamp: new Date(Date.now() - 3600000) // 1 hour ago
-        },
-        {
-          id: 'msg-2',
-          sender: 'user',
-          sender_id: 'user-1',
-          conversation_id: conversationId,
-          content: 'Je me sens stressé au travail',
-          is_read: true,
-          timestamp: new Date(Date.now() - 3540000) // 59 minutes ago
-        },
-        {
-          id: 'msg-3',
-          sender: 'bot',
-          sender_id: 'coach-ai',
-          conversation_id: conversationId,
-          content: 'Je comprends. Pouvez-vous m\'en dire plus sur ce qui vous stresse précisément?',
-          is_read: true,
-          timestamp: new Date(Date.now() - 3480000) // 58 minutes ago
-        }
-      ];
-      
-      // Update the conversation in state with messages
-      setConversations(prevConversations => 
-        prevConversations.map(conv =>
-          conv.id === conversationId ? { ...conv, messages: mockMessages } : conv
-        )
-      );
-      
-      setActiveConversationId(conversationId);
-      
-      return mockMessages;
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les messages.",
-        variant: "destructive"
-      });
-      return [];
-    }
-  }, [toast]);
+  };
 
   return {
+    history,
+    isLoading,
     conversations,
     activeConversationId,
     deleteConversation,

@@ -20,7 +20,8 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     benefits: ['Réduction du stress', 'Amélioration du sommeil'],
     tags: ['nature', 'water', 'relaxation'],
     popularity: 95,
-    recommended_mood: 'stressed'
+    recommended_mood: 'stressed',
+    level: 'beginner'
   },
   {
     id: 'template-2',
@@ -40,7 +41,8 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     benefits: ['Clarté mentale', 'Réduction de l\'anxiété'],
     tags: ['nature', 'forest', 'meditation'],
     popularity: 88,
-    recommended_mood: 'anxious'
+    recommended_mood: 'anxious',
+    level: 'intermediate'
   },
   {
     id: 'template-3',
@@ -59,7 +61,9 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     benefits: ['Réduction du stress', 'Amélioration du bien-être'],
     tags: ['audio', 'meditation', 'guided'],
     popularity: 75,
-    recommended_mood: 'overwhelmed'
+    recommended_mood: 'overwhelmed',
+    level: 'beginner',
+    preview_url: '' // Add empty string for required field
   },
   {
     id: 'template-4',
@@ -79,7 +83,8 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     benefits: ['Amélioration de la concentration', 'Augmentation de l\'énergie'],
     tags: ['mountains', 'breathing', 'energy'],
     popularity: 82,
-    recommended_mood: 'tired'
+    recommended_mood: 'tired',
+    level: 'beginner'
   }
 ];
 

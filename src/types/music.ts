@@ -1,4 +1,3 @@
-
 export interface MusicTrack {
   id: string;
   title: string;
@@ -35,26 +34,6 @@ export interface MusicPlaylist {
   emotion?: string;
 }
 
-export interface MusicRecommendationCardProps {
-  title?: string;
-  emotion?: string;
-  onSelect?: () => void;
-  
-  // Add missing properties
-  intensity?: number;
-  standalone?: boolean;
-  className?: string;
-}
-
-export interface MusicDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  
-  // Add for backward compatibility
-  isOpen?: boolean;
-  onClose?: () => void;
-}
-
 export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
@@ -80,6 +59,15 @@ export interface MusicContextType {
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
 }
 
+export interface MusicDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  
+  // Add for backward compatibility
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
@@ -94,4 +82,15 @@ export interface TrackInfoProps {
 export interface VolumeControlProps {
   volume: number;
   onChange: (volume: number) => void;
+}
+
+export interface MusicRecommendationCardProps {
+  title?: string;
+  emotion?: string;
+  onSelect?: () => void;
+  
+  // Add missing properties
+  intensity?: number;
+  standalone?: boolean;
+  className?: string;
 }

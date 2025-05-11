@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward, SkipBack, Repeat, Shuffle } from 'lucide-react';
 
 export interface MusicControlsProps {
-  showDrawer?: () => void; // Add showDrawer property
+  showDrawer?: () => void; // Added the showDrawer property
 }
 
 const MusicControls: React.FC<MusicControlsProps> = ({ showDrawer }) => {

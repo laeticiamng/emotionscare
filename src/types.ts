@@ -183,6 +183,7 @@ export interface Badge {
   threshold?: number;
   user_id?: string;
   unlocked_at?: string;
+  progress?: number; // Added for compatibility
 }
 
 export interface JournalEntry {
@@ -298,8 +299,10 @@ export interface VRSessionWithMusicProps {
 }
 
 export interface ChatResponse {
-  id: string;
-  content: string;
-  role: string;
-  timestamp: string;
+  id?: string;
+  content?: string;
+  message?: string; // Added for compatibility
+  role?: string;
+  timestamp?: string;
+  emotion?: string; // Added for compatibility
 }

@@ -4,14 +4,27 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
 import { VRSessionWithMusicProps } from '@/types/vr';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onComplete }) => {
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
+  template, 
+  onComplete, 
+  session, 
+  onSessionComplete, 
+  isAudioOnly, 
+  videoUrl, 
+  audioUrl, 
+  emotion 
+}) => {
+  // Use either direct props or from template
+  const activeTemplate = session || template;
+  const handleComplete = onSessionComplete || onComplete;
+  const targetEmotion = emotion || (activeTemplate.emotions && activeTemplate.emotions.length > 0 ? activeTemplate.emotions[0] : 'calm');
+  
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
   
   useEffect(() => {
     // Load a playlist based on the target emotion of the session
     const loadMusic = async () => {
-      if (template.emotions && template.emotions.length > 0) {
-        const targetEmotion = template.emotions[0];
+      if (targetEmotion) {
         const playlist = await loadPlaylistForEmotion(targetEmotion);
         
         if (playlist && playlist.tracks.length > 0) {
@@ -26,7 +39,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onCom
     return () => {
       pauseTrack();
     };
-  }, [template, loadPlaylistForEmotion, playTrack, pauseTrack]);
+  }, [activeTemplate, targetEmotion, loadPlaylistForEmotion, playTrack, pauseTrack]);
   
   return (
     <Card className="mb-4">
