@@ -2,7 +2,7 @@
 export interface User {
   id: string;
   name: string;
-  email?: string;
+  email: string; // Making this required
   role?: string;
   avatar?: string;
   image?: string; 
@@ -21,12 +21,12 @@ export interface User {
 
 export interface UserPreferences {
   theme?: ThemeName;
-  notifications?: boolean;
+  notifications?: boolean; // Keeping this as boolean only
   soundEnabled?: boolean;
   language?: string;
-  fontFamily?: string; 
+  fontFamily?: string; // Adding fontFamily
   fontSize?: FontSize;
-  privacyLevel?: string;
+  privacyLevel?: string; // Adding privacyLevel
   privacy?: 'public' | 'private' | 'friends';
   showEmotionPrompts?: boolean;
   notification_frequency?: string;

@@ -3,11 +3,11 @@ export interface VRSessionTemplate {
   id: string;
   name: string;
   description: string;
-  thumbnail: string;
-  title?: string;
+  thumbnail: string; // Making this required
+  title?: string; // Making this optional
   category: string;
   duration: number;
-  intensity: 'low' | 'medium' | 'high';
+  intensity: 'low' | 'medium' | 'high'; // Making this required
   tags: string[];
   youtubeId?: string;
   lastUsed?: Date;

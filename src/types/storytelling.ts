@@ -1,15 +1,23 @@
-// Change import to avoid conflict with local declaration
-import { User } from './user';
-// Rename the imported Story to avoid conflict
-import { Story as ImportedStory } from './story';
 
-// Local declaration
 export interface Story {
   id: string;
   title: string;
   content: string;
-  // other fields...
+  type: string;
+  seen?: boolean;
+  image?: string;
+  emotion?: string;
+  cta?: {
+    label: string;
+    route: string;
+    text?: string;
+    action?: string;
+  };
 }
 
-// Re-export the imported Story with a different name
-export { ImportedStory };
+export interface StorytellingConfig {
+  autoPlay?: boolean;
+  interval?: number;
+  showIndicators?: boolean;
+  showControls?: boolean;
+}

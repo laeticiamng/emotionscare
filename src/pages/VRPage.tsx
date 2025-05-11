@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,7 +23,7 @@ const VRPage: React.FC = () => {
   
   const [activeTemplate, setActiveTemplate] = useState<VRSessionTemplate | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { startSession, completeSession, isActive } = useVRSession('user-id'); // Pass a userId
+  const { startSession, completeSession } = useVRSession();
   
   // Effect to load recommended template if specified in URL
   useEffect(() => {
@@ -106,7 +107,7 @@ const VRPage: React.FC = () => {
           </Button>
           
           <Card className="p-6">
-            <h2 className="text-2xl font-bold mb-4">{activeTemplate.title}</h2>
+            <h2 className="text-2xl font-bold mb-4">{activeTemplate.title || activeTemplate.name}</h2>
             <p className="text-muted-foreground mb-6">{activeTemplate.description}</p>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-2/3">
@@ -114,7 +115,7 @@ const VRPage: React.FC = () => {
                   <div className="rounded-lg overflow-hidden bg-muted aspect-video mb-4">
                     <img 
                       src={activeTemplate.preview_url} 
-                      alt={activeTemplate.title || ''} 
+                      alt={activeTemplate.title || activeTemplate.name} 
                       className="w-full h-full object-cover"
                     />
                   </div>

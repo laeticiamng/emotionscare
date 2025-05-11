@@ -3,8 +3,8 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  url: string;
-  duration: number;
+  url: string; // Making this required
+  duration: number; // Making this required
   coverUrl?: string;
   coverImage?: string;
   genre?: string;
@@ -24,7 +24,7 @@ export interface MusicPlaylist {
   title?: string;
   description: string;
   coverUrl: string;
-  emotion?: string;
+  emotion?: string; // Adding emotion as an optional property
   mood?: string;
   tracks: MusicTrack[];
 }
@@ -81,5 +81,5 @@ export interface Toast {
   description?: string;
   variant?: 'default' | 'destructive';
   action?: React.ReactNode;
-  duration?: number;
+  duration?: number; // Added duration
 }

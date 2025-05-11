@@ -4,30 +4,10 @@ export interface ChatMessage {
   text?: string;
   content?: string;
   sender: string;
-  sender_id?: string;
   sender_type?: string;
-  timestamp: string;
+  timestamp?: string;
   conversation_id?: string;
   role?: string;
-  is_read?: boolean;
-  emotion?: string;
-}
-
-export interface ChatConversation {
-  id: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-  title: string;
-  last_message: string; // Required based on errors
-  last_message_time?: string;
-  messages?: ChatMessage[];
-  
-  // Legacy fields for backwards compatibility
-  userId?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  lastMessage?: string;
 }
 
 export interface ChatResponse {
@@ -37,8 +17,24 @@ export interface ChatResponse {
   role?: string;
   timestamp?: string;
   emotion?: string;
-  follow_up_questions?: string[]; // Added missing property
 }
 
-// Add this for compatibility with useChatProcessing.ts and useChat.tsx
-export type ChatResponseType = ChatResponse;
+export interface ChatConversation {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  assistant_id?: string;
+  messages: ChatMessage[];
+  status: 'active' | 'archived' | 'deleted';
+  context?: string;
+}
+
+export interface ChatParticipant {
+  id: string;
+  name: string;
+  avatar?: string;
+  type: 'user' | 'assistant' | 'system';
+  status?: 'online' | 'offline' | 'away';
+}

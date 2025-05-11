@@ -61,10 +61,11 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   const handlePlay = () => {
     if (recommendedPlaylist && recommendedPlaylist.tracks.length > 0) {
       // Ensure track has required fields
+      const track = recommendedPlaylist.tracks[0];
       const trackWithRequiredProps: MusicTrack = {
-        ...recommendedPlaylist.tracks[0],
-        url: recommendedPlaylist.tracks[0].url || recommendedPlaylist.tracks[0].audioUrl || recommendedPlaylist.tracks[0].audio_url || '',
-        duration: recommendedPlaylist.tracks[0].duration || 0
+        ...track,
+        url: track.url || track.audioUrl || track.audio_url || '',
+        duration: track.duration || 0
       };
       
       playTrack(trackWithRequiredProps);

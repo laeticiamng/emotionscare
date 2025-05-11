@@ -1,12 +1,15 @@
+
 import { Playlist } from './types';
-import { convertMusicPlaylistToPlaylist } from './converters';
-import { MusicPlaylist } from '@/types';
+import { playlistToMusicPlaylist } from './converters';
+import { MusicPlaylist } from '@/types/music';
 
 // Données mockées de playlists pour le développement
 const mockPlaylists: Record<string, MusicPlaylist> = {
   'meditation': {
     id: 'meditation-playlist',
     name: 'Méditation profonde',
+    description: 'Musique apaisante pour la méditation',
+    coverUrl: '/images/meditation.jpg',
     emotion: 'calm',
     tracks: [
       {
@@ -14,8 +17,8 @@ const mockPlaylists: Record<string, MusicPlaylist> = {
         title: 'Inner Peace',
         artist: 'Zen Garden',
         duration: 360,
-        audioUrl: 'https://example.com/meditation1.mp3',
         url: 'https://example.com/meditation1.mp3',
+        audioUrl: 'https://example.com/meditation1.mp3',
         coverUrl: '/images/meditation1.jpg'
       },
       {
@@ -23,8 +26,8 @@ const mockPlaylists: Record<string, MusicPlaylist> = {
         title: 'Mindful Morning',
         artist: 'Breath Collective',
         duration: 480,
-        audioUrl: 'https://example.com/meditation2.mp3',
         url: 'https://example.com/meditation2.mp3',
+        audioUrl: 'https://example.com/meditation2.mp3',
         coverUrl: '/images/meditation2.jpg'
       }
     ]
@@ -32,6 +35,8 @@ const mockPlaylists: Record<string, MusicPlaylist> = {
   'focus': {
     id: 'focus-playlist',
     name: 'Concentration maximale',
+    description: 'Musique pour améliorer la concentration',
+    coverUrl: '/images/focus.jpg',
     emotion: 'focused',
     tracks: [
       {
@@ -39,8 +44,8 @@ const mockPlaylists: Record<string, MusicPlaylist> = {
         title: 'Deep Work',
         artist: 'Productivity Sound',
         duration: 300,
-        audioUrl: 'https://example.com/focus1.mp3',
         url: 'https://example.com/focus1.mp3',
+        audioUrl: 'https://example.com/focus1.mp3',
         coverUrl: '/images/focus1.jpg'
       },
       {
@@ -48,8 +53,8 @@ const mockPlaylists: Record<string, MusicPlaylist> = {
         title: 'Flow State',
         artist: 'Mind Waves',
         duration: 320,
-        audioUrl: 'https://example.com/focus2.mp3',
         url: 'https://example.com/focus2.mp3',
+        audioUrl: 'https://example.com/focus2.mp3',
         coverUrl: '/images/focus2.jpg'
       }
     ]
@@ -69,7 +74,15 @@ export const getPlaylist = async (id: string): Promise<Playlist | null> => {
     const mockPlaylist = mockPlaylists[id];
     
     if (mockPlaylist) {
-      return convertMusicPlaylistToPlaylist(mockPlaylist);
+      return {
+        id: mockPlaylist.id,
+        name: mockPlaylist.name,
+        title: mockPlaylist.title,
+        tracks: mockPlaylist.tracks.map(track => ({
+          ...track,
+          url: track.url || track.audioUrl || track.audio_url || ''
+        }))
+      };
     }
     
     return null;
@@ -89,9 +102,15 @@ export const getAllPlaylists = async (): Promise<Playlist[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     
     // Dans une implémentation réelle, on ferait un appel à l'API
-    return Object.values(mockPlaylists).map(playlist => 
-      convertMusicPlaylistToPlaylist(playlist)
-    );
+    return Object.values(mockPlaylists).map(playlist => ({
+      id: playlist.id,
+      name: playlist.name,
+      title: playlist.title,
+      tracks: playlist.tracks.map(track => ({
+        ...track,
+        url: track.url || track.audioUrl || track.audio_url || ''
+      }))
+    }));
   } catch (error) {
     console.error('Error fetching all playlists:', error);
     return [];
@@ -109,8 +128,16 @@ export const getRecommendedPlaylists = async (emotion: string): Promise<Playlist
     
     // Dans une implémentation réelle, on ferait un appel à l'API avec l'émotion comme paramètre
     return Object.values(mockPlaylists)
-      .filter(playlist => playlist.emotion.includes(emotion.toLowerCase()))
-      .map(playlist => convertMusicPlaylistToPlaylist(playlist));
+      .filter(playlist => playlist.emotion && playlist.emotion.includes(emotion.toLowerCase()))
+      .map(playlist => ({
+        id: playlist.id,
+        name: playlist.name,
+        title: playlist.title,
+        tracks: playlist.tracks.map(track => ({
+          ...track,
+          url: track.url || track.audioUrl || track.audio_url || ''
+        }))
+      }));
   } catch (error) {
     console.error('Error fetching recommended playlists:', error);
     return [];

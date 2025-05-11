@@ -22,10 +22,13 @@ export const useUser = () => {
     setIsLoading(true);
     try {
       // Call the auth context update function
-      const updatedUser = await authUpdateUser({
+      const result = await authUpdateUser({
         ...user,
         ...userData
       });
+      
+      // Make sure we have a valid user object
+      const updatedUser = result || { ...user, ...userData };
       
       setUser(updatedUser as User);
       
