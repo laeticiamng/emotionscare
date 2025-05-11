@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -114,26 +115,14 @@ export const Home: React.FC = () => {
                 </Button>
               </>
             ) : (
-              <>
-                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-                  <Link to="/register">
-                    S'inscrire
-                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
-                  <Link to="/login">
-                    Se connecter
-                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-              </>
+              // Now empty since login/signup is handled via B2C/B2B access buttons below
+              <div className="h-10"></div> 
             )}
           </div>
         </div>
       </section>
 
-      {/* NEW B2C/B2B ACCESS SECTION */}
+      {/* B2C/B2B ACCESS SECTION */}
       {!isAuthenticated && (
         <motion.section 
           className="mb-16 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg"
@@ -243,17 +232,14 @@ export const Home: React.FC = () => {
             <p className="text-lg mb-6 text-gray-600">
               Rejoignez notre communauté d'utilisateurs qui ont trouvé un meilleur équilibre émotionnel grâce à EmotionsCare.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg" className="transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-                <Link to={isAuthenticated ? "/scan" : "/register"}>
-                  Commencer maintenant
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
-                <Link to="/about">
-                  En savoir plus
-                </Link>
-              </Button>
+            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+              {/* Modified to use CallToAction for consistency */}
+              <div className="w-full md:w-auto">
+                <CallToAction type="personal" className="w-full md:w-auto" />
+              </div>
+              <div className="w-full md:w-auto">
+                <CallToAction type="business" className="w-full md:w-auto" />
+              </div>
             </div>
           </div>
           <div className="flex-1 flex justify-center animate-fade-in" style={{ animationDelay: "200ms" }}>
