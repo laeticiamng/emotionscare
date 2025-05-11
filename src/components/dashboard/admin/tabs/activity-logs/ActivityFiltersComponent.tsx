@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/ui/date-picker-with-range";
+import { DateRange } from "react-day-picker";
 
 interface ActivityFiltersComponentProps {
   filters: {
@@ -26,6 +27,18 @@ const ActivityFiltersComponent: React.FC<ActivityFiltersComponentProps> = ({
   setFilters,
   handleDateRangeChange
 }) => {
+  // Créer un état local pour la plage de dates au format DateRange
+  const [dateRange, setDateRange] = React.useState<DateRange>({
+    from: filters.startDate ? new Date(filters.startDate) : undefined,
+    to: filters.endDate ? new Date(filters.endDate) : undefined
+  });
+
+  // Mettre à jour la plage de dates et appeler handleDateRangeChange
+  const handleSetDateRange = (range: DateRange) => {
+    setDateRange(range);
+    handleDateRangeChange(range);
+  };
+
   return (
     <>
       <div className="mt-4">
@@ -52,7 +65,7 @@ const ActivityFiltersComponent: React.FC<ActivityFiltersComponentProps> = ({
       </div>
       <div className="mt-4">
         <Label>Période</Label>
-        <DatePickerWithRange onDateChange={handleDateRangeChange} />
+        <DatePickerWithRange date={dateRange} setDate={handleSetDateRange} />
       </div>
     </>
   );
