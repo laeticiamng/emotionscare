@@ -4,7 +4,7 @@ import ColorPaletteDisplay from '@/components/theme/ColorPaletteDisplay';
 import ThemeColorExample from '@/components/theme/ThemeColorExample';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme, Theme } from '@/contexts/ThemeContext';
 import { Sun, Moon, Palette } from 'lucide-react';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 
@@ -13,7 +13,7 @@ import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
  * Affiche la palette de couleurs et les composants stylés
  */
 const DesignSystemPage: React.FC = () => {
-  const { theme, setThemePreference } = useTheme();
+  const { theme, setTheme } = useTheme() || { theme: 'light' as Theme, setTheme: () => {} };
 
   return (
     <div className="container mx-auto py-8 space-y-8 animate-fade-in">
@@ -35,21 +35,21 @@ const DesignSystemPage: React.FC = () => {
         <div className="flex gap-2">
           <Button
             variant={theme === 'light' ? 'default' : 'outline'}
-            onClick={() => setThemePreference('light')}
+            onClick={() => setTheme('light')}
           >
             <Sun className="mr-2 h-4 w-4" />
             Clair
           </Button>
           <Button
             variant={theme === 'dark' ? 'default' : 'outline'}
-            onClick={() => setThemePreference('dark')}
+            onClick={() => setTheme('dark')}
           >
             <Moon className="mr-2 h-4 w-4" />
             Sombre
           </Button>
           <Button
             variant={theme === 'pastel' ? 'default' : 'outline'}
-            onClick={() => setThemePreference('pastel')}
+            onClick={() => setTheme('pastel')}
           >
             <Palette className="mr-2 h-4 w-4" />
             Pastel

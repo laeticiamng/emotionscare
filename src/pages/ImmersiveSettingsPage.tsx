@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme, FontFamily, FontSize } from '@/contexts/ThemeContext';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
 
@@ -9,14 +9,16 @@ const ImmersiveSettingsPage: React.FC = () => {
   const { 
     theme, 
     setTheme, 
-    fontFamily, 
-    setFontFamily, 
-    fontSize, 
-    setFontSize 
-  } = useTheme();
+    fontFamily = 'inter',
+    setFontFamily = () => {},
+    fontSize = 'medium',
+    setFontSize = () => {}
+  } = useTheme() || {};
   
   const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme as any);
+    if (setTheme && (newTheme === 'light' || newTheme === 'dark' || newTheme === 'system' || newTheme === 'pastel')) {
+      setTheme(newTheme as any);
+    }
   };
   
   return (
@@ -30,10 +32,10 @@ const ImmersiveSettingsPage: React.FC = () => {
         />
         
         <FontSettings 
-          currentFontFamily={fontFamily}
-          onChangeFontFamily={setFontFamily}
-          currentFontSize={fontSize}
-          onChangeFontSize={setFontSize}
+          currentFontFamily={fontFamily as FontFamily}
+          onChangeFontFamily={(value) => setFontFamily(value as FontFamily)}
+          currentFontSize={fontSize as FontSize}
+          onChangeFontSize={(value) => setFontSize(value as FontSize)}
         />
         
         <Card>

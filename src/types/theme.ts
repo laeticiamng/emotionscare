@@ -37,5 +37,10 @@ export interface ThemeProviderProps {
 export interface ThemeContextProps {
   theme: ThemeName;
   setTheme: (theme: ThemeName) => void;
+  setThemePreference?: (theme: ThemeName) => void;
   systemTheme?: ThemeName;
+  fontFamily?: string;
+  setFontFamily?: (font: string) => void;
+  fontSize?: string;
+  setFontSize?: (size: string) => void;
 }
