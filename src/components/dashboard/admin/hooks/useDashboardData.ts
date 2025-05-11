@@ -1,27 +1,53 @@
 
 import { useState, useEffect } from 'react';
-import { fetchReports, fetchUsersAvgScore, fetchUsersWithStatus } from '@/lib/dashboardService';
 import { ChartData, DashboardStats } from '../tabs/overview/types';
 import { useSegment } from '@/contexts/SegmentContext';
+
+// Mock function implementations to replace imported functions
+const fetchReports = async (reportTypes: string[], timePeriod: number): Promise<{[key: string]: ChartData[]}> => {
+  // Mock implementation that returns fake data
+  const mockData: {[key: string]: ChartData[]} = {};
+  
+  // Generate random data points for each report type
+  reportTypes.forEach(type => {
+    const data: ChartData[] = [];
+    
+    for (let i = 0; i < timePeriod; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() - (timePeriod - i - 1));
+      
+      data.push({
+        date: `${date.getDate()}/${date.getMonth() + 1}`,
+        value: Math.floor(Math.random() * 100)
+      });
+    }
+    
+    mockData[type] = data;
+  });
+  
+  return Promise.resolve(mockData);
+};
+
+const fetchUsersAvgScore = async (days?: number): Promise<number> => {
+  return Promise.resolve(78);
+};
+
+const fetchUsersWithStatus = async (status?: string, days?: number): Promise<number> => {
+  return Promise.resolve(42);
+};
 
 export const useDashboardData = (timePeriod: string) => {
   const [absenteeismData, setAbsenteeismData] = useState<ChartData[]>([]);
   const [productivityData, setProductivityData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { activeDimension, activeOption } = useSegment();
+  const { segment } = useSegment();
   
-  const segmentFilter = activeDimension && activeOption ? {
-    dimensionKey: activeDimension.key,
-    optionKey: activeOption.key
-  } : undefined;
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const reportsData = await fetchReports(
         ['absenteeism', 'productivity'], 
-        parseInt(timePeriod),
-        segmentFilter
+        parseInt(timePeriod)
       );
       
       setAbsenteeismData(reportsData.absenteeism || []);
@@ -35,7 +61,7 @@ export const useDashboardData = (timePeriod: string) => {
 
   useEffect(() => {
     fetchData();
-  }, [timePeriod, activeDimension?.key, activeOption?.key]);
+  }, [timePeriod, segment]);
 
   return {
     absenteeismData,
@@ -48,18 +74,24 @@ export const useDashboardData = (timePeriod: string) => {
 export const useEmotionalScoreTrend = () => {
   const [data, setData] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { activeDimension, activeOption } = useSegment();
-  
-  const segmentFilter = activeDimension && activeOption ? {
-    dimensionKey: activeDimension.key,
-    optionKey: activeOption.key
-  } : undefined;
+  const { segment } = useSegment();
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const emotionalData = await fetchUsersAvgScore(7, segmentFilter);
-      setData(emotionalData);
+      
+      // Mock data generation
+      const mockData: ChartData[] = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - (7 - i - 1));
+        mockData.push({
+          date: `${date.getDate()}/${date.getMonth() + 1}`,
+          value: Math.floor(Math.random() * 20) + 70 // Generate random values between 70-90
+        });
+      }
+      
+      setData(mockData);
     } catch (error) {
       console.error("Error fetching emotional score trend:", error);
     } finally {
@@ -69,7 +101,7 @@ export const useEmotionalScoreTrend = () => {
 
   useEffect(() => {
     fetchData();
-  }, [activeDimension?.key, activeOption?.key]);
+  }, [segment]);
 
   return {
     data,
@@ -89,18 +121,15 @@ export const useDashboardStats = () => {
     emotionalScore: { current: 0, trend: 0 }
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { activeDimension, activeOption } = useSegment();
-  
-  const segmentFilter = activeDimension && activeOption ? {
-    dimensionKey: activeDimension.key,
-    optionKey: activeOption.key
-  } : undefined;
+  const { segment } = useSegment();
 
   const fetchData = async () => {
     try {
       setIsLoading(true);
+      
+      // Generate mock data
       const totalUsers = 256;
-      const activeUsers = await fetchUsersWithStatus("active", 1, segmentFilter);
+      const activeUsers = 178; // Mock active users
       const avgScore = 78;
       const criticalUsers = 5;
       
@@ -122,7 +151,7 @@ export const useDashboardStats = () => {
 
   useEffect(() => {
     fetchData();
-  }, [activeDimension?.key, activeOption?.key]);
+  }, [segment]);
 
   return {
     data,

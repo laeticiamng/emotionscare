@@ -32,3 +32,14 @@ export interface MoodStats {
     evening: number;
   };
 }
+
+export interface MoodData {
+  id?: string;
+  date: Date | string;
+  originalDate?: Date | string;
+  value: number;
+  label?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
+}

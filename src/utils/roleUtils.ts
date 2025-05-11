@@ -4,6 +4,11 @@ export const isAdminRole = (role: string | undefined): boolean => {
   return role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator';
 };
 
+export const isUserRole = (role: string | undefined): boolean => {
+  if (!role) return false;
+  return role.toLowerCase() === 'user';
+};
+
 export const isManagerRole = (role: string | undefined): boolean => {
   if (!role) return false;
   return role.toLowerCase() === 'manager';

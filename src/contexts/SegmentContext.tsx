@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export interface SegmentOption {
   key: string;
@@ -44,7 +44,7 @@ interface SegmentProviderProps {
 }
 
 export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) => {
-  const [segment, setSegment] = useState<SegmentValue>({ dimensionKey: null, optionKey: null });
+  const [segment, setSegmentState] = useState<SegmentValue>({ dimensionKey: null, optionKey: null });
   const [activeDimension, setActiveDimension] = useState<SegmentDimension | null>(null);
   const [activeOption, setActiveOption] = useState<SegmentOption | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -80,6 +80,28 @@ export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) =>
       ]
     }
   ];
+
+  // Update activeDimension and activeOption when segment changes
+  useEffect(() => {
+    if (segment.dimensionKey) {
+      const dimension = dimensions.find(d => d.key === segment.dimensionKey) || null;
+      setActiveDimension(dimension);
+      
+      if (dimension && segment.optionKey) {
+        const option = dimension.options.find(o => o.key === segment.optionKey) || null;
+        setActiveOption(option);
+      } else {
+        setActiveOption(null);
+      }
+    } else {
+      setActiveDimension(null);
+      setActiveOption(null);
+    }
+  }, [segment]);
+
+  const setSegment = (newSegment: SegmentValue) => {
+    setSegmentState(newSegment);
+  };
 
   return (
     <SegmentContext.Provider

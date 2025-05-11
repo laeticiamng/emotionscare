@@ -5,25 +5,24 @@ interface Story {
   id: string;
   title: string;
   content: string;
-  cta?: {
-    text: string;
-    route: string;
-  };
-  seen?: boolean;
+  emotion?: string;
+  imageUrl?: string;
 }
 
 interface StorytellingContextType {
   activeStory: Story | null;
-  setActiveStory: (story: Story | null) => void;
   stories: Story[];
   showStory: (storyId: string) => void;
+  hideStory: () => void;
+  addStory: (story: Story) => void;
 }
 
 const StorytellingContext = createContext<StorytellingContextType>({
   activeStory: null,
-  setActiveStory: () => {},
   stories: [],
-  showStory: () => {}
+  showStory: () => {},
+  hideStory: () => {},
+  addStory: () => {}
 });
 
 interface StorytellingProviderProps {
@@ -31,51 +30,47 @@ interface StorytellingProviderProps {
 }
 
 export const StorytellingProvider: React.FC<StorytellingProviderProps> = ({ children }) => {
-  const [activeStory, setActiveStory] = useState<Story | null>(null);
   const [stories, setStories] = useState<Story[]>([
     {
-      id: '1',
-      title: 'Bienvenue sur EmotionsCare',
-      content: 'Découvrez comment notre application peut vous aider à gérer vos émotions.',
-      cta: {
-        text: 'En savoir plus',
-        route: '/about'
-      },
-      seen: false
+      id: 'welcome',
+      title: 'Bienvenue à EmotionsCare',
+      content: 'Découvrez comment gérer vos émotions et améliorer votre bien-être émotionnel.',
+      emotion: 'joy',
+      imageUrl: '/images/welcome.jpg'
     },
     {
-      id: '2',
-      title: 'Nouvelle fonctionnalité : Journal émotionnel',
-      content: 'Enregistrez vos émotions quotidiennes pour mieux comprendre vos tendances.',
-      cta: {
-        text: 'Essayer maintenant',
-        route: '/journal'
-      },
-      seen: false
+      id: 'mindfulness',
+      title: 'Pratique de la pleine conscience',
+      content: 'Apprenez à être présent dans le moment et à observer vos émotions sans jugement.',
+      emotion: 'calm',
+      imageUrl: '/images/mindfulness.jpg'
     }
   ]);
+  const [activeStory, setActiveStory] = useState<Story | null>(null);
 
   const showStory = (storyId: string) => {
     const story = stories.find(s => s.id === storyId);
     if (story) {
       setActiveStory(story);
-      
-      // Mark the story as seen
-      setStories(prevStories => 
-        prevStories.map(s => 
-          s.id === storyId ? { ...s, seen: true } : s
-        )
-      );
     }
+  };
+
+  const hideStory = () => {
+    setActiveStory(null);
+  };
+
+  const addStory = (story: Story) => {
+    setStories(prev => [...prev, story]);
   };
 
   return (
     <StorytellingContext.Provider
       value={{
         activeStory,
-        setActiveStory,
         stories,
-        showStory
+        showStory,
+        hideStory,
+        addStory
       }}
     >
       {children}

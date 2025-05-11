@@ -19,7 +19,7 @@ export interface MusicTrack {
   emotion?: string;
   emotion_tag?: string;
   externalUrl?: string;
-  genre?: string; // Added genre property to fix MusicWellbeingPage errors
+  genre?: string;
 }
 
 export interface MusicPlaylist {
@@ -78,4 +78,20 @@ export interface MusicContextType {
   toggleRepeat?: () => void;
   toggleShuffle?: () => void;
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+}
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onChange: (time: number) => void;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack | null;
+  isPlaying: boolean;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onChange: (volume: number) => void;
 }

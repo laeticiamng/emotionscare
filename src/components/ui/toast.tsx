@@ -21,12 +21,16 @@ const toastVariants = cva(
   }
 );
 
+interface ToastProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof toastVariants> {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+type ToastActionElement = React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+
 const Toast = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof toastVariants> & {
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
-  }
+  ToastProps
 >(({ className, variant, ...props }, ref) => {
   return (
     <div
@@ -106,8 +110,8 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = "ToastViewport";
 
 export {
-  type ToastProps,
-  type ToastActionElement,
+  ToastProps,
+  ToastActionElement,
   ToastProvider,
   ToastViewport,
   Toast,

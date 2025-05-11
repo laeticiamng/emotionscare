@@ -1,15 +1,12 @@
 
 export interface ChatMessage {
   id: string;
-  conversation_id: string;
-  timestamp: Date | string;
-  sender: string;
-  text: string;
+  text?: string;
   content?: string;
-  sender_id?: string;
-  is_read?: boolean;
+  sender: string;
   sender_type?: string;
-  role?: string;
+  timestamp?: string;
+  conversation_id?: string;
 }
 
 export interface ChatConversation {

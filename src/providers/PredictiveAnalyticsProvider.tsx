@@ -1,40 +1,41 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface Recommendation {
-  id: string;
-  title: string;
-  description: string;
-  confidence: number;
-  route?: string;
-  icon?: string;
-}
-
-export interface PredictionResult {
-  confidence: number;
+interface EmotionPrediction {
   emotion: string;
-  trends: {
-    engagement: number;
-    wellbeing: number;
-  };
+  probability: number;
+  triggers?: string[];
+  recommendations?: string[];
 }
 
 interface PredictiveAnalyticsContextType {
-  recommendations: Recommendation[];
-  setRecommendations: (recs: Recommendation[]) => void;
-  generatePredictions: () => Promise<void>;
+  isLoading: boolean;
+  error: string;
   isEnabled: boolean;
   setEnabled: (enabled: boolean) => void;
-  currentPredictions: PredictionResult | null;
+  currentPredictions: EmotionPrediction;
+  recommendations: string[];
+  availableFeatures: string[];
+  predictionEnabled: boolean;
+  setPredictionEnabled: (enabled: boolean) => void;
+  generatePredictions: (userData?: any) => Promise<void>;
+  generatePrediction: (userData?: any) => Promise<EmotionPrediction>;
+  resetPredictions: () => void;
 }
 
 const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType>({
-  recommendations: [],
-  setRecommendations: () => {},
-  generatePredictions: async () => {},
+  isLoading: false,
+  error: '',
   isEnabled: false,
   setEnabled: () => {},
-  currentPredictions: null
+  currentPredictions: { emotion: '', probability: 0 },
+  recommendations: [],
+  availableFeatures: [],
+  predictionEnabled: false,
+  setPredictionEnabled: () => {},
+  generatePredictions: async () => {},
+  generatePrediction: async () => ({ emotion: '', probability: 0 }),
+  resetPredictions: () => {}
 });
 
 interface PredictiveAnalyticsProviderProps {
@@ -42,53 +43,102 @@ interface PredictiveAnalyticsProviderProps {
 }
 
 export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderProps> = ({ children }) => {
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [isEnabled, setEnabled] = useState<boolean>(true);
-  const [currentPredictions, setCurrentPredictions] = useState<PredictionResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [predictionEnabled, setPredictionEnabled] = useState(false);
+  const [currentPredictions, setCurrentPredictions] = useState<EmotionPrediction>({ 
+    emotion: '', 
+    probability: 0 
+  });
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+  
+  const availableFeatures = [
+    'predictive-mood',
+    'preventive-alerts',
+    'personalized-recommendations'
+  ];
 
-  const generatePredictions = async () => {
-    // Mock function to generate predictions
-    const mockRecommendations: Recommendation[] = [
-      {
-        id: '1',
-        title: 'Séance de méditation recommandée',
-        description: 'Basé sur vos tendances de stress, une séance de méditation pourrait être bénéfique.',
-        confidence: 0.92,
-        route: '/meditation',
-        icon: 'brain'
-      },
-      {
-        id: '2',
-        title: 'Pause cognitive suggérée',
-        description: 'Votre concentration diminue, prenez une courte pause de 5 minutes.',
-        confidence: 0.87,
-        route: '/break',
-        icon: 'coffee'
-      }
-    ];
+  const generatePredictions = async (userData?: any) => {
+    setIsLoading(true);
+    setError('');
     
-    setRecommendations(mockRecommendations);
-    
-    // Set mock current predictions
-    setCurrentPredictions({
-      confidence: 0.89,
-      emotion: 'calme',
-      trends: {
-        engagement: 0.76,
-        wellbeing: 0.82
-      }
-    });
+    try {
+      // Mock prediction generation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const emotions = ['calm', 'happy', 'anxious', 'sad', 'energetic'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const randomProbability = Math.round((Math.random() * 40 + 60) * 100) / 100; // 60-100%
+      
+      const prediction: EmotionPrediction = {
+        emotion: randomEmotion,
+        probability: randomProbability,
+        triggers: ['work stress', 'lack of sleep', 'physical activity'],
+        recommendations: [
+          'Take a short break',
+          'Practice deep breathing',
+          'Listen to calming music'
+        ]
+      };
+      
+      setCurrentPredictions(prediction);
+      setRecommendations(prediction.recommendations || []);
+      
+    } catch (err) {
+      console.error('Error generating predictions:', err);
+      setError('Failed to generate predictions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generatePrediction = async (userData?: any): Promise<EmotionPrediction> => {
+    try {
+      // Mock prediction generation
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const emotions = ['calm', 'happy', 'anxious', 'sad', 'energetic'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const randomProbability = Math.round((Math.random() * 40 + 60) * 100) / 100; // 60-100%
+      
+      return {
+        emotion: randomEmotion,
+        probability: randomProbability,
+        triggers: ['work stress', 'lack of sleep', 'physical activity'],
+        recommendations: [
+          'Take a short break',
+          'Practice deep breathing',
+          'Listen to calming music'
+        ]
+      };
+      
+    } catch (error) {
+      console.error('Error in generatePrediction:', error);
+      return { emotion: 'neutral', probability: 50 };
+    }
+  };
+
+  const resetPredictions = () => {
+    setCurrentPredictions({ emotion: '', probability: 0 });
+    setRecommendations([]);
   };
 
   return (
     <PredictiveAnalyticsContext.Provider
       value={{
-        recommendations,
-        setRecommendations,
-        generatePredictions,
+        isLoading,
+        error,
         isEnabled,
-        setEnabled,
-        currentPredictions
+        setEnabled: setIsEnabled,
+        currentPredictions,
+        recommendations,
+        availableFeatures,
+        predictionEnabled,
+        setPredictionEnabled,
+        generatePredictions,
+        generatePrediction,
+        resetPredictions
       }}
     >
       {children}

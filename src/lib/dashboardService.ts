@@ -38,11 +38,12 @@ export async function fetchUsersAvgScore(): Promise<number> {
   return Promise.resolve(78);
 }
 
-export async function fetchUsersWithStatus(): Promise<{active: number, total: number}> {
-  return Promise.resolve({
-    active: 42,
-    total: 50
-  });
+export async function fetchUsersWithStatus(status: string = "active", days: number = 1): Promise<number> {
+  return Promise.resolve(42);
+}
+
+export async function fetchBadgesCount(): Promise<number> {
+  return Promise.resolve(15);
 }
 
 export async function fetchDashboardStats(): Promise<DashboardStats> {
