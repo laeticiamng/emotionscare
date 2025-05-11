@@ -53,5 +53,4 @@ export const getRoleDisplayName = (role?: string | null): string => {
   }
 };
 
-// Export des fonctions pour l'index des utilitaires
-export { getRoleName as getRoleDisplayName } from './roleUtils';
+// Remove the problematic re-export line - it's unnecessary since the function is already exported above
