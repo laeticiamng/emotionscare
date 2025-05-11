@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage, ChatResponseType } from '@/types/chat';
-import { ChatService } from '@/services/chatService';
+import * as ChatService from '@/services/chatService';
 
 export const useChat = (conversationId: string, userId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

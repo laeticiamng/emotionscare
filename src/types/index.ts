@@ -95,3 +95,4 @@ export * from './music';
 export * from './preferences';
 export * from './invitation';
 export * from './vr';
+export * from './toast';

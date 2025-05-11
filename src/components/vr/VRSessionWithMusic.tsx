@@ -14,7 +14,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   audioUrl, 
   emotion 
 }) => {
-  // Use either direct props or from template
+  // Utiliser les props directes ou depuis le template
   const activeTemplate = session || template;
   const handleComplete = onSessionComplete || onComplete;
   const targetEmotion = emotion || (
@@ -26,16 +26,17 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
   
   useEffect(() => {
-    // Load a playlist based on the target emotion of the session
+    // Charger une playlist basée sur l'émotion cible de la session
     const loadMusic = async () => {
       if (targetEmotion) {
         const playlist = await loadPlaylistForEmotion(targetEmotion);
         
         if (playlist && playlist.tracks.length > 0) {
-          // Ensure track has url
+          // S'assurer que la track a l'url requise et la durée
           const trackWithUrl = {
             ...playlist.tracks[0],
-            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
+            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || '',
+            duration: playlist.tracks[0].duration || 0 // S'assurer que duration est définie
           };
           playTrack(trackWithUrl);
         }
@@ -44,7 +45,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
     
     loadMusic();
     
-    // Cleanup
+    // Nettoyage
     return () => {
       pauseTrack();
     };

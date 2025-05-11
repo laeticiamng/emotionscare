@@ -16,20 +16,22 @@ export function VRMusicIntegration({ emotion }: { emotion: string }) {
     };
     
     loadMusic();
-  }, [emotion]);
+  }, [emotion, musicContext]);
   
   const playMusic = (track?: MusicTrack) => {
     if (track) {
-      // Ensure track has url
+      // Assurer que track a l'URL requise
       const trackWithUrl = {
         ...track,
-        url: track.url || track.audioUrl || track.audio_url || ''
+        url: track.url || track.audioUrl || track.audio_url || '',
+        duration: track.duration || 0 // S'assurer que duration est définie
       };
       musicContext.playTrack(trackWithUrl);
     } else if (playlist?.tracks?.length) {
       const trackWithUrl = {
         ...playlist.tracks[0],
-        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
+        url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || '',
+        duration: playlist.tracks[0].duration || 0 // S'assurer que duration est définie
       };
       musicContext.playTrack(trackWithUrl);
     }

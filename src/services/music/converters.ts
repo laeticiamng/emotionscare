@@ -1,52 +1,65 @@
 
+import { Track, Playlist } from './types';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { Playlist } from '@/services/music/types';
 
-// Fix the convertTrackToMusicTrack function
-export const convertTrackToMusicTrack = (track: any): MusicTrack => ({
-  id: track.id || `track-${Date.now()}`,
-  title: track.title || track.name || '',
-  artist: track.artist || 'Unknown Artist',
-  album: track.album || '',
-  url: track.url || '',
-  duration: track.duration || 0,
-  coverUrl: track.coverUrl || track.cover_url || '',
-  genre: track.genre || '',
-  mood: track.mood || '',
-  emotion: track.emotion || ''
-});
+/**
+ * Convertit un objet Track du service en objet MusicTrack pour l'UI
+ */
+export const trackToMusicTrack = (track: Track): MusicTrack => {
+  return {
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
+    url: track.url,
+    duration: track.duration,
+    coverUrl: track.coverUrl || track.cover,
+    emotion: track.emotion,
+    // Inclure les autres propriétés pour compatibilité
+    audioUrl: track.audioUrl || track.url,
+    audio_url: track.audioUrl || track.url,
+    cover_url: track.coverUrl || track.cover,
+    cover: track.cover || track.coverUrl
+  };
+};
 
-// Fix the convertMusicTrackToTrack function
-export const convertMusicTrackToTrack = (musicTrack: MusicTrack): any => ({
-  id: musicTrack.id,
-  title: musicTrack.title,
-  artist: musicTrack.artist,
-  album: musicTrack.album || '',
-  url: musicTrack.url,
-  duration: musicTrack.duration,
-  coverUrl: musicTrack.coverUrl || '',
-  genre: musicTrack.genre || '',
-  mood: musicTrack.mood || '',
-  emotion: musicTrack.emotion || ''
-});
+/**
+ * Convertit un objet MusicTrack de l'UI en objet Track pour le service
+ */
+export const musicTrackToTrack = (musicTrack: MusicTrack): Track => {
+  return {
+    id: musicTrack.id,
+    title: musicTrack.title,
+    artist: musicTrack.artist,
+    duration: musicTrack.duration,
+    url: musicTrack.url,
+    coverUrl: musicTrack.coverUrl || musicTrack.cover_url || musicTrack.cover,
+    emotion: musicTrack.emotion
+  };
+};
 
-// Fix the convertMusicPlaylistToPlaylist function
-export const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => ({
-  id: musicPlaylist.id,
-  name: musicPlaylist.name,
-  title: musicPlaylist.name,
-  emotion: musicPlaylist.emotion || '',
-  tracks: musicPlaylist.tracks
-});
+/**
+ * Convertit un objet Playlist du service en objet MusicPlaylist pour l'UI
+ */
+export const playlistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
+  return {
+    id: playlist.id,
+    name: playlist.name,
+    title: playlist.name, // Utiliser name comme title pour la compatibilité
+    description: playlist.name || 'Playlist personnalisée',
+    coverUrl: (playlist.tracks && playlist.tracks.length > 0 && playlist.tracks[0].coverUrl) || '/images/music/default-playlist.jpg',
+    emotion: playlist.emotion,
+    tracks: playlist.tracks.map(trackToMusicTrack)
+  };
+};
 
-// Fix the convertPlaylistToMusicPlaylist function
-export const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => ({
-  id: playlist.id,
-  name: playlist.name,
-  title: playlist.title || playlist.name,
-  description: playlist.description || '',
-  coverUrl: playlist.coverUrl || '',
-  emotion: playlist.emotion || '',
-  mood: playlist.mood || '',
-  tracks: playlist.tracks.map(convertTrackToMusicTrack)
-});
+/**
+ * Convertit un objet MusicPlaylist de l'UI en objet Playlist pour le service
+ */
+export const musicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => {
+  return {
+    id: musicPlaylist.id,
+    name: musicPlaylist.name || musicPlaylist.title || '',
+    emotion: musicPlaylist.emotion,
+    tracks: musicPlaylist.tracks.map(musicTrackToTrack)
+  };
+};

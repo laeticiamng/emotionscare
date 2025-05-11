@@ -1,216 +1,178 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Track, Playlist } from '@/services/music/types';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { useToast } from '@/hooks/use-toast';
-
-// Converters to handle type differences
-const convertMusicTrackToTrack = (musicTrack: MusicTrack): Track => ({
-  id: musicTrack.id,
-  title: musicTrack.title,
-  artist: musicTrack.artist,
-  duration: musicTrack.duration,
-  url: musicTrack.audioUrl || musicTrack.audio_url || musicTrack.url || '',
-  cover: musicTrack.coverUrl || musicTrack.cover_url || musicTrack.cover,
-  emotion: musicTrack.emotion || musicTrack.emotion_tag
-});
-
-const convertTrackToMusicTrack = (track: Track): MusicTrack => ({
-  id: track.id,
-  title: track.title,
-  artist: track.artist,
-  duration: track.duration,
-  url: track.url || '',
-  audioUrl: track.url || '',
-  coverUrl: track.cover || track.coverUrl,
-  emotion: track.emotion
-});
-
-const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => ({
-  id: musicPlaylist.id,
-  name: musicPlaylist.name || musicPlaylist.title || '',
-  emotion: musicPlaylist.emotion,
-  tracks: musicPlaylist.tracks.map(convertMusicTrackToTrack)
-});
-
-const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => ({
-  id: playlist.id,
-  name: playlist.name,
-  description: '',
-  coverUrl: '',
-  emotion: playlist.emotion,
-  tracks: playlist.tracks.map(convertTrackToMusicTrack)
-});
-
-// Mock playlist data
-const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
-  calm: {
-    id: 'calm-playlist',
-    name: 'Calm Music',
-    description: 'Relaxing tunes to help you find peace',
-    coverUrl: '/images/music/calm.jpg',
-    tracks: [
-      {
-        id: 'calm-1',
-        title: 'Ocean Waves',
-        artist: 'Nature Sounds',
-        duration: 180,
-        url: '/audio/calm1.mp3',
-        audioUrl: '/audio/calm1.mp3'
-      },
-      {
-        id: 'calm-2',
-        title: 'Forest Rain',
-        artist: 'Nature Sounds',
-        duration: 210,
-        url: '/audio/calm2.mp3',
-        audioUrl: '/audio/calm2.mp3'
-      }
-    ]
-  },
-  happy: {
-    id: 'happy-playlist',
-    name: 'Happy Vibes',
-    description: 'Upbeat music to boost your mood',
-    coverUrl: '/images/music/happy.jpg',
-    tracks: [
-      {
-        id: 'happy-1',
-        title: 'Summer Joy',
-        artist: 'Good Times',
-        duration: 160,
-        url: '/audio/happy1.mp3',
-        audioUrl: '/audio/happy1.mp3'
-      },
-      {
-        id: 'happy-2',
-        title: 'Celebration',
-        artist: 'Party Band',
-        duration: 190,
-        url: '/audio/happy2.mp3',
-        audioUrl: '/audio/happy2.mp3'
-      }
-    ]
-  },
-  neutral: {
-    id: 'neutral-playlist',
-    name: 'Background Focus',
-    description: 'Neutral tunes for focus and concentration',
-    coverUrl: '/images/music/neutral.jpg',
-    tracks: [
-      {
-        id: 'neutral-1',
-        title: 'Deep Focus',
-        artist: 'Study Music',
-        duration: 220,
-        url: '/audio/neutral1.mp3',
-        audioUrl: '/audio/neutral1.mp3'
-      },
-      {
-        id: 'neutral-2',
-        title: 'Ambient Work',
-        artist: 'Productivity',
-        duration: 240,
-        url: '/audio/neutral2.mp3',
-        audioUrl: '/audio/neutral2.mp3'
-      }
-    ]
-  }
-};
-
-const getPlaylistByEmotion = (emotion: string): MusicPlaylist | null => {
-  const normalizedEmotion = emotion.toLowerCase();
-  
-  // Direct match
-  if (EMOTION_PLAYLISTS[normalizedEmotion]) {
-    return EMOTION_PLAYLISTS[normalizedEmotion];
-  }
-  
-  // Map emotional states to playlists
-  const emotionMap: Record<string, string> = {
-    happy: 'happy',
-    joy: 'happy',
-    excited: 'happy',
-    cheerful: 'happy',
-    
-    calm: 'calm',
-    relaxed: 'calm',
-    peaceful: 'calm',
-    serene: 'calm',
-    
-    sad: 'calm',
-    melancholy: 'calm',
-    
-    focused: 'neutral',
-    neutral: 'neutral',
-    balanced: 'neutral'
-  };
-  
-  const mappedEmotion = emotionMap[normalizedEmotion];
-  if (mappedEmotion && EMOTION_PLAYLISTS[mappedEmotion]) {
-    return EMOTION_PLAYLISTS[mappedEmotion];
-  }
-  
-  // Default to neutral
-  return EMOTION_PLAYLISTS.neutral;
-};
+import { mockPlaylists } from '@/data/mockMusic';
 
 export const usePlaylistManager = () => {
-  const [playlists, setPlaylists] = useState<Record<string, Playlist>>({});
-  const [currentPlaylistId, setCurrentPlaylistId] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initialiser les playlists au chargement du hook
-  useEffect(() => {
-    const convertedPlaylists: Record<string, Playlist> = {};
-    
-    Object.entries(EMOTION_PLAYLISTS).forEach(([emotion, musicPlaylist]) => {
-      convertedPlaylists[emotion] = convertMusicPlaylistToPlaylist(musicPlaylist);
-    });
-    
-    setPlaylists(convertedPlaylists);
+  // Fonction helper pour normaliser une track
+  const normalizeTrack = (track: any): MusicTrack => {
+    return {
+      id: track.id,
+      title: track.title,
+      artist: track.artist,
+      duration: track.duration || 0, // S'assurer que duration est définie
+      url: track.url || track.audioUrl || track.audio_url || '', // S'assurer que url est définie
+      coverUrl: track.coverUrl || track.cover_url || track.cover || '',
+      emotion: track.emotion || track.emotion_tag || '',
+    };
+  };
+
+  // Charge toutes les playlists
+  const loadAllPlaylists = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // En production, cette fonction ferait un appel API
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setPlaylists(mockPlaylists);
+    } catch (error) {
+      console.error("Erreur lors du chargement des playlists:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  // Obtenir la playlist actuelle
-  const getCurrentPlaylist = useCallback(() => {
-    if (!currentPlaylistId || !playlists[currentPlaylistId]) return null;
-    return playlists[currentPlaylistId];
-  }, [currentPlaylistId, playlists]);
-
-  // Charger une playlist pour une émotion spécifique
-  const loadPlaylistForEmotion = useCallback((emotion: string) => {
-    const normalizedEmotion = emotion.toLowerCase();
-    
-    if (playlists[normalizedEmotion]) {
-      setCurrentPlaylistId(normalizedEmotion);
-      return playlists[normalizedEmotion];
-    } else if (playlists['neutral']) {
-      // Fallback sur la playlist neutre si l'émotion n'existe pas
-      setCurrentPlaylistId('neutral');
-      toast({
-        title: "Playlist indisponible",
-        description: `La playlist pour "${emotion}" n'existe pas. Utilisation de la playlist neutre.`,
-      });
-      return playlists['neutral'];
-    } else {
-      toast({
-        title: "Erreur de musique",
-        description: "Impossible de charger une playlist. Veuillez réessayer.",
-        variant: "destructive"
-      });
+  // Charge une playlist pour une émotion spécifique
+  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
+    try {
+      const matchingPlaylist = mockPlaylists.find(p => 
+        p.emotion && p.emotion.toLowerCase() === emotion.toLowerCase()
+      );
+      
+      if (matchingPlaylist) {
+        return {
+          ...matchingPlaylist,
+          tracks: matchingPlaylist.tracks.map(normalizeTrack)
+        };
+      }
+      
+      // Si aucune playlist ne correspond exactement, créer une playlist personnalisée
+      // avec des tracks qui correspondent à l'émotion
+      const tracks: MusicTrack[] = [];
+      
+      // Dans une vraie application, nous ferions un appel API ici
+      // pour obtenir des pistes adaptées à l'émotion
+      const customTracks = [
+        {
+          id: `${emotion}-1`,
+          title: "Ambient Calm",
+          artist: "Zen Music",
+          duration: 240,
+          url: "/audio/ambient-calm.mp3",
+          emotion: emotion
+        },
+        {
+          id: `${emotion}-2`,
+          title: "Nature Sounds",
+          artist: "Relaxation Channel",
+          duration: 320,
+          url: "/audio/nature-sounds.mp3",
+          emotion: emotion
+        },
+        {
+          id: `${emotion}-3`,
+          title: "Deep Focus",
+          artist: "Concentration Music",
+          duration: 420,
+          url: "/audio/deep-focus.mp3",
+          emotion: emotion
+        }
+      ];
+      
+      return {
+        id: `playlist-${emotion}`,
+        name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Mood`,
+        title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Mood`, // Pour la compatibilité
+        description: `Music tailored for your ${emotion} mood`,
+        coverUrl: `/images/emotions/${emotion}.jpg`,
+        emotion: emotion,
+        tracks: customTracks.map(normalizeTrack)
+      };
+    } catch (error) {
+      console.error(`Erreur lors du chargement de la playlist pour l'émotion ${emotion}:`, error);
       return null;
     }
-  }, [playlists, toast]);
+  }, []);
+
+  // Charge les playlists au montage du composant
+  useEffect(() => {
+    loadAllPlaylists();
+  }, [loadAllPlaylists]);
+
+  // Crée une nouvelle playlist
+  const createPlaylist = async (name: string, tracks: MusicTrack[] = []): Promise<MusicPlaylist> => {
+    const newPlaylist: MusicPlaylist = {
+      id: `playlist-${Date.now()}`,
+      name,
+      title: name, // Pour la compatibilité
+      description: `Playlist: ${name}`,
+      coverUrl: tracks.length > 0 ? tracks[0].coverUrl || '/images/default-cover.jpg' : '/images/default-cover.jpg',
+      tracks: tracks.map(normalizeTrack)
+    };
+
+    setPlaylists(prev => [...prev, newPlaylist]);
+    return newPlaylist;
+  };
+
+  // Ajoute une track à une playlist
+  const addTrackToPlaylist = (playlistId: string, track: MusicTrack): boolean => {
+    let success = false;
+
+    setPlaylists(prev => {
+      const updatedPlaylists = prev.map(playlist => {
+        if (playlist.id === playlistId) {
+          // Vérifier si la track existe déjà dans la playlist
+          const trackExists = playlist.tracks.some(t => t.id === track.id);
+          if (!trackExists) {
+            success = true;
+            return {
+              ...playlist,
+              tracks: [...playlist.tracks, normalizeTrack(track)]
+            };
+          }
+        }
+        return playlist;
+      });
+
+      return updatedPlaylists;
+    });
+
+    return success;
+  };
+
+  // Supprime une track d'une playlist
+  const removeTrackFromPlaylist = (playlistId: string, trackId: string): boolean => {
+    let success = false;
+
+    setPlaylists(prev => {
+      const updatedPlaylists = prev.map(playlist => {
+        if (playlist.id === playlistId) {
+          success = true;
+          return {
+            ...playlist,
+            tracks: playlist.tracks.filter(track => track.id !== trackId)
+          };
+        }
+        return playlist;
+      });
+
+      return updatedPlaylists;
+    });
+
+    return success;
+  };
 
   return {
     playlists,
-    setPlaylists,
-    currentPlaylistId,
-    setCurrentPlaylistId,
-    getCurrentPlaylist,
-    loadPlaylistForEmotion
+    isLoading,
+    loadAllPlaylists,
+    loadPlaylistForEmotion,
+    createPlaylist,
+    addTrackToPlaylist,
+    removeTrackFromPlaylist
   };
 };
 
-export { EMOTION_PLAYLISTS, getPlaylistByEmotion };
 export default usePlaylistManager;

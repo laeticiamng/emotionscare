@@ -1,127 +1,92 @@
 
 import { useState, useCallback } from 'react';
 import { VRSession, VRSessionTemplate } from '@/types/vr';
-import { useToast } from './use-toast';
+import { saveVRSession, getVRSessionHistory } from '@/lib/vrService';
 
-interface UseVRSessionProps {
-  onSessionComplete?: (session: VRSession) => void;
-  initialSession?: VRSession | null;
-}
-
-export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSessionProps = {}) => {
-  const [session, setSession] = useState<VRSession | null>(initialSession || null);
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [duration, setDuration] = useState<number>(0);
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [heartRate, setHeartRate] = useState({ before: 75, after: 65 });
+export const useVRSession = (userId: string) => {
+  const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
+  const [sessionHistory, setSessionHistory] = useState<VRSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [historyLoading, setHistoryLoading] = useState(false);
   
-  const startSession = useCallback((templateId?: string | VRSessionTemplate, emotionBefore?: string) => {
-    setIsLoading(true);
-    
-    // Si templateId est un objet VRSessionTemplate, extraire son ID
-    const actualTemplateId = typeof templateId === 'string' ? templateId : templateId?.id;
-    
+  // Commencer une nouvelle session VR
+  const startSession = useCallback((template: VRSessionTemplate, emotionBefore?: string) => {
     const newSession: VRSession = {
       id: `session-${Date.now()}`,
-      user_id: 'current-user', // Dans une app réelle, ce serait l'ID utilisateur réel
-      date: new Date().toISOString(),
+      user_id: userId,
+      template_id: template.id,
       start_time: new Date().toISOString(),
-      duration: 0,
       duration_seconds: 0,
-      template_id: actualTemplateId || '',
-      emotion_before: emotionBefore,
-      mood_before: emotionBefore,
-      is_audio_only: false,
       completed: false,
-      emotions: emotionBefore ? [emotionBefore] : undefined
+      template: template,
+      emotion_before: emotionBefore,
+      emotions: template.emotions || [],
     };
     
-    setSession(newSession);
-    setIsActive(true);
-    setStartTime(new Date());
-    setDuration(0);
-    setIsLoading(false);
-    
-    toast({
-      title: 'Session démarrée',
-      description: 'Votre session de bien-être a commencée.'
-    });
-    
+    setCurrentSession(newSession);
     return newSession;
-  }, [toast]);
+  }, [userId]);
   
-  const completeSession = useCallback((emotionAfter?: string) => {
-    if (!session || !isActive) return null;
+  // Terminer une session VR en cours
+  const completeSession = useCallback(async (emotionAfter?: string) => {
+    setIsLoading(true);
     
-    // Calculer la durée finale
-    const endTime = new Date();
-    const startTimeDate = startTime || new Date();
-    const durationSeconds = Math.floor((endTime.getTime() - startTimeDate.getTime()) / 1000); // Convertir en secondes
-    
-    const completedSession: VRSession = {
-      ...session,
-      emotion_after: emotionAfter,
-      mood_after: emotionAfter,
-      duration_seconds: durationSeconds,
-      duration: durationSeconds, // S'assurer que c'est un nombre
-      completed: true,
-      end_time: endTime.toISOString(),
-      emotions: session.emotions || []
-    };
-    
-    // Add the emotion_after to the emotions array if it's not already there
-    if (emotionAfter && completedSession.emotions && !completedSession.emotions.includes(emotionAfter)) {
-      completedSession.emotions.push(emotionAfter);
+    try {
+      if (currentSession) {
+        const endTime = new Date();
+        const startTime = new Date(currentSession.start_time);
+        const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000);
+        
+        const completedSession: VRSession = {
+          ...currentSession,
+          end_time: endTime.toISOString(),
+          duration_seconds: durationSeconds,
+          completed: true,
+          emotion_after: emotionAfter,
+        };
+        
+        // Enregistrer la session dans l'API
+        const savedSession = await saveVRSession(completedSession);
+        
+        // Mettre à jour l'historique local avec la nouvelle session
+        setSessionHistory(prev => [savedSession, ...prev]);
+        setCurrentSession(null);
+        
+        return savedSession;
+      }
+      return null;
+    } catch (error) {
+      console.error('Erreur lors de la finalisation de la session:', error);
+      return null;
+    } finally {
+      setIsLoading(false);
     }
+  }, [currentSession]);
+  
+  // Charger l'historique des sessions
+  const loadSessionHistory = useCallback(async () => {
+    setHistoryLoading(true);
     
-    setSession(completedSession);
-    setIsActive(false);
-    
-    toast({
-      title: 'Session terminée',
-      description: `Votre session de ${formatDuration(durationSeconds)} est complétée.`
-    });
-    
-    if (onSessionComplete) {
-      onSessionComplete(completedSession);
+    try {
+      const history = await getVRSessionHistory(userId);
+      setSessionHistory(history);
+      return history;
+    } catch (error) {
+      console.error('Erreur lors du chargement de l\'historique des sessions:', error);
+      return [];
+    } finally {
+      setHistoryLoading(false);
     }
-    
-    return completedSession;
-  }, [session, isActive, startTime, toast, onSessionComplete]);
-  
-  const cancelSession = useCallback(() => {
-    setSession(null);
-    setIsActive(false);
-    setDuration(0);
-    setStartTime(null);
-    
-    toast({
-      title: 'Session annulée',
-      description: 'Votre session a été annulée.'
-    });
-  }, [toast]);
-  
-  // Format duration for display (e.g., "5 min 30 sec")
-  const formatDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins} min ${secs} sec`;
-  };
+  }, [userId]);
   
   return {
-    session,
-    isActive,
-    duration,
-    heartRate,
+    currentSession,
+    sessionHistory,
     isLoading,
-    isSessionActive: isActive,
-    activeTemplate: typeof session?.template_id === 'object' ? session?.template_id : null,
+    historyLoading,
     startSession,
     completeSession,
-    cancelSession,
-    formatDuration
+    loadSessionHistory,
   };
 };
 

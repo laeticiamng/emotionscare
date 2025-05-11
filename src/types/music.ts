@@ -3,9 +3,8 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  album?: string;
   url: string;
-  duration: number;
+  duration: number;  // Obligatoire pour la cohérence
   coverUrl?: string;
   coverImage?: string;
   genre?: string;
@@ -16,6 +15,7 @@ export interface MusicTrack {
   cover_url?: string;
   cover?: string;
   emotion_tag?: string;
+  album?: string;
 }
 
 export interface MusicPlaylist {
@@ -41,8 +41,8 @@ export interface MusicContextType {
   setOpenDrawer?: (open: boolean) => void;
   currentTime: number;
   duration: number;
-  shuffle?: boolean;
-  repeat?: boolean;
+  shuffle: boolean;
+  repeat: boolean;
   
   // Playback controls
   playTrack: (track: MusicTrack) => void;

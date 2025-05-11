@@ -2,7 +2,7 @@
 export type FontSize = 'small' | 'medium' | 'large' | string;
 export type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | string;
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type Theme = ThemeName; // Make them the same type to avoid assignment errors
+export type Theme = ThemeName; // Les rendre du même type pour éviter les erreurs d'affectation
 
 export interface UserPreferencesState {
   theme: ThemeName;
@@ -21,7 +21,7 @@ export interface UserPreferencesState {
   font?: string;
 }
 
-// Export notification types for compatibility
+// Exporter les types de notifications pour la compatibilité
 export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never';
 export type NotificationTone = 'formal' | 'friendly' | 'energetic';
 
@@ -33,7 +33,7 @@ export const defaultUserPreferences: UserPreferencesState = {
   notificationSound: true,
   language: 'fr',
   privacy: 'private',
-  privacyLevel: 'private',
+  privacyLevel: 'private', 
   showEmotionPrompts: true,
   notification_frequency: 'daily',
   notification_type: 'push',

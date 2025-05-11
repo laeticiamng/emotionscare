@@ -1,20 +1,38 @@
 
-export interface InvitationVerificationResult {
-  valid: boolean;
-  expired: boolean;
-  alreadyUsed: boolean;
-  email?: string;
-  role?: string;
-  invitationId?: string;
-}
-
 export interface Invitation {
   id: string;
   email: string;
-  name?: string;
-  status: 'pending' | 'accepted' | 'expired';
+  status: 'pending' | 'accepted' | 'expired' | 'revoked';
+  role: string;
   created_at: string;
   expires_at: string;
-  role?: string;
-  department?: string;
+  accepted_at?: string;
+  token: string;
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  invitation?: Invitation;
+  message: string;
+  errorCode?: string;
+}
+
+export interface NewInvitationData {
+  email: string;
+  role: string;
+  expiresInDays?: number;
+}
+
+export interface InvitationResponse {
+  success: boolean;
+  message: string;
+  invitation?: Invitation;
+  error?: string;
+}
+
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
 }

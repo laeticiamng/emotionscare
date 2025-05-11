@@ -17,4 +17,5 @@ export interface Playlist {
   name: string;
   emotion?: string;
   tracks: Track[];
+  title?: string; // Ajouté pour la compatibilité
 }

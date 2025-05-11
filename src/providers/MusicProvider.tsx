@@ -1,3 +1,8 @@
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types/music';
+import { mockTracks, mockPlaylists } from '@/data/mockMusic';
+import { useMusicService } from '@/hooks/useMusicService';
+import { useToast } from '@/hooks/use-toast';
 
 // Only update the loadPlaylists function
 const loadPlaylists = async (): Promise<void> => {

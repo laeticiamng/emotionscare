@@ -1,70 +1,42 @@
 
 import { ChatResponse } from '@/types/music';
 
-export async function getChatResponse(query: string): Promise<ChatResponse> {
-  // Mock API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+/**
+ * Obtient une réponse AI pour un message utilisateur
+ */
+export const getChatResponse = async (message: string): Promise<ChatResponse> => {
+  // Simuler une réponse pour la démonstration
+  await new Promise(resolve => setTimeout(resolve, 800));
   
-  // Sample responses based on query content
-  if (query.toLowerCase().includes('bonjour') || query.toLowerCase().includes('salut')) {
-    return {
-      text: "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
-      follow_up_questions: [
-        "Comment vous sentez-vous ?",
-        "Souhaitez-vous explorer vos émotions ?",
-        "Avez-vous besoin d'aide pour la méditation ?"
-      ],
-      sentiment: "neutral"
-    };
+  // Analyse basique de sentiment pour la démonstration
+  let sentiment = 'neutral';
+  if (message.toLowerCase().includes('heureux') || message.toLowerCase().includes('content') || message.toLowerCase().includes('bien')) {
+    sentiment = 'happy';
+  } else if (message.toLowerCase().includes('triste') || message.toLowerCase().includes('mal') || message.toLowerCase().includes('pas bien')) {
+    sentiment = 'sad';
+  } else if (message.toLowerCase().includes('stressé') || message.toLowerCase().includes('anxieux')) {
+    sentiment = 'anxious';
   }
   
-  if (
-    query.toLowerCase().includes('triste') || 
-    query.toLowerCase().includes('déprimé') ||
-    query.toLowerCase().includes('mal')
-  ) {
-    return {
-      text: "Je suis désolé d'apprendre que vous ne vous sentez pas bien. C'est normal de traverser des moments difficiles. Voulez-vous essayer une session de méditation guidée pour vous aider à vous sentir mieux ?",
-      follow_up_questions: [
-        "Depuis combien de temps vous sentez-vous ainsi ?",
-        "Qu'est-ce qui pourrait vous remonter le moral ?",
-        "Aimeriez-vous parler de ce qui vous préoccupe ?"
-      ],
-      sentiment: "empathetic"
-    };
-  }
-  
-  if (
-    query.toLowerCase().includes('heureux') || 
-    query.toLowerCase().includes('content') ||
-    query.toLowerCase().includes('bien')
-  ) {
-    return {
-      text: "Je suis ravi d'entendre que vous vous sentez bien ! C'est une excellente occasion de renforcer cette énergie positive. Peut-être souhaitez-vous explorer une activité créative ou partager votre bonheur avec quelqu'un ?",
-      follow_up_questions: [
-        "Qu'est-ce qui vous rend particulièrement heureux aujourd'hui ?",
-        "Comment pourriez-vous maintenir cette bonne humeur ?",
-        "Avez-vous pensé à noter ce moment dans votre journal émotionnel ?"
-      ],
-      sentiment: "positive"
-    };
-  }
-  
-  // Default response
-  return {
-    text: "Merci pour votre message. Comment puis-je vous aider davantage avec votre bien-être émotionnel aujourd'hui ?",
-    follow_up_questions: [
-      "Souhaitez-vous explorer vos émotions actuelles ?",
-      "Avez-vous essayé notre nouvelle fonctionnalité de méditation guidée ?",
-      "Puis-je vous suggérer des activités pour améliorer votre humeur ?"
-    ],
-    sentiment: "neutral"
+  const responses: Record<string, string> = {
+    happy: "Je suis ravi que vous vous sentiez bien ! C'est une excellente nouvelle. Souhaitez-vous explorer des activités qui pourraient prolonger cet état de bien-être ?",
+    sad: "Je comprends que vous ne vous sentiez pas au mieux. C'est normal d'avoir des hauts et des bas. Souhaitez-vous que je vous suggère des activités qui pourraient vous aider à vous sentir mieux ?",
+    anxious: "Je perçois que vous êtes stressé. Respirez profondément. Souhaiteriez-vous essayer une courte séance de respiration guidée ou de méditation pour vous aider à vous détendre ?",
+    neutral: "Merci de partager cela avec moi. Comment puis-je vous aider aujourd'hui ? Souhaitez-vous explorer des exercices de bien-être, discuter de vos émotions, ou autre chose ?"
   };
-}
-
-// Export the ChatService
-export const ChatService = {
-  getChatResponse
+  
+  return {
+    text: responses[sentiment] || responses.neutral,
+    sentiment: sentiment,
+    follow_up_questions: [
+      "Comment vous sentez-vous généralement ces derniers jours ?",
+      "Qu'est-ce qui vous aide habituellement quand vous vous sentez ainsi ?",
+      "Souhaitez-vous explorer des activités pour améliorer votre bien-être ?"
+    ]
+  };
 };
 
-export default ChatService;
+// Exporter le module par défaut pour la compatibilité
+export default {
+  getChatResponse
+};

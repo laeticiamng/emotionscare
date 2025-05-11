@@ -1,112 +1,105 @@
 
-import { db } from '@/lib/db'; // Import your database client
-import { VRSession, VRSessionTemplate } from '@/types/vr';
+import { VRSessionTemplate, VRSession } from '@/types';
 
-export async function getRecommendedVRSessions(): Promise<VRSessionTemplate[]> {
-  try {
-    // Mocking database fetch
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return [
-      {
-        id: 'vr-1',
-        name: 'Ocean Calm',
-        title: 'Ocean Calm',
-        description: 'Experience the gentle sounds and sights of the ocean',
-        category: 'relaxation',
-        duration: 10,
-        intensity: 'low',
-        tags: ['ocean', 'calm', 'beginner'],
-        thumbnail: '/images/vr/ocean.jpg',
-      },
-      {
-        id: 'vr-2',
-        name: 'Forest Meditation',
-        title: 'Forest Meditation',
-        description: 'Deep meditation in a peaceful forest setting',
-        category: 'meditation',
-        duration: 15,
-        intensity: 'medium',
-        tags: ['forest', 'meditation', 'nature'],
-        thumbnail: '/images/vr/forest.jpg',
-      }
-    ] as VRSessionTemplate[];
-  } catch (error) {
-    console.error("Error fetching VR sessions:", error);
-    return [];
-  }
-}
+// Fonction pour obtenir les sessions recommandées
+export const getRecommendedSessions = (): VRSessionTemplate[] => {
+  return [
+    {
+      id: "1",
+      name: "Méditation Guidée",
+      title: "Méditation Guidée pour la Sérénité",
+      description: "Une méditation guidée pour retrouver calme et sérénité",
+      category: "meditation",
+      duration: 600,
+      intensity: "low",
+      tags: ["calme", "meditation", "respiration"],
+      thumbnail: "/images/vr/meditation-thumbnail.jpg",
+      popularity: 98,
+      recommendedFor: ["stress", "anxiété", "insomnie"],
+      emotions: ["calme", "serein", "détendu"]
+    },
+    {
+      id: "2", 
+      name: "Forêt Apaisante",
+      title: "Immersion en Forêt Relaxante",
+      description: "Évadez-vous dans une forêt apaisante pour retrouver votre équilibre naturel",
+      category: "nature",
+      duration: 900,
+      intensity: "medium",
+      tags: ["nature", "forêt", "relaxation"],
+      thumbnail: "/images/vr/forest-thumbnail.jpg",
+      popularity: 85,
+      recommendedFor: ["fatigue", "burnout", "concentration"],
+      emotions: ["apaisé", "ressourcé", "énergisé"]
+    }
+  ];
+};
 
-export async function getUserVRHistory(userId: string): Promise<VRSession[]> {
-  try {
-    // Mocking database fetch
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return [
-      {
-        id: 'session-1',
-        user_id: userId,
-        template_id: 'vr-1',
-        start_time: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-        end_time: new Date(Date.now() - 86400000 + 600000).toISOString(), // +10 minutes
-        duration_seconds: 600,
-        completed: true,
-      },
-      {
-        id: 'session-2',
-        user_id: userId,
-        template_id: 'vr-2',
-        start_time: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-        end_time: new Date(Date.now() - 172800000 + 900000).toISOString(), // +15 minutes
-        duration_seconds: 900,
-        completed: true,
-      }
-    ] as VRSession[];
-  } catch (error) {
-    console.error("Error fetching user VR history:", error);
-    return [];
-  }
-}
+// Fonction pour enregistrer une session VR
+export const saveVRSession = async (session: VRSession): Promise<VRSession> => {
+  // Simuler un appel API avec un délai
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Normalement, nous ferions un appel à une API ici
+  console.log('Enregistrement de la session VR:', session);
+  
+  return {
+    ...session,
+    id: session.id || `session-${Date.now()}`,
+    completed: true
+  };
+};
 
-export async function recordVRSession(
-  userId: string, 
-  templateId: string, 
-  startTime: Date,
-  endTime?: Date,
-  completed: boolean = false
-): Promise<VRSession | null> {
-  try {
-    // Mocking database insert
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    
-    const durationSeconds = endTime 
-      ? Math.floor((endTime.getTime() - startTime.getTime()) / 1000) 
-      : 0;
-    
-    const session: VRSession = {
-      id: `session-${Date.now()}`,
+// Fonction pour enregistrer une session de relaxation
+export const saveRelaxationSession = async (sessionData: {
+  userId: string;
+  duration: number;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  templateId?: string;
+}): Promise<{ success: boolean; id: string }> => {
+  // Simuler un appel API avec un délai
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  console.log('Enregistrement de la session de relaxation:', sessionData);
+  
+  // Dans une vraie application, nous ferions un appel API ici
+  return {
+    success: true,
+    id: `rel-${Date.now()}`
+  };
+};
+
+// Fonction pour récupérer l'historique des sessions
+export const getVRSessionHistory = async (userId: string): Promise<VRSession[]> => {
+  // Simuler un appel API avec un délai
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  // Dans une application réelle, nous récupérerions l'historique depuis une API
+  return [
+    {
+      id: "session-1",
       user_id: userId,
-      template_id: templateId,
-      start_time: startTime.toISOString(),
-      end_time: endTime?.toISOString(),
-      duration_seconds: durationSeconds,
-      completed,
-    };
-    
-    return session;
-  } catch (error) {
-    console.error("Error recording VR session:", error);
-    return null;
-  }
-}
-
-// Add the missing function
-export async function saveRelaxationSession(sessionData: any): Promise<boolean> {
-  try {
-    // Mock implementation for now
-    console.log("Saving relaxation session:", sessionData);
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return true;
-  } catch (error) {
-    console.error("Error saving relaxation session:", error);
-    return false;
-  }
-}
+      template_id: "1",
+      start_time: new Date(Date.now() - 86400000).toISOString(),
+      end_time: new Date(Date.now() - 86370000).toISOString(),
+      duration_seconds: 1800,
+      completed: true,
+      emotion_before: "stressé",
+      emotion_after: "calme",
+      emotions: ["calme", "serein"]
+    },
+    {
+      id: "session-2",
+      user_id: userId,
+      template_id: "2",
+      start_time: new Date(Date.now() - 172800000).toISOString(),
+      end_time: new Date(Date.now() - 172770000).toISOString(),
+      duration_seconds: 1200,
+      completed: true,
+      emotion_before: "anxieux",
+      emotion_after: "apaisé",
+      emotions: ["apaisé", "confiant"]
+    }
+  ];
+};
