@@ -18,11 +18,13 @@ interface ThemeSwitcherProps {
 }
 
 const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showLabel = false }: ThemeSwitcherProps) => {
-  const { theme, resolvedTheme, setTheme, setThemePreference } = useTheme() || { 
-    theme: 'system' as Theme, 
-    resolvedTheme: 'light',
-    setTheme: () => {},
-    setThemePreference: () => {}
+  const { theme = 'system', resolvedTheme = 'light', setTheme } = useTheme() || {};
+
+  // Function to handle theme changes
+  const handleThemeChange = (newTheme: Theme) => {
+    if (setTheme) {
+      setTheme(newTheme);
+    }
   };
 
   // Icons based on current theme
@@ -64,7 +66,7 @@ const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showL
       <DropdownMenuContent align="end">
         <DropdownMenuItem 
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() => setTheme('light')}
+          onClick={() => handleThemeChange('light')}
         >
           <Sun size={16} />
           <span>Clair</span>
@@ -72,7 +74,7 @@ const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showL
         </DropdownMenuItem>
         <DropdownMenuItem 
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() => setTheme('dark')}
+          onClick={() => handleThemeChange('dark')}
         >
           <Moon size={16} />
           <span>Sombre</span>
@@ -80,7 +82,7 @@ const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showL
         </DropdownMenuItem>
         <DropdownMenuItem 
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() => setTheme('pastel')}
+          onClick={() => handleThemeChange('pastel')}
         >
           <Palette size={16} />
           <span>Pastel</span>
@@ -88,7 +90,7 @@ const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showL
         </DropdownMenuItem>
         <DropdownMenuItem 
           className="flex items-center gap-2 cursor-pointer"
-          onClick={() => setTheme('system')}
+          onClick={() => handleThemeChange('system')}
         >
           <Laptop size={16} />
           <span>Système</span>

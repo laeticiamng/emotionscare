@@ -7,10 +7,17 @@ import { Theme } from '@/contexts/ThemeContext';
 
 interface ThemeSelectorProps {
   currentTheme: Theme;
-  onChange: (theme: string) => void;
+  onChange: (theme: Theme) => void;
 }
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange }) => {
+  const handleThemeChange = (value: string) => {
+    // Validate that the value is a valid Theme before passing it to onChange
+    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
+      onChange(value as Theme);
+    }
+  };
+  
   return (
     <Card>
       <CardHeader>
@@ -19,7 +26,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange })
       <CardContent>
         <RadioGroup
           value={currentTheme}
-          onValueChange={onChange}
+          onValueChange={handleThemeChange}
           className="grid grid-cols-2 gap-4"
         >
           <div className="flex items-center space-x-2">

@@ -15,11 +15,17 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const setTheme = themeContext?.setTheme || ((t: Theme) => console.log('Theme would change to:', t));
   
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    // Cycle through themes: light -> dark -> system
+    const themeOrder: Theme[] = ['light', 'dark', 'system'];
+    const currentIndex = themeOrder.indexOf(theme as Theme);
+    const nextIndex = (currentIndex + 1) % themeOrder.length;
+    const newTheme = themeOrder[nextIndex];
     setTheme(newTheme);
   };
   
-  const isDark = theme === 'dark';
+  // Determine if the current theme is dark
+  // This works with both direct 'dark' theme and system preference resulting in dark
+  const isDark = theme === 'dark' || (theme === 'system' && themeContext?.resolvedTheme === 'dark');
   
   if (collapsed) {
     return (

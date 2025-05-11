@@ -12,7 +12,7 @@ export interface UserPreferencesState {
   highContrast: boolean;
   reducedAnimations: boolean;
   fontSize: FontSize;
-  font: string;
+  font: FontFamily | string;
   customBackground?: string;
   
   // Identity
@@ -124,7 +124,7 @@ export function useUserPreferences() {
       if (newPreferences.theme && themeContext?.setTheme) {
         // Fix: Ensure theme is one of the allowed values
         const themeValue = newPreferences.theme;
-        if (themeValue === 'light' || themeValue === 'dark' || themeValue === 'system' || themeValue === 'pastel') {
+        if (['light', 'dark', 'system', 'pastel'].includes(themeValue)) {
           themeContext.setTheme(themeValue);
         }
       }
@@ -170,13 +170,15 @@ export function useUserPreferences() {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
-    // Check if the preset theme is a valid Theme type
+    // Ensure the preset theme is a valid Theme type
     const presetTheme = preset.theme;
     if (['light', 'dark', 'system', 'pastel'].includes(presetTheme)) {
       updatePreferences({ theme: presetTheme });
     }
     
-    audioPrefs.setEqualizerPreset?.(preset.audioPreset);
+    if (audioPrefs.setEqualizerPreset) {
+      audioPrefs.setEqualizerPreset(preset.audioPreset);
+    }
     
     toast({
       title: "Preset applied",
