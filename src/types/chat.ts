@@ -4,11 +4,12 @@ export interface ChatMessage {
   text?: string;
   content?: string;
   sender: string;
-  sender_id?: string; // Added for compatibility
+  sender_id?: string;
   timestamp?: string | Date;
   is_read?: boolean;
   conversation_id?: string;
   role?: string;
+  sender_type?: string;
 }
 
 export interface ChatConversation {
@@ -25,8 +26,10 @@ export interface ChatConversation {
 export interface ChatResponseType {
   id?: string;
   content?: string;
-  message?: string; // For compatibility
+  message?: string; 
   role?: string;
   timestamp?: string;
-  emotion?: string; // For compatibility
+  emotion?: string;
 }
+
+export type ChatResponse = ChatResponseType;

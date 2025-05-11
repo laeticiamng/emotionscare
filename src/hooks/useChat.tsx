@@ -1,14 +1,14 @@
 
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatResponse } from '@/types';
+import { ChatMessage, ChatResponseType } from '@/types/chat';
 import chatService from '@/services/chatService';
 
 export const useChat = (conversationId: string, userId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = async (messageText: string): Promise<ChatResponse> => {
+  const handleSend = async (messageText: string): Promise<ChatResponseType> => {
     setIsLoading(true);
 
     try {
@@ -32,7 +32,7 @@ export const useChat = (conversationId: string, userId: string) => {
         id: uuidv4(),
         conversation_id: conversationId,
         sender: 'assistant',
-        text: response.message,
+        text: response.content || response.message,
         timestamp: new Date().toISOString()
       };
 
@@ -41,7 +41,7 @@ export const useChat = (conversationId: string, userId: string) => {
     } catch (error) {
       console.error('Error sending message:', error);
       return {
-        message: 'Sorry, I encountered an error. Please try again.',
+        content: 'Sorry, I encountered an error. Please try again.',
         emotion: 'error'
       };
     } finally {

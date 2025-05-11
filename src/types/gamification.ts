@@ -10,6 +10,22 @@ export interface Challenge {
   icon?: string;
   requirements?: string[];
   completedAt?: string;
+  name?: string;
+  total?: number;
+  difficulty?: string;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  category: string;
+  level: number;
+  unlocked: boolean;
+  unlocked_at?: string;
+  user_id?: string;
+  progress?: number;
 }
 
 export interface AchievementStat {

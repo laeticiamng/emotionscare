@@ -1,80 +1,49 @@
+import { toast } from "@/hooks/use-toast";
+import { env } from "@/env.mjs";
 
-/**
- * Service de Modération de Contenu
- */
-import { moderateContent } from './openai-client';
-import { toast } from '@/hooks/use-toast';
+const OPENAI_API_KEY = env.NEXT_PUBLIC_OPENAI_API_KEY;
 
-export enum ModerationType {
-  HATE = 'hate',
-  HATE_THREATENING = 'hate/threatening',
-  SELF_HARM = 'self-harm',
-  SEXUAL = 'sexual',
-  SEXUAL_MINORS = 'sexual/minors',
-  VIOLENCE = 'violence',
-  VIOLENCE_GRAPHIC = 'violence/graphic'
-}
+export async function moderateText(input: string): Promise<boolean> {
+  if (!OPENAI_API_KEY) {
+    console.warn("OPENAI_API_KEY is not set. Skipping moderation.");
+    return true;
+  }
 
-interface ModerationResult {
-  flagged: boolean;
-  categories: Record<ModerationType, boolean>;
-  scores: Record<ModerationType, number>;
-  isSafe: boolean;
-  reason?: string;
-}
-
-/**
- * Vérifie si un contenu est approprié selon les politiques de modération
- */
-export async function checkContentSafety(content: string): Promise<ModerationResult> {
   try {
-    const response = await moderateContent(content);
-    const result = response.results[0];
-    
-    // Identifier la raison du flagging si présente
-    let reason = '';
-    if (result.flagged) {
-      const flaggedCategories = Object.entries(result.categories)
-        .filter(([_, value]) => value)
-        .map(([key, _]) => key);
-      
-      reason = `Contenu inapproprié détecté: ${flaggedCategories.join(', ')}`;
-    }
-    
-    return {
-      flagged: result.flagged,
-      categories: result.categories as Record<ModerationType, boolean>,
-      scores: result.category_scores as Record<ModerationType, number>,
-      isSafe: !result.flagged,
-      reason: result.flagged ? reason : undefined
-    };
-  } catch (error) {
-    console.error('Error checking content safety:', error);
-    toast({
-      title: "Erreur de modération",
-      description: "Impossible de vérifier le contenu pour le moment.",
-      variant: "warning" // Variant personnalisé défini dans le toast.tsx
+    const response = await fetch("https://api.openai.com/v1/moderations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({ input }),
     });
-    
-    // Par défaut, en cas d'erreur, on suppose que le contenu est sûr
-    // mais on informe l'utilisateur que la vérification a échoué
-    return {
-      flagged: false,
-      categories: {} as Record<ModerationType, boolean>,
-      scores: {} as Record<ModerationType, number>,
-      isSafe: true,
-      reason: "La vérification de sécurité n'a pas pu être effectuée"
-    };
+
+    if (!response.ok) {
+      console.error("Moderation API error:", response.status, response.statusText);
+      return true;
+    }
+
+    const data = await response.json();
+    const result = data.results[0];
+
+    if (!result.flagged) {
+      return true;
+    }
+
+    console.warn("Moderation flags:", result.categories);
+    return false;
+  } catch (error) {
+    console.error("Moderation API failed:", error);
+    return true;
   }
 }
 
-/**
- * Hook React pour vérifier en temps réel le contenu
- */
-export function useContentModeration() {
-  const moderateContentAsync = async (content: string): Promise<ModerationResult> => {
-    return checkContentSafety(content);
-  };
-  
-  return { moderateContentAsync };
-}
+export const showModerationWarning = (message: string) => {
+  toast({
+    title: "Content Warning",
+    description: message,
+    variant: "default", // Changed from "warning" to "default"
+    duration: 5000,
+  });
+};

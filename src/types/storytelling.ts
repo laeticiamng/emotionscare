@@ -12,3 +12,19 @@ export interface StorytellingContextType {
   markStorySeen: (storyId: string) => void;
   playFunctionalSound?: (soundType: string) => void;
 }
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  imageUrl?: string;
+  seen: boolean;
+  category: string;
+  createdAt: Date | string;
+  action?: {
+    label: string;
+    route: string;
+    text?: string;
+  };
+  emotion?: string;
+}

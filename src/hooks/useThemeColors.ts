@@ -1,141 +1,107 @@
 
-import { useMemo } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useEffect, useState } from 'react';
+import { useBranding } from './useBranding';
+import { Theme } from '@/types/branding';
 
-export interface ThemeColors {
-  background: string;
-  foreground: string;
-  card: string;
-  cardForeground: string;
-  popover: string;
-  popoverForeground: string;
+export interface ColorPalette {
   primary: string;
-  primaryForeground: string;
   secondary: string;
-  secondaryForeground: string;
-  muted: string;
-  mutedForeground: string;
   accent: string;
-  accentForeground: string;
-  destructive: string;
-  destructiveForeground: string;
+  background: string;
+  text: string;
+  muted: string;
   border: string;
-  input: string;
-  ring: string;
-}
-
-export interface WellnessColors {
-  blue: string;
-  mint: string;
-  coral: string;
-  lavender: string;
-  gold: string;
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
 }
 
 export const useThemeColors = () => {
-  const { theme } = useTheme();
-  
-  const colors = useMemo(() => {
-    switch (theme) {
-      case 'dark':
-        return {
-          background: 'rgb(13, 17, 23)',
-          foreground: 'rgb(230, 237, 243)',
-          card: 'rgb(22, 27, 34)',
-          cardForeground: 'rgb(230, 237, 243)',
-          popover: 'rgb(22, 27, 34)',
-          popoverForeground: 'rgb(230, 237, 243)',
-          primary: '#9b87f5',
-          primaryForeground: 'rgb(13, 17, 23)',
-          secondary: 'rgb(24, 31, 41)',
-          secondaryForeground: 'rgb(230, 237, 243)',
-          muted: 'rgb(24, 31, 41)',
-          mutedForeground: 'rgb(139, 148, 158)',
-          accent: 'rgb(24, 31, 41)',
-          accentForeground: 'rgb(230, 237, 243)',
-          destructive: 'rgb(248, 81, 73)',
-          destructiveForeground: 'rgb(230, 237, 243)',
-          border: 'rgb(33, 38, 45)',
-          input: 'rgb(33, 38, 45)',
-          ring: '#9b87f5',
-        };
-      case 'pastel':
-        return {
-          background: '#fcfcff',
-          foreground: '#1a1523',
-          card: '#ffffff',
-          cardForeground: '#1a1523',
-          popover: '#ffffff',
-          popoverForeground: '#1a1523',
-          primary: '#7E69AB',
-          primaryForeground: '#ffffff',
-          secondary: '#f5f1ff',
-          secondaryForeground: '#7E69AB',
-          muted: '#f5f1ff',
-          mutedForeground: '#6f6e77',
-          accent: '#f5f1ff',
-          accentForeground: '#1a1523',
-          destructive: '#ee5479',
-          destructiveForeground: '#ffffff',
-          border: '#e4dffc',
-          input: '#e4dffc',
-          ring: '#7E69AB',
-        };
-      default: // light theme
-        return {
-          background: '#ffffff',
-          foreground: 'rgb(10, 10, 10)',
-          card: '#ffffff',
-          cardForeground: 'rgb(10, 10, 10)',
-          popover: '#ffffff',
-          popoverForeground: 'rgb(10, 10, 10)',
-          primary: '#6E59A5',
-          primaryForeground: '#ffffff',
-          secondary: '#f4f4f5',
-          secondaryForeground: 'rgb(10, 10, 10)',
-          muted: '#f4f4f5',
-          mutedForeground: '#71717a',
-          accent: '#f4f4f5',
-          accentForeground: 'rgb(10, 10, 10)',
-          destructive: '#ef4444',
-          destructiveForeground: '#ffffff',
-          border: '#e4e4e7',
-          input: '#e4e4e7',
-          ring: '#6E59A5',
-        };
+  const { theme, isDarkMode } = useBranding();
+  const [colors, setColors] = useState<ColorPalette>({
+    primary: '',
+    secondary: '',
+    accent: '',
+    background: '',
+    text: '',
+    muted: '',
+    border: '',
+    success: '',
+    warning: '',
+    error: '',
+    info: ''
+  });
+
+  useEffect(() => {
+    let newColors: ColorPalette;
+    
+    if (isDarkMode) {
+      newColors = {
+        primary: 'hsl(210, 100%, 52%)',
+        secondary: 'hsl(280, 60%, 52%)',
+        accent: 'hsl(330, 80%, 52%)',
+        background: 'hsl(220, 13%, 18%)',
+        text: 'hsl(220, 6%, 90%)',
+        muted: 'hsl(220, 6%, 50%)',
+        border: 'hsl(220, 13%, 25%)',
+        success: 'hsl(160, 84%, 39%)',
+        warning: 'hsl(30, 100%, 50%)',
+        error: 'hsl(0, 84%, 60%)',
+        info: 'hsl(210, 100%, 77%)',
+      };
+    } else {
+      newColors = {
+        primary: 'hsl(210, 100%, 45%)',
+        secondary: 'hsl(280, 60%, 45%)',
+        accent: 'hsl(330, 80%, 45%)',
+        background: 'hsl(0, 0%, 100%)',
+        text: 'hsl(220, 13%, 10%)',
+        muted: 'hsl(220, 13%, 40%)',
+        border: 'hsl(220, 13%, 91%)',
+        success: 'hsl(160, 84%, 39%)',
+        warning: 'hsl(30, 100%, 50%)',
+        error: 'hsl(0, 84%, 60%)',
+        info: 'hsl(210, 100%, 60%)',
+      };
     }
-  }, [theme]);
-  
-  const wellness = useMemo<WellnessColors>(() => {
-    switch (theme) {
-      case 'dark':
-        return {
-          blue: '#4A90E2',
-          mint: '#7ED321',
-          coral: '#FF5A5F',
-          lavender: '#9B87F5',
-          gold: '#F5A623',
-        };
-      case 'pastel':
-        return {
-          blue: '#8ECAE6',
-          mint: '#A8E6CF',
-          coral: '#FFB6B9',
-          lavender: '#CBC3E3',
-          gold: '#F7D488',
-        };
-      default: // light theme
-        return {
-          blue: '#3498db',
-          mint: '#2ecc71',
-          coral: '#e74c3c',
-          lavender: '#9b59b6',
-          gold: '#f1c40f',
-        };
+    
+    // Apply "pastel" theme colors if that theme is active
+    const isPastel = theme === 'pastel' as Theme;
+    
+    if (isPastel) {
+      newColors = {
+        ...newColors,
+        primary: 'hsl(180, 60%, 60%)',
+        secondary: 'hsl(310, 50%, 75%)',
+        accent: 'hsl(30, 70%, 75%)',
+        background: isDarkMode ? 'hsl(240, 10%, 20%)' : 'hsl(50, 30%, 96%)',
+        text: isDarkMode ? 'hsl(240, 10%, 90%)' : 'hsl(240, 10%, 30%)',
+        muted: isDarkMode ? 'hsl(240, 5%, 60%)' : 'hsl(240, 5%, 50%)',
+        border: isDarkMode ? 'hsl(240, 10%, 28%)' : 'hsl(240, 20%, 90%)',
+      };
     }
-  }, [theme]);
+    
+    setColors(newColors);
+  }, [theme, isDarkMode]);
   
-  return { colors, wellness, currentTheme: theme };
+  // Color scheme detection helper
+  const getPrimaryColorScheme = () => {
+    // Check if pastel theme
+    const isPastel = theme === 'pastel' as Theme;
+    
+    if (isPastel) {
+      return 'pastel';
+    }
+    
+    return isDarkMode ? 'dark' : 'light';
+  };
+  
+  return {
+    colors,
+    getPrimaryColorScheme,
+    isDarkMode
+  };
 };
 
 export default useThemeColors;

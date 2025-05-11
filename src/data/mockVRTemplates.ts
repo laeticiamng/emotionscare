@@ -1,91 +1,82 @@
 
 import { VRSessionTemplate } from '@/types';
 
-export const mockVRTemplatesData: VRSessionTemplate[] = [
+// Mock VR session templates
+export const mockVRTemplates: VRSessionTemplate[] = [
   {
-    id: 'template-1',
-    template_id: 'template-1',
-    title: 'Plage tranquille',
-    theme: 'Plage tranquille',
-    name: 'Plage tranquille',
-    description: 'Relaxation sur une plage tranquille avec le son des vagues et une vue panoramique sur l\'océan.',
-    duration: 5,
-    category: 'relaxation',
-    preview_url: 'https://www.youtube.com/embed/LXb3EKWsInQ',
+    id: '1',
+    template_id: 'forest-meditation',
+    title: 'Forest Meditation',
+    theme: 'nature',
+    name: 'Forest Meditation',
+    description: 'Experience the tranquility of a forest meditation session with birds singing and leaves rustling.',
+    duration: 300, // 5 minutes
+    category: 'meditation',
     is_audio_only: false,
-    audio_url: '/audio/beach.mp3', // Added missing required property
-    difficulty: 'easy',
-    completion_rate: 85,
+    preview_url: '/videos/forest-preview.mp4',
+    audio_url: '/audio/forest-meditation.mp3',
+    difficulty: 'beginner',
     emotions: ['calm', 'peaceful'],
-    benefits: ['Réduction du stress', 'Amélioration du sommeil'],
-    tags: ['nature', 'water', 'relaxation'],
-    popularity: 95,
-    recommended_mood: 'stressed',
-    level: 'beginner'
-  },
-  {
-    id: 'template-2',
-    template_id: 'template-2',
-    title: 'Méditation en forêt',
-    theme: 'Méditation en forêt',
-    name: 'Méditation en forêt',
-    description: 'Une session de méditation guidée au milieu d\'une forêt paisible avec des sons naturels.',
-    duration: 10,
-    category: 'meditation',
-    preview_url: 'https://www.youtube.com/embed/ReYbOqwJk6I',
-    is_audio_only: false,
-    audio_url: '/audio/forest.mp3', // Added missing required property
-    difficulty: 'medium',
-    completion_rate: 72,
-    emotions: ['mindful', 'focused'],
-    benefits: ['Clarté mentale', 'Réduction de l\'anxiété'],
-    tags: ['nature', 'forest', 'meditation'],
-    popularity: 88,
-    recommended_mood: 'anxious',
-    level: 'intermediate'
-  },
-  {
-    id: 'template-3',
-    template_id: 'template-3',
-    title: 'Méditation guidée',
-    theme: 'Méditation guidée',
-    name: 'Méditation guidée',
-    description: 'Une méditation guidée audio uniquement pour se reconnecter avec soi-même et réduire le stress.',
-    duration: 15,
-    category: 'meditation',
-    is_audio_only: true,
-    audio_url: '/audio/guided-meditation.mp3',
-    difficulty: 'easy',
-    completion_rate: 65,
-    emotions: ['peaceful', 'relaxed'],
-    benefits: ['Réduction du stress', 'Amélioration du bien-être'],
-    tags: ['audio', 'meditation', 'guided'],
-    popularity: 75,
-    recommended_mood: 'overwhelmed',
+    goals: ['reduce stress', 'improve focus'],
+    completed_count: 0,
     level: 'beginner',
-    preview_url: '' // Add empty string for required field
+    recommended_mood: 'stressed'
   },
   {
-    id: 'template-4',
-    template_id: 'template-4',
-    title: 'Respiration en montagne',
-    theme: 'Respiration en montagne',
-    name: 'Respiration en montagne',
-    description: 'Exercices de respiration avec vue panoramique sur des montagnes majestueuses.',
-    duration: 8,
-    category: 'breathing',
-    preview_url: 'https://www.youtube.com/embed/21qNxnCS8WU',
-    is_audio_only: false,
-    audio_url: '/audio/mountain.mp3', // Added missing required property
+    id: '2',
+    template_id: 'ocean-relaxation',
+    title: 'Ocean Relaxation',
+    theme: 'water',
+    name: 'Ocean Relaxation',
+    description: 'Let the gentle waves and ocean sounds wash away your stress in this relaxing session.',
+    duration: 600, // 10 minutes
+    category: 'relaxation',
+    is_audio_only: true,
+    preview_url: '/videos/ocean-preview.mp4',
+    audio_url: '/audio/ocean-waves.mp3',
     difficulty: 'easy',
-    completion_rate: 78,
-    emotions: ['energized', 'balanced'],
-    benefits: ['Amélioration de la concentration', 'Augmentation de l\'énergie'],
-    tags: ['mountains', 'breathing', 'energy'],
-    popularity: 82,
-    recommended_mood: 'tired',
-    level: 'beginner'
+    emotions: ['calm', 'peaceful'],
+    goals: ['reduce anxiety', 'improve sleep'],
+    completed_count: 0,
+    level: 'beginner',
+    recommended_mood: 'anxious'
+  },
+  {
+    id: '3',
+    template_id: 'mindfulness-practice',
+    title: 'Mindfulness Practice',
+    theme: 'mindfulness',
+    name: 'Mindfulness Practice',
+    description: 'A guided mindfulness practice to help you stay present and aware of your thoughts and feelings.',
+    duration: 900, // 15 minutes
+    category: 'mindfulness',
+    is_audio_only: false,
+    preview_url: '/videos/mindfulness-preview.mp4',
+    audio_url: '/audio/mindfulness-practice.mp3',
+    difficulty: 'intermediate',
+    emotions: ['focused', 'grounded'],
+    goals: ['improve focus', 'reduce rumination'],
+    completed_count: 0,
+    level: 'intermediate',
+    recommended_mood: 'distracted'
+  },
+  {
+    id: '4',
+    template_id: 'energy-boost',
+    title: 'Energy Boost',
+    theme: 'energy',
+    name: 'Energy Boost',
+    description: 'A quick energizing session to boost your mood and motivation.',
+    duration: 180, // 3 minutes
+    category: 'energy',
+    is_audio_only: false,
+    preview_url: '/videos/energy-preview.mp4',
+    audio_url: '/audio/energy-boost.mp3',
+    difficulty: 'easy',
+    emotions: ['energized', 'motivated'],
+    goals: ['increase energy', 'improve mood'],
+    completed_count: 0,
+    level: 'beginner',
+    recommended_mood: 'tired'
   }
 ];
-
-export default mockVRTemplatesData;

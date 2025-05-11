@@ -48,54 +48,57 @@ export function useCommunityGamification() {
             name: 'Premier pas',
             description: 'A rejoint la communauté',
             image_url: '/badges/first-step.png',
-            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 jours avant
+            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(),
             unlocked: true,
             category: 'onboarding',
-            level: 1
+            level: 1,
+            user_id: user.id
           },
           {
             id: 'badge-2',
             name: 'Soutien communautaire',
             description: 'A aidé 5 membres',
             image_url: '/badges/community-support.png',
-            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(), // 15 jours avant
+            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(),
             unlocked: true,
             category: 'community',
-            level: 2
+            level: 2,
+            user_id: user.id
           },
           {
             id: 'badge-3',
             name: 'Créateur de contenu',
             description: 'A créé 10 publications de qualité',
             image_url: '/badges/content-creator.png',
-            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 jours avant
+            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
             unlocked: true,
             category: 'content',
-            level: 2
+            level: 2,
+            user_id: user.id
           }
         ],
         challenges: [
           {
             id: 'challenge-1',
-            name: 'Partage de connaissance',
             title: 'Partage de connaissance',
+            name: 'Partage de connaissance',
             description: 'Créez une publication éducative dans la communauté',
             progress: 0,
             total: 1,
-            difficulty: 'easy',
             points: 100,
-            completed: false
+            completed: false,
+            category: 'social'
           },
           {
             id: 'challenge-2',
-            name: 'Connecteur',
             title: 'Connecteur',
+            name: 'Connecteur',
             description: 'Connectez-vous avec 3 nouveaux membres',
             progress: 1,
             total: 3,
-            difficulty: 'medium',
             points: 150,
-            completed: false
+            completed: false,
+            category: 'social'
           }
         ],
         recentAchievements: [
@@ -103,14 +106,14 @@ export function useCommunityGamification() {
             type: 'badge',
             id: 'badge-3',
             name: 'Créateur de contenu',
-            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), // 5 jours avant
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
             points: 200
           },
           {
             type: 'level',
             id: 'level-3',
             name: 'Niveau 3',
-            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 7 jours avant
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
             points: 0
           }
         ]
@@ -135,89 +138,85 @@ export function useCommunityGamification() {
     try {
       if (!user) return;
       
-      // Dans une implémentation réelle, nous utiliserions OpenAI pour générer des défis personnalisés
-      // via aiChallenges.generateChallenge
-      // Pour cette démonstration, nous simulons des défis
-      
       const emotion = userEmotion || 'neutral';
       
       const emotionChallenges: Record<string, Challenge[]> = {
         'calm': [
           {
             id: 'ai-challenge-calm-1',
-            name: 'Journal de gratitude',
             title: 'Journal de gratitude',
+            name: 'Journal de gratitude',
             description: 'Partagez trois choses pour lesquelles vous êtes reconnaissant aujourd\'hui',
             progress: 0,
             total: 1,
-            difficulty: 'easy',
             points: 50,
-            completed: false
+            completed: false,
+            category: 'wellness'
           }
         ],
         'energetic': [
           {
             id: 'ai-challenge-energetic-1',
-            name: 'Motivation matinale',
             title: 'Motivation matinale',
+            name: 'Motivation matinale',
             description: 'Partagez votre routine matinale énergisante avec la communauté',
             progress: 0,
             total: 1,
-            difficulty: 'easy',
             points: 50,
-            completed: false
+            completed: false,
+            category: 'wellness'
           }
         ],
         'creative': [
           {
             id: 'ai-challenge-creative-1',
-            name: 'Inspiration créative',
             title: 'Inspiration créative',
+            name: 'Inspiration créative',
             description: 'Partagez une source d\'inspiration qui a stimulé votre créativité récemment',
             progress: 0,
             total: 1,
-            difficulty: 'medium',
             points: 75,
-            completed: false
+            completed: false,
+            category: 'creative'
           }
         ],
         'reflective': [
           {
             id: 'ai-challenge-reflective-1',
-            name: 'Question philosophique',
             title: 'Question philosophique',
+            name: 'Question philosophique',
             description: 'Posez une question réflexive à la communauté et engagez une discussion profonde',
             progress: 0,
             total: 1,
-            difficulty: 'medium',
             points: 75,
-            completed: false
+            completed: false,
+            category: 'intellectual'
           }
         ],
         'anxious': [
           {
             id: 'ai-challenge-anxious-1',
-            name: 'Technique anti-stress',
             title: 'Technique anti-stress',
+            name: 'Technique anti-stress',
             description: 'Partagez une technique efficace pour gérer l\'anxiété que vous avez personnellement testée',
             progress: 0,
             total: 1,
-            difficulty: 'easy',
             points: 50,
-            completed: false
+            completed: false,
+            category: 'wellness'
           }
         ],
         'neutral': [
           {
             id: 'ai-challenge-neutral-1',
-            name: 'Connexion communautaire',
             title: 'Connexion communautaire',
+            name: 'Connexion communautaire',
             description: 'Commentez sur 3 publications d\'autres membres pour créer des liens',
             progress: 0,
             total: 3,
-            difficulty: 'easy',
             points: 60,
-            completed: false
+            completed: false,
+            category: 'social'
           }
         ]
       };
