@@ -9,7 +9,7 @@ import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/user';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, updateUserPreferences } = useAuth();
+  const { user, updateUser } = useAuth();
   const { toast } = useToast();
   
   const [step, setStep] = useState(0);
@@ -38,24 +38,25 @@ const OnboardingPage: React.FC = () => {
     try {
       // Save user preferences
       const preferences: UserPreferences = {
-        theme: userResponses.theme as ThemeName || 'light',
+        theme: (userResponses.theme as ThemeName) || 'light',
         language: userResponses.language || 'fr',
-        fontSize: userResponses.fontSize as FontSize || 'medium',
-        fontFamily: userResponses.fontFamily as FontFamily || 'inter',
+        fontSize: (userResponses.fontSize as FontSize) || 'medium',
+        fontFamily: (userResponses.fontFamily as FontFamily) || 'inter',
         notifications: !!userResponses.notifications,
         soundEnabled: !!userResponses.soundEnabled,
         privacyLevel: userResponses.privacyLevel || 'private',
-        emotionalInsightsEnabled: !!userResponses.emotionalInsightsEnabled,
+        // Remove emotionalInsightsEnabled as it's not in the UserPreferences type
         onboardingCompleted: true,
         dashboardLayout: userResponses.dashboardLayout || 'standard',
-        musicPreferences: userResponses.musicPreferences || [],
-        emotionalGoals: userResponses.emotionalGoals || [],
-        wellbeingPreferences: userResponses.wellbeingPreferences || {},
-        recentModules: [],
       };
       
       if (user?.id) {
-        await updateUserPreferences(user.id, preferences);
+        // Update the user with the new preferences
+        await updateUser({
+          ...user,
+          onboarded: true,
+          preferences
+        });
       }
       
       toast({

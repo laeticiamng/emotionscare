@@ -1,29 +1,26 @@
 
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function safeOpen(url: string, target: string = '_blank') {
-  // Safely open a URL in a new tab/window
-  const safeUrl = url.startsWith('http') ? url : `https://${url}`;
-  window.open(safeUrl, target, 'noopener,noreferrer');
-}
-
-export function formatDate(dateString?: string): string {
-  if (!dateString) return 'Non disponible';
+/**
+ * Format a date string or Date object into a localized date string
+ */
+export function formatDate(date: string | Date | undefined): string {
+  if (!date) return 'N/A';
   
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  } catch (error) {
-    console.error('Error formatting date:', error);
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(dateObj.getTime())) {
     return 'Date invalide';
   }
+
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(dateObj);
 }
