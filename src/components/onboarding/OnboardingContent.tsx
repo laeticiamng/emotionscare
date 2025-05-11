@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import WelcomeSection from '@/components/onboarding/WelcomeSection';
 import EmotionalAssessment from '@/components/onboarding/EmotionalAssessment';
@@ -28,6 +28,9 @@ const OnboardingContent: React.FC<OnboardingContentProps> = ({
   handleResponse,
   completeOnboarding
 }) => {
+  // Create a video reference to pass to WelcomeSection
+  const videoRef = useRef<HTMLVideoElement>(null);
+  
   const renderStep = () => {
     switch(step) {
       case 0:
@@ -35,6 +38,7 @@ const OnboardingContent: React.FC<OnboardingContentProps> = ({
           <WelcomeSection 
             onContinue={nextStep} 
             onResponse={handleResponse}
+            videoRef={videoRef}
           />
         );
       case 1:
