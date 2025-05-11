@@ -1,114 +1,115 @@
 
 import { useState, useEffect } from 'react';
+import { Activity, Brain, Heart, Star, Calendar, Users } from 'lucide-react';
 
-interface KPI {
-  id: string;
+interface DashboardKpi {
+  key: string;
   label: string;
-  value: string | number;
-  change: number;
-  unit?: string;
+  value: number | string;
+  icon: any;
+  trend?: {
+    value: number;
+    direction: 'up' | 'down' | 'neutral';
+  } | number;
 }
 
-interface Shortcut {
-  id: string;
+interface DashboardShortcut {
   label: string;
-  icon: string;
-  href: string;
+  name?: string;
+  icon: any;
+  to: string;
+  description?: string;
 }
 
-export const useDashboardHero = (userId?: string) => {
-  const [kpis, setKpis] = useState<KPI[]>([]);
-  const [shortcuts, setShortcuts] = useState<Shortcut[]>([]);
+export function useDashboardHero(userId?: string) {
+  const [kpis, setKpis] = useState<DashboardKpi[]>([]);
+  const [shortcuts, setShortcuts] = useState<DashboardShortcut[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
-    const fetchHeroData = async () => {
+    const fetchDashboardData = async () => {
       setIsLoading(true);
+      
       try {
-        // Simuler une API pour les données KPI
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // Mock data fetch delay
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        setKpis([
+        // Mock KPIs
+        const mockKpis: DashboardKpi[] = [
           {
-            id: 'mood-score',
-            label: 'Score d\'humeur',
-            value: 7.8,
-            change: 0.4,
-            unit: '/10'
+            key: 'emotional_score',
+            label: 'Score émotionnel',
+            value: 84,
+            icon: Heart,
+            trend: {
+              value: 3,
+              direction: 'up'
+            }
           },
           {
-            id: 'emotions-count',
-            label: 'Émotions scannées',
-            value: 12,
-            change: 4
+            key: 'activities',
+            label: 'Activités terminées',
+            value: 7,
+            icon: Activity,
+            trend: 2
           },
           {
-            id: 'sessions-streak',
-            label: 'Jours consécutifs',
-            value: 5,
-            change: 2
+            key: 'streak',
+            label: 'Série actuelle',
+            value: '5 jours',
+            icon: Calendar
+          },
+          {
+            key: 'points',
+            label: 'Points',
+            value: 423,
+            icon: Star,
+            trend: {
+              value: 12,
+              direction: 'up'
+            }
           }
-        ]);
+        ];
         
-        setShortcuts([
+        // Mock shortcuts
+        const mockShortcuts: DashboardShortcut[] = [
           {
-            id: 'scan',
-            label: 'Scanner mon émotion',
-            icon: 'heart-pulse',
-            href: '/scan'
+            label: 'Scanner',
+            name: 'scan',
+            icon: Brain,
+            to: '/scan',
+            description: 'Faire un scan émotionnel'
           },
           {
-            id: 'journal',
-            label: 'Écrire dans mon journal',
-            icon: 'book',
-            href: '/journal'
-          },
-          {
-            id: 'meditation',
-            label: 'Méditation guidée',
-            icon: 'sparkles',
-            href: '/meditation'
+            label: 'Coach IA',
+            name: 'coach',
+            icon: Users,
+            to: '/coach',
+            description: 'Discuter avec le coach IA'
           }
-        ]);
+        ];
+        
+        setKpis(mockKpis);
+        setShortcuts(mockShortcuts);
       } catch (error) {
         console.error('Error fetching dashboard hero data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    if (userId) {
-      fetchHeroData();
-    }
+    
+    fetchDashboardData();
   }, [userId]);
-
+  
   const refetch = async () => {
-    // Recharger les données
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Générer des valeurs légèrement différentes pour simuler des données fraîches
-      setKpis(prevKpis => 
-        prevKpis.map(kpi => ({
-          ...kpi,
-          value: typeof kpi.value === 'number' 
-            ? +(kpi.value + (Math.random() * 0.4 - 0.2)).toFixed(1)
-            : kpi.value,
-          change: +(kpi.change + (Math.random() * 0.6 - 0.3)).toFixed(1)
-        }))
-      );
-    } catch (error) {
-      console.error('Error refetching dashboard hero data:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    // Re-fetch logic would go here in a real implementation
   };
-
+  
   return {
     kpis,
     shortcuts,
     isLoading,
     refetch
   };
-};
+}

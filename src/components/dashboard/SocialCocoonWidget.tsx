@@ -1,99 +1,105 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, ArrowRight, MessageSquare, ThumbsUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface SocialCocoonWidgetProps {
-  className?: string;
-  style?: React.CSSProperties;
-  collapsed?: boolean;
-  onToggle?: () => void;
-  userId?: string;
+  collapsed: boolean;
+  onToggle: () => void;
+  userId: string;
 }
 
-const SocialCocoonWidget: React.FC<SocialCocoonWidgetProps> = ({ 
-  className, 
-  style, 
+const SocialCocoonWidget: React.FC<SocialCocoonWidgetProps> = ({
   collapsed,
   onToggle,
   userId
 }) => {
-  const navigate = useNavigate();
-
-  // Sample data for recent posts
-  const recentPosts = [
-    {
-      id: '1',
-      author: 'Utilisateur_A24',
-      content: 'J\'ai essayé la micro-pause VR "Forêt zen" aujourd\'hui, vraiment efficace pour déstresser ! Quelqu\'un d\'autre l\'a testé ?',
-      reactions: 5,
-      comments: 3,
-      time: '30 min'
-    },
-    {
-      id: '2',
-      author: 'Utilisateur_B67',
-      content: 'Astuce du jour : prendre 5 minutes pour respirer profondément entre deux réunions. Ça change toute ma journée !',
-      reactions: 8,
-      comments: 2,
-      time: '2h'
-    }
-  ];
-
+  if (collapsed) {
+    return (
+      <Card>
+        <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center">
+            <Users className="h-5 w-5 mr-2" />
+            Communauté
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={onToggle}>
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+      </Card>
+    );
+  }
+  
   return (
-    <Card className={`${className} bg-gradient-to-br from-pastel-purple/30 to-white border-white/50`} style={style}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-cocoon-600" />
-          Social Cocoon
+    <Card>
+      <CardHeader className="pb-3 flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center">
+          <Users className="h-5 w-5 mr-2" />
+          Communauté
         </CardTitle>
+        <Button variant="ghost" size="sm" onClick={onToggle}>
+          <ChevronUp className="h-4 w-4" />
+        </Button>
       </CardHeader>
-      
       <CardContent>
-        <div className="space-y-4 mb-4">
-          {recentPosts.map(post => (
-            <div key={post.id} className="bg-white/70 rounded-2xl p-4 hover:shadow-sm transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-cocoon-100 text-cocoon-800">{post.author.substring(0, 2)}</AvatarFallback>
+        <div className="space-y-5">
+          <div>
+            <h4 className="font-medium mb-3">Groupe de soutien actif</h4>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex -space-x-2">
+                <Avatar className="border-2 border-background">
+                  <AvatarFallback>JD</AvatarFallback>
+                </Avatar>
+                <Avatar className="border-2 border-background">
+                  <AvatarFallback>ST</AvatarFallback>
+                </Avatar>
+                <Avatar className="border-2 border-background">
+                  <AvatarFallback>RK</AvatarFallback>
+                </Avatar>
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted border-2 border-background text-xs">
+                  +4
+                </div>
+              </div>
+              <div className="text-sm font-medium">Méditation du soir</div>
+            </div>
+            <Button variant="outline" className="w-full">Rejoindre</Button>
+          </div>
+          
+          <div>
+            <h4 className="font-medium mb-3">Publications récentes</h4>
+            <Card className="p-3 mb-2">
+              <div className="flex gap-3">
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback>SM</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-sm">{post.author}</p>
-                  <p className="text-xs text-muted-foreground">il y a {post.time}</p>
+                  <div className="text-sm font-medium">Sophie M.</div>
+                  <p className="text-xs text-muted-foreground">
+                    Je pratique la méditation depuis 3 semaines et je me sens beaucoup plus calme...
+                  </p>
+                  <div className="text-xs text-muted-foreground mt-1">Il y a 2h • 5 réactions</div>
                 </div>
               </div>
-              <p className="text-sm mb-3">{post.content}</p>
-              <div className="flex items-center text-xs text-muted-foreground gap-4">
-                <div className="flex items-center gap-1">
-                  <ThumbsUp size={14} />
-                  <span>{post.reactions}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MessageSquare size={14} />
-                  <span>{post.comments}</span>
+            </Card>
+            <Card className="p-3">
+              <div className="flex gap-3">
+                <Avatar className="w-8 h-8">
+                  <AvatarFallback>TR</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="text-sm font-medium">Thomas R.</div>
+                  <p className="text-xs text-muted-foreground">
+                    Quelqu'un a-t-il essayé l'exercice de respiration 4-7-8 ? Ça fonctionne vraiment...
+                  </p>
+                  <div className="text-xs text-muted-foreground mt-1">Il y a 5h • 8 réactions</div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex space-x-3">
-          <Button 
-            onClick={() => navigate('/community')}
-            className="flex-1 bg-cocoon-500 hover:bg-cocoon-600 text-white rounded-full"
-          >
-            Voir toutes les publications
-          </Button>
-          <Button
-            onClick={() => navigate('/community/new')}
-            variant="outline"
-            className="rounded-full border-cocoon-200"
-          >
-            <MessageSquare size={18} />
-          </Button>
+            </Card>
+          </div>
+          
+          <Button className="w-full">Explorer la communauté</Button>
         </div>
       </CardContent>
     </Card>

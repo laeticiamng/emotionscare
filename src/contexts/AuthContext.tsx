@@ -7,6 +7,8 @@ export interface User {
   email: string;
   role: string;
   avatar?: string;
+  avatar_url?: string;
+  onboarded?: boolean;
 }
 
 interface AuthContextType {
@@ -15,6 +17,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  signOut: () => void; // Add signOut property
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,7 +25,8 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: true,
   login: async () => false,
-  logout: () => {}
+  logout: () => {},
+  signOut: () => {} // Initialize signOut function
 });
 
 interface AuthProviderProps {
@@ -67,7 +71,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         name: 'Utilisateur Test',
         email,
         role: email.includes('admin') ? 'admin' : 'user',
-        avatar: '/images/avatar.png'
+        avatar: '/images/avatar.png',
+        avatar_url: '/images/avatar.png',
+        onboarded: true
       };
       
       setUser(mockUser);
@@ -84,6 +90,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  // Add signOut function as an alias to logout
+  const signOut = () => {
+    logout();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -91,7 +102,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: !!user,
         isLoading,
         login,
-        logout
+        logout,
+        signOut
       }}
     >
       {children}

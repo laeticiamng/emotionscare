@@ -1,114 +1,54 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Music, Play } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Headphones, Music } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
-import { MusicRecommendationCardProps } from '@/types/music';
+import { cn } from '@/lib/utils';
 
-const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ 
-  title,
-  emotion = 'neutral',
+interface MusicRecommendationCardProps {
+  emotion: string;
+  intensity?: number;
+  standalone?: boolean;
+  className?: string;
+}
+
+const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
+  emotion,
   intensity = 50,
   standalone = false,
-  className = '',
-  onSelect
+  className
 }) => {
   const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
-
-  const handlePlayMusic = async () => {
-    if (onSelect) {
-      onSelect();
-      return;
-    }
-    
+  
+  const handlePlay = async () => {
     await loadPlaylistForEmotion(emotion);
     setOpenDrawer(true);
   };
-
-  const getEmotionRecommendation = (emotion: string): { title: string; description: string } => {
-    // Default recommendation
-    let recommendation = {
-      title: "Playlist personnalisée",
-      description: "Une sélection musicale adaptée à votre humeur du moment."
-    };
-
-    // Emotion-based recommendations
-    switch(emotion.toLowerCase()) {
-      case 'happy':
-      case 'joy':
-      case 'excited':
-        recommendation = {
-          title: "Amplificateur de joie",
-          description: "Des morceaux entraînants pour maintenir votre bonne humeur."
-        };
-        break;
-      case 'sad':
-      case 'depressed':
-        recommendation = {
-          title: "Réconfort musical",
-          description: "Des mélodies apaisantes pour vous accompagner et vous réconforter."
-        };
-        break;
-      case 'angry':
-      case 'frustrated':
-        recommendation = {
-          title: "Canalisateur d'énergie",
-          description: "Des morceaux pour transformer cette énergie en quelque chose de positif."
-        };
-        break;
-      case 'anxious':
-      case 'stressed':
-        recommendation = {
-          title: "Détente profonde",
-          description: "Des compositions relaxantes pour apaiser votre anxiété."
-        };
-        break;
-      case 'calm':
-      case 'relaxed':
-        recommendation = {
-          title: "Maintien de la sérénité",
-          description: "Des morceaux doux pour préserver votre état de calme."
-        };
-        break;
-      case 'focused':
-        recommendation = {
-          title: "Concentration optimale",
-          description: "Des morceaux sans paroles pour améliorer votre concentration."
-        };
-        break;
-    }
-
-    // If title is provided, override the generated one
-    if (title) {
-      recommendation.title = title;
-    }
-
-    return recommendation;
-  };
-
-  const recommendation = getEmotionRecommendation(emotion);
-
+  
   return (
-    <Card className={`${className} ${standalone ? 'border-primary/30' : ''}`}>
-      <CardContent className={`${standalone ? 'p-4' : 'p-3'}`}>
-        <div className="flex items-center space-x-3">
-          <div className="bg-primary/10 p-3 rounded-full">
-            <Music className="h-5 w-5 text-primary" />
+    <Card className={cn(standalone ? 'border-2 border-primary/20' : '', className)}>
+      {standalone && (
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center text-lg">
+            <Music className="mr-2 h-5 w-5" />
+            Recommandation musicale
+          </CardTitle>
+        </CardHeader>
+      )}
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-medium">Musique pour état "{emotion}"</h4>
+            <p className="text-sm text-muted-foreground">
+              Playlist adaptée à votre humeur actuelle
+            </p>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm">{recommendation.title}</h3>
-            <p className="text-xs text-muted-foreground">{recommendation.description}</p>
-          </div>
+          <Button onClick={handlePlay} className="flex items-center gap-2">
+            <Headphones className="h-4 w-4" />
+            Écouter
+          </Button>
         </div>
-        <Button 
-          onClick={handlePlayMusic}
-          className="w-full mt-3"
-          size="sm"
-        >
-          <Play className="h-4 w-4 mr-2" />
-          Écouter la playlist
-        </Button>
       </CardContent>
     </Card>
   );

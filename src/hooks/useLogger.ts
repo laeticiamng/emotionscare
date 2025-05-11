@@ -1,60 +1,23 @@
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+import { useCallback } from 'react';
 
-interface LoggerOptions {
-  enabled?: boolean;
-  minLevel?: LogLevel;
-  includeTimestamp?: boolean;
-}
+export default function useLogger(componentName: string) {
+  const debug = useCallback((...args: any[]) => {
+    console.debug(`[${componentName}]`, ...args);
+  }, [componentName]);
 
-const logLevelPriority: Record<LogLevel, number> = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3
-};
+  const info = useCallback((...args: any[]) => {
+    console.info(`[${componentName}]`, ...args);
+  }, [componentName]);
 
-export default function useLogger(namespace: string, options: LoggerOptions = {}) {
-  const {
-    enabled = true,
-    minLevel = 'debug',
-    includeTimestamp = true
-  } = options;
-  
-  const shouldLog = (level: LogLevel): boolean => {
-    if (!enabled) return false;
-    return logLevelPriority[level] >= logLevelPriority[minLevel];
-  };
-  
-  const formatMessage = (message: string): string => {
-    const timestamp = includeTimestamp ? `[${new Date().toISOString()}]` : '';
-    return `${timestamp} [${namespace}] ${message}`;
-  };
-  
-  const debug = (message: string, ...args: any[]): void => {
-    if (shouldLog('debug')) {
-      console.debug(formatMessage(message), ...args);
-    }
-  };
-  
-  const info = (message: string, ...args: any[]): void => {
-    if (shouldLog('info')) {
-      console.info(formatMessage(message), ...args);
-    }
-  };
-  
-  const warn = (message: string, ...args: any[]): void => {
-    if (shouldLog('warn')) {
-      console.warn(formatMessage(message), ...args);
-    }
-  };
-  
-  const error = (message: string, ...args: any[]): void => {
-    if (shouldLog('error')) {
-      console.error(formatMessage(message), ...args);
-    }
-  };
-  
+  const warn = useCallback((...args: any[]) => {
+    console.warn(`[${componentName}]`, ...args);
+  }, [componentName]);
+
+  const error = useCallback((...args: any[]) => {
+    console.error(`[${componentName}]`, ...args);
+  }, [componentName]);
+
   return {
     debug,
     info,

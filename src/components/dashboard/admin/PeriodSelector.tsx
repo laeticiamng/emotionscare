@@ -1,33 +1,36 @@
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { Button } from '@/components/ui/button';
+import { Calendar } from 'lucide-react';
 
 interface PeriodSelectorProps {
   timePeriod: string;
   setTimePeriod: (period: string) => void;
-  disabled?: boolean;
 }
 
-const PeriodSelector: React.FC<PeriodSelectorProps> = ({ 
-  timePeriod, 
-  setTimePeriod,
-  disabled = false
+const PeriodSelector: React.FC<PeriodSelectorProps> = ({
+  timePeriod,
+  setTimePeriod
 }) => {
+  const periods = [
+    { key: '7', label: '7 jours' },
+    { key: '30', label: '30 jours' },
+    { key: '90', label: '3 mois' }
+  ];
+  
   return (
-    <div className={cn("mt-4 md:mt-0", disabled && "opacity-70")}>
-      <Tabs value={timePeriod} onValueChange={setTimePeriod} className="w-[300px]">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="7" disabled={disabled}>7 jours</TabsTrigger>
-          <TabsTrigger value="30" disabled={disabled}>30 jours</TabsTrigger>
-          <TabsTrigger value="90" disabled={disabled}>90 jours</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      {disabled && (
-        <div className="text-xs text-muted-foreground mt-1 text-center">
-          Mise à jour en cours...
-        </div>
-      )}
+    <div className="flex items-center gap-2 bg-muted/40 rounded-lg p-1 mt-4 md:mt-0">
+      <Calendar className="h-4 w-4 ml-2 text-muted-foreground" />
+      {periods.map((period) => (
+        <Button
+          key={period.key}
+          variant={timePeriod === period.key ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setTimePeriod(period.key)}
+        >
+          {period.label}
+        </Button>
+      ))}
     </div>
   );
 };

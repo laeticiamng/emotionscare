@@ -1,97 +1,48 @@
 
 import React from 'react';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useStorytelling } from '@/providers/StorytellingProvider';
-import { useSoundscape } from '@/providers/SoundscapeProvider';
-import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
+import { X } from 'lucide-react';
 
 interface StoryDrawerProps {
   open: boolean;
   onClose: () => void;
-  onCTAClick?: (action: string) => void; // Optional handler for CTA actions
+  onCTAClick?: (route: string) => void;
 }
 
-const StoryDrawer: React.FC<StoryDrawerProps> = ({ open, onClose, onCTAClick }) => {
-  const { activeStory, markStorySeen } = useStorytelling();
-  const { playEmotionalResponse, playFunctionalSound } = useSoundscape();
-  
-  if (!activeStory) return null;
-  
-  const handleClose = () => {
-    if (activeStory) {
-      markStorySeen(activeStory.id);
-    }
-    onClose();
-  };
-  
-  const handleCTAClick = () => {
-    if (activeStory) {
-      markStorySeen(activeStory.id);
-      playFunctionalSound('transition');
-      if (activeStory.cta?.action && onCTAClick) {
-        onCTAClick(activeStory.cta.action);
-      }
-      onClose();
-    }
-  };
-  
-  // Play emotional response sound when drawer opens
-  React.useEffect(() => {
-    if (open && activeStory?.emotion) {
-      playEmotionalResponse(activeStory.emotion);
-    }
-  }, [open, activeStory, playEmotionalResponse]);
+const StoryDrawer: React.FC<StoryDrawerProps> = ({
+  open,
+  onClose,
+  onCTAClick
+}) => {
+  if (!open) return null;
   
   return (
-    <Drawer open={open} onClose={handleClose}>
-      <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader>
-          <DrawerTitle className="text-2xl">{activeStory.title}</DrawerTitle>
-        </DrawerHeader>
-        
-        <div className="px-4">
-          {activeStory.image && (
-            <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-              <img
-                src={activeStory.image}
-                alt={activeStory.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-          
-          <p className="text-muted-foreground mb-6">{activeStory.content}</p>
-          
-          {activeStory.emotion && (
-            <div className="mb-6">
-              <EnhancedMusicVisualizer
-                emotion={activeStory.emotion}
-                intensity={50}
-                height={100}
-              />
-            </div>
-          )}
-        </div>
-        
-        <DrawerFooter>
-          {activeStory.cta && (
-            <Button className="w-full" onClick={handleCTAClick}>
-              {activeStory.cta.text}
-            </Button>
-          )}
-          <Button variant="outline" onClick={handleClose}>
-            Fermer
+    <div className="fixed right-0 top-0 h-full w-80 bg-background shadow-lg z-50 border-l">
+      <Card className="h-full border-0 rounded-none flex flex-col">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h3 className="font-semibold">Histoire</h3>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="h-4 w-4" />
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </div>
+        <CardContent className="flex-1 overflow-y-auto p-4">
+          <div>
+            <h4 className="text-lg font-medium mb-2">Titre de l'histoire</h4>
+            <p className="text-muted-foreground">
+              Contenu de l'histoire à afficher ici. Cette section peut être
+              enrichie avec des images, des citations ou d'autres éléments
+              interactifs pour renforcer l'engagement de l'utilisateur.
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="border-t p-4">
+          <Button className="w-full" onClick={() => onCTAClick && onCTAClick('/story')}>
+            Continuer l'aventure
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

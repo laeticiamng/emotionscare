@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 export interface ChartData {
   date: string;
   value: number;
@@ -20,9 +22,7 @@ export interface DashboardStats {
   };
 }
 
-export interface GamificationData {
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels?: Array<{ level: string; count: number }>;
-  topChallenges?: Array<{ name: string; completions: number }>;
+export interface OverviewTabProps {
+  timePeriod: string;
+  onRefresh?: () => Promise<void>;
 }

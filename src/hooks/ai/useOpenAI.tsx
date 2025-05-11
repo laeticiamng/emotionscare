@@ -1,58 +1,42 @@
 
 import { useState } from 'react';
 
-type ModerationResult = {
+interface ModerationResult {
   flagged: boolean;
   reason?: string;
-};
+}
 
 export function useOpenAI() {
   const [isLoading, setIsLoading] = useState(false);
-  
-  const checkContent = async (content: string): Promise<ModerationResult> => {
-    setIsLoading(true);
-    
-    try {
-      // Simulation d'une vérification de contenu
-      // Dans une implémentation réelle, nous appellerions l'API OpenAI
-      await new Promise(resolve => setTimeout(resolve, 500));
+  const [error, setError] = useState<string | null>(null);
+
+  const moderation = {
+    checkContent: async (content: string): Promise<ModerationResult | null> => {
+      setIsLoading(true);
+      setError(null);
       
-      // Détecter les contenus potentiellement inappropriés (simulation)
-      const sensitiveWords = ["hate", "violence", "racist", "suicide", "kill"];
-      const hasSensitiveContent = sensitiveWords.some(word => 
-        content.toLowerCase().includes(word)
-      );
-      
-      return {
-        flagged: hasSensitiveContent,
-        reason: hasSensitiveContent ? "Le contenu pourrait contenir des éléments inappropriés." : undefined
-      };
-    } catch (error) {
-      console.error("Erreur lors de la vérification du contenu:", error);
-      return {
-        flagged: false
-      };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  return {
-    isLoading,
-    moderation: {
-      checkContent
-    },
-    admin: {
-      generateAnalytics: async (data: any) => {
-        // Simulation d'une génération d'analyses
+      try {
+        // Mock implementation
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const containsBadWords = /\b(hate|violence|explicit)\b/i.test(content);
+        
         return {
-          insights: "Données d'analyse simulées par OpenAI",
-          recommendations: [
-            "Recommandation 1",
-            "Recommandation 2"
-          ]
+          flagged: containsBadWords,
+          reason: containsBadWords ? 'Content may violate our guidelines' : undefined
         };
+      } catch (err) {
+        setError('Failed to check content moderation');
+        return null;
+      } finally {
+        setIsLoading(false);
       }
     }
+  };
+
+  return {
+    isLoading,
+    error,
+    moderation
   };
 }

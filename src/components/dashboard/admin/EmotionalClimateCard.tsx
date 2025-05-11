@@ -1,90 +1,60 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Brain } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartInteractiveLegend } from '@/components/ui/chart';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import CountUp from 'react-countup';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart } from 'lucide-react';
 
-interface EmotionalClimateCardProps {
-  emotionalScoreTrend?: Array<{ date: string; value: number }>;
+interface DataPoint {
+  date: string;
+  value: number;
 }
 
-const EmotionalClimateCard: React.FC<EmotionalClimateCardProps> = ({ emotionalScoreTrend = [] }) => {
-  const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  
-  // Calculate current average score
-  const currentScore = emotionalScoreTrend.length > 0 
-    ? emotionalScoreTrend[emotionalScoreTrend.length - 1].value 
-    : 75.5; // Default fallback value
+interface EmotionalClimateCardProps {
+  emotionalScoreTrend: DataPoint[];
+}
 
-  const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
-    if (isHidden) {
-      setHiddenSeries(hiddenSeries.filter(key => key !== dataKey));
-    } else {
-      setHiddenSeries([...hiddenSeries, dataKey]);
-    }
-  };
+const EmotionalClimateCard: React.FC<EmotionalClimateCardProps> = ({
+  emotionalScoreTrend
+}) => {
+  // Calculate the average score
+  const averageScore = emotionalScoreTrend.reduce((sum, point) => sum + point.value, 0) / emotionalScoreTrend.length;
+  
+  // Get the latest score
+  const latestScore = emotionalScoreTrend[emotionalScoreTrend.length - 1]?.value || 0;
+  
+  // Calculate the change from the first to last datapoint
+  const firstScore = emotionalScoreTrend[0]?.value || 0;
+  const scoreChange = latestScore - firstScore;
+  const changeDirection = scoreChange >= 0 ? 'up' : 'down';
   
   return (
-    <Card className="glass-card overflow-hidden hover:shadow-md hover:scale-[1.02] transition-all duration-300">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="text-[#1B365D]" />
-          Score émotionnel moyen
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center">
+          <Heart className="h-5 w-5 mr-2 text-red-500" />
+          Climat émotionnel
         </CardTitle>
-        <CardDescription>
-          Évolution du bien-être collectif
-        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          <div className="text-3xl font-semibold mb-2">
-            <CountUp 
-              end={currentScore} 
-              duration={2} 
-              decimals={1} 
-              suffix="/100" 
-              enableScrollSpy 
-              scrollSpyOnce
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="bg-muted/20 rounded-lg p-4 text-center">
+            <div className="text-sm text-muted-foreground">Score moyen</div>
+            <div className="text-3xl font-bold mt-1">{averageScore.toFixed(1)}</div>
+            <div className="text-xs text-muted-foreground mt-1">sur 100</div>
           </div>
-          <Progress value={currentScore} className="h-2 bg-gray-100" />
+          
+          <div className="bg-muted/20 rounded-lg p-4 text-center">
+            <div className="text-sm text-muted-foreground">Tendance</div>
+            <div className={`text-3xl font-bold mt-1 ${
+              changeDirection === 'up' ? 'text-emerald-500' : 'text-red-500'
+            }`}>
+              {changeDirection === 'up' ? '↑' : '↓'} {Math.abs(scoreChange).toFixed(1)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">sur 7 jours</div>
+          </div>
         </div>
         
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart 
-              data={emotionalScoreTrend}
-              margin={{ top: 15, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <ChartInteractiveLegend
-                onToggleSeries={handleToggleSeries}
-                hiddenSeries={hiddenSeries}
-                verticalAlign={isMobile ? "bottom" : "top"}
-                align="right"
-                layout={isMobile ? "vertical" : "horizontal"}
-              />
-              {!hiddenSeries.includes('value') && (
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  name="Score émotionnel"
-                  stroke="#FF6F61" 
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6, stroke: '#FF6F61', strokeWidth: 2 }}
-                />
-              )}
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="h-48 bg-muted/20 rounded-md flex items-center justify-center">
+          Graphique de tendance émotionnelle
         </div>
       </CardContent>
     </Card>

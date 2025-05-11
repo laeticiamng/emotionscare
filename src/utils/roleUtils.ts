@@ -24,3 +24,20 @@ export const getUserRoleLevel = (role: string | undefined): number => {
   
   return roleLevels[role.toLowerCase()] || 0;
 };
+
+export const getRoleName = (role: string | undefined): string => {
+  if (!role) return 'Utilisateur';
+  
+  const roleNames: Record<string, string> = {
+    'admin': 'Administrateur',
+    'administrator': 'Administrateur',
+    'manager': 'Manager',
+    'therapist': 'Thérapeute',
+    'coach': 'Coach',
+    'user': 'Utilisateur',
+    'guest': 'Invité',
+    'wellbeing_manager': 'Manager de bien-être'
+  };
+  
+  return roleNames[role.toLowerCase()] || role;
+};

@@ -1,82 +1,46 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, ArrowRight, Clock3 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Glasses } from 'lucide-react';
 import { Emotion } from '@/types';
 
 interface VREmotionRecommendationProps {
-  emotion: Emotion | null | string;
-  className?: string;
+  emotion: Emotion | null;
 }
 
-const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ 
-  emotion,
-  className
-}) => {
-  const navigate = useNavigate();
-  
+const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emotion }) => {
   if (!emotion) return null;
   
-  // Get the emotion name safely depending on whether we received a string or an Emotion object
-  const emotionName = typeof emotion === 'string' 
-    ? emotion
-    : emotion.name || emotion.emotion || '';
+  const getRecommendedSession = (emotionName: string) => {
+    const sessions = {
+      'calm': 'Méditation tranquille',
+      'energetic': 'Énergisation positive',
+      'creative': 'Flux créatif',
+      'reflective': 'Réflexion profonde',
+      'anxious': 'Relaxation anti-stress',
+      'sad': 'Réconfort émotionnel',
+      'angry': 'Apaisement et lâcher-prise',
+      'default': 'Session de bien-être'
+    };
+    
+    return sessions[emotionName.toLowerCase() as keyof typeof sessions] || sessions.default;
+  };
   
-  // Determine if this is a stressful emotion
-  const isStressfulEmotion = ['stressed', 'anxious', 'overwhelmed', 'angry', 'sad', 'sadness', 'anger', 'fear', 'anxiety'].includes(emotionName.toLowerCase());
-  
-  // Recommend different VR sessions based on emotion type
-  const recommendedSession = isStressfulEmotion
-    ? {
-        title: "Séance de relaxation profonde",
-        duration: 5,
-        description: "Une expérience immersive pour réduire votre niveau de stress et retrouver calme intérieur."
-      }
-    : {
-        title: "Renforcement émotionnel positif",
-        duration: 8,
-        description: "Une expérience pour amplifier et ancrer vos émotions positives."
-      };
+  const session = getRecommendedSession(emotion.emotion);
   
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center text-lg">
-          <Calendar className="mr-2 h-5 w-5" />
-          Séance VR recommandée
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-medium">{recommendedSession.title}</h3>
-            <div className="flex items-center text-sm text-muted-foreground mt-1">
-              <Clock3 className="h-3.5 w-3.5 mr-1" />
-              {recommendedSession.duration} minutes
-            </div>
-            <p className="text-sm mt-2">
-              {recommendedSession.description}
-            </p>
+            <h4 className="font-medium">Session VR recommandée</h4>
+            <p className="text-sm text-muted-foreground">{session}</p>
           </div>
-          
-          <div className="flex space-x-2">
-            <Button 
-              onClick={() => navigate('/vr/schedule')}
-              variant="outline"
-              className="flex-1"
-            >
-              Planifier
-            </Button>
-            <Button 
-              onClick={() => navigate('/vr/sessions')}
-              className="flex-1"
-            >
-              <ArrowRight className="h-4 w-4 mr-2" />
-              Explorer
-            </Button>
-          </div>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Glasses className="h-4 w-4" />
+            Démarrer
+          </Button>
         </div>
       </CardContent>
     </Card>

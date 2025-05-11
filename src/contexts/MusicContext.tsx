@@ -1,156 +1,115 @@
-import React, { createContext, useState, useContext, useCallback, ReactNode } from 'react';
-import { EMOTION_TO_MUSIC_MAP } from '@/services/music/emotion-music-mapping';
 
-type Track = {
-  id: string;
-  title: string;
-  artist: string;
-  url: string;
-  duration: number;
-  cover?: string;
-};
-
-type Playlist = {
-  id: string;
-  name: string;
-  description?: string;
-  tracks: Track[];
-};
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Track, Playlist } from '@/services/music/types';
 
 interface MusicContextType {
-  currentTrack: Track | null;
   isPlaying: boolean;
-  volume: number;
-  playlists: Playlist[];
-  currentPlaylist: Playlist | null;
-  setVolume: (volume: number) => void;
+  currentTrack: Track | null;
+  playlist: Playlist | null;
   playTrack: (track: Track) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  addPlaylist: (playlist: Playlist) => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<Playlist | null>;
-  setOpenDrawer: (isOpen: boolean) => void;
+  setOpenDrawer: (open: boolean) => void;
+  isDrawerOpen: boolean;
 }
 
-const defaultContext: MusicContextType = {
-  currentTrack: null,
+const MusicContext = createContext<MusicContextType>({
   isPlaying: false,
-  volume: 0.5,
-  playlists: [],
-  currentPlaylist: null,
-  setVolume: () => {},
+  currentTrack: null,
+  playlist: null,
   playTrack: () => {},
   pauseTrack: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
-  addPlaylist: () => {},
   loadPlaylistForEmotion: async () => null,
-  setOpenDrawer: () => {}
-};
-
-const MusicContext = createContext<MusicContextType>(defaultContext);
+  setOpenDrawer: () => {},
+  isDrawerOpen: false
+});
 
 interface MusicProviderProps {
   children: ReactNode;
 }
 
 export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const playTrack = (track: Track) => {
-    console.info('Playing track:', track.title);
     setCurrentTrack(track);
     setIsPlaying(true);
+    console.info('Playing track:', track.title);
   };
 
   const pauseTrack = () => {
-    console.info('Paused playback');
     setIsPlaying(false);
+    console.info('Paused playback');
   };
 
   const nextTrack = () => {
-    // Logique pour passer à la piste suivante
-    console.log('Next track');
+    if (!playlist || !currentTrack) return;
+    
+    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex >= 0 && currentIndex < playlist.tracks.length - 1) {
+      playTrack(playlist.tracks[currentIndex + 1]);
+    }
   };
 
   const previousTrack = () => {
-    // Logique pour revenir à la piste précédente
-    console.log('Previous track');
-  };
-
-  const addPlaylist = (playlist: Playlist) => {
-    setPlaylists(current => [...current, playlist]);
-  };
-
-  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<Playlist | null> => {
-    try {
-      // Simulation du chargement d'une playlist basée sur l'émotion
-      console.log(`Loading playlist for emotion: ${emotion}`);
-      
-      // Dans une implémentation réelle, nous appellerions une API ou une base de données
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Créer une playlist simulée
-      const playlist: Playlist = {
-        id: `playlist-${Date.now()}`,
-        name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Playlist`,
-        description: `Une playlist optimisée pour l'état émotionnel: ${emotion}`,
-        tracks: [
-          {
-            id: `track-${Date.now()}-1`,
-            title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Melody`,
-            artist: 'EmotionsCare Music',
-            url: '/audio/placeholder.mp3',
-            duration: 180,
-            cover: '/images/cover-art.jpg'
-          },
-          {
-            id: `track-${Date.now()}-2`,
-            title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Harmony`,
-            artist: 'EmotionsCare Music',
-            url: '/audio/placeholder2.mp3',
-            duration: 210,
-            cover: '/images/cover-art2.jpg'
-          }
-        ]
-      };
-      
-      setCurrentPlaylist(playlist);
-      addPlaylist(playlist);
-      
-      return playlist;
-    } catch (error) {
-      console.error('Erreur lors du chargement de la playlist:', error);
-      return null;
+    if (!playlist || !currentTrack) return;
+    
+    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex > 0) {
+      playTrack(playlist.tracks[currentIndex - 1]);
     }
-  }, []);
+  };
 
-  const setOpenDrawer = (isOpen: boolean) => {
-    setIsDrawerOpen(isOpen);
+  const loadPlaylistForEmotion = async (emotion: string): Promise<Playlist | null> => {
+    // Mock function to load a playlist based on emotion
+    const mockPlaylist: Playlist = {
+      id: `playlist-${emotion}`,
+      name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Playlist`,
+      emotion: emotion,
+      tracks: [
+        {
+          id: `${emotion}-track-1`,
+          title: `${emotion} Track 1`,
+          artist: 'Artist 1',
+          duration: 180,
+          url: '/audio/track1.mp3',
+          cover: '/images/cover1.jpg'
+        },
+        {
+          id: `${emotion}-track-2`,
+          title: `${emotion} Track 2`,
+          artist: 'Artist 2',
+          duration: 210,
+          url: '/audio/track2.mp3',
+          cover: '/images/cover2.jpg'
+        }
+      ]
+    };
+    
+    setPlaylist(mockPlaylist);
+    return mockPlaylist;
   };
 
   return (
     <MusicContext.Provider
       value={{
-        currentTrack,
         isPlaying,
-        volume,
-        playlists,
-        currentPlaylist,
-        setVolume,
+        currentTrack,
+        playlist,
         playTrack,
         pauseTrack,
         nextTrack,
         previousTrack,
-        addPlaylist,
         loadPlaylistForEmotion,
-        setOpenDrawer
+        setOpenDrawer: setIsDrawerOpen,
+        isDrawerOpen
       }}
     >
       {children}

@@ -1,59 +1,98 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ChevronDown, ChevronUp, MessageCircle, Brain } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-// Define proper TypeScript props interface
 interface CoachRecommendationsProps {
+  collapsed: boolean;
+  onToggle: () => void;
   emotion?: string;
-  collapsed?: boolean;
-  onToggle?: () => void;
 }
 
-const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({ emotion, collapsed, onToggle }) => {
-  // Sample recommendations based on emotion
-  const getRecommendations = () => {
-    switch (emotion) {
-      case 'joie':
-        return [
-          'Profitez de cette énergie positive pour aborder un projet créatif',
-          'Partagez ce sentiment avec un proche',
-          'Notez dans votre journal ce qui a contribué à cette joie'
-        ];
-      case 'stress':
-        return [
-          'Prenez 5 minutes pour pratiquer une respiration profonde',
-          'Faites une courte promenade à l\'extérieur si possible',
-          'Écoutez un morceau de musique relaxante'
-        ];
-      case 'fatigue':
-        return [
-          'Accordez-vous une micro-pause de 10 minutes',
-          'Hydratez-vous et prenez une collation nutritive',
-          'Ajustez votre prochaine tâche pour qu\'elle soit moins exigeante'
-        ];
-      default:
-        return [
-          'Prenez un moment pour respirer profondément',
-          'Notez vos pensées dans votre journal',
-          'Explorez une musique adaptée à votre humeur actuelle'
-        ];
+const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
+  collapsed,
+  onToggle,
+  emotion
+}) => {
+  const navigate = useNavigate();
+  
+  // Generate recommendations based on emotion
+  const getRecommendationsForEmotion = (emotion?: string) => {
+    const baseRecommendations = [
+      "Prendre 5 minutes pour respirer profondément",
+      "Écouter une musique apaisante",
+      "Faire une courte marche dehors"
+    ];
+    
+    if (emotion === 'anxious') {
+      return [
+        "Pratiquer une méditation de pleine conscience",
+        "Faire des exercices de respiration 4-7-8",
+        "Écrire vos pensées dans un journal"
+      ];
+    } else if (emotion === 'energetic') {
+      return [
+        "Canaliser cette énergie dans une activité créative",
+        "Faire une séance d'exercice physique",
+        "Établir un plan pour un projet important"
+      ];
     }
+    
+    return baseRecommendations;
   };
-
+  
+  const recommendations = getRecommendationsForEmotion(emotion);
+  
+  if (collapsed) {
+    return (
+      <Card>
+        <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center">
+            <Brain className="h-5 w-5 mr-2" />
+            Recommandations du coach
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={onToggle}>
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </CardHeader>
+      </Card>
+    );
+  }
+  
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl">Recommandations du Coach</CardTitle>
+    <Card>
+      <CardHeader className="pb-3 flex flex-row items-center justify-between">
+        <CardTitle className="flex items-center">
+          <Brain className="h-5 w-5 mr-2" />
+          Recommandations du coach
+        </CardTitle>
+        <Button variant="ghost" size="sm" onClick={onToggle}>
+          <ChevronUp className="h-4 w-4" />
+        </Button>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-3">
-          {getRecommendations().map((rec, index) => (
-            <li key={index} className="flex items-start gap-2">
-              <span className="text-primary">•</span>
-              <span>{rec}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-4">
+          <ul className="space-y-2">
+            {recommendations.map((recommendation, index) => (
+              <li key={index} className="p-3 bg-muted/20 rounded-lg">
+                {recommendation}
+              </li>
+            ))}
+          </ul>
+          
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => navigate('/coach-chat')}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Parler au coach
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

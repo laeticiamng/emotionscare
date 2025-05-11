@@ -1,66 +1,45 @@
 
 import React from 'react';
-import { User } from '@/types';
-import { Separator } from '@/components/ui/separator';
-import AutoRefreshControl from '@/components/dashboard/AutoRefreshControl';
-import { useAutoRefresh } from '@/hooks/useAutoRefresh';
-import { SegmentSelector } from '@/components/dashboard/admin/SegmentSelector';
+import { Button } from '@/components/ui/button';
+import { RefreshCcw } from 'lucide-react';
 
 interface DashboardHeaderProps {
-  user: User | null;
-  isAdmin?: boolean;
-  onRefresh?: () => Promise<any>;
+  onRefresh?: () => Promise<void>;
 }
 
-const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
-  user, 
-  isAdmin = false,
-  onRefresh = async () => { return null; } 
-}) => {
-  const {
-    enabled: autoRefreshEnabled,
-    interval: autoRefreshInterval,
-    refreshing,
-    toggleAutoRefresh,
-    changeInterval
-  } = useAutoRefresh({
-    onRefresh,
-    defaultEnabled: false,
-    defaultInterval: 60000 // 1 minute default
-  });
-  
+const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onRefresh }) => {
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const handleRefresh = async () => {
+    if (!onRefresh) return;
+    
+    try {
+      setIsRefreshing(true);
+      await onRefresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
-    <>
-      <div className="mb-10 animate-fade-in">
-        <div className="flex flex-col md:flex-row items-start justify-between">
-          <div>
-            <h1>
-              {isAdmin ? (
-                <>Tableau de bord <span className="font-semibold">Direction</span></>
-              ) : (
-                <>Bienvenue, <span className="font-semibold">{user?.name || 'utilisateur'}</span></>
-              )}
-            </h1>
-            <h2 className="text-muted-foreground mt-2">
-              {isAdmin ? 'Métriques globales et anonymisées' : 'Votre espace bien-être personnel'}
-            </h2>
-          </div>
-          
-          <div className="mt-4 md:mt-0 flex items-center space-x-4">
-            {isAdmin && <SegmentSelector />}
-            <AutoRefreshControl
-              enabled={autoRefreshEnabled}
-              interval={autoRefreshInterval}
-              refreshing={refreshing}
-              onToggle={toggleAutoRefresh}
-              onIntervalChange={changeInterval}
-            />
-          </div>
-        </div>
+    <div className="flex justify-between items-center mb-6">
+      <div>
+        <h1 className="text-2xl font-bold">Administration</h1>
+        <p className="text-muted-foreground">Gestion des données de bien-être</p>
       </div>
       
-      <Separator className="mb-8" />
-    </>
+      {onRefresh && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+        >
+          <RefreshCcw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+          Actualiser
+        </Button>
+      )}
+    </div>
   );
 };
 

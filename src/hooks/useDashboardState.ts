@@ -1,75 +1,48 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { LucideIcon } from 'lucide-react';
+import { useState } from 'react';
 
-export interface DashboardSectionState {
-  [key: string]: boolean;
+interface DashboardState {
+  minimalView: boolean;
+  collapsedSections: {
+    [key: string]: boolean;
+  };
 }
 
-// Define the DashboardKpi interface using LucideIcon to match DashboardHero
-export interface DashboardKpi {
-  key: string;
-  value: string | number;
-  label: string;
-  trend?: number | { value: number; direction: 'up' | 'down' | 'neutral' };
-  icon: LucideIcon;
-}
-
-// Updated DashboardShortcut to include label property
-export interface DashboardShortcut {
-  name: string;
-  label: string; // Added to match DashboardHero's requirement
-  icon: LucideIcon;
-  to: string;
-  description?: string;
-}
-
-const useDashboardState = () => {
-  const [minimalView, setMinimalView] = useState(() => {
-    const stored = localStorage.getItem('dashboard_minimal_view');
-    return stored ? JSON.parse(stored) : false;
-  });
-
-  const [collapsedSections, setCollapsedSections] = useState<DashboardSectionState>(() => {
-    const stored = localStorage.getItem('dashboard_collapsed_sections');
-    return stored ? JSON.parse(stored) : {
-      modules: false,
-      emotions: false,
+export default function useDashboardState() {
+  const [state, setState] = useState<DashboardState>({
+    minimalView: false,
+    collapsedSections: {
+      emotionScan: false,
       charts: false,
       recommendations: false,
-      emotionScan: false,
+      gamification: false,
       social: false,
       sidePanel: false,
-      vr: false,
-      gamification: false
-    };
+      modules: false
+    }
   });
 
-  useEffect(() => {
-    localStorage.setItem('dashboard_minimal_view', JSON.stringify(minimalView));
-  }, [minimalView]);
-
-  useEffect(() => {
-    localStorage.setItem('dashboard_collapsed_sections', JSON.stringify(collapsedSections));
-  }, [collapsedSections]);
-
-  const toggleMinimalView = useCallback(() => {
-    setMinimalView(prev => !prev);
-  }, []);
-
-  const toggleSection = useCallback((sectionKey: string) => {
-    setCollapsedSections(prev => ({
+  const toggleMinimalView = () => {
+    setState(prev => ({
       ...prev,
-      [sectionKey]: !prev[sectionKey]
+      minimalView: !prev.minimalView
     }));
-  }, []);
+  };
+
+  const toggleSection = (section: string) => {
+    setState(prev => ({
+      ...prev,
+      collapsedSections: {
+        ...prev.collapsedSections,
+        [section]: !prev.collapsedSections[section]
+      }
+    }));
+  };
 
   return {
-    minimalView,
-    collapsedSections,
+    minimalView: state.minimalView,
+    collapsedSections: state.collapsedSections,
     toggleMinimalView,
     toggleSection
   };
-};
-
-export default useDashboardState;
+}
