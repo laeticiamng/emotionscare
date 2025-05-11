@@ -1,0 +1,339 @@
+
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useOpenAI } from '@/hooks/ai/useOpenAI';
+import { Badge, Challenge } from '@/types/gamification';
+
+interface GamificationStats {
+  level: number;
+  points: number;
+  nextLevelPoints: number;
+  badges: Badge[];
+  challenges: Challenge[];
+  recentAchievements: {
+    type: 'badge' | 'challenge' | 'level';
+    id: string;
+    name: string;
+    timestamp: Date;
+    points?: number;
+  }[];
+}
+
+export function useCommunityGamification() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const { challenges: aiChallenges } = useOpenAI();
+  const [stats, setStats] = useState<GamificationStats | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeChallenges, setActiveChallenges] = useState<Challenge[]>([]);
+  const [recommendedChallenges, setRecommendedChallenges] = useState<Challenge[]>([]);
+  
+  // Charger les statistiques de gamification
+  const loadGamificationStats = useCallback(async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Dans une implémentation réelle, nous chargerions ces données depuis la base de données
+      // Pour cette démonstration, nous simulons des données
+      const mockStats: GamificationStats = {
+        level: 3,
+        points: 2750,
+        nextLevelPoints: 3000,
+        badges: [
+          {
+            id: 'badge-1',
+            name: 'Premier pas',
+            description: 'A rejoint la communauté',
+            image_url: '/badges/first-step.png',
+            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30).toISOString(), // 30 jours avant
+            unlocked: true,
+            category: 'onboarding',
+            level: 1
+          },
+          {
+            id: 'badge-2',
+            name: 'Soutien communautaire',
+            description: 'A aidé 5 membres',
+            image_url: '/badges/community-support.png',
+            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15).toISOString(), // 15 jours avant
+            unlocked: true,
+            category: 'community',
+            level: 2
+          },
+          {
+            id: 'badge-3',
+            name: 'Créateur de contenu',
+            description: 'A créé 10 publications de qualité',
+            image_url: '/badges/content-creator.png',
+            unlocked_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 jours avant
+            unlocked: true,
+            category: 'content',
+            level: 2
+          }
+        ],
+        challenges: [
+          {
+            id: 'challenge-1',
+            name: 'Partage de connaissance',
+            title: 'Partage de connaissance',
+            description: 'Créez une publication éducative dans la communauté',
+            progress: 0,
+            total: 1,
+            difficulty: 'easy',
+            points: 100,
+            completed: false
+          },
+          {
+            id: 'challenge-2',
+            name: 'Connecteur',
+            title: 'Connecteur',
+            description: 'Connectez-vous avec 3 nouveaux membres',
+            progress: 1,
+            total: 3,
+            difficulty: 'medium',
+            points: 150,
+            completed: false
+          }
+        ],
+        recentAchievements: [
+          {
+            type: 'badge',
+            id: 'badge-3',
+            name: 'Créateur de contenu',
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), // 5 jours avant
+            points: 200
+          },
+          {
+            type: 'level',
+            id: 'level-3',
+            name: 'Niveau 3',
+            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), // 7 jours avant
+            points: 0
+          }
+        ]
+      };
+      
+      setStats(mockStats);
+      setActiveChallenges(mockStats.challenges);
+    } catch (error) {
+      console.error("Erreur lors du chargement des statistiques:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger vos données de gamification",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user, toast]);
+  
+  // Générer des défis personnalisés avec OpenAI
+  const generatePersonalizedChallenges = useCallback(async (userEmotion?: string) => {
+    try {
+      if (!user) return;
+      
+      // Dans une implémentation réelle, nous utiliserions OpenAI pour générer des défis personnalisés
+      // via aiChallenges.generateChallenge
+      // Pour cette démonstration, nous simulons des défis
+      
+      const emotion = userEmotion || 'neutral';
+      
+      const emotionChallenges: Record<string, Challenge[]> = {
+        'calm': [
+          {
+            id: 'ai-challenge-calm-1',
+            name: 'Journal de gratitude',
+            title: 'Journal de gratitude',
+            description: 'Partagez trois choses pour lesquelles vous êtes reconnaissant aujourd\'hui',
+            progress: 0,
+            total: 1,
+            difficulty: 'easy',
+            points: 50,
+            completed: false
+          }
+        ],
+        'energetic': [
+          {
+            id: 'ai-challenge-energetic-1',
+            name: 'Motivation matinale',
+            title: 'Motivation matinale',
+            description: 'Partagez votre routine matinale énergisante avec la communauté',
+            progress: 0,
+            total: 1,
+            difficulty: 'easy',
+            points: 50,
+            completed: false
+          }
+        ],
+        'creative': [
+          {
+            id: 'ai-challenge-creative-1',
+            name: 'Inspiration créative',
+            title: 'Inspiration créative',
+            description: 'Partagez une source d\'inspiration qui a stimulé votre créativité récemment',
+            progress: 0,
+            total: 1,
+            difficulty: 'medium',
+            points: 75,
+            completed: false
+          }
+        ],
+        'reflective': [
+          {
+            id: 'ai-challenge-reflective-1',
+            name: 'Question philosophique',
+            title: 'Question philosophique',
+            description: 'Posez une question réflexive à la communauté et engagez une discussion profonde',
+            progress: 0,
+            total: 1,
+            difficulty: 'medium',
+            points: 75,
+            completed: false
+          }
+        ],
+        'anxious': [
+          {
+            id: 'ai-challenge-anxious-1',
+            name: 'Technique anti-stress',
+            title: 'Technique anti-stress',
+            description: 'Partagez une technique efficace pour gérer l\'anxiété que vous avez personnellement testée',
+            progress: 0,
+            total: 1,
+            difficulty: 'easy',
+            points: 50,
+            completed: false
+          }
+        ],
+        'neutral': [
+          {
+            id: 'ai-challenge-neutral-1',
+            name: 'Connexion communautaire',
+            title: 'Connexion communautaire',
+            description: 'Commentez sur 3 publications d\'autres membres pour créer des liens',
+            progress: 0,
+            total: 3,
+            difficulty: 'easy',
+            points: 60,
+            completed: false
+          }
+        ]
+      };
+      
+      const challenges = emotionChallenges[emotion] || emotionChallenges.neutral;
+      setRecommendedChallenges(challenges);
+      
+      return challenges;
+    } catch (error) {
+      console.error("Erreur lors de la génération des défis:", error);
+      return [];
+    }
+  }, [user]);
+  
+  // Accepter un défi
+  const acceptChallenge = useCallback(async (challengeId: string) => {
+    try {
+      const challenge = [...activeChallenges, ...recommendedChallenges].find(c => c.id === challengeId);
+      
+      if (!challenge) {
+        throw new Error("Défi non trouvé");
+      }
+      
+      // Dans une implémentation réelle, nous sauvegarderions cette action dans la base de données
+      
+      // Ajouter le défi aux défis actifs s'il n'y est pas déjà
+      if (!activeChallenges.some(c => c.id === challengeId)) {
+        setActiveChallenges(prev => [...prev, challenge]);
+      }
+      
+      // Retirer le défi des recommandations
+      setRecommendedChallenges(prev => prev.filter(c => c.id !== challengeId));
+      
+      toast({
+        title: "Défi accepté",
+        description: `Vous avez accepté le défi "${challenge.name}"`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de l'acceptation du défi:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'accepter le défi",
+        variant: "destructive"
+      });
+      return false;
+    }
+  }, [activeChallenges, recommendedChallenges, toast]);
+  
+  // Compléter un défi
+  const completeChallenge = useCallback(async (challengeId: string) => {
+    try {
+      // Mettre à jour les défis actifs
+      const updatedChallenges = activeChallenges.map(challenge => {
+        if (challenge.id === challengeId) {
+          return { ...challenge, completed: true, progress: challenge.total };
+        }
+        return challenge;
+      });
+      
+      setActiveChallenges(updatedChallenges);
+      
+      // Mettre à jour les statistiques générales
+      if (stats) {
+        const challenge = activeChallenges.find(c => c.id === challengeId);
+        const points = challenge?.points || 50;
+        
+        const newAchievement = {
+          type: 'challenge' as const,
+          id: challengeId,
+          name: challenge?.name || 'Défi complété',
+          timestamp: new Date(),
+          points
+        };
+        
+        setStats({
+          ...stats,
+          points: stats.points + points,
+          recentAchievements: [newAchievement, ...stats.recentAchievements]
+        });
+      }
+      
+      toast({
+        title: "Défi complété",
+        description: "Félicitations ! Vous avez complété le défi avec succès !",
+      });
+      
+      return true;
+    } catch (error) {
+      console.error("Erreur lors de la complétion du défi:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de compléter le défi",
+        variant: "destructive"
+      });
+      return false;
+    }
+  }, [activeChallenges, stats, toast]);
+  
+  // Initialiser le chargement des données
+  useEffect(() => {
+    if (user) {
+      loadGamificationStats();
+      generatePersonalizedChallenges();
+    }
+  }, [user, loadGamificationStats, generatePersonalizedChallenges]);
+  
+  return {
+    stats,
+    isLoading,
+    activeChallenges,
+    recommendedChallenges,
+    generatePersonalizedChallenges,
+    acceptChallenge,
+    completeChallenge,
+    refresh: loadGamificationStats
+  };
+}
