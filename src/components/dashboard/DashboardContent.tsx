@@ -10,6 +10,9 @@ import UserSidePanel from './UserSidePanel';
 import FeatureHub from '../features/FeatureHub';
 import SecurityCertifications from '../features/SecurityCertifications';
 import { UserMode } from '@/contexts/UserModeContext';
+import PredictiveRecommendations from '@/components/predictive/PredictiveRecommendations';
+import { Link } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 interface DashboardContentProps {
   isMobile: boolean;
@@ -53,6 +56,19 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
               Données anonymisées d'absentéisme et de bien-être
             </div>
           </Card>
+          
+          <div className="group relative">
+            <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
+            <PredictiveRecommendations 
+              maxRecommendations={2}
+              showControls={false}
+              className="relative transition-all hover:shadow-md group-hover:border-primary/50"
+            />
+            <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Premium
+            </div>
+          </div>
         </div>
         
         <div className="space-y-6">
@@ -87,6 +103,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           userId={userId}
           latestEmotion={latestEmotion}
         />
+        
+        <div className="group relative">
+          <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
+          <PredictiveRecommendations 
+            maxRecommendations={1}
+            className="relative transition-all hover:shadow-md group-hover:border-primary/50"
+          />
+          <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            Premium
+          </div>
+        </div>
         
         <TrendCharts 
           collapsed={collapsedSections.charts}
@@ -133,6 +161,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           latestEmotion={latestEmotion}
         />
         
+        <div className="group relative">
+          <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
+          <PredictiveRecommendations 
+            maxRecommendations={2}
+            className="relative transition-all hover:shadow-md group-hover:border-primary/50"
+          />
+          <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            Premium
+          </div>
+        </div>
+        
         <TrendCharts 
           collapsed={collapsedSections.charts}
           onToggle={() => toggleSection('charts')}
@@ -167,6 +207,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           userId={userId}
           latestEmotion={latestEmotion}
         />
+        
+        <div className="group relative">
+          <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
+          <PredictiveRecommendations 
+            maxRecommendations={3}
+            className="relative transition-all hover:shadow-md group-hover:border-primary/50"
+          />
+          <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <Sparkles className="h-3 w-3" />
+            Premium
+          </div>
+        </div>
         
         <TrendCharts 
           collapsed={collapsedSections.charts}

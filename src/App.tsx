@@ -8,6 +8,7 @@ import { BrandingProvider } from '@/contexts/BrandingContext';
 import { SoundscapeProvider } from '@/providers/SoundscapeProvider';
 import { StorytellingProvider } from '@/providers/StorytellingProvider';
 import { MusicProvider } from '@/contexts/MusicContext';
+import { PredictiveAnalyticsProvider } from '@/providers/PredictiveAnalyticsProvider';
 import BrandingManager from '@/components/branding/BrandingManager';
 
 // Import pages
@@ -35,6 +36,7 @@ import SupportPage from '@/pages/Support';
 import OnboardingModePage from '@/pages/OnboardingModePage';
 import OnboardingPage from '@/pages/OnboardingPage';
 import OnboardingExperiencePage from '@/pages/OnboardingExperiencePage';
+import PredictiveDashboardPage from '@/pages/PredictiveDashboardPage';
 
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
@@ -50,39 +52,42 @@ const App: React.FC = () => {
             <BrandingProvider>
               <SoundscapeProvider>
                 <StorytellingProvider>
-                  <BrandingManager>
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/reset-password" element={<ResetPassword />} />
-                      <Route path="/forgot-password" element={<ResetPassword />} />
-                      <Route path="/onboarding-mode" element={<OnboardingModePage />} />
-                      <Route path="/onboarding" element={<OnboardingPage />} />
-                      <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
-                      
-                      {/* Protected Routes */}
-                      <Route element={<ProtectedLayoutWrapper><ProtectedRoute /></ProtectedLayoutWrapper>}>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/journal" element={<JournalPage />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/admin" element={<AdminDashboardPage />} />
-                        <Route path="/scan" element={<ScanPage />} />
-                        <Route path="/music" element={<MusicPage />} />
-                        <Route path="/account" element={<AccountSettingsPage />} />
-                        <Route path="/team" element={<TeamPage />} />
-                        <Route path="/coach" element={<CoachPage />} />
-                        <Route path="/coach-chat" element={<CoachChatPage />} />
-                        <Route path="/docs" element={<DocsPage />} />
-                        <Route path="/buddy" element={<BuddyPage />} />
-                        <Route path="/vr" element={<VRPage />} />
-                        <Route path="/settings" element={<UserSettingsPage />} />
-                        <Route path="/support" element={<SupportPage />} />
-                      </Route>
-                      
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </BrandingManager>
+                  <PredictiveAnalyticsProvider>
+                    <BrandingManager>
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
+                        <Route path="/forgot-password" element={<ResetPassword />} />
+                        <Route path="/onboarding-mode" element={<OnboardingModePage />} />
+                        <Route path="/onboarding" element={<OnboardingPage />} />
+                        <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
+                        
+                        {/* Protected Routes */}
+                        <Route element={<ProtectedLayoutWrapper><ProtectedRoute /></ProtectedLayoutWrapper>}>
+                          <Route path="/dashboard" element={<Dashboard />} />
+                          <Route path="/journal" element={<JournalPage />} />
+                          <Route path="/profile" element={<Profile />} />
+                          <Route path="/admin" element={<AdminDashboardPage />} />
+                          <Route path="/scan" element={<ScanPage />} />
+                          <Route path="/music" element={<MusicPage />} />
+                          <Route path="/account" element={<AccountSettingsPage />} />
+                          <Route path="/team" element={<TeamPage />} />
+                          <Route path="/coach" element={<CoachPage />} />
+                          <Route path="/coach-chat" element={<CoachChatPage />} />
+                          <Route path="/docs" element={<DocsPage />} />
+                          <Route path="/buddy" element={<BuddyPage />} />
+                          <Route path="/vr" element={<VRPage />} />
+                          <Route path="/settings" element={<UserSettingsPage />} />
+                          <Route path="/support" element={<SupportPage />} />
+                          <Route path="/predictive" element={<PredictiveDashboardPage />} />
+                        </Route>
+                        
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </BrandingManager>
+                  </PredictiveAnalyticsProvider>
                 </StorytellingProvider>
               </SoundscapeProvider>
             </BrandingProvider>
