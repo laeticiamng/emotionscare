@@ -1,10 +1,10 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
-export type Segment = {
+export interface Segment {
   dimensionKey: string | null;
   optionKey: string | null;
-};
+}
 
 export interface SegmentDimension {
   key: string;

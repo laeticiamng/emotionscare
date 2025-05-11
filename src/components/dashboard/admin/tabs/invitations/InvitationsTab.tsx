@@ -1,110 +1,148 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import InvitationList from '@/components/invitations/InvitationList';
 import InvitationForm from '@/components/invitations/InvitationForm';
-import { InvitationStatsCards } from './InvitationStats';
-import InvitationModal from './InvitationModal';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import { fetchInvitationStats } from '@/services/invitationService';
-import { InvitationStats } from '@/types';
+import InvitationStatsDisplay from './InvitationStats';
+import { InvitationStats, InvitationData } from '@/types';
 
-const InvitationsTab: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [stats, setStats] = useState<InvitationStats>({
+const InvitationsTab = () => {
+  const [invitationStats, setInvitationStats] = useState<InvitationStats>({
     total: 0,
     pending: 0,
+    accepted: 0,
     expired: 0,
+    rejected: 0,
+    sent: 0,
     completed: 0,
     conversionRate: 0,
     averageTimeToAccept: 0,
-    sent: 0,
-    accepted: 0,
-    rejected: 0,
     teams: {},
     recent_invites: []
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const statsData = await fetchInvitationStats();
-        setStats({
-          ...statsData,
-          teams: statsData.teams || {},
-          recent_invites: statsData.recent_invites || [],
-          rejected: statsData.rejected || 0,
-          sent: statsData.sent || 0,
-          accepted: statsData.accepted || 0
-        });
-      } catch (error) {
-        console.error('Error fetching invitation stats:', error);
-      }
+    // Simulate API fetch
+    const fetchInvitationStats = async () => {
+      setLoading(true);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Mock data
+      setInvitationStats({
+        total: 120,
+        pending: 45,
+        accepted: 62,
+        expired: 8,
+        rejected: 5,
+        sent: 120,
+        completed: 67,
+        conversionRate: 51.7,
+        averageTimeToAccept: 32, // hours
+        teams: {
+          'Marketing': 28,
+          'Engineering': 35,
+          'Sales': 22,
+          'HR': 15,
+          'Management': 20
+        },
+        recent_invites: [
+          {
+            id: 'inv1',
+            email: 'johndoe@example.com',
+            status: 'accepted',
+            created_at: '2023-10-15T14:30:00Z',
+            expires_at: '2023-10-22T14:30:00Z',
+            accepted_at: '2023-10-16T09:12:00Z',
+            role: 'user'
+          },
+          {
+            id: 'inv2',
+            email: 'janedoe@example.com',
+            status: 'pending',
+            created_at: '2023-10-16T11:20:00Z',
+            expires_at: '2023-10-23T11:20:00Z',
+            role: 'user'
+          },
+          {
+            id: 'inv3',
+            email: 'robert@example.com',
+            status: 'expired',
+            created_at: '2023-09-29T08:45:00Z',
+            expires_at: '2023-10-06T08:45:00Z',
+            role: 'manager'
+          }
+        ] as InvitationData[]
+      });
+      
+      setLoading(false);
     };
     
-    fetchStats();
+    fetchInvitationStats();
   }, []);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Invitations</h2>
-          <p className="text-muted-foreground mt-2">
-            Gérez les invitations des collaborateurs pour rejoindre EmotionsCare.
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <InvitationStatsDisplay stats={invitationStats} />
         </div>
-        <Button onClick={() => setShowInviteModal(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Inviter un collaborateur
-        </Button>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Nouvelle invitation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <InvitationForm />
+          </CardContent>
+        </Card>
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="new">Nouvelle invitation</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistiques des invitations</CardTitle>
-              <CardDescription>
-                Vue d'ensemble anonymisée des invitations envoyées aux collaborateurs.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <InvitationStatsCards stats={stats} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="new" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inviter un collaborateur</CardTitle>
-              <CardDescription>
-                Envoyez une invitation par email à un nouveau collaborateur pour rejoindre la plateforme.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <InvitationForm onInvitationSent={() => setActiveTab('overview')} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      <InvitationModal
-        open={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
-        onInvitationSent={() => {
-          setShowInviteModal(false);
-          setActiveTab('overview');
-        }}
-      />
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Gérer les invitations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="pending">
+            <TabsList className="grid grid-cols-4 mb-4">
+              <TabsTrigger value="all">Toutes ({invitationStats.total})</TabsTrigger>
+              <TabsTrigger value="pending">En attente ({invitationStats.pending})</TabsTrigger>
+              <TabsTrigger value="accepted">Acceptées ({invitationStats.accepted})</TabsTrigger>
+              <TabsTrigger value="expired">Expirées ({invitationStats.expired + invitationStats.rejected})</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="all">
+              <InvitationList invitations={invitationStats.recent_invites} isLoading={loading} />
+            </TabsContent>
+            
+            <TabsContent value="pending">
+              <InvitationList 
+                invitations={invitationStats.recent_invites.filter(inv => inv.status === 'pending')}
+                isLoading={loading} 
+              />
+            </TabsContent>
+            
+            <TabsContent value="accepted">
+              <InvitationList 
+                invitations={invitationStats.recent_invites.filter(inv => inv.status === 'accepted')}
+                isLoading={loading} 
+              />
+            </TabsContent>
+            
+            <TabsContent value="expired">
+              <InvitationList 
+                invitations={invitationStats.recent_invites.filter(inv => 
+                  inv.status === 'expired' || inv.status === 'rejected'
+                )}
+                isLoading={loading} 
+              />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };

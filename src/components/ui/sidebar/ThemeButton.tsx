@@ -1,49 +1,91 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Moon, Sun, Palette } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { Moon, Sun, Laptop, Palette, PanelLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import { cn } from '@/lib/utils';
 
 interface ThemeButtonProps {
-  collapsed: boolean;
+  collapsed?: boolean;
 }
 
-const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
-  const { theme, toggleTheme } = useTheme();
+const ThemeButton = ({ collapsed = false }: ThemeButtonProps) => {
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
-  // Select the appropriate icon and text based on current theme
-  const getThemeIcon = () => {
-    switch (theme) {
-      case 'dark':
-        return <Moon className="h-4 w-4" />;
-      case 'pastel':
-        return <Palette className="h-4 w-4" />;
-      default: // 'light'
-        return <Sun className="h-4 w-4" />;
+  // Toggle theme in sequence: light -> dark -> pastel -> system -> light
+  const toggleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('pastel');
+    } else if (theme === 'pastel') {
+      setTheme('system');
+    } else {
+      setTheme('light');
     }
   };
 
-  const getThemeText = () => {
-    switch (theme) {
-      case 'dark':
-        return 'Mode clair';
-      case 'pastel':
-        return 'Mode sombre';
-      default: // 'light'
-        return 'Mode pastel';
+  // Get icon based on current theme
+  const getIcon = () => {
+    if (theme === 'system') {
+      return <Laptop size={18} />;
+    } else if (theme === 'dark') {
+      return <Moon size={18} />;
+    } else if (theme === 'pastel') {
+      return <Palette size={18} />;
+    } else {
+      return <Sun size={18} />;
     }
   };
+
+  // Get theme name for display
+  const getThemeName = () => {
+    switch (theme) {
+      case 'light': return 'Clair';
+      case 'dark': return 'Sombre';
+      case 'pastel': return 'Pastel';
+      case 'system': return 'Système';
+      default: return 'Thème';
+    }
+  };
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="h-9 w-9"
+          >
+            {getIcon()}
+            <span className="sr-only">Changer de thème</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <p>Thème: {getThemeName()}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
 
   return (
     <Button
       variant="ghost"
-      size={collapsed ? "icon" : "sm"}
       onClick={toggleTheme}
-      className={`${collapsed ? 'w-10' : 'w-full justify-start'}`}
-      aria-label="Changer le thème"
+      className={cn(
+        "w-full justify-start",
+        resolvedTheme === 'dark' && "text-slate-400 hover:text-slate-100",
+      )}
     >
-      {getThemeIcon()}
-      {!collapsed && <span className="ml-2">{getThemeText()}</span>}
+      {getIcon()}
+      <span className="ml-2">Thème: {getThemeName()}</span>
     </Button>
   );
 };

@@ -7,6 +7,8 @@ export interface User {
   avatar?: string;
   avatar_url?: string;
   image?: string;
+  position?: string;
+  department?: string;
   preferences?: UserPreferences;
   onboarded?: boolean;
   joined_at?: string;
@@ -28,7 +30,7 @@ export interface UserPreferences {
   dataCollection?: boolean;
 }
 
-export type ThemeName = 'light' | 'dark' | 'system';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
 
 export interface VRSessionTemplate {
@@ -106,6 +108,8 @@ export interface EmotionResult {
   emojis?: string;
   ai_feedback?: string;
   intensity?: number;
+  transcript?: string;
+  recommendations?: string[];
   primaryEmotion?: {
     name: string;
     intensity?: number;
@@ -137,6 +141,11 @@ export interface Story {
   content: string;
   type: string;
   seen?: boolean;
+  image?: string;
+  cta?: {
+    label: string;
+    route: string;
+  };
 }
 
 export interface Recommendation {
@@ -145,6 +154,7 @@ export interface Recommendation {
   description: string;
   category: string;
   priority: number;
+  confidence: number;
 }
 
 export interface Badge {
@@ -171,8 +181,25 @@ export interface JournalEntry {
 export interface InvitationStats {
   total: number;
   pending: number;
-  accepted: number;
   expired: number;
+  accepted: number;
+  rejected: number;
+  sent: number;
+  completed: number;
+  conversionRate: number;
+  averageTimeToAccept: number;
+  teams: Record<string, number>;
+  recent_invites: InvitationData[];
+}
+
+export interface InvitationData {
+  id: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'expired' | 'rejected';
+  created_at: string;
+  expires_at: string;
+  accepted_at?: string;
+  role: string;
 }
 
 export interface InvitationFormData {
@@ -180,9 +207,10 @@ export interface InvitationFormData {
   role: UserRole;
   message?: string;
   expires_in_days: number;
+  expiresIn?: number;
 }
 
-export type UserRole = 'admin' | 'manager' | 'user' | 'therapist' | 'coach' | 'guest';
+export type UserRole = 'admin' | 'manager' | 'user' | 'therapist' | 'coach' | 'guest' | 'employee';
 
 export interface MusicTrack {
   id: string;
@@ -209,19 +237,36 @@ export interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onSeek: (time: number) => void;
+  formatTime?: (time: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  showTimestamps?: boolean;
+  className?: string;
 }
 
 export interface TrackInfoProps {
   track: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: boolean;
+  className?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
   onChange: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  showLabel?: boolean;
+  className?: string;
 }
 
 export interface Track extends MusicTrack {
   coverImage?: string;
+  coverUrl?: string;
 }
 
 export interface Playlist extends MusicPlaylist {

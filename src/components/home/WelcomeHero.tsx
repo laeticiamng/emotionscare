@@ -1,169 +1,112 @@
 
-import React, { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserMode } from "@/contexts/UserModeContext";
-import { motion } from "framer-motion";
-import { useStorytelling } from "@/providers/StorytellingProvider";
-import { useSoundscape } from "@/providers/SoundscapeProvider";
-import { useBranding } from "@/contexts/BrandingContext";
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useStorytelling } from '@/providers/StorytellingProvider';
+import { Story } from '@/types';
 
 interface WelcomeHeroProps {
   userName?: string;
-  timeOfDay?: "morning" | "afternoon" | "evening";
-  onMoodSelect?: () => void;
+  userRole?: string;
+  onboardingComplete?: boolean;
 }
 
-const WelcomeHero: React.FC<WelcomeHeroProps> = ({
-  userName,
-  timeOfDay = "morning",
-  onMoodSelect,
+const WelcomeHero: React.FC<WelcomeHeroProps> = ({ 
+  userName = '',
+  userRole = '',
+  onboardingComplete = false
 }) => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { userMode } = useUserMode();
-  const { emotionalTone, colors } = useBranding();
-  const { playFunctionalSound } = useSoundscape();
-  const { stories, showStory } = useStorytelling();
-
-  const getTimeOfDayMessage = () => {
-    switch (timeOfDay) {
-      case "morning":
-        return "Bon matin";
-      case "afternoon":
-        return "Bon après-midi";
-      case "evening":
-        return "Bonne soirée";
-      default:
-        return "Bienvenue";
+  const { storyQueue, addStory, markStorySeen } = useStorytelling();
+  const [greeting, setGreeting] = useState('');
+  
+  // Set greeting based on time of day
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting('Bonjour');
+    } else if (hour < 18) {
+      setGreeting('Bon après-midi');
+    } else {
+      setGreeting('Bonsoir');
     }
-  };
-
-  const getGreeting = () => {
-    if (userName) {
-      return `${getTimeOfDayMessage()}, ${userName} !`;
-    }
-
-    if (isAuthenticated) {
-      return `${getTimeOfDayMessage()} !`;
-    }
-
-    return "Bienvenue sur EmotionsCare";
-  };
-
-  const getTagline = () => {
-    if (isAuthenticated) {
-      if (userMode === 'b2b-admin') {
-        return "Découvrez l'état émotionnel global de votre équipe";
-      } else if (userMode === 'b2b-collaborator') {
-        return "Suivez votre bien-être émotionnel professionnel";
-      } else {
-        return "Comment vous sentez-vous aujourd'hui ?";
+  }, []);
+  
+  // Add welcome story if it's the user's first visit and onboarding is complete
+  useEffect(() => {
+    if (onboardingComplete && userName) {
+      // Check if welcome story exists and has not been seen
+      const welcomeStoryExists = storyQueue.some(
+        story => story.id === 'welcome' && !story.seen
+      );
+      
+      if (!welcomeStoryExists) {
+        const welcomeStory: Story = {
+          id: 'welcome',
+          title: 'Bienvenue sur EmotionsCare',
+          content: `${userName}, bienvenue dans votre espace personnel de bien-être émotionnel. Vous pouvez maintenant accéder à tous les outils pour prendre soin de votre santé émotionnelle.`,
+          type: 'onboarding',
+          seen: false,
+          cta: {
+            label: "Explorer les fonctionnalités",
+            route: "/dashboard"
+          }
+        };
+        
+        addStory(welcomeStory);
       }
     }
+  }, [onboardingComplete, userName, storyQueue, addStory]);
 
-    return "Votre partenaire pour le bien-être émotionnel";
-  };
-
-  // Play welcome sound when component mounts
-  useEffect(() => {
-    playFunctionalSound('transition');
-  }, []);
-
-  const handleNavigate = (path: string) => {
-    // Changed from 'click' to 'transition' to match the allowed types
-    playFunctionalSound('transition');
-    navigate(path);
-  };
-
-  const handleShowStory = () => {
-    // Find an unseen story to show
-    const unseenStory = stories.find(story => !story.seen);
-    if (unseenStory) {
-      playFunctionalSound('notification');
-      showStory(unseenStory.id);
-    } else if (stories.length > 0) {
-      // If all stories are seen, show the first one
-      playFunctionalSound('notification');
-      showStory(stories[0].id);
+  const handleGetStarted = () => {
+    navigate('/dashboard');
+    
+    // Mark welcome story as seen when user clicks get started
+    const welcomeStory = storyQueue.find(story => story.id === 'welcome');
+    if (welcomeStory) {
+      markStorySeen(welcomeStory.id);
     }
   };
-
+  
   return (
-    <div className="relative z-10 text-center md:text-left">
-      <motion.h1 
-        className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <span className="text-gradient">{getGreeting()}</span>
-      </motion.h1>
+    <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 py-20">
+      <div className="container max-w-5xl relative z-10">
+        <motion.div 
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-3xl md:text-5xl font-light mb-4">
+            {greeting}, <span className="font-semibold">{userName || 'Bienvenue'}</span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            {userName ? 
+              'Prenez soin de votre équilibre émotionnel et explorez toutes nos fonctionnalités.' : 
+              'EmotionsCare vous accompagne dans la gestion de votre bien-être émotionnel quotidien.'
+            }
+          </p>
+          
+          <Button 
+            onClick={handleGetStarted} 
+            size="lg" 
+            className="group px-8"
+          >
+            {userName ? 'Accéder au tableau de bord' : 'Commencer maintenant'}
+            <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={18} />
+          </Button>
+        </motion.div>
+      </div>
       
-      <motion.p 
-        className="text-xl md:text-2xl mb-8 text-muted-foreground"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        {getTagline()}
-      </motion.p>
-
-      <motion.div 
-        className="flex flex-wrap gap-4 justify-center md:justify-start"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        {isAuthenticated ? (
-          <>
-            <Button
-              size="lg"
-              onClick={() => handleNavigate("/dashboard")}
-              className="shadow-md hover-lift"
-              style={{ backgroundColor: colors.primary }}
-            >
-              {userMode === 'b2b-admin' 
-                ? "Voir le tableau de bord RH"
-                : "Accéder à mon espace"
-              }
-            </Button>
-
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={onMoodSelect || handleShowStory}
-              className="flex items-center gap-2 hover-lift"
-            >
-              {onMoodSelect ? "Comment je me sens ?" : "Découvrir nos actualités"} 
-              <span role="img" aria-label="mood">
-                {onMoodSelect ? "🤔" : "✨"}
-              </span>
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              size="lg"
-              onClick={() => handleNavigate("/login")}
-              className="shadow-md hover-lift"
-              style={{ backgroundColor: colors.primary }}
-            >
-              Se connecter
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => handleNavigate("/register")}
-              className="hover-lift"
-            >
-              Créer un compte
-            </Button>
-          </>
-        )}
-      </motion.div>
-    </div>
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl"></div>
+      </div>
+    </section>
   );
 };
 

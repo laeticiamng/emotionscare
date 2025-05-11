@@ -1,178 +1,151 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Music2, Play, Pause, Loader2 } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { useMusic } from '@/contexts/MusicContext';
-import MusicPresetCard from './MusicPresetCard';
-import EnhancedMusicVisualizer from './EnhancedMusicVisualizer';
-import { safeOpen } from '@/lib/utils';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2, Music } from 'lucide-react';
+import { useMusic } from '@/providers/MusicProvider';
+import { Track } from '@/types';
 
-interface MusicCreatorProps {
-  // Add props if needed
-}
-
-const MusicCreator: React.FC<MusicCreatorProps> = () => {
-  const [tempo, setTempo] = useState(120);
-  const [volume, setVolume] = useState(50);
-  const [mood, setMood] = useState('calm');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+const MusicCreator: React.FC = () => {
   const { toast } = useToast();
   const { setOpenDrawer } = useMusic();
   
-  const [selectedPreset, setSelectedPreset] = useState<any>(null);
+  const [emotion, setEmotion] = useState('');
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [generatedTrack, setGeneratedTrack] = useState<Track | null>(null);
 
-  const handleTempoChange = (values: number[]) => {
-    setTempo(values[0]);
-  };
-
-  const handleVolumeChange = (values: number[]) => {
-    setVolume(values[0]);
-  };
-
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleGenerateMusic = async () => {
-    setIsLoading(true);
+  const generateTrack = async () => {
+    if (!emotion && !prompt) {
+      toast({
+        title: "Information manquante",
+        description: "Veuillez indiquer une émotion ou un prompt pour générer une musique",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    // Simulate music generation
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    setLoading(true);
     
-    setIsLoading(false);
+    try {
+      // This would be an API call in a real application
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      
+      // Mock generated track
+      const mockTrack: Track = {
+        id: 'generated-' + Date.now(),
+        title: `Mélodie ${emotion || 'personnalisée'}`,
+        artist: 'IA Composer',
+        duration: 180,
+        url: '/audio/generated-track.mp3',
+        coverUrl: '/images/music/generated-cover.jpg'
+      };
+      
+      setGeneratedTrack(mockTrack);
+      
+      toast({
+        title: "Musique générée",
+        description: "Votre création musicale personnalisée est prête à être écoutée",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur de génération",
+        description: "Une erreur s'est produite lors de la génération de la musique",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveToLibrary = () => {
+    if (!generatedTrack) return;
+    
     toast({
-      title: "Musique générée",
-      description: "Votre musique personnalisée est prête à être écoutée!",
+      title: "Sauvegardé",
+      description: "La musique a été ajoutée à votre bibliothèque personnelle",
     });
-    safeOpen(setOpenDrawer);
-  };
-  
-  const musicPresets = [
-    {
-      name: 'Relaxation',
-      description: 'Ambiance douce pour la détente',
-      genre: 'Ambient',
-      mood: 'Calm',
-      tempo: 90,
-      duration: 180,
-      icon: <Music2 className="h-4 w-4" />
-    },
-    {
-      name: 'Concentration',
-      description: 'Rythmes pour la concentration',
-      genre: 'Lo-Fi',
-      mood: 'Focused',
-      tempo: 110,
-      duration: 240,
-      icon: <Music2 className="h-4 w-4" />
-    },
-    {
-      name: 'Énergie',
-      description: 'Morceaux pour la motivation',
-      genre: 'Electro',
-      mood: 'Energetic',
-      tempo: 130,
-      duration: 150,
-      icon: <Music2 className="h-4 w-4" />
-    },
-    {
-      name: 'Joie',
-      description: 'Mélodies pour la bonne humeur',
-      genre: 'Pop',
-      mood: 'Happy',
-      tempo: 120,
-      duration: 200,
-      icon: <Music2 className="h-4 w-4" />
-    },
-  ];
-  
-  const handlePresetSelect = (preset: any) => {
-    setSelectedPreset(preset);
-    setTempo(preset.tempo);
-    setMood(preset.mood);
+    
+    // Here you would normally save to the user's library via API
+    setGeneratedTrack(null);
+    setEmotion('');
+    setPrompt('');
   };
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Créateur de musique IA</CardTitle>
+        <CardTitle className="text-xl font-bold">Créateur de musique IA</CardTitle>
+        <CardDescription>
+          Créez une musique personnalisée basée sur vos émotions ou un prompt textuel
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {musicPresets.map((preset) => (
-            <MusicPresetCard
-              key={preset.name}
-              preset={preset}
-              onSelect={handlePresetSelect}
-              isActive={selectedPreset?.name === preset.name}
+      <CardContent>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="emotion">Émotion principale</Label>
+            <Input
+              id="emotion"
+              value={emotion}
+              onChange={(e) => setEmotion(e.target.value)}
+              placeholder="Ex: Joie, Sérénité, Mélancolie..."
+              disabled={loading}
             />
-          ))}
-        </div>
-        
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium">Tempo ({tempo} BPM)</h3>
-          <Slider
-            defaultValue={[tempo]}
-            max={200}
-            step={1}
-            onValueChange={handleTempoChange}
-            disabled={isLoading}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <h3 className="text-sm font-medium">Volume ({volume}%)</h3>
-          <Slider
-            defaultValue={[volume]}
-            max={100}
-            step={1}
-            onValueChange={handleVolumeChange}
-            disabled={isLoading}
-          />
-        </div>
-        
-        <EnhancedMusicVisualizer 
-          emotion={mood}
-          intensity={volume}
-          volume={volume / 100}
-        />
-        
-        <div className="flex justify-between">
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="prompt">Description détaillée (optionnel)</Label>
+            <Textarea
+              id="prompt"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Décrivez l'ambiance, le style musical ou les instruments souhaités..."
+              className="h-24"
+              disabled={loading}
+            />
+          </div>
+          
           <Button 
-            variant="outline"
-            disabled={isLoading}
-            onClick={handlePlayPause}
+            onClick={generateTrack} 
+            className="w-full"
+            disabled={loading}
           >
-            {isPlaying ? (
+            {loading ? (
               <>
-                <Pause className="mr-2 h-4 w-4" />
-                Pause
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Génération en cours...
               </>
             ) : (
               <>
-                <Play className="mr-2 h-4 w-4" />
-                Play
+                <Music className="mr-2 h-4 w-4" />
+                Générer ma musique
               </>
             )}
           </Button>
           
-          <Button 
-            disabled={isLoading}
-            onClick={handleGenerateMusic}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Génération...
-              </>
-            ) : (
-              "Générer ma musique"
-            )}
-          </Button>
+          {generatedTrack && (
+            <div className="mt-6 p-4 border rounded-lg bg-muted/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">{generatedTrack.title}</h4>
+                  <p className="text-sm text-muted-foreground">Par {generatedTrack.artist}</p>
+                </div>
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => saveToLibrary()}
+                    size="sm"
+                  >
+                    Sauvegarder
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

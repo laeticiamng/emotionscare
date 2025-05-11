@@ -1,170 +1,153 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Recommendation } from '@/types';
-
-interface EmotionPrediction {
-  emotion: string;
-  probability: number;
-  confidence?: number;
-  triggers?: string[];
-  recommendations?: string[];
-}
+import React, { createContext, useState, useContext, ReactNode } from 'react';
+import { EmotionPrediction, Recommendation } from '@/types';
 
 interface PredictiveAnalyticsContextType {
   isLoading: boolean;
   error: string;
-  isEnabled: boolean;
-  setEnabled: (enabled: boolean) => void;
   currentPredictions: EmotionPrediction;
   recommendations: Recommendation[];
   availableFeatures: string[];
   predictionEnabled: boolean;
   setPredictionEnabled: (enabled: boolean) => void;
-  generatePredictions: (userData?: any) => Promise<void>;
   generatePrediction: (userData?: any) => Promise<EmotionPrediction>;
   resetPredictions: () => void;
+  addRecommendation: (recommendation: Recommendation) => void;
 }
+
+const initialState: EmotionPrediction = {
+  predictedEmotion: '',
+  probability: 0,
+  confidence: 0,
+  triggers: [],
+  recommendations: []
+};
 
 const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType>({
   isLoading: false,
   error: '',
-  isEnabled: false,
-  setEnabled: () => {},
-  currentPredictions: { emotion: '', probability: 0, confidence: 0 },
+  currentPredictions: initialState,
   recommendations: [],
   availableFeatures: [],
   predictionEnabled: false,
   setPredictionEnabled: () => {},
-  generatePredictions: async () => {},
-  generatePrediction: async () => ({ emotion: '', probability: 0 }),
-  resetPredictions: () => {}
+  generatePrediction: async () => initialState,
+  resetPredictions: () => {},
+  addRecommendation: () => {}
 });
 
-interface PredictiveAnalyticsProviderProps {
-  children: ReactNode;
-}
-
-export const PredictiveAnalyticsProvider: React.FC<PredictiveAnalyticsProviderProps> = ({ children }) => {
+export const PredictiveAnalyticsProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isEnabled, setIsEnabled] = useState(false);
-  const [predictionEnabled, setPredictionEnabled] = useState(false);
-  const [currentPredictions, setCurrentPredictions] = useState<EmotionPrediction>({ 
-    emotion: '', 
-    probability: 0,
-    confidence: 0
-  });
+  const [currentPredictions, setCurrentPredictions] = useState<EmotionPrediction>(initialState);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [predictionEnabled, setPredictionEnabled] = useState(true);
   
-  const availableFeatures = [
-    'predictive-mood',
-    'preventive-alerts',
-    'personalized-recommendations'
-  ];
+  // Available predictive features (e.g., "mood", "stress", "sleep")
+  const [availableFeatures] = useState<string[]>([
+    'mood_prediction', 
+    'burnout_risk', 
+    'stress_levels',
+    'team_dynamics',
+    'well_being_optimization'
+  ]);
 
-  const generatePredictions = async (userData?: any) => {
+  // Generate a prediction based on user data
+  const generatePrediction = async (userData?: any): Promise<EmotionPrediction> => {
+    if (!predictionEnabled) {
+      return currentPredictions;
+    }
+
     setIsLoading(true);
     setError('');
     
     try {
-      // Mock prediction generation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // This is a mock implementation that would be replaced with an actual API call
+      // In a real app, this would call a backend endpoint with the user data
       
-      const emotions = ['calm', 'happy', 'anxious', 'sad', 'energetic'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const randomProbability = Math.round((Math.random() * 40 + 60) * 100) / 100; // 60-100%
-      const randomConfidence = Math.round((Math.random() * 30 + 70) * 100) / 100; // 70-100%
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const prediction: EmotionPrediction = {
-        emotion: randomEmotion,
-        probability: randomProbability,
-        confidence: randomConfidence,
-        triggers: ['work stress', 'lack of sleep', 'physical activity'],
+      // Mock response
+      const mockPrediction: EmotionPrediction = {
+        predictedEmotion: 'contentment',
+        probability: 0.85,
+        confidence: 0.78,
+        triggers: ['work pressure', 'sleep quality', 'recent accomplishments'],
         recommendations: [
-          'Take a short break',
-          'Practice deep breathing',
-          'Listen to calming music'
+          'Take short 5-minute breaks every hour',
+          'Consider a short meditation session',
+          'Engage in social interactions during lunch'
         ]
       };
       
-      setCurrentPredictions(prediction);
+      setCurrentPredictions(mockPrediction);
       
-      // Create mock Recommendation objects
-      const mockRecommendations: Recommendation[] = [
+      // Generate recommendations based on prediction
+      const newRecommendations: Recommendation[] = [
         {
           id: '1',
-          title: 'Take a short break',
-          description: 'Step away from your work for 5-10 minutes',
-          category: 'wellness',
-          priority: 1
+          title: 'Schedule small breaks',
+          description: 'Taking regular short breaks can help maintain your current positive emotional state.',
+          category: 'work',
+          priority: 2,
+          confidence: 0.85
         },
         {
           id: '2',
-          title: 'Practice deep breathing',
-          description: 'Try 4-7-8 breathing technique for relaxation',
-          category: 'wellness',
-          priority: 2
+          title: 'Sleep optimization',
+          description: 'Maintaining your current sleep schedule appears beneficial for your emotional balance.',
+          category: 'health',
+          priority: 1,
+          confidence: 0.78
+        },
+        {
+          id: '3',
+          title: 'Social engagement',
+          description: 'Your recent social interactions are contributing positively to your emotional state.',
+          category: 'social',
+          priority: 3,
+          confidence: 0.9
         }
       ];
       
-      setRecommendations(mockRecommendations);
+      setRecommendations(newRecommendations);
       
+      return mockPrediction;
     } catch (err) {
-      console.error('Error generating predictions:', err);
-      setError('Failed to generate predictions');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to generate prediction';
+      setError(errorMsg);
+      return initialState;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const generatePrediction = async (userData?: any): Promise<EmotionPrediction> => {
-    try {
-      // Mock prediction generation
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const emotions = ['calm', 'happy', 'anxious', 'sad', 'energetic'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const randomProbability = Math.round((Math.random() * 40 + 60) * 100) / 100; // 60-100%
-      const randomConfidence = Math.round((Math.random() * 30 + 70) * 100) / 100; // 70-100%
-      
-      return {
-        emotion: randomEmotion,
-        probability: randomProbability,
-        confidence: randomConfidence,
-        triggers: ['work stress', 'lack of sleep', 'physical activity'],
-        recommendations: [
-          'Take a short break',
-          'Practice deep breathing',
-          'Listen to calming music'
-        ]
-      };
-      
-    } catch (error) {
-      console.error('Error in generatePrediction:', error);
-      return { emotion: 'neutral', probability: 50, confidence: 50 };
-    }
-  };
-
+  // Reset predictions to initial state
   const resetPredictions = () => {
-    setCurrentPredictions({ emotion: '', probability: 0, confidence: 0 });
+    setCurrentPredictions(initialState);
     setRecommendations([]);
+    setError('');
+  };
+  
+  // Add a new recommendation
+  const addRecommendation = (recommendation: Recommendation) => {
+    setRecommendations(prev => [...prev, recommendation]);
   };
 
   return (
-    <PredictiveAnalyticsContext.Provider
+    <PredictiveAnalyticsContext.Provider 
       value={{
         isLoading,
         error,
-        isEnabled,
-        setEnabled: setIsEnabled,
         currentPredictions,
         recommendations,
         availableFeatures,
         predictionEnabled,
         setPredictionEnabled,
-        generatePredictions,
         generatePrediction,
-        resetPredictions
+        resetPredictions,
+        addRecommendation
       }}
     >
       {children}

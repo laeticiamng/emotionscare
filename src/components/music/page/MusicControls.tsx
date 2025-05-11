@@ -1,144 +1,147 @@
 
 import React from 'react';
+import { useMusic } from '@/providers/MusicProvider';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
+import VolumeControl from '@/components/music/player/VolumeControl';
+import TrackInfo from '@/components/music/player/TrackInfo';
+import ProgressBar from '@/components/music/player/ProgressBar';
 import { 
-  Play, Pause, SkipBack, SkipForward, 
-  Volume, Volume2, VolumeX, List 
+  Play, Pause, SkipBack, SkipForward, Repeat, Shuffle, 
+  Volume2, VolumeX 
 } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { Separator } from '@/components/ui/separator';
 
 interface MusicControlsProps {
-  showDetails?: boolean;
-  showDrawer?: () => void;
+  className?: string;
+  showProgress?: boolean;
+  showTrackInfo?: boolean;
+  showVolumeControl?: boolean;
+  compact?: boolean;
 }
 
-const MusicControls: React.FC<MusicControlsProps> = ({ 
-  showDetails = true,
-  showDrawer
+const MusicControls: React.FC<MusicControlsProps> = ({
+  className = '',
+  showProgress = true,
+  showTrackInfo = true,
+  showVolumeControl = true,
+  compact = false
 }) => {
   const { 
-    currentTrack, 
     isPlaying, 
-    playTrack, 
+    currentTrack, 
     pauseTrack, 
-    nextTrack, 
+    resumeTrack, 
+    nextTrack,
     previousTrack,
+    seekTo,
+    currentTime,
+    duration,
     volume,
-    setVolume 
+    setVolume,
+    toggleShuffle,
+    toggleRepeat,
+    isShuffled,
+    isRepeating
   } = useMusic();
-  
-  // Fix: Accept an array of values and use the first element
-  const handleVolumeChange = (values: number[]) => {
-    setVolume(values[0] / 100);
+
+  // Format time in MM:SS format
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-  
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      pauseTrack();
-    } else if (currentTrack) {
-      playTrack(currentTrack);
-    }
-  };
-  
-  if (!currentTrack) {
-    return showDetails ? (
-      <div className="text-center text-muted-foreground p-4">
-        Aucune musique en cours de lecture
-      </div>
-    ) : null;
-  }
-  
-  // Determine the URL of the track cover
-  const getCoverUrl = () => {
-    if (!currentTrack) return null;
-    
-    if (currentTrack.coverUrl) return currentTrack.coverUrl;
-    if (currentTrack.cover) return currentTrack.cover;
-    if (currentTrack.coverImage) return currentTrack.coverImage;
-    
-    return null;
-  };
-  
-  const coverUrl = getCoverUrl();
-  
+
   return (
-    <div className="flex flex-col gap-2">
-      {showDetails && (
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-primary/10 rounded-md flex items-center justify-center overflow-hidden">
-            {coverUrl ? (
-              <img 
-                src={coverUrl} 
-                alt={currentTrack.title} 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-muted" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">{currentTrack.title}</p>
-            <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-          </div>
+    <div className={`${className}`}>
+      {showTrackInfo && currentTrack && (
+        <div className="mb-4">
+          <TrackInfo
+            track={currentTrack}
+            coverUrl={currentTrack?.coverImage || currentTrack?.coverUrl}
+          />
         </div>
       )}
       
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex-1 flex items-center justify-center gap-2">
-          <Button 
-            variant="ghost" 
+      {showProgress && currentTrack && (
+        <div className="mb-4">
+          <ProgressBar
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={seekTo}
+            formatTime={formatTime}
+          />
+        </div>
+      )}
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          {!compact && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleShuffle}
+                className={isShuffled ? "text-primary" : ""}
+              >
+                <Shuffle size={compact ? 16 : 18} />
+              </Button>
+            </>
+          )}
+          
+          <Button
+            variant="ghost"
             size="icon"
-            onClick={() => previousTrack()}
-            className="h-8 w-8"
+            onClick={previousTrack}
+            disabled={!currentTrack}
           >
-            <SkipBack className="h-4 w-4" />
+            <SkipBack size={compact ? 18 : 20} />
           </Button>
           
-          <Button 
-            variant={isPlaying ? "secondary" : "default"}
-            size="icon"
-            onClick={togglePlayPause}
-            className="h-10 w-10"
+          <Button
+            variant={compact ? "ghost" : "outline"}
+            size={compact ? "icon" : "default"}
+            className={compact ? "" : "h-10 w-10 rounded-full"}
+            onClick={() => isPlaying ? pauseTrack() : resumeTrack()}
+            disabled={!currentTrack}
           >
             {isPlaying ? (
-              <Pause className="h-5 w-5" />
+              <Pause size={compact ? 18 : 20} />
             ) : (
-              <Play className="h-5 w-5" />
+              <Play size={compact ? 18 : 20} />
             )}
           </Button>
           
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
-            onClick={() => nextTrack()}
-            className="h-8 w-8"
+            onClick={nextTrack}
+            disabled={!currentTrack}
           >
-            <SkipForward className="h-4 w-4" />
+            <SkipForward size={compact ? 18 : 20} />
           </Button>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Volume2 className="h-4 w-4 text-muted-foreground" />
-          <Slider
-            defaultValue={[volume * 100]}
-            max={100}
-            step={1}
-            onValueChange={handleVolumeChange}
-            className="w-20"
-          />
           
-          {showDrawer && (
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={showDrawer}
-              className="h-8 w-8"
-            >
-              <List className="h-4 w-4" />
-            </Button>
+          {!compact && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleRepeat}
+                className={isRepeating ? "text-primary" : ""}
+              >
+                <Repeat size={compact ? 16 : 18} />
+              </Button>
+            </>
           )}
         </div>
+        
+        {showVolumeControl && (
+          <div className={`flex items-center ${compact ? 'hidden sm:flex' : ''}`}>
+            <VolumeControl
+              volume={volume}
+              onChange={setVolume}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

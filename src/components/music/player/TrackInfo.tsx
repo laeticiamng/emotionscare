@@ -1,91 +1,64 @@
 
 import React from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle } from 'lucide-react';
 import { TrackInfoProps } from '@/types';
-import { cn } from '@/lib/utils';
-import { MusicTrack } from '@/types/music';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Music } from 'lucide-react';
 
 const TrackInfo: React.FC<TrackInfoProps> = ({
+  track,
   title,
   artist,
   coverUrl,
-  track,
   showCover = true,
   showControls = false,
   currentTrack,
   loadingTrack = false,
-  audioError = null,
+  audioError = false,
   className = ''
 }) => {
-  // Use track properties if provided, otherwise use individual props
-  const displayTrack = track || currentTrack || {
-    title,
-    artist,
-    coverUrl: coverUrl || ''
-  };
-
-  if (loadingTrack) {
-    return (
-      <div className={cn("flex items-center gap-3", className)}>
-        {showCover && (
-          <Skeleton className="h-12 w-12 rounded-md" />
-        )}
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-      </div>
-    );
-  }
-
-  if (audioError) {
-    return (
-      <div className={cn("flex items-center gap-2 text-destructive", className)}>
-        <AlertCircle className="h-4 w-4" />
-        <span className="text-sm">Erreur de lecture audio</span>
-      </div>
-    );
-  }
-
-  // Get the cover URL from the track object, considering multiple property names
-  const getCoverUrl = (): string | null => {
-    if (!displayTrack) return null;
-    
-    // Check all possible cover image property names
-    if ('coverUrl' in displayTrack && displayTrack.coverUrl) return displayTrack.coverUrl as string;
-    if ('cover' in displayTrack && displayTrack.cover) return displayTrack.cover as string;
-    if ('cover_url' in displayTrack && displayTrack.cover_url) return displayTrack.cover_url;
-    if ('coverImage' in displayTrack && displayTrack.coverImage) return displayTrack.coverImage as string;
-    if ('imageUrl' in displayTrack && displayTrack.imageUrl) return displayTrack.imageUrl as string;
-    
-    return null;
-  };
+  // Use provided values or default to track properties
+  const displayTitle = title || track?.title || 'Unknown Track';
+  const displayArtist = artist || track?.artist || 'Unknown Artist';
+  const displayCoverUrl = coverUrl || track?.coverUrl || track?.cover_url;
   
-  const trackCoverUrl = getCoverUrl();
-  const safeTrackCoverUrl: string | null = trackCoverUrl || null;
-
   return (
-    <div className={cn("flex items-center gap-3", className)}>
-      {showCover && safeTrackCoverUrl && (
-        <img 
-          src={safeTrackCoverUrl} 
-          alt={`${displayTrack?.title} cover`} 
-          className="h-12 w-12 rounded-md object-cover"
-          onError={(e) => {
-            // If image fails to load, hide it
-            (e.target as HTMLImageElement).style.display = 'none';
-          }}
-        />
+    <div className={`flex items-center ${className}`}>
+      {showCover && (
+        <div className="relative mr-3 rounded-md overflow-hidden w-12 h-12 flex-shrink-0">
+          {loadingTrack ? (
+            <Skeleton className="w-12 h-12" />
+          ) : displayCoverUrl ? (
+            <img
+              src={displayCoverUrl}
+              alt={displayTitle}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <Music className="h-6 w-6 text-muted-foreground" />
+            </div>
+          )}
+        </div>
       )}
       
-      <div>
-        <p className="font-medium line-clamp-1">
-          {displayTrack?.title || 'Titre inconnu'}
-        </p>
-        <p className="text-sm text-muted-foreground line-clamp-1">
-          {displayTrack?.artist || 'Artiste inconnu'}
-        </p>
+      <div className="truncate">
+        <div className="font-medium truncate">
+          {loadingTrack ? (
+            <Skeleton className="h-4 w-32" />
+          ) : audioError ? (
+            <span className="text-destructive">Error loading track</span>
+          ) : (
+            displayTitle
+          )}
+        </div>
+        
+        <div className="text-sm text-muted-foreground truncate">
+          {loadingTrack ? (
+            <Skeleton className="h-3 w-24 mt-1" />
+          ) : (
+            displayArtist
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,103 +1,93 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Moon, Sun, Laptop, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Moon, Sun, Palette } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
+import { useTheme } from '@/components/theme/ThemeProvider';
 import { ThemeName } from '@/types';
 
 interface ThemeSwitcherProps {
-  variant?: 'default' | 'outline' | 'ghost';
   size?: 'default' | 'sm' | 'lg' | 'icon';
-  showLabel?: boolean;
+  variant?: 'default' | 'outline' | 'secondary' | 'ghost';
+  className?: string;
 }
 
-/**
- * Premium theme switcher component
- * Allows users to toggle between light, dark and pastel themes
- * with a sleek Apple-inspired interface
- */
-const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
-  variant = 'outline',
-  size = 'icon',
-  showLabel = false
-}) => {
-  const { theme, setThemePreference } = useTheme();
+const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '' }: ThemeSwitcherProps) => {
+  const { theme, resolvedTheme, setTheme, setThemePreference } = useTheme();
 
-  // Icon to display based on current theme
-  const ThemeIcon = () => {
+  // Icons based on current theme
+  const getIcon = () => {
+    if (theme === 'system') {
+      return <Laptop size={size === 'icon' ? 18 : 16} />;
+    }
+    
+    if (theme === 'dark') {
+      return <Moon size={size === 'icon' ? 18 : 16} />;
+    }
+    
+    if (theme === 'pastel') {
+      return <Palette size={size === 'icon' ? 18 : 16} />;
+    }
+    
+    return <Sun size={size === 'icon' ? 18 : 16} />;
+  };
+  
+  // Text label for current theme
+  const getLabel = () => {
     switch (theme) {
-      case 'dark':
-        return <Moon className="h-[1.3rem] w-[1.3rem]" />;
-      case 'pastel':
-        return <Palette className="h-[1.3rem] w-[1.3rem]" />;
-      default: // light
-        return <Sun className="h-[1.3rem] w-[1.3rem]" />;
+      case 'light': return 'Clair';
+      case 'dark': return 'Sombre';
+      case 'system': return 'Système';
+      case 'pastel': return 'Pastel';
+      default: return 'Thème';
     }
   };
-  
-  // Text to display based on current theme
-  const themeText = theme === 'dark' ? 'Sombre' : theme === 'pastel' ? 'Pastel' : 'Clair';
-  
-  // Function to change theme
-  const handleThemeChange = (newTheme: ThemeName) => {
-    setThemePreference(newTheme);
-  };
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant={variant} 
-          size={size} 
-          className="focus-premium hover-lift shadow-sm"
-        >
-          <ThemeIcon />
-          {showLabel && <span className="ml-2 font-medium">{themeText}</span>}
-          <span className="sr-only">Changer de thème</span>
+        <Button variant={variant} size={size} className={`gap-2 ${className}`}>
+          {getIcon()}
+          {size !== 'icon' && getLabel()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[220px] shadow-premium rounded-xl border p-1">
+      <DropdownMenuContent align="end">
         <DropdownMenuItem 
-          onClick={() => handleThemeChange('light')}
-          className="cursor-pointer py-3 rounded-lg"
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setTheme('light')}
         >
-          <Sun className="mr-3 h-5 w-5 text-amber-500" />
-          <span className="font-medium">Mode clair</span>
-          {theme === 'light' && (
-            <span className="ml-auto text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
-              Actif
-            </span>
-          )}
+          <Sun size={16} />
+          <span>Clair</span>
+          {theme === 'light' && <span className="ml-auto text-xs text-green-500">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => handleThemeChange('dark')}
-          className="cursor-pointer py-3 rounded-lg"
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setTheme('dark')}
         >
-          <Moon className="mr-3 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-          <span className="font-medium">Mode sombre</span>
-          {theme === 'dark' && (
-            <span className="ml-auto text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
-              Actif
-            </span>
-          )}
+          <Moon size={16} />
+          <span>Sombre</span>
+          {theme === 'dark' && <span className="ml-auto text-xs text-green-500">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => handleThemeChange('pastel')}
-          className="cursor-pointer py-3 rounded-lg"
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setTheme('pastel')}
         >
-          <Palette className="mr-3 h-5 w-5 text-blue-500" />
-          <span className="font-medium">Mode pastel</span>
-          {theme === 'pastel' && (
-            <span className="ml-auto text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
-              Actif
-            </span>
-          )}
+          <Palette size={16} />
+          <span>Pastel</span>
+          {theme === 'pastel' && <span className="ml-auto text-xs text-green-500">✓</span>}
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setTheme('system')}
+        >
+          <Laptop size={16} />
+          <span>Système</span>
+          {theme === 'system' && <span className="ml-auto text-xs text-green-500">✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,48 +1,56 @@
 
-export const isAdminRole = (role: string | undefined): boolean => {
+/**
+ * Utility functions for user role management
+ */
+
+import { User } from '@/types';
+
+/**
+ * Check if user has admin role
+ */
+export const isAdminRole = (role?: string): boolean => {
   if (!role) return false;
-  return role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator';
+  return role === 'admin' || role === 'superadmin';
 };
 
-export const isUserRole = (role: string | undefined): boolean => {
+/**
+ * Check if user has user role (non-admin)
+ */
+export const isUserRole = (role?: string): boolean => {
   if (!role) return false;
-  return role.toLowerCase() === 'user';
+  return role === 'user' || role === 'employee' || role === 'coach' || role === 'guest';
 };
 
-export const isManagerRole = (role: string | undefined): boolean => {
-  if (!role) return false;
-  return role.toLowerCase() === 'manager';
+/**
+ * Check if user has therapist or coach role
+ */
+export const isTherapistRole = (user?: User | null): boolean => {
+  if (!user || !user.role) return false;
+  return user.role === 'therapist' || user.role === 'coach';
 };
 
-export const getUserRoleLevel = (role: string | undefined): number => {
-  if (!role) return 0;
-  
-  const roleLevels: Record<string, number> = {
-    'admin': 100,
-    'administrator': 100,
-    'manager': 50,
-    'therapist': 40,
-    'coach': 30,
-    'user': 10,
-    'guest': 1
-  };
-  
-  return roleLevels[role.toLowerCase()] || 0;
-};
-
-export const getRoleName = (role: string | undefined): string => {
-  if (!role) return 'Utilisateur';
-  
-  const roleNames: Record<string, string> = {
-    'admin': 'Administrateur',
-    'administrator': 'Administrateur',
-    'manager': 'Manager',
-    'therapist': 'Thérapeute',
-    'coach': 'Coach',
-    'user': 'Utilisateur',
-    'guest': 'Invité',
-    'wellbeing_manager': 'Manager de bien-être'
-  };
-  
-  return roleNames[role.toLowerCase()] || role;
+/**
+ * Get user role display name
+ */
+export const getRoleDisplayName = (role: string): string => {
+  switch (role) {
+    case 'admin':
+      return 'Administrateur';
+    case 'superadmin':
+      return 'Super administrateur';
+    case 'therapist':
+      return 'Thérapeute';
+    case 'coach':
+      return 'Coach';
+    case 'manager':
+      return 'Manager';
+    case 'user':
+      return 'Utilisateur';
+    case 'employee':
+      return 'Collaborateur';
+    case 'guest':
+      return 'Invité';
+    default:
+      return role;
+  }
 };
