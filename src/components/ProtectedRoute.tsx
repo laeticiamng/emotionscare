@@ -9,8 +9,7 @@ const ProtectedRoute: React.FC = () => {
   const { userMode } = useUserMode();
   const location = useLocation();
   
-  // For now, we'll simply wrap the Outlet with our authentication check
-  // This basic implementation can be expanded with additional logic as needed
+  // Pour l'instant, nous allons simplement rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

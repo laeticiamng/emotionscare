@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -8,53 +8,53 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Building, BarChart2, Users } from "lucide-react";
+import { Menu, Building, BarChart2, Users, Home, Heart, FileText, Music, MessageSquare, Headphones, X, LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from '@/types';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserMode } from '@/contexts/UserModeContext';
-import { isAdminRole } from '@/utils/roleUtils';
 import { Badge } from '@/components/ui/badge';
+import { isAdminRole } from '@/utils/roleUtils';
 
-interface MobileNavProps {
-  user: User | null;
-}
-
-const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
-  const { logout } = useAuth();
+const MobileNavigation: React.FC = () => {
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const { userMode, setUserMode } = useUserMode();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await logout?.();
-    navigate('/login');
-  };
-
-  const mainNavItems = [
-    { title: 'Accueil', href: '/' },
-    { title: 'Scan émotionnel', href: '/scan' },
-    { title: 'Journal', href: '/journal' },
-    { title: 'Musicothérapie', href: '/music' },
-    { title: 'VR thérapie', href: '/vr' },
-    { title: 'Coach IA', href: '/coach' },
-  ];
-  
-  const adminNavItems = [
-    { title: 'Tableau de bord', href: '/admin/dashboard', icon: BarChart2 },
-    { title: 'Gestion utilisateurs', href: '/admin/users', icon: Users },
-    { title: 'Gestion d\'entreprise', href: '/admin/organization', icon: Building },
-  ];
-  
-  // Check if user has admin role
   const isAdmin = user ? isAdminRole(user.role) : false;
   const isB2BMode = userMode === 'b2b-admin';
+  
+  const mainLinks = [
+    { title: 'Accueil', href: '/', icon: Home },
+    { title: 'Tableau de bord', href: '/dashboard', icon: BarChart2 },
+    { title: 'Scan émotionnel', href: '/scan', icon: Heart },
+    { title: 'Journal', href: '/journal', icon: FileText },
+    { title: 'Musicothérapie', href: '/music', icon: Music },
+    { title: 'Coach IA', href: '/coach', icon: MessageSquare }
+  ];
+
+  const adminLinks = [
+    { title: 'Dashboard Admin', href: '/admin/dashboard', icon: BarChart2 },
+    { title: 'Gestion utilisateurs', href: '/admin/users', icon: Users },
+    { title: 'Gestion d\'entreprise', href: '/admin/organization', icon: Building }
+  ];
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setMobileMenuOpen(false);
+      navigate('/login');
+    } catch (error) {
+      console.error('Erreur de déconnexion:', error);
+    }
+  };
 
   return (
-    <Sheet>
+    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="mr-2">
           <Menu className="h-5 w-5" />
@@ -107,7 +107,7 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
             <nav className="grid gap-2 mb-6">
               {isAdmin && isB2BMode ? (
                 // Admin navigation items
-                adminNavItems.map((item, i) => (
+                adminLinks.map((item, i) => (
                   <NavLink 
                     key={i} 
                     to={item.href} 
@@ -116,6 +116,7 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
                         isActive ? "bg-muted font-medium" : ""
                       }`
                     }
+                    onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                     {item.title}
@@ -123,7 +124,7 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
                 ))
               ) : (
                 // Regular navigation items
-                mainNavItems.map((item, i) => (
+                mainLinks.map((item, i) => (
                   <NavLink 
                     key={i} 
                     to={item.href} 
@@ -132,7 +133,9 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
                         isActive ? "bg-muted font-medium" : ""
                       }`
                     }
+                    onClick={() => setMobileMenuOpen(false)}
                   >
+                    {item.icon && <item.icon className="mr-2 h-4 w-4" />}
                     {item.title}
                   </NavLink>
                 ))
@@ -142,15 +145,33 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
             <Separator className="my-2" />
 
             {user ? (
-              <Button variant="outline" onClick={handleLogout} className="w-full justify-start">
-                Déconnexion
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate('/settings');
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Paramètres
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Se déconnecter
+                </Button>
+              </div>
             ) : (
               <div className="space-y-2">
-                <Button asChild variant="default" className="w-full">
+                <Button asChild variant="default" className="w-full" onClick={() => setMobileMenuOpen(false)}>
                   <NavLink to="/login">Se connecter</NavLink>
                 </Button>
-                <Button asChild variant="outline" className="w-full">
+                <Button asChild variant="outline" className="w-full" onClick={() => setMobileMenuOpen(false)}>
                   <NavLink to="/register">S'inscrire</NavLink>
                 </Button>
               </div>

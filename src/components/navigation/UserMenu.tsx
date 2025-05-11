@@ -10,9 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole, getRoleDisplayName } from '@/utils/roleUtils';
@@ -29,13 +29,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   
   if (!user) return null;
 
-  const handleLogout = () => {
-    logout();
-    toast({
-      title: 'Déconnexion réussie',
-      description: 'Vous avez été déconnecté de votre compte.',
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: 'Déconnexion réussie',
+        description: 'Vous avez été déconnecté de votre compte.',
+      });
+      navigate('/');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
   };
 
   const getAvatarFallback = () => {
@@ -114,24 +118,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
         <DropdownMenuItem onClick={handleLogout}>
           <Lock className="mr-2 h-4 w-4" />
           <span>Se déconnecter</span>
-          <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1.5 rounded border bg-muted px-2 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-3 w-3"
-            >
-              <path d="M3 3h18v18H3z" />
-              <path d="m9.17 14.83 5.66-5.66" />
-            </svg>
-            Ctrl+Shift+Q
-          </kbd>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

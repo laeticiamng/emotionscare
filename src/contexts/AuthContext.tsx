@@ -10,6 +10,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
+  error: string | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,6 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
   register: async () => {},
   updateUser: async () => {},
+  error: null,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -28,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Simulation d'une vérification d'authentification au chargement
   useEffect(() => {
@@ -54,10 +57,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     // Simulation d'une API de connexion
     setIsLoading(true);
+    setError(null);
     
     try {
       // Simulation de délai réseau
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (!email || !password) {
+        throw new Error("L'email et le mot de passe sont requis");
+      }
       
       // Créer un utilisateur de demo (en production, cela viendrait de l'API)
       const mockUser: User = {
@@ -82,8 +90,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(mockUser);
       setIsAuthenticated(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      setError(error.message || "Erreur de connexion");
       throw error;
     } finally {
       setIsLoading(false);
@@ -108,10 +117,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (email: string, password: string, name: string) => {
     setIsLoading(true);
+    setError(null);
     
     try {
       // Simulation d'enregistrement
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (!email || !password || !name) {
+        throw new Error("Tous les champs sont requis");
+      }
       
       const newUser: User = {
         id: Date.now().toString(),
@@ -125,8 +139,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUser(newUser);
       setIsAuthenticated(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Register error:', error);
+      setError(error.message || "Erreur d'enregistrement");
       throw error;
     } finally {
       setIsLoading(false);
@@ -164,7 +179,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         register,
-        updateUser
+        updateUser,
+        error
       }}
     >
       {children}
