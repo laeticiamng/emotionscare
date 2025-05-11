@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -64,7 +63,10 @@ export type UserPreferencesState = UserPreferences;
 
 export interface InvitationVerificationResult {
   valid: boolean;
-  email?: string;
-  invitationId?: string;
-  error?: string;
+  message?: string;
+  data?: {
+    email: string;
+    role: string;
+    invitationId?: string;
+  }
 }

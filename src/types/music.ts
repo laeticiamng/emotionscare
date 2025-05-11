@@ -53,5 +53,3 @@ export interface Toast {
   action?: React.ReactNode;
   variant?: 'default' | 'destructive' | 'success';
 }
-
-// Remove the conflicting exports

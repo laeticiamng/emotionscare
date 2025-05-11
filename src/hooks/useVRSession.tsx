@@ -15,7 +15,8 @@ export function useVRSession(userId: string) {
   useEffect(() => {
     setIsLoading(true);
     // Use mockVRTemplates as our data source
-    setTemplates(mockVRTemplates);
+    // Need to explicitly cast the templates to match the current type
+    setTemplates(() => mockVRTemplates as VRSessionTemplate[]);
     setIsLoading(false);
   }, []);
 

@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Shell from '@/Shell'; // Fixed import statement - import as default
+import Shell from '@/Shell'; // Fixed import statement
 import { useVRSession } from '@/hooks/useVRSession';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/vr';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { mockVRTemplates } from '@/data/mockVRTemplates';

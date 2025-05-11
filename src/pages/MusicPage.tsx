@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
@@ -10,16 +11,19 @@ import { mockMusicPlaylists } from '@/data/mockMusic';
 import { MusicPlaylist } from '@/types/music';
 
 const MusicPage: React.FC = () => {
-  const { isPlaying, currentTrack, playTrack, loadPlaylistForEmotion } = useMusic();
+  const { isPlaying, currentTrack, playTrack, pauseTrack, nextTrack, previousTrack, volume, setVolume, loadPlaylistForEmotion } = useMusic();
   const [activeTab, setActiveTab] = useState('recommended');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState<MusicPlaylist | null>(null);
   const [expandedSection, setExpandedSection] = useState<string | null>('featured');
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0);
   
   useEffect(() => {
     // Load default playlist on mount
     const loadDefaultPlaylist = async () => {
-      await loadPlaylistForEmotion('calm');
+      await loadPlaylistForEmotion?.('calm');
     };
     
     loadDefaultPlaylist();
@@ -36,6 +40,11 @@ const MusicPage: React.FC = () => {
     } else {
       setExpandedSection(section);
     }
+  };
+
+  const handleSeek = (position: number) => {
+    // Implement seek functionality here
+    setProgress(position);
   };
   
   return (
@@ -66,7 +75,7 @@ const MusicPage: React.FC = () => {
                   
                   {expandedSection === 'featured' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {mockMusicPlaylists.map((playlist) => (
+                      {mockMusicPlaylists?.map((playlist) => (
                         <Card key={playlist.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
                           <CardContent className="p-4" onClick={() => handlePlaylistSelect(playlist)}>
                             <div className="aspect-square rounded-lg bg-muted overflow-hidden mb-3">
@@ -128,9 +137,18 @@ const MusicPage: React.FC = () => {
             <CardContent>
               {currentTrack ? (
                 <MusicControls 
-                  showProgress={true}
-                  showTrackInfo={true}
-                  showVolumeControl={true}
+                  track={currentTrack}
+                  isPlaying={isPlaying}
+                  volume={volume * 100}
+                  onPlay={() => playTrack(currentTrack)}
+                  onPause={pauseTrack}
+                  onNext={nextTrack}
+                  onPrevious={previousTrack}
+                  onVolumeChange={(value) => setVolume(value / 100)}
+                  progress={progress}
+                  onSeek={handleSeek}
+                  duration={duration}
+                  currentTime={currentTime}
                 />
               ) : (
                 <div className="text-center py-8">

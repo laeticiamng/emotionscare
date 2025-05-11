@@ -22,10 +22,12 @@ export const useUser = () => {
     setIsLoading(true);
     try {
       // Call the auth context update function
-      const updatedUser = await authUpdateUser({
+      const updatePromise = authUpdateUser({
         ...user,
         ...userData
       } as User);
+      
+      const updatedUser = await updatePromise;
       
       // Update local user state if the update was successful
       if (updatedUser) {
