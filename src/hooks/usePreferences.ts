@@ -1,93 +1,83 @@
+import { useState, useEffect, useCallback } from 'react';
+import { UserPreferences, ThemeName, FontFamily, FontSize, NotificationFrequency, NotificationTone } from '@/types/user';
+import { useAuth } from '@/contexts/AuthContext';
 
-import { useState, useCallback } from 'react';
-import { UserPreferences } from '@/types/user';
-
-export const usePreferences = () => {
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    theme: 'light',
-    fontSize: 'medium',
-    notifications: {
-      email: true,
-      push: true,
-      sms: false
-    },
-    autoplayVideos: true,
-    showEmotionPrompts: true,
-    privacy: 'private',
-    dataCollection: true,
-    notifications_enabled: true,
-    email_notifications: true,
-    push_notifications: true,
-    emotionalCamouflage: false,
-    aiSuggestions: false,
-    fullAnonymity: false
-  });
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      // Simuler un appel API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setPreferences((prev) => ({ 
-        ...prev, 
-        ...newPreferences,
-        // Ensure nested structures are handled correctly
-        ...(newPreferences.notifications 
-          ? { notifications: { ...prev.notifications, ...newPreferences.notifications } } 
-          : {})
-      }));
-      setIsLoading(false);
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Une erreur est survenue";
-      setError(errorMessage);
-      setIsLoading(false);
-      return false;
-    }
-  }, []);
-
-  const resetPreferences = useCallback(() => {
-    setPreferences({
-      theme: 'light',
-      fontSize: 'medium',
-      notifications: {
-        email: true,
-        push: true,
-        sms: false
-      },
-      autoplayVideos: true,
-      showEmotionPrompts: true,
-      privacy: 'private',
-      dataCollection: true,
-      notifications_enabled: true,
-      email_notifications: true,
-      push_notifications: true,
-      emotionalCamouflage: false,
-      aiSuggestions: false,
-      fullAnonymity: false
-    });
-    setError(null);
-  }, []);
-
-  return {
-    preferences,
-    isLoading,
-    error,
-    updatePreferences,
-    resetPreferences,
-    theme: preferences.theme,
-    fontSize: preferences.fontSize || 'medium',
-    notifications_enabled: preferences.notifications_enabled,
-    notification_frequency: preferences.notification_frequency,
-    notification_tone: preferences.notification_tone,
-    notification_type: preferences.notification_type,
-    email_notifications: preferences.email_notifications,
-    push_notifications: preferences.push_notifications,
-    emotionalCamouflage: preferences.emotionalCamouflage
-  };
+const defaultPreferences: UserPreferences = {
+  theme: 'system',
+  notifications: true,
+  language: 'fr',
+  privacy: 'private',
+  fontSize: 'medium',
+  email_notifications: true,
+  push_notifications: true,
+  notifications_enabled: true,
+  autoplayVideos: true,
+  dataCollection: true,
+  showEmotionPrompts: true,
+  notification_frequency: 'medium',
+  notification_type: 'email',
+  notification_tone: 'friendly',
+  emotionalCamouflage: false,
 };
 
-export default usePreferences;
+export const usePreferences = () => {
+  const { user, updateUser } = useAuth();
+  const [preferences, setPreferences] = useState<UserPreferences>(user?.preferences || defaultPreferences);
+  
+  useEffect(() => {
+    if (user?.preferences) {
+      setPreferences(user.preferences);
+    } else {
+      setPreferences(defaultPreferences);
+    }
+  }, [user?.preferences]);
+  
+  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences> | boolean) => {
+    if (!user) return;
+    
+    const currentPreferences = user.preferences;
+    
+    // Update the spread operations to handle object and boolean types
+    const updatedPreferences = typeof currentPreferences === 'object' ? {
+      ...(currentPreferences || {}),
+      ...newPreferences
+    } : newPreferences;
+    
+    await updateUser({
+      ...user,
+      preferences: updatedPreferences
+    });
+    
+    setPreferences(updatedPreferences as UserPreferences);
+  }, [user, updateUser]);
+  
+  const setTheme = (theme: ThemeName) => {
+    updatePreferences({ theme });
+  };
+  
+  const setFontSize = (fontSize: FontSize) => {
+    updatePreferences({ fontSize });
+  };
+  
+  const setFontFamily = (fontFamily: FontFamily) => {
+    updatePreferences({ fontFamily });
+  };
+  
+  const setNotificationFrequency = (notification_frequency: NotificationFrequency) => {
+    updatePreferences({ notification_frequency });
+  };
+  
+  const setNotificationTone = (notification_tone: NotificationTone) => {
+    updatePreferences({ notification_tone });
+  };
+  
+  return {
+    preferences,
+    setTheme,
+    setFontSize,
+    setFontFamily,
+    setNotificationFrequency,
+    setNotificationTone,
+    updatePreferences
+  };
+};

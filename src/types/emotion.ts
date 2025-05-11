@@ -14,11 +14,11 @@ export interface Emotion {
   intensity?: number;
   name?: string;
   category?: string;
-  source?: string; // Added to support emotionService.ts
+  source?: string;
   primaryEmotion?: {
     name: string;
     intensity?: number;
-    score?: number; // Added to support analyzeService.ts
+    score?: number;
   };
 }
 
@@ -37,7 +37,7 @@ export interface EmotionResult {
   transcript?: string;
   recommendations?: string[];
   source?: string;
-  audio_url?: string; // Added to support analyzeService.ts
+  audio_url?: string;
   primaryEmotion?: {
     name: string;
     intensity?: number;

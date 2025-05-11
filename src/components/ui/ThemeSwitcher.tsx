@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Moon, Sun, Laptop, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,9 +14,10 @@ interface ThemeSwitcherProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
   variant?: 'default' | 'outline' | 'secondary' | 'ghost';
   className?: string;
+  showLabel?: boolean;
 }
 
-const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '' }: ThemeSwitcherProps) => {
+const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showLabel = false }: ThemeSwitcherProps) => {
   const { theme, resolvedTheme, setTheme, setThemePreference } = useTheme();
 
   // Icons based on current theme

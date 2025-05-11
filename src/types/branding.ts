@@ -20,5 +20,5 @@ export interface BrandingContextType {
   brandName: string;
   soundEnabled?: boolean;
   visualDensity?: VisualDensity;
-  setThemePreference?: (theme: Theme) => void; // Added to support DesignSystemPage.tsx
+  setThemePreference?: (theme: Theme) => void;
 }

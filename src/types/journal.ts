@@ -9,8 +9,8 @@ export interface JournalEntry {
   mood_score?: number;
   tags?: string[];
   ai_feedback?: string;
-  title?: string; // Added for JournalEntryPage.tsx
-  mood?: string;  // Added for JournalEntryPage.tsx
+  title?: string;
+  mood?: string;
 }
 
 export interface JournalPrompt {

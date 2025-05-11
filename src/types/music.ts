@@ -9,8 +9,10 @@ export interface MusicTrack {
   coverUrl?: string;
   cover_url?: string;
   audioUrl?: string;
+  audio_url?: string;
   mood?: string;
-  emotion?: string; // Added to support usage in mockMusic.ts and elsewhere
+  emotion?: string;
+  emotion_tag?: string;
 }
 
 export interface MusicPlaylist {
@@ -21,15 +23,15 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   coverImage?: string;
   category?: string;
-  coverUrl?: string; // Added to support usage in usePlaylistManager.tsx
-  emotion?: string;  // Added to support usage in mockMusic.ts and elsewhere
+  coverUrl?: string;
+  emotion?: string;
 }
 
 export interface MusicDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenChange?: (open: boolean) => void;
-  playlist?: MusicPlaylist; // Added to support usage in MusicDrawer.tsx
+  playlist?: MusicPlaylist;
 }
 
 export interface MusicContextType {
@@ -38,7 +40,7 @@ export interface MusicContextType {
   queue: MusicTrack[];
   playlists: MusicPlaylist[];
   volume: number;
-  isInitialized: boolean; // Added to fix MusicLayout.tsx error
+  isInitialized: boolean;
   error: string | null;
   openDrawer?: boolean;
   setOpenDrawer?: (open: boolean) => void;
@@ -61,5 +63,5 @@ export interface MusicContextType {
   
   // Initialization
   initializeMusicSystem?: () => Promise<void>;
-  currentPlaylist?: MusicPlaylist; // Added for compatibility
+  currentPlaylist?: MusicPlaylist;
 }

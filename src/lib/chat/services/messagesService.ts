@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
@@ -19,13 +18,15 @@ const getMessagesForConversation = async (conversationId: string): Promise<ChatM
  * @param conversationId - The ID of the conversation to add the message to
  * @param message - The message data
  */
-const addMessageToConversation = async (conversationId: string, message: Omit<ChatMessage, 'id'>): Promise<ChatMessage> => {
+const addMessageToConversation = async (conversationId: string, messageData: Omit<ChatMessage, 'id'>): Promise<ChatMessage> => {
   // Create a new message object with an ID
-  const newMessage: ChatMessage = {
-    id: uuidv4(),
-    ...message,
-    timestamp: typeof message.timestamp === 'object' ? message.timestamp?.toISOString() || new Date().toISOString() : (message.timestamp || new Date().toISOString()),
-    conversation_id: conversationId,
+  const message = {
+    id: messageData.id,
+    conversation_id: messageData.conversation_id,
+    sender: messageData.sender,
+    text: messageData.text || messageData.content,
+    timestamp: messageData.timestamp?.toString() || new Date().toISOString(),
+    role: messageData.role || (messageData.sender === 'user' ? 'user' : 'assistant'),
   };
   
   // Initialize the conversation's messages array if it doesn't exist
@@ -34,9 +35,9 @@ const addMessageToConversation = async (conversationId: string, message: Omit<Ch
   }
   
   // Add the message to the array
-  mockMessages[conversationId].push(newMessage);
+  mockMessages[conversationId].push(message);
   
-  return newMessage;
+  return message;
 };
 
 /**

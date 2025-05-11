@@ -11,7 +11,7 @@ export interface Badge {
   progress?: number;
   level?: number;
   unlocked?: boolean;
-  category?: string; // Added to support useCommunityGamification.tsx
+  category?: string;
 }
 
 export interface Challenge {
@@ -19,15 +19,15 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  requirements: string[];
+  requirements?: string[];
   completed?: boolean;
   progress?: number;
   deadline?: string;
   category?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   level?: number;
-  name?: string; // Added to support useCommunityGamification.tsx and GamificationPage.tsx
-  total?: number; // Added to support useCommunityGamification.tsx
+  name?: string;
+  total?: number;
 }
 
 export interface Achievement {
