@@ -1,48 +1,26 @@
 
-import { User, UserRole } from '@/types';
-
-export const isAdminRole = (role?: string): boolean => {
-  return role === 'admin';
+export const isAdminRole = (role: string | undefined): boolean => {
+  if (!role) return false;
+  return role.toLowerCase() === 'admin' || role.toLowerCase() === 'administrator';
 };
 
-export const isCoachRole = (role?: string): boolean => {
-  return role === 'coach';
+export const isManagerRole = (role: string | undefined): boolean => {
+  if (!role) return false;
+  return role.toLowerCase() === 'manager';
 };
 
-export const isUserRole = (role?: string): boolean => {
-  return role === 'user';
-};
-
-export const getRoleName = (role?: string): string => {
-  switch (role) {
-    case 'admin':
-      return 'Administrateur';
-    case 'coach':
-      return 'Coach';
-    case 'user':
-      return 'Utilisateur';
-    default:
-      return 'Invité';
-  }
-};
-
-export const canAccessAdminFeatures = (user: User | null): boolean => {
-  return user ? isAdminRole(user.role) : false;
-};
-
-export const canAccessCoachFeatures = (user: User | null): boolean => {
-  return user ? (isAdminRole(user.role) || isCoachRole(user.role)) : false;
-};
-
-export const getUserRoleBadgeColor = (role?: string): string => {
-  switch (role) {
-    case 'admin':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
-    case 'coach':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-    case 'user':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-  }
+export const getUserRoleLevel = (role: string | undefined): number => {
+  if (!role) return 0;
+  
+  const roleLevels: Record<string, number> = {
+    'admin': 100,
+    'administrator': 100,
+    'manager': 50,
+    'therapist': 40,
+    'coach': 30,
+    'user': 10,
+    'guest': 1
+  };
+  
+  return roleLevels[role.toLowerCase()] || 0;
 };

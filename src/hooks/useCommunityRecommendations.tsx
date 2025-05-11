@@ -1,233 +1,100 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { usePredictiveAnalytics } from '@/providers/PredictiveAnalyticsProvider';
-import { useOpenAI } from '@/hooks/ai/useOpenAI';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import { useToast } from './use-toast';
 
-interface CommunityGroup {
+interface CommunityRecommendation {
   id: string;
   name: string;
   description: string;
+  emotionTheme: string;
+  matchScore: number;
   memberCount: number;
-  emotionTheme?: string;
   tags: string[];
-  activity: {
-    type: 'post' | 'comment' | 'reaction';
-    count: number;
-    trend: 'up' | 'down' | 'stable';
-  }[];
 }
 
 export function useCommunityRecommendations() {
-  const { user } = useAuth();
-  const { currentPredictions } = usePredictiveAnalytics();
-  const { admin } = useOpenAI();
+  const [recommendations, setRecommendations] = useState<CommunityRecommendation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [recommendedGroups, setRecommendedGroups] = useState<CommunityGroup[]>([]);
-  const [availableGroups, setAvailableGroups] = useState<CommunityGroup[]>([]);
-  const [userPreferences, setUserPreferences] = useState<string[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  // Charger la liste des groupes communautaires
-  const loadGroups = useCallback(async () => {
+  const { toast } = useToast();
+
+  const getRecommendations = async (userEmotions?: string[], userInterests?: string[]) => {
     setIsLoading(true);
     
     try {
-      // Ici, dans une implémentation réelle, nous chargerions les groupes depuis la base de données
-      // Pour cette démonstration, nous simulons des données
-      const mockGroups: CommunityGroup[] = [
+      // Simuler un appel API qui utiliserait OpenAI pour générer des recommandations
+      // basées sur les émotions et intérêts de l'utilisateur
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Données simulées
+      const mockRecommendations: CommunityRecommendation[] = [
         {
-          id: 'group-1',
+          id: '1',
           name: 'Méditation Pleine Conscience',
-          description: 'Partagez vos expériences de méditation et techniques de pleine conscience.',
-          memberCount: 128,
+          description: 'Un groupe pour pratiquer et partager autour de la méditation',
           emotionTheme: 'calm',
-          tags: ['méditation', 'pleine conscience', 'relaxation'],
-          activity: [
-            { type: 'post', count: 24, trend: 'up' },
-            { type: 'comment', count: 86, trend: 'up' },
-            { type: 'reaction', count: 215, trend: 'up' }
-          ]
+          matchScore: 95,
+          memberCount: 128,
+          tags: ['méditation', 'pleine conscience', 'relaxation']
         },
         {
-          id: 'group-2',
-          name: 'Boost Créatif',
-          description: 'Un espace pour stimuler votre créativité et partager vos projets.',
-          memberCount: 93,
+          id: '2',
+          name: 'Créativité et Bien-être',
+          description: 'Explorez comment la créativité améliore le bien-être émotionnel',
           emotionTheme: 'creative',
-          tags: ['créativité', 'inspiration', 'projets'],
-          activity: [
-            { type: 'post', count: 18, trend: 'stable' },
-            { type: 'comment', count: 42, trend: 'up' },
-            { type: 'reaction', count: 156, trend: 'down' }
-          ]
+          matchScore: 87,
+          memberCount: 96,
+          tags: ['créativité', 'art-thérapie', 'expression']
         },
         {
-          id: 'group-3',
+          id: '3',
           name: 'Gestion du Stress Professionnel',
-          description: 'Techniques et discussions autour de la gestion du stress au travail.',
-          memberCount: 207,
+          description: 'Partagez techniques et astuces pour gérer le stress au travail',
           emotionTheme: 'anxious',
-          tags: ['stress', 'travail', 'bien-être'],
-          activity: [
-            { type: 'post', count: 31, trend: 'up' },
-            { type: 'comment', count: 124, trend: 'up' },
-            { type: 'reaction', count: 276, trend: 'up' }
-          ]
-        },
-        {
-          id: 'group-4',
-          name: 'Énergie et Motivation',
-          description: 'Partagez vos astuces pour rester motivé et énergique au quotidien.',
-          memberCount: 81,
-          emotionTheme: 'energetic',
-          tags: ['motivation', 'énergie', 'objectifs'],
-          activity: [
-            { type: 'post', count: 15, trend: 'down' },
-            { type: 'comment', count: 34, trend: 'stable' },
-            { type: 'reaction', count: 98, trend: 'down' }
-          ]
-        },
-        {
-          id: 'group-5',
-          name: 'Moments de Réflexion',
-          description: 'Un espace pour le partage de réflexions profondes et discussions philosophiques.',
-          memberCount: 65,
-          emotionTheme: 'reflective',
-          tags: ['philosophie', 'réflexion', 'développement personnel'],
-          activity: [
-            { type: 'post', count: 12, trend: 'stable' },
-            { type: 'comment', count: 67, trend: 'up' },
-            { type: 'reaction', count: 121, trend: 'up' }
-          ]
+          matchScore: 82,
+          memberCount: 215,
+          tags: ['stress', 'travail', 'équilibre']
         }
       ];
       
-      setAvailableGroups(mockGroups);
+      setRecommendations(mockRecommendations);
+      return mockRecommendations;
     } catch (error) {
-      console.error("Erreur lors du chargement des groupes:", error);
+      console.error('Erreur lors de la récupération des recommandations:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les recommandations pour le moment.',
+        variant: 'destructive',
+      });
+      return [];
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
   
-  // Charger les préférences utilisateur
-  const loadUserPreferences = useCallback(async () => {
-    if (!user) return;
-    
+  const analyzeCommunityTrends = async () => {
     try {
-      // Dans une implémentation réelle, nous chargerions les préférences depuis la base de données
-      // Pour cette démonstration, nous simulons des données
-      const mockPreferences = ['méditation', 'bien-être', 'créativité'];
-      setUserPreferences(mockPreferences);
-    } catch (error) {
-      console.error("Erreur lors du chargement des préférences:", error);
-    }
-  }, [user]);
-  
-  // Initialiser le chargement des données
-  useEffect(() => {
-    if (!isInitialized) {
-      Promise.all([loadGroups(), loadUserPreferences()]).then(() => {
-        setIsInitialized(true);
-      });
-    }
-  }, [isInitialized, loadGroups, loadUserPreferences]);
-  
-  // Mettre à jour les recommandations en fonction des données et des prédictions
-  useEffect(() => {
-    const updateRecommendations = async () => {
-      if (!availableGroups.length) return;
+      // Simuler une analyse des tendances communautaires avec OpenAI
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      try {
-        // Combiner les préférences utilisateur et l'état émotionnel prédit
-        const currentEmotion = currentPredictions?.emotion?.toLowerCase();
-        
-        // Algorithme simple de recommandation (dans une implémentation réelle, cela utiliserait OpenAI)
-        let recommended = [...availableGroups];
-        
-        // Filtrer par préférences
-        if (userPreferences.length) {
-          const preferencesMatches = recommended.filter(group => 
-            group.tags.some(tag => userPreferences.includes(tag))
-          );
-          
-          if (preferencesMatches.length) {
-            recommended = recommended.filter(group => 
-              group.tags.some(tag => userPreferences.includes(tag))
-            );
-          }
-        }
-        
-        // Filtrer par émotion si disponible
-        if (currentEmotion) {
-          const emotionalMatches = availableGroups.filter(group => 
-            group.emotionTheme?.toLowerCase() === currentEmotion
-          );
-          
-          if (emotionalMatches.length) {
-            // Ajouter les correspondances émotionnelles en priorité s'il y en a
-            const existingIds = new Set(recommended.map(g => g.id));
-            emotionalMatches.forEach(match => {
-              if (!existingIds.has(match.id)) {
-                recommended.unshift(match);
-                existingIds.add(match.id);
-              }
-            });
-          }
-        }
-        
-        // Limiter les résultats
-        setRecommendedGroups(recommended.slice(0, 3));
-      } catch (error) {
-        console.error("Erreur lors de la mise à jour des recommandations:", error);
-      }
-    };
-    
-    updateRecommendations();
-  }, [availableGroups, userPreferences, currentPredictions]);
-  
-  // Analyser les tendances pour le reporting admin
-  const analyzeCommunityTrends = useCallback(async () => {
-    if (availableGroups.length === 0) return null;
-    
-    try {
-      // Simuler l'analyse des tendances avec OpenAI (dans une implémentation réelle)
-      // Ici nous simulons la réponse
-      const mockAnalysis = {
-        topTrends: ["méditation", "bien-être", "stress"],
-        growingTopics: ["méditation pleine conscience", "gestion du stress"],
-        engagementScore: 8.4,
-        emotionDistribution: {
-          calm: 35,
-          anxious: 25,
-          creative: 15,
-          energetic: 15,
-          reflective: 10
-        },
-        recommendations: [
-          "Créer plus de contenu sur la méditation",
-          "Organiser des événements communautaires en ligne"
+      return {
+        topTrends: ['méditation', 'résilience', 'créativité', 'gestion du stress'],
+        dominantEmotion: 'calm',
+        growingTopics: ['intelligence émotionnelle', 'micro-pauses'],
+        recommendedActions: [
+          'Lancer une série sur la résilience',
+          'Créer un challenge de méditation quotidienne'
         ]
       };
-      
-      return mockAnalysis;
     } catch (error) {
-      console.error("Erreur lors de l'analyse des tendances:", error);
+      console.error('Erreur lors de l\'analyse des tendances:', error);
       return null;
     }
-  }, [availableGroups]);
-  
+  };
+
   return {
+    recommendations,
     isLoading,
-    recommendedGroups,
-    availableGroups,
-    userPreferences,
-    setUserPreferences,
-    refresh: () => {
-      loadGroups();
-      loadUserPreferences();
-    },
+    getRecommendations,
     analyzeCommunityTrends
   };
 }

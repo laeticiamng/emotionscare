@@ -9,6 +9,11 @@ import { MusicProvider } from './contexts/MusicContext';
 import { Toaster } from './components/ui/toaster';
 import ErrorBoundary from './components/ErrorBoundary.tsx';
 import { BrowserRouter } from 'react-router-dom';
+import { SoundscapeProvider } from './providers/SoundscapeProvider';
+import { StorytellingProvider } from './providers/StorytellingProvider';
+import { BrandingProvider } from './contexts/BrandingContext';
+import { PredictiveAnalyticsProvider } from './providers/PredictiveAnalyticsProvider';
+import { UserModeProvider } from './contexts/UserModeContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -16,8 +21,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <ThemeProvider>
           <MusicProvider>
-            <App />
-            <Toaster />
+            <BrandingProvider>
+              <SoundscapeProvider>
+                <StorytellingProvider>
+                  <UserModeProvider>
+                    <PredictiveAnalyticsProvider>
+                      <App />
+                      <Toaster />
+                    </PredictiveAnalyticsProvider>
+                  </UserModeProvider>
+                </StorytellingProvider>
+              </SoundscapeProvider>
+            </BrandingProvider>
           </MusicProvider>
         </ThemeProvider>
       </BrowserRouter>

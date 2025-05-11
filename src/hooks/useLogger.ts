@@ -1,28 +1,64 @@
 
-const useLogger = (componentName: string) => {
-  const prefix = `[${componentName}]`;
-  
-  const debug = (message: string, data?: any) => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug(`${prefix} ${message}`, data || '');
-    }
-  };
-  
-  const info = (message: string, data?: any) => {
-    if (process.env.NODE_ENV !== 'production') {
-      console.info(`${prefix} ${message}`, data || '');
-    }
-  };
-  
-  const warn = (message: string, data?: any) => {
-    console.warn(`${prefix} ${message}`, data || '');
-  };
-  
-  const error = (message: string, data?: any) => {
-    console.error(`${prefix} ${message}`, data || '');
-  };
-  
-  return { debug, info, warn, error };
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+interface LoggerOptions {
+  enabled?: boolean;
+  minLevel?: LogLevel;
+  includeTimestamp?: boolean;
+}
+
+const logLevelPriority: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3
 };
 
-export default useLogger;
+export default function useLogger(namespace: string, options: LoggerOptions = {}) {
+  const {
+    enabled = true,
+    minLevel = 'debug',
+    includeTimestamp = true
+  } = options;
+  
+  const shouldLog = (level: LogLevel): boolean => {
+    if (!enabled) return false;
+    return logLevelPriority[level] >= logLevelPriority[minLevel];
+  };
+  
+  const formatMessage = (message: string): string => {
+    const timestamp = includeTimestamp ? `[${new Date().toISOString()}]` : '';
+    return `${timestamp} [${namespace}] ${message}`;
+  };
+  
+  const debug = (message: string, ...args: any[]): void => {
+    if (shouldLog('debug')) {
+      console.debug(formatMessage(message), ...args);
+    }
+  };
+  
+  const info = (message: string, ...args: any[]): void => {
+    if (shouldLog('info')) {
+      console.info(formatMessage(message), ...args);
+    }
+  };
+  
+  const warn = (message: string, ...args: any[]): void => {
+    if (shouldLog('warn')) {
+      console.warn(formatMessage(message), ...args);
+    }
+  };
+  
+  const error = (message: string, ...args: any[]): void => {
+    if (shouldLog('error')) {
+      console.error(formatMessage(message), ...args);
+    }
+  };
+  
+  return {
+    debug,
+    info,
+    warn,
+    error
+  };
+}

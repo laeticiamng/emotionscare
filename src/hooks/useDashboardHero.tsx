@@ -1,86 +1,93 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  Activity, Calendar, Heart, Users, 
-  Zap, Clock, TrendingUp
-} from 'lucide-react';
-import { DashboardKpi, DashboardShortcut } from '@/components/dashboard/DashboardHero';
+import { useState, useEffect } from 'react';
+import { Activity, BarChart3, Heart, Calendar, Users } from 'lucide-react';
+import type { DashboardKpi, DashboardShortcut } from '@/components/dashboard/DashboardHero';
 
-export const useDashboardHero = (userId: string | undefined) => {
-  const [isLoading, setIsLoading] = useState(true);
+export function useDashboardHero(userId?: string) {
   const [kpis, setKpis] = useState<DashboardKpi[]>([]);
   const [shortcuts, setShortcuts] = useState<DashboardShortcut[]>([]);
-  
-  // Function to fetch dashboard data
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fonction pour charger les données du tableau de bord
+  const fetchDashboardData = async () => {
     try {
-      // Simulate API delay
+      setIsLoading(true);
+      
+      // Simuler un délai de chargement
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Mock KPI data
-      const mockKpis: DashboardKpi[] = [
-        { 
-          key: 'sessions_today', 
-          label: 'Sessions aujourd\'hui', 
-          value: 8, 
-          icon: Calendar,
-          trend: { value: 12, direction: 'up' }
+      // Données simulées pour la démonstration
+      setKpis([
+        {
+          key: 'emotional_score',
+          value: 84,
+          label: 'Score émotionnel',
+          trend: '+5%',
+          icon: Heart
         },
-        { 
-          key: 'active_users', 
-          label: 'Utilisateurs actifs', 
-          value: '85%', 
-          icon: Users,
-          trend: { value: 5, direction: 'up' }
+        {
+          key: 'activities',
+          value: 12,
+          label: 'Activités',
+          trend: '+2',
+          icon: Activity
         },
-        { 
-          key: 'avg_wellbeing', 
-          label: 'Score bien-être', 
-          value: '78/100', 
+        {
+          key: 'community',
+          value: 4,
+          label: 'Communauté',
+          trend: 'stable',
+          icon: Users
+        },
+        {
+          key: 'streak',
+          value: 7,
+          label: 'Jours consécutifs',
+          trend: '+3',
+          icon: Calendar
+        }
+      ]);
+      
+      setShortcuts([
+        {
+          name: 'journal',
+          label: 'Journal émotionnel',
+          description: 'Noter mes émotions et réflexions',
+          icon: BarChart3,
+          to: '/journal'
+        },
+        {
+          name: 'scan',
+          label: 'Scan émotionnel',
+          description: 'Analyser mon état actuel',
           icon: Heart,
-          trend: { value: 3, direction: 'down' }
+          to: '/scan'
         },
-        { 
-          key: 'productivity', 
-          label: 'Productivité', 
-          value: '92%', 
-          icon: TrendingUp,
-          trend: { value: 2, direction: 'up' }
-        },
-      ];
+        {
+          name: 'coach',
+          label: 'Coach émotionnel',
+          description: 'Discuter avec mon coach IA',
+          icon: Users,
+          to: '/coach'
+        }
+      ]);
       
-      // Mock shortcuts data
-      const mockShortcuts: DashboardShortcut[] = [
-        { label: 'Scan émotionnel', icon: Activity, to: '/scan' },
-        { label: 'Micro-pause VR', icon: Zap, to: '/vr' },
-        { label: 'Communauté', icon: Users, to: '/community' },
-        { label: 'Journal', icon: Clock, to: '/journal' },
-      ];
-      
-      // Add some randomness to the values to simulate real-time changes
-      mockKpis[0].value = Math.floor(Math.random() * 5) + 6; // 6-10
-      mockKpis[2].value = `${Math.floor(Math.random() * 10) + 75}/100`; // 75-85/100
-      
-      setKpis(mockKpis);
-      setShortcuts(mockShortcuts);
     } catch (error) {
-      console.error('Error fetching dashboard hero data:', error);
+      console.error('Erreur lors du chargement des données du tableau de bord:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
-  
-  // Fetch initial data
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-  
-  return { 
-    kpis, 
-    shortcuts, 
-    isLoading,
-    refetch: fetchData
   };
-};
+
+  // Charger les données au montage du composant
+  useEffect(() => {
+    fetchDashboardData();
+  }, [userId]);
+
+  return {
+    kpis,
+    shortcuts,
+    isLoading,
+    refetch: fetchDashboardData
+  };
+}

@@ -6,26 +6,36 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Format time in seconds to a readable format (mm:ss)
-export function formatTime(seconds: number): string {
-  if (isNaN(seconds) || seconds < 0) return '0:00';
-  
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-  
-  return `${min}:${sec.toString().padStart(2, '0')}`;
+export function timeAgo(date: Date): string {
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  let interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " ans";
+  }
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " mois";
+  }
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " jours";
+  }
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " heures";
+  }
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " minutes";
+  }
+  return Math.floor(seconds) + " secondes";
 }
 
-// Safe opener function that handles multiple types of arguments
-export function safeOpen(url?: string | null): void;
-export function safeOpen(callback?: ((value: boolean) => void) | boolean): void;
-export function safeOpen(arg?: string | null | ((value: boolean) => void) | boolean): void {
-  if (typeof arg === 'string' && arg) {
-    window.open(arg, '_blank', 'noopener,noreferrer');
-  } else if (typeof arg === 'function') {
-    arg(true);
-  } else if (typeof arg === 'boolean') {
-    // Just a boolean value, do nothing special
-    return;
-  }
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
 }
