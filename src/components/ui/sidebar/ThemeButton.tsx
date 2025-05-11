@@ -72,6 +72,7 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
             size="icon"
             className="w-full h-10"
             onClick={toggleTheme}
+            aria-label="Changer de thème"
           >
             {getThemeIcon()}
             <span className="sr-only">Changer de thème</span>
@@ -89,6 +90,7 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
       variant="ghost"
       className="w-full justify-start px-3"
       onClick={toggleTheme}
+      aria-label="Changer de thème"
     >
       {getThemeIcon()}
       <span>{getThemeLabel()}</span>

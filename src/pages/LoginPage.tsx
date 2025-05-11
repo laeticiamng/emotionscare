@@ -10,11 +10,13 @@ import Shell from '@/Shell';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { ReloadIcon } from '@radix-ui/react-icons';
+import { Eye, EyeOff } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -36,6 +38,21 @@ const LoginPage: React.FC = () => {
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email.trim()) {
+      toast.error("Erreur de validation", {
+        description: "Veuillez saisir votre adresse e-mail",
+      });
+      return;
+    }
+    
+    if (!password) {
+      toast.error("Erreur de validation", {
+        description: "Veuillez saisir votre mot de passe",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -59,6 +76,10 @@ const LoginPage: React.FC = () => {
   const handleDemoLogin = (userType: 'user' | 'admin') => {
     setEmail(userType === 'admin' ? 'admin@example.com' : 'user@example.com');
     setPassword('password123');
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -86,18 +107,38 @@ const LoginPage: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Mot de passe</Label>
-                <Input 
-                  id="password" 
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="current-password"
-                />
+                <div className="relative">
+                  <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    disabled={isLoading}
+                  />
+                  <Button 
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+                    </span>
+                  </Button>
+                </div>
               </div>
               <div className="text-sm text-right">
                 <Link to="/forgot-password" className="text-primary hover:underline">

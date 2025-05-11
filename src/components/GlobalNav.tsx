@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole } from '@/utils/roleUtils';
+import { toast } from 'sonner';
 
 const GlobalNav = () => {
   const { user, logout } = useAuth();
@@ -30,8 +31,14 @@ const GlobalNav = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
-    window.location.href = '/login';
+    try {
+      await logout();
+      toast.success("Déconnexion réussie");
+      window.location.href = '/login';
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion", error);
+      toast.error("Erreur lors de la déconnexion");
+    }
   };
   
   // Check if user has admin role
@@ -67,7 +74,12 @@ const GlobalNav = () => {
         
         {/* Mobile Menu Button */}
         {isMobile && (
-          <button onClick={toggleMenu} className="text-muted-foreground focus:outline-none">
+          <button 
+            onClick={toggleMenu} 
+            className="text-muted-foreground focus:outline-none"
+            aria-label="Ouvrir le menu"
+            aria-expanded={isMenuOpen}
+          >
             <List className="h-6 w-6" />
           </button>
         )}
@@ -76,7 +88,11 @@ const GlobalNav = () => {
           <ul className="flex items-center space-x-6">
             {menuItems.map((item) => (
               <li key={item.path}>
-                <NavLink to={item.path} className={({ isActive }) => isActive ? "text-primary font-medium flex items-center space-x-1" : "hover:text-primary transition-colors flex items-center space-x-1"}>
+                <NavLink 
+                  to={item.path} 
+                  className={({ isActive }) => isActive ? "text-primary font-medium flex items-center space-x-1" : "hover:text-primary transition-colors flex items-center space-x-1"}
+                  aria-label={item.title}
+                >
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
                 </NavLink>
@@ -84,7 +100,12 @@ const GlobalNav = () => {
             ))}
           </ul>
           
-          <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label={theme === "dark" ? "Passer au mode clair" : "Passer au mode sombre"}
+          >
             {theme === "dark" ? (
               <Sun className="h-4 w-4 mr-1" />
             ) : (
@@ -96,11 +117,11 @@ const GlobalNav = () => {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" aria-label="Menu utilisateur">
                   <Avatar className="h-8 w-8">
                     <AvatarImage 
                       src={user.avatar || user.avatar_url} 
-                      alt={user.name} 
+                      alt={user.name || "Utilisateur"} 
                     />
                     <AvatarFallback>{user.name?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
                   </Avatar>
@@ -113,6 +134,14 @@ const GlobalNav = () => {
                   <span>{user.name}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+                  <User className="h-4 w-4 mr-2" />
+                  <span>Mon profil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/dashboard'}>
+                  <Home className="h-4 w-4 mr-2" />
+                  <span>Tableau de bord</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => window.location.href = '/settings'}>
                   <Settings className="h-4 w-4 mr-2" />
                   <span>Paramètres</span>
@@ -128,18 +157,30 @@ const GlobalNav = () => {
         
         {/* Mobile Menu (conditionally rendered) */}
         {isMobile && isMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-background border rounded-md shadow-md mt-1 overflow-hidden">
+          <div className="absolute top-full left-0 w-full bg-background border rounded-md shadow-md mt-1 overflow-hidden z-50">
             <ul className="divide-y divide-border">
               {menuItems.map((item) => (
                 <li key={item.path}>
-                  <NavLink to={item.path} className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
+                  <NavLink 
+                    to={item.path} 
+                    className="block py-2 px-4 hover:bg-muted transition-colors" 
+                    onClick={toggleMenu}
+                  >
                     <item.icon className="h-4 w-4 inline-block mr-2" />
                     {item.title}
                   </NavLink>
                 </li>
               ))}
               <li>
-                <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); toggleMenu(); }}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" 
+                  onClick={() => { 
+                    setTheme(theme === "dark" ? "light" : "dark"); 
+                    toggleMenu(); 
+                  }}
+                >
                   {theme === "dark" ? (
                     <Sun className="h-4 w-4 inline-block mr-2" />
                   ) : (
@@ -151,20 +192,42 @@ const GlobalNav = () => {
               {user ? (
                 <>
                   <li>
+                    <NavLink to="/profile" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
+                      <User className="h-4 w-4 inline-block mr-2" />
+                      Mon profil
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/dashboard" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
+                      <Home className="h-4 w-4 inline-block mr-2" />
+                      Tableau de bord
+                    </NavLink>
+                  </li>
+                  <li>
                     <NavLink to="/settings" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
                       <Settings className="h-4 w-4 inline-block mr-2" />
                       Paramètres
                     </NavLink>
                   </li>
                   <li>
-                    <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={handleLogout}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start text-destructive" 
+                      onClick={handleLogout}
+                    >
                       Déconnexion
                     </Button>
                   </li>
                 </>
               ) : (
                 <li>
-                  <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={() => window.location.href = '/login'}>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" 
+                    onClick={() => window.location.href = '/login'}
+                  >
                     Se connecter
                   </Button>
                 </li>

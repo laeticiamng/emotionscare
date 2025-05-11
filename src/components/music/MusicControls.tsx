@@ -17,6 +17,9 @@ interface MusicControlsProps {
   onProgressChange?: (value: number) => void;
   showShuffle?: boolean;
   showRepeat?: boolean;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
+  className?: string;
 }
 
 const MusicControls: React.FC<MusicControlsProps> = ({ 
@@ -31,7 +34,10 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   duration = 0,
   onProgressChange,
   showShuffle = false,
-  showRepeat = false
+  showRepeat = false,
+  isMuted = false,
+  onToggleMute,
+  className = ''
 }) => {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -40,7 +46,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   };
   
   return (
-    <div className="flex flex-col w-full gap-2">
+    <div className={`flex flex-col w-full gap-2 ${className}`}>
       {/* Slider de progression */}
       {onProgressChange && (
         <div className="flex items-center gap-2">
@@ -54,6 +60,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
             className="flex-grow"
             onValueChange={(values) => onProgressChange(values[0])}
             disabled={!duration}
+            aria-label="Progression de la lecture"
           />
           <span className="text-xs text-muted-foreground">
             {formatTime(duration)}
@@ -70,16 +77,18 @@ const MusicControls: React.FC<MusicControlsProps> = ({
                 variant="ghost" 
                 size="icon" 
                 className="h-8 w-8"
-                onClick={() => onVolumeChange(volume > 0 ? 0 : 50)}
+                onClick={onToggleMute || (() => onVolumeChange(isMuted ? 50 : 0))}
+                aria-label={isMuted ? "Activer le son" : "Couper le son"}
               >
-                {volume > 0 ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>
               <Slider
-                value={[volume]}
+                value={[isMuted ? 0 : volume]}
                 max={100}
                 step={1}
                 className="w-24"
                 onValueChange={(values) => onVolumeChange(values[0])}
+                aria-label="Volume"
               />
             </div>
           )}
@@ -87,7 +96,12 @@ const MusicControls: React.FC<MusicControlsProps> = ({
 
         <div className="flex items-center gap-2">
           {showShuffle && (
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              aria-label="Mode aléatoire"
+            >
               <Shuffle className="h-4 w-4" />
             </Button>
           )}
@@ -98,6 +112,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
               size="icon" 
               className="h-8 w-8" 
               onClick={onPrevious}
+              aria-label="Piste précédente"
             >
               <SkipBack className="h-4 w-4" />
             </Button>
@@ -108,6 +123,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
             size="icon"
             onClick={isPlaying ? onPause : onPlay}
             className="h-10 w-10 rounded-full"
+            aria-label={isPlaying ? "Pause" : "Lecture"}
           >
             {isPlaying ? (
               <Pause className="h-5 w-5" />
@@ -122,13 +138,19 @@ const MusicControls: React.FC<MusicControlsProps> = ({
               size="icon" 
               className="h-8 w-8" 
               onClick={onNext}
+              aria-label="Piste suivante"
             >
               <SkipForward className="h-4 w-4" />
             </Button>
           )}
 
           {showRepeat && (
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              aria-label="Répéter"
+            >
               <Repeat className="h-4 w-4" />
             </Button>
           )}

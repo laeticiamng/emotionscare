@@ -71,7 +71,7 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
   };
   
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 py-20">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 dark:from-background dark:to-primary/5 py-20">
       <div className="container max-w-5xl relative z-10">
         <motion.div 
           className="text-center"

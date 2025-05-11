@@ -4,16 +4,18 @@ import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { 
-  Play, Pause, SkipForward, SkipBack, Volume2, 
+  Play, Pause, SkipForward, SkipBack, Volume2, VolumeX,
   ListMusic, Repeat, Shuffle
 } from 'lucide-react';
 
 interface MusicControlsProps {
   showDrawer?: () => void;
+  compact?: boolean;
 }
 
 const MusicControls: React.FC<MusicControlsProps> = ({ 
-  showDrawer 
+  showDrawer,
+  compact = false
 }) => {
   const { 
     isPlaying, 
@@ -22,7 +24,9 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     nextTrack,
     previousTrack,
     volume,
-    setVolume
+    setVolume,
+    isMuted,
+    toggleMute
   } = useMusic();
 
   if (!currentTrack) {
@@ -37,9 +41,9 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   }
 
   return (
-    <div className="p-2">
+    <div className={`p-2 ${compact ? 'space-y-1' : 'space-y-2'}`}>
       <div className="flex items-center justify-between">
-        <div className="hidden sm:flex items-center space-x-2 w-1/3">
+        <div className={`${compact ? 'hidden' : 'hidden sm:flex'} items-center space-x-2 w-1/3`}>
           <img 
             src={currentTrack.coverUrl || currentTrack.cover_url || '/images/music/default-cover.jpg'} 
             alt={currentTrack.title} 
@@ -51,47 +55,81 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-center space-x-2 flex-1 sm:w-1/3">
-          <Button size="icon" variant="ghost" onClick={previousTrack}>
-            <SkipBack className="h-5 w-5" />
+        <div className={`flex items-center justify-center space-x-2 ${compact ? 'w-full' : 'flex-1 sm:w-1/3'}`}>
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            onClick={previousTrack} 
+            className={compact ? 'h-8 w-8' : 'h-9 w-9'}
+            aria-label="Piste précédente"
+          >
+            <SkipBack className={`${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
           </Button>
           
-          <Button size="icon" onClick={togglePlay} className="h-10 w-10 rounded-full">
+          <Button 
+            size="icon" 
+            onClick={togglePlay} 
+            className={`${compact ? 'h-9 w-9' : 'h-10 w-10'} rounded-full`}
+            aria-label={isPlaying ? "Pause" : "Lecture"}
+          >
             {isPlaying ? (
-              <Pause className="h-5 w-5" />
+              <Pause className={`${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
             ) : (
-              <Play className="h-5 w-5 ml-0.5" />
+              <Play className={`${compact ? 'h-4 w-4 ml-0.5' : 'h-5 w-5 ml-0.5'}`} />
             )}
           </Button>
           
-          <Button size="icon" variant="ghost" onClick={nextTrack}>
-            <SkipForward className="h-5 w-5" />
+          <Button 
+            size="icon" 
+            variant="ghost" 
+            onClick={nextTrack} 
+            className={compact ? 'h-8 w-8' : 'h-9 w-9'}
+            aria-label="Piste suivante"
+          >
+            <SkipForward className={`${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
           </Button>
         </div>
 
-        <div className="hidden sm:flex items-center justify-end space-x-2 w-1/3">
-          <Button variant="ghost" size="icon" onClick={showDrawer}>
-            <ListMusic className="h-4 w-4" />
-          </Button>
+        <div className={`${compact ? 'hidden' : 'hidden sm:flex'} items-center justify-end space-x-2 w-1/3`}>
+          {showDrawer && (
+            <Button variant="ghost" size="icon" onClick={showDrawer} aria-label="Afficher la playlist">
+              <ListMusic className="h-4 w-4" />
+            </Button>
+          )}
           
           <div className="flex items-center space-x-2 w-28">
-            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleMute} 
+              className="h-8 w-8 p-0"
+              aria-label={isMuted ? "Activer le son" : "Couper le son"}
+            >
+              {isMuted || volume === 0 ? (
+                <VolumeX className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <Volume2 className="h-4 w-4 text-muted-foreground" />
+              )}
+            </Button>
             <Slider
-              value={[volume * 100]}
+              value={[isMuted ? 0 : volume * 100]}
               max={100}
               step={1}
               onValueChange={(value) => setVolume(value[0] / 100)}
               className="w-full"
+              aria-label="Volume"
             />
           </div>
         </div>
         
-        {/* Mobile version for track info */}
-        <div className="sm:hidden flex items-center">
-          <Button variant="ghost" size="icon" onClick={showDrawer}>
-            <ListMusic className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Mobile version for playlist button */}
+        {showDrawer && (
+          <div className={`${compact ? 'flex' : 'sm:hidden flex'} items-center`}>
+            <Button variant="ghost" size="icon" onClick={showDrawer} aria-label="Afficher la playlist">
+              <ListMusic className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -68,7 +68,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className={`gap-2 ${className}`}>
+        <Button variant={variant} size={size} className={`gap-2 ${className}`} aria-label="Changer de thème">
           {getIcon()}
           {showLabel && <span>{getLabel()}</span>}
         </Button>

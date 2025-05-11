@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { analyzeEmotion } from '@/lib/scanService';
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +16,7 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [quickMode, setQuickMode] = useState<boolean>(false);
   const [skipDay, setSkipDay] = useState<boolean>(false);
+  const [audioRecording, setAudioRecording] = useState<boolean>(false);
   const MAX_CHARS = 500;
 
   const handleEmojiClick = (emoji: string) => {
@@ -31,6 +33,14 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
       setText(value);
       setCharCount(value.length);
     }
+  };
+
+  const clearForm = () => {
+    setText('');
+    setEmojis('');
+    setAudioUrl(null);
+    setCharCount(0);
+    setActiveTab('text');
   };
 
   const handleQuickSubmit = async (emojiValue: string) => {
@@ -53,6 +63,7 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
       
       onScanSaved();
       if (onSaveComplete) onSaveComplete();
+      clearForm();
     } catch (error) {
       console.error('Error analyzing emotion:', error);
       toast({
@@ -96,6 +107,7 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
       
       onScanSaved();
       if (onSaveComplete) onSaveComplete();
+      clearForm();
     } catch (error) {
       console.error('Error analyzing emotion:', error);
       toast({
@@ -111,6 +123,10 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
   const handleCorrection = () => {
     setActiveTab('text');
     setAnalysisResult(null);
+  };
+
+  const toggleAudioRecording = (isRecording: boolean) => {
+    setAudioRecording(isRecording);
   };
 
   return {
@@ -135,10 +151,13 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
     setQuickMode,
     skipDay,
     setSkipDay,
+    audioRecording,
+    toggleAudioRecording,
     MAX_CHARS,
     handleEmojiClick,
     handleTextChange,
     handleSubmit,
-    handleCorrection
+    handleCorrection,
+    clearForm
   };
 }
