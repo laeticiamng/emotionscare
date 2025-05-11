@@ -1,136 +1,173 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types/user';
 
-export interface AuthContextType {
-  user: User | null;
+interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  updateUser: (user: User) => Promise<void>;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  signOut: () => void;
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
   isAuthenticated: false,
   isLoading: true,
+  user: null,
+  login: async () => {},
+  logout: async () => {},
+  register: async () => {},
   updateUser: async () => {},
-  login: async () => false,
-  logout: () => {},
-  signOut: () => {}
 });
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Vérifier si l'utilisateur est connecté au chargement de l'application
+  // Simulation d'une vérification d'authentification au chargement
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Simuler un délai de chargement
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // En production, cela interrogerait une API ou vérifierait localement
+        const storedUser = localStorage.getItem('user');
         
-        const savedUser = localStorage.getItem('user');
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          setIsAuthenticated(true);
         }
       } catch (error) {
-        console.error('Erreur d\'authentification:', error);
-        setUser(null);
+        console.error('Auth check error:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     checkAuth();
   }, []);
 
-  const updateUser = async (userData: User) => {
-    try {
-      // In a real application, we would send this to an API
-      setUser(prevUser => ({
-        ...prevUser,
-        ...userData
-      }));
-      
-      // Update local storage
-      if (userData.id) {
-        const currentUser = localStorage.getItem('user');
-        if (currentUser) {
-          const parsedUser = JSON.parse(currentUser);
-          localStorage.setItem('user', JSON.stringify({
-            ...parsedUser,
-            ...userData
-          }));
-        }
-      }
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
-    }
-  };
-
   const login = async (email: string, password: string) => {
+    // Simulation d'une API de connexion
+    setIsLoading(true);
+    
     try {
-      // Simuler un délai d'authentification
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Simulation de délai réseau
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simuler une connexion réussie pour la démonstration
-      // (dans une implémentation réelle, nous utiliserions une API)
+      // Créer un utilisateur de demo (en production, cela viendrait de l'API)
       const mockUser: User = {
-        id: '123456',
+        id: '1',
         name: 'Utilisateur Test',
-        email,
-        role: email.includes('admin') ? 'admin' : 'user',
-        avatar: '/images/avatar.png',
-        avatar_url: '/images/avatar.png',
-        onboarded: true,
+        email: email,
+        role: 'user',
+        avatar_url: '',
         preferences: {
-          theme: 'light',
-          notifications: true
-        }
+          theme: 'system',
+          fontSize: 'medium',
+          fontFamily: 'inter',
+          language: 'fr',
+          notifications: true,
+          soundEnabled: true
+        },
+        onboarded: true
       };
       
-      setUser(mockUser);
+      // Stocker l'utilisateur
       localStorage.setItem('user', JSON.stringify(mockUser));
-      return true;
+      
+      setUser(mockUser);
+      setIsAuthenticated(true);
     } catch (error) {
-      console.error('Erreur de connexion:', error);
-      return false;
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    setIsLoading(true);
+    
+    try {
+      // En production, cela enverrait une requête à l'API
+      localStorage.removeItem('user');
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // Add signOut function as an alias to logout
-  const signOut = () => {
-    logout();
+  const register = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    
+    try {
+      // Simulation d'enregistrement
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newUser: User = {
+        id: Date.now().toString(),
+        name,
+        email,
+        role: 'user',
+        onboarded: false
+      };
+      
+      localStorage.setItem('user', JSON.stringify(newUser));
+      
+      setUser(newUser);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Register error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUser = async (userData: Partial<User>) => {
+    setIsLoading(true);
+    
+    try {
+      // En production, cela enverrait une mise à jour à l'API
+      if (user) {
+        const updatedUser = {
+          ...user,
+          ...userData,
+        };
+        
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error('Update user error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isAuthenticated: !!user,
+        isAuthenticated,
         isLoading,
-        updateUser,
+        user,
         login,
         logout,
-        signOut
+        register,
+        updateUser
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);
