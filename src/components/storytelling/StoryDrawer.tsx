@@ -8,7 +8,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 import { useStorytelling } from '@/providers/StorytellingProvider';
 import { useSoundscape } from '@/providers/SoundscapeProvider';
 import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
@@ -16,12 +15,12 @@ import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer'
 interface StoryDrawerProps {
   open: boolean;
   onClose: () => void;
+  onCTAClick?: (action: string) => void; // Optional handler for CTA actions
 }
 
-const StoryDrawer: React.FC<StoryDrawerProps> = ({ open, onClose }) => {
+const StoryDrawer: React.FC<StoryDrawerProps> = ({ open, onClose, onCTAClick }) => {
   const { activeStory, markStorySeen } = useStorytelling();
   const { playEmotionalResponse, playFunctionalSound } = useSoundscape();
-  const navigate = useNavigate();
   
   if (!activeStory) return null;
   
@@ -36,8 +35,8 @@ const StoryDrawer: React.FC<StoryDrawerProps> = ({ open, onClose }) => {
     if (activeStory) {
       markStorySeen(activeStory.id);
       playFunctionalSound('transition');
-      if (activeStory.cta?.action) {
-        navigate(activeStory.cta.action);
+      if (activeStory.cta?.action && onCTAClick) {
+        onCTAClick(activeStory.cta.action);
       }
       onClose();
     }
@@ -48,7 +47,7 @@ const StoryDrawer: React.FC<StoryDrawerProps> = ({ open, onClose }) => {
     if (open && activeStory?.emotion) {
       playEmotionalResponse(activeStory.emotion);
     }
-  }, [open, activeStory]);
+  }, [open, activeStory, playEmotionalResponse]);
   
   return (
     <Drawer open={open} onClose={handleClose}>

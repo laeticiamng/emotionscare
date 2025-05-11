@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
@@ -50,39 +51,37 @@ const App: React.FC = () => {
               <SoundscapeProvider>
                 <StorytellingProvider>
                   <BrandingManager>
-                    <Router>
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Register />} />
-                        <Route path="/reset-password" element={<ResetPassword />} />
-                        <Route path="/forgot-password" element={<ResetPassword />} />
-                        <Route path="/onboarding-mode" element={<OnboardingModePage />} />
-                        <Route path="/onboarding" element={<OnboardingPage />} />
-                        <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
-                        
-                        {/* Protected Routes */}
-                        <Route element={<ProtectedLayoutWrapper><ProtectedRoute /></ProtectedLayoutWrapper>}>
-                          <Route path="/dashboard" element={<Dashboard />} />
-                          <Route path="/journal" element={<JournalPage />} />
-                          <Route path="/profile" element={<Profile />} />
-                          <Route path="/admin" element={<AdminDashboardPage />} />
-                          <Route path="/scan" element={<ScanPage />} />
-                          <Route path="/music" element={<MusicPage />} />
-                          <Route path="/account" element={<AccountSettingsPage />} />
-                          <Route path="/team" element={<TeamPage />} />
-                          <Route path="/coach" element={<CoachPage />} />
-                          <Route path="/coach-chat" element={<CoachChatPage />} />
-                          <Route path="/docs" element={<DocsPage />} />
-                          <Route path="/buddy" element={<BuddyPage />} />
-                          <Route path="/vr" element={<VRPage />} />
-                          <Route path="/settings" element={<UserSettingsPage />} />
-                          <Route path="/support" element={<SupportPage />} />
-                        </Route>
-                        
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
-                    </Router>
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/forgot-password" element={<ResetPassword />} />
+                      <Route path="/onboarding-mode" element={<OnboardingModePage />} />
+                      <Route path="/onboarding" element={<OnboardingPage />} />
+                      <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
+                      
+                      {/* Protected Routes */}
+                      <Route element={<ProtectedLayoutWrapper><ProtectedRoute /></ProtectedLayoutWrapper>}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/journal" element={<JournalPage />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/admin" element={<AdminDashboardPage />} />
+                        <Route path="/scan" element={<ScanPage />} />
+                        <Route path="/music" element={<MusicPage />} />
+                        <Route path="/account" element={<AccountSettingsPage />} />
+                        <Route path="/team" element={<TeamPage />} />
+                        <Route path="/coach" element={<CoachPage />} />
+                        <Route path="/coach-chat" element={<CoachChatPage />} />
+                        <Route path="/docs" element={<DocsPage />} />
+                        <Route path="/buddy" element={<BuddyPage />} />
+                        <Route path="/vr" element={<VRPage />} />
+                        <Route path="/settings" element={<UserSettingsPage />} />
+                        <Route path="/support" element={<SupportPage />} />
+                      </Route>
+                      
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
                   </BrandingManager>
                 </StorytellingProvider>
               </SoundscapeProvider>

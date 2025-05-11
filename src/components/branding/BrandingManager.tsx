@@ -6,6 +6,7 @@ import { useSoundscape } from '@/providers/SoundscapeProvider';
 import StoryDrawer from '@/components/storytelling/StoryDrawer';
 import StoryNotification from '@/components/storytelling/StoryNotification';
 import { useStorytelling } from '@/providers/StorytellingProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface BrandingManagerProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ const BrandingManager: React.FC<BrandingManagerProps> = ({ children }) => {
   const { theme } = useTheme();
   const { activeStory } = useStorytelling();
   const [storyDrawerOpen, setStoryDrawerOpen] = useState(false);
+  const navigate = useNavigate();
   
   // Apply CSS variables for theming
   useEffect(() => {
@@ -49,13 +51,22 @@ const BrandingManager: React.FC<BrandingManagerProps> = ({ children }) => {
     }
   }, [activeStory]);
   
+  // Handle CTA click by navigating to the provided route
+  const handleCTAClick = (route: string) => {
+    navigate(route);
+  };
+  
   return (
     <>
       {children}
       
       {/* Story components */}
       <StoryNotification position="bottom-right" />
-      <StoryDrawer open={storyDrawerOpen} onClose={() => setStoryDrawerOpen(false)} />
+      <StoryDrawer 
+        open={storyDrawerOpen} 
+        onClose={() => setStoryDrawerOpen(false)} 
+        onCTAClick={handleCTAClick}
+      />
     </>
   );
 };
