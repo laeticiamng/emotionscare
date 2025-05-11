@@ -1,3 +1,4 @@
+
 export interface InvitationVerificationResult {
   valid: boolean;
   expired: boolean;

@@ -1,64 +1,92 @@
-// Export all types from their respective files
-export * from './user';
-export * from './preferences';
-export * from './music';
-export * from './chat';
-export * from './journal';
-export * from './emotion';
-export * from './coach';
-export * from './vr';
-export * from './breathing';
-export * from './analytics';
-export * from './invitation';
-export * from './audio';
-export * from './storytelling';
-export * from './notifications';
-export * from './onboarding';
-export * from './activity';
 
-// Export an interface for the MusicTrack with the corrected properties
-export interface MusicTrack {
+export interface User {
   id: string;
-  title: string;
-  artist: string;
-  duration?: number;
-  url?: string;
-  cover?: string;
-  coverUrl?: string;
-  coverImage?: string; // Added
-  audio_url?: string;
-  audioUrl?: string;
-  emotion?: string;
-  genre?: string; // Added
-  mood?: string;  // Added
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+  avatar_url?: string;
+  image?: string;
+  position?: string;
+  department?: string;
+  preferences?: UserPreferences;
+  onboarded?: boolean;
+  joined_at?: string;
+  created_at?: string;
+  anonymity_code?: string;
+  emotional_score?: number;
 }
 
-// Export a UserPreferences interface with the corrected properties
 export interface UserPreferences {
-  theme?: string;
-  // Fix duplicate notifications by having only one definition
-  notifications?: boolean | {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  soundEnabled?: boolean;
+  theme?: ThemeName;
+  notifications?: boolean;
   language?: string;
-  fontFamily?: string;
-  fontSize?: string;
-  privacyLevel?: string; // Added
   privacy?: 'public' | 'private' | 'friends';
-  font?: string; // Added
-  showEmotionPrompts?: boolean;
-  notification_frequency?: string;
-  notification_tone?: string;
-  notification_type?: string;
-  emotionalCamouflage?: boolean;
-  notifications_enabled?: boolean;
+  privacyLevel?: 'public' | 'private' | 'friends';
+  fontSize?: FontSize;
   email_notifications?: boolean;
   push_notifications?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
+  notifications_enabled?: boolean;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
+  showEmotionPrompts?: boolean;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
+  emotionalCamouflage?: boolean;
+  font?: string;
 }
+
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'default' | 'serif' | 'mono';
+
+export interface VRSession {
+  id: string;
+  user_id: string;
+  template_id: string;
+  start_time: string;
+  end_time?: string;
+  duration_seconds: number;
+  completed: boolean;
+  template?: VRSessionTemplate;
+  date?: string;
+  duration?: number;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+}
+
+export interface VRSessionTemplate {
+  id: string;
+  name: string;
+  title?: string;
+  description: string;
+  duration: number;
+  theme?: string;
+  is_audio_only?: boolean;
+  preview_url?: string;
+  audio_url?: string;
+  category: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  tags: string[];
+  benefits?: string[];
+  emotions?: string[];
+  popularity?: number;
+  template_id?: string;
+  completion_rate?: number;
+  emotion_target?: string;
+  level?: string;
+  recommended_mood?: string;
+  thumbnail: string;
+  intensity: 'low' | 'medium' | 'high';
+  youtubeId?: string;
+  lastUsed?: Date;
+  recommendedFor?: string[];
+}
+
+// Export other needed types from src/types
+export * from './music';
+export * from './preferences';
+export * from './invitation';
+export * from './vr';

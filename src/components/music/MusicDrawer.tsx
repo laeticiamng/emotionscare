@@ -12,13 +12,13 @@ import { X } from 'lucide-react';
 import { MusicDrawerProps } from '@/types/music';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
-  isOpen, 
+  open, 
   onOpenChange, 
   onClose,
   playlist, 
 }) => {
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="h-[85vh]">
         <DrawerHeader className="border-b">
           <div className="flex justify-between items-center">

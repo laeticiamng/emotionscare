@@ -9,16 +9,16 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { MusicDrawerProps, MusicPlaylist } from '@/types/music';
+import { MusicDrawerProps } from '@/types/music';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
-  isOpen, 
+  open, 
   onOpenChange, 
   onClose,
   playlist, 
 }) => {
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[320px] sm:w-[400px] overflow-y-auto">
         <SheetHeader className="border-b pb-4">
           <div className="flex justify-between items-center">

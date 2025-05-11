@@ -1,5 +1,6 @@
 
-import { MusicTrack, MusicPlaylist, Playlist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { Playlist } from '@/services/music/types';
 
 // Fix the convertTrackToMusicTrack function
 export const convertTrackToMusicTrack = (track: any): MusicTrack => ({
@@ -10,7 +11,6 @@ export const convertTrackToMusicTrack = (track: any): MusicTrack => ({
   url: track.url || '',
   duration: track.duration || 0,
   coverUrl: track.coverUrl || track.cover_url || '',
-  coverImage: track.coverImage || track.coverUrl || '',
   genre: track.genre || '',
   mood: track.mood || '',
   emotion: track.emotion || ''
@@ -43,7 +43,8 @@ export const convertMusicPlaylistToPlaylist = (musicPlaylist: MusicPlaylist): Pl
 export const convertPlaylistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => ({
   id: playlist.id,
   name: playlist.name,
-  description: playlist.description || '', // Add required description
+  title: playlist.title || playlist.name,
+  description: playlist.description || '',
   coverUrl: playlist.coverUrl || '',
   emotion: playlist.emotion || '',
   mood: playlist.mood || '',

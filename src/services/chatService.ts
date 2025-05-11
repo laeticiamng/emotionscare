@@ -1,77 +1,70 @@
-import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatConversation, ChatResponse } from '@/types/chat';
 
-// Mock function to simulate getting AI response
-export const getAIResponse = async (message: string): Promise<ChatResponse> => {
-  // Simulate a delay
+import { ChatResponse } from '@/types/music';
+
+export async function getChatResponse(query: string): Promise<ChatResponse> {
+  // Mock API delay
   await new Promise(resolve => setTimeout(resolve, 500));
-
-  const mockResponse: ChatResponse = {
-    id: uuidv4(),
-    content: "Bonjour, comment puis-je vous aider aujourd'hui?",
-    role: "assistant",
-    timestamp: new Date().toISOString(),
+  
+  // Sample responses based on query content
+  if (query.toLowerCase().includes('bonjour') || query.toLowerCase().includes('salut')) {
+    return {
+      text: "Bonjour ! Comment puis-je vous aider aujourd'hui ?",
+      follow_up_questions: [
+        "Comment vous sentez-vous ?",
+        "Souhaitez-vous explorer vos émotions ?",
+        "Avez-vous besoin d'aide pour la méditation ?"
+      ],
+      sentiment: "neutral"
+    };
+  }
+  
+  if (
+    query.toLowerCase().includes('triste') || 
+    query.toLowerCase().includes('déprimé') ||
+    query.toLowerCase().includes('mal')
+  ) {
+    return {
+      text: "Je suis désolé d'apprendre que vous ne vous sentez pas bien. C'est normal de traverser des moments difficiles. Voulez-vous essayer une session de méditation guidée pour vous aider à vous sentir mieux ?",
+      follow_up_questions: [
+        "Depuis combien de temps vous sentez-vous ainsi ?",
+        "Qu'est-ce qui pourrait vous remonter le moral ?",
+        "Aimeriez-vous parler de ce qui vous préoccupe ?"
+      ],
+      sentiment: "empathetic"
+    };
+  }
+  
+  if (
+    query.toLowerCase().includes('heureux') || 
+    query.toLowerCase().includes('content') ||
+    query.toLowerCase().includes('bien')
+  ) {
+    return {
+      text: "Je suis ravi d'entendre que vous vous sentez bien ! C'est une excellente occasion de renforcer cette énergie positive. Peut-être souhaitez-vous explorer une activité créative ou partager votre bonheur avec quelqu'un ?",
+      follow_up_questions: [
+        "Qu'est-ce qui vous rend particulièrement heureux aujourd'hui ?",
+        "Comment pourriez-vous maintenir cette bonne humeur ?",
+        "Avez-vous pensé à noter ce moment dans votre journal émotionnel ?"
+      ],
+      sentiment: "positive"
+    };
+  }
+  
+  // Default response
+  return {
+    text: "Merci pour votre message. Comment puis-je vous aider davantage avec votre bien-être émotionnel aujourd'hui ?",
     follow_up_questions: [
-      "Comment vous sentez-vous aujourd'hui?",
-      "Avez-vous besoin d'aide avec quelque chose en particulier?"
-    ]
+      "Souhaitez-vous explorer vos émotions actuelles ?",
+      "Avez-vous essayé notre nouvelle fonctionnalité de méditation guidée ?",
+      "Puis-je vous suggérer des activités pour améliorer votre humeur ?"
+    ],
+    sentiment: "neutral"
   };
+}
 
-  return mockResponse;
+// Export the ChatService
+const ChatService = {
+  getChatResponse
 };
 
-// Mock function to simulate processing chat
-export const processChatResponse = async (message: string): Promise<ChatResponse> => {
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  const mockResponse: ChatResponse = {
-    id: uuidv4(),
-    content: "Je suis là pour vous aider à gérer vos émotions.",
-    role: "assistant",
-    timestamp: new Date().toISOString(),
-    follow_up_questions: [
-      "Comment puis-je vous aider?",
-      "Avez-vous des questions?"
-    ]
-  };
-
-  return mockResponse;
-};
-
-// Mock function to simulate creating a chat conversation
-export const createChatConversation = async (userId: string): Promise<ChatConversation> => {
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  const mockConversation: ChatConversation = {
-    id: uuidv4(),
-    user_id: userId,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    title: "Nouvelle conversation",
-    last_message: "Bonjour!",
-    last_message_time: new Date().toISOString()
-  };
-
-  return mockConversation;
-};
-
-// Mock function to simulate sending a chat message
-export const sendChatMessage = async (conversationId: string, message: string, sender: string): Promise<ChatResponse> => {
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  const mockResponse: ChatResponse = {
-    id: uuidv4(),
-    content: message,
-    role: sender === 'user' ? 'user' : 'assistant',
-    timestamp: new Date().toISOString(),
-    follow_up_questions: [
-      "Comment puis-je vous aider davantage?",
-      "Avez-vous d'autres préoccupations?"
-    ]
-  };
-
-  return mockResponse;
-};
+export { ChatService };

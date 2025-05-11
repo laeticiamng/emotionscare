@@ -31,18 +31,19 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     isPlaying, 
     currentTrack, 
     pauseTrack, 
-    togglePlay, // Use togglePlay instead of resumeTrack
+    togglePlay, 
     nextTrack,
     previousTrack,
-    seek, // Use seek instead of seekTo
+    seek, 
+    seekTo,
     currentTime,
     duration,
     volume,
     setVolume,
     toggleShuffle,
     toggleRepeat,
-    shuffle: isShuffled, // Use shuffle instead of isShuffled
-    repeat: isRepeating  // Use repeat instead of isRepeating
+    shuffle,
+    repeat
   } = useMusic();
 
   // Format time in MM:SS format
@@ -52,13 +53,22 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  // Use seekTo if seek is not available
+  const handleSeek = (time: number) => {
+    if (seek) {
+      seek(time);
+    } else if (seekTo) {
+      seekTo(time);
+    }
+  };
+
   return (
     <div className={`${className}`}>
       {showTrackInfo && currentTrack && (
         <div className="mb-4">
           <TrackInfo
             track={currentTrack}
-            coverUrl={currentTrack?.coverUrl || currentTrack?.cover} // Use existing properties
+            coverUrl={currentTrack?.coverUrl || currentTrack?.coverImage} 
           />
         </div>
       )}
@@ -68,7 +78,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
           <ProgressBar
             currentTime={currentTime}
             duration={duration}
-            onSeek={seek} // Use seek instead of seekTo
+            onSeek={handleSeek}
             formatTime={formatTime}
           />
         </div>
@@ -82,7 +92,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
                 variant="ghost"
                 size="icon"
                 onClick={toggleShuffle}
-                className={isShuffled ? "text-primary" : ""}
+                className={shuffle ? "text-primary" : ""}
               >
                 <Shuffle size={compact ? 16 : 18} />
               </Button>
@@ -102,7 +112,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
             variant={compact ? "ghost" : "outline"}
             size={compact ? "icon" : "default"}
             className={compact ? "" : "h-10 w-10 rounded-full"}
-            onClick={togglePlay} // Use togglePlay instead of conditional call
+            onClick={togglePlay}
             disabled={!currentTrack}
           >
             {isPlaying ? (
@@ -127,7 +137,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
                 variant="ghost"
                 size="icon"
                 onClick={toggleRepeat}
-                className={isRepeating ? "text-primary" : ""}
+                className={repeat ? "text-primary" : ""}
               >
                 <Repeat size={compact ? 16 : 18} />
               </Button>

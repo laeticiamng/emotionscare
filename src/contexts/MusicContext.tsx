@@ -1,5 +1,6 @@
+
 import React, { createContext, useContext, useState } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
@@ -13,21 +14,28 @@ export interface MusicContextType {
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   togglePlay: () => void;
+  resumeTrack?: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   addTrackToQueue: (track: MusicTrack) => void;
   clearQueue: () => void;
+  addToQueue: (track: MusicTrack) => void;
   duration: number;
   currentTime: number;
-  seek: (time: number) => void;
+  seek?: (time: number) => void;
+  seekTo?: (time: number) => void;
   openDrawer: boolean;
   setOpenDrawer: (open: boolean) => void;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
+  repeat?: boolean;
+  shuffle?: boolean;
+  loadPlaylist: (playlist: MusicPlaylist) => void;
+  shufflePlaylist: () => void;
   initializeMusicSystem: () => Promise<void>;
   error: string | null;
 }
@@ -49,16 +57,22 @@ const defaultMusicContext: MusicContextType = {
   previousTrack: () => {},
   setVolume: () => {},
   addTrackToQueue: () => {},
+  addToQueue: () => {},
   clearQueue: () => {},
+  loadPlaylist: () => {},
+  shufflePlaylist: () => {},
   duration: 0,
   currentTime: 0,
   seek: () => {},
+  seekTo: () => {},
   openDrawer: false,
   setOpenDrawer: () => {},
   loadPlaylistForEmotion: async () => null,
   loadPlaylistById: async () => null,
   toggleRepeat: () => {},
   toggleShuffle: () => {},
+  shuffle: false,
+  repeat: false,
   initializeMusicSystem: async () => {},
   error: null
 };
@@ -78,6 +92,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentEmotion, setCurrentEmotion] = useState('neutral');
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
+  const [repeat, setRepeat] = useState(false);
   
   const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
@@ -86,6 +102,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   const pauseTrack = () => {
     setIsPlaying(false);
+  };
+  
+  const resumeTrack = () => {
+    if (currentTrack) {
+      setIsPlaying(true);
+    }
   };
   
   const togglePlay = () => {
@@ -116,6 +138,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setQueue(prev => [...prev, track]);
   };
   
+  const addToQueue = addTrackToQueue; // Alias for compatibility
+  
   const clearQueue = () => {
     setQueue([]);
   };
@@ -123,6 +147,27 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const seek = (time: number) => {
     setCurrentTime(time);
     // Would also set the audio element's current time
+  };
+  
+  const seekTo = seek; // Alias for compatibility
+  
+  const loadPlaylist = (playlist: MusicPlaylist) => {
+    setCurrentPlaylist(playlist);
+    if (playlist.tracks.length > 0) {
+      setQueue(playlist.tracks);
+    }
+  };
+  
+  const shufflePlaylist = () => {
+    if (currentPlaylist && currentPlaylist.tracks.length > 0) {
+      // Simple Fisher-Yates shuffle
+      const shuffled = [...currentPlaylist.tracks];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setQueue(shuffled);
+    }
   };
   
   const loadPlaylistForEmotion = async (emotion: string): Promise<MusicPlaylist | null> => {
@@ -135,6 +180,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: `playlist-${emotion}`,
         name: `${emotion} Playlist`,
         description: `A playlist for ${emotion} mood`,
+        coverUrl: '/images/cover.jpg',
+        emotion: emotion,
         tracks: [
           {
             id: `track-${emotion}-1`,
@@ -142,7 +189,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             artist: 'AI Music',
             duration: 180,
             url: '/audio/track1.mp3',
-            cover_url: '/images/cover1.jpg'
+            coverUrl: '/images/cover1.jpg'
           },
           {
             id: `track-${emotion}-2`,
@@ -150,7 +197,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             artist: 'AI Music',
             duration: 240,
             url: '/audio/track2.mp3',
-            cover_url: '/images/cover2.jpg'
+            coverUrl: '/images/cover2.jpg'
           }
         ]
       };
@@ -175,6 +222,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id,
         name: `Playlist ${id}`,
         description: `A playlist with ID ${id}`,
+        coverUrl: '/images/cover.jpg',
         tracks: [
           {
             id: `track-${id}-1`,
@@ -182,7 +230,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             artist: 'AI Music',
             duration: 180,
             url: '/audio/track1.mp3',
-            cover_url: '/images/cover1.jpg'
+            coverUrl: '/images/cover1.jpg'
           }
         ]
       };
@@ -197,11 +245,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
   
   const toggleRepeat = () => {
-    console.log('Toggle repeat mode');
+    setRepeat(prev => !prev);
   };
   
   const toggleShuffle = () => {
-    console.log('Toggle shuffle mode');
+    setShuffle(prev => !prev);
   };
   
   const initializeMusicSystem = async () => {
@@ -229,22 +277,29 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       isInitialized,
       playTrack,
       pauseTrack,
+      resumeTrack,
       togglePlay,
       nextTrack,
       prevTrack,
       previousTrack,
       setVolume,
       addTrackToQueue,
+      addToQueue,
       clearQueue,
+      loadPlaylist,
+      shufflePlaylist,
       duration,
       currentTime,
       seek,
+      seekTo,
       openDrawer,
       setOpenDrawer,
       loadPlaylistForEmotion,
       loadPlaylistById,
       toggleRepeat,
       toggleShuffle,
+      shuffle,
+      repeat,
       initializeMusicSystem,
       error
     }}>

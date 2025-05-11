@@ -9,9 +9,8 @@ export const mockTracks: MusicTrack[] = [
     artist: 'Nature Sounds',
     duration: 180,
     coverUrl: '/images/music/ocean.jpg',
-    audioUrl: '/audio/calm-ocean.mp3',
-    emotion: 'calm', // Now supported in MusicTrack type
-    url: '/audio/calm-ocean.mp3'
+    url: '/audio/calm-ocean.mp3',
+    emotion: 'calm'
   },
   {
     id: '2',
@@ -19,9 +18,8 @@ export const mockTracks: MusicTrack[] = [
     artist: 'Upbeat Studio',
     duration: 240,
     coverUrl: '/images/music/morning.jpg',
-    audioUrl: '/audio/morning-motivation.mp3',
-    emotion: 'happy', // Now supported in MusicTrack type
-    url: '/audio/morning-motivation.mp3'
+    url: '/audio/morning-motivation.mp3',
+    emotion: 'happy'
   },
   {
     id: '3',
@@ -29,9 +27,8 @@ export const mockTracks: MusicTrack[] = [
     artist: 'Concentration Wave',
     duration: 320,
     coverUrl: '/images/music/focus.jpg',
-    audioUrl: '/audio/deep-focus.mp3',
-    emotion: 'focused', // Now supported in MusicTrack type
-    url: '/audio/deep-focus.mp3'
+    url: '/audio/deep-focus.mp3',
+    emotion: 'focused'
   },
   {
     id: '4',
@@ -39,9 +36,8 @@ export const mockTracks: MusicTrack[] = [
     artist: 'Relax Mode',
     duration: 290,
     coverUrl: '/images/music/release.jpg',
-    audioUrl: '/audio/tension-release.mp3',
-    emotion: 'stressed', // Now supported in MusicTrack type
-    url: '/audio/tension-release.mp3'
+    url: '/audio/tension-release.mp3',
+    emotion: 'stressed'
   }
 ];
 
@@ -52,7 +48,7 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
     name: 'Calming Sounds',
     description: 'Perfect for relaxation and stress relief',
     tracks: [mockTracks[0], mockTracks[3]],
-    emotion: 'calm', // Now supported in MusicPlaylist type
+    emotion: 'calm',
     coverUrl: '/images/playlists/calm.jpg'
   },
   {
@@ -60,7 +56,7 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
     name: 'Energy Boost',
     description: 'Get motivated and energized',
     tracks: [mockTracks[1]],
-    emotion: 'happy', // Now supported in MusicPlaylist type
+    emotion: 'happy',
     coverUrl: '/images/playlists/energy.jpg'
   },
   {
@@ -68,7 +64,7 @@ export const mockMusicPlaylists: MusicPlaylist[] = [
     name: 'Work Concentration',
     description: 'Enhance your focus and productivity',
     tracks: [mockTracks[2]],
-    emotion: 'focused', // Now supported in MusicPlaylist type
+    emotion: 'focused',
     coverUrl: '/images/playlists/focus.jpg'
   }
 ];
