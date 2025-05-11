@@ -24,6 +24,9 @@ import BuddyPage from '@/pages/BuddyPage';
 import VRPage from '@/pages/VRPage';
 import UserSettingsPage from '@/pages/UserSettingsPage';
 import SupportPage from '@/pages/Support';
+import OnboardingModePage from '@/pages/OnboardingModePage';
+import OnboardingPage from '@/pages/OnboardingPage';
+import OnboardingExperiencePage from '@/pages/OnboardingExperiencePage';
 
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
@@ -39,6 +42,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
+        <Route path="/onboarding-mode" element={<OnboardingModePage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
         
         {/* Protected Routes */}
         <Route element={<ProtectedLayoutWrapper><ProtectedRoute /></ProtectedLayoutWrapper>}>
