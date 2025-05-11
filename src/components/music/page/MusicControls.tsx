@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { useMusic } from '@/providers/MusicProvider';
+// Fix: Import from contexts instead of providers
+import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
 import VolumeControl from '@/components/music/player/VolumeControl';
 import TrackInfo from '@/components/music/player/TrackInfo';

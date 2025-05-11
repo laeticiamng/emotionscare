@@ -196,6 +196,8 @@ export interface JournalEntry {
   mood_score?: number;
   tags?: string[];
   ai_feedback?: string;
+  title?: string; // Added missing property
+  mood?: string; // Added missing property
 }
 
 export interface InvitationStats {

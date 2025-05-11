@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
@@ -13,6 +14,7 @@ type ThemeContextType = {
   theme: Theme;
   resolvedTheme: 'light' | 'dark' | 'pastel';
   setTheme: (theme: Theme) => void;
+  // Add missing function for backward compatibility
   setThemePreference: (theme: Theme) => void;
 };
 

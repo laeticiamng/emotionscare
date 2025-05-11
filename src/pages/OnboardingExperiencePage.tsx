@@ -9,20 +9,16 @@ const OnboardingExperiencePage: React.FC = () => {
   const onboarding = useOnboarding();
   const navigate = useNavigate();
   
-  // Ensure we have all properties needed for rendering
+  // Use properties from the onboarding context correctly
   const currentStep = onboarding.currentStep;
-  const loading = false; // Default value if not provided
-  const emotion = ''; // Default value if not provided
-  const intensity = 0; // Default value if not provided
-  const userResponses = {}; // Default value if not provided
+  const loading = onboarding.loading || false;
+  const emotion = onboarding.emotion || '';
+  const intensity = onboarding.intensity || 0;
+  const userResponses = onboarding.userResponses || {};
   
   const nextStep = onboarding.nextStep;
   const previousStep = onboarding.previousStep;
-  const handleResponse = (response: any) => {
-    // Default implementation
-    console.log('Response:', response);
-    nextStep();
-  };
+  const handleResponse = onboarding.handleResponse;
   
   return (
     <div className="container mx-auto py-6">

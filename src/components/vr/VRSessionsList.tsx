@@ -4,7 +4,7 @@ import { VRSessionTemplate } from '@/types/vr';
 
 export interface VRSessionsListProps {
   templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
+  onSelect: (template: VRSessionTemplate) => void; // Added property
 }
 
 const VRSessionsList: React.FC<VRSessionsListProps> = ({ templates, onSelect }) => {

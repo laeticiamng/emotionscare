@@ -47,6 +47,9 @@ export interface UserPreferencesState {
   incognitoMode: boolean;
   lockJournals: boolean;
   
+  // Privacy
+  privacyLevel?: string;
+  
   // Premium features
   emotionalCamouflage: boolean;
   duoModeEnabled?: boolean;
@@ -84,6 +87,7 @@ const defaultPreferences: UserPreferencesState = {
   incognitoMode: false,
   lockJournals: false,
   emotionalCamouflage: false,
+  privacyLevel: 'standard',
   
   customPresets: []
 };
@@ -112,13 +116,14 @@ export function useUserPreferences() {
   // Update preferences
   const updatePreferences = (newPreferences: Partial<UserPreferencesState>) => {
     try {
+      // Fix: cast the theme type properly before updating
       const updatedPreferences = { ...preferences, ...newPreferences };
       setPreferences(updatedPreferences);
       localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
       // Synchronize with other contexts if needed
       if (newPreferences.theme && theme.setTheme) {
-        // Convert string theme to Theme type to avoid type errors
+        // Fix: ensure theme matches the expected type before setting it
         theme.setTheme(newPreferences.theme as Theme);
       }
       

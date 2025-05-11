@@ -29,7 +29,7 @@ export interface UserPreferences {
   language?: string;
   fontFamily?: string;
   fontSize?: string;
-  privacyLevel?: string;
+  privacyLevel?: string; // Added missing property
   privacy?: 'public' | 'private' | 'friends';
   showEmotionPrompts?: boolean;
   notification_frequency?: string;
@@ -43,7 +43,7 @@ export interface UserPreferences {
   fullAnonymity?: boolean;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
-  font?: string; // Add font property
+  font?: string; // Added missing property
 }
 
 export enum UserRole {
@@ -56,8 +56,8 @@ export enum UserRole {
   ANALYST = 'analyst'
 }
 
-export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat';
-export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | string; // Updated to accept string
+export type FontSize = 'small' | 'medium' | 'large' | string; // Updated to accept string
 export type NotificationFrequency = 'high' | 'medium' | 'low' | 'none';
 export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';

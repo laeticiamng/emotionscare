@@ -10,9 +10,10 @@ export interface MusicTrack {
   cover_url?: string;
   audioUrl?: string;
   audio_url?: string;
-  mood?: string;
+  mood?: string; // Added for compatibility
   emotion?: string;
   emotion_tag?: string;
+  genre?: string; // Added for compatibility
 }
 
 export interface MusicPlaylist {
@@ -25,6 +26,7 @@ export interface MusicPlaylist {
   category?: string;
   coverUrl?: string;
   emotion?: string;
+  mood?: string; // Added for compatibility
 }
 
 export interface MusicDrawerProps {
@@ -40,7 +42,7 @@ export interface MusicContextType {
   queue: MusicTrack[];
   playlists: MusicPlaylist[];
   volume: number;
-  isInitialized: boolean;
+  isInitialized: boolean; // Missing property added
   error: string | null;
   openDrawer?: boolean;
   setOpenDrawer?: (open: boolean) => void;

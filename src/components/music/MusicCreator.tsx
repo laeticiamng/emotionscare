@@ -7,7 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Music } from 'lucide-react';
-import { useMusic } from '@/providers/MusicProvider';
+// Fix: Import from contexts instead of providers
+import { useMusic } from '@/contexts/MusicContext';
 import { Track } from '@/types';
 
 const MusicCreator: React.FC = () => {

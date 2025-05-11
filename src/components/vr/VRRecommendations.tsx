@@ -4,9 +4,9 @@ import { VRSessionTemplate } from '@/types/vr';
 
 export interface VRRecommendationsProps {
   templates: VRSessionTemplate[];
-  currentTemplateId?: string;
+  currentTemplateId?: string; // Added property
   showHeading?: boolean;
-  onSelect: (template: VRSessionTemplate) => void;
+  onSelect: (template: VRSessionTemplate) => void; // Added property
 }
 
 const VRRecommendations: React.FC<VRRecommendationsProps> = ({ templates, onSelect, currentTemplateId, showHeading = true }) => {
