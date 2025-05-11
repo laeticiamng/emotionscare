@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shell } from '@/Shell';
+import Shell from '@/Shell'; // Fixed import statement - import as default
 import { useVRSession } from '@/hooks/useVRSession';
 import { VRSessionTemplate } from '@/types';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { mockVRTemplates } from '@/data/mockVRTemplates';
 
 const VRPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("meditation");
-  const { templates, isLoading } = useVRSession("meditation"); // Add a default category
+  const [templates, setTemplates] = useState<VRSessionTemplate[]>([]);
+  const { isLoading } = useVRSession("user-123"); // Added a default user ID
+
+  // Load templates when component mounts
+  useEffect(() => {
+    // Filter templates by category if needed
+    const filteredTemplates = selectedCategory 
+      ? mockVRTemplates.filter(t => t.category === selectedCategory)
+      : mockVRTemplates;
+    setTemplates(filteredTemplates);
+  }, [selectedCategory]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);

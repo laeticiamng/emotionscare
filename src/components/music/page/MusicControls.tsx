@@ -1,158 +1,141 @@
-
 import React from 'react';
-// Fix: Import from contexts instead of providers
-import { useMusic } from '@/contexts/MusicContext';
+import { MusicTrack } from '@/types';
 import { Button } from '@/components/ui/button';
-import VolumeControl from '@/components/music/player/VolumeControl';
-import TrackInfo from '@/components/music/player/TrackInfo';
-import ProgressBar from '@/components/music/player/ProgressBar';
+import { Slider } from '@/components/ui/slider';
 import { 
-  Play, Pause, SkipBack, SkipForward, Repeat, Shuffle, 
-  Volume2, VolumeX 
+  Play, 
+  Pause, 
+  SkipBack, 
+  SkipForward, 
+  Volume2, 
+  VolumeX 
 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
 
 interface MusicControlsProps {
-  className?: string;
-  showProgress?: boolean;
-  showTrackInfo?: boolean;
-  showVolumeControl?: boolean;
-  compact?: boolean;
+  track?: MusicTrack;
+  isPlaying: boolean;
+  volume: number;
+  onPlay: () => void;
+  onPause: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  onVolumeChange: (value: number) => void;
+  progress?: number;
+  onSeek?: (position: number) => void;
+  duration?: number;
+  currentTime?: number;
 }
 
 const MusicControls: React.FC<MusicControlsProps> = ({
-  className = '',
-  showProgress = true,
-  showTrackInfo = true,
-  showVolumeControl = true,
-  compact = false
+  track,
+  isPlaying,
+  volume,
+  onPlay,
+  onPause,
+  onNext,
+  onPrevious,
+  onVolumeChange,
+  progress = 0,
+  onSeek,
+  duration = 0,
+  currentTime = 0
 }) => {
-  const { 
-    isPlaying, 
-    currentTrack, 
-    pauseTrack, 
-    togglePlay, 
-    nextTrack,
-    previousTrack,
-    seek, 
-    seekTo,
-    currentTime,
-    duration,
-    volume,
-    setVolume,
-    toggleShuffle,
-    toggleRepeat,
-    shuffle,
-    repeat
-  } = useMusic();
-
-  // Format time in MM:SS format
-  const formatTime = (seconds: number): string => {
+  const getCoverImage = (track?: MusicTrack) => {
+    if (!track) return '';
+    return track.coverUrl || track.cover || track.cover_url || '';
+  };
+  
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  // Use seekTo if seek is not available
-  const handleSeek = (time: number) => {
-    if (seek) {
-      seek(time);
-    } else if (seekTo) {
-      seekTo(time);
-    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className={`${className}`}>
-      {showTrackInfo && currentTrack && (
-        <div className="mb-4">
-          <TrackInfo
-            track={currentTrack}
-            coverUrl={currentTrack?.coverUrl || currentTrack?.coverImage} 
-          />
-        </div>
-      )}
-      
-      {showProgress && currentTrack && (
-        <div className="mb-4">
-          <ProgressBar
-            currentTime={currentTime}
-            duration={duration}
-            onSeek={handleSeek}
-            formatTime={formatTime}
-          />
-        </div>
-      )}
-      
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          {!compact && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleShuffle}
-                className={shuffle ? "text-primary" : ""}
-              >
-                <Shuffle size={compact ? 16 : 18} />
-              </Button>
-            </>
-          )}
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={previousTrack}
-            disabled={!currentTrack}
-          >
-            <SkipBack size={compact ? 18 : 20} />
-          </Button>
-          
-          <Button
-            variant={compact ? "ghost" : "outline"}
-            size={compact ? "icon" : "default"}
-            className={compact ? "" : "h-10 w-10 rounded-full"}
-            onClick={togglePlay}
-            disabled={!currentTrack}
-          >
-            {isPlaying ? (
-              <Pause size={compact ? 18 : 20} />
+    <div className="music-controls p-4 bg-card rounded-lg shadow-sm">
+      <div className="flex items-center gap-4">
+        {track && (
+          <div className="flex-shrink-0 w-16 h-16 rounded overflow-hidden bg-muted">
+            {getCoverImage(track) ? (
+              <img 
+                src={getCoverImage(track)} 
+                alt={track.title} 
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <Play size={compact ? 18 : 20} />
+              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                ♪
+              </div>
             )}
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={nextTrack}
-            disabled={!currentTrack}
-          >
-            <SkipForward size={compact ? 18 : 20} />
-          </Button>
-          
-          {!compact && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleRepeat}
-                className={repeat ? "text-primary" : ""}
-              >
-                <Repeat size={compact ? 16 : 18} />
-              </Button>
-            </>
-          )}
-        </div>
-        
-        {showVolumeControl && (
-          <div className={`flex items-center ${compact ? 'hidden sm:flex' : ''}`}>
-            <VolumeControl
-              volume={volume}
-              onChange={setVolume}
-            />
           </div>
         )}
+        
+        <div className="flex-grow min-w-0">
+          {track && (
+            <>
+              <div className="font-medium truncate">{track.title}</div>
+              <div className="text-sm text-muted-foreground truncate">{track.artist}</div>
+            </>
+          )}
+          
+          {onSeek && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {formatTime(currentTime)}
+              </span>
+              <Slider
+                value={[progress]}
+                max={100}
+                step={1}
+                className="flex-grow"
+                onValueChange={(values) => onSeek(values[0])}
+              />
+              <span className="text-xs text-muted-foreground">
+                {formatTime(duration)}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onVolumeChange(volume > 0 ? 0 : 100)}
+          >
+            {volume > 0 ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          </Button>
+          <Slider
+            value={[volume]}
+            max={100}
+            step={1}
+            className="w-24"
+            onValueChange={(values) => onVolumeChange(values[0])}
+          />
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={onPrevious}>
+            <SkipBack size={18} />
+          </Button>
+          
+          <Button 
+            variant="default" 
+            size="icon" 
+            className="h-10 w-10 rounded-full"
+            onClick={isPlaying ? onPause : onPlay}
+          >
+            {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+          </Button>
+          
+          <Button variant="ghost" size="icon" onClick={onNext}>
+            <SkipForward size={18} />
+          </Button>
+        </div>
+        
+        <div className="w-[100px]" /> {/* Spacer for balance */}
       </div>
     </div>
   );

@@ -54,4 +54,4 @@ export interface Toast {
   variant?: 'default' | 'destructive' | 'success';
 }
 
-// Export types without the re-export that causes conflicts
+// Remove the conflicting exports

@@ -1,13 +1,23 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { VRSession, VRSessionTemplate } from '@/types/vr';
-import { saveVRSession } from '@/lib/vrService';
+import { saveVRSession, getRecommendedSessions } from '@/lib/vrService';
+import { mockVRTemplates } from '@/data/mockVRTemplates';
 
 export function useVRSession(userId: string) {
   const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
   const [sessionHistory, setSessionHistory] = useState<VRSession[]>([]);
+  const [templates, setTemplates] = useState<VRSessionTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  // Load templates when hook is initialized
+  useEffect(() => {
+    setIsLoading(true);
+    // Use mockVRTemplates as our data source
+    setTemplates(mockVRTemplates);
+    setIsLoading(false);
+  }, []);
 
   // Check if there's an active session
   const isActive = !!currentSession && !currentSession.completed;
@@ -90,6 +100,7 @@ export function useVRSession(userId: string) {
   return {
     currentSession,
     sessionHistory,
+    templates,
     isLoading,
     historyLoading,
     isActive,

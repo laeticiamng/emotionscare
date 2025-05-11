@@ -15,6 +15,7 @@ export function playlistToMusicPlaylist(rawData: any): MusicPlaylist {
       ? rawData.tracks.map((track: any) => trackToMusicTrack(track))
       : [],
     category: rawData.category || '',
+    emotion: rawData.emotion || ''
   };
 }
 
@@ -44,7 +45,8 @@ export function musicTrackToTrack(track: MusicTrack): any {
     artist: track.artist,
     duration: track.duration,
     url: track.url,
-    coverUrl: track.coverUrl || track.cover || '',
+    cover: track.cover || '',
+    coverUrl: track.coverUrl || '',
     emotion: track.emotion || '',
   };
 }
@@ -58,7 +60,7 @@ export function musicPlaylistToPlaylist(playlist: MusicPlaylist): any {
     name: playlist.name,
     title: playlist.title || playlist.name,
     tracks: playlist.tracks.map(musicTrackToTrack),
-    coverUrl: playlist.coverUrl,
+    coverUrl: playlist.coverUrl || '',
     description: playlist.description,
     category: playlist.category || '',
     emotion: playlist.emotion || ''

@@ -16,7 +16,8 @@ export const getRecommendedSessions = (): VRSessionTemplate[] => {
       thumbnail: "/images/vr/meditation-thumbnail.jpg",
       popularity: 98,
       recommendedFor: ["stress", "anxiété", "insomnie"],
-      emotions: ["calme", "serein", "détendu"]
+      emotions: ["calme", "serein", "détendu"],
+      theme: "Meditation" // Added required theme property
     },
     {
       id: "2", 
@@ -30,7 +31,8 @@ export const getRecommendedSessions = (): VRSessionTemplate[] => {
       thumbnail: "/images/vr/forest-thumbnail.jpg",
       popularity: 85,
       recommendedFor: ["fatigue", "burnout", "concentration"],
-      emotions: ["apaisé", "ressourcé", "énergisé"]
+      emotions: ["apaisé", "ressourcé", "énergisé"],
+      theme: "Nature" // Added required theme property
     }
   ];
 };
@@ -97,7 +99,8 @@ export const getVRSessionHistory = async (userId: string): Promise<VRSession[]> 
         duration: 600,
         intensity: "low",
         tags: ["calme", "meditation", "respiration"],
-        thumbnail: "/images/vr/meditation-thumbnail.jpg"
+        thumbnail: "/images/vr/meditation-thumbnail.jpg",
+        theme: "Meditation" // Added required theme property
       }
     },
     {
@@ -120,7 +123,8 @@ export const getVRSessionHistory = async (userId: string): Promise<VRSession[]> 
         duration: 900,
         intensity: "medium",
         tags: ["nature", "forêt", "relaxation"],
-        thumbnail: "/images/vr/forest-thumbnail.jpg"
+        thumbnail: "/images/vr/forest-thumbnail.jpg",
+        theme: "Nature" // Added required theme property
       }
     }
   ];
