@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -9,13 +9,13 @@ const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
-  const { setUserMode } = useUserMode();
+  const { userMode, setUserMode } = useUserMode();
 
-  // Pour la démo, nous considérons tout le monde comme authentifié
+  // For demo purposes, we consider everyone as authenticated
   const demoIsAuthenticated = true;
 
-  // Déterminer le mode d'utilisateur en fonction du chemin
-  React.useEffect(() => {
+  // Set user mode based on path
+  useEffect(() => {
     console.log('ProtectedRoute path:', location.pathname);
     if (location.pathname.includes('/admin')) {
       setUserMode('b2b-admin');
@@ -28,6 +28,11 @@ const ProtectedRoute: React.FC = () => {
       console.log('Setting mode to b2c');
     }
   }, [location.pathname, setUserMode]);
+
+  // Additional debugging
+  useEffect(() => {
+    console.log('Current user mode in ProtectedRoute:', userMode);
+  }, [userMode]);
 
   if (isLoading) {
     return (

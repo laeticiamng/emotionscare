@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import UserDashboard from '@/components/dashboard/UserDashboard';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { notificationService } from '@/lib/coach/notification-service';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { SegmentProvider } from '@/contexts/SegmentContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -18,7 +17,7 @@ const DashboardPage: React.FC = () => {
   
   console.log('DashboardPage rendering with userMode:', userMode);
   
-  // Mock user data pour la démonstration
+  // Mock user data for demonstration
   const mockUser: User = {
     id: "demo-user-id",
     name: "Utilisateur Démo",
@@ -36,7 +35,8 @@ const DashboardPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Notification de bienvenue
+    console.log('Dashboard loaded with userMode:', userMode);
+    // Welcome notification
     toast({
       title: "Tableau de bord chargé",
       description: userMode === 'b2b-admin' 

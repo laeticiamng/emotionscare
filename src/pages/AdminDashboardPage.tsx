@@ -10,7 +10,7 @@ const AdminDashboardPage: React.FC = () => {
   const { setUserMode, userMode } = useUserMode();
   const { toast } = useToast();
   
-  // S'assurer que le mode utilisateur est défini sur b2b-admin
+  // Make sure user mode is set to b2b-admin
   useEffect(() => {
     setUserMode('b2b-admin');
     console.log('AdminDashboardPage is setting userMode to b2b-admin');
@@ -24,13 +24,11 @@ const AdminDashboardPage: React.FC = () => {
   console.log('AdminDashboardPage rendering with userMode:', userMode);
   
   return (
-    <Shell>
-      <div className="container mx-auto p-4">
-        <SegmentProvider>
-          <AdminDashboard />
-        </SegmentProvider>
-      </div>
-    </Shell>
+    <div className="container mx-auto p-4">
+      <SegmentProvider>
+        <AdminDashboard />
+      </SegmentProvider>
+    </div>
   );
 };
 

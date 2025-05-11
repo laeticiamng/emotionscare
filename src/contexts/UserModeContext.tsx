@@ -22,8 +22,21 @@ const UserModeContext = createContext<UserModeContextType>({
 });
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>('personal');
+  // Try to get stored mode from localStorage or default to 'personal'
+  const getInitialMode = (): UserMode => {
+    const storedMode = localStorage.getItem('userMode');
+    return (storedMode as UserMode) || 'personal';
+  };
+  
+  const [userMode, setUserModeState] = useState<UserMode>(getInitialMode);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Store mode in localStorage when it changes
+  const setUserMode = (mode: UserMode) => {
+    console.log('Setting user mode to:', mode);
+    setUserModeState(mode);
+    localStorage.setItem('userMode', mode);
+  };
   
   // Log userMode changes for debugging
   useEffect(() => {

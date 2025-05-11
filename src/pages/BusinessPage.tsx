@@ -13,11 +13,11 @@ const BusinessPage = () => {
   const { setUserMode } = useUserMode();
   
   const handleUserAccess = () => {
-    // Définir le mode utilisateur comme collaborateur B2B
+    // Set user mode to B2B collaborator
     setUserMode('b2b-collaborator');
     console.log('Setting user mode to b2b-collaborator');
     
-    // Redirection vers le tableau de bord utilisateur
+    // Redirect to user dashboard
     navigate('/dashboard');
     toast({
       title: "Accès collaborateur",
@@ -26,11 +26,11 @@ const BusinessPage = () => {
   };
   
   const handleAdminAccess = () => {
-    // Définir le mode utilisateur comme admin B2B
+    // Set user mode to B2B admin
     setUserMode('b2b-admin');
     console.log('Setting user mode to b2b-admin');
     
-    // Redirection vers le tableau de bord admin
+    // Redirect to admin dashboard
     navigate('/admin/dashboard');
     toast({
       title: "Accès administration",
@@ -72,7 +72,7 @@ const BusinessPage = () => {
           </Button>
           
           <Button 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/home')} 
             variant="ghost" 
             className="w-full mt-6"
           >

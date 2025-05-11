@@ -1,10 +1,15 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
   const navigate = useNavigate();
+  
+  // Auto-redirect to home
+  useEffect(() => {
+    navigate('/home');
+  }, [navigate]);
 
   return (
     <div className="container px-4 py-12 mx-auto">
