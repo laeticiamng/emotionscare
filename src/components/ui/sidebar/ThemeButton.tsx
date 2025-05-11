@@ -10,11 +10,9 @@ interface ThemeButtonProps {
 }
 
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
-  // Utiliser le hook useTheme ou créer une implémentation simple si non disponible
-  const { theme, setTheme } = useTheme?.() || { 
-    theme: 'light', 
-    setTheme: (t: string) => console.log('Theme would change to:', t) 
-  };
+  const themeContext = useTheme();
+  const theme = themeContext?.theme || 'light';
+  const setTheme = themeContext?.setTheme || ((t: any) => console.log('Theme would change to:', t));
   
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';

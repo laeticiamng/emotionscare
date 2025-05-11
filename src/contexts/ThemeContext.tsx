@@ -1,15 +1,16 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Updated to include all possible theme options
-type Theme = 'light' | 'dark' | 'system' | 'pastel';
-type FontSize = 'small' | 'medium' | 'large';
-type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | 'roboto' | 'poppins' | 'montserrat';
+// Définition unifiée des types de thème
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | 'roboto' | 'poppins' | 'montserrat';
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme;
+  resolvedTheme?: 'light' | 'dark' | 'pastel';
   setTheme: (theme: Theme) => void;
-  setThemePreference: (theme: Theme) => void; // Added for backward compatibility
+  setThemePreference: (theme: Theme) => void;
   fontFamily: FontFamily;
   setFontFamily: (fontFamily: FontFamily) => void;
   fontSize: FontSize;
@@ -37,11 +38,32 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     return savedFontSize || 'medium';
   });
 
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark' | 'pastel'>(
+    theme === 'system' 
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : theme as 'light' | 'dark' | 'pastel'
+  );
+
   useEffect(() => {
     const root = window.document.documentElement;
     
     // Enregistrer la préférence dans localStorage
     localStorage.setItem('theme', theme);
+    
+    // Résoudre le thème système si nécessaire
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      setResolvedTheme(systemTheme as 'light' | 'dark');
+      
+      // Appliquer le thème résolu
+      root.classList.remove('light', 'dark', 'system', 'pastel');
+      root.classList.add(systemTheme);
+    } else {
+      // Appliquer directement le thème choisi
+      root.classList.remove('light', 'dark', 'system', 'pastel');
+      root.classList.add(theme);
+      setResolvedTheme(theme as 'light' | 'dark' | 'pastel');
+    }
     
     // Appliquer la classe dark au document si nécessaire
     if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -49,12 +71,31 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       root.classList.remove('dark');
     }
-
-    // Apply theme-specific classes
-    root.classList.remove('light', 'dark', 'system', 'pastel');
-    root.classList.add(theme);
     
-    console.log('Theme updated:', theme);
+    console.log('Theme updated:', theme, 'Resolved theme:', resolvedTheme);
+  }, [theme]);
+
+  // Écouter les changements de préférence système
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = () => {
+      if (theme === 'system') {
+        const systemTheme = mediaQuery.matches ? 'dark' : 'light';
+        setResolvedTheme(systemTheme as 'light' | 'dark');
+        const root = window.document.documentElement;
+        
+        // Mettre à jour les classes
+        if (mediaQuery.matches) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
 
   // Save font preferences to localStorage when they change
@@ -76,6 +117,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <ThemeContext.Provider value={{ 
       theme, 
+      resolvedTheme,
       setTheme, 
       setThemePreference, 
       fontFamily, 
@@ -97,4 +139,4 @@ export const useTheme = () => {
 };
 
 // Export types for use in other files
-export type { Theme, FontSize, FontFamily };
+export type { ThemeContextType };

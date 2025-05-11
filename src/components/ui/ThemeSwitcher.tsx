@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+
+import React from 'react';
 import { Moon, Sun, Laptop, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,8 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTheme } from '@/components/theme/ThemeProvider';
-import { ThemeName } from '@/types';
+import { useTheme, Theme } from '@/contexts/ThemeContext';
 
 interface ThemeSwitcherProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
@@ -18,7 +18,12 @@ interface ThemeSwitcherProps {
 }
 
 const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showLabel = false }: ThemeSwitcherProps) => {
-  const { theme, resolvedTheme, setTheme, setThemePreference } = useTheme();
+  const { theme, resolvedTheme, setTheme, setThemePreference } = useTheme() || { 
+    theme: 'system' as Theme, 
+    resolvedTheme: 'light',
+    setTheme: () => {},
+    setThemePreference: () => {}
+  };
 
   // Icons based on current theme
   const getIcon = () => {
@@ -53,7 +58,7 @@ const ThemeSwitcher = ({ size = 'icon', variant = 'ghost', className = '', showL
       <DropdownMenuTrigger asChild>
         <Button variant={variant} size={size} className={`gap-2 ${className}`}>
           {getIcon()}
-          {size !== 'icon' && getLabel()}
+          {showLabel && getLabel()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTheme, FontFamily, FontSize } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
 
@@ -10,9 +10,9 @@ const ImmersiveSettingsPage: React.FC = () => {
     theme, 
     setTheme, 
     fontFamily = 'inter',
-    setFontFamily = () => {},
+    setFontFamily,
     fontSize = 'medium',
-    setFontSize = () => {}
+    setFontSize
   } = useTheme() || {};
   
   const handleThemeChange = (newTheme: string) => {
@@ -31,12 +31,14 @@ const ImmersiveSettingsPage: React.FC = () => {
           onChange={handleThemeChange}
         />
         
-        <FontSettings 
-          currentFontFamily={fontFamily as FontFamily}
-          onChangeFontFamily={(value) => setFontFamily(value as FontFamily)}
-          currentFontSize={fontSize as FontSize}
-          onChangeFontSize={(value) => setFontSize(value as FontSize)}
-        />
+        {setFontFamily && setFontSize && (
+          <FontSettings 
+            currentFontFamily={fontFamily}
+            onChangeFontFamily={(value) => setFontFamily(value)}
+            currentFontSize={fontSize}
+            onChangeFontSize={(value) => setFontSize(value)}
+          />
+        )}
         
         <Card>
           <CardHeader>

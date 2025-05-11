@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useTheme, Theme } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
@@ -94,7 +93,7 @@ const defaultPreferences: UserPreferencesState = {
 export function useUserPreferences() {
   const [preferences, setPreferences] = useState<UserPreferencesState>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
-  const theme = useTheme();
+  const themeContext = useTheme();
   const audioPrefs = useAudioPreferences();
   const { toast } = useToast();
 
@@ -121,11 +120,11 @@ export function useUserPreferences() {
       localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
       // Synchronize with other contexts if needed
-      if (newPreferences.theme && theme?.setTheme) {
+      if (newPreferences.theme && themeContext?.setTheme) {
         // Fix: Ensure theme is one of the allowed values
         const themeValue = newPreferences.theme;
         if (themeValue === 'light' || themeValue === 'dark' || themeValue === 'system' || themeValue === 'pastel') {
-          theme.setTheme(themeValue as Theme);
+          themeContext.setTheme(themeValue as Theme);
         }
       }
       
@@ -188,8 +187,8 @@ export function useUserPreferences() {
     localStorage.removeItem('userPreferences');
     
     // Also reset associated contexts
-    if (theme?.setTheme) {
-      theme.setTheme('light');
+    if (themeContext?.setTheme) {
+      themeContext.setTheme('light');
     }
     
     toast({

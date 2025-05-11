@@ -12,6 +12,8 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import ScanPage from '@/pages/ScanPage';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import ImmersiveSettingsPage from '@/pages/ImmersiveSettingsPage';
+import DesignSystemPage from '@/pages/DesignSystemPage';
 
 const App: React.FC = () => {
   console.log("Rendering App component");
@@ -33,6 +35,9 @@ const App: React.FC = () => {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             <Route path="/scan" element={<ScanPage />} />
+            <Route path="/settings/design" element={<DesignSystemPage />} />
+            <Route path="/settings/immersive" element={<ImmersiveSettingsPage />} />
+            
             {/* Ajout des routes pour les autres éléments de la sidebar */}
             <Route path="/journal" element={<div className="p-8"><h1>Journal</h1><p>Page en construction</p></div>} />
             <Route path="/music" element={<div className="p-8"><h1>Musicothérapie</h1><p>Page en construction</p></div>} />

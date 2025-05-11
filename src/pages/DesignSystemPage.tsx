@@ -4,7 +4,7 @@ import ColorPaletteDisplay from '@/components/theme/ColorPaletteDisplay';
 import ThemeColorExample from '@/components/theme/ThemeColorExample';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useTheme, Theme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon, Palette } from 'lucide-react';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 
@@ -13,7 +13,7 @@ import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
  * Affiche la palette de couleurs et les composants stylés
  */
 const DesignSystemPage: React.FC = () => {
-  const { theme, setTheme } = useTheme() || { theme: 'light' as Theme, setTheme: () => {} };
+  const { theme, setTheme, setThemePreference } = useTheme() || { theme: 'light', setTheme: () => {}, setThemePreference: () => {} };
 
   return (
     <div className="container mx-auto py-8 space-y-8 animate-fade-in">

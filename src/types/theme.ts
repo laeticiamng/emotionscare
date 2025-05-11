@@ -1,12 +1,16 @@
 
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+// Import des définitions de types depuis le ThemeContext principal
+import { Theme, FontSize, FontFamily, ThemeContextType } from '@/contexts/ThemeContext';
+
+// Re-export des types pour la compatibilité
+export type ThemeName = Theme;
 
 export interface ThemeSettings {
   name: ThemeName;
   primaryColor?: string;
   secondaryColor?: string;
   fontFamily?: string;
-  fontSize?: 'small' | 'medium' | 'large';
+  fontSize?: FontSize;
   radius?: 'none' | 'small' | 'medium' | 'large' | 'full';
   animations?: boolean;
 }
@@ -34,13 +38,5 @@ export interface ThemeProviderProps {
   defaultTheme?: ThemeName;
 }
 
-export interface ThemeContextProps {
-  theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
-  setThemePreference?: (theme: ThemeName) => void;
-  systemTheme?: ThemeName;
-  fontFamily?: string;
-  setFontFamily?: (font: string) => void;
-  fontSize?: string;
-  setFontSize?: (size: string) => void;
-}
+// Mettre à jour pour être compatible avec le ThemeContext principal
+export type ThemeContextProps = ThemeContextType;
