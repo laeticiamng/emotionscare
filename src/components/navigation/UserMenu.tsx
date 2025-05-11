@@ -103,7 +103,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="font-normal text-xs">Mode utilisateur</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => setUserMode(userMode === 'b2b-admin' ? 'personal' : 'b2b-admin')}>
+            <DropdownMenuItem onClick={() => setUserMode(userMode === 'b2b-admin' ? 'b2c' : 'b2b-admin')}>
               <Briefcase className="mr-2 h-4 w-4" />
               <span>{userMode === 'b2b-admin' ? 'Vue utilisateur' : 'Vue administrateur'}</span>
             </DropdownMenuItem>

@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type UserMode = 'b2c' | 'b2b-collaborator' | 'b2b-admin';
+export type UserMode = 'b2c' | 'b2b-collaborator' | 'b2b-admin' | 'personal';
 
 interface UserModeContextType {
   userMode: UserMode;
@@ -41,7 +41,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
   
   // Valeurs dérivées
-  const isB2C = userMode === 'b2c';
+  const isB2C = userMode === 'b2c' || userMode === 'personal';
   const isB2B = userMode === 'b2b-collaborator' || userMode === 'b2b-admin';
   const isAdmin = userMode === 'b2b-admin';
 

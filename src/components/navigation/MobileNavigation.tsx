@@ -95,7 +95,7 @@ const MobileNavigation: React.FC<MobileNavProps> = ({ user }) => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => setUserMode(isB2BMode ? 'personal' : 'b2b-admin')}
+                  onClick={() => setUserMode(isB2BMode ? 'b2c' : 'b2b-admin')}
                   className="mb-2"
                 >
                   Passer en mode {isB2BMode ? 'Particulier' : 'Administrateur'}
