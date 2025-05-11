@@ -37,6 +37,8 @@ import OnboardingModePage from '@/pages/OnboardingModePage';
 import OnboardingPage from '@/pages/OnboardingPage';
 import OnboardingExperiencePage from '@/pages/OnboardingExperiencePage';
 import PredictiveDashboardPage from '@/pages/PredictiveDashboardPage';
+import BusinessPage from '@/pages/BusinessPage';
+import AdminLoginPage from '@/pages/AdminLoginPage';
 
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
@@ -63,6 +65,10 @@ const App: React.FC = () => {
                         <Route path="/onboarding-mode" element={<OnboardingModePage />} />
                         <Route path="/onboarding" element={<OnboardingPage />} />
                         <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
+                        
+                        {/* New B2B Routes */}
+                        <Route path="/business" element={<BusinessPage />} />
+                        <Route path="/admin-login" element={<AdminLoginPage />} />
                         
                         {/* Protected Routes */}
                         <Route element={<ProtectedLayoutWrapper><ProtectedRoute /></ProtectedLayoutWrapper>}>

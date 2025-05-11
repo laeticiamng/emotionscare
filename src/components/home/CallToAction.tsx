@@ -2,10 +2,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, User, Building } from 'lucide-react';
 
 interface CallToActionProps {
-  type: 'user' | 'admin';
+  type: 'personal' | 'business';
   className?: string;
 }
 
@@ -13,10 +13,10 @@ const CallToAction: React.FC<CallToActionProps> = ({ type, className = '' }) => 
   const navigate = useNavigate();
   
   const handleNavigate = () => {
-    if (type === 'user') {
+    if (type === 'personal') {
       navigate('/login');
     } else {
-      navigate('/admin-login');
+      navigate('/business');
     }
   };
   
@@ -25,10 +25,20 @@ const CallToAction: React.FC<CallToActionProps> = ({ type, className = '' }) => 
       onClick={handleNavigate}
       size="lg"
       className={`w-full hover-lift shadow-premium transition-all duration-300 ${className}`}
-      variant={type === 'admin' ? 'outline' : 'default'}
+      variant={type === 'business' ? 'outline' : 'default'}
     >
-      <span className="mr-2.5">{type === 'user' ? 'Me connecter' : 'Connexion Admin'}</span>
-      <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
+      {type === 'personal' ? (
+        <>
+          <User className="mr-2 h-5 w-5" />
+          <span>Particulier</span>
+        </>
+      ) : (
+        <>
+          <Building className="mr-2 h-5 w-5" />
+          <span>Entreprise</span>
+        </>
+      )}
+      <ArrowRight size={18} className="ml-2 transition-transform group-hover:translate-x-0.5" />
     </Button>
   );
 };
