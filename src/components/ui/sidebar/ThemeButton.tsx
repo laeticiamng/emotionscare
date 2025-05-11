@@ -45,7 +45,7 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
     switch (theme) {
       case 'light': return 'Mode sombre';
       case 'dark': return 'Mode système';
-      case 'system': return theme === 'system' && resolvedTheme === 'dark' ? 'Mode clair' : 'Mode pastel';
+      case 'system': return 'Mode pastel';
       case 'pastel': return 'Mode clair';
       default: return 'Changer de thème';
     }
