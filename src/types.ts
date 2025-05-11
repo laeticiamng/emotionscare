@@ -27,6 +27,11 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
+  showEmotionPrompts?: boolean;
+  notification_frequency?: string;
+  notification_type?: string;
+  notification_tone?: string;
+  emotionalCamouflage?: boolean;
 }
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
@@ -68,6 +73,8 @@ export interface VRSessionTemplate {
   template_id?: string;
   completion_rate?: number;
   emotion_target?: string;
+  level?: string;
+  recommended_mood?: string;
 }
 
 export interface ChatMessage {
@@ -149,9 +156,12 @@ export interface Story {
   type: string;
   seen?: boolean;
   image?: string;
+  emotion?: string;
   cta?: {
     label: string;
     route: string;
+    text?: string;
+    action?: string;
   };
 }
 
@@ -171,6 +181,8 @@ export interface Badge {
   image_url?: string;
   icon?: string;
   threshold?: number;
+  user_id?: string;
+  unlocked_at?: string;
 }
 
 export interface JournalEntry {
@@ -278,4 +290,16 @@ export interface Track extends MusicTrack {
 
 export interface Playlist extends MusicPlaylist {
   title?: string;
+}
+
+export interface VRSessionWithMusicProps {
+  template: VRSessionTemplate;
+  onComplete: () => void;
+}
+
+export interface ChatResponse {
+  id: string;
+  content: string;
+  role: string;
+  timestamp: string;
 }

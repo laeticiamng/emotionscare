@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useStorytelling } from '@/providers/StorytellingProvider';
+import { useStorytelling } from '@/contexts/StorytellingContext';
 import { Story } from '@/types';
 
 interface WelcomeHeroProps {

@@ -1,84 +1,132 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CircularProgress from '@/components/ui/circular-progress';
 import { InvitationStats } from '@/types';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { CircularProgress } from '@/components/ui/circular-progress';
 
-interface InvitationStatsProps {
+interface InvitationStatsDisplayProps {
   stats: InvitationStats;
 }
 
-const InvitationStatsDisplay: React.FC<InvitationStatsProps> = ({ stats }) => {
-  // Calculate percentage of each status
-  const total = stats.total || 1; // Avoid division by zero
-  const pendingPercentage = Math.round((stats.pending / total) * 100);
-  const acceptedPercentage = Math.round((stats.accepted / total) * 100);
-  const expiredPercentage = Math.round((stats.expired / total) * 100);
-  const rejectedPercentage = Math.round((stats.rejected / total) * 100);
-  const sentPercentage = Math.round((stats.sent / total) * 100);
-
-  // Chart data
-  const chartData = [
-    { name: 'En attente', value: stats.pending },
-    { name: 'Acceptées', value: stats.accepted },
-    { name: 'Expirées', value: stats.expired },
-    { name: 'Rejetées', value: stats.rejected },
-    { name: 'Envoyées', value: stats.sent || 0 }
-  ];
-
+const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }) => {
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle>Statistiques des invitations</CardTitle>
-      </CardHeader>
-      <CardContent className="p-6">
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="flex flex-col justify-center items-center">
-            <CircularProgress
-              value={stats.accepted}
-              max={total}
-              size={120}
-              className="text-primary"
-              showValue={false}
-            />
-            <div className="mt-2 text-center">
-              <p className="text-2xl font-semibold">{acceptedPercentage}%</p>
-              <p className="text-sm text-muted-foreground">Taux d&apos;acceptation</p>
+    <Card>
+      <CardContent className="pt-6">
+        <Tabs defaultValue="overview">
+          <TabsList className="mb-4">
+            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="teams">Par équipe</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatCard 
+                title="Total" 
+                value={stats.total} 
+                icon="📧"
+              />
+              <StatCard 
+                title="En attente" 
+                value={stats.pending} 
+                icon="⏳"
+                percentage={stats.total > 0 ? (stats.pending / stats.total) * 100 : 0}
+              />
+              <StatCard 
+                title="Acceptées" 
+                value={stats.accepted} 
+                icon="✅"
+                percentage={stats.total > 0 ? (stats.accepted / stats.total) * 100 : 0}
+              />
+              <StatCard 
+                title="Expirées" 
+                value={stats.expired + stats.rejected} 
+                icon="⛔"
+                percentage={stats.total > 0 ? ((stats.expired + stats.rejected) / stats.total) * 100 : 0}
+              />
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col items-center bg-card/50 p-3 rounded">
-              <span className="text-lg font-semibold">{stats.total}</span>
-              <span className="text-xs text-muted-foreground">Total</span>
+            
+            <div className="flex flex-col md:flex-row gap-4 mt-4">
+              <div className="flex-1">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">Taux de conversion</h3>
+                        <p className="text-2xl font-bold">{stats.conversionRate}%</p>
+                      </div>
+                      <CircularProgress 
+                        value={stats.conversionRate} 
+                        size={70}
+                        thickness={8}
+                        color="var(--primary)"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <div className="flex-1">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">Temps moyen d'acceptation</h3>
+                        <p className="text-2xl font-bold">{stats.averageTimeToAccept} heures</p>
+                      </div>
+                      <div className="text-3xl">⏱️</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-            <div className="flex flex-col items-center bg-card/50 p-3 rounded">
-              <span className="text-lg font-semibold text-amber-500">{stats.pending}</span>
-              <span className="text-xs text-muted-foreground">En attente</span>
+          </TabsContent>
+          
+          <TabsContent value="teams">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(stats.teams).map(([team, count]) => (
+                <Card key={team}>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium">{team}</h3>
+                        <p className="text-2xl font-bold">{count}</p>
+                      </div>
+                      <CircularProgress 
+                        value={count} 
+                        max={stats.total} 
+                        size={60}
+                        thickness={6}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-            <div className="flex flex-col items-center bg-card/50 p-3 rounded">
-              <span className="text-lg font-semibold text-green-500">{stats.accepted}</span>
-              <span className="text-xs text-muted-foreground">Acceptées</span>
-            </div>
-            <div className="flex flex-col items-center bg-card/50 p-3 rounded">
-              <span className="text-lg font-semibold text-red-500">{stats.expired}</span>
-              <span className="text-xs text-muted-foreground">Expirées</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="h-60 mt-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-              <XAxis dataKey="name" fontSize={12} tick={{ fill: '#888888' }} />
-              <YAxis fontSize={12} tick={{ fill: '#888888' }} />
-              <Tooltip />
-              <Bar dataKey="value" name="Nombre" fill="var(--color-brand-primary)" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
+  );
+};
+
+const StatCard = ({ title, value, icon, percentage }: { 
+  title: string; 
+  value: number; 
+  icon: string;
+  percentage?: number;
+}) => {
+  return (
+    <div className="bg-white rounded-lg p-4 shadow-sm border">
+      <div className="flex justify-between items-center">
+        <span className="text-3xl">{icon}</span>
+        {percentage !== undefined && (
+          <span className="text-xs text-muted-foreground">{Math.round(percentage)}%</span>
+        )}
+      </div>
+      <h3 className="mt-2 text-gray-500 text-sm">{title}</h3>
+      <p className="text-2xl font-bold">{value}</p>
+    </div>
   );
 };
 

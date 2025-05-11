@@ -105,7 +105,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     console.log('Previous track');
   };
   
-  const previousTrack = prevTrack;
+  const previousTrack = () => {
+    // Alias for prevTrack for compatibility
+    prevTrack();
+  };
   
   const addTrackToQueue = (track: MusicTrack) => {
     setQueue(prev => [...prev, track]);

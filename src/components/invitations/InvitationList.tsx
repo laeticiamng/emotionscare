@@ -1,144 +1,119 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { InvitationData, UserRole } from '@/types';
-import { Check, Clock, X, Trash, Send, RefreshCw } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { getRoleDisplayName } from '@/utils/roleUtils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { InvitationData } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Send, Eye, Trash } from 'lucide-react';
 
 interface InvitationListProps {
   invitations: InvitationData[];
-  isLoading: boolean;
-  onResend?: (invitation: InvitationData) => void;
-  onDelete?: (invitation: InvitationData) => void;
+  isLoading?: boolean;
+  onResend?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onView?: (id: string) => void;
 }
 
-const InvitationList: React.FC<InvitationListProps> = ({ 
-  invitations, 
-  isLoading,
+const InvitationList: React.FC<InvitationListProps> = ({
+  invitations,
+  isLoading = false,
   onResend,
-  onDelete
+  onDelete,
+  onView
 }) => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return <Check className="h-4 w-4 text-green-500" />;
-      case 'pending':
-        return <Clock className="h-4 w-4 text-amber-500" />;
-      case 'expired':
-        return <X className="h-4 w-4 text-red-500" />;
-      case 'rejected':
-        return <X className="h-4 w-4 text-red-500" />;
-      default:
-        return null;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Acceptée</Badge>;
-      case 'pending':
-        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">En attente</Badge>;
-      case 'expired':
-        return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Expirée</Badge>;
-      case 'rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Rejetée</Badge>;
-      default:
-        return null;
-    }
-  };
-
-  const formatDate = (dateStr: string) => {
-    try {
-      return formatDistanceToNow(new Date(dateStr), { addSuffix: true, locale: fr });
-    } catch (e) {
-      return 'Invalid date';
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="flex justify-between items-center p-3 border rounded-lg">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-3 w-32" />
-            </div>
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-8 w-20" />
-              <Skeleton className="h-8 w-8 rounded-full" />
-            </div>
-          </div>
-        ))}
+      <div className="flex justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   if (invitations.length === 0) {
     return (
-      <div className="text-center py-6 text-muted-foreground">
-        Aucune invitation dans cette catégorie
+      <div className="text-center py-8 text-muted-foreground">
+        Aucune invitation trouvée
       </div>
     );
   }
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Badge variant="warning">En attente</Badge>;
+      case 'accepted':
+        return <Badge variant="success">Acceptée</Badge>;
+      case 'expired':
+        return <Badge variant="secondary">Expirée</Badge>;
+      case 'rejected':
+        return <Badge variant="destructive">Refusée</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {invitations.map((invitation) => (
-        <div key={invitation.id} className="flex justify-between items-center p-3 border rounded-lg hover:bg-muted/5">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{invitation.email}</span>
-              {getStatusBadge(invitation.status)}
+        <div
+          key={invitation.id}
+          className="p-4 border rounded-lg bg-background shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
+        >
+          <div className="flex-1">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
+              <p className="font-medium">{invitation.email}</p>
+              <div className="flex items-center gap-2">
+                {getStatusBadge(invitation.status)}
+                <Badge variant="outline">{invitation.role}</Badge>
+              </div>
             </div>
-            <div className="text-sm text-muted-foreground mt-1 flex items-center gap-3">
-              <span>Rôle: {getRoleDisplayName(invitation.role as UserRole)}</span>
-              <span>•</span>
-              <span>Envoyée {formatDate(invitation.created_at)}</span>
-              {invitation.expires_at && invitation.status === 'pending' && (
+            
+            <div className="mt-2 text-sm text-muted-foreground">
+              <span>
+                Envoyée {formatDistanceToNow(new Date(invitation.created_at), { addSuffix: true, locale: fr })}
+              </span>
+              <span className="mx-2">•</span>
+              <span>
+                Expire {formatDistanceToNow(new Date(invitation.expires_at), { addSuffix: true, locale: fr })}
+              </span>
+              {invitation.accepted_at && (
                 <>
-                  <span>•</span>
-                  <span>Expire {formatDate(invitation.expires_at)}</span>
+                  <span className="mx-2">•</span>
+                  <span>
+                    Acceptée {formatDistanceToNow(new Date(invitation.accepted_at), { addSuffix: true, locale: fr })}
+                  </span>
                 </>
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {invitation.status === 'pending' && onResend && (
               <Button 
-                size="icon" 
-                variant="ghost" 
-                onClick={() => onResend(invitation)}
-                title="Renvoyer l'invitation"
+                variant="outline" 
+                size="sm" 
+                onClick={() => onResend(invitation.id)}
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4 mr-1" /> Renvoyer
               </Button>
             )}
             
-            {(invitation.status === 'expired' || invitation.status === 'pending') && onResend && (
+            {onView && (
               <Button 
-                size="icon" 
                 variant="ghost" 
-                onClick={() => onResend(invitation)}
-                title="Renouveler l'invitation"
+                size="sm" 
+                onClick={() => onView(invitation.id)}
               >
-                <RefreshCw className="h-4 w-4" />
+                <Eye className="h-4 w-4" />
               </Button>
             )}
             
             {onDelete && (
               <Button 
-                size="icon" 
                 variant="ghost" 
-                onClick={() => onDelete(invitation)}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                title="Supprimer l'invitation"
+                size="sm" 
+                onClick={() => onDelete(invitation.id)}
               >
                 <Trash className="h-4 w-4" />
               </Button>

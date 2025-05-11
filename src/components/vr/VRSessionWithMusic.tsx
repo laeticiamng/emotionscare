@@ -1,87 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import VRSessionProgress from './VRSessionProgress';
-import VRSessionControls from './VRSessionControls';
-import VRMusicTrackInfo from './VRMusicTrackInfo';
-import { VRSessionTemplate, MusicTrack, VRSessionWithMusicProps } from '@/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
-  session,
-  musicTracks = [],
-  onSessionComplete,
-  isAudioOnly = false,
-  videoUrl,
-  audioUrl,
-  emotion
-}) => {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(musicTracks[0] || null);
-  const [isMusicPlaying, setIsMusicPlaying] = useState(true);
-  const [percentComplete, setPercentComplete] = useState(0);
-  const [timer, setTimer] = useState(0);
+import React, { useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { useMusic } from '@/contexts/MusicContext';
+import { VRSessionWithMusicProps } from '@/types/vr';
 
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ template, onComplete }) => {
+  const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
+  
   useEffect(() => {
-    if (musicTracks.length > 0) {
-      setCurrentTrack(musicTracks[0]);
-    }
-  }, [musicTracks]);
-
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-
-    if (isPlaying && !isPaused && session) {
-      intervalId = setInterval(() => {
-        setTimer((prevTimer) => {
-          const newTimer = prevTimer + 1;
-          const newPercentComplete = Math.min((newTimer / session.duration) * 100, 100);
-          setPercentComplete(newPercentComplete);
-          return newTimer;
-        });
-      }, 60000); // Update every 60 seconds (1 minute)
-    }
-
-    return () => clearInterval(intervalId);
-  }, [isPlaying, isPaused, session]);
-
-  const togglePause = () => {
-    setIsPaused(!isPaused);
-    setIsPlaying(true);
-  };
-
-  const toggleMusic = () => {
-    setIsMusicPlaying(!isMusicPlaying);
-  };
-
-  const completeSession = () => {
-    setIsPlaying(false);
-    setIsPaused(false);
-    onSessionComplete();
-  };
-
+    // Load a playlist based on the target emotion of the session
+    const loadMusic = async () => {
+      if (template.emotions && template.emotions.length > 0) {
+        const targetEmotion = template.emotions[0];
+        const playlist = await loadPlaylistForEmotion(targetEmotion);
+        
+        if (playlist && playlist.tracks.length > 0) {
+          playTrack(playlist.tracks[0]);
+        }
+      }
+    };
+    
+    loadMusic();
+    
+    // Cleanup
+    return () => {
+      pauseTrack();
+    };
+  }, [template, loadPlaylistForEmotion, playTrack, pauseTrack]);
+  
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>{session?.title || 'Session VR'}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <VRSessionProgress percentComplete={percentComplete} />
-          {currentTrack && isMusicPlaying && (
-            <VRMusicTrackInfo currentTrack={currentTrack} />
-          )}
-          <VRSessionControls
-            isPaused={isPaused}
-            isAudioOnly={isAudioOnly}
-            isMusicPlaying={isMusicPlaying}
-            onTogglePause={togglePause}
-            onToggleMusic={toggleMusic}
-            onComplete={completeSession}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="mb-4">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium">Musique adaptative</h3>
+            <p className="text-sm text-muted-foreground">
+              {isPlaying ? 
+                'Lecture en cours - Musique adaptée à votre session' : 
+                'La musique démarrera automatiquement'}
+            </p>
+          </div>
+          
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <span className="animate-pulse">🎵</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

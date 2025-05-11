@@ -2,10 +2,27 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import InvitationList from '@/components/invitations/InvitationList';
 import InvitationForm from '@/components/invitations/InvitationForm';
 import InvitationStatsDisplay from './InvitationStats';
 import { InvitationStats, InvitationData } from '@/types';
+import InvitationModal from './InvitationModal';
+
+// Mock implementation for InvitationList component
+const InvitationList = ({ invitations, isLoading }: { invitations: InvitationData[], isLoading: boolean }) => (
+  <div>
+    {isLoading ? (
+      <div>Loading...</div>
+    ) : invitations.length === 0 ? (
+      <div>Aucune invitation trouvée</div>
+    ) : (
+      <ul>
+        {invitations.map(invitation => (
+          <li key={invitation.id}>{invitation.email} - {invitation.status}</li>
+        ))}
+      </ul>
+    )}
+  </div>
+);
 
 const InvitationsTab = () => {
   const [invitationStats, setInvitationStats] = useState<InvitationStats>({
@@ -22,65 +39,71 @@ const InvitationsTab = () => {
     recent_invites: []
   });
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleInvitationSent = () => {
+    // Refresh data after an invitation is sent
+    fetchInvitationStats();
+    setModalOpen(false);
+  };
+
+  const fetchInvitationStats = async () => {
+    setLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Mock data
+    setInvitationStats({
+      total: 120,
+      pending: 45,
+      accepted: 62,
+      expired: 8,
+      rejected: 5,
+      sent: 120,
+      completed: 67,
+      conversionRate: 51.7,
+      averageTimeToAccept: 32, // hours
+      teams: {
+        'Marketing': 28,
+        'Engineering': 35,
+        'Sales': 22,
+        'HR': 15,
+        'Management': 20
+      },
+      recent_invites: [
+        {
+          id: 'inv1',
+          email: 'johndoe@example.com',
+          status: 'accepted',
+          created_at: '2023-10-15T14:30:00Z',
+          expires_at: '2023-10-22T14:30:00Z',
+          accepted_at: '2023-10-16T09:12:00Z',
+          role: 'user'
+        },
+        {
+          id: 'inv2',
+          email: 'janedoe@example.com',
+          status: 'pending',
+          created_at: '2023-10-16T11:20:00Z',
+          expires_at: '2023-10-23T11:20:00Z',
+          role: 'user'
+        },
+        {
+          id: 'inv3',
+          email: 'robert@example.com',
+          status: 'expired',
+          created_at: '2023-09-29T08:45:00Z',
+          expires_at: '2023-10-06T08:45:00Z',
+          role: 'manager'
+        }
+      ] as InvitationData[]
+    });
+    
+    setLoading(false);
+  };
 
   useEffect(() => {
-    // Simulate API fetch
-    const fetchInvitationStats = async () => {
-      setLoading(true);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock data
-      setInvitationStats({
-        total: 120,
-        pending: 45,
-        accepted: 62,
-        expired: 8,
-        rejected: 5,
-        sent: 120,
-        completed: 67,
-        conversionRate: 51.7,
-        averageTimeToAccept: 32, // hours
-        teams: {
-          'Marketing': 28,
-          'Engineering': 35,
-          'Sales': 22,
-          'HR': 15,
-          'Management': 20
-        },
-        recent_invites: [
-          {
-            id: 'inv1',
-            email: 'johndoe@example.com',
-            status: 'accepted',
-            created_at: '2023-10-15T14:30:00Z',
-            expires_at: '2023-10-22T14:30:00Z',
-            accepted_at: '2023-10-16T09:12:00Z',
-            role: 'user'
-          },
-          {
-            id: 'inv2',
-            email: 'janedoe@example.com',
-            status: 'pending',
-            created_at: '2023-10-16T11:20:00Z',
-            expires_at: '2023-10-23T11:20:00Z',
-            role: 'user'
-          },
-          {
-            id: 'inv3',
-            email: 'robert@example.com',
-            status: 'expired',
-            created_at: '2023-09-29T08:45:00Z',
-            expires_at: '2023-10-06T08:45:00Z',
-            role: 'manager'
-          }
-        ] as InvitationData[]
-      });
-      
-      setLoading(false);
-    };
-    
     fetchInvitationStats();
   }, []);
 
@@ -96,7 +119,7 @@ const InvitationsTab = () => {
             <CardTitle>Nouvelle invitation</CardTitle>
           </CardHeader>
           <CardContent>
-            <InvitationForm />
+            <InvitationForm onInvitationSent={handleInvitationSent} />
           </CardContent>
         </Card>
       </div>
@@ -143,6 +166,12 @@ const InvitationsTab = () => {
           </Tabs>
         </CardContent>
       </Card>
+
+      <InvitationModal 
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        onInvitationSent={handleInvitationSent}
+      />
     </div>
   );
 };

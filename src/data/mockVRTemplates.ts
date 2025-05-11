@@ -13,14 +13,14 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     category: 'relaxation',
     preview_url: 'https://www.youtube.com/embed/LXb3EKWsInQ',
     is_audio_only: false,
-    level: 'beginner',
+    audio_url: '/audio/beach.mp3', // Added missing required property
+    difficulty: 'easy',
     completion_rate: 85,
     emotions: ['calm', 'peaceful'],
     benefits: ['Réduction du stress', 'Amélioration du sommeil'],
-    recommended_mood: 'stressed',
     tags: ['nature', 'water', 'relaxation'],
     popularity: 95,
-    difficulty: 'easy'
+    recommended_mood: 'stressed'
   },
   {
     id: 'template-2',
@@ -33,14 +33,14 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     category: 'meditation',
     preview_url: 'https://www.youtube.com/embed/ReYbOqwJk6I',
     is_audio_only: false,
-    level: 'intermediate',
+    audio_url: '/audio/forest.mp3', // Added missing required property
+    difficulty: 'medium',
     completion_rate: 72,
     emotions: ['mindful', 'focused'],
     benefits: ['Clarté mentale', 'Réduction de l\'anxiété'],
-    recommended_mood: 'anxious',
     tags: ['nature', 'forest', 'meditation'],
     popularity: 88,
-    difficulty: 'medium'
+    recommended_mood: 'anxious'
   },
   {
     id: 'template-3',
@@ -53,14 +53,13 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     category: 'meditation',
     is_audio_only: true,
     audio_url: '/audio/guided-meditation.mp3',
-    level: 'beginner',
+    difficulty: 'easy',
     completion_rate: 65,
     emotions: ['peaceful', 'relaxed'],
     benefits: ['Réduction du stress', 'Amélioration du bien-être'],
-    recommended_mood: 'overwhelmed',
     tags: ['audio', 'meditation', 'guided'],
     popularity: 75,
-    difficulty: 'easy'
+    recommended_mood: 'overwhelmed'
   },
   {
     id: 'template-4',
@@ -73,14 +72,14 @@ export const mockVRTemplatesData: VRSessionTemplate[] = [
     category: 'breathing',
     preview_url: 'https://www.youtube.com/embed/21qNxnCS8WU',
     is_audio_only: false,
-    level: 'beginner',
+    audio_url: '/audio/mountain.mp3', // Added missing required property
+    difficulty: 'easy',
     completion_rate: 78,
     emotions: ['energized', 'balanced'],
     benefits: ['Amélioration de la concentration', 'Augmentation de l\'énergie'],
-    recommended_mood: 'tired',
     tags: ['mountains', 'breathing', 'energy'],
     popularity: 82,
-    difficulty: 'easy'
+    recommended_mood: 'tired'
   }
 ];
 

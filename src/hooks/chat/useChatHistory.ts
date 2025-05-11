@@ -1,135 +1,89 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { ChatConversation, ChatMessage } from '@/types/chat';
+import { useState, useEffect } from 'react';
+import { ChatMessage } from '@/types';
 
-export interface UseChatHistoryResult {
-  conversations: ChatConversation[];
-  activeConversationId: string | null;
-  deleteConversation: (conversationId: string) => Promise<boolean>;
-  loadMessages: (conversationId: string) => Promise<ChatMessage[]>;
-  setActiveConversationId: (id: string | null) => void;
+interface UseChatHistoryOptions {
+  limit?: number;
 }
 
-export function useChatHistory(): UseChatHistoryResult {
-  const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  
-  // Load conversations on component mount
+export const useChatHistory = (options?: UseChatHistoryOptions) => {
+  const [history, setHistory] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const limit = options?.limit || 10;
+
   useEffect(() => {
-    const loadConversations = async () => {
+    const fetchChatHistory = async () => {
+      setIsLoading(true);
+      
       try {
-        // In a real application, this would be loaded from an API
-        const mockConversations: ChatConversation[] = [
-          {
-            id: 'conv1',
-            title: 'Première conversation',
-            created_at: new Date(Date.now() - 86400000 * 3),
-            updated_at: new Date(Date.now() - 86400000 * 2),
-            user_id: 'user-1',
-            messages: [],
-            last_message: 'Comment puis-je améliorer mon bien-être ?'
-          },
-          {
-            id: 'conv2',
-            title: 'Discussion sur l\'anxiété',
-            created_at: new Date(Date.now() - 86400000 * 2),
-            updated_at: new Date(Date.now() - 86400000),
-            user_id: 'user-1',
-            messages: [],
-            last_message: 'Merci pour ces conseils utiles.'
-          }
-        ];
-        setConversations(mockConversations);
+        // Mock API call to fetch chat history
+        await new Promise(resolve => setTimeout(resolve, 600));
         
-        // Set the most recent conversation as active if none is selected
-        if (!activeConversationId && mockConversations.length > 0) {
-          setActiveConversationId(mockConversations[0].id);
-        }
+        // Mock data
+        setHistory(getMockChatHistory());
       } catch (error) {
-        console.error('Error loading conversations:', error);
+        console.error('Error fetching chat history:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     
-    loadConversations();
-  }, []);
+    fetchChatHistory();
+  }, [limit]);
   
-  // Load messages for a specific conversation
-  const loadMessages = useCallback(async (conversationId: string): Promise<ChatMessage[]> => {
-    try {
-      // In a real application, this would be loaded from an API
-      const mockMessages: ChatMessage[] = [
-        {
-          id: 'msg1',
-          content: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
-          text: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
-          sender: 'bot',
-          sender_id: 'coach-1',
-          conversation_id: conversationId,
-          is_read: true,
-          timestamp: new Date(Date.now() - 3600000)
-        },
-        {
-          id: 'msg2',
-          content: 'Je me sens stressé au travail. Que me conseillez-vous ?',
-          text: 'Je me sens stressé au travail. Que me conseillez-vous ?',
-          sender: 'user',
-          sender_id: 'user-1',
-          conversation_id: conversationId,
-          is_read: true,
-          timestamp: new Date(Date.now() - 3300000)
-        },
-        {
-          id: 'msg3',
-          content: 'Je comprends. Le stress au travail est courant. Essayez des exercices de respiration profonde et prenez des pauses régulières.',
-          text: 'Je comprends. Le stress au travail est courant. Essayez des exercices de respiration profonde et prenez des pauses régulières.',
-          sender: 'bot',
-          sender_id: 'coach-1',
-          conversation_id: conversationId,
-          is_read: true,
-          timestamp: new Date(Date.now() - 3000000)
-        }
-      ];
-      
-      // Update the local state with the loaded messages
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversationId ? { ...conv, messages: mockMessages } : conv
-        )
-      );
-      
-      return mockMessages;
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      return [];
-    }
-  }, []);
-  
-  // Delete a conversation
-  const deleteConversation = useCallback(async (conversationId: string): Promise<boolean> => {
-    try {
-      // In a real application, this would be an API call
-      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-      
-      // If the active conversation is deleted, set the active conversation to null
-      if (activeConversationId === conversationId) {
-        setActiveConversationId(null);
+  const getMockChatHistory = (): ChatMessage[] => {
+    // Mock chat history data
+    return [
+      {
+        id: 'msg1',
+        text: "Bonjour, comment puis-je vous aider aujourd'hui?",
+        sender: 'coach',
+        sender_type: 'ai',
+        timestamp: new Date(Date.now() - 3600000 * 24).toISOString(), // 1 day ago
+        conversation_id: 'conv1',
+        role: 'assistant'
+      },
+      {
+        id: 'msg2',
+        text: "Je me sens un peu stressé ces derniers jours.",
+        sender: 'user',
+        sender_type: 'user',
+        timestamp: new Date(Date.now() - 3550000 * 24).toISOString(),
+        conversation_id: 'conv1',
+        role: 'user'
+      },
+      {
+        id: 'msg3',
+        text: "Je comprends. Pouvez-vous me dire ce qui vous stresse particulièrement?",
+        sender: 'coach',
+        sender_type: 'ai',
+        timestamp: new Date(Date.now() - 3500000 * 24).toISOString(),
+        conversation_id: 'conv1',
+        role: 'assistant'
+      },
+      {
+        id: 'msg4',
+        text: "Mon travail et aussi ma vie personnelle. J'ai du mal à trouver un équilibre.",
+        sender: 'user',
+        sender_type: 'user',
+        timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
+        conversation_id: 'conv1',
+        role: 'user'
+      },
+      {
+        id: 'msg5',
+        text: "Merci pour votre confiance. Nous allons explorer ensemble des stratégies pour mieux gérer ce stress et trouver un meilleur équilibre entre vie professionnelle et personnelle.",
+        sender: 'coach',
+        sender_type: 'ai',
+        timestamp: new Date(Date.now() - 1700000).toISOString(),
+        conversation_id: 'conv1',
+        role: 'assistant'
       }
-      
-      return true;
-    } catch (error) {
-      console.error('Error deleting conversation:', error);
-      return false;
-    }
-  }, [activeConversationId]);
-
-  return {
-    conversations,
-    activeConversationId,
-    deleteConversation,
-    loadMessages,
-    setActiveConversationId
+    ];
   };
-}
-
-export default useChatHistory;
+  
+  return {
+    history,
+    isLoading,
+  };
+};

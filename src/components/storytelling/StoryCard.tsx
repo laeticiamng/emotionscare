@@ -1,130 +1,110 @@
 
 import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useStorytelling } from '@/providers/StorytellingProvider';
+import { Story } from '@/types';
 import { useSoundscape } from '@/providers/SoundscapeProvider';
+import { useStorytelling } from '@/contexts/StorytellingContext';
 
 interface StoryCardProps {
-  storyId: string;
-  minimal?: boolean;
-  className?: string;
+  story: Story;
+  onClose?: () => void;
 }
 
-const StoryCard: React.FC<StoryCardProps> = ({ storyId, minimal = false, className = '' }) => {
+const StoryCard: React.FC<StoryCardProps> = ({ story, onClose }) => {
   const navigate = useNavigate();
-  const { stories, markStorySeen } = useStorytelling();
+  const { markStorySeen } = useStorytelling();
   const { playFunctionalSound } = useSoundscape();
-  
-  const story = stories.find(s => s.id === storyId);
-  
-  if (!story) return null;
-  
-  const handleCTAClick = () => {
-    markStorySeen(storyId);
-    playFunctionalSound('transition');
-    if (story.cta?.action) {
-      navigate(story.cta.action);
-    }
-  };
-  
-  // Animation variants
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        type: "spring",
-        stiffness: 300,
-        damping: 24
+
+  const handleActionClick = () => {
+    if (story && story.cta) {
+      // Mark story as seen
+      markStorySeen(story.id);
+      
+      // Play sound effect
+      playFunctionalSound("click");
+      
+      // Navigate to route if provided
+      if (story.cta.route) {
+        navigate(story.cta.route);
       }
-    },
-    hover: { 
-      scale: 1.02,
-      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-      transition: { 
-        type: "spring", 
-        stiffness: 400, 
-        damping: 10 
-      }
+      
+      // Close dialog/modal if onClose provided
+      if (onClose) onClose();
     }
   };
-  
-  // Define card background based on emotion
-  const getEmotionBackground = () => {
-    switch(story.emotion) {
-      case 'calm': return 'bg-blue-50 dark:bg-blue-950';
-      case 'joyful':
-      case 'happy': return 'bg-amber-50 dark:bg-amber-950';
-      case 'energetic': return 'bg-orange-50 dark:bg-orange-950';
-      case 'focused': return 'bg-purple-50 dark:bg-purple-950';
-      case 'reflective':
-      case 'sad': return 'bg-gray-50 dark:bg-gray-900';
-      default: return 'bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-blue-950';
-    }
+
+  // Determine emotion-based styling
+  const getEmotionStyling = () => {
+    if (!story.emotion) return {};
+
+    const emotionStyles: Record<string, { bg: string; accent: string }> = {
+      'happy': { bg: 'from-yellow-50 to-orange-50 border-yellow-200', accent: 'bg-yellow-500' },
+      'peaceful': { bg: 'from-blue-50 to-cyan-50 border-blue-200', accent: 'bg-blue-500' },
+      'excited': { bg: 'from-orange-50 to-red-50 border-orange-200', accent: 'bg-orange-500' },
+      'focused': { bg: 'from-purple-50 to-indigo-50 border-purple-200', accent: 'bg-purple-500' },
+      'neutral': { bg: 'from-gray-50 to-slate-50 border-gray-200', accent: 'bg-gray-500' }
+    };
+
+    const style = emotionStyles[story.emotion.toLowerCase()] || emotionStyles.neutral;
+    return {
+      cardClass: `bg-gradient-to-br ${style.bg}`,
+      accentClass: style.accent
+    };
   };
-  
-  // Minimal version for sidebars and notifications
-  if (minimal) {
-    return (
-      <motion.div
-        className={`cursor-pointer ${className}`}
-        variants={cardVariants}
-        initial="hidden"
-        animate="visible"
-        whileHover="hover"
-        onClick={() => markStorySeen(storyId)}
-      >
-        <div className={`p-3 rounded-lg ${getEmotionBackground()} border border-primary/10`}>
-          <h4 className="text-sm font-medium">{story.title}</h4>
-          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{story.content}</p>
-        </div>
-      </motion.div>
-    );
-  }
-  
-  // Full card version
+
+  const { cardClass, accentClass } = getEmotionStyling();
+
   return (
     <motion.div
-      className={className}
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      whileHover="hover"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
     >
-      <Card className={`overflow-hidden ${getEmotionBackground()} border-primary/10`}>
+      <Card className={`overflow-hidden shadow-lg ${cardClass}`}>
         {story.image && (
-          <div className="w-full h-40 overflow-hidden">
+          <div className="relative w-full h-48">
             <img 
-              src={story.image}
-              alt={story.title}
-              className="w-full h-full object-cover transition-transform hover:scale-105"
+              src={story.image} 
+              alt={story.title} 
+              className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            <CardTitle className="absolute bottom-4 left-4 text-white">{story.title}</CardTitle>
           </div>
         )}
         
-        <CardHeader>
-          <CardTitle>{story.title}</CardTitle>
-        </CardHeader>
+        {!story.image && (
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              {accentClass && (
+                <div className={`w-2 h-10 rounded-full ${accentClass}`}></div>
+              )}
+              <CardTitle>{story.title}</CardTitle>
+            </div>
+          </CardHeader>
+        )}
         
-        <CardContent>
-          <p className="text-muted-foreground">{story.content}</p>
+        <CardContent className="pb-2">
+          <CardDescription className="text-foreground/80 whitespace-pre-line text-base">
+            {story.content}
+          </CardDescription>
         </CardContent>
         
-        <CardFooter className="flex justify-between">
-          <Button variant="ghost" size="sm" onClick={() => markStorySeen(storyId)}>
-            Fermer
-          </Button>
-          
-          {story.cta && (
-            <Button size="sm" onClick={handleCTAClick}>
-              {story.cta.text}
+        {story.cta && (
+          <CardFooter>
+            <Button 
+              onClick={handleActionClick}
+              className="w-full"
+              variant="default"
+            >
+              {story.cta.label}
             </Button>
-          )}
-        </CardFooter>
+          </CardFooter>
+        )}
       </Card>
     </motion.div>
   );
