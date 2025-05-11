@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import OnboardingContent from '@/components/onboarding/OnboardingContent';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/user';
+import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/preferences';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();

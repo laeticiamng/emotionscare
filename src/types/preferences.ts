@@ -19,6 +19,7 @@ export interface UserPreferencesState {
   notification_tone: 'formal' | 'friendly' | 'energetic';
   emotionalCamouflage: boolean;
   font?: string;
+  soundEnabled?: boolean;
 }
 
 export const defaultUserPreferences: UserPreferencesState = {
@@ -35,7 +36,8 @@ export const defaultUserPreferences: UserPreferencesState = {
   notification_type: 'push',
   notification_tone: 'friendly',
   emotionalCamouflage: false,
-  font: 'default'
+  font: 'default',
+  soundEnabled: true
 };
 
 export interface UserPreferences {
@@ -55,4 +57,7 @@ export interface UserPreferences {
   onboardingCompleted?: boolean;
   dashboardLayout?: string;
   soundEnabled?: boolean;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
 }
