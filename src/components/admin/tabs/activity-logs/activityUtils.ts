@@ -37,13 +37,18 @@ export const applyFilters = (
     if ('timestamp_day' in item && (filters.startDate || filters.endDate)) {
       const itemDate = new Date(item.timestamp_day);
       
-      if (filters.startDate && itemDate < filters.startDate) {
-        return false;
+      // Convert string dates to Date objects before comparison
+      if (filters.startDate) {
+        const startDate = typeof filters.startDate === 'string' ? new Date(filters.startDate) : filters.startDate;
+        if (itemDate < startDate) {
+          return false;
+        }
       }
       
       if (filters.endDate) {
         // Add one day to the end date to include the entire end day
-        const endDatePlusDay = new Date(filters.endDate);
+        const endDate = typeof filters.endDate === 'string' ? new Date(filters.endDate) : filters.endDate;
+        const endDatePlusDay = new Date(endDate);
         endDatePlusDay.setDate(endDatePlusDay.getDate() + 1);
         
         if (itemDate > endDatePlusDay) {

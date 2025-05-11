@@ -4,8 +4,8 @@ export type ActivityTabView = 'daily' | 'stats';
 export interface ActivityFiltersState {
   searchTerm: string;
   activityType: string;
-  startDate: string;
-  endDate: string;
+  startDate: string | Date;
+  endDate: string | Date;
 }
 
 export interface AnonymousActivity {
