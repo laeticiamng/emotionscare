@@ -10,7 +10,7 @@ import Login from '@/pages/LoginPage';
 import Register from '@/pages/RegisterPage';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import NotFound from '@/pages/NotFound';
-import ResetPassword from '@/pages/ResetPassword';
+import ResetPassword from '@/pages/ResetPasswordPage';
 import Profile from '@/pages/Profile';
 import AdminDashboardPage from '@/pages/AdminDashboard';
 import ScanPage from '@/pages/ScanPage';

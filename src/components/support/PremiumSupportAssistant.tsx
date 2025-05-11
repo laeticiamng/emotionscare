@@ -1,396 +1,300 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Avatar } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Mic, Phone, Mail, MessageCircle, Send, HeadphonesIcon, Sparkles, Volume2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { supabase } from '@/integrations/supabase/client';
+import { Message } from '@/types/support';
+import { v4 as uuidv4 } from 'uuid';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Send, Sparkles, Users, Phone, Clock, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
-interface Message {
-  id: string;
-  content: string;
-  sender: 'user' | 'assistant';
-  timestamp: Date;
-  emotion?: string;
-  isTyping?: boolean;
-}
+const analyzeEmotion = (text: string): string => {
+  // Simple emotion detection - in a real app would use more sophisticated analysis
+  const emotions = {
+    happy: ['happy', 'glad', 'joy', 'excited', 'wonderful', 'great'],
+    sad: ['sad', 'upset', 'unhappy', 'disappointed', 'sorry'],
+    angry: ['angry', 'frustrated', 'annoyed', 'mad', 'irritated'],
+    confused: ['confused', 'unsure', 'don\'t understand', 'unclear', 'help'],
+    neutral: []
+  };
+  
+  const lowerText = text.toLowerCase();
+  
+  for (const [emotion, keywords] of Object.entries(emotions)) {
+    if (keywords.some(keyword => lowerText.includes(keyword))) {
+      return emotion;
+    }
+  }
+  
+  return 'neutral';
+};
 
 const PremiumSupportAssistant: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: uuidv4(),
+      content: "Bonjour ! Je suis votre assistant premium personnel. Comment puis-je vous aider aujourd'hui ?",
+      sender: "assistant",
+      timestamp: new Date(),
+      emotion: "neutral"
+    }
+  ]);
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [detectedEmotion, setDetectedEmotion] = useState<string | null>(null);
-  const [supportMode, setSupportMode] = useState<'chat' | 'call' | 'email'>('chat');
-  const [isTypingEffect, setIsTypingEffect] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [showCallOption, setShowCallOption] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [expertAvailable, setExpertAvailable] = useState(true);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
-  // Add welcome message on component mount
+  // Auto-scroll to bottom of messages
   useEffect(() => {
-    setMessages([
-      {
-        id: '1',
-        content: "Bonjour 👋 Je suis votre assistant premium personnel. Comment puis-je vous aider aujourd'hui ?",
-        sender: 'assistant',
-        timestamp: new Date(),
-        emotion: 'friendly'
-      }
-    ]);
-  }, []);
-
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  // Send message to assistant
-  const handleSendMessage = async () => {
+  }, [messages]);
+  
+  // Focus input on load
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  
+  // Detect when human assistance might be needed
+  useEffect(() => {
+    if (messages.length > 3) {
+      const lastTwoUserMessages = messages
+        .filter(m => m.sender === 'user')
+        .slice(-2);
+      
+      if (lastTwoUserMessages.length === 2 && 
+          (lastTwoUserMessages[0].emotion === 'angry' || lastTwoUserMessages[0].emotion === 'confused') &&
+          (lastTwoUserMessages[1].emotion === 'angry' || lastTwoUserMessages[1].emotion === 'confused')) {
+        setShowCallOption(true);
+      }
+    }
+  }, [messages]);
+  
+  const handleSend = () => {
     if (!inputValue.trim()) return;
     
+    // Detect emotion in user message
+    const emotion = analyzeEmotion(inputValue);
+    
     // Add user message
-    const userMessageId = Date.now().toString();
-    const userMessage: Message = {
-      id: userMessageId,
+    const newUserMessage: Message = {
+      id: uuidv4(),
       content: inputValue,
-      sender: 'user',
-      timestamp: new Date()
+      sender: "user",
+      timestamp: new Date(),
+      emotion
     };
     
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, newUserMessage]);
     setInputValue('');
-    setIsLoading(true);
+    setIsTyping(true);
     
-    // Add typing indicator
-    const typingIndicatorId = `typing-${Date.now()}`;
-    setMessages(prev => [...prev, {
-      id: typingIndicatorId,
-      content: '',
-      sender: 'assistant',
+    // Simulate AI thinking
+    setTimeout(() => {
+      let response = "";
+      
+      // Generate contextual response based on emotion and content
+      if (emotion === 'angry') {
+        response = "Je comprends votre frustration. Laissez-moi vous aider à résoudre ce problème rapidement. Pourriez-vous me donner plus de détails ?";
+      } else if (emotion === 'confused') {
+        response = "Je vois que cela peut être déroutant. Essayons de clarifier ensemble. Que souhaitez-vous accomplir exactement ?";
+      } else if (emotion === 'sad') {
+        response = "Je suis désolé d'apprendre cela. Prenons le temps de résoudre cette situation ensemble. Comment puis-je vous aider ?";
+      } else if (emotion === 'happy') {
+        response = "Je suis ravi de voir que vous êtes satisfait ! Y a-t-il autre chose que je puisse faire pour vous aujourd'hui ?";
+      } else {
+        response = "Merci pour ces informations. Comment puis-je vous aider davantage avec cela ?";
+      }
+      
+      // Add assistant response
+      const newAssistantMessage: Message = {
+        id: uuidv4(),
+        content: response,
+        sender: "assistant",
+        timestamp: new Date(),
+        emotion: "neutral"
+      };
+      
+      setMessages(prev => [...prev, newAssistantMessage]);
+      setIsTyping(false);
+      
+      // Show feedback request after a few exchanges
+      if (messages.length > 4 && !showFeedback) {
+        setTimeout(() => setShowFeedback(true), 1000);
+      }
+    }, 1500);
+  };
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+  
+  const handleCallExpert = () => {
+    toast({
+      title: "Connexion avec un expert",
+      description: "Un expert va vous contacter dans les prochaines minutes",
+    });
+    
+    // Add system message
+    const systemMessage: Message = {
+      id: uuidv4(),
+      content: "Votre demande a été transmise à un expert qui va vous contacter sous peu. Un de nos spécialistes est en train de consulter votre historique de conversation pour vous offrir l'aide la plus adaptée.",
+      sender: "assistant",
       timestamp: new Date(),
-      isTyping: true
-    }]);
+      emotion: "neutral"
+    };
     
-    try {
-      // Analyze emotion first
-      const emotionAnalysis = await analyzeEmotionFromText(inputValue);
-      setDetectedEmotion(emotionAnalysis.primaryEmotion);
-      
-      // Get assistant response
-      const response = await getPremiumResponse(inputValue, emotionAnalysis.primaryEmotion);
-      
-      // Remove typing indicator
-      setMessages(prev => prev.filter(msg => msg.id !== typingIndicatorId));
-      
-      // Simulate typing effect for premium feel
-      setIsTypingEffect(true);
-      let displayedText = '';
-      const words = response.content.split(' ');
-      
-      for (let i = 0; i < words.length; i++) {
-        displayedText += words[i] + ' ';
-        const partialMessage: Message = {
-          id: response.id,
-          content: displayedText,
-          sender: 'assistant',
-          timestamp: new Date(),
-          emotion: emotionAnalysis.primaryEmotion
-        };
-        
-        setMessages(prev => {
-          const filtered = prev.filter(msg => msg.id !== response.id);
-          return [...filtered, partialMessage];
-        });
-        
-        // Random delay between 50-150ms per word for natural typing feel
-        await new Promise(r => setTimeout(r, Math.random() * 100 + 50));
-      }
-      
-      setIsTypingEffect(false);
-    } catch (error) {
-      console.error('Error getting assistant response:', error);
-      toast({
-        title: "Erreur de communication",
-        description: "Impossible de contacter l'assistant pour le moment. Un spécialiste va vous contacter.",
-        variant: "destructive"
-      });
-      
-      // Remove typing indicator
-      setMessages(prev => prev.filter(msg => msg.id !== typingIndicatorId));
-    } finally {
-      setIsLoading(false);
-    }
+    setMessages(prev => [...prev, systemMessage]);
+    setShowCallOption(false);
   };
-
-  // Analyze emotion from user text
-  const analyzeEmotionFromText = async (text: string): Promise<{primaryEmotion: string, intensity: number}> => {
-    try {
-      // Call emotion analysis function
-      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-        body: {
-          message: text,
-          model: "gpt-4o-mini",
-          temperature: 0.2,
-          max_tokens: 100,
-          top_p: 1.0,
-          module: "emotion-analysis"
-        }
-      });
-      
-      if (error) throw error;
-      
-      // Parse response - in a real app, this would be more sophisticated
-      const response = data.response || '';
-      
-      // Very simple emotion extraction - would be more sophisticated in production
-      const emotions = ['happy', 'sad', 'angry', 'frustrated', 'confused', 'neutral', 'anxious', 'concerned'];
-      let primaryEmotion = 'neutral';
-      
-      for (const emotion of emotions) {
-        if (response.toLowerCase().includes(emotion)) {
-          primaryEmotion = emotion;
-          break;
-        }
-      }
-      
-      return {
-        primaryEmotion,
-        intensity: 0.8 // Default intensity
-      };
-    } catch (error) {
-      console.error('Error analyzing emotion:', error);
-      return {
-        primaryEmotion: 'neutral',
-        intensity: 0.5
-      };
-    }
+  
+  const handleFeedback = (positive: boolean) => {
+    toast({
+      title: positive ? "Merci pour votre retour positif !" : "Merci pour votre retour",
+      description: positive 
+        ? "Nous sommes heureux d'avoir pu vous aider" 
+        : "Nous allons faire de notre mieux pour améliorer notre assistance",
+    });
+    setShowFeedback(false);
   };
-
-  // Get premium response from AI
-  const getPremiumResponse = async (message: string, emotion: string): Promise<Message> => {
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-        body: {
-          message: message,
-          userContext: {
-            detectedEmotion: emotion
-          },
-          model: "gpt-4o",
-          temperature: 0.5,
-          max_tokens: 1000,
-          top_p: 1.0,
-          module: "premium-support"
-        }
-      });
-      
-      if (error) throw error;
-      
-      return {
-        id: Date.now().toString(),
-        content: data.response,
-        sender: 'assistant',
-        timestamp: new Date(),
-        emotion: emotion
-      };
-    } catch (error) {
-      console.error('Error getting premium response:', error);
-      
-      return {
-        id: Date.now().toString(),
-        content: "Je suis désolé, mais je rencontre des difficultés à répondre à votre demande. Un spécialiste va vous contacter très rapidement pour vous aider.",
-        sender: 'assistant',
-        timestamp: new Date(),
-        emotion: 'concerned'
-      };
-    }
-  };
-
-  // Handle mode switching
-  const handleSwitchMode = (mode: 'chat' | 'call' | 'email') => {
-    setSupportMode(mode);
-    
-    if (mode === 'call') {
-      toast({
-        title: "Demande d'appel initiée",
-        description: "Un spécialiste va vous contacter dans les prochaines minutes",
-        duration: 5000
-      });
-      
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: "Votre demande d'appel a été enregistrée. Un spécialiste va vous contacter dans les prochaines minutes. Vous pouvez continuer à utiliser le chat en attendant.",
-        sender: 'assistant',
-        timestamp: new Date(),
-        emotion: 'friendly'
-      }]);
-    } else if (mode === 'email') {
-      toast({
-        title: "Support par email",
-        description: "Envoyez-nous un email détaillé ou laissez un message ici",
-        duration: 5000
-      });
-    }
-  };
-
+  
   // Get message style based on sender and emotion
   const getMessageStyle = (message: Message) => {
-    if (message.sender === 'user') {
-      return "bg-primary text-primary-foreground";
-    } else {
-      switch (message.emotion) {
-        case 'happy':
-          return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
-        case 'sad':
-        case 'concerned':
-          return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
-        case 'angry':
-        case 'frustrated':
-          return "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300";
-        case 'confused':
-          return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300";
-        default:
-          return "bg-muted/50";
-      }
+    if (message.sender === 'assistant') {
+      return "bg-primary/10 text-foreground";
+    }
+    
+    // Style based on emotion
+    switch (message.emotion) {
+      case 'angry':
+        return "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200";
+      case 'sad':
+        return "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200";
+      case 'happy':
+        return "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200";
+      case 'confused':
+        return "bg-amber-100 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200";
+      default:
+        return "bg-muted/50 text-foreground";
     }
   };
-
+  
   return (
-    <Card className="w-full h-full flex flex-col shadow-premium premium-card">
-      <CardHeader className="border-b">
+    <Card className="w-full max-w-md mx-auto h-[500px] flex flex-col shadow-lg border-primary/10">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <span>Support Premium</span>
-            <Badge className="ml-2" variant="outline">24/7</Badge>
+            Assistant Premium
           </CardTitle>
-          
-          <div className="flex gap-2">
-            <Button 
-              size="sm" 
-              variant={supportMode === 'chat' ? 'default' : 'outline'} 
-              onClick={() => handleSwitchMode('chat')}
-              className={supportMode === 'chat' ? 'bg-primary' : ''}
-            >
-              <MessageCircle className="h-4 w-4 mr-1" />
-              <span className="sr-only sm:not-sr-only sm:text-xs">Chat</span>
-            </Button>
-            <Button 
-              size="sm" 
-              variant={supportMode === 'call' ? 'default' : 'outline'} 
-              onClick={() => handleSwitchMode('call')}
-            >
-              <Phone className="h-4 w-4 mr-1" />
-              <span className="sr-only sm:not-sr-only sm:text-xs">Appel</span>
-            </Button>
-            <Button 
-              size="sm" 
-              variant={supportMode === 'email' ? 'default' : 'outline'} 
-              onClick={() => handleSwitchMode('email')}
-            >
-              <Mail className="h-4 w-4 mr-1" />
-              <span className="sr-only sm:not-sr-only sm:text-xs">Email</span>
-            </Button>
-          </div>
+          <Badge variant="outline" className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+            {expertAvailable ? "Experts disponibles" : "Réponse rapide"}
+          </Badge>
         </div>
-        
-        {detectedEmotion && (
-          <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-            <span>Émotion détectée:</span>
-            <Badge variant="secondary">{detectedEmotion}</Badge>
-          </div>
-        )}
       </CardHeader>
       
-      <CardContent className="flex-1 p-4 overflow-hidden">
-        <ScrollArea className="h-full pr-4">
-          <div className="flex flex-col gap-4">
-            {messages.map((message) => (
-              <div 
-                key={message.id} 
-                className={cn(
-                  "flex",
-                  message.sender === 'user' ? "justify-end" : "justify-start"
-                )}
-              >
-                {message.sender === 'assistant' && (
-                  <Avatar className="h-8 w-8 mr-2">
-                    <HeadphonesIcon className="h-5 w-5" />
-                  </Avatar>
-                )}
-                
-                <div 
-                  className={cn(
-                    "rounded-lg px-4 py-2 max-w-[80%]",
-                    getMessageStyle(message)
-                  )}
-                >
-                  {message.isTyping ? (
-                    <div className="flex space-x-1 items-center h-6">
-                      <div className="w-2 h-2 rounded-full bg-current animate-bounce" />
-                      <div className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:-.3s]" />
-                      <div className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:-.5s]" />
-                    </div>
-                  ) : (
-                    <div className="whitespace-pre-wrap">{message.content}</div>
-                  )}
-                </div>
-                
-                {message.sender === 'user' && (
-                  <Avatar className="h-8 w-8 ml-2">
-                    <div className="bg-primary text-primary-foreground rounded-full h-full w-full flex items-center justify-center text-sm">
-                      U
-                    </div>
-                  </Avatar>
-                )}
+      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+        <AnimatePresence>
+          {messages.map((message) => (
+            <motion.div
+              key={message.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`p-3 rounded-lg max-w-[85%] ${message.sender === 'user' ? 'ml-auto' : 'mr-auto'} ${getMessageStyle(message)}`}
+            >
+              {message.content}
+              <div className="text-xs text-muted-foreground mt-1">
+                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
+            </motion.div>
+          ))}
+          
+          {isTyping && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="p-3 rounded-lg max-w-[85%] bg-primary/10 mr-auto"
+            >
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </motion.div>
+          )}
+          
+          {showCallOption && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 rounded-lg bg-primary/5 border border-primary/10 w-full"
+            >
+              <p className="text-sm mb-2">Besoin d'une assistance personnalisée ?</p>
+              <div className="flex gap-2">
+                <Button size="sm" variant="default" onClick={handleCallExpert} className="flex items-center gap-1">
+                  <Phone className="h-4 w-4" />
+                  Parler à un expert
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setShowCallOption(false)}>
+                  Continuer avec l'IA
+                </Button>
+              </div>
+            </motion.div>
+          )}
+          
+          {showFeedback && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 rounded-lg bg-muted/50 w-full text-center"
+            >
+              <p className="text-sm mb-2">Cette réponse vous a-t-elle été utile ?</p>
+              <div className="flex justify-center gap-4">
+                <Button size="sm" variant="ghost" onClick={() => handleFeedback(true)} className="flex items-center gap-1">
+                  <ThumbsUp className="h-4 w-4" />
+                  Oui
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => handleFeedback(false)} className="flex items-center gap-1">
+                  <ThumbsDown className="h-4 w-4" />
+                  Non
+                </Button>
+              </div>
+            </motion.div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </AnimatePresence>
       </CardContent>
       
       <CardFooter className="border-t p-3">
-        <form 
-          className="flex w-full gap-2" 
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSendMessage();
-          }}
-        >
-          <Button 
-            type="button" 
-            variant="ghost" 
-            size="icon"
-            disabled={isLoading || isTypingEffect}
-            title="Enregistrer un message audio"
-          >
-            <Mic className="h-4 w-4" />
-          </Button>
-          
+        <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="flex w-full gap-2">
           <Input
-            placeholder="Tapez votre message..."
+            ref={inputRef}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            disabled={isLoading || isTypingEffect}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Tapez votre message..."
             className="flex-1"
+            disabled={isTyping}
           />
-          
           <Button 
             type="submit" 
-            disabled={!inputValue.trim() || isLoading || isTypingEffect}
-            className="premium-transition hover-lift"
+            size="icon" 
+            disabled={!inputValue.trim() || isTyping}
           >
-            <Send className="h-4 w-4 mr-1" />
-            Envoyer
+            <Send className="h-4 w-4" />
           </Button>
         </form>
       </CardFooter>
