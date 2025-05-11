@@ -1,9 +1,13 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserMode } from "@/contexts/UserModeContext";
+import { motion } from "framer-motion";
+import { useStorytelling } from "@/providers/StorytellingProvider";
+import { useSoundscape } from "@/providers/SoundscapeProvider";
+import { useBranding } from "@/contexts/BrandingContext";
 
 interface WelcomeHeroProps {
   userName?: string;
@@ -19,6 +23,9 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { userMode } = useUserMode();
+  const { emotionalTone, colors } = useBranding();
+  const { playFunctionalSound } = useSoundscape();
+  const { stories, showStory } = useStorytelling();
 
   const getTimeOfDayMessage = () => {
     switch (timeOfDay) {
@@ -59,22 +66,62 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
     return "Votre partenaire pour le bien-être émotionnel";
   };
 
+  // Play welcome sound when component mounts
+  useEffect(() => {
+    playFunctionalSound('transition');
+  }, []);
+
+  const handleNavigate = (path: string) => {
+    playFunctionalSound('click');
+    navigate(path);
+  };
+
+  const handleShowStory = () => {
+    // Find an unseen story to show
+    const unseenStory = stories.find(story => !story.seen);
+    if (unseenStory) {
+      playFunctionalSound('notification');
+      showStory(unseenStory.id);
+    } else if (stories.length > 0) {
+      // If all stories are seen, show the first one
+      playFunctionalSound('notification');
+      showStory(stories[0].id);
+    }
+  };
+
   return (
     <div className="relative z-10 text-center md:text-left">
-      <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-        {getGreeting()}
-      </h1>
-      <p className="text-xl md:text-2xl mb-8 text-muted-foreground">
+      <motion.h1 
+        className="text-4xl md:text-5xl font-bold tracking-tight mb-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <span className="text-gradient">{getGreeting()}</span>
+      </motion.h1>
+      
+      <motion.p 
+        className="text-xl md:text-2xl mb-8 text-muted-foreground"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
         {getTagline()}
-      </p>
+      </motion.p>
 
-      <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+      <motion.div 
+        className="flex flex-wrap gap-4 justify-center md:justify-start"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         {isAuthenticated ? (
           <>
             <Button
               size="lg"
-              onClick={() => navigate("/dashboard")}
-              className="shadow-md"
+              onClick={() => handleNavigate("/dashboard")}
+              className="shadow-md hover-lift"
+              style={{ backgroundColor: colors.primary }}
             >
               {userMode === 'b2b-admin' 
                 ? "Voir le tableau de bord RH"
@@ -85,12 +132,12 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
             <Button
               variant="outline"
               size="lg"
-              onClick={onMoodSelect}
-              className="flex items-center gap-2"
+              onClick={onMoodSelect || handleShowStory}
+              className="flex items-center gap-2 hover-lift"
             >
-              Comment je me sens ? 
+              {onMoodSelect ? "Comment je me sens ?" : "Découvrir nos actualités"} 
               <span role="img" aria-label="mood">
-                🤔
+                {onMoodSelect ? "🤔" : "✨"}
               </span>
             </Button>
           </>
@@ -98,21 +145,23 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
           <>
             <Button
               size="lg"
-              onClick={() => navigate("/login")}
-              className="shadow-md"
+              onClick={() => handleNavigate("/login")}
+              className="shadow-md hover-lift"
+              style={{ backgroundColor: colors.primary }}
             >
               Se connecter
             </Button>
             <Button
               variant="outline"
               size="lg"
-              onClick={() => navigate("/register")}
+              onClick={() => handleNavigate("/register")}
+              className="hover-lift"
             >
               Créer un compte
             </Button>
           </>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };
