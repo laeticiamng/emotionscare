@@ -12,6 +12,7 @@ export interface Badge {
   unlocked?: boolean;
   icon_url?: string;
   level?: number;
+  category?: string;
 }
 
 export interface Challenge {
@@ -57,4 +58,3 @@ export interface GamificationAction {
   description: string;
   max_daily?: number;
 }
-

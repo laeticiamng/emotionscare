@@ -27,7 +27,7 @@ export function useChatStatus() {
         sender_id: 'user-1',
         conversation_id: 'default',
         is_read: true,
-        timestamp: new Date()
+        timestamp: new Date().toISOString()
       };
       addUserMessage(userMessage);
       
@@ -46,7 +46,7 @@ export function useChatStatus() {
             sender_id: 'bot-1',
             conversation_id: 'default',
             is_read: true,
-            timestamp: new Date()
+            timestamp: new Date().toISOString()
           };
           addBotMessage(botMessage);
         })
@@ -63,7 +63,7 @@ export function useChatStatus() {
             sender_id: 'bot-1',
             conversation_id: 'default',
             is_read: true,
-            timestamp: new Date()
+            timestamp: new Date().toISOString()
           };
           addBotMessage(errorMessage);
         })
@@ -96,7 +96,7 @@ export function useChatStatus() {
       setIsLoading(true);
       setError(null);
       
-      processMessage(lastUserMessage.text || lastUserMessage.content)
+      processMessage(lastUserMessage.text || lastUserMessage.content || '')
         .then((response) => {
           // Add bot response
           const botMessage: ChatMessage = {
@@ -107,7 +107,7 @@ export function useChatStatus() {
             sender_id: 'bot-1',
             conversation_id: 'default',
             is_read: true,
-            timestamp: new Date()
+            timestamp: new Date().toISOString()
           };
           addBotMessage(botMessage);
         })
@@ -124,7 +124,7 @@ export function useChatStatus() {
             sender_id: 'bot-1',
             conversation_id: 'default',
             is_read: true,
-            timestamp: new Date()
+            timestamp: new Date().toISOString()
           };
           addBotMessage(errorMessage);
         })

@@ -5,8 +5,8 @@ export interface User {
   email?: string;
   role?: string;
   avatar?: string;
-  image?: string; // Adding image property
-  avatar_url?: string; // Adding avatar_url property
+  image?: string; 
+  avatar_url?: string;
   preferences?: UserPreferences;
   createdAt?: string;
   created_at?: string;
@@ -35,7 +35,10 @@ export interface UserPreferences {
   notification_tone?: string;
   emotionalCamouflage?: boolean;
   notifications_enabled?: boolean;
-  privacyLevel?: string;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }
 
 export enum UserRole {
@@ -54,4 +57,3 @@ export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional'
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export type UserPreferencesState = UserPreferences;
-

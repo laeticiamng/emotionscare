@@ -35,8 +35,8 @@ export const useMessages = (conversationId: string | null) => {
       // Convert any Date to string if needed
       const messageWithStringTimestamp = {
         ...message,
-        timestamp: typeof message.timestamp === 'object' && message.timestamp instanceof Date
-          ? message.timestamp.toISOString()
+        timestamp: typeof message.timestamp === 'object'
+          ? (message.timestamp as Date).toISOString()
           : message.timestamp
       };
       

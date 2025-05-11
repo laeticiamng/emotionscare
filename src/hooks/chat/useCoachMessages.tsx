@@ -28,7 +28,7 @@ export function useCoachMessages() {
       sender_id: 'system',
       conversation_id: 'system',
       is_read: true,
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     };
     
     setMessages(prev => [...prev, systemMessage]);

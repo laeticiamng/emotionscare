@@ -31,8 +31,8 @@ export function useConversationState({ initialConversations = [] }: UseConversat
       title,
       user_id: 'user-1',
       messages: [],
-      created_at: new Date(),
-      updated_at: new Date()
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
     
     setConversations(prev => [newConversation, ...prev]);
@@ -45,7 +45,11 @@ export function useConversationState({ initialConversations = [] }: UseConversat
   const updateConversation = useCallback((id: string, data: Partial<ChatConversation>) => {
     setConversations(prev => 
       prev.map(conv => 
-        conv.id === id ? { ...conv, ...data, updated_at: new Date() } : conv
+        conv.id === id ? { 
+          ...conv, 
+          ...data, 
+          updated_at: new Date().toISOString() 
+        } : conv
       )
     );
   }, []);
@@ -73,9 +77,9 @@ export function useConversationState({ initialConversations = [] }: UseConversat
         return {
           ...conv,
           messages: [...(conv.messages || []), message],
-          last_message: message.text || message.content,
+          last_message: message.text || message.content || '',
           last_message_time: message.timestamp,
-          updated_at: new Date()
+          updated_at: new Date().toISOString()
         };
       })
     );

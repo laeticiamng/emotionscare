@@ -34,6 +34,15 @@ const ConversationList: React.FC<ConversationListProps> = ({
     return conversation.last_message || "Aucun message";
   };
   
+  // Format date helper function
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch (e) {
+      return "Date inconnue";
+    }
+  };
+  
   return (
     <div className="w-full md:w-64 h-full flex flex-col bg-background border-r">
       <div className="p-3 border-b">
@@ -69,9 +78,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     {getLastMessageText(conversation)}
                   </p>
                   <p className="text-xs mt-1">
-                    {conversation.updated_at instanceof Date 
-                      ? conversation.updated_at.toLocaleDateString() 
-                      : new Date(conversation.updated_at || conversation.created_at).toLocaleDateString()}
+                    {formatDate(conversation.updated_at || conversation.created_at)}
                   </p>
                 </div>
                 <Button 

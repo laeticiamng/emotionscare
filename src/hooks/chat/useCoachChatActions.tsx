@@ -20,7 +20,7 @@ export const useCoachChatActions = (conversationId: string) => {
       sender_id: 'user-1',
       conversation_id: conversationId,
       is_read: true,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
     
     return newMessage;
@@ -36,7 +36,7 @@ export const useCoachChatActions = (conversationId: string) => {
       sender_id: 'bot-1',
       conversation_id: conversationId,
       is_read: true,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
     
     return newMessage;
@@ -55,7 +55,7 @@ export const useCoachChatActions = (conversationId: string) => {
       sender_id: 'bot-1',
       conversation_id: conversationId,
       is_read: true,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
     
     // Process the actual response when ready

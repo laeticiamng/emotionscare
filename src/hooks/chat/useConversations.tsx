@@ -38,8 +38,8 @@ export function useConversations() {
           title: 'Discussion sur le bien-être',
           lastMessage: 'Comment puis-je améliorer mon sommeil ?',
           user_id: user?.id || '',
-          created_at: new Date(),
-          updated_at: new Date()
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         }
       ];
       
@@ -75,8 +75,8 @@ export function useConversations() {
         id: `conv-${Date.now()}`,
         title: title || 'Nouvelle conversation',
         user_id: user?.id || '',
-        created_at: new Date(),
-        updated_at: new Date(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         lastMessage: ''
       };
       
@@ -133,7 +133,11 @@ export function useConversations() {
       setConversations(prevConversations => 
         prevConversations.map(conv => 
           conv.id === conversationId 
-            ? {...conv, ...updates, updatedAt: new Date()} 
+            ? {
+                ...conv, 
+                ...updates, 
+                updated_at: new Date().toISOString()
+              } 
             : conv
         )
       );
