@@ -26,7 +26,11 @@ import {
   ClipboardList,
   CalendarDays,
   Activity,
-  VideoIcon
+  VideoIcon,
+  Building,
+  FileQuestion,
+  Flame,
+  FilePenLine
 } from 'lucide-react';
 
 export type NavItem = {
@@ -84,7 +88,7 @@ export const sidebarItems: NavItem[] = [
 export const adminSidebarItems: NavItem[] = [
   {
     title: 'Administration',
-    href: '/dashboard',
+    href: '/admin/dashboard',
     icon: Gauge,
     description: 'Tableau de bord d\'administration',
   },
@@ -95,10 +99,28 @@ export const adminSidebarItems: NavItem[] = [
     description: 'Gestion des utilisateurs',
   },
   {
-    title: 'Analyse',
+    title: 'Organisation',
+    href: '/admin/organization',
+    icon: Building,
+    description: 'Structure organisationnelle',
+  },
+  {
+    title: 'Analyse émotionnelle',
     href: '/admin/analytics',
     icon: BarChart3,
     description: 'Analyser les données',
+  },
+  {
+    title: 'Détection burnout',
+    href: '/admin/burnout',
+    icon: Flame,
+    description: 'Détection préventive',
+  },
+  {
+    title: 'Rapports personnalisés',
+    href: '/admin/reports',
+    icon: FilePenLine,
+    description: 'Générateur de rapports RH',
   },
   {
     title: 'Paramètres',

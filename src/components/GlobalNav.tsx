@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Moon, Sun, User, Home, Plus, List, Settings, Brain, MessageSquare } from 'lucide-react';
+import { Moon, Sun, User, Home, Plus, List, Settings, Brain, MessageSquare, Building, Users } from 'lucide-react';
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -15,12 +15,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { isAdminRole } from '@/utils/roleUtils';
 
 const GlobalNav = () => {
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { userMode } = useUserMode();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -31,10 +34,25 @@ const GlobalNav = () => {
     window.location.href = '/login';
   };
   
-  // Helper function to toggle theme since we don't have the actual toggleTheme function
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+  // Check if user has admin role
+  const isAdmin = user ? isAdminRole(user.role) : false;
+  const isB2BMode = userMode === 'b2b-admin' || userMode === 'b2b-collaborator';
+  
+  // Define menu items based on user role and mode
+  const standardMenuItems = [
+    { icon: Home, title: 'Accueil', path: '/' },
+    { icon: Plus, title: 'Scanner', path: '/scan' },
+    { icon: Brain, title: 'Coach IA', path: '/coach' },
+    { icon: MessageSquare, title: 'Discussions Coach', path: '/coach-chat' },
+  ];
+  
+  const adminMenuItems = [
+    { icon: Home, title: 'Dashboard', path: '/admin/dashboard' },
+    { icon: Users, title: 'Utilisateurs', path: '/admin/users' },
+    { icon: Building, title: 'Organisation', path: '/admin/organization' },
+  ];
+  
+  const menuItems = isB2BMode && isAdmin ? adminMenuItems : standardMenuItems;
   
   return (
     <nav className="bg-background border-b sticky top-0 z-50">
@@ -43,6 +61,7 @@ const GlobalNav = () => {
           <NavLink to="/" className="flex items-center font-semibold">
             <img src="/logo.svg" alt="EmotionsCare Logo" className="h-8 w-auto mr-2" />
             EmotionsCare
+            {isB2BMode && <span className="ml-2 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">B2B</span>}
           </NavLink>
         </div>
         
@@ -55,37 +74,21 @@ const GlobalNav = () => {
         
         <div className={`items-center space-x-6 ${isMobile ? 'hidden' : 'flex'}`}>
           <ul className="flex items-center space-x-6">
-            <li>
-              <NavLink to="/" className={({ isActive }) => isActive ? "text-primary font-medium" : "hover:text-primary transition-colors"}>
-                <Home className="h-4 w-4" />
-                <span>Accueil</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/scan" className={({ isActive }) => isActive ? "text-primary font-medium" : "hover:text-primary transition-colors"}>
-                <Plus className="h-4 w-4" />
-                <span>Scanner</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/coach" className={({ isActive }) => isActive ? "text-primary font-medium" : "hover:text-primary transition-colors"}>
-                <Brain className="h-4 w-4" />
-                <span>Coach IA</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/coach-chat" className={({ isActive }) => isActive ? "text-primary font-medium" : "hover:text-primary transition-colors"}>
-                <MessageSquare className="h-4 w-4" />
-                <span>Discussions Coach</span>
-              </NavLink>
-            </li>
+            {menuItems.map((item) => (
+              <li key={item.path}>
+                <NavLink to={item.path} className={({ isActive }) => isActive ? "text-primary font-medium flex items-center space-x-1" : "hover:text-primary transition-colors flex items-center space-x-1"}>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </NavLink>
+              </li>
+            ))}
           </ul>
           
-          <Button variant="ghost" size="sm" onClick={toggleTheme}>
+          <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
             {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
+              <Sun className="h-4 w-4 mr-1" />
             ) : (
-              <Moon className="h-4 w-4" />
+              <Moon className="h-4 w-4 mr-1" />
             )}
             <span>{theme === "dark" ? "Light" : "Dark"}</span>
           </Button>
@@ -127,32 +130,16 @@ const GlobalNav = () => {
         {isMobile && isMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-background border rounded-md shadow-md mt-1 overflow-hidden">
             <ul className="divide-y divide-border">
+              {menuItems.map((item) => (
+                <li key={item.path}>
+                  <NavLink to={item.path} className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
+                    <item.icon className="h-4 w-4 inline-block mr-2" />
+                    {item.title}
+                  </NavLink>
+                </li>
+              ))}
               <li>
-                <NavLink to="/" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
-                  <Home className="h-4 w-4 inline-block mr-2" />
-                  Accueil
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/scan" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
-                  <Plus className="h-4 w-4 inline-block mr-2" />
-                  Scanner
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/coach" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
-                  <Brain className="h-4 w-4 inline-block mr-2" />
-                  Coach IA
-                </NavLink>
-              </li>
-              <li>
-                <NavLink to="/coach-chat" className="block py-2 px-4 hover:bg-muted transition-colors" onClick={toggleMenu}>
-                  <MessageSquare className="h-4 w-4 inline-block mr-2" />
-                  Discussions Coach
-                </NavLink>
-              </li>
-              <li>
-                <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={() => { toggleTheme(); toggleMenu(); }}>
+                <Button variant="ghost" size="sm" className="block py-2 px-4 hover:bg-muted transition-colors w-full justify-start" onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); toggleMenu(); }}>
                   {theme === "dark" ? (
                     <Sun className="h-4 w-4 inline-block mr-2" />
                   ) : (

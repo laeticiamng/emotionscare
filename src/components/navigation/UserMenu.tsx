@@ -1,18 +1,21 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User as UserIcon, Settings } from 'lucide-react';
+import { Lock, User as UserIcon, Settings, Briefcase, BarChart2, Building } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { isAdminRole, getRoleDisplayName } from '@/utils/roleUtils';
 
 interface UserMenuProps {
   badgesCount: number;
@@ -22,6 +25,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, logout } = useAuth();
+  const { userMode, setUserMode } = useUserMode();
   
   if (!user) return null;
 
@@ -40,6 +44,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
   
   // Use avatar as fallback if image is not available
   const userImage = user?.image || user?.avatar || user?.avatar_url;
+  
+  // Check if user has admin role
+  const isAdmin = isAdminRole(user.role);
 
   return (
     <DropdownMenu>
@@ -58,6 +65,31 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            <p className="text-xs leading-none text-muted-foreground mt-1">
+              {getRoleDisplayName(user.role || 'user')}
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        
+        {isAdmin && (
+          <>
+            <DropdownMenuItem onClick={() => navigate('/admin/dashboard')}>
+              <BarChart2 className="mr-2 h-4 w-4" />
+              <span>Tableau de bord admin</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/admin/users')}>
+              <Building className="mr-2 h-4 w-4" />
+              <span>Gestion d'entreprise</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        
         <DropdownMenuItem onClick={() => navigate('/profile')}>
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
@@ -66,6 +98,18 @@ const UserMenu: React.FC<UserMenuProps> = ({ badgesCount }) => {
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
+        
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="font-normal text-xs">Mode utilisateur</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setUserMode(userMode === 'b2b-admin' ? 'personal' : 'b2b-admin')}>
+              <Briefcase className="mr-2 h-4 w-4" />
+              <span>{userMode === 'b2b-admin' ? 'Vue utilisateur' : 'Vue administrateur'}</span>
+            </DropdownMenuItem>
+          </>
+        )}
+        
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <Lock className="mr-2 h-4 w-4" />
