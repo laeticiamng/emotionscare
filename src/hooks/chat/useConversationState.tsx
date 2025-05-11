@@ -25,14 +25,15 @@ export function useConversationState({ initialConversations = [] }: UseConversat
   
   // Create a new conversation
   const createConversation = useCallback((title = 'Nouvelle conversation') => {
+    const now = new Date().toISOString();
     const newConversationId = uuidv4();
     const newConversation: ChatConversation = {
       id: newConversationId,
       title,
       user_id: 'user-1',
       messages: [],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      created_at: now,
+      updated_at: now
     };
     
     setConversations(prev => [newConversation, ...prev]);
@@ -43,12 +44,14 @@ export function useConversationState({ initialConversations = [] }: UseConversat
   
   // Update conversation details
   const updateConversation = useCallback((id: string, data: Partial<ChatConversation>) => {
+    const now = new Date().toISOString();
+    
     setConversations(prev => 
       prev.map(conv => 
         conv.id === id ? { 
           ...conv, 
           ...data, 
-          updated_at: new Date().toISOString() 
+          updated_at: now
         } : conv
       )
     );
@@ -70,8 +73,10 @@ export function useConversationState({ initialConversations = [] }: UseConversat
   
   // Add message to a conversation
   const addMessage = useCallback((conversationId: string, message: ChatMessage) => {
-    setConversations(prev => 
-      prev.map(conv => {
+    const now = new Date().toISOString();
+    
+    setConversations(prevConversations => 
+      prevConversations.map(conv => {
         if (conv.id !== conversationId) return conv;
         
         return {
@@ -79,7 +84,7 @@ export function useConversationState({ initialConversations = [] }: UseConversat
           messages: [...(conv.messages || []), message],
           last_message: message.text || message.content || '',
           last_message_time: message.timestamp,
-          updated_at: new Date().toISOString()
+          updated_at: now
         };
       })
     );

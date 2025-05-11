@@ -15,8 +15,8 @@ interface CoachAssistantProps {
   style?: React.CSSProperties;
 }
 
-// Create a mock hook for recommendations since useCoachDashboard seems to be missing properties
-const useCoachDashboard = () => {
+// Create a mock hook for recommendations
+const useCoachRecommendations = () => {
   const [isProcessing, setIsProcessing] = React.useState(false);
   const recommendations = [
     "Prenez 5 minutes pour méditer aujourd'hui",
@@ -62,7 +62,7 @@ const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => 
     quickSuggestions, 
     playRecommendedMusic, 
     handleRefreshRecommendations 
-  } = useCoachDashboard();
+  } = useCoachRecommendations();
   
   // Navigate to full coach chat
   const handleOpenFullChat = () => {

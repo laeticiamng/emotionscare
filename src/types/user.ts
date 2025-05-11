@@ -28,11 +28,13 @@ export interface UserPreferences {
   soundEnabled?: boolean;
   language?: string;
   fontFamily?: string;
+  fontSize?: string;
   privacyLevel?: string;
   privacy?: 'public' | 'private' | 'friends';
   showEmotionPrompts?: boolean;
   notification_frequency?: string;
   notification_tone?: string;
+  notification_type?: string;
   emotionalCamouflage?: boolean;
   notifications_enabled?: boolean;
   email_notifications?: boolean;
@@ -52,8 +54,10 @@ export enum UserRole {
 }
 
 export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat';
+export type FontSize = 'small' | 'medium' | 'large';
 export type NotificationFrequency = 'high' | 'medium' | 'low' | 'none';
 export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type Theme = ThemeName;
 
 export type UserPreferencesState = UserPreferences;

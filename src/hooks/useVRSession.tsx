@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { VRSession, VRSessionTemplate } from '@/types';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 import { useToast } from './use-toast';
 
 interface UseVRSessionProps {
@@ -27,11 +27,10 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
       id: `session-${Date.now()}`,
       user_id: 'current-user', // Dans une app réelle, ce serait l'ID utilisateur réel
       date: new Date().toISOString(),
-      started_at: new Date().toISOString(),
       start_time: new Date().toISOString(),
       duration: 0,
       duration_seconds: 0,
-      template_id: actualTemplateId,
+      template_id: actualTemplateId || '',
       emotion_before: emotionBefore,
       mood_before: emotionBefore,
       is_audio_only: false,
@@ -67,7 +66,7 @@ export const useVRSession = ({ onSessionComplete, initialSession }: UseVRSession
       duration_seconds: durationSeconds,
       duration: durationSeconds, // S'assurer que c'est un nombre
       completed: true,
-      completed_at: endTime
+      end_time: endTime.toISOString()
     };
     
     setSession(completedSession);

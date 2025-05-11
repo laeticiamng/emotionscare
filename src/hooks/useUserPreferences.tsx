@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
-import { FontSize, ThemeName } from '@/types/user';
+import { ThemeName, Theme } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
 
 // Types for user preferences
@@ -12,7 +12,7 @@ export interface UserPreferencesState {
   dynamicTheme: 'none' | 'time' | 'emotion' | 'weather';
   highContrast: boolean;
   reducedAnimations: boolean;
-  fontSize: FontSize;
+  fontSize: string;
   font: string;
   customBackground?: string;
   
@@ -118,7 +118,7 @@ export function useUserPreferences() {
       
       // Synchronize with other contexts if needed
       if (newPreferences.theme && theme.setTheme) {
-        theme.setTheme(newPreferences.theme as ThemeName);
+        theme.setTheme(newPreferences.theme as Theme);
       }
       
       toast({
@@ -144,8 +144,8 @@ export function useUserPreferences() {
   const createPreset = (name: string) => {
     const newPreset = {
       name,
-      theme: theme,
-      audioPreset: audioPrefs.preferences.currentEqualizer
+      theme: preferences.theme,
+      audioPreset: audioPrefs.preferences?.currentEqualizer || "standard"
     };
     
     const updatedPresets = [...preferences.customPresets, newPreset];
@@ -162,7 +162,7 @@ export function useUserPreferences() {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
-    setThemePreference(preset.theme as ThemeName);
+    updatePreferences({ theme: preset.theme as ThemeName });
     audioPrefs.setEqualizerPreset?.(preset.audioPreset);
     
     toast({
@@ -179,7 +179,9 @@ export function useUserPreferences() {
     localStorage.removeItem('userPreferences');
     
     // Also reset associated contexts
-    setThemePreference('light');
+    if (theme.setTheme) {
+      theme.setTheme('light');
+    }
     
     toast({
       title: "Reset completed",

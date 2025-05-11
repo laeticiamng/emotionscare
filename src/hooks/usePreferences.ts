@@ -1,12 +1,16 @@
 
 import { useState, useCallback } from 'react';
-import { User, UserPreferences } from '@/types/user';
+import { UserPreferences } from '@/types/user';
 
 export const usePreferences = () => {
   const [preferences, setPreferences] = useState<UserPreferences>({
     theme: 'light',
     fontSize: 'medium',
-    notifications: true,
+    notifications: {
+      email: true,
+      push: true,
+      sms: false
+    },
     autoplayVideos: true,
     showEmotionPrompts: true,
     privacy: 'private',
@@ -27,7 +31,14 @@ export const usePreferences = () => {
     try {
       // Simuler un appel API
       await new Promise(resolve => setTimeout(resolve, 500));
-      setPreferences((prev) => ({ ...prev, ...newPreferences }));
+      setPreferences((prev) => ({ 
+        ...prev, 
+        ...newPreferences,
+        // Ensure nested structures are handled correctly
+        ...(newPreferences.notifications 
+          ? { notifications: { ...prev.notifications, ...newPreferences.notifications } } 
+          : {})
+      }));
       setIsLoading(false);
       return true;
     } catch (err) {
@@ -42,7 +53,11 @@ export const usePreferences = () => {
     setPreferences({
       theme: 'light',
       fontSize: 'medium',
-      notifications: true,
+      notifications: {
+        email: true,
+        push: true,
+        sms: false
+      },
       autoplayVideos: true,
       showEmotionPrompts: true,
       privacy: 'private',
@@ -64,11 +79,11 @@ export const usePreferences = () => {
     updatePreferences,
     resetPreferences,
     theme: preferences.theme,
-    fontSize: preferences.fontSize,
+    fontSize: preferences.fontSize || 'medium',
     notifications_enabled: preferences.notifications_enabled,
     notification_frequency: preferences.notification_frequency,
-    notification_type: preferences.notification_type,
     notification_tone: preferences.notification_tone,
+    notification_type: preferences.notification_type,
     email_notifications: preferences.email_notifications,
     push_notifications: preferences.push_notifications,
     emotionalCamouflage: preferences.emotionalCamouflage

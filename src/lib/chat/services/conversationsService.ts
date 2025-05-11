@@ -17,20 +17,20 @@ const getConversationsForUser = async (userId: string): Promise<ChatConversation
     .map(conv => ({
       id: conv.id,
       user_id: conv.user_id || conv.userId || userId,
-      created_at: conv.created_at || conv.createdAt || new Date(),
-      updated_at: conv.updated_at || conv.updatedAt || new Date(),
+      created_at: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : conv.created_at || new Date().toISOString(),
+      updated_at: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : conv.updated_at || new Date().toISOString(),
       title: conv.title,
       last_message: conv.last_message || conv.lastMessage || '',
       // Add in legacy fields for compatibility
       userId: conv.user_id || conv.userId || userId,
-      createdAt: conv.created_at || conv.createdAt || new Date(),
-      updatedAt: conv.updated_at || conv.updatedAt || new Date(),
+      createdAt: typeof conv.created_at === 'object' ? conv.created_at.toISOString() : conv.created_at || new Date().toISOString(),
+      updatedAt: typeof conv.updated_at === 'object' ? conv.updated_at.toISOString() : conv.updated_at || new Date().toISOString(),
       lastMessage: conv.last_message || conv.lastMessage || '',
     }))
     .sort((a, b) => {
       // Sort by the most recent conversation
-      const dateA = a.updated_at instanceof Date ? a.updated_at : new Date(a.updated_at);
-      const dateB = b.updated_at instanceof Date ? b.updated_at : new Date(b.updated_at);
+      const dateA = new Date(a.updated_at);
+      const dateB = new Date(b.updated_at);
       return dateB.getTime() - dateA.getTime();
     });
 };
@@ -41,7 +41,7 @@ const getConversationsForUser = async (userId: string): Promise<ChatConversation
  * @param title - The title of the conversation
  */
 const createConversation = async (userId: string, title: string): Promise<ChatConversation> => {
-  const now = new Date();
+  const now = new Date().toISOString();
   
   const conversation: ChatConversation = {
     id: uuidv4(),
@@ -85,10 +85,12 @@ const updateConversation = async (
     throw new Error('Conversation not found');
   }
   
-  const updatedConversation = {
+  const now = new Date().toISOString();
+  
+  const updatedConversation: ChatConversation = {
     ...mockConversations[index],
-    updated_at: new Date(),
-    updatedAt: new Date(),
+    updated_at: now,
+    updatedAt: now,
   };
   
   if (updates.title) {

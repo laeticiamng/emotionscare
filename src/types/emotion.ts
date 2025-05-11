@@ -1,63 +1,69 @@
 
 export interface Emotion {
-  id?: string;
-  user_id?: string;
-  date: string | Date;
-  score: number;
+  id: string;
+  user_id: string;
+  date: string;
   emotion: string;
-  emojis?: string;
+  score: number;
   text?: string;
-  audio_url?: string;
+  emojis?: string;
+  audio_url?: string | null;
   ai_feedback?: string;
-  timestamp?: string | Date; // Pour compatibilité
-  created_at?: string | Date; // Pour compatibilité
-  name?: string; // Pour compatibilité avec VR
-  confidence?: number; // Niveau de confiance de l'analyse
-  intensity?: number; // Intensité de l'émotion
-  category?: string; // Catégorie d'émotion
-  dominant_emotion?: string; // Pour compatibilité
-  is_confidential?: boolean; // Pour confidentialité
-  source?: string; // Source de l'émotion (texte, audio, etc.)
+  created_at?: string;
+  confidence?: number;
+  intensity?: number;
+  name?: string;
+  category?: string;
+  source?: string;
+  primaryEmotion?: {
+    name: string;
+    intensity?: number;
+    score?: number;
+  };
 }
 
 export interface EmotionResult {
   id?: string;
   user_id?: string;
-  emotion: string;
-  score: number;
+  date?: string;
+  emotion?: string;
+  score?: number;
+  confidence?: number;
   feedback?: string;
   text?: string;
-  transcript?: string;
   emojis?: string;
-  date?: string | Date;
-  confidence?: number;
-  intensity?: number;
   ai_feedback?: string;
+  intensity?: number;
+  transcript?: string;
   recommendations?: string[];
   source?: string;
   primaryEmotion?: {
     name: string;
-    score: number;
+    intensity?: number;
+    score?: number;
   };
 }
 
-export interface EmotionalTeamViewProps {
-  userId: string;
-  period: string;
-  teamId?: string;
-  className?: string;
-  onRefresh?: () => void;
-}
-
-export interface EnhancedEmotionResult extends Omit<EmotionResult, 'recommendations'> {
-  recommendations?: {
-    activities?: string[];
-    music?: string[];
-    breathing?: string[];
-  };
-  timestamp: Date;
-  analysis?: string;
-  color?: string;
-  insights?: string[];
+export interface EmotionPrediction {
+  predictedEmotion: string;
+  emotion?: string;
+  probability: number;
+  confidence?: number;
   triggers?: string[];
+  recommendations?: string[];
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  enhancedFeedback?: string;
+  detailedAnalysis?: {
+    causes?: string[];
+    suggestions?: string[];
+    insights?: string;
+  };
+  relatedJournalPrompts?: string[];
+  audioSuggestions?: {
+    type: string;
+    title: string;
+    description: string;
+  }[];
 }

@@ -71,12 +71,13 @@ export function useConversations() {
       // Simuler un délai d'API
       await new Promise(resolve => setTimeout(resolve, 500));
       
+      const now = new Date().toISOString();
       const newConversation: ChatConversation = {
         id: `conv-${Date.now()}`,
         title: title || 'Nouvelle conversation',
         user_id: user?.id || '',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        created_at: now,
+        updated_at: now,
         lastMessage: ''
       };
       
@@ -107,7 +108,11 @@ export function useConversations() {
       
       // Effacer la conversation active si la supprimée était active
       if (activeConversationId === conversationId) {
-        setActiveConversationId(null);
+        setActiveConversationId(prev => 
+          prev === conversationId 
+            ? (conversations.filter(c => c.id !== conversationId)[0]?.id || null)
+            : prev
+        );
       }
       
       return true;
@@ -129,14 +134,16 @@ export function useConversations() {
       // Simuler un délai d'API
       await new Promise(resolve => setTimeout(resolve, 500));
       
+      const now = new Date().toISOString();
+      
       // Mettre à jour la conversation dans notre état
       setConversations(prevConversations => 
         prevConversations.map(conv => 
           conv.id === conversationId 
             ? {
                 ...conv, 
-                ...updates, 
-                updated_at: new Date().toISOString()
+                ...updates,
+                updated_at: now
               } 
             : conv
         )

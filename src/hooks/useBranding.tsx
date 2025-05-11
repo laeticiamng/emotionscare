@@ -1,6 +1,6 @@
 
 import { useContext } from 'react';
-import { BrandingContextType, Theme, BrandingOptions } from '@/types/branding';
+import { BrandingContextType, Theme, BrandingOptions, VisualDensity } from '@/types/branding';
 
 // Create context interface
 interface ThemeContextType {
@@ -37,7 +37,7 @@ export const useBranding = (): BrandingContextType => {
     primaryColor: '#9b87f5',
     brandName: 'EmotionAI',
     soundEnabled: true,
-    visualDensity: 'comfortable',
+    visualDensity: 'balanced' as VisualDensity,
     setThemePreference: themeContext.setTheme
   };
 };

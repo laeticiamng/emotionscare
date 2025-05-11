@@ -1,8 +1,26 @@
 
-import { VRSessionTemplate } from '@/types';
-
-// Export the VRSessionTemplate from this module as well
-export { VRSessionTemplate };
+export interface VRSessionTemplate {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  duration: number;
+  theme: string;
+  is_audio_only: boolean;
+  preview_url: string;
+  audio_url: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  tags: string[];
+  benefits: string[];
+  emotions: string[];
+  popularity: number;
+  template_id?: string;
+  completion_rate?: number;
+  emotion_target?: string;
+  level?: string;
+  recommended_mood?: string;
+}
 
 // Define and export the VRSession interface
 export interface VRSession {
@@ -19,8 +37,8 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
-  started_at?: Date | string;
-  completed_at?: Date | string;
+  started_at?: string;
+  completed_at?: string;
   emotion_before?: string;
   emotion_after?: string;
   mood_before?: string;

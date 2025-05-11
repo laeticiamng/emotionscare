@@ -22,7 +22,7 @@ export function useMessageHandling({ initialMessages = [] }: UseMessageHandlingO
       sender_id: sender === 'user' ? 'user-1' : 'bot-1',
       conversation_id: 'default',
       is_read: true,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       ...metadata
     };
     
@@ -46,8 +46,8 @@ export function useMessageHandling({ initialMessages = [] }: UseMessageHandlingO
   }, [messages]);
   
   // Format time display for a message
-  const formatMessageTime = useCallback((timestamp: Date | string): string => {
-    const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  const formatMessageTime = useCallback((timestamp: string): string => {
+    const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }, []);
   

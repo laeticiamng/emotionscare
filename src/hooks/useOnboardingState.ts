@@ -13,11 +13,11 @@ interface OnboardingStep {
 
 interface AuthContextWithUpdateUser {
   user: User | null;
-  updateUser: (user: User) => Promise<User>;
+  updateUser: (user: User) => Promise<User | void>;
 }
 
 export const useOnboardingState = () => {
-  const auth = useAuth() as AuthContextWithUpdateUser;
+  const auth = useAuth() as unknown as AuthContextWithUpdateUser;
   const { user, updateUser } = auth;
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
@@ -103,6 +103,8 @@ export const useOnboardingState = () => {
   
   const completeOnboarding = useCallback(async () => {
     try {
+      if (!user) return false;
+      
       const preferences = {
         ...(user?.preferences || {}),
         theme,
@@ -111,7 +113,7 @@ export const useOnboardingState = () => {
       };
       
       const updatedUser = {
-        ...user!,
+        ...user,
         name,
         role,
         department,
@@ -119,7 +121,7 @@ export const useOnboardingState = () => {
         onboarded: true,
       } as User;
       
-      // Add goals to user metadata or store it separately
+      // Update the user
       await updateUser(updatedUser);
       
       toast({

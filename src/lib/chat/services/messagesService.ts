@@ -24,7 +24,7 @@ const addMessageToConversation = async (conversationId: string, message: Omit<Ch
   const newMessage: ChatMessage = {
     id: uuidv4(),
     ...message,
-    timestamp: message.timestamp || new Date(),
+    timestamp: typeof message.timestamp === 'object' ? message.timestamp.toISOString() : (message.timestamp || new Date().toISOString()),
     conversation_id: conversationId,
   };
   
@@ -62,7 +62,7 @@ const getLastMessageForConversation = async (conversationId: string): Promise<Ch
  */
 const formatDate = (date: Date | string): string => {
   if (typeof date === 'string') {
-    return new Date(date).toISOString();
+    return date;
   }
   return date.toISOString();
 };
