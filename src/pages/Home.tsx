@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -98,27 +97,22 @@ export const Home: React.FC = () => {
             Votre journal, votre musique, votre calme. Trouvez l'équilibre dont vous avez besoin.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
-            {isAuthenticated ? (
-              <>
-                <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-                  <Link to="/dashboard">
-                    Accéder à mon espace
-                    <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
-                  <Link to="/scan">
-                    Faire un scan émotionnel
-                    <Heart className="h-4 w-4 ml-2 transition-all group-hover:scale-110 group-hover:text-rose-500" />
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              // Now empty since login/signup is handled via B2C/B2B access buttons below
-              <div className="h-10"></div> 
-            )}
-          </div>
+          {isAuthenticated && (
+            <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
+              <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
+                <Link to="/dashboard">
+                  Accéder à mon espace
+                  <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
+                <Link to="/scan">
+                  Faire un scan émotionnel
+                  <Heart className="h-4 w-4 ml-2 transition-all group-hover:scale-110 group-hover:text-rose-500" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
