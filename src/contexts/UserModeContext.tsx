@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type UserMode = 'personal' | 'professional' | 'anonymous' | 'b2b-collaborator' | 'b2b-admin' | 'b2c';
 
@@ -24,6 +24,11 @@ const UserModeContext = createContext<UserModeContextType>({
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userMode, setUserMode] = useState<UserMode>('personal');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Log userMode changes for debugging
+  useEffect(() => {
+    console.log('UserModeContext - current mode:', userMode);
+  }, [userMode]);
   
   // Derived values
   const isB2C = userMode === 'personal' || userMode === 'b2c';

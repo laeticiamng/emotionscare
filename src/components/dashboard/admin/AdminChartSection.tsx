@@ -1,8 +1,10 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Activity, LineChart, Users } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import ChartCard from '@/components/dashboard/charts/ChartCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, TrendingUp } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdminChartSectionProps {
   absenteeismData: Array<{ date: string; value: number }>;
@@ -10,62 +12,74 @@ interface AdminChartSectionProps {
   isLoading?: boolean;
 }
 
-const AdminChartSection: React.FC<AdminChartSectionProps> = ({ 
-  absenteeismData, 
+const AdminChartSection: React.FC<AdminChartSectionProps> = ({
+  absenteeismData,
   productivityData,
   isLoading = false
 }) => {
-  if (isLoading) {
+  const renderChart = (data: Array<{ date: string; value: number }>, color: string) => {
     return (
-      <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>Chargement des données...</CardTitle>
-        </CardHeader>
-        <CardContent className="h-80 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </CardContent>
-      </Card>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={data}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 0,
+            bottom: 0,
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} width={30} />
+          <Tooltip />
+          <Area type="monotone" dataKey="value" stroke={color} fill={color} fillOpacity={0.2} />
+        </AreaChart>
+      </ResponsiveContainer>
     );
-  }
+  };
   
-  // Si les données sont vides, afficher un message
-  if (!absenteeismData?.length || !productivityData?.length) {
-    return (
-      <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>Données non disponibles</CardTitle>
-        </CardHeader>
-        <CardContent className="h-80 flex items-center justify-center">
-          <p className="text-muted-foreground">Aucune donnée disponible pour la période sélectionnée.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Calculate trends (example calculation, modify as needed)
+  const absenteeismTrend = absenteeismData.length > 1 ? 
+    Math.round((absenteeismData[absenteeismData.length-1].value - absenteeismData[0].value) / absenteeismData[0].value * 100) : 0;
   
+  const productivityTrend = productivityData.length > 1 ?
+    Math.round((productivityData[productivityData.length-1].value - productivityData[0].value) / productivityData[0].value * 100) : 0;
+
   return (
-    <Card className="col-span-2">
-      <CardHeader>
-        <CardTitle>Métriques principales</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ChartCard 
-          title="Taux d'absentéisme" 
-          data={absenteeismData} 
-          icon={BarChart3}
-          valueFormat={(val) => `${val}%`}
-          trend={-1.2}
-          trendLabel="vs période précédente"
-        />
-        <ChartCard 
-          title="Productivité" 
-          data={productivityData}
-          icon={TrendingUp}
-          valueFormat={(val) => `${val}%`}
-          trend={2.1}
-          trendLabel="vs période précédente"
-        />
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <ChartCard
+        title="Taux d'absentéisme"
+        data={absenteeismData}
+        icon={Users}
+        isLoading={isLoading}
+        valueFormat={(val) => `${val}%`}
+        trend={absenteeismTrend}
+        trendLabel="depuis le début de la période"
+      >
+        {isLoading ? (
+          <Skeleton className="h-full w-full" />
+        ) : (
+          renderChart(absenteeismData, '#ef4444')
+        )}
+      </ChartCard>
+      
+      <ChartCard
+        title="Taux de productivité"
+        data={productivityData}
+        icon={Activity}
+        isLoading={isLoading}
+        valueFormat={(val) => `${val}%`}
+        trend={productivityTrend}
+        trendLabel="depuis le début de la période"
+      >
+        {isLoading ? (
+          <Skeleton className="h-full w-full" />
+        ) : (
+          renderChart(productivityData, '#3b82f6')
+        )}
+      </ChartCard>
+    </div>
   );
 };
 

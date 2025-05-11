@@ -1,7 +1,6 @@
 
 import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import UserDashboard from '@/components/dashboard/UserDashboard';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -13,10 +12,11 @@ import { User } from '@/types/user';
 
 const DashboardPage: React.FC = () => {
   const { user, isLoading } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { userMode } = useUserMode();
+  
+  console.log('DashboardPage rendering with userMode:', userMode);
   
   // Mock user data pour la démonstration
   const mockUser: User = {
@@ -34,6 +34,16 @@ const DashboardPage: React.FC = () => {
     emotion: "calm", 
     score: 85
   };
+
+  useEffect(() => {
+    // Notification de bienvenue
+    toast({
+      title: "Tableau de bord chargé",
+      description: userMode === 'b2b-admin' 
+        ? "Bienvenue dans votre espace administrateur" 
+        : "Bienvenue dans votre espace personnel"
+    });
+  }, [toast, userMode]);
   
   if (isLoading) {
     return (

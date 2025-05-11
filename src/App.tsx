@@ -18,6 +18,8 @@ import { UserModeProvider } from '@/contexts/UserModeContext';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
 const App: React.FC = () => {
+  console.log('App component rendering');
+  
   return (
     <UserModeProvider>
       <Routes>
@@ -32,43 +34,15 @@ const App: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             {/* B2C user routes */}
-            <Route path="/dashboard" element={
-              <ProtectedLayoutWrapper>
-                <DashboardPage />
-              </ProtectedLayoutWrapper>
-            } />
-            <Route path="/predictive" element={
-              <ProtectedLayoutWrapper>
-                <PredictiveDashboardPage />
-              </ProtectedLayoutWrapper>
-            } />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/predictive" element={<PredictiveDashboardPage />} />
             
             {/* B2B admin routes */}
-            <Route path="/admin/dashboard" element={
-              <ProtectedLayoutWrapper>
-                <AdminDashboardPage />
-              </ProtectedLayoutWrapper>
-            } />
-            <Route path="/admin/premium" element={
-              <ProtectedLayoutWrapper>
-                <AdminPremiumDashboard />
-              </ProtectedLayoutWrapper>
-            } />
-            <Route path="/admin/organization" element={
-              <ProtectedLayoutWrapper>
-                <OrganizationPage />
-              </ProtectedLayoutWrapper>
-            } />
-            <Route path="/admin/burnout" element={
-              <ProtectedLayoutWrapper>
-                <PredictiveBurnoutPage />
-              </ProtectedLayoutWrapper>
-            } />
-            <Route path="/admin/reports" element={
-              <ProtectedLayoutWrapper>
-                <CustomReportsPage />
-              </ProtectedLayoutWrapper>
-            } />
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/admin/premium" element={<AdminPremiumDashboard />} />
+            <Route path="/admin/organization" element={<OrganizationPage />} />
+            <Route path="/admin/burnout" element={<PredictiveBurnoutPage />} />
+            <Route path="/admin/reports" element={<CustomReportsPage />} />
           </Route>
         </Route>
       </Routes>

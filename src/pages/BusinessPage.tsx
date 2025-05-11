@@ -15,6 +15,8 @@ const BusinessPage = () => {
   const handleUserAccess = () => {
     // Définir le mode utilisateur comme collaborateur B2B
     setUserMode('b2b-collaborator');
+    console.log('Setting user mode to b2b-collaborator');
+    
     // Redirection vers le tableau de bord utilisateur
     navigate('/dashboard');
     toast({
@@ -26,6 +28,8 @@ const BusinessPage = () => {
   const handleAdminAccess = () => {
     // Définir le mode utilisateur comme admin B2B
     setUserMode('b2b-admin');
+    console.log('Setting user mode to b2b-admin');
+    
     // Redirection vers le tableau de bord admin
     navigate('/admin/dashboard');
     toast({

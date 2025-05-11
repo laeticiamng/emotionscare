@@ -22,6 +22,8 @@ const LoginPage: React.FC = () => {
     // Définir le mode utilisateur approprié
     if (isAdminLogin) {
       setUserMode('b2b-admin');
+      console.log('Setting user mode to b2b-admin from login');
+      
       toast({
         title: "Connexion réussie",
         description: "Bienvenue sur votre tableau de bord administrateur"
@@ -29,6 +31,8 @@ const LoginPage: React.FC = () => {
       navigate('/admin/dashboard');
     } else {
       setUserMode('b2c');
+      console.log('Setting user mode to b2c from login');
+      
       toast({
         title: "Connexion réussie",
         description: "Bienvenue sur votre tableau de bord personnel"

@@ -17,6 +17,8 @@ const AdminDashboard: React.FC = () => {
   const [timePeriod, setTimePeriod] = useState<string>('7');
   const { segment } = useSegment();
 
+  console.log('AdminDashboard component rendering');
+
   // Mock data for Social Cocoon section
   const socialCocoonData = {
     totalPosts: 248,
@@ -48,6 +50,7 @@ const AdminDashboard: React.FC = () => {
 
   // Générer des données fictives pour les graphiques
   useEffect(() => {
+    console.log('Generating chart data with timePeriod:', timePeriod);
     const generateMockData = () => {
       setIsLoading(true);
       

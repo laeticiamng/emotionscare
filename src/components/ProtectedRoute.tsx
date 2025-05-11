@@ -12,17 +12,20 @@ const ProtectedRoute: React.FC = () => {
   const { setUserMode } = useUserMode();
 
   // Pour la démo, nous considérons tout le monde comme authentifié
-  // Dans une vraie application, nous vérifierions isAuthenticated
   const demoIsAuthenticated = true;
 
   // Déterminer le mode d'utilisateur en fonction du chemin
   React.useEffect(() => {
+    console.log('ProtectedRoute path:', location.pathname);
     if (location.pathname.includes('/admin')) {
       setUserMode('b2b-admin');
+      console.log('Setting mode to b2b-admin');
     } else if (location.pathname.includes('/business')) {
       setUserMode('b2b-collaborator');
+      console.log('Setting mode to b2b-collaborator');
     } else {
       setUserMode('b2c');
+      console.log('Setting mode to b2c');
     }
   }, [location.pathname, setUserMode]);
 
