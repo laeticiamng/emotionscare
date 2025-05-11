@@ -2,7 +2,7 @@
 export type FontSize = 'small' | 'medium' | 'large' | string;
 export type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | string;
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type Theme = ThemeName; // Les rendre du même type pour éviter les erreurs d'affectation
+export type Theme = ThemeName;
 
 export interface UserPreferencesState {
   theme: ThemeName;
@@ -20,10 +20,6 @@ export interface UserPreferencesState {
   emotionalCamouflage: boolean;
   font?: string;
 }
-
-// Exporter les types de notifications pour la compatibilité
-export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never';
-export type NotificationTone = 'formal' | 'friendly' | 'energetic';
 
 export const defaultUserPreferences: UserPreferencesState = {
   theme: 'system',
@@ -56,6 +52,6 @@ export interface UserPreferences {
   notification_tone?: 'formal' | 'friendly' | 'energetic';
   emotionalCamouflage?: boolean;
   font?: string;
-  onboardingCompleted?: boolean; // Added this property
-  dashboardLayout?: string; // Added this property for consistency
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
 }

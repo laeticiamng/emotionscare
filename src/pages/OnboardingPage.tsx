@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -45,7 +44,6 @@ const OnboardingPage: React.FC = () => {
         notifications: !!userResponses.notifications,
         soundEnabled: !!userResponses.soundEnabled,
         privacyLevel: userResponses.privacyLevel || 'private',
-        // Remove emotionalInsightsEnabled as it's not in the UserPreferences type
         onboardingCompleted: true,
         dashboardLayout: userResponses.dashboardLayout || 'standard',
       };

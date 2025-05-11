@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -9,7 +10,7 @@ export interface User {
   preferences?: UserPreferences;
   createdAt?: string;
   created_at?: string;
-  joined_at?: string; // Ajouté pour résoudre les erreurs
+  joined_at?: string; 
   onboarded?: boolean;
   department?: string;
   team_id?: string;
@@ -41,8 +42,8 @@ export interface UserPreferences {
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   font?: string;
-  onboardingCompleted?: boolean; // Added this property
-  dashboardLayout?: string; // This property is also used in OnboardingPage.tsx
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
 }
 
 export enum UserRole {

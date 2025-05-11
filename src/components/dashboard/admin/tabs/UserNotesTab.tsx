@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface UserNotesTabProps {
   userId: string;
-  userName?: string; // Added userName as an optional prop
+  userName?: string;
 }
 
 const UserNotesTab: React.FC<UserNotesTabProps> = ({ userId, userName }) => {
