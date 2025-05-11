@@ -8,7 +8,7 @@ interface RoleCardProps {
   title: string;
   icon: LucideIcon;
   features: string[];
-  type: 'user' | 'admin';
+  type: 'personal' | 'business';  // Changed from 'user' | 'admin' to match CallToAction props
 }
 
 const RoleCard: React.FC<RoleCardProps> = ({ title, icon: Icon, features, type }) => {

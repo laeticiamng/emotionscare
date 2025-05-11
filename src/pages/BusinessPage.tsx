@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { User, Shield, ArrowLeft } from 'lucide-react';
+import { User, Shield, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const BusinessPage = () => {
