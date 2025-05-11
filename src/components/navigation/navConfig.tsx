@@ -1,5 +1,4 @@
-
-import { Home, Heart, FileText, Music, Headphones, Video, Settings, User, Building, Users, BarChart2 } from 'lucide-react';
+import { Home, Heart, FileText, Music, Headphones, Video, Settings, User, Building, Users, BarChart2, Cube } from 'lucide-react';
 
 // Mapping d'icônes pour utilisation dans les composants de sidebar
 export const sidebarItems = [
@@ -37,6 +36,11 @@ export const sidebarItems = [
     title: 'Vidéothérapie',
     href: '/video',
     icon: Video,
+  },
+  {
+    title: "Réalité Augmentée",
+    href: "/ar",
+    icon: Cube
   },
 ];
 

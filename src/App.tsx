@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
@@ -15,6 +14,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import ImmersiveSettingsPage from '@/pages/ImmersiveSettingsPage';
 import DesignSystemPage from '@/pages/DesignSystemPage';
 import UserSettingsPage from '@/pages/UserSettingsPage';
+import ARPage from './pages/ARPage';
 
 const App: React.FC = () => {
   console.log("Rendering App component");
@@ -49,6 +49,9 @@ const App: React.FC = () => {
             <Route path="/settings" element={<div className="p-8"><h1>Paramètres</h1><p>Page en construction</p></div>} />
           </Route>
         </Route>
+        
+        {/* Ajoutez cette route au composant Routes */}
+        <Route path="/ar" element={<ARPage />} />
       </Routes>
     </ThemeProvider>
   );
