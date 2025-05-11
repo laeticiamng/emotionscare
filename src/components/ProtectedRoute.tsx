@@ -9,6 +9,8 @@ const ProtectedRoute: React.FC = () => {
   const { userMode, isLoading: userModeLoading } = useUserMode();
   const location = useLocation();
   
+  console.log("ProtectedRoute - isAuthenticated:", isAuthenticated, "userMode:", userMode, "isLoading:", isLoading);
+  
   // Si l'authentification est en cours de chargement, afficher un indicateur de chargement
   if (isLoading || userModeLoading) {
     return (
@@ -18,8 +20,6 @@ const ProtectedRoute: React.FC = () => {
       </div>
     );
   }
-  
-  console.log("ProtectedRoute: isAuthenticated =", isAuthenticated, "userMode =", userMode);
   
   // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
   if (!isAuthenticated) {
@@ -33,6 +33,7 @@ const ProtectedRoute: React.FC = () => {
     return <Navigate to="/onboarding" replace />;
   }
   
+  console.log("User authenticated, rendering protected content");
   // L'utilisateur est authentifié et a complété les étapes nécessaires, afficher le contenu protégé
   return <Outlet />;
 };

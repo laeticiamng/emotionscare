@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface NavItemButtonProps {
   path: string;
@@ -20,6 +20,7 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
   };
 
   const handleNavigation = () => {
+    console.log(`Navigation to: ${path}`);
     navigate(path);
   };
 
@@ -28,23 +29,21 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
   // Collapsed version with tooltip
   if (collapsed) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant={isActive(path) ? "secondary" : "ghost"}
-              size="icon"
-              className="w-full h-10"
-              onClick={handleNavigation}
-            >
-              <Icon className="h-5 w-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right">
-            {label}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={isActive(path) ? "secondary" : "ghost"}
+            size="icon"
+            className="w-full h-10"
+            onClick={handleNavigation}
+          >
+            <Icon className="h-5 w-5" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          {label}
+        </TooltipContent>
+      </Tooltip>
     );
   }
 

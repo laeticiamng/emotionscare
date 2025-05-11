@@ -18,7 +18,7 @@ const DashboardLayout: React.FC = () => {
             <Sidebar />
           </div>
         )}
-        <div className="flex-1 p-4 bg-background">
+        <div className="flex-1 p-4 ml-16 md:ml-64 bg-background transition-all">
           <Outlet />
         </div>
       </div>

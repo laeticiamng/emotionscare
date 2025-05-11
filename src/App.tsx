@@ -10,10 +10,11 @@ import RegisterPage from '@/pages/RegisterPage';
 import Index from '@/pages/Index';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { UserModeProvider } from '@/contexts/UserModeContext';
+import ScanPage from '@/pages/ScanPage';
 
 const App: React.FC = () => {
+  console.log("Rendering App component");
+  
   return (
     <Routes>
       {/* Routes publiques */}
@@ -29,6 +30,7 @@ const App: React.FC = () => {
           {/* Tableaux de bord */}
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/scan" element={<ScanPage />} />
         </Route>
       </Route>
     </Routes>

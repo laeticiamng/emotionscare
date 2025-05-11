@@ -32,6 +32,8 @@ const SidebarContent: React.FC = () => {
   const { collapsed } = useSidebar();
   const isAdmin = isAdminRole(user?.role);
   
+  console.log("Rendering Sidebar with user:", user?.name, "isAdmin:", isAdmin, "collapsed:", collapsed);
+  
   // Choisir les éléments de navigation en fonction du rôle
   const items = isAdmin ? adminSidebarItems : sidebarItems;
   const configItems = convertToNavItemConfig(items);
@@ -75,6 +77,7 @@ const SidebarContent: React.FC = () => {
 
 // Export the main Sidebar component that provides the context
 const Sidebar: React.FC = () => {
+  console.log("Rendering Sidebar component");
   return (
     <SidebarProvider>
       <SidebarContent />

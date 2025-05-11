@@ -1,29 +1,30 @@
 
 import React from 'react';
+import { useSidebar } from './SidebarContext';
 import NavItemButton from './NavItemButton';
-
-// Export the interface so it can be imported elsewhere
-export interface NavItemConfig {
-  path: string;
-  label: string;
-  icon: React.ElementType;
-  roles?: string[];
-}
 
 interface SidebarNavGroupProps {
   title: string;
-  items: NavItemConfig[];
+  items: Array<{
+    path: string;
+    label: string;
+    icon: React.ElementType;
+  }>;
   collapsed: boolean;
 }
 
 const SidebarNavGroup: React.FC<SidebarNavGroupProps> = ({ title, items, collapsed }) => {
+  const { collapsed: sidebarCollapsed } = useSidebar();
+  
+  console.log(`Rendering SidebarNavGroup: ${title}, Items:`, items.map(i => i.label), "Collapsed:", collapsed);
+
   return (
-    <>
-      <div className="px-3 mb-2">
-        <h2 className={`text-sm font-medium text-muted-foreground ${collapsed ? 'sr-only' : ''}`}>
+    <div className="space-y-1">
+      {!sidebarCollapsed && (
+        <h2 className="mb-2 px-2 text-xs font-semibold text-muted-foreground">
           {title}
         </h2>
-      </div>
+      )}
       <div className="space-y-1">
         {items.map((item) => (
           <NavItemButton
@@ -31,11 +32,11 @@ const SidebarNavGroup: React.FC<SidebarNavGroupProps> = ({ title, items, collaps
             path={item.path}
             icon={item.icon}
             label={item.label}
-            collapsed={collapsed}
+            collapsed={sidebarCollapsed}
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

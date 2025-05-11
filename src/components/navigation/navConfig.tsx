@@ -1,153 +1,8 @@
 
-import React from 'react';
-import {
-  Home,
-  Heart,
-  Gauge,
-  BarChart3,
-  Users,
-  Settings,
-  FileText,
-  Music,
-  Headphones,
-  VolumeX,
-  ThumbsUp,
-  Layout,
-  ArrowRightLeft,
-  BookOpen,
-  Clock,
-  Shuffle,
-  Shield,
-  UserCog,
-  Webhook,
-  Database,
-  Bell,
-  LineChart,
-  ClipboardList,
-  CalendarDays,
-  Activity,
-  VideoIcon,
-  Building,
-  FileQuestion,
-  Flame,
-  FilePenLine
-} from 'lucide-react';
+import { Home, Heart, FileText, Music, Headphones, Video, Settings, User, Building, Users, BarChart2 } from 'lucide-react';
 
-export type NavItem = {
-  title: string;
-  href: string;
-  icon: React.ElementType;
-  description?: string;
-  isDisabled?: boolean;
-  isExternal?: boolean;
-  isPro?: boolean;
-  badge?: string | number;
-};
-
-// Sidebar navigation items for regular users
-export const sidebarItems: NavItem[] = [
-  {
-    title: 'Tableau de bord',
-    href: '/dashboard',
-    icon: Gauge,
-    description: 'Aperçu de votre bien-être émotionnel',
-  },
-  {
-    title: 'Scan émotionnel',
-    href: '/scan',
-    icon: Heart,
-    description: 'Analyser votre état émotionnel',
-  },
-  {
-    title: 'Journal',
-    href: '/journal',
-    icon: FileText,
-    description: 'Votre journal émotionnel',
-  },
-  {
-    title: 'Musique',
-    href: '/music',
-    icon: Headphones,
-    description: 'Thérapie musicale basée sur vos émotions',
-  },
-  {
-    title: 'Réalité virtuelle',
-    href: '/vr',
-    icon: VideoIcon,
-    description: 'Immersion VR pour rééquilibrage émotionnel',
-  },
-  {
-    title: 'Coach IA',
-    href: '/coach',
-    icon: ThumbsUp,
-    description: 'Votre coach d\'équilibre émotionnel',
-  },
-];
-
-// Sidebar navigation items for admin users
-export const adminSidebarItems: NavItem[] = [
-  {
-    title: 'Administration',
-    href: '/admin/dashboard',
-    icon: Gauge,
-    description: 'Tableau de bord d\'administration',
-  },
-  {
-    title: 'Utilisateurs',
-    href: '/admin/users',
-    icon: Users,
-    description: 'Gestion des utilisateurs',
-  },
-  {
-    title: 'Organisation',
-    href: '/admin/organization',
-    icon: Building,
-    description: 'Structure organisationnelle',
-  },
-  {
-    title: 'Analyse émotionnelle',
-    href: '/admin/analytics',
-    icon: BarChart3,
-    description: 'Analyser les données',
-  },
-  {
-    title: 'Détection burnout',
-    href: '/admin/burnout',
-    icon: Flame,
-    description: 'Détection préventive',
-  },
-  {
-    title: 'Rapports personnalisés',
-    href: '/admin/reports',
-    icon: FilePenLine,
-    description: 'Générateur de rapports RH',
-  },
-  {
-    title: 'Paramètres',
-    href: '/admin/settings',
-    icon: Settings,
-    description: 'Configuration du système',
-  }
-];
-
-// Footer navigation items (shown at the bottom of the sidebar)
-export const footerNavItems: NavItem[] = [
-  {
-    title: 'Paramètres',
-    href: '/settings',
-    icon: Settings,
-    description: 'Personnaliser votre environnement',
-  },
-];
-
-// Navigation items for the mobile drawer
-export const drawerItems: NavItem[] = [
-  ...sidebarItems,
-  ...footerNavItems
-];
-
-// Desktop navigation items (shown in the header)
-export const desktopItems: NavItem[] = [
+// Mapping d'icônes pour utilisation dans les composants de sidebar
+export const sidebarItems = [
   {
     title: 'Accueil',
     href: '/',
@@ -156,10 +11,10 @@ export const desktopItems: NavItem[] = [
   {
     title: 'Tableau de bord',
     href: '/dashboard',
-    icon: Gauge,
+    icon: BarChart2,
   },
   {
-    title: 'Scan',
+    title: 'Scan émotionnel',
     href: '/scan',
     icon: Heart,
   },
@@ -168,97 +23,52 @@ export const desktopItems: NavItem[] = [
     href: '/journal',
     icon: FileText,
   },
-];
-
-// Dashboard shortcuts for quick navigation
-export const dashboardShortcuts: NavItem[] = [
   {
-    title: 'Nouveau scan',
-    href: '/scan',
-    icon: Heart,
-    description: 'Faire un scan émotionnel',
-  },
-  {
-    title: 'Journal',
-    href: '/journal',
-    icon: FileText,
-    description: 'Noter mon ressenti',
-  },
-  {
-    title: 'Musique',
+    title: 'Musicothérapie',
     href: '/music',
     icon: Music,
-    description: 'Thérapie musicale',
   },
   {
-    title: 'VR',
-    href: '/vr',
-    icon: VideoIcon,
-    description: 'Session immersive',
+    title: 'Audio',
+    href: '/audio',
+    icon: Headphones,
+  },
+  {
+    title: 'Vidéothérapie',
+    href: '/video',
+    icon: Video,
   },
 ];
 
-// Admin dashboard tabs
-export const adminDashboardTabs = [
+// Items spécifiques pour admin
+export const adminSidebarItems = [
   {
-    id: 'overview',
-    label: 'Vue d\'ensemble',
-    icon: Layout,
+    title: 'Dashboard',
+    href: '/admin/dashboard',
+    icon: BarChart2,
   },
   {
-    id: 'users',
-    label: 'Utilisateurs',
+    title: 'Utilisateurs',
+    href: '/admin/users',
     icon: Users,
   },
   {
-    id: 'analytics',
-    label: 'Analyses',
-    icon: BarChart3,
+    title: 'Organisation',
+    href: '/admin/organization',
+    icon: Building,
+  },
+];
+
+// Items du bas de la sidebar
+export const footerNavItems = [
+  {
+    title: 'Profil',
+    href: '/profile',
+    icon: User,
   },
   {
-    id: 'scan',
-    label: 'Scan d\'équipes',
-    icon: Heart,
-  },
-  {
-    id: 'vr',
-    label: 'Sessions VR',
-    icon: VideoIcon,
-  },
-  {
-    id: 'journal',
-    label: 'Tendances journal',
-    icon: LineChart,
-  },
-  {
-    id: 'social',
-    label: 'Cocon social',
-    icon: Users,
-  },
-  {
-    id: 'gamification',
-    label: 'Gamification',
-    icon: ThumbsUp,
-  },
-  {
-    id: 'invitations',
-    label: 'Invitations',
-    icon: Bell,
-  },
-  {
-    id: 'settings',
-    label: 'Paramètres',
+    title: 'Paramètres',
+    href: '/settings',
     icon: Settings,
   },
 ];
-
-// Export the navigation items for use throughout the app
-export default {
-  sidebar: sidebarItems,
-  adminSidebar: adminSidebarItems,
-  footer: footerNavItems,
-  drawer: drawerItems,
-  desktop: desktopItems,
-  dashboardShortcuts,
-  adminDashboardTabs,
-};
