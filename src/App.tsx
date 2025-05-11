@@ -12,7 +12,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import NotFound from '@/pages/NotFound';
 import ResetPassword from '@/pages/ResetPasswordPage';
 import Profile from '@/pages/Profile';
-import AdminDashboardPage from '@/pages/AdminDashboard';
+import AdminDashboardPage from '@/pages/AdminDashboardPage';
 import ScanPage from '@/pages/ScanPage';
 import MusicPage from '@/pages/MusicPage';
 import AccountSettingsPage from '@/pages/AccountSettings';
