@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -13,14 +13,16 @@ interface VRPromptWidgetProps {
 const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
   const { toast } = useToast();
   const { 
-    isActive,
     startSession,
-    completeSession 
+    completeSession,
+    currentSession 
   } = useVRSession('user-id'); // Provide a default user ID for now
+  
+  const isActive = !!currentSession?.id && !currentSession?.completed;
   
   const handleStartSession = () => {
     if (template) {
-      startSession(template);
+      startSession(template.id);
       toast({
         title: 'Session VR démarrée',
         description: `Votre session de ${template.duration} minutes a commencé`
@@ -36,7 +38,7 @@ const VRPromptWidget = ({ template }: VRPromptWidgetProps) => {
       <CardContent>
         {isActive ? (
           <Button 
-            onClick={() => completeSession()}
+            onClick={() => completeSession(currentSession.id)}
             variant="destructive"
             className="w-full"
           >

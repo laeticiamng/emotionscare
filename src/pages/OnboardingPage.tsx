@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from '@/hooks/useUser';
 import { useToast } from '@/hooks/use-toast';
-import { FontFamily, FontSize } from '@/types';
+import { FontFamily, FontSize, ThemeName, UserPreferences } from '@/types/user';
 
 const steps = [
   { id: 'welcome', title: 'Bienvenue', description: 'Bienvenue sur notre plateforme de bien-être émotionnel' },
@@ -20,8 +20,8 @@ const OnboardingPage: React.FC = () => {
   const { toast } = useToast();
   
   const [currentStep, setCurrentStep] = useState(0);
-  const [preferences, setPreferences] = useState({
-    theme: 'light',
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    theme: 'light' as ThemeName,
     language: 'fr',
     fontSize: 'medium' as FontSize,
     fontFamily: 'inter' as FontFamily,

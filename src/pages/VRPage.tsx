@@ -22,8 +22,18 @@ const VRPage: React.FC = () => {
       ? mockVRTemplates.filter(t => t.category === selectedCategory)
       : mockVRTemplates;
     
-    // Create a copy of the array to avoid React warning about setting state from another type
-    setTemplates([...filteredTemplates]);
+    if (Array.isArray(filteredTemplates)) {
+      // Ensure each template has required properties
+      const validTemplates = filteredTemplates.map(template => ({
+        ...template,
+        thumbnail: template.thumbnail || '/images/vr/default-thumbnail.jpg',
+        title: template.title || template.name || 'Session VR',
+        intensity: template.intensity || 'medium',
+        theme: template.theme || 'Wellbeing'
+      }));
+      
+      setTemplates(validTemplates);
+    }
   }, [selectedCategory]);
 
   const handleCategoryChange = (category: string) => {

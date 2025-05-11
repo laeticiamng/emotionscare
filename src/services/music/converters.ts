@@ -10,13 +10,13 @@ export function playlistToMusicPlaylist(rawData: any): MusicPlaylist {
     name: rawData.name || '',
     title: rawData.title || rawData.name || '',
     description: rawData.description || '',
-    coverUrl: rawData.coverUrl || rawData.cover_url || '',
-    coverImage: rawData.coverImage || rawData.coverUrl || '',
-    cover_url: rawData.cover_url || rawData.coverUrl || '',
     tracks: Array.isArray(rawData.tracks) 
       ? rawData.tracks.map((track: any) => trackToMusicTrack(track))
       : [],
     category: rawData.category || '',
+    coverUrl: rawData.coverUrl || rawData.cover_url || '',
+    cover_url: rawData.cover_url || rawData.coverUrl || '',
+    coverImage: rawData.coverImage || rawData.coverUrl || '',
     emotion: rawData.emotion || ''
   };
 }

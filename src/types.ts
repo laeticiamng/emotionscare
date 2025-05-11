@@ -1,3 +1,4 @@
+
 export type {
   User,
   UserPreferences,
@@ -10,8 +11,12 @@ export type {
 export type {
   VRSessionTemplate,
   VRSession,
-  VRHistoryListProps,
-  VRSessionWithMusicProps
+  VRHistoryListProps
+} from './types/vr';
+
+// Renommer ceci pour éviter les conflits d'exportation
+export type {
+  VRSessionWithMusicProps as VRSessionWithMusicPropsType
 } from './types/vr';
 
 export type {
@@ -128,7 +133,7 @@ export interface Badge {
   threshold?: number;
   user_id?: string;
   unlocked_at?: string;
-  progress?: number; // Added for compatibility
+  progress?: number;
 }
 
 export interface JournalEntry {
@@ -141,8 +146,8 @@ export interface JournalEntry {
   mood_score?: number;
   tags?: string[];
   ai_feedback?: string;
-  title?: string; // Added missing property
-  mood?: string; // Added missing property
+  title?: string;
+  mood?: string;
 }
 
 export interface InvitationStats {
@@ -179,6 +184,9 @@ export interface InvitationFormData {
 
 export type UserRole = 'admin' | 'manager' | 'user' | 'therapist' | 'coach' | 'guest' | 'employee';
 
+// Import these from types/music to avoid duplicate definitions
+import { MusicTrack as MT } from './types/music';
+
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
@@ -190,13 +198,13 @@ export interface ProgressBarProps {
 }
 
 export interface TrackInfoProps {
-  track: MusicTrack;
+  track: MT;
   title?: string;
   artist?: string;
   coverUrl?: string;
   showCover?: boolean;
   showControls?: boolean;
-  currentTrack?: MusicTrack;
+  currentTrack?: MT;
   loadingTrack?: boolean;
   audioError?: boolean;
   className?: string;
@@ -210,16 +218,19 @@ export interface VolumeControlProps {
   className?: string;
 }
 
+// Import from types/vr to avoid duplicate definition
+import { VRSessionTemplate as VST } from './types/vr';
+
 export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
+  template: VST;
   onComplete: () => void;
 }
 
 export interface ChatResponse {
   id?: string;
   content?: string;
-  message?: string; // Added for compatibility
+  message?: string;
   role?: string;
   timestamp?: string;
-  emotion?: string; // Added for compatibility
+  emotion?: string;
 }

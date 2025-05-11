@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
-import { useTheme } from '@/components/theme/ThemeProvider';
+import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeName, FontFamily, FontSize } from '@/types/user';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
 
 const ImmersiveSettingsPage = () => {
-  const { theme, setTheme, fontFamily, setFontFamily, fontSize, setFontSize } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
   
   // Convertir en types corrects pour la sécurité TypeScript
   const handleThemeChange = (newTheme: string) => {
