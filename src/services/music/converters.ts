@@ -1,5 +1,5 @@
 
-import { MusicPlaylist, MusicTrack } from '@/types';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 
 /**
  * Convert raw playlist data to MusicPlaylist type
@@ -11,6 +11,8 @@ export function playlistToMusicPlaylist(rawData: any): MusicPlaylist {
     title: rawData.title || rawData.name || '',
     description: rawData.description || '',
     coverUrl: rawData.coverUrl || rawData.cover_url || '',
+    coverImage: rawData.coverImage || rawData.coverUrl || '',
+    cover_url: rawData.cover_url || rawData.coverUrl || '',
     tracks: Array.isArray(rawData.tracks) 
       ? rawData.tracks.map((track: any) => trackToMusicTrack(track))
       : [],
@@ -60,7 +62,8 @@ export function musicPlaylistToPlaylist(playlist: MusicPlaylist): any {
     name: playlist.name,
     title: playlist.title || playlist.name,
     tracks: playlist.tracks.map(musicTrackToTrack),
-    coverUrl: playlist.coverUrl || '',
+    coverUrl: playlist.coverUrl || playlist.cover_url || '',
+    coverImage: playlist.coverImage || '',
     description: playlist.description,
     category: playlist.category || '',
     emotion: playlist.emotion || ''

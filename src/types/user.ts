@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -52,7 +53,7 @@ export enum UserRole {
   ANALYST = 'analyst'
 }
 
-export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | string;
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'sans' | 'serif' | 'mono' | 'default' | string;
 export type FontSize = 'small' | 'medium' | 'large' | string;
 export type NotificationFrequency = 'high' | 'medium' | 'low' | 'none';
 export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional';

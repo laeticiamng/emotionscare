@@ -21,7 +21,7 @@ const VRPage: React.FC = () => {
     const filteredTemplates = selectedCategory 
       ? mockVRTemplates.filter(t => t.category === selectedCategory)
       : mockVRTemplates;
-    setTemplates(filteredTemplates);
+    setTemplates([...filteredTemplates]);
   }, [selectedCategory]);
 
   const handleCategoryChange = (category: string) => {

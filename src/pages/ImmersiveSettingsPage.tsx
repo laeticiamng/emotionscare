@@ -3,16 +3,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ThemePreview from '@/components/preferences/ThemePreview';
-import { useUserPreferences, UserPreferencesState } from '@/hooks/useUserPreferences';
-import { FontFamily, FontSize, ThemeName } from '@/types';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { FontFamily, FontSize, ThemeName } from '@/types/user';
 
 // Autres imports...
 
 const ImmersiveSettingsPage: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
-  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(preferences.theme as ThemeName || 'light');
-  const [selectedFont, setSelectedFont] = useState<FontFamily>(preferences.font || 'inter');
-  const [selectedFontSize, setSelectedFontSize] = useState<FontSize>(preferences.fontSize || 'medium');
+  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(preferences.theme || 'light');
+  const [selectedFont, setSelectedFont] = useState<FontFamily>(preferences.font as FontFamily || 'inter');
+  const [selectedFontSize, setSelectedFontSize] = useState<FontSize>(preferences.fontSize as FontSize || 'medium');
   
   const [highContrast, setHighContrast] = useState<boolean>(preferences.highContrast || false);
   const [reducedAnimations, setReducedAnimations] = useState<boolean>(preferences.reducedAnimations || false);
@@ -32,12 +32,12 @@ const ImmersiveSettingsPage: React.FC = () => {
   
   const handleFontChange = (font: FontFamily) => {
     setSelectedFont(font);
-    updatePreferences({ font });
+    updatePreferences({ font: font as string });
   };
   
   const handleFontSizeChange = (fontSize: FontSize) => {
     setSelectedFontSize(fontSize);
-    updatePreferences({ fontSize });
+    updatePreferences({ fontSize: fontSize as string });
   };
   
   const handleHighContrastChange = (value: boolean) => {

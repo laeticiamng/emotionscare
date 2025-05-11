@@ -1,81 +1,24 @@
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-  avatar_url?: string;
-  image?: string;
-  position?: string;
-  department?: string;
-  preferences?: UserPreferences;
-  onboarded?: boolean;
-  joined_at?: string;
-  created_at?: string;
-  anonymity_code?: string;
-  emotional_score?: number;
-}
+export type {
+  User,
+  UserRole,
+  UserPreferences,
+  FontFamily,
+  FontSize,
+  ThemeName,
+  InvitationVerificationResult
+} from './types/user';
 
-export interface UserPreferences {
-  theme?: ThemeName;
-  notifications?: boolean;
-  language?: string;
-  privacy?: 'public' | 'private' | 'friends';
-  fontSize?: FontSize;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  notifications_enabled?: boolean;
-  autoplayVideos?: boolean;
-  dataCollection?: boolean;
-  showEmotionPrompts?: boolean;
-  notification_frequency?: string;
-  notification_type?: string;
-  notification_tone?: string;
-  emotionalCamouflage?: boolean;
-}
+export type {
+  VRSession,
+  VRSessionTemplate
+} from './types/vr';
 
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'default' | 'serif' | 'mono';
-
-export interface VRSession {
-  id: string;
-  user_id: string;
-  template_id: string;
-  start_time: string;
-  end_time?: string;
-  duration_seconds: number;
-  completed: boolean;
-  template?: VRSessionTemplate;
-  date?: string;
-  duration?: number;
-  is_audio_only?: boolean;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
-}
-
-export interface VRSessionTemplate {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  duration: number;
-  theme: string;
-  is_audio_only: boolean;
-  preview_url: string;
-  audio_url: string;
-  category: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  tags: string[];
-  benefits: string[];
-  emotions: string[];
-  popularity: number;
-  template_id?: string;
-  completion_rate?: number;
-  emotion_target?: string;
-  level?: string;
-  recommended_mood?: string;
-}
+export type {
+  MusicTrack,
+  MusicPlaylist,
+  MusicContextType,
+  MusicDrawerProps
+} from './types/music';
 
 export interface ChatMessage {
   id: string;
@@ -234,32 +177,6 @@ export interface InvitationFormData {
 
 export type UserRole = 'admin' | 'manager' | 'user' | 'therapist' | 'coach' | 'guest' | 'employee';
 
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration?: number;
-  url?: string;
-  cover?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  mood?: string;
-  audioUrl?: string;
-  emotion?: string;
-  emotion_tag?: string;
-  audio_url?: string;
-}
-
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  title?: string;
-  description: string;
-  tracks: MusicTrack[];
-  coverImage?: string;
-  category?: string;
-}
-
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
@@ -289,15 +206,6 @@ export interface VolumeControlProps {
   onVolumeChange?: (volume: number) => void;
   showLabel?: boolean;
   className?: string;
-}
-
-export interface Track extends MusicTrack {
-  coverImage?: string;
-  coverUrl?: string;
-}
-
-export interface Playlist extends MusicPlaylist {
-  title?: string;
 }
 
 export interface VRSessionWithMusicProps {

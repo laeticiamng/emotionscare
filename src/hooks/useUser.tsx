@@ -22,12 +22,10 @@ export const useUser = () => {
     setIsLoading(true);
     try {
       // Call the auth context update function
-      const updatePromise = authUpdateUser({
+      const updatedUser = await authUpdateUser({
         ...user,
         ...userData
       } as User);
-      
-      const updatedUser = await updatePromise;
       
       // Update local user state if the update was successful
       if (updatedUser) {
@@ -41,7 +39,7 @@ export const useUser = () => {
           description: "Vos informations ont été enregistrées"
         });
         
-        return { ...user, ...userData } as User;
+        return updatedUser;
       }
       
       throw new Error("Échec de la mise à jour du profil");

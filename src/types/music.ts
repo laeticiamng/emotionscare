@@ -20,9 +20,11 @@ export interface MusicPlaylist {
   title?: string;
   description: string;
   tracks: MusicTrack[];
-  coverUrl: string; // Required
+  coverUrl?: string; // Made optional
+  coverImage?: string;
+  cover_url?: string;
   category?: string;
-  emotion?: string; // Support for emotion
+  emotion?: string; // Added emotion property
 }
 
 export interface MusicContextType {
