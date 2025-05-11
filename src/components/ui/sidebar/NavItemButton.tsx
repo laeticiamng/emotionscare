@@ -28,8 +28,8 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
   // Collapsed version with tooltip
   if (collapsed) {
     return (
-      <TooltipProvider key={path}>
-        <Tooltip delayDuration={300}>
+      <TooltipProvider>
+        <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant={isActive(path) ? "secondary" : "ghost"}

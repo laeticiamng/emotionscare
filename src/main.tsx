@@ -14,26 +14,30 @@ import { StorytellingProvider } from './providers/StorytellingProvider';
 import { BrandingProvider } from './contexts/BrandingContext';
 import { PredictiveAnalyticsProvider } from './providers/PredictiveAnalyticsProvider';
 import { UserModeProvider } from './contexts/UserModeContext';
+import { TooltipProvider } from './components/ui/tooltip';
+import { AuthProvider } from './contexts/AuthContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
         <ThemeProvider>
-          <MusicProvider>
-            <BrandingProvider>
-              <SoundscapeProvider>
-                <StorytellingProvider>
-                  <UserModeProvider>
-                    <PredictiveAnalyticsProvider>
-                      <App />
-                      <Toaster />
-                    </PredictiveAnalyticsProvider>
-                  </UserModeProvider>
-                </StorytellingProvider>
-              </SoundscapeProvider>
-            </BrandingProvider>
-          </MusicProvider>
+          <TooltipProvider>
+            <MusicProvider>
+              <BrandingProvider>
+                <SoundscapeProvider>
+                  <StorytellingProvider>
+                    <UserModeProvider>
+                      <PredictiveAnalyticsProvider>
+                        <App />
+                        <Toaster />
+                      </PredictiveAnalyticsProvider>
+                    </UserModeProvider>
+                  </StorytellingProvider>
+                </SoundscapeProvider>
+              </BrandingProvider>
+            </MusicProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </BrowserRouter>
     </ErrorBoundary>

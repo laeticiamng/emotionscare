@@ -10,31 +10,28 @@ import RegisterPage from '@/pages/RegisterPage';
 import Index from '@/pages/Index';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
-import { UserModeProvider } from '@/contexts/UserModeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <UserModeProvider>
-        <Routes>
-          {/* Routes publiques */}
-          <Route path="/" element={<Index />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/business" element={<BusinessPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          
-          {/* Routes protégées */}
-          <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout />}>
-              {/* Tableaux de bord */}
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-            </Route>
+      <Routes>
+        {/* Routes publiques */}
+        <Route path="/" element={<Index />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/business" element={<BusinessPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Routes protégées */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            {/* Tableaux de bord */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           </Route>
-        </Routes>
-      </UserModeProvider>
+        </Route>
+      </Routes>
     </AuthProvider>
   );
 };
