@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Cube, Sparkles, Play, PauseCircle } from 'lucide-react';
+import { Box, Sparkles, Play, PauseCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
 
@@ -135,7 +135,7 @@ const ARExperience: React.FC<ARExperienceProps> = ({
     <Card className="relative overflow-hidden">
       <CardHeader className="bg-gradient-to-r from-primary/20 to-primary/5">
         <CardTitle className="flex items-center gap-2">
-          <Cube className="h-5 w-5" />
+          <Box className="h-5 w-5" />
           Expérience de Réalité Augmentée
         </CardTitle>
         <CardDescription>

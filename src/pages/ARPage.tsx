@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Cube, Zap, Music, Heart } from 'lucide-react';
+import { Box, Zap, Music, Heart } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import MusicControls from '@/components/music/player/MusicControls';
 
@@ -39,7 +39,7 @@ const ARPage: React.FC = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col gap-2 mb-6">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Cube className="h-8 w-8 text-primary" /> 
+            <Box className="h-8 w-8 text-primary" /> 
             Réalité Augmentée Immersive
           </h1>
           <p className="text-muted-foreground">
@@ -52,7 +52,7 @@ const ARPage: React.FC = () => {
             <Tabs defaultValue="experience" className="mb-6">
               <TabsList className="mb-4">
                 <TabsTrigger value="experience" className="flex items-center gap-1">
-                  <Cube className="h-4 w-4" /> Expérience AR
+                  <Box className="h-4 w-4" /> Expérience AR
                 </TabsTrigger>
                 <TabsTrigger value="music" className="flex items-center gap-1">
                   <Music className="h-4 w-4" /> Ambiance sonore
