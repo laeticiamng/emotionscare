@@ -19,9 +19,7 @@ export function useMessageHandling({ initialMessages = [] }: UseMessageHandlingO
       content,
       text: content,
       sender,
-      sender_id: sender === 'user' ? 'user-1' : 'bot-1',
       conversation_id: 'default',
-      is_read: true,
       timestamp: new Date().toISOString(),
       ...metadata
     };

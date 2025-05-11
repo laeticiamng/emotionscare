@@ -4,10 +4,11 @@ export interface ChatMessage {
   text?: string;
   content?: string;
   sender: string;
-  sender_type?: string;
+  sender_id?: string;
   timestamp?: string;
   conversation_id?: string;
   role?: string;
+  is_read?: boolean;
 }
 
 export interface ChatResponse {
@@ -17,7 +18,11 @@ export interface ChatResponse {
   role?: string;
   timestamp?: string;
   emotion?: string;
+  text?: string;
 }
+
+// Adding this type to fix the ChatResponseType errors
+export type ChatResponseType = ChatResponse;
 
 export interface ChatConversation {
   id: string;
@@ -26,9 +31,14 @@ export interface ChatConversation {
   updated_at: string;
   user_id: string;
   assistant_id?: string;
-  messages: ChatMessage[];
-  status: 'active' | 'archived' | 'deleted';
+  messages?: ChatMessage[];
+  status?: 'active' | 'archived' | 'deleted';
   context?: string;
+  last_message?: string;
+  lastMessage?: string;
+  userId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ChatParticipant {

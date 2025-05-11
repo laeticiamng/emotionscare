@@ -25,9 +25,7 @@ export function useCoachMessages() {
       text,
       content: text,
       sender: 'bot',
-      sender_id: 'system',
       conversation_id: 'system',
-      is_read: true,
       timestamp: new Date().toISOString()
     };
     

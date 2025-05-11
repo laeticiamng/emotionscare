@@ -54,13 +54,11 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {
-      // Ensure track has required fields
-      const trackWithRequiredProps: MusicTrack = {
+      playTrack({
         ...track,
         url: track.url || track.audioUrl || track.audio_url || '',
         duration: track.duration || 0
-      };
-      playTrack(trackWithRequiredProps);
+      });
     }
   };
   

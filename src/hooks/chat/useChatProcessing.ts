@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatResponseType } from '@/types/chat';
+import { ChatMessage, ChatResponse } from '@/types/chat';
 
 export function useChatProcessing() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -9,7 +9,7 @@ export function useChatProcessing() {
   // Process a user message and get AI response
   const processMessage = useCallback(async (
     message: string, 
-    aiResponseFn: (msg: string) => Promise<ChatResponseType>
+    aiResponseFn: (msg: string) => Promise<ChatResponse>
   ): Promise<[ChatMessage, ChatMessage]> => {
     setIsProcessing(true);
     

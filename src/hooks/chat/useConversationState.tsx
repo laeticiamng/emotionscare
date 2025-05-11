@@ -29,7 +29,8 @@ export const useConversationState = ({
         messages: [],
         created_at: timestamp,
         updated_at: timestamp,
-        last_message: '',  // Added required field
+        last_message: '',
+        status: 'active'
       };
       
       setConversations((prev) => [conversation, ...prev]);
@@ -81,7 +82,6 @@ export const useConversationState = ({
                 ...conv,
                 messages: [...(conv.messages || []), message],
                 last_message: lastMessageText,
-                last_message_time: message.timestamp,
                 updated_at: new Date().toISOString(),
               }
             : conv
@@ -94,7 +94,6 @@ export const useConversationState = ({
               ...prev,
               messages: [...(prev.messages || []), message],
               last_message: lastMessageText,
-              last_message_time: message.timestamp,
               updated_at: new Date().toISOString(),
             }
           : prev

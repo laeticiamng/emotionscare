@@ -24,9 +24,7 @@ export function useChatStatus() {
         text,
         content: text,
         sender: 'user',
-        sender_id: 'user-1',
         conversation_id: 'default',
-        is_read: true,
         timestamp: new Date().toISOString()
       };
       addUserMessage(userMessage);
@@ -43,9 +41,7 @@ export function useChatStatus() {
             text: response,
             content: response,
             sender: 'bot',
-            sender_id: 'bot-1',
             conversation_id: 'default',
-            is_read: true,
             timestamp: new Date().toISOString()
           };
           addBotMessage(botMessage);
@@ -60,9 +56,7 @@ export function useChatStatus() {
             text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
             content: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
             sender: 'bot',
-            sender_id: 'bot-1',
             conversation_id: 'default',
-            is_read: true,
             timestamp: new Date().toISOString()
           };
           addBotMessage(errorMessage);
@@ -104,9 +98,7 @@ export function useChatStatus() {
             text: response,
             content: response,
             sender: 'bot',
-            sender_id: 'bot-1',
             conversation_id: 'default',
-            is_read: true,
             timestamp: new Date().toISOString()
           };
           addBotMessage(botMessage);
@@ -121,9 +113,7 @@ export function useChatStatus() {
             text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
             content: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
             sender: 'bot',
-            sender_id: 'bot-1',
             conversation_id: 'default',
-            is_read: true,
             timestamp: new Date().toISOString()
           };
           addBotMessage(errorMessage);

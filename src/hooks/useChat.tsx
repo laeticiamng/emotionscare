@@ -1,14 +1,14 @@
 
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatResponseType } from '@/types/chat';
+import { ChatMessage, ChatResponse } from '@/types/chat';
 import * as ChatService from '@/services/chatService';
 
 export const useChat = (conversationId: string, userId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = async (messageText: string): Promise<ChatResponseType> => {
+  const handleSend = async (messageText: string): Promise<ChatResponse> => {
     setIsLoading(true);
 
     try {
@@ -17,7 +17,6 @@ export const useChat = (conversationId: string, userId: string) => {
         id: uuidv4(),
         conversation_id: conversationId,
         sender: 'user',
-        sender_id: userId,
         text: messageText,
         timestamp: new Date().toISOString()
       };
@@ -71,6 +70,6 @@ export const useChat = (conversationId: string, userId: string) => {
     addMessage,
     clearMessages
   };
-};
+}
 
 export default useChat;

@@ -11,8 +11,7 @@ export const useChatMessages = () => {
       id: uuidv4(),
       text,
       sender: 'user',
-      timestamp: new Date().toISOString(), // Convert Date to string
-      is_read: true
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, message]);
@@ -24,8 +23,7 @@ export const useChatMessages = () => {
       id: uuidv4(),
       text,
       sender: 'bot',
-      timestamp: new Date().toISOString(), // Convert Date to string
-      is_read: true
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, message]);
@@ -37,8 +35,7 @@ export const useChatMessages = () => {
       id: uuidv4(),
       text,
       sender: 'system',
-      timestamp: new Date().toISOString(), // Convert Date to string
-      is_read: true
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, message]);
@@ -50,8 +47,7 @@ export const useChatMessages = () => {
       id: uuidv4(),
       text,
       sender: 'coach',
-      timestamp: new Date().toISOString(), // Convert Date to string
-      is_read: true
+      timestamp: new Date().toISOString()
     };
 
     setMessages(prev => [...prev, message]);

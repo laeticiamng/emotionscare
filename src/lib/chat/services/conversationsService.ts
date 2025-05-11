@@ -11,10 +11,8 @@ const mockConversations: ChatConversation[] = [
     updated_at: '2023-01-15T11:45:00Z',
     title: 'Initial Consultation',
     last_message: 'Thank you for your time today.',
-    userId: 'user-1',
-    createdAt: '2023-01-15T10:30:00Z',
-    updatedAt: '2023-01-15T11:45:00Z',
-    lastMessage: 'Thank you for your time today.'
+    status: 'active',
+    messages: []
   }
 ];
 
@@ -22,22 +20,9 @@ const mockConversations: ChatConversation[] = [
 const getConversationsForUser = async (userId: string): Promise<ChatConversation[]> => {
   // In a real app, this would be an API call
   // Filter conversations for the specified user
-  const userConversations = mockConversations.filter(conv => conv.user_id === userId || conv.userId === userId);
+  const userConversations = mockConversations.filter(conv => conv.user_id === userId);
   
-  // Map to ensure consistent object structure
-  return userConversations.map(conv => ({
-    id: conv.id,
-    user_id: conv.user_id || conv.userId || '',
-    created_at: (conv.created_at || conv.createdAt || '').toString(),
-    updated_at: (conv.updated_at || conv.updatedAt || '').toString(),
-    title: conv.title,
-    last_message: conv.last_message || conv.lastMessage || '',
-    // These are for backward compatibility
-    userId: conv.user_id || conv.userId || '',
-    createdAt: (conv.created_at || conv.createdAt || '').toString(),
-    updatedAt: (conv.updated_at || conv.updatedAt || '').toString(),
-    lastMessage: conv.last_message || conv.lastMessage || ''
-  }));
+  return userConversations;
 };
 
 // Get a specific conversation by ID
@@ -58,11 +43,8 @@ const createConversation = async (userId: string, title: string): Promise<ChatCo
     updated_at: timestamp,
     title,
     last_message: '',
-    // These are for backward compatibility
-    userId,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-    lastMessage: '',
+    status: 'active',
+    messages: []
   };
   
   mockConversations.push(newConversation);
@@ -84,21 +66,12 @@ const updateConversation = async (conversationId: string, updates: Partial<ChatC
   const updatedConversation: ChatConversation = {
     ...mockConversations[index],
     ...updates,
-    updated_at: timestamp,
-    updatedAt: timestamp
+    updated_at: timestamp
   };
   
   // Ensure last_message is present and is a string
-  if (!updatedConversation.last_message && updatedConversation.lastMessage) {
-    updatedConversation.last_message = updatedConversation.lastMessage;
-  } else if (!updatedConversation.last_message) {
+  if (!updatedConversation.last_message) {
     updatedConversation.last_message = '';
-  }
-  
-  if (!updatedConversation.lastMessage && updatedConversation.last_message) {
-    updatedConversation.lastMessage = updatedConversation.last_message;
-  } else if (!updatedConversation.lastMessage) {
-    updatedConversation.lastMessage = '';
   }
   
   // Update the conversation in the array

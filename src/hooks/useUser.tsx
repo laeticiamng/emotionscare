@@ -22,22 +22,23 @@ export const useUser = () => {
     setIsLoading(true);
     try {
       // Call the auth context update function
-      const result = await authUpdateUser({
+      await authUpdateUser({
         ...user,
         ...userData
-      });
+      } as User);
       
-      // Make sure we have a valid user object
-      const updatedUser = result || { ...user, ...userData };
-      
-      setUser(updatedUser as User);
+      // Update local user state
+      setUser(prevUser => prevUser ? {
+        ...prevUser,
+        ...userData
+      } : null);
       
       toast({
         title: "Profil mis à jour",
         description: "Vos informations ont été enregistrées"
       });
       
-      return updatedUser;
+      return { ...user, ...userData } as User;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMsg);

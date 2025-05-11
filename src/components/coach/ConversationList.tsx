@@ -31,7 +31,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
     }
     
     // Or use the last_message field if available
-    return conversation.last_message || "Aucun message";
+    return conversation.last_message || conversation.lastMessage || "Aucun message";
   };
   
   // Format date helper function

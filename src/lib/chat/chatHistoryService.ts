@@ -20,7 +20,9 @@ function initializeData() {
         title: `Conversation ${i + 1}`,
         created_at: createdAt.toISOString(),
         updated_at: createdAt.toISOString(),
-        last_message: `Last message from conversation ${i + 1}`
+        last_message: `Last message from conversation ${i + 1}`,
+        status: 'active',
+        messages: []
       };
       
       conversations.push(conversation);
@@ -74,7 +76,9 @@ export async function createConversation(userId: string, title: string): Promise
     title,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    last_message: ''
+    last_message: '',
+    status: 'active',
+    messages: []
   };
   
   conversations.push(newConversation);

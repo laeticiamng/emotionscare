@@ -3,8 +3,8 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  url: string; // Making this required
-  duration: number; // Making this required
+  url: string;
+  duration: number;
   coverUrl?: string;
   coverImage?: string;
   genre?: string;
@@ -24,7 +24,7 @@ export interface MusicPlaylist {
   title?: string;
   description: string;
   coverUrl: string;
-  emotion?: string; // Adding emotion as an optional property
+  emotion?: string;
   mood?: string;
   tracks: MusicTrack[];
 }

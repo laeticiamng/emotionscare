@@ -17,9 +17,7 @@ export const useCoachChatActions = (conversationId: string) => {
       text: content,
       content: content,
       sender: 'user',
-      sender_id: 'user-1',
       conversation_id: conversationId,
-      is_read: true,
       timestamp: new Date().toISOString(),
     };
     
@@ -33,9 +31,7 @@ export const useCoachChatActions = (conversationId: string) => {
       text: content,
       content: content,
       sender: 'bot',
-      sender_id: 'bot-1',
       conversation_id: conversationId,
-      is_read: true,
       timestamp: new Date().toISOString(),
     };
     
@@ -52,9 +48,7 @@ export const useCoachChatActions = (conversationId: string) => {
       text: '...',
       content: '...',
       sender: 'bot',
-      sender_id: 'bot-1',
       conversation_id: conversationId,
-      is_read: true,
       timestamp: new Date().toISOString(),
     };
     

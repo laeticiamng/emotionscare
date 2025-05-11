@@ -8,20 +8,22 @@ const initialConversations: ChatConversation[] = [
   {
     id: '1',
     title: 'Conversation with AI Assistant',
-    lastMessage: 'Hello! How can I help you today?',
     user_id: 'user-1',
     created_at: '2023-03-15T12:00:00Z',
     updated_at: '2023-03-15T12:05:00Z',
-    last_message: 'Hello! How can I help you today?',  // Added required field
+    last_message: 'Hello! How can I help you today?',
+    status: 'active',
+    messages: []
   },
   {
     id: '2',
     title: 'Emotional Support',
-    lastMessage: 'Remember to take breaks during your workday.',
     user_id: 'user-1',
     created_at: '2023-03-14T09:30:00Z',
     updated_at: '2023-03-14T09:35:00Z',
-    last_message: 'Remember to take breaks during your workday.',  // Added required field
+    last_message: 'Remember to take breaks during your workday.',
+    status: 'active',
+    messages: []
   }
 ];
 
@@ -65,8 +67,9 @@ export const useConversations = (userId = 'user-1') => {
       user_id: userId,
       created_at: timestamp,
       updated_at: timestamp,
-      lastMessage: '',
-      last_message: '',  // Added required field
+      last_message: '',
+      status: 'active',
+      messages: []
     };
 
     setConversations(prev => [newConversation, ...prev]);
@@ -101,10 +104,8 @@ export const useConversations = (userId = 'user-1') => {
       prevConversations.map(conv => 
         conv.id === conversationId ? {
           ...conv,
-          updatedAt: timestamp,
           updated_at: timestamp,
           title: conv.title,
-          lastMessage: message.content || message.text || '',
           last_message: message.content || message.text || '',
         } : conv
       )

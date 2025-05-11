@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/types/user';
 
@@ -94,11 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         onboarded: true,
         preferences: {
           theme: 'light',
-          notifications: {
-            email: true,
-            push: true,
-            sms: false
-          }
+          notifications: true
         }
       };
       
