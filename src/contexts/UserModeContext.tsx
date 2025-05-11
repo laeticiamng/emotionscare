@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-export type UserMode = 'personal' | 'professional' | 'anonymous' | 'b2b-admin' | 'b2b-collaborator';
+export type UserMode = 'personal' | 'professional' | 'anonymous' | 'b2b-admin' | 'b2b-collaborator' | 'b2c';
 
 interface UserModeContextType {
   userMode: UserMode | null;
@@ -26,7 +26,7 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
   useEffect(() => {
     // Try to load user mode from localStorage
     const savedMode = localStorage.getItem('user-mode');
-    if (savedMode && ['personal', 'professional', 'anonymous', 'b2b-admin', 'b2b-collaborator'].includes(savedMode)) {
+    if (savedMode && ['personal', 'professional', 'anonymous', 'b2b-admin', 'b2b-collaborator', 'b2c'].includes(savedMode)) {
       setUserModeState(savedMode as UserMode);
     }
     setIsLoading(false);

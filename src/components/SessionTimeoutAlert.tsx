@@ -26,8 +26,7 @@ const SessionTimeoutAlert: React.FC = () => {
             >
               Prolonger la session
             </Button>
-          </div>,
-        duration: 60000
+          </div>
       });
     }
   }, [showWarning, toast, resetTimer]);

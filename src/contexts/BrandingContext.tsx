@@ -1,59 +1,57 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-export type BrandingTheme = 'standard' | 'premium' | 'ultra-premium';
-export type EmotionalTone = 'neutral' | 'calming' | 'energetic' | 'creative' | 'focused';
-
-interface Colors {
-  primary: string;
-  secondary: string;
-  accent: string;
-  highlight: string;
-}
+import React, { createContext, useContext, useState } from 'react';
+import { Recommendation } from '@/types';
 
 interface BrandingContextType {
-  brandingTheme: BrandingTheme;
-  setBrandingTheme: (theme: BrandingTheme) => void;
-  emotionalTone: EmotionalTone;
-  setEmotionalTone: (tone: EmotionalTone) => void;
-  colors: Colors;
-  setColors: (colors: Colors) => void;
+  brandingTheme: string;
+  emotionalTone: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+  setBrandingTheme: (theme: string) => void;
+  setEmotionalTone: (tone: string) => void;
+  updateColors: (colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  }) => void;
 }
 
-const defaultColors: Colors = {
+const defaultColors = {
   primary: '#6366f1',
-  secondary: '#8b5cf6',
-  accent: '#06b6d4',
-  highlight: '#f59e0b'
+  secondary: '#a855f7',
+  accent: '#ec4899'
 };
 
 const BrandingContext = createContext<BrandingContextType>({
-  brandingTheme: 'standard',
-  setBrandingTheme: () => {},
-  emotionalTone: 'neutral',
-  setEmotionalTone: () => {},
+  brandingTheme: 'modern',
+  emotionalTone: 'positive',
   colors: defaultColors,
-  setColors: () => {}
+  setBrandingTheme: () => {},
+  setEmotionalTone: () => {},
+  updateColors: () => {}
 });
 
-interface BrandingProviderProps {
-  children: ReactNode;
-}
+export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [brandingTheme, setBrandingTheme] = useState('modern');
+  const [emotionalTone, setEmotionalTone] = useState('positive');
+  const [colors, setColors] = useState(defaultColors);
 
-export const BrandingProvider: React.FC<BrandingProviderProps> = ({ children }) => {
-  const [brandingTheme, setBrandingTheme] = useState<BrandingTheme>('standard');
-  const [emotionalTone, setEmotionalTone] = useState<EmotionalTone>('neutral');
-  const [colors, setColors] = useState<Colors>(defaultColors);
+  const updateColors = (newColors: typeof defaultColors) => {
+    setColors(newColors);
+  };
 
   return (
-    <BrandingContext.Provider
-      value={{
-        brandingTheme,
-        setBrandingTheme,
-        emotionalTone,
-        setEmotionalTone,
+    <BrandingContext.Provider 
+      value={{ 
+        brandingTheme, 
+        emotionalTone, 
         colors,
-        setColors
+        setBrandingTheme,
+        setEmotionalTone,
+        updateColors
       }}
     >
       {children}

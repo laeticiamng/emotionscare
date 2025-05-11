@@ -1,246 +1,181 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Track, Playlist } from '@/services/music/types';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import React, { createContext, useContext, useState } from 'react';
+import { MusicTrack, MusicPlaylist } from '@/types';
+
+export interface Track extends MusicTrack {
+  coverUrl?: string;
+}
+
+export interface Playlist extends MusicPlaylist {
+  title?: string;
+}
 
 interface MusicContextType {
   isPlaying: boolean;
+  togglePlay: () => void;
   currentTrack: Track | null;
-  playlist: Playlist | null;
-  volume: number;
-  currentPlaylist: Playlist | null;
-  playlists?: Playlist[];
-  error: string | null;
-  openDrawer: boolean;
-  currentEmotion?: string;
   playTrack: (track: Track) => void;
-  pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
+  volume: number;
   setVolume: (volume: number) => void;
+  currentPlaylist: Playlist | null;
+  playlists: Playlist[];
+  loadPlaylistById: (id: string) => Promise<Playlist | null>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<Playlist | null>;
+  initializeMusicSystem: () => Promise<void>;
+  error: string | null;
+  currentEmotion: string | null;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<Playlist | null>;
-  loadPlaylistById?: (id: string) => Promise<Playlist | null>;
-  setOpenDrawer: (open: boolean) => void;
-  initializeMusicSystem: () => Promise<void>;
 }
+
+const defaultTracks: Track[] = [
+  {
+    id: '1',
+    title: 'Calm Meditation',
+    artist: 'Mindfulness',
+    duration: 180,
+    coverUrl: '/images/tracks/meditation.jpg'
+  },
+  {
+    id: '2',
+    title: 'Focus Session',
+    artist: 'Concentration',
+    duration: 300,
+    coverUrl: '/images/tracks/focus.jpg'
+  }
+];
+
+const defaultPlaylists: Playlist[] = [
+  {
+    id: '1',
+    name: 'Meditation',
+    title: 'Meditation Collection',
+    description: 'Calm your mind with these tracks',
+    tracks: defaultTracks,
+    category: 'mindfulness'
+  },
+  {
+    id: '2',
+    name: 'Focus',
+    title: 'Focus Playlist',
+    description: 'Boost your productivity',
+    tracks: defaultTracks,
+    category: 'productivity'
+  }
+];
 
 const MusicContext = createContext<MusicContextType>({
   isPlaying: false,
+  togglePlay: () => {},
   currentTrack: null,
-  playlist: null,
-  volume: 0.5,
-  currentPlaylist: null,
-  error: null,
-  openDrawer: false,
   playTrack: () => {},
-  pauseTrack: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
+  volume: 50,
   setVolume: () => {},
-  toggleRepeat: () => {},
-  toggleShuffle: () => {},
+  currentPlaylist: null,
+  playlists: [],
+  loadPlaylistById: async () => null,
   loadPlaylistForEmotion: async () => null,
-  setOpenDrawer: () => {},
-  initializeMusicSystem: async () => {}
+  initializeMusicSystem: async () => {},
+  error: null,
+  currentEmotion: null,
+  toggleRepeat: () => {},
+  toggleShuffle: () => {}
 });
 
-interface MusicProviderProps {
-  children: ReactNode;
-}
-
-export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
+export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [volume, setVolume] = useState(50);
   const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [playlists] = useState<Playlist[]>(defaultPlaylists);
   const [error, setError] = useState<string | null>(null);
-  const [currentEmotion, setCurrentEmotion] = useState<string | undefined>(undefined);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
 
   const playTrack = (track: Track) => {
     setCurrentTrack(track);
     setIsPlaying(true);
-    console.info('Playing track:', track.title);
-  };
-
-  const pauseTrack = () => {
-    setIsPlaying(false);
-    console.info('Paused playback');
   };
 
   const nextTrack = () => {
-    if (!playlist || !currentTrack) return;
+    if (!currentPlaylist || !currentTrack) return;
     
-    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex >= 0 && currentIndex < playlist.tracks.length - 1) {
-      playTrack(playlist.tracks[currentIndex + 1]);
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex < currentPlaylist.tracks.length - 1) {
+      playTrack(currentPlaylist.tracks[currentIndex + 1] as Track);
     }
   };
 
   const previousTrack = () => {
-    if (!playlist || !currentTrack) return;
+    if (!currentPlaylist || !currentTrack) return;
     
-    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
     if (currentIndex > 0) {
-      playTrack(playlist.tracks[currentIndex - 1]);
+      playTrack(currentPlaylist.tracks[currentIndex - 1] as Track);
     }
   };
 
-  const toggleRepeat = () => {
-    // Implementation placeholder
-    console.log('Toggle repeat');
-  };
-
-  const toggleShuffle = () => {
-    // Implementation placeholder
-    console.log('Toggle shuffle');
+  const loadPlaylistById = async (id: string): Promise<Playlist | null> => {
+    try {
+      const playlist = playlists.find(p => p.id === id);
+      if (playlist) {
+        setCurrentPlaylist(playlist);
+        return playlist;
+      }
+      return null;
+    } catch (err) {
+      setError('Failed to load playlist');
+      return null;
+    }
   };
 
   const loadPlaylistForEmotion = async (emotion: string): Promise<Playlist | null> => {
     setCurrentEmotion(emotion);
-    
-    // Mock function to load a playlist based on emotion
-    const mockPlaylist: Playlist = {
-      id: `playlist-${emotion}`,
-      name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Playlist`,
-      emotion: emotion,
-      tracks: [
-        {
-          id: `${emotion}-track-1`,
-          title: `${emotion} Track 1`,
-          artist: 'Artist 1',
-          duration: 180,
-          url: '/audio/track1.mp3',
-          cover: '/images/cover1.jpg',
-          coverImage: '/images/cover1.jpg',
-          coverUrl: '/images/cover1.jpg',
-        },
-        {
-          id: `${emotion}-track-2`,
-          title: `${emotion} Track 2`,
-          artist: 'Artist 2',
-          duration: 210,
-          url: '/audio/track2.mp3',
-          cover: '/images/cover2.jpg',
-          coverImage: '/images/cover2.jpg',
-          coverUrl: '/images/cover2.jpg',
-        }
-      ]
-    };
-    
-    setPlaylist(mockPlaylist);
-    setCurrentPlaylist(mockPlaylist);
-    return mockPlaylist;
-  };
-
-  const loadPlaylistById = async (id: string): Promise<Playlist | null> => {
-    // Mock implementation
-    const mockPlaylist: Playlist = {
-      id: id,
-      name: `Playlist ${id}`,
-      tracks: [
-        {
-          id: `${id}-track-1`,
-          title: `Track 1`,
-          artist: 'Artist 1',
-          duration: 180,
-          url: '/audio/track1.mp3',
-          cover: '/images/cover1.jpg',
-          coverImage: '/images/cover1.jpg',
-          coverUrl: '/images/cover1.jpg',
-        },
-        {
-          id: `${id}-track-2`,
-          title: `Track 2`,
-          artist: 'Artist 2',
-          duration: 210,
-          url: '/audio/track2.mp3',
-          cover: '/images/cover2.jpg',
-          coverImage: '/images/cover2.jpg',
-          coverUrl: '/images/cover2.jpg',
-        }
-      ]
-    };
-    
-    setPlaylist(mockPlaylist);
-    setCurrentPlaylist(mockPlaylist);
-    return mockPlaylist;
+    // In a real app, you would fetch a playlist based on the emotion
+    // For now, return the first playlist
+    return playlists[0];
   };
 
   const initializeMusicSystem = async () => {
-    try {
-      // Mock initializing the music system
-      setError(null);
-      // Generate some mock playlists
-      const mockPlaylists = [
-        {
-          id: 'calm',
-          name: 'Calm Vibes',
-          tracks: [
-            {
-              id: 'calm-1',
-              title: 'Peaceful Morning',
-              artist: 'Ambient Artist',
-              duration: 180,
-              url: '/audio/calm1.mp3',
-              cover: '/images/calm1.jpg',
-              coverImage: '/images/calm1.jpg',
-              coverUrl: '/images/calm1.jpg',
-            }
-          ]
-        },
-        {
-          id: 'focus',
-          name: 'Deep Focus',
-          tracks: [
-            {
-              id: 'focus-1',
-              title: 'Concentration',
-              artist: 'Focus Artist',
-              duration: 240,
-              url: '/audio/focus1.mp3',
-              cover: '/images/focus1.jpg',
-              coverImage: '/images/focus1.jpg',
-              coverUrl: '/images/focus1.jpg',
-            }
-          ]
-        }
-      ];
-      
-      setPlaylists(mockPlaylists);
-    } catch (err) {
-      setError('Failed to initialize music system');
-      console.error(err);
-    }
+    // Initialize audio system, load resources, etc.
+    console.log('Music system initialized');
+  };
+
+  const toggleRepeat = () => {
+    console.log('Toggle repeat mode');
+  };
+
+  const toggleShuffle = () => {
+    console.log('Toggle shuffle mode');
   };
 
   return (
     <MusicContext.Provider
       value={{
         isPlaying,
+        togglePlay,
         currentTrack,
-        playlist,
-        volume,
-        currentPlaylist,
-        playlists,
-        error,
-        openDrawer: isDrawerOpen,
-        currentEmotion,
         playTrack,
-        pauseTrack,
         nextTrack,
         previousTrack,
+        volume,
         setVolume,
-        toggleRepeat,
-        toggleShuffle,
-        loadPlaylistForEmotion,
+        currentPlaylist,
+        playlists,
         loadPlaylistById,
-        setOpenDrawer: setIsDrawerOpen,
-        initializeMusicSystem
+        loadPlaylistForEmotion,
+        initializeMusicSystem,
+        error,
+        currentEmotion,
+        toggleRepeat,
+        toggleShuffle
       }}
     >
       {children}
