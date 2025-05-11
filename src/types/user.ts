@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -42,6 +41,8 @@ export interface UserPreferences {
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   font?: string;
+  onboardingCompleted?: boolean; // Added this property
+  dashboardLayout?: string; // This property is also used in OnboardingPage.tsx
 }
 
 export enum UserRole {

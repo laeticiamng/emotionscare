@@ -56,4 +56,6 @@ export interface UserPreferences {
   notification_tone?: 'formal' | 'friendly' | 'energetic';
   emotionalCamouflage?: boolean;
   font?: string;
+  onboardingCompleted?: boolean; // Added this property
+  dashboardLayout?: string; // Added this property for consistency
 }

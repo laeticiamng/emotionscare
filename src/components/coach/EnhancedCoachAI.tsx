@@ -9,7 +9,7 @@ import { Emotion, EmotionResult } from '@/types';
 import MusicRecommendationCard from '../music/MusicRecommendationCard';
 import VREmotionRecommendation from '../vr/VREmotionRecommendation';
 import { Separator } from '@/components/ui/separator';
-import { safeOpen } from '@/lib/utils';
+import { safeOpen } from '@/utils/safeOpen'; // Updated import path
 
 interface EnhancedCoachAIProps {
   emotionResult: EmotionResult;
