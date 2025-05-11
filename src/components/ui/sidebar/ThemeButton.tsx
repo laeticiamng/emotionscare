@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Sun, Moon, Laptop } from 'lucide-react';
+import { Sun, Moon, Laptop, Palette } from 'lucide-react';
 import { useTheme, Theme } from '@/contexts/ThemeContext';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -31,18 +31,20 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
       return <Laptop className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
     }
     
-    // For light theme
     if (theme === 'light') {
       return <Sun className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
     }
     
-    // For dark theme
     if (theme === 'dark') {
       return <Moon className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
     }
     
-    // Default icon (pastel or any other theme)
-    return <Moon className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
+    if (theme === 'pastel') {
+      return <Palette className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
+    }
+    
+    // Default fallback
+    return <Sun className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
   };
   
   // Get label text based on current theme

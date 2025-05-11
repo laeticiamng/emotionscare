@@ -70,10 +70,10 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
       <DropdownMenuTrigger asChild>
         <Button variant={variant} size={size} className={`gap-2 ${className}`}>
           {getIcon()}
-          {showLabel && getLabel()}
+          {showLabel && <span>{getLabel()}</span>}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="z-50 bg-background border border-border">
         <DropdownMenuItem 
           className="flex items-center gap-2 cursor-pointer"
           onClick={() => handleThemeChange('light')}
