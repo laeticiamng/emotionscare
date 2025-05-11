@@ -34,9 +34,21 @@ const ImmersiveSettingsPage: React.FC = () => {
         {setFontFamily && setFontSize && (
           <FontSettings 
             currentFontFamily={fontFamily}
-            onChangeFontFamily={(value) => setFontFamily(value)}
+            onChangeFontFamily={(value) => {
+              if (setFontFamily) {
+                // Ensure value is of type FontFamily before passing it
+                const typedValue = value as typeof fontFamily;
+                setFontFamily(typedValue);
+              }
+            }}
             currentFontSize={fontSize}
-            onChangeFontSize={(value) => setFontSize(value)}
+            onChangeFontSize={(value) => {
+              if (setFontSize) {
+                // Ensure value is of type FontSize before passing it
+                const typedValue = value as typeof fontSize;
+                setFontSize(typedValue);
+              }
+            }}
           />
         )}
         

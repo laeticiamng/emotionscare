@@ -9,7 +9,7 @@ export interface ThemeSettings {
   name: ThemeName;
   primaryColor?: string;
   secondaryColor?: string;
-  fontFamily?: string;
+  fontFamily?: FontFamily;
   fontSize?: FontSize;
   radius?: 'none' | 'small' | 'medium' | 'large' | 'full';
   animations?: boolean;
@@ -39,4 +39,4 @@ export interface ThemeProviderProps {
 }
 
 // Mettre à jour pour être compatible avec le ThemeContext principal
-export type ThemeContextProps = ThemeContextType;
+export type { ThemeContextType };

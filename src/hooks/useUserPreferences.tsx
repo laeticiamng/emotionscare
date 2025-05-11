@@ -1,16 +1,17 @@
+
 import { useState, useEffect } from 'react';
-import { useTheme, Theme } from '@/contexts/ThemeContext';
+import { useTheme, Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
 import { useToast } from '@/hooks/use-toast';
 
 // Types for user preferences
 export interface UserPreferencesState {
   // Appearance
-  theme: string;
+  theme: Theme;
   dynamicTheme: 'none' | 'time' | 'emotion' | 'weather';
   highContrast: boolean;
   reducedAnimations: boolean;
-  fontSize: string;
+  fontSize: FontSize;
   font: string;
   customBackground?: string;
   
@@ -124,7 +125,7 @@ export function useUserPreferences() {
         // Fix: Ensure theme is one of the allowed values
         const themeValue = newPreferences.theme;
         if (themeValue === 'light' || themeValue === 'dark' || themeValue === 'system' || themeValue === 'pastel') {
-          themeContext.setTheme(themeValue as Theme);
+          themeContext.setTheme(themeValue);
         }
       }
       
@@ -169,8 +170,12 @@ export function useUserPreferences() {
     const preset = preferences.customPresets.find(p => p.name === name);
     if (!preset) return false;
     
-    // Use as string first, then convert to Theme
-    updatePreferences({ theme: preset.theme });
+    // Check if the preset theme is a valid Theme type
+    const presetTheme = preset.theme as Theme;
+    if (['light', 'dark', 'system', 'pastel'].includes(presetTheme)) {
+      updatePreferences({ theme: presetTheme });
+    }
+    
     audioPrefs.setEqualizerPreset?.(preset.audioPreset);
     
     toast({

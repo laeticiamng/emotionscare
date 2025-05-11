@@ -5,11 +5,11 @@ import { Card } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Check, Sun, Moon, Laptop, Palette } from 'lucide-react';
-import { ThemeName } from '@/types';
+import { Theme } from '@/contexts/ThemeContext';
 
 interface ThemeColorExampleProps {
-  initialTheme?: ThemeName;
-  onThemeChange?: (theme: ThemeName) => void;
+  initialTheme?: Theme;
+  onThemeChange?: (theme: Theme) => void;
   className?: string;
 }
 
@@ -18,16 +18,16 @@ const ThemeColorExample: React.FC<ThemeColorExampleProps> = ({
   onThemeChange,
   className
 }) => {
-  const [selectedTheme, setSelectedTheme] = useState<ThemeName>(initialTheme);
+  const [selectedTheme, setSelectedTheme] = useState<Theme>(initialTheme);
   
-  const handleThemeChange = (theme: ThemeName) => {
+  const handleThemeChange = (theme: Theme) => {
     setSelectedTheme(theme);
     if (onThemeChange) {
       onThemeChange(theme);
     }
   };
   
-  const getThemeIcon = (theme: ThemeName) => {
+  const getThemeIcon = (theme: Theme) => {
     switch (theme) {
       case 'light': return <Sun size={16} />;
       case 'dark': return <Moon size={16} />;
@@ -41,7 +41,7 @@ const ThemeColorExample: React.FC<ThemeColorExampleProps> = ({
     <Card className={`p-4 ${className || ''}`}>
       <RadioGroup 
         value={selectedTheme} 
-        onValueChange={(value) => handleThemeChange(value as ThemeName)}
+        onValueChange={(value) => handleThemeChange(value as Theme)}
         className="grid grid-cols-2 gap-2"
       >
         <div>

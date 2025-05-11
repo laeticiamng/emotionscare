@@ -138,5 +138,4 @@ export const useTheme = () => {
   return context;
 };
 
-// Export types for use in other files
-export type { ThemeContextType };
+// Remove the duplicate export that was causing the conflict
