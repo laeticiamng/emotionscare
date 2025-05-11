@@ -10,6 +10,7 @@ export interface User {
   preferences?: UserPreferences;
   createdAt?: string;
   created_at?: string;
+  joined_at?: string; // Ajouté pour résoudre les erreurs
   onboarded?: boolean;
   department?: string;
   team_id?: string;

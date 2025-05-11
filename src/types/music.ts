@@ -12,6 +12,8 @@ export interface MusicTrack {
   emotion_tag?: string;
   audio_url?: string;
   audioUrl?: string;
+  mood?: string; // Ajouté pour résoudre les erreurs
+  genre?: string; // Ajouté pour compatibilité
 }
 
 export interface MusicPlaylist {
@@ -20,11 +22,11 @@ export interface MusicPlaylist {
   title?: string;
   description: string;
   tracks: MusicTrack[];
-  coverUrl?: string; // Made optional
+  coverUrl?: string;
   coverImage?: string;
   cover_url?: string;
   category?: string;
-  emotion?: string; // Added emotion property
+  emotion?: string;
 }
 
 export interface MusicContextType {
@@ -55,3 +57,6 @@ export interface Toast {
   action?: React.ReactNode;
   variant?: 'default' | 'destructive' | 'success';
 }
+
+// Ajout du type Track pour la compatibilité avec MusicCreator
+export type Track = MusicTrack;

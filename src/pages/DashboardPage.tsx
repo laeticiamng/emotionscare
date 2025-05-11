@@ -1,4 +1,3 @@
-
 import React, { useEffect, useCallback, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -146,7 +145,7 @@ const DashboardPage: React.FC = () => {
   });
   
   // Cast user to User type from user.ts for compatibility
-  const typedUser = user as User;
+  const typedUser = user as unknown as User;
   
   return (
     <DashboardContainer>
@@ -177,7 +176,7 @@ const DashboardPage: React.FC = () => {
       
       <div className={`${isMobile ? 'w-full px-0 py-1' : 'w-full premium-layout py-4'}`}>
         <SegmentProvider>
-          {isAdmin ? (
+          {isAdminRole(user?.role) ? (
             <AdminDashboard />
           ) : (
             <UserDashboard user={typedUser} latestEmotion={lastEmotion ? { emotion: lastEmotion.emotion, score: lastEmotion.score } : undefined} />

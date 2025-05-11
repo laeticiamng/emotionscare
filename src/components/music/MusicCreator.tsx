@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Music } from 'lucide-react';
 // Fix: Import from contexts instead of providers
 import { useMusic } from '@/contexts/MusicContext';
-import { Track } from '@/types';
+import { MusicTrack } from '@/types/music';
 
 const MusicCreator: React.FC = () => {
   const { toast } = useToast();
@@ -18,7 +18,7 @@ const MusicCreator: React.FC = () => {
   const [emotion, setEmotion] = useState('');
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
-  const [generatedTrack, setGeneratedTrack] = useState<Track | null>(null);
+  const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
 
   const generateTrack = async () => {
     if (!emotion && !prompt) {
@@ -37,7 +37,7 @@ const MusicCreator: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 2500));
       
       // Mock generated track
-      const mockTrack: Track = {
+      const mockTrack: MusicTrack = {
         id: 'generated-' + Date.now(),
         title: `Mélodie ${emotion || 'personnalisée'}`,
         artist: 'IA Composer',

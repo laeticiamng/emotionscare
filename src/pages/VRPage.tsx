@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Shell from '@/Shell'; // Fixed import statement
+import Shell from '@/Shell';
 import { useVRSession } from '@/hooks/useVRSession';
 import { VRSessionTemplate } from '@/types/vr';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,8 @@ const VRPage: React.FC = () => {
     const filteredTemplates = selectedCategory 
       ? mockVRTemplates.filter(t => t.category === selectedCategory)
       : mockVRTemplates;
+    
+    // Create a copy of the array to avoid React warning about setting state from another type
     setTemplates([...filteredTemplates]);
   }, [selectedCategory]);
 

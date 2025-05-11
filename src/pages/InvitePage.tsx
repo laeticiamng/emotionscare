@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase-client';
 import Layout from '@/components/Layout';
-import { InvitationVerificationResult } from '@/types';
+import { InvitationVerificationResult } from '@/types/user';
 
 const signupSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),

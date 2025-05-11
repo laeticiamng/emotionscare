@@ -1,52 +1,33 @@
+
 import React, { useState } from 'react';
-import { UserPreferences, FontSize, ThemeName } from '@/types';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { UserPreferences, FontSize, FontFamily, ThemeName } from '@/types/user';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
   onSave: (preferences: UserPreferences) => void;
 }
 
-const fontSizeOptions: FontSize[] = ['small', 'medium', 'large'];
-type ThemeOption = 'light' | 'dark' | 'pastel';
-
 const preferencesSchema = z.object({
-  theme: z.enum(['light', 'dark', 'pastel']),
-  notifications_enabled: z.boolean(),
-  fontSize: z.enum(['small', 'medium', 'large']),
-  language: z.string(),
-  notifications: z.boolean().optional(),
-  autoplayVideos: z.boolean().optional(),
-  showEmotionPrompts: z.boolean().optional(),
-  privacy: z.string().optional(),
-  dataCollection: z.boolean().optional(),
+  theme: z.enum(['light', 'dark', 'pastel', 'system']).optional(),
+  notifications_enabled: z.boolean().optional(),
+  fontSize: z.enum(['small', 'medium', 'large']).optional(),
+  language: z.string().optional(),
+  privacy: z.enum(['public', 'private', 'friends']).optional()
 });
 
 const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  // Assurer la présence de tous les champs requis
-  const defaultValues: UserPreferences = {
-    theme: preferences.theme || 'light',
-    fontSize: preferences.fontSize || 'medium',
-    language: preferences.language || 'fr',
-    notifications: preferences.notifications || preferences.notifications_enabled || false,
-    autoplayVideos: preferences.autoplayVideos || false,
-    showEmotionPrompts: preferences.showEmotionPrompts || true,
-    privacy: preferences.privacy || preferences.privacyLevel || 'standard',
-    dataCollection: preferences.dataCollection || true,
-    notifications_enabled: preferences.notifications_enabled || preferences.notifications || false,
-  };
-
   const form = useForm<UserPreferences>({
     resolver: zodResolver(preferencesSchema),
-    defaultValues,
+    defaultValues: preferences,
   });
 
   const handleSubmit = async (data: UserPreferences) => {
@@ -67,7 +48,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
           render={({ field }) => (
             <FormItem>
               <FormLabel>Thème</FormLabel>
-              <Select onValueChange={(value: ThemeName) => field.onChange(value)} defaultValue={field.value}>
+              <Select onValueChange={field.onChange as (value: string) => void} defaultValue={field.value as string}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner un thème" />
@@ -77,6 +58,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
                   <SelectItem value="light">Clair</SelectItem>
                   <SelectItem value="dark">Sombre</SelectItem>
                   <SelectItem value="pastel">Pastel</SelectItem>
+                  <SelectItem value="system">Système</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -92,7 +74,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
           render={({ field }) => (
             <FormItem>
               <FormLabel>Taille de police</FormLabel>
-              <Select onValueChange={(value: FontSize) => field.onChange(value)} defaultValue={field.value}>
+              <Select onValueChange={field.onChange as (value: string) => void} defaultValue={field.value as string}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner une taille de police" />
@@ -130,6 +112,31 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
               </Select>
               <FormDescription>
                 Sélectionnez la langue de l'interface.
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="privacy"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confidentialité</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Niveau de confidentialité" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="private">Privé</SelectItem>
+                  <SelectItem value="friends">Amis seulement</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Définissez qui peut voir votre profil et vos activités.
               </FormDescription>
             </FormItem>
           )}

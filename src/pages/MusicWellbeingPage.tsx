@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -8,7 +9,6 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { MusicTrack } from '@/types';
-import { useMusicControls } from '@/hooks/useMusicControls';
 
 const MusicWellbeingPage = () => {
   const { toast } = useToast();
@@ -43,15 +43,18 @@ const MusicWellbeingPage = () => {
   const handleGenerateMusic = () => {
     // AI music generation logic would go here
     // For the demo, we're just simulating generation
-    setCurrentMusic({
+    const generatedTrack: MusicTrack = {
       id: 'generated-1',
       title: 'Méditation tranquille',
       artist: 'EmotionsAI',
       duration: duration,
       url: '#',
       cover: '/images/music/meditation.jpg',
-      mood: 'calm',
-    });
+      emotion: 'calm',
+      mood: 'calm' // Ajout pour compatibilité
+    };
+    
+    setCurrentMusic(generatedTrack);
     
     // Show toast when music is generated
     toast({

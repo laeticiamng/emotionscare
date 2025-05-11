@@ -1,6 +1,5 @@
 export type {
   User,
-  UserRole,
   UserPreferences,
   FontFamily,
   FontSize,
@@ -9,15 +8,18 @@ export type {
 } from './types/user';
 
 export type {
+  VRSessionTemplate,
   VRSession,
-  VRSessionTemplate
+  VRHistoryListProps,
+  VRSessionWithMusicProps
 } from './types/vr';
 
 export type {
   MusicTrack,
   MusicPlaylist,
   MusicContextType,
-  MusicDrawerProps
+  MusicDrawerProps,
+  Track
 } from './types/music';
 
 export interface ChatMessage {

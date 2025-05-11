@@ -19,9 +19,9 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     benefits: ['Réduction de l\'anxiété', 'Calme mental', 'Détente musculaire'],
     emotions: ['calme', 'sérénité', 'paix'],
     popularity: 92,
-    template_id: '1',
-    completion_rate: 89,
-    emotion_target: 'calme'
+    emotion_target: 'calme',
+    thumbnail: '/images/vr/ocean-preview.jpg', // Ajouté pour compatibilité
+    intensity: 'low', // Ajouté pour compatibilité
   },
   {
     id: '2',
@@ -39,9 +39,9 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     benefits: ['Amélioration de la concentration', 'Réduction du stress', 'Clarté mentale'],
     emotions: ['paix', 'concentration', 'présence'],
     popularity: 85,
-    template_id: '2',
-    completion_rate: 78,
-    emotion_target: 'concentration'
+    emotion_target: 'concentration',
+    thumbnail: '/images/vr/meditation-preview.jpg', // Ajouté pour compatibilité
+    intensity: 'low', // Ajouté pour compatibilité
   },
   {
     id: '3',
@@ -59,9 +59,9 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     benefits: ['Connexion avec la nature', 'Rafraîchissement mental', 'Inspiration'],
     emotions: ['émerveillement', 'curiosité', 'joie'],
     popularity: 78,
-    template_id: '3',
-    completion_rate: 72,
-    emotion_target: 'émerveillement'
+    emotion_target: 'émerveillement',
+    thumbnail: '/images/vr/forest-preview.jpg', // Ajouté pour compatibilité
+    intensity: 'medium', // Ajouté pour compatibilité
   },
   {
     id: '4',
@@ -79,9 +79,9 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     benefits: ['Réduction de l\'anxiété', 'Amélioration du sommeil', 'Régulation du système nerveux'],
     emotions: ['calme', 'détente', 'apaisement'],
     popularity: 95,
-    template_id: '4',
-    completion_rate: 94,
-    emotion_target: 'calme'
+    emotion_target: 'calme',
+    thumbnail: '/images/vr/breathing-preview.jpg', // Ajouté pour compatibilité
+    intensity: 'low', // Ajouté pour compatibilité
   }
 ];
 

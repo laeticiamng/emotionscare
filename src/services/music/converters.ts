@@ -34,6 +34,8 @@ export function trackToMusicTrack(rawData: any): MusicTrack {
     cover: rawData.cover || rawData.coverUrl || rawData.cover_url || '',
     coverUrl: rawData.coverUrl || rawData.cover_url || rawData.cover || '',
     emotion: rawData.emotion || rawData.emotion_tag || '',
+    mood: rawData.mood || rawData.emotion || '',
+    genre: rawData.genre || ''
   };
 }
 
@@ -50,6 +52,7 @@ export function musicTrackToTrack(track: MusicTrack): any {
     cover: track.cover || '',
     coverUrl: track.coverUrl || '',
     emotion: track.emotion || '',
+    mood: track.mood || track.emotion || ''
   };
 }
 

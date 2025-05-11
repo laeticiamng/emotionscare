@@ -1,210 +1,134 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Switch } from '@/components/ui/switch';
-import { FontSize, ThemeName, User } from '@/types';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useUser } from '@/hooks/useUser';
+import { useToast } from '@/hooks/use-toast';
+import { FontFamily, FontSize } from '@/types';
 
-const OnboardingPage = () => {
-  const { user, updateUser } = useAuth();
-  const { userMode } = useUserMode();
+const steps = [
+  { id: 'welcome', title: 'Bienvenue', description: 'Bienvenue sur notre plateforme de bien-être émotionnel' },
+  { id: 'preferences', title: 'Préférences', description: 'Personnalisez votre expérience' },
+  { id: 'goals', title: 'Objectifs', description: 'Définissez vos objectifs de bien-être' },
+  { id: 'complete', title: 'Terminé', description: 'Vous êtes prêt à commencer' },
+];
+
+const OnboardingPage: React.FC = () => {
+  const { user, updateUser } = useUser();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const mode = searchParams.get('mode') || (userMode === 'b2c' ? 'personal' : 'business');
+  const { toast } = useToast();
   
-  const [name, setName] = useState<string>(user?.name || '');
-  const [theme, setTheme] = useState<ThemeName>('light');
-  const [fontSize, setFontSize] = useState<FontSize>('medium');
-  const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
-  const [emailNotifications, setEmailNotifications] = useState<boolean>(true);
-  const [department, setDepartment] = useState<string>('');
-  const [position, setPosition] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [preferences, setPreferences] = useState({
+    theme: 'light',
+    language: 'fr',
+    fontSize: 'medium' as FontSize,
+    fontFamily: 'inter' as FontFamily,
+    notifications: true,
+  });
   
-  useEffect(() => {
-    // If user has already completed onboarding, redirect to dashboard
-    if (user?.onboarded) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      if (!user) return;
-      
-      // Common user preferences
-      const updatedUser: User = {
-        ...user,
-        name,
-        preferences: {
-          theme,
-          fontSize,
-          // Don't include fontFamily if it's not in UserPreferences
-          notifications_enabled: notificationsEnabled,
-          email_notifications: emailNotifications,
-          push_notifications: true
-        },
-        onboarded: true,
-        joined_at: new Date().toISOString(),
-        avatar_url: user.avatar_url || ''
-      };
-      
-      // Add business-specific fields if in business mode
-      if (mode === 'business' || userMode === 'b2b-collaborator' || userMode === 'b2b-admin') {
-        updatedUser.department = department;
-        updatedUser.position = position;
+  const [goals, setGoals] = useState<string[]>([
+    'Réduire le stress',
+    'Améliorer le sommeil'
+  ]);
+
+  const handleNext = async () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      try {
+        // Update the user profile with onboarding information
+        if (user) {
+          await updateUser({
+            onboarded: true,
+            preferences: {
+              ...user.preferences,
+              ...preferences
+            }
+          });
+        }
+        
+        toast({
+          title: "Onboarding terminé",
+          description: "Votre profil a été mis à jour avec succès."
+        });
+        
+        navigate('/dashboard');
+      } catch (error) {
+        console.error("Error completing onboarding:", error);
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors de la mise à jour de votre profil.",
+          variant: "destructive"
+        });
       }
-      
-      await updateUser(updatedUser);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Error during onboarding:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
   
+  const handlePrevious = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+  
+  const renderStepContent = () => {
+    switch (steps[currentStep].id) {
+      case 'welcome':
+        return (
+          <div className="space-y-4">
+            <p>Nous sommes ravis de vous accueillir sur notre plateforme dédiée au bien-être émotionnel.</p>
+            <p>Suivez ces quelques étapes pour personnaliser votre expérience.</p>
+          </div>
+        );
+      case 'preferences':
+        return (
+          <div className="space-y-4">
+            {/* Préférences UI - simplifié pour l'exemple */}
+            <p>Choisissez vos préférences d'interface pour une expérience personnalisée.</p>
+          </div>
+        );
+      case 'goals':
+        return (
+          <div className="space-y-4">
+            <p>Quels sont vos objectifs de bien-être ?</p>
+            {/* Sélection d'objectifs - simplifié pour l'exemple */}
+          </div>
+        );
+      case 'complete':
+        return (
+          <div className="space-y-4 text-center">
+            <p className="text-xl">Félicitations !</p>
+            <p>Votre profil est configuré et vous êtes prêt à commencer votre parcours de bien-être.</p>
+          </div>
+        );
+      default:
+        return <p>Étape inconnue</p>;
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted/20 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted/20">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Bienvenue !</CardTitle>
-          <CardDescription>
-            {mode === 'business' 
-              ? 'Configurez votre profil professionnel' 
-              : 'Configurez votre expérience pour commencer'}
-          </CardDescription>
+        <CardHeader>
+          <CardTitle>{steps[currentStep].title}</CardTitle>
+          <CardDescription>{steps[currentStep].description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="name">Votre nom</Label>
-              <Input 
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Comment souhaitez-vous être appelé ?"
-                required
-              />
-            </div>
-            
-            {/* Business-specific fields */}
-            {(mode === 'business' || userMode === 'b2b-collaborator' || userMode === 'b2b-admin') && (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="department">Département</Label>
-                  <Select value={department} onValueChange={setDepartment}>
-                    <SelectTrigger id="department">
-                      <SelectValue placeholder="Sélectionnez votre département" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="rh">Ressources Humaines</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="tech">Technique / IT</SelectItem>
-                      <SelectItem value="finance">Finance</SelectItem>
-                      <SelectItem value="operations">Opérations</SelectItem>
-                      <SelectItem value="direction">Direction</SelectItem>
-                      <SelectItem value="other">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="position">Poste</Label>
-                  <Input 
-                    id="position"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    placeholder="Votre fonction dans l'entreprise"
-                  />
-                </div>
-              </>
-            )}
-            
-            <div className="space-y-2">
-              <Label>Thème</Label>
-              <RadioGroup 
-                value={theme} 
-                onValueChange={(value) => setTheme(value as ThemeName)}
-                className="flex space-x-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="light" id="light" />
-                  <Label htmlFor="light">Clair</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="dark" id="dark" />
-                  <Label htmlFor="dark">Sombre</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="system" id="system" />
-                  <Label htmlFor="system">Système</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Taille de police</Label>
-              <RadioGroup 
-                value={fontSize} 
-                onValueChange={(value) => setFontSize(value as FontSize)}
-                className="flex space-x-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="small" id="small" />
-                  <Label htmlFor="small">Petite</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="medium" id="medium" />
-                  <Label htmlFor="medium">Moyenne</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="large" id="large" />
-                  <Label htmlFor="large">Grande</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
-            <div className="space-y-4">
-              <Label>Notifications</Label>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="notifications" className="text-sm">
-                  Notifications dans l'application
-                </Label>
-                <Switch 
-                  id="notifications"
-                  checked={notificationsEnabled}
-                  onCheckedChange={setNotificationsEnabled}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <Label htmlFor="email-notifications" className="text-sm">
-                  Notifications par email
-                </Label>
-                <Switch 
-                  id="email-notifications"
-                  checked={emailNotifications}
-                  onCheckedChange={setEmailNotifications}
-                />
-              </div>
-            </div>
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Chargement..." : "Commencer"}
-            </Button>
-          </form>
+          {renderStepContent()}
         </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button 
+            variant="outline" 
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+          >
+            Précédent
+          </Button>
+          <Button onClick={handleNext}>
+            {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

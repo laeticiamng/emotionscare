@@ -24,6 +24,7 @@ export interface VRSessionTemplate {
   emotion_target?: string;
   level?: string;
   recommended_mood?: string;
+  template_id?: string; // Ajouté pour compatibilité
 }
 
 export interface VRHistoryListProps {

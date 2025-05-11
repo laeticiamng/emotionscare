@@ -1,114 +1,129 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { VRSession, VRSessionTemplate } from '@/types/vr';
-import { saveVRSession, getRecommendedSessions } from '@/lib/vrService';
 import { mockVRTemplates } from '@/data/mockVRTemplates';
 
-export function useVRSession(userId: string) {
+export const useVRSession = (userId: string) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [sessions, setSessions] = useState<VRSession[]>([]);
   const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
-  const [sessionHistory, setSessionHistory] = useState<VRSession[]>([]);
   const [templates, setTemplates] = useState<VRSessionTemplate[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [historyLoading, setHistoryLoading] = useState(false);
 
-  // Load templates when hook is initialized
+  // Load VR templates
   useEffect(() => {
-    setIsLoading(true);
-    // Use mockVRTemplates as our data source
-    // Need to explicitly cast the templates to match the current type
-    setTemplates(() => mockVRTemplates as VRSessionTemplate[]);
-    setIsLoading(false);
-  }, []);
+    const loadTemplates = async () => {
+      try {
+        // In a real application, this would fetch from an API
+        setTemplates(mockVRTemplates);
+      } catch (error) {
+        console.error("Error loading VR templates:", error);
+      }
+    };
 
-  // Check if there's an active session
-  const isActive = !!currentSession && !currentSession.completed;
+    const loadUserSessions = async () => {
+      try {
+        // Mock data - in a real app, this would fetch from an API
+        const mockSessions: VRSession[] = [
+          {
+            id: 'session-1',
+            user_id: userId,
+            template_id: '1',
+            start_time: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            end_time: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
+            duration_seconds: 300,
+            completed: true,
+            emotion_before: 'stressed',
+            emotion_after: 'calm'
+          },
+          {
+            id: 'session-2',
+            user_id: userId,
+            template_id: '3',
+            start_time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            end_time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
+            duration_seconds: 900,
+            completed: true,
+            emotion_before: 'anxious',
+            emotion_after: 'relaxed'
+          }
+        ];
 
-  /**
-   * Start a new VR session with the specified template
-   */
-  const startSession = useCallback((template: VRSessionTemplate, emotionBefore?: string) => {
-    // Create a new session
+        setSessions(mockSessions);
+      } catch (error) {
+        console.error("Error loading user sessions:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadTemplates();
+    loadUserSessions();
+  }, [userId]);
+
+  // Start a new VR session
+  const startSession = useCallback((templateId: string): VRSession => {
+    const template = templates.find(t => t.id === templateId);
+    if (!template) {
+      throw new Error("Template not found");
+    }
+
     const newSession: VRSession = {
       id: `session-${Date.now()}`,
       user_id: userId,
-      template_id: template.id,
+      template_id: templateId,
       start_time: new Date().toISOString(),
       duration_seconds: template.duration * 60,
-      completed: false,
-      template: template,
-      emotion_before: emotionBefore
+      completed: false
     };
-    
+
     setCurrentSession(newSession);
-    // Add to history as well
-    setSessionHistory(prev => [newSession, ...prev]);
-    
     return newSession;
-  }, [userId]);
-  
-  /**
-   * Complete the current session
-   */
-  const completeSession = useCallback(async (emotionAfter?: string) => {
-    if (!currentSession) return null;
-    
-    setIsLoading(true);
-    try {
-      const completedSession: VRSession = {
-        ...currentSession,
-        end_time: new Date().toISOString(),
-        completed: true,
-        emotion_after: emotionAfter
-      };
-      
-      // Save to backend
-      const savedSession = await saveVRSession(completedSession);
-      
-      setCurrentSession(savedSession);
-      
-      // Update in history
-      setSessionHistory(prev => 
-        prev.map(s => s.id === savedSession.id ? savedSession : s)
-      );
-      
-      return savedSession;
-    } catch (error) {
-      console.error('Error completing VR session:', error);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentSession]);
-  
-  /**
-   * Load session history for current user
-   */
-  const loadSessionHistory = useCallback(async () => {
-    setHistoryLoading(true);
-    try {
-      // In real app, this would be fetched from API
-      const mockHistory: VRSession[] = [];
-      setSessionHistory(mockHistory);
-      return mockHistory;
-    } catch (error) {
-      console.error('Error loading session history:', error);
-      return [];
-    } finally {
-      setHistoryLoading(false);
-    }
+  }, [templates, userId]);
+
+  // Complete a VR session
+  const completeSession = useCallback((sessionId: string, emotionAfter?: string) => {
+    setSessions(prevSessions => {
+      const updatedSessions = prevSessions.map(session => {
+        if (session.id === sessionId) {
+          return {
+            ...session,
+            end_time: new Date().toISOString(),
+            completed: true,
+            emotion_after: emotionAfter || session.emotion_after
+          };
+        }
+        return session;
+      });
+      return updatedSessions;
+    });
+
+    setCurrentSession(null);
   }, []);
-  
+
+  // Get stats for a user
+  const getUserStats = useCallback(() => {
+    const completedCount = sessions.filter(s => s.completed).length;
+    const totalDuration = sessions.reduce((acc, session) => {
+      return acc + (session.duration_seconds || 0);
+    }, 0);
+    
+    return {
+      sessionsCount: sessions.length,
+      completedCount,
+      totalDurationMinutes: Math.floor(totalDuration / 60),
+      lastSessionDate: sessions.length > 0 ? new Date(sessions[0].start_time) : null
+    };
+  }, [sessions]);
+
   return {
-    currentSession,
-    sessionHistory,
-    templates,
     isLoading,
-    historyLoading,
-    isActive,
+    sessions,
+    templates,
+    currentSession,
     startSession,
     completeSession,
-    loadSessionHistory
+    getUserStats
   };
-}
+};
 
 export default useVRSession;

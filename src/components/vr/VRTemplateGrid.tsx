@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import VRTemplateCard from './VRTemplateCard';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/vr';
 
 interface VRTemplateGridProps {
   templates: VRSessionTemplate[];
@@ -23,7 +23,7 @@ const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ templates, onSelectTemp
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
         {templates.map((template) => (
           <VRTemplateCard
-            key={template.template_id}
+            key={template.id}
             template={template}
             onClick={onSelectTemplate}
           />
