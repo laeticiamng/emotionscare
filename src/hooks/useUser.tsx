@@ -27,22 +27,18 @@ export const useUser = () => {
         ...userData
       } as User);
       
-      // Update local user state if the update was successful
-      if (updatedUser) {
-        setUser(prevUser => prevUser ? {
-          ...prevUser,
-          ...userData
-        } : null);
-        
-        toast({
-          title: "Profil mis à jour",
-          description: "Vos informations ont été enregistrées"
-        });
-        
-        return updatedUser;
-      }
+      // Update local user state
+      setUser(prevUser => prevUser ? {
+        ...prevUser,
+        ...userData
+      } : null);
       
-      throw new Error("Échec de la mise à jour du profil");
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été enregistrées"
+      });
+      
+      return updatedUser;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Une erreur est survenue';
       setError(errorMsg);
