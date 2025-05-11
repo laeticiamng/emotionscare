@@ -24,9 +24,9 @@ export interface UserPreferences {
   notifications?: boolean;
   soundEnabled?: boolean;
   language?: string;
-  fontFamily?: string; // Adding fontFamily
+  fontFamily?: FontFamily;
   fontSize?: FontSize;
-  privacyLevel?: string; // Adding privacyLevel
+  privacyLevel?: string;
   privacy?: 'public' | 'private' | 'friends';
   showEmotionPrompts?: boolean;
   notification_frequency?: string;

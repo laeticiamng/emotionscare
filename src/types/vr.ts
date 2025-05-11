@@ -3,17 +3,17 @@ export interface VRSessionTemplate {
   id: string;
   name: string;
   description: string;
-  thumbnail: string; // Making this required
-  title: string; // Making this required
+  thumbnail: string; // Required
+  title: string; // Required
   category: string;
   duration: number;
-  intensity: 'low' | 'medium' | 'high'; // Making this required
+  intensity: 'low' | 'medium' | 'high'; // Required
   tags: string[];
   youtubeId?: string;
   lastUsed?: Date;
   popularity?: number;
   recommendedFor?: string[];
-  theme?: string;
+  theme: string; // Required
   is_audio_only?: boolean;
   preview_url?: string;
   audio_url?: string;

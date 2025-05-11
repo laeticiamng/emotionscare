@@ -33,3 +33,34 @@ export function trackToMusicTrack(rawData: any): MusicTrack {
     emotion: rawData.emotion || rawData.emotion_tag || '',
   };
 }
+
+/**
+ * Convert MusicTrack to raw track format (for backward compatibility)
+ */
+export function musicTrackToTrack(track: MusicTrack): any {
+  return {
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
+    duration: track.duration,
+    url: track.url,
+    coverUrl: track.coverUrl || track.cover || '',
+    emotion: track.emotion || '',
+  };
+}
+
+/**
+ * Convert MusicPlaylist to raw playlist format (for backward compatibility)
+ */
+export function musicPlaylistToPlaylist(playlist: MusicPlaylist): any {
+  return {
+    id: playlist.id,
+    name: playlist.name,
+    title: playlist.title || playlist.name,
+    tracks: playlist.tracks.map(musicTrackToTrack),
+    coverUrl: playlist.coverUrl,
+    description: playlist.description,
+    category: playlist.category || '',
+    emotion: playlist.emotion || ''
+  };
+}

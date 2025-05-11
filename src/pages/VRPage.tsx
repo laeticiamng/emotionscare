@@ -1,212 +1,60 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import VRSessionsList from '@/components/vr/VRSessionsList';
-import VRSessionPlayer from '@/components/vr/VRSessionPlayer';
-import VRRecommendations from '@/components/vr/VRRecommendations';
-import VRHistoryList from '@/components/vr/VRHistoryList';
-import { VRSessionTemplate } from '@/types/vr';
+import React, { useState } from 'react';
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Shell } from '@/Shell';
 import { useVRSession } from '@/hooks/useVRSession';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { ArrowLeft } from 'lucide-react';
-
-// Import from the correct export name
-import { mockVRTemplates } from '@/data/mockVRTemplates';
+import { VRSessionTemplate } from '@/types';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const VRPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const tab = searchParams.get('tab') || 'discover';
-  const isMobile = useIsMobile();
-  
-  const [activeTemplate, setActiveTemplate] = useState<VRSessionTemplate | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const { startSession, completeSession } = useVRSession({});
-  
-  // Effect to load recommended template if specified in URL
-  useEffect(() => {
-    const templateId = searchParams.get('template');
-    if (templateId) {
-      const template = mockVRTemplates.find(t => t.id === templateId);
-      if (template) {
-        // Ensure we have the required properties
-        const completeTemplate: VRSessionTemplate = {
-          ...template,
-          thumbnail: template.thumbnail || '/images/default-thumbnail.jpg',
-          intensity: template.intensity || 'medium',
-          title: template.title || template.name
-        };
-        setActiveTemplate(completeTemplate);
-      }
-    }
-  }, [searchParams]);
-  
-  const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value });
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState("meditation");
+  const { templates, isLoading } = useVRSession("meditation"); // Add a default category
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
   };
-  
-  const handleSelectTemplate = (template: VRSessionTemplate) => {
-    // Ensure we have the required properties
-    const completeTemplate: VRSessionTemplate = {
-      ...template,
-      thumbnail: template.thumbnail || '/images/default-thumbnail.jpg',
-      intensity: template.intensity || 'medium'
-    };
-    setActiveTemplate(completeTemplate);
-    setIsPlaying(false);
+
+  const handleSessionStart = (template: VRSessionTemplate) => {
+    navigate(`/vr-session/${template.id}`);
   };
-  
-  const handleStartSession = () => {
-    if (activeTemplate) {
-      startSession(activeTemplate);
-      setIsPlaying(true);
-    }
-  };
-  
-  const handleEndSession = () => {
-    if (activeTemplate) {
-      completeSession();
-      setIsPlaying(false);
-    }
-  };
-  
-  const handleBackToList = () => {
-    setActiveTemplate(null);
-    setIsPlaying(false);
-  };
-  
-  // Function to ensure all VRSessionTemplate[] arrays have required properties
-  const ensureCompleteTemplates = (templates: any[]): VRSessionTemplate[] => {
-    return templates.map(t => ({
-      ...t,
-      thumbnail: t.thumbnail || '/images/default-thumbnail.jpg',
-      intensity: t.intensity || 'medium'
-    }));
-  };
-  
-  if (isPlaying && activeTemplate) {
-    return (
-      <VRSessionPlayer 
-        template={activeTemplate}
-        onComplete={handleEndSession}
-      />
-    );
-  }
-  
+
   return (
-    <div className="container mx-auto p-4">
-      {activeTemplate ? (
-        <div className="mb-6">
-          <Button 
-            variant="ghost" 
-            className="mb-4" 
-            onClick={handleBackToList}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Retour
-          </Button>
-          
-          <Card className="p-6">
-            <h2 className="text-2xl font-bold mb-4">{activeTemplate.title || activeTemplate.name}</h2>
-            <p className="text-muted-foreground mb-6">{activeTemplate.description}</p>
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="md:w-2/3">
-                {activeTemplate.preview_url && !activeTemplate.is_audio_only && (
-                  <div className="rounded-lg overflow-hidden bg-muted aspect-video mb-4">
-                    <img 
-                      src={activeTemplate.preview_url} 
-                      alt={activeTemplate.title || activeTemplate.name} 
-                      className="w-full h-full object-cover"
-                    />
+    <Shell>
+      <div className="container mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-6">Sessions de réalité virtuelle</h1>
+        <p className="mb-4">
+          Choisissez une session de réalité virtuelle pour améliorer votre bien-être émotionnel.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {isLoading ? (
+            <p>Chargement des sessions...</p>
+          ) : (
+            templates?.map((template) => (
+              <Card key={template.id} className="bg-card text-card-foreground shadow-sm h-full flex flex-col">
+                <CardHeader className="flex flex-col space-y-1.5 p-4">
+                  <CardTitle className="text-lg font-semibold leading-none tracking-tight">{template.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 flex flex-col flex-grow">
+                  <div className="aspect-video rounded-lg overflow-hidden bg-muted">
+                    <img src={template.thumbnail} alt={template.title} className="w-full h-full object-cover" />
                   </div>
-                )}
-                
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground">Durée</h4>
-                    <p>{activeTemplate.duration} min</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground">Catégorie</h4>
-                    <p className="capitalize">{activeTemplate.category}</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-muted-foreground">Difficulté</h4>
-                    <p className="capitalize">{activeTemplate.difficulty}</p>
-                  </div>
-                  <div className="col-span-2 md:col-span-3">
-                    <h4 className="text-sm font-medium text-muted-foreground">Bénéfices</h4>
-                    <p>{(activeTemplate.benefits || []).join(', ')}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="md:w-1/3">
-                <Button 
-                  size="lg" 
-                  className="w-full mb-4"
-                  onClick={handleStartSession}
-                >
-                  Commencer la session
-                </Button>
-                
-                {activeTemplate.tags && activeTemplate.tags.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-2">Tags</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {activeTemplate.tags.map((tag) => (
-                        <div key={tag} className="px-2 py-1 bg-secondary rounded text-xs">
-                          {tag}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Card>
-          
-          <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Vous pourriez aussi aimer</h3>
-            <VRRecommendations 
-              currentTemplateId={activeTemplate.id}
-              onSelect={handleSelectTemplate}
-              templates={ensureCompleteTemplates(mockVRTemplates)}
-            />
-          </div>
+                  <Badge variant={template.intensity === 'low' ? 'outline' : (template.intensity === 'high' ? 'destructive' : 'default')}>
+                    {template.intensity === 'low' ? 'Facile' : (template.intensity === 'high' ? 'Intense' : 'Modéré')}
+                  </Badge>
+                  <p className="text-sm text-muted-foreground mt-2 flex-grow">
+                    {template.description}
+                  </p>
+                  <Button onClick={() => handleSessionStart(template)} className="mt-4">Commencer la session</Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
-      ) : (
-        <Tabs defaultValue={tab} className="w-full" onValueChange={handleTabChange}>
-          <TabsList className={isMobile ? "grid w-full grid-cols-2" : "grid w-full grid-cols-3"}>
-            <TabsTrigger value="discover">Découvrir</TabsTrigger>
-            <TabsTrigger value="recommended">Recommandés</TabsTrigger>
-            {!isMobile && <TabsTrigger value="history">Historique</TabsTrigger>}
-          </TabsList>
-          
-          <TabsContent value="discover">
-            <VRSessionsList 
-              templates={ensureCompleteTemplates(mockVRTemplates)} 
-              onSelect={handleSelectTemplate}
-            />
-          </TabsContent>
-          
-          <TabsContent value="recommended">
-            <VRRecommendations 
-              onSelect={handleSelectTemplate}
-              templates={ensureCompleteTemplates(mockVRTemplates.filter(t => t.category === 'relaxation'))}
-              showHeading={false}
-            />
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <VRHistoryList 
-              onSelect={handleSelectTemplate}
-              templates={[]}
-            />
-          </TabsContent>
-        </Tabs>
-      )}
-    </div>
+      </div>
+    </Shell>
   );
 };
 

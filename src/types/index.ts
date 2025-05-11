@@ -2,13 +2,12 @@
 // Re-export all types for easy imports
 export type { User, UserPreferences, UserRole, FontFamily, FontSize, ThemeName, Theme, UserPreferencesState, InvitationVerificationResult } from './user';
 export type { VRSessionTemplate, VRSession, VRHistoryListProps, VRSessionWithMusicProps } from './vr';
-export type { MusicTrack, MusicPlaylist } from './music';
+export type { MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps } from './music';
+export type { ChatMessage, ChatConversation, ChatResponse, ChatResponseType } from './chat';
 
 // We'll add these module stubs to prevent compilation errors
 // and implement them later if needed
 export type Toast = any;
-export type MusicContextType = any;
-export type MusicDrawerProps = any;
 export type Notification = any;
 export type NotificationType = any;
 export type NotificationPriority = any;

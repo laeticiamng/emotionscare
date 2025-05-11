@@ -42,6 +42,8 @@ export interface MusicContextType {
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist | null;
 }
 
 export interface Toast {
@@ -52,5 +54,4 @@ export interface Toast {
   variant?: 'default' | 'destructive' | 'success';
 }
 
-// Re-export all types to make them available from this module
-export type { MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps, Toast };
+// Export types without the re-export that causes conflicts
