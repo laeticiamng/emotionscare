@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { usePredictiveAnalytics } from '@/providers/PredictiveAnalyticsProvider';
 import { useToast } from '@/hooks/use-toast';
 
+// Update the recommendation type to match the provider's type
 interface PredictiveInsightToastProps {
   recommendation: {
     id: string;
     title: string;
     description: string;
-    actionType: string;
+    actionType: 'music' | 'story' | 'exercise' | 'break' | 'focus';
     confidence: number;
     category: string;
   };

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useBranding } from '@/contexts/BrandingContext';
 
@@ -15,7 +14,7 @@ interface SoundscapeContextType {
   toggleEnabled: () => void;
   playEmotionalResponse: (emotion: string) => void;
   playFunctionalSound: (type: 'success' | 'error' | 'notification' | 'transition') => void;
-  updateSoundscapeForEmotion: (emotion: string, intensity?: number) => void;
+  updateSoundscapeForEmotion: (emotion: string) => void;
 }
 
 const SoundscapeContext = createContext<SoundscapeContextType>({
@@ -39,7 +38,7 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
   const [isEnabled, setIsEnabled] = useState(true);
-  const { brandingTheme, updatePalette } = useBranding();
+  const { brandingTheme } = useBranding();
   
   // Toggle mute state
   const toggleMute = () => setIsMuted(!isMuted);
@@ -81,10 +80,10 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [isEnabled, isMuted]);
   
   // Update soundscape based on predicted or detected emotion
-  const updateSoundscapeForEmotion = useCallback((emotion: string, intensity: number = 100) => {
+  const updateSoundscapeForEmotion = useCallback((emotion: string) => {
     if (!isEnabled) return;
     
-    console.log(`Updating soundscape for emotion: ${emotion} (intensity: ${intensity})`);
+    console.log(`Updating soundscape for emotion: ${emotion}`);
     
     // Map emotions to appropriate soundscapes
     const emotionToSoundscape: Record<string, SoundscapeType> = {
@@ -105,9 +104,22 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const newSoundscape = emotionToSoundscape[emotion.toLowerCase()] || 'ambient';
     setSoundscapeType(newSoundscape);
     
-    // Also adjust volume based on intensity
-    const normalizedIntensity = Math.min(Math.max(intensity, 0), 100) / 100;
-    setVolume(normalizedIntensity * 0.7 + 0.3); // Range between 0.3 and 1.0
+    // Also adjust volume based on emotion intensity
+    const intensityMap: Record<string, number> = {
+      'excited': 0.8,
+      'energetic': 0.7,
+      'happy': 0.65,
+      'focused': 0.6,
+      'creative': 0.6,
+      'calm': 0.5,
+      'relaxed': 0.4,
+      'sad': 0.4,
+      'anxious': 0.5,
+      'stressed': 0.5
+    };
+    
+    const newVolume = intensityMap[emotion.toLowerCase()] || 0.5;
+    setVolume(newVolume);
     
   }, [isEnabled]);
   

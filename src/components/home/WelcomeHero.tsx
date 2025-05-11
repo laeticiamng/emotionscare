@@ -72,7 +72,8 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
   }, []);
 
   const handleNavigate = (path: string) => {
-    playFunctionalSound('click');
+    // Changed from 'click' to 'transition' to match the allowed types
+    playFunctionalSound('transition');
     navigate(path);
   };
 
