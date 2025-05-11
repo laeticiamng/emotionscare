@@ -22,28 +22,39 @@ const UserModeContext = createContext<UserModeContextType>({
 });
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Try to get stored mode from localStorage or default to 'personal'
+  // Essayer d'obtenir le mode stocké de localStorage ou par défaut à 'personal'
   const getInitialMode = (): UserMode => {
-    const storedMode = localStorage.getItem('userMode');
-    return (storedMode as UserMode) || 'personal';
+    if (typeof window !== 'undefined') {
+      const storedMode = localStorage.getItem('userMode');
+      return (storedMode as UserMode) || 'personal';
+    }
+    return 'personal';
   };
   
   const [userMode, setUserModeState] = useState<UserMode>(getInitialMode);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Store mode in localStorage when it changes
+  // Initialiser le mode utilisateur
+  useEffect(() => {
+    setUserModeState(getInitialMode());
+    setIsLoading(false);
+  }, []);
+  
+  // Stocker le mode dans localStorage quand il change
   const setUserMode = (mode: UserMode) => {
     console.log('Setting user mode to:', mode);
     setUserModeState(mode);
-    localStorage.setItem('userMode', mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userMode', mode);
+    }
   };
   
-  // Log userMode changes for debugging
+  // Journaliser les changements de userMode pour le débogage
   useEffect(() => {
     console.log('UserModeContext - current mode:', userMode);
   }, [userMode]);
   
-  // Derived values
+  // Valeurs dérivées
   const isB2C = userMode === 'personal' || userMode === 'b2c';
   const isB2B = userMode === 'professional' || userMode === 'b2b-collaborator' || userMode === 'b2b-admin';
   const isAdmin = userMode === 'professional' || userMode === 'b2b-admin';

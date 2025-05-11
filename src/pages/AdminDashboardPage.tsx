@@ -10,9 +10,10 @@ const AdminDashboardPage: React.FC = () => {
   const { setUserMode, userMode } = useUserMode();
   const { toast } = useToast();
   
-  // Make sure user mode is set to b2b-admin
+  // S'assurer que le mode utilisateur est défini sur b2b-admin
   useEffect(() => {
     setUserMode('b2b-admin');
+    localStorage.setItem('userMode', 'b2b-admin');
     console.log('AdminDashboardPage is setting userMode to b2b-admin');
     
     toast({

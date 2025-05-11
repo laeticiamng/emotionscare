@@ -11,25 +11,28 @@ const ProtectedRoute: React.FC = () => {
   const { toast } = useToast();
   const { userMode, setUserMode } = useUserMode();
 
-  // For demo purposes, we consider everyone as authenticated
+  // Pour la démo, tout le monde est considéré comme authentifié
   const demoIsAuthenticated = true;
 
-  // Set user mode based on path
+  // Définir le mode utilisateur en fonction du chemin
   useEffect(() => {
     console.log('ProtectedRoute path:', location.pathname);
     if (location.pathname.includes('/admin')) {
-      setUserMode('b2b-admin');
       console.log('Setting mode to b2b-admin');
+      setUserMode('b2b-admin');
+      localStorage.setItem('userMode', 'b2b-admin');
     } else if (location.pathname.includes('/business')) {
-      setUserMode('b2b-collaborator');
       console.log('Setting mode to b2b-collaborator');
+      setUserMode('b2b-collaborator');
+      localStorage.setItem('userMode', 'b2b-collaborator');
     } else {
-      setUserMode('b2c');
       console.log('Setting mode to b2c');
+      setUserMode('b2c');
+      localStorage.setItem('userMode', 'b2c');
     }
   }, [location.pathname, setUserMode]);
 
-  // Additional debugging
+  // Débogage supplémentaire
   useEffect(() => {
     console.log('Current user mode in ProtectedRoute:', userMode);
   }, [userMode]);

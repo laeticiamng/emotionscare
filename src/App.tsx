@@ -15,18 +15,13 @@ import Index from '@/pages/Index';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import { UserModeProvider, useUserMode } from '@/contexts/UserModeContext';
+import { useToast } from '@/hooks/use-toast';
 
 const AppRoutes: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { userMode, setUserMode } = useUserMode();
-
-  // Redirect root path to homepage
-  useEffect(() => {
-    if (location.pathname === '/') {
-      navigate('/home');
-    }
-  }, [location.pathname, navigate]);
+  const { toast } = useToast();
 
   // Debug logging
   useEffect(() => {
@@ -36,21 +31,24 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Route d'index explicite */}
+      <Route path="/" element={<Index />} />
+      
+      {/* Autres routes publiques */}
       <Route path="/home" element={<HomePage />} />
       <Route path="/index" element={<Index />} />
       <Route path="/business" element={<BusinessPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/admin-login" element={<LoginPage />} />
       
-      {/* Protected routes - user needs to be logged in to access */}
+      {/* Routes protégées - l'utilisateur doit être connecté pour y accéder */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
-          {/* B2C user routes */}
+          {/* Routes utilisateur B2C */}
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/predictive" element={<PredictiveDashboardPage />} />
           
-          {/* B2B admin routes */}
+          {/* Routes admin B2B */}
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/premium" element={<AdminPremiumDashboard />} />
           <Route path="/admin/organization" element={<OrganizationPage />} />
@@ -59,8 +57,8 @@ const AppRoutes: React.FC = () => {
         </Route>
       </Route>
 
-      {/* Fallback route for unmatched paths */}
-      <Route path="*" element={<HomePage />} />
+      {/* Route par défaut pour les chemins non correspondants */}
+      <Route path="*" element={<Index />} />
     </Routes>
   );
 };

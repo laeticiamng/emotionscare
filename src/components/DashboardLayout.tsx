@@ -15,34 +15,44 @@ const DashboardLayout: React.FC = () => {
   const { userMode, setUserMode } = useUserMode();
   const { toast } = useToast();
   
-  // Set user mode based on URL path
+  // Définir le mode utilisateur en fonction du chemin URL
   useEffect(() => {
+    let newMode: 'b2b-admin' | 'b2b-collaborator' | 'b2c' = 'b2c';
+    
     if (location.pathname.includes('/admin')) {
-      setUserMode('b2b-admin');
+      newMode = 'b2b-admin';
       console.log('Setting user mode to b2b-admin from DashboardLayout');
     } else if (location.pathname.includes('/business')) {
-      setUserMode('b2b-collaborator');
+      newMode = 'b2b-collaborator';
       console.log('Setting user mode to b2b-collaborator from DashboardLayout');
     } else {
-      setUserMode('b2c');
+      newMode = 'b2c';
       console.log('Setting user mode to b2c from DashboardLayout');
     }
+    
+    setUserMode(newMode);
+    localStorage.setItem('userMode', newMode);
   }, [location.pathname, setUserMode]);
 
-  // Show welcome toast based on user mode
+  // Afficher le toast de bienvenue en fonction du mode utilisateur
   useEffect(() => {
-    const modeLabels = {
-      'b2b-admin': 'administrateur',
-      'b2b-collaborator': 'collaborateur',
-      'b2c': 'personnel'
-    };
-    
-    const label = modeLabels[userMode as keyof typeof modeLabels] || 'utilisateur';
-    
-    toast({
-      title: `Bienvenue dans votre espace ${label}`,
-      description: "Votre tableau de bord est prêt"
-    });
+    if (userMode) {
+      const modeLabels = {
+        'b2b-admin': 'administrateur',
+        'b2b-collaborator': 'collaborateur',
+        'b2c': 'personnel',
+        'personal': 'personnel',
+        'professional': 'professionnel',
+        'anonymous': 'anonyme'
+      };
+      
+      const label = userMode in modeLabels ? modeLabels[userMode as keyof typeof modeLabels] : 'utilisateur';
+      
+      toast({
+        title: `Bienvenue dans votre espace ${label}`,
+        description: "Votre tableau de bord est prêt"
+      });
+    }
   }, [userMode, toast]);
 
   return (
