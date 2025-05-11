@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,18 +15,21 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
   const location = useLocation();
   const navigate = useNavigate();
   
-  const isActive = (path: string) => {
+  const isActive = useCallback((path: string) => {
     return location.pathname === path || (path !== '/' && location.pathname.startsWith(path));
-  };
+  }, [location.pathname]);
 
-  const handleNavigation = () => {
+  const handleNavigation = useCallback(() => {
     console.log(`Navigation to: ${path}`);
     navigate(path);
-  };
+  }, [path, navigate]);
 
   const Icon = icon;
+  
+  // Ajout de debug pour vérifier si le bouton reçoit correctement les props
+  console.log(`Rendering NavItemButton: ${label}, Path: ${path}, Active: ${isActive(path)}, Collapsed: ${collapsed}`);
 
-  // Collapsed version with tooltip
+  // Version avec tooltip lorsque la barre latérale est réduite
   if (collapsed) {
     return (
       <Tooltip>
@@ -34,28 +37,31 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
           <Button
             variant={isActive(path) ? "secondary" : "ghost"}
             size="icon"
-            className="w-full h-10"
+            className="w-full h-10 my-1"
             onClick={handleNavigation}
+            aria-current={isActive(path) ? "page" : undefined}
           >
             <Icon className="h-5 w-5" />
+            <span className="sr-only">{label}</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="right">
+        <TooltipContent side="right" className="z-50">
           {label}
         </TooltipContent>
       </Tooltip>
     );
   }
 
-  // Expanded version
+  // Version étendue
   return (
     <Button
       variant={isActive(path) ? "secondary" : "ghost"}
-      className="w-full justify-start px-3"
+      className="w-full justify-start px-3 my-1"
       onClick={handleNavigation}
+      aria-current={isActive(path) ? "page" : undefined}
     >
-      <Icon className="h-5 w-5" />
-      <span className="ml-2">{label}</span>
+      <Icon className="h-5 w-5 mr-2 flex-shrink-0" />
+      <span className="truncate">{label}</span>
     </Button>
   );
 };

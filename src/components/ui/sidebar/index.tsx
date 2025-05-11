@@ -8,7 +8,7 @@ import SidebarNavGroup from './SidebarNavGroup';
 import SidebarFooter from './SidebarFooter';
 import ThemeButton from './ThemeButton';
 
-// Interface to ensure compatibility with NavItemConfig
+// Interface pour assurer la compatibilité avec NavItemConfig
 interface NavItemConfig {
   path: string;
   label: string;
@@ -16,7 +16,7 @@ interface NavItemConfig {
   [key: string]: any;
 }
 
-// Function to convert NavItem to NavItemConfig
+// Fonction pour convertir NavItem en NavItemConfig
 const convertToNavItemConfig = (items: any[]) => {
   return items.map(item => ({
     path: item.href || "",
@@ -26,11 +26,11 @@ const convertToNavItemConfig = (items: any[]) => {
   }));
 };
 
-// Inner component that uses the sidebar context
+// Composant interne qui utilise le contexte sidebar
 const SidebarContent: React.FC = () => {
   const { user } = useAuth();
   const { collapsed } = useSidebar();
-  const isAdmin = isAdminRole(user?.role);
+  const isAdmin = user ? isAdminRole(user.role) : false;
   
   console.log("Rendering Sidebar with user:", user?.name, "isAdmin:", isAdmin, "collapsed:", collapsed);
   
@@ -41,7 +41,7 @@ const SidebarContent: React.FC = () => {
 
   return (
     <aside 
-      className={`bg-background/80 backdrop-blur-sm border-r border-border transition-all duration-300 flex flex-col h-full fixed left-0 top-16 bottom-0 z-40 ${
+      className={`bg-background/80 backdrop-blur-sm border-r border-border h-full flex flex-col transition-all duration-300 ${
         collapsed ? 'w-16' : 'w-64'
       }`}
       aria-label="Sidebar navigation"
@@ -75,7 +75,7 @@ const SidebarContent: React.FC = () => {
   );
 };
 
-// Export the main Sidebar component that provides the context
+// Exporter le composant Sidebar principal qui fournit le contexte
 const Sidebar: React.FC = () => {
   console.log("Rendering Sidebar component");
   return (

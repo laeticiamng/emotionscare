@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface SidebarContextType {
   collapsed: boolean;
@@ -10,9 +10,21 @@ interface SidebarContextType {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(true); // Collapsed by default
+  // Récupérer l'état initial du localStorage ou utiliser true (réduit) par défaut
+  const [collapsed, setCollapsed] = useState(() => {
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    return savedState ? JSON.parse(savedState) : true;
+  });
 
-  const toggleCollapsed = () => setCollapsed(!collapsed);
+  // Persister l'état dans localStorage
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
+    console.log("Sidebar state changed:", collapsed);
+  }, [collapsed]);
+
+  const toggleCollapsed = () => {
+    setCollapsed(prev => !prev);
+  };
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, toggleCollapsed }}>

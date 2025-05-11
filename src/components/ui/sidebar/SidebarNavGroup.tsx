@@ -16,11 +16,14 @@ interface SidebarNavGroupProps {
 const SidebarNavGroup: React.FC<SidebarNavGroupProps> = ({ title, items, collapsed }) => {
   const { collapsed: sidebarCollapsed } = useSidebar();
   
-  console.log(`Rendering SidebarNavGroup: ${title}, Items:`, items.map(i => i.label), "Collapsed:", collapsed);
+  // Pour s'assurer que la valeur correcte de collapsed est utilisée
+  const isCollapsed = sidebarCollapsed !== undefined ? sidebarCollapsed : collapsed;
+  
+  console.log(`Rendering SidebarNavGroup: ${title}, Items:`, items.map(i => i.label), "Collapsed:", isCollapsed);
 
   return (
-    <div className="space-y-1">
-      {!sidebarCollapsed && (
+    <div className="space-y-1 py-2">
+      {!isCollapsed && (
         <h2 className="mb-2 px-2 text-xs font-semibold text-muted-foreground">
           {title}
         </h2>
@@ -32,7 +35,7 @@ const SidebarNavGroup: React.FC<SidebarNavGroupProps> = ({ title, items, collaps
             path={item.path}
             icon={item.icon}
             label={item.label}
-            collapsed={sidebarCollapsed}
+            collapsed={isCollapsed}
           />
         ))}
       </div>

@@ -1,58 +1,49 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { Theme, FontFamily, FontSize } from '@/types/user';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export interface ThemeContextType {
+type Theme = 'light' | 'dark' | 'system';
+
+interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  setThemePreference: (theme: Theme) => void;
-  toggleTheme: () => void;
-  fontFamily: FontFamily;
-  setFontFamily: (fontFamily: FontFamily) => void;
-  fontSize: FontSize;
-  setFontSize: (fontSize: FontSize) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
-  setTheme: () => {},
-  setThemePreference: () => {},
-  toggleTheme: () => {},
-  fontFamily: 'inter',
-  setFontFamily: () => {},
-  fontSize: 'medium',
-  setFontSize: () => {}
-});
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('light');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
-  const [fontSize, setFontSize] = useState<FontSize>('medium');
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ 
+  children 
+}) => {
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Récupérer le thème du localStorage s'il existe
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    return savedTheme || 'system';
+  });
 
-  const setThemePreference = (newTheme: Theme) => {
-    setTheme(newTheme);
-  };
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
-  };
+  useEffect(() => {
+    const root = window.document.documentElement;
+    
+    // Enregistrer la préférence dans localStorage
+    localStorage.setItem('theme', theme);
+    
+    // Appliquer la classe dark au document si nécessaire
+    if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ 
-      theme, 
-      setTheme, 
-      setThemePreference, 
-      toggleTheme,
-      fontFamily,
-      setFontFamily,
-      fontSize,
-      setFontSize
-    }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
-
-export default ThemeContext;
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    console.warn("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+};

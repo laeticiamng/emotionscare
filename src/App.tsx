@@ -11,29 +11,39 @@ import Index from '@/pages/Index';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
 import ScanPage from '@/pages/ScanPage';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const App: React.FC = () => {
   console.log("Rendering App component");
   
   return (
-    <Routes>
-      {/* Routes publiques */}
-      <Route path="/" element={<Index />} />
-      <Route path="/home" element={<HomePage />} />
-      <Route path="/business" element={<BusinessPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      
-      {/* Routes protégées */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<DashboardLayout />}>
-          {/* Tableaux de bord */}
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-          <Route path="/scan" element={<ScanPage />} />
+    <ThemeProvider>
+      <Routes>
+        {/* Routes publiques */}
+        <Route path="/" element={<Index />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/business" element={<BusinessPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Routes protégées */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            {/* Tableaux de bord */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/scan" element={<ScanPage />} />
+            {/* Ajout des routes pour les autres éléments de la sidebar */}
+            <Route path="/journal" element={<div className="p-8"><h1>Journal</h1><p>Page en construction</p></div>} />
+            <Route path="/music" element={<div className="p-8"><h1>Musicothérapie</h1><p>Page en construction</p></div>} />
+            <Route path="/audio" element={<div className="p-8"><h1>Audio</h1><p>Page en construction</p></div>} />
+            <Route path="/video" element={<div className="p-8"><h1>Vidéothérapie</h1><p>Page en construction</p></div>} />
+            <Route path="/profile" element={<div className="p-8"><h1>Profil</h1><p>Page en construction</p></div>} />
+            <Route path="/settings" element={<div className="p-8"><h1>Paramètres</h1><p>Page en construction</p></div>} />
+          </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </ThemeProvider>
   );
 };
 

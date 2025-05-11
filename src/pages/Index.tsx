@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   
   const handleLoginClick = () => {
     navigate('/login');
@@ -28,6 +28,8 @@ const Index = () => {
     }
   };
   
+  console.log("Rendering Index page, isAuthenticated:", isAuthenticated, "user:", user?.name);
+
   return (
     <Shell>
       <div className="container px-4 py-8 mx-auto">
