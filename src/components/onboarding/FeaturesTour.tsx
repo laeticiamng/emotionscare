@@ -187,7 +187,7 @@ const FeaturesTour: React.FC<FeaturesTourProps> = ({
             <FeatureCard 
               title="Sessions VR" 
               description="Immergez-vous dans des expériences de réalité virtuelle apaisantes."
-              icon={VrHeadset}
+              icon={Headset}
               id="vr"
               selected={selectedFeatures.includes('vr')}
               onSelect={handleFeatureSelect}
