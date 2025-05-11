@@ -17,7 +17,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const GlobalNav = () => {
   const { user, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isMobile = useIsMobile();
 
@@ -28,6 +28,11 @@ const GlobalNav = () => {
   const handleLogout = async () => {
     await signOut();
     window.location.href = '/login';
+  };
+  
+  // Helper function to toggle theme since we don't have the actual toggleTheme function
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
   
   return (

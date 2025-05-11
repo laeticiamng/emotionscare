@@ -1,4 +1,28 @@
 
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  album?: string;
+  url: string;
+  duration: number;
+  coverUrl?: string;
+  coverImage?: string; // Added missing property
+  genre?: string; // Added missing property
+  mood?: string; // Added for compatibility
+  emotion?: string; // Added for compatibility
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  description: string;
+  coverUrl: string;
+  emotion?: string; // Added for compatibility
+  mood?: string; // Added for compatibility
+  tracks: MusicTrack[];
+}
+
 export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
@@ -36,3 +60,35 @@ export interface MusicContextType {
   initializeMusicSystem?: () => Promise<void>;
   currentPlaylist?: MusicPlaylist;
 }
+
+export interface Playlist {
+  id: string;
+  name: string;
+  title: string;
+  emotion: string;
+  tracks: MusicTrack[];
+}
+
+export interface MusicDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  playlist?: MusicPlaylist;
+}
+
+export interface Toast {
+  title: string;
+  description?: string;
+  variant?: 'default' | 'destructive';
+  action?: React.ReactNode;
+  duration?: number; // Added missing property
+}
+
+export interface ChatResponse {
+  text: string;
+  follow_up_questions?: string[]; // Added missing property
+  suggestions?: string[];
+  sentiment?: string;
+}
+
+// Export other types that might be needed
+export type { MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps };

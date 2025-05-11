@@ -1,6 +1,6 @@
 
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'default' | 'serif' | 'mono' | 'inter';
+export type FontSize = 'small' | 'medium' | 'large' | string;
+export type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | string;
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type Theme = ThemeName; // Make them the same type to avoid assignment errors
 
@@ -33,9 +33,11 @@ export const defaultUserPreferences: UserPreferencesState = {
   notificationSound: true,
   language: 'fr',
   privacy: 'private',
+  privacyLevel: 'private', // Added for compatibility
   showEmotionPrompts: true,
   notification_frequency: 'daily',
   notification_type: 'push',
   notification_tone: 'friendly',
-  emotionalCamouflage: false
+  emotionalCamouflage: false,
+  font: 'default' // Added for compatibility
 };
