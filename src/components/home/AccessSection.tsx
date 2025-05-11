@@ -3,8 +3,11 @@ import React from 'react';
 import { User, Building, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const AccessSection: React.FC = () => {
+  const navigate = useNavigate();
+  
   return (
     <motion.section 
       className="mb-16 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 shadow-lg"
@@ -29,7 +32,7 @@ const AccessSection: React.FC = () => {
               Accédez à votre espace personnel pour prendre soin de votre bien-être émotionnel
             </p>
             <Button 
-              onClick={() => window.location.href = '/login'}
+              onClick={() => navigate('/login')}
               size="lg" 
               className="w-full bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white shadow-md"
             >
@@ -49,7 +52,7 @@ const AccessSection: React.FC = () => {
               Solutions de bien-être émotionnel pour vos équipes et votre organisation
             </p>
             <Button 
-              onClick={() => window.location.href = '/business'}
+              onClick={() => navigate('/business')}
               size="lg" 
               variant="outline"
               className="w-full border-2 border-indigo-600 text-indigo-700 dark:border-indigo-400 dark:text-indigo-300 shadow-sm"

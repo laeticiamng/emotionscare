@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
@@ -7,6 +8,7 @@ import AdminPremiumDashboard from '@/pages/AdminPremiumDashboard';
 import OrganizationPage from '@/pages/admin/OrganizationPage';
 import PredictiveBurnoutPage from '@/pages/admin/PredictiveBurnoutPage';
 import CustomReportsPage from '@/pages/admin/CustomReportsPage';
+import BusinessPage from '@/pages/BusinessPage';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +20,7 @@ const App: React.FC = () => {
       <Route path="/admin/organization" element={<OrganizationPage />} />
       <Route path="/admin/burnout" element={<PredictiveBurnoutPage />} />
       <Route path="/admin/reports" element={<CustomReportsPage />} />
+      <Route path="/business" element={<BusinessPage />} />
       {/* Add additional routes as needed */}
     </Routes>
   );
