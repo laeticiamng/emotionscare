@@ -31,12 +31,17 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
       return <Laptop className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
     }
     
-    // For light theme or system preference resulting in light
-    if (theme === 'light' || (theme === 'system' && resolvedTheme === 'light')) {
+    // For light theme
+    if (theme === 'light') {
       return <Sun className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
     }
     
-    // Default to dark theme icon
+    // For dark theme
+    if (theme === 'dark') {
+      return <Moon className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
+    }
+    
+    // Default icon (pastel or any other theme)
     return <Moon className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
   };
   
