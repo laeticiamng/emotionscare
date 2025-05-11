@@ -4,9 +4,29 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { User, Shield, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 const BusinessPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const handleUserAccess = () => {
+    // Normalement, ceci demanderait l'authentification, mais pour la démo on redirige directement
+    navigate('/dashboard');
+    toast({
+      title: "Accès collaborateur",
+      description: "Bienvenue dans votre espace collaborateur"
+    });
+  };
+  
+  const handleAdminAccess = () => {
+    // Pour un admin, rediriger vers le tableau de bord admin
+    navigate('/admin/dashboard');
+    toast({
+      title: "Accès administration",
+      description: "Bienvenue dans l'espace administration"
+    });
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex flex-col items-center justify-center p-4">
@@ -23,7 +43,7 @@ const BusinessPage = () => {
         
         <div className="space-y-4">
           <Button 
-            onClick={() => navigate('/dashboard')} 
+            onClick={handleUserAccess}
             className="w-full h-16 text-lg bg-blue-500 hover:bg-blue-600 shadow-md transition-all duration-300"
           >
             <User className="mr-3 h-6 w-6" />
@@ -32,7 +52,7 @@ const BusinessPage = () => {
           </Button>
           
           <Button 
-            onClick={() => navigate('/admin/dashboard')} 
+            onClick={handleAdminAccess}
             className="w-full h-16 text-lg bg-gray-800 hover:bg-gray-900 shadow-md transition-all duration-300"
             variant="default"
           >

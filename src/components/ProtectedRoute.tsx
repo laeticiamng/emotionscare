@@ -2,10 +2,16 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const { toast } = useToast();
+
+  // Pour la démo, nous considérons tout le monde comme authentifié
+  // Dans une vraie application, nous vérifierions isAuthenticated
+  const demoIsAuthenticated = true;
 
   if (isLoading) {
     return (
@@ -15,7 +21,12 @@ const ProtectedRoute: React.FC = () => {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!demoIsAuthenticated) {
+    toast({
+      title: "Accès refusé",
+      description: "Veuillez vous connecter pour accéder à cette page",
+      variant: "destructive"
+    });
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -12,7 +12,7 @@ const DashboardLayout: React.FC = () => {
   // Si l'utilisateur n'est pas authentifié, ne pas afficher la sidebar
   return (
     <div className="flex min-h-screen">
-      {isAuthenticated && !isMobile && (
+      {!isMobile && (
         <div className="w-16 md:w-64">
           <Sidebar />
         </div>

@@ -4,13 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would authenticate the user
+    // Dans une vraie application, nous authentifierions l'utilisateur
+    toast({
+      title: "Connexion réussie",
+      description: "Bienvenue sur votre tableau de bord"
+    });
     navigate('/dashboard');
   };
 
