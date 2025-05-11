@@ -43,11 +43,16 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   // Get label text based on current theme
   const getThemeLabel = () => {
     switch (theme) {
-      case 'light': return 'Mode sombre';
-      case 'dark': return 'Mode système';
-      case 'system': return 'Mode pastel';
-      case 'pastel': return 'Mode clair';
-      default: return 'Changer de thème';
+      case 'light': 
+        return 'Mode sombre';
+      case 'dark': 
+        return 'Mode système';
+      case 'system': 
+        return 'Mode pastel';
+      case 'pastel': 
+        return 'Mode clair';
+      default: 
+        return 'Changer de thème';
     }
   };
   
