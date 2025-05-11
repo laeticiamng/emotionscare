@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { fetchReports } from '@/lib/dashboardService';
-import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
 import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
 import AdminChartSection from '@/components/dashboard/admin/AdminChartSection';
 import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateCard';
@@ -15,14 +13,14 @@ const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
   const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [timePeriod, setTimePeriod] = useState<string>('7');
-  const { segment } = useSegment(); // Utiliser le contexte qui vient du parent
+  const { segment } = useSegment();
 
   // Mock data for Social Cocoon section
   const socialCocoonData = {
     totalPosts: 248,
-    moderationRate: 3.2, // Changed from blockedPercentage to moderationRate
+    moderationRate: 3.2,
     topHashtags: [
       { tag: '#bienetre', count: 42 },
       { tag: '#entraide', count: 36 },
@@ -48,25 +46,42 @@ const AdminDashboard: React.FC = () => {
     ]
   };
 
+  // Générer des données fictives pour les graphiques
   useEffect(() => {
-    async function loadDashboardData() {
-      try {
-        setIsLoading(true);
+    const generateMockData = () => {
+      setIsLoading(true);
+      
+      // Générer des données d'absentéisme
+      const absentData = [];
+      const prodData = [];
+      
+      const days = parseInt(timePeriod);
+      const today = new Date();
+      
+      for (let i = 0; i < days; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - (days - i - 1));
+        const dateStr = `${date.getDate()}/${date.getMonth() + 1}`;
         
-        // Load reports data
-        const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod));
+        // Valeurs aléatoires pour la démo
+        absentData.push({
+          date: dateStr,
+          value: Math.floor(Math.random() * 10) + 2 // Valeur entre 2 et 12
+        });
         
-        setAbsenteeismData(reportsData.absenteeism || []);
-        setProductivityData(reportsData.productivity || []);
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-      } finally {
-        setIsLoading(false);
+        prodData.push({
+          date: dateStr,
+          value: Math.floor(Math.random() * 20) + 70 // Valeur entre 70 et 90
+        });
       }
-    }
+      
+      setAbsenteeismData(absentData);
+      setProductivityData(prodData);
+      setIsLoading(false);
+    };
     
-    loadDashboardData();
-  }, [timePeriod, segment]); // Ajout de segment dans les dépendances pour recharger si le segment change
+    generateMockData();
+  }, [timePeriod, segment]);
   
   return (
     <div className="max-w-7xl mx-auto">
@@ -89,6 +104,7 @@ const AdminDashboard: React.FC = () => {
         <AdminChartSection 
           absenteeismData={absenteeismData} 
           productivityData={productivityData}
+          isLoading={isLoading}
         />
         
         {/* Emotional Climate Overview */}
@@ -96,7 +112,10 @@ const AdminDashboard: React.FC = () => {
           { date: '1/5', value: 72 },
           { date: '2/5', value: 75 },
           { date: '3/5', value: 78 },
-          { date: '4/5', value: 80 }
+          { date: '4/5', value: 80 },
+          { date: '5/5', value: 83 },
+          { date: '6/5', value: 79 },
+          { date: '7/5', value: 82 }
         ]} />
         
         {/* Social Cocoon Analytics */}
@@ -105,8 +124,6 @@ const AdminDashboard: React.FC = () => {
         {/* Gamification Summary */}
         <GamificationSummaryCard gamificationStats={gamificationData} />
       </div>
-      
-      {/* Completely removed DashboardFooter */}
     </div>
   );
 };

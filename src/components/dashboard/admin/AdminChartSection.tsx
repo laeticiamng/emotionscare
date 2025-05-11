@@ -1,52 +1,71 @@
 
 import React from 'react';
+import ChartCard from '@/components/dashboard/charts/ChartCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Layers, TrendingDown } from 'lucide-react';
-
-interface DataPoint {
-  date: string;
-  value: number;
-}
+import { BarChart3, TrendingUp } from 'lucide-react';
 
 interface AdminChartSectionProps {
-  absenteeismData: DataPoint[];
-  productivityData: DataPoint[];
+  absenteeismData: Array<{ date: string; value: number }>;
+  productivityData: Array<{ date: string; value: number }>;
+  isLoading?: boolean;
 }
 
-const AdminChartSection: React.FC<AdminChartSectionProps> = ({
-  absenteeismData,
-  productivityData
+const AdminChartSection: React.FC<AdminChartSectionProps> = ({ 
+  absenteeismData, 
+  productivityData,
+  isLoading = false
 }) => {
+  if (isLoading) {
+    return (
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Chargement des données...</CardTitle>
+        </CardHeader>
+        <CardContent className="h-80 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Si les données sont vides, afficher un message
+  if (!absenteeismData?.length || !productivityData?.length) {
+    return (
+      <Card className="col-span-2">
+        <CardHeader>
+          <CardTitle>Données non disponibles</CardTitle>
+        </CardHeader>
+        <CardContent className="h-80 flex items-center justify-center">
+          <p className="text-muted-foreground">Aucune donnée disponible pour la période sélectionnée.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center">
-            <TrendingDown className="h-5 w-5 mr-2 text-amber-500" />
-            Absentéisme
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-            Graphique d'absentéisme
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center">
-            <Layers className="h-5 w-5 mr-2 text-blue-500" />
-            Productivité
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-            Graphique de productivité
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="col-span-2">
+      <CardHeader>
+        <CardTitle>Métriques principales</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard 
+          title="Taux d'absentéisme" 
+          data={absenteeismData} 
+          icon={BarChart3}
+          valueFormat={(val) => `${val}%`}
+          trend={-1.2}
+          trendLabel="vs période précédente"
+        />
+        <ChartCard 
+          title="Productivité" 
+          data={productivityData}
+          icon={TrendingUp}
+          valueFormat={(val) => `${val}%`}
+          trend={2.1}
+          trendLabel="vs période précédente"
+        />
+      </CardContent>
+    </Card>
   );
 };
 

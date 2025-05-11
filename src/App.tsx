@@ -14,33 +14,65 @@ import PredictiveDashboardPage from '@/pages/PredictiveDashboardPage';
 import Index from '@/pages/Index';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import DashboardLayout from '@/components/DashboardLayout';
+import { UserModeProvider } from '@/contexts/UserModeContext';
+import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 
 const App: React.FC = () => {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<HomePage />} />
-      <Route path="/index" element={<Index />} />
-      <Route path="/business" element={<BusinessPage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/admin-login" element={<LoginPage />} />
-      
-      {/* Protected routes - user needs to be logged in to access */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<DashboardLayout />}>
-          {/* B2C user routes */}
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/predictive" element={<PredictiveDashboardPage />} />
-          
-          {/* B2B admin routes */}
-          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-          <Route path="/admin/premium" element={<AdminPremiumDashboard />} />
-          <Route path="/admin/organization" element={<OrganizationPage />} />
-          <Route path="/admin/burnout" element={<PredictiveBurnoutPage />} />
-          <Route path="/admin/reports" element={<CustomReportsPage />} />
+    <UserModeProvider>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/index" element={<Index />} />
+        <Route path="/business" element={<BusinessPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin-login" element={<LoginPage />} />
+        
+        {/* Protected routes - user needs to be logged in to access */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<DashboardLayout />}>
+            {/* B2C user routes */}
+            <Route path="/dashboard" element={
+              <ProtectedLayoutWrapper>
+                <DashboardPage />
+              </ProtectedLayoutWrapper>
+            } />
+            <Route path="/predictive" element={
+              <ProtectedLayoutWrapper>
+                <PredictiveDashboardPage />
+              </ProtectedLayoutWrapper>
+            } />
+            
+            {/* B2B admin routes */}
+            <Route path="/admin/dashboard" element={
+              <ProtectedLayoutWrapper>
+                <AdminDashboardPage />
+              </ProtectedLayoutWrapper>
+            } />
+            <Route path="/admin/premium" element={
+              <ProtectedLayoutWrapper>
+                <AdminPremiumDashboard />
+              </ProtectedLayoutWrapper>
+            } />
+            <Route path="/admin/organization" element={
+              <ProtectedLayoutWrapper>
+                <OrganizationPage />
+              </ProtectedLayoutWrapper>
+            } />
+            <Route path="/admin/burnout" element={
+              <ProtectedLayoutWrapper>
+                <PredictiveBurnoutPage />
+              </ProtectedLayoutWrapper>
+            } />
+            <Route path="/admin/reports" element={
+              <ProtectedLayoutWrapper>
+                <CustomReportsPage />
+              </ProtectedLayoutWrapper>
+            } />
+          </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </UserModeProvider>
   );
 };
 

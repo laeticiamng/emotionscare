@@ -4,23 +4,25 @@ import { Outlet } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Sidebar from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
+import Shell from '@/Shell';
 
 const DashboardLayout: React.FC = () => {
   const isMobile = useIsMobile();
   const { isAuthenticated } = useAuth();
 
-  // Si l'utilisateur n'est pas authentifié, ne pas afficher la sidebar
   return (
-    <div className="flex min-h-screen">
-      {!isMobile && (
-        <div className="w-16 md:w-64">
-          <Sidebar />
+    <Shell>
+      <div className="flex min-h-screen">
+        {!isMobile && (
+          <div className="w-16 md:w-64">
+            <Sidebar />
+          </div>
+        )}
+        <div className="flex-1 p-4">
+          <Outlet />
         </div>
-      )}
-      <div className="flex-1">
-        <Outlet />
       </div>
-    </div>
+    </Shell>
   );
 };
 

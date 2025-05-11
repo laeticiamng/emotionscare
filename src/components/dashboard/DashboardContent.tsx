@@ -37,7 +37,9 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   latestEmotion,
   userMode
 }) => {
-  // Specific B2B admin components would be rendered here
+  console.log('Rendering DashboardContent with userMode:', userMode);
+  
+  // Pour le mode B2B admin
   if (userMode === 'b2b-admin') {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -58,15 +60,17 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           
           <div className="group relative">
             <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
-            <PredictiveRecommendations 
-              maxRecommendations={2}
-              showControls={false}
-              className="relative transition-all hover:shadow-md group-hover:border-primary/50"
-            />
-            <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              Premium
-            </div>
+            <Card className="p-4 relative transition-all hover:shadow-md group-hover:border-primary/50">
+              <h2 className="text-xl font-semibold mb-4">Prédictions avancées</h2>
+              <div className="space-y-2">
+                <div className="p-3 bg-muted/20 rounded-md">Prédiction de pic d'absentéisme</div>
+                <div className="p-3 bg-muted/20 rounded-md">Alerte préventive burnout</div>
+              </div>
+              <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                Premium
+              </div>
+            </Card>
           </div>
         </div>
         
@@ -92,7 +96,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
     );
   }
 
-  // Render different layouts based on screen size and preferences
+  // Pour les modes utilisateurs
+  // Render différents layouts basés sur la taille de l'écran et les préférences
   if (isMobile) {
     return (
       <div className="space-y-8">
@@ -209,14 +214,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         
         <div className="group relative">
           <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
-          <PredictiveRecommendations 
-            maxRecommendations={3}
-            className="relative transition-all hover:shadow-md group-hover:border-primary/50"
-          />
-          <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-            <Sparkles className="h-3 w-3" />
-            Premium
-          </div>
+          <Card className="p-4 relative transition-all hover:shadow-md group-hover:border-primary/50">
+            <h2 className="text-xl font-semibold mb-4">Prédictions personnalisées</h2>
+            <div className="space-y-2">
+              <div className="p-3 bg-muted/20 rounded-md">Recommandation d'activité: Méditation guidée</div>
+              <div className="p-3 bg-muted/20 rounded-md">Alerte: Risque de stress détecté pour mardi</div>
+              <div className="p-3 bg-muted/20 rounded-md">Suggestion: Planifier une pause à 15h30</div>
+            </div>
+            <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Premium
+            </div>
+          </Card>
         </div>
         
         <TrendCharts 

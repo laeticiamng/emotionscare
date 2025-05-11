@@ -5,13 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import { User, Shield, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 const BusinessPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { setUserMode } = useUserMode();
   
   const handleUserAccess = () => {
-    // Normalement, ceci demanderait l'authentification, mais pour la démo on redirige directement
+    // Définir le mode utilisateur comme collaborateur B2B
+    setUserMode('b2b-collaborator');
+    // Redirection vers le tableau de bord utilisateur
     navigate('/dashboard');
     toast({
       title: "Accès collaborateur",
@@ -20,7 +24,9 @@ const BusinessPage = () => {
   };
   
   const handleAdminAccess = () => {
-    // Pour un admin, rediriger vers le tableau de bord admin
+    // Définir le mode utilisateur comme admin B2B
+    setUserMode('b2b-admin');
+    // Redirection vers le tableau de bord admin
     navigate('/admin/dashboard');
     toast({
       title: "Accès administration",
