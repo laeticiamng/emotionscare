@@ -1,102 +1,113 @@
 
-import { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserPreferences, UserPreferencesState } from '@/types';
+import { useState } from 'react';
+import { useToast } from './use-toast';
 
-export const usePreferences = (): UserPreferencesState => {
-  const { user, updateUser } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export interface UserPreferences {
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  theme?: 'light' | 'dark' | 'system';
+  fontSize?: 'small' | 'medium' | 'large';
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+  language?: string;
+  autoPlay?: boolean;
+  journalReminders?: boolean;
+  audioQuality?: 'low' | 'medium' | 'high';
+}
 
-  // Get preferences from user or set defaults
-  const defaultPreferences: UserPreferences = {
-    theme: 'light',
-    fontSize: 'medium',
-    language: 'fr',
-    notifications: true,
-    autoplayVideos: true,
-    showEmotionPrompts: true,
-    privacyLevel: 'medium',
-    dataCollection: true,
+export function usePreferences() {
+  // Dans une app réelle, ceci viendrait de l'API ou du stockage local
+  const [preferences, setPreferences] = useState<UserPreferences>({
     notifications_enabled: true,
-    email_notifications: true,
+    email_notifications: false,
     push_notifications: true,
+    theme: 'system',
+    fontSize: 'medium',
     emotionalCamouflage: false,
-    aiSuggestions: false,
-    fullAnonymity: false
-  };
+    aiSuggestions: true,
+    fullAnonymity: false,
+    language: 'fr',
+    autoPlay: false,
+    journalReminders: true,
+    audioQuality: 'high'
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  const preferences = user?.preferences || defaultPreferences;
-
-  const updatePreferences = useCallback(async (newPrefs: Partial<UserPreferences>): Promise<boolean> => {
-    if (!user) return false;
-    
+  const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
     setIsLoading(true);
-    setError(null);
     
     try {
-      const updatedPreferences = {
+      // Simuler un appel d'API
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setPreferences({
         ...preferences,
         ...newPrefs
-      };
-      
-      await updateUser({
-        ...user,
-        preferences: updatedPreferences
       });
-      return true;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update preferences');
-      console.error('Error updating preferences:', err);
-      return false;
+      
+      toast({
+        title: "Préférences mises à jour",
+        description: "Vos préférences ont été enregistrées avec succès"
+      });
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour vos préférences",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [user, preferences, updateUser]);
+  };
 
-  const resetPreferences = useCallback(() => {
-    if (!user) return;
-    
+  const resetToDefaults = async () => {
     setIsLoading(true);
-    setError(null);
     
     try {
-      updatePreferences(defaultPreferences);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reset preferences');
-      console.error('Error resetting preferences:', err);
+      // Simuler un appel d'API
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setPreferences({
+        notifications_enabled: true,
+        email_notifications: false,
+        push_notifications: true,
+        theme: 'system',
+        fontSize: 'medium',
+        emotionalCamouflage: false,
+        aiSuggestions: true,
+        fullAnonymity: false,
+        language: 'fr',
+        autoPlay: false,
+        journalReminders: true,
+        audioQuality: 'high'
+      });
+      
+      toast({
+        title: "Réinitialisation réussie",
+        description: "Vos préférences ont été réinitialisées aux valeurs par défaut"
+      });
+    } catch (error) {
+      console.error('Error resetting preferences:', error);
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser vos préférences",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [user, updatePreferences, defaultPreferences]);
-
-  // Derive legacy properties for backward compatibility
-  const theme = preferences.theme;
-  const fontSize = preferences.fontSize;
-  const notifications_enabled = preferences.notifications_enabled || preferences.notifications;
-  const notification_frequency = preferences.notification_frequency || preferences.notificationFrequency;
-  const notification_type = preferences.notification_type || preferences.notificationType;
-  const notification_tone = preferences.notification_tone || preferences.notificationTone;
-  const email_notifications = preferences.email_notifications;
-  const push_notifications = preferences.push_notifications;
-  const emotionalCamouflage = preferences.emotionalCamouflage;
+  };
 
   return {
     preferences,
     isLoading,
-    error,
     updatePreferences,
-    resetPreferences,
-    theme,
-    fontSize,
-    notifications_enabled,
-    notification_frequency,
-    notification_type,
-    notification_tone,
-    email_notifications,
-    push_notifications,
-    emotionalCamouflage
+    resetToDefaults
   };
-};
-
-export default usePreferences;
+}

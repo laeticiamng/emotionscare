@@ -21,6 +21,13 @@ import { MusicProvider } from '@/contexts/MusicContext';
 import OnboardingPage from './pages/OnboardingPage';
 import OnboardingModePage from './pages/OnboardingModePage';
 import OnboardingExperiencePage from './pages/OnboardingExperiencePage';
+import VideoTherapyPage from './pages/VideoTherapyPage';
+import AudioPage from './pages/AudioPage';
+import Profile from './pages/Profile';
+import SettingsPage from './pages/SettingsPage';
+import JournalPage from './pages/JournalPage';
+import JournalNewPage from './pages/JournalNewPage';
+import JournalEntryPage from './pages/JournalEntryPage';
 
 const App: React.FC = () => {
   console.log("Rendering App component");
@@ -50,17 +57,19 @@ const App: React.FC = () => {
               <Route path="/settings/immersive" element={<ImmersiveSettingsPage />} />
               <Route path="/settings/user" element={<UserSettingsPage />} />
               
-              {/* Ajout des routes pour les autres éléments de la sidebar */}
-              <Route path="/journal" element={<div className="p-8"><h1>Journal</h1><p>Page en construction</p></div>} />
+              {/* Pages principales */}
+              <Route path="/journal" element={<JournalPage />} />
+              <Route path="/journal/new" element={<JournalNewPage />} />
+              <Route path="/journal/:id" element={<JournalEntryPage />} />
               <Route path="/music" element={<MusicTherapyPage />} />
-              <Route path="/audio" element={<div className="p-8"><h1>Audio</h1><p>Page en construction</p></div>} />
-              <Route path="/video" element={<div className="p-8"><h1>Vidéothérapie</h1><p>Page en construction</p></div>} />
-              <Route path="/profile" element={<div className="p-8"><h1>Profil</h1><p>Page en construction</p></div>} />
-              <Route path="/settings" element={<div className="p-8"><h1>Paramètres</h1><p>Page en construction</p></div>} />
+              <Route path="/audio" element={<AudioPage />} />
+              <Route path="/video" element={<VideoTherapyPage />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Route>
           
-          {/* Ajoutez cette route au composant Routes */}
+          {/* Routes spéciales */}
           <Route path="/ar" element={<ARPage />} />
         </Routes>
       </MusicProvider>
