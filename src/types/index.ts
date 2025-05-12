@@ -13,17 +13,7 @@ export interface User {
   avatar_url?: string;
 }
 
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  cover?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  source?: string;
-  file?: string;
-}
+// Removed duplicate MusicTrack definition since it's now in types/music.ts
 
 export interface AudioTrack {
   id: string;
@@ -47,14 +37,7 @@ export interface VideoItem {
   coach?: string;
 }
 
-export interface JournalEntry {
-  id: string;
-  title: string;
-  content: string;
-  mood: string;
-  date: Date | string;
-  tags?: string[];
-}
+// Removed duplicate JournalEntry definition since it's now in types.ts
 
 export interface NotificationType {
   id: string;

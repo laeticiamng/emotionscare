@@ -1,3 +1,4 @@
+
 export type {
   User,
   UserPreferences,
@@ -138,12 +139,6 @@ export interface Badge {
   image_url?: string;
   icon?: string;
   threshold?: number;
-}
-
-export interface MoodData {
-  date: string;
-  value: number;
-  mood: string;
 }
 
 export interface EmotionPrediction {

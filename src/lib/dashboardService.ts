@@ -1,3 +1,4 @@
+
 /**
  * Service functions for the dashboard
  */
@@ -92,6 +93,7 @@ export const fetchPredictions = async (userId: string): Promise<EmotionPredictio
   // This is a mock implementation
   return {
     predictedEmotion: 'contentment',
+    emotion: 'contentment', // Added the required 'emotion' property
     probability: 0.8,
     confidence: 0.75,
     triggers: ['work stress', 'sleep quality', 'social interactions'],
@@ -145,7 +147,7 @@ export const getPredictiveAnalytics = async (userId: string): Promise<EmotionPre
   
   return {
     predictedEmotion: 'calm',
-    emotion: 'calm', // Added missing property
+    emotion: 'calm', // Added the required 'emotion' property
     probability: 0.85,
     confidence: 0.75,
     triggers: [

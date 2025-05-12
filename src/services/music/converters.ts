@@ -13,11 +13,11 @@ export function playlistToMusicPlaylist(rawData: any): MusicPlaylist {
     tracks: Array.isArray(rawData.tracks) 
       ? rawData.tracks.map((track: any) => trackToMusicTrack(track))
       : [],
-    category: rawData.category || '',
     coverUrl: rawData.coverUrl || rawData.cover_url || '',
     cover_url: rawData.cover_url || rawData.coverUrl || '',
     coverImage: rawData.coverImage || rawData.coverUrl || '',
-    emotion: rawData.emotion || ''
+    emotion: rawData.emotion || '',
+    category: rawData.category || ''
   };
 }
 
@@ -65,7 +65,7 @@ export function musicPlaylistToPlaylist(playlist: MusicPlaylist): any {
     name: playlist.name,
     title: playlist.title || playlist.name,
     tracks: playlist.tracks.map(musicTrackToTrack),
-    coverUrl: playlist.coverUrl || playlist.cover_url || '',
+    coverUrl: playlist.coverUrl || '',
     coverImage: playlist.coverImage || '',
     description: playlist.description,
     category: playlist.category || '',

@@ -34,8 +34,11 @@ export interface MusicPlaylist {
   title?: string;
   description?: string;
   coverUrl?: string;
+  cover_url?: string;
+  coverImage?: string;
   tracks: MusicTrack[];
   emotion?: string;
+  category?: string;
 }
 
 export interface MusicContextType {

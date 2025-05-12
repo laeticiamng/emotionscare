@@ -73,6 +73,27 @@ export const deleteJournalEntry = async (id: string): Promise<boolean> => {
   return journalEntries.length < initialLength;
 };
 
+// Save a journal entry (creates or updates)
+export const saveJournalEntry = async (entry: Partial<JournalEntry> & { user_id: string }): Promise<JournalEntry> => {
+  if (entry.id) {
+    const updatedEntry = await updateJournalEntry(entry.id, entry);
+    if (updatedEntry) return updatedEntry;
+  }
+  
+  // If update failed or no ID provided, create new entry
+  return createJournalEntry({
+    id: entry.id || Math.random().toString(36).substring(2, 9),
+    title: entry.title || 'Nouvelle entrée',
+    content: entry.content || '',
+    mood: entry.mood || 'neutral',
+    date: entry.date || new Date().toISOString(),
+    user_id: entry.user_id,
+    tags: entry.tags || [],
+    mood_score: entry.mood_score,
+    emotion: entry.emotion
+  } as JournalEntry);
+};
+
 // Get AI feedback for an entry
 export const getAIFeedback = async (content: string): Promise<string> => {
   // This would be an API call to an AI service in a real app
