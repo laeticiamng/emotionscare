@@ -14,6 +14,8 @@ export interface ThemeContextType {
   setFontFamily?: (family: FontFamily) => void;
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  resolvedTheme?: Theme; // Added property
+  setThemePreference?: (theme: Theme) => void; // Added property
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -23,6 +25,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [fontSize, setFontSize] = useState<FontSize>('medium');
   const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [resolvedTheme, setResolvedTheme] = useState<Theme>('light');
 
   useEffect(() => {
     // Get saved preferences from localStorage or system
@@ -37,8 +40,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Set initial dark mode based on theme
     if (savedTheme === 'dark') {
       setIsDarkMode(true);
+      setResolvedTheme('dark');
     } else if (savedTheme === 'system') {
-      setIsDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(systemDark);
+      setResolvedTheme(systemDark ? 'dark' : 'light');
+    } else {
+      setResolvedTheme(savedTheme);
     }
   }, []);
 
@@ -50,12 +58,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.classList.add(systemDark ? 'dark' : 'light');
       setIsDarkMode(systemDark);
+      setResolvedTheme(systemDark ? 'dark' : 'light');
     } else if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDarkMode(true);
+      setResolvedTheme('dark');
     } else {
       document.documentElement.classList.add('light');
       setIsDarkMode(false);
+      setResolvedTheme(theme);
     }
     
     // Save to localStorage
@@ -92,6 +103,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTheme(isDarkMode ? 'light' : 'dark');
   };
 
+  // Adding setThemePreference as an alias for setTheme for compatibility
+  const setThemePreference = (newTheme: Theme) => {
+    setTheme(newTheme);
+  };
+
   return (
     <ThemeContext.Provider 
       value={{ 
@@ -102,7 +118,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         fontFamily, 
         setFontFamily, 
         isDarkMode, 
-        toggleDarkMode 
+        toggleDarkMode,
+        resolvedTheme,
+        setThemePreference
       }}
     >
       {children}

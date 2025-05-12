@@ -16,7 +16,6 @@ const DesignSystemPage: React.FC = () => {
   const themeContext = useTheme();
   const theme = themeContext?.theme || 'light';
   const setTheme = themeContext?.setTheme || (() => {});
-  const setThemePreference = themeContext?.setThemePreference || setTheme;
 
   return (
     <div className="container mx-auto py-8 space-y-8 animate-fade-in">

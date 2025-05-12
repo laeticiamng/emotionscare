@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom';
 import MainNavbar from './navigation/MainNavbar';
 import MainFooter from './navigation/MainFooter';
 
-// Define the props interface
 interface ShellProps {
   children?: React.ReactNode;
 }

@@ -11,10 +11,10 @@ interface PremiumAdminHeaderProps {
 }
 
 const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({ user }) => {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme, isDarkMode } = useTheme();
   
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'light' ? 'dark' : 'light');
+    setTheme(isDarkMode ? 'light' : 'dark');
   };
   
   return (
@@ -36,7 +36,7 @@ const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({ user }) => {
         </div>
         
         <Button variant="outline" size="icon" onClick={toggleTheme}>
-          {resolvedTheme === 'light' ? <Moon className="h-[1.2rem] w-[1.2rem]" /> : <Sun className="h-[1.2rem] w-[1.2rem]" />}
+          {isDarkMode ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
         </Button>
         
         <Button variant="outline" size="icon">

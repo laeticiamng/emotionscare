@@ -30,7 +30,7 @@ const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
     return null;
   }
   
-  const { theme, resolvedTheme, setTheme } = themeContext;
+  const { theme, setTheme } = themeContext;
   
   // Function to handle theme changes
   const handleThemeChange = (newTheme: Theme) => {

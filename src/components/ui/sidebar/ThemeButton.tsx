@@ -12,7 +12,6 @@ interface ThemeButtonProps {
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
   const themeContext = useTheme();
   const theme = themeContext?.theme || 'light';
-  const resolvedTheme = themeContext?.resolvedTheme;
   
   const toggleTheme = () => {
     if (themeContext?.setTheme) {
