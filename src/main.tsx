@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './styles/branding.css';
-import { ThemeProvider } from './components/theme/ThemeProvider';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { MusicProvider } from './contexts/MusicContext';
 import { Toaster } from './components/ui/toaster';
 import ErrorBoundary from './components/ErrorBoundary.tsx';
@@ -16,6 +16,10 @@ import { PredictiveAnalyticsProvider } from './providers/PredictiveAnalyticsProv
 import { UserModeProvider } from './contexts/UserModeContext';
 import { TooltipProvider } from './components/ui/tooltip';
 import { AuthProvider } from './contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a query client
+const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -23,22 +27,24 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <ThemeProvider>
           <TooltipProvider>
-            <MusicProvider>
-              <BrandingProvider>
-                <SoundscapeProvider>
-                  <StorytellingProvider>
-                    <UserModeProvider>
-                      <PredictiveAnalyticsProvider>
-                        <AuthProvider>
-                          <App />
-                          <Toaster />
-                        </AuthProvider>
-                      </PredictiveAnalyticsProvider>
-                    </UserModeProvider>
-                  </StorytellingProvider>
-                </SoundscapeProvider>
-              </BrandingProvider>
-            </MusicProvider>
+            <QueryClientProvider client={queryClient}>
+              <MusicProvider>
+                <BrandingProvider>
+                  <SoundscapeProvider>
+                    <StorytellingProvider>
+                      <UserModeProvider>
+                        <PredictiveAnalyticsProvider>
+                          <AuthProvider>
+                            <App />
+                            <Toaster />
+                          </AuthProvider>
+                        </PredictiveAnalyticsProvider>
+                      </UserModeProvider>
+                    </StorytellingProvider>
+                  </SoundscapeProvider>
+                </BrandingProvider>
+              </MusicProvider>
+            </QueryClientProvider>
           </TooltipProvider>
         </ThemeProvider>
       </BrowserRouter>
