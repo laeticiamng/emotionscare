@@ -1,88 +1,78 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Shell from '@/Shell';
 import PageHeader from '@/components/layout/PageHeader';
 import ARExperience from '@/components/ar/ARExperience';
-import ARVoiceInterface from '@/components/ar/ARVoiceInterface';
-import { Box, MusicIcon, Mic } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
-const ARPage: React.FC = () => {
-  const [emotionState, setEmotionState] = useState<string>('calm');
-  const [intensityState, setIntensityState] = useState<number>(50);
-  
-  // Handle commands from voice interface
-  const handleVoiceCommand = (command: string) => {
-    console.log("Voice command received in AR Page:", command);
-    
-    // You can add global command handling here if needed
+const ARPage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleExperienceComplete = () => {
+    toast({
+      title: "Expérience AR terminée",
+      description: "Votre session a été enregistrée avec succès."
+    });
   };
 
   return (
-    <div className="container mx-auto py-6 max-w-5xl">
-      <PageHeader 
-        title="Réalité Augmentée"
-        description="Expériences immersives pour votre bien-être émotionnel"
-        icon={<Box className="h-6 w-6" />}
-      />
-      
-      <div className="mt-8">
-        <Tabs defaultValue="experience" className="space-y-6">
-          <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="experience" className="flex items-center gap-2">
-              <Box className="h-4 w-4" />
-              <span className="hidden sm:inline">Expérience AR</span>
-              <span className="sm:hidden">AR</span>
-            </TabsTrigger>
-            <TabsTrigger value="voice" className="flex items-center gap-2">
-              <Mic className="h-4 w-4" />
-              <span className="hidden sm:inline">Commandes vocales</span>
-              <span className="sm:hidden">Voix</span>
-            </TabsTrigger>
-            <TabsTrigger value="music" className="flex items-center gap-2">
-              <MusicIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">Ambiance sonore</span>
-              <span className="sm:hidden">Musique</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="experience" className="space-y-6">
+    <Shell>
+      <div className="container px-4 py-6 mx-auto">
+        <PageHeader
+          title="Thérapie en Réalité Augmentée"
+          description="Immergez-vous dans un environnement thérapeutique en réalité augmentée"
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="lg:col-span-2">
             <ARExperience 
-              emotion={emotionState}
-              intensity={intensityState}
+              emotion="calm" 
+              intensity={7}
+              onComplete={handleExperienceComplete}
             />
-          </TabsContent>
-          
-          <TabsContent value="voice">
-            <ARVoiceInterface 
-              enabled={true}
-              onCommand={handleVoiceCommand} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="music">
-            <div className="space-y-4">
-              <h3 className="text-xl font-medium mb-4">Ambiance sonore</h3>
-              <p className="text-muted-foreground">
-                L'ambiance sonore s'adapte automatiquement à l'expérience AR active.
-                Utilisez les commandes vocales ou les contrôles dans l'expérience pour
-                ajuster le volume ou changer de piste.
-              </p>
-              
-              <div className="bg-muted p-4 rounded-lg">
-                <h4 className="font-medium">Commandes disponibles</h4>
-                <ul className="mt-2 space-y-1 list-disc list-inside text-sm text-muted-foreground">
-                  <li>"Lecture" - Démarrer la musique</li>
-                  <li>"Pause" - Mettre en pause</li>
-                  <li>"Plus fort" - Augmenter le volume</li>
-                  <li>"Moins fort" - Diminuer le volume</li>
-                  <li>"Suivant" - Passer à la piste suivante</li>
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Comment ça marche</CardTitle>
+                <CardDescription>
+                  Découvrez comment la réalité augmentée peut vous aider
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm list-disc pl-5">
+                  <li>Votre téléphone ou votre tablette analyse votre environnement</li>
+                  <li>Des éléments virtuels sont ajoutés en fonction de votre état émotionnel</li>
+                  <li>La musique adaptative complète l'expérience immersive</li>
+                  <li>Le suivi de vos progrès est enregistré pour adapter les futures sessions</li>
                 </ul>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full" onClick={() => navigate('/dashboard')}>
+                  Retour au tableau de bord
+                </Button>
+              </CardFooter>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Sessions précédentes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Vous n'avez pas encore de sessions AR enregistrées.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    </Shell>
   );
 };
 

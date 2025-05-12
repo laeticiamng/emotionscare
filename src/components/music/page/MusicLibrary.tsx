@@ -1,64 +1,90 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search, Plus } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Loader2, Music } from 'lucide-react';
 
 const MusicLibrary: React.FC = () => {
   const { playlists, loadPlaylistById } = useMusic();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
 
-  const filteredPlaylists = playlists.filter(playlist => 
-    playlist.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    if (playlists.length > 0 && !selectedPlaylistId) {
+      setSelectedPlaylistId(playlists[0].id);
+    }
+  }, [playlists, selectedPlaylistId]);
 
-  const handlePlaylistSelect = async (id: string) => {
-    await loadPlaylistById(id);
+  const loadPlaylist = async (id: string) => {
+    setIsLoading(true);
+    try {
+      await loadPlaylistById(id);
+      setSelectedPlaylistId(id);
+    } catch (error) {
+      console.error('Erreur lors du chargement de la playlist:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-semibold mb-4">Music Library</h2>
+    <div className="space-y-6">
+      <h3 className="text-xl font-medium">Bibliothèque musicale</h3>
       
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          className="pl-10"
-          placeholder="Search playlists..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredPlaylists.map((playlist) => (
-          <div 
-            key={playlist.id} 
-            className="bg-muted/40 hover:bg-muted/60 rounded-lg p-4 cursor-pointer transition-colors"
-            onClick={() => handlePlaylistSelect(playlist.id)}
-          >
-            <div className="aspect-square bg-muted mb-3 rounded-md flex items-center justify-center">
-              {playlist.coverUrl ? (
-                <img 
-                  src={playlist.coverUrl} 
-                  alt={playlist.title} 
-                  className="w-full h-full object-cover rounded-md" 
-                />
-              ) : (
-                <div className="text-muted-foreground">No Cover</div>
-              )}
-            </div>
-            <h3 className="font-medium">{playlist.title}</h3>
-            <p className="text-sm text-muted-foreground">{playlist.description}</p>
-          </div>
-        ))}
-        
-        <div className="bg-muted/20 border border-dashed border-muted-foreground/30 rounded-lg p-4 flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-muted/30 transition-colors">
-          <Plus className="h-10 w-10 mb-2 text-muted-foreground" />
-          <p className="text-center text-muted-foreground">Create New Playlist</p>
+      {playlists.length === 0 ? (
+        <div className="text-center py-8">
+          <Music className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <p>Aucune playlist disponible</p>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {playlists.map(playlist => (
+            <Card 
+              key={playlist.id} 
+              className={`cursor-pointer transition-all ${
+                selectedPlaylistId === playlist.id 
+                  ? 'ring-2 ring-primary ring-offset-2' 
+                  : 'hover:bg-muted/50'
+              }`}
+              onClick={() => loadPlaylist(playlist.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-16 w-16 bg-muted flex items-center justify-center rounded">
+                    {playlist.coverUrl ? (
+                      <img 
+                        src={playlist.coverUrl} 
+                        alt={playlist.title} 
+                        className="h-full w-full object-cover rounded"
+                      />
+                    ) : (
+                      <Music className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="font-medium">{playlist.title}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {playlist.tracks.length} pistes
+                    </p>
+                    {playlist.emotion && (
+                      <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                        {playlist.emotion}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+      
+      {isLoading && (
+        <div className="flex justify-center">
+          <Loader2 className="h-6 w-6 text-primary animate-spin" />
+        </div>
+      )}
     </div>
   );
 };
