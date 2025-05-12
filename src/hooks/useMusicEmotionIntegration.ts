@@ -1,102 +1,59 @@
 
-import { useCallback, useState } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useState } from 'react';
 
-interface EmotionMusicParams {
+// Interface pour les paramètres envoyés vers le service de musique
+export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
+  // Nous retirons la propriété 'confidence' car elle n'est pas utilisée
 }
 
-interface MusicEmotionMapping {
-  emotion: string;
-  description: string;
-  intensity: number;
-}
+// Descriptions des musiques par émotion
+const musicDescriptions: Record<string, string> = {
+  happy: "Des mélodies joyeuses et dynamiques pour amplifier votre bonne humeur.",
+  sad: "Des compositions apaisantes qui vous aideront à traverser ce moment difficile.",
+  angry: "De la musique équilibrante pour canaliser votre énergie et retrouver le calme.",
+  anxious: "Des sonorités douces et relaxantes pour apaiser votre anxiété.",
+  calm: "Des ambiances paisibles pour maintenir votre état de sérénité.",
+  excited: "Des rythmes entraînants pour accompagner votre enthousiasme.",
+  neutral: "Une sélection équilibrée adaptée à votre humeur neutre.",
+};
 
-export function useMusicEmotionIntegration() {
+export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { 
-    loadPlaylistForEmotion, 
-    currentPlaylist,
-    setOpenDrawer 
-  } = useMusic();
+  const [lastPlayedEmotion, setLastPlayedEmotion] = useState<string | null>(null);
 
-  const emotionToMusicMap: Record<string, MusicEmotionMapping> = {
-    happy: {
-      emotion: 'happy',
-      description: 'Musique joyeuse et légère pour accompagner votre bonne humeur',
-      intensity: 70
-    },
-    calm: {
-      emotion: 'calm',
-      description: 'Sons apaisants pour maintenir votre tranquillité d\'esprit',
-      intensity: 30
-    },
-    focused: {
-      emotion: 'focused',
-      description: 'Rythmes doux et réguliers pour soutenir votre concentration',
-      intensity: 50
-    },
-    energetic: {
-      emotion: 'energetic',
-      description: 'Mélodies dynamiques pour amplifier votre énergie',
-      intensity: 80
-    },
-    tired: {
-      emotion: 'calm',
-      description: 'Sons relaxants pour vous aider à vous ressourcer',
-      intensity: 20
-    },
-    stressed: {
-      emotion: 'calm',
-      description: 'Musique apaisante pour diminuer votre niveau de stress',
-      intensity: 40
-    },
-    sad: {
-      emotion: 'melancholic',
-      description: 'Mélodies douces et compréhensives pour accompagner vos émotions',
-      intensity: 40
-    },
-    melancholic: {
-      emotion: 'melancholic',
-      description: 'Ambiances sonores réconfortantes pour la réflexion et l\'introspection',
-      intensity: 30
-    }
-  };
-
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams) => {
-    const { emotion, intensity = 50 } = params;
-    
+  // Fonction pour activer la musique correspondante à l'émotion
+  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<boolean> => {
     setIsLoading(true);
     
     try {
-      const mappedEmotion = emotionToMusicMap[emotion]?.emotion || emotion;
-      const playlist = await loadPlaylistForEmotion(mappedEmotion);
+      // Simulation de l'appel API - à remplacer par un vrai appel API
+      console.log(`Activating music for emotion: ${params.emotion} with intensity: ${params.intensity}`);
       
-      if (playlist) {
-        // Open the music drawer
-        setOpenDrawer(true);
-      }
+      // Simuler un délai de traitement
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      return playlist;
+      setLastPlayedEmotion(params.emotion);
+      return true;
     } catch (error) {
-      console.error('Error activating music for emotion:', error);
-      return null;
+      console.error("Error activating music for emotion:", error);
+      return false;
     } finally {
       setIsLoading(false);
     }
-  }, [loadPlaylistForEmotion, setOpenDrawer, emotionToMusicMap]);
+  };
 
-  const getEmotionMusicDescription = useCallback((emotion: string): string => {
-    return emotionToMusicMap[emotion]?.description || 
-      'Musique adaptée à votre humeur actuelle';
-  }, [emotionToMusicMap]);
+  // Obtenir la description de la musique pour une émotion
+  const getEmotionMusicDescription = (emotion: string): string => {
+    return musicDescriptions[emotion.toLowerCase()] || 
+      "Une musique spécialement sélectionnée pour s'accorder à votre état émotionnel actuel.";
+  };
 
   return {
     activateMusicForEmotion,
-    isLoading,
-    currentPlaylist,
     getEmotionMusicDescription,
-    emotionMusicMappings: emotionToMusicMap
+    isLoading,
+    lastPlayedEmotion
   };
-}
+};

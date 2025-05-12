@@ -1,94 +1,97 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { UserPreferences, ThemeName, FontFamily, FontSize, NotificationFrequency, NotificationTone } from '@/types/user';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
+import { UserPreferences } from '@/types/user';
+import { useTheme } from '@/contexts/ThemeContext';
 
-const defaultPreferences: UserPreferences = {
-  theme: 'system',
-  notifications: true,
-  language: 'fr',
-  privacy: 'private',
-  fontSize: 'medium',
-  email_notifications: true,
-  push_notifications: true,
-  notifications_enabled: true,
-  autoplayVideos: true,
-  dataCollection: true,
-  showEmotionPrompts: true,
-  notification_frequency: 'medium',
-  notification_type: 'email',
-  notification_tone: 'friendly',
-  emotionalCamouflage: false,
-};
-
-export const usePreferences = () => {
-  const { user, updateUser } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>(user?.preferences || defaultPreferences);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+export function usePreferences() {
+  const themeContext = useTheme();
+  
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    theme: themeContext?.theme || 'system',
+    fontSize: 'medium',
+    fontFamily: 'inter',
+    language: 'fr',
+    notifications: true,
+    soundEnabled: true
+  });
+  
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
   useEffect(() => {
-    if (user?.preferences) {
-      setPreferences(user.preferences);
-    } else {
-      setPreferences(defaultPreferences);
-    }
-  }, [user?.preferences]);
+    // Dans une vraie application, charger depuis une API
+    const loadPreferences = async () => {
+      try {
+        // Simuler un délai de chargement
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Récupérer les préférences depuis le localStorage
+        const storedPreferences = localStorage.getItem('userPreferences');
+        if (storedPreferences) {
+          setPreferences(JSON.parse(storedPreferences));
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des préférences:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadPreferences();
+  }, []);
   
-  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
-    if (!user) return;
-    
-    setIsLoading(true);
-    
-    const currentPreferences = user.preferences || {};
-    
-    // Fixed spread operation
-    const updatedPreferences = {
-      ...currentPreferences,
-      ...newPreferences
-    } as UserPreferences;
-    
+  // Mettre à jour les préférences
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
     try {
-      await updateUser({
-        ...user,
-        preferences: updatedPreferences
-      });
+      const updatedPreferences = { ...preferences, ...newPreferences };
+      
+      // Dans une vraie application, envoyer à une API
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Mettre à jour le thème si nécessaire
+      if (newPreferences.theme && themeContext) {
+        themeContext.setTheme(newPreferences.theme);
+      }
+      
+      // Mettre à jour la taille de police si nécessaire
+      if (newPreferences.fontSize && themeContext && themeContext.setFontSize) {
+        themeContext.setFontSize(newPreferences.fontSize);
+      }
+      
+      // Mettre à jour la famille de police si nécessaire
+      if (newPreferences.fontFamily && themeContext && themeContext.setFontFamily) {
+        themeContext.setFontFamily(newPreferences.fontFamily);
+      }
+      
+      // Sauvegarder dans le localStorage
+      localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
       setPreferences(updatedPreferences);
+      
+      return true;
     } catch (error) {
-      console.error('Failed to update preferences:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('Erreur lors de la mise à jour des préférences:', error);
+      return false;
     }
-  }, [user, updateUser]);
-  
-  const setTheme = (theme: ThemeName) => {
-    updatePreferences({ theme });
   };
   
-  const setFontSize = (fontSize: FontSize) => {
-    updatePreferences({ fontSize });
-  };
-  
-  const setFontFamily = (fontFamily: FontFamily) => {
-    updatePreferences({ fontFamily });
-  };
-  
-  const setNotificationFrequency = (notification_frequency: NotificationFrequency) => {
-    updatePreferences({ notification_frequency });
-  };
-  
-  const setNotificationTone = (notification_tone: NotificationTone) => {
-    updatePreferences({ notification_tone });
+  // Réinitialiser les préférences aux valeurs par défaut
+  const resetPreferences = async () => {
+    const defaultPreferences: UserPreferences = {
+      theme: 'system',
+      fontSize: 'medium',
+      fontFamily: 'inter',
+      language: 'fr',
+      notifications: true,
+      soundEnabled: true
+    };
+    
+    return updatePreferences(defaultPreferences);
   };
   
   return {
     preferences,
-    isLoading,
-    setTheme,
-    setFontSize,
-    setFontFamily,
-    setNotificationFrequency,
-    setNotificationTone,
-    updatePreferences
+    updatePreferences,
+    resetPreferences,
+    isLoading
   };
-};
+}
