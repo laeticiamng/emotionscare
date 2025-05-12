@@ -14,39 +14,46 @@ import { StorytellingProvider } from './providers/StorytellingProvider';
 import { BrandingProvider } from './contexts/BrandingContext';
 import { PredictiveAnalyticsProvider } from './providers/PredictiveAnalyticsProvider';
 import { UserModeProvider } from './contexts/UserModeContext';
-import { TooltipProvider } from './components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Create a query client
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <ThemeProvider>
-          <TooltipProvider>
-            <QueryClientProvider client={queryClient}>
-              <MusicProvider>
-                <BrandingProvider>
-                  <SoundscapeProvider>
-                    <StorytellingProvider>
-                      <UserModeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <TooltipProvider>
+              <AuthProvider>
+                <UserModeProvider>
+                  <BrandingProvider>
+                    <SoundscapeProvider>
+                      <StorytellingProvider>
                         <PredictiveAnalyticsProvider>
-                          <AuthProvider>
+                          <MusicProvider>
                             <App />
                             <Toaster />
-                          </AuthProvider>
+                          </MusicProvider>
                         </PredictiveAnalyticsProvider>
-                      </UserModeProvider>
-                    </StorytellingProvider>
-                  </SoundscapeProvider>
-                </BrandingProvider>
-              </MusicProvider>
-            </QueryClientProvider>
-          </TooltipProvider>
-        </ThemeProvider>
+                      </StorytellingProvider>
+                    </SoundscapeProvider>
+                  </BrandingProvider>
+                </UserModeProvider>
+              </AuthProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
       </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>,

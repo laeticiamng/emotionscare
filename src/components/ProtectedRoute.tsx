@@ -28,7 +28,10 @@ const ProtectedRoute: React.FC = () => {
   }
   
   // Si l'utilisateur est authentifié mais n'a pas encore complété l'onboarding (si nécessaire)
-  if (isAuthenticated && user && !user.onboarded && !location.pathname.includes('/onboarding')) {
+  if (isAuthenticated && user && !user.onboarded && 
+      !location.pathname.includes('/onboarding') && 
+      !location.pathname.includes('/choose-mode') && 
+      !location.pathname.includes('/onboarding-experience')) {
     console.log("User needs to complete onboarding");
     return <Navigate to="/onboarding" replace />;
   }

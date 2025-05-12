@@ -61,7 +61,11 @@ const App: React.FC = () => {
           <Route path="/journal" element={<JournalPage />} />
           <Route path="/journal/new" element={<JournalNewPage />} />
           <Route path="/journal/:id" element={<JournalEntryPage />} />
-          <Route path="/music" element={<MusicTherapyPage />} />
+          <Route path="/music" element={
+            <MusicProvider>
+              <MusicTherapyPage />
+            </MusicProvider>
+          } />
           <Route path="/audio" element={<AudioPage />} />
           <Route path="/video" element={<VideoTherapyPage />} />
           <Route path="/profile" element={<Profile />} />
