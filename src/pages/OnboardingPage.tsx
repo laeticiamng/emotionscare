@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { UserPreferences } from '@/types/user';
+import { UserPreferences } from '@/types';
 import { Theme, FontSize, FontFamily } from '@/contexts/ThemeContext';
 
 const OnboardingPage: React.FC = () => {
