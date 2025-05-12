@@ -7,12 +7,18 @@ interface EnhancedMusicVisualizerProps {
   height?: number;
   showControls?: boolean;
   className?: string;
+  mood?: string;
+  intensity?: number;
+  volume?: number;
 }
 
 const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({ 
   height = 120, 
   showControls = true,
-  className = '' 
+  className = '',
+  mood = 'neutral',
+  intensity = 50,
+  volume = 0.5
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { isPlaying, currentTrack } = useMusic();
@@ -85,6 +91,17 @@ const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
       cancelAnimationFrame(animationId);
     };
   }, [isPlaying, visualizerType]);
+
+  // Use mood to influence the visualization
+  useEffect(() => {
+    if (mood === 'calm' || mood === 'melancholic') {
+      setVisualizerType('wave');
+    } else if (mood === 'focused') {
+      setVisualizerType('circle');
+    } else {
+      setVisualizerType('bars');
+    }
+  }, [mood]);
   
   const drawBars = (
     ctx: CanvasRenderingContext2D, 

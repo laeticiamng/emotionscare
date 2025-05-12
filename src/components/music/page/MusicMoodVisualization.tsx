@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import EnhancedMusicVisualizer from './EnhancedMusicVisualizer';
+import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
 
 interface MusicMoodVisualizationProps {
   mood: string;
