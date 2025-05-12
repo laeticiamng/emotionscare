@@ -84,6 +84,33 @@ export function VRMusicIntegration({ emotion }: { emotion: string }) {
     }
   };
   
+  // Ajouter des contrôles avancés
+  const adjustVolume = (adjustment: number) => {
+    const newVolume = Math.max(0, Math.min(1, volume + adjustment));
+    setVolume(newVolume);
+    
+    toast({
+      title: "Volume ajusté",
+      description: `Niveau de volume: ${Math.round(newVolume * 100)}%`
+    });
+  };
+  
+  const toggleAudio = () => {
+    if (isPlaying) {
+      pauseTrack();
+      toast({
+        title: "Musique en pause"
+      });
+    } else if (currentTrack) {
+      playTrack(currentTrack);
+      toast({
+        title: "Musique reprise"
+      });
+    } else {
+      playMusic();
+    }
+  };
+  
   return {
     playlist,
     playMusic,
@@ -95,6 +122,10 @@ export function VRMusicIntegration({ emotion }: { emotion: string }) {
     isPlaying,
     currentTrack,
     volume,
-    setVolume
+    setVolume,
+    adjustVolume,
+    toggleAudio
   };
 }
+
+export default VRMusicIntegration;

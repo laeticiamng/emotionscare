@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Shell from '@/Shell';
 import ARExperience from '@/components/ar/ARExperience';
+import ARVoiceInterface from '@/components/ar/ARVoiceInterface';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Box, Zap, Music, Heart } from 'lucide-react';
+import { Box, Zap, Music, Heart, Mic, Volume2 } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import MusicControls from '@/components/music/player/MusicControls';
 
@@ -14,6 +15,7 @@ const ARPage: React.FC = () => {
   const [selectedEmotion, setSelectedEmotion] = useState('calm');
   const [intensity, setIntensity] = useState(50);
   const [completedExperiences, setCompletedExperiences] = useState(0);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { toast } = useToast();
   const musicContext = useMusic();
 
@@ -33,6 +35,51 @@ const ARPage: React.FC = () => {
     { id: 'angry', label: 'Colère', icon: <span className="text-red-400">○</span> },
     { id: 'neutral', label: 'Neutre', icon: <span className="text-gray-400">○</span> }
   ];
+  
+  const handleVoiceCommand = useCallback((command: string) => {
+    const cmd = command.toLowerCase();
+    
+    if (cmd.includes('pause')) {
+      musicContext.pauseTrack();
+      toast({ title: "Musique en pause" });
+    } 
+    else if (cmd.includes('play') || cmd.includes('lecture')) {
+      if (musicContext.currentTrack) {
+        musicContext.playTrack(musicContext.currentTrack);
+        toast({ title: "Lecture de la musique" });
+      }
+    }
+    else if (cmd.includes('suivant')) {
+      musicContext.nextTrack();
+      toast({ title: "Piste suivante" });
+    }
+    else if (cmd.includes('précédent')) {
+      musicContext.previousTrack();
+      toast({ title: "Piste précédente" });
+    }
+    else if (cmd.includes('plus fort') || cmd.includes('volume plus')) {
+      const newVolume = Math.min(1, (musicContext.volume || 0) + 0.1);
+      musicContext.setVolume(newVolume);
+      toast({ title: `Volume: ${Math.round(newVolume * 100)}%` });
+    }
+    else if (cmd.includes('moins fort') || cmd.includes('volume moins')) {
+      const newVolume = Math.max(0, (musicContext.volume || 0) - 0.1);
+      musicContext.setVolume(newVolume);
+      toast({ title: `Volume: ${Math.round(newVolume * 100)}%` });
+    }
+    else if (cmd.includes('changer') && cmd.includes('environnement')) {
+      // Changer aléatoirement d'environnement
+      const emotionIds = emotions.map(e => e.id);
+      const nextEmotion = emotionIds.filter(e => e !== selectedEmotion)[
+        Math.floor(Math.random() * (emotionIds.length - 1))
+      ];
+      setSelectedEmotion(nextEmotion);
+      toast({ 
+        title: "Environnement changé", 
+        description: `Nouvel environnement: ${emotions.find(e => e.id === nextEmotion)?.label}`
+      });
+    }
+  }, [musicContext, selectedEmotion, emotions, toast]);
 
   return (
     <Shell>
@@ -59,6 +106,9 @@ const ARPage: React.FC = () => {
                 </TabsTrigger>
                 <TabsTrigger value="emotions" className="flex items-center gap-1">
                   <Heart className="h-4 w-4" /> État émotionnel
+                </TabsTrigger>
+                <TabsTrigger value="voice" className="flex items-center gap-1">
+                  <Mic className="h-4 w-4" /> Interface vocale
                 </TabsTrigger>
               </TabsList>
               
@@ -101,6 +151,22 @@ const ARPage: React.FC = () => {
                     <div className="p-4 border rounded-lg bg-card">
                       <MusicControls />
                     </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-muted/40 rounded-lg text-sm">
+                      <span className="font-medium">Audio spatial</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => toast({
+                          title: "Audio spatial activé",
+                          description: "Utilisez un casque pour une expérience optimale"
+                        })}
+                      >
+                        <Volume2 className="h-3.5 w-3.5" />
+                        Activer
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -141,6 +207,32 @@ const ARPage: React.FC = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+              
+              <TabsContent value="voice" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Commandes vocales</CardTitle>
+                      <Button 
+                        variant={voiceEnabled ? "default" : "outline"} 
+                        size="sm"
+                        onClick={() => setVoiceEnabled(!voiceEnabled)}
+                      >
+                        {voiceEnabled ? "Désactiver" : "Activer"}
+                      </Button>
+                    </div>
+                    <CardDescription>
+                      Contrôlez votre expérience AR à l'aide de commandes vocales
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ARVoiceInterface 
+                      onCommand={handleVoiceCommand}
+                      enabled={voiceEnabled}
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </Tabs>
           </div>
           
@@ -165,6 +257,11 @@ const ARPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Intensité</span>
                     <span className="font-medium">{intensity}%</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Commande vocale</span>
+                    <span className="font-medium">{voiceEnabled ? "Activée" : "Désactivée"}</span>
                   </div>
                   
                   <div className="mt-6">

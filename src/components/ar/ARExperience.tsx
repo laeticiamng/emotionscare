@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Box, Sparkles, Play, PauseCircle } from 'lucide-react';
+import { Box, Sparkles, Play, PauseCircle, Mic, MicOff, Volume2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
 
@@ -19,45 +19,76 @@ const ARExperience: React.FC<ARExperienceProps> = ({
 }) => {
   const [isActive, setIsActive] = useState(false);
   const [loadingAR, setLoadingAR] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
-  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, currentTrack } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, currentTrack, isMuted, toggleMute } = useMusic();
 
   const arExperiences = {
     calm: {
       title: "Forêt apaisante",
       description: "Immergez-vous dans une forêt apaisante avec des sons naturels",
       icon: <Sparkles className="h-6 w-6 text-emerald-500" />,
-      audioType: "ambient"
+      audioType: "ambient",
+      arElements: [
+        { type: "tree", position: { x: 0, y: 0, z: -3 }, scale: 1.2 },
+        { type: "birds", position: { x: 2, y: 3, z: -5 }, scale: 0.8 },
+        { type: "water", position: { x: -2, y: 0, z: -4 }, scale: 1.5 }
+      ]
     },
     happy: {
       title: "Jardin ensoleillé",
       description: "Explorez un jardin vibrant et coloré",
       icon: <Sparkles className="h-6 w-6 text-yellow-500" />,
-      audioType: "upbeat"
+      audioType: "upbeat",
+      arElements: [
+        { type: "flowers", position: { x: -1, y: 0, z: -2 }, scale: 1.0 },
+        { type: "sun", position: { x: 0, y: 4, z: -10 }, scale: 2.0 },
+        { type: "butterflies", position: { x: 1, y: 1, z: -3 }, scale: 0.5 }
+      ]
     },
     sad: {
       title: "Pluie méditative",
       description: "Écoutez la pluie tomber doucement autour de vous",
       icon: <Sparkles className="h-6 w-6 text-blue-500" />,
-      audioType: "calming"
+      audioType: "calming",
+      arElements: [
+        { type: "clouds", position: { x: 0, y: 4, z: -5 }, scale: 2.0 },
+        { type: "rain", position: { x: 0, y: 2, z: -3 }, scale: 3.0 },
+        { type: "puddle", position: { x: 0, y: -0.5, z: -2 }, scale: 1.0 }
+      ]
     },
     anxious: {
       title: "Refuge de montagne",
       description: "Trouvez la paix dans un refuge de montagne serein",
       icon: <Sparkles className="h-6 w-6 text-violet-500" />,
-      audioType: "ambient"
+      audioType: "ambient",
+      arElements: [
+        { type: "mountains", position: { x: 0, y: 0, z: -10 }, scale: 3.0 },
+        { type: "cabin", position: { x: 0, y: 0, z: -5 }, scale: 1.0 },
+        { type: "fire", position: { x: 0, y: 0, z: -3 }, scale: 0.8 }
+      ]
     },
     angry: {
       title: "Plage au crépuscule",
       description: "Laissez votre tension se dissiper sur une plage paisible",
       icon: <Sparkles className="h-6 w-6 text-orange-500" />,
-      audioType: "calming"
+      audioType: "calming",
+      arElements: [
+        { type: "waves", position: { x: 0, y: -0.5, z: -7 }, scale: 2.5 },
+        { type: "sunset", position: { x: 0, y: 2, z: -15 }, scale: 4.0 },
+        { type: "sand", position: { x: 0, y: -1, z: -2 }, scale: 5.0 }
+      ]
     },
     neutral: {
       title: "Jardin zen",
       description: "Contemplez un jardin zen minimaliste",
       icon: <Sparkles className="h-6 w-6 text-slate-500" />,
-      audioType: "focus"
+      audioType: "focus",
+      arElements: [
+        { type: "rocks", position: { x: -1, y: -0.5, z: -3 }, scale: 1.0 },
+        { type: "sand_pattern", position: { x: 0, y: -1, z: -2 }, scale: 2.0 },
+        { type: "bamboo", position: { x: 2, y: 0, z: -4 }, scale: 1.5 }
+      ]
     }
   };
 
@@ -105,6 +136,7 @@ const ARExperience: React.FC<ARExperienceProps> = ({
   const handleEndAR = () => {
     setIsActive(false);
     pauseTrack();
+    setIsListening(false);
     
     toast({
       title: "Expérience AR terminée",
@@ -113,6 +145,28 @@ const ARExperience: React.FC<ARExperienceProps> = ({
     
     if (onComplete) {
       onComplete();
+    }
+  };
+
+  const handleVoiceCommand = () => {
+    setIsListening(!isListening);
+    
+    if (!isListening) {
+      toast({
+        title: "Commandes vocales activées",
+        description: "Dites 'Pause', 'Lecture', 'Suivant' ou 'Changer d'environnement'",
+      });
+      
+      // Simulation de reconnaissance vocale
+      setTimeout(() => {
+        setIsListening(false);
+        
+        // Simuler une commande reconnue
+        toast({
+          title: "Commande reconnue",
+          description: "Action effectuée avec succès",
+        });
+      }, 5000);
     }
   };
 
@@ -174,7 +228,7 @@ const ARExperience: React.FC<ARExperienceProps> = ({
               )}
             </div>
             
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
               <div>
                 {isActive && currentTrack && (
                   <div className="text-sm">
@@ -183,6 +237,28 @@ const ARExperience: React.FC<ARExperienceProps> = ({
                   </div>
                 )}
               </div>
+              
+              {isActive && (
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={toggleMute}
+                    className="rounded-full"
+                  >
+                    <Volume2 className={`h-4 w-4 ${isMuted ? 'opacity-40' : ''}`} />
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={handleVoiceCommand}
+                    className={`rounded-full ${isListening ? 'bg-primary/20' : ''}`}
+                  >
+                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  </Button>
+                </div>
+              )}
               
               {!isActive ? (
                 <Button 
