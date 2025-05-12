@@ -1,10 +1,10 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Box, Sparkles, Play, PauseCircle, Mic, MicOff, Volume2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
+import VoiceCommandListener from './VoiceCommandListener';
 
 interface ARExperienceProps {
   emotion?: string;
@@ -19,9 +19,8 @@ const ARExperience: React.FC<ARExperienceProps> = ({
 }) => {
   const [isActive, setIsActive] = useState(false);
   const [loadingAR, setLoadingAR] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
-  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, currentTrack, isMuted, toggleMute } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, pauseTrack, nextTrack, isPlaying, currentTrack, isMuted, toggleMute, adjustVolume } = useMusic();
 
   const arExperiences = {
     calm: {
@@ -136,7 +135,6 @@ const ARExperience: React.FC<ARExperienceProps> = ({
   const handleEndAR = () => {
     setIsActive(false);
     pauseTrack();
-    setIsListening(false);
     
     toast({
       title: "Expérience AR terminée",
@@ -148,27 +146,50 @@ const ARExperience: React.FC<ARExperienceProps> = ({
     }
   };
 
-  const handleVoiceCommand = () => {
-    setIsListening(!isListening);
-    
-    if (!isListening) {
-      toast({
-        title: "Commandes vocales activées",
-        description: "Dites 'Pause', 'Lecture', 'Suivant' ou 'Changer d'environnement'",
-      });
-      
-      // Simulation de reconnaissance vocale
-      setTimeout(() => {
-        setIsListening(false);
-        
-        // Simuler une commande reconnue
-        toast({
-          title: "Commande reconnue",
-          description: "Action effectuée avec succès",
+  // Handle voice commands
+  const handleVoiceCommand = useCallback((command: string) => {
+    switch (command) {
+      case 'play':
+        if (currentTrack) {
+          playTrack(currentTrack);
+          toast({ title: "Lecture démarrée" });
+        }
+        break;
+      case 'pause':
+        pauseTrack();
+        toast({ title: "Lecture en pause" });
+        break;
+      case 'next':
+        nextTrack();
+        toast({ title: "Piste suivante" });
+        break;
+      case 'volumeUp':
+        adjustVolume(0.1);
+        toast({ title: "Volume augmenté" });
+        break;
+      case 'volumeDown':
+        adjustVolume(-0.1);
+        toast({ title: "Volume diminué" });
+        break;
+      case 'mute':
+      case 'unmute':
+        toggleMute();
+        toast({ title: isMuted ? "Son activé" : "Son désactivé" });
+        break;
+      case 'exit':
+        handleEndAR();
+        break;
+      case 'changeEnvironment':
+        // This would trigger environment change in a real AR experience
+        toast({ 
+          title: "Environnement changé", 
+          description: "Un nouvel environnement a été chargé" 
         });
-      }, 5000);
+        break;
+      default:
+        console.log("Commande non reconnue:", command);
     }
-  };
+  }, [currentTrack, playTrack, pauseTrack, nextTrack, adjustVolume, toggleMute, isMuted, toast, handleEndAR]);
 
   // Vérifier si l'appareil est compatible AR
   const [arSupported, setArSupported] = useState<boolean | null>(null);
@@ -249,14 +270,10 @@ const ARExperience: React.FC<ARExperienceProps> = ({
                     <Volume2 className={`h-4 w-4 ${isMuted ? 'opacity-40' : ''}`} />
                   </Button>
                   
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={handleVoiceCommand}
-                    className={`rounded-full ${isListening ? 'bg-primary/20' : ''}`}
-                  >
-                    {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  </Button>
+                  <VoiceCommandListener 
+                    isActive={isActive} 
+                    onCommand={handleVoiceCommand} 
+                  />
                 </div>
               )}
               

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
 interface VoiceCommandListenerProps {
   isActive: boolean;
@@ -10,62 +11,19 @@ interface VoiceCommandListenerProps {
 }
 
 const VoiceCommandListener: React.FC<VoiceCommandListenerProps> = ({ isActive, onCommand }) => {
-  const [isListening, setIsListening] = useState(false);
-  const [supported, setSupported] = useState<boolean | null>(null);
+  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands({
+    enabled: isActive,
+    commandCallback: onCommand
+  });
+  
   const { toast } = useToast();
   
-  // Vérifier la compatibilité de la reconnaissance vocale
+  // Pass commands to parent when recognized
   useEffect(() => {
-    setSupported('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-  }, []);
-  
-  const toggleListening = () => {
-    if (!supported || !isActive) return;
-    
-    const listening = !isListening;
-    setIsListening(listening);
-    
-    if (listening) {
-      startListening();
-    } else {
-      stopListening();
+    if (lastCommand && isActive) {
+      onCommand(lastCommand);
     }
-  };
-  
-  const startListening = () => {
-    toast({
-      title: "Commandes vocales activées",
-      description: "Dites 'Pause', 'Lecture', 'Suivant', 'Plus fort', 'Moins fort', ou 'Changer d'environnement'",
-    });
-    
-    // Dans une implémentation réelle, nous activerions l'API de reconnaissance vocale ici
-    // Pour cette démo, nous simulons une reconnaissance
-    
-    // Simuler la reconnaissance après un délai
-    const timeout = setTimeout(() => {
-      const commands = ['Pause', 'Lecture', 'Suivant', 'Plus fort', 'Moins fort', 'Changer environnement'];
-      const randomCommand = commands[Math.floor(Math.random() * commands.length)];
-      
-      onCommand(randomCommand.toLowerCase());
-      
-      toast({
-        title: "Commande reconnue",
-        description: `"${randomCommand}" - Action effectuée`,
-      });
-      
-      setIsListening(false);
-    }, 3000);
-    
-    return () => clearTimeout(timeout);
-  };
-  
-  const stopListening = () => {
-    // Dans une implémentation réelle, nous arrêterions l'API de reconnaissance vocale ici
-    toast({
-      title: "Commandes vocales désactivées",
-      description: "Mode d'écoute terminé",
-    });
-  };
+  }, [lastCommand, onCommand, isActive]);
   
   if (!supported || !isActive) return null;
   

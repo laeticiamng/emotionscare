@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mic, Volume2, Command } from 'lucide-react';
+import { Mic, Command } from 'lucide-react';
 import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
 interface ARVoiceInterfaceProps {
@@ -14,10 +14,23 @@ const ARVoiceInterface: React.FC<ARVoiceInterfaceProps> = ({
   onCommand,
   enabled = false
 }) => {
-  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands({
+  const { isListening, toggleListening, supported, lastCommand, lastTranscript } = useVoiceCommands({
     enabled,
     commandCallback: onCommand
   });
+  
+  const [expandedCommands, setExpandedCommands] = useState<boolean>(false);
+
+  // List of available commands with descriptions
+  const availableCommands = [
+    { command: "Lecture", description: "Démarrer la lecture" },
+    { command: "Pause", description: "Mettre en pause" },
+    { command: "Plus fort", description: "Augmenter le volume" },
+    { command: "Moins fort", description: "Baisser le volume" },
+    { command: "Suivant", description: "Piste suivante" },
+    { command: "Changer environnement", description: "Changer le décor AR" },
+    { command: "Quitter", description: "Terminer l'expérience" }
+  ];
   
   if (!supported || !enabled) {
     return (
@@ -56,26 +69,59 @@ const ARVoiceInterface: React.FC<ARVoiceInterfaceProps> = ({
       <CardContent>
         <div className="space-y-3">
           <div className="flex flex-wrap gap-1 text-sm">
-            <Badge variant="secondary" className="hover:bg-secondary/80 cursor-pointer" onClick={() => onCommand && onCommand('play')}>
-              "Lecture"
-            </Badge>
-            <Badge variant="secondary" className="hover:bg-secondary/80 cursor-pointer" onClick={() => onCommand && onCommand('pause')}>
-              "Pause"
-            </Badge>
-            <Badge variant="secondary" className="hover:bg-secondary/80 cursor-pointer" onClick={() => onCommand && onCommand('volume plus')}>
-              "Plus fort"
-            </Badge>
-            <Badge variant="secondary" className="hover:bg-secondary/80 cursor-pointer" onClick={() => onCommand && onCommand('volume moins')}>
-              "Moins fort"
-            </Badge>
-            <Badge variant="secondary" className="hover:bg-secondary/80 cursor-pointer" onClick={() => onCommand && onCommand('changer environnement')}>
-              "Changer environnement"
-            </Badge>
+            {!expandedCommands ? (
+              <>
+                {availableCommands.slice(0, 4).map((cmd, index) => (
+                  <Badge 
+                    key={index}
+                    variant="secondary" 
+                    className="hover:bg-secondary/80 cursor-pointer" 
+                    onClick={() => onCommand && onCommand(cmd.command.toLowerCase())}
+                  >
+                    "{cmd.command}"
+                  </Badge>
+                ))}
+                <Badge 
+                  variant="outline" 
+                  className="cursor-pointer text-xs hover:bg-accent" 
+                  onClick={() => setExpandedCommands(true)}
+                >
+                  Voir plus...
+                </Badge>
+              </>
+            ) : (
+              <>
+                {availableCommands.map((cmd, index) => (
+                  <Badge 
+                    key={index}
+                    variant="secondary" 
+                    className="hover:bg-secondary/80 cursor-pointer flex items-center gap-1" 
+                    onClick={() => onCommand && onCommand(cmd.command.toLowerCase())}
+                  >
+                    <span>"{cmd.command}"</span>
+                    <span className="text-xs text-muted-foreground hidden sm:inline">
+                      - {cmd.description}
+                    </span>
+                  </Badge>
+                ))}
+                <Badge 
+                  variant="outline" 
+                  className="cursor-pointer text-xs hover:bg-accent" 
+                  onClick={() => setExpandedCommands(false)}
+                >
+                  Voir moins
+                </Badge>
+              </>
+            )}
           </div>
           
-          {lastCommand && (
-            <div className="text-xs text-muted-foreground">
-              Dernière commande : <span className="font-medium">{lastCommand}</span>
+          {lastTranscript && (
+            <div className="text-xs bg-muted p-2 rounded-md">
+              <span className="text-muted-foreground">Vous avez dit : </span>
+              <span className="italic font-medium">"{lastTranscript}"</span>
+              {lastCommand && (
+                <span className="text-primary"> → {lastCommand}</span>
+              )}
             </div>
           )}
           

@@ -1,6 +1,8 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import createARSpeechRecognition from '@/lib/ar/speechRecognition';
+import { createVoiceCommandMatcher } from '@/lib/ar/voiceCommandMatcher';
 
 type CommandHandler = (command: string) => void;
 
@@ -9,65 +11,86 @@ interface VoiceCommandOptions {
   lang?: string;
   continuous?: boolean;
   commandCallback?: CommandHandler;
+  strictMode?: boolean;
 }
 
 export function useVoiceCommands({
   enabled = false,
-  lang = 'fr-FR',
+  lang = 'fr',
   continuous = false,
-  commandCallback
+  commandCallback,
+  strictMode = false
 }: VoiceCommandOptions = {}) {
   const [isListening, setIsListening] = useState(false);
   const [supported, setSupported] = useState<boolean | null>(null);
   const [lastCommand, setLastCommand] = useState<string | null>(null);
+  const [lastTranscript, setLastTranscript] = useState<string | null>(null);
   const { toast } = useToast();
+  const recognitionRef = useRef<any>(null);
+  const commandMatcher = useRef(createVoiceCommandMatcher({ language: lang, strictMode }));
   
-  // Vérifier si la fonctionnalité est supportée
+  // Check if speech recognition is supported
   useEffect(() => {
-    setSupported('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+    if (typeof window !== 'undefined') {
+      const isSupported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+      setSupported(isSupported);
+    }
   }, []);
   
-  // Simuler la reconnaissance vocale (dans une implémentation réelle, utiliser l'API Web Speech)
-  const simulateRecognition = useCallback((isActive: boolean) => {
-    if (isActive && enabled) {
-      // Liste de commandes possibles
-      const possibleCommands = [
-        'pause', 'play', 'lecture', 'stop', 'arrêter', 
-        'suivant', 'précédent', 'volume plus', 'volume moins',
-        'afficher', 'cacher', 'quitter'
-      ];
-      
-      console.log('Voice recognition started');
-      
-      // Simuler la reconnaissance après un court délai
-      const timeout = setTimeout(() => {
-        // En environnement de production, ce serait remplacé par une vraie reconnaissance
-        // En démo, nous choisissons aléatoirement une commande
-        if (Math.random() > 0.7) {
-          const randomCommand = possibleCommands[Math.floor(Math.random() * possibleCommands.length)];
-          setLastCommand(randomCommand);
+  // Initialize speech recognition
+  const initRecognition = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    
+    recognitionRef.current = createARSpeechRecognition({
+      language: lang === 'fr' ? 'fr-FR' : 'en-US',
+      continuous,
+      interimResults: true,
+      onResult: (result) => {
+        if (result.isFinal) {
+          setLastTranscript(result.transcript);
+          const command = commandMatcher.current.match(result.transcript);
           
-          if (commandCallback) {
-            commandCallback(randomCommand);
+          if (command) {
+            setLastCommand(command);
+            
+            if (commandCallback) {
+              commandCallback(command);
+            }
+            
+            toast({
+              title: "Commande vocale reconnue",
+              description: `"${result.transcript}" - Commande exécutée: ${command}`,
+            });
           }
-          
-          toast({
-            title: "Commande vocale reconnue",
-            description: `"${randomCommand}" - Commande exécutée`,
-          });
         }
-        
-        // Automatiquement arrêter l'écoute si non continue
+      },
+      onError: (error) => {
+        console.error('Speech recognition error:', error);
+        toast({
+          title: "Erreur de reconnaissance vocale",
+          description: error,
+          variant: "destructive"
+        });
+        setIsListening(false);
+      },
+      onStart: () => {
+        console.log('Speech recognition started');
+      },
+      onEnd: () => {
+        console.log('Speech recognition ended');
+        // Only update if we're not in continuous mode, as continuous will restart itself
         if (!continuous) {
           setIsListening(false);
         }
-      }, 2000);
-      
-      return () => clearTimeout(timeout);
-    }
-  }, [enabled, continuous, toast, commandCallback]);
+      }
+    });
+    
+    return recognitionRef.current;
+  }, [lang, continuous, commandCallback, toast]);
   
-  // Démarrer/arrêter l'écoute
+  // Toggle listening state
   const toggleListening = useCallback(() => {
     if (!supported || !enabled) return;
     
@@ -75,35 +98,39 @@ export function useVoiceCommands({
     setIsListening(newListeningState);
     
     if (newListeningState) {
+      const recognition = recognitionRef.current || initRecognition();
+      
       toast({
         title: "Commandes vocales activées",
         description: "Je vous écoute... Dites une commande",
       });
       
-      simulateRecognition(true);
-    } else {
+      recognition.start();
+    } else if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      
       toast({
         title: "Commandes vocales désactivées",
         description: "Mode d'écoute terminé",
       });
     }
-  }, [isListening, supported, enabled, toast, simulateRecognition]);
+  }, [isListening, supported, enabled, toast, initRecognition]);
   
-  // Effet pour lancer/arrêter la reconnaissance selon l'état isListening
+  // Clean up on unmount
   useEffect(() => {
-    if (isListening) {
-      const cleanupFn = simulateRecognition(true);
-      return () => {
-        if (cleanupFn) cleanupFn();
-      };
-    }
-  }, [isListening, simulateRecognition]);
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
   
   return {
     isListening,
     toggleListening,
     supported,
-    lastCommand
+    lastCommand,
+    lastTranscript
   };
 }
 
