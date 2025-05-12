@@ -1,46 +1,52 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import MusicLibrary from './MusicLibrary';
-import MusicPlayer from '../player/MusicPlayer';
-import MusicStatistics from './MusicStatistics';
-import { Music, BarChart, Library, Headphones } from 'lucide-react';
+import { Music, Library, Settings } from 'lucide-react';
 
 interface MusicTabsProps {
   activeTab: string;
-  setActiveTab: (tab: string) => void;
+  setActiveTab: (value: string) => void;
 }
 
 const MusicTabs: React.FC<MusicTabsProps> = ({ activeTab, setActiveTab }) => {
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <TabsList className="grid grid-cols-3 mb-4">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <TabsList className="grid grid-cols-3">
         <TabsTrigger value="player" className="flex items-center gap-2">
-          <Headphones className="h-4 w-4" />
-          <span className="hidden sm:inline">Lecteur</span>
+          <Music className="h-4 w-4" />
+          <span className="hidden sm:inline">Player</span>
         </TabsTrigger>
         <TabsTrigger value="library" className="flex items-center gap-2">
           <Library className="h-4 w-4" />
-          <span className="hidden sm:inline">Bibliothèque</span>
+          <span className="hidden sm:inline">Library</span>
         </TabsTrigger>
-        <TabsTrigger value="statistics" className="flex items-center gap-2">
-          <BarChart className="h-4 w-4" />
-          <span className="hidden sm:inline">Statistiques</span>
+        <TabsTrigger value="settings" className="flex items-center gap-2">
+          <Settings className="h-4 w-4" />
+          <span className="hidden sm:inline">Settings</span>
         </TabsTrigger>
       </TabsList>
-      
-      <TabsContent value="player" className="space-y-6">
-        <div className="max-w-md mx-auto">
-          <MusicPlayer />
+
+      <TabsContent value="player">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold mb-4">Music Player</h2>
+          <p className="text-muted-foreground">
+            Use the player controls below to adjust your music experience.
+          </p>
         </div>
       </TabsContent>
-      
+
       <TabsContent value="library">
         <MusicLibrary />
       </TabsContent>
-      
-      <TabsContent value="statistics">
-        <MusicStatistics />
+
+      <TabsContent value="settings">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold mb-4">Music Settings</h2>
+          <p className="text-muted-foreground">
+            Adjust your music preferences and settings here.
+          </p>
+        </div>
       </TabsContent>
     </Tabs>
   );

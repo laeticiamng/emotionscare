@@ -4,23 +4,22 @@ import React from 'react';
 interface PageTitleProps {
   title: string;
   description?: string;
-  icon?: React.ReactNode;
   actions?: React.ReactNode;
 }
 
-const PageTitle: React.FC<PageTitleProps> = ({ title, description, icon, actions }) => {
+const PageTitle: React.FC<PageTitleProps> = ({ 
+  title, 
+  description, 
+  actions 
+}) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        {icon && <div className="text-primary">{icon}</div>}
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-          {description && (
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
-          )}
-        </div>
+    <div className="flex items-start justify-between mb-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+        {description && (
+          <p className="text-muted-foreground mt-1">{description}</p>
+        )}
       </div>
-      
       {actions && (
         <div className="flex items-center gap-2">
           {actions}

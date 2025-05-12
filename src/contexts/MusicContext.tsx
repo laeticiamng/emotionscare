@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
@@ -118,7 +117,12 @@ interface MusicContextValue {
   volume: number;
   openDrawer: boolean;
   currentPlaylist: MusicPlaylist | null;
+  currentEmotion?: string;
+  isInitialized?: boolean;
+  error?: string | null;
+  playlists?: MusicPlaylist[];
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  loadPlaylistById?: (id: string) => Promise<MusicPlaylist | null>;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
@@ -128,6 +132,7 @@ interface MusicContextValue {
   setVolume: (volume: number) => void;
   adjustVolume: (adjustment: number) => void;
   setOpenDrawer: (open: boolean) => void;
+  initializeMusicSystem?: () => Promise<void>;
 }
 
 const MusicContext = createContext<MusicContextValue | undefined>(undefined);
@@ -139,6 +144,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [volume, setVolumeState] = useState(0.7);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentEmotion, setCurrentEmotion] = useState<string>('neutral');
+  const [playlists] = useState<MusicPlaylist[]>(Object.values(MOCK_PLAYLISTS));
   const { toast } = useToast();
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
 
@@ -156,6 +165,42 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
+  // Initialize the music system
+  const initializeMusicSystem = useCallback(async (): Promise<void> => {
+    try {
+      setError(null);
+      console.log('Initializing music system...');
+      // Simulate async loading
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsInitialized(true);
+      toast({
+        title: "Music system initialized",
+        description: "Ready to play music"
+      });
+    } catch (err) {
+      console.error('Error initializing music system:', err);
+      setError('Unable to initialize music system');
+      toast({
+        title: "Initialization error",
+        description: "Unable to initialize music system",
+        variant: "destructive"
+      });
+    }
+  }, [toast]);
+
+  const loadPlaylistById = useCallback(async (id: string): Promise<MusicPlaylist | null> => {
+    // In a real app, this would call an API
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Find the playlist by ID or fallback to focus
+        const playlist = Object.values(MOCK_PLAYLISTS).find(p => p.id === id) || MOCK_PLAYLISTS.focus;
+        setCurrentPlaylist(playlist);
+        setCurrentEmotion(playlist.emotion || 'neutral');
+        resolve(playlist);
+      }, 500);
+    });
+  }, []);
+
   const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
     // In a real app, this would call an API
     return new Promise((resolve) => {
@@ -167,6 +212,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         
         const playlist = MOCK_PLAYLISTS[playlistKey];
         setCurrentPlaylist(playlist);
+        setCurrentEmotion(emotion);
         resolve(playlist);
       }, 500);
     });
@@ -277,14 +323,19 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setVolume(volume + adjustment);
   }, [volume, setVolume]);
 
-  const value = {
+  const value: MusicContextValue = {
     currentTrack,
     isPlaying,
     isMuted,
     volume,
     openDrawer,
     currentPlaylist,
+    currentEmotion,
+    isInitialized,
+    error,
+    playlists: Object.values(MOCK_PLAYLISTS),
     loadPlaylistForEmotion,
+    loadPlaylistById,
     playTrack,
     pauseTrack,
     nextTrack,
@@ -293,7 +344,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     toggleMute,
     setVolume,
     adjustVolume,
-    setOpenDrawer
+    setOpenDrawer,
+    initializeMusicSystem
   };
 
   return (
