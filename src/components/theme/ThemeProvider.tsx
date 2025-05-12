@@ -1,5 +1,5 @@
 
-// Ce fichier est maintenant obsolète et redirige vers le contexte principal
+// This file is now obsolete and redirects to the main context
 import { 
   ThemeProvider, 
   useTheme, 

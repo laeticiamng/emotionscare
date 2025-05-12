@@ -1,7 +1,7 @@
 
-export type ThemeName = 'light' | 'dark' | 'system';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'system' | 'mono';
+import { Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
+
+export type ThemeName = Theme;
 export type PrivacyLevel = 'private' | 'friends' | 'public';
 export type DashboardLayout = 'compact' | 'standard' | 'expanded';
 

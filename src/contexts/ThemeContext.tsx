@@ -1,8 +1,9 @@
 
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontFamily = 'inter' | 'poppins' | 'roboto' | 'mono';
+export type FontFamily = 'inter' | 'poppins' | 'roboto' | 'mono' | 'serif' | 'montserrat' | 'default';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export interface ThemeContextType {
   theme: Theme;
@@ -11,11 +12,21 @@ export interface ThemeContextType {
   setThemePreference: (theme: Theme) => void;
   fontFamily: FontFamily;
   setFontFamily: (fontFamily: FontFamily) => void;
-  fontSize: 'small' | 'medium' | 'large';
-  setFontSize: (size: 'small' | 'medium' | 'large') => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  
+  return context;
+};
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -24,14 +35,14 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('system');
   const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
   
   // Effect to load preferences from localStorage
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme') as Theme | null;
     const storedFontFamily = localStorage.getItem('fontFamily') as FontFamily | null;
-    const storedFontSize = localStorage.getItem('fontSize') as 'small' | 'medium' | 'large' | null;
+    const storedFontSize = localStorage.getItem('fontSize') as FontSize | null;
     
     if (storedTheme) {
       setTheme(storedTheme);
@@ -117,6 +128,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         return 'Roboto, sans-serif';
       case 'mono':
         return 'monospace';
+      case 'serif':
+        return 'serif';
+      case 'montserrat':
+        return 'Montserrat, sans-serif';
+      case 'default':
+        return 'system-ui, -apple-system, sans-serif';
       default:
         return 'Inter, sans-serif';
     }

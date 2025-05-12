@@ -9,10 +9,10 @@ export const useTheme = () => {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
   
-  // Calculer isDarkMode basé sur le thème actuel
+  // Calculate isDarkMode based on the current theme
   const isDarkMode = context.theme === 'dark' || 
-                    (context.theme === 'system' && 
-                    context.resolvedTheme === 'dark');
+                   (context.theme === 'system' && 
+                   context.resolvedTheme === 'dark');
   
   return {
     ...context,

@@ -1,3 +1,6 @@
+
+import { Theme, FontSize, FontFamily } from '@/contexts/ThemeContext';
+
 export interface User {
   id: string;
   name: string;
@@ -60,8 +63,6 @@ export interface ThemeSettings {
   animations?: boolean;
 }
 
-// Import from ThemeContext
-import { Theme, FontSize, FontFamily } from '@/contexts/ThemeContext';
 export type ThemeName = Theme;
 export type { FontSize, FontFamily };
 
