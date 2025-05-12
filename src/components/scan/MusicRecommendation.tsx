@@ -21,7 +21,7 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
         const result = await activateMusicForEmotion({
           emotion: emotion.emotion,
           intensity: emotion.intensity || 0.5,
-          confidence: emotion.confidence || 0.7
+          // Removed the 'confidence' property as it's not in the EmotionMusicParams type
         });
         
         if (!result) {
