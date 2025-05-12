@@ -5,7 +5,11 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import Sidebar from '@/components/ui/sidebar';
 import Shell from '@/Shell';
 
-const DashboardLayout: React.FC = () => {
+interface DashboardLayoutProps {
+  children?: React.ReactNode;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
   
@@ -25,7 +29,7 @@ const DashboardLayout: React.FC = () => {
         
         {/* Main content - Ajusté pour le bon espacement avec la sidebar */}
         <div className={`flex-1 transition-all ${isMobile ? 'ml-0 p-4' : 'ml-16 md:ml-64 p-4'} bg-background`}>
-          {mounted && <Outlet />}
+          {children || (mounted && <Outlet />)}
         </div>
       </div>
     </Shell>
