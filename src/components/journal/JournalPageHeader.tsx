@@ -7,9 +7,10 @@ import { ArrowLeft } from 'lucide-react';
 interface JournalPageHeaderProps {
   title: string;
   children?: ReactNode;
+  icon?: ReactNode;  // Added icon prop
 }
 
-const JournalPageHeader: React.FC<JournalPageHeaderProps> = ({ title, children }) => {
+const JournalPageHeader: React.FC<JournalPageHeaderProps> = ({ title, children, icon }) => {
   const navigate = useNavigate();
 
   return (
@@ -24,6 +25,7 @@ const JournalPageHeader: React.FC<JournalPageHeaderProps> = ({ title, children }
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h1 className="text-2xl font-semibold md:text-3xl">{title}</h1>
+        {icon && <span className="ml-2">{icon}</span>} {/* Display icon if provided */}
       </div>
       {children && <div className="flex items-center gap-2">{children}</div>}
     </div>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Music, PlayCircle } from 'lucide-react';
 import { Emotion } from '@/types';
-import useMusicEmotionIntegration from '@/hooks/useMusicEmotionIntegration';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { useToast } from '@/components/ui/use-toast';
 
 interface MusicRecommendationProps {

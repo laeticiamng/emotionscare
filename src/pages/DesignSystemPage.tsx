@@ -4,7 +4,7 @@ import ColorPaletteDisplay from '@/components/theme/ColorPaletteDisplay';
 import ThemeColorExample from '@/components/theme/ThemeColorExample';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme, Theme } from '@/contexts/ThemeContext';
 import { Sun, Moon, Palette } from 'lucide-react';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 
@@ -13,7 +13,10 @@ import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
  * Affiche la palette de couleurs et les composants stylés
  */
 const DesignSystemPage: React.FC = () => {
-  const { theme, setTheme, setThemePreference } = useTheme() || { theme: 'light', setTheme: () => {}, setThemePreference: () => {} };
+  const themeContext = useTheme();
+  const theme = themeContext?.theme || 'light';
+  const setTheme = themeContext?.setTheme || (() => {});
+  const setThemePreference = themeContext?.setThemePreference || setTheme;
 
   return (
     <div className="container mx-auto py-8 space-y-8 animate-fade-in">
@@ -49,7 +52,7 @@ const DesignSystemPage: React.FC = () => {
           </Button>
           <Button
             variant={theme === 'pastel' ? 'default' : 'outline'}
-            onClick={() => setTheme('pastel')}
+            onClick={() => setTheme('pastel' as Theme)}
           >
             <Palette className="mr-2 h-4 w-4" />
             Pastel

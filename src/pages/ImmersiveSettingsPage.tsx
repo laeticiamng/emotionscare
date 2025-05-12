@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTheme, FontFamily, FontSize } from '@/contexts/ThemeContext';
@@ -6,14 +5,13 @@ import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
 
 const ImmersiveSettingsPage: React.FC = () => {
-  const { 
-    theme, 
-    setTheme, 
-    fontFamily = 'inter',
-    setFontFamily,
-    fontSize = 'medium',
-    setFontSize
-  } = useTheme() || {};
+  const themeContext = useTheme();
+  const theme = themeContext?.theme || 'system';
+  const setTheme = themeContext?.setTheme;
+  const fontFamily = themeContext?.fontFamily || 'inter';
+  const setFontFamily = themeContext?.setFontFamily;
+  const fontSize = themeContext?.fontSize || 'medium';
+  const setFontSize = themeContext?.setFontSize;
   
   return (
     <div className="container mx-auto py-8 max-w-5xl">

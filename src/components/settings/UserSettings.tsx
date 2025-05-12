@@ -14,7 +14,11 @@ import { Loader2 } from 'lucide-react';
 
 const UserSettings: React.FC = () => {
   const { toast } = useToast();
-  const { theme, fontFamily, fontSize, setFontFamily, setFontSize } = useTheme() || {};
+  const themeContext = useTheme();
+  const fontFamily = themeContext?.fontFamily || 'inter';
+  const fontSize = themeContext?.fontSize || 'medium';
+  const setFontFamily = themeContext?.setFontFamily;
+  const setFontSize = themeContext?.setFontSize;
   const [isAccountSaving, setIsAccountSaving] = useState(false);
   const [isNotifSaving, setIsNotifSaving] = useState(false);
   const [isPrivacySaving, setIsPrivacySaving] = useState(false);
@@ -70,9 +74,9 @@ const UserSettings: React.FC = () => {
             <ThemeSettingsTab />
             {setFontFamily && setFontSize && (
               <FontSettings 
-                currentFontFamily={fontFamily || 'inter'} 
+                currentFontFamily={fontFamily} 
                 onChangeFontFamily={setFontFamily}
-                currentFontSize={fontSize || 'medium'}
+                currentFontSize={fontSize}
                 onChangeFontSize={setFontSize}
               />
             )}

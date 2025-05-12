@@ -1,8 +1,12 @@
 
-// Import des définitions de types depuis le ThemeContext principal
-import { Theme, FontSize, FontFamily } from '@/contexts/ThemeContext';
+// Import definitions from the ThemeContext
+import { 
+  Theme, 
+  FontSize, 
+  FontFamily 
+} from '@/contexts/ThemeContext';
 
-// Re-export des types pour la compatibilité
+// Re-export the types for compatibility
 export type ThemeName = Theme;
 
 export interface ThemeSettings {
@@ -38,5 +42,5 @@ export interface ThemeProviderProps {
   defaultTheme?: ThemeName;
 }
 
-// Export des types depuis ThemeContext
+// Re-export these types from ThemeContext
 export type { Theme, FontSize, FontFamily };

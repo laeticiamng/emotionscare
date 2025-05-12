@@ -21,22 +21,22 @@ const ThemeSettingsTab: React.FC = () => {
   });
   
   const handleSaveChanges = () => {
-    // Met à jour le thème via le contexte si disponible
+    // Update theme via context if available
     if (themeContext) {
       if (themeContext.theme !== pendingChanges.theme) {
         themeContext.setTheme(pendingChanges.theme);
       }
       
-      if (themeContext.fontFamily !== pendingChanges.fontFamily) {
+      if (themeContext.fontFamily !== pendingChanges.fontFamily && themeContext.setFontFamily) {
         themeContext.setFontFamily(pendingChanges.fontFamily);
       }
       
-      if (themeContext.fontSize !== pendingChanges.fontSize) {
+      if (themeContext.fontSize !== pendingChanges.fontSize && themeContext.setFontSize) {
         themeContext.setFontSize(pendingChanges.fontSize);
       }
     }
     
-    // Sauvegarde également dans les préférences utilisateur
+    // Also save to user preferences
     updatePreferences({
       theme: pendingChanges.theme,
       font: pendingChanges.fontFamily,
@@ -50,18 +50,18 @@ const ThemeSettingsTab: React.FC = () => {
   };
   
   const handleReset = () => {
-    // Réinitialiser aux valeurs par défaut
+    // Reset to default values
     setPendingChanges({
       theme: 'light',
       fontFamily: 'inter',
       fontSize: 'medium'
     });
     
-    // Applique immédiatement les réinitialisations
+    // Apply resets immediately
     if (themeContext) {
       themeContext.setTheme('light');
-      themeContext.setFontFamily('inter');
-      themeContext.setFontSize('medium');
+      if (themeContext.setFontFamily) themeContext.setFontFamily('inter');
+      if (themeContext.setFontSize) themeContext.setFontSize('medium');
     }
     
     resetPreferences();

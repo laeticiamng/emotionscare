@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTheme, Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import type { Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
 import useAudioPreferences from '@/hooks/useAudioPreferences';
 import { useToast } from '@/hooks/use-toast';
 
