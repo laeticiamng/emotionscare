@@ -1,54 +1,61 @@
 
 import React, { useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import MusicControls from '../player/MusicControls';
+import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-const MusicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { 
-    isInitialized, 
-    initializeMusicSystem, 
-    error,
-    setOpenDrawer,
-    openDrawer
-  } = useMusic();
-  
+interface MusicLayoutProps {
+  children: React.ReactNode;
+}
+
+const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
+  const { isInitialized, initializeMusicSystem, error } = useMusic();
+  const { toast } = useToast();
+
   useEffect(() => {
-    if (!isInitialized && initializeMusicSystem) {
-      initializeMusicSystem();
+    const loadMusic = async () => {
+      try {
+        await initializeMusicSystem();
+      } catch (err) {
+        console.error('Error initializing music system:', err);
+        toast({
+          title: 'Error',
+          description: 'Failed to initialize music system. Please try again.',
+          variant: 'destructive'
+        });
+      }
+    };
+
+    if (!isInitialized) {
+      loadMusic();
     }
-  }, [isInitialized, initializeMusicSystem]);
-  
-  if (error) {
+  }, [isInitialized, initializeMusicSystem, toast]);
+
+  if (!isInitialized) {
     return (
-      <div className="container mx-auto p-4">
-        <Card className="p-4 border-red-300">
-          <h2 className="text-lg font-semibold text-red-600">Error loading music system</h2>
-          <p className="text-red-500">{error}</p>
-        </Card>
+      <div className="flex items-center justify-center w-full h-64">
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+        <span className="ml-2 text-muted-foreground">Loading music system...</span>
       </div>
     );
   }
-  
-  const handleShowDrawer = () => {
-    if (setOpenDrawer) {
-      setOpenDrawer(!openDrawer);
-    }
-  };
-  
-  return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex-1">
-        {children}
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-medium text-destructive mb-2">Error loading music system</h2>
+        <p className="text-muted-foreground">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors"
+        >
+          Try again
+        </button>
       </div>
-      
-      <div className="sticky bottom-0 left-0 right-0 bg-background py-2">
-        <Card className="mx-auto max-w-4xl">
-          <MusicControls showDrawer={handleShowDrawer} />
-        </Card>
-      </div>
-    </div>
-  );
+    );
+  }
+
+  return <div>{children}</div>;
 };
 
 export default MusicLayout;

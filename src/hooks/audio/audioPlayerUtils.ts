@@ -1,67 +1,44 @@
 
-// Utility functions for audio player
+import { MusicTrack } from '@/types/music';
 
 /**
- * Format seconds into MM:SS time format
+ * Format seconds to mm:ss format
  */
-export const formatTime = (timeInSeconds: number): string => {
-  if (isNaN(timeInSeconds) || timeInSeconds < 0) return '0:00';
+export const formatTime = (seconds: number): string => {
+  if (isNaN(seconds) || seconds < 0) return '0:00';
   
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = Math.floor(timeInSeconds % 60);
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
   
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
 };
 
 /**
- * Handle errors during audio playback
+ * Get audio URL from track object
  */
-export const handlePlayError = (error: any): string => {
+export const getTrackAudioUrl = (track: MusicTrack): string => {
+  // Try different property names that might contain the URL
+  return track.url || '';
+};
+
+/**
+ * Handle play errors
+ */
+export const handlePlayError = (error: Error): string => {
   console.error('Audio playback error:', error);
   
+  // Check for common error types
   if (error.name === 'NotAllowedError') {
-    return 'Permission de lecture audio refusée. Vérifiez vos paramètres de navigateur.';
-  } else if (error.name === 'NotSupportedError') {
-    return 'Format audio non supporté par votre navigateur.';
-  } else if (error.name === 'AbortError') {
-    return 'La lecture audio a été interrompue.';
+    return 'Playback was blocked by the browser. User interaction may be required.';
   }
   
-  return 'Erreur lors de la lecture audio. Veuillez réessayer.';
-};
-
-/**
- * Get the audio URL from a track object
- */
-export const getTrackAudioUrl = (track: any): string => {
-  if (!track) return '';
-  return track.url || track.audioUrl || '';
-};
-
-/**
- * Calculate progress percentage
- */
-export const calculateProgress = (currentTime: number, duration: number): number => {
-  if (!duration) return 0;
-  const progress = (currentTime / duration) * 100;
-  return isNaN(progress) ? 0 : Math.min(100, Math.max(0, progress));
-};
-
-/**
- * Map emotions to music genres for better recommendations
- */
-export const mapEmotionToMusicGenre = (emotion: string): string => {
-  const emotionMusicMap: Record<string, string> = {
-    happy: 'upbeat',
-    sad: 'relaxing',
-    angry: 'empowering',
-    anxious: 'calming',
-    neutral: 'ambient',
-    excited: 'energetic',
-    tired: 'meditation',
-    stressed: 'nature',
-    peaceful: 'classical'
-  };
+  if (error.name === 'NotSupportedError') {
+    return 'The audio format is not supported by your browser.';
+  }
   
-  return emotionMusicMap[emotion.toLowerCase()] || 'ambient';
+  if (error.message.includes('network')) {
+    return 'Network error while loading the audio file.';
+  }
+  
+  return 'An error occurred during audio playback.';
 };

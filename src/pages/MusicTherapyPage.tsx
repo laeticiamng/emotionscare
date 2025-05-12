@@ -19,18 +19,12 @@ const MusicPage: React.FC = () => {
     const loadMusic = async () => {
       try {
         setIsLoading(true);
-        // For compatibility, we're adding a check for initializeMusicSystem
-        if (typeof initializeMusicSystem === 'function') {
-          await initializeMusicSystem();
-        } else {
-          // Fallback if function doesn't exist
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        await initializeMusicSystem();
       } catch (err) {
-        console.error("Erreur d'initialisation du système musical:", err);
+        console.error("Error initializing music system:", err);
         toast({
-          title: "Erreur d'initialisation",
-          description: "Impossible de charger le module musical. Veuillez réessayer.",
+          title: "Initialization Error",
+          description: "Unable to load the music module. Please try again.",
           variant: "destructive"
         });
       } finally {
@@ -41,19 +35,19 @@ const MusicPage: React.FC = () => {
     loadMusic();
   }, [initializeMusicSystem, toast]);
 
-  // Titre dynamique selon la piste en cours
+  // Dynamic title based on current track
   const getPageTitle = () => {
     if (currentTrack) {
-      return `Musique Thérapeutique - ${currentTrack.title} par ${currentTrack.artist}`;
+      return `Music Therapy - ${currentTrack.title} by ${currentTrack.artist}`;
     }
-    return "Musique Thérapeutique";
+    return "Music Therapy";
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-64">
         <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <span className="ml-2 text-muted-foreground">Chargement du module musical...</span>
+        <span className="ml-2 text-muted-foreground">Loading music module...</span>
       </div>
     );
   }
@@ -61,15 +55,15 @@ const MusicPage: React.FC = () => {
   if (error) {
     return (
       <div className="p-6 text-center">
-        <h2 className="text-xl font-medium text-destructive mb-2">Erreur de chargement</h2>
+        <h2 className="text-xl font-medium text-destructive mb-2">Loading Error</h2>
         <p className="text-muted-foreground">
-          Une erreur est survenue lors du chargement du module musical.
+          An error occurred while loading the music module.
         </p>
         <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors"
         >
-          Réessayer
+          Try Again
         </button>
       </div>
     );
@@ -79,7 +73,7 @@ const MusicPage: React.FC = () => {
     <div className="container mx-auto p-4">
       <PageTitle
         title={getPageTitle()}
-        description="Écoutez de la musique adaptée à votre état émotionnel"
+        description="Listen to music adapted to your emotional state"
       />
       
       <div className="mt-6">
