@@ -36,13 +36,6 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
         fontSize: formData.fontSize as FontSize,
       };
       
-      // Setup notifications object with correct types
-      const notifications = {
-        email: formData.email_notifications || false,
-        push: formData.push_notifications || false,
-        sms: false
-      };
-      
       await onSave(safeFormData);
     } catch (error) {
       console.error('Error saving preferences:', error);
@@ -87,8 +80,11 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications</span>
               <Switch
-                checked={formData.notifications_enabled || false}
-                onCheckedChange={(checked) => handleChange('notifications_enabled', checked)}
+                checked={formData.notifications || formData.notifications_enabled || false}
+                onCheckedChange={(checked) => {
+                  handleChange('notifications', checked);
+                  handleChange('notifications_enabled', checked);
+                }}
               />
             </div>
             
@@ -111,7 +107,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Autoplay des vidéos</span>
               <Switch
-                checked={formData.autoplayVideos}
+                checked={formData.autoplayVideos || false}
                 onCheckedChange={(checked) => handleChange('autoplayVideos', checked)}
               />
             </div>
@@ -119,7 +115,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Collecte de données</span>
               <Switch
-                checked={formData.dataCollection}
+                checked={formData.dataCollection || false}
                 onCheckedChange={(checked) => handleChange('dataCollection', checked)}
               />
             </div>

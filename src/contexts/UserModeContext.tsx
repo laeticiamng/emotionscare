@@ -1,67 +1,58 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-export type UserMode = 'b2c' | 'b2b-collaborator' | 'b2b-admin' | 'personal';
+export type UserMode = 'personal' | 'b2c' | 'b2b-collaborator' | 'b2b-admin';
 
 interface UserModeContextType {
   userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
-  isB2C: boolean;
-  isB2B: boolean;
-  isAdmin: boolean;
   isLoading: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType>({
   userMode: 'b2c',
   setUserMode: () => {},
-  isB2C: true,
-  isB2B: false,
-  isAdmin: false,
   isLoading: true
 });
+
+export const useUserMode = () => useContext(UserModeContext);
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userMode, setUserModeState] = useState<UserMode>('b2c');
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Initialiser le mode utilisateur depuis localStorage
+
   useEffect(() => {
-    const storedMode = localStorage.getItem('userMode') as UserMode | null;
-    if (storedMode && (storedMode === 'b2c' || storedMode === 'b2b-collaborator' || storedMode === 'b2b-admin' || storedMode === 'personal')) {
-      console.log("UserMode loaded from localStorage:", storedMode);
-      setUserModeState(storedMode);
-    } else {
-      console.log("Using default userMode: b2c");
-      localStorage.setItem('userMode', 'b2c');
+    // Charger le mode utilisateur depuis le localStorage
+    const storedMode = localStorage.getItem('userMode');
+    if (storedMode) {
+      try {
+        // Vérifier que la valeur est l'un des types UserMode valides
+        const mode = storedMode as UserMode;
+        if (mode === 'personal' || mode === 'b2c' || mode === 'b2b-collaborator' || mode === 'b2b-admin') {
+          console.info('UserMode loaded from localStorage:', mode);
+          setUserModeState(mode);
+        }
+      } catch (error) {
+        console.error('Error parsing stored user mode:', error);
+      }
     }
     setIsLoading(false);
   }, []);
-  
-  // Mettre à jour localStorage lorsque le mode change
+
   const setUserMode = (mode: UserMode) => {
-    console.log("Setting userMode to:", mode);
-    setUserModeState(mode);
     localStorage.setItem('userMode', mode);
+    setUserModeState(mode);
   };
-  
-  // Valeurs dérivées
-  const isB2C = userMode === 'b2c' || userMode === 'personal';
-  const isB2B = userMode === 'b2b-collaborator' || userMode === 'b2b-admin';
-  const isAdmin = userMode === 'b2b-admin';
+
+  const value = {
+    userMode,
+    setUserMode,
+    isLoading
+  };
 
   return (
-    <UserModeContext.Provider value={{
-      userMode,
-      setUserMode,
-      isB2C,
-      isB2B,
-      isAdmin,
-      isLoading
-    }}>
+    <UserModeContext.Provider value={value}>
       {children}
     </UserModeContext.Provider>
   );
 };
-
-export const useUserMode = () => useContext(UserModeContext);

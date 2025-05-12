@@ -19,8 +19,8 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Activer les notifications</p>
             </div>
             <Switch 
-              checked={preferences.notifications_enabled || false}
-              onCheckedChange={(checked) => updatePreferences({ notifications_enabled: checked })}
+              checked={preferences.notifications_enabled || preferences.notifications || false}
+              onCheckedChange={(checked) => updatePreferences({ notifications_enabled: checked, notifications: checked })}
               disabled={isLoading}
             />
           </div>

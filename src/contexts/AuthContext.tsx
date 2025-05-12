@@ -1,88 +1,55 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '@/types/user';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { User } from '@/types';
 
 interface AuthContextType {
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
-  updateUser: (userData: Partial<User>) => Promise<void>;
-  error: string | null;
-  clearError: () => void;
+  updateUser: (user: User) => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextType>({
+  user: null,
   isAuthenticated: false,
   isLoading: true,
-  user: null,
-  login: async () => {},
-  logout: async () => {},
-  register: async () => {},
-  updateUser: async () => {},
-  error: null,
-  clearError: () => {},
+  login: () => Promise.resolve(null),
+  logout: () => Promise.resolve(),
+  updateUser: () => Promise.resolve({} as User),
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Simulation d'une vérification d'authentification au chargement
   useEffect(() => {
-    const checkAuth = async () => {
+    // Vérifier si l'utilisateur est déjà connecté lors du chargement initial
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
       try {
-        // En production, cela interrogerait une API ou vérifierait localement
-        const storedUser = localStorage.getItem('user');
-        
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          console.log("User found in localStorage:", parsedUser);
-          setUser(parsedUser);
-          setIsAuthenticated(true);
-        } else {
-          console.log("No user found in localStorage");
-        }
+        const parsedUser = JSON.parse(storedUser);
+        console.info('User found in localStorage:', parsedUser);
+        setUser(parsedUser);
       } catch (error) {
-        console.error('Auth check error:', error);
-      } finally {
-        setIsLoading(false);
+        console.error('Error parsing stored user:', error);
       }
-    };
-
-    checkAuth();
+    }
+    setIsLoading(false);
   }, []);
 
-  const clearError = () => setError(null);
-
-  const login = async (email: string, password: string): Promise<void> => {
-    // Simulation d'une API de connexion
+  const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
-    setError(null);
-    
     try {
-      console.log("Attempting login with:", { email });
-      
-      // Validation simple
-      if (!email || !password) {
-        throw new Error("L'email et le mot de passe sont requis");
-      }
-      
-      // Simulation de délai réseau
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Créer un utilisateur de demo (en production, cela viendrait de l'API)
-      const mockUser: User = {
+      // Simulation d'une connexion
+      const user: User = {
         id: '1',
         name: 'Utilisateur Test',
-        email: email,
-        role: email.includes('admin') ? 'admin' : 'user',
+        email,
+        role: 'user',
         avatar_url: '',
         preferences: {
           theme: 'system',
@@ -90,117 +57,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           fontFamily: 'inter',
           language: 'fr',
           notifications: true,
-          soundEnabled: true
+          soundEnabled: true,
+          privacyLevel: 'private',
+          onboardingCompleted: false,
+          dashboardLayout: 'standard'
         },
         onboarded: true
       };
-      
-      // Stocker l'utilisateur
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      console.log("User stored in localStorage:", mockUser);
-      
-      setUser(mockUser);
-      setIsAuthenticated(true);
-    } catch (error: any) {
+
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      return user;
+    } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || "Erreur de connexion");
-      throw error;
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
 
   const logout = async (): Promise<void> => {
-    setIsLoading(true);
-    
-    try {
-      // En production, cela enverrait une requête à l'API
-      localStorage.removeItem('user');
-      console.log("User removed from localStorage");
-      setUser(null);
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
-  const register = async (email: string, password: string, name: string): Promise<void> => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      console.log("Attempting registration with:", { email, name });
-      
-      // Validation simple
-      if (!email || !password || !name) {
-        throw new Error("Tous les champs sont requis");
-      }
-      
-      // Simulation d'enregistrement
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const newUser: User = {
-        id: Date.now().toString(),
-        name,
-        email,
-        role: 'user',
-        onboarded: false
-      };
-      
-      localStorage.setItem('user', JSON.stringify(newUser));
-      console.log("New user stored in localStorage:", newUser);
-      
-      setUser(newUser);
-      setIsAuthenticated(true);
-    } catch (error: any) {
-      console.error('Register error:', error);
-      setError(error.message || "Erreur d'enregistrement");
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const updateUser = async (updatedUser: User): Promise<User> => {
+    // Mettre à jour l'utilisateur dans le stockage
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    return updatedUser;
   };
 
-  const updateUser = async (userData: Partial<User>): Promise<void> => {
-    setIsLoading(true);
-    
-    try {
-      // En production, cela enverrait une mise à jour à l'API
-      if (user) {
-        const updatedUser = {
-          ...user,
-          ...userData,
-        };
-        
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        console.log("User updated in localStorage:", updatedUser);
-        setUser(updatedUser);
-      }
-    } catch (error) {
-      console.error('Update user error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
+    updateUser
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        isLoading,
-        user,
-        login,
-        logout,
-        register,
-        updateUser,
-        error,
-        clearError
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

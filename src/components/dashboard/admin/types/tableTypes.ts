@@ -10,6 +10,8 @@ export interface UserData extends User {
   createdAt?: string;
   lastActivity?: string;
   avatar?: string;
+  emotional_score?: number;
+  anonymity_code?: string;
 }
 
 // Add BulkActionProps interface

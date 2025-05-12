@@ -18,4 +18,15 @@ export interface UserPreferences {
   privacyLevel: PrivacyLevel;
   onboardingCompleted: boolean;
   dashboardLayout: DashboardLayout;
+  
+  // Propriétés supplémentaires utilisées dans l'application
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  privacy?: string;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }

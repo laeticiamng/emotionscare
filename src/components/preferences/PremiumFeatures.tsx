@@ -20,7 +20,9 @@ const PremiumFeatures: React.FC = () => {
             </div>
             <Switch 
               checked={preferences.emotionalCamouflage || false}
-              onCheckedChange={(checked) => updatePreferences({ emotionalCamouflage: checked })}
+              onCheckedChange={(checked) => updatePreferences({ 
+                emotionalCamouflage: checked 
+              } as any)}
             />
           </div>
           
@@ -31,7 +33,9 @@ const PremiumFeatures: React.FC = () => {
             </div>
             <Switch 
               checked={preferences.aiSuggestions || false}
-              onCheckedChange={(checked) => updatePreferences({ aiSuggestions: checked })}
+              onCheckedChange={(checked) => updatePreferences({ 
+                aiSuggestions: checked 
+              } as any)}
             />
           </div>
           
@@ -42,7 +46,9 @@ const PremiumFeatures: React.FC = () => {
             </div>
             <Switch 
               checked={preferences.fullAnonymity || false}
-              onCheckedChange={(checked) => updatePreferences({ fullAnonymity: checked })}
+              onCheckedChange={(checked) => updatePreferences({ 
+                fullAnonymity: checked 
+              } as any)}
             />
           </div>
         </div>
