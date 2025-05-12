@@ -5,8 +5,8 @@ export type ThemeName = Theme;
 export type PrivacyLevel = 'private' | 'friends' | 'public';
 export type DashboardLayout = 'compact' | 'standard' | 'expanded';
 
-// Re-export FontSize and FontFamily from ThemeContext
-export { FontSize, FontFamily };
+// Re-export FontSize and FontFamily from ThemeContext using 'export type'
+export type { FontSize, FontFamily };
 
 export interface UserPreferences {
   theme: ThemeName;
