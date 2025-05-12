@@ -1,5 +1,3 @@
-
-
 export type {
   User,
   UserPreferences,
@@ -93,15 +91,28 @@ export interface EmotionResult {
 }
 
 // Adding additional required types
+export interface MoodData {
+  date: string;
+  originalDate?: string;
+  value: number;
+  mood?: string;
+  sentiment: number;
+  anxiety: number;
+  energy: number;
+}
+
 export interface JournalEntry {
   id: string;
   title: string;
   content: string;
   text?: string;
   mood: string;
+  mood_score?: number;
+  emotion?: string;
   date: Date | string;
   tags?: string[];
   ai_feedback?: string;
+  user_id?: string;
 }
 
 export interface Story {
@@ -183,4 +194,3 @@ export interface InvitationFormData {
   message?: string;
   expires_in_days: number;
 }
-

@@ -1,93 +1,80 @@
 
-import { v4 as uuidv4 } from 'uuid';
 import { JournalEntry } from '@/types';
 
-// Entrées de journal simulées
+// Mock database of journal entries
 let journalEntries: JournalEntry[] = [
   {
     id: '1',
-    content: 'Journée difficile avec beaucoup de pression au travail.',
-    emotion: 'stressed',
-    mood_score: 3,
-    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    user_id: 'user-1',
-    text: 'Journée difficile avec beaucoup de pression au travail.' // Pour compatibility
+    title: 'Une bonne journée',
+    content: 'Aujourd\'hui était une excellente journée. J\'ai accompli beaucoup de choses et je me sens bien.',
+    mood: 'happy',
+    mood_score: 85,
+    emotion: 'joy',
+    date: new Date().toISOString(),
+    user_id: 'user1',
+    tags: ['productif', 'heureux']
   },
   {
     id: '2',
-    content: 'Superbe journée à la plage avec les amis. Très reposant!',
-    emotion: 'happy',
-    mood_score: 8,
-    date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    user_id: 'user-1',
-    text: 'Superbe journée à la plage avec les amis. Très reposant!' // Pour compatibility
-  },
+    title: 'Journée stressante',
+    content: 'Beaucoup de pression au travail aujourd\'hui. Je me sens un peu dépassé mais je gère.',
+    mood: 'stressed',
+    mood_score: 40,
+    emotion: 'stressed',
+    date: new Date(Date.now() - 86400000).toISOString(),
+    user_id: 'user1',
+    tags: ['travail', 'stress']
+  }
 ];
 
-/**
- * Récupérer toutes les entrées de journal pour un utilisateur spécifique
- */
-export const getJournalEntries = async (userId: string): Promise<JournalEntry[]> => {
-  return journalEntries.filter(entry => entry.user_id === userId);
+// Get all journal entries
+export const getJournalEntries = async (user_id: string): Promise<JournalEntry[]> => {
+  // Filter by user_id in a real app
+  return journalEntries;
 };
 
-// Exporter avec un alias pour la compatibilité en amont
-export const fetchJournalEntries = getJournalEntries;
-
-/**
- * Récupérer une entrée de journal spécifique par ID
- */
-export const getJournalEntryById = async (entryId: string): Promise<JournalEntry | undefined> => {
-  return journalEntries.find(entry => entry.id === entryId);
+// Get a single journal entry
+export const getJournalEntry = async (id: string): Promise<JournalEntry | null> => {
+  const entry = journalEntries.find(e => e.id === id);
+  return entry || null;
 };
 
-/**
- * Créer une nouvelle entrée de journal
- */
-export const createJournalEntry = async (entryData: Omit<JournalEntry, 'id'>): Promise<JournalEntry> => {
+// Create a new journal entry
+export const createJournalEntry = async (entry: Omit<JournalEntry, 'id'>): Promise<JournalEntry> => {
   const newEntry: JournalEntry = {
-    id: uuidv4(),
-    ...entryData,
-    date: entryData.date || new Date().toISOString()
+    ...entry,
+    id: Math.random().toString(36).substring(2, 9),
+    date: entry.date || new Date().toISOString()
   };
   
-  journalEntries.push(newEntry);
+  journalEntries.unshift(newEntry);
   return newEntry;
 };
 
-/**
- * Mettre à jour une entrée de journal existante
- */
-export const updateJournalEntry = async (entryId: string, entryData: Partial<JournalEntry>): Promise<JournalEntry | undefined> => {
-  const index = journalEntries.findIndex(entry => entry.id === entryId);
-  if (index === -1) return undefined;
+// Update a journal entry
+export const updateJournalEntry = async (id: string, updates: Partial<JournalEntry>): Promise<JournalEntry | null> => {
+  const index = journalEntries.findIndex(e => e.id === id);
   
-  journalEntries[index] = {
+  if (index === -1) return null;
+  
+  const updatedEntry = {
     ...journalEntries[index],
-    ...entryData,
-    text: entryData.content || journalEntries[index].text // Pour compatibility
+    ...updates
   };
   
-  return journalEntries[index];
+  journalEntries[index] = updatedEntry;
+  return updatedEntry;
 };
 
-/**
- * Supprimer une entrée de journal par ID
- */
-export const deleteJournalEntry = async (entryId: string): Promise<boolean> => {
+// Delete a journal entry
+export const deleteJournalEntry = async (id: string): Promise<boolean> => {
   const initialLength = journalEntries.length;
-  journalEntries = journalEntries.filter(entry => entry.id !== entryId);
+  journalEntries = journalEntries.filter(e => e.id !== id);
   return journalEntries.length < initialLength;
 };
 
-/**
- * Sauvegarder une entrée de journal (créer ou mettre à jour)
- */
-export const saveJournalEntry = async (entryData: any): Promise<JournalEntry> => {
-  if (entryData.id) {
-    const updated = await updateJournalEntry(entryData.id, entryData);
-    if (updated) return updated;
-  }
-  
-  return createJournalEntry(entryData as Omit<JournalEntry, 'id'>);
+// Get AI feedback for an entry
+export const getAIFeedback = async (content: string): Promise<string> => {
+  // This would be an API call to an AI service in a real app
+  return "Based on your entry, you seem to be handling stress well. Consider taking short breaks during work hours to maintain your energy levels.";
 };

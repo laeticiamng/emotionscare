@@ -13,8 +13,8 @@ import { MusicDrawerProps } from '@/types/music';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
   open, 
-  onOpenChange, 
   onClose,
+  onOpenChange,
   playlist, 
 }) => {
   return (

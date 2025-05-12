@@ -7,8 +7,16 @@ export interface MusicTrack {
   cover?: string;
   coverUrl?: string;
   cover_url?: string;
+  url: string;
   source?: string;
   file?: string;
+  audioUrl?: string;
+  audio_url?: string;
+  lyrics?: string;
+  mood?: string;
+  tempo?: number;
+  genre?: string;
+  emotion?: string;
 }
 
 export interface Track {
@@ -23,9 +31,11 @@ export interface Track {
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
   description?: string;
   coverUrl?: string;
   tracks: MusicTrack[];
+  emotion?: string;
 }
 
 export interface MusicContextType {
@@ -47,6 +57,8 @@ export interface MusicContextType {
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist;
 }
 
 export interface ProgressBarProps {

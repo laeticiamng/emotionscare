@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Calendar, List, Plus, Search } from 'lucide-react';
@@ -12,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { PageHeader } from '@/components/layout/PageHeader';
+import PageHeader from '@/components/layout/PageHeader';
 import Container from '@/components/layout/Container';
 
 const JournalPage: React.FC = () => {
@@ -138,7 +139,7 @@ const JournalPage: React.FC = () => {
       {view === 'list' ? (
         <JournalListView entries={filteredEntries} onDeleteEntry={handleDeleteEntry} />
       ) : (
-        <JournalCalendarView entries={filteredEntries} />
+        <JournalCalendarView entries={filteredEntries} onEntryClick={(entry) => navigate(`/journal/${entry.id}`)} />
       )}
     </Container>
   );

@@ -1,32 +1,62 @@
 
+import { format, subDays } from 'date-fns';
 import { MoodData } from '@/types';
-import { subDays, format } from 'date-fns';
 
-/**
- * Generates mock mood data for charts and visualizations
- */
-export function generateMockMoodData(days = 30): MoodData[] {
-  const today = new Date();
-  const data: MoodData[] = [];
-
-  for (let i = days - 1; i >= 0; i--) {
-    const date = subDays(today, i);
+// Generate mock mood data for the given number of days
+export const generateMoodData = (days: number = 30): MoodData[] => {
+  const result: MoodData[] = [];
+  
+  for (let i = days; i >= 0; i--) {
+    const date = subDays(new Date(), i);
     const formattedDate = format(date, 'dd/MM');
-    const originalDate = date.toISOString();
     
-    // Generate some realistic looking data
-    const baseValue = Math.floor(Math.random() * 30) + 40; // Base between 40-70
-    const dayVariation = Math.floor(Math.random() * 40) - 20; // -20 to +20 variation
-    
-    data.push({
+    result.push({
       date: formattedDate,
-      originalDate,
-      value: Math.max(0, Math.min(100, baseValue + dayVariation)),
-      sentiment: Math.max(0, Math.min(100, baseValue + Math.floor(Math.random() * 30) - 15)),
-      anxiety: Math.max(0, Math.min(100, 100 - baseValue + Math.floor(Math.random() * 20) - 10)),
-      energy: Math.max(0, Math.min(100, baseValue - 10 + Math.floor(Math.random() * 40) - 20)),
+      originalDate: date.toISOString(),
+      value: Math.floor(Math.random() * 100),
+      sentiment: Math.floor(Math.random() * 100),
+      anxiety: Math.floor(Math.random() * 100),
+      energy: Math.floor(Math.random() * 100),
+      mood: getMoodFromValue(Math.floor(Math.random() * 100))
     });
   }
+  
+  return result;
+};
 
-  return data;
+// Helper function to get mood string from value
+function getMoodFromValue(value: number): string {
+  if (value < 20) return 'very_sad';
+  if (value < 40) return 'sad';
+  if (value < 60) return 'neutral';
+  if (value < 80) return 'happy';
+  return 'very_happy';
 }
+
+// Generate mock alerts data
+export const generateAlerts = (count: number = 5) => {
+  const alertTypes = ['danger', 'warning', 'info', 'success'];
+  const alertMessages = [
+    'Anomalie détectée dans les tendances émotionnelles',
+    'Rappel de consultation programmée',
+    'Nouvelle fonctionnalité disponible',
+    'Progrès significatif observé',
+    'Modification des habitudes détectée'
+  ];
+  
+  const alerts = [];
+  
+  for (let i = 0; i < count; i++) {
+    const typeIndex = Math.floor(Math.random() * alertTypes.length);
+    const messageIndex = Math.floor(Math.random() * alertMessages.length);
+    
+    alerts.push({
+      id: `alert-${i}`,
+      type: alertTypes[typeIndex],
+      message: alertMessages[messageIndex],
+      date: subDays(new Date(), Math.floor(Math.random() * 7)).toISOString()
+    });
+  }
+  
+  return alerts;
+};

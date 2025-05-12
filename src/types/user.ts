@@ -1,5 +1,3 @@
-
-
 export interface User {
   id: string;
   name: string;
@@ -84,7 +82,11 @@ export interface InvitationVerificationResult {
   email?: string;
   role?: string;
   error?: string;
+  message?: string; // Add message property
   invitationId?: string;
   expiresAt?: string;
+  data?: { // Add data property to maintain compatibility with existing code
+    email?: string;
+    role?: string;
+  };
 }
-

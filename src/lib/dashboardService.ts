@@ -1,4 +1,3 @@
-
 /**
  * Service functions for the dashboard
  */
@@ -135,4 +134,29 @@ export const fetchBadges = async (userId: string): Promise<Badge[]> => {
     console.error('Error fetching badges:', error);
     return [];
   }
+};
+
+/**
+ * Fetch predictive analytics
+ */
+export const getPredictiveAnalytics = async (userId: string): Promise<EmotionPrediction> => {
+  // This would be an actual API call in a real application
+  // For demonstration, we'll return mock data
+  
+  return {
+    predictedEmotion: 'calm',
+    emotion: 'calm', // Added missing property
+    probability: 0.85,
+    confidence: 0.75,
+    triggers: [
+      'Work-related stress',
+      'Inadequate sleep patterns',
+      'Regular physical activity'
+    ],
+    recommendations: [
+      'Consider mindfulness meditation for 10 minutes daily',
+      'Maintain regular sleep schedule',
+      'Continue physical activity routine'
+    ]
+  };
 };
