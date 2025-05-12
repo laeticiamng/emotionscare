@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +18,8 @@ export interface MusicContextValue {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   seekTo: (time: number) => void;
+  togglePlay: () => void;
+  adjustVolume: (change: number) => void;
   
   // Playlist management
   playlists: MusicPlaylist[];
@@ -53,6 +54,7 @@ const mockPlaylists: MusicPlaylist[] = [
   {
     id: "playlist-1",
     title: "Relaxation",
+    name: "Relaxation", // Added name property
     description: "Calm and peaceful tracks",
     coverUrl: "/assets/images/playlist-covers/relaxation.jpg",
     emotion: "calm",
@@ -69,6 +71,7 @@ const mockPlaylists: MusicPlaylist[] = [
   {
     id: "playlist-2",
     title: "Energy Boost",
+    name: "Energy Boost", // Added name property
     description: "Upbeat and energetic tracks",
     coverUrl: "/assets/images/playlist-covers/energy.jpg",
     emotion: "happy",
@@ -97,6 +100,8 @@ const defaultContext: MusicContextValue = {
   previousTrack: () => {},
   setVolume: () => {},
   seekTo: () => {},
+  togglePlay: () => {}, // Added missing method
+  adjustVolume: () => {}, // Added missing method
   playlists: [],
   currentPlaylist: null,
   loadPlaylistById: async () => null,
@@ -305,6 +310,29 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return null;
   }, [playlists]);
   
+  // Add togglePlay function
+  const togglePlay = useCallback(() => {
+    if (isPlaying) {
+      pauseTrack();
+    } else if (currentTrack) {
+      resumeTrack();
+    }
+  }, [isPlaying, currentTrack, pauseTrack, resumeTrack]);
+  
+  // Add adjustVolume function
+  const adjustVolume = useCallback((change: number) => {
+    setVolumeState(prev => {
+      const newVolume = Math.max(0, Math.min(1, prev + change));
+      
+      // Update audio element volume if available
+      if (audioRef.current) {
+        audioRef.current.volume = newVolume;
+      }
+      
+      return newVolume;
+    });
+  }, []);
+  
   // Audio event listeners
   useEffect(() => {
     const audio = audioRef.current;
@@ -347,6 +375,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     previousTrack,
     setVolume,
     seekTo,
+    togglePlay, // Added
+    adjustVolume, // Added
     playlists,
     currentPlaylist,
     loadPlaylistById,

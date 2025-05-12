@@ -15,6 +15,7 @@ export interface MusicTrack {
 export interface MusicPlaylist {
   id: string;
   title: string;
+  name: string; // Adding name as required by the interface
   description?: string;
   coverUrl?: string;
   emotion?: string;
@@ -39,6 +40,8 @@ export interface MusicContextType {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   seekTo: (time: number) => void;
+  togglePlay: () => void; // Adding missing method
+  adjustVolume: (change: number) => void; // Adding missing method
   
   // Playlist management
   playlists: MusicPlaylist[];
