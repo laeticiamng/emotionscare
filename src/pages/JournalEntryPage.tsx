@@ -110,22 +110,24 @@ const JournalEntryPage: React.FC = () => {
   if (!entry) {
     return (
       <DashboardLayout>
-        <JournalPageHeader title="Entrée non trouvée" />
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground mb-4">Cette entrée de journal n'existe pas ou a été supprimée.</p>
-            <Button onClick={() => navigate('/journal')}>Retour au journal</Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <JournalPageHeader title="Entrée non trouvée" />
+          <Card>
+            <CardContent className="p-8 text-center">
+              <p className="text-muted-foreground mb-4">Cette entrée de journal n'existe pas ou a été supprimée.</p>
+              <Button onClick={() => navigate('/journal')}>Retour au journal</Button>
+            </CardContent>
+          </Card>
+        </div>
       </DashboardLayout>
     );
   }
   
   return (
     <DashboardLayout>
-      <JournalPageHeader title={entry.title} />
-      
-      <div className="grid gap-6">
+      <div className="space-y-6">
+        <JournalPageHeader title={entry.title} />
+        
         <Card>
           <CardContent className="p-6">
             <div className="flex flex-wrap justify-between items-center mb-6">

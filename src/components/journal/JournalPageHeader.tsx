@@ -1,33 +1,27 @@
 
-import React, { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import React from 'react';
+import { BookOpen } from 'lucide-react';
 
 interface JournalPageHeaderProps {
   title: string;
-  children?: ReactNode;
-  icon?: ReactNode;  // Added icon prop
+  description?: string;
+  icon?: React.ReactNode;
 }
 
-const JournalPageHeader: React.FC<JournalPageHeaderProps> = ({ title, children, icon }) => {
-  const navigate = useNavigate();
-
+const JournalPageHeader: React.FC<JournalPageHeaderProps> = ({
+  title,
+  description,
+  icon = <BookOpen className="h-5 w-5" />,
+}) => {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+    <div className="flex flex-col space-y-2 mb-6">
       <div className="flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => navigate('/journal')}
-          className="mr-2"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-2xl font-semibold md:text-3xl">{title}</h1>
-        {icon && <span className="ml-2">{icon}</span>} {/* Display icon if provided */}
+        {icon}
+        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
       </div>
-      {children && <div className="flex items-center gap-2">{children}</div>}
+      {description && (
+        <p className="text-muted-foreground">{description}</p>
+      )}
     </div>
   );
 };

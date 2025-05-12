@@ -1,11 +1,21 @@
 
-import { useTheme as useThemeContext } from '@/contexts/ThemeContext';
-import type { Theme, FontFamily, FontSize, ThemeContextType } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeContext';
 
-export function useTheme(): ThemeContextType | undefined {
-  return useThemeContext();
-}
-
-export type { Theme, ThemeContextType, FontFamily, FontSize };
-
-export default useTheme;
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  
+  // Calculer isDarkMode basé sur le thème actuel
+  const isDarkMode = context.theme === 'dark' || 
+                    (context.theme === 'system' && 
+                    context.resolvedTheme === 'dark');
+  
+  return {
+    ...context,
+    isDarkMode
+  };
+};
