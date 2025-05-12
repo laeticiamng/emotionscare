@@ -1,94 +1,248 @@
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect, useState } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
+import { Card } from '@/components/ui/card';
 
 interface EnhancedMusicVisualizerProps {
-  emotion?: string;
-  intensity?: number;
-  volume?: number;
-  showControls?: boolean;
   height?: number;
+  showControls?: boolean;
   className?: string;
 }
 
 const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({ 
-  emotion = 'neutral',
-  intensity = 50,
-  volume = 0.5,
+  height = 120, 
   showControls = true,
-  height = 120,
-  className = ''
+  className = '' 
 }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { isPlaying, currentTrack } = useMusic();
-  const [bars, setBars] = useState<number[]>([]);
+  const [visualizerType, setVisualizerType] = useState<'bars' | 'wave' | 'circle'>('bars');
   
-  // Generate color based on emotion
-  const getEmotionColor = () => {
-    const emotionColors: Record<string, string> = {
-      happy: 'from-amber-300 to-amber-500',
-      calm: 'from-blue-300 to-indigo-500',
-      focused: 'from-emerald-300 to-emerald-500',
-      energetic: 'from-rose-300 to-rose-500',
-      melancholic: 'from-violet-300 to-violet-500',
-      neutral: 'from-slate-300 to-slate-500',
+  // Generate random data for visualization demo
+  // In a real app, this would use Web Audio API to analyze frequency data
+  const generateRandomData = (length: number) => {
+    const data = [];
+    for (let i = 0; i < length; i++) {
+      // Generate smoother data by creating patterns
+      const baseHeight = Math.sin((i / length) * Math.PI * 4) * 0.5 + 0.5;
+      const randomFactor = isPlaying ? 0.5 : 0.1;
+      const value = baseHeight * (1 - randomFactor) + Math.random() * randomFactor;
+      data.push(value * 0.8 + 0.2); // Scale to 0.2-1.0 range
+    }
+    return data;
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Adjust for high DPI displays
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    let animationId: number;
+    let lastTime = 0;
+    const fpsInterval = 1000 / 30; // 30fps
+    
+    const draw = (currentTime: number) => {
+      animationId = requestAnimationFrame(draw);
+      
+      // Throttle to 30fps
+      const elapsed = currentTime - lastTime;
+      if (elapsed < fpsInterval) return;
+      lastTime = currentTime - (elapsed % fpsInterval);
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      
+      // Generate visualization data
+      const barCount = Math.floor(rect.width / 5);
+      const data = generateRandomData(barCount);
+      
+      // Choose visualization type
+      switch (visualizerType) {
+        case 'bars':
+          drawBars(ctx, data, rect.width, rect.height);
+          break;
+        case 'wave':
+          drawWave(ctx, data, rect.width, rect.height);
+          break;
+        case 'circle':
+          drawCircle(ctx, data, rect.width, rect.height);
+          break;
+      }
     };
     
-    return emotionColors[emotion?.toLowerCase() || 'neutral'] || emotionColors.neutral;
-  };
-  
-  // Generate bars
-  useEffect(() => {
-    const barCount = 18;
-    const newBars = Array.from({ length: barCount }, () => Math.random() * 100);
-    setBars(newBars);
-    
-    let interval: NodeJS.Timeout;
-    
-    if (isPlaying && currentTrack) {
-      interval = setInterval(() => {
-        setBars(prev => prev.map(bar => {
-          // Create more variation for different emotions
-          let variation = 20;
-          if (emotion === 'calm') variation = 10;
-          if (emotion === 'energetic') variation = 30;
-          
-          return Math.min(100, Math.max(10, 
-            bar + (Math.random() - 0.5) * variation * (volume || 0.5) * (intensity / 50)
-          ));
-        }));
-      }, 150);
-    }
+    animationId = requestAnimationFrame(draw);
     
     return () => {
-      if (interval) clearInterval(interval);
+      cancelAnimationFrame(animationId);
     };
-  }, [isPlaying, currentTrack, emotion, volume, intensity]);
+  }, [isPlaying, visualizerType]);
   
-  const barColor = getEmotionColor();
+  const drawBars = (
+    ctx: CanvasRenderingContext2D, 
+    data: number[], 
+    width: number, 
+    height: number
+  ) => {
+    const barWidth = width / data.length;
+    const baseHue = currentTrack ? 
+      (currentTrack.title.charCodeAt(0) % 360) : 
+      220; // Default blue hue
+    
+    data.forEach((value, i) => {
+      const barHeight = value * height;
+      const x = i * barWidth;
+      const hue = (baseHue + i * 0.5) % 360;
+      
+      ctx.fillStyle = isPlaying ? 
+        `hsla(${hue}, 80%, 60%, 0.7)` : 
+        `hsla(${hue}, 20%, 60%, 0.3)`;
+      
+      ctx.beginPath();
+      ctx.roundRect(
+        x, 
+        height - barHeight, 
+        barWidth - 1, 
+        barHeight, 
+        [2, 2, 0, 0]
+      );
+      ctx.fill();
+    });
+  };
+  
+  const drawWave = (
+    ctx: CanvasRenderingContext2D, 
+    data: number[], 
+    width: number, 
+    height: number
+  ) => {
+    const baseHue = currentTrack ? 
+      (currentTrack.title.charCodeAt(0) % 360) : 
+      220; // Default blue hue
+    
+    ctx.strokeStyle = isPlaying ? 
+      `hsla(${baseHue}, 80%, 60%, 0.8)` : 
+      `hsla(${baseHue}, 20%, 60%, 0.4)`;
+    ctx.lineWidth = 2;
+    
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    
+    data.forEach((value, i) => {
+      const x = (width / data.length) * i;
+      const y = height / 2 + (value - 0.5) * height * 0.8;
+      ctx.lineTo(x, y);
+    });
+    
+    ctx.stroke();
+    
+    // Add reflection
+    ctx.strokeStyle = isPlaying ? 
+      `hsla(${baseHue}, 80%, 60%, 0.3)` : 
+      `hsla(${baseHue}, 20%, 60%, 0.1)`;
+    
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    
+    data.forEach((value, i) => {
+      const x = (width / data.length) * i;
+      const y = height / 2 - (value - 0.5) * height * 0.4;
+      ctx.lineTo(x, y);
+    });
+    
+    ctx.stroke();
+  };
+  
+  const drawCircle = (
+    ctx: CanvasRenderingContext2D, 
+    data: number[], 
+    width: number, 
+    height: number
+  ) => {
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) * 0.3;
+    const baseHue = currentTrack ? 
+      (currentTrack.title.charCodeAt(0) % 360) : 
+      220;
+    
+    ctx.lineWidth = 2;
+    
+    data.forEach((value, i) => {
+      const angle = (i / data.length) * Math.PI * 2;
+      const spikeHeight = radius * value * 0.8;
+      const x = centerX + Math.cos(angle) * (radius + spikeHeight);
+      const y = centerY + Math.sin(angle) * (radius + spikeHeight);
+      const hue = (baseHue + i * 2) % 360;
+      
+      ctx.strokeStyle = isPlaying ? 
+        `hsla(${hue}, 80%, 60%, 0.7)` : 
+        `hsla(${hue}, 20%, 60%, 0.3)`;
+      
+      ctx.beginPath();
+      ctx.moveTo(
+        centerX + Math.cos(angle) * radius,
+        centerY + Math.sin(angle) * radius
+      );
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    });
+    
+    // Draw inner circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.9, 0, Math.PI * 2);
+    ctx.strokeStyle = isPlaying ? 
+      `hsla(${baseHue}, 70%, 60%, 0.3)` : 
+      `hsla(${baseHue}, 20%, 60%, 0.1)`;
+    ctx.stroke();
+  };
   
   return (
-    <div 
-      className={`w-full bg-muted/30 rounded-lg overflow-hidden ${className}`} 
-      style={{ height: `${height}px` }}
-    >
-      <div className="h-full w-full flex items-end justify-center gap-[2px] px-2">
-        {bars.map((height, index) => (
-          <motion.div
-            key={index}
-            className={`w-full h-1/2 bg-gradient-to-t ${barColor} rounded-t-sm`}
-            animate={{ 
-              height: isPlaying 
-                ? `${Math.max(5, (height/100) * 80)}%` 
-                : '10%' 
-            }}
-            transition={{ 
-              duration: 0.2,
-              ease: "easeOut"
-            }}
-          />
-        ))}
+    <div className={`w-full ${className}`}>
+      <div className="relative" style={{ height: `${height}px` }}>
+        <canvas 
+          ref={canvasRef} 
+          className="w-full h-full"
+          style={{ height: `${height}px` }}
+        />
+        
+        {!currentTrack && !isPlaying && (
+          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">
+            {currentTrack === null ? "Aucune musique sélectionnée" : "Lecture en pause"}
+          </div>
+        )}
       </div>
+      
+      {showControls && (
+        <div className="flex justify-center gap-2 mt-2">
+          <button 
+            className={`px-3 py-1 text-xs rounded ${visualizerType === 'bars' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+            onClick={() => setVisualizerType('bars')}
+          >
+            Barres
+          </button>
+          <button 
+            className={`px-3 py-1 text-xs rounded ${visualizerType === 'wave' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+            onClick={() => setVisualizerType('wave')}
+          >
+            Onde
+          </button>
+          <button 
+            className={`px-3 py-1 text-xs rounded ${visualizerType === 'circle' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}
+            onClick={() => setVisualizerType('circle')}
+          >
+            Cercle
+          </button>
+        </div>
+      )}
     </div>
   );
 };

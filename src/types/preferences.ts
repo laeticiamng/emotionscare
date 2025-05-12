@@ -1,63 +1,18 @@
 
-export type FontSize = 'small' | 'medium' | 'large' | string;
-export type FontFamily = 'default' | 'serif' | 'mono' | 'inter' | string;
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type Theme = ThemeName;
+export type ThemeName = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'inter' | 'system' | 'mono';
+export type PrivacyLevel = 'private' | 'friends' | 'public';
+export type DashboardLayout = 'compact' | 'standard' | 'expanded';
 
-export interface UserPreferencesState {
+export interface UserPreferences {
   theme: ThemeName;
+  language: string;
   fontSize: FontSize;
   fontFamily: FontFamily;
   notifications: boolean;
-  notificationSound: boolean;
-  language: string;
-  privacy: 'public' | 'private' | 'friends';
-  privacyLevel?: 'public' | 'private' | 'friends';
-  showEmotionPrompts: boolean;
-  notification_frequency: 'daily' | 'weekly' | 'monthly' | 'never';
-  notification_type: 'email' | 'push' | 'both' | 'none';
-  notification_tone: 'formal' | 'friendly' | 'energetic';
-  emotionalCamouflage: boolean;
-  font?: string;
-  soundEnabled?: boolean;
-}
-
-export const defaultUserPreferences: UserPreferencesState = {
-  theme: 'system',
-  fontSize: 'medium',
-  fontFamily: 'default',
-  notifications: true,
-  notificationSound: true,
-  language: 'fr',
-  privacy: 'private',
-  privacyLevel: 'private', 
-  showEmotionPrompts: true,
-  notification_frequency: 'daily',
-  notification_type: 'push',
-  notification_tone: 'friendly',
-  emotionalCamouflage: false,
-  font: 'default',
-  soundEnabled: true
-};
-
-export interface UserPreferences {
-  theme?: ThemeName;
-  fontSize?: FontSize;
-  fontFamily?: FontFamily;
-  notifications?: boolean;
-  language?: string;
-  privacy?: 'public' | 'private' | 'friends';
-  privacyLevel?: 'public' | 'private' | 'friends';
-  showEmotionPrompts?: boolean;
-  notification_frequency?: 'daily' | 'weekly' | 'monthly' | 'never';
-  notification_type?: 'email' | 'push' | 'both' | 'none';
-  notification_tone?: 'formal' | 'friendly' | 'energetic';
-  emotionalCamouflage?: boolean;
-  font?: string;
-  onboardingCompleted?: boolean;
-  dashboardLayout?: string;
-  soundEnabled?: boolean;
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
+  soundEnabled: boolean;
+  privacyLevel: PrivacyLevel;
+  onboardingCompleted: boolean;
+  dashboardLayout: DashboardLayout;
 }

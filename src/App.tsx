@@ -18,6 +18,9 @@ import UserSettingsPage from '@/pages/UserSettingsPage';
 import ARPage from './pages/ARPage';
 import MusicTherapyPage from './pages/MusicTherapyPage';
 import { MusicProvider } from '@/contexts/MusicContext';
+import OnboardingPage from './pages/OnboardingPage';
+import OnboardingModePage from './pages/OnboardingModePage';
+import OnboardingExperiencePage from './pages/OnboardingExperiencePage';
 
 const App: React.FC = () => {
   console.log("Rendering App component");
@@ -32,6 +35,9 @@ const App: React.FC = () => {
           <Route path="/business" element={<BusinessPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/choose-mode" element={<OnboardingModePage />} />
+          <Route path="/onboarding-experience" element={<OnboardingExperiencePage />} />
           
           {/* Routes protégées */}
           <Route element={<ProtectedRoute />}>

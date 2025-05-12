@@ -1,10 +1,15 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { motion } from "framer-motion";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { InfoIcon } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 interface FeatureCardProps {
   icon: LucideIcon;
@@ -15,50 +20,50 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ 
-  icon: Icon,
+  icon: Icon, 
   title, 
-  description,
-  badge,
-  tooltip
+  description, 
+  badge, 
+  tooltip 
 }) => {
   return (
-    <motion.div 
-      whileHover={{ scale: 1.03 }}
-      transition={{ type: "spring", stiffness: 300 }}
-    >
-      <Card className="bg-muted/50 hover:bg-muted/70 transition-colors border-2 border-transparent hover:border-primary/20">
-        <CardContent className="flex flex-col items-center justify-center p-6">
-          <div className="relative">
-            <Icon className="h-8 w-8 mb-4 text-primary" />
-            {badge && (
-              <Badge variant="outline" className="absolute -top-2 -right-6 text-xs bg-primary/10 hover:bg-primary/20">
-                {badge}
-              </Badge>
-            )}
+    <Card className="h-full transition-all hover:shadow-md">
+      <CardContent className="p-6 flex flex-col h-full">
+        <div className="flex items-start mb-4">
+          <div className="bg-primary/10 p-3 rounded-full mr-4">
+            <Icon className="h-6 w-6 text-primary" />
           </div>
           
-          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-            {title}
-            {tooltip && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="inline-flex items-center justify-center rounded-full h-5 w-5 bg-muted text-xs cursor-help">?</span>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p>{tooltip}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </h3>
-          
-          <p className="text-sm text-muted-foreground text-center mb-4">
-            {description}
-          </p>
-        </CardContent>
-      </Card>
-    </motion.div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-medium">{title}</h3>
+              {badge && (
+                <Badge variant="outline" className="bg-primary/10">
+                  {badge}
+                </Badge>
+              )}
+              
+              {tooltip && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InfoIcon className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {tooltip}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+            
+            <p className="text-sm text-muted-foreground mt-1">
+              {description}
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

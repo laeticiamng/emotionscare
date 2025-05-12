@@ -1,14 +1,16 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import OnboardingContent from '@/components/onboarding/OnboardingContent';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/preferences';
+import { OnboardingProvider } from '@/contexts/OnboardingContext';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, updateUser } = useAuth();
   const { toast } = useToast();
   
@@ -16,6 +18,10 @@ const OnboardingPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [emotion, setEmotion] = useState('neutral');
   const [userResponses, setUserResponses] = useState<Record<string, any>>({});
+  
+  // Extract mode from URL query params
+  const searchParams = new URLSearchParams(location.search);
+  const mode = searchParams.get('mode') || 'personal';
   
   const handleResponse = (key: string, value: any) => {
     setUserResponses(prev => ({ ...prev, [key]: value }));
@@ -77,6 +83,11 @@ const OnboardingPage: React.FC = () => {
       setLoading(false);
     }
   };
+  
+  useEffect(() => {
+    // Add any initialization logic here
+    console.log("Onboarding initialized with mode:", mode);
+  }, [mode]);
   
   return (
     <div className="min-h-screen bg-background flex flex-col">

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 
-export const useIsMobile = (): boolean => {
+export const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
   
   useEffect(() => {
@@ -9,14 +9,16 @@ export const useIsMobile = (): boolean => {
       setIsMobile(window.innerWidth < 768);
     };
     
-    // Vérifier au chargement
+    // Initial check
     checkMobile();
     
-    // Ajouter l'écouteur pour les changements de taille
+    // Add event listener
     window.addEventListener('resize', checkMobile);
     
-    // Nettoyer l'écouteur
-    return () => window.removeEventListener('resize', checkMobile);
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
   
   return isMobile;
