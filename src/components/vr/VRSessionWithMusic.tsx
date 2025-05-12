@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
@@ -35,12 +34,12 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
         
         if (playlist && playlist.tracks.length > 0) {
           // S'assurer que la track a les propriétés requises
-          const trackWithUrl = {
+          const track = {
             ...playlist.tracks[0],
-            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || '',
-            duration: playlist.tracks[0].duration || 0
+            duration: playlist.tracks[0].duration || 0,
+            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].coverUrl || ''
           };
-          playTrack(trackWithUrl);
+          playTrack(track);
         }
       }
     };

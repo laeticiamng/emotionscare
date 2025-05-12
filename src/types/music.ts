@@ -8,10 +8,10 @@ export interface MusicTrack {
   cover?: string;
   coverUrl?: string;
   cover_url?: string;
+  audioUrl?: string;
+  audio_url?: string;
   emotion?: string;
   emotion_tag?: string;
-  audio_url?: string;
-  audioUrl?: string;
   mood?: string; // Ajouté pour résoudre les erreurs
   genre?: string; // Ajouté pour compatibilité
 }
@@ -41,8 +41,14 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   loadPlaylist: (id: string) => Promise<MusicPlaylist | null>;
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
-  isMuted: boolean; // Changed from optional to required
-  toggleMute: () => void; // Changed from optional to required
+  togglePlay: () => void;
+  adjustVolume: (amount: number) => void;
+  currentPlaylist: MusicPlaylist | null;
+  isInitialized: boolean;
+  openDrawer: boolean;
+  setOpenDrawer: (isOpen: boolean) => void;
+  isMuted: boolean;
+  toggleMute: () => void;
 }
 
 export interface MusicDrawerProps {

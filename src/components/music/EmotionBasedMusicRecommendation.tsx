@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,7 +34,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
         const track = {
           ...playlist.tracks[0],
           duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].cover_url || ''
+          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].coverUrl || ''
         };
         playTrack(track);
         setOpenDrawer(true);

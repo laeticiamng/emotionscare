@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Music, Plus, LibrarySquare, Palette, Sliders, Wand2 } from 'lucide-react';
@@ -134,7 +133,7 @@ const MusicGenerationPage = () => {
         </ExpandedTabsList>
         
         <ExpandedTabsContent active={activeTab === 'recommend'} className="mt-6">
-          <MoodBasedRecommendations />
+          <MoodBasedRecommendations mood="neutral" />
         </ExpandedTabsContent>
         
         <ExpandedTabsContent active={activeTab === 'create'} className="mt-6">

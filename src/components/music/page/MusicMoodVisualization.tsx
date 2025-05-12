@@ -1,120 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
-import { useToast } from '@/hooks/use-toast';
+import EnhancedMusicVisualizer from './EnhancedMusicVisualizer';
 
 interface MusicMoodVisualizationProps {
   mood: string;
-  intensity?: number;
+  intensity?: number; // 0-100
+  height?: number;
+  volume?: number;
 }
 
-const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({ 
+const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
   mood,
-  intensity = 50
+  intensity = 50,
+  height = 160,
+  volume = 0.5
 }) => {
-  const [localIntensity, setLocalIntensity] = useState(intensity);
-  const [muted, setMuted] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const { toast } = useToast();
-  
-  // Update local intensity when prop changes
-  useEffect(() => {
-    setLocalIntensity(intensity);
-  }, [intensity]);
-
-  // Get appropriate title based on mood
-  const getMoodTitle = () => {
+  // Map moods to colors and patterns
+  const getMoodStyles = () => {
     switch (mood.toLowerCase()) {
-      case 'happy': return 'Joie';
-      case 'calm': return 'Calme';
-      case 'focused': return 'Concentration';
-      case 'energetic': return 'Énergie';
-      case 'melancholic': return 'Mélancolie';
-      default: return mood.charAt(0).toUpperCase() + mood.slice(1);
+      case 'happy':
+        return {
+          primaryColor: '#FDE68A', // Yellow
+          secondaryColor: '#FBBF24', 
+          background: 'radial-gradient(circle at center, #FDE68A 0%, #FBBF24 100%)',
+          animation: 'pulse 3s infinite'
+        };
+      case 'calm':
+        return {
+          primaryColor: '#93C5FD', // Light blue
+          secondaryColor: '#3B82F6',
+          background: 'linear-gradient(135deg, #93C5FD 0%, #3B82F6 100%)',
+          animation: 'wave 6s infinite ease-in-out'
+        };
+      case 'focused':
+        return {
+          primaryColor: '#A78BFA', // Purple
+          secondaryColor: '#7C3AED',
+          background: 'linear-gradient(90deg, #A78BFA 0%, #7C3AED 100%)',
+          animation: 'pulse 4s infinite alternate'
+        };
+      case 'energetic':
+        return {
+          primaryColor: '#FCA5A5', // Red
+          secondaryColor: '#EF4444',
+          background: 'radial-gradient(circle at center, #FCA5A5 0%, #EF4444 100%)',
+          animation: 'bounce 2s infinite'
+        };
+      case 'melancholic':
+        return {
+          primaryColor: '#6B7280', // Gray
+          secondaryColor: '#4B5563',
+          background: 'linear-gradient(180deg, #6B7280 0%, #4B5563 100%)',
+          animation: 'slowPulse 8s infinite'
+        };
+      default:
+        return {
+          primaryColor: '#D1D5DB', // Default gray
+          secondaryColor: '#9CA3AF',
+          background: 'linear-gradient(135deg, #D1D5DB 0%, #9CA3AF 100%)',
+          animation: 'none'
+        };
     }
   };
 
-  // Toggle mute
-  const toggleMute = () => {
-    setMuted(!muted);
-    toast({
-      title: muted ? "Son activé" : "Son désactivé",
-      description: muted ? "La visualisation sonore est maintenant active" : "La visualisation sonore est maintenant muette"
-    });
-  };
+  const styles = getMoodStyles();
   
-  // Toggle expanded view
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-
+  // Adjust animation speed based on intensity
+  const animationDuration = Math.max(1, 10 - intensity / 10); // 1-10 seconds inverse to intensity
+  
   return (
-    <Card className={`overflow-hidden transition-all duration-300 ${isExpanded ? 'md:col-span-2' : ''}`}>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium">Visualisation pour ambiance "{getMoodTitle()}"</h3>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8" 
-              onClick={toggleMute}
-              title={muted ? "Activer le son" : "Désactiver le son"}
-            >
-              {muted ? (
-                <VolumeX className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={toggleExpand}
-              className="h-8"
-              title={isExpanded ? "Réduire la visualisation" : "Agrandir la visualisation"}
-            >
-              {isExpanded ? (
-                <>
-                  <Minimize className="h-4 w-4 mr-2" />
-                  Réduire
-                </>
-              ) : (
-                <>
-                  <Maximize className="h-4 w-4 mr-2" />
-                  Agrandir
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        <div className={`transition-all duration-300 ${isExpanded ? 'h-[300px]' : 'h-[180px]'}`}>
-          <EnhancedMusicVisualizer 
-            emotion={mood}
-            height={isExpanded ? 280 : 160}
-            showControls={false}
-            intensity={localIntensity}
-            volume={muted ? 0 : 1}
-          />
-        </div>
-        
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-sm mb-1">
-            <span>Intensité</span>
-            <span>{localIntensity}%</span>
-          </div>
-          <Slider
-            value={[localIntensity]}
-            min={10}
-            max={100}
-            step={1}
-            onValueChange={(value) => setLocalIntensity(value[0])}
-          />
-        </div>
+    <Card className="overflow-hidden">
+      <CardContent className="p-0">
+        <EnhancedMusicVisualizer 
+          mood={mood}
+          height={height}
+          showControls={false}
+          intensity={intensity} 
+          volume={volume}
+        />
       </CardContent>
     </Card>
   );

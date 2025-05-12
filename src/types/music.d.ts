@@ -6,6 +6,9 @@ export interface MusicTrack {
   duration: number;
   url: string;
   coverUrl?: string;
+  audioUrl?: string;
+  audio_url?: string;
+  cover_url?: string;
   lyrics?: string;
   mood?: string;
   tempo?: number;

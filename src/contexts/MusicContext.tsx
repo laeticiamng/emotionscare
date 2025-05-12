@@ -9,6 +9,8 @@ export interface MusicTrack {
   url: string;
   coverUrl?: string;
   cover?: string;
+  audioUrl?: string;
+  audio_url?: string;
 }
 
 export interface MusicPlaylist {
@@ -29,6 +31,9 @@ interface MusicContextType {
   playlists: MusicPlaylist[];
   currentEmotion: string | null;
   error: string | null;
+  currentPlaylist: MusicPlaylist | null;
+  isInitialized: boolean;
+  openDrawer: boolean;
   
   // Player controls
   playTrack: (track: MusicTrack) => void;
@@ -44,6 +49,9 @@ interface MusicContextType {
   loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   
+  // UI state
+  setOpenDrawer: (isOpen: boolean) => void;
+  
   // Initialization
   initializeMusicSystem: () => Promise<void>;
 }
@@ -57,6 +65,9 @@ const MusicContext = createContext<MusicContextType>({
   playlists: [],
   currentEmotion: null,
   error: null,
+  currentPlaylist: null,
+  isInitialized: false,
+  openDrawer: false,
   
   playTrack: () => {},
   pauseTrack: () => {},
@@ -70,7 +81,8 @@ const MusicContext = createContext<MusicContextType>({
   loadPlaylistById: async () => null,
   loadPlaylistForEmotion: async () => null,
   
-  initializeMusicSystem: async () => {}
+  initializeMusicSystem: async () => {},
+  setOpenDrawer: () => {}
 });
 
 // Sample music data for demo
@@ -149,12 +161,15 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>(SAMPLE_PLAYLISTS);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   
   // Initialize the music system
   const initializeMusicSystem = useCallback(async () => {
     try {
       // In a real app, this would load user preferences, check permissions, etc.
       console.log('Music system initialized');
+      setIsInitialized(true);
       return;
     } catch (err) {
       setError('Failed to initialize music system');
@@ -258,6 +273,9 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     playlists,
     currentEmotion,
     error,
+    currentPlaylist,
+    isInitialized,
+    openDrawer,
     
     playTrack,
     pauseTrack,
@@ -271,7 +289,8 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     loadPlaylistById,
     loadPlaylistForEmotion,
     
-    initializeMusicSystem
+    initializeMusicSystem,
+    setOpenDrawer
   };
   
   return (
