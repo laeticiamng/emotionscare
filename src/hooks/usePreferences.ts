@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { UserPreferences } from '@/types/user';
 import { useTheme } from '@/contexts/ThemeContext';
+import { toast } from 'sonner';
 
 export function usePreferences() {
   const themeContext = useTheme();
@@ -12,7 +13,17 @@ export function usePreferences() {
     fontFamily: 'inter',
     language: 'fr',
     notifications: true,
-    soundEnabled: true
+    soundEnabled: true,
+    // Additional preferences fields used by components
+    notifications_enabled: true,
+    email_notifications: false,
+    push_notifications: true,
+    privacy: 'private',
+    autoplayVideos: false,
+    dataCollection: true,
+    emotionalCamouflage: false,
+    aiSuggestions: true,
+    fullAnonymity: false
   });
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -66,10 +77,12 @@ export function usePreferences() {
       localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
       
       setPreferences(updatedPreferences);
+      toast.success("Préférences mises à jour");
       
       return true;
     } catch (error) {
       console.error('Erreur lors de la mise à jour des préférences:', error);
+      toast.error("Erreur lors de la mise à jour des préférences");
       return false;
     }
   };
@@ -82,7 +95,16 @@ export function usePreferences() {
       fontFamily: 'inter',
       language: 'fr',
       notifications: true,
-      soundEnabled: true
+      soundEnabled: true,
+      notifications_enabled: true,
+      email_notifications: false,
+      push_notifications: true,
+      privacy: 'private',
+      autoplayVideos: false,
+      dataCollection: true,
+      emotionalCamouflage: false,
+      aiSuggestions: false,
+      fullAnonymity: false
     };
     
     return updatePreferences(defaultPreferences);

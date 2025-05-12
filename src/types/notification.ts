@@ -7,39 +7,39 @@ export enum NotificationFrequency {
 }
 
 export enum NotificationType {
-  MINIMAL = 'minimal',
-  DETAILED = 'detailed',
-  FULL = 'full',
   ALL = 'all',
   IMPORTANT = 'important',
-  NONE = 'none'
+  ACTIVITY = 'activity',
+  REMINDERS = 'reminders',
+  MESSAGES = 'messages'
 }
 
 export enum NotificationTone {
   MINIMALIST = 'minimalist',
   POETIC = 'poetic',
   DIRECTIVE = 'directive',
-  SILENT = 'silent',
   MOTIVATING = 'motivating',
   GENTLE = 'gentle'
-}
-
-export interface NotificationPreferencesProps {
-  frequency: NotificationFrequency;
-  type: NotificationType;
-  tone: NotificationTone;
-  onFrequencyChange: (frequency: NotificationFrequency) => void;
-  onTypeChange: (type: NotificationType) => void; 
-  onToneChange: (tone: NotificationTone) => void;
 }
 
 export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  created_at: string | Date;
+  type: 'info' | 'success' | 'warning' | 'error';
   read: boolean;
-  link?: string;
-  user_id: string;
+  createdAt: Date | string;
+  linkTo?: string;
+}
+
+export interface NotificationPreference {
+  type: string;
+  enabled: boolean;
+  frequency?: NotificationFrequency;
+  time?: string;
+  channels?: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
 }

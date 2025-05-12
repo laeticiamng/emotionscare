@@ -1,33 +1,29 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 
-interface PageHeaderProps {
+export interface PageHeaderProps {
   title: string;
   description?: string;
-  children?: ReactNode;
-  icon?: ReactNode; // Added icon prop to support using icons in header
+  icon?: React.ReactNode;
+  actions?: React.ReactNode;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ 
-  title, 
+const PageHeader: React.FC<PageHeaderProps> = ({
+  title,
   description,
-  children,
-  icon // Add icon to the destructured props
+  icon,
+  actions
 }) => {
   return (
-    <div className="pb-4 mb-6 border-b">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {icon && <span className="text-muted-foreground">{icon}</span>} {/* Render the icon when provided */}
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-            {description && (
-              <p className="text-sm text-muted-foreground mt-1">{description}</p>
-            )}
-          </div>
+    <div className="flex flex-col sm:flex-row items-start justify-between pb-4 mb-4 border-b">
+      <div className="flex items-center">
+        {icon && <div className="mr-2 text-primary">{icon}</div>}
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          {description && <p className="text-muted-foreground mt-1">{description}</p>}
         </div>
-        {children && <div>{children}</div>}
       </div>
+      {actions && <div className="mt-4 sm:mt-0">{actions}</div>}
     </div>
   );
 };
