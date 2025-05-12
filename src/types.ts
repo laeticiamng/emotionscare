@@ -1,11 +1,13 @@
 
+
 export type {
   User,
   UserPreferences,
   FontFamily,
   FontSize,
   ThemeName,
-  InvitationVerificationResult
+  InvitationVerificationResult,
+  UserRole
 } from './types/user';
 
 export type {
@@ -24,7 +26,10 @@ export type {
   MusicPlaylist,
   MusicContextType,
   MusicDrawerProps,
-  Track
+  Track,
+  ProgressBarProps,
+  TrackInfoProps,
+  VolumeControlProps
 } from './types/music';
 
 export type {
@@ -86,3 +91,96 @@ export interface EmotionResult {
     intensity?: number;
   };
 }
+
+// Adding additional required types
+export interface JournalEntry {
+  id: string;
+  title: string;
+  content: string;
+  text?: string;
+  mood: string;
+  date: Date | string;
+  tags?: string[];
+  ai_feedback?: string;
+}
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  seen: boolean;
+  emotion?: string;
+  image?: string;
+  cta?: {
+    label: string;
+    route: string;
+    text?: string;
+    action?: string;
+  };
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  icon?: string;
+  threshold?: number;
+}
+
+export interface MoodData {
+  date: string;
+  value: number;
+  mood: string;
+}
+
+export interface EmotionPrediction {
+  predictedEmotion: string;
+  emotion: string;
+  probability: number;
+  confidence: number;
+  triggers: string[];
+  recommendations: string[];
+}
+
+export interface Recommendation {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: number;
+  confidence: number;
+}
+
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  rejected: number;
+  sent: number;
+  completed: number;
+  conversionRate: number;
+  averageTimeToAccept: number;
+  teams: Record<string, number>;
+  recent_invites: InvitationData[];
+}
+
+export interface InvitationData {
+  id: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'expired' | 'rejected';
+  created_at: string;
+  expires_at: string;
+  accepted_at?: string;
+  role: string;
+}
+
+export interface InvitationFormData {
+  email: string;
+  role: string;
+  message?: string;
+  expires_in_days: number;
+}
+

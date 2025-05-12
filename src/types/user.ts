@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   name: string;
@@ -65,3 +66,25 @@ export interface ThemeSettings {
 import { Theme, FontSize, FontFamily } from '@/contexts/ThemeContext';
 export type ThemeName = Theme;
 export type { FontSize, FontFamily };
+
+// Add UserRole enum
+export enum UserRole {
+  USER = 'user',
+  EMPLOYEE = 'employee',
+  MANAGER = 'manager',
+  ADMIN = 'admin',
+  WELLBEING_MANAGER = 'wellbeing_manager',
+  COACH = 'coach',
+  ANALYST = 'analyst'
+}
+
+// Add InvitationVerificationResult
+export interface InvitationVerificationResult {
+  isValid: boolean;
+  email?: string;
+  role?: string;
+  error?: string;
+  invitationId?: string;
+  expiresAt?: string;
+}
+

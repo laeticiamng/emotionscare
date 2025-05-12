@@ -1,147 +1,146 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '@/components/layout/PageHeader';
-import DashboardLayout from '@/components/DashboardLayout';
+import { BookOpen, Calendar, List, Plus, Search } from 'lucide-react';
+import { JournalEntry } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import { deleteJournalEntry } from '@/lib/journalService';
+import JournalListView from '@/components/journal/JournalListView';
+import JournalCalendarView from '@/components/journal/JournalCalendarView';
+import JournalMoodView from '@/components/journal/JournalMoodView';
 import { Button } from '@/components/ui/button';
-import { Plus, Filter, BookOpen } from 'lucide-react';
-import JournalEntryList from '@/components/journal/JournalEntryList';
-import JournalStatsCards from '@/components/journal/JournalStatsCards';
-import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/components/ui/use-toast';
-
-// Mock journal entries data
-const mockJournalEntries = [
-  {
-    id: '1',
-    title: 'Journée productive',
-    date: new Date('2023-05-10T14:00:00'),
-    mood: 'happy',
-    content: 'Aujourd\'hui était une journée très productive. J\'ai terminé plusieurs tâches importantes et je me sens satisfait de mes accomplissements.',
-    tags: ['travail', 'productivité', 'satisfaction']
-  },
-  {
-    id: '2',
-    title: 'Promenade au parc',
-    date: new Date('2023-05-08T18:30:00'),
-    mood: 'calm',
-    content: 'J\'ai fait une longue promenade au parc ce soir. Le temps était parfait et j\'ai pu me détendre et réfléchir tranquillement.',
-    tags: ['nature', 'détente', 'réflexion']
-  },
-  {
-    id: '3',
-    title: 'Discussion difficile',
-    date: new Date('2023-05-05T10:15:00'),
-    mood: 'anxious',
-    content: 'J\'ai dû avoir une conversation difficile aujourd\'hui. Bien que stressant, je pense que c\'était nécessaire et finalement bénéfique.',
-    tags: ['communication', 'défi', 'croissance']
-  },
-];
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { PageHeader } from '@/components/layout/PageHeader';
+import Container from '@/components/layout/Container';
 
 const JournalPage: React.FC = () => {
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showMoodView, setShowMoodView] = useState(false);
   const navigate = useNavigate();
-  const [filter, setFilter] = useState('all');
-  const [entries, setEntries] = useState(mockJournalEntries);
   const { toast } = useToast();
   
   useEffect(() => {
-    // Dans une application réelle, nous chargerions les entrées depuis une API ici
-    console.log('Journal entries would be loaded here');
+    // Mock data for demonstration
+    const mockEntries: JournalEntry[] = [
+      {
+        id: '1',
+        title: 'Aujourd\'hui',
+        content: 'Je me suis senti bien aujourd\'hui...',
+        mood: 'happy',
+        date: new Date().toISOString(),
+        tags: ['positif', 'reconnaissance'],
+        ai_feedback: 'Votre journée semble avoir été positive. Continuez à cultiver ces moments.'
+      },
+      {
+        id: '2',
+        title: 'Hier',
+        content: 'J\'étais un peu stressé à cause du travail...',
+        mood: 'anxious',
+        date: new Date(Date.now() - 86400000).toISOString(),
+        tags: ['travail', 'stress'],
+        ai_feedback: 'Il est important de gérer le stress. Essayez des techniques de relaxation.'
+      },
+      {
+        id: '3',
+        title: 'Avant-hier',
+        content: 'Je me suis promené dans la nature...',
+        mood: 'calm',
+        date: new Date(Date.now() - 172800000).toISOString(),
+        tags: ['nature', 'relaxation'],
+        ai_feedback: 'La nature a un effet apaisant. Continuez à profiter de ces moments.'
+      }
+    ];
+    setEntries(mockEntries);
   }, []);
   
-  // Fonction pour filtrer les entrées par humeur
-  const filterEntries = (mood: string) => {
-    setFilter(mood);
-    if (mood === 'all') {
-      setEntries(mockJournalEntries);
-    } else {
-      setEntries(mockJournalEntries.filter(entry => entry.mood === mood));
+  const filteredEntries = entries.filter(entry =>
+    entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (entry.content && entry.content.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  
+  const handleDeleteEntry = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await deleteJournalEntry(id);
+      setEntries(entries.filter(entry => entry.id !== id));
+      toast({
+        title: "Succès",
+        description: "L'entrée a été supprimée avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de la suppression de l'entrée.",
+        variant: "destructive",
+      });
     }
-    
-    toast({
-      title: "Filtre appliqué",
-      description: `Affichage des entrées avec l'humeur: ${mood === 'all' ? 'toutes' : mood}`
-    });
-  };
-  
-  const handleNewEntry = () => {
-    navigate('/journal/new');
-  };
-  
-  const handleViewEntry = (id: string) => {
-    navigate(`/journal/${id}`);
   };
   
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
-        <PageHeader 
-          title="Journal émotionnel" 
-          description="Suivez et analysez vos émotions au fil du temps"
-          icon={<BookOpen className="h-5 w-5" />}
-        >
-          <Button onClick={handleNewEntry} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Nouvelle entrée
+    <Container>
+      <PageHeader 
+        title="Journal émotionnel" 
+        description="Suivez et analysez vos émotions quotidiennes"
+        icon={<BookOpen className="h-6 w-6" />}
+      />
+      
+      <div className="grid gap-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant={view === 'list' ? 'default' : 'outline'}
+              onClick={() => setView('list')}
+            >
+              <List className="h-4 w-4 mr-2" /> Liste
+            </Button>
+            <Button 
+              variant={view === 'calendar' ? 'default' : 'outline'}
+              onClick={() => setView('calendar')}
+            >
+              <Calendar className="h-4 w-4 mr-2" /> Calendrier
+            </Button>
+          </div>
+          <Button onClick={() => navigate('/journal/new')}>
+            <Plus className="h-4 w-4 mr-2" /> Ajouter une entrée
           </Button>
-        </PageHeader>
-        
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <JournalStatsCards />
         </div>
         
-        {entries.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <Alert>
-                <AlertDescription>
-                  Vous n'avez pas encore d'entrées de journal. Commencez à noter vos émotions pour voir des entrées apparaître ici.
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <div className="flex items-center gap-4 py-4">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <div className="flex flex-wrap gap-2">
-                <Button 
-                  variant={filter === 'all' ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => filterEntries('all')}
-                >
-                  Toutes
-                </Button>
-                <Button 
-                  variant={filter === 'happy' ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => filterEntries('happy')}
-                >
-                  Joie
-                </Button>
-                <Button 
-                  variant={filter === 'calm' ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => filterEntries('calm')}
-                >
-                  Calme
-                </Button>
-                <Button 
-                  variant={filter === 'anxious' ? "default" : "outline"} 
-                  size="sm"
-                  onClick={() => filterEntries('anxious')}
-                >
-                  Anxiété
-                </Button>
-              </div>
-            </div>
-            
-            <JournalEntryList entries={entries} onViewEntry={handleViewEntry} />
-          </>
-        )}
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="search">Rechercher:</Label>
+          <Input
+            type="search"
+            id="search"
+            placeholder="Rechercher une entrée..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
-    </DashboardLayout>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Vue d'ensemble</CardTitle>
+        </CardHeader>
+        <div className="p-4 flex items-center justify-between">
+          <p>Afficher l'analyse des émotions</p>
+          <Switch checked={showMoodView} onCheckedChange={setShowMoodView} />
+        </div>
+      </Card>
+      
+      {showMoodView && (
+        <JournalMoodView entries={filteredEntries} />
+      )}
+      
+      {view === 'list' ? (
+        <JournalListView entries={filteredEntries} onDeleteEntry={handleDeleteEntry} />
+      ) : (
+        <JournalCalendarView entries={filteredEntries} />
+      )}
+    </Container>
   );
 };
 

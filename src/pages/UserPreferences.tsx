@@ -16,9 +16,10 @@ const UserPreferences: React.FC = () => {
 
   const [userPreferences, setUserPreferences] = useState<UserPreferencesType>({
     theme: 'system',
-    notifications: false,
     fontSize: 'medium',
-    language: 'fr'
+    fontFamily: 'inter',
+    language: 'fr',
+    notifications: false
   });
   const [isSaving, setIsSaving] = useState(false);
 

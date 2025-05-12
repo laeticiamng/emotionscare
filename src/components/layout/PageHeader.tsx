@@ -6,13 +6,15 @@ export interface PageHeaderProps {
   description?: string;
   icon?: React.ReactNode;
   actions?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   description,
   icon,
-  actions
+  actions,
+  children
 }) => {
   return (
     <div className="flex flex-col sm:flex-row items-start justify-between pb-4 mb-4 border-b">
@@ -24,6 +26,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
       </div>
       {actions && <div className="mt-4 sm:mt-0">{actions}</div>}
+      {children}
     </div>
   );
 };

@@ -50,9 +50,12 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user, onUpdate, onClose
   };
 
   const handleRoleChange = (role: string) => {
+    // Check if the role is one of the valid User role types
+    const validRole = role as User['role'];
+    
     setEditedUser(prev => ({
       ...prev,
-      role
+      role: validRole
     }));
   };
 
