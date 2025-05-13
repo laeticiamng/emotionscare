@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNotificationBadge } from "@/hooks/useNotificationBadge";
 import { motion } from "framer-motion";
 import { useUserMode } from '@/contexts/UserModeContext';
+import { getRoleHomePath, getRoleName } from '@/utils/roleUtils';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -42,26 +44,63 @@ const MainNavbar: React.FC = () => {
   const navigate = useNavigate();
   const { userMode } = useUserMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const isAdmin = userMode === 'b2b-admin';
   
-  const mainLinks = [
-    { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: "/" },
-    { label: "Tableau de bord", icon: <Layout className="h-4 w-4 mr-2" />, path: "/dashboard" },
-    { label: "Scan émotionnel", icon: <Heart className="h-4 w-4 mr-2" />, path: "/scan" },
-    { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: "/journal" },
-    { label: "Musicothérapie", icon: <Music className="h-4 w-4 mr-2" />, path: "/music" },
-    { label: "Coach IA", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: "/coach" }
-  ];
-
-  const adminLinks = [
-    { label: "Dashboard Admin", icon: <BarChart className="h-4 w-4 mr-2" />, path: "/admin" }
-  ];
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
+  const getNavItems = () => {
+    if (isAdmin) {
+      return [
+        { label: "Tableau de bord", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2b/admin/dashboard" },
+        { label: "Équipes", icon: <User className="h-4 w-4 mr-2" />, path: "/b2b/admin/teams" },
+        { label: "Rapports", icon: <FileText className="h-4 w-4 mr-2" />, path: "/b2b/admin/reports" },
+        { label: "Événements", icon: <Layout className="h-4 w-4 mr-2" />, path: "/b2b/admin/events" },
+        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: "/b2b/admin/settings" }
+      ];
+    }
+    
+    if (userMode === 'b2b-user') {
+      return [
+        { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2b/user/dashboard" },
+        { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: "/b2b/user/scan" },
+        { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: "/b2b/user/journal" },
+        { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: "/b2b/user/music" },
+        { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: "/b2b/user/coach" },
+        { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: "/b2b/user/vr" },
+        { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: "/b2b/user/gamification" },
+        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: "/b2b/user/preferences" }
+      ];
+    }
+    
+    return [
+      { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2c/dashboard" },
+      { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: "/b2c/scan" },
+      { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: "/b2c/journal" },
+      { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: "/b2c/music" },
+      { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: "/b2c/coach" },
+      { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: "/b2c/vr" },
+      { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: "/b2c/gamification" },
+      { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: "/b2c/preferences" }
+    ];
   };
+
+  const handleLogout = () => {
+    setShowConfirm(true);
+  };
+  
+  const confirmLogout = async () => {
+    await logout();
+    setShowConfirm(false);
+    navigate('/');
+  };
+  
+  const cancelLogout = () => {
+    setShowConfirm(false);
+  };
+  
+  const navItems = getNavItems();
+  
+  const userRole = user?.role ? getRoleName(user.role) : 'Utilisateur';
 
   return (
     <header className="bg-background/95 backdrop-blur-md border-b sticky top-0 z-50 transition-all">
@@ -90,22 +129,7 @@ const MainNavbar: React.FC = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1">
-          {isAuthenticated && mainLinks.map((link) => (
-            <Button 
-              key={link.path} 
-              variant="ghost" 
-              size="sm"
-              asChild
-              className="px-3"
-            >
-              <Link to={link.path} className="flex items-center">
-                {link.icon}
-                <span>{link.label}</span>
-              </Link>
-            </Button>
-          ))}
-          
-          {isAuthenticated && isAdmin && adminLinks.map((link) => (
+          {isAuthenticated && navItems.map((link) => (
             <Button 
               key={link.path} 
               variant="ghost" 
@@ -182,9 +206,20 @@ const MainNavbar: React.FC = () => {
                   <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <DropdownMenuItem>
                       <User className="mr-2 h-4 w-4" />
-                      <span>Profil</span>
+                      <span>{user?.name || 'Utilisateur'}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <BarChart className="mr-2 h-4 w-4" />
+                      <span>{userRole}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => navigate(getRoleHomePath(user?.role))}>
+                      <Home className="mr-2 h-4 w-4" />
+                      <span>Tableau de bord</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate('/settings')}>
                       <Settings className="mr-2 h-4 w-4" />
@@ -226,22 +261,7 @@ const MainNavbar: React.FC = () => {
                     </div>
                     
                     <nav className="flex-1 space-y-2 py-4">
-                      {mainLinks.map((link) => (
-                        <Button 
-                          key={link.path} 
-                          variant="ghost" 
-                          className="w-full justify-start"
-                          onClick={() => {
-                            navigate(link.path);
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          {link.icon}
-                          {link.label}
-                        </Button>
-                      ))}
-                      
-                      {isAdmin && adminLinks.map((link) => (
+                      {navItems.map((link) => (
                         <Button 
                           key={link.path} 
                           variant="ghost" 
@@ -272,10 +292,7 @@ const MainNavbar: React.FC = () => {
                       <Button 
                         variant="ghost" 
                         className="w-full justify-start"
-                        onClick={() => {
-                          handleLogout();
-                          setMobileMenuOpen(false);
-                        }}
+                        onClick={handleLogout}
                       >
                         <LogOut className="mr-2 h-4 w-4" />
                         Se déconnecter
@@ -297,6 +314,17 @@ const MainNavbar: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showConfirm && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
+            <Button variant="destructive" onClick={confirmLogout}>Oui</Button>
+            <Button variant="outline" onClick={cancelLogout}>Annuler</Button>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

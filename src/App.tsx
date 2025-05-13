@@ -1,25 +1,23 @@
 
-import React, { useEffect } from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
-import { useTheme } from './contexts/ThemeContext';
-import './styles/modals.css';
+import React, { useEffect } from "react";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
+import { Analytics } from "./utils/analytics"; // Keep this if analytics is used
+import "./App.css";
+import { Toaster } from "sonner";
 
-const App: React.FC = () => {
-  const { theme } = useTheme();
-
-  // Apply dark class to document based on theme
+function App() {
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
+    // Initialize analytics or any other app-wide setup here
+    Analytics.initialize();
+  }, []);
 
   return (
-    <RouterProvider router={router} />
+    <>
+      <RouterProvider router={router} />
+      <Toaster position="top-right" />
+    </>
   );
-};
+}
 
 export default App;

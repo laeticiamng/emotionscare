@@ -65,17 +65,16 @@
   }
 }
 
-/* Dark mode support */
 .dark .modal-content {
-  background: #1f2937;
-  color: #f9fafb;
+  background: #1f1f1f;
+  color: #f0f0f0;
 }
 
 .dark .modal-content p {
-  color: #f9fafb;
+  color: #f0f0f0;
 }
 
 .dark .modal-content button:last-of-type {
-  background: #374151;
-  color: #f9fafb;
+  background: #333;
+  color: #f0f0f0;
 }

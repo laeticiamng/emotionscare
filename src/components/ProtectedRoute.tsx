@@ -3,6 +3,7 @@ import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { getRoleLoginPath } from '@/utils/roleUtils';
 
 type ProtectedRouteProps = {
   children?: React.ReactNode;
@@ -29,7 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   
   // Redirect to login if user is not authenticated
   if (!isAuthenticated) {
-    const defaultRedirect = role ? `/${role}/login` : '/login';
+    const defaultRedirect = role ? getRoleLoginPath(role) : '/login';
     const redirectPath = redirectTo || defaultRedirect;
     
     console.log(`User not authenticated, redirecting to ${redirectPath}`);

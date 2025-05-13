@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { getRoleHomePath } from '@/utils/roleUtils';
 
 export function useRoleRedirect() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -11,18 +12,7 @@ export function useRoleRedirect() {
     if (isLoading) return;
     
     if (isAuthenticated && user) {
-      switch(user.role) {
-        case 'b2b_admin':
-          navigate('/b2b/admin/dashboard');
-          break;
-        case 'b2b_user':
-          navigate('/b2b/user/dashboard');
-          break;
-        case 'b2c':
-        default:
-          navigate('/b2c/dashboard');
-          break;
-      }
+      navigate(getRoleHomePath(user.role));
     }
   }, [isAuthenticated, user, isLoading, navigate]);
   

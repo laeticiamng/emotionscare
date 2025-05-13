@@ -4,11 +4,11 @@ import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import './styles/branding.css';
+import './styles/modals.css';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { MusicProvider } from './contexts/MusicContext';
 import { Toaster } from './components/ui/toaster';
 import ErrorBoundary from './components/ErrorBoundary.tsx';
-import { BrowserRouter } from 'react-router-dom';
 import { SoundscapeProvider } from './providers/SoundscapeProvider';
 import { StorytellingProvider } from './providers/StorytellingProvider';
 import { BrandingProvider } from './contexts/BrandingContext';
@@ -31,30 +31,28 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <BrowserRouter>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <TooltipProvider>
-              <AuthProvider>
-                <UserModeProvider>
-                  <BrandingProvider>
-                    <SoundscapeProvider>
-                      <StorytellingProvider>
-                        <PredictiveAnalyticsProvider>
-                          <MusicProvider>
-                            <App />
-                            <Toaster />
-                          </MusicProvider>
-                        </PredictiveAnalyticsProvider>
-                      </StorytellingProvider>
-                    </SoundscapeProvider>
-                  </BrandingProvider>
-                </UserModeProvider>
-              </AuthProvider>
-            </TooltipProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <TooltipProvider>
+            <AuthProvider>
+              <UserModeProvider>
+                <BrandingProvider>
+                  <SoundscapeProvider>
+                    <StorytellingProvider>
+                      <PredictiveAnalyticsProvider>
+                        <MusicProvider>
+                          <App />
+                          <Toaster />
+                        </MusicProvider>
+                      </PredictiveAnalyticsProvider>
+                    </StorytellingProvider>
+                  </SoundscapeProvider>
+                </BrandingProvider>
+              </UserModeProvider>
+            </AuthProvider>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   </React.StrictMode>,
 );

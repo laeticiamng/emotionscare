@@ -1,45 +1,28 @@
 
 import { useState, useEffect } from 'react';
-import { NotificationService } from '@/lib/notifications';
-import { useAuth } from '@/contexts/AuthContext';
 
-export function useNotificationBadge() {
-  const [unreadCount, setUnreadCount] = useState(0); // Renamed from count to unreadCount for consistency
-  const { user } = useAuth();
+export const useNotificationBadge = () => {
+  const [count, setCount] = useState<number>(0);
   
   useEffect(() => {
-    if (!user?.id) return;
+    // Mock notification count - in a real app this would come from an API or context
+    const mockNotifications = Math.floor(Math.random() * 5);
+    setCount(mockNotifications);
     
-    // Load initial count
-    const loadNotifications = async () => {
-      try {
-        const count = await NotificationService.getUnreadCount(user.id);
-        setUnreadCount(count);
-      } catch (error) {
-        console.error('Error loading notification count:', error);
+    // Simulate new notifications coming in
+    const intervalId = setInterval(() => {
+      const shouldAddNotification = Math.random() > 0.7;
+      if (shouldAddNotification) {
+        setCount(prevCount => prevCount + 1);
       }
-    };
+    }, 60000); // Every minute
     
-    loadNotifications();
-    
-    // Subscribe to notification updates if available
-    const unsubscribe = NotificationService.subscribeToNotifications?.(loadNotifications);
-    
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [user?.id]);
+    return () => clearInterval(intervalId);
+  }, []);
   
-  const markAllAsRead = async () => {
-    try {
-      if (!user?.id) return;
-      await NotificationService.markAllAsRead(user.id);
-      setUnreadCount(0);
-    } catch (error) {
-      console.error('Error marking notifications as read:', error);
-    }
+  const clearBadge = () => {
+    setCount(0);
   };
   
-  // Return unreadCount for consistent naming across components
-  return { unreadCount, markAllAsRead, count: unreadCount };
-}
+  return { count, clearBadge };
+};

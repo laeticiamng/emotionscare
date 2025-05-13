@@ -1,7 +1,8 @@
 
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import ProtectedLayout from '@/components/ProtectedLayout';
+
+// Layouts
 import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
 import B2BAdminLayout from '@/layouts/B2BAdminLayout';
@@ -54,7 +55,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/onboarding',
-    element: <ProtectedLayout><Onboarding /></ProtectedLayout>,
+    element: <ProtectedRoute><Onboarding /></ProtectedRoute>,
   },
   {
     path: '/login',

@@ -1,44 +1,64 @@
 
-import { UserRole } from '@/types/user';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | 'user';
 
-export function isAdminRole(role?: string): boolean {
-  return role === 'admin' || role === 'b2b_admin';
-}
-
-export function isUserRole(role?: string): boolean {
-  return role === 'user' || role === 'b2b_user' || role === 'b2c';
-}
-
-export function getRoleName(role?: string): string {
-  switch(role) {
-    case 'admin': return 'Administrateur';
-    case 'b2b_admin': return 'Admin B2B';
-    case 'b2b_user': return 'Utilisateur B2B';
-    case 'user': return 'Utilisateur';
-    case 'b2c': return 'Particulier';
-    case 'moderator': return 'Modérateur';
-    default: return 'Utilisateur';
-  }
-}
-
-export function getRolePermissions(role?: string): string[] {
-  switch(role) {
-    case 'admin':
-    case 'b2b_admin':
-      return ['read', 'write', 'delete', 'manage_users', 'view_reports', 'manage_settings'];
-    case 'moderator':
-      return ['read', 'write', 'delete', 'manage_content'];
-    case 'b2b_user':
-      return ['read', 'write', 'view_team_data'];
-    case 'user':
-    case 'b2c':
-    default:
-      return ['read', 'write'];
-  }
-}
-
-export function hasPermission(role: string | undefined, permission: string): boolean {
+/**
+ * Determines if a role is an admin role
+ */
+export const isAdminRole = (role?: string | null): boolean => {
   if (!role) return false;
-  const permissions = getRolePermissions(role);
-  return permissions.includes(permission);
-}
+  return role === 'b2b_admin' || role === 'admin';
+};
+
+/**
+ * Get a human-readable name for a role
+ */
+export const getRoleName = (role?: UserRole | string | null): string => {
+  switch (role) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_user':
+    case 'user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+    case 'admin':
+      return 'Administrateur';
+    default:
+      return 'Utilisateur';
+  }
+};
+
+/**
+ * Get the home page path for a specific role
+ */
+export const getRoleHomePath = (role?: UserRole | string | null): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+    case 'user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+    case 'admin':
+      return '/b2b/admin/dashboard';
+    default:
+      return '/';
+  }
+};
+
+/**
+ * Get the corresponding login page for a role
+ */
+export const getRoleLoginPath = (role?: UserRole | string | null): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/login';
+    case 'b2b_user':
+    case 'user':
+      return '/b2b/user/login';
+    case 'b2b_admin':
+    case 'admin':
+      return '/b2b/admin/login';
+    default:
+      return '/login';
+  }
+};

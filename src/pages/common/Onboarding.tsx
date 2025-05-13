@@ -2,253 +2,112 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CheckCircle2, Heart } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
-const OnboardingSteps = [
-  {
-    id: 'welcome',
-    title: 'Bienvenue sur EmotionsCare',
-    description: 'Configurons votre profil pour personnaliser votre expérience.'
-  },
-  {
-    id: 'personal-info',
-    title: 'Informations personnelles',
-    description: 'Ces informations nous aideront à adapter notre accompagnement.'
-  },
-  {
-    id: 'interests',
-    title: 'Vos centres d'intérêt',
-    description: 'Pour vous proposer des contenus qui vous correspondent.'
-  },
-  {
-    id: 'complete',
-    title: 'Félicitations !',
-    description: 'Votre profil est maintenant configuré.'
-  }
-];
-
 const Onboarding: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    displayName: '',
-    language: 'fr',
-    interests: [] as string[]
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const navigate = useNavigate();
   const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   
-  const handleNext = () => {
-    if (currentStep < OnboardingSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+  const totalSteps = 3;
   
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-  
-  const handleSubmit = async () => {
-    if (!user) return;
-    
-    setIsSubmitting(true);
+  const completeOnboarding = async () => {
+    setLoading(true);
     
     try {
-      // Update user profile with onboarding information
-      await updateUser({
-        ...user,
-        name: formData.displayName || user.name,
-        onboarded: true,
-        preferences: {
-          ...user.preferences,
-          language: formData.language,
-        }
-      });
+      if (user) {
+        await updateUser({
+          ...user,
+          onboarded: true
+        });
+      }
       
       toast({
-        title: 'Profil configuré',
-        description: 'Votre profil a été configuré avec succès.'
+        title: "Onboarding terminé",
+        description: "Bienvenue sur EmotionsCare"
       });
       
-      // Redirect based on user role
-      if (user.role === 'b2b_admin') {
-        navigate('/b2b/admin/dashboard');
-      } else if (user.role === 'b2b_user') {
-        navigate('/b2b/user/dashboard');
-      } else {
-        navigate('/b2c/dashboard');
-      }
+      navigate('/choose-mode');
     } catch (error) {
       toast({
-        title: 'Erreur',
-        description: 'Une erreur est survenue lors de la configuration de votre profil.',
-        variant: 'destructive'
+        title: "Erreur",
+        description: "Impossible de finaliser l'onboarding",
+        variant: "destructive"
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
   
-  const renderStepContent = () => {
-    const currentStepData = OnboardingSteps[currentStep];
-    
-    switch (currentStepData.id) {
-      case 'welcome':
-        return (
-          <div className="text-center">
-            <div className="mb-6 mx-auto bg-primary/10 p-4 rounded-full w-16 h-16 flex items-center justify-center">
-              <Heart className="h-8 w-8 text-primary" />
-            </div>
-            <p className="text-lg mb-6">
-              Nous sommes ravis de vous accueillir sur EmotionsCare. 
-              Prenez quelques instants pour configurer votre profil afin de personnaliser votre expérience.
-            </p>
-            <Button onClick={handleNext}>Commencer</Button>
-          </div>
-        );
-        
-      case 'personal-info':
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="displayName">Nom d'affichage</Label>
-              <Input
-                id="displayName"
-                name="displayName"
-                value={formData.displayName}
-                onChange={handleChange}
-                placeholder="Comment souhaitez-vous être appelé ?"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Langue préférée</Label>
-              <RadioGroup 
-                value={formData.language} 
-                onValueChange={(value) => setFormData({...formData, language: value})}
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="fr" id="fr" />
-                  <Label htmlFor="fr">Français</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="en" id="en" />
-                  <Label htmlFor="en">English</Label>
-                </div>
-              </RadioGroup>
-            </div>
-          </div>
-        );
-        
-      case 'interests':
-        const interests = ['Méditation', 'Musique', 'Lecture', 'Sport', 'Nature', 'Art', 'Voyage'];
-        
-        return (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground mb-4">
-              Sélectionnez les activités que vous appréciez (utilisées pour personnaliser les recommandations)
-            </p>
-            
-            <div className="grid grid-cols-2 gap-2">
-              {interests.map((interest) => (
-                <div 
-                  key={interest}
-                  className={`
-                    border rounded-md p-3 cursor-pointer transition-colors
-                    ${formData.interests.includes(interest) 
-                      ? 'bg-primary/10 border-primary' 
-                      : 'hover:bg-muted'}
-                  `}
-                  onClick={() => {
-                    if (formData.interests.includes(interest)) {
-                      setFormData({
-                        ...formData,
-                        interests: formData.interests.filter(i => i !== interest)
-                      });
-                    } else {
-                      setFormData({
-                        ...formData,
-                        interests: [...formData.interests, interest]
-                      });
-                    }
-                  }}
-                >
-                  <div className="flex items-center">
-                    {formData.interests.includes(interest) && (
-                      <CheckCircle2 className="h-4 w-4 mr-2 text-primary" />
-                    )}
-                    <span>{interest}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-        
-      case 'complete':
-        return (
-          <div className="text-center">
-            <div className="mb-6 mx-auto bg-green-100 dark:bg-green-900/20 p-4 rounded-full w-16 h-16 flex items-center justify-center">
-              <CheckCircle2 className="h-8 w-8 text-green-600 dark:text-green-500" />
-            </div>
-            <p className="text-lg mb-6">
-              Votre profil est maintenant configuré ! Vous êtes prêt à commencer votre parcours de bien-être émotionnel.
-            </p>
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? 'Finalisation...' : 'Accéder à mon espace'}
-            </Button>
-          </div>
-        );
-        
-      default:
-        return null;
+  const nextStep = () => {
+    if (step < totalSteps) {
+      setStep(step + 1);
+    } else {
+      completeOnboarding();
+    }
+  };
+  
+  const prevStep = () => {
+    if (step > 1) {
+      setStep(step - 1);
     }
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/30">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{OnboardingSteps[currentStep].title}</CardTitle>
-          <CardDescription>{OnboardingSteps[currentStep].description}</CardDescription>
+        <CardHeader className="text-center">
+          <CardTitle>Bienvenue sur EmotionsCare</CardTitle>
         </CardHeader>
-        
-        <CardContent className="py-4">
-          {renderStepContent()}
+        <CardContent className="space-y-4">
+          <div className="flex justify-center mb-4">
+            <div className="flex gap-2">
+              {[...Array(totalSteps)].map((_, i) => (
+                <div 
+                  key={i}
+                  className={`h-2 w-8 rounded-full ${i < step ? 'bg-primary' : 'bg-muted'}`}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {step === 1 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">À propos de vous</h3>
+              <p>Nous allons vous guider à travers les premières étapes pour configurer votre profil.</p>
+            </div>
+          )}
+          
+          {step === 2 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Vos objectifs</h3>
+              <p>Quels sont vos objectifs en matière de bien-être émotionnel ?</p>
+            </div>
+          )}
+          
+          {step === 3 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Vous êtes prêt !</h3>
+              <p>Votre profil est prêt. Vous pouvez maintenant explorer l'application.</p>
+            </div>
+          )}
+          
+          <div className="flex justify-between pt-4">
+            <Button 
+              variant="outline" 
+              onClick={prevStep}
+              disabled={step === 1}
+            >
+              Retour
+            </Button>
+            <Button onClick={nextStep} disabled={loading}>
+              {step === totalSteps ? 'Terminer' : 'Suivant'}
+            </Button>
+          </div>
         </CardContent>
-        
-        <CardFooter className="flex justify-between">
-          {currentStep > 0 && currentStep < OnboardingSteps.length - 1 && (
-            <Button variant="outline" onClick={handlePrevious}>
-              Précédent
-            </Button>
-          )}
-          
-          <div className="flex-1" />
-          
-          {currentStep > 0 && currentStep < OnboardingSteps.length - 1 && (
-            <Button onClick={handleNext}>
-              Suivant
-            </Button>
-          )}
-        </CardFooter>
       </Card>
     </div>
   );
