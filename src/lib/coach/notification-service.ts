@@ -1,73 +1,71 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { CoachNotification } from './types';
 
-/**
- * Service for managing coach notifications
- */
 export class NotificationService {
+  private notifications: CoachNotification[] = [];
   private userId: string | null = null;
   
   constructor(userId?: string) {
     this.userId = userId || null;
+    this.loadNotifications();
   }
   
   setUserId(userId: string) {
     this.userId = userId;
+    this.loadNotifications();
   }
   
-  // Add a new notification
-  async addNotification(notification: Omit<CoachNotification, 'id'>): Promise<CoachNotification> {
-    const id = `notification-${Date.now()}`;
-    
+  private loadNotifications() {
+    // In a real app, this would load from local storage or backend
+    this.notifications = [];
+  }
+  
+  async getNotifications(): Promise<CoachNotification[]> {
+    return [...this.notifications];
+  }
+  
+  async addNotification(notification: Omit<CoachNotification, 'id' | 'timestamp' | 'read'>): Promise<CoachNotification> {
     const newNotification: CoachNotification = {
-      ...notification,
-      id,
-      timestamp: notification.timestamp || new Date().toISOString(),
-      read: false
+      id: `notif-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      read: false,
+      ...notification
     };
     
-    // In a real implementation, this would save to Supabase
-    console.log("Adding notification:", newNotification, "for user:", this.userId);
+    this.notifications.unshift(newNotification);
     
+    // Limit to 50 notifications
+    if (this.notifications.length > 50) {
+      this.notifications = this.notifications.slice(0, 50);
+    }
+    
+    // In a real app, save to backend or local storage
     return newNotification;
   }
   
-  // Mark notification as read
   async markAsRead(notificationId: string): Promise<boolean> {
-    // In a real implementation, this would update in Supabase
-    console.log("Marking notification as read:", notificationId);
+    const notification = this.notifications.find(n => n.id === notificationId);
+    
+    if (notification) {
+      notification.read = true;
+      return true;
+    }
+    
+    return false;
+  }
+  
+  async markAllAsRead(): Promise<boolean> {
+    this.notifications.forEach(notif => {
+      notif.read = true;
+    });
+    
     return true;
   }
   
-  // Get user's unread notifications
-  async getUnreadNotifications(): Promise<CoachNotification[]> {
-    if (!this.userId) {
-      console.error("No user ID set for notification service");
-      return [];
-    }
-    
-    // In a real implementation, this would fetch from Supabase
-    return [
-      {
-        id: "notif-1",
-        title: "Rappel d'exercice",
-        message: "N'oubliez pas votre exercice de respiration quotidien",
-        type: "info",
-        timestamp: new Date(Date.now() - 3600000).toISOString()
-      }
-    ];
+  getUnreadCount(): number {
+    return this.notifications.filter(n => !n.read).length;
   }
 }
 
-const notificationService = new NotificationService();
-export default notificationService;
-
-// Helper function to add a notification
-export const addNotification = (
-  userId: string,
-  notification: Omit<CoachNotification, 'id'>
-): Promise<CoachNotification> => {
-  notificationService.setUserId(userId);
-  return notificationService.addNotification(notification);
-};
+// Export a singleton instance
+export const notificationService = new NotificationService();

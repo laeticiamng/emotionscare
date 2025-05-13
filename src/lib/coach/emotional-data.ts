@@ -2,9 +2,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { CoachAction, CoachEvent, EmotionalData } from './types';
 
-/**
- * Service for storing and analyzing emotional data
- */
 export class EmotionalDataService {
   private userId: string | null = null;
   
@@ -16,65 +13,84 @@ export class EmotionalDataService {
     this.userId = userId;
   }
   
-  async getEmotionalHistory(
-    startDate?: Date, 
-    endDate?: Date, 
-    limit = 50
-  ): Promise<EmotionalData[]> {
+  async addEmotionEntry(data: EmotionalData): Promise<boolean> {
     if (!this.userId) {
-      console.error("No user ID set for emotional data service");
+      console.error("User ID required for adding emotion entry");
+      return false;
+    }
+    
+    try {
+      // In a real implementation, save to Supabase
+      console.log("Adding emotion entry:", data);
+      return true;
+    } catch (error) {
+      console.error("Error adding emotion entry:", error);
+      return false;
+    }
+  }
+  
+  async getRecentEmotions(days = 7): Promise<EmotionalData[]> {
+    if (!this.userId) {
       return [];
     }
     
-    // In a real implementation, this would fetch from Supabase
-    return [
-      {
-        emotion: "happy",
-        intensity: 0.8,
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-      },
-      {
-        emotion: "calm",
-        intensity: 0.6,
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
-      }
-    ];
+    try {
+      const date = new Date();
+      date.setDate(date.getDate() - days);
+      
+      // Mock data for now
+      return [
+        {
+          emotion: "happy",
+          intensity: 0.8,
+          timestamp: new Date().toISOString()
+        },
+        {
+          emotion: "calm",
+          intensity: 0.6,
+          timestamp: new Date(Date.now() - 86400000).toISOString()
+        }
+      ];
+    } catch (error) {
+      console.error("Error fetching emotions:", error);
+      return [];
+    }
   }
   
-  async getEmotionalTrend(days = 7): Promise<Record<string, number>> {
-    // Calculate emotional trends over time
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+  async analyzeEmotionalTrend(): Promise<{
+    primaryEmotion: string;
+    trend: 'improving' | 'declining' | 'stable';
+    averageIntensity: number;
+  }> {
+    const emotions = await this.getRecentEmotions();
     
-    const history = await this.getEmotionalHistory(startDate, endDate);
+    if (emotions.length === 0) {
+      return {
+        primaryEmotion: "neutral",
+        trend: "stable",
+        averageIntensity: 0.5
+      };
+    }
     
-    // Count emotions
-    const counts: Record<string, number> = {};
-    history.forEach(item => {
-      const emotion = item.emotion;
-      counts[emotion] = (counts[emotion] || 0) + 1;
+    // Simple analysis - in a real app this would be more sophisticated
+    const emotionCounts: Record<string, number> = {};
+    let totalIntensity = 0;
+    
+    emotions.forEach(entry => {
+      emotionCounts[entry.emotion] = (emotionCounts[entry.emotion] || 0) + 1;
+      totalIntensity += entry.intensity;
     });
     
-    return counts;
-  }
-  
-  async getPredominantEmotion(days = 7): Promise<string | null> {
-    const trends = await this.getEmotionalTrend(days);
-    
-    let predominant: string | null = null;
-    let maxCount = 0;
-    
-    Object.entries(trends).forEach(([emotion, count]) => {
-      if (count > maxCount) {
-        predominant = emotion;
-        maxCount = count;
-      }
-    });
-    
-    return predominant;
+    const primaryEmotion = Object.entries(emotionCounts)
+      .sort((a, b) => b[1] - a[1])[0][0];
+      
+    return {
+      primaryEmotion,
+      trend: "stable", // Simplified for this implementation
+      averageIntensity: totalIntensity / emotions.length
+    };
   }
 }
 
-const emotionalDataService = new EmotionalDataService();
-export default emotionalDataService;
+// Export a singleton instance
+export const emotionalDataService = new EmotionalDataService();

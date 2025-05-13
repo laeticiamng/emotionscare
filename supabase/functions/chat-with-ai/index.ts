@@ -124,8 +124,10 @@ serve(async (req) => {
           'Connection': 'keep-alive'
         },
       });
-    } else {
-      // Regular non-streaming request
+    } 
+    
+    // Regular non-streaming request
+    else {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -135,52 +137,40 @@ serve(async (req) => {
         body: JSON.stringify(requestBody),
       });
 
-      const data = await response.json();
-      console.log("OpenAI response received");
-
-      if (!data.choices || data.choices.length === 0) {
-        console.error("No choices returned from OpenAI:", data);
-        throw new Error('No response from OpenAI');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'OpenAI API error');
       }
 
-      const aiResponse = data.choices[0].message.content.trim();
-      console.log("Formatted AI response received");
+      const data = await response.json();
+      const result = {
+        response: data.choices[0].message.content,
+        model: data.model,
+        usage: data.usage,
+        session_id: sessionId
+      };
 
-      // Cache responses if caching is enabled with proper TTL
-      if (cacheEnabled) {
+      // Cache the response if caching is enabled
+      if (cacheEnabled && !userContext) {
         const cacheKey = `${model}:${message || ''}`;
-        const responseObject = { response: aiResponse, sessionId, model };
-        cache.set(cacheKey, responseObject);
+        cache.set(cacheKey, result);
         
-        // Set a timeout to delete from cache after TTL period
+        // Set timeout to clear cache entry after TTL
         setTimeout(() => {
           cache.delete(cacheKey);
-        }, CACHE_TTL); 
+        }, CACHE_TTL);
       }
 
-      // Store the message and response if sessionId is provided
-      if (sessionId) {
-        try {
-          console.log(`Storing message in session ${sessionId}`);
-          // Implementation to be developed as needed
-        } catch (storageError) {
-          console.error("Error storing message:", storageError);
-        }
-      }
-
-      return new Response(JSON.stringify({ 
-        response: aiResponse,
-        sessionId: sessionId,
-        model: model // Return the model used for debugging
-      }), {
+      return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
   } catch (error) {
-    console.error('Error in chat-with-ai function:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message,
-      response: "Je suis désolé, mais je ne peux pas répondre à votre question pour le moment. Veuillez réessayer plus tard."
+    console.error("Error in chat-with-ai function:", error);
+    
+    return new Response(JSON.stringify({
+      error: error.message || "An error occurred processing your request",
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

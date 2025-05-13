@@ -1,74 +1,77 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { CoachAction } from './types';
+import { executeAction } from './action-executor';
 
-/**
- * Service for managing wellness routines
- */
-export class RoutinesService {
+// Daily routines scheduler for coaching
+export class RoutinesManager {
   private userId: string | null = null;
+  private routines: Map<string, () => Promise<void>> = new Map();
   
   constructor(userId?: string) {
     this.userId = userId || null;
+    this.setupDefaultRoutines();
   }
   
   setUserId(userId: string) {
     this.userId = userId;
   }
   
-  // Get routines recommended based on emotional state
-  async getRecommendedRoutines(emotion: string): Promise<any[]> {
-    if (!this.userId) {
-      console.error("No user ID set for routines service");
-      return [];
-    }
-    
-    // In a real implementation, this would fetch appropriate routines
-    const routines = [
-      {
-        id: "routine-1",
-        title: "Méditation pleine conscience",
-        description: "5 minutes de méditation guidée pour vous recentrer",
-        duration: 300,
-        type: "meditation",
-        recommendedFor: ["anxious", "stressed"]
-      },
-      {
-        id: "routine-2",
-        title: "Exercice de respiration",
-        description: "Respirez profondément pendant 2 minutes",
-        duration: 120,
-        type: "breathing",
-        recommendedFor: ["anxious", "angry", "stressed"]
-      },
-      {
-        id: "routine-3",
-        title: "Visualisation positive",
-        description: "Imaginez un lieu apaisant pour vous détendre",
-        duration: 300,
-        type: "visualization",
-        recommendedFor: ["sad", "anxious", "stressed"]
-      }
-    ];
-    
-    // Filter by emotion
-    return routines.filter(routine => 
-      routine.recommendedFor.includes(emotion.toLowerCase())
-    );
+  private setupDefaultRoutines() {
+    this.routines.set('daily-check-in', this.dailyCheckInRoutine.bind(this));
+    this.routines.set('weekly-reflection', this.weeklyReflectionRoutine.bind(this));
   }
   
-  // Record completion of a routine
-  async completeRoutine(routineId: string): Promise<boolean> {
+  async executeRoutine(routineId: string): Promise<boolean> {
     if (!this.userId) {
-      console.error("No user ID set for routines service");
+      console.error("No user ID set for routines");
       return false;
     }
     
-    // In a real implementation, this would save to Supabase
-    console.log("Recording routine completion:", routineId, "for user:", this.userId);
-    return true;
+    const routine = this.routines.get(routineId);
+    
+    if (!routine) {
+      console.error(`Routine not found: ${routineId}`);
+      return false;
+    }
+    
+    try {
+      await routine();
+      return true;
+    } catch (error) {
+      console.error(`Error executing routine ${routineId}:`, error);
+      return false;
+    }
+  }
+  
+  private async dailyCheckInRoutine(): Promise<void> {
+    console.log("Executing daily check-in routine for user:", this.userId);
+    
+    const action: CoachAction = {
+      id: `action-${Date.now()}`,
+      type: 'reminder',
+      payload: {
+        message: "N'oubliez pas de faire votre scan émotionnel quotidien",
+        importance: "medium"
+      }
+    };
+    
+    await executeAction(action, this.userId || undefined);
+  }
+  
+  private async weeklyReflectionRoutine(): Promise<void> {
+    console.log("Executing weekly reflection routine for user:", this.userId);
+    
+    const action: CoachAction = {
+      id: `action-${Date.now()}`,
+      type: 'generate_report',
+      payload: {
+        reportType: 'weekly_emotional_summary'
+      }
+    };
+    
+    await executeAction(action, this.userId || undefined);
   }
 }
 
-const routinesService = new RoutinesService();
-export default routinesService;
+// Export a singleton instance
+export const routinesManager = new RoutinesManager();

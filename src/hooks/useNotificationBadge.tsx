@@ -1,43 +1,33 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { notificationService } from '@/lib/coach/notification-service';
+import { useEffect, useState } from 'react';
+import { useUser } from '@/hooks/useUser';
+import { notificationService, NotificationService } from '@/lib/coach/notification-service';
 
 export function useNotificationBadge() {
-  const [unreadCount, setUnreadCount] = useState(0);
-  const { user } = useAuth();
+  const [count, setCount] = useState(0);
+  const { user } = useUser();
   
   useEffect(() => {
-    if (!user?.id) return;
-    
-    // Get initial count
-    const initialCount = notificationService.getUnreadCount(user.id);
-    setUnreadCount(initialCount);
-    
-    // Subscribe to notification updates
-    const unsubscribe = notificationService.subscribeToUnreadCount(
-      user.id, 
-      (count) => setUnreadCount(count)
-    );
-    
-    return unsubscribe;
-  }, [user?.id]);
-  
-  const markAsRead = (notificationId: string) => {
-    if (user?.id) {
-      notificationService.markAsRead(user.id, notificationId);
+    if (!user) {
+      setCount(0);
+      return;
     }
+    
+    // Initial count
+    setCount(notificationService.getUnreadCount());
+    
+    // Setup refresh interval
+    const intervalId = setInterval(() => {
+      setCount(notificationService.getUnreadCount());
+    }, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(intervalId);
+  }, [user]);
+  
+  const markAllAsRead = async () => {
+    await notificationService.markAllAsRead();
+    setCount(0);
   };
   
-  const markAllAsRead = () => {
-    if (user?.id) {
-      notificationService.markAllAsRead(user.id);
-    }
-  };
-  
-  return {
-    unreadCount,
-    markAsRead,
-    markAllAsRead
-  };
+  return { count, markAllAsRead };
 }
