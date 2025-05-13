@@ -18,6 +18,8 @@ import AudioPage from './pages/AudioPage';
 import VideoTherapyPage from './pages/VideoTherapyPage';
 import ARPage from './pages/ARPage';
 import MarketplacePage from './pages/MarketplacePage';
+import CompliancePage from './pages/CompliancePage';
+import GdprPortal from './pages/GdprPortal'; // Import the new GDPR portal page
 
 const AppRouter: React.FC = () => {
   return (
@@ -41,6 +43,8 @@ const AppRouter: React.FC = () => {
         <Route path="ar" element={<ARPage />} />
         <Route path="mindfulness" element={<DashboardPage />} />
         <Route path="marketplace" element={<MarketplacePage />} />
+        <Route path="compliance" element={<CompliancePage />} />
+        <Route path="gdpr-portal" element={<GdprPortal />} /> {/* Add new GDPR portal route */}
       </Route>
 
       {/* 404 route */}

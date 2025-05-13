@@ -9,7 +9,7 @@ port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. public and storage are always included.
 schemas = ["public", "storage", "graphql_public"]
-# Extra schemas to add to the search_path of every request. public is always included.
+# Extra schemas to add to the search_path of every request.
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
@@ -49,6 +49,10 @@ additional_redirect_urls = ["https://localhost:3000"]
 jwt_expiry = 3600
 # Allow/disallow new user signups to your project.
 enable_signup = true
+
+[auth.email]
+# Allow/disallow new user signups via email to your project.
+enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
@@ -73,9 +77,20 @@ enabled = false
 port = 54327
 vector_port = 54328
 # Setup BigQuery project to enable log viewer on local development stack.
+# See: https://supabase.com/docs/guides/getting-started/local-development#enabling-local-logging
 gcp_project_id = ""
 gcp_project_number = ""
 gcp_jwt_path = "supabase/gcloud.json"
 
-[functions.voice-assistant]
+[functions]
+# Port to use for functions development server.
+port = 54321
+
+[functions.explain-gdpr]
+verify_jwt = true
+
+[functions.gdpr-assistant]
+verify_jwt = true
+
+[functions.gdpr-request-template]
 verify_jwt = true
