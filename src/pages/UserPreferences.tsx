@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { UserPreferences as UserPreferencesType, UserPreferencesState, ThemeName, FontSize } from '@/types/user';
+import { UserPreferences as UserPreferencesType, ThemeName, FontSize } from '@/types/user';
 import { usePreferences } from '@/hooks/usePreferences';
 
 const UserPreferences: React.FC = () => {
@@ -19,7 +19,11 @@ const UserPreferences: React.FC = () => {
     fontSize: 'medium',
     fontFamily: 'inter',
     language: 'fr',
-    notifications: false
+    notifications: false,
+    soundEnabled: true,
+    privacyLevel: 'private',
+    onboardingCompleted: false,
+    dashboardLayout: 'standard'
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -33,7 +37,7 @@ const UserPreferences: React.FC = () => {
   }, [preferences]);
 
   const handlePreferenceChange = useCallback(
-    (key: keyof UserPreferencesState, value: string | boolean) => {
+    (key: keyof UserPreferencesType, value: string | boolean) => {
       setUserPreferences((prevPreferences) => ({
         ...prevPreferences,
         [key]: value,

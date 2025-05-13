@@ -20,6 +20,7 @@ export interface User {
   image?: string;
   preferences?: UserPreferences;
   onboarded?: boolean;
+  bio?: string; // Added missing bio property
   
   // Propriétés supplémentaires utilisées dans l'application
   department?: string;
@@ -33,5 +34,47 @@ export interface User {
   isActive?: boolean;
 }
 
-// Re-exporter les types depuis le fichier preferences pour la compatibilité
-export type { UserPreferences } from './preferences';
+// Export the FontFamily and FontSize types directly
+export type { FontFamily, FontSize };
+export type ThemeName = Theme;
+
+// Re-exporting UserPreferences
+export interface UserPreferences {
+  theme: ThemeName;
+  language: string;
+  fontSize: FontSize;
+  fontFamily: FontFamily;
+  notifications: boolean;
+  soundEnabled: boolean;
+  privacyLevel: 'private' | 'friends' | 'public';
+  onboardingCompleted: boolean;
+  dashboardLayout: 'compact' | 'standard' | 'expanded';
+  
+  // Propriétés supplémentaires utilisées dans l'application
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  privacy?: string;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+}
+
+// Alias for UserPreferencesState
+export type UserPreferencesState = UserPreferences;
+
+// Add InvitationVerificationResult type
+export interface InvitationVerificationResult {
+  valid: boolean;
+  expired?: boolean;
+  alreadyAccepted?: boolean;
+  error?: string;
+  invitation?: {
+    id: string;
+    email: string;
+    role: string;
+    expiresAt: string;
+  };
+}

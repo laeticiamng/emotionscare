@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
 // Types pour le thème
@@ -6,13 +5,14 @@ export type Theme = 'light' | 'dark' | 'pastel' | 'system';
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'serif' | 'mono' | 'sans';
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   fontSize: FontSize;
   setFontSize: (size: FontSize) => void;
   fontFamily: FontFamily;
   setFontFamily: (family: FontFamily) => void;
+  resolvedTheme?: Theme;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -113,13 +113,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.classList.add(`font-${family}`);
   };
 
-  const value = {
+  // Add resolvedTheme to the context value
+  const value: ThemeContextType = {
     theme,
     setTheme,
     fontSize,
     setFontSize,
     fontFamily,
     setFontFamily,
+    resolvedTheme: theme === 'system' ? 
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : 
+      undefined
   };
 
   return (

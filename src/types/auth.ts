@@ -8,6 +8,7 @@ export interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
+  clearError?: () => void;
   
   // Add missing properties
   isAuthenticated: boolean;

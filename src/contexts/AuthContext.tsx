@@ -9,6 +9,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   updateUser: (user: User) => Promise<User>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  error: string | null;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +21,9 @@ const AuthContext = createContext<AuthContextType>({
   login: () => Promise.resolve(null),
   logout: () => Promise.resolve(),
   updateUser: () => Promise.resolve({} as User),
+  register: () => Promise.resolve(),
+  error: null,
+  clearError: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -25,6 +31,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Vérifier si l'utilisateur est déjà connecté lors du chargement initial
@@ -40,6 +47,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false);
   }, []);
+
+  const clearError = () => {
+    setError(null);
+  };
 
   const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
@@ -70,6 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return user;
     } catch (error) {
       console.error('Login error:', error);
+      setError('Erreur de connexion. Veuillez vérifier vos identifiants.');
       return null;
     } finally {
       setIsLoading(false);
@@ -79,6 +91,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async (): Promise<void> => {
     localStorage.removeItem('user');
     setUser(null);
+  };
+
+  const register = async (email: string, password: string, name: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // Mock registration logic
+      const newUser: User = {
+        id: Math.random().toString(36).substr(2, 9),
+        name,
+        email,
+        role: 'user',
+        preferences: {
+          theme: 'system',
+          fontSize: 'medium',
+          fontFamily: 'inter',
+          language: 'fr',
+          notifications: false,
+          soundEnabled: true,
+          privacyLevel: 'private',
+          onboardingCompleted: false,
+          dashboardLayout: 'standard'
+        },
+        onboarded: false
+      };
+      
+      localStorage.setItem('user', JSON.stringify(newUser));
+      setUser(newUser);
+    } catch (error) {
+      console.error('Registration error:', error);
+      setError('Erreur lors de l\'inscription. Veuillez réessayer.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const updateUser = async (updatedUser: User): Promise<User> => {
@@ -94,7 +139,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading,
     login,
     logout,
-    updateUser
+    updateUser,
+    register,
+    error,
+    clearError,
   };
 
   return (
