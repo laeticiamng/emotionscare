@@ -37,14 +37,14 @@ const Index = () => {
       <div className="container px-4 py-8 mx-auto">
         <HeroSection />
         
-        {/* Connection Options - Made more prominent */}
-        <div className="max-w-3xl mx-auto bg-card rounded-xl shadow-lg p-8 mb-12 border border-primary/20">
+        {/* Connection Options - Highlighted with prominent styling */}
+        <div className="max-w-3xl mx-auto bg-primary/5 rounded-xl shadow-lg p-8 mb-12 border-2 border-primary/20 animate-fade-in">
           <h2 className="text-3xl font-bold tracking-tight mb-6 text-center">
             Choisissez votre accès
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-primary-50 dark:bg-primary-950/30 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300 border-2 border-primary hover:scale-105">
               <h3 className="text-xl font-bold mb-3">Particulier</h3>
               <p className="mb-4 text-muted-foreground">Accédez à votre espace personnel</p>
               <Button 
@@ -56,7 +56,7 @@ const Index = () => {
               </Button>
             </div>
             
-            <div className="bg-secondary-50 dark:bg-secondary-950/30 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300 border-2 border-secondary hover:scale-105">
               <h3 className="text-xl font-bold mb-3">Entreprise</h3>
               <p className="mb-4 text-muted-foreground">Solutions pour votre organisation</p>
               <Button 

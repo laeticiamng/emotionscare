@@ -10,7 +10,7 @@ const AccessSection: React.FC = () => {
   
   return (
     <motion.section 
-      className="mb-16 rounded-2xl overflow-hidden bg-card shadow-lg"
+      className="mb-16 rounded-2xl overflow-hidden bg-card shadow-lg border-2 border-primary/20"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
@@ -22,8 +22,8 @@ const AccessSection: React.FC = () => {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* B2C Card */}
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-800/30 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+          {/* B2C Card - Enhanced styling */}
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-800/30 p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-blue-200 dark:border-blue-700">
             <div className="bg-blue-100 dark:bg-blue-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <User className="h-8 w-8 text-blue-600 dark:text-blue-300" />
             </div>
@@ -42,8 +42,8 @@ const AccessSection: React.FC = () => {
             </Button>
           </div>
           
-          {/* B2B Card */}
-          <div className="bg-gradient-to-br from-gray-50 to-indigo-100 dark:from-gray-900/50 dark:to-indigo-900/30 p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+          {/* B2B Card - Enhanced styling */}
+          <div className="bg-gradient-to-br from-gray-50 to-indigo-100 dark:from-gray-900/50 dark:to-indigo-900/30 p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-2 border-indigo-200 dark:border-indigo-700">
             <div className="bg-indigo-100 dark:bg-indigo-900/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Building className="h-8 w-8 text-indigo-600 dark:text-indigo-300" />
             </div>
@@ -55,7 +55,7 @@ const AccessSection: React.FC = () => {
               onClick={() => navigate('/business')}
               size="lg" 
               variant="outline"
-              className="w-full border-2 border-indigo-600 text-indigo-700 dark:border-indigo-400 dark:text-indigo-300 shadow-sm"
+              className="w-full border-2 border-indigo-600 text-indigo-700 dark:border-indigo-400 dark:text-indigo-300 shadow-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
             >
               <Building className="mr-2 h-5 w-5" />
               Espace Entreprise

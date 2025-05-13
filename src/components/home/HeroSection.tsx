@@ -10,7 +10,7 @@ const HeroSection: React.FC = () => {
   const { isAuthenticated } = useAuth();
   
   return (
-    <section className="relative py-20 px-4 rounded-3xl bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background/80 dark:to-primary/5 mb-16 overflow-hidden transform transition-all duration-700 hover:shadow-xl">
+    <section className="relative py-20 px-4 rounded-3xl bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background/80 dark:to-primary/5 mb-16 overflow-hidden transform transition-all duration-700 hover:shadow-xl border border-primary/10">
       <div 
         className="absolute inset-0 rounded-3xl bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMCkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiMzQjgyRjYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')]"
         style={{ opacity: "0.4", mixBlendMode: "overlay" }}
@@ -54,17 +54,17 @@ const HeroSection: React.FC = () => {
             </Button>
           ) : (
             <>
-              <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-                <Link to="/login" className="flex items-center">
+              <Button asChild size="lg" className="shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.05] border-2 border-primary/20 bg-primary py-7">
+                <Link to="/login" className="flex items-center text-lg">
                   <User className="h-5 w-5 mr-2" />
-                  Espace Personnel
+                  <span className="font-bold">Espace Personnel</span>
                 </Link>
               </Button>
               
-              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-                <Link to="/business" className="flex items-center">
+              <Button asChild variant="outline" size="lg" className="shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.05] border-2 border-secondary/50 py-7">
+                <Link to="/business" className="flex items-center text-lg">
                   <Building className="h-5 w-5 mr-2" />
-                  Espace Entreprise
+                  <span className="font-bold">Espace Entreprise</span>
                 </Link>
               </Button>
             </>
