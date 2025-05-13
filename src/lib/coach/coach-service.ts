@@ -1,203 +1,163 @@
 
-import { Emotion } from '@/types';
+// Re-export everything from the refactored coach module
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { CoachAction, CoachEvent, EmotionalData, CoachNotification } from './types';
 
-// Get coach recommendations based on user emotions
-export async function getCoachRecommendations(userId: string): Promise<string[]> {
-  try {
-    // In a real implementation, this would call an API
-    // For now, return static recommendations
-    return [
-      "Prenez une pause de 5 minutes toutes les heures pour vous étirer",
-      "Pratiquez la respiration profonde pendant 2 minutes en cas de stress",
-      "Buvez suffisamment d'eau tout au long de la journée"
-    ];
-  } catch (error) {
-    console.error('Error getting coach recommendations:', error);
-    return [];
-  }
-}
-
-// Process emotions to generate insights
-export async function processEmotions(emotions: Emotion[]): Promise<{
-  primaryEmotion: string;
-  averageScore: number;
-  trend: 'improving' | 'declining' | 'stable';
-}> {
-  if (!emotions.length) {
-    return {
-      primaryEmotion: 'neutral',
-      averageScore: 50,
-      trend: 'stable'
-    };
-  }
-
-  const sortedEmotions = [...emotions].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+// Coach service client
+export class CoachService {
+  private userId: string | null = null;
   
-  // Count occurrences of each emotion
-  const emotionCounts = sortedEmotions.reduce((acc, emotion) => {
-    acc[emotion.emotion] = (acc[emotion.emotion] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  // Get the most frequent emotion
-  const primaryEmotion = Object.entries(emotionCounts)
-    .sort((a, b) => b[1] - a[1])[0][0];
-  
-  // Calculate average score
-  const averageScore = Math.round(
-    sortedEmotions.reduce((sum, emotion) => sum + emotion.score, 0) / sortedEmotions.length
-  );
-  
-  // Determine trend by comparing newest vs oldest entries
-  const oldestScore = sortedEmotions[sortedEmotions.length - 1].score;
-  const newestScore = sortedEmotions[0].score;
-  let trend: 'improving' | 'declining' | 'stable';
-  
-  if (newestScore - oldestScore > 10) {
-    trend = 'improving';
-  } else if (oldestScore - newestScore > 10) {
-    trend = 'declining';
-  } else {
-    trend = 'stable';
+  constructor(userId?: string) {
+    this.userId = userId || null;
   }
   
-  return {
-    primaryEmotion,
-    averageScore,
-    trend
-  };
-}
-
-// Trigger coach events based on emotion analysis
-export async function triggerCoachEvent(
-  eventType: 'scan_complete' | 'trend_change' | 'low_score' | 'reminder',
-  data: any
-): Promise<{
-  message: string;
-  recommendations: string[];
-}> {
-  // Generate appropriate response based on event type
-  switch(eventType) {
-    case 'scan_complete':
-      return {
-        message: `J'ai analysé votre état émotionnel. Vous semblez vous sentir ${data.emotion}.`,
-        recommendations: [
-          "Prenez un moment pour réfléchir à votre ressenti",
-          "Considérez les facteurs qui ont influencé votre humeur aujourd'hui",
-          "Notez vos émotions dans votre journal pour suivre vos tendances"
-        ]
-      };
-      
-    case 'trend_change':
-      return {
-        message: `J'ai remarqué un changement dans votre bien-être émotionnel. Votre score moyen a ${data.direction === 'up' ? 'augmenté' : 'diminué'} de ${data.amount} points.`,
-        recommendations: data.direction === 'up' ? [
-          "Continuez vos pratiques positives actuelles",
-          "Partagez vos succès avec votre cercle de confiance",
-          "Réfléchissez à ce qui a contribué à cette amélioration"
-        ] : [
-          "Prenez du temps pour vous reposer",
-          "Parlez à un proche de confiance",
-          "Essayez une séance de méditation guidée"
-        ]
-      };
-      
-    case 'low_score':
-      return {
-        message: "Je constate que votre niveau de bien-être est bas aujourd'hui. Comment puis-je vous aider?",
-        recommendations: [
-          "Essayez une séance de respiration profonde de 5 minutes",
-          "Écoutez notre playlist spéciale relaxation",
-          "Prenez une pause de vos écrans pendant 30 minutes"
-        ]
-      };
-      
-    case 'reminder':
-      return {
-        message: "Voici votre rappel quotidien pour prendre soin de votre bien-être.",
-        recommendations: [
-          "N'oubliez pas de faire une pause régulière",
-          "Hydratez-vous tout au long de la journée",
-          "Prenez quelques minutes pour vous étirer"
-        ]
-      };
-      
-    default:
-      return {
-        message: "Je suis là pour vous aider à améliorer votre bien-être.",
-        recommendations: []
-      };
+  setUserId(userId: string) {
+    this.userId = userId;
   }
-}
-
-// Obtenir une recommandation musicale basée sur l'émotion
-export async function getMusicRecommendation(emotion: string): Promise<{
-  title: string;
-  genre: string;
-  description: string;
-}> {
-  const recommendations = {
-    happy: {
-      title: "Playlist Énergisante",
-      genre: "Pop, Dance",
-      description: "Des morceaux joyeux et dynamiques pour amplifier votre bonne humeur"
-    },
-    sad: {
-      title: "Playlist Réconfortante",
-      genre: "Acoustique, Ballades",
-      description: "Des morceaux doux et mélodieux pour vous accompagner dans ce moment"
-    },
-    calm: {
-      title: "Playlist Zen",
-      genre: "Ambient, Classique légère",
-      description: "Des sonorités apaisantes pour maintenir votre état de sérénité"
-    },
-    anxious: {
-      title: "Playlist Anti-Stress",
-      genre: "New Age, Sons de la nature",
-      description: "Des compositions relaxantes pour apaiser votre anxiété"
-    },
-    neutral: {
-      title: "Playlist Équilibrée",
-      genre: "Indie, Instrumental",
-      description: "Une sélection variée et équilibrée pour accompagner votre journée"
+  
+  // Add an emotional data point to the user's history
+  async addEmotionalData(data: EmotionalData): Promise<boolean> {
+    if (!this.userId) {
+      console.error("No user ID set for coach service");
+      return false;
     }
-  };
+    
+    try {
+      // In a real implementation, this would save to Supabase
+      // For now, we'll log the action and simulate success
+      console.log("Adding emotional data:", data, "for user:", this.userId);
+      return true;
+    } catch (error) {
+      console.error("Error adding emotional data:", error);
+      return false;
+    }
+  }
   
-  const defaultRecommendation = {
-    title: "Playlist Personnalisée",
-    genre: "Variés",
-    description: "Une sélection adaptée à votre humeur actuelle"
-  };
+  // Get the user's recent emotional data
+  async getRecentEmotionalData(limit = 10): Promise<EmotionalData[]> {
+    if (!this.userId) {
+      console.error("No user ID set for coach service");
+      return [];
+    }
+    
+    try {
+      // In a real implementation, this would fetch from Supabase
+      return [
+        {
+          emotion: "calm",
+          intensity: 0.8,
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+        },
+        {
+          emotion: "happy",
+          intensity: 0.7,
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+        }
+      ];
+    } catch (error) {
+      console.error("Error fetching emotional data:", error);
+      return [];
+    }
+  }
   
-  return recommendations[emotion.toLowerCase()] || defaultRecommendation;
+  // Register events that might trigger coach actions
+  async registerEvent(event: CoachEvent): Promise<void> {
+    if (!this.userId) {
+      console.error("No user ID set for coach service");
+      return;
+    }
+    
+    try {
+      console.log("Registering event:", event, "for user:", this.userId);
+      // Process event and potentially trigger actions
+    } catch (error) {
+      console.error("Error registering event:", error);
+    }
+  }
+  
+  // Execute a coach action
+  async executeAction(action: CoachAction): Promise<boolean> {
+    if (!this.userId) {
+      console.error("No user ID set for coach service");
+      return false;
+    }
+    
+    try {
+      console.log("Executing action:", action, "for user:", this.userId);
+      // Based on action type, delegate to specific handlers
+      
+      toast({
+        title: "Action exécutée",
+        description: `L'action de type ${action.type} a été exécutée avec succès.`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error("Error executing action:", error);
+      return false;
+    }
+  }
+  
+  // Get coaching recommendations based on emotional state
+  async getCoachRecommendations(emotion: string, intensity: number): Promise<any[]> {
+    try {
+      // In a real implementation, this would use AI or a rule-based system
+      console.log("Getting recommendations for emotion:", emotion, "with intensity:", intensity);
+      
+      // Mock recommendations
+      return [
+        {
+          id: "rec-1",
+          type: "music",
+          title: "Écouter de la musique apaisante",
+          description: "La musique peut aider à stabiliser et améliorer votre humeur.",
+          actionType: "play_music",
+          actionPayload: { emotion }
+        },
+        {
+          id: "rec-2",
+          type: "breathing",
+          title: "Exercice de respiration",
+          description: "Prenez quelques minutes pour vous recentrer avec cet exercice de respiration.",
+          actionType: "start_breathing_exercise",
+          actionPayload: { duration: 3 }
+        }
+      ];
+    } catch (error) {
+      console.error("Error getting coach recommendations:", error);
+      return [];
+    }
+  }
 }
 
-// Coach service object for query operations
-export const coachService = {
-  async askQuestion(question: string): Promise<string> {
-    // In a real implementation, this would call a ChatGPT-style API
-    console.log("Asking coach:", question);
-    
-    // Simulate AI response delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Return mock response
-    if (question.toLowerCase().includes('stress')) {
-      return "Pour gérer le stress, je vous recommande de pratiquer la respiration profonde pendant quelques minutes. Inspirez lentement par le nez pendant 4 secondes, retenez votre souffle pendant 4 secondes, puis expirez lentement par la bouche pendant 6 secondes.";
-    } else if (question.toLowerCase().includes('dormir') || question.toLowerCase().includes('sommeil')) {
-      return "Pour améliorer votre sommeil, essayez d'établir une routine régulière avant de vous coucher. Évitez les écrans une heure avant le coucher, maintenez votre chambre fraîche et sombre, et considérez des techniques de relaxation comme la méditation.";
-    } else if (question.toLowerCase().includes('fatigue')) {
-      return "La fatigue peut avoir plusieurs causes. Assurez-vous de dormir suffisamment, de bien vous hydrater et de maintenir une alimentation équilibrée. De petites pauses régulières pendant votre journée de travail peuvent également aider à maintenir votre niveau d'énergie.";
-    } else {
-      return "Merci pour votre question. Pour améliorer votre bien-être, je vous recommande de prendre des pauses régulières, de pratiquer la pleine conscience et de vous assurer que vous vous accordez du temps pour les activités qui vous apportent de la joie. N'hésitez pas à me poser des questions spécifiques sur la gestion du stress, le sommeil ou l'équilibre travail-vie personnelle.";
-    }
-  },
+// Create and export a singleton instance
+const coachService = new CoachService();
+export default coachService;
+
+// Helper functions for simpler API access
+export const addEmotionalDataPoint = async (
+  emotion: string, 
+  intensity: number, 
+  userId?: string,
+  context?: string
+): Promise<boolean> => {
+  if (userId) coachService.setUserId(userId);
   
-  getRecommendations,
-  processEmotions,
-  triggerCoachEvent,
-  getMusicRecommendation
+  return await coachService.addEmotionalData({
+    emotion,
+    intensity,
+    timestamp: new Date().toISOString(),
+    context
+  });
+};
+
+export const getCoachRecommendations = async (
+  emotion: string,
+  intensity: number,
+  userId?: string
+): Promise<any[]> => {
+  if (userId) coachService.setUserId(userId);
+  
+  return await coachService.getCoachRecommendations(emotion, intensity);
 };

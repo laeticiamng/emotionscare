@@ -1,89 +1,80 @@
 
+import { supabase } from '@/integrations/supabase/client';
 import { CoachAction, CoachEvent, EmotionalData } from './types';
 
 /**
- * Service for handling emotional data
+ * Service for storing and analyzing emotional data
  */
 export class EmotionalDataService {
-  private userEmotionalData: Map<string, EmotionalData[]> = new Map();
-
-  /**
-   * Update user emotional data with new entry
-   */
-  updateUserEmotionalData(userId: string, data: EmotionalData): void {
-    if (!this.userEmotionalData.has(userId)) {
-      this.userEmotionalData.set(userId, []);
-    }
-    
-    const userData = this.userEmotionalData.get(userId);
-    if (userData) {
-      userData.push({
-        ...data,
-        date: data.date || new Date().toISOString()
-      });
-    }
+  private userId: string | null = null;
+  
+  constructor(userId?: string) {
+    this.userId = userId || null;
   }
-
-  /**
-   * Get user emotional data
-   */
-  getUserEmotionalData(userId: string): EmotionalData[] {
-    return this.userEmotionalData.get(userId) || [];
+  
+  setUserId(userId: string) {
+    this.userId = userId;
   }
-
-  /**
-   * Check if user has a negative emotional trend
-   */
-  hasNegativeTrend(userId: string): boolean {
-    const userData = this.userEmotionalData.get(userId) || [];
-    if (userData.length < 3) return false;
+  
+  async getEmotionalHistory(
+    startDate?: Date, 
+    endDate?: Date, 
+    limit = 50
+  ): Promise<EmotionalData[]> {
+    if (!this.userId) {
+      console.error("No user ID set for emotional data service");
+      return [];
+    }
     
-    // Get last 3 entries
-    const recent = userData.slice(-3);
-    const scores = recent.map(entry => entry.score || 50);
-    
-    // Check if scores are consistently decreasing
-    return scores[0] > scores[1] && scores[1] > scores[2];
+    // In a real implementation, this would fetch from Supabase
+    return [
+      {
+        emotion: "happy",
+        intensity: 0.8,
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
+      },
+      {
+        emotion: "calm",
+        intensity: 0.6,
+        timestamp: new Date(Date.now() - 86400000).toISOString(),
+      }
+    ];
   }
-
-  /**
-   * Determine actions based on emotional data
-   */
-  determineActions(event: CoachEvent): CoachAction[] {
-    const actions: CoachAction[] = [];
-    const data = event.data || {};
+  
+  async getEmotionalTrend(days = 7): Promise<Record<string, number>> {
+    // Calculate emotional trends over time
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
     
-    // Record emotional data
-    actions.push({ type: 'record_emotion_data', payload: data });
+    const history = await this.getEmotionalHistory(startDate, endDate);
     
-    // Check if emotions require an alert
-    if (data.emotion && (data.intensity > 7 || data.score < 30)) {
-      actions.push({ type: 'check_emotion_alert', payload: data });
-    }
+    // Count emotions
+    const counts: Record<string, number> = {};
+    history.forEach(item => {
+      const emotion = item.emotion;
+      counts[emotion] = (counts[emotion] || 0) + 1;
+    });
     
-    // Suggest an adapted VR session
-    if (data.emotion && ['tristesse', 'stress', 'anxiété'].includes(data.emotion.toLowerCase())) {
-      actions.push({ type: 'suggest_vr_session', payload: { emotion: data.emotion } });
-    }
+    return counts;
+  }
+  
+  async getPredominantEmotion(days = 7): Promise<string | null> {
+    const trends = await this.getEmotionalTrend(days);
     
-    // Update music playlist
-    if (data.emotion) {
-      actions.push({
-        type: 'update_music_playlist',
-        payload: { emotion: data.emotion, intensity: data.intensity || 5 }
-      });
-    }
+    let predominant: string | null = null;
+    let maxCount = 0;
     
-    return actions;
+    Object.entries(trends).forEach(([emotion, count]) => {
+      if (count > maxCount) {
+        predominant = emotion;
+        maxCount = count;
+      }
+    });
+    
+    return predominant;
   }
 }
 
-// Create a singleton instance
-export const emotionalDataService = new EmotionalDataService();
-
-/**
- * Determine actions based on emotional data (legacy function)
- */
-export function determineActions(event: CoachEvent): CoachAction[] {
-  return emotionalDataService.determineActions(event);
-}
+const emotionalDataService = new EmotionalDataService();
+export default emotionalDataService;

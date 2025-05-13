@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Music, Loader2, PlayCircle } from 'lucide-react';
 import { EmotionResult, MusicPlaylist, MusicTrack } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface EmotionBasedMusicRecommendationProps {
   emotionResult: EmotionResult;
@@ -21,6 +22,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
   const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   const [isLoadingMusic, setIsLoadingMusic] = useState(false);
+  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
   const handlePlayMusic = async () => {
     if (!emotionResult.emotion) return;
@@ -28,26 +30,18 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
     setIsLoadingMusic(true);
     try {
       const emotion = emotionResult.emotion.toLowerCase();
-      const playlist = await loadPlaylistForEmotion(emotion);
+      const intensity = emotionResult.intensity || 0.5;
       
-      if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-        // Ensure the track has the required duration and url fields
-        const track = {
-          ...playlist.tracks[0],
-          duration: playlist.tracks[0].duration || 0,
-          url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].coverUrl || ''
-        };
-        playTrack(track);
-        setOpenDrawer(true);
-        
+      // Use our integrated function that now properly uses the TopMedia API
+      const success = await activateMusicForEmotion({
+        emotion,
+        intensity: intensity * 100
+      });
+      
+      if (!success) {
         toast({
-          title: "Musique lancée",
-          description: `Lecture de '${playlist.tracks[0].title}' démarrée`,
-        });
-      } else {
-        toast({
-          title: "Aucune musique disponible",
-          description: `Aucune playlist n'a été trouvée pour l'émotion ${emotionResult.emotion}`,
+          title: "Problème d'activation",
+          description: "Impossible d'activer la musique pour votre émotion",
           variant: "destructive"
         });
       }
@@ -64,6 +58,8 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
   };
 
   const isStandalone = variant === 'standalone';
+  const emotionName = emotionResult.emotion || 'neutral';
+  const musicDescription = getEmotionMusicDescription(emotionName);
 
   return (
     <Card className={isStandalone ? "border-t-4 border-t-primary" : ""}>
@@ -77,10 +73,10 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
         <div className="flex items-center gap-4">
           <div className={isStandalone ? "flex-1" : ""}>
             <h4 className="font-medium text-base">
-              Musique adaptée à votre état : {emotionResult.emotion}
+              Musique adaptée à votre état : {emotionName}
             </h4>
             <p className="text-sm text-muted-foreground mt-1">
-              Écoutez une sélection musicale conçue pour accompagner et améliorer votre état émotionnel actuel.
+              {musicDescription}
             </p>
           </div>
           <Button 
