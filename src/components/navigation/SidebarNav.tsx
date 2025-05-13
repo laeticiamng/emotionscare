@@ -9,6 +9,14 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole } from '@/utils/roleUtils';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface NavItemType {
+  title: string;
+  href: string;
+  icon: React.ElementType;
+  b2cOnly?: boolean;
+  b2bOnly?: boolean;
+}
+
 interface SidebarNavProps {
   className?: string;
   onNavItemClick?: () => void;
@@ -29,10 +37,10 @@ const SidebarNav: React.FC<SidebarNavProps> = ({ className, onNavItemClick }) =>
   // Filtrer les éléments en fonction du mode utilisateur
   const filteredNavItems = navItems.filter(item => {
     // Si l'élément est marqué b2cOnly, ne l'afficher qu'en mode B2C
-    if (item.b2cOnly && !isB2C) return false;
+    if ((item as NavItemType).b2cOnly && !isB2C) return false;
     
     // Si l'élément est marqué b2bOnly, ne l'afficher qu'en mode B2B
-    if (item.b2bOnly && isB2C) return false;
+    if ((item as NavItemType).b2bOnly && isB2C) return false;
     
     return true;
   });

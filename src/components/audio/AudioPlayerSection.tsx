@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -88,14 +87,14 @@ const AudioPlayerSection: React.FC = () => {
     if (isPlaying && currentTrack) {
       toast({
         title: "Lecture démarrée",
-        description: `En cours: ${currentTrack.title} - ${currentTrack.artist}`,
-        duration: 3000,
+        description: `En cours: ${currentTrack.title} - ${currentTrack.artist}`
       });
     }
   }, [isPlaying, currentTrack, toast]);
   
   return (
     <div className="space-y-6">
+      {/* Lecteur principal */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-3 mb-8">
           <TabsTrigger value="relaxation">Relaxation</TabsTrigger>
@@ -251,6 +250,7 @@ const AudioPlayerSection: React.FC = () => {
         </TabsContent>
       </Tabs>
       
+      {/* Liste des podcasts */}
       <Card>
         <CardContent className="p-4">
           <h3 className="font-medium mb-2">Sessions recommandées</h3>

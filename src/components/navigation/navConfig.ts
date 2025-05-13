@@ -1,7 +1,15 @@
 
 import { Home, BarChart2, Scan, BookOpen, Music, Headphones, Video, Settings, User, HeadsetIcon, Activity, Layers, Store, Box, Users, Building } from "lucide-react";
 
-export const sidebarItems = [
+export interface NavItemType {
+  title: string;
+  href: string;
+  icon: any;
+  b2cOnly?: boolean;
+  b2bOnly?: boolean;
+}
+
+export const sidebarItems: NavItemType[] = [
   {
     title: "Accueil",
     href: "/dashboard",
@@ -60,7 +68,7 @@ export const sidebarItems = [
   }
 ];
 
-export const adminSidebarItems = [
+export const adminSidebarItems: NavItemType[] = [
   {
     title: "Tableau de bord",
     href: "/dashboard",
@@ -97,6 +105,19 @@ export const adminSidebarItems = [
     title: "Produits",
     href: "/dashboard/products",
     icon: Box,
+  },
+  {
+    title: "Paramètres",
+    href: "/dashboard/settings",
+    icon: Settings,
+  }
+];
+
+export const footerNavItems: NavItemType[] = [
+  {
+    title: "Profil",
+    href: "/dashboard/profile",
+    icon: User,
   },
   {
     title: "Paramètres",
