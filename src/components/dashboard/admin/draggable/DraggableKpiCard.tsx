@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { DashboardWidgetConfig } from '@/types/dashboard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DashboardStats, GamificationData } from '../tabs/overview/types';
 
 // Import our KPI card components
 import AbsenteeismKpiCard from '../kpi/AbsenteeismKpiCard';
@@ -27,12 +28,16 @@ export interface DraggableKpiCardProps {
   widget: DashboardWidgetConfig;
   editable?: boolean;
   onSettingsClick?: (widget: DashboardWidgetConfig) => void;
+  dashboardStats?: DashboardStats;
+  gamificationData?: GamificationData;
 }
 
 export const DraggableKpiCard: React.FC<DraggableKpiCardProps> = ({
   widget,
   editable = true,
-  onSettingsClick
+  onSettingsClick,
+  dashboardStats,
+  gamificationData
 }) => {
   const {
     attributes,
@@ -55,6 +60,18 @@ export const DraggableKpiCard: React.FC<DraggableKpiCardProps> = ({
 
   // Get the component for this widget type or show placeholder
   const WidgetComponent = WIDGET_COMPONENTS[widget.type] || PlaceholderWidget;
+
+  // Prepare props for the widget component
+  const componentProps: any = { widget };
+  
+  // Add additional data props if available and applicable
+  if (dashboardStats && widget.type.includes('dashboard-stats')) {
+    componentProps.dashboardStats = dashboardStats;
+  }
+  
+  if (gamificationData && widget.type.includes('gamification')) {
+    componentProps.gamificationData = gamificationData;
+  }
 
   return (
     <div
@@ -96,7 +113,7 @@ export const DraggableKpiCard: React.FC<DraggableKpiCardProps> = ({
           </div>
         )}
         
-        <WidgetComponent widget={widget} />
+        <WidgetComponent {...componentProps} />
       </Card>
     </div>
   );

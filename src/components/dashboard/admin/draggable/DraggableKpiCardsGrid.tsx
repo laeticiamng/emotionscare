@@ -17,19 +17,24 @@ import {
 } from '@dnd-kit/sortable';
 import { DraggableKpiCard } from './DraggableKpiCard';
 import { DashboardWidgetConfig } from '@/types/dashboard';
+import { DashboardStats, GamificationData } from '../tabs/overview/types';
 
 interface DraggableKpiCardsGridProps {
   widgets: DashboardWidgetConfig[];
   onWidgetsChange?: (widgets: DashboardWidgetConfig[]) => void;
   className?: string;
   editable?: boolean;
+  dashboardStats?: DashboardStats;
+  gamificationData?: GamificationData;
 }
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
   widgets,
   onWidgetsChange,
   className = '',
-  editable = true
+  editable = true,
+  dashboardStats,
+  gamificationData
 }) => {
   const [items, setItems] = useState<DashboardWidgetConfig[]>(widgets);
 
@@ -66,6 +71,21 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
     });
   }
 
+  // Pass the dashboardStats and gamificationData to each card that might need them
+  const getCardProps = (widget: DashboardWidgetConfig) => {
+    let props: any = { widget };
+
+    if (dashboardStats && widget.type.includes('dashboard-stats')) {
+      props.dashboardStats = dashboardStats;
+    }
+    
+    if (gamificationData && widget.type.includes('gamification')) {
+      props.gamificationData = gamificationData;
+    }
+
+    return props;
+  };
+
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
       <DndContext
@@ -77,7 +97,7 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
           {items.map((widget) => (
             <DraggableKpiCard
               key={widget.id}
-              widget={widget}
+              {...getCardProps(widget)}
               editable={editable}
             />
           ))}
