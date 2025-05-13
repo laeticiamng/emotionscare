@@ -1,54 +1,62 @@
 
 import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { MessageSquare, Loader2 } from "lucide-react";
 
-interface TextEmotionScannerProps {
+export interface TextEmotionScannerProps {
   text: string;
   onTextChange: (text: string) => void;
-  disabled?: boolean;
-  maxLength?: number;
+  onChange?: (text: string) => void; // For backward compatibility
+  onAnalyze: () => void;
+  isAnalyzing: boolean;
 }
 
 const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
   text,
   onTextChange,
-  disabled = false,
-  maxLength = 500
+  onChange,
+  onAnalyze,
+  isAnalyzing
 }) => {
+  // Use the appropriate change handler
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (maxLength && value.length <= maxLength) {
-      onTextChange(value);
-    } else if (!maxLength) {
-      onTextChange(value);
+    const newText = e.target.value;
+    if (onChange) {
+      onChange(newText);
+    } else if (onTextChange) {
+      onTextChange(newText);
     }
   };
 
-  const charCount = text.length;
-  const charPercentage = maxLength ? Math.floor((charCount / maxLength) * 100) : 0;
-  
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label htmlFor="emotion-text" className="text-sm font-medium">
-          Décrivez votre état émotionnel actuel
-        </Label>
-        <span className={`text-xs ${charCount > (maxLength * 0.9) ? 'text-red-500' : 'text-muted-foreground'}`}>
-          {charCount}/{maxLength}
-        </span>
+    <div className="space-y-4">
+      <div>
+        <Textarea
+          value={text}
+          onChange={handleChange}
+          placeholder="Décrivez comment vous vous sentez aujourd'hui..."
+          className="min-h-32"
+        />
       </div>
-      <Textarea
-        id="emotion-text"
-        placeholder="Comment vous sentez-vous en ce moment ? Partagez vos pensées..."
-        value={text}
-        onChange={handleChange}
-        disabled={disabled}
-        className="min-h-[150px] resize-none"
-      />
-      <p className="text-xs text-muted-foreground italic">
-        Soyez aussi détaillé que possible pour une analyse plus précise.
-      </p>
+
+      <Button
+        onClick={onAnalyze}
+        disabled={isAnalyzing || !text.trim()}
+        className="w-full"
+      >
+        {isAnalyzing ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Analyse en cours...
+          </>
+        ) : (
+          <>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            Analyser mon texte
+          </>
+        )}
+      </Button>
     </div>
   );
 };

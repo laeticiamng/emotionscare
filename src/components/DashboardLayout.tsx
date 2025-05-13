@@ -1,11 +1,13 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '@/components/sidebar/Sidebar';
-import { ModeToggle } from '@/components/theme/ModeToggle';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginPage from '@/pages/LoginPage';
-import EmotionalCheckIn from '@/components/dashboard/EmotionalCheckIn';
+import { ModeToggle } from '@/components/theme/ModeToggle';
+import { useLayout } from '@/contexts/LayoutContext';
+import { useSidebar } from '@/contexts/SidebarContext';
+import { Button } from '@/components/ui/button';
+import { Menu } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children?: React.ReactNode;
@@ -13,6 +15,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, isLoading } = useAuth();
+  const { sidebarOpen, toggleSidebar } = useLayout();
 
   if (isLoading) {
     return (
@@ -28,9 +31,22 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar />
+      {/* Import directly from the folders that exist */}
+      <div className="hidden md:block">
+        {/* Sidebar will be rendered separately using the SidebarProvider */}
+      </div>
+      
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex h-14 items-center border-b px-4 lg:px-6">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={toggleSidebar}
+            className="md:hidden"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle sidebar</span>
+          </Button>
           <div className="flex-1"></div>
           <ModeToggle />
         </header>
@@ -38,9 +54,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           {children || <Outlet />}
         </main>
       </div>
-      
-      {/* Emotional check-in component */}
-      <EmotionalCheckIn />
     </div>
   );
 };

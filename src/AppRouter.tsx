@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Shell from './Shell';
 import DashboardLayout from './components/DashboardLayout';
@@ -22,6 +22,7 @@ import CompliancePage from './pages/CompliancePage';
 import GdprPortal from './pages/GdprPortal';
 import GamificationPage from './pages/GamificationPage';
 import CoachPage from './pages/CoachPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -34,22 +35,27 @@ const AppRouter: React.FC = () => {
       </Route>
 
       {/* Protected routes with DashboardLayout */}
-      <Route path="/" element={<DashboardLayout />}>
-        <Route path="dashboard" element={<DashboardPage />} />
-        <Route path="scan" element={<ScanPage />} />
-        <Route path="journal" element={<JournalPage />} />
-        <Route path="music" element={<MusicPage />} />
-        <Route path="musicotherapy" element={<MusicTherapyPage />} />
-        <Route path="audio" element={<AudioPage />} />
-        <Route path="video" element={<VideoTherapyPage />} />
-        <Route path="ar" element={<ARPage />} />
-        <Route path="marketplace" element={<MarketplacePage />} />
-        <Route path="compliance" element={<CompliancePage />} />
-        <Route path="gdpr-portal" element={<GdprPortal />} />
-        <Route path="gamification" element={<GamificationPage />} />
-        <Route path="coach" element={<CoachPage />} />
-        <Route path="coach-chat" element={<CoachPage />} /> {/* Alias for coach */}
+      <Route element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+        <Route path="/scan" element={<ScanPage />} />
+        <Route path="/journal" element={<JournalPage />} />
+        <Route path="/music" element={<MusicPage />} />
+        <Route path="/musicotherapy" element={<MusicTherapyPage />} />
+        <Route path="/audio" element={<AudioPage />} />
+        <Route path="/video" element={<VideoTherapyPage />} />
+        <Route path="/ar" element={<ARPage />} />
+        <Route path="/marketplace" element={<MarketplacePage />} />
+        <Route path="/compliance" element={<CompliancePage />} />
+        <Route path="/gdpr-portal" element={<GdprPortal />} />
+        <Route path="/gamification" element={<GamificationPage />} />
+        <Route path="/coach" element={<CoachPage />} />
+        <Route path="/coach-chat" element={<CoachPage />} /> {/* Alias for coach */}
       </Route>
+
+      {/* Redirect /app and /admin to their respective dashboards */}
+      <Route path="/app" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/admin" element={<Navigate to="/admin-dashboard" replace />} />
 
       {/* 404 route */}
       <Route path="*" element={<NotFound />} />

@@ -186,7 +186,7 @@ const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({
           <TabsContent value="text">
             <TextEmotionScanner 
               text={text}
-              onChange={setText}
+              onTextChange={setText}
               onAnalyze={handleAnalyze}
               isAnalyzing={isAnalyzing}
             />
@@ -195,7 +195,7 @@ const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({
           <TabsContent value="emoji">
             <EmojiEmotionScanner 
               emojis={emojis}
-              onChange={setEmojis}
+              onEmojiChange={setEmojis}
               onAnalyze={handleAnalyze}
               isAnalyzing={isAnalyzing}
             />
@@ -204,7 +204,7 @@ const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({
           <TabsContent value="audio">
             <AudioEmotionScanner 
               audioUrl={audioUrl}
-              setAudioUrl={setAudioUrl}
+              onAudioChange={setAudioUrl}
               onAnalyze={handleAnalyze}
               isAnalyzing={isAnalyzing}
             />

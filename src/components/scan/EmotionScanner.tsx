@@ -101,7 +101,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
       <TabsContent value="text">
         <TextEmotionScanner 
           text={text}
-          onChange={onTextChange}
+          onTextChange={onTextChange}
           onAnalyze={onAnalyze}
           isAnalyzing={isAnalyzing}
         />
@@ -110,7 +110,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
       <TabsContent value="emoji">
         <EmojiEmotionScanner 
           emojis={emojis}
-          onChange={onEmojiChange}
+          onEmojiChange={onEmojiChange}
           onAnalyze={onAnalyze}
           isAnalyzing={isAnalyzing}
         />
@@ -119,7 +119,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
       <TabsContent value="audio">
         <AudioEmotionScanner 
           audioUrl={audioUrl}
-          setAudioUrl={onAudioChange}
+          onAudioChange={onAudioChange}
           onAnalyze={onAnalyze}
           isAnalyzing={isAnalyzing}
         />
