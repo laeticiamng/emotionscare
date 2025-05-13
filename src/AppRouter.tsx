@@ -20,6 +20,7 @@ import ARPage from './pages/ARPage';
 import MarketplacePage from './pages/MarketplacePage';
 import CompliancePage from './pages/CompliancePage';
 import GdprPortal from './pages/GdprPortal'; // Import the new GDPR portal page
+import GamificationPage from './pages/GamificationPage'; // Import the new Gamification page
 
 const AppRouter: React.FC = () => {
   return (
@@ -44,7 +45,8 @@ const AppRouter: React.FC = () => {
         <Route path="mindfulness" element={<DashboardPage />} />
         <Route path="marketplace" element={<MarketplacePage />} />
         <Route path="compliance" element={<CompliancePage />} />
-        <Route path="gdpr-portal" element={<GdprPortal />} /> {/* Add new GDPR portal route */}
+        <Route path="gdpr-portal" element={<GdprPortal />} /> 
+        <Route path="gamification" element={<GamificationPage />} /> {/* Add new Gamification route */}
       </Route>
 
       {/* 404 route */}
