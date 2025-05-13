@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import GdprDisclaimer from './overview/GdprDisclaimer';
 import DraggableKpiCardsGrid from '../DraggableKpiCardsGrid';
@@ -9,6 +10,7 @@ import WidgetSettings, { widgetCatalog } from '../WidgetSettings';
 import { toast } from "sonner";
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DashboardWidgetConfig } from '@/types/dashboard';
 
 interface GlobalOverviewTabProps {
   absenteeismChartData: ChartData[];
@@ -17,6 +19,34 @@ interface GlobalOverviewTabProps {
   gamificationData: GamificationData;
   isLoading?: boolean;
 }
+
+// Default KPI card widget configurations
+const defaultKpiWidgets: DashboardWidgetConfig[] = [
+  {
+    id: "absenteeism-card",
+    type: "absenteeism-card",
+    position: { x: 0, y: 0, w: 1, h: 1 },
+    settings: { title: "Taux d'absentéisme", value: "4.2%", trend: "+0.5%" }
+  },
+  {
+    id: "emotional-health-card",
+    type: "emotional-health-card",
+    position: { x: 1, y: 0, w: 1, h: 1 },
+    settings: { title: "Santé émotionnelle", value: "82", trend: "+5%" }
+  },
+  {
+    id: "productivity-card",
+    type: "productivity-card",
+    position: { x: 0, y: 1, w: 1, h: 1 },
+    settings: { title: "Productivité", value: "87%", trend: "+3.2%" }
+  },
+  {
+    id: "turnover-risk-card",
+    type: "turnover-risk-card",
+    position: { x: 1, y: 1, w: 1, h: 1 },
+    settings: { title: "Risque de turnover", value: "8.5%", trend: "-1.5%" }
+  }
+];
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ 
   absenteeismChartData, 
@@ -27,6 +57,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
 }) => {
   const [enabledWidgets, setEnabledWidgets] = useState<string[]>([]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [kpiWidgets, setKpiWidgets] = useState<DashboardWidgetConfig[]>(defaultKpiWidgets);
   
   // Load user widget preferences
   useEffect(() => {
@@ -37,6 +68,12 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       } else {
         // Default to all widgets
         setEnabledWidgets(widgetCatalog.filter(w => w.default).map(w => w.key));
+      }
+
+      // Try to load saved KPI widget configuration
+      const savedKpiWidgets = localStorage.getItem('dashboard.kpiWidgets');
+      if (savedKpiWidgets) {
+        setKpiWidgets(JSON.parse(savedKpiWidgets));
       }
     } catch (error) {
       console.error('Error loading widget preferences:', error);
@@ -67,6 +104,13 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  // Handle KPI widget ordering changes
+  const handleKpiWidgetsChange = (updatedWidgets: DashboardWidgetConfig[]) => {
+    setKpiWidgets(updatedWidgets);
+    // Save to localStorage
+    localStorage.setItem('dashboard.kpiWidgets', JSON.stringify(updatedWidgets));
+  };
 
   // Determine if we should show an empty state
   const isEmpty = enabledWidgets.length === 0;
@@ -144,6 +188,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
           {/* KPI Summary Cards - conditionally rendered */}
           {enabledWidgets.includes('kpiCards') && (
             <DraggableKpiCardsGrid 
+              widgets={kpiWidgets}
+              onWidgetsChange={handleKpiWidgetsChange}
               dashboardStats={dashboardStats}
               gamificationData={gamificationData}
             />
