@@ -1,38 +1,47 @@
 
-import { notificationService } from '../notification-service';
-import { ActionHandler } from './action-handler.interface';
-import { actionHandlerRegistry } from './action-handler-registry';
+import { NotificationService } from '@/lib/notifications';
+import { CoachNotification } from '../types';
 
 /**
- * Handler for sending simple notifications
+ * Add a notification to remind the user about something
  */
-export class SendNotificationHandler implements ActionHandler {
-  actionType = 'send_notification';
-
-  execute(userId: string, payload: any): void {
-    notificationService.addNotification(userId, {
-      title: payload.title || "Notification",
-      message: payload.message,
-      type: payload.type || 'info',
+export async function reminderNotification(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'reminder',
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating reminder notification:', error);
+    return false;
   }
 }
 
 /**
- * Handler for sending scheduled notifications
+ * Add a notification about an important event
  */
-export class ScheduleNotificationHandler implements ActionHandler {
-  actionType = 'schedule_notification';
-
-  execute(userId: string, payload: any): void {
-    notificationService.addNotification(userId, {
-      title: payload.title || "Notification programmée",
-      message: payload.message,
-      type: payload.type || 'info',
+export async function eventNotification(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'info',
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating event notification:', error);
+    return false;
   }
 }
-
-// Register all notification handlers
-actionHandlerRegistry.register(new SendNotificationHandler());
-actionHandlerRegistry.register(new ScheduleNotificationHandler());

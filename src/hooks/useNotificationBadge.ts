@@ -1,46 +1,45 @@
 
 import { useState, useEffect } from 'react';
-import { notificationService } from '@/lib/coach/notification-service';
+import { NotificationService } from '@/lib/notifications';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function useNotificationBadge() {
   const [count, setCount] = useState(0);
   const { user } = useAuth();
-
-  // Map the count property to unreadCount for backward compatibility
-  const mappedObject = {
-    count,
-    unreadCount: count, // Added this line for backward compatibility
-    markAllAsRead: async () => {
-      if (user?.id) {
-        await notificationService.markAllAsRead(user.id);
-        setCount(0);
-      }
-    }
-  };
-
+  
   useEffect(() => {
     if (!user?.id) return;
-
-    // Initial count
-    const fetchUnreadCount = async () => {
-      const unreadCount = notificationService.getUnreadCount();
-      setCount(unreadCount);
+    
+    // Load initial count
+    const loadNotifications = async () => {
+      try {
+        const unreadCount = await NotificationService.getUnreadCount();
+        setCount(unreadCount);
+      } catch (error) {
+        console.error('Error loading notification count:', error);
+      }
     };
     
-    fetchUnreadCount();
-
-    // Subscribe to notifications updates
-    const unsubscribe = notificationService.subscribeToNotifications(user.id, () => {
-      fetchUnreadCount();
+    loadNotifications();
+    
+    // Subscribe to notification updates if available
+    const unsubscribe = NotificationService.subscribeToNotifications?.(() => {
+      loadNotifications();
     });
-
+    
     return () => {
       if (unsubscribe) unsubscribe();
     };
   }, [user?.id]);
-
-  return mappedObject;
+  
+  const markAllAsRead = async () => {
+    try {
+      await NotificationService.markAllAsRead();
+      setCount(0);
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  };
+  
+  return { count, markAllAsRead };
 }
-
-export default useNotificationBadge;

@@ -1,23 +1,25 @@
 
-import { notificationService } from '../notification-service';
-import { ActionHandler } from './action-handler.interface';
-import { actionHandlerRegistry } from './action-handler-registry';
+import { NotificationService } from '@/lib/notifications';
+import { CoachNotification } from '../types';
 
 /**
- * Handler for recommending VR sessions
+ * Add a notification for VR session recommendation
  */
-export class RecommendVRSessionHandler implements ActionHandler {
-  actionType = 'recommend_vr_session';
-
-  execute(userId: string, payload: any): void {
-    console.log(`Recommending VR session "${payload.sessionType}" for user ${userId}`);
-    notificationService.addNotification(userId, {
-      title: "Séance de VR recommandée",
-      message: `Une séance de VR "${payload.sessionName || payload.sessionType}" pourrait vous aider en ce moment.`,
-      type: 'info',
+export async function recommendVRSession(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'info', // Changed from 'recommendation' to 'info'
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating VR recommendation notification:', error);
+    return false;
   }
 }
-
-// Register all VR handlers
-actionHandlerRegistry.register(new RecommendVRSessionHandler());

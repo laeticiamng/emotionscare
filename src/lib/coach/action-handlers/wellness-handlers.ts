@@ -1,56 +1,69 @@
 
-import { notificationService } from '../notification-service';
-import { ActionHandler } from './action-handler.interface';
-import { actionHandlerRegistry } from './action-handler-registry';
+import { NotificationService } from '@/lib/notifications';
+import { CoachNotification } from '../types';
 
 /**
- * Handler for breathing exercise recommendations
+ * Add a wellness notification to the user
  */
-export class BreathingExerciseHandler implements ActionHandler {
-  actionType = 'start_breathing_exercise';
-
-  execute(userId: string, payload: any): void {
-    console.log(`Starting breathing exercise for user ${userId}`);
-    
-    notificationService.addNotification(userId, {
-      title: "Exercice de respiration",
-      message: payload.message || "Prenez un moment pour faire cet exercice de respiration.",
-      type: 'info',
+export async function wellnessNotification(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'info', // Changed from 'wellness' to 'info'
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating wellness notification:', error);
+    return false;
   }
 }
 
 /**
- * Handler for hydration reminders
+ * Add a reminder notification for wellness activities
  */
-export class HydrationReminderHandler implements ActionHandler {
-  actionType = 'hydration_reminder';
-
-  execute(userId: string, payload: any): void {
-    notificationService.addNotification(userId, {
-      title: "Rappel d'hydratation",
-      message: payload.message || "N'oubliez pas de boire de l'eau régulièrement.",
-      type: 'info',
+export async function wellnessReminder(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'info', // Changed from 'reminder' to 'info'
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating wellness reminder:', error);
+    return false;
   }
 }
 
 /**
- * Handler for wellness tips
+ * Add a notification with wellness tips
  */
-export class WellnessTipHandler implements ActionHandler {
-  actionType = 'wellness_tip';
-
-  execute(userId: string, payload: any): void {
-    notificationService.addNotification(userId, {
-      title: "Conseil bien-être",
-      message: payload.message || "Voici un conseil pour améliorer votre bien-être.",
-      type: 'info',
+export async function wellnessTip(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'info', // Changed from 'tip' to 'info'
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating wellness tip notification:', error);
+    return false;
   }
 }
-
-// Register all wellness handlers
-actionHandlerRegistry.register(new BreathingExerciseHandler());
-actionHandlerRegistry.register(new HydrationReminderHandler());
-actionHandlerRegistry.register(new WellnessTipHandler());

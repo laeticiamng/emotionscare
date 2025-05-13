@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
@@ -268,9 +267,9 @@ export class TopMediaMusicService {
    */
   async saveToUserLibrary(userId: string, track: MusicTrack): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('user_music_library')
-        .insert({
+      // Use edge function to save to user library
+      const { error } = await supabase.functions.invoke('save-music', {
+        body: {
           user_id: userId,
           track_id: track.id,
           title: track.title,
@@ -278,9 +277,9 @@ export class TopMediaMusicService {
           duration: track.duration,
           url: track.url,
           cover_url: track.coverUrl,
-          emotion: track.emotion,
-          added_at: new Date().toISOString()
-        });
+          emotion: track.emotion
+        }
+      });
         
       if (error) {
         console.error('Error saving track to library:', error);
@@ -299,18 +298,17 @@ export class TopMediaMusicService {
    */
   async getUserLibrary(userId: string): Promise<MusicTrack[]> {
     try {
-      const { data, error } = await supabase
-        .from('user_music_library')
-        .select('*')
-        .eq('user_id', userId)
-        .order('added_at', { ascending: false });
+      // Use edge function to get user library
+      const { data, error } = await supabase.functions.invoke('get-music-library', {
+        body: { user_id: userId }
+      });
         
       if (error) {
         console.error('Error fetching user library:', error);
         return [];
       }
       
-      return data.map(item => ({
+      return (data || []).map((item: any) => ({
         id: item.track_id,
         title: item.title,
         artist: item.artist,

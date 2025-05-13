@@ -1,29 +1,25 @@
 
-import { notificationService } from '../notification-service';
-import { ActionHandler } from './action-handler.interface';
-import { actionHandlerRegistry } from './action-handler-registry';
+import { NotificationService } from '@/lib/notifications';
+import { CoachNotification } from '../types';
 
 /**
- * Handler for playing music presets
+ * Add a notification about music recommendation
  */
-export class PlayMusicPresetHandler implements ActionHandler {
-  actionType = 'play_music_preset';
-
-  execute(userId: string, payload: any): void {
-    console.log(`Playing music preset "${payload.preset}" for user ${userId}`);
-    notificationService.addNotification(userId, {
-      title: "Playlist activée",
-      message: `Playlist "${payload.preset}" activée pour accompagner votre moment.`,
+export async function musicRecommendationNotification(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
       type: 'info',
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating music recommendation notification:', error);
+    return false;
   }
-}
-
-// Register all music handlers
-actionHandlerRegistry.register(new PlayMusicPresetHandler());
-
-// Legacy function handler for backward compatibility
-export function handlePlayMusicPreset(userId: string, payload: any): void {
-  const handler = actionHandlerRegistry.getHandler('play_music_preset');
-  if (handler) handler.execute(userId, payload);
 }

@@ -1,40 +1,47 @@
 
-import { notificationService } from '../notification-service';
-import { ActionHandler } from './action-handler.interface';
-import { actionHandlerRegistry } from './action-handler-registry';
+import { NotificationService } from '@/lib/notifications';
+import { CoachNotification } from '../types';
 
 /**
- * Handler for buddy interactions
+ * Send a notification about buddy matching
  */
-export class ActivateBuddySessionHandler implements ActionHandler {
-  actionType = 'activate_buddy_session';
-
-  execute(userId: string, payload: any): void {
-    console.log(`Activating buddy session for user ${userId}`);
-    notificationService.addNotification(userId, {
-      title: "Buddy Ready",
-      message: "Your virtual buddy is ready to assist you.",
-      type: 'info',
+export async function buddyMatchNotification(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'success',
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating buddy match notification:', error);
+    return false;
   }
 }
 
 /**
- * Handler for buddy reminder
+ * Create a reminder notification for buddy system
  */
-export class BuddyReminderHandler implements ActionHandler {
-  actionType = 'buddy_reminder';
-
-  execute(userId: string, payload: any): void {
-    console.log(`Sending buddy reminder for user ${userId}`);
-    notificationService.addNotification(userId, {
-      title: "Buddy Reminder",
-      message: payload.message || "Your buddy has a reminder for you.",
-      type: 'info',
+export async function buddyReminderNotification(
+  title: string,
+  message: string,
+  userId?: string
+): Promise<boolean> {
+  try {
+    await NotificationService.addNotification({
+      title,
+      message,
+      type: 'info', // Changed from 'reminder' to 'info'
+      userId
     });
+    return true;
+  } catch (error) {
+    console.error('Error creating buddy reminder notification:', error);
+    return false;
   }
 }
-
-// Register all buddy handlers
-actionHandlerRegistry.register(new ActivateBuddySessionHandler());
-actionHandlerRegistry.register(new BuddyReminderHandler());

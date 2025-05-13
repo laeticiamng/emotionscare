@@ -2,113 +2,135 @@
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionalData, EmotionalTrend } from './types';
 
-class EmotionalDataService {
-  // Mock storage for emotional data since the table doesn't exist in Supabase
-  private emotionalData: Map<string, EmotionalData[]> = new Map();
-
-  // Fetch the last emotional data for a specific user
-  async getLastEmotionalData(userId: string): Promise<EmotionalData | null> {
-    if (!userId) return null;
-    
-    // Get user data from our mock storage
-    const userEmotions = this.emotionalData.get(userId) || [];
-    
-    if (userEmotions.length === 0) {
-      return null;
+export class EmotionalDataService {
+  /**
+   * Save emotional data to the database
+   */
+  async saveEmotionalData(data: EmotionalData): Promise<void> {
+    try {
+      // Use emotions table, which we know exists in the DB
+      const { error } = await supabase
+        .from('emotions')
+        .insert({
+          user_id: data.userId,
+          date: data.timestamp,
+          score: Math.round(data.intensity * 100),
+          emojis: this.mapEmotionToEmojis(data.emotion),
+          text: data.feedback || undefined,
+          ai_feedback: data.feedback
+        });
+        
+      if (error) {
+        console.error('Error saving emotional data:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error in saveEmotionalData:', error);
+      throw error;
     }
-    
-    // Sort by timestamp descending and get the first item
-    return [...userEmotions].sort((a, b) => {
-      const dateA = new Date(a.timestamp).getTime();
-      const dateB = new Date(b.timestamp).getTime();
-      return dateB - dateA;
-    })[0];
-  }
-  
-  // Fetch emotional data history for a specific user
-  async getEmotionalDataHistory(userId: string, limit = 10): Promise<EmotionalData[]> {
-    if (!userId) return [];
-    
-    // Get user data from our mock storage
-    const userEmotions = this.emotionalData.get(userId) || [];
-    
-    // Sort by timestamp descending and limit the results
-    return [...userEmotions]
-      .sort((a, b) => {
-        const dateA = new Date(a.timestamp).getTime();
-        const dateB = new Date(b.timestamp).getTime();
-        return dateB - dateA;
-      })
-      .slice(0, limit);
   }
 
-  // Insert or update emotional data for a user
-  async updateUserEmotionalData(userId: string, data: Partial<EmotionalData>): Promise<void> {
-    if (!userId) return;
-    
-    const emotionalData: EmotionalData = {
-      emotion: data.emotion || 'neutral',
-      intensity: data.intensity || 0,
-      timestamp: new Date().toISOString(),
-      context: data.context,
-      feedback: data.feedback
+  /**
+   * Map emotion name to emojis
+   */
+  private mapEmotionToEmojis(emotion: string): string {
+    const emotionToEmoji: Record<string, string> = {
+      'happy': '😊',
+      'joy': '😄',
+      'sad': '😢',
+      'angry': '😠',
+      'fear': '😨',
+      'surprise': '😲',
+      'disgust': '🤢',
+      'calm': '😌',
+      'neutral': '😐',
+      'anxiety': '😰',
+      'stress': '😓',
+      'relaxed': '😌',
+      'tired': '😴',
+      'excited': '🤩',
+      'confident': '😎'
     };
     
-    // Get or initialize user's emotional data
-    const userEmotions = this.emotionalData.get(userId) || [];
-    
-    // Add new emotional data
-    userEmotions.push(emotionalData);
-    
-    // Update the storage
-    this.emotionalData.set(userId, userEmotions);
+    return emotionToEmoji[emotion.toLowerCase()] || '😐';
   }
-  
-  // Analyze emotional data to detect trends
-  async getEmotionalTrend(userId: string, days = 7): Promise<EmotionalTrend | null> {
-    const history = await this.getEmotionalDataHistory(userId, days);
-    
-    if (history.length < 2) {
-      return null;
+
+  /**
+   * Get user's emotional data history
+   */
+  async getUserEmotionalData(userId: string): Promise<EmotionalData[]> {
+    try {
+      const { data, error } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching emotional data:', error);
+        throw error;
+      }
+      
+      return data.map((item: any) => ({
+        userId: item.user_id,
+        emotion: this.detectEmotionFromScore(item.score),
+        intensity: item.score / 100,
+        timestamp: item.date,
+        feedback: item.ai_feedback,
+        source: 'database'
+      }));
+    } catch (error) {
+      console.error('Error in getUserEmotionalData:', error);
+      return [];
     }
-    
-    // Simple trend analysis - more sophisticated analysis would be implemented here
-    const recentEmotions = history.slice(0, Math.ceil(history.length / 2));
-    const olderEmotions = history.slice(Math.ceil(history.length / 2));
-    
-    // Calculate average valence for recent and older emotions
-    const recentValence = this.calculateAverageValence(recentEmotions);
-    const olderValence = this.calculateAverageValence(olderEmotions);
-    
-    // Determine trend direction
-    const direction = recentValence > olderValence ? 'improving' : 
-                    recentValence < olderValence ? 'declining' : 'stable';
-    
-    return {
-      userId,
-      direction,
-      magnitude: Math.abs(recentValence - olderValence),
-      period: days
-    };
   }
   
-  // Helper method to calculate average valence from emotional data
-  private calculateAverageValence(emotions: EmotionalData[]): number {
-    if (emotions.length === 0) return 0;
-    
-    // Use intensity as a proxy for valence in this simple implementation
-    const totalValence = emotions.reduce((sum, emotion) => {
-      return sum + emotion.intensity;
-    }, 0);
-    
-    return totalValence / emotions.length;
+  /**
+   * Detect emotion from numerical score
+   */
+  private detectEmotionFromScore(score: number): string {
+    if (score >= 80) return 'happy';
+    if (score >= 60) return 'calm';
+    if (score >= 40) return 'neutral';
+    if (score >= 20) return 'sad';
+    return 'anxious';
   }
   
-  // Check if user has a negative emotional trend
-  async hasNegativeTrend(userId: string): Promise<boolean> {
-    const trend = await this.getEmotionalTrend(userId);
-    return trend ? trend.direction === 'declining' && trend.magnitude > 0.2 : false;
+  /**
+   * Update user's emotional trend data
+   */
+  async updateEmotionTrend(userId: string): Promise<void> {
+    // Implementation would store the trend calculation
+    // Currently just a placeholder
+  }
+  
+  /**
+   * Check if user has a negative emotional trend
+   */
+  async checkNegativeTrend(userId: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('emotions')
+        .select('score')
+        .eq('user_id', userId)
+        .order('date', { ascending: false })
+        .limit(5);
+        
+      if (error) {
+        console.error('Error checking emotional trend:', error);
+        return false;
+      }
+      
+      if (!data || data.length < 3) {
+        return false;
+      }
+      
+      // Simple heuristic: If average of last 3 entries is below 40, consider it negative
+      const avgScore = data.slice(0, 3).reduce((sum, item) => sum + (item.score || 50), 0) / 3;
+      return avgScore < 40;
+    } catch (error) {
+      console.error('Error in checkNegativeTrend:', error);
+      return false;
+    }
   }
 }
-
-export const emotionalDataService = new EmotionalDataService();
