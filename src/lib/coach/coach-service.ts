@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { AIRecommendation, AIMessage } from '@/types/ai';
@@ -39,10 +38,10 @@ export const getCoachResponse = async (
       throw new Error(error.message);
     }
 
+    // Retourne uniquement les propriétés qui sont définies dans le type ChatResponseType
     return {
       content: data.response,
-      emotion: 'neutral',
-      model: data.model,
+      emotion: 'neutral'
     };
   } catch (error) {
     console.error('Erreur Coach IA:', error);
