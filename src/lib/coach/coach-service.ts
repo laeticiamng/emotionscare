@@ -1,166 +1,168 @@
 
-// Re-export everything from the refactored coach module
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { CoachAction, CoachEvent, EmotionalData, CoachNotification } from './types';
+import { AIRecommendation, AIMessage } from '@/types/ai';
+import { ChatResponseType } from '@/types/chat';
+import { AI_MODEL_CONFIG } from '@/lib/ai/openai-config';
 
-// Coach service client
-export class CoachService {
-  private userId: string | null = null;
-  
-  constructor(userId?: string) {
-    this.userId = userId || null;
+/**
+ * Service d'interaction avec le coach IA
+ */
+export const getCoachResponse = async (
+  message: string,
+  userContext?: {
+    recentEmotions?: string;
+    currentScore?: number;
+    lastEmotionDate?: string;
   }
-  
-  setUserId(userId: string) {
-    this.userId = userId;
-  }
-  
-  // Add an emotional data point to the user's history
-  async addEmotionalData(data: EmotionalData): Promise<boolean> {
-    if (!this.userId) {
-      console.error("No user ID set for coach service");
-      return false;
-    }
-    
-    try {
-      // In a real implementation, this would save to Supabase
-      // For now, we'll log the action and simulate success
-      console.log("Adding emotional data:", data, "for user:", this.userId);
-      return true;
-    } catch (error) {
-      console.error("Error adding emotional data:", error);
-      return false;
-    }
-  }
-  
-  // Get the user's recent emotional data
-  async getRecentEmotionalData(limit = 10): Promise<EmotionalData[]> {
-    if (!this.userId) {
-      console.error("No user ID set for coach service");
-      return [];
-    }
-    
-    try {
-      // In a real implementation, this would fetch from Supabase
-      return [
-        {
-          userId: this.userId,
-          emotion: "calm",
-          intensity: 0.8,
-          timestamp: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-          userId: this.userId,
-          emotion: "happy",
-          intensity: 0.7,
-          timestamp: new Date(Date.now() - 86400000).toISOString(),
-        }
-      ];
-    } catch (error) {
-      console.error("Error fetching emotional data:", error);
-      return [];
-    }
-  }
-  
-  // Register events that might trigger coach actions
-  async registerEvent(event: CoachEvent): Promise<void> {
-    if (!this.userId) {
-      console.error("No user ID set for coach service");
-      return;
-    }
-    
-    try {
-      console.log("Registering event:", event, "for user:", this.userId);
-      // Process event and potentially trigger actions
-    } catch (error) {
-      console.error("Error registering event:", error);
-    }
-  }
-  
-  // Execute a coach action
-  async executeAction(action: CoachAction): Promise<boolean> {
-    if (!this.userId) {
-      console.error("No user ID set for coach service");
-      return false;
-    }
-    
-    try {
-      console.log("Executing action:", action, "for user:", this.userId);
-      // Based on action type, delegate to specific handlers
-      
+): Promise<ChatResponseType> => {
+  try {
+    // Utilise l'Edge Function Supabase pour communiquer avec OpenAI
+    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+      body: {
+        message,
+        userContext,
+        model: AI_MODEL_CONFIG.coach.model,
+        temperature: AI_MODEL_CONFIG.coach.temperature,
+        max_tokens: AI_MODEL_CONFIG.coach.max_tokens,
+        module: 'coach'
+      }
+    });
+
+    if (error) {
+      console.error('Erreur API Coach:', error);
       toast({
-        title: "Action exécutée",
-        description: `L'action de type ${action.type} a été exécutée avec succès.`,
+        title: "Erreur de communication",
+        description: "Impossible de contacter le service de coach IA",
+        variant: "destructive"
       });
-      
-      return true;
-    } catch (error) {
-      console.error("Error executing action:", error);
-      return false;
+      throw new Error(error.message);
     }
-  }
-  
-  // Get coaching recommendations based on emotional state
-  async getCoachRecommendations(emotion: string, intensity: number): Promise<any[]> {
-    try {
-      // In a real implementation, this would use AI or a rule-based system
-      console.log("Getting recommendations for emotion:", emotion, "with intensity:", intensity);
-      
-      // Mock recommendations
-      return [
-        {
-          id: "rec-1",
-          type: "music",
-          title: "Écouter de la musique apaisante",
-          description: "La musique peut aider à stabiliser et améliorer votre humeur.",
-          actionType: "play_music",
-          actionPayload: { emotion }
-        },
-        {
-          id: "rec-2",
-          type: "breathing",
-          title: "Exercice de respiration",
-          description: "Prenez quelques minutes pour vous recentrer avec cet exercice de respiration.",
-          actionType: "start_breathing_exercise",
-          actionPayload: { duration: 3 }
-        }
-      ];
-    } catch (error) {
-      console.error("Error getting coach recommendations:", error);
-      return [];
-    }
-  }
-}
 
-// Create and export a singleton instance
-const coachService = new CoachService();
-export default coachService;
-
-// Helper functions for simpler API access
-export const addEmotionalDataPoint = async (
-  emotion: string, 
-  intensity: number, 
-  userId?: string,
-  context?: string
-): Promise<boolean> => {
-  if (userId) coachService.setUserId(userId);
-  
-  return await coachService.addEmotionalData({
-    userId: userId || 'anonymous',
-    emotion,
-    intensity,
-    timestamp: new Date().toISOString(),
-    context
-  });
+    return {
+      content: data.response,
+      emotion: 'neutral',
+      model: data.model,
+    };
+  } catch (error) {
+    console.error('Erreur Coach IA:', error);
+    return {
+      content: "Je suis désolé, je rencontre des difficultés techniques. Veuillez réessayer dans quelques instants.",
+      emotion: 'error'
+    };
+  }
 };
 
-export const getCoachRecommendations = async (
-  emotion: string,
-  intensity: number,
-  userId?: string
-): Promise<any[]> => {
-  if (userId) coachService.setUserId(userId);
-  
-  return await coachService.getCoachRecommendations(emotion, intensity);
+/**
+ * Générer une recommandation du coach basée sur l'état émotionnel
+ */
+export const generateCoachRecommendation = async (
+  emotionalState: string,
+  context?: string
+): Promise<AIRecommendation> => {
+  try {
+    const prompt = `En tant que coach de bien-être, propose une recommandation courte et pratique pour quelqu'un qui se sent "${emotionalState}". ${context || ''} Sois concis (max 200 caractères) et directement utile.`;
+    
+    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+      body: {
+        message: prompt,
+        model: AI_MODEL_CONFIG.coach.model,
+        temperature: 0.3,
+        max_tokens: 120,
+        module: 'coach'
+      }
+    });
+
+    if (error) throw new Error(error.message);
+
+    return {
+      id: crypto.randomUUID(),
+      type: 'activity',
+      title: 'Recommandation personnalisée',
+      description: data.response,
+      confidence: 0.85,
+      reasoning: `Basé sur votre état émotionnel: ${emotionalState}`,
+      emotion_context: emotionalState
+    };
+  } catch (error) {
+    console.error('Erreur génération recommandation:', error);
+    
+    return {
+      id: crypto.randomUUID(),
+      type: 'activity',
+      title: 'Prenez soin de vous',
+      description: 'Prenez un moment pour respirer profondément et vous recentrer.',
+      confidence: 0.5,
+      reasoning: 'Recommandation générique suite à une erreur technique',
+      emotion_context: emotionalState
+    };
+  }
+};
+
+/**
+ * Analyser l'état émotionnel à partir d'un message
+ */
+export const analyzeEmotionalState = async (message: string): Promise<{
+  primaryEmotion: string;
+  secondaryEmotion?: string;
+  intensity: number;
+  sentiment: 'positive' | 'neutral' | 'negative';
+}> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('analyze-emotion', {
+      body: { text: message }
+    });
+
+    if (error) throw new Error(error.message);
+    
+    return data;
+  } catch (error) {
+    console.error('Erreur analyse émotionnelle:', error);
+    return {
+      primaryEmotion: 'indéterminé',
+      intensity: 0.5,
+      sentiment: 'neutral'
+    };
+  }
+};
+
+/**
+ * Générer un message de réponse optimisé pour le support
+ */
+export const getPremiumSupportResponse = async (
+  message: string,
+  userContext?: any
+): Promise<AIMessage> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+      body: {
+        message,
+        userContext,
+        model: 'gpt-4o',
+        temperature: 0.4,
+        max_tokens: 1000,
+        module: 'premium-support'
+      }
+    });
+
+    if (error) throw new Error(error.message);
+
+    return {
+      id: crypto.randomUUID(),
+      role: 'assistant',
+      content: data.response,
+      timestamp: new Date().toISOString(),
+      emotions_detected: userContext?.detectedEmotion ? [userContext.detectedEmotion] : undefined,
+      confidence: 0.95
+    };
+  } catch (error) {
+    console.error('Erreur support premium:', error);
+    return {
+      id: crypto.randomUUID(),
+      role: 'assistant',
+      content: "Je vous présente mes excuses, mais je rencontre des difficultés techniques. Un membre de notre équipe d'assistance premium va vous contacter sous peu.",
+      timestamp: new Date().toISOString(),
+      confidence: 0.5
+    };
+  }
 };
