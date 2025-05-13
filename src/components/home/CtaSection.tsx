@@ -1,9 +1,12 @@
 
 import React from 'react';
-import { ThumbsUp } from 'lucide-react';
-import CallToAction from './CallToAction';
+import { ThumbsUp, User, Building } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const CtaSection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="bg-primary/5 rounded-2xl p-8 md:p-12 mb-16 transform transition-all duration-500 hover:bg-primary/10 hover:shadow-lg overflow-hidden relative">
       {/* Élément décoratif animé */}
@@ -16,13 +19,24 @@ const CtaSection: React.FC = () => {
           <p className="text-lg mb-6 text-gray-600">
             Rejoignez notre communauté d'utilisateurs qui ont trouvé un meilleur équilibre émotionnel grâce à EmotionsCare.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-            <div className="w-full md:w-auto">
-              <CallToAction type="personal" className="w-full md:w-auto" />
-            </div>
-            <div className="w-full md:w-auto">
-              <CallToAction type="business" className="w-full md:w-auto" />
-            </div>
+          <div className="flex flex-wrap gap-6 justify-center md:justify-start">
+            <Button 
+              onClick={() => navigate('/login')} 
+              size="lg"
+              className="w-full md:w-auto flex items-center gap-2 bg-primary hover:bg-primary/90"
+            >
+              <User className="h-5 w-5" />
+              Accès Particulier
+            </Button>
+            <Button 
+              onClick={() => navigate('/business')} 
+              variant="outline"
+              size="lg"
+              className="w-full md:w-auto flex items-center gap-2 border-2"
+            >
+              <Building className="h-5 w-5" />
+              Accès Entreprise
+            </Button>
           </div>
         </div>
         <div className="flex-1 flex justify-center animate-fade-in" style={{ animationDelay: "200ms" }}>

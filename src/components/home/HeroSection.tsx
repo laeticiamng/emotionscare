@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ArrowRight } from 'lucide-react';
+import { Heart, ArrowRight, User, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion } from 'framer-motion';
@@ -55,15 +55,16 @@ const HeroSection: React.FC = () => {
           ) : (
             <>
               <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-                <Link to="/login">
-                  Se connecter
-                  <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                <Link to="/login" className="flex items-center">
+                  <User className="h-5 w-5 mr-2" />
+                  Espace Personnel
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
-                <Link to="/register">
-                  S'inscrire
-                  <Heart className="h-4 w-4 ml-2 transition-all group-hover:scale-110 group-hover:text-rose-500" />
+              
+              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
+                <Link to="/business" className="flex items-center">
+                  <Building className="h-5 w-5 mr-2" />
+                  Espace Entreprise
                 </Link>
               </Button>
             </>

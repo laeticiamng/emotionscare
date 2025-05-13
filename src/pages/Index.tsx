@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import Shell from '@/Shell';
 import { useAuth } from '@/contexts/AuthContext';
 import AccessSection from '@/components/home/AccessSection';
+import HeroSection from '@/components/home/HeroSection';
+import CtaSection from '@/components/home/CtaSection';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -33,33 +35,44 @@ const Index = () => {
   return (
     <Shell>
       <div className="container px-4 py-8 mx-auto">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">
-            Bienvenue sur EmotionsCare
-          </h1>
-          <p className="text-lg text-muted-foreground mb-8">
-            Votre plateforme de bien-être émotionnel
-          </p>
+        <HeroSection />
+        
+        {/* Connection Options - Made more prominent */}
+        <div className="max-w-3xl mx-auto bg-card rounded-xl shadow-lg p-8 mb-12 border border-primary/20">
+          <h2 className="text-3xl font-bold tracking-tight mb-6 text-center">
+            Choisissez votre accès
+          </h2>
           
-          <div className="flex flex-wrap justify-center gap-4 mb-10">
-            {isAuthenticated ? (
-              <Button size="lg" onClick={handleDashboardClick} className="px-6">
-                Accéder à mon tableau de bord
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-primary-50 dark:bg-primary-950/30 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300">
+              <h3 className="text-xl font-bold mb-3">Particulier</h3>
+              <p className="mb-4 text-muted-foreground">Accédez à votre espace personnel</p>
+              <Button 
+                onClick={() => navigate('/login')}
+                size="lg" 
+                className="w-full"
+              >
+                Espace Personnel
               </Button>
-            ) : (
-              <>
-                <Button size="lg" onClick={handleLoginClick} className="px-6">
-                  Se connecter
-                </Button>
-                <Button variant="outline" size="lg" onClick={handleRegisterClick} className="px-6">
-                  S'inscrire
-                </Button>
-              </>
-            )}
+            </div>
+            
+            <div className="bg-secondary-50 dark:bg-secondary-950/30 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300">
+              <h3 className="text-xl font-bold mb-3">Entreprise</h3>
+              <p className="mb-4 text-muted-foreground">Solutions pour votre organisation</p>
+              <Button 
+                onClick={() => navigate('/business')}
+                variant="secondary"
+                size="lg" 
+                className="w-full"
+              >
+                Espace Entreprise
+              </Button>
+            </div>
           </div>
         </div>
         
         <AccessSection />
+        <CtaSection />
       </div>
     </Shell>
   );
