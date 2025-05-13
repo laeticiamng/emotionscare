@@ -1,89 +1,55 @@
-
 import { notificationService } from '../notification-service';
 import { ActionHandler } from './action-handler.interface';
 import { actionHandlerRegistry } from './action-handler-registry';
 
 /**
- * Handler for checking scan status
+ * Handler for breathing exercise recommendations
  */
-export class CheckScanStatusHandler implements ActionHandler {
-  actionType = 'check_scan_status';
+export class BreathingExerciseHandler implements ActionHandler {
+  actionType = 'start_breathing_exercise';
 
-  execute(userId: string): void {
-    // Vérifier si un scan a été fait aujourd'hui
-    const hasScannedToday = Math.random() > 0.5; // Simulation
-    if (!hasScannedToday) {
-      notificationService.addNotification(userId, {
-        id: `scan-reminder-${Date.now()}`,
-        title: "Rappel de scan",
-        message: "Vous n'avez pas encore fait votre scan émotionnel aujourd'hui. Prenez un moment pour vous !",
-        type: 'info',
-        timestamp: new Date()
-      });
-    }
-  }
-}
-
-/**
- * Handler for suggesting journal entries
- */
-export class SuggestJournalEntryHandler implements ActionHandler {
-  actionType = 'suggest_journal_entry';
-
-  execute(userId: string): void {
+  execute(userId: string, payload: any): void {
+    console.log(`Starting breathing exercise for user ${userId}`);
+    
     notificationService.addNotification(userId, {
-      id: `journal-suggest-${Date.now()}`,
-      title: "Suggestion journal",
-      message: "Exprimer vos pensées dans votre journal pourrait vous aider à mieux comprendre vos émotions actuelles.",
-      type: 'info',
-      timestamp: new Date()
+      title: "Exercice de respiration",
+      message: payload.message || "Prenez un moment pour faire cet exercice de respiration.",
+      type: 'wellness',
     });
   }
 }
 
 /**
- * Handler for suggesting wellness activities
+ * Handler for hydration reminders
  */
-export class SuggestWellnessActivityHandler implements ActionHandler {
-  actionType = 'suggest_wellness_activity';
+export class HydrationReminderHandler implements ActionHandler {
+  actionType = 'hydration_reminder';
 
-  execute(userId: string): void {
-    const activities = [
-      "Prenez 5 minutes pour faire des exercices de respiration profonde.",
-      "Une courte marche de 10 minutes peut vous aider à vous recentrer.",
-      "Hydratez-vous régulièrement pour maintenir votre bien-être.",
-      "Avez-vous pris un moment pour vous aujourd'hui ? Un peu de méditation peut aider."
-    ];
-    
-    const randomActivity = activities[Math.floor(Math.random() * activities.length)];
-    
+  execute(userId: string, payload: any): void {
     notificationService.addNotification(userId, {
-      id: `wellness-suggest-${Date.now()}`,
-      title: "Activité bien-être",
-      message: randomActivity,
-      type: 'info',
-      timestamp: new Date()
+      title: "Rappel d'hydratation",
+      message: payload.message || "N'oubliez pas de boire de l'eau régulièrement.",
+      type: 'reminder',
+    });
+  }
+}
+
+/**
+ * Handler for wellness tips
+ */
+export class WellnessTipHandler implements ActionHandler {
+  actionType = 'wellness_tip';
+
+  execute(userId: string, payload: any): void {
+    notificationService.addNotification(userId, {
+      title: "Conseil bien-être",
+      message: payload.message || "Voici un conseil pour améliorer votre bien-être.",
+      type: 'tip',
     });
   }
 }
 
 // Register all wellness handlers
-actionHandlerRegistry.register(new CheckScanStatusHandler());
-actionHandlerRegistry.register(new SuggestJournalEntryHandler());
-actionHandlerRegistry.register(new SuggestWellnessActivityHandler());
-
-// Legacy function handlers for backward compatibility
-export function handleCheckScanStatus(userId: string): void {
-  const handler = actionHandlerRegistry.getHandler('check_scan_status');
-  if (handler) handler.execute(userId, {});
-}
-
-export function handleSuggestJournalEntry(userId: string): void {
-  const handler = actionHandlerRegistry.getHandler('suggest_journal_entry');
-  if (handler) handler.execute(userId, {});
-}
-
-export function handleSuggestWellnessActivity(userId: string): void {
-  const handler = actionHandlerRegistry.getHandler('suggest_wellness_activity');
-  if (handler) handler.execute(userId, {});
-}
+actionHandlerRegistry.register(new BreathingExerciseHandler());
+actionHandlerRegistry.register(new HydrationReminderHandler());
+actionHandlerRegistry.register(new WellnessTipHandler());

@@ -1,53 +1,39 @@
-
 import { notificationService } from '../notification-service';
 import { ActionHandler } from './action-handler.interface';
 import { actionHandlerRegistry } from './action-handler-registry';
 
 /**
- * Handler for sending dashboard alerts
+ * Handler for sending simple notifications
  */
-export class SendDashboardAlertHandler implements ActionHandler {
-  actionType = 'send_dashboard_alert';
+export class SendNotificationHandler implements ActionHandler {
+  actionType = 'send_notification';
 
   execute(userId: string, payload: any): void {
     notificationService.addNotification(userId, {
-      id: `dashboard-alert-${Date.now()}`,
-      title: payload.title || "Alerte",
+      title: payload.title || "Notification",
       message: payload.message,
-      type: 'warning',
+      type: payload.type || 'info',
       timestamp: new Date()
     });
   }
 }
 
 /**
- * Handler for sending dashboard notifications
+ * Handler for sending scheduled notifications
  */
-export class SendDashboardNotificationHandler implements ActionHandler {
-  actionType = 'send_dashboard_notification';
+export class ScheduleNotificationHandler implements ActionHandler {
+  actionType = 'schedule_notification';
 
   execute(userId: string, payload: any): void {
     notificationService.addNotification(userId, {
-      id: `dashboard-notif-${Date.now()}`,
-      title: payload.title || "Notification",
+      title: payload.title || "Notification programmée",
       message: payload.message,
-      type: 'info',
+      type: payload.type || 'info',
       timestamp: new Date()
     });
   }
 }
 
 // Register all notification handlers
-actionHandlerRegistry.register(new SendDashboardAlertHandler());
-actionHandlerRegistry.register(new SendDashboardNotificationHandler());
-
-// Legacy function handlers for backward compatibility
-export function handleSendDashboardAlert(userId: string, payload: any): void {
-  const handler = actionHandlerRegistry.getHandler('send_dashboard_alert');
-  if (handler) handler.execute(userId, payload);
-}
-
-export function handleSendDashboardNotification(userId: string, payload: any): void {
-  const handler = actionHandlerRegistry.getHandler('send_dashboard_notification');
-  if (handler) handler.execute(userId, payload);
-}
+actionHandlerRegistry.register(new SendNotificationHandler());
+actionHandlerRegistry.register(new ScheduleNotificationHandler());

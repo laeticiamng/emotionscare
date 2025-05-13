@@ -2,16 +2,13 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/contexts/MusicContext';
+import { topMediaMusicService } from '@/services/music/topMediaService';
 
 // Interface pour les paramètres envoyés vers le service de musique
 export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
 }
-
-// TopMedia API key - This should ideally come from environment variables in production
-const API_KEY = '1e4228c100304c658ab1eab4333f54be'; // This is the key shown in the screenshot
-const API_BASE_URL = 'https://api.topmusicai.com/v1';
 
 // Descriptions des musiques par émotion
 const musicDescriptions: Record<string, string> = {
@@ -27,6 +24,7 @@ const musicDescriptions: Record<string, string> = {
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [lastPlayedEmotion, setLastPlayedEmotion] = useState<string | null>(null);
+  const [generatedSongId, setGeneratedSongId] = useState<string | null>(null);
   const { toast } = useToast();
   const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
 
@@ -35,30 +33,22 @@ export const useMusicEmotionIntegration = () => {
     try {
       console.log(`Generating music for emotion: ${emotion}`);
       
-      const body = {
+      // Get suggestion for this emotion
+      const suggestion = topMediaMusicService.getMoodSuggestions(emotion.toLowerCase());
+      
+      const params = {
         is_auto: 1, // Auto generate
-        prompt: `Music that evokes the feeling of being ${emotion}`,
-        title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Mood`,
-        instrumental: 1 // Instrumental track
+        prompt: suggestion.prompt || `Music that evokes the feeling of being ${emotion}`,
+        title: suggestion.title || `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Mood`,
+        instrumental: suggestion.instrumental ? 1 : 0,
+        lyrics: suggestion.lyrics
       };
 
-      const response = await fetch(`${API_BASE_URL}/music`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log('Music generation result:', data);
+      const { song_id } = await topMediaMusicService.generateMusic(params);
+      setGeneratedSongId(song_id);
       
-      return data.song_id || null;
+      console.log('Music generation result:', song_id);
+      return song_id;
     } catch (error) {
       console.error('Error generating music:', error);
       return null;
@@ -68,22 +58,10 @@ export const useMusicEmotionIntegration = () => {
   // Check status of generated music
   const checkMusicStatus = async (songId: string): Promise<{url?: string, status: string}> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/query?song_id=${songId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
+      const result = await topMediaMusicService.checkGenerationStatus(songId);
       return {
-        url: data.url,
-        status: data.status
+        url: result.url,
+        status: result.status
       };
     } catch (error) {
       console.error('Error checking music status:', error);
@@ -132,27 +110,42 @@ export const useMusicEmotionIntegration = () => {
           });
           
           // In real implementation, you would poll for status until completed
-          // For demo purposes, we'll simulate a successful generation
+          const statusCheckInterval = setInterval(async () => {
+            const status = await checkMusicStatus(songId);
+            
+            if (status.status === 'completed' && status.url) {
+              clearInterval(statusCheckInterval);
+              
+              // Create a track from the generated music
+              const generatedTrack = {
+                id: songId,
+                title: `${params.emotion.charAt(0).toUpperCase() + params.emotion.slice(1)} Mélodie`,
+                artist: 'TopMedia AI',
+                duration: 180,
+                url: status.url,
+                coverUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+              };
+              
+              playTrack(generatedTrack);
+              setOpenDrawer(true);
+              
+              toast({
+                title: "Musique générée",
+                description: `Une mélodie basée sur votre émotion: ${params.emotion} est prête`,
+              });
+              
+              setLastPlayedEmotion(params.emotion);
+            } else if (status.status === 'failed') {
+              clearInterval(statusCheckInterval);
+              
+              toast({
+                title: "Échec de la génération",
+                description: "Impossible de générer la musique. Veuillez réessayer.",
+                variant: "destructive"
+              });
+            }
+          }, 5000); // Check every 5 seconds
           
-          // Simulated music track
-          const generatedTrack = {
-            id: songId,
-            title: `${params.emotion.charAt(0).toUpperCase() + params.emotion.slice(1)} Mélodie`,
-            artist: 'IA Composer',
-            duration: 180,
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // Demo URL
-            coverUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-          };
-          
-          playTrack(generatedTrack);
-          setOpenDrawer(true);
-          
-          toast({
-            title: "Musique générée",
-            description: `Une mélodie basée sur votre émotion: ${params.emotion} est prête`,
-          });
-          
-          setLastPlayedEmotion(params.emotion);
           return true;
         } else {
           console.log("Failed to generate music for emotion:", params.emotion);
@@ -189,7 +182,8 @@ export const useMusicEmotionIntegration = () => {
     generateMusicForEmotion,
     checkMusicStatus,
     isLoading,
-    lastPlayedEmotion
+    lastPlayedEmotion,
+    generatedSongId
   };
 };
 
