@@ -9,7 +9,7 @@ import { MusicProvider } from "./contexts/MusicContext";
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider>
       <LayoutProvider>
         <SidebarProvider>
           <MusicProvider>
