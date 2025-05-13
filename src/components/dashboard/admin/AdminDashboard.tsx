@@ -8,6 +8,9 @@ import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateC
 import SocialCocoonCard from '@/components/dashboard/admin/SocialCocoonCard';
 import GamificationSummaryCard from '@/components/dashboard/admin/GamificationSummaryCard';
 import { useSegment } from '@/contexts/SegmentContext';
+import DraggableKpiCardsGrid from './draggable/DraggableKpiCardsGrid';
+import { DashboardWidgetConfig } from '@/types/dashboard';
+import { toast } from '@/hooks/use-toast';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -16,6 +19,44 @@ const AdminDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [timePeriod, setTimePeriod] = useState<string>('7');
   const { segment } = useSegment();
+  const [kpiWidgets, setKpiWidgets] = useState<DashboardWidgetConfig[]>([
+    {
+      id: 'absenteeism-overview',
+      type: 'absenteeism-card',
+      position: { x: 0, y: 0, w: 1, h: 1 },
+      settings: {
+        title: "Taux d'absentéisme",
+        trend: "+2.5%"
+      }
+    },
+    {
+      id: 'emotional-health-overview',
+      type: 'emotional-health-card',
+      position: { x: 1, y: 0, w: 1, h: 1 },
+      settings: {
+        title: "Santé émotionnelle",
+        trend: "+5%"
+      }
+    },
+    {
+      id: 'productivity-overview',
+      type: 'productivity-card',
+      position: { x: 2, y: 0, w: 1, h: 1 },
+      settings: {
+        title: "Productivité",
+        trend: "+3.2%"
+      }
+    },
+    {
+      id: 'turnover-risk',
+      type: 'turnover-risk-card',
+      position: { x: 0, y: 1, w: 1, h: 1 },
+      settings: {
+        title: "Risque de turnover",
+        trend: "-1.5%"
+      }
+    }
+  ]);
 
   console.log('AdminDashboard component rendering');
 
@@ -86,6 +127,14 @@ const AdminDashboard: React.FC = () => {
     generateMockData();
   }, [timePeriod, segment]);
   
+  const handleKpiWidgetsChange = (newWidgets: DashboardWidgetConfig[]) => {
+    setKpiWidgets(newWidgets);
+    toast({
+      title: "Disposition mise à jour",
+      description: "La disposition du tableau de bord a été enregistrée",
+    });
+  };
+  
   return (
     <div className="max-w-7xl mx-auto">
       {/* Hero Section with Period Selector */}
@@ -99,6 +148,15 @@ const AdminDashboard: React.FC = () => {
           </div>
           <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
         </div>
+      </div>
+      
+      {/* KPI Cards Section */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Indicateurs clés de performance</h2>
+        <DraggableKpiCardsGrid 
+          widgets={kpiWidgets}
+          onWidgetsChange={handleKpiWidgetsChange}
+        />
       </div>
       
       {/* Main Content */}
