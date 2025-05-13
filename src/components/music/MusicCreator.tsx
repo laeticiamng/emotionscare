@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -11,7 +10,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { MusicTrack } from '@/types/music';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { topMediaMusicService } from '@/services/music/topMediaService';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MusicCreator: React.FC = () => {
   const { toast } = useToast();

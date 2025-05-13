@@ -3,15 +3,9 @@ import { CoachNotification } from './types';
 
 export class NotificationService {
   private notifications: CoachNotification[] = [];
-  private userId: string | null = null;
+  private subscribers: Map<string, Function[]> = new Map();
   
-  constructor(userId?: string) {
-    this.userId = userId || null;
-    this.loadNotifications();
-  }
-  
-  setUserId(userId: string) {
-    this.userId = userId;
+  constructor() {
     this.loadNotifications();
   }
   
@@ -39,6 +33,9 @@ export class NotificationService {
       this.notifications = this.notifications.slice(0, 50);
     }
     
+    // Notify subscribers
+    this.notifySubscribers(userId);
+    
     // In a real app, save to backend or local storage
     return newNotification;
   }
@@ -54,16 +51,50 @@ export class NotificationService {
     return false;
   }
   
-  async markAllAsRead(): Promise<boolean> {
+  async markAllAsRead(userId?: string): Promise<boolean> {
     this.notifications.forEach(notif => {
       notif.read = true;
     });
     
+    // Notify subscribers if userId is provided
+    if (userId) {
+      this.notifySubscribers(userId);
+    }
+    
     return true;
   }
   
-  getUnreadCount(): number {
+  getUnreadCount(userId?: string): number {
     return this.notifications.filter(n => !n.read).length;
+  }
+  
+  // Add subscription functionality
+  subscribeToNotifications(userId: string, callback: Function): () => void {
+    if (!this.subscribers.has(userId)) {
+      this.subscribers.set(userId, []);
+    }
+    
+    this.subscribers.get(userId)?.push(callback);
+    
+    // Return unsubscribe function
+    return () => {
+      const userSubscribers = this.subscribers.get(userId) || [];
+      const index = userSubscribers.indexOf(callback);
+      if (index !== -1) {
+        userSubscribers.splice(index, 1);
+      }
+    };
+  }
+  
+  private notifySubscribers(userId: string): void {
+    const callbacks = this.subscribers.get(userId) || [];
+    callbacks.forEach(callback => {
+      try {
+        callback();
+      } catch (error) {
+        console.error('Error in notification subscriber callback:', error);
+      }
+    });
   }
 }
 

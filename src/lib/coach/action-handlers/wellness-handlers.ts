@@ -1,3 +1,4 @@
+
 import { notificationService } from '../notification-service';
 import { ActionHandler } from './action-handler.interface';
 import { actionHandlerRegistry } from './action-handler-registry';
@@ -14,7 +15,7 @@ export class BreathingExerciseHandler implements ActionHandler {
     notificationService.addNotification(userId, {
       title: "Exercice de respiration",
       message: payload.message || "Prenez un moment pour faire cet exercice de respiration.",
-      type: 'wellness',
+      type: 'info',
     });
   }
 }
@@ -29,7 +30,7 @@ export class HydrationReminderHandler implements ActionHandler {
     notificationService.addNotification(userId, {
       title: "Rappel d'hydratation",
       message: payload.message || "N'oubliez pas de boire de l'eau régulièrement.",
-      type: 'reminder',
+      type: 'info',
     });
   }
 }
@@ -44,7 +45,7 @@ export class WellnessTipHandler implements ActionHandler {
     notificationService.addNotification(userId, {
       title: "Conseil bien-être",
       message: payload.message || "Voici un conseil pour améliorer votre bien-être.",
-      type: 'tip',
+      type: 'info',
     });
   }
 }

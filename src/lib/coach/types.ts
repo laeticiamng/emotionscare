@@ -24,13 +24,23 @@ export type EmotionalData = {
   intensity: number;
   timestamp: Date | string;
   context?: string;
+  feedback?: string;
 };
+
+export type EmotionalTrend = {
+  userId: string;
+  direction: 'improving' | 'declining' | 'stable';
+  magnitude: number;
+  period: number;
+};
+
+export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'reminder' | 'wellness' | 'tip' | 'recommendation';
 
 export type CoachNotification = {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
+  type: NotificationType;
   timestamp: Date | string;
   read?: boolean;
   action?: CoachAction;

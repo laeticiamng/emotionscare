@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { notificationService } from '@/lib/coach/notification-service';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useNotificationBadge() {
   const [count, setCount] = useState(0);
@@ -24,7 +24,7 @@ export function useNotificationBadge() {
 
     // Initial count
     const fetchUnreadCount = async () => {
-      const unreadCount = await notificationService.getUnreadCount(user.id);
+      const unreadCount = notificationService.getUnreadCount();
       setCount(unreadCount);
     };
     

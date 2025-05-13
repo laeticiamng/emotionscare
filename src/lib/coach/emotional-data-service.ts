@@ -3,61 +3,65 @@ import { supabase } from '@/integrations/supabase/client';
 import { EmotionalData, EmotionalTrend } from './types';
 
 class EmotionalDataService {
+  // Mock storage for emotional data since the table doesn't exist in Supabase
+  private emotionalData: Map<string, EmotionalData[]> = new Map();
+
   // Fetch the last emotional data for a specific user
   async getLastEmotionalData(userId: string): Promise<EmotionalData | null> {
     if (!userId) return null;
     
-    const { data, error } = await supabase
-      .from('emotional_data')
-      .select('*')
-      .eq('user_id', userId)
-      .order('timestamp', { ascending: false })
-      .limit(1);
-      
-    if (error || !data || data.length === 0) {
-      console.error('Error fetching emotional data:', error);
+    // Get user data from our mock storage
+    const userEmotions = this.emotionalData.get(userId) || [];
+    
+    if (userEmotions.length === 0) {
       return null;
     }
     
-    return data[0] as EmotionalData;
+    // Sort by timestamp descending and get the first item
+    return [...userEmotions].sort((a, b) => {
+      const dateA = new Date(a.timestamp).getTime();
+      const dateB = new Date(b.timestamp).getTime();
+      return dateB - dateA;
+    })[0];
   }
   
   // Fetch emotional data history for a specific user
   async getEmotionalDataHistory(userId: string, limit = 10): Promise<EmotionalData[]> {
     if (!userId) return [];
     
-    const { data, error } = await supabase
-      .from('emotional_data')
-      .select('*')
-      .eq('user_id', userId)
-      .order('timestamp', { ascending: false })
-      .limit(limit);
-      
-    if (error) {
-      console.error('Error fetching emotional data history:', error);
-      return [];
-    }
+    // Get user data from our mock storage
+    const userEmotions = this.emotionalData.get(userId) || [];
     
-    return data as EmotionalData[];
+    // Sort by timestamp descending and limit the results
+    return [...userEmotions]
+      .sort((a, b) => {
+        const dateA = new Date(a.timestamp).getTime();
+        const dateB = new Date(b.timestamp).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, limit);
   }
 
   // Insert or update emotional data for a user
   async updateUserEmotionalData(userId: string, data: Partial<EmotionalData>): Promise<void> {
     if (!userId) return;
     
-    const emotionalData = {
-      user_id: userId,
+    const emotionalData: EmotionalData = {
+      emotion: data.emotion || 'neutral',
+      intensity: data.intensity || 0,
       timestamp: new Date().toISOString(),
-      ...data
+      context: data.context,
+      feedback: data.feedback
     };
     
-    const { error } = await supabase
-      .from('emotional_data')
-      .insert(emotionalData);
-      
-    if (error) {
-      console.error('Error updating emotional data:', error);
-    }
+    // Get or initialize user's emotional data
+    const userEmotions = this.emotionalData.get(userId) || [];
+    
+    // Add new emotional data
+    userEmotions.push(emotionalData);
+    
+    // Update the storage
+    this.emotionalData.set(userId, userEmotions);
   }
   
   // Analyze emotional data to detect trends
@@ -92,8 +96,9 @@ class EmotionalDataService {
   private calculateAverageValence(emotions: EmotionalData[]): number {
     if (emotions.length === 0) return 0;
     
+    // Use intensity as a proxy for valence in this simple implementation
     const totalValence = emotions.reduce((sum, emotion) => {
-      return sum + (emotion.valence || 0);
+      return sum + emotion.intensity;
     }, 0);
     
     return totalValence / emotions.length;

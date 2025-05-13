@@ -1,3 +1,4 @@
+
 import { notificationService } from '../notification-service';
 import { ActionHandler } from './action-handler.interface';
 import { actionHandlerRegistry } from './action-handler-registry';
@@ -13,7 +14,6 @@ export class SendNotificationHandler implements ActionHandler {
       title: payload.title || "Notification",
       message: payload.message,
       type: payload.type || 'info',
-      timestamp: new Date()
     });
   }
 }
@@ -29,7 +29,6 @@ export class ScheduleNotificationHandler implements ActionHandler {
       title: payload.title || "Notification programmée",
       message: payload.message,
       type: payload.type || 'info',
-      timestamp: new Date()
     });
   }
 }
