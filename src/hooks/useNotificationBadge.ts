@@ -4,7 +4,7 @@ import { NotificationService } from '@/lib/notifications';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function useNotificationBadge() {
-  const [count, setCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0); // Renamed from count to unreadCount for consistency
   const { user } = useAuth();
   
   useEffect(() => {
@@ -13,8 +13,8 @@ export function useNotificationBadge() {
     // Load initial count
     const loadNotifications = async () => {
       try {
-        const unreadCount = await NotificationService.getUnreadCount();
-        setCount(unreadCount);
+        const count = await NotificationService.getUnreadCount(user.id);
+        setUnreadCount(count);
       } catch (error) {
         console.error('Error loading notification count:', error);
       }
@@ -23,9 +23,7 @@ export function useNotificationBadge() {
     loadNotifications();
     
     // Subscribe to notification updates if available
-    const unsubscribe = NotificationService.subscribeToNotifications?.(() => {
-      loadNotifications();
-    });
+    const unsubscribe = NotificationService.subscribeToNotifications?.(loadNotifications);
     
     return () => {
       if (unsubscribe) unsubscribe();
@@ -34,12 +32,14 @@ export function useNotificationBadge() {
   
   const markAllAsRead = async () => {
     try {
-      await NotificationService.markAllAsRead();
-      setCount(0);
+      if (!user?.id) return;
+      await NotificationService.markAllAsRead(user.id);
+      setUnreadCount(0);
     } catch (error) {
       console.error('Error marking notifications as read:', error);
     }
   };
   
-  return { count, markAllAsRead };
+  // Return unreadCount for consistent naming across components
+  return { unreadCount, markAllAsRead, count: unreadCount };
 }

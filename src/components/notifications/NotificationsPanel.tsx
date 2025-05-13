@@ -26,7 +26,7 @@ const NotificationsPanel: React.FC = () => {
     markAllAsRead
   } = useNotifications();
   
-  const { unreadCount } = useNotificationBadge();
+  const { count, unreadCount } = useNotificationBadge();
   
   const handleFilterChange = (value: string) => {
     setFilter(value as NotificationFilter);
@@ -42,9 +42,9 @@ const NotificationsPanel: React.FC = () => {
           aria-label="Afficher les notifications"
         >
           <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
+          {count > 0 && (
             <NotificationBadge 
-              count={unreadCount}
+              count={count}
               className="absolute -top-1 -right-1"
             />
           )}
@@ -62,7 +62,7 @@ const NotificationsPanel: React.FC = () => {
             variant="ghost" 
             size="sm" 
             onClick={markAllAsRead}
-            disabled={unreadCount === 0}
+            disabled={count === 0}
           >
             Tout marquer comme lu
           </Button>
@@ -85,7 +85,7 @@ const NotificationsPanel: React.FC = () => {
                 value="unread" 
                 className="text-xs h-7 data-[state=active]:bg-muted"
               >
-                Non lus ({unreadCount})
+                Non lus ({count})
               </TabsTrigger>
               <TabsTrigger 
                 value="invitation" 

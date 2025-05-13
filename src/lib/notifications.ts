@@ -6,7 +6,7 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'success' | 'warning' | 'info' | 'error';
+  type: 'success' | 'warning' | 'info' | 'error' | 'reminder' | 'wellness' | 'tip' | 'recommendation';
   timestamp: string;
   read: boolean;
   actionUrl?: string;
@@ -69,7 +69,7 @@ export class NotificationService {
       });
       
       if (error) throw error;
-      return data.count || 0;
+      return data?.count || 0;
     } catch (error) {
       console.error('Error getting unread count:', error);
       return 0;

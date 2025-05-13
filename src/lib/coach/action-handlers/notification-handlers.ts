@@ -14,7 +14,7 @@ export async function reminderNotification(
     await NotificationService.addNotification({
       title,
       message,
-      type: 'reminder',
+      type: 'reminder', // This is now a valid type since we updated the Notification types
       userId
     });
     return true;

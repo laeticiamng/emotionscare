@@ -45,11 +45,13 @@ export class CoachService {
       // In a real implementation, this would fetch from Supabase
       return [
         {
+          userId: this.userId,
           emotion: "calm",
           intensity: 0.8,
           timestamp: new Date(Date.now() - 3600000).toISOString(),
         },
         {
+          userId: this.userId,
           emotion: "happy",
           intensity: 0.7,
           timestamp: new Date(Date.now() - 86400000).toISOString(),
@@ -145,6 +147,7 @@ export const addEmotionalDataPoint = async (
   if (userId) coachService.setUserId(userId);
   
   return await coachService.addEmotionalData({
+    userId: userId || 'anonymous',
     emotion,
     intensity,
     timestamp: new Date().toISOString(),

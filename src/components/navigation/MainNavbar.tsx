@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
-  const { unreadCount } = useNotificationBadge();
+  const { count } = useNotificationBadge();
   const navigate = useNavigate();
   const { userMode } = useUserMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -141,11 +140,11 @@ const MainNavbar: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full relative">
                     <Bell className="h-5 w-5" />
-                    {unreadCount > 0 && (
+                    {count > 0 && (
                       <Badge 
                         className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-primary text-white"
                       >
-                        {unreadCount}
+                        {count}
                       </Badge>
                     )}
                   </Button>

@@ -3,6 +3,7 @@
 import { MusicTrack } from '@/types/music';
 
 export interface CoachAction {
+  id?: string; // Make id optional to fix the routines.ts errors
   type: string;
   payload: any;
 }
@@ -21,10 +22,19 @@ export interface CoachMessage {
   actions?: CoachAction[];
 }
 
+// Add CoachEvent type that was missing
+export interface CoachEvent {
+  id: string;
+  type: string;
+  data: any;
+  timestamp: Date | string;
+}
+
 export interface CoachNotification {
   id: string;
   title: string;
   message: string;
+  // Fix notification type mismatch by expanding the allowed types
   type: 'success' | 'warning' | 'info' | 'error' | 'reminder' | 'wellness' | 'tip' | 'recommendation';
   timestamp: string; 
   read: boolean;
@@ -39,6 +49,7 @@ export interface EmotionalData {
   timestamp: string;
   feedback?: string;
   source?: string;
+  context?: string; // Add context property to fix the error
 }
 
 export type EmotionalTrend = 'positive' | 'negative' | 'stable';

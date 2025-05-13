@@ -47,7 +47,6 @@ export class RoutinesManager {
     console.log("Executing daily check-in routine for user:", this.userId);
     
     const action: CoachAction = {
-      id: `action-${Date.now()}`,
       type: 'reminder',
       payload: {
         message: "N'oubliez pas de faire votre scan émotionnel quotidien",
@@ -62,7 +61,6 @@ export class RoutinesManager {
     console.log("Executing weekly reflection routine for user:", this.userId);
     
     const action: CoachAction = {
-      id: `action-${Date.now()}`,
       type: 'generate_report',
       payload: {
         reportType: 'weekly_emotional_summary'

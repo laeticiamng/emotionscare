@@ -1,5 +1,6 @@
+
 import { supabase } from '@/integrations/supabase/client';
-import { CoachAction, CoachEvent, EmotionalData } from './types';
+import { EmotionalData, EmotionalTrend } from './types';
 
 export class EmotionalDataService {
   private userId: string | null = null;
@@ -41,11 +42,13 @@ export class EmotionalDataService {
       // Mock data for now
       return [
         {
+          userId: this.userId,
           emotion: "happy",
           intensity: 0.8,
           timestamp: new Date().toISOString()
         },
         {
+          userId: this.userId,
           emotion: "calm",
           intensity: 0.6,
           timestamp: new Date(Date.now() - 86400000).toISOString()
@@ -100,6 +103,7 @@ export class EmotionalDataService {
     const userEmotions = this.emotionalData.get(userId) || [];
     
     const newEmotionData: EmotionalData = {
+      userId,
       emotion: data.emotion || "neutral",
       intensity: data.confidence || data.intensity || 0.5,
       timestamp: new Date().toISOString(),

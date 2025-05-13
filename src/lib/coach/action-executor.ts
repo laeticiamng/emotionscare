@@ -1,5 +1,5 @@
 
-import { CoachAction, CoachEvent } from './types';
+import { CoachAction } from './types';
 
 // Interface for action handlers
 interface ActionHandler {
