@@ -9,7 +9,8 @@ export interface Challenge {
   category: string;
   points: number;
   deadline?: string;
-  status?: 'active' | 'completed' | 'expired';
+  status?: 'active' | 'completed' | 'expired' | 'ongoing' | 'available';
+  name?: string;
 }
 
 export interface Badge {
@@ -18,6 +19,7 @@ export interface Badge {
   description: string;
   image: string;
   dateEarned: string;
+  imageUrl?: string;
 }
 
 export interface GamificationStats {

@@ -1,56 +1,47 @@
 
-import { EmotionResult } from '@/types';
 import { Badge } from '@/types/gamification';
+import { EmotionResult } from '@/types/emotion';
 
 /**
- * Process an emotion result to potentially award badges
- * @param emotionResult The emotion scan result
- * @returns Array of any badges earned
+ * Process an emotion result to determine if any badges should be awarded
+ * @param userId User ID
+ * @param emotionResult Emotion detection result
+ * @param timestamp Timestamp when the emotion was detected
+ * @returns Any badges that were awarded
  */
-export async function processEmotionForBadges(emotionResult: EmotionResult): Promise<Badge[]> {
+export async function processEmotionForBadges(
+  userId: string,
+  emotionResult: EmotionResult,
+): Promise<Badge[]> {
   // In a real implementation, this would call an API
-  // For now, we'll simulate some badge awards based on the emotion
+  // For now, we'll return mock data
   
-  const earnedBadges: Badge[] = [];
-  
-  if (emotionResult.emotion === 'happy' && emotionResult.score && emotionResult.score > 80) {
-    earnedBadges.push({
-      id: 'happiness-master',
-      name: 'Maître du bonheur',
-      description: 'Atteindre un niveau élevé de bonheur',
-      image: '/badges/happiness.svg',
+  const mockBadges: Badge[] = [
+    {
+      id: 'emotion-explorer',
+      name: 'Explorateur émotionnel',
+      description: 'Scannez votre état émotionnel pour la première fois',
+      image: '/badges/emotion-explorer.png',
       dateEarned: new Date().toISOString()
-    });
-  }
+    }
+  ];
   
-  if (emotionResult.text && emotionResult.text.length > 100) {
-    earnedBadges.push({
-      id: 'expressive-soul',
-      name: 'Âme expressive',
-      description: 'Partager ses émotions de manière détaillée',
-      image: '/badges/expression.svg',
-      dateEarned: new Date().toISOString()
-    });
-  }
+  // Simulate processing delay
+  await new Promise(resolve => setTimeout(resolve, 300));
   
-  return earnedBadges;
+  return mockBadges;
 }
 
 /**
- * Update user stats based on activity
- * @param activityType Type of activity performed
- * @returns Updated user stats
+ * Award points for completing an action
  */
-export async function updateUserStats(activityType: string): Promise<any> {
+export async function awardPoints(userId: string, action: string, points: number): Promise<number> {
   // In a real implementation, this would call an API
-  // For now, we'll just return a mock response
-  return {
-    pointsEarned: 10,
-    newLevel: false,
-    currentStats: {
-      level: 5,
-      points: 450,
-      nextLevelPoints: 500
-    }
-  };
+  console.log(`Award ${points} points to user ${userId} for action: ${action}`);
+  
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  // Return the total points (mock)
+  return 100 + points;
 }

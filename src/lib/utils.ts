@@ -1,5 +1,23 @@
 
 import { User } from '@/types/user';
+import { type ClassValue, clsx } from 'clsx';
+import { format } from 'date-fns';
+import { twMerge } from 'tailwind-merge';
+
+/**
+ * Merge class names with Tailwind CSS
+ */
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+/**
+ * Format a date using date-fns
+ */
+export function formatDate(date: Date | string, formatString: string = 'PP') {
+  if (!date) return '';
+  return format(new Date(date), formatString);
+}
 
 /**
  * Get the user's avatar URL from the user object

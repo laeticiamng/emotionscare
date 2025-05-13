@@ -1,78 +1,86 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { emotionsList, intensityLevels } from '@/data/emotions';
-import { EmotionSelectorProps } from '@/types/emotion';
+import { cn } from '@/lib/utils';
+import { getEmotionColor } from '@/data/emotions';
 
-const EmotionSelector: React.FC<EmotionSelectorProps> = ({ 
+export interface EmotionSelectorProps {
+  onSelect: (emotion: string, intensity: number) => void;
+  preselected?: string;
+  selectedEmotion?: string;
+  onSelectEmotion?: React.Dispatch<React.SetStateAction<string>>;
+  emotions?: string[];
+}
+
+const EmotionSelector: React.FC<EmotionSelectorProps> = ({
   onSelect,
-  preselected
+  preselected,
+  selectedEmotion,
+  onSelectEmotion,
+  emotions = [
+    'joy', 'calm', 'excitement',
+    'sadness', 'anger', 'anxiety',
+    'fear', 'surprise', 'disgust',
+    'neutral', 'contentment', 'confusion'
+  ]
 }) => {
-  const [selectedEmotion, setSelectedEmotion] = useState<string>(preselected || '');
-  const [intensity, setIntensity] = useState<number>(3);
-
-  const handleEmotionSelect = (emotion: string) => {
-    setSelectedEmotion(emotion);
-  };
-
-  const handleConfirm = () => {
-    if (selectedEmotion) {
-      onSelect(selectedEmotion, intensity);
+  const handleEmotionClick = (emotion: string) => {
+    if (onSelectEmotion) {
+      onSelectEmotion(emotion);
     }
+    
+    // Default intensity to 0.5 (medium)
+    onSelect(emotion, 0.5);
   };
-
+  
   return (
-    <Card className="w-full">
-      <CardContent className="p-4">
-        <h3 className="font-medium mb-3">Comment vous sentez-vous ?</h3>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+      {emotions.map((emotion) => {
+        const isSelected = selectedEmotion === emotion || preselected === emotion;
+        const emotionColor = getEmotionColor(emotion);
         
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-          {emotionsList.map((emotion) => (
-            <Button
-              key={emotion.name}
-              variant={selectedEmotion === emotion.name ? "default" : "outline"}
-              className="h-auto py-2 px-3 flex flex-col items-center justify-center"
-              onClick={() => handleEmotionSelect(emotion.name)}
-              style={{
-                borderColor: selectedEmotion === emotion.name ? emotion.color : undefined,
-                backgroundColor: selectedEmotion === emotion.name ? emotion.color : undefined,
-                color: selectedEmotion === emotion.name ? '#fff' : undefined
-              }}
-            >
-              <span className="text-sm capitalize">{emotion.name}</span>
-            </Button>
-          ))}
-        </div>
-        
-        {selectedEmotion && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Intensité</span>
-                <span>{intensityLevels.find(level => level.value === intensity)?.label}</span>
-              </div>
-              <Slider
-                min={1}
-                max={5}
-                step={1}
-                value={[intensity]}
-                onValueChange={(value) => setIntensity(value[0])}
-              />
-            </div>
-            
-            <Button 
-              className="w-full" 
-              onClick={handleConfirm}
-            >
-              Confirmer
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        return (
+          <Button
+            key={emotion}
+            variant={isSelected ? "default" : "outline"}
+            className={cn(
+              "py-6 h-auto capitalize flex flex-col",
+              isSelected ? "border-2 border-primary" : ""
+            )}
+            onClick={() => handleEmotionClick(emotion)}
+            style={{
+              backgroundColor: isSelected ? `${emotionColor}20` : undefined,
+              borderColor: isSelected ? emotionColor : undefined
+            }}
+          >
+            <span className="text-lg mb-1">{getEmotionEmoji(emotion)}</span>
+            <span>{emotion}</span>
+          </Button>
+        );
+      })}
+    </div>
   );
 };
+
+function getEmotionEmoji(emotion: string): string {
+  const emojiMap: Record<string, string> = {
+    joy: '😊',
+    happiness: '😄',
+    sadness: '😢',
+    anger: '😠',
+    fear: '😨',
+    surprise: '😯',
+    disgust: '🤢',
+    neutral: '😐',
+    calm: '😌',
+    anxiety: '😰',
+    stress: '😫',
+    excitement: '🤩',
+    contentment: '😊',
+    confusion: '😕'
+  };
+  
+  return emojiMap[emotion.toLowerCase()] || '😐';
+}
 
 export default EmotionSelector;

@@ -1,18 +1,17 @@
-
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { UserModeType } from '@/contexts/UserModeContext';
-import DashboardHeader from './DashboardHeader';
-import EmotionalCheckIn from './EmotionalCheckIn';
-import EmotionalTrends from './EmotionalTrends';
-import RecentJournalEntries from './RecentJournalEntries';
-import UpcomingReminders from './UpcomingReminders';
-import CoachSuggestions from './CoachSuggestions';
+import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
+import EmotionalCheckIn from '@/components/dashboard/EmotionScanSection';
+import EmotionalTrends from '@/components/dashboard/EmotionalTrends';
+import RecentJournalEntries from '@/components/dashboard/RecentJournalEntries';
+import UpcomingReminders from '@/components/dashboard/UpcomingReminders';
+import CoachSuggestions from '@/components/dashboard/CoachSuggestions';
 import TeamOverview from '../scan/TeamOverview';
-import OrganizationStats from '../admin/OrganizationStats';
-import UserActivityChart from '../admin/UserActivityChart';
-import NewUsersCard from '../admin/NewUsersCard';
-import EmotionalHealthOverview from '../admin/EmotionalHealthOverview';
+import OrganizationStats from '@/components/admin/OrganizationStats';
+import UserActivityChart from '@/components/admin/UserActivityChart';
+import NewUsersCard from '@/components/admin/NewUsersCard';
+import EmotionalHealthOverview from '@/components/admin/EmotionalHealthOverview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -50,8 +49,26 @@ const mockTeamUsers: User[] = [
   }
 ];
 
-const DashboardContent: React.FC = () => {
-  const { userMode } = useUserMode();
+export interface DashboardContentProps {
+  isMobile: boolean;
+  minimalView: boolean;
+  collapsedSections: { [key: string]: boolean };
+  toggleSection: (section: string) => void;
+  userId: string;
+  latestEmotion?: { emotion: string; score: number; };
+  userMode: UserModeType;
+}
+
+const DashboardContent: React.FC<DashboardContentProps> = ({
+  isMobile,
+  minimalView,
+  collapsedSections,
+  toggleSection,
+  userId,
+  latestEmotion,
+  userMode
+}) => {
+  const { userMode: normalizedUserMode } = useUserMode();
   const { user } = useAuth();
   
   // Convert personal to b2c for backwards compatibility
