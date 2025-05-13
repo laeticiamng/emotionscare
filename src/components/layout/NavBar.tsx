@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/hooks/use-theme';
 import { Sun, Moon, Menu } from 'lucide-react';
 import VoiceAssistant from '@/components/navigation/VoiceAssistant';
 import { useAuth } from '@/contexts/AuthContext';

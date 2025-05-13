@@ -69,7 +69,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
       toast({
         title: "Assistant vocal activé",
         description: "Je vous écoute...",
-        duration: 2000,
+        variant: "default",
       });
       
     } catch (error) {
@@ -140,6 +140,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
             toast({
               title: "Commande détectée",
               description: data.responseMessage,
+              variant: "default",
             });
             
             // Exécuter l'action détectée
