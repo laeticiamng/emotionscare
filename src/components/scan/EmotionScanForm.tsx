@@ -6,6 +6,8 @@ import { X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { analyzeEmotion, saveEmotion } from '@/lib/scanService';
 import { useToast } from '@/components/ui/use-toast';
+import { processEmotionForBadges } from '@/lib/gamificationService';
+import { Badge } from '@/types/gamification';
 
 interface EmotionScanFormProps {
   onScanSaved: () => void;
@@ -71,6 +73,23 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
           title: "Analyse complétée",
           description: `Votre émotion dominante : ${result.emotion}`,
         });
+        
+        // Process emotion for gamification badges
+        const earnedBadge = await processEmotionForBadges(
+          user.id, 
+          result.emotion,
+          result.confidence || 0.5
+        );
+        
+        // Show badge earned notification if applicable
+        if (earnedBadge) {
+          setTimeout(() => {
+            toast({
+              title: "🎉 Badge débloqué !",
+              description: `Vous avez gagné le badge "${earnedBadge.name}"`,
+            });
+          }, 1000);
+        }
         
         onScanSaved();
       }
