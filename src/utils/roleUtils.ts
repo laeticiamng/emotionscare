@@ -1,64 +1,46 @@
 
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | 'user';
+import { UserRole } from '@/types/user';
 
 /**
- * Determines if a role is an admin role
+ * Check if a user role is an admin role
  */
-export const isAdminRole = (role?: string | null): boolean => {
-  if (!role) return false;
-  return role === 'b2b_admin' || role === 'admin';
-};
+export function isAdminRole(role?: UserRole): boolean {
+  return role === 'admin' || role === 'b2b_admin';
+}
 
 /**
- * Get a human-readable name for a role
+ * Get the appropriate redirect path based on user role
  */
-export const getRoleName = (role?: UserRole | string | null): string => {
+export function getRedirectPathForRole(role?: UserRole): string {
+  if (!role) return '/';
+  
   switch (role) {
-    case 'b2c':
-      return 'Particulier';
-    case 'b2b_user':
-    case 'user':
-      return 'Collaborateur';
-    case 'b2b_admin':
     case 'admin':
-      return 'Administrateur';
-    default:
-      return 'Utilisateur';
-  }
-};
-
-/**
- * Get the home page path for a specific role
- */
-export const getRoleHomePath = (role?: UserRole | string | null): string => {
-  switch (role) {
-    case 'b2c':
-      return '/b2c/dashboard';
-    case 'b2b_user':
-    case 'user':
-      return '/b2b/user/dashboard';
     case 'b2b_admin':
-    case 'admin':
       return '/b2b/admin/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'user':
+    case 'b2c':
     default:
-      return '/';
+      return '/b2c/dashboard';
   }
-};
+}
 
 /**
- * Get the corresponding login page for a role
+ * Check if a user has access to a specific route based on role
  */
-export const getRoleLoginPath = (role?: UserRole | string | null): string => {
-  switch (role) {
+export function userHasRouteAccess(role: UserRole | undefined, routeType: 'b2c' | 'b2b-user' | 'b2b-admin'): boolean {
+  if (!role) return false;
+  
+  switch (routeType) {
     case 'b2c':
-      return '/b2c/login';
-    case 'b2b_user':
-    case 'user':
-      return '/b2b/user/login';
-    case 'b2b_admin':
-    case 'admin':
-      return '/b2b/admin/login';
+      return role === 'user' || role === 'b2c';
+    case 'b2b-user':
+      return role === 'b2b_user' || isAdminRole(role);
+    case 'b2b-admin':
+      return isAdminRole(role);
     default:
-      return '/login';
+      return false;
   }
-};
+}

@@ -2,7 +2,7 @@
 export interface Emotion {
   id: string;
   user_id: string;
-  date: string | Date;
+  date: string;
   emotion: string;
   score: number;
   text?: string;
@@ -38,12 +38,4 @@ export interface EmotionResult {
     name: string;
     intensity?: number;
   };
-}
-
-export interface EmotionalTeamViewProps {
-  userId?: string;
-  teamId?: string;
-  period?: string;
-  className?: string;
-  onRefresh?: () => void;
 }

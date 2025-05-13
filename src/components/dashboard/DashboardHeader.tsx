@@ -2,9 +2,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
+import { User } from '@/types/user';
 
-interface DashboardHeaderProps {
-  user: any;
+export interface DashboardHeaderProps {
+  user: User | null;
   onRefresh?: () => Promise<void>;
 }
 
@@ -26,7 +27,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user, onRefresh }) =>
     <div className="flex justify-between items-center">
       <div>
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        <p className="text-muted-foreground">Aperçu de votre bien-être</p>
+        <p className="text-muted-foreground">
+          {user ? `Bienvenue, ${user.name}` : 'Aperçu de votre bien-être'}
+        </p>
       </div>
       
       {onRefresh && (

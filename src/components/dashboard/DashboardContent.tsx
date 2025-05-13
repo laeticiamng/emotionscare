@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { UserModeType } from '@/contexts/UserModeContext';
@@ -17,6 +18,31 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
 
+// Mock data for team overview
+const mockTeamUsers = [
+  {
+    id: '1',
+    name: 'Jane Smith',
+    avatar: '',
+    emotional_score: 82,
+    anonymity_code: 'JS-2022'
+  },
+  {
+    id: '2',
+    name: 'John Doe',
+    avatar: '',
+    emotional_score: 65,
+    anonymity_code: 'JD-2022'
+  },
+  {
+    id: '3',
+    name: 'Amy Johnson',
+    avatar: '',
+    emotional_score: 78,
+    anonymity_code: 'AJ-2022'
+  }
+];
+
 const DashboardContent: React.FC = () => {
   const { userMode } = useUserMode();
   const { user } = useAuth();
@@ -34,7 +60,7 @@ const DashboardContent: React.FC = () => {
   if (isB2BAdmin || (isAdmin && isB2BUser)) {
     return (
       <div className="container mx-auto p-4 space-y-6">
-        <DashboardHeader />
+        <DashboardHeader user={user} />
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="md:col-span-2">
@@ -82,7 +108,7 @@ const DashboardContent: React.FC = () => {
   if (isB2BUser) {
     return (
       <div className="container mx-auto p-4 space-y-6">
-        <DashboardHeader />
+        <DashboardHeader user={user} />
         
         <Tabs defaultValue="personal">
           <TabsList>
@@ -103,7 +129,7 @@ const DashboardContent: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="team" className="space-y-4">
-            <TeamOverview />
+            <TeamOverview users={mockTeamUsers} />
           </TabsContent>
         </Tabs>
       </div>
@@ -113,7 +139,7 @@ const DashboardContent: React.FC = () => {
   // Default B2C dashboard
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <DashboardHeader />
+      <DashboardHeader user={user} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <EmotionalCheckIn />

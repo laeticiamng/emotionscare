@@ -32,8 +32,8 @@ export interface User {
   email: string;
   role: UserRole;
   avatar_url?: string;
-  preferences: UserPreferences;
-  onboarded: boolean;
+  preferences?: UserPreferences;
+  onboarded?: boolean;
   company_id?: string;
   department?: string;
   job_title?: string;

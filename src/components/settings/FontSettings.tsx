@@ -1,15 +1,15 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { FontFamily, FontSize } from '@/contexts/ThemeContext';
 
 interface FontSettingsProps {
   currentFontFamily: FontFamily;
-  onChangeFontFamily: (value: FontFamily) => void;
+  onChangeFontFamily: (fontFamily: FontFamily) => void;
   currentFontSize: FontSize;
-  onChangeFontSize: (value: FontSize) => void;
+  onChangeFontSize: (fontSize: FontSize) => void;
 }
 
 const FontSettings: React.FC<FontSettingsProps> = ({
@@ -18,78 +18,57 @@ const FontSettings: React.FC<FontSettingsProps> = ({
   currentFontSize,
   onChangeFontSize
 }) => {
-  const handleFontFamilyChange = (value: string) => {
-    // Validate the value is a valid FontFamily
-    if (['inter', 'serif', 'mono', 'roboto', 'poppins', 'montserrat', 'default'].includes(value)) {
-      onChangeFontFamily(value as FontFamily);
-    }
-  };
-
-  const handleFontSizeChange = (value: string) => {
-    // Validate the value is a valid FontSize
-    if (['small', 'medium', 'large'].includes(value)) {
-      onChangeFontSize(value as FontSize);
-    }
-  };
-
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Police & Affichage</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="mb-4">
-          <h3 className="text-sm font-medium mb-3">Famille de police</h3>
+      <CardContent className="space-y-6 p-6">
+        <div>
+          <h3 className="text-lg font-medium mb-4">Police d'écriture</h3>
           <RadioGroup
             value={currentFontFamily}
-            onValueChange={handleFontFamilyChange}
-            className="grid grid-cols-2 gap-2 mb-4"
+            onValueChange={(value) => onChangeFontFamily(value as FontFamily)}
+            className="space-y-2"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="inter" id="inter" />
-              <Label htmlFor="inter">Inter</Label>
+              <RadioGroupItem value="inter" id="font-inter" />
+              <Label htmlFor="font-inter" className="font-['Inter']">Inter</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="serif" id="serif" />
-              <Label htmlFor="serif">Serif</Label>
+              <RadioGroupItem value="roboto" id="font-roboto" />
+              <Label htmlFor="font-roboto" className="font-['Roboto']">Roboto</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="mono" id="mono" />
-              <Label htmlFor="mono">Mono</Label>
+              <RadioGroupItem value="poppins" id="font-poppins" />
+              <Label htmlFor="font-poppins" className="font-['Poppins']">Poppins</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="roboto" id="roboto" />
-              <Label htmlFor="roboto">Roboto</Label>
+              <RadioGroupItem value="montserrat" id="font-montserrat" />
+              <Label htmlFor="font-montserrat" className="font-['Montserrat']">Montserrat</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="poppins" id="poppins" />
-              <Label htmlFor="poppins">Poppins</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="montserrat" id="montserrat" />
-              <Label htmlFor="montserrat">Montserrat</Label>
+              <RadioGroupItem value="raleway" id="font-raleway" />
+              <Label htmlFor="font-raleway" className="font-['Raleway']">Raleway</Label>
             </div>
           </RadioGroup>
         </div>
-
+        
         <div>
-          <h3 className="text-sm font-medium mb-3">Taille de police</h3>
+          <h3 className="text-lg font-medium mb-4">Taille du texte</h3>
           <RadioGroup
             value={currentFontSize}
-            onValueChange={handleFontSizeChange}
-            className="grid grid-cols-3 gap-2"
+            onValueChange={(value) => onChangeFontSize(value as FontSize)}
+            className="space-y-2"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="small" id="small" />
-              <Label htmlFor="small">Petite</Label>
+              <RadioGroupItem value="small" id="font-small" />
+              <Label htmlFor="font-small" className="text-sm">Petit</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="medium" id="medium" />
-              <Label htmlFor="medium">Moyenne</Label>
+              <RadioGroupItem value="medium" id="font-medium" />
+              <Label htmlFor="font-medium">Moyen</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="large" id="large" />
-              <Label htmlFor="large">Grande</Label>
+              <RadioGroupItem value="large" id="font-large" />
+              <Label htmlFor="font-large" className="text-lg">Grand</Label>
             </div>
           </RadioGroup>
         </div>

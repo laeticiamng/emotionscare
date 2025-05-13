@@ -14,6 +14,14 @@ export interface GamificationStats {
     timestamp: Date;
     points?: number;
   }[];
+  // Add the missing properties
+  currentLevel: number;
+  pointsToNextLevel: number;
+  progressToNextLevel: number;
+  totalPoints: number;
+  badgesCount: number;
+  streakDays: number;
+  lastActivityDate: string;
 }
 
 export interface UseChallengeManagementResult {

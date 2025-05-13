@@ -2,22 +2,40 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'raleway';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
+  fontFamily: FontFamily;
+  setFontFamily: (fontFamily: FontFamily) => void;
+  fontSize: FontSize;
+  setFontSize: (fontSize: FontSize) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
+export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
-  isDarkMode: false
+  isDarkMode: false,
+  fontFamily: 'inter',
+  setFontFamily: () => {},
+  fontSize: 'medium',
+  setFontSize: () => {}
 });
 
 export const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem('theme') as Theme) || 'system'
+  );
+  
+  const [fontFamily, setFontFamily] = useState<FontFamily>(
+    () => (localStorage.getItem('fontFamily') as FontFamily) || 'inter'
+  );
+  
+  const [fontSize, setFontSize] = useState<FontSize>(
+    () => (localStorage.getItem('fontSize') as FontSize) || 'medium'
   );
   
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -56,6 +74,19 @@ export const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => 
     }
   }, [theme]);
   
+  // Apply font family
+  useEffect(() => {
+    localStorage.setItem('fontFamily', fontFamily);
+    document.documentElement.style.setProperty('--font-family', fontFamily);
+  }, [fontFamily]);
+  
+  // Apply font size
+  useEffect(() => {
+    localStorage.setItem('fontSize', fontSize);
+    const fontSizeValue = fontSize === 'small' ? '0.875rem' : fontSize === 'large' ? '1.125rem' : '1rem';
+    document.documentElement.style.setProperty('--font-size-base', fontSizeValue);
+  }, [fontSize]);
+  
   // Listen for system theme changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -76,7 +107,15 @@ export const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => 
   }, [theme]);
   
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, isDarkMode }}>
+    <ThemeContext.Provider value={{ 
+      theme, 
+      setTheme, 
+      isDarkMode, 
+      fontFamily, 
+      setFontFamily, 
+      fontSize, 
+      setFontSize 
+    }}>
       {children}
     </ThemeContext.Provider>
   );
