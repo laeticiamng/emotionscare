@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -11,15 +11,12 @@ interface VoiceCommandListenerProps {
 }
 
 const VoiceCommandListener: React.FC<VoiceCommandListenerProps> = ({ isActive, onCommand }) => {
-  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands({
-    enabled: isActive,
-    commandCallback: onCommand
-  });
+  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands();
   
   const { toast } = useToast();
   
   // Pass commands to parent when recognized
-  useEffect(() => {
+  React.useEffect(() => {
     if (lastCommand && isActive) {
       onCommand(lastCommand);
     }

@@ -1,56 +1,29 @@
 
-/**
- * Vérifie si le rôle fourni est un rôle admin
- */
-export const isAdminRole = (role?: string | null): boolean => {
-  if (!role) return false;
-  return role.toLowerCase().includes('admin');
-};
+import { UserRole } from '@/types/user';
 
 /**
- * Retourne un nom lisible pour un rôle donné
+ * Check if a role is an admin role
+ * @param role User role to check
+ * @returns Boolean indicating if the role has admin privileges
  */
-export const getRoleName = (role?: string | null): string => {
-  if (!role) return 'Utilisateur';
-  
-  switch (role.toLowerCase()) {
-    case 'admin':
-      return 'Administrateur';
-    case 'moderator':
-      return 'Modérateur';
-    case 'b2b-admin':
-      return 'Admin B2B';
-    case 'b2b-collaborator':
-      return 'Collaborateur B2B';
-    default:
-      return 'Utilisateur';
-  }
-};
+export function isAdminRole(role: UserRole): boolean {
+  return ['admin', 'b2b_admin', 'moderator'].includes(role);
+}
 
 /**
- * Retourne un nom d'affichage complet pour un rôle donné
- * Utilisé dans les interfaces pour une description plus détaillée
+ * Check if a role is a business-to-business role (B2B)
+ * @param role User role to check
+ * @returns Boolean indicating if the role is B2B
  */
-export const getRoleDisplayName = (role?: string | null): string => {
-  if (!role) return 'Utilisateur standard';
-  
-  switch (role.toLowerCase()) {
-    case 'admin':
-      return 'Administrateur système';
-    case 'moderator':
-      return 'Modérateur de contenu';
-    case 'b2b-admin':
-      return 'Administrateur d\'entreprise';
-    case 'b2b-collaborator':
-      return 'Collaborateur d\'entreprise';
-    case 'user':
-      return 'Utilisateur standard';
-    default:
-      // Si c'est un rôle personnalisé, le formater joliment
-      return role.split('-').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ');
-  }
-};
+export function isB2BRole(role: UserRole): boolean {
+  return role === 'b2b_user' || role === 'b2b_admin';
+}
 
-// Remove the problematic re-export line - it's unnecessary since the function is already exported above
+/**
+ * Check if a role is a business-to-consumer role (B2C)
+ * @param role User role to check
+ * @returns Boolean indicating if the role is B2C
+ */
+export function isB2CRole(role: UserRole): boolean {
+  return role === 'b2c' || role === 'user';
+}

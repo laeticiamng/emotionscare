@@ -1,186 +1,171 @@
 
 import React, { useState } from 'react';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Menu, Building, BarChart2, Users, Home, Heart, FileText, Music, MessageSquare, Headphones, X, LogOut, Settings, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, NavLink } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Badge } from '@/components/ui/badge';
-import { isAdminRole } from '@/utils/roleUtils';
+import { Menu, X, User, Settings, LogOut, Moon, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useTheme } from '@/contexts/ThemeContext';
+import { getUserAvatarUrl, getUserInitials } from '@/utils/userUtils';
+import { toast } from 'sonner';
 
-const MobileNavigation: React.FC = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+interface NavItem {
+  label: string;
+  href: string;
+  icon?: React.ReactNode;
+}
+
+interface MobileNavigationProps {
+  items: NavItem[];
+}
+
+export default function MobileNavigation({ items }: MobileNavigationProps) {
+  const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { userMode, setUserMode } = useUserMode();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
 
-  const isAdmin = user ? isAdminRole(user.role) : false;
-  const isB2BMode = userMode === 'b2b-admin';
-  
-  const mainLinks = [
-    { title: 'Accueil', href: '/', icon: Home },
-    { title: 'Tableau de bord', href: '/dashboard', icon: BarChart2 },
-    { title: 'Scan émotionnel', href: '/scan', icon: Heart },
-    { title: 'Journal', href: '/journal', icon: FileText },
-    { title: 'Musicothérapie', href: '/music', icon: Music },
-    { title: 'Coach IA', href: '/coach', icon: MessageSquare }
-  ];
-
-  const adminLinks = [
-    { title: 'Dashboard Admin', href: '/admin/dashboard', icon: BarChart2 },
-    { title: 'Gestion utilisateurs', href: '/admin/users', icon: Users },
-    { title: 'Gestion d\'entreprise', href: '/admin/organization', icon: Building }
-  ];
+  const handleLinkClick = (href: string) => {
+    navigate(href);
+    setOpen(false);
+  };
 
   const handleLogout = async () => {
     try {
       await logout();
-      setMobileMenuOpen(false);
-      navigate('/login');
+      toast.success('Déconnexion réussie');
+      navigate('/');
+      setOpen(false);
     } catch (error) {
-      console.error('Erreur de déconnexion:', error);
+      toast.error('Erreur lors de la déconnexion');
+      console.error(error);
     }
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const avatarUrl = getUserAvatarUrl(user);
+  const userInitials = getUserInitials(user);
+
   return (
-    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="mr-2">
+        <Button variant="ghost" size="icon" aria-label="Menu">
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[250px] sm:w-[300px] p-0">
-        <ScrollArea className="h-full">
-          <div className="flex flex-col space-y-1 text-sm font-medium p-4">
-            <SheetHeader className="pl-0 pb-4 pt-4">
-              <SheetTitle className="text-lg">
-                {user ? `Bonjour, ${user.name}` : 'Menu'}
-              </SheetTitle>
-              <SheetDescription>
-                Explorez les différentes sections de EmotionsCare.
-              </SheetDescription>
-            </SheetHeader>
-
-            {user && (
-              <div className="flex items-center space-x-2">
-                <Avatar>
-                  <AvatarImage src={user.avatar || "/avatars/placeholder.jpg"} alt={user.name || "Utilisateur"} />
-                  <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <span>{user.name}</span>
-                  {isAdmin && <Badge className="ml-2" variant="outline">Admin</Badge>}
-                </div>
-              </div>
-            )}
-
-            <Separator className="my-2" />
-            
-            {isAdmin && (
-              <>
-                <div className="mb-2 px-2 text-xs text-muted-foreground">
-                  Mode: {isB2BMode ? 'Administrateur' : 'Particulier'}
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setUserMode(isB2BMode ? 'b2c' : 'b2b-admin')}
-                  className="mb-2"
-                >
-                  Passer en mode {isB2BMode ? 'Particulier' : 'Administrateur'}
-                </Button>
-                <Separator className="my-2" />
-              </>
-            )}
-
-            <nav className="grid gap-2 mb-6">
-              {isAdmin && isB2BMode ? (
-                // Admin navigation items
-                adminLinks.map((item, i) => (
-                  <NavLink 
-                    key={i} 
-                    to={item.href} 
-                    className={({ isActive }) => 
-                      `flex items-center px-2 py-1.5 rounded-md hover:bg-muted transition-colors ${
-                        isActive ? "bg-muted font-medium" : ""
-                      }`
-                    }
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.icon && <item.icon className="mr-2 h-4 w-4" />}
-                    {item.title}
-                  </NavLink>
-                ))
-              ) : (
-                // Regular navigation items
-                mainLinks.map((item, i) => (
-                  <NavLink 
-                    key={i} 
-                    to={item.href} 
-                    className={({ isActive }) => 
-                      `flex items-center px-2 py-1.5 rounded-md hover:bg-muted transition-colors ${
-                        isActive ? "bg-muted font-medium" : ""
-                      }`
-                    }
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.icon && <item.icon className="mr-2 h-4 w-4" />}
-                    {item.title}
-                  </NavLink>
-                ))
-              )}
-            </nav>
-
-            <Separator className="my-2" />
-
-            {user ? (
-              <div className="space-y-2">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => {
-                    navigate('/settings');
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Paramètres
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Se déconnecter
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Button asChild variant="default" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                  <NavLink to="/login">Se connecter</NavLink>
-                </Button>
-                <Button asChild variant="outline" className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                  <NavLink to="/register">S'inscrire</NavLink>
-                </Button>
-              </div>
-            )}
+      <SheetContent side="right" className="p-0 flex flex-col">
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-lg">Menu</h2>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <X className="h-5 w-5" />
+            </Button>
           </div>
-        </ScrollArea>
+        </div>
+
+        {user && (
+          <div className="p-4 border-b">
+            <div className="flex items-center gap-4">
+              <Avatar>
+                <AvatarImage src={avatarUrl} />
+                <AvatarFallback>{userInitials}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{user.name}</p>
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <nav className="flex-1 overflow-auto py-2">
+          <ul className="grid gap-1 p-2">
+            {items.map((item, index) => (
+              <li key={index}>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-base" 
+                  onClick={() => handleLinkClick(item.href)}
+                >
+                  {item.icon}
+                  {item.label}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="p-4 border-t mt-auto">
+          <ul className="grid gap-2">
+            <li>
+              <Button 
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={toggleTheme}
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="mr-2 h-4 w-4" />
+                    <span>Mode clair</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="mr-2 h-4 w-4" />
+                    <span>Mode sombre</span>
+                  </>
+                )}
+              </Button>
+            </li>
+            {user ? (
+              <>
+                <li>
+                  <Button 
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleLinkClick('/profile')}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Mon profil</span>
+                  </Button>
+                </li>
+                <li>
+                  <Button 
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleLinkClick('/settings')}
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Paramètres</span>
+                  </Button>
+                </li>
+                <li>
+                  <Button 
+                    variant="destructive"
+                    className="w-full justify-start"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Déconnexion</span>
+                  </Button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Button 
+                  className="w-full"
+                  onClick={() => handleLinkClick('/login')}
+                >
+                  Se connecter
+                </Button>
+              </li>
+            )}
+          </ul>
+        </div>
       </SheetContent>
     </Sheet>
   );
-};
-
-export default MobileNavigation;
+}

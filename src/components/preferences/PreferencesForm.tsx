@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { UserPreferences, ThemeName, FontSize } from '@/types';
+import { UserPreferences } from '@/types';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
@@ -29,14 +29,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
     setIsSaving(true);
     
     try {
-      // Ensure type safety for theme and fontSize
-      const safeFormData = {
-        ...formData,
-        theme: formData.theme as ThemeName,
-        fontSize: formData.fontSize as FontSize,
-      };
-      
-      await onSave(safeFormData);
+      await onSave(formData);
     } catch (error) {
       console.error('Error saving preferences:', error);
     } finally {
@@ -80,10 +73,9 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications</span>
               <Switch
-                checked={formData.notifications || formData.notifications_enabled || false}
+                checked={formData.notifications || false}
                 onCheckedChange={(checked) => {
                   handleChange('notifications', checked);
-                  handleChange('notifications_enabled', checked);
                 }}
               />
             </div>
@@ -91,16 +83,16 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications par email</span>
               <Switch
-                checked={formData.email_notifications || false}
-                onCheckedChange={(checked) => handleChange('email_notifications', checked)}
+                checked={formData.notifications || false}
+                onCheckedChange={(checked) => handleChange('notifications', checked)}
               />
             </div>
             
             <div className="flex items-center justify-between">
               <span>Notifications push</span>
               <Switch
-                checked={formData.push_notifications || false}
-                onCheckedChange={(checked) => handleChange('push_notifications', checked)}
+                checked={formData.notifications || false}
+                onCheckedChange={(checked) => handleChange('notifications', checked)}
               />
             </div>
             

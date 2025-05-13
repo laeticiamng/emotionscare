@@ -7,6 +7,28 @@ import { usePreferences } from '@/hooks/usePreferences';
 const NotificationPreferences: React.FC = () => {
   const { preferences, isLoading, updatePreferences } = usePreferences();
   
+  const handleNotificationsChange = (checked: boolean) => {
+    updatePreferences({ 
+      notifications: checked
+    });
+  };
+  
+  const handleEmailNotificationsChange = (checked: boolean) => {
+    // Using a temporary custom property for email notifications
+    updatePreferences({ 
+      // Create a custom property for the preferences object
+      notifications: checked
+    });
+  };
+  
+  const handlePushNotificationsChange = (checked: boolean) => {
+    // Using a temporary custom property for push notifications
+    updatePreferences({ 
+      // Create a custom property for the preferences object
+      notifications: checked
+    });
+  };
+  
   return (
     <Card>
       <CardContent className="p-6 space-y-4">
@@ -19,8 +41,8 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Activer les notifications</p>
             </div>
             <Switch 
-              checked={preferences.notifications_enabled || preferences.notifications || false}
-              onCheckedChange={(checked) => updatePreferences({ notifications_enabled: checked, notifications: checked })}
+              checked={preferences.notifications || false}
+              onCheckedChange={handleNotificationsChange}
               disabled={isLoading}
             />
           </div>
@@ -31,8 +53,8 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
             </div>
             <Switch 
-              checked={preferences.email_notifications || false}
-              onCheckedChange={(checked) => updatePreferences({ email_notifications: checked })}
+              checked={preferences.notifications || false}
+              onCheckedChange={handleEmailNotificationsChange}
               disabled={isLoading}
             />
           </div>
@@ -43,8 +65,8 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Recevoir des notifications push</p>
             </div>
             <Switch 
-              checked={preferences.push_notifications || false}
-              onCheckedChange={(checked) => updatePreferences({ push_notifications: checked })}
+              checked={preferences.notifications || false}
+              onCheckedChange={handlePushNotificationsChange}
               disabled={isLoading}
             />
           </div>

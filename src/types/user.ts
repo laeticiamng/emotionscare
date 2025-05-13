@@ -9,6 +9,14 @@ export interface UserPreferences {
   privacyLevel: 'private' | 'team' | 'public';
   onboardingCompleted: boolean;
   dashboardLayout: 'standard' | 'compact' | 'detailed';
+  
+  // Add missing properties referenced in components
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  privacy?: string;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
 }
 
 export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'moderator';
@@ -26,4 +34,12 @@ export interface User {
   job_title?: string;
   created_at?: string;
   last_login?: string;
+  
+  // Add missing properties referenced in components
+  avatar?: string;
+  image?: string;
+  position?: string;
+  joined_at?: string;
+  createdAt?: string;
+  emotional_score?: number;
 }

@@ -13,7 +13,7 @@ export interface Challenge {
   due_date?: string;
   completion_date?: string;
   emotion_target?: string;
-  category?: string;
+  category: string; // Make this required since it's used in components
 }
 
 export type ChallengeType = 

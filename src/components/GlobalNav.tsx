@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Moon, Sun, User, Home, Plus, List, Settings, Brain, MessageSquare, Building, Users } from 'lucide-react';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,12 +12,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole } from '@/utils/roleUtils';
 import { toast } from 'sonner';
+import { getUserAvatarUrl, getUserInitials } from '@/utils/userUtils';
 
 const GlobalNav = () => {
   const { user, logout } = useAuth();
@@ -60,6 +61,9 @@ const GlobalNav = () => {
   ];
   
   const menuItems = isB2BMode && isAdmin ? adminMenuItems : standardMenuItems;
+  
+  const avatarUrl = getUserAvatarUrl(user);
+  const userInitials = getUserInitials(user);
   
   return (
     <nav className="bg-background border-b sticky top-0 z-50">
@@ -120,10 +124,10 @@ const GlobalNav = () => {
                 <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" aria-label="Menu utilisateur">
                   <Avatar className="h-8 w-8">
                     <AvatarImage 
-                      src={user.avatar || user.avatar_url} 
+                      src={avatarUrl}
                       alt={user.name || "Utilisateur"} 
                     />
-                    <AvatarFallback>{user.name?.charAt(0).toUpperCase() || '?'}</AvatarFallback>
+                    <AvatarFallback>{userInitials}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
