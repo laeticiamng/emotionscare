@@ -5,12 +5,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 
 const ProtectedLayout = () => {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { userMode, isLoading: userModeLoading } = useUserMode();
   const location = useLocation();
 
   // If authentication or userMode is loading, show a loading state
-  if (isLoading || userModeLoading) {
+  if (authLoading || userModeLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>

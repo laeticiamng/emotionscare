@@ -9,7 +9,7 @@ import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
 import FeatureHub from '../features/FeatureHub';
 import SecurityCertifications from '../features/SecurityCertifications';
-import { UserMode } from '@/contexts/UserModeContext';
+import { UserModeType } from '@/contexts/UserModeContext';
 import PredictiveRecommendations from '@/components/predictive/PredictiveRecommendations';
 import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
@@ -26,7 +26,7 @@ interface DashboardContentProps {
     emotion: string;
     score: number;
   };
-  userMode?: UserMode;
+  userMode?: UserModeType;
 }
 
 const DashboardContent: React.FC<DashboardContentProps> = ({

@@ -29,7 +29,7 @@ const AdminPremiumInterface: React.FC<AdminPremiumInterfaceProps> = ({ user }) =
           className="md:col-span-2" 
           teamId="team-1"
           userId={user?.id || 'admin'}
-          period="7j"
+          period="week"
         />
       </div>
     </div>
