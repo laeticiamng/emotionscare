@@ -38,32 +38,32 @@ const Index = () => {
         <HeroSection />
         
         {/* Connection Options - Highlighted with prominent styling */}
-        <div className="max-w-3xl mx-auto bg-primary/5 rounded-xl shadow-lg p-8 mb-12 border-2 border-primary/20 animate-fade-in">
-          <h2 className="text-3xl font-bold tracking-tight mb-6 text-center">
+        <div className="max-w-4xl mx-auto bg-primary/10 rounded-xl shadow-xl p-8 mb-12 border-2 border-primary/20 animate-pulse">
+          <h2 className="text-4xl font-bold tracking-tight mb-8 text-center text-primary">
             Choisissez votre accès
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300 border-2 border-primary hover:scale-105">
-              <h3 className="text-xl font-bold mb-3">Particulier</h3>
-              <p className="mb-4 text-muted-foreground">Accédez à votre espace personnel</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center hover:shadow-xl transition-all duration-300 border-4 border-primary hover:scale-105 transform">
+              <h3 className="text-2xl font-bold mb-4 text-primary">Particulier</h3>
+              <p className="mb-6 text-lg text-muted-foreground">Accédez à votre espace personnel</p>
               <Button 
                 onClick={() => navigate('/login')}
                 size="lg" 
-                className="w-full"
+                className="w-full text-lg py-6"
               >
                 Espace Personnel
               </Button>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 text-center hover:shadow-lg transition-all duration-300 border-2 border-secondary hover:scale-105">
-              <h3 className="text-xl font-bold mb-3">Entreprise</h3>
-              <p className="mb-4 text-muted-foreground">Solutions pour votre organisation</p>
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-8 text-center hover:shadow-xl transition-all duration-300 border-4 border-secondary hover:scale-105 transform">
+              <h3 className="text-2xl font-bold mb-4 text-secondary">Entreprise</h3>
+              <p className="mb-6 text-lg text-muted-foreground">Solutions pour votre organisation</p>
               <Button 
                 onClick={() => navigate('/business')}
                 variant="secondary"
                 size="lg" 
-                className="w-full"
+                className="w-full text-lg py-6"
               >
                 Espace Entreprise
               </Button>

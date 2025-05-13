@@ -132,6 +132,49 @@ export async function triggerCoachEvent(
   }
 }
 
+// Obtenir une recommandation musicale basée sur l'émotion
+export async function getMusicRecommendation(emotion: string): Promise<{
+  title: string;
+  genre: string;
+  description: string;
+}> {
+  const recommendations = {
+    happy: {
+      title: "Playlist Énergisante",
+      genre: "Pop, Dance",
+      description: "Des morceaux joyeux et dynamiques pour amplifier votre bonne humeur"
+    },
+    sad: {
+      title: "Playlist Réconfortante",
+      genre: "Acoustique, Ballades",
+      description: "Des morceaux doux et mélodieux pour vous accompagner dans ce moment"
+    },
+    calm: {
+      title: "Playlist Zen",
+      genre: "Ambient, Classique légère",
+      description: "Des sonorités apaisantes pour maintenir votre état de sérénité"
+    },
+    anxious: {
+      title: "Playlist Anti-Stress",
+      genre: "New Age, Sons de la nature",
+      description: "Des compositions relaxantes pour apaiser votre anxiété"
+    },
+    neutral: {
+      title: "Playlist Équilibrée",
+      genre: "Indie, Instrumental",
+      description: "Une sélection variée et équilibrée pour accompagner votre journée"
+    }
+  };
+  
+  const defaultRecommendation = {
+    title: "Playlist Personnalisée",
+    genre: "Variés",
+    description: "Une sélection adaptée à votre humeur actuelle"
+  };
+  
+  return recommendations[emotion.toLowerCase()] || defaultRecommendation;
+}
+
 // Coach service object for query operations
 export const coachService = {
   async askQuestion(question: string): Promise<string> {
@@ -151,5 +194,10 @@ export const coachService = {
     } else {
       return "Merci pour votre question. Pour améliorer votre bien-être, je vous recommande de prendre des pauses régulières, de pratiquer la pleine conscience et de vous assurer que vous vous accordez du temps pour les activités qui vous apportent de la joie. N'hésitez pas à me poser des questions spécifiques sur la gestion du stress, le sommeil ou l'équilibre travail-vie personnelle.";
     }
-  }
+  },
+  
+  getRecommendations,
+  processEmotions,
+  triggerCoachEvent,
+  getMusicRecommendation
 };
