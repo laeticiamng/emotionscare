@@ -1,4 +1,3 @@
-
 export type {
   User,
   UserPreferences,
@@ -155,9 +154,12 @@ export interface Recommendation {
   id: string;
   title: string;
   description: string;
-  category: string;
+  category?: string;
   priority: number;
-  confidence: number;
+  confidence?: number;
+  actionUrl?: string;
+  actionLabel?: string;
+  type?: 'activity' | 'content' | 'insight';
 }
 
 export interface InvitationStats {

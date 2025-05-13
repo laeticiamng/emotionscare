@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getChallenges, getBadges } from '@/lib/gamificationService';
 import { Badge, Challenge } from '@/types/gamification';
+import { getBadges, getChallenges } from '@/lib/gamificationService';
 
 const GamificationPage = () => {
   const [badges, setBadges] = useState<Badge[]>([]);
@@ -13,8 +14,8 @@ const GamificationPage = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const badgesData = await getBadges(); // Changed from fetchBadges
-        const challengesData = await getChallenges(); // Changed from fetchChallenges
+        const badgesData = await getBadges();
+        const challengesData = await getChallenges();
         
         setBadges(badgesData);
         setChallenges(challengesData);

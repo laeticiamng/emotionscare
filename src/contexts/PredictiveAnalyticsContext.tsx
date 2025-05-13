@@ -332,7 +332,7 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
         generatePrediction,
         resetPredictions,
         isEnabled,
-        setEnabled,
+        setEnabled: setIsEnabled,
         predictionEnabled,
         setPredictionEnabled,
         availableFeatures,

@@ -12,6 +12,8 @@ export interface Badge {
   level?: number;
   unlocked?: boolean;
   category?: string;
+  earned_at?: string;
+  type?: string;
 }
 
 export interface Challenge {
@@ -39,4 +41,24 @@ export interface Achievement {
   progress?: number;
   total?: number;
   completed?: boolean;
+}
+
+export interface EmotionBadge {
+  id: string;
+  name: string;
+  description: string;
+  type: 'achievement' | 'emotion' | 'diversity' | 'balance' | 'streak';
+  icon: string;
+  threshold: number;
+  emotionCount?: number;
+  emotion?: string;
+  streakDays?: number;
+}
+
+export interface GamificationLevel {
+  currentLevel: number;
+  nextLevel: number;
+  progress: number;
+  points: number;
+  pointsToNextLevel: number;
 }

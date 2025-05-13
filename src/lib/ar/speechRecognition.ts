@@ -10,6 +10,14 @@ interface SpeechRecognitionOptions {
   onEnd?: () => void;
 }
 
+// Add TypeScript declarations for the Speech Recognition API
+declare global {
+  interface Window {
+    SpeechRecognition?: typeof SpeechRecognition;
+    webkitSpeechRecognition?: typeof SpeechRecognition;
+  }
+}
+
 export default function createARSpeechRecognition(options: SpeechRecognitionOptions = {}) {
   // Browser compatibility check
   const SpeechRecognitionAPI = 
