@@ -5,7 +5,7 @@ import {
   getSimplifiedGDPRExplanation,
   getGDPRQuestionResponse,
   generateGDPRRequestTemplate 
-} from '@/lib/gdpr-service';
+} from '@/lib/ai/gdpr-service';
 
 export type GdprExplanation = {
   explanation: string;
