@@ -8,11 +8,11 @@ export interface Badge {
   threshold?: number;
   user_id?: string;
   unlocked_at?: string;
+  earned_at?: string;
   progress?: number;
   level?: number;
   unlocked?: boolean;
   category?: string;
-  earned_at?: string;
   type?: string;
 }
 

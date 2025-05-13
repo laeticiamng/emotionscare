@@ -1,95 +1,68 @@
-
-import React, { useEffect, useState } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useBranding } from '@/contexts/BrandingContext';
-import { useSoundscape } from '@/providers/SoundscapeProvider';
-import StoryDrawer from '@/components/storytelling/StoryDrawer';
-import StoryNotification from '@/components/storytelling/StoryNotification';
-import { useStorytelling } from '@/providers/StorytellingProvider';
-import { useNavigate } from 'react-router-dom';
-import { usePredictiveAnalytics } from '@/providers/PredictiveAnalyticsProvider';
+import React, { useState, useEffect } from 'react';
+import { useBranding } from '@/hooks/useBranding';
 import PredictiveInsightToast from '@/components/predictive/PredictiveInsightToast';
-import { Recommendation } from '@/types';
+import { usePredictiveIntelligence } from '@/hooks/usePredictiveIntelligence';
 
-interface BrandingManagerProps {
-  children: React.ReactNode;
+// Need to augment the PredictionRecommendation type to include confidence
+interface PredictionRecommendation {
+  title: string;
+  description: string;
+  actionUrl?: string;
+  actionLabel?: string;
+  confidence: number; // Add confidence property
+  category?: string;
+  priority: number;
+  type?: 'activity' | 'content' | 'insight';
 }
 
-const BrandingManager: React.FC<BrandingManagerProps> = ({ children }) => {
-  const { brandingTheme, emotionalTone, colors } = useBranding();
-  const { soundscapeType } = useSoundscape();
-  const { theme } = useTheme();
-  const { activeStory } = useStorytelling();
-  const { recommendations } = usePredictiveAnalytics();
-  const [storyDrawerOpen, setStoryDrawerOpen] = useState(false);
+const BrandingManager: React.FC = () => {
+  const { branding, isLoading, error } = useBranding();
+  const [showBrandingToast, setShowBrandingToast] = useState(false);
+  
+  useEffect(() => {
+    if (branding && !isLoading) {
+      // Show branding toast after a delay
+      const timer = setTimeout(() => {
+        setShowBrandingToast(true);
+      }, 3000);
+      
+      // Clear timeout if component unmounts or branding changes
+      return () => clearTimeout(timer);
+    }
+  }, [branding, isLoading]);
+
+  // Predictive intelligence for notifications
+  const { recommendations } = usePredictiveIntelligence();
   const [showPredictiveToast, setShowPredictiveToast] = useState(false);
-  const navigate = useNavigate();
   
-  // Apply CSS variables for theming
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    // Set primary colors
-    root.style.setProperty('--color-brand-primary', colors.primary);
-    root.style.setProperty('--color-brand-secondary', colors.secondary);
-    root.style.setProperty('--color-brand-accent', colors.accent);
-    root.style.setProperty('--color-brand-highlight', colors.highlight || '#22c55e');
-    
-    // Set additional variables based on theme
-    root.setAttribute('data-branding', brandingTheme);
-    root.setAttribute('data-emotional-tone', emotionalTone);
-    root.setAttribute('data-soundscape', soundscapeType);
-    
-    // Apply premium styles
-    if (brandingTheme === 'ultra-premium') {
-      document.body.classList.add('ultra-premium');
-    } else {
-      document.body.classList.remove('ultra-premium');
-    }
-    
-  }, [theme, brandingTheme, emotionalTone, colors, soundscapeType]);
-  
-  // Open story drawer when active story changes
-  useEffect(() => {
-    if (activeStory) {
-      setStoryDrawerOpen(true);
-    }
-  }, [activeStory]);
-  
-  // Show predictive toast when new recommendations arrive
+  // Show predictive toast when recommendations change
   useEffect(() => {
     if (recommendations && recommendations.length > 0) {
-      // Only show toast for high confidence recommendations
-      const highConfidenceRecs = recommendations.filter(rec => rec.priority > 0);
-      if (highConfidenceRecs.length > 0) {
+      const timer = setTimeout(() => {
         setShowPredictiveToast(true);
-        
-        // Auto-hide after 10 seconds
-        const timer = setTimeout(() => {
-          setShowPredictiveToast(false);
-        }, 10000);
-        
-        return () => clearTimeout(timer);
-      }
+      }, 5000);
+      
+      return () => clearTimeout(timer);
     }
   }, [recommendations]);
   
-  // Handle CTA click by navigating to the provided route
-  const handleCTAClick = (route: string) => {
-    navigate(route);
-  };
-  
   return (
     <>
-      {children}
-      
-      {/* Story components */}
-      <StoryNotification position="bottom-right" />
-      <StoryDrawer 
-        open={storyDrawerOpen} 
-        onClose={() => setStoryDrawerOpen(false)} 
-        onCTAClick={handleCTAClick}
-      />
+      {/* Branding toast */}
+      {showBrandingToast && branding && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-card rounded-md shadow-lg p-4">
+            <h2 className="text-lg font-semibold">{branding.title}</h2>
+            <p className="text-sm text-muted-foreground">{branding.description}</p>
+            <button 
+              className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+              onClick={() => setShowBrandingToast(false)}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Predictive insights toast */}
       {showPredictiveToast && recommendations && recommendations.length > 0 && (

@@ -1,13 +1,10 @@
 
-// Create a flexible wrapper for browser Speech Recognition API
-interface SpeechRecognitionOptions {
-  language?: string;
-  continuous?: boolean;
-  interimResults?: boolean;
-  onResult?: (result: { transcript: string; isFinal: boolean }) => void;
-  onError?: (error: string) => void;
-  onStart?: () => void;
-  onEnd?: () => void;
+import { toast } from '@/hooks/use-toast';
+
+export interface SpeechRecognitionResult {
+  transcript: string;
+  confidence: number;
+  isFinal: boolean;
 }
 
 // Add TypeScript declarations for the Speech Recognition API
@@ -43,74 +40,140 @@ declare global {
   }
 }
 
-export default function createARSpeechRecognition(options: SpeechRecognitionOptions = {}) {
-  // Browser compatibility check
-  const SpeechRecognitionAPI = 
-    window.SpeechRecognition || 
-    window.webkitSpeechRecognition || 
-    null;
+export interface RecognitionOptions {
+  lang?: string;
+  continuous?: boolean;
+  interimResults?: boolean;
+  onStart?: () => void;
+  onEnd?: () => void;
+  onError?: (error: string) => void;
+  onResult?: (result: SpeechRecognitionResult) => void;
+}
+
+export class SpeechRecognitionService {
+  private recognition: SpeechRecognition | null = null;
+  private isSupported: boolean = false;
+  private isListening: boolean = false;
   
-  if (!SpeechRecognitionAPI) {
-    console.error('Speech recognition not supported in this browser');
-    if (options.onError) {
-      options.onError('Speech recognition not supported in this browser');
+  constructor() {
+    this.isSupported = this.checkBrowserSupport();
+    
+    if (!this.isSupported) {
+      console.warn('Speech recognition is not supported in this browser');
     }
-    return null;
   }
   
-  const recognition = new SpeechRecognitionAPI();
+  private checkBrowserSupport(): boolean {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  }
   
-  // Configure recognition
-  recognition.lang = options.language || 'fr-FR';
-  recognition.continuous = options.continuous || false;
-  recognition.interimResults = options.interimResults || false;
-  
-  // Set up event handlers
-  recognition.onstart = () => {
-    if (options.onStart) options.onStart();
-  };
-  
-  recognition.onend = () => {
-    if (options.onEnd) options.onEnd();
-  };
-  
-  recognition.onerror = (event) => {
-    if (options.onError) options.onError(event.error);
-  };
-  
-  recognition.onresult = (event) => {
-    if (options.onResult) {
-      const last = event.results.length - 1;
-      const transcript = event.results[last][0].transcript.trim();
-      const isFinal = event.results[last].isFinal;
+  public initialize(options: RecognitionOptions = {}): boolean {
+    if (!this.isSupported) return false;
+    
+    try {
+      // Create recognition instance
+      const SpeechRecognitionConstructor = window.SpeechRecognition || window.webkitSpeechRecognition;
+      this.recognition = new SpeechRecognitionConstructor();
       
-      options.onResult({ transcript, isFinal });
+      // Configure recognition
+      this.recognition.lang = options.lang || 'fr-FR';
+      this.recognition.continuous = options.continuous !== undefined ? options.continuous : true;
+      this.recognition.interimResults = options.interimResults !== undefined ? options.interimResults : true;
+      
+      // Set up event handlers
+      this.recognition.onstart = () => {
+        this.isListening = true;
+        if (options.onStart) options.onStart();
+      };
+      
+      this.recognition.onend = () => {
+        this.isListening = false;
+        if (options.onEnd) options.onEnd();
+      };
+      
+      this.recognition.onerror = (event) => {
+        if (options.onError) options.onError(event.error);
+      };
+      
+      this.recognition.onresult = (event) => {
+        if (options.onResult && event.results.length > 0) {
+          const lastResult = event.results[event.results.length - 1];
+          
+          if (lastResult.length > 0) {
+            const transcript = lastResult[0].transcript;
+            const confidence = lastResult[0].confidence;
+            const isFinal = lastResult.isFinal;
+            
+            options.onResult({
+              transcript,
+              confidence,
+              isFinal
+            });
+          }
+        }
+      };
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to initialize speech recognition:', error);
+      return false;
     }
-  };
+  }
   
-  // Return controller object
-  return {
-    start: () => {
-      try {
-        recognition.start();
-      } catch (error) {
-        console.error('Error starting speech recognition:', error);
-        if (options.onError) options.onError('Failed to start recognition');
-      }
-    },
-    stop: () => {
-      try {
-        recognition.stop();
-      } catch (error) {
-        console.error('Error stopping speech recognition:', error);
-      }
-    },
-    abort: () => {
-      try {
-        recognition.abort();
-      } catch (error) {
-        console.error('Error aborting speech recognition:', error);
-      }
+  public start(): boolean {
+    if (!this.recognition || !this.isSupported) {
+      return false;
     }
-  };
+    
+    try {
+      this.recognition.start();
+      return true;
+    } catch (error) {
+      console.error('Error starting speech recognition:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de démarrer la reconnaissance vocale',
+        variant: 'destructive',
+      });
+      return false;
+    }
+  }
+  
+  public stop(): boolean {
+    if (!this.recognition || !this.isSupported || !this.isListening) {
+      return false;
+    }
+    
+    try {
+      this.recognition.stop();
+      return true;
+    } catch (error) {
+      console.error('Error stopping speech recognition:', error);
+      return false;
+    }
+  }
+  
+  public abort(): boolean {
+    if (!this.recognition || !this.isSupported) {
+      return false;
+    }
+    
+    try {
+      this.recognition.abort();
+      return true;
+    } catch (error) {
+      console.error('Error aborting speech recognition:', error);
+      return false;
+    }
+  }
+  
+  public isRecognitionSupported(): boolean {
+    return this.isSupported;
+  }
+  
+  public isCurrentlyListening(): boolean {
+    return this.isListening;
+  }
 }
+
+export const speechRecognitionService = new SpeechRecognitionService();
