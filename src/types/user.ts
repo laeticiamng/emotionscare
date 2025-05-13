@@ -17,6 +17,11 @@ export interface UserPreferences {
   privacy?: string;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
+  
+  // Add premium features properties
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }
 
 export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'moderator';
@@ -42,4 +47,28 @@ export interface User {
   joined_at?: string;
   createdAt?: string;
   emotional_score?: number;
+  team_id?: string;
+  anonymity_code?: string;
+}
+
+export interface UserPreferencesState {
+  theme: 'light' | 'dark' | 'system' | 'pastel';
+  fontSize: 'small' | 'medium' | 'large';
+  fontFamily: 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'raleway';
+  notifications: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+  // Add other fields as needed
+}
+
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'raleway';
+export type FontSize = 'small' | 'medium' | 'large';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+
+export interface InvitationVerificationResult {
+  isValid: boolean;
+  message: string;
+  role?: UserRole;
+  email?: string;
 }

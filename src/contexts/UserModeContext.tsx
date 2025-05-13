@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin';
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'b2b-collaborator';
 
 // Export UserMode type for other components to use
 export type UserMode = UserModeType;

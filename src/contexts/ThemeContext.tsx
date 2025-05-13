@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'raleway';
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;

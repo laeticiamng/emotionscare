@@ -1,267 +1,132 @@
-
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import TrendCharts from './TrendCharts';
-import EmotionScanSection from './EmotionScanSection';
-import CoachRecommendations from '../coach/CoachRecommendations';
-import GamificationWidget from './GamificationWidget';
-import SocialCocoonWidget from './SocialCocoonWidget';
-import UserSidePanel from './UserSidePanel';
-import FeatureHub from '../features/FeatureHub';
-import SecurityCertifications from '../features/SecurityCertifications';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { UserModeType } from '@/contexts/UserModeContext';
-import PredictiveRecommendations from '@/components/predictive/PredictiveRecommendations';
-import { Link } from 'react-router-dom';
-import { Sparkles } from 'lucide-react';
+import DashboardHeader from './DashboardHeader';
+import EmotionalCheckIn from './EmotionalCheckIn';
+import EmotionalTrends from './EmotionalTrends';
+import RecentJournalEntries from './RecentJournalEntries';
+import UpcomingReminders from './UpcomingReminders';
+import CoachSuggestions from './CoachSuggestions';
+import TeamOverview from '../scan/TeamOverview';
+import OrganizationStats from '../admin/OrganizationStats';
+import UserActivityChart from '../admin/UserActivityChart';
+import NewUsersCard from '../admin/NewUsersCard';
+import EmotionalHealthOverview from '../admin/EmotionalHealthOverview';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/utils/roleUtils';
 
-interface DashboardContentProps {
-  isMobile: boolean;
-  minimalView: boolean;
-  collapsedSections: {
-    [key: string]: boolean;
-  };
-  toggleSection: (section: string) => void;
-  userId: string;
-  latestEmotion?: {
-    emotion: string;
-    score: number;
-  };
-  userMode?: UserModeType;
-}
-
-const DashboardContent: React.FC<DashboardContentProps> = ({
-  isMobile,
-  minimalView,
-  collapsedSections,
-  toggleSection,
-  userId,
-  latestEmotion,
-  userMode
-}) => {
-  console.log('Rendering DashboardContent with userMode:', userMode);
+const DashboardContent: React.FC = () => {
+  const { userMode } = useUserMode();
+  const { user } = useAuth();
   
-  // Pour le mode B2B admin
-  if (userMode === 'b2b-admin') {
+  // Convert personal to b2c for backwards compatibility
+  const normalizedUserMode = userMode === 'personal' ? 'b2c' : userMode;
+  
+  // Update comparisons to match normalized userMode
+  const isB2BUser = normalizedUserMode === 'b2b-user';
+  const isB2BAdmin = normalizedUserMode === 'b2b-admin';
+  const isB2C = normalizedUserMode === 'b2c';
+  const isAdmin = user ? isAdminRole(user.role) : false;
+  
+  // Render different dashboard based on user mode
+  if (isB2BAdmin || (isAdmin && isB2BUser)) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Vue d'ensemble de l'équipe</h2>
-            <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-              Graphique des tendances émotionnelles de l'équipe (données anonymisées)
-            </div>
+      <div className="container mx-auto p-4 space-y-6">
+        <DashboardHeader />
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Activité des utilisateurs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UserActivityChart />
+            </CardContent>
           </Card>
           
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Analyse des tendances</h2>
-            <div className="h-64 bg-muted/20 rounded-md flex items-center justify-center">
-              Données anonymisées d'absentéisme et de bien-être
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Statistiques</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <OrganizationStats />
+            </CardContent>
           </Card>
-          
-          <div className="group relative">
-            <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
-            <Card className="p-4 relative transition-all hover:shadow-md group-hover:border-primary/50">
-              <h2 className="text-xl font-semibold mb-4">Prédictions avancées</h2>
-              <div className="space-y-2">
-                <div className="p-3 bg-muted/20 rounded-md">Prédiction de pic d'absentéisme</div>
-                <div className="p-3 bg-muted/20 rounded-md">Alerte préventive burnout</div>
-              </div>
-              <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                <Sparkles className="h-3 w-3" />
-                Premium
-              </div>
-            </Card>
-          </div>
         </div>
         
-        <div className="space-y-6">
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Suggestions d'activités</h2>
-            <div className="space-y-2">
-              <div className="p-3 bg-muted/20 rounded-md">Atelier de respiration en groupe</div>
-              <div className="p-3 bg-muted/20 rounded-md">Session de team building</div>
-              <div className="p-3 bg-muted/20 rounded-md">Pause musicale collective</div>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Nouveaux utilisateurs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <NewUsersCard />
+            </CardContent>
           </Card>
           
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold mb-4">Notifications importantes</h2>
-            <div className="space-y-2">
-              <div className="p-3 bg-muted/20 rounded-md">Rappel: Semaine du bien-être</div>
-              <div className="p-3 bg-muted/20 rounded-md">3 nouveaux membres ont rejoint l'équipe</div>
-            </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Santé émotionnelle</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EmotionalHealthOverview />
+            </CardContent>
           </Card>
         </div>
       </div>
     );
   }
-
-  // Pour les modes utilisateurs
-  // Render différents layouts basés sur la taille de l'écran et les préférences
-  if (isMobile) {
+  
+  if (isB2BUser) {
     return (
-      <div className="space-y-8">
-        <EmotionScanSection 
-          collapsed={collapsedSections.emotionScan}
-          onToggle={() => toggleSection('emotionScan')}
-          userId={userId}
-          latestEmotion={latestEmotion}
-        />
+      <div className="container mx-auto p-4 space-y-6">
+        <DashboardHeader />
         
-        <div className="group relative">
-          <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
-          <PredictiveRecommendations 
-            maxRecommendations={1}
-            className="relative transition-all hover:shadow-md group-hover:border-primary/50"
-          />
-          <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-            <Sparkles className="h-3 w-3" />
-            Premium
-          </div>
-        </div>
-        
-        <TrendCharts 
-          collapsed={collapsedSections.charts}
-          onToggle={() => toggleSection('charts')}
-          userId={userId}
-        />
-        
-        <CoachRecommendations 
-          collapsed={collapsedSections.recommendations}
-          onToggle={() => toggleSection('recommendations')}
-          emotion={latestEmotion?.emotion}
-        />
-        
-        <FeatureHub />
-        
-        {userMode === 'b2c' && (
-          <GamificationWidget
-            collapsed={collapsedSections.gamification}
-            onToggle={() => toggleSection('gamification')}
-            userId={userId}
-          />
-        )}
-        
-        {userMode === 'b2c' && (
-          <SocialCocoonWidget 
-            collapsed={collapsedSections.social}
-            onToggle={() => toggleSection('social')}
-            userId={userId}
-          />
-        )}
-        
-        <SecurityCertifications />
+        <Tabs defaultValue="personal">
+          <TabsList>
+            <TabsTrigger value="personal">Personnel</TabsTrigger>
+            <TabsTrigger value="team">Équipe</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="personal" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <EmotionalCheckIn />
+              <EmotionalTrends />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <RecentJournalEntries />
+              <UpcomingReminders />
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="team" className="space-y-4">
+            <TeamOverview />
+          </TabsContent>
+        </Tabs>
       </div>
     );
   }
-
-  if (minimalView) {
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <EmotionScanSection 
-          collapsed={collapsedSections.emotionScan}
-          onToggle={() => toggleSection('emotionScan')}
-          userId={userId}
-          latestEmotion={latestEmotion}
-        />
-        
-        <div className="group relative">
-          <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
-          <PredictiveRecommendations 
-            maxRecommendations={2}
-            className="relative transition-all hover:shadow-md group-hover:border-primary/50"
-          />
-          <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-            <Sparkles className="h-3 w-3" />
-            Premium
-          </div>
-        </div>
-        
-        <TrendCharts 
-          collapsed={collapsedSections.charts}
-          onToggle={() => toggleSection('charts')}
-          userId={userId}
-        />
-        
-        <CoachRecommendations 
-          collapsed={collapsedSections.recommendations}
-          onToggle={() => toggleSection('recommendations')}
-          emotion={latestEmotion?.emotion}
-        />
-        
-        <FeatureHub />
-        
-        {userMode === 'b2c' && (
-          <GamificationWidget
-            collapsed={collapsedSections.gamification}
-            onToggle={() => toggleSection('gamification')}
-            userId={userId}
-          />
-        )}
-      </div>
-    );
-  }
-
+  
+  // Default B2C dashboard
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <EmotionScanSection 
-          collapsed={collapsedSections.emotionScan}
-          onToggle={() => toggleSection('emotionScan')}
-          userId={userId}
-          latestEmotion={latestEmotion}
-        />
-        
-        <div className="group relative">
-          <Link to="/predictive" className="absolute inset-0 z-10" aria-label="Voir les prédictions avancées"></Link>
-          <Card className="p-4 relative transition-all hover:shadow-md group-hover:border-primary/50">
-            <h2 className="text-xl font-semibold mb-4">Prédictions personnalisées</h2>
-            <div className="space-y-2">
-              <div className="p-3 bg-muted/20 rounded-md">Recommandation d'activité: Méditation guidée</div>
-              <div className="p-3 bg-muted/20 rounded-md">Alerte: Risque de stress détecté pour mardi</div>
-              <div className="p-3 bg-muted/20 rounded-md">Suggestion: Planifier une pause à 15h30</div>
-            </div>
-            <div className="absolute right-4 top-4 bg-primary/10 text-primary px-2 py-1 rounded-full text-xs flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              Premium
-            </div>
-          </Card>
-        </div>
-        
-        <TrendCharts 
-          collapsed={collapsedSections.charts}
-          onToggle={() => toggleSection('charts')}
-          userId={userId}
-        />
-        
-        <FeatureHub />
-        
-        <CoachRecommendations 
-          collapsed={collapsedSections.recommendations}
-          onToggle={() => toggleSection('recommendations')}
-          emotion={latestEmotion?.emotion}
-        />
-        
-        {/* Conditionally render based on userMode */}
-        {(userMode === 'b2c' || userMode === 'personal') && (
-          <GamificationWidget
-            collapsed={collapsedSections.gamification}
-            onToggle={() => toggleSection('gamification')}
-            userId={userId}
-          />
-        )}
+    <div className="container mx-auto p-4 space-y-6">
+      <DashboardHeader />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <EmotionalCheckIn />
+        <EmotionalTrends />
       </div>
       
-      <div className="space-y-6">
-        <UserSidePanel
-          collapsed={collapsedSections.sidePanel}
-          onToggle={() => toggleSection('sidePanel')}
-          userId={userId}
-          userMode={userMode}
-        />
-        
-        <SecurityCertifications />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <RecentJournalEntries />
+        <CoachSuggestions />
+      </div>
+      
+      <div className="grid grid-cols-1">
+        <UpcomingReminders />
       </div>
     </div>
   );

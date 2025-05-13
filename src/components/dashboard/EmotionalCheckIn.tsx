@@ -1,108 +1,70 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from '@/components/ui/use-toast';
 import { Emotion } from '@/types/emotion';
 
-// Sample emotions for demonstration
-const EMOTIONS = [
-  { id: 'joy', name: 'Joie', emoji: '😊' },
-  { id: 'calm', name: 'Calme', emoji: '😌' },
-  { id: 'sad', name: 'Tristesse', emoji: '😢' },
-  { id: 'angry', name: 'Colère', emoji: '😠' },
-  { id: 'fearful', name: 'Peur', emoji: '😨' },
-  { id: 'tired', name: 'Fatigue', emoji: '😴' }
-];
+// ... rest of imports
 
-interface EmotionalCheckInProps {
-  onEmotionSelected?: (emotion: string, intensity: number) => void;
-  compact?: boolean;
-}
+const EmotionalCheckIn: React.FC = () => {
+  const [emotion, setEmotion] = useState<string>('');
+  const [text, setText] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-const EmotionalCheckIn: React.FC<EmotionalCheckInProps> = ({ 
-  onEmotionSelected,
-  compact = false
-}) => {
-  const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
-  const [intensity, setIntensity] = useState(3);
-  const { toast } = useToast();
-
-  const handleSubmit = () => {
-    if (!selectedEmotion) {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!emotion) {
       toast({
         title: "Erreur",
-        description: "Veuillez sélectionner une émotion",
-        variant: "destructive"
+        description: "Veuillez sélectionner une émotion.",
+        variant: "destructive",
       });
       return;
     }
-
-    if (onEmotionSelected) {
-      onEmotionSelected(selectedEmotion, intensity);
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Fake API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Successful submission
+      toast({
+        title: "Émotion enregistrée",
+        description: "Votre check-in émotionnel a été sauvegardé avec succès.",
+      });
+      
+      setText('');
+      setEmotion('');
+    } catch (error) {
+      console.error('Error submitting emotion:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer votre émotion. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Show success toast
-    toast({
-      title: "Check-in émotionnel enregistré",
-      description: `Vous vous sentez: ${EMOTIONS.find(e => e.id === selectedEmotion)?.name} (intensité: ${intensity}/5)`
-      // Remove the duration property as it's not part of the Toast type
-    });
-
-    // Reset state after submission
-    setSelectedEmotion(null);
-    setIntensity(3);
   };
 
+  // ... rest of component
+  
   return (
-    <Card className={compact ? 'shadow-sm' : 'shadow'}>
-      <CardHeader className={compact ? 'pb-2 pt-4' : 'pb-2'}>
-        <CardTitle className={compact ? 'text-lg' : 'text-xl'}>Comment vous sentez-vous ?</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle>Comment vous sentez-vous aujourd'hui ?</CardTitle>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-3 gap-2">
-          {EMOTIONS.map((emotion) => (
-            <Button
-              key={emotion.id}
-              variant={selectedEmotion === emotion.id ? "default" : "outline"}
-              className="h-auto py-3 flex flex-col gap-1"
-              onClick={() => setSelectedEmotion(emotion.id)}
-            >
-              <span className="text-2xl">{emotion.emoji}</span>
-              <span className="text-xs font-normal">{emotion.name}</span>
-            </Button>
-          ))}
-        </div>
-        
-        {selectedEmotion && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Intensité</p>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <Button
-                  key={level}
-                  variant={intensity === level ? "default" : "outline"}
-                  className="flex-1"
-                  onClick={() => setIntensity(level)}
-                >
-                  {level}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+      <CardContent>
+        <form onSubmit={handleSubmit}>
+          {/* Form content */}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Enregistrement...' : 'Enregistrer mon émotion'}
+          </Button>
+        </form>
       </CardContent>
-      
-      <CardFooter>
-        <Button 
-          onClick={handleSubmit} 
-          className="w-full"
-          disabled={!selectedEmotion}
-        >
-          Enregistrer mon humeur
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
