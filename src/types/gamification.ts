@@ -32,8 +32,8 @@ export interface Challenge {
   badgeId?: string;
   imageUrl?: string;
   total?: number;
-  title?: string; // Adding for backward compatibility
-  type?: string;   // Adding for backward compatibility
+  title: string; // Making this required to fix the error
+  type?: string;
   completed?: boolean;
 }
 
@@ -51,8 +51,8 @@ export interface GamificationStats {
   badgesCount?: number;
   pointsToNextLevel?: number;
   lastActivityDate?: string | null;
-  challenges?: Challenge[];
-  recentAchievements?: Badge[];
+  challenges: Challenge[]; // Make this required
+  recentAchievements: Badge[]; // Make this required
   challengesCompleted?: number; // For backward compatibility
   streak?: number;  // For backward compatibility
 }

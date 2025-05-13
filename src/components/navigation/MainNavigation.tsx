@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Sheet,
@@ -108,7 +109,7 @@ export function MainNavigation() {
             </SheetContent>
           </Sheet>
           <Avatar className="ml-4">
-            <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+            <AvatarImage src={user?.avatar_url} alt={user?.name} />
             <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
           </Avatar>
           <Sheet>

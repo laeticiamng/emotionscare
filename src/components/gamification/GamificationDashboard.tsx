@@ -14,8 +14,8 @@ const GamificationDashboard: React.FC = () => {
     badges, 
     challenges, 
     stats, 
-    isLoading, 
-    loadGamificationData 
+    loading: isLoading, 
+    completeChallenge: loadGamificationData 
   } = useGamification();
 
   if (isLoading) {
@@ -98,10 +98,16 @@ const GamificationDashboard: React.FC = () => {
           <BadgeGrid badges={badges} />
         </TabsContent>
         <TabsContent value="challenges" className="space-y-4">
-          <ChallengesList 
-            challenges={challenges} 
-            onUpdate={loadGamificationData}
-          />
+          <div className="challenges-list">
+            {challenges.map(challenge => ({
+              id: challenge.id,
+              title: challenge.title || challenge.name,
+              description: challenge.description,
+              points: challenge.points,
+              status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
+              category: challenge.category || 'general'
+            }))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

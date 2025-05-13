@@ -33,14 +33,14 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ userId, onScanSaved, 
       toast({
         title: "Émotion enregistrée",
         description: `${result.dominantEmotion?.name || result.emotion || 'Émotion'} détectée et enregistrée.`,
-        variant: "success"
+        variant: "default" // Changed from "success" to "default"
       });
       
       if (badges.length > 0) {
         toast({
           title: "Badge débloqué !",
           description: `Vous avez débloqué ${badges.length} badge(s) !`,
-          variant: "success"
+          variant: "default" // Changed from "success" to "default"
         });
       }
       

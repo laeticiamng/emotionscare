@@ -1,25 +1,23 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Camera, CameraOff } from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useToast } from '@/hooks/use-toast';
+import { Camera, RefreshCw } from 'lucide-react';
+import { Emotion, EmotionResult } from '@/types/emotion';
 import { useHumeAI } from '@/hooks/useHumeAI';
-import { EmotionResult, FacialEmotionScannerProps } from '@/types/emotion';
 
-const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
-  onEmotionDetected,
-  isScanning: externalIsScanning,
-  onToggleScanning
-}) => {
-  const [localIsScanning, setLocalIsScanning] = useState(externalIsScanning || false);
+interface FacialEmotionScannerProps {
+  onEmotionDetected?: (result: EmotionResult) => void;
+}
+
+const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onEmotionDetected }) => {
+  const [isScanning, setIsScanning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
-  const { analyzeFace, loading } = useHumeAI();
-  
-  const isScanning = externalIsScanning !== undefined ? externalIsScanning : localIsScanning;
-  
+  const { isProcessing, processFacialExpression } = useHumeAI();
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -28,139 +26,115 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        streamRef.current = stream;
       }
       
-      setLocalIsScanning(true);
-      if (onToggleScanning) onToggleScanning();
-      
-      // Run facial scan automatically after camera starts
-      setTimeout(scanFace, 1000);
+      setIsScanning(true);
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast({
         title: "Erreur d'accès à la caméra",
-        description: "Veuillez autoriser l'accès à votre caméra pour utiliser cette fonctionnalité.",
+        description: "Impossible d'accéder à votre webcam.",
         variant: "destructive"
       });
     }
   };
-  
+
   const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    
-    if (videoRef.current) {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      
+      tracks.forEach(track => track.stop());
       videoRef.current.srcObject = null;
     }
     
-    setLocalIsScanning(false);
-    if (onToggleScanning) onToggleScanning();
+    setIsScanning(false);
   };
-  
-  const toggleCamera = () => {
-    if (isScanning) {
-      stopCamera();
-    } else {
-      startCamera();
-    }
-  };
-  
-  const scanFace = async () => {
-    if (!videoRef.current || !streamRef.current) return;
-    
-    try {
-      // In a real implementation, this would capture a frame from the video
-      // and send it to a facial emotion recognition API
+
+  const captureImage = useCallback(() => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
       
-      // For now, we'll simulate a result
-      const mockResult: EmotionResult = {
-        emotions: [
-          { name: 'happiness', intensity: 0.7, score: 0.7 },
-          { name: 'neutral', intensity: 0.2, score: 0.2 },
-          { name: 'surprise', intensity: 0.1, score: 0.1 }
-        ],
-        dominantEmotion: { name: 'happiness', intensity: 0.7, score: 0.7 },
-        source: 'facial',
-        timestamp: new Date().toISOString(),
-        faceDetected: true,
-        confidence: 0.85
-      };
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
       
-      if (onEmotionDetected) {
-        onEmotionDetected(mockResult);
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        
+        // Convert to base64 data URL
+        const imageData = canvas.toDataURL('image/jpeg');
+        
+        // Process with Hume AI
+        processFacialExpression(imageData).then(result => {
+          if (result) {
+            // Create appropriate result structure for emotions
+            const dominantEmotion: Emotion = {
+              name: result.dominantEmotion?.name || "neutral",
+              intensity: result.dominantEmotion?.intensity || 0.5
+            };
+            
+            // Create result with the emotion
+            const emotionResult: EmotionResult = {
+              emotions: result.emotions || [],
+              dominantEmotion,
+              intensity: dominantEmotion.intensity,
+              source: 'facial',
+              faceDetected: true,
+              timestamp: new Date().toISOString()
+            };
+            
+            if (onEmotionDetected) {
+              onEmotionDetected(emotionResult);
+            }
+          }
+        });
       }
-      
-      // Stop scanning after result
-      stopCamera();
-    } catch (error) {
-      console.error('Error scanning face:', error);
-      toast({
-        title: "Erreur d'analyse",
-        description: "Impossible d'analyser votre visage. Veuillez réessayer.",
-        variant: "destructive"
-      });
     }
-  };
-  
-  useEffect(() => {
-    return () => {
-      // Clean up on unmount
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
-  
+  }, [onEmotionDetected, processFacialExpression]);
+
   return (
-    <Card className="overflow-hidden">
-      <CardHeader>
-        <CardTitle>Scan émotionnel facial</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center">
-        <div className="relative w-full max-w-md aspect-video bg-muted rounded-md overflow-hidden">
-          {isScanning ? (
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <p className="text-muted-foreground">Caméra désactivée</p>
+    <Card className="p-4 overflow-hidden">
+      <div className="space-y-4">
+        <div className="relative">
+          <video 
+            ref={videoRef} 
+            className={`w-full rounded-md ${isScanning ? 'block' : 'hidden'}`}
+            autoPlay 
+            playsInline
+            muted
+          />
+          
+          <canvas 
+            ref={canvasRef} 
+            className="hidden" // Hidden canvas for image processing
+          />
+          
+          {!isScanning && (
+            <div className="bg-muted h-48 flex items-center justify-center rounded-md">
+              <Camera className="h-12 w-12 text-muted-foreground" />
             </div>
           )}
         </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={scanFace}
-          disabled={!isScanning || loading}
-        >
-          Analyser maintenant
-        </Button>
-        <Button
-          variant={isScanning ? "destructive" : "default"}
-          onClick={toggleCamera}
-        >
-          {isScanning ? (
-            <>
-              <CameraOff className="mr-2 h-4 w-4" />
-              Arrêter la caméra
-            </>
-          ) : (
-            <>
-              <Camera className="mr-2 h-4 w-4" />
+        
+        <div className="flex justify-between">
+          {!isScanning ? (
+            <Button onClick={startCamera} className="w-full">
               Activer la caméra
-            </>
+            </Button>
+          ) : (
+            <div className="flex w-full gap-2">
+              <Button onClick={captureImage} disabled={isProcessing} className="flex-1">
+                {isProcessing ? 'Analyse en cours...' : 'Analyser l\'expression'}
+              </Button>
+              <Button onClick={stopCamera} variant="outline">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
           )}
-        </Button>
-      </CardFooter>
+        </div>
+      </div>
     </Card>
   );
 };

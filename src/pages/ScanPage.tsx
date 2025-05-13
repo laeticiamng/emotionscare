@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import EmotionBasedMusicRecommendation from '@/components/music/EmotionBasedMusicRecommendation';
 
 const ScanPage: React.FC = () => {
@@ -34,12 +34,18 @@ const ScanPage: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <h3 className="font-medium">Émotion principale</h3>
-                      <p className="text-2xl font-semibold">{emotionResult.emotion}</p>
+                      <p className="text-2xl font-semibold">
+                        {emotionResult.dominantEmotion?.name || 'Non détectée'}
+                      </p>
                     </div>
                     
                     <div>
                       <h3 className="font-medium">Intensité</h3>
-                      <p className="text-xl">{emotionResult.score}/10</p>
+                      <p className="text-xl">
+                        {emotionResult.dominantEmotion?.intensity ? 
+                          `${(emotionResult.dominantEmotion.intensity * 10).toFixed(1)}/10` : 
+                          'N/A'}
+                      </p>
                     </div>
                     
                     {emotionResult.ai_feedback && (
@@ -52,10 +58,12 @@ const ScanPage: React.FC = () => {
                 </CardContent>
               </Card>
               
-              <EmotionBasedMusicRecommendation 
-                emotionResult={emotionResult}
-                variant="standalone"
-              />
+              {emotionResult && (
+                <EmotionBasedMusicRecommendation 
+                  emotionResult={emotionResult}
+                  variant="standalone"
+                />
+              )}
             </>
           )}
           

@@ -1,122 +1,101 @@
 
-import React, { useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult, UnifiedEmotionCheckinProps } from '@/types/emotion';
 import TextEmotionScanner from './TextEmotionScanner';
 import VoiceEmotionAnalyzer from './VoiceEmotionAnalyzer';
 import FacialEmotionScanner from './FacialEmotionScanner';
+import { EmotionResult } from '@/types/emotion';
+
+interface UnifiedEmotionCheckinProps {
+  onScanComplete?: (result: EmotionResult) => void;
+}
 
 const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({ onScanComplete }) => {
   const [activeTab, setActiveTab] = useState<string>('text');
   const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-  
-  const handleEmotionDetected = useCallback((result: EmotionResult) => {
+
+  const handleEmotionDetected = (result: EmotionResult) => {
     setScanResult(result);
-  }, []);
-  
-  const handleSubmitScan = useCallback(async () => {
+  };
+
+  const handleSave = async () => {
     if (!scanResult) return;
     
-    setIsProcessing(true);
+    setIsSaving(true);
     try {
-      // In a real app, this would save the scan to a database
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // In a real implementation, this would save to a database
       
-      // Show success toast
+      // Show success message
       toast({
-        title: "Scan émotionnel complété",
-        description: `Vous vous sentez principalement ${scanResult.dominantEmotion?.name || scanResult.emotion} avec une intensité de ${scanResult.dominantEmotion?.intensity || scanResult.intensity || 0.5}/1.`,
-        variant: "success"
+        title: "Émotion enregistrée",
+        description: `${scanResult.dominantEmotion?.name || 'Émotion'} détectée avec une intensité de ${scanResult.dominantEmotion?.intensity || 0}.`,
+        variant: "default" // Changed from "success" to "default"
       });
       
-      // Notify parent component if callback provided
+      // Pass result to parent
       if (onScanComplete) {
         onScanComplete(scanResult);
       }
       
-      // Reset scan result
-      setScanResult(null);
     } catch (error) {
-      console.error("Error processing emotion scan:", error);
+      console.error('Error saving scan:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de traiter le scan émotionnel. Veuillez réessayer.",
+        description: "Impossible d'enregistrer l'émotion.",
         variant: "destructive"
       });
     } finally {
-      setIsProcessing(false);
+      setIsSaving(false);
     }
-  }, [scanResult, onScanComplete, toast]);
-  
-  const renderResultSection = () => {
-    if (!scanResult) return null;
-    
-    return (
-      <Card className="mt-6 bg-muted/40">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Résultat de votre scan</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="font-medium text-sm">Émotion principale:</div>
-            <div className="text-sm capitalize">
-              {scanResult.dominantEmotion?.name || scanResult.emotion || "Non détectée"}
-            </div>
-            
-            <div className="font-medium text-sm">Intensité:</div>
-            <div className="text-sm">
-              {typeof (scanResult.dominantEmotion?.intensity || scanResult.intensity) === 'number' 
-                ? `${Math.round((scanResult.dominantEmotion?.intensity || scanResult.intensity || 0) * 100)}%` 
-                : "N/A"}
-            </div>
-            
-            <div className="font-medium text-sm">Source:</div>
-            <div className="text-sm capitalize">
-              {scanResult.source || activeTab}
-            </div>
-          </div>
-          
-          <Button 
-            className="w-full mt-4" 
-            onClick={handleSubmitScan}
-            disabled={isProcessing}
-          >
-            {isProcessing ? "Traitement..." : "Enregistrer ce scan"}
-          </Button>
-        </CardContent>
-      </Card>
-    );
   };
-  
+
   return (
-    <div className="space-y-4">
+    <Card className="p-4">
       <Tabs defaultValue="text" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-3">
+        <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger value="text">Texte</TabsTrigger>
           <TabsTrigger value="voice">Voix</TabsTrigger>
           <TabsTrigger value="face">Visage</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="text" className="mt-4">
+        <TabsContent value="text">
           <TextEmotionScanner onEmotionDetected={handleEmotionDetected} />
         </TabsContent>
         
-        <TabsContent value="voice" className="mt-4">
+        <TabsContent value="voice">
           <VoiceEmotionAnalyzer onEmotionDetected={handleEmotionDetected} />
         </TabsContent>
         
-        <TabsContent value="face" className="mt-4">
+        <TabsContent value="face">
           <FacialEmotionScanner onEmotionDetected={handleEmotionDetected} />
         </TabsContent>
       </Tabs>
       
-      {renderResultSection()}
-    </div>
+      {scanResult && (
+        <div className="mt-4">
+          <h3 className="text-lg font-medium">Résultat de l'analyse</h3>
+          <div className="mt-2 p-4 bg-muted rounded-md">
+            <p className="mb-2">
+              <span className="font-semibold">Émotion détectée:</span> {scanResult.dominantEmotion?.name || 'Non détectée'}
+            </p>
+            <p>
+              <span className="font-semibold">Intensité:</span> {scanResult.dominantEmotion?.intensity || 0}/1
+            </p>
+            
+            <div className="mt-4 flex justify-end">
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Enregistrement...' : 'Enregistrer cette émotion'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 };
 

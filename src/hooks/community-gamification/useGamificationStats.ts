@@ -1,8 +1,10 @@
 
 import { useState, useCallback } from 'react';
-import { Badge, Challenge, GamificationStats } from '@/types/gamification';
+import { GamificationStats } from './types';
+import { Badge, Challenge } from '@/types/gamification';
+import { getUserGamificationStats } from '@/lib/gamificationService';
 
-export const useGamificationStats = () => {
+export function useGamificationStats() {
   const [stats, setStats] = useState<GamificationStats>({
     points: 0,
     level: 1,
@@ -12,35 +14,28 @@ export const useGamificationStats = () => {
     activeChallenges: 0,
     streakDays: 0,
     progressToNextLevel: 0,
+    totalPoints: 0,
+    currentLevel: 1,
+    badgesCount: 0,
+    pointsToNextLevel: 100,
+    lastActivityDate: null,
     challenges: [],
     recentAchievements: []
   });
   
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const loadGamificationStats = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Mock data loading
-      const mockStats: GamificationStats = {
-        points: 450,
-        level: 3,
-        nextLevelPoints: 600,
-        badges: [],
-        completedChallenges: 7,
-        activeChallenges: 3,
-        streakDays: 5,
-        progressToNextLevel: 75,
-        totalPoints: 450,
-        currentLevel: 3,
-        badgesCount: 5,
-        pointsToNextLevel: 150,
-        lastActivityDate: new Date().toISOString(),
-        challenges: [],
-        recentAchievements: []
-      };
+      const userId = 'current-user'; // This would normally come from auth context
+      const userStats = await getUserGamificationStats(userId);
       
-      setStats(mockStats);
+      setStats({
+        ...userStats,
+        challenges: userStats.challenges || [],
+        recentAchievements: userStats.recentAchievements || []
+      });
     } catch (error) {
       console.error('Error loading gamification stats:', error);
     } finally {
@@ -48,19 +43,42 @@ export const useGamificationStats = () => {
     }
   }, []);
   
-  const updateStatsForCompletedChallenge = useCallback((challengeId: string, challenges: Challenge[]) => {
-    // Find the challenge in the list
-    const challenge = challenges.find(c => c.id === challengeId);
-    
-    if (!challenge) return;
-    
-    setStats(prevStats => ({
-      ...prevStats,
-      completedChallenges: prevStats.completedChallenges + 1,
-      points: prevStats.points + (challenge.points || 0),
-      totalPoints: (prevStats.totalPoints || prevStats.points) + (challenge.points || 0)
-    }));
-  }, []);
+  const updateStatsForCompletedChallenge = useCallback(
+    (challengeId: string, activeChallenges: Challenge[]) => {
+      const challenge = activeChallenges.find(c => c.id === challengeId);
+      
+      if (!challenge) return;
+      
+      setStats(prevStats => {
+        const pointsEarned = challenge.points || 0;
+        const newTotalPoints = (prevStats.totalPoints || prevStats.points) + pointsEarned;
+        const newLevel = Math.floor(Math.sqrt(newTotalPoints / 100)) + 1;
+        const nextLevelPoints = (newLevel + 1) * (newLevel + 1) * 100;
+        const pointsToNext = nextLevelPoints - newTotalPoints;
+        const progress = Math.floor((newTotalPoints / nextLevelPoints) * 100);
+        
+        return {
+          ...prevStats,
+          points: newTotalPoints,
+          totalPoints: newTotalPoints,
+          level: newLevel,
+          currentLevel: newLevel,
+          nextLevelPoints,
+          pointsToNextLevel: pointsToNext,
+          progressToNextLevel: progress,
+          completedChallenges: prevStats.completedChallenges + 1,
+          challenges: prevStats.challenges.map(c => 
+            c.id === challengeId ? { ...c, status: 'completed' as const, completed: true } : c
+          )
+        };
+      });
+    }, []
+  );
+  
+  // Initialize data on first render
+  useCallback(() => {
+    loadGamificationStats();
+  }, [loadGamificationStats]);
   
   return {
     stats,
@@ -68,4 +86,4 @@ export const useGamificationStats = () => {
     loadGamificationStats,
     updateStatsForCompletedChallenge
   };
-};
+}
