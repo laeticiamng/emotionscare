@@ -1,48 +1,29 @@
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { User } from '@/types/user';
 
 /**
- * Merges class names with TailwindCSS classes
+ * Get the user's avatar URL from the user object
+ * @param user User object
+ * @returns Avatar URL or empty string
  */
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+export function getUserAvatarUrl(user: User | null) {
+  if (!user) return '';
+  
+  return user.avatar_url || user.avatar || user.image || '';
 }
 
 /**
- * Format a date with options
+ * Get the user's initials from the user object
+ * @param user User object
+ * @returns Initials (up to 2 characters)
  */
-export function formatDate(date: Date | string, options: Intl.DateTimeFormatOptions = {}) {
-  const dateObj = typeof date === "string" ? new Date(date) : date;
+export function getUserInitials(user: User | null) {
+  if (!user || !user.name) return 'U';
   
-  return dateObj.toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    ...options,
-  });
-}
-
-/**
- * Get a user's avatar URL or generate one
- */
-export function getUserAvatarUrl(user: { name?: string; avatar?: string; image?: string; avatar_url?: string; }): string {
-  if (user.avatar) return user.avatar;
-  if (user.image) return user.image;
-  if (user.avatar_url) return user.avatar_url;
+  const names = user.name.split(' ');
+  if (names.length === 1) {
+    return names[0].charAt(0).toUpperCase();
+  }
   
-  // Generate a placeholder avatar with initials
-  return `https://api.dicebear.com/7.x/initials/svg?seed=${user.name || 'User'}`;
-}
-
-/**
- * Get a user's initials from their name
- */
-export function getUserInitials(name?: string): string {
-  if (!name) return 'UN';
-  
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return name.substring(0, 2).toUpperCase();
-  
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
 }

@@ -1,99 +1,67 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Sun, Moon, Laptop, Palette } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useTheme, Theme } from '@/contexts/ThemeContext';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ThemeButtonProps {
-  collapsed: boolean;
+  iconOnly?: boolean;
 }
 
-const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed }) => {
+const ThemeButton: React.FC<ThemeButtonProps> = ({ iconOnly = false }) => {
   const themeContext = useTheme();
-  const theme = themeContext?.theme || 'light';
   
-  const toggleTheme = () => {
-    if (themeContext?.setTheme) {
-      // Cycle through themes: light -> dark -> system -> pastel -> light
-      const themeOrder: Theme[] = ['light', 'dark', 'system', 'pastel'];
-      const currentIndex = themeOrder.indexOf(theme as Theme);
-      const nextIndex = (currentIndex + 1) % themeOrder.length;
-      const newTheme = themeOrder[nextIndex];
-      themeContext.setTheme(newTheme);
-    }
-  };
-  
-  // Determine the current theme state for displaying the correct icon
-  const getThemeIcon = () => {
-    if (theme === 'system') {
-      return <Laptop className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
-    }
-    
-    if (theme === 'light') {
-      return <Sun className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
-    }
-    
-    if (theme === 'dark') {
-      return <Moon className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
-    }
-    
-    if (theme === 'pastel') {
-      return <Palette className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
-    }
-    
-    // Default fallback
-    return <Sun className={`h-5 w-5 ${!collapsed ? 'mr-2' : ''}`} />;
-  };
-  
-  // Get label text based on current theme
-  const getThemeLabel = () => {
-    switch (theme) {
-      case 'light': 
-        return 'Mode sombre';
-      case 'dark': 
-        return 'Mode système';
-      case 'system': 
-        return 'Mode pastel';
-      case 'pastel': 
-        return 'Mode clair';
-      default: 
-        return 'Changer de thème';
-    }
-  };
-  
-  if (collapsed) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-full h-10"
-            onClick={toggleTheme}
-            aria-label="Changer de thème"
-          >
-            {getThemeIcon()}
-            <span className="sr-only">Changer de thème</span>
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          {getThemeLabel()}
-        </TooltipContent>
-      </Tooltip>
-    );
+  if (!themeContext) {
+    return null;
   }
   
+  const { theme, setTheme } = themeContext;
+  
+  const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
+    { value: 'light', label: 'Clair', icon: <Sun size={16} /> },
+    { value: 'dark', label: 'Sombre', icon: <Moon size={16} /> },
+    { value: 'system', label: 'Système', icon: <Laptop size={16} /> },
+    { value: 'pastel', label: 'Pastel', icon: <Palette size={16} /> },
+  ];
+  
+  const currentTheme = themes.find(t => t.value === theme) || themes[0];
+  
   return (
-    <Button
-      variant="ghost"
-      className="w-full justify-start px-3"
-      onClick={toggleTheme}
-      aria-label="Changer de thème"
-    >
-      {getThemeIcon()}
-      <span>{getThemeLabel()}</span>
-    </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size={iconOnly ? "icon" : "sm"}
+          className="w-full justify-start"
+        >
+          {currentTheme.icon}
+          {!iconOnly && (
+            <span className="ml-2">{currentTheme.label}</span>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {themes.map((item) => (
+          <DropdownMenuItem
+            key={item.value}
+            onClick={() => setTheme(item.value)}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            {item.icon}
+            <span>{item.label}</span>
+            {theme === item.value && (
+              <span className="ml-auto text-xs text-green-500">✓</span>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

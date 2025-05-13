@@ -9,6 +9,7 @@ export interface Challenge {
   category: string;
   points: number;
   deadline?: string;
+  status?: 'active' | 'completed' | 'expired';
 }
 
 export interface Badge {
@@ -26,4 +27,15 @@ export interface GamificationStats {
   badges: Badge[];
   challengesCompleted: number;
   streak: number;
+  
+  // Add missing properties based on GamificationDashboard usage
+  currentLevel: number;
+  totalPoints: number;
+  pointsToNextLevel: number;
+  progressToNextLevel: number;
+  badgesCount: number;
+  streakDays: number;
+  lastActivityDate: string;
+  activeChallenges: number;
+  completedChallenges: number;
 }
