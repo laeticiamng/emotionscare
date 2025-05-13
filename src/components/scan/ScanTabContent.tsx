@@ -1,66 +1,21 @@
-
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import EmotionScanForm from '@/components/scan/EmotionScanForm';
-import EmotionScanLive from '@/components/scan/EmotionScanLive';
-import { useScanPage } from '@/hooks/useScanPage';
-import EmotionHistory from './EmotionHistory';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import EmotionScanForm from './EmotionScanForm';
 
-interface ScanTabContentProps {
-  userId: string;
-  showScanForm: boolean;
-  setShowScanForm: (show: boolean) => void;
-  handleScanSaved: () => void;
-  onResultSaved: () => Promise<void>;
-}
-
-const ScanTabContent: React.FC<ScanTabContentProps> = ({
-  userId,
-  showScanForm,
-  setShowScanForm,
-  handleScanSaved,
-  onResultSaved
+const ScanTabContent: React.FC<{ onScanSaved: () => void, onClose: () => void }> = ({ 
+  onScanSaved, 
+  onClose 
 }) => {
-  const { emotions, isLoading, error, refreshEmotions } = useScanPage();
-  const [showLiveScan, setShowLiveScan] = useState(false);
-  const { user } = useAuth();
-  
+  const { user } = useAuth(); // Import and use the Auth context to get the user
+
   return (
-    <div className="space-y-4">
-      {showScanForm ? (
-        <EmotionScanForm 
-          onScanSaved={handleScanSaved}
-          onClose={() => setShowScanForm(false)}
-          userId={userId || user?.id}
-        />
-      ) : showLiveScan ? (
-        <EmotionScanLive 
-          userId={userId}
-          onScanComplete={() => setShowLiveScan(false)}
-          onResultSaved={onResultSaved}
-        />
-      ) : (
-        <div className="space-y-6">
-          <div className="flex justify-end">
-            <Button 
-              onClick={() => setShowLiveScan(true)} 
-              className="flex items-center gap-2"
-            >
-              <PlusCircle className="h-4 w-4" />
-              Nouveau scan
-            </Button>
-          </div>
-          <EmotionHistory 
-            emotions={emotions} 
-            isLoading={isLoading} 
-            error={error} 
-            onRefresh={refreshEmotions}
-          />
-        </div>
-      )}
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Pass the required userId prop */}
+      <EmotionScanForm 
+        userId={user?.id || ''} 
+        onScanSaved={onScanSaved} 
+        onClose={onClose} 
+      />
     </div>
   );
 };

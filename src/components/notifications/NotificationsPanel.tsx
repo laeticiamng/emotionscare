@@ -1,150 +1,126 @@
-
-import React from 'react';
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from '@/components/ui/popover';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Bell } from 'lucide-react';
-import { 
-  useNotifications, 
-  NotificationFilter 
-} from '@/hooks/useNotifications';
-import NotificationItem from './NotificationItem';
-import NotificationBadge from './NotificationBadge';
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNotifications } from '@/hooks/useNotifications';
+import { useAuth } from '@/contexts/AuthContext';
+import { Notification } from '@/types';
+import { CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useNotificationBadge } from '@/hooks/useNotificationBadge';
 
-const NotificationsPanel: React.FC = () => {
-  const {
-    notifications,
-    isLoading,
-    filter,
-    setFilter,
-    markAsRead,
-    markAllAsRead
-  } = useNotifications();
-  
-  const { count, unreadCount } = useNotificationBadge();
-  
-  const handleFilterChange = (value: string) => {
-    setFilter(value as NotificationFilter);
+const NotificationsPanel = () => {
+  const { notifications, markAsRead, clearAll } = useNotifications();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const badge = useNotificationBadge();
+
+  useEffect(() => {
+    // Update unread count based on count property if unreadCount is missing
+    if (badge && badge.count > 0 && badge.unreadCount === undefined) {
+      // Use count as fallback for unreadCount
+      const unreadCountValue = badge.count;
+      // Do whatever you need with unreadCountValue
+    }
+    
+    if (notifications && badge) {
+      const unread = notifications.filter(n => !n.read).length;
+      badge.setUnreadCount?.(unread);
+    }
+  }, [notifications, badge]);
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    setLoading(true);
+    try {
+      await markAsRead(notificationId);
+    } finally {
+      setLoading(false);
+    }
   };
-  
+
+  const handleClearAll = async () => {
+    setLoading(true);
+    try {
+      await clearAll();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'success':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-500" />;
+    }
+  };
+
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative"
-          aria-label="Afficher les notifications"
-        >
-          <Bell className="h-5 w-5" />
-          {count > 0 && (
-            <NotificationBadge 
-              count={count}
-              className="absolute -top-1 -right-1"
-            />
-          )}
+    <Card className="w-full max-w-md">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">Notifications</CardTitle>
+        <Button variant="ghost" size="sm" onClick={handleClearAll} disabled={loading}>
+          Marquer tout comme lu
         </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className="w-[340px] max-h-[70vh] p-0 overflow-hidden flex flex-col" 
-        align="end"
-        side="bottom"
-        sideOffset={8}
-      >
-        <div className="flex items-center justify-between p-3 border-b">
-          <h2 className="text-sm font-semibold">Notifications</h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={markAllAsRead}
-            disabled={count === 0}
-          >
-            Tout marquer comme lu
-          </Button>
-        </div>
-        
-        <Tabs 
-          value={filter} 
-          onValueChange={handleFilterChange} 
-          className="w-full"
-        >
-          <div className="border-b px-2">
-            <TabsList className="w-full h-auto py-1 bg-transparent gap-1">
-              <TabsTrigger 
-                value="all" 
-                className="text-xs h-7 data-[state=active]:bg-muted"
+      </CardHeader>
+      <CardContent className="p-0">
+        <ScrollArea className="h-[300px] w-full">
+          {notifications && notifications.length > 0 ? (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className="flex items-start space-x-4 p-4 border-b last:border-b-0"
               >
-                Tout
-              </TabsTrigger>
-              <TabsTrigger 
-                value="unread" 
-                className="text-xs h-7 data-[state=active]:bg-muted"
-              >
-                Non lus ({count})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="invitation" 
-                className="text-xs h-7 data-[state=active]:bg-muted"
-              >
-                Invitations
-              </TabsTrigger>
-              <TabsTrigger 
-                value="reminder" 
-                className="text-xs h-7 data-[state=active]:bg-muted"
-              >
-                Rappels
-              </TabsTrigger>
-              <TabsTrigger 
-                value="system" 
-                className="text-xs h-7 data-[state=active]:bg-muted"
-              >
-                Système
-              </TabsTrigger>
-            </TabsList>
-          </div>
-          
-          {Object.entries({
-            all: 'Toutes les notifications',
-            unread: 'Notifications non lues',
-            invitation: 'Invitations',
-            reminder: 'Rappels',
-            system: 'Notifications système'
-          }).map(([key, title]) => (
-            <TabsContent 
-              key={key} 
-              value={key}
-              className="overflow-y-auto max-h-[400px] focus:outline-none"
-              aria-live="polite"
-            >
-              {isLoading ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  Chargement...
+                {getIcon(notification.type)}
+                <div className="flex-1">
+                  <div className="text-sm font-medium">{notification.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {notification.message}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(notification.timestamp), {
+                      addSuffix: true,
+                      locale: fr,
+                    })}
+                  </div>
                 </div>
-              ) : notifications.length === 0 ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  Aucune notification {key !== 'all' ? 'dans cette catégorie' : ''}
-                </div>
-              ) : (
-                <div className="divide-y">
-                  {notifications.map(notification => (
-                    <NotificationItem
-                      key={notification.id}
-                      notification={notification}
-                      onRead={markAsRead}
-                    />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
-      </PopoverContent>
-    </Popover>
+                {!notification.read && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleMarkAsRead(notification.id)}
+                    disabled={loading}
+                  >
+                    <span className="sr-only">Marquer comme lu</span>
+                    <CheckCircle className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              Aucune notification pour le moment.
+            </div>
+          )}
+        </ScrollArea>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <p className="text-xs text-muted-foreground">
+          {notifications ? notifications.length : 0} Notifications
+        </p>
+        {user && (
+          <p className="text-xs text-muted-foreground">
+            Connecté en tant que {user.email}
+          </p>
+        )}
+      </CardFooter>
+    </Card>
   );
 };
 

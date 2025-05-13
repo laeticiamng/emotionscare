@@ -1,90 +1,44 @@
 
-import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types/gamification';
-import { getBadgesForUser, getAllBadges } from './gamification/badge-service';
-import { getChallengesForUser, getAllChallenges } from './gamification/challenge-service';
-import { getUserStats } from './gamification/stats-service';
+import { Badge, Challenge } from '@/types/gamification';
+import { getBadges } from './gamification/badge-service';
+import { getChallenges } from './gamification/challenge-service';
+import { getGamificationStats } from './gamification/stats-service';
+import { Emotion, EmotionResult } from '@/types/emotion';
 
-// Add the missing completeChallenge function
-export const completeChallenge = async (
-  userId: string,
-  challengeId: string
-): Promise<Challenge | null> => {
-  try {
-    console.log(`Completing challenge ${challengeId} for user ${userId}`);
-    
-    // In a real implementation, this would make an API call to update the challenge status
-    // For now, we'll simulate a successful completion
-    
-    // Fetch the current challenge to update it
-    const challenges = await getChallengesForUser(userId);
-    const challenge = challenges.find(c => c.id === challengeId);
-    
-    if (!challenge) {
-      console.error(`Challenge ${challengeId} not found for user ${userId}`);
-      return null;
-    }
-    
-    // Update challenge status to completed
-    const updatedChallenge: Challenge = {
-      ...challenge,
-      status: 'completed',
-      progress: 100
-    };
-    
-    console.log(`Challenge ${challengeId} marked as completed`);
-    
-    // In a real implementation, we would persist this change
-    
-    return updatedChallenge;
-  } catch (error) {
-    console.error('Error completing challenge:', error);
-    return null;
-  }
+// Re-export functions from gamification modules
+export {
+  getBadges,
+  getChallenges,
+  getGamificationStats
 };
 
-// Export existing functions
-export { 
-  getBadgesForUser, 
-  getAllBadges, 
-  getChallengesForUser, 
-  getAllChallenges,
-  getUserStats 
+// Define missing functions
+export const getBadgesForUser = getBadges;
+export const getAllBadges = async (): Promise<Badge[]> => {
+  // This would normally fetch all available badges
+  return getBadges('system');
 };
 
-// Add missing updateChallenge function
-export const updateChallenge = async (
-  userId: string,
-  challengeId: string,
-  updates: Partial<Challenge>
-): Promise<Challenge | null> => {
-  try {
-    console.log(`Updating challenge ${challengeId} for user ${userId}`, updates);
-    
-    // In a real implementation, this would make an API call to update the challenge
-    // For now, we'll simulate a successful update
-    
-    // Fetch the current challenge to update it
-    const challenges = await getChallengesForUser(userId);
-    const challenge = challenges.find(c => c.id === challengeId);
-    
-    if (!challenge) {
-      console.error(`Challenge ${challengeId} not found for user ${userId}`);
-      return null;
-    }
-    
-    // Update challenge with new values
-    const updatedChallenge: Challenge = {
-      ...challenge,
-      ...updates
-    };
-    
-    console.log(`Challenge ${challengeId} updated successfully`);
-    
-    // In a real implementation, we would persist this change
-    
-    return updatedChallenge;
-  } catch (error) {
-    console.error('Error updating challenge:', error);
-    return null;
-  }
+export const getChallengesForUser = getChallenges;
+export const getAllChallenges = async (): Promise<Challenge[]> => {
+  // This would normally fetch all available challenges
+  return getChallenges('system');
+};
+
+export const getUserStats = getGamificationStats;
+
+export const processEmotionForBadges = async (
+  userId: string, 
+  emotionResult: EmotionResult
+): Promise<Badge[]> => {
+  // Mock implementation that would process an emotion and return any badges earned
+  console.log(`Processing emotion ${emotionResult.emotion || emotionResult.dominantEmotion?.name} for user ${userId}`);
+  
+  // Return empty array for now - no badges earned
+  return [];
+};
+
+export const completeChallenge = async (challengeId: string): Promise<boolean> => {
+  console.log(`Completing challenge ${challengeId}`);
+  return true;
 };

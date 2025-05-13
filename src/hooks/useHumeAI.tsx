@@ -1,9 +1,8 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult, Emotion } from '@/types/emotion';
 
-export const useHumeAI = () => {
+export function useHumeAI() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isError, setIsError] = useState(false);
   const [result, setResult] = useState<EmotionResult | null>(null);
@@ -68,11 +67,21 @@ export const useHumeAI = () => {
     }
   }, [toast]);
   
+  const processEmotions = useCallback((faceData: any): Emotion[] => {
+    // Mock emotions data with properly typed confidence
+    return [
+      { name: 'happiness', intensity: 0.8, score: 0.8 },
+      { name: 'sadness', intensity: 0.2, score: 0.2 },
+      { name: 'anger', intensity: 0.1, score: 0.1 }
+    ];
+  }, []);
+  
   return {
     isProcessing,
     isError,
     result,
-    processFacialExpression
+    processFacialExpression,
+    processEmotions
   };
 };
 

@@ -6,7 +6,8 @@ export const analyzeTextForEmotion = async (text: string): Promise<EmotionResult
   // In a real app, this would be an API call to an ML model
   if (!text) {
     return {
-      emotion: "neutral",
+      emotions: [{ name: "neutral", intensity: 0.5, score: 50 }],
+      dominantEmotion: { name: "neutral", intensity: 0.5, score: 50 },
       score: 50,
       confidence: 0.6,
       text: text
@@ -60,16 +61,18 @@ export const analyzeTextForEmotion = async (text: string): Promise<EmotionResult
   // Calculate a mock score based on keyword count (between 0 and 100)
   const score = Math.min(maxCount * 20 + 50, 100);
   
+  const emotions = [
+    { name: primaryEmotion, intensity: score / 100, score: score },
+    { name: "neutral", intensity: 0.2, score: 20 }
+  ];
+  
   const result: EmotionResult = {
-    emotion: primaryEmotion,
+    emotions,
+    dominantEmotion: { name: primaryEmotion, intensity: score / 100, score: score },
     score: score,
     confidence: 0.7,
     text: text,
-    primaryEmotion: {
-      name: primaryEmotion,
-      intensity: score / 100,
-      score: score  // Added to match the expected type
-    }
+    emotion: primaryEmotion // For backward compatibility
   };
 
   return result;
@@ -88,16 +91,18 @@ export const analyzeAudioForEmotion = async (audioUrl: string): Promise<EmotionR
   // Random score between 50 and 95
   const randomScore = Math.floor(Math.random() * 45) + 50;
   
+  const emotionItems = [
+    { name: randomEmotion, intensity: randomScore / 100, score: randomScore },
+    { name: "neutral", intensity: 0.2, score: 20 }
+  ];
+  
   const result: EmotionResult = {
-    emotion: randomEmotion,
+    emotions: emotionItems,
+    dominantEmotion: { name: randomEmotion, intensity: randomScore / 100, score: randomScore },
     score: randomScore,
     confidence: 0.65,
-    audio_url: audioUrl, // Added audio_url
-    primaryEmotion: {
-      name: randomEmotion,
-      intensity: randomScore / 100,
-      score: randomScore  // Added to match the expected type
-    }
+    audio_url: audioUrl,
+    emotion: randomEmotion // For backward compatibility
   };
   
   return result;

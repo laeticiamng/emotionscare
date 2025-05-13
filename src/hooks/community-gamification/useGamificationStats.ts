@@ -1,66 +1,71 @@
 
 import { useState, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { GamificationStats } from './types';
-import { generateMockGamificationStats } from './mockData';
-import { Challenge } from '@/types/gamification';
+import { Badge, Challenge, GamificationStats } from '@/types/gamification';
 
-/**
- * Hook to manage gamification stats
- */
-export function useGamificationStats() {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<GamificationStats | null>(null);
+export const useGamificationStats = () => {
+  const [stats, setStats] = useState<GamificationStats>({
+    points: 0,
+    level: 1,
+    nextLevelPoints: 100,
+    badges: [],
+    completedChallenges: 0,
+    activeChallenges: 0,
+    streakDays: 0,
+    progressToNextLevel: 0,
+    challenges: [],
+    recentAchievements: []
+  });
+  
   const [isLoading, setIsLoading] = useState(false);
-
-  /**
-   * Load gamification stats for the current user
-   */
+  
   const loadGamificationStats = useCallback(async () => {
-    if (!user) return;
-    
     setIsLoading(true);
-    
     try {
-      // In a real implementation, we would load this data from the database
-      // For this demo, we're simulating data
-      const mockStats = generateMockGamificationStats(user.id);
+      // Mock data loading
+      const mockStats: GamificationStats = {
+        points: 450,
+        level: 3,
+        nextLevelPoints: 600,
+        badges: [],
+        completedChallenges: 7,
+        activeChallenges: 3,
+        streakDays: 5,
+        progressToNextLevel: 75,
+        totalPoints: 450,
+        currentLevel: 3,
+        badgesCount: 5,
+        pointsToNextLevel: 150,
+        lastActivityDate: new Date().toISOString(),
+        challenges: [],
+        recentAchievements: []
+      };
+      
       setStats(mockStats);
     } catch (error) {
-      console.error("Erreur lors du chargement des statistiques:", error);
+      console.error('Error loading gamification stats:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
-
-  /**
-   * Update stats when a challenge is completed
-   */
+  }, []);
+  
   const updateStatsForCompletedChallenge = useCallback((challengeId: string, challenges: Challenge[]) => {
-    if (!stats) return;
-
+    // Find the challenge in the list
     const challenge = challenges.find(c => c.id === challengeId);
-    const points = challenge?.points || 50;
     
-    const newAchievement = {
-      type: 'challenge' as const,
-      id: challengeId,
-      name: challenge?.name || 'Défi complété',
-      timestamp: new Date(),
-      points
-    };
+    if (!challenge) return;
     
-    setStats({
-      ...stats,
-      points: stats.points + points,
-      recentAchievements: [newAchievement, ...stats.recentAchievements]
-    });
-  }, [stats]);
-
+    setStats(prevStats => ({
+      ...prevStats,
+      completedChallenges: prevStats.completedChallenges + 1,
+      points: prevStats.points + (challenge.points || 0),
+      totalPoints: (prevStats.totalPoints || prevStats.points) + (challenge.points || 0)
+    }));
+  }, []);
+  
   return {
     stats,
     isLoading,
     loadGamificationStats,
     updateStatsForCompletedChallenge
   };
-}
+};

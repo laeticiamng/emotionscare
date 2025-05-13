@@ -8,16 +8,19 @@ export const getGamificationStats = async (userId: string): Promise<Gamification
     points: 450,
     nextLevelPoints: 600,
     badges: [],
-    challengesCompleted: 7,
-    streak: 5,
+    completedChallenges: 7,
+    activeChallenges: 3,
+    streakDays: 5,
+    progressToNextLevel: 75,
     currentLevel: 3,
     totalPoints: 450,
     pointsToNextLevel: 150,
-    progressToNextLevel: 75,
     badgesCount: 5,
-    streakDays: 5,
     lastActivityDate: new Date().toISOString(),
-    activeChallenges: 3,
-    completedChallenges: 7
+    challenges: [],
+    recentAchievements: []
   };
 };
+
+// Added this function
+export const getUserStats = getGamificationStats;

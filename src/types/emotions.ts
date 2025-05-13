@@ -1,5 +1,5 @@
 
-export interface Emotion {
+export interface EmotionRecord {
   id: string;
   user_id: string;
   date: string;
@@ -16,7 +16,7 @@ export interface Emotion {
   ai_feedback?: string;
 }
 
-export interface EmotionResult {
+export interface EmotionResultRecord {
   emotion: string;
   score: number;
   text?: string;

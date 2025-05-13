@@ -1,66 +1,67 @@
 
+import { EmotionRecord, EmotionResultRecord } from '@/types/emotions';
 import { Emotion, EmotionPrediction } from '@/types/emotion';
 import { v4 as uuidv4 } from 'uuid';
 
 // Mock database of emotions
-let emotions: Emotion[] = [];
+let emotionRecords: EmotionRecord[] = [];
 
 // Get all emotions for a user
-export const getEmotionsForUser = async (userId: string): Promise<Emotion[]> => {
-  return emotions.filter(e => e.user_id === userId);
+export const getEmotionsForUser = async (userId: string): Promise<EmotionRecord[]> => {
+  return emotionRecords.filter(e => e.user_id === userId);
 };
 
 // Get a specific emotion by ID
-export const getEmotion = async (emotionId: string): Promise<Emotion | null> => {
-  return emotions.find(e => e.id === emotionId) || null;
+export const getEmotion = async (emotionId: string): Promise<EmotionRecord | null> => {
+  return emotionRecords.find(e => e.id === emotionId) || null;
 };
 
 // Add a new emotion record
 export const recordEmotion = async (
   userId: string,
-  emotionData: Partial<Emotion>
-): Promise<Emotion> => {
+  emotionData: Partial<EmotionRecord>
+): Promise<EmotionRecord> => {
   const now = new Date().toISOString();
   
-  const newEmotion: Emotion = {
+  const newEmotion: EmotionRecord = {
     id: uuidv4(),
     user_id: userId,
     date: now,
     emotion: emotionData.emotion || 'neutral',
+    name: emotionData.name || emotionData.emotion || 'neutral',
     score: emotionData.score !== undefined ? emotionData.score : 50,
     created_at: now,
-    ...emotionData,
-    source: emotionData.source || 'manual' // Source property is now supported
+    ...emotionData
   };
   
-  emotions.push(newEmotion);
+  emotionRecords.push(newEmotion);
   return newEmotion;
 };
 
 // Delete an emotion record
 export const deleteEmotion = async (emotionId: string): Promise<boolean> => {
-  const initialLength = emotions.length;
-  emotions = emotions.filter(e => e.id !== emotionId);
-  return emotions.length < initialLength;
+  const initialLength = emotionRecords.length;
+  emotionRecords = emotionRecords.filter(e => e.id !== emotionId);
+  return emotionRecords.length < initialLength;
 };
 
 // Update an emotion record
 export const updateEmotion = async (
   emotionId: string,
-  updates: Partial<Emotion>
-): Promise<Emotion | null> => {
-  const index = emotions.findIndex(e => e.id === emotionId);
+  updates: Partial<EmotionRecord>
+): Promise<EmotionRecord | null> => {
+  const index = emotionRecords.findIndex(e => e.id === emotionId);
   
   if (index === -1) {
     return null;
   }
   
-  const updatedEmotion: Emotion = {
-    ...emotions[index],
+  const updatedEmotion: EmotionRecord = {
+    ...emotionRecords[index],
     ...updates,
   };
   
-  emotions[index] = updatedEmotion;
+  emotionRecords[index] = updatedEmotion;
   return updatedEmotion;
 };
 
@@ -69,8 +70,8 @@ export const getEmotionsInDateRange = async (
   userId: string,
   startDate: Date,
   endDate: Date
-): Promise<Emotion[]> => {
-  return emotions.filter(e => {
+): Promise<EmotionRecord[]> => {
+  return emotionRecords.filter(e => {
     const emotionDate = new Date(e.date);
     return (
       e.user_id === userId &&
@@ -97,7 +98,7 @@ export const predictEmotion = async (
   
   if (userEmotions.length === 0) {
     return {
-      predictedEmotion: 'neutral',
+      emotion: 'neutral',
       probability: 0.5,
       triggers: ['Not enough data'],
       recommendations: ['Record more emotions to improve predictions']
@@ -125,7 +126,7 @@ export const predictEmotion = async (
   const probability = maxCount / userEmotions.length;
   
   return {
-    predictedEmotion: mostCommonEmotion,
+    emotion: mostCommonEmotion,
     probability,
     triggers: ['Historical pattern', context.activity || 'Current activity'],
     recommendations: [
@@ -160,36 +161,33 @@ export const saveScannedEmotion = async (
     text?: string;
     audio_url?: string;
     emojis?: string;
-    primaryEmotion?: {
-      name: string;
-      intensity?: number;
-      score?: number;
-    };
+    name?: string;
+    intensity?: number;
   }
-): Promise<Emotion> => {
+): Promise<EmotionRecord> => {
   const now = new Date().toISOString();
   
-  const newEmotion: Emotion = {
+  const newEmotion: EmotionRecord = {
     id: uuidv4(),
     user_id: userId,
     date: now,
     emotion: emotionData.emotion,
+    name: emotionData.name || emotionData.emotion,
     score: emotionData.score,
     text: emotionData.text,
     audio_url: emotionData.audio_url,
     emojis: emotionData.emojis,
     confidence: emotionData.confidence,
-    created_at: now,
-    primaryEmotion: emotionData.primaryEmotion,
-    source: emotionData.source // Source property is now supported
+    intensity: emotionData.intensity,
+    source: emotionData.source
   };
   
-  emotions.push(newEmotion);
+  emotionRecords.push(newEmotion);
   return newEmotion;
 };
 
 // Generate mock AI feedback for an emotion
-export const generateAIFeedback = async (emotion: Partial<Emotion>): Promise<string> => {
+export const generateAIFeedback = async (emotion: Partial<EmotionRecord>): Promise<string> => {
   // In a real app, this would call a language model API
   const feedbackTemplates: Record<string, string[]> = {
     happy: [
@@ -214,7 +212,7 @@ export const generateAIFeedback = async (emotion: Partial<Emotion>): Promise<str
     ]
   };
   
-  const emotionType = emotion.emotion?.toLowerCase() || 'neutral';
+  const emotionType = emotion.name?.toLowerCase() || emotion.emotion?.toLowerCase() || 'neutral';
   const templates = feedbackTemplates[emotionType] || feedbackTemplates.neutral;
   const randomIndex = Math.floor(Math.random() * templates.length);
   
@@ -222,7 +220,7 @@ export const generateAIFeedback = async (emotion: Partial<Emotion>): Promise<str
 };
 
 // Update an emotion with AI feedback
-export const addAIFeedbackToEmotion = async (emotionId: string): Promise<Emotion | null> => {
+export const addAIFeedbackToEmotion = async (emotionId: string): Promise<EmotionRecord | null> => {
   const emotion = await getEmotion(emotionId);
   
   if (!emotion) {

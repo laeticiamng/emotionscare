@@ -6,25 +6,27 @@ export const getChallenges = async (userId: string): Promise<Challenge[]> => {
   return [
     {
       id: '1',
+      name: 'Journal quotidien',
       title: 'Journal quotidien',
       description: 'Enregistrer une émotion chaque jour pendant 7 jours',
       type: 'streak',
-      completed: false,
+      points: 50,
+      status: 'active',
       progress: 3,
       category: 'daily',
-      points: 50,
-      status: 'active'
+      completed: false
     },
     {
       id: '2',
+      name: 'Méditation matinale',
       title: 'Méditation matinale',
       description: 'Compléter 5 sessions de méditation',
       type: 'completion',
-      completed: false,
+      points: 75,
+      status: 'active',
       progress: 2,
       category: 'mindfulness',
-      points: 75,
-      status: 'active'
+      completed: false
     }
   ];
 };

@@ -14,5 +14,7 @@ export interface Badge {
   icon_url?: string;
   total_required?: number;
   category?: string;
-  imageUrl?: string; // Add this to match what's used in the code
+  imageUrl?: string; 
+  image?: string; // Adding for backward compatibility
+  dateEarned?: string; // Adding for backward compatibility
 }

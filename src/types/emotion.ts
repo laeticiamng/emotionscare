@@ -2,8 +2,10 @@
 export interface Emotion {
   name: string;
   intensity?: number;
-  score?: number; // Added for compatibility
-  source?: string; // Added for compatibility
+  score?: number;
+  source?: string;
+  confidence?: number; // Adding confidence property
+  category?: string;
 }
 
 export interface EmotionResult {
@@ -15,10 +17,13 @@ export interface EmotionResult {
   userId?: string;
   id?: string;
   text?: string;
-  primaryEmotion?: string; // Added for compatibility
-  error?: string; // Added for compatibility
-  faceDetected?: boolean; // Added for compatibility
-  confidence?: number; // Added for compatibility
+  primaryEmotion?: string;
+  error?: string;
+  faceDetected?: boolean;
+  confidence?: number;
+  intensity?: number;
+  emotion?: string; // Adding for backward compatibility
+  audio_url?: string; // Adding for backward compatibility
 }
 
 export interface EmotionalStateEntry {
@@ -49,6 +54,8 @@ export interface EmotionPrediction {
   emotion: string;
   probability: number;
   triggers?: string[];
+  recommendations?: string[];
+  predictedEmotion?: string; // Adding for backward compatibility
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -60,7 +67,7 @@ export interface EnhancedEmotionResult extends EmotionResult {
 
 export interface TextEmotionScannerProps {
   onEmotionDetected?: (result: EmotionResult) => void;
-  text?: string; // Added for compatibility
+  text?: string;
   onTextChange?: (text: string) => void;
   onAnalyze?: () => void;
   isAnalyzing?: boolean;
@@ -80,4 +87,18 @@ export interface FacialEmotionScannerProps {
 
 export interface UnifiedEmotionCheckinProps {
   onScanComplete?: (result: EmotionResult) => void;
+}
+
+export interface EmotionalTeamViewProps {
+  userId?: string;
+  period?: string;
+  teamId?: string;
+  className?: string;
+  onRefresh?: () => Promise<void>;
+}
+
+export interface EmotionScanFormProps {
+  userId: string;
+  onScanSaved?: () => void;
+  onClose?: () => void;
 }

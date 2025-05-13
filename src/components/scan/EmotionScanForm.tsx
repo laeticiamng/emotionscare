@@ -1,91 +1,117 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import UnifiedEmotionCheckin from './UnifiedEmotionCheckin';
-import { EmotionResult } from '@/types/emotion';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useToast } from '@/hooks/use-toast';
+import { EmotionResult, EmotionScanFormProps } from '@/types/emotion';
 import { processEmotionForBadges } from '@/lib/gamificationService';
 import { useAuth } from '@/contexts/AuthContext';
+import TextEmotionScanner from './TextEmotionScanner';
+import VoiceEmotionAnalyzer from './VoiceEmotionAnalyzer';
+import FacialEmotionScanner from './FacialEmotionScanner';
 
-export interface EmotionScanFormProps {
-  onScanSaved: () => void;
-  onClose: () => void;
-  userId?: string;
-}
-
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ 
-  onScanSaved, 
-  onClose,
-  userId 
-}) => {
-  const { user } = useAuth();
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ userId, onScanSaved, onClose }) => {
+  const [activeTab, setActiveTab] = useState<'text' | 'voice' | 'face'>('text');
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-  const [detectedEmotion, setDetectedEmotion] = useState<EmotionResult | null>(null);
-  const actualUserId = userId || user?.id;
+  const { user } = useAuth();
   
-  const handleEmotionDetected = (emotion: EmotionResult) => {
-    setDetectedEmotion(emotion);
+  const handleEmotionDetected = (scanResult: EmotionResult) => {
+    setResult(scanResult);
   };
   
-  const handleSaveScan = async () => {
-    if (!detectedEmotion || !actualUserId) return;
+  const handleSave = async () => {
+    if (!result || !userId) return;
     
+    setIsSaving(true);
     try {
-      // In a real app, save the emotion to your database
-      console.log('Saving emotion:', detectedEmotion);
+      // Process the emotion for potential badges
+      const badges = await processEmotionForBadges(userId, result);
       
-      // Check if user earned any badges from this emotion recording
-      if (detectedEmotion.emotion) {
-        const earnedBadges = await processEmotionForBadges(
-          actualUserId, 
-          detectedEmotion.emotion, 
-          detectedEmotion.score || 0
-        );
-        
-        // Show badge earned notification if applicable
-        if (earnedBadges.length > 0) {
-          toast({
-            title: "Badge débloqué !",
-            description: `Vous avez gagné le badge "${earnedBadges[0].name}"`,
-          });
-        }
-      }
-      
+      // Show success message
       toast({
-        title: "Émotion enregistrée !",
-        description: "Votre état émotionnel a été enregistré avec succès.",
+        title: "Émotion enregistrée",
+        description: `${result.dominantEmotion?.name || result.emotion || 'Émotion'} détectée et enregistrée.`,
+        variant: "success"
       });
       
-      onScanSaved();
+      if (badges.length > 0) {
+        toast({
+          title: "Badge débloqué !",
+          description: `Vous avez débloqué ${badges.length} badge(s) !`,
+          variant: "success"
+        });
+      }
+      
+      if (onScanSaved) {
+        onScanSaved();
+      }
+      
+      if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error('Error saving emotion scan:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'enregistrer votre émotion. Veuillez réessayer.",
-        variant: "destructive",
+        description: "Impossible d'enregistrer l'émotion.",
+        variant: "destructive"
       });
+    } finally {
+      setIsSaving(false);
     }
   };
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Comment vous sentez-vous aujourd'hui ?</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <UnifiedEmotionCheckin onEmotionDetected={handleEmotionDetected} />
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onClose}>Annuler</Button>
-        <Button 
-          onClick={handleSaveScan}
-          disabled={!detectedEmotion}
-        >
-          Enregistrer
-        </Button>
-      </CardFooter>
+    <Card className="p-4">
+      <div className="space-y-4">
+        <div className="flex space-x-2">
+          <Button
+            variant={activeTab === 'text' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('text')}
+          >
+            Texte
+          </Button>
+          <Button
+            variant={activeTab === 'voice' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('voice')}
+          >
+            Voix
+          </Button>
+          <Button
+            variant={activeTab === 'face' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('face')}
+          >
+            Visage
+          </Button>
+        </div>
+        
+        {activeTab === 'text' && (
+          <TextEmotionScanner onEmotionDetected={handleEmotionDetected} />
+        )}
+        
+        {activeTab === 'voice' && (
+          <VoiceEmotionAnalyzer onEmotionDetected={handleEmotionDetected} />
+        )}
+        
+        {activeTab === 'face' && (
+          <FacialEmotionScanner onEmotionDetected={handleEmotionDetected} />
+        )}
+        
+        {result && (
+          <div className="mt-4 p-4 bg-muted rounded-md">
+            <h3 className="font-semibold mb-2">Résultat de l'analyse</h3>
+            <p>Émotion dominante: {result.dominantEmotion?.name || result.emotion}</p>
+            <p>Intensité: {result.dominantEmotion?.intensity || result.intensity || 0}</p>
+            <div className="mt-4 flex justify-end">
+              <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };

@@ -1,154 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EmotionResult } from '@/types/emotion';
-import FacialEmotionScanner from './FacialEmotionScanner';
+
+import React, { useState, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from '@/hooks/use-toast';
+import { EmotionResult, UnifiedEmotionCheckinProps } from '@/types/emotion';
 import TextEmotionScanner from './TextEmotionScanner';
-import EmotionSelector from '@/components/emotions/EmotionSelector';
-import { emotionColors, primaryEmotions } from '@/data/emotions';
-import EmojiEmotionScanner from './EmojiEmotionScanner';
 import VoiceEmotionAnalyzer from './VoiceEmotionAnalyzer';
-import { cn } from '@/lib/utils';
+import FacialEmotionScanner from './FacialEmotionScanner';
 
-interface UnifiedEmotionCheckinProps {
-  onEmotionDetected: (result: EmotionResult) => void;
-  onClose?: () => void;
-}
-
-const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({ onEmotionDetected, onClose }) => {
-  const [selectedEmotion, setSelectedEmotion] = useState<EmotionResult | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('emoji');
-
-  const handleEmotionResult = (result: EmotionResult) => {
-    // Convert intensity to score if needed
-    const finalResult: EmotionResult = {
-      ...result,
-      // Ensure we have a score even if only intensity was provided
-      score: result.score || result.intensity || 0.5
-    };
+const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({ onScanComplete }) => {
+  const [activeTab, setActiveTab] = useState<string>('text');
+  const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+  
+  const handleEmotionDetected = useCallback((result: EmotionResult) => {
+    setScanResult(result);
+  }, []);
+  
+  const handleSubmitScan = useCallback(async () => {
+    if (!scanResult) return;
     
-    setSelectedEmotion(finalResult);
-    onEmotionDetected(finalResult);
-    onClose?.();
-  };
-
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Comment vous sentez-vous ?</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="emoji" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="emoji">Emoji</TabsTrigger>
-            <TabsTrigger value="text">Texte</TabsTrigger>
-            <TabsTrigger value="voice">Voix</TabsTrigger>
-            <TabsTrigger value="face">Visage</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="emoji">
-            <EmojiTab onEmotionDetected={handleEmotionResult} />
-          </TabsContent>
-          
-          <TabsContent value="text">
-            <TextTab onEmotionDetected={handleEmotionResult} />
-          </TabsContent>
-          
-          <TabsContent value="voice">
-            <VoiceTab onEmotionDetected={handleEmotionResult} />
-          </TabsContent>
-          
-          <TabsContent value="face">
-            <FacialTab onEmotionDetected={handleEmotionResult} />
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
-};
-
-const TextTab: React.FC<{
-  onEmotionDetected: (result: EmotionResult) => void;
-}> = ({ onEmotionDetected }) => {
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Décrivez vos émotions en quelques mots pour obtenir une analyse.
-      </p>
+    setIsProcessing(true);
+    try {
+      // In a real app, this would save the scan to a database
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      <TextEmotionScanner onEmotionDetected={onEmotionDetected} />
-    </div>
-  );
-};
-
-const VoiceTab: React.FC<{
-  onEmotionDetected: (result: EmotionResult) => void;
-}> = ({ onEmotionDetected }) => {
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Enregistrez votre voix pour une analyse émotionnelle basée sur votre ton et votre discours.
-      </p>
-      
-      <VoiceEmotionAnalyzer onEmotionDetected={onEmotionDetected} />
-    </div>
-  );
-};
-
-const EmojiTab: React.FC<{
-  onEmotionDetected: (result: EmotionResult) => void;
-}> = ({ onEmotionDetected }) => {
-  const [selectedEmotion, setSelectedEmotion] = useState<string>('');
-  const [intensity, setIntensity] = useState<number>(0.5);
-
-  const handleSelectEmotion = (emotion: string, value: number) => {
-    setSelectedEmotion(emotion);
-    setIntensity(value);
-  };
-
-  const handleSubmit = () => {
-    if (selectedEmotion) {
-      onEmotionDetected({
-        emotion: selectedEmotion,
-        score: intensity,
-        intensity: intensity
+      // Show success toast
+      toast({
+        title: "Scan émotionnel complété",
+        description: `Vous vous sentez principalement ${scanResult.dominantEmotion?.name || scanResult.emotion} avec une intensité de ${scanResult.dominantEmotion?.intensity || scanResult.intensity || 0.5}/1.`,
+        variant: "success"
       });
+      
+      // Notify parent component if callback provided
+      if (onScanComplete) {
+        onScanComplete(scanResult);
+      }
+      
+      // Reset scan result
+      setScanResult(null);
+    } catch (error) {
+      console.error("Error processing emotion scan:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de traiter le scan émotionnel. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
     }
+  }, [scanResult, onScanComplete, toast]);
+  
+  const renderResultSection = () => {
+    if (!scanResult) return null;
+    
+    return (
+      <Card className="mt-6 bg-muted/40">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Résultat de votre scan</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="font-medium text-sm">Émotion principale:</div>
+            <div className="text-sm capitalize">
+              {scanResult.dominantEmotion?.name || scanResult.emotion || "Non détectée"}
+            </div>
+            
+            <div className="font-medium text-sm">Intensité:</div>
+            <div className="text-sm">
+              {typeof (scanResult.dominantEmotion?.intensity || scanResult.intensity) === 'number' 
+                ? `${Math.round((scanResult.dominantEmotion?.intensity || scanResult.intensity || 0) * 100)}%` 
+                : "N/A"}
+            </div>
+            
+            <div className="font-medium text-sm">Source:</div>
+            <div className="text-sm capitalize">
+              {scanResult.source || activeTab}
+            </div>
+          </div>
+          
+          <Button 
+            className="w-full mt-4" 
+            onClick={handleSubmitScan}
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Traitement..." : "Enregistrer ce scan"}
+          </Button>
+        </CardContent>
+      </Card>
+    );
   };
-
+  
   return (
     <div className="space-y-4">
-      <EmotionSelector 
-        selectedEmotion={selectedEmotion} 
-        onSelectEmotion={setSelectedEmotion}
-        emotions={primaryEmotions}
-        onSelect={handleSelectEmotion}
-      />
+      <Tabs defaultValue="text" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-3">
+          <TabsTrigger value="text">Texte</TabsTrigger>
+          <TabsTrigger value="voice">Voix</TabsTrigger>
+          <TabsTrigger value="face">Visage</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="text" className="mt-4">
+          <TextEmotionScanner onEmotionDetected={handleEmotionDetected} />
+        </TabsContent>
+        
+        <TabsContent value="voice" className="mt-4">
+          <VoiceEmotionAnalyzer onEmotionDetected={handleEmotionDetected} />
+        </TabsContent>
+        
+        <TabsContent value="face" className="mt-4">
+          <FacialEmotionScanner onEmotionDetected={handleEmotionDetected} />
+        </TabsContent>
+      </Tabs>
       
-      <div className="flex justify-end">
-        <Button 
-          onClick={handleSubmit} 
-          disabled={!selectedEmotion}
-        >
-          Enregistrer cette émotion
-        </Button>
-      </div>
-    </div>
-  );
-};
-
-const FacialTab: React.FC<{
-  onEmotionDetected: (result: EmotionResult) => void;
-}> = ({ onEmotionDetected }) => {
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Votre caméra analysera vos expressions faciales pour déterminer votre état émotionnel.
-        Nous respectons votre vie privée - les images ne sont pas stockées.
-      </p>
-      
-      <FacialEmotionScanner onEmotionDetected={onEmotionDetected} />
+      {renderResultSection()}
     </div>
   );
 };
