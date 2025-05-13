@@ -1,15 +1,25 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, BookOpen, Music, Scan, MessageCircle, Glasses, Trophy, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import ConfirmationModal from '@/components/ui/confirmation-modal';
 
 const B2BUserNavBar: React.FC = () => {
   const location = useLocation();
+  const { logout } = useAuth();
+  const [showConfirm, setShowConfirm] = useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+  
+  const handleLogout = async () => {
+    await logout();
+    setShowConfirm(false);
+    window.location.href = '/b2b/user/login';
   };
   
   return (
@@ -22,6 +32,22 @@ const B2BUserNavBar: React.FC = () => {
       <NavItem to="/b2b/user/vr" isActive={isActive('/b2b/user/vr')} icon={<Glasses className="h-5 w-5" />} label="VR" />
       <NavItem to="/b2b/user/gamification" isActive={isActive('/b2b/user/gamification')} icon={<Trophy className="h-5 w-5" />} label="Défis" />
       <NavItem to="/b2b/user/preferences" isActive={isActive('/b2b/user/preferences')} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
+      
+      <button 
+        onClick={() => setShowConfirm(true)}
+        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 transition-all mt-auto"
+      >
+        Déconnexion
+      </button>
+      
+      <ConfirmationModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleLogout}
+        message="Êtes-vous sûr de vouloir vous déconnecter ?"
+        confirmText="Oui"
+        cancelText="Annuler"
+      />
     </nav>
   );
 };

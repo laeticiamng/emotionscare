@@ -1,27 +1,25 @@
 
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
-import { AudioProvider } from "@/contexts/AudioContext";
-import { Toaster } from "@/components/ui/toaster";
-import AppRouter from "./AppRouter";
-import { LayoutProvider } from "./contexts/LayoutContext";
-import { SidebarProvider } from "./contexts/SidebarContext";
-import { MusicProvider } from "./contexts/MusicContext";
+import React, { useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
+import { useTheme } from './contexts/ThemeContext';
+import './styles/modals.css';
 
-function App() {
+const App: React.FC = () => {
+  const { theme } = useTheme();
+
+  // Apply dark class to document based on theme
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   return (
-    <ThemeProvider>
-      <LayoutProvider>
-        <SidebarProvider>
-          <MusicProvider>
-            <AudioProvider>
-              <AppRouter />
-              <Toaster />
-            </AudioProvider>
-          </MusicProvider>
-        </SidebarProvider>
-      </LayoutProvider>
-    </ThemeProvider>
+    <RouterProvider router={router} />
   );
-}
+};
 
 export default App;

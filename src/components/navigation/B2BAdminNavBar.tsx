@@ -1,15 +1,25 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LayoutDashboard, Users, FileBarChart, Calendar, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import ConfirmationModal from '@/components/ui/confirmation-modal';
 
 const B2BAdminNavBar: React.FC = () => {
   const location = useLocation();
+  const { logout } = useAuth();
+  const [showConfirm, setShowConfirm] = useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+  
+  const handleLogout = async () => {
+    await logout();
+    setShowConfirm(false);
+    window.location.href = '/b2b/admin/login';
   };
   
   return (
@@ -19,6 +29,22 @@ const B2BAdminNavBar: React.FC = () => {
       <NavItem to="/b2b/admin/reports" isActive={isActive('/b2b/admin/reports')} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
       <NavItem to="/b2b/admin/events" isActive={isActive('/b2b/admin/events')} icon={<Calendar className="h-5 w-5" />} label="Événements" />
       <NavItem to="/b2b/admin/settings" isActive={isActive('/b2b/admin/settings')} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
+      
+      <button 
+        onClick={() => setShowConfirm(true)}
+        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-red-300 hover:bg-red-900/30 transition-all mt-auto"
+      >
+        Déconnexion
+      </button>
+      
+      <ConfirmationModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleLogout}
+        message="Êtes-vous sûr de vouloir vous déconnecter ?"
+        confirmText="Oui"
+        cancelText="Annuler"
+      />
     </nav>
   );
 };

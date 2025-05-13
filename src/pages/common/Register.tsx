@@ -3,16 +3,16 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 
 interface RegisterProps {
-  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  role?: 'b2c' | 'b2b_user' | 'b2b_admin';
 }
 
-const Register: React.FC<RegisterProps> = ({ role }) => {
+const Register: React.FC<RegisterProps> = ({ role = 'b2c' }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,37 +21,29 @@ const Register: React.FC<RegisterProps> = ({ role }) => {
   const [passwordError, setPasswordError] = useState('');
   
   const navigate = useNavigate();
-  const { register, error: authError } = useAuth();
+  const { register, error: authError, clearError } = useAuth();
   
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'b2c':
-        return 'Particulier';
-      case 'b2b_user':
-        return 'Collaborateur';
-      case 'b2b_admin':
-        return 'RH/Administration';
-      default:
-        return '';
+  const getRoleName = () => {
+    switch(role) {
+      case 'b2b_admin': return 'Administrateur';
+      case 'b2b_user': return 'Collaborateur';
+      case 'b2c': default: return 'Particulier';
     }
   };
   
-  const getDashboardPath = (role: string) => {
-    switch (role) {
-      case 'b2c':
-        return '/b2c/dashboard';
-      case 'b2b_user':
-        return '/b2b/user/dashboard';
-      case 'b2b_admin':
-        return '/b2b/admin/dashboard';
-      default:
-        return '/dashboard';
+  const getRedirectPath = () => {
+    switch(role) {
+      case 'b2b_admin': return '/b2b/admin/dashboard';
+      case 'b2b_user': return '/b2b/user/dashboard';
+      case 'b2c': default: return '/b2c/dashboard';
     }
   };
   
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     setPasswordError('');
+    if (clearError) clearError();
     
     if (password !== confirmPassword) {
       setPasswordError('Les mots de passe ne correspondent pas');
@@ -62,11 +54,13 @@ const Register: React.FC<RegisterProps> = ({ role }) => {
     
     try {
       await register(email, password, name);
+      
       toast({
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès",
       });
-      navigate(getDashboardPath(role));
+      
+      navigate(getRedirectPath());
     } catch (error: any) {
       toast({
         title: "Erreur d'inscription",
@@ -77,13 +71,21 @@ const Register: React.FC<RegisterProps> = ({ role }) => {
       setIsLoading(false);
     }
   };
-
+  
+  const getLoginPath = () => {
+    switch(role) {
+      case 'b2b_admin': return '/b2b/admin/login';
+      case 'b2b_user': return '/b2b/user/login';
+      case 'b2c': default: return '/b2c/login';
+    }
+  };
+  
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Créer un compte {getRoleLabel(role)}</CardTitle>
-          <CardDescription>Rejoignez EmotionsCare pour prendre soin de votre bien-être émotionnel</CardDescription>
+          <CardTitle>Créer un compte {getRoleName()}</CardTitle>
+          <CardDescription>Rejoignez EmotionsCare en tant que {getRoleName()}</CardDescription>
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="space-y-4">
@@ -143,8 +145,13 @@ const Register: React.FC<RegisterProps> = ({ role }) => {
             </Button>
             <div className="text-sm text-center">
               Vous avez déjà un compte?{' '}
-              <Link to={`/${role}/login`} className="text-primary hover:underline">
+              <Link to={getLoginPath()} className="text-primary hover:underline">
                 Se connecter
+              </Link>
+            </div>
+            <div className="text-sm text-center mt-2">
+              <Link to="/" className="text-muted-foreground hover:underline">
+                Retour à la sélection du profil
               </Link>
             </div>
           </CardFooter>
