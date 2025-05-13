@@ -1,42 +1,34 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface SidebarContextType {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-  toggleCollapsed: () => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  toggle: () => void;
 }
 
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextType>({
+  isOpen: false,
+  setIsOpen: () => {},
+  toggle: () => {},
+});
 
-export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Récupérer l'état initial du localStorage ou utiliser true (réduit) par défaut
-  const [collapsed, setCollapsed] = useState(() => {
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    return savedState ? JSON.parse(savedState) : true;
-  });
+interface SidebarProviderProps {
+  children: ReactNode;
+}
 
-  // Persister l'état dans localStorage
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
-    console.log("Sidebar state changed:", collapsed);
-  }, [collapsed]);
-
-  const toggleCollapsed = () => {
-    setCollapsed(prev => !prev);
+export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const toggle = () => {
+    setIsOpen((prev) => !prev);
   };
-
+  
   return (
-    <SidebarContext.Provider value={{ collapsed, setCollapsed, toggleCollapsed }}>
+    <SidebarContext.Provider value={{ isOpen, setIsOpen, toggle }}>
       {children}
     </SidebarContext.Provider>
   );
 };
 
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (context === undefined) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-};
+export const useSidebar = () => useContext(SidebarContext);

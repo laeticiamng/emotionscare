@@ -1,3 +1,4 @@
+
 export interface GamificationSettings {
   points_per_action: number;
   badges_enabled: boolean;
@@ -41,6 +42,8 @@ export interface Challenge {
   end_date: string;
   status: 'open' | 'in_progress' | 'completed' | 'failed';
   requirements: string[];
+  name?: string; // Ajouté pour résoudre les erreurs
+  total?: number; // Ajouté pour résoudre les erreurs
 }
 
 export interface Notification {
@@ -58,6 +61,7 @@ export interface Badge {
   name: string;
   description: string;
   imageUrl?: string;
+  image_url?: string; // Ajouté pour la compatibilité
   category: string;
   level?: number;
   unlocked: boolean;
@@ -65,4 +69,26 @@ export interface Badge {
   date_earned?: string;
   tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
   requirements?: string[];
+  icon?: string; // Ajouté pour résoudre les erreurs
+}
+
+export interface GamificationLevel {
+  id: number;
+  name: string;
+  minPoints: number;
+  maxPoints: number;
+  badge?: string;
+  benefits: string[];
+}
+
+export interface GamificationStats {
+  totalPoints: number;
+  currentLevel: number;
+  badgesCount: number;
+  completedChallenges: number;
+  activeChallenges: number;
+  pointsToNextLevel: number;
+  progressToNextLevel: number;
+  streakDays: number;
+  lastActivityDate: string | null;
 }

@@ -1,65 +1,65 @@
 
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home';
-import Shell from './Shell';
-import DashboardLayout from './components/DashboardLayout';
-import NotFound from './pages/NotFound';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { SidebarProvider } from '@/components/ui/sidebar/SidebarContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { MusicProvider } from '@/contexts/MusicContext';
 
-// Import additional pages
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import ScanPage from './pages/ScanPage';
-import JournalPage from './pages/JournalPage';
-import MusicPage from './pages/MusicPage';
-import MusicTherapyPage from './pages/MusicTherapyPage';
-import AudioPage from './pages/AudioPage';
-import VideoTherapyPage from './pages/VideoTherapyPage';
-import ARPage from './pages/ARPage';
-import MarketplacePage from './pages/MarketplacePage';
-import CompliancePage from './pages/CompliancePage';
-import GdprPortal from './pages/GdprPortal';
-import GamificationPage from './pages/GamificationPage';
-import CoachPage from './pages/CoachPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
+// Layouts
+import DashboardLayout from '@/components/DashboardLayout';
+
+// Pages
+import HomePage from '@/pages/HomePage';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import ScanPage from '@/pages/ScanPage';
+import JournalPage from '@/pages/JournalPage';
+import MusicTherapyPage from '@/pages/MusicTherapyPage';
+import CoachPage from '@/pages/CoachPage';
+import GamificationPage from '@/pages/GamificationPage';
+import SettingsPage from '@/pages/SettingsPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import OnboardingPage from '@/pages/OnboardingPage';
+import ReportsPage from '@/pages/ReportsPage';
+import SessionsPage from '@/pages/SessionsPage';
+
+// Contexte d'authentification pour les routes protégées
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const AppRouter: React.FC = () => {
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<Shell />}>
-        <Route index element={<Home />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-      </Route>
-
-      {/* Protected routes with DashboardLayout */}
-      <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
-        <Route path="/scan" element={<ScanPage />} />
-        <Route path="/journal" element={<JournalPage />} />
-        <Route path="/music" element={<MusicPage />} />
-        <Route path="/musicotherapy" element={<MusicTherapyPage />} />
-        <Route path="/audio" element={<AudioPage />} />
-        <Route path="/video" element={<VideoTherapyPage />} />
-        <Route path="/ar" element={<ARPage />} />
-        <Route path="/marketplace" element={<MarketplacePage />} />
-        <Route path="/compliance" element={<CompliancePage />} />
-        <Route path="/gdpr-portal" element={<GdprPortal />} />
-        <Route path="/gamification" element={<GamificationPage />} />
-        <Route path="/coach" element={<CoachPage />} />
-        <Route path="/coach-chat" element={<CoachPage />} /> {/* Alias for coach */}
-      </Route>
-
-      {/* Redirect /app and /admin to their respective dashboards */}
-      <Route path="/app" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/admin" element={<Navigate to="/admin-dashboard" replace />} />
-
-      {/* 404 route */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Router>
+      <ThemeProvider>
+        <AuthProvider>
+          <SidebarProvider>
+            <MusicProvider>
+              <Routes>
+                {/* Routes d'authentification et d'onboarding */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                
+                {/* Routes de l'application */}
+                <Route path="/" element={<DashboardLayout />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="scan" element={<ScanPage />} />
+                  <Route path="journal" element={<JournalPage />} />
+                  <Route path="music" element={<MusicTherapyPage />} />
+                  <Route path="coach" element={<CoachPage />} />
+                  <Route path="gamification" element={<GamificationPage />} />
+                  <Route path="reports" element={<ReportsPage />} />
+                  <Route path="sessions" element={<SessionsPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
+                </Route>
+                
+                {/* Page 404 */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </MusicProvider>
+          </SidebarProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </Router>
   );
 };
 

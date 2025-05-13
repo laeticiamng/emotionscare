@@ -1,62 +1,166 @@
 
-import { GamificationLevel } from '@/types/gamification';
+import { GamificationLevel, GamificationStats } from '@/types/gamification';
 
-// Level thresholds
-export const LEVEL_THRESHOLDS = [
-  0,     // Level 1
-  100,   // Level 2
-  250,   // Level 3
-  500,   // Level 4
-  1000,  // Level 5
-  2000,  // Level 6
-  3500,  // Level 7
-  5000,  // Level 8
-  7500,  // Level 9
-  10000  // Level 10
+// Définition des niveaux de gamification
+const gamificationLevels: GamificationLevel[] = [
+  {
+    id: 1,
+    name: "Novice",
+    minPoints: 0,
+    maxPoints: 500,
+    benefits: [
+      "Accès aux fonctionnalités de base",
+      "3 scans émotionnels par jour"
+    ]
+  },
+  {
+    id: 2,
+    name: "Apprenti",
+    minPoints: 501,
+    maxPoints: 1500,
+    badge: "apprentice",
+    benefits: [
+      "Déblocage de 2 playlists thérapeutiques",
+      "5 scans émotionnels par jour",
+      "Accès aux défis hebdomadaires"
+    ]
+  },
+  {
+    id: 3,
+    name: "Adepte",
+    minPoints: 1501,
+    maxPoints: 3000,
+    badge: "adept",
+    benefits: [
+      "Déblocage des séances guidées",
+      "Analyse émotionnelle avancée",
+      "Personnalisation de l'interface"
+    ]
+  },
+  {
+    id: 4,
+    name: "Expert",
+    minPoints: 3001,
+    maxPoints: 6000,
+    badge: "expert",
+    benefits: [
+      "Scans émotionnels illimités",
+      "Création de playlists personnalisées",
+      "Accès à la communauté exclusive"
+    ]
+  },
+  {
+    id: 5,
+    name: "Maître",
+    minPoints: 6001,
+    maxPoints: 10000,
+    badge: "master",
+    benefits: [
+      "Toutes les fonctionnalités premium",
+      "Sessions coaching IA avancées",
+      "Rapports émotionnels détaillés"
+    ]
+  },
+  {
+    id: 6,
+    name: "Grand Maître",
+    minPoints: 10001,
+    maxPoints: Infinity,
+    badge: "grandmaster",
+    benefits: [
+      "Fonctionnalités expérimentales",
+      "Contenu en avant-première",
+      "Badge exclusif"
+    ]
+  }
 ];
 
 /**
- * Get level data based on points
+ * Récupère le niveau actuel de l'utilisateur en fonction de ses points
+ * @param points Nombre de points de l'utilisateur
  */
-export const getLevelData = (points: number): GamificationLevel => {
-  // Determine current level
-  let currentLevel = 1;
-  let nextLevel = 2;
-  let currentLevelThreshold = 0;
-  let nextLevelThreshold = LEVEL_THRESHOLDS[1];
+export const getCurrentLevel = (points: number): GamificationLevel => {
+  return gamificationLevels.find(
+    level => points >= level.minPoints && points <= level.maxPoints
+  ) || gamificationLevels[0];
+};
+
+/**
+ * Calcule les informations sur le niveau suivant
+ * @param points Nombre de points de l'utilisateur
+ */
+export const getNextLevelInfo = (
+  points: number
+): { nextLevel: GamificationLevel; pointsNeeded: number; progress: number } => {
+  const currentLevel = getCurrentLevel(points);
+  const currentLevelIndex = gamificationLevels.findIndex(level => level.id === currentLevel.id);
   
-  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (points >= LEVEL_THRESHOLDS[i]) {
-      currentLevel = i + 1;
-      currentLevelThreshold = LEVEL_THRESHOLDS[i];
-      nextLevel = i + 2;
-      nextLevelThreshold = LEVEL_THRESHOLDS[i + 1] || LEVEL_THRESHOLDS[i] * 2;
-      break;
-    }
+  // Si l'utilisateur est au niveau maximum
+  if (currentLevelIndex === gamificationLevels.length - 1) {
+    return {
+      nextLevel: currentLevel,
+      pointsNeeded: 0,
+      progress: 100
+    };
   }
   
-  // Calculate progress to next level
-  const pointsInCurrentLevel = points - currentLevelThreshold;
-  const pointsToNextLevel = nextLevelThreshold - currentLevelThreshold;
-  const progress = Math.min(100, Math.round((pointsInCurrentLevel / pointsToNextLevel) * 100));
+  const nextLevel = gamificationLevels[currentLevelIndex + 1];
+  const pointsNeeded = nextLevel.minPoints - points;
+  const totalPointsInLevel = currentLevel.maxPoints - currentLevel.minPoints;
+  const pointsInCurrentLevel = points - currentLevel.minPoints;
+  const progress = (pointsInCurrentLevel / totalPointsInLevel) * 100;
   
   return {
-    currentLevel,
     nextLevel,
-    progress,
-    points,
-    pointsToNextLevel: nextLevelThreshold - points
+    pointsNeeded,
+    progress: Math.min(Math.round(progress), 99) // Cap to 99% until new level
   };
 };
 
 /**
- * Calculate new level based on points
+ * Récupère tous les niveaux de gamification
  */
-export const calculateLevel = (points: number): number => {
-  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (points >= LEVEL_THRESHOLDS[i]) {
-      return i + 1;
-    }
-  }
-  return 1; // Default to level 1
+export const getAllLevels = (): GamificationLevel[] => {
+  return gamificationLevels;
+};
+
+/**
+ * Calcule les statistiques complètes de gamification pour un utilisateur
+ * @param userId ID de l'utilisateur
+ * @param points Points totaux
+ * @param badgesCount Nombre de badges débloqués
+ * @param completedChallenges Nombre de défis complétés
+ * @param activeChallenges Nombre de défis actifs
+ */
+export const calculateGamificationStats = (
+  userId: string,
+  points: number = 0,
+  badgesCount: number = 0,
+  completedChallenges: number = 0,
+  activeChallenges: number = 0
+): GamificationStats => {
+  const currentLevel = getCurrentLevel(points);
+  const { pointsNeeded, progress } = getNextLevelInfo(points);
+  
+  // Simuler le calcul des jours consécutifs d'activité
+  const streakDays = Math.floor(Math.random() * 30) + 1; // Entre 1 et 30 jours
+  
+  return {
+    totalPoints: points,
+    currentLevel: currentLevel.id,
+    badgesCount,
+    completedChallenges,
+    activeChallenges,
+    pointsToNextLevel: pointsNeeded,
+    progressToNextLevel: progress,
+    streakDays,
+    lastActivityDate: new Date().toISOString()
+  };
+};
+
+export default {
+  getCurrentLevel,
+  getNextLevelInfo,
+  getAllLevels,
+  calculateGamificationStats
 };
