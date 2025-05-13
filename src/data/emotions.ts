@@ -1,53 +1,40 @@
 
-// Define primary emotions
 export const primaryEmotions = [
-  'joy',
-  'sadness',
-  'anger',
-  'fear',
-  'surprise',
-  'disgust',
-  'neutral',
-  'calm',
-  'anxiety',
-  'excitement',
-  'contentment',
-  'confusion'
+  { name: 'joy', label: 'Joie', emoji: '😊', color: '#FFD700' },
+  { name: 'sadness', label: 'Tristesse', emoji: '😢', color: '#6495ED' },
+  { name: 'anger', label: 'Colère', emoji: '😠', color: '#FF4500' },
+  { name: 'fear', label: 'Peur', emoji: '😨', color: '#8A2BE2' },
+  { name: 'disgust', label: 'Dégoût', emoji: '🤢', color: '#32CD32' },
+  { name: 'surprise', label: 'Surprise', emoji: '😲', color: '#FF69B4' },
+  { name: 'neutral', label: 'Neutre', emoji: '😐', color: '#A9A9A9' },
+  { name: 'calm', label: 'Calme', emoji: '😌', color: '#87CEEB' }
 ];
 
-// Map of emotions to colors
-export const emotionColors: Record<string, string> = {
-  joy: '#FFD700',
-  happiness: '#FFD700',
-  sadness: '#4682B4',
-  anger: '#FF4500',
-  fear: '#800080',
-  surprise: '#00CED1',
-  disgust: '#228B22',
-  neutral: '#A9A9A9',
-  calm: '#87CEEB',
-  anxiety: '#FF6347',
-  stress: '#FF6347',
-  excitement: '#FF69B4',
-  contentment: '#98FB98',
-  confusion: '#DDA0DD'
+export const getEmotionColor = (emotion: string | undefined): string => {
+  if (!emotion) return '#A9A9A9'; // Default gray for undefined
+  
+  const found = primaryEmotions.find(e => 
+    e.name.toLowerCase() === emotion.toLowerCase() || 
+    e.label.toLowerCase() === emotion.toLowerCase()
+  );
+  
+  return found?.color || '#A9A9A9';
 };
 
-/**
- * Get color code for an emotion
- */
-export function getEmotionColor(emotion: string): string {
-  const normalizedEmotion = emotion.toLowerCase();
-  return emotionColors[normalizedEmotion] || '#A9A9A9'; // Default to gray
-}
-
-/**
- * Get intensity level description based on score
- */
-export function getEmotionIntensity(score: number): string {
-  if (score >= 0.8) return 'Très élevé';
-  if (score >= 0.6) return 'Élevé';
-  if (score >= 0.4) return 'Modéré';
-  if (score >= 0.2) return 'Faible';
-  return 'Très faible';
-}
+export const emotionColors = {
+  joy: '#FFD700',
+  happiness: '#FFD700',
+  sadness: '#6495ED',
+  anger: '#FF4500',
+  fear: '#8A2BE2',
+  disgust: '#32CD32',
+  surprise: '#FF69B4',
+  neutral: '#A9A9A9',
+  calm: '#87CEEB',
+  anxiety: '#9932CC',
+  stress: '#DC143C',
+  motivation: '#FFA500',
+  exhaustion: '#708090',
+  hope: '#00CED1',
+  gratitude: '#00FA9A'
+};

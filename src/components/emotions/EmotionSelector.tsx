@@ -2,85 +2,76 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getEmotionColor } from '@/data/emotions';
+import { primaryEmotions } from '@/data/emotions';
 
 export interface EmotionSelectorProps {
   onSelect: (emotion: string, intensity: number) => void;
-  preselected?: string;
   selectedEmotion?: string;
-  onSelectEmotion?: React.Dispatch<React.SetStateAction<string>>;
-  emotions?: string[];
+  emotions?: Array<{ name: string; label: string; emoji: string; color: string }>;
+  onSelectEmotion?: (emotion: string) => void;
 }
 
-const EmotionSelector: React.FC<EmotionSelectorProps> = ({
-  onSelect,
-  preselected,
+const EmotionSelector: React.FC<EmotionSelectorProps> = ({ 
+  onSelect, 
   selectedEmotion,
-  onSelectEmotion,
-  emotions = [
-    'joy', 'calm', 'excitement',
-    'sadness', 'anger', 'anxiety',
-    'fear', 'surprise', 'disgust',
-    'neutral', 'contentment', 'confusion'
-  ]
+  emotions = primaryEmotions,
+  onSelectEmotion
 }) => {
-  const handleEmotionClick = (emotion: string) => {
+  const [intensity, setIntensity] = React.useState<number>(0.5);
+  
+  const handleSelect = (emotion: string) => {
     if (onSelectEmotion) {
       onSelectEmotion(emotion);
     }
+    onSelect(emotion, intensity);
+  };
+  
+  const handleIntensityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    setIntensity(value);
     
-    // Default intensity to 0.5 (medium)
-    onSelect(emotion, 0.5);
+    if (selectedEmotion) {
+      onSelect(selectedEmotion, value);
+    }
   };
   
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-      {emotions.map((emotion) => {
-        const isSelected = selectedEmotion === emotion || preselected === emotion;
-        const emotionColor = getEmotionColor(emotion);
-        
-        return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {emotions.map((emotion) => (
           <Button
-            key={emotion}
-            variant={isSelected ? "default" : "outline"}
+            key={emotion.name}
+            variant={selectedEmotion === emotion.name ? "default" : "outline"}
             className={cn(
-              "py-6 h-auto capitalize flex flex-col",
-              isSelected ? "border-2 border-primary" : ""
+              "flex flex-col p-3 h-auto gap-1",
+              selectedEmotion === emotion.name && "border-primary"
             )}
-            onClick={() => handleEmotionClick(emotion)}
-            style={{
-              backgroundColor: isSelected ? `${emotionColor}20` : undefined,
-              borderColor: isSelected ? emotionColor : undefined
-            }}
+            onClick={() => handleSelect(emotion.name)}
           >
-            <span className="text-lg mb-1">{getEmotionEmoji(emotion)}</span>
-            <span>{emotion}</span>
+            <span className="text-2xl">{emotion.emoji}</span>
+            <span>{emotion.label}</span>
           </Button>
-        );
-      })}
+        ))}
+      </div>
+      
+      {selectedEmotion && (
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Intensité: {Math.round(intensity * 100)}%
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={intensity}
+            onChange={handleIntensityChange}
+            className="w-full"
+          />
+        </div>
+      )}
     </div>
   );
 };
-
-function getEmotionEmoji(emotion: string): string {
-  const emojiMap: Record<string, string> = {
-    joy: '😊',
-    happiness: '😄',
-    sadness: '😢',
-    anger: '😠',
-    fear: '😨',
-    surprise: '😯',
-    disgust: '🤢',
-    neutral: '😐',
-    calm: '😌',
-    anxiety: '😰',
-    stress: '😫',
-    excitement: '🤩',
-    contentment: '😊',
-    confusion: '😕'
-  };
-  
-  return emojiMap[emotion.toLowerCase()] || '😐';
-}
 
 export default EmotionSelector;

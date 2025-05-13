@@ -7,6 +7,7 @@ import { useScanPage } from '@/hooks/useScanPage';
 import EmotionHistory from './EmotionHistory';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ScanTabContentProps {
   userId: string;
@@ -25,6 +26,7 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
 }) => {
   const { emotions, isLoading, error, refreshEmotions } = useScanPage();
   const [showLiveScan, setShowLiveScan] = useState(false);
+  const { user } = useAuth();
   
   return (
     <div className="space-y-4">
@@ -32,6 +34,7 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
         <EmotionScanForm 
           onScanSaved={handleScanSaved}
           onClose={() => setShowScanForm(false)}
+          userId={userId || user?.id}
         />
       ) : showLiveScan ? (
         <EmotionScanLive 

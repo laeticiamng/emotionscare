@@ -1,47 +1,82 @@
 
-import { Badge } from '@/types/gamification';
-import { EmotionResult } from '@/types/emotion';
+import { Badge, Challenge } from '@/types/gamification';
 
-/**
- * Process an emotion result to determine if any badges should be awarded
- * @param userId User ID
- * @param emotionResult Emotion detection result
- * @param timestamp Timestamp when the emotion was detected
- * @returns Any badges that were awarded
- */
-export async function processEmotionForBadges(
-  userId: string,
-  emotionResult: EmotionResult,
-): Promise<Badge[]> {
-  // In a real implementation, this would call an API
-  // For now, we'll return mock data
-  
-  const mockBadges: Badge[] = [
+export const getBadges = async (): Promise<Badge[]> => {
+  // Mock implementation
+  return [
     {
-      id: 'emotion-explorer',
+      id: '1',
+      name: 'Premier pas',
+      description: 'Première émotion enregistrée',
+      image: '/badges/first-step.png',
+      dateEarned: new Date().toISOString()
+    },
+    {
+      id: '2',
       name: 'Explorateur émotionnel',
-      description: 'Scannez votre état émotionnel pour la première fois',
-      image: '/badges/emotion-explorer.png',
+      description: '5 émotions différentes enregistrées',
+      image: '/badges/explorer.png',
       dateEarned: new Date().toISOString()
     }
   ];
-  
-  // Simulate processing delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return mockBadges;
-}
+};
 
-/**
- * Award points for completing an action
- */
-export async function awardPoints(userId: string, action: string, points: number): Promise<number> {
-  // In a real implementation, this would call an API
-  console.log(`Award ${points} points to user ${userId} for action: ${action}`);
+export const getChallenges = async (): Promise<Challenge[]> => {
+  // Mock implementation
+  return [
+    {
+      id: '1',
+      title: 'Journal quotidien',
+      description: 'Enregistrer une émotion chaque jour pendant 7 jours',
+      type: 'streak',
+      completed: false,
+      progress: 3,
+      category: 'daily',
+      points: 50,
+      status: 'active'
+    },
+    {
+      id: '2',
+      title: 'Méditation matinale',
+      description: 'Compléter 5 sessions de méditation',
+      type: 'completion',
+      completed: false,
+      progress: 2,
+      category: 'mindfulness',
+      points: 75,
+      status: 'active'
+    }
+  ];
+};
+
+export const processEmotionForBadges = async (
+  userId: string,
+  emotion: string,
+  score: number
+): Promise<Badge[]> => {
+  // In a real app, this would check badge criteria against user history
+  // and return any newly earned badges
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 200));
+  // Mock implementation - return a random badge occasionally
+  if (Math.random() > 0.7) {
+    return [
+      {
+        id: '3',
+        name: 'Maître de conscience',
+        description: 'Enregistrer 10 émotions',
+        image: '/badges/master.png',
+        dateEarned: new Date().toISOString()
+      }
+    ];
+  }
   
-  // Return the total points (mock)
-  return 100 + points;
-}
+  return [];
+};
+
+export const completeChallenge = async (challengeId: string): Promise<boolean> => {
+  // In a real app, this would update the challenge status in the database
+  console.log(`Challenge ${challengeId} marked as completed`);
+  
+  // Mock successful completion
+  return true;
+};

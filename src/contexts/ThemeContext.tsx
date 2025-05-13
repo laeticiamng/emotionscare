@@ -3,16 +3,16 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded';
+export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'raleway' | 'default';
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode?: boolean;
-  fontFamily?: string;
-  fontSize?: string;
-  setFontFamily?: (font: string) => void;
-  setFontSize?: (size: string) => void;
+  fontFamily?: FontFamily;
+  fontSize?: FontSize;
+  setFontFamily?: (font: FontFamily) => void;
+  setFontSize?: (size: FontSize) => void;
 }
 
 const defaultContext: ThemeContextType = {
@@ -40,12 +40,12 @@ export function ThemeProvider({
     return (storedTheme as Theme) || defaultTheme;
   });
 
-  const [fontFamily, setFontFamily] = useState<string>(() => {
-    return localStorage.getItem('fontFamily') || 'sans';
+  const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
+    return (localStorage.getItem('fontFamily') as FontFamily) || 'sans';
   });
 
-  const [fontSize, setFontSize] = useState<string>(() => {
-    return localStorage.getItem('fontSize') || 'medium';
+  const [fontSize, setFontSize] = useState<FontSize>(() => {
+    return (localStorage.getItem('fontSize') as FontSize) || 'medium';
   });
 
   useEffect(() => {

@@ -9,8 +9,9 @@ export interface Challenge {
   category: string;
   points: number;
   deadline?: string;
-  status?: 'active' | 'completed' | 'expired' | 'ongoing' | 'available';
+  status?: 'active' | 'completed' | 'expired' | 'ongoing' | 'available' | 'in_progress' | 'open';
   name?: string;
+  total?: number; // Adding this property which is used in community-gamification
 }
 
 export interface Badge {
@@ -23,6 +24,7 @@ export interface Badge {
 }
 
 export interface GamificationStats {
+  // Original properties
   level: number;
   points: number;
   nextLevelPoints: number;
@@ -30,7 +32,7 @@ export interface GamificationStats {
   challengesCompleted: number;
   streak: number;
   
-  // Add missing properties based on GamificationDashboard usage
+  // Additional properties used in the application
   currentLevel: number;
   totalPoints: number;
   pointsToNextLevel: number;
@@ -40,4 +42,14 @@ export interface GamificationStats {
   lastActivityDate: string;
   activeChallenges: number;
   completedChallenges: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  user_id: string;
+  user_name: string;
+  points: number;
+  level: number;
+  rank: number;
+  avatar_url?: string;
 }

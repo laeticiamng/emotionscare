@@ -1,67 +1,79 @@
 
 import React from 'react';
-import { Sun, Moon, Laptop, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useTheme, Theme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Sun, Moon, Laptop, Palette } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-interface ThemeButtonProps {
-  iconOnly?: boolean;
+export interface ThemeButtonProps {
+  collapsed?: boolean;
 }
 
-const ThemeButton: React.FC<ThemeButtonProps> = ({ iconOnly = false }) => {
-  const themeContext = useTheme();
-  
-  if (!themeContext) {
-    return null;
-  }
-  
-  const { theme, setTheme } = themeContext;
-  
-  const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
-    { value: 'light', label: 'Clair', icon: <Sun size={16} /> },
-    { value: 'dark', label: 'Sombre', icon: <Moon size={16} /> },
-    { value: 'system', label: 'Système', icon: <Laptop size={16} /> },
-    { value: 'pastel', label: 'Pastel', icon: <Palette size={16} /> },
-  ];
-  
-  const currentTheme = themes.find(t => t.value === theme) || themes[0];
-  
+const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed = false }) => {
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    switch (theme) {
+      case 'dark':
+        setTheme('system');
+        break;
+      case 'system':
+        setTheme('light');
+        break;
+      case 'light':
+        setTheme('pastel');
+        break;
+      case 'pastel':
+        setTheme('dark');
+        break;
+      default:
+        setTheme('light');
+    }
+  };
+
+  const getIcon = () => {
+    switch (theme) {
+      case 'dark':
+        return <Moon className="h-4 w-4" />;
+      case 'system':
+        return <Laptop className="h-4 w-4" />;
+      case 'light':
+        return <Sun className="h-4 w-4" />;
+      case 'pastel':
+        return <Palette className="h-4 w-4" />;
+      default:
+        return <Sun className="h-4 w-4" />;
+    }
+  };
+
+  const getLabel = () => {
+    switch (theme) {
+      case 'dark':
+        return 'Thème: Sombre';
+      case 'system':
+        return 'Thème: Système';
+      case 'light':
+        return 'Thème: Clair';
+      case 'pastel':
+        return 'Thème: Pastel';
+      default:
+        return 'Thème';
+    }
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size={iconOnly ? "icon" : "sm"}
-          className="w-full justify-start"
-        >
-          {currentTheme.icon}
-          {!iconOnly && (
-            <span className="ml-2">{currentTheme.label}</span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {themes.map((item) => (
-          <DropdownMenuItem
-            key={item.value}
-            onClick={() => setTheme(item.value)}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            {item.icon}
-            <span>{item.label}</span>
-            {theme === item.value && (
-              <span className="ml-auto text-xs text-green-500">✓</span>
-            )}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={toggleTheme}
+      className={cn(
+        "flex items-center", 
+        collapsed ? "justify-center w-10 h-10 p-0" : "justify-start w-full"
+      )}
+    >
+      {getIcon()}
+      {!collapsed && <span className="ml-2">{getLabel()}</span>}
+    </Button>
   );
 };
 

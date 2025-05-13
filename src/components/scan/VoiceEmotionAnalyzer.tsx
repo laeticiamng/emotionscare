@@ -1,156 +1,115 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Mic, StopCircle, Volume2 } from 'lucide-react';
-import { EmotionResult, VoiceEmotionAnalyzerProps } from '@/types/emotion';
-import { cn } from '@/lib/utils';
+import { Mic, Square, Loader2 } from 'lucide-react';
+import { EmotionResult } from '@/types/emotion';
 
-const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({
-  onEmotionDetected,
-  compact = false
+export interface VoiceEmotionAnalyzerProps {
+  onEmotionDetected: (result: EmotionResult) => void;
+}
+
+const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ 
+  onEmotionDetected 
 }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [audioData, setAudioData] = useState<Blob | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
   
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-      
-      mediaRecorderRef.current.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        setAudioData(audioBlob);
-        processAudioData(audioBlob);
-        
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-      };
-      
-      mediaRecorderRef.current.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      alert('Impossible d\'accéder au microphone. Veuillez vérifier vos permissions.');
-    }
-  };
+  let recordingInterval: ReturnType<typeof setInterval>;
   
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-  
-  const processAudioData = async (audioBlob: Blob) => {
-    setIsProcessing(true);
+  const startRecording = () => {
+    setIsRecording(true);
+    setRecordingSeconds(0);
     
-    try {
-      // Mock processing - in a real app, you'd send this to an API
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock result
-      const result: EmotionResult = {
-        emotion: ['joy', 'calm', 'anxiety', 'neutral'][Math.floor(Math.random() * 4)],
-        score: Math.random() * 0.5 + 0.5,
-        confidence: Math.random() * 0.3 + 0.7,
-        text: "Voici ce que j'ai dit pendant l'enregistrement audio."
-      };
-      
-      onEmotionDetected(result);
-    } catch (error) {
-      console.error('Error processing audio:', error);
-    } finally {
-      setIsProcessing(false);
-    }
+    // Start a timer to track recording duration
+    recordingInterval = setInterval(() => {
+      setRecordingSeconds(prev => prev + 1);
+    }, 1000);
+    
+    // In a real implementation, you would use the MediaRecorder API here
+    console.log('Voice recording started');
   };
   
-  if (compact) {
-    return (
-      <div className="flex items-center gap-3">
-        <Button
-          variant={isRecording ? "destructive" : "outline"}
-          size="icon"
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={isProcessing}
-          className={cn(isRecording && "animate-pulse")}
-        >
-          {isRecording ? <StopCircle size={18} /> : <Mic size={18} />}
-        </Button>
-        <span className="text-sm text-muted-foreground">
-          {isProcessing ? "Analyse..." : isRecording ? "Enregistrement..." : "Enregistrer ma voix"}
-        </span>
-      </div>
-    );
-  }
+  const stopRecording = async () => {
+    setIsRecording(false);
+    clearInterval(recordingInterval);
+    setIsAnalyzing(true);
+    
+    // In a real implementation, you would stop the MediaRecorder and analyze the audio
+    console.log('Voice recording stopped, analyzing...');
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Mock emotion result
+    const mockResult: EmotionResult = {
+      emotion: 'calm',
+      score: 0.85,
+      confidence: 0.78,
+      transcript: "J'ai passé une journée agréable aujourd'hui, je me sens plutôt bien.",
+      primaryEmotion: {
+        name: 'calm',
+        intensity: 0.85
+      }
+    };
+    
+    onEmotionDetected(mockResult);
+    setIsAnalyzing(false);
+  };
+  
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  };
   
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="text-center mb-4">
-            <h3 className="font-medium text-lg mb-2">Analyse vocale</h3>
-            <p className="text-muted-foreground text-sm">
-              Parlez de votre humeur actuelle pour une analyse émotionnelle
-            </p>
+    <div className="space-y-4">
+      <div className="flex flex-col items-center justify-center py-4">
+        {isRecording && (
+          <div className="text-xl font-mono mb-4">
+            {formatTime(recordingSeconds)}
           </div>
-          
-          <div className="relative">
-            <Button
+        )}
+        
+        <div className="flex justify-center">
+          {!isRecording && !isAnalyzing ? (
+            <Button 
+              onClick={startRecording}
               size="lg"
-              variant={isRecording ? "destructive" : "default"}
-              className={cn(
-                "h-20 w-20 rounded-full flex items-center justify-center",
-                isRecording && "animate-pulse"
-              )}
-              onClick={isRecording ? stopRecording : startRecording}
-              disabled={isProcessing}
+              className="rounded-full h-16 w-16 flex items-center justify-center"
             >
-              {isRecording ? (
-                <StopCircle size={36} />
-              ) : isProcessing ? (
-                <span className="animate-spin">⏳</span>
-              ) : (
-                <Mic size={36} />
-              )}
+              <Mic className="h-8 w-8" />
             </Button>
-            
-            {isRecording && (
-              <div className="absolute -inset-4 rounded-full border-4 border-red-500 animate-ping opacity-50"></div>
-            )}
-          </div>
-          
-          <div className="text-center text-sm text-muted-foreground mt-4">
-            {isProcessing ? (
-              "Analyse de votre voix en cours..."
-            ) : isRecording ? (
-              "Parlez maintenant... Cliquez pour arrêter"
-            ) : (
-              "Cliquez pour commencer l'enregistrement"
-            )}
-          </div>
-          
-          {audioData && !isProcessing && !isRecording && (
-            <div className="flex items-center gap-2 mt-4">
-              <Volume2 size={16} className="text-muted-foreground" />
-              <audio
-                controls
-                src={URL.createObjectURL(audioData)}
-                className="h-8 w-48"
-              />
-            </div>
+          ) : isRecording ? (
+            <Button 
+              onClick={stopRecording}
+              variant="destructive"
+              size="lg"
+              className="rounded-full h-16 w-16 flex items-center justify-center"
+            >
+              <Square className="h-6 w-6" />
+            </Button>
+          ) : (
+            <Button 
+              disabled
+              size="lg"
+              className="rounded-full h-16 w-16 flex items-center justify-center"
+            >
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </Button>
           )}
         </div>
-      </CardContent>
-    </Card>
+        
+        <p className="text-sm text-muted-foreground mt-4">
+          {isRecording 
+            ? "Parlez de votre journée ou de comment vous vous sentez..." 
+            : isAnalyzing 
+              ? "Analyse de votre voix en cours..." 
+              : "Appuyez pour commencer l'enregistrement"}
+        </p>
+      </div>
+    </div>
   );
 };
 
