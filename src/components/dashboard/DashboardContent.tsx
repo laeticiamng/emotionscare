@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { UserModeType } from '@/contexts/UserModeContext';
@@ -68,7 +69,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   latestEmotion,
   userMode
 }) => {
-  const { userMode: normalizedUserMode } = useUserMode();
+  const { userMode: contextUserMode } = useUserMode();
   const { user } = useAuth();
   
   // Convert personal to b2c for backwards compatibility
@@ -84,7 +85,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   if (isB2BAdmin || (isAdmin && isB2BUser)) {
     return (
       <div className="container mx-auto p-4 space-y-6">
-        <DashboardHeader user={user} />
+        <DashboardHeader />
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="md:col-span-2">
@@ -132,7 +133,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   if (isB2BUser) {
     return (
       <div className="container mx-auto p-4 space-y-6">
-        <DashboardHeader user={user} />
+        <DashboardHeader />
         
         <Tabs defaultValue="personal">
           <TabsList>
@@ -142,7 +143,10 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           
           <TabsContent value="personal" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <EmotionalCheckIn />
+              <EmotionalCheckIn 
+                collapsed={collapsedSections['emotionalCheckin'] || false} 
+                onToggle={() => toggleSection('emotionalCheckin')} 
+              />
               <EmotionalTrends />
             </div>
             
@@ -163,10 +167,13 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   // Default B2C dashboard
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <DashboardHeader user={user} />
+      <DashboardHeader />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <EmotionalCheckIn />
+        <EmotionalCheckIn 
+          collapsed={collapsedSections['emotionalCheckin'] || false} 
+          onToggle={() => toggleSection('emotionalCheckin')}
+        />
         <EmotionalTrends />
       </div>
       

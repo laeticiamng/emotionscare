@@ -1,44 +1,78 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { usePreferences } from '@/hooks/usePreferences';
-import { ThemeName } from '@/types';
+import { useTheme, Theme } from '@/contexts/ThemeContext';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import ThemePreview from './ThemePreview';
 
 const ThemeSettingsForm: React.FC = () => {
-  const { preferences, updatePreferences } = usePreferences();
+  const { theme, setTheme } = useTheme();
   
-  const handleThemeChange = (theme: ThemeName) => {
-    updatePreferences({ theme });
+  const handleThemeChange = (value: Theme) => {
+    setTheme(value);
   };
   
   return (
-    <Card className="w-full max-w-md">
-      <CardContent className="pt-6 space-y-4">
-        <div>
-          <h3 className="font-medium mb-4">Apparence</h3>
-          <RadioGroup 
-            defaultValue={preferences.theme} 
-            onValueChange={(value) => handleThemeChange(value as ThemeName)}
-            className="space-y-3"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="light" id="light" />
-              <Label htmlFor="light">Light</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="dark" id="dark" />
-              <Label htmlFor="dark">Dark</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="system" id="system" />
-              <Label htmlFor="system">System</Label>
-            </div>
-          </RadioGroup>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h3 className="text-lg font-medium">Thème de l'interface</h3>
+        <p className="text-sm text-muted-foreground">
+          Choisissez l'apparence visuelle de l'application
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-4">
+        <ThemePreview 
+          theme="light" 
+          isActive={theme === 'light'}
+          onClick={() => handleThemeChange('light')}
+        />
+        
+        <ThemePreview 
+          theme="dark" 
+          isActive={theme === 'dark'}
+          onClick={() => handleThemeChange('dark')}
+        />
+        
+        <ThemePreview 
+          theme="system" 
+          isActive={theme === 'system'}
+          onClick={() => handleThemeChange('system')}
+        />
+
+        <ThemePreview 
+          theme="pastel" 
+          isActive={theme === 'pastel'}
+          onClick={() => handleThemeChange('pastel' as Theme)}
+        />
+      </div>
+      
+      <RadioGroup 
+        value={theme} 
+        onValueChange={(value) => handleThemeChange(value as Theme)}
+        className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+      >
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="light" id="theme-light" />
+          <Label htmlFor="theme-light">Clair</Label>
         </div>
-      </CardContent>
-    </Card>
+        
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="dark" id="theme-dark" />
+          <Label htmlFor="theme-dark">Sombre</Label>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="system" id="theme-system" />
+          <Label htmlFor="theme-system">Système</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="pastel" id="theme-pastel" />
+          <Label htmlFor="theme-pastel">Pastel</Label>
+        </div>
+      </RadioGroup>
+    </div>
   );
 };
 

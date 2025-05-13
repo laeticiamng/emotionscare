@@ -1,58 +1,84 @@
-
-import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { Separator } from '@/components/ui/separator';
-import NavItem from './NavItem';
-import UserMenu from './UserMenu';
-import GuestMenu from './GuestMenu';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import NavbarBadge from './NavbarBadge';
+import { useNotificationBadge } from '@/hooks/useNotificationBadge';
 import { useAuth } from '@/contexts/AuthContext';
-import { sidebarItems, adminSidebarItems } from './navConfig';
-import { isAdminRole } from '@/utils/roleUtils';
-import { fetchBadgesCount } from '@/lib/dashboardService';
+import { getRoleHomePath, getRoleName } from '@/utils/roleUtils';
+
+// Main Navigation Component
+// Responsible for rendering the appropriate navigation bar based on user's authentication status and role
+
+interface NavigationItemProps {
+  label: string;
+  href: string;
+  isActive?: boolean;
+  hasNotification?: boolean;
+  badgesCount?: number;
+}
+
+const NavigationItem: React.FC<NavigationItemProps> = ({
+  label,
+  href,
+  isActive = false,
+  hasNotification = false,
+  badgesCount = 0,
+}) => {
+  return (
+    <li className="relative">
+      <Link
+        to={href}
+        className={cn(
+          'block px-4 py-2 text-sm rounded-md transition-colors',
+          isActive
+            ? 'bg-primary text-primary-foreground'
+            : 'hover:bg-accent text-foreground'
+        )}
+      >
+        {label}
+        {hasNotification && (
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        )}
+        {badgesCount > 0 && <NavbarBadge badgesCount={badgesCount} />}
+      </Link>
+    </li>
+  );
+};
 
 const MainNavigation: React.FC = () => {
-  const { pathname } = useLocation();
-  const { user } = useAuth();
-  const [badgesCount, setBadgesCount] = useState<number>(0);
-  const isAdmin = user ? isAdminRole(user.role) : false;
+  const { user, isAuthenticated } = useAuth();
+  const { badgesCount } = useNotificationBadge(user?.id);
   
-  // Note: Cette composante n'est plus utilisée dans l'interface principale,
-  // mais nous gardons le code mis à jour au cas où
-  const navigationItems = isAdmin ? adminSidebarItems : sidebarItems;
-
-  useEffect(() => {
-    const loadBadgesCount = async () => {
-      if (user?.id) {
-        const count = await fetchBadgesCount(user.id);
-        setBadgesCount(count);
-      }
-    };
-
-    loadBadgesCount();
-  }, [user?.id]);
-
+  // Determine the appropriate navigation items based on authentication status and user role
+  let navigationItems: NavigationItemProps[] = [];
+  
+  if (isAuthenticated && user) {
+    navigationItems = [
+      { label: 'Tableau de bord', href: getRoleHomePath(user.role), isActive: true, badgesCount: badgesCount },
+      { label: 'Préférences', href: '/preferences' },
+      { label: 'Déconnexion', href: '/logout' },
+    ];
+  } else {
+    navigationItems = [
+      { label: 'Connexion', href: '/login' },
+      { label: 'Inscription', href: '/register' },
+    ];
+  }
+  
   return (
-    <div className="flex flex-col gap-2 py-2">
-      {navigationItems.map((item) => (
-        <NavItem
-          key={item.href}
-          icon={item.icon ? React.createElement(item.icon) : null}
-          label={item.title}
-          to={item.href}
-          active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
-        />
-      ))}
-      
-      <Separator className="my-2" />
-      
-      {user ? (
-        <UserMenu badgesCount={badgesCount} />
-      ) : (
-        <GuestMenu />
-      )}
-
-      <Separator className="my-2" />
-    </div>
+    <nav className="bg-background border-b">
+      <div className="container flex items-center justify-between py-4">
+        <Link to="/" className="font-bold text-xl">
+          Bien-Être
+        </Link>
+        
+        <ul className="flex items-center space-x-2">
+          {navigationItems.map((item) => (
+            <NavigationItem key={item.label} {...item} />
+          ))}
+        </ul>
+      </div>
+    </nav>
   );
 };
 

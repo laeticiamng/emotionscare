@@ -62,7 +62,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({
         emotion: ['joy', 'calm', 'anxiety', 'neutral'][Math.floor(Math.random() * 4)],
         score: Math.random() * 0.5 + 0.5,
         confidence: Math.random() * 0.3 + 0.7,
-        transcript: "Voici ce que j'ai dit pendant l'enregistrement audio."
+        text: "Voici ce que j'ai dit pendant l'enregistrement audio."
       };
       
       onEmotionDetected(result);

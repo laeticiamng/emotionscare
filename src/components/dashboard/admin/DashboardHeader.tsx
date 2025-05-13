@@ -2,13 +2,16 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';
+import { User } from '@/types/user';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface DashboardHeaderProps {
+export interface DashboardHeaderProps {
   onRefresh?: () => Promise<void>;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onRefresh }) => {
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const { user } = useAuth();
 
   const handleRefresh = async () => {
     if (!onRefresh) return;
@@ -22,10 +25,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onRefresh }) => {
   };
 
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex justify-between items-center">
       <div>
-        <h1 className="text-2xl font-bold">Administration</h1>
-        <p className="text-muted-foreground">Gestion des données de bien-être</p>
+        <h1 className="text-2xl font-bold">Tableau de bord</h1>
+        <p className="text-muted-foreground">
+          {user ? `Bienvenue, ${user.name}` : 'Aperçu de votre bien-être'}
+        </p>
       </div>
       
       {onRefresh && (
@@ -35,7 +40,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ onRefresh }) => {
           onClick={handleRefresh}
           disabled={isRefreshing}
         >
-          <RefreshCcw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <RefreshCcw className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
           Actualiser
         </Button>
       )}

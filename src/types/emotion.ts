@@ -62,4 +62,6 @@ export interface EmotionResult {
   ai_feedback?: string;
   timestamp?: string;
   confidence?: number;
+  intensity?: number;
+  transcript?: string;
 }
