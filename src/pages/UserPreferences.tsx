@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { UserPreferences as UserPreferencesType, ThemeName, FontSize } from '@/types/user';
+import { UserPreferences as UserPreferencesType } from '@/types';
 import { usePreferences } from '@/hooks/usePreferences';
 
 const UserPreferences: React.FC = () => {
