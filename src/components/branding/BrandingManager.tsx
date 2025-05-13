@@ -3,7 +3,7 @@ import { useBranding } from '@/hooks/useBranding';
 import PredictiveInsightToast from '@/components/predictive/PredictiveInsightToast';
 import { usePredictiveIntelligence } from '@/hooks/usePredictiveIntelligence';
 
-// Need to augment the PredictionRecommendation type to include confidence
+// Need to update the recommendation type to include confidence
 interface PredictionRecommendation {
   title: string;
   description: string;
