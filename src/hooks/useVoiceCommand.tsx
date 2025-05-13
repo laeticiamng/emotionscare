@@ -1,0 +1,112 @@
+
+import { useState, useCallback, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+
+interface UseVoiceCommandProps {
+  commands?: Record<string, () => void>;
+  autoStart?: boolean;
+}
+
+export const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandProps = {}) => {
+  const [isListening, setIsListening] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
+  const { toast } = useToast();
+
+  // Check if browser supports speech recognition
+  useEffect(() => {
+    const hasSpeechRecognition = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+    setIsSupported(hasSpeechRecognition);
+    
+    if (!hasSpeechRecognition) {
+      console.log('Speech recognition not supported in this browser');
+    }
+    
+    if (autoStart && hasSpeechRecognition) {
+      startListening();
+    }
+    
+    return () => {
+      if (isListening) {
+        stopListening();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const startListening = useCallback(() => {
+    if (!isSupported) return;
+    
+    try {
+      setIsListening(true);
+      toast({
+        title: 'Commandes vocales activées',
+        description: 'Je vous écoute...',
+      });
+      
+      // In a real implementation, this would initialize the WebSpeech API
+      // or integrate with Whisper API for voice recognition
+      console.log('Voice recognition started');
+      
+      // For demo purposes only - this simulates voice recognition
+      // In a real app, you'd connect to Whisper API here
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'activer la reconnaissance vocale',
+        variant: 'destructive',
+      });
+      setIsListening(false);
+    }
+  }, [isSupported, toast]);
+
+  const stopListening = useCallback(() => {
+    if (!isListening) return;
+    
+    setIsListening(false);
+    toast({
+      title: 'Commandes vocales désactivées',
+      description: 'Le microphone est maintenant éteint',
+    });
+    
+    // In a real implementation, this would stop the WebSpeech API
+    // or disconnect from Whisper API
+    console.log('Voice recognition stopped');
+  }, [isListening, toast]);
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
+
+  // For simulation purposes - execute a command
+  const executeCommand = useCallback((command: string) => {
+    const normalizedCommand = command.toLowerCase().trim();
+    
+    for (const [key, callback] of Object.entries(commands)) {
+      if (normalizedCommand.includes(key.toLowerCase())) {
+        callback();
+        return;
+      }
+    }
+    
+    toast({
+      title: 'Commande non reconnue',
+      description: `Désolé, je n'ai pas compris "${command}"`,
+    });
+  }, [commands, toast]);
+
+  return {
+    isListening,
+    isSupported,
+    startListening,
+    stopListening,
+    toggleListening,
+    executeCommand,
+  };
+};
+
+export default useVoiceCommand;

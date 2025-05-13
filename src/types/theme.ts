@@ -1,46 +1,35 @@
 
-// Import definitions from the ThemeContext
-import { 
-  Theme, 
-  FontSize, 
-  FontFamily 
-} from '@/contexts/ThemeContext';
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 
-// Re-export the types for compatibility
-export type ThemeName = Theme;
+export type FontFamily = 
+  | 'inter' 
+  | 'system' 
+  | 'serif'
+  | 'mono'
+  | 'rounded'
+  | string; // Add string to fix type errors
 
-export interface ThemeSettings {
-  name: ThemeName;
-  primaryColor?: string;
-  secondaryColor?: string;
-  fontFamily?: FontFamily;
-  fontSize?: FontSize;
-  radius?: 'none' | 'small' | 'medium' | 'large' | 'full';
-  animations?: boolean;
+export type FontSize = 
+  | 'small' 
+  | 'medium' 
+  | 'large'
+  | 'extra-large'
+  | string; // Add string to fix type errors
+
+export interface ThemePreviewProps {
+  theme: Theme;
+  isActive?: boolean; // Added for compatibility
+  onClick?: () => void;
 }
 
-export interface ColorPalette {
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
-  foreground: string;
-  muted: string;
-  mutedForeground: string;
-  card: string;
-  cardForeground: string;
-  popover: string;
-  popoverForeground: string;
-  border: string;
-  input: string;
-  ring: string;
+export interface ThemeButtonProps {
+  collapsed?: boolean; // Added for compatibility
 }
 
-export interface ThemeProviderProps {
-  theme?: ThemeName;
-  children: React.ReactNode;
-  defaultTheme?: ThemeName;
+export interface AppTheme {
+  theme: Theme;
+  fontFamily: FontFamily;
+  fontSize: FontSize;
+  animations: boolean;
+  soundEffects: boolean;
 }
-
-// Re-export these types from ThemeContext
-export type { Theme, FontSize, FontFamily };

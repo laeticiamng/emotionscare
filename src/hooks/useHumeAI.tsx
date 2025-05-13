@@ -1,124 +1,79 @@
 
-import { useState, useRef, useCallback } from 'react';
-import { EmotionResult } from '@/types/emotion';
+import { useState, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { EmotionResult, Emotion } from '@/types/emotion';
 
 export const useHumeAI = () => {
-  const [cameraActive, setCameraActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const [isError, setIsError] = useState(false);
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const { toast } = useToast();
 
-  const startCamera = useCallback(async (videoRef: React.RefObject<HTMLVideoElement>) => {
+  // Process facial expression image
+  const processFacialExpression = useCallback(async (imageData: string): Promise<EmotionResult | null> => {
     try {
-      setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false
-      });
-      
-      streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      
-      setCameraActive(true);
-      return true;
-    } catch (err) {
-      console.error('Error accessing camera:', err);
-      setError('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
-      setCameraActive(false);
-      return false;
-    }
-  }, []);
+      setIsProcessing(true);
+      setIsError(false);
 
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    setCameraActive(false);
-  }, []);
-
-  const processFaceEmotion = useCallback(async (
-    videoElement: HTMLVideoElement,
-    canvasElement: HTMLCanvasElement
-  ): Promise<EmotionResult> => {
-    setIsProcessing(true);
-    setError(null);
-    
-    try {
-      // Draw the current video frame to the canvas
-      const context = canvasElement.getContext('2d');
-      if (!context) {
-        throw new Error('Cannot get canvas context');
-      }
+      // In a real implementation, this would call the Hume AI API
+      // For now, we'll simulate a successful API response
       
-      canvasElement.width = videoElement.videoWidth;
-      canvasElement.height = videoElement.videoHeight;
-      context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+      console.log('Processing facial expression with Hume AI...');
       
-      // Normally here we would send the image data to HumAI API
-      // For now, we'll simulate a response
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Mock emotion detection result
-      const emotions = [
-        { name: 'joy', confidence: 0.85 },
-        { name: 'calm', confidence: 0.75 },
-        { name: 'focus', confidence: 0.65 },
-        { name: 'surprise', confidence: 0.45 },
-        { name: 'anger', confidence: 0.15 },
-        { name: 'sadness', confidence: 0.1 }
+      // Simulate a successful response
+      const simulatedEmotions: Emotion[] = [
+        { name: 'joy', intensity: 0.8, confidence: 0.9 },
+        { name: 'calm', intensity: 0.6, confidence: 0.85 },
+        { name: 'surprise', intensity: 0.2, confidence: 0.7 }
       ];
       
-      // Randomly select one emotion with higher probability for positive emotions
-      const randomIndex = Math.floor(Math.pow(Math.random(), 2) * emotions.length);
-      const primaryEmotion = emotions[randomIndex];
+      const dominantEmotion = simulatedEmotions[0];
       
-      return {
-        emotion: primaryEmotion.name,
-        confidence: primaryEmotion.confidence,
-        primaryEmotion: {
-          name: primaryEmotion.name,
-          confidence: primaryEmotion.confidence,
-          description: `Vous semblez éprouver de ${primaryEmotion.name === 'joy' ? 'la joie' : 
-            primaryEmotion.name === 'calm' ? 'la sérénité' :
-            primaryEmotion.name === 'focus' ? 'la concentration' :
-            primaryEmotion.name === 'surprise' ? 'la surprise' :
-            primaryEmotion.name === 'anger' ? 'la colère' : 'la tristesse'}`
-        },
-        faceDetected: true,
+      const emotionResult: EmotionResult = {
+        emotions: simulatedEmotions,
+        dominantEmotion,
         timestamp: new Date().toISOString(),
+        source: 'facial',
+        faceDetected: true
       };
-    } catch (err) {
-      console.error('Error processing face emotion:', err);
-      setError('Erreur lors de l\'analyse des émotions. Veuillez réessayer.');
-      return {
-        emotion: 'unknown',
-        confidence: 0,
-        error: 'Erreur de traitement',
+      
+      setResult(emotionResult);
+      return emotionResult;
+    } catch (error) {
+      console.error('Error processing facial expression:', error);
+      setIsError(true);
+      
+      toast({
+        title: "Erreur de traitement",
+        description: "Impossible d'analyser l'expression faciale",
+        variant: "destructive"
+      });
+      
+      // Return error result
+      const errorResult: EmotionResult = {
+        emotions: [],
+        dominantEmotion: { name: 'neutral', intensity: 0 },
+        source: 'facial',
+        error: 'Failed to process facial expression',
         faceDetected: false
       };
+      
+      setResult(errorResult);
+      return errorResult;
     } finally {
       setIsProcessing(false);
     }
-  }, []);
-
-  // Set up HumeAI with API key
-  const setupHumeAI = useCallback((apiKey: string) => {
-    console.log('Setting up HumeAI with API key:', apiKey);
-    // In a real implementation, this would initialize the HumeAI client
-    localStorage.setItem('humeai_api_key', apiKey);
-  }, []);
-
+  }, [toast]);
+  
   return {
-    cameraActive,
     isProcessing,
-    error,
-    startCamera,
-    stopCamera,
-    processFaceEmotion,
-    setupHumeAI
+    isError,
+    result,
+    processFacialExpression
   };
 };
+
+export default useHumeAI;

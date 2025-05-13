@@ -1,43 +1,65 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface NotificationBadgeState {
+  visible: boolean;
   count: number;
-  badgesCount: number;
-  clearBadge: () => void;
+  badgesCount?: number; // Added for compatibility
+  notificationsCount?: number;
 }
 
-export const useNotificationBadge = (userId?: string): NotificationBadgeState => {
-  const [count, setCount] = useState(0);
-  
-  useEffect(() => {
-    if (!userId) return;
-    
-    // Simulating loading notifications from an API or local storage
-    const loadNotificationCount = () => {
-      // For demo purposes, we'll use a random number
-      // In a real app, you would fetch this from your notifications API
-      const randomCount = Math.floor(Math.random() * 5);
-      setCount(randomCount);
-    };
-    
-    loadNotificationCount();
-    
-    // Optionally set up a polling interval to check for new notifications
-    const intervalId = setInterval(() => {
-      loadNotificationCount();
-    }, 60000); // Check every minute
-    
-    return () => clearInterval(intervalId);
-  }, [userId]);
-  
-  const clearBadge = () => {
-    setCount(0);
-  };
-  
+export const useNotificationBadge = (initialCount = 0) => {
+  const [state, setState] = useState<NotificationBadgeState>({
+    visible: initialCount > 0,
+    count: initialCount,
+    badgesCount: 0,
+    notificationsCount: 0
+  });
+
+  const show = useCallback((count = 1) => {
+    setState(prev => ({
+      ...prev,
+      visible: true,
+      count
+    }));
+  }, []);
+
+  const hide = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      visible: false
+    }));
+  }, []);
+
+  const increment = useCallback((amount = 1) => {
+    setState(prev => ({
+      ...prev,
+      visible: true,
+      count: prev.count + amount
+    }));
+  }, []);
+
+  const reset = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      count: 0,
+      visible: false
+    }));
+  }, []);
+
+  const setBadgesCount = useCallback((count: number) => {
+    setState(prev => ({
+      ...prev,
+      badgesCount: count
+    }));
+  }, []);
+
   return {
-    count,
-    badgesCount: count, // Make badgesCount same as count for compatibility
-    clearBadge
+    ...state,
+    show,
+    hide,
+    increment,
+    reset,
+    setBadgesCount
   };
 };

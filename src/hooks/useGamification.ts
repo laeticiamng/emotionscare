@@ -1,123 +1,121 @@
 
 import { useState, useEffect } from 'react';
-import { Badge, Challenge, LeaderboardEntry, GamificationStats } from '@/types/gamification';
-import { getBadges, unlockBadge } from '@/lib/gamification/badge-service';
-import { getChallenges, updateChallenge } from '@/lib/gamification/challenge-service';
+import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types/gamification';
+import { getBadgesForUser, getAllBadges } from '@/lib/gamification/badge-service';
+import { getChallengesForUser, getAllChallenges } from '@/lib/gamification/challenge-service';
+import { completeChallenge, updateChallenge } from '@/lib/gamificationService';
 import { getLeaderboard } from '@/lib/gamification/leaderboard-service';
-import { getUserPoints, addPoints } from '@/lib/gamification/points-service';
-import { getGamificationStats } from '@/lib/gamification/stats-service';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { awardPoints } from '@/lib/gamification/points-service';
+import { getUserGamificationStats } from '@/lib/gamification/level-service';
 
-export interface GamificationReward {
-  id: string;
-  name: string;
-  description: string;
-  type: 'badge' | 'points' | 'level' | 'item';
-  imageUrl?: string;
-  value?: number;
-}
-
-export function useGamification() {
-  const { user } = useAuth();
-  const { toast } = useToast();
+export const useGamification = (userId: string = 'current-user') => {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [userPoints, setUserPoints] = useState<number>(0);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [stats, setStats] = useState<GamificationStats>({
-    totalPoints: 0,
-    currentLevel: 1,
-    badgesCount: 0,
+    points: 0,
+    level: 1,
+    nextLevelPoints: 100,
+    badges: [],
     completedChallenges: 0,
     activeChallenges: 0,
-    pointsToNextLevel: 100,
-    progressToNextLevel: 0,
     streakDays: 0,
-    lastActivityDate: null
+    progressToNextLevel: 0
   });
-  const [rewards, setRewards] = useState<GamificationReward[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize gamification data
   useEffect(() => {
-    if (user?.id) {
-      loadGamificationData();
-    }
-  }, [user?.id]);
+    const fetchGamificationData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch user's badges
+        const userBadges = await getBadgesForUser(userId);
+        setBadges(userBadges);
 
-  const loadGamificationData = async () => {
-    if (!user?.id) return;
-    
-    setIsLoading(true);
+        // Fetch user's challenges
+        const userChallenges = await getChallengesForUser(userId);
+        setChallenges(userChallenges);
+
+        // Calculate statistics
+        const userStats = getUserGamificationStats(
+          userId,
+          1250, // mock total points
+          userBadges.length,
+          userChallenges.filter(c => c.status === 'completed').length,
+          userChallenges.filter(c => c.status === 'ongoing' || c.status === 'active').length
+        );
+        setStats(userStats);
+
+        // Fetch leaderboard data
+        const leaderboardData = await getLeaderboard('global');
+        setLeaderboard(leaderboardData);
+
+        setError(null);
+      } catch (err) {
+        setError('Failed to load gamification data');
+        console.error('Error fetching gamification data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGamificationData();
+  }, [userId]);
+
+  // Handle challenge completion
+  const handleCompleteChallenge = async (challengeId: string) => {
     try {
-      // Charger les badges
-      const userBadges = await getBadges(user.id);
-      setBadges(userBadges);
+      const updatedChallenge = await completeChallenge(userId, challengeId);
       
-      // Charger les défis
-      const userChallenges = await getChallenges(user.id);
-      setChallenges(userChallenges);
-      
-      // Charger les points
-      const points = await getUserPoints(user.id);
-      setUserPoints(points);
-      
-      // Charger le classement
-      const userLeaderboard = await getLeaderboard();
-      setLeaderboard(userLeaderboard);
-      
-      // Charger les statistiques
-      const userStats = await getGamificationStats(user.id);
-      setStats(userStats);
-      
-      setError(null);
+      if (updatedChallenge) {
+        // Update the challenges list
+        setChallenges(prev => 
+          prev.map(c => c.id === challengeId ? updatedChallenge : c)
+        );
+        
+        // Award points for completion
+        await awardPoints(userId, updatedChallenge.points, `Challenge completed: ${updatedChallenge.name}`);
+        
+        // Update stats
+        setStats(prev => ({
+          ...prev,
+          points: prev.points + updatedChallenge.points,
+          completedChallenges: prev.completedChallenges + 1,
+          activeChallenges: prev.activeChallenges - 1
+        }));
+        
+        return true;
+      }
+      return false;
     } catch (err) {
-      console.error("Erreur lors du chargement des données de gamification:", err);
-      setError("Impossible de charger les données de gamification.");
-    } finally {
-      setIsLoading(false);
+      setError('Failed to complete challenge');
+      console.error('Error completing challenge:', err);
+      return false;
     }
   };
 
-  const claimReward = async (rewardId: string, rewardType: 'badge' | 'challenge' | 'points') => {
-    if (!user?.id) return false;
-    
+  // Update challenge progress
+  const handleUpdateChallengeProgress = async (challengeId: string, progress: number) => {
     try {
-      switch (rewardType) {
-        case 'badge':
-          await unlockBadge(user.id, rewardId);
-          toast({
-            title: "Badge débloqué!",
-            description: "Félicitations! Vous avez débloqué un nouveau badge."
-          });
-          break;
-        case 'challenge':
-          await updateChallenge(rewardId, { status: 'completed' });
-          toast({
-            title: "Défi complété!",
-            description: "Félicitations! Vous avez terminé un défi."
-          });
-          break;
-        case 'points':
-          await addPoints(user.id, parseInt(rewardId, 10));
-          toast({
-            title: "Points gagnés!",
-            description: `Vous avez gagné ${rewardId} points.`
-          });
-          break;
-      }
+      const challenge = challenges.find(c => c.id === challengeId);
       
-      // Recharger les données
-      await loadGamificationData();
-      return true;
+      if (!challenge) return false;
+      
+      const updatedChallenge = await updateChallenge(userId, challengeId, { progress });
+      
+      if (updatedChallenge) {
+        setChallenges(prev => 
+          prev.map(c => c.id === challengeId ? updatedChallenge : c)
+        );
+        return true;
+      }
+      return false;
     } catch (err) {
-      console.error("Erreur lors de la réclamation de la récompense:", err);
-      toast({
-        title: "Erreur",
-        description: "Impossible de réclamer cette récompense.",
-        variant: "destructive"
-      });
+      setError('Failed to update challenge progress');
+      console.error('Error updating challenge progress:', err);
       return false;
     }
   };
@@ -126,12 +124,10 @@ export function useGamification() {
     badges,
     challenges,
     stats,
-    userPoints,
     leaderboard,
+    loading,
     error,
-    isLoading,
-    claimReward,
-    rewards,
-    loadGamificationData
+    completeChallenge: handleCompleteChallenge,
+    updateChallengeProgress: handleUpdateChallengeProgress
   };
-}
+};

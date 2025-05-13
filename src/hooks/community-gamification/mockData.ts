@@ -1,137 +1,156 @@
 
-import { Challenge, Badge } from '@/types/gamification';
-import { GamificationStats } from './types';
+import { Badge, Challenge } from '@/types/gamification';
 
-// Mock badges for community gamification
 export const mockBadges: Badge[] = [
   {
     id: 'badge-1',
-    name: 'Débutant',
-    description: 'Premier pas dans la communauté',
-    image: '/badges/community-starter.png',
-    dateEarned: '2025-01-15T12:00:00Z',
-    imageUrl: '/badges/community-starter.png',
-    category: 'community'
+    name: 'Premier pas',
+    description: 'Premier scan émotionnel réalisé',
+    imageUrl: '/images/badges/first-scan.svg',
+    unlockedAt: new Date().toISOString(),
+    category: 'Débutant' // Added category field
   },
   {
     id: 'badge-2',
-    name: 'Contributeur',
-    description: 'A aidé 5 membres de la communauté',
-    image: '/badges/community-contributor.png',
-    dateEarned: '2025-02-20T14:30:00Z',
-    imageUrl: '/badges/community-contributor.png',
-    category: 'community'
+    name: 'Explorateur émotionnel',
+    description: 'A utilisé tous les outils de scan émotionnel',
+    imageUrl: '/images/badges/explorer.svg',
+    unlockedAt: new Date().toISOString(),
+    category: 'Intermédiaire' // Added category field
   },
   {
     id: 'badge-3',
-    name: 'Mentor',
-    description: 'A partagé 10 conseils utiles',
-    image: '/badges/community-mentor.png',
-    dateEarned: '2025-03-10T09:15:00Z',
-    imageUrl: '/badges/community-mentor.png', 
-    category: 'community'
+    name: 'Maître du journal',
+    description: '10 entrées dans le journal émotionnel',
+    imageUrl: '/images/badges/journal-master.svg',
+    category: 'Expert' // Added category field
   },
   {
     id: 'badge-4',
-    name: 'Expert',
-    description: 'A participé à tous les défis du mois',
-    image: '/badges/community-expert.png',
-    dateEarned: '2025-04-05T16:45:00Z',
-    imageUrl: '/badges/community-expert.png',
-    category: 'community'
+    name: 'Sommelier musical',
+    description: 'A créé 5 playlists personnalisées',
+    imageUrl: '/images/badges/music-master.svg',
+    category: 'Spécialiste' // Added category field
   }
 ];
 
-// Mock challenges for community gamification
 export const mockChallenges: Challenge[] = [
   {
     id: 'challenge-1',
-    title: 'Première connexion',
-    description: 'Se connecter 7 jours consécutifs',
-    type: 'streak',
-    completed: false,
+    name: '7 jours de pleine conscience',
+    description: 'Réaliser un scan émotionnel chaque jour pendant une semaine',
+    points: 100,
+    status: 'ongoing',
     progress: 5,
-    category: 'engagement',
-    points: 50,
-    status: 'active',
-    name: 'Première connexion'
+    startDate: new Date(Date.now() - 5 * 86400000).toISOString(),
+    endDate: new Date(Date.now() + 2 * 86400000).toISOString(),
+    total: 7
   },
   {
     id: 'challenge-2',
-    title: 'Partage social',
-    description: 'Partager 3 expériences positives',
-    type: 'count',
-    completed: false,
-    progress: 1,
-    category: 'social',
-    points: 75,
-    status: 'active',
-    name: 'Partage social'
+    name: 'Explorateur musical',
+    description: 'Écouter 5 genres musicaux différents',
+    points: 50,
+    status: 'active', // Changed from 'in_progress' to 'active'
+    progress: 3,
+    total: 5
   },
   {
     id: 'challenge-3',
-    title: 'Méditation matinale',
-    description: 'Compléter une session de méditation avant 9h',
-    type: 'daily',
-    completed: false,
+    name: 'Maître de l\'équilibre',
+    description: 'Maintenir un score émotionnel équilibré pendant 3 jours',
+    points: 75,
+    status: 'available', // Changed from 'open' to 'available'
     progress: 0,
-    category: 'mindfulness',
-    points: 30,
-    status: 'available',
-    name: 'Méditation matinale'
+    total: 3
+  },
+  {
+    id: 'challenge-4',
+    name: 'Conversation profonde',
+    description: 'Avoir 10 échanges avec le coach IA',
+    points: 60,
+    status: 'active', // Changed from 'in_progress' to 'active'
+    progress: 6,
+    total: 10
+  },
+  {
+    id: 'challenge-5',
+    name: 'Journal régulier',
+    description: 'Rédiger 5 entrées dans le journal émotionnel',
+    points: 80,
+    status: 'active', // Changed from 'in_progress' to 'active'
+    progress: 2,
+    total: 5
+  },
+  {
+    id: 'challenge-6',
+    name: 'Méditation guidée',
+    description: 'Compléter le programme de méditation de 7 jours',
+    points: 120,
+    status: 'available', // Changed from 'open' to 'available'
+    progress: 0,
+    total: 7
+  },
+  {
+    id: 'challenge-7',
+    name: 'Scan facial avancé',
+    description: 'Utiliser le scan facial 3 jours consécutifs',
+    points: 90,
+    status: 'available', // Changed from 'open' to 'available'
+    progress: 0,
+    total: 3
+  },
+  {
+    id: 'challenge-8',
+    name: 'Maîtrise de la voix',
+    description: 'Améliorer son score émotionnel vocal 3 fois',
+    points: 70,
+    status: 'active', // Changed from 'in_progress' to 'active'
+    progress: 1,
+    total: 3
+  },
+  {
+    id: 'challenge-9',
+    name: 'Explorateur de réalité virtuelle',
+    description: 'Essayer 3 environnements VR différents',
+    points: 100,
+    status: 'available', // Changed from 'open' to 'available'
+    progress: 0,
+    total: 3
+  },
+  {
+    id: 'challenge-10',
+    name: 'Connecté au COCON',
+    description: 'Participer 5 fois au réseau COCON',
+    points: 85,
+    status: 'available', // Changed from 'open' to 'available'
+    progress: 0,
+    total: 5
   }
 ];
 
-// Generate mock gamification stats
-export const generateMockGamificationStats = (userId: string): GamificationStats => {
-  return {
-    level: 4,
-    points: 550,
-    nextLevelPoints: 700,
-    badges: mockBadges,
-    challenges: mockChallenges,
-    recentAchievements: [
-      {
-        type: 'badge',
-        id: 'badge-2',
-        name: 'Contributeur',
-        timestamp: new Date('2025-04-30T10:15:00Z'),
-        points: 75
-      },
-      {
-        type: 'challenge',
-        id: 'challenge-completed-1',
-        name: 'Streak hebdomadaire',
-        timestamp: new Date('2025-04-28T08:30:00Z'),
-        points: 50
-      }
-    ],
-    currentLevel: 4,
-    pointsToNextLevel: 150,
-    progressToNextLevel: 75,
-    totalPoints: 550,
-    badgesCount: mockBadges.length,
-    streakDays: 8,
-    lastActivityDate: new Date().toISOString()
-  };
+// Add the missing functions
+
+export const getEmotionBasedChallenges = (emotion: string): Challenge[] => {
+  // In a real implementation, this would filter challenges based on the emotion
+  // For now, return a subset of mock challenges
+  return mockChallenges.slice(0, 3);
 };
 
-// Generate emotion-based challenges
-export const getEmotionBasedChallenges = (emotion: string): Challenge[] => {
-  const challenges: Challenge[] = [
-    {
-      id: `emotion-challenge-${Date.now()}`,
-      title: `Exercice de ${emotion}`,
-      description: `Activité personnalisée basée sur votre émotion: ${emotion}`,
-      type: 'emotion',
-      completed: false,
-      progress: 0,
-      category: 'emotional',
-      points: 40,
-      status: 'available',
-      name: `Exercice de ${emotion}`
-    }
-  ];
-  
-  return challenges;
+export const generateMockGamificationStats = (userId: string) => {
+  return {
+    points: 1250,
+    level: 3,
+    nextLevelPoints: 2000,
+    badges: mockBadges.slice(0, 2),
+    completedChallenges: 4,
+    activeChallenges: 3,
+    streakDays: 5,
+    progressToNextLevel: 60,
+    totalPoints: 1250,
+    currentLevel: 3,
+    badgesCount: 2,
+    pointsToNextLevel: 750,
+    lastActivityDate: new Date().toISOString(),
+  };
 };

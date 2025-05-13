@@ -1,82 +1,90 @@
 
-import { Badge, Challenge } from '@/types/gamification';
+import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types/gamification';
+import { getBadgesForUser, getAllBadges } from './gamification/badge-service';
+import { getChallengesForUser, getAllChallenges } from './gamification/challenge-service';
+import { getUserStats } from './gamification/stats-service';
 
-export const getBadges = async (): Promise<Badge[]> => {
-  // Mock implementation
-  return [
-    {
-      id: '1',
-      name: 'Premier pas',
-      description: 'Première émotion enregistrée',
-      image: '/badges/first-step.png',
-      dateEarned: new Date().toISOString()
-    },
-    {
-      id: '2',
-      name: 'Explorateur émotionnel',
-      description: '5 émotions différentes enregistrées',
-      image: '/badges/explorer.png',
-      dateEarned: new Date().toISOString()
-    }
-  ];
-};
-
-export const getChallenges = async (): Promise<Challenge[]> => {
-  // Mock implementation
-  return [
-    {
-      id: '1',
-      title: 'Journal quotidien',
-      description: 'Enregistrer une émotion chaque jour pendant 7 jours',
-      type: 'streak',
-      completed: false,
-      progress: 3,
-      category: 'daily',
-      points: 50,
-      status: 'active'
-    },
-    {
-      id: '2',
-      title: 'Méditation matinale',
-      description: 'Compléter 5 sessions de méditation',
-      type: 'completion',
-      completed: false,
-      progress: 2,
-      category: 'mindfulness',
-      points: 75,
-      status: 'active'
-    }
-  ];
-};
-
-export const processEmotionForBadges = async (
+// Add the missing completeChallenge function
+export const completeChallenge = async (
   userId: string,
-  emotion: string,
-  score: number
-): Promise<Badge[]> => {
-  // In a real app, this would check badge criteria against user history
-  // and return any newly earned badges
-  
-  // Mock implementation - return a random badge occasionally
-  if (Math.random() > 0.7) {
-    return [
-      {
-        id: '3',
-        name: 'Maître de conscience',
-        description: 'Enregistrer 10 émotions',
-        image: '/badges/master.png',
-        dateEarned: new Date().toISOString()
-      }
-    ];
+  challengeId: string
+): Promise<Challenge | null> => {
+  try {
+    console.log(`Completing challenge ${challengeId} for user ${userId}`);
+    
+    // In a real implementation, this would make an API call to update the challenge status
+    // For now, we'll simulate a successful completion
+    
+    // Fetch the current challenge to update it
+    const challenges = await getChallengesForUser(userId);
+    const challenge = challenges.find(c => c.id === challengeId);
+    
+    if (!challenge) {
+      console.error(`Challenge ${challengeId} not found for user ${userId}`);
+      return null;
+    }
+    
+    // Update challenge status to completed
+    const updatedChallenge: Challenge = {
+      ...challenge,
+      status: 'completed',
+      progress: 100
+    };
+    
+    console.log(`Challenge ${challengeId} marked as completed`);
+    
+    // In a real implementation, we would persist this change
+    
+    return updatedChallenge;
+  } catch (error) {
+    console.error('Error completing challenge:', error);
+    return null;
   }
-  
-  return [];
 };
 
-export const completeChallenge = async (challengeId: string): Promise<boolean> => {
-  // In a real app, this would update the challenge status in the database
-  console.log(`Challenge ${challengeId} marked as completed`);
-  
-  // Mock successful completion
-  return true;
+// Export existing functions
+export { 
+  getBadgesForUser, 
+  getAllBadges, 
+  getChallengesForUser, 
+  getAllChallenges,
+  getUserStats 
+};
+
+// Add missing updateChallenge function
+export const updateChallenge = async (
+  userId: string,
+  challengeId: string,
+  updates: Partial<Challenge>
+): Promise<Challenge | null> => {
+  try {
+    console.log(`Updating challenge ${challengeId} for user ${userId}`, updates);
+    
+    // In a real implementation, this would make an API call to update the challenge
+    // For now, we'll simulate a successful update
+    
+    // Fetch the current challenge to update it
+    const challenges = await getChallengesForUser(userId);
+    const challenge = challenges.find(c => c.id === challengeId);
+    
+    if (!challenge) {
+      console.error(`Challenge ${challengeId} not found for user ${userId}`);
+      return null;
+    }
+    
+    // Update challenge with new values
+    const updatedChallenge: Challenge = {
+      ...challenge,
+      ...updates
+    };
+    
+    console.log(`Challenge ${challengeId} updated successfully`);
+    
+    // In a real implementation, we would persist this change
+    
+    return updatedChallenge;
+  } catch (error) {
+    console.error('Error updating challenge:', error);
+    return null;
+  }
 };

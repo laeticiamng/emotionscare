@@ -2,20 +2,22 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
+// Landing and selection pages
+import LandingPage from '@/pages/LandingPage';
+import B2BSelectionPage from '@/pages/B2BSelectionPage';
+
 // Layouts
 import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
 import B2BAdminLayout from '@/layouts/B2BAdminLayout';
 
 // Common pages
-import Selection from '@/pages/common/Selection';
 import Login from '@/pages/common/Login';
 import Register from '@/pages/common/Register';
 import Unauthorized from '@/pages/common/Unauthorized';
 import NotFound from '@/pages/common/NotFound';
 import Onboarding from '@/pages/common/Onboarding';
 import ChooseMode from '@/pages/common/ChooseMode';
-import B2BSelection from '@/pages/common/B2BSelection';
 
 // B2C pages
 import B2CDashboard from '@/pages/b2c/Dashboard';
@@ -50,12 +52,12 @@ export const router = createBrowserRouter([
   // Root redirects to the main selection page
   {
     path: '/',
-    element: <Selection />,
+    element: <LandingPage />,
   },
   // B2B selection page for choosing between user and admin
   {
     path: '/b2b/selection',
-    element: <B2BSelection />,
+    element: <B2BSelectionPage />,
   },
   {
     path: '/choose-mode',
