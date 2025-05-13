@@ -6,15 +6,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Headphones, Mic } from 'lucide-react';
 import AudioPlayerSection from '@/components/audio/AudioPlayerSection';
 import AudioRecorderSection from '@/components/audio/AudioRecorderSection';
+import { useAudio } from '@/contexts/AudioContext';
 
 const AudioPage: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState('listen');
+  const { currentTrack } = useAudio();
 
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Thérapie Audio</h1>
+          {currentTrack && (
+            <div className="text-sm text-muted-foreground">
+              En cours: {currentTrack.title}
+            </div>
+          )}
         </div>
 
         <Tabs 
