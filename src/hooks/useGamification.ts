@@ -96,7 +96,7 @@ export const useGamification = () => {
         setChallenges(prev => 
           prev.map(c => 
             c.id === challengeId 
-              ? { ...c, status: 'completed' as ChallengeStatus } 
+              ? { ...c, status: 'completed' } 
               : c
           )
         );

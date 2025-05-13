@@ -1,92 +1,131 @@
 
 import React, { useState } from 'react';
-import DashboardLayout from '@/components/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Check } from 'lucide-react';
+import { UnifiedEmotionCheckin } from '@/components/scan/UnifiedEmotionCheckin';
 import { EmotionResult } from '@/types/emotion';
-import EmotionBasedMusicRecommendation from '@/components/music/EmotionBasedMusicRecommendation';
+import { useToast } from '@/hooks/use-toast';
+import { processEmotionForBadges } from '@/lib/gamificationService';
+import { useAuth } from '@/contexts/AuthContext';
+import { enhanceEmotionAnalysis } from '@/lib/scan/enhancedAnalyzeService';
 
-const ScanPage: React.FC = () => {
+const ScanPage = () => {
   const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
+  const [insights, setInsights] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const { toast } = useToast();
+  const { user } = useAuth();
   
-  const handleScanComplete = (result: EmotionResult) => {
+  const handleScanComplete = async (result: EmotionResult) => {
     setEmotionResult(result);
+    
+    if (user?.id) {
+      try {
+        // Process emotion for badges
+        const badges = await processEmotionForBadges(user.id, result);
+        
+        if (badges.length > 0) {
+          toast({
+            title: "Badge débloqué !",
+            description: `Vous avez débloqué ${badges.length} badge(s) !`,
+            variant: "default"
+          });
+        }
+        
+        // Get enhanced analysis with insights and recommendations
+        const enhanced = await enhanceEmotionAnalysis(result);
+        setInsights(enhanced.insights || null);
+        setRecommendations(enhanced.recommendations || []);
+        
+      } catch (error) {
+        console.error('Error processing emotion result:', error);
+      }
+    }
   };
   
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Analyse émotionnelle</h1>
-      <p className="text-muted-foreground">
-        Découvrez et suivez votre état émotionnel grâce à plusieurs méthodes d'analyse
-      </p>
+    <div className="container max-w-4xl mx-auto py-8 px-4">
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Scanner vos émotions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <UnifiedEmotionCheckin onScanComplete={handleScanComplete} />
+        </CardContent>
+      </Card>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <UnifiedEmotionCheckin onScanComplete={handleScanComplete} />
-        
-        <div className="space-y-6">
-          {emotionResult && (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Résultat de l'analyse</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-medium">Émotion principale</h3>
-                      <p className="text-2xl font-semibold">
-                        {emotionResult.dominantEmotion?.name || 'Non détectée'}
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-medium">Intensité</h3>
-                      <p className="text-xl">
-                        {emotionResult.dominantEmotion?.intensity ? 
-                          `${(emotionResult.dominantEmotion.intensity * 10).toFixed(1)}/10` : 
-                          'N/A'}
-                      </p>
-                    </div>
-                    
-                    {emotionResult.ai_feedback && (
-                      <div>
-                        <h3 className="font-medium">Analyse IA</h3>
-                        <p className="text-muted-foreground">{emotionResult.ai_feedback}</p>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {emotionResult && (
-                <EmotionBasedMusicRecommendation 
-                  emotionResult={emotionResult}
-                  variant="standalone"
-                />
-              )}
-            </>
-          )}
+      {emotionResult && (
+        <Tabs defaultValue="results" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="results">Résultats</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
+          </TabsList>
           
-          {!emotionResult && (
+          <TabsContent value="results">
             <Card>
               <CardHeader>
-                <CardTitle>Instructions</CardTitle>
+                <CardTitle>Analyse émotionnelle</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Utilisez l'un des modes d'analyse pour détecter votre état émotionnel :
-                </p>
-                <ul className="list-disc ml-6 mt-2 space-y-1 text-muted-foreground">
-                  <li>Analyse faciale par webcam (la plus précise)</li>
-                  <li>Description textuelle de votre ressenti</li>
-                  <li>Sélection d'émojis représentant votre humeur</li>
-                  <li>Enregistrement vocal exprimant vos émotions</li>
-                </ul>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Émotion dominante: {emotionResult.dominantEmotion?.name || "Neutre"}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <p className="text-sm font-medium">Intensité</p>
+                      <p className="text-2xl">{Math.round((emotionResult.dominantEmotion?.intensity || 0) * 100)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Confiance</p>
+                      <p className="text-2xl">{Math.round((emotionResult.confidence || 0) * 100)}%</p>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
-          )}
-        </div>
-      </div>
+          </TabsContent>
+          
+          <TabsContent value="insights">
+            <Card>
+              <CardHeader>
+                <CardTitle>Insights</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {insights ? (
+                  <p className="text-lg">{insights}</p>
+                ) : (
+                  <p className="text-muted-foreground">Aucun insight disponible pour cette analyse.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="recommendations">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recommandations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {recommendations.length > 0 ? (
+                  <ul className="space-y-2">
+                    {recommendations.map((recommendation, index) => (
+                      <li key={index} className="flex gap-2">
+                        <span className="mt-0.5 text-green-500"><Check size={16} /></span>
+                        <span>{recommendation}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground">Aucune recommandation disponible pour cette analyse.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

@@ -19,8 +19,8 @@ interface BrandingContextType {
   setEmotionalTone: (tone: EmotionalTone) => void;
   setColors: (colors: Partial<BrandingColors>) => void;
   applyEmotionalBranding?: (emotion: string) => void;
-  logoUrl?: string; // Added missing property
-  companyName?: string; // Added missing property
+  logoUrl: string;
+  companyName: string;
 }
 
 const defaultColors: BrandingColors = {
@@ -37,8 +37,8 @@ const BrandingContext = createContext<BrandingContextType>({
   setBrandingTheme: () => {},
   setEmotionalTone: () => {},
   setColors: () => {},
-  logoUrl: '/logo.svg', // Default logo
-  companyName: 'EmotionsCare' // Default company name
+  logoUrl: '/logo.svg',
+  companyName: 'EmotionsCare'
 });
 
 export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

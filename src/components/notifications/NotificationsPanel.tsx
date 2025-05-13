@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,23 +11,32 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNotificationBadge } from '@/hooks/useNotificationBadge';
 
+// Extend the Notification type to include required properties
+interface EnhancedNotification extends Notification {
+  read: boolean;
+  timestamp: string;
+}
+
 const NotificationsPanel = () => {
-  const { notifications, markAsRead, clearAll } = useNotifications();
+  const { notifications, markAsRead, markAllAsRead } = useNotifications();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const badge = useNotificationBadge();
 
+  // Cast notifications to the enhanced type that includes the required properties
+  const typedNotifications = notifications as EnhancedNotification[];
+
   useEffect(() => {
     // Update unread count based on count property if unreadCount is missing
-    if (badge && badge.count > 0 && badge.unreadCount === undefined) {
-      // Use count as fallback for unreadCount
+    if (badge && badge.count > 0) {
+      // Use count as fallback
       const unreadCountValue = badge.count;
       // Do whatever you need with unreadCountValue
     }
     
-    if (notifications && badge) {
-      const unread = notifications.filter(n => !n.read).length;
-      badge.setUnreadCount?.(unread);
+    if (notifications) {
+      const unread = typedNotifications.filter(n => !n.read).length;
+      badge.setBadgesCount?.(unread);
     }
   }, [notifications, badge]);
 
@@ -42,7 +52,7 @@ const NotificationsPanel = () => {
   const handleClearAll = async () => {
     setLoading(true);
     try {
-      await clearAll();
+      await markAllAsRead();
     } finally {
       setLoading(false);
     }
@@ -71,8 +81,8 @@ const NotificationsPanel = () => {
       </CardHeader>
       <CardContent className="p-0">
         <ScrollArea className="h-[300px] w-full">
-          {notifications && notifications.length > 0 ? (
-            notifications.map((notification) => (
+          {typedNotifications && typedNotifications.length > 0 ? (
+            typedNotifications.map((notification) => (
               <div
                 key={notification.id}
                 className="flex items-start space-x-4 p-4 border-b last:border-b-0"

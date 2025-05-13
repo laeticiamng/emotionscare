@@ -2,16 +2,17 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, CheckCircle, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 
 interface Challenge {
   id: string;
   title: string;
   description: string;
   points: number;
-  status: 'completed' | 'ongoing' | 'available';
-  deadline?: string;
-  category: string;
+  status: string;
+  category?: string;
+  progress?: number;
 }
 
 interface ChallengesListProps {
@@ -19,52 +20,69 @@ interface ChallengesListProps {
 }
 
 const ChallengesList: React.FC<ChallengesListProps> = ({ challenges }) => {
-  if (!challenges || challenges.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">Aucun défi disponible pour le moment.</p>
-      </div>
-    );
-  }
-
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-500"><CheckCircle className="mr-1 h-3 w-3" /> Complété</Badge>;
+        return 'bg-green-100 text-green-800';
+      case 'active':
       case 'ongoing':
-        return <Badge className="bg-blue-500"><Clock className="mr-1 h-3 w-3" /> En cours</Badge>;
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'available':
+      case 'open':
+        return 'bg-amber-100 text-amber-800';
+      case 'expired':
+        return 'bg-red-100 text-red-800';
       default:
-        return <Badge variant="outline">Disponible</Badge>;
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {challenges.map((challenge) => (
-        <Card key={challenge.id}>
+        <Card key={challenge.id} className="overflow-hidden">
           <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg flex items-center">
-                <Trophy className="h-5 w-5 mr-2 text-yellow-500" />
-                {challenge.title}
-              </CardTitle>
-              {getStatusBadge(challenge.status)}
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-md">{challenge.title}</CardTitle>
+              <Badge variant="outline" className={getStatusColor(challenge.status)}>
+                {challenge.status}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">{challenge.description}</p>
-            <div className="flex justify-between items-center mt-4">
-              <Badge variant="secondary">{challenge.category}</Badge>
-              <span className="font-bold">{challenge.points} points</span>
+            <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">{challenge.points} points</span>
+              <Badge variant="secondary">{challenge.category || 'Général'}</Badge>
             </div>
-            {challenge.deadline && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Échéance: {new Date(challenge.deadline).toLocaleDateString()}
-              </p>
+            
+            {challenge.progress !== undefined && (
+              <div className="mt-3">
+                <div className="flex justify-between text-xs mb-1">
+                  <span>Progression</span>
+                  <span>{challenge.progress}%</span>
+                </div>
+                <Progress value={challenge.progress} className="h-1" />
+              </div>
+            )}
+            
+            {challenge.status !== 'completed' && (
+              <Button variant="outline" size="sm" className="w-full mt-4">
+                {challenge.status === 'available' || challenge.status === 'open' 
+                  ? "Accepter le défi" 
+                  : "Voir les détails"}
+              </Button>
             )}
           </CardContent>
         </Card>
       ))}
+      
+      {challenges.length === 0 && (
+        <div className="col-span-full text-center py-10">
+          <p className="text-muted-foreground">Aucun défi disponible pour le moment.</p>
+        </div>
+      )}
     </div>
   );
 };

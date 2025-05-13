@@ -14,9 +14,12 @@ const GamificationDashboard: React.FC = () => {
     badges, 
     challenges, 
     stats, 
-    loading: isLoading, 
-    completeChallenge: loadGamificationData 
+    loading, 
+    completeChallenge 
   } = useGamification();
+
+  const isLoading = loading;
+  const loadGamificationData = completeChallenge;
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -99,14 +102,14 @@ const GamificationDashboard: React.FC = () => {
         </TabsContent>
         <TabsContent value="challenges" className="space-y-4">
           <div className="challenges-list">
-            {challenges.map(challenge => ({
+            <ChallengesList challenges={challenges.map(challenge => ({
               id: challenge.id,
               title: challenge.title || challenge.name,
               description: challenge.description,
               points: challenge.points,
               status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
               category: challenge.category || 'general'
-            }))}
+            }))} />
           </div>
         </TabsContent>
       </Tabs>

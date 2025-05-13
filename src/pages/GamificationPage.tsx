@@ -3,22 +3,27 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge, Challenge } from '@/types/gamification';
-import { getBadges, getChallenges } from '@/lib/gamificationService';
+import { getBadgesForUser, getChallengesForUser } from '@/lib/gamificationService';
+import { useAuth } from '@/contexts/AuthContext';
 
 const GamificationPage = () => {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const badgesData = await getBadges();
-        const challengesData = await getChallenges();
         
-        setBadges(badgesData);
-        setChallenges(challengesData);
+        if (user?.id) {
+          const badgesData = await getBadgesForUser(user.id);
+          const challengesData = await getChallengesForUser(user.id);
+          
+          setBadges(badgesData);
+          setChallenges(challengesData);
+        }
       } catch (error) {
         console.error('Error loading gamification data:', error);
       } finally {
@@ -27,7 +32,7 @@ const GamificationPage = () => {
     };
     
     loadData();
-  }, []);
+  }, [user]);
   
   return (
     <div className="container mx-auto py-6">
@@ -59,7 +64,7 @@ const GamificationPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {challenges.map((challenge) => (
                 <div key={challenge.id} className="bg-card rounded-lg p-4 shadow-sm">
-                  <h3 className="text-lg font-semibold">{challenge.title}</h3>
+                  <h3 className="text-lg font-semibold">{challenge.title || challenge.name}</h3>
                   <p className="text-sm text-muted-foreground">{challenge.description}</p>
                   <Button variant="outline" size="sm" className="mt-2">
                     Accepter le défi
