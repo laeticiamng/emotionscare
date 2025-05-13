@@ -1,114 +1,95 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 
-export interface UseVoiceCommandsProps {
-  enabled?: boolean;
-  commands?: Record<string, string>;
-  commandCallback?: (command: string) => void;
-  onRecognized?: (text: string) => void;
-  onError?: (error: string) => void;
+interface UseVoiceCommandsReturn {
+  isListening: boolean;
+  transcript: string;
+  startListening: () => void;
+  stopListening: () => void;
+  toggleListening: () => void;
+  supported: boolean;
+  lastCommand: string | null;
+  lastTranscript: string | null;
 }
 
-export const useVoiceCommands = ({
-  enabled = false,
-  commands = {},
-  commandCallback,
-  onRecognized,
-  onError
-}: UseVoiceCommandsProps = {}) => {
+export const useVoiceCommands = (): UseVoiceCommandsReturn => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [recognition, setRecognition] = useState<any>(null);
-
-  useEffect(() => {
-    // Initialize speech recognition if supported
-    if (typeof window !== 'undefined' && 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
-      recognitionInstance.continuous = true;
-      recognitionInstance.interimResults = true;
-      recognitionInstance.lang = 'fr-FR';
-
-      recognitionInstance.onresult = (event: any) => {
-        const current = event.resultIndex;
-        const result = event.results[current][0].transcript.trim().toLowerCase();
-        setTranscript(result);
+  const [lastCommand, setLastCommand] = useState<string | null>(null);
+  const [lastTranscript, setLastTranscript] = useState<string | null>(null);
+  
+  // Check if SpeechRecognition is supported
+  const supported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition: any = null;
+  
+  if (supported) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'fr-FR'; // Use French as default
+  }
+  
+  const startListening = useCallback(() => {
+    if (!supported) return;
+    
+    setIsListening(true);
+    setTranscript('');
+    
+    recognition.onresult = (event: any) => {
+      const current = event.resultIndex;
+      const newTranscript = event.results[current][0].transcript;
+      setTranscript(prev => prev + ' ' + newTranscript);
+      
+      // Process commands if final
+      if (event.results[current].isFinal) {
+        setLastTranscript(newTranscript);
         
-        // Call onRecognized callback if provided
-        if (onRecognized) {
-          onRecognized(result);
-        }
+        // Basic command processing
+        const command = newTranscript.toLowerCase();
         
-        // Check if the transcript matches any command
-        Object.entries(commands).forEach(([key, value]) => {
-          if (result.includes(key.toLowerCase())) {
-            console.log(`Voice command detected: ${key}`);
-            if (commandCallback) {
-              commandCallback(value);
-            }
-          }
-        });
-      };
-
-      recognitionInstance.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error);
-        if (onError) {
-          onError(event.error);
+        if (command.includes('arrêter') || command.includes('stop')) {
+          setLastCommand('stop');
+        } else if (command.includes('lancer') || command.includes('jouer') || command.includes('play')) {
+          setLastCommand('play');
         }
-        setIsListening(false);
-      };
-
-      setRecognition(recognitionInstance);
-    } else if (onError) {
-      onError('Speech recognition not supported');
-    }
-
-    return () => {
-      if (recognition) {
-        recognition.abort();
       }
     };
-  }, [commands, onRecognized, onError, commandCallback]);
-
-  useEffect(() => {
-    if (recognition) {
-      if (enabled && !isListening) {
-        try {
-          recognition.start();
-          setIsListening(true);
-        } catch (error) {
-          console.error('Failed to start speech recognition:', error);
-        }
-      } else if (!enabled && isListening) {
-        recognition.stop();
-        setIsListening(false);
-      }
-    }
-  }, [enabled, isListening, recognition]);
-
-  const startListening = () => {
-    if (recognition && !isListening) {
-      try {
+    
+    recognition.onend = () => {
+      if (isListening) {
         recognition.start();
-        setIsListening(true);
-      } catch (error) {
-        console.error('Failed to start speech recognition:', error);
       }
+    };
+    
+    recognition.start();
+  }, [supported, isListening]);
+  
+  const stopListening = useCallback(() => {
+    if (!supported) return;
+    
+    setIsListening(false);
+    recognition.stop();
+  }, [supported]);
+  
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
-  };
-
-  const stopListening = () => {
-    if (recognition && isListening) {
-      recognition.stop();
-      setIsListening(false);
-    }
-  };
-
+  }, [isListening, startListening, stopListening]);
+  
   return {
     isListening,
     transcript,
     startListening,
-    stopListening
+    stopListening,
+    toggleListening,
+    supported,
+    lastCommand,
+    lastTranscript
   };
 };
 

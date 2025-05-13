@@ -1,158 +1,140 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { useToast } from '@/hooks/use-toast';
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Sparkles, Loader2 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import FacialEmotionScanner from '@/components/scan/FacialEmotionScanner';
+import { useHumeAI } from '@/hooks/useHumeAI';
+import { EmotionResult } from '@/types/emotion';
+import { useToast } from '@/components/ui/use-toast';
 
-// Simplified version without HumAI integration for now
 const EmotionalCheckIn: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [checkInComplete, setCheckInComplete] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [emotionLabel, setEmotionLabel] = useState('Calme');
-  const [emotionIntensity, setEmotionIntensity] = useState(65);
-  const { user } = useAuth();
+  const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
+  const [checkInCompleted, setCheckInCompleted] = useState(false);
   const { toast } = useToast();
   
-  // Show check-in after login
+  // Check if check-in was done today
   useEffect(() => {
-    // Check if we've already done a check-in today
-    const lastCheckIn = localStorage.getItem('lastEmotionalCheckIn');
-    const today = new Date().toDateString();
+    const lastCheckIn = localStorage.getItem('last_emotion_check_in');
+    if (lastCheckIn) {
+      const lastDate = new Date(lastCheckIn).toDateString();
+      const today = new Date().toDateString();
+      
+      if (lastDate === today) {
+        setCheckInCompleted(true);
+      }
+    }
     
-    if (user && (!lastCheckIn || lastCheckIn !== today)) {
-      setTimeout(() => {
+    // Auto-prompt after 5 seconds if not completed today
+    const timer = setTimeout(() => {
+      if (!checkInCompleted) {
         setOpen(true);
-      }, 1500);
-    }
-  }, [user]);
-  
-  // Simulate scanning progress
-  useEffect(() => {
-    if (open && !checkInComplete) {
-      const interval = setInterval(() => {
-        setScanProgress(prev => {
-          const newProgress = prev + 2;
-          if (newProgress >= 100) {
-            clearInterval(interval);
-            setCheckInComplete(true);
-            return 100;
-          }
-          return newProgress;
-        });
-      }, 100);
-      
-      return () => clearInterval(interval);
-    }
-  }, [open, checkInComplete]);
-  
-  // Handle scan completion
-  useEffect(() => {
-    if (scanProgress >= 100 && checkInComplete) {
-      // Save today's date as last check-in
-      localStorage.setItem('lastEmotionalCheckIn', new Date().toDateString());
-      
-      toast({
-        title: "Check-in émotionnel complété",
-        description: `Votre état émotionnel détecté : ${emotionLabel}`,
-      });
-    }
-  }, [scanProgress, checkInComplete, emotionLabel, toast]);
-  
-  const handleClose = () => {
-    setOpen(false);
-  };
-  
-  // Get emotion color based on name
-  const getEmotionColor = (emotion: string): string => {
-    const emotionToColor: Record<string, string> = {
-      'Joie': 'bg-yellow-500',
-      'Tristesse': 'bg-blue-500',
-      'Colère': 'bg-red-500',
-      'Peur': 'bg-purple-500',
-      'Surprise': 'bg-pink-500',
-      'Dégoût': 'bg-green-500',
-      'Neutre': 'bg-gray-500',
-      'Calme': 'bg-sky-500',
-      'Excitation': 'bg-orange-500',
-      'Anxiété': 'bg-indigo-500',
-      'Stress': 'bg-amber-500',
-      'Ennui': 'bg-slate-500',
-      'Fatigue': 'bg-zinc-500',
-      'Concentration': 'bg-emerald-500'
-    };
+      }
+    }, 5000);
     
-    return emotionToColor[emotion] || 'bg-gray-500';
+    return () => clearTimeout(timer);
+  }, []);
+  
+  const handleEmotionDetected = (result: EmotionResult) => {
+    setEmotionResult(result);
+    
+    // Store check-in timestamp
+    localStorage.setItem('last_emotion_check_in', new Date().toISOString());
+    setCheckInCompleted(true);
+    
+    // Close dialog after 3 seconds
+    setTimeout(() => {
+      setOpen(false);
+      
+      // Show toast with suggestion based on emotion
+      toast({
+        title: `Bonjour ! Vous semblez ${getEmotionLabel(result.emotion)}`,
+        description: getEmotionSuggestion(result.emotion),
+        duration: 5000,
+      });
+    }, 3000);
   };
   
+  const getEmotionLabel = (emotion: string): string => {
+    switch (emotion.toLowerCase()) {
+      case 'joy':
+      case 'happy':
+        return 'joyeux(se) aujourd\'hui !';
+      case 'calm':
+      case 'relaxed':
+        return 'calme et détendu(e).';
+      case 'focused':
+      case 'concentration':
+        return 'très concentré(e).';
+      case 'surprise':
+        return 'surpris(e).';
+      case 'anger':
+        return 'un peu tendu(e).';
+      case 'sadness':
+        return 'un peu mélancolique.';
+      default:
+        return 'dans un état émotionnel intéressant.';
+    }
+  };
+  
+  const getEmotionSuggestion = (emotion: string): string => {
+    switch (emotion.toLowerCase()) {
+      case 'joy':
+      case 'happy':
+        return 'Profitez de cette énergie positive pour accomplir vos tâches importantes !';
+      case 'calm':
+      case 'relaxed':
+        return 'C\'est un bon moment pour la réflexion et la planification.';
+      case 'focused':
+      case 'concentration':
+        return 'Excellent moment pour travailler sur des tâches complexes.';
+      case 'surprise':
+        return 'Prenez un moment pour intégrer les nouvelles informations.';
+      case 'anger':
+        return 'Une session de respiration ou de musique pourrait vous aider à vous détendre.';
+      case 'sadness':
+        return 'Un peu de musicothérapie pourrait vous aider à vous sentir mieux.';
+      default:
+        return 'Explorez nos différents modules pour accompagner votre journée.';
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Check-in émotionnel
-          </DialogTitle>
-          <DialogDescription>
-            {checkInComplete 
-              ? "Analyse complétée ! Nous adaptons l'interface à votre état émotionnel."
-              : "Nous analysons vos expressions faciales pour personnaliser votre expérience."}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="flex flex-col space-y-4">
-          {/* Video would be here in the full implementation */}
-          <div className="relative h-48 bg-black rounded-md overflow-hidden flex items-center justify-center">
-            <div className="text-white">Caméra simulée</div>
+    <>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Check-in émotionnel</DialogTitle>
+            <DialogDescription>
+              Prenons un moment pour analyser comment vous vous sentez aujourd'hui.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <FacialEmotionScanner 
+              onEmotionDetected={handleEmotionDetected}
+              autoStart={true}
+            />
           </div>
           
-          {/* Progress indicator */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Analyse en cours</span>
-              <span>{scanProgress}%</span>
-            </div>
-            <Progress value={scanProgress} className="h-2" />
-          </div>
-          
-          {/* Emotion display */}
-          {emotionLabel && (
-            <div className="flex flex-col items-center gap-2 p-3 bg-muted/20 rounded-md">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Votre état émotionnel détecté</p>
-                <Badge className={`mt-1 ${getEmotionColor(emotionLabel)} text-white`}>
-                  {emotionLabel}
-                </Badge>
-              </div>
-              <div className="w-full space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span>Intensité</span>
-                  <span>{emotionIntensity}%</span>
-                </div>
-                <Progress value={emotionIntensity} className="h-1.5" />
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <DialogFooter>
-          {checkInComplete ? (
-            <Button onClick={handleClose} className="w-full">
-              Continuer
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setOpen(false)}
+            >
+              Plus tard
             </Button>
-          ) : (
-            <Button disabled className="w-full">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse en cours...
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
