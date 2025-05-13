@@ -92,11 +92,11 @@ const BrandingManager: React.FC<BrandingManagerProps> = ({ children }) => {
       />
       
       {/* Predictive insights toast */}
-      {showPredictiveToast && recommendations.length > 0 && (
+      {showPredictiveToast && recommendations && recommendations.length > 0 && (
         <PredictiveInsightToast 
           recommendation={{
             ...recommendations[0],
-            confidence: recommendations[0].confidence || 0.8  // Add default confidence if missing
+            confidence: recommendations[0].confidence || 0.8  // Ensure confidence exists
           }}
           onClose={() => setShowPredictiveToast(false)}
         />

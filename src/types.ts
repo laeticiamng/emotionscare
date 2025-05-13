@@ -1,3 +1,4 @@
+
 export type {
   User,
   UserPreferences,
@@ -156,7 +157,7 @@ export interface Recommendation {
   description: string;
   category?: string;
   priority: number;
-  confidence?: number;
+  confidence: number; // Making this required
   actionUrl?: string;
   actionLabel?: string;
   type?: 'activity' | 'content' | 'insight';
