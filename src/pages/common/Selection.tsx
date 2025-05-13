@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { User, Building, ShieldCheck } from 'lucide-react';
+import { User, Building } from 'lucide-react';
 import Shell from '@/Shell';
 
 const Selection: React.FC = () => {
@@ -20,8 +20,11 @@ const Selection: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2c/login')}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <Card 
+              className="hover:shadow-lg transition-shadow transform hover:scale-105 cursor-pointer border-2 border-blue-200 dark:border-blue-800" 
+              onClick={() => navigate('/b2c/login')}
+            >
               <CardHeader className="text-center pb-2">
                 <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 mx-auto flex items-center justify-center mb-4">
                   <User className="w-8 h-8 text-blue-600 dark:text-blue-400" />
@@ -30,36 +33,25 @@ const Selection: React.FC = () => {
                 <CardDescription>Accès personnel</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <p className="mb-4 text-sm">Gérez vos émotions et votre bien-être au quotidien</p>
-                <Button variant="outline">Accéder</Button>
+                <p className="mb-6 text-sm">Gérez vos émotions et votre bien-être au quotidien</p>
+                <Button className="w-full">Je suis un particulier</Button>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/user/login')}>
+            <Card 
+              className="hover:shadow-lg transition-shadow transform hover:scale-105 cursor-pointer border-2 border-emerald-200 dark:border-emerald-800" 
+              onClick={() => navigate('/b2b/selection')}
+            >
               <CardHeader className="text-center pb-2">
-                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 mx-auto flex items-center justify-center mb-4">
-                  <Building className="w-8 h-8 text-green-600 dark:text-green-400" />
+                <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mx-auto flex items-center justify-center mb-4">
+                  <Building className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <CardTitle>Collaborateur</CardTitle>
+                <CardTitle>Entreprise</CardTitle>
                 <CardDescription>Accès professionnel</CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <p className="mb-4 text-sm">Améliorez votre bien-être et vos performances au travail</p>
-                <Button variant="outline">Accéder</Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/admin/login')}>
-              <CardHeader className="text-center pb-2">
-                <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 mx-auto flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-                </div>
-                <CardTitle>Administration</CardTitle>
-                <CardDescription>Accès RH / Direction</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="mb-4 text-sm">Pilotez le bien-être de vos équipes et analysez les données</p>
-                <Button variant="outline">Accéder</Button>
+                <p className="mb-6 text-sm">Solutions pour votre organisation et vos collaborateurs</p>
+                <Button variant="outline" className="w-full">Je suis une entreprise</Button>
               </CardContent>
             </Card>
           </div>

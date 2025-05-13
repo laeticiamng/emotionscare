@@ -1,48 +1,42 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 
 interface DashboardState {
   minimalView: boolean;
-  collapsedSections: {
-    [key: string]: boolean;
-  };
+  collapsedSections: { [key: string]: boolean };
+  toggleSection: (section: string) => void;
+  toggleMinimalView: () => void;
 }
 
-export default function useDashboardState() {
-  const [state, setState] = useState<DashboardState>({
-    minimalView: false,
-    collapsedSections: {
-      emotionScan: false,
-      charts: false,
-      recommendations: false,
-      gamification: false,
-      social: false,
-      sidePanel: false,
-      modules: false
-    }
+const useDashboardState = (): DashboardState => {
+  const [minimalView, setMinimalView] = useLocalStorage('dashboard_minimal_view', false);
+  const [collapsedSections, setCollapsedSections] = useLocalStorage('dashboard_collapsed_sections', {
+    emotionalCheckin: false,
+    trends: false,
+    journal: false,
+    reminders: false,
+    coach: false,
+    modules: false
   });
 
-  const toggleMinimalView = () => {
-    setState(prev => ({
+  const toggleSection = useCallback((section: string) => {
+    setCollapsedSections(prev => ({
       ...prev,
-      minimalView: !prev.minimalView
+      [section]: !prev[section]
     }));
-  };
+  }, [setCollapsedSections]);
 
-  const toggleSection = (section: string) => {
-    setState(prev => ({
-      ...prev,
-      collapsedSections: {
-        ...prev.collapsedSections,
-        [section]: !prev.collapsedSections[section]
-      }
-    }));
-  };
+  const toggleMinimalView = useCallback(() => {
+    setMinimalView(prev => !prev);
+  }, [setMinimalView]);
 
   return {
-    minimalView: state.minimalView,
-    collapsedSections: state.collapsedSections,
-    toggleMinimalView,
-    toggleSection
+    minimalView,
+    collapsedSections,
+    toggleSection,
+    toggleMinimalView
   };
-}
+};
+
+export default useDashboardState;

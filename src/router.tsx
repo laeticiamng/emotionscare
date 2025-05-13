@@ -7,14 +7,15 @@ import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
 import B2BAdminLayout from '@/layouts/B2BAdminLayout';
 
-// Auth and common pages
+// Common pages
+import Selection from '@/pages/common/Selection';
 import Login from '@/pages/common/Login';
 import Register from '@/pages/common/Register';
 import Unauthorized from '@/pages/common/Unauthorized';
 import NotFound from '@/pages/common/NotFound';
 import Onboarding from '@/pages/common/Onboarding';
 import ChooseMode from '@/pages/common/ChooseMode';
-import Selection from '@/pages/common/Selection';
+import B2BSelection from '@/pages/common/B2BSelection';
 
 // B2C pages
 import B2CDashboard from '@/pages/b2c/Dashboard';
@@ -25,6 +26,7 @@ import B2CCoach from '@/pages/b2c/Coach';
 import B2CVR from '@/pages/b2c/VR';
 import B2CPreferences from '@/pages/b2c/Preferences';
 import B2CGamification from '@/pages/b2c/Gamification';
+import B2CCocon from '@/pages/b2c/Cocon';
 
 // B2B User pages
 import B2BUserDashboard from '@/pages/b2b/user/Dashboard';
@@ -35,6 +37,7 @@ import B2BUserCoach from '@/pages/b2b/user/Coach';
 import B2BUserVR from '@/pages/b2b/user/VR';
 import B2BUserPreferences from '@/pages/b2b/user/Preferences';
 import B2BUserGamification from '@/pages/b2b/user/Gamification';
+import B2BUserCocon from '@/pages/b2b/user/Cocon';
 
 // B2B Admin pages
 import B2BAdminDashboard from '@/pages/b2b/admin/Dashboard';
@@ -44,10 +47,15 @@ import B2BAdminEvents from '@/pages/b2b/admin/Events';
 import B2BAdminSettings from '@/pages/b2b/admin/Settings';
 
 export const router = createBrowserRouter([
-  // Root redirection & common access points
+  // Root redirects to the main selection page
   {
     path: '/',
-    element: <Selection />, // Landing page to choose between B2C, B2B User, B2B Admin
+    element: <Selection />,
+  },
+  // B2B selection page for choosing between user and admin
+  {
+    path: '/b2b/selection',
+    element: <B2BSelection />,
   },
   {
     path: '/choose-mode',
@@ -56,14 +64,6 @@ export const router = createBrowserRouter([
   {
     path: '/onboarding',
     element: <ProtectedRoute><Onboarding /></ProtectedRoute>,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/register',
-    element: <Register />,
   },
   {
     path: '/unauthorized',
@@ -119,6 +119,10 @@ export const router = createBrowserRouter([
         path: 'gamification', 
         element: <B2CGamification /> 
       },
+      { 
+        path: 'cocon', 
+        element: <B2CCocon /> 
+      },
     ],
   },
 
@@ -170,6 +174,10 @@ export const router = createBrowserRouter([
       { 
         path: 'gamification', 
         element: <B2BUserGamification /> 
+      },
+      { 
+        path: 'cocon', 
+        element: <B2BUserCocon /> 
       },
     ],
   },
