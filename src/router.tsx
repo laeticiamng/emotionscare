@@ -48,8 +48,6 @@ export const router = createBrowserRouter([
     path: '/b2c',
     element: <ProtectedRoute role="b2c"><B2CLayout /></ProtectedRoute>,
     children: [
-      { path: 'login', element: <Login role="b2c" /> },
-      { path: 'register', element: <Register role="b2c" /> },
       { path: 'dashboard', element: <B2CDashboard /> },
       { path: 'journal', element: <B2CJournal /> },
       { path: 'music', element: <B2CMusic /> },
@@ -60,12 +58,12 @@ export const router = createBrowserRouter([
       { path: 'gamification', element: <B2CGamification /> },
     ],
   },
+  { path: '/b2c/login', element: <Login role="b2c" /> },
+  { path: '/b2c/register', element: <Register role="b2c" /> },
   {
     path: '/b2b/user',
     element: <ProtectedRoute role="b2b_user"><B2BUserLayout /></ProtectedRoute>,
     children: [
-      { path: 'login', element: <Login role="b2b_user" /> },
-      { path: 'register', element: <Register role="b2b_user" /> },
       { path: 'dashboard', element: <B2BUserDashboard /> },
       { path: 'journal', element: <B2BUserJournal /> },
       { path: 'music', element: <B2BUserMusic /> },
@@ -76,11 +74,12 @@ export const router = createBrowserRouter([
       { path: 'gamification', element: <B2BUserGamification /> },
     ],
   },
+  { path: '/b2b/user/login', element: <Login role="b2b_user" /> },
+  { path: '/b2b/user/register', element: <Register role="b2b_user" /> },
   {
     path: '/b2b/admin',
     element: <ProtectedRoute role="b2b_admin"><B2BAdminLayout /></ProtectedRoute>,
     children: [
-      { path: 'login', element: <Login role="b2b_admin" /> },
       { path: 'dashboard', element: <B2BAdminDashboard /> },
       { path: 'teams', element: <B2BAdminTeams /> },
       { path: 'reports', element: <B2BAdminReports /> },
@@ -88,6 +87,7 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <B2BAdminSettings /> },
     ],
   },
+  { path: '/b2b/admin/login', element: <Login role="b2b_admin" /> },
   { path: '/unauthorized', element: <Unauthorized /> },
   { path: '*', element: <NotFound /> },
 ]);

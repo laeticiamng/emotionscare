@@ -1,40 +1,39 @@
 
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import B2BAdminNavBar from '@/components/navigation/B2BAdminNavBar';
+import { ModeToggle } from '@/components/ui/mode-toggle';
 import { useAuth } from '@/contexts/AuthContext';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import Sidebar from '@/components/ui/sidebar/Sidebar';
-import { ModeToggle } from '@/components/theme/ModeToggle';
 
 const B2BAdminLayout: React.FC = () => {
-  const { isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        <div className="ml-2">Chargement en cours...</div>
-      </div>
-    );
-  }
-
+  const { user } = useAuth();
+  
   return (
-    <ThemeProvider>
-      <div className="flex h-screen overflow-hidden bg-background">
-        <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <header className="flex h-14 items-center border-b px-4 lg:px-6">
-            <div className="flex-1">
-              <h1 className="text-xl font-semibold">Administration Portal</h1>
-            </div>
-            <ModeToggle />
-          </header>
-          <main className="flex-1 overflow-auto p-4">
-            <Outlet />
-          </main>
-        </div>
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-900">
+      <div className="w-64 flex-shrink-0">
+        <B2BAdminNavBar />
       </div>
-    </ThemeProvider>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="flex h-16 items-center border-b px-6 bg-white dark:bg-slate-800 shadow-sm">
+          <div className="flex-1">
+            {user && (
+              <div>
+                <h1 className="text-xl font-semibold">
+                  Administration
+                </h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {user.name} - Administrateur
+                </p>
+              </div>
+            )}
+          </div>
+          <ModeToggle />
+        </header>
+        <main className="flex-1 overflow-auto p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 };
 

@@ -1,86 +1,29 @@
 
-import { Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
-
-export type UserRole = 
-  | 'user' 
-  | 'admin' 
-  | 'manager' 
-  | 'employee' 
-  | 'wellbeing_manager' 
-  | 'coach' 
-  | 'analyst';
-
 export interface UserPreferences {
-  theme: ThemeName;
+  theme: 'light' | 'dark' | 'system';
+  fontSize: 'small' | 'medium' | 'large';
+  fontFamily: string;
   language: string;
-  fontSize: FontSize;
-  fontFamily: FontFamily;
   notifications: boolean;
   soundEnabled: boolean;
-  privacyLevel: 'private' | 'friends' | 'public';
+  privacyLevel: 'private' | 'team' | 'public';
   onboardingCompleted: boolean;
-  dashboardLayout: 'compact' | 'standard' | 'expanded';
-  
-  // Propriétés supplémentaires utilisées dans l'application
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  privacy?: string;
-  autoplayVideos?: boolean;
-  dataCollection?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
+  dashboardLayout: 'standard' | 'compact' | 'detailed';
 }
+
+export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'moderator';
 
 export interface User {
   id: string;
-  name?: string;
-  email?: string;
-  role?: UserRole;
+  name: string;
+  email: string;
+  role: UserRole;
   avatar_url?: string;
-  avatar?: string;
-  image?: string;
-  preferences?: UserPreferences;
-  onboarded?: boolean;
-  bio?: string; // Added missing bio property
-  
-  // Propriétés supplémentaires utilisées dans l'application
+  preferences: UserPreferences;
+  onboarded: boolean;
+  company_id?: string;
   department?: string;
-  position?: string;
+  job_title?: string;
   created_at?: string;
-  createdAt?: string;
-  joined_at?: string;
-  emotional_score?: number;
-  anonymity_code?: string;
-  team_id?: string;
-  isActive?: boolean;
-}
-
-// Export the FontFamily and FontSize types directly
-export type { FontFamily, FontSize };
-export type ThemeName = Theme;
-
-// Alias for UserPreferencesState
-export type UserPreferencesState = UserPreferences;
-
-// Add InvitationVerificationResult type
-export interface InvitationVerificationResult {
-  valid: boolean;
-  expired?: boolean;
-  alreadyAccepted?: boolean;
-  error?: string;
-  message?: string;
-  data?: {
-    id: string;
-    email: string;
-    role: string;
-    expiresAt: string;
-  };
-  invitation?: {
-    id: string;
-    email: string;
-    role: string;
-    expiresAt: string;
-  };
+  last_login?: string;
 }
