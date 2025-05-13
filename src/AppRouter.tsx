@@ -6,7 +6,7 @@ import Shell from './Shell';
 import DashboardLayout from './components/DashboardLayout';
 import NotFound from './pages/NotFound';
 
-// Import additional pages that exist in the project
+// Import additional pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -19,8 +19,9 @@ import VideoTherapyPage from './pages/VideoTherapyPage';
 import ARPage from './pages/ARPage';
 import MarketplacePage from './pages/MarketplacePage';
 import CompliancePage from './pages/CompliancePage';
-import GdprPortal from './pages/GdprPortal'; // Import the new GDPR portal page
-import GamificationPage from './pages/GamificationPage'; // Import the new Gamification page
+import GdprPortal from './pages/GdprPortal';
+import GamificationPage from './pages/GamificationPage';
+import CoachPage from './pages/CoachPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -32,9 +33,9 @@ const AppRouter: React.FC = () => {
         <Route path="register" element={<RegisterPage />} />
       </Route>
 
-      {/* Dashboard and protected routes */}
-      <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route index element={<DashboardPage />} />
+      {/* Protected routes with DashboardLayout */}
+      <Route path="/" element={<DashboardLayout />}>
+        <Route path="dashboard" element={<DashboardPage />} />
         <Route path="scan" element={<ScanPage />} />
         <Route path="journal" element={<JournalPage />} />
         <Route path="music" element={<MusicPage />} />
@@ -42,11 +43,12 @@ const AppRouter: React.FC = () => {
         <Route path="audio" element={<AudioPage />} />
         <Route path="video" element={<VideoTherapyPage />} />
         <Route path="ar" element={<ARPage />} />
-        <Route path="mindfulness" element={<DashboardPage />} />
         <Route path="marketplace" element={<MarketplacePage />} />
         <Route path="compliance" element={<CompliancePage />} />
-        <Route path="gdpr-portal" element={<GdprPortal />} /> 
-        <Route path="gamification" element={<GamificationPage />} /> {/* Add new Gamification route */}
+        <Route path="gdpr-portal" element={<GdprPortal />} />
+        <Route path="gamification" element={<GamificationPage />} />
+        <Route path="coach" element={<CoachPage />} />
+        <Route path="coach-chat" element={<CoachPage />} /> {/* Alias for coach */}
       </Route>
 
       {/* 404 route */}

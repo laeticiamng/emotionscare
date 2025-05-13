@@ -1,80 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { useBranding } from '@/hooks/useBranding';
-import PredictiveInsightToast from '@/components/predictive/PredictiveInsightToast';
-import { usePredictiveIntelligence } from '@/hooks/usePredictiveIntelligence';
+import React from 'react';
+import { useBranding } from '@/contexts/BrandingContext';
 
-// Need to update the recommendation type to include confidence
+// Define the PredictionRecommendation type if it's not defined elsewhere
 interface PredictionRecommendation {
+  id: string;
   title: string;
   description: string;
-  actionUrl?: string;
-  actionLabel?: string;
-  confidence: number; // Add confidence property
-  category?: string;
-  priority: number;
-  type?: 'activity' | 'content' | 'insight';
+  type: string;
+  confidence?: number; // Make confidence optional
 }
 
 const BrandingManager: React.FC = () => {
-  const { branding, isLoading, error } = useBranding();
-  const [showBrandingToast, setShowBrandingToast] = useState(false);
+  // Use the branding context correctly
+  const context = useBranding();
   
-  useEffect(() => {
-    if (branding && !isLoading) {
-      // Show branding toast after a delay
-      const timer = setTimeout(() => {
-        setShowBrandingToast(true);
-      }, 3000);
-      
-      // Clear timeout if component unmounts or branding changes
-      return () => clearTimeout(timer);
-    }
-  }, [branding, isLoading]);
+  // If you need branding, isLoading, and error properties from context
+  // they should be accessed from context directly
+  const { branding, isLoading, error } = context || { 
+    branding: null, 
+    isLoading: false, 
+    error: null 
+  };
 
-  // Predictive intelligence for notifications
-  const { recommendations } = usePredictiveIntelligence();
-  const [showPredictiveToast, setShowPredictiveToast] = useState(false);
-  
-  // Show predictive toast when recommendations change
-  useEffect(() => {
-    if (recommendations && recommendations.length > 0) {
-      const timer = setTimeout(() => {
-        setShowPredictiveToast(true);
-      }, 5000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [recommendations]);
-  
+  if (isLoading) {
+    return <p>Loading branding...</p>;
+  }
+
+  if (error) {
+    return <p>Error loading branding: {error}</p>;
+  }
+
+  if (!branding) {
+    return <p>No branding available.</p>;
+  }
+
   return (
-    <>
-      {/* Branding toast */}
-      {showBrandingToast && branding && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-card rounded-md shadow-lg p-4">
-            <h2 className="text-lg font-semibold">{branding.title}</h2>
-            <p className="text-sm text-muted-foreground">{branding.description}</p>
-            <button 
-              className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-              onClick={() => setShowBrandingToast(false)}
-            >
-              Fermer
-            </button>
-          </div>
-        </div>
+    <div className="branding-container">
+      <h1>{branding.appName}</h1>
+      <p>{branding.tagline}</p>
+      {branding.logoUrl && (
+        <img src={branding.logoUrl} alt="Logo" style={{ maxWidth: '100px' }} />
       )}
-      
-      {/* Predictive insights toast */}
-      {showPredictiveToast && recommendations && recommendations.length > 0 && (
-        <PredictiveInsightToast 
-          recommendation={{
-            ...recommendations[0],
-            confidence: recommendations[0].confidence || 0.8  // Ensure confidence exists
-          }}
-          onClose={() => setShowPredictiveToast(false)}
-        />
+      {branding.primaryColor && (
+        <style>
+          {`
+            .branding-container {
+              color: ${branding.primaryColor};
+            }
+          `}
+        </style>
       )}
-    </>
+    </div>
   );
 };
 

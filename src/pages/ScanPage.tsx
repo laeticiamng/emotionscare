@@ -1,150 +1,84 @@
 
-import React, { useState, useCallback } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { PlusCircle, HistoryIcon, RefreshCw } from "lucide-react";
-import { useAuth } from '@/contexts/AuthContext';
-import { useScanPage } from '@/hooks/useScanPage';
-import EmotionScanner from '@/components/scan/EmotionScanner';
-import ScanTabContent from '@/components/scan/ScanTabContent';
-import { useToast } from '@/components/ui/use-toast';
+import React, { useState } from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
+import { EmotionResult } from '@/types';
+import EmotionBasedMusicRecommendation from '@/components/music/EmotionBasedMusicRecommendation';
 
 const ScanPage: React.FC = () => {
-  const { user } = useAuth();
-  const scanHook = useScanPage();
-  const [showScanForm, setShowScanForm] = useState<boolean>(false);
-  const [scanText, setScanText] = useState<string>('');
-  const [scanEmojis, setScanEmojis] = useState<string>('');
-  const [scanAudio, setScanAudio] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("new");
-  const { toast } = useToast();
-
-  const handleScanSaved = useCallback(() => {
-    setShowScanForm(false);
-    scanHook.refreshEmotions();
-    
-    toast({
-      title: "Scan complété",
-      description: "Votre état émotionnel a été enregistré avec succès.",
-    });
-    
-    // Réinitialiser les champs
-    setScanText('');
-    setScanEmojis('');
-    setScanAudio(null);
-  }, [scanHook, toast]);
-
-  const handleAnalyze = async () => {
-    if (!scanText && !scanEmojis && !scanAudio) {
-      toast({
-        title: "Information manquante",
-        description: "Veuillez saisir du texte, sélectionner des emojis ou enregistrer un audio pour l'analyse.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsAnalyzing(true);
-    
-    // Ici, nous simulons une analyse pour la démonstration
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      handleScanSaved();
-    } catch (error) {
-      console.error("Erreur lors de l'analyse:", error);
-      toast({
-        title: "Erreur d'analyse",
-        description: "Une erreur s'est produite lors de l'analyse. Veuillez réessayer.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
+  const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
+  
+  const handleScanComplete = (result: EmotionResult) => {
+    setEmotionResult(result);
   };
-
-  // Fonction d'actualisation adaptée pour retourner void comme attendu
-  const onResultSaved = async (): Promise<void> => {
-    await scanHook.refreshEmotions();
-    return;
-  };
-
+  
   return (
-    <div className="container mx-auto py-8 max-w-4xl animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Scan émotionnel</h1>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={scanHook.refreshEmotions}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Actualiser
-        </Button>
-      </div>
-
-      <Tabs 
-        defaultValue="new" 
-        value={activeTab} 
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList className="grid grid-cols-2 mb-8 w-full max-w-md mx-auto">
-          <TabsTrigger value="new">Nouveau scan</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="new" className="space-y-4">
-          {showScanForm ? (
-            <Card className="shadow-md rounded-xl overflow-hidden">
-              <CardContent className="p-6">
-                <EmotionScanner
-                  text={scanText}
-                  emojis={scanEmojis}
-                  audioUrl={scanAudio}
-                  onTextChange={setScanText}
-                  onEmojiChange={setScanEmojis}
-                  onAudioChange={setScanAudio}
-                  onAnalyze={handleAnalyze}
-                  isAnalyzing={isAnalyzing}
-                />
-                <div className="mt-4 flex justify-end">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowScanForm(false)}
-                  >
-                    Annuler
-                  </Button>
-                </div>
+    <div className="container mx-auto py-6 space-y-6">
+      <h1 className="text-3xl font-bold">Analyse émotionnelle</h1>
+      <p className="text-muted-foreground">
+        Découvrez et suivez votre état émotionnel grâce à plusieurs méthodes d'analyse
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <UnifiedEmotionCheckin onScanComplete={handleScanComplete} />
+        
+        <div className="space-y-6">
+          {emotionResult && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Résultat de l'analyse</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-medium">Émotion principale</h3>
+                      <p className="text-2xl font-semibold">{emotionResult.emotion}</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium">Intensité</h3>
+                      <p className="text-xl">{emotionResult.score}/10</p>
+                    </div>
+                    
+                    {emotionResult.ai_feedback && (
+                      <div>
+                        <h3 className="font-medium">Analyse IA</h3>
+                        <p className="text-muted-foreground">{emotionResult.ai_feedback}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <EmotionBasedMusicRecommendation 
+                emotionResult={emotionResult}
+                variant="standalone"
+              />
+            </>
+          )}
+          
+          {!emotionResult && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Instructions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Utilisez l'un des modes d'analyse pour détecter votre état émotionnel :
+                </p>
+                <ul className="list-disc ml-6 mt-2 space-y-1 text-muted-foreground">
+                  <li>Analyse faciale par webcam (la plus précise)</li>
+                  <li>Description textuelle de votre ressenti</li>
+                  <li>Sélection d'émojis représentant votre humeur</li>
+                  <li>Enregistrement vocal exprimant vos émotions</li>
+                </ul>
               </CardContent>
             </Card>
-          ) : (
-            <div className="text-center py-12">
-              <div className="mb-6 text-2xl">Prêt pour un nouveau scan émotionnel?</div>
-              <Button
-                size="lg"
-                onClick={() => setShowScanForm(true)}
-                className="gap-2"
-              >
-                <PlusCircle className="h-5 w-5" />
-                Commencer un scan
-              </Button>
-            </div>
           )}
-        </TabsContent>
-
-        <TabsContent value="history">
-          <ScanTabContent
-            userId={user?.id || ''}
-            showScanForm={showScanForm}
-            setShowScanForm={setShowScanForm}
-            handleScanSaved={handleScanSaved}
-            onResultSaved={onResultSaved}
-          />
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };

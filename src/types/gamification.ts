@@ -1,19 +1,34 @@
+export interface GamificationSettings {
+  points_per_action: number;
+  badges_enabled: boolean;
+  leaderboard_enabled: boolean;
+  notifications_enabled: boolean;
+  challenges_enabled: boolean;
+  social_sharing_enabled: boolean;
+}
 
-export interface Badge {
+export interface UserProfile {
   id: string;
   name: string;
-  description: string;
-  image_url?: string;
-  icon?: string;
-  threshold?: number;
-  user_id?: string;
-  unlocked_at?: string;
-  earned_at?: string;
-  progress?: number;
-  level?: number;
-  unlocked?: boolean;
-  category?: string;
-  type?: string;
+  email: string;
+  points: number;
+  level: number;
+  badges: string[];
+  last_activity?: string;
+  join_date?: string;
+  profile_picture?: string;
+  bio?: string;
+  location?: string;
+  interests?: string[];
+}
+
+export interface LeaderboardEntry {
+  user_id: string;
+  rank: number;
+  points: number;
+  level: number;
+  username: string;
+  profile_picture?: string;
 }
 
 export interface Challenge {
@@ -21,44 +36,33 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  requirements?: string[];
-  completed?: boolean;
-  progress?: number;
-  deadline?: string;
-  category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  badge_reward?: string;
+  start_date: string;
+  end_date: string;
+  status: 'open' | 'in_progress' | 'completed' | 'failed';
+  requirements: string[];
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  type: 'points' | 'badge' | 'challenge' | 'level_up';
+  message: string;
+  timestamp: string;
+  is_read: boolean;
+  related_item_id?: string;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl?: string;
+  category: string;
   level?: number;
-  name?: string;
-  total?: number;
-}
-
-export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  unlockedAt?: string;
+  unlocked: boolean;
   progress?: number;
-  total?: number;
-  completed?: boolean;
-}
-
-export interface EmotionBadge {
-  id: string;
-  name: string;
-  description: string;
-  type: 'achievement' | 'emotion' | 'diversity' | 'balance' | 'streak';
-  icon: string;
-  threshold: number;
-  emotionCount?: number;
-  emotion?: string;
-  streakDays?: number;
-}
-
-export interface GamificationLevel {
-  currentLevel: number;
-  nextLevel: number;
-  progress: number;
-  points: number;
-  pointsToNextLevel: number;
+  date_earned?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  requirements?: string[];
 }

@@ -1,212 +1,257 @@
-
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Award, Trophy, Flame, Medal } from 'lucide-react';
-import { useCommunityGamification } from '@/hooks/useCommunityGamification';
-import { Progress } from '@/components/ui/progress';
-import BadgeGrid from './BadgeGrid';
-import ChallengeItem from './ChallengeItem';
-import GamificationLevelProgress from '@/components/gamification/widgets/GamificationLevelProgress';
-import GamificationStatsCards from '@/components/gamification/widgets/GamificationStatsCards';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
+import { useGamification } from '@/hooks/useGamification';
+import { Badge as BadgeType } from '@/types/gamification';
+import { motion } from "framer-motion";
 
 const GamificationDashboard: React.FC = () => {
-  const [loadingChallengeId, setLoadingChallengeId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("badges");
   const { 
-    stats, 
-    activeChallenges,
-    recommendedChallenges,
-    completeChallenge,
-    acceptChallenge, 
-    isLoading,
-    refresh
-  } = useCommunityGamification();
-
-  const handleCompleteChallenge = async (challengeId: string) => {
-    setLoadingChallengeId(challengeId);
+    badges, 
+    userPoints, 
+    leaderboard, 
+    isLoading, 
+    error, 
+    claimReward, 
+    rewards 
+  } = useGamification();
+  
+  const [claimingReward, setClaimingReward] = useState(false);
+  const [selectedReward, setSelectedReward] = useState<string | null>(null);
+  
+  const handleClaimReward = async (rewardId: string) => {
+    setSelectedReward(rewardId);
+    setClaimingReward(true);
+    
     try {
-      await completeChallenge(challengeId);
+      await claimReward(rewardId);
+    } catch (err) {
+      console.error("Error claiming reward:", err);
     } finally {
-      setLoadingChallengeId(null);
+      setClaimingReward(false);
+      setSelectedReward(null);
     }
   };
-
-  const handleAcceptChallenge = async (challengeId: string) => {
-    setLoadingChallengeId(challengeId);
-    try {
-      await acceptChallenge(challengeId);
-    } finally {
-      setLoadingChallengeId(null);
-    }
-  };
-
-  // Calculate progress as a percentage of total points needed for a threshold
-  const calculateProgress = (threshold: number) => {
-    if (!stats) return 0;
-    return Math.min(100, (stats.points / threshold) * 100);
-  };
-
-  if (isLoading || !stats) {
-    return (
-      <div className="container mx-auto py-8 flex justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex flex-col md:flex-row gap-6 mb-6">
-        <Card className="md:w-2/3 shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Trophy className="mr-2 h-5 w-5 text-amber-500" />
-              Votre Niveau
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-primary/10 p-4 rounded-full">
-                <Medal className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">Niveau {stats.level}</h3>
-                <p className="text-sm text-muted-foreground">{stats.points} points totaux</p>
-              </div>
-            </div>
-            
-            <GamificationLevelProgress 
-              level={stats.level} 
-              points={stats.points}
-              nextMilestone={stats.nextLevelPoints} 
-              progressToNextLevel={(stats.points / stats.nextLevelPoints) * 100}
-            />
-          </CardContent>
-        </Card>
+    <div className="container mx-auto py-6 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="text-center">
+          <h1 className="text-3xl font-bold">Tableau de bord de gamification</h1>
+          <p className="text-muted-foreground">
+            Suivez vos progrès, débloquez des badges et gagnez des récompenses !
+          </p>
+        </div>
         
-        <Card className="md:w-1/3 shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Flame className="mr-2 h-5 w-5 text-orange-500" />
-              Statistiques
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {stats.badges && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Badges débloqués</span>
-                  <span className="text-2xl font-bold">{stats.badges.filter(b => b.unlocked).length}</span>
-                </div>
-              )}
-              
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Défis complétés</span>
-                <span className="text-2xl font-bold">
-                  {stats.challenges?.filter(c => c.completed).length || 0}
-                </span>
-              </div>
-              
-              <div>
-                <span className="text-sm font-medium">Réalisations récentes</span>
-                <div className="mt-1 space-y-2">
-                  {stats.recentAchievements?.slice(0, 2).map(achievement => (
-                    <div key={achievement.id} className="bg-muted/30 p-2 rounded-md text-xs">
-                      {achievement.name} 
-                      {achievement.points && (
-                        <span className="text-primary float-right">+{achievement.points} pts</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs defaultValue="challenges" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="challenges">Défis</TabsTrigger>
-          <TabsTrigger value="badges">Badges</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="challenges">
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Vos défis actifs</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {activeChallenges.length > 0 ? activeChallenges.map(challenge => (
-                  <ChallengeItem 
-                    key={challenge.id}
-                    id={challenge.id}
-                    title={challenge.name || challenge.title}
-                    description={challenge.description}
-                    points={challenge.points || 50}
-                    isCompleted={!!challenge.completed}
-                    onComplete={handleCompleteChallenge}
-                    isLoading={loadingChallengeId === challenge.id}
-                  />
-                )) : (
-                  <p className="text-muted-foreground col-span-2 text-center py-8">
-                    Vous n'avez pas de défis actifs pour le moment
-                  </p>
+        <Tabs defaultValue="badges" className="w-full mt-8">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+            <TabsTrigger value="badges">Badges</TabsTrigger>
+            <TabsTrigger value="points">Points</TabsTrigger>
+            <TabsTrigger value="leaderboard">Classement</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="badges" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Mes Badges</CardTitle>
+                <CardDescription>
+                  Collectionnez des badges en atteignant des objectifs et en participant à des activités
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+                {isLoading ? (
+                  <div className="col-span-full flex justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : error ? (
+                  <div className="col-span-full text-center text-red-500 py-12">
+                    Erreur lors du chargement des badges.
+                  </div>
+                ) : badges && badges.length > 0 ? (
+                  badges.map((badge: BadgeType) => (
+                    <motion.div
+                      key={badge.id}
+                      className="overflow-hidden rounded-lg border shadow-sm hover:shadow-md transition-shadow"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <Card className="h-full">
+                        <CardHeader>
+                          <CardTitle className="text-lg font-semibold">{badge.name}</CardTitle>
+                          <CardDescription>{badge.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          {badge.imageUrl && (
+                            <img
+                              src={badge.imageUrl}
+                              alt={badge.name}
+                              className="w-full h-32 object-cover rounded-md"
+                            />
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            Catégorie: {badge.category}
+                          </p>
+                          {badge.progress !== undefined && badge.progress < 100 && (
+                            <>
+                              <p className="text-sm">Progression: {badge.progress}%</p>
+                              <Progress value={badge.progress} />
+                            </>
+                          )}
+                        </CardContent>
+                        <CardFooter className="text-sm">
+                          {badge.unlocked ? (
+                            <Badge variant="outline">Débloqué</Badge>
+                          ) : (
+                            <p className="text-muted-foreground">
+                              {badge.requirements ? badge.requirements.join(', ') : 'Atteignez les objectifs pour débloquer'}
+                            </p>
+                          )}
+                        </CardFooter>
+                      </Card>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center text-muted-foreground py-12">
+                    Aucun badge disponible pour le moment.
+                  </div>
                 )}
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Défis recommandés</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {recommendedChallenges.map(challenge => (
-                  <Card key={challenge.id} className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="font-medium">{challenge.name || challenge.title}</h4>
-                        <p className="text-sm text-muted-foreground">{challenge.description}</p>
-                      </div>
-                      <Badge variant="outline" className="bg-primary/10 text-primary">
-                        {challenge.points || 50} points
-                      </Badge>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="points">
+            <Card>
+              <CardHeader>
+                <CardTitle>Mes Points</CardTitle>
+                <CardDescription>
+                  Gagnez des points en participant à des activités et échangez-les contre des récompenses
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isLoading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : error ? (
+                  <div className="text-center text-red-500 py-12">
+                    Erreur lors du chargement des points.
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-5xl font-bold text-center">
+                      {userPoints || 0} Points
                     </div>
-                    <div className="mt-4">
-                      <Button 
-                        onClick={() => handleAcceptChallenge(challenge.id)}
-                        disabled={loadingChallengeId === challenge.id}
-                      >
-                        {loadingChallengeId === challenge.id ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            En cours...
-                          </>
+                    
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-2">Récompenses disponibles</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {rewards && rewards.length > 0 ? (
+                          rewards.map(reward => (
+                            <Card key={reward.id} className="shadow-sm hover:shadow-md transition-shadow">
+                              <CardHeader>
+                                <CardTitle>{reward.name}</CardTitle>
+                                <CardDescription>{reward.description}</CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <p className="text-xl font-semibold">{reward.cost} Points</p>
+                              </CardContent>
+                              <CardFooter>
+                                <Button 
+                                  onClick={() => handleClaimReward(reward.id)}
+                                  disabled={claimingReward || userPoints < reward.cost}
+                                  className="w-full"
+                                >
+                                  {claimingReward && selectedReward === reward.id ? (
+                                    <>
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                      Réclamation...
+                                    </>
+                                  ) : (
+                                    `Réclamer pour ${reward.cost} points`
+                                  )}
+                                </Button>
+                              </CardFooter>
+                            </Card>
+                          ))
                         ) : (
-                          'Accepter le défi'
+                          <p className="text-muted-foreground">Aucune récompense disponible pour le moment.</p>
                         )}
-                      </Button>
+                      </div>
                     </div>
-                  </Card>
-                ))}
-                
-                {recommendedChallenges.length === 0 && (
-                  <p className="text-muted-foreground col-span-2 text-center py-8">
-                    Aucun défi recommandé pour le moment
-                  </p>
+                  </>
                 )}
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="badges">
-          {stats.badges && (
-            <BadgeGrid 
-              badges={stats.badges} 
-              earnedBadgeIds={stats.badges.filter(b => b.unlocked).map(b => b.id)}
-              progressFunction={calculateProgress}
-            />
-          )}
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="leaderboard">
+            <Card>
+              <CardHeader>
+                <CardTitle>Classement</CardTitle>
+                <CardDescription>
+                  Voyez comment vous vous situez par rapport aux autres utilisateurs
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : error ? (
+                  <div className="text-center text-red-500 py-12">
+                    Erreur lors du chargement du classement.
+                  </div>
+                ) : leaderboard && leaderboard.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead>
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Rang
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Utilisateur
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Points
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {leaderboard.map((entry, index) => (
+                          <tr key={entry.userId}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900 dark:text-gray-100">{index + 1}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900 dark:text-gray-100">{entry.username}</div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="text-sm text-gray-900 dark:text-gray-100">{entry.points}</div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center text-muted-foreground py-12">
+                    Le classement est vide pour le moment.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
     </div>
   );
 };
