@@ -1,34 +1,10 @@
 
-export interface CoachEmotionData {
+// Coach hook shared types
+export type CoachEmotionData = {
   emotion: string;
   score: number;
-}
+};
 
-export interface MusicRecommendation {
-  title: string;
-  genre: string;
-  description: string;
-}
-
-export interface CoachServiceInterface {
-  askQuestion: (question: string) => Promise<string>;
-  getRecommendations: (userId: string) => Promise<string[]>;
-  processEmotions: (emotions: any[]) => Promise<{
-    primaryEmotion: string;
-    averageScore: number;
-    trend: 'improving' | 'declining' | 'stable';
-  }>;
-  triggerCoachEvent: (
-    eventType: 'scan_complete' | 'trend_change' | 'low_score' | 'reminder',
-    data: any
-  ) => Promise<{
-    message: string;
-    recommendations: string[];
-  }>;
-  getMusicRecommendation: (emotion: string) => Promise<MusicRecommendation>;
-}
-
-// Coach hook shared types
 export type CoachAction = {
   id: string;
   type: string;
@@ -80,6 +56,15 @@ export const AI_MODEL_CONFIG = {
     cacheTTL: 7200
   },
   coach: {
+    model: 'gpt-4o-mini',
+    temperature: 0.3,
+    max_tokens: 500,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 3600
+  },
+  scan: {
     model: 'gpt-4o-mini',
     temperature: 0.3,
     max_tokens: 500,

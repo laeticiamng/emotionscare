@@ -1,9 +1,9 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { CoachAction, CoachEvent, EmotionalData } from './types';
 
 export class EmotionalDataService {
   private userId: string | null = null;
+  private emotionalData: Map<string, EmotionalData[]> = new Map();
   
   constructor(userId?: string) {
     this.userId = userId || null;
@@ -89,6 +89,50 @@ export class EmotionalDataService {
       trend: "stable", // Simplified for this implementation
       averageIntensity: totalIntensity / emotions.length
     };
+  }
+  
+  // Add missing methods that were referenced in emotion-handlers.ts
+  updateUserEmotionalData(userId: string, data: any): void {
+    if (!this.emotionalData.has(userId)) {
+      this.emotionalData.set(userId, []);
+    }
+    
+    const userEmotions = this.emotionalData.get(userId) || [];
+    
+    const newEmotionData: EmotionalData = {
+      emotion: data.emotion || "neutral",
+      intensity: data.confidence || data.intensity || 0.5,
+      timestamp: new Date().toISOString(),
+      context: data.context
+    };
+    
+    userEmotions.push(newEmotionData);
+    
+    // Keep only the most recent 100 entries
+    if (userEmotions.length > 100) {
+      userEmotions.shift();
+    }
+  }
+  
+  hasNegativeTrend(userId: string): boolean {
+    const userEmotions = this.emotionalData.get(userId) || [];
+    
+    if (userEmotions.length < 3) {
+      return false;
+    }
+    
+    // Get the 3 most recent emotions
+    const recentEmotions = userEmotions.slice(-3);
+    
+    // Check if there's a negative trend in intensity
+    const negativeEmotions = ['sad', 'angry', 'anxious', 'depressed', 'stressed', 'worried', 'fearful', 'upset'];
+    
+    const hasNegativeEmotions = recentEmotions.filter(e => 
+      negativeEmotions.includes(e.emotion.toLowerCase())
+    ).length >= 2;
+    
+    // Very simplified trend detection
+    return hasNegativeEmotions;
   }
 }
 

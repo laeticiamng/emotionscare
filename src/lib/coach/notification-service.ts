@@ -24,7 +24,7 @@ export class NotificationService {
     return [...this.notifications];
   }
   
-  async addNotification(notification: Omit<CoachNotification, 'id' | 'timestamp' | 'read'>): Promise<CoachNotification> {
+  async addNotification(userId: string, notification: Omit<CoachNotification, 'id' | 'timestamp' | 'read'>): Promise<CoachNotification> {
     const newNotification: CoachNotification = {
       id: `notif-${Date.now()}`,
       timestamp: new Date().toISOString(),
