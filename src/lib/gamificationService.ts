@@ -1,319 +1,400 @@
-import { Badge, Challenge, Achievement } from '@/types/gamification';
 
-// Mock data for challenges
-const challenges: Challenge[] = [
-  {
-    id: 'challenge-1',
-    title: 'First Journal Entry',
-    description: 'Create your first journal entry to start tracking your emotional journey.',
-    points: 10,
-    requirements: ['Create a journal entry'],
-    completed: false,
-    category: 'journal',
-    difficulty: 'easy',
-    name: 'First Journal Entry'  // Added name property
-  },
-  {
-    id: 'challenge-2',
-    title: 'Complete an Emotion Scan',
-    description: 'Complete your first emotion scan to understand your emotional state.',
-    points: 15,
-    requirements: ['Use the emotion scanner'],
-    completed: false,
-    category: 'emotions',
-    difficulty: 'easy',
-    name: 'Complete an Emotion Scan'  // Added name property
-  }
+import { supabase } from '@/lib/supabase-client';
+import { Badge, EmotionBadge, GamificationLevel } from '@/types/gamification';
+import { v4 as uuidv4 } from 'uuid';
+import { Emotion } from '@/types';
+import { toast } from '@/hooks/use-toast';
+
+// Gamification points for different activities
+const POINTS = {
+  EMOTION_SCAN: 10,
+  STREAK_DAY: 5,
+  JOURNAL_ENTRY: 15,
+  MEDITATION_COMPLETE: 20,
+  COACH_CHAT: 5,
+  BALANCED_EMOTION: 15
+};
+
+// Level thresholds
+const LEVEL_THRESHOLDS = [
+  0,     // Level 1
+  100,   // Level 2
+  250,   // Level 3
+  500,   // Level 4
+  1000,  // Level 5
+  2000,  // Level 6
+  3500,  // Level 7
+  5000,  // Level 8
+  7500,  // Level 9
+  10000  // Level 10
 ];
 
-// Mock data for badges
-const badges: Badge[] = [
+// Emotion badges configuration
+const EMOTION_BADGES: EmotionBadge[] = [
   {
-    id: 'badge-1',
-    name: 'Emotion Explorer',
-    description: 'Completed 5 emotion scans',
-    image_url: '/badges/emotion-explorer.png',
+    id: 'emotion-tracker-bronze',
+    name: 'Traceur d\'émotions Bronze',
+    description: 'Enregistrez 5 émotions',
+    type: 'achievement',
+    icon: '🥉',
     threshold: 5,
-    progress: 2,
-    unlocked: false
+    emotionCount: 5
   },
   {
-    id: 'badge-2',
-    name: 'Journal Master',
-    description: 'Created 10 journal entries',
-    image_url: '/badges/journal-master.png',
-    threshold: 10,
-    progress: 3,
-    unlocked: false
+    id: 'emotion-tracker-silver',
+    name: 'Traceur d\'émotions Argent',
+    description: 'Enregistrez 25 émotions',
+    type: 'achievement',
+    icon: '🥈',
+    threshold: 25,
+    emotionCount: 25
+  },
+  {
+    id: 'emotion-tracker-gold',
+    name: 'Traceur d\'émotions Or',
+    description: 'Enregistrez 100 émotions',
+    type: 'achievement',
+    icon: '🥇',
+    threshold: 100,
+    emotionCount: 100
+  },
+  {
+    id: 'joy-explorer',
+    name: 'Explorateur de Joie',
+    description: 'Explorez votre joie 10 fois',
+    type: 'emotion',
+    icon: '😄',
+    emotion: 'joy',
+    threshold: 10
+  },
+  {
+    id: 'calm-mind',
+    name: 'Esprit Calme',
+    description: 'Atteignez un état calme 10 fois',
+    type: 'emotion',
+    icon: '😌',
+    emotion: 'calm',
+    threshold: 10
+  },
+  {
+    id: 'courage-badge',
+    name: 'Badge de Courage',
+    description: 'Admettez votre peur 5 fois',
+    type: 'emotion',
+    icon: '😰',
+    emotion: 'fear',
+    threshold: 5
+  },
+  {
+    id: 'emotional-awareness',
+    name: 'Conscience Émotionnelle',
+    description: 'Enregistrez 5 émotions différentes',
+    type: 'diversity',
+    icon: '🌈',
+    threshold: 5
+  },
+  {
+    id: 'emotional-balance',
+    name: 'Équilibre Émotionnel',
+    description: 'Maintenez un équilibre entre émotions positives et négatives',
+    type: 'balance',
+    icon: '☯️',
+    threshold: 10
+  },
+  {
+    id: 'streak-week',
+    name: 'Régularité Hebdomadaire',
+    description: 'Enregistrez des émotions 7 jours de suite',
+    type: 'streak',
+    icon: '🔥',
+    threshold: 7,
+    streakDays: 7
   }
 ];
 
-// Get all challenges
-export const getChallenges = async (): Promise<Challenge[]> => {
-  return [...challenges];
-};
-
-// Get a specific challenge by ID
-export const getChallenge = async (id: string): Promise<Challenge | undefined> => {
-  return challenges.find(challenge => challenge.id === id);
-};
-
-// Complete a challenge
-export const completeChallenge = async (id: string): Promise<Challenge | undefined> => {
-  const challengeIndex = challenges.findIndex(challenge => challenge.id === id);
-  
-  if (challengeIndex === -1) {
-    return undefined;
-  }
-  
-  challenges[challengeIndex] = {
-    ...challenges[challengeIndex],
-    completed: true
-  };
-  
-  return challenges[challengeIndex];
-};
-
-// Get all badges
-export const getBadges = async (): Promise<Badge[]> => {
-  return [...badges];
-};
-
-// Get a specific badge by ID
-export const getBadge = async (id: string): Promise<Badge | undefined> => {
-  return badges.find(badge => badge.id === id);
-};
-
-// Unlock a badge
-export const unlockBadge = async (id: string): Promise<Badge | undefined> => {
-  const badgeIndex = badges.findIndex(badge => badge.id === id);
-  
-  if (badgeIndex === -1) {
-    return undefined;
-  }
-  
-  badges[badgeIndex] = {
-    ...badges[badgeIndex],
-    unlocked: true,
-    unlocked_at: new Date().toISOString(),
-    progress: badges[badgeIndex].threshold || 1
-  };
-  
-  return badges[badgeIndex];
-};
-
-// Update badge progress
-export const updateBadgeProgress = async (id: string, progress: number): Promise<Badge | undefined> => {
-  const badgeIndex = badges.findIndex(badge => badge.id === id);
-  
-  if (badgeIndex === -1) {
-    return undefined;
-  }
-  
-  const threshold = badges[badgeIndex].threshold || 1;
-  const isUnlocked = progress >= threshold;
-  
-  badges[badgeIndex] = {
-    ...badges[badgeIndex],
-    progress,
-    unlocked: isUnlocked,
-    unlocked_at: isUnlocked ? new Date().toISOString() : undefined
-  };
-  
-  return badges[badgeIndex];
-};
-
-// Awards a badge based on emotion data
+/**
+ * Process an emotion scan for gamification badges and points
+ * @param userId User ID
+ * @param emotion Emotion detected
+ * @param confidence Confidence level of detection
+ * @returns The badge earned, if any
+ */
 export const processEmotionForBadges = async (
   userId: string,
   emotion: string,
-  intensity: number
+  confidence: number
 ): Promise<Badge | null> => {
   try {
-    // Get existing badges for this user
-    const { data: existingBadges } = await supabase
-      .from('badges')
+    // 1. Get user's current gamification data
+    const { data: userData, error: userError } = await supabase
+      .from('user_gamification')
       .select('*')
-      .eq('user_id', userId);
-      
-    // Get total scan count
-    const { count } = await supabase
-      .from('emotions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId);
-      
-    let newBadge: Badge | null = null;
-    
-    // Check for milestone based badges
-    if (count === 1) {
-      newBadge = {
-        id: 'first-scan',
-        name: 'Premier Scan',
-        description: 'Premier scan émotionnel complété',
-        icon: 'award',
-        category: 'milestone'
-      };
-    } else if (count === 10) {
-      newBadge = {
-        id: 'ten-scans',
-        name: 'Scanner Émotionnel',
-        description: '10 scans émotionnels complétés',
-        icon: 'activity',
-        category: 'milestone'
-      };
-    } else if (count === 50) {
-      newBadge = {
-        id: 'emotion-master',
-        name: 'Maître des Émotions',
-        description: '50 scans émotionnels complétés',
-        icon: 'star',
-        category: 'milestone'
-      };
-    }
-    
-    // Check for consistency streak badges
-    const streakDays = await calculateEmotionStreak(userId);
-    if (streakDays === 3) {
-      const hasBadge = existingBadges?.some(b => b.name === 'Constance');
-      if (!hasBadge) {
-        newBadge = {
-          id: 'three-day-streak',
-          name: 'Constance',
-          description: 'Scan émotionnel 3 jours consécutifs',
-          icon: 'calendar',
-          category: 'streak'
-        };
-      }
-    } else if (streakDays === 7) {
-      const hasBadge = existingBadges?.some(b => b.name === 'Régularité');
-      if (!hasBadge) {
-        newBadge = {
-          id: 'week-streak',
-          name: 'Régularité',
-          description: 'Scan émotionnel 7 jours consécutifs',
-          icon: 'calendar-check',
-          category: 'streak'
-        };
-      }
-    } else if (streakDays === 30) {
-      const hasBadge = existingBadges?.some(b => b.name === 'Dévouement');
-      if (!hasBadge) {
-        newBadge = {
-          id: 'month-streak',
-          name: 'Dévouement',
-          description: 'Scan émotionnel 30 jours consécutifs',
-          icon: 'award',
-          category: 'streak'
-        };
-      }
-    }
-    
-    // Check for emotion diversity badges
-    const { data: distinctEmotions } = await supabase
-      .from('emotions')
-      .select('emojis')
       .eq('user_id', userId)
-      .not('emojis', 'is', null);
-      
-    // Count unique emotions
-    const uniqueEmotions = new Set(distinctEmotions?.map(d => d.emojis));
-    if (uniqueEmotions.size >= 5) {
-      const hasBadge = existingBadges?.some(b => b.name === 'Émotion Variée');
-      if (!hasBadge) {
-        newBadge = {
-          id: 'emotion-diversity',
-          name: 'Émotion Variée',
-          description: 'Expérience de 5 émotions différentes',
-          icon: 'smile',
-          category: 'diversity'
-        };
-      }
-    }
+      .single();
     
-    // Save the new badge if one was earned
-    if (newBadge && userId) {
-      const { error: badgeError } = await supabase
-        .from('badges')
+    if (userError && userError.code !== 'PGRST116') {
+      console.error('Error fetching user gamification data:', userError);
+      return null;
+    }
+
+    // 2. If no data exists, create it
+    if (!userData) {
+      const { error: createError } = await supabase
+        .from('user_gamification')
         .insert({
           user_id: userId,
-          name: newBadge.name,
-          description: newBadge.description,
-          image_url: `/badges/${newBadge.id}.png`,
-          awarded_at: new Date().toISOString()
+          points: POINTS.EMOTION_SCAN,
+          level: 1,
+          badges: [],
+          streak_days: 1,
+          last_activity_date: new Date().toISOString().split('T')[0],
+          emotion_counts: { [emotion]: 1 }
         });
-        
-      if (badgeError) {
-        console.error('Error saving badge:', badgeError);
+      
+      if (createError) {
+        console.error('Error creating user gamification data:', createError);
         return null;
       }
       
-      return newBadge;
+      return null; // First entry, no badges yet
     }
     
-    return null;
+    // 3. Prepare data for update
+    const today = new Date().toISOString().split('T')[0];
+    const lastActivityDate = userData.last_activity_date;
+    const isConsecutiveDay = isConsecutiveDate(lastActivityDate, today);
+    
+    let streakDays = userData.streak_days || 0;
+    if (isConsecutiveDay) {
+      streakDays += 1;
+    } else if (lastActivityDate !== today) {
+      streakDays = 1; // Reset streak if not consecutive and not same day
+    }
+    
+    // Update emotion counts
+    const emotionCounts = userData.emotion_counts || {};
+    emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+    
+    // Calculate points to add
+    let pointsToAdd = POINTS.EMOTION_SCAN;
+    if (isConsecutiveDay && lastActivityDate !== today) {
+      pointsToAdd += POINTS.STREAK_DAY;
+    }
+    
+    // Check for balanced emotions
+    const positiveEmotions = ['joy', 'calm', 'excited', 'creative'];
+    const negativeEmotions = ['anger', 'fear', 'sadness', 'stress'];
+    
+    const totalPositive = positiveEmotions.reduce((sum, emotion) => 
+      sum + (emotionCounts[emotion] || 0), 0);
+    const totalNegative = negativeEmotions.reduce((sum, emotion) => 
+      sum + (emotionCounts[emotion] || 0), 0);
+    
+    // Bonus for emotional balance
+    if (totalPositive > 0 && totalNegative > 0 && 
+        Math.abs(totalPositive - totalNegative) <= 3 && 
+        totalPositive + totalNegative >= 10) {
+      pointsToAdd += POINTS.BALANCED_EMOTION;
+    }
+    
+    // 4. Check for badges
+    const currentBadges = userData.badges || [];
+    let newBadge: Badge | null = null;
+    
+    // Calculate total emotions tracked
+    const totalEmotions = Object.values(emotionCounts).reduce((a, b) => (a as number) + (b as number), 0) as number;
+    
+    // Check each badge type
+    for (const badgeTemplate of EMOTION_BADGES) {
+      // Skip if user already has this badge
+      if (currentBadges.some(b => b.id === badgeTemplate.id)) {
+        continue;
+      }
+      
+      let badgeEarned = false;
+      
+      switch (badgeTemplate.type) {
+        case 'achievement':
+          // Emotion tracker badges based on total count
+          if (totalEmotions >= badgeTemplate.threshold) {
+            badgeEarned = true;
+          }
+          break;
+          
+        case 'emotion':
+          // Specific emotion badges
+          if (badgeTemplate.emotion && 
+              emotionCounts[badgeTemplate.emotion] >= badgeTemplate.threshold) {
+            badgeEarned = true;
+          }
+          break;
+          
+        case 'diversity':
+          // Emotion diversity badge
+          if (Object.keys(emotionCounts).length >= badgeTemplate.threshold) {
+            badgeEarned = true;
+          }
+          break;
+          
+        case 'balance':
+          // Emotional balance badge
+          if (totalPositive >= badgeTemplate.threshold/2 && 
+              totalNegative >= badgeTemplate.threshold/2 && 
+              Math.abs(totalPositive - totalNegative) <= 3) {
+            badgeEarned = true;
+          }
+          break;
+          
+        case 'streak':
+          // Streak badge
+          if (streakDays >= badgeTemplate.threshold) {
+            badgeEarned = true;
+          }
+          break;
+      }
+      
+      if (badgeEarned) {
+        // Create badge instance with timestamp
+        const badge: Badge = {
+          id: badgeTemplate.id,
+          name: badgeTemplate.name,
+          description: badgeTemplate.description,
+          icon: badgeTemplate.icon,
+          earned_at: new Date().toISOString(),
+          type: badgeTemplate.type
+        };
+        
+        // Add badge to array
+        currentBadges.push(badge);
+        newBadge = badge;
+        
+        // Add bonus points for earning a badge
+        pointsToAdd += 50;
+        
+        break; // Only award one badge at a time
+      }
+    }
+    
+    // 5. Calculate new level
+    const newPoints = userData.points + pointsToAdd;
+    let newLevel = userData.level;
+    
+    // Check if user leveled up
+    for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+      if (newPoints >= LEVEL_THRESHOLDS[i]) {
+        newLevel = i + 1;
+        break;
+      }
+    }
+    
+    // 6. Update user data
+    const { error: updateError } = await supabase
+      .from('user_gamification')
+      .update({
+        points: newPoints,
+        level: newLevel,
+        badges: currentBadges,
+        streak_days: streakDays,
+        last_activity_date: today,
+        emotion_counts: emotionCounts
+      })
+      .eq('user_id', userId);
+    
+    if (updateError) {
+      console.error('Error updating user gamification data:', updateError);
+      return null;
+    }
+    
+    return newBadge;
   } catch (error) {
     console.error('Error processing emotion for badges:', error);
     return null;
   }
 };
 
-// Calculate consecutive days streak for a user
-export const calculateEmotionStreak = async (userId: string): Promise<number> => {
+/**
+ * Check if two dates are consecutive
+ */
+function isConsecutiveDate(date1: string, date2: string): boolean {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  
+  // Reset hours to compare just dates
+  d1.setHours(0, 0, 0, 0);
+  d2.setHours(0, 0, 0, 0);
+  
+  // Calculate difference in days
+  const diffTime = d2.getTime() - d1.getTime();
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+  
+  return diffDays === 1;
+}
+
+/**
+ * Get gamification data for a user
+ */
+export const getGamificationData = async (userId: string) => {
   try {
-    const { data: emotionsData, error } = await supabase
-      .from('emotions')
-      .select('date')
+    const { data, error } = await supabase
+      .from('user_gamification')
+      .select('*')
       .eq('user_id', userId)
-      .order('date', { ascending: false });
+      .single();
       
-    if (error || !emotionsData) {
-      return 0;
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching gamification data:', error);
+      return null;
     }
     
-    if (emotionsData.length === 0) {
-      return 0;
+    if (!data) {
+      // Return default data structure if no data exists
+      return {
+        points: 0,
+        level: 1,
+        badges: [],
+        streak_days: 0,
+        emotion_counts: {},
+        last_activity_date: null
+      };
     }
     
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    let streakDays = 0;
-    let currentDate = new Date(today);
-    
-    // Check for consecutive days with entries
-    while (true) {
-      // Format the date as yyyy-MM-dd to match with dates in the database
-      const dateString = currentDate.toISOString().split('T')[0];
-      
-      // Find if there's an entry for this date
-      const hasEntryForDate = emotionsData.some(entry => {
-        const entryDate = new Date(entry.date);
-        return entryDate.toISOString().split('T')[0] === dateString;
-      });
-      
-      if (hasEntryForDate) {
-        streakDays++;
-        currentDate.setDate(currentDate.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-    
-    return streakDays;
+    return data;
   } catch (error) {
-    console.error('Error calculating emotion streak:', error);
-    return 0;
+    console.error('Error in getGamificationData:', error);
+    return null;
   }
 };
 
-export default {
-  getChallenges,
-  getChallenge,
-  completeChallenge,
-  getBadges,
-  getBadge,
-  unlockBadge,
-  updateBadgeProgress,
-  processEmotionForBadges,
-  calculateEmotionStreak
+/**
+ * Get level data based on points
+ */
+export const getLevelData = (points: number): GamificationLevel => {
+  // Determine current level
+  let currentLevel = 1;
+  let nextLevel = 2;
+  let currentLevelThreshold = 0;
+  let nextLevelThreshold = LEVEL_THRESHOLDS[1];
+  
+  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (points >= LEVEL_THRESHOLDS[i]) {
+      currentLevel = i + 1;
+      currentLevelThreshold = LEVEL_THRESHOLDS[i];
+      nextLevel = i + 2;
+      nextLevelThreshold = LEVEL_THRESHOLDS[i + 1] || LEVEL_THRESHOLDS[i] * 2;
+      break;
+    }
+  }
+  
+  // Calculate progress to next level
+  const pointsInCurrentLevel = points - currentLevelThreshold;
+  const pointsToNextLevel = nextLevelThreshold - currentLevelThreshold;
+  const progress = Math.min(100, Math.round((pointsInCurrentLevel / pointsToNextLevel) * 100));
+  
+  return {
+    currentLevel,
+    nextLevel,
+    progress,
+    points,
+    pointsToNextLevel: nextLevelThreshold - points
+  };
 };

@@ -2,8 +2,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -39,7 +37,7 @@ serve(async (req) => {
       transcriptionResponse = await fetch("https://api.openai.com/v1/audio/transcriptions", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${openAIApiKey}`
+          "Authorization": `Bearer ${Deno.env.get('OPENAI_API_KEY')}`
         },
         body: formData
       });
@@ -92,7 +90,7 @@ serve(async (req) => {
     const intentResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openAIApiKey}`,
+        "Authorization": `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({

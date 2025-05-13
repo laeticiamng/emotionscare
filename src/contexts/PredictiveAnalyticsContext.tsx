@@ -1,154 +1,343 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { EmotionPrediction, Recommendation } from '@/types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase-client';
+import { useAuth } from './AuthContext';
+import { useToast } from '@/hooks/use-toast';
+
+// Types for predictions
+export interface PredictiveFeature {
+  name: string;
+  description: string;
+  enabled: boolean;
+  priority: number; // 1-10, 10 being highest priority
+  toggleFeature: (enabled: boolean) => void;
+}
+
+export interface Prediction {
+  emotion: string;
+  confidence: number;
+  timestamp: string;
+  source: string;
+  context?: string;
+}
+
+export interface PredictionRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  type: 'activity' | 'content' | 'insight';
+  priority: number;
+  actionUrl?: string;
+  actionLabel?: string;
+}
 
 interface PredictiveAnalyticsContextType {
   isLoading: boolean;
-  error: string;
-  currentPredictions: EmotionPrediction;
-  generatePrediction: (userData?: any) => Promise<EmotionPrediction>;
+  error: string | null;
+  currentPredictions: Prediction | null;
+  generatePrediction: () => Promise<void>;
   resetPredictions: () => void;
   isEnabled: boolean;
   setEnabled: (enabled: boolean) => void;
-  availableFeatures: Array<{
-    name: string;
-    description: string;
-    enabled: boolean;
-    toggleFeature: (enabled: boolean) => void;
-    priority: number;
-  }>;
   predictionEnabled: boolean;
   setPredictionEnabled: (enabled: boolean) => void;
-  generatePredictions: () => void;
-  recommendations: Recommendation[];
+  availableFeatures: PredictiveFeature[];
+  recommendations: PredictionRecommendation[];
+  generatePredictions: () => Promise<void>;
 }
 
-const defaultPrediction: EmotionPrediction = {
-  predictedEmotion: '',
-  emotion: '',
-  probability: 0,
-  confidence: 0,
-  triggers: [],
-  recommendations: []
-};
-
-const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType>({
-  isLoading: false,
-  error: '',
-  currentPredictions: defaultPrediction,
-  generatePrediction: async () => defaultPrediction,
-  resetPredictions: () => {},
-  isEnabled: false,
-  setEnabled: () => {},
-  availableFeatures: [],
-  predictionEnabled: false,
-  setPredictionEnabled: () => {},
-  generatePredictions: () => {},
-  recommendations: []
-});
+const PredictiveAnalyticsContext = createContext<PredictiveAnalyticsContextType | undefined>(undefined);
 
 export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [currentPredictions, setCurrentPredictions] = useState<EmotionPrediction>(defaultPrediction);
-  const [isEnabled, setIsEnabled] = useState(true);
-  const [predictionEnabled, setPredictionEnabled] = useState(true);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  
-  const availableFeatures = [
-    {
-      name: "Prédiction émotionnelle",
-      description: "Prédire vos émotions futures basées sur les données historiques",
-      enabled: true,
-      toggleFeature: (enabled: boolean) => {},
-      priority: 9
-    },
-    {
-      name: "Détection de stress",
-      description: "Alertes préventives pour les niveaux de stress élevés",
-      enabled: true,
-      toggleFeature: (enabled: boolean) => {},
-      priority: 8
-    },
-    {
-      name: "Recommandations proactives",
-      description: "Suggestions d'activités basées sur vos habitudes",
-      enabled: false,
-      toggleFeature: (enabled: boolean) => {},
-      priority: 7
-    }
-  ];
+  const [error, setError] = useState<string | null>(null);
+  const [currentPredictions, setCurrentPredictions] = useState<Prediction | null>(null);
+  const [isEnabled, setIsEnabled] = useState(() => {
+    const stored = localStorage.getItem('predictiveAnalyticsEnabled');
+    return stored ? JSON.parse(stored) : true;
+  });
+  const [predictionEnabled, setPredictionEnabled] = useState(() => {
+    const stored = localStorage.getItem('predictionEnabled');
+    return stored ? JSON.parse(stored) : true;
+  });
+  const [recommendations, setRecommendations] = useState<PredictionRecommendation[]>([]);
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const generatePrediction = async (userData?: any): Promise<EmotionPrediction> => {
-    setIsLoading(true);
-    setError('');
+  // Define available features
+  const [availableFeatures, setAvailableFeatures] = useState<PredictiveFeature[]>([
+    {
+      name: 'Prédiction émotionnelle',
+      description: 'Anticiper vos états émotionnels pour adapter l\'expérience',
+      enabled: predictionEnabled,
+      priority: 10,
+      toggleFeature: (enabled) => setPredictionEnabled(enabled)
+    },
+    {
+      name: 'Recommandations musicales prédictives',
+      description: 'Suggérer automatiquement des musiques adaptées à votre état prédit',
+      enabled: true,
+      priority: 8,
+      toggleFeature: () => {}
+    },
+    {
+      name: 'Adaptation visuelle anticipative',
+      description: 'Ajuster l\'interface selon vos préférences anticipées',
+      enabled: true,
+      priority: 7,
+      toggleFeature: () => {}
+    },
+    {
+      name: 'Storytelling prédictif',
+      description: 'Présenter des récits pertinents selon les prédictions',
+      enabled: true,
+      priority: 6,
+      toggleFeature: () => {}
+    },
+    {
+      name: 'Détection de désengagement',
+      description: 'Identifier les signes précoces de désengagement pour une intervention préventive',
+      enabled: true,
+      priority: 9,
+      toggleFeature: () => {}
+    }
+  ]);
+
+  // Store settings in localStorage
+  useEffect(() => {
+    localStorage.setItem('predictiveAnalyticsEnabled', JSON.stringify(isEnabled));
+  }, [isEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('predictionEnabled', JSON.stringify(predictionEnabled));
+  }, [predictionEnabled]);
+  
+  // Update feature enabled status when predictionEnabled changes
+  useEffect(() => {
+    setAvailableFeatures(prev => prev.map(feature => 
+      feature.name === 'Prédiction émotionnelle' 
+        ? { ...feature, enabled: predictionEnabled } 
+        : feature
+    ));
+  }, [predictionEnabled]);
+
+  // Generate a new prediction based on user data
+  const generatePrediction = async () => {
+    if (!user || !isEnabled) return;
     
     try {
-      // Simulating API call
+      setIsLoading(true);
+      setError(null);
+      
+      // This would typically call an API/backend service
+      // For now, we're simulating predictions
+      
+      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const mockPrediction: EmotionPrediction = {
-        predictedEmotion: 'calm',
-        emotion: 'calm',
-        probability: 0.85,
-        confidence: 0.82,
-        triggers: ['work deadline', 'lack of sleep'],
-        recommendations: ['Take a short break', 'Practice deep breathing']
+      // Sample emotional states
+      const emotions = ['calm', 'focused', 'stressed', 'tired', 'energetic', 'creative'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const randomConfidence = Math.random() * 0.5 + 0.5; // 0.5-1.0
+      
+      const prediction: Prediction = {
+        emotion: randomEmotion,
+        confidence: parseFloat(randomConfidence.toFixed(2)),
+        timestamp: new Date().toISOString(),
+        source: 'pattern-analysis',
+        context: 'user-activity'
       };
       
-      setCurrentPredictions(mockPrediction);
-      return mockPrediction;
+      setCurrentPredictions(prediction);
+      
+      // Generate recommendations based on prediction
+      generateRecommendationsForPrediction(prediction);
+      
+      toast({
+        title: "Nouvelle prédiction",
+        description: `État émotionnel prédit : ${randomEmotion} (${(randomConfidence * 100).toFixed(0)}% de confiance)`,
+      });
+      
     } catch (err) {
-      setError('Failed to generate prediction');
-      throw err;
+      console.error('Error generating prediction:', err);
+      setError('Erreur lors de la génération des prédictions');
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer une prédiction pour le moment",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const resetPredictions = () => {
-    setCurrentPredictions(defaultPrediction);
-  };
 
-  const generatePredictions = () => {
-    generatePrediction().then(() => {
-      // Generate some mock recommendations
-      setRecommendations([
+  // Generate recommendations based on predicted emotion
+  const generateRecommendationsForPrediction = (prediction: Prediction) => {
+    const recommendationsByEmotion: Record<string, PredictionRecommendation[]> = {
+      'calm': [
         {
-          id: '1',
-          title: 'Prendre une pause méditative',
-          description: 'Prenez 5 minutes pour vous recentrer et respirer profondément',
-          category: 'wellbeing',
-          priority: 9,
-          confidence: 0.92
+          id: 'calm-1',
+          title: 'Maintenir votre sérénité',
+          description: 'Profitez de votre état de calme pour une séance de méditation profonde',
+          type: 'activity',
+          priority: 10,
+          actionUrl: '/meditation',
+          actionLabel: 'Méditer maintenant'
         },
         {
-          id: '2',
-          title: 'Écouter un podcast inspirant',
-          description: 'Découvrez notre sélection de contenus audio pour vous motiver',
-          category: 'content',
+          id: 'calm-2',
+          title: 'Journal de gratitude',
+          description: 'Votre état calme est idéal pour réfléchir à ce dont vous êtes reconnaissant',
+          type: 'insight',
           priority: 8,
-          confidence: 0.85
+          actionUrl: '/journal',
+          actionLabel: 'Écrire une entrée'
         }
-      ]);
-    });
+      ],
+      'focused': [
+        {
+          id: 'focused-1',
+          title: 'Maximiser votre concentration',
+          description: 'Vous êtes dans un état de concentration idéal pour des tâches importantes',
+          type: 'insight',
+          priority: 10
+        },
+        {
+          id: 'focused-2',
+          title: 'Musique pour rester concentré',
+          description: 'Une playlist spécialement conçue pour maintenir votre concentration',
+          type: 'content',
+          priority: 8,
+          actionUrl: '/music',
+          actionLabel: 'Écouter la playlist'
+        }
+      ],
+      'stressed': [
+        {
+          id: 'stressed-1',
+          title: 'Réduire votre stress',
+          description: 'Une courte séance de respiration pour diminuer rapidement votre niveau de stress',
+          type: 'activity',
+          priority: 10,
+          actionUrl: '/meditation',
+          actionLabel: 'Commencer maintenant'
+        },
+        {
+          id: 'stressed-2',
+          title: 'Parler à votre coach',
+          description: 'Discuter avec le coach IA peut vous aider à identifier les sources de stress',
+          type: 'activity',
+          priority: 9,
+          actionUrl: '/coach-chat',
+          actionLabel: 'Consulter le coach'
+        }
+      ],
+      'tired': [
+        {
+          id: 'tired-1',
+          title: 'Regain d\'énergie',
+          description: 'Une courte séance d\'étirements pour retrouver votre vitalité',
+          type: 'activity',
+          priority: 10
+        },
+        {
+          id: 'tired-2',
+          title: 'Musique énergisante',
+          description: 'Une playlist dynamique pour vous revitaliser',
+          type: 'content',
+          priority: 8,
+          actionUrl: '/music',
+          actionLabel: 'Écouter la playlist'
+        }
+      ],
+      'energetic': [
+        {
+          id: 'energetic-1',
+          title: 'Canalisez votre énergie',
+          description: 'Profitez de votre énergie pour compléter des tâches importantes',
+          type: 'insight',
+          priority: 9
+        },
+        {
+          id: 'energetic-2',
+          title: 'Activité créative',
+          description: 'Votre niveau d\'énergie est parfait pour explorer votre créativité',
+          type: 'activity',
+          priority: 8
+        }
+      ],
+      'creative': [
+        {
+          id: 'creative-1',
+          title: 'Explorez votre créativité',
+          description: 'Une session de brainstorming pour tirer parti de votre état créatif',
+          type: 'activity',
+          priority: 10
+        },
+        {
+          id: 'creative-2',
+          title: 'Journal créatif',
+          description: 'Notez vos idées créatives pendant que vous êtes inspiré',
+          type: 'content',
+          priority: 9,
+          actionUrl: '/journal',
+          actionLabel: 'Prendre des notes'
+        }
+      ]
+    };
+    
+    // Get recommendations for predicted emotion or default to empty array
+    const emotionalRecommendations = recommendationsByEmotion[prediction.emotion] || [];
+    
+    // Add generic recommendations that apply to all emotions
+    const genericRecommendations: PredictionRecommendation[] = [
+      {
+        id: 'generic-1',
+        title: 'Vérifiez votre progression',
+        description: 'Consultez vos statistiques et votre évolution émotionnelle',
+        type: 'insight',
+        priority: 7,
+        actionUrl: '/dashboard',
+        actionLabel: 'Voir le tableau de bord'
+      }
+    ];
+    
+    // Combine and sort by priority
+    const allRecommendations = [...emotionalRecommendations, ...genericRecommendations]
+      .sort((a, b) => b.priority - a.priority);
+      
+    setRecommendations(allRecommendations);
+  };
+
+  // Reset all predictions
+  const resetPredictions = () => {
+    setCurrentPredictions(null);
+    setRecommendations([]);
+  };
+
+  // Generate multiple predictions (useful for admin dashboard)
+  const generatePredictions = async () => {
+    if (!user || !isEnabled) return;
+    
+    // For simplicity, we'll just call the single prediction generator
+    await generatePrediction();
   };
 
   return (
-    <PredictiveAnalyticsContext.Provider 
-      value={{ 
-        isLoading, 
-        error, 
-        currentPredictions, 
-        generatePrediction, 
+    <PredictiveAnalyticsContext.Provider
+      value={{
+        isLoading,
+        error,
+        currentPredictions,
+        generatePrediction,
         resetPredictions,
         isEnabled,
-        setEnabled: setIsEnabled,
-        availableFeatures,
+        setEnabled,
         predictionEnabled,
         setPredictionEnabled,
-        generatePredictions,
-        recommendations
+        availableFeatures,
+        recommendations,
+        generatePredictions
       }}
     >
       {children}
@@ -156,4 +345,10 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
   );
 };
 
-export const usePredictiveAnalytics = () => useContext(PredictiveAnalyticsContext);
+export const usePredictiveAnalytics = () => {
+  const context = useContext(PredictiveAnalyticsContext);
+  if (context === undefined) {
+    throw new Error('usePredictiveAnalytics must be used within a PredictiveAnalyticsProvider');
+  }
+  return context;
+};
