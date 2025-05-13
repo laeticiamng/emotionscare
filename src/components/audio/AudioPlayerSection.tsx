@@ -1,14 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, SkipBack, SkipForward, Pause, Volume2, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAudio } from '@/contexts/AudioContext';
+import { useToast } from '@/hooks/use-toast';
 
 const AudioPlayerSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState('relaxation');
+  const { toast } = useToast();
   
   const { 
     currentTrack, 
@@ -80,6 +82,17 @@ const AudioPlayerSection: React.FC = () => {
   const handleVolumeChange = (values: number[]) => {
     setVolume(values[0] / 100);
   };
+  
+  // Notification de lecture démarrée
+  useEffect(() => {
+    if (isPlaying && currentTrack) {
+      toast({
+        title: "Lecture démarrée",
+        description: `En cours: ${currentTrack.title} - ${currentTrack.artist}`,
+        duration: 3000,
+      });
+    }
+  }, [isPlaying, currentTrack, toast]);
   
   return (
     <div className="space-y-6">

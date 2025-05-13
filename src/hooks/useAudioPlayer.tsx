@@ -1,25 +1,24 @@
 
-import { ChangeEvent } from 'react';
+import { useRef, useEffect, useState, useCallback, ChangeEvent } from 'react';
 import { MusicTrack } from '@/types/music';
 import { useAudioPlayerCore } from './audio/useAudioPlayerCore';
-import { formatTime } from './audio/audioPlayerUtils';
 
 /**
- * Centralized hook for managing audio playback throughout the application
+ * Hook centralisé pour gérer la lecture audio dans toute l'application
  */
 export function useAudioPlayer() {
-  // Use our core implementation
+  // Utiliser notre implémentation core
   const audioPlayer = useAudioPlayerCore();
   
-  // Add adapter for volume change handler
-  const handleVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Fonction auxiliaire pour le changement de volume via l'élément input
+  const handleVolumeChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     audioPlayer.setVolume(newVolume);
-  };
+  }, [audioPlayer]);
   
-  // Return the public API interface
+  // Retourner l'API publique
   return {
-    // State
+    // État
     currentTrack: audioPlayer.currentTrack,
     isPlaying: audioPlayer.isPlaying,
     volume: audioPlayer.volume,
@@ -31,19 +30,20 @@ export function useAudioPlayer() {
     error: audioPlayer.error,
     currentTime: audioPlayer.currentTime,
     loadingTrack: audioPlayer.loadingTrack,
+    isMuted: audioPlayer.isMuted,
     
-    // Track operations
+    // Opérations sur les pistes
     playTrack: audioPlayer.playTrack,
     pauseTrack: audioPlayer.pauseTrack,
     resumeTrack: audioPlayer.resumeTrack,
     nextTrack: audioPlayer.nextTrack,
     previousTrack: audioPlayer.previousTrack,
     
-    // Player controls
+    // Contrôles du lecteur
     seekTo: audioPlayer.seekTo,
     setVolume: audioPlayer.setVolume,
-    setCurrentTrack: audioPlayer.setCurrentTrack,
-    formatTime,
+    toggleMute: audioPlayer.toggleMute,
+    formatTime: audioPlayer.formatTime,
     handleProgressClick: audioPlayer.handleProgressClick,
     handleVolumeChange,
     toggleRepeat: audioPlayer.toggleRepeat,

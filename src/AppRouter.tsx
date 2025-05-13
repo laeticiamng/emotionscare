@@ -13,9 +13,11 @@ import DashboardPage from './pages/DashboardPage';
 import ScanPage from './pages/ScanPage';
 import JournalPage from './pages/JournalPage';
 import MusicPage from './pages/MusicPage';
+import MusicTherapyPage from './pages/MusicTherapyPage';
 import AudioPage from './pages/AudioPage';
 import VideoTherapyPage from './pages/VideoTherapyPage';
 import ARPage from './pages/ARPage';
+import MarketplacePage from './pages/MarketplacePage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -33,10 +35,12 @@ const AppRouter: React.FC = () => {
         <Route path="scan" element={<ScanPage />} />
         <Route path="journal" element={<JournalPage />} />
         <Route path="music" element={<MusicPage />} />
+        <Route path="musicotherapy" element={<MusicTherapyPage />} />
         <Route path="audio" element={<AudioPage />} />
         <Route path="video" element={<VideoTherapyPage />} />
         <Route path="ar" element={<ARPage />} />
         <Route path="mindfulness" element={<DashboardPage />} />
+        <Route path="marketplace" element={<MarketplacePage />} />
       </Route>
 
       {/* 404 route */}
