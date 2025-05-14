@@ -1,98 +1,90 @@
 
 import { useState, useEffect } from 'react';
-import { User, UserRole } from '@/types';
+import { User } from '@/types/user';
 
-// Simulated API call to get users
-const fetchUsers = async (): Promise<User[]> => {
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-  
-  // Mock user data
-  const users: User[] = [
-    {
-      id: '1',
-      name: 'Alex Dubois',
-      email: 'alex@company.com',
-      role: 'user' as UserRole,
-      department: 'Marketing',
-      emotional_score: 78,
-      createdAt: '2023-05-10T10:30:00Z'
-    },
-    {
-      id: '2',
-      name: 'Marie Laurent',
-      email: 'marie@company.com',
-      role: 'manager' as UserRole,
-      department: 'Finance',
-      emotional_score: 65,
-      createdAt: '2023-04-15T09:20:00Z'
-    },
-    {
-      id: '3',
-      name: 'Thomas Petit',
-      email: 'thomas@company.com',
-      role: 'employee' as UserRole,
-      department: 'IT',
-      emotional_score: 82,
-      createdAt: '2023-06-01T14:45:00Z'
-    },
-    {
-      id: '4',
-      name: 'Sophie Martin',
-      email: 'sophie@company.com',
-      role: 'employee' as UserRole,
-      department: 'HR',
-      emotional_score: 73,
-      createdAt: '2023-05-22T11:15:00Z'
-    },
-    {
-      id: '5',
-      name: 'Lucas Bernard',
-      email: 'lucas@company.com',
-      role: 'employee' as UserRole,
-      department: 'Sales',
-      emotional_score: 45,
-      createdAt: '2023-03-10T08:30:00Z'
-    }
-  ];
-  
-  return users;
-};
+interface UseUserTableDataReturn {
+  users: User[];
+  departments: string[];
+  loading: boolean;
+  error: string;
+}
 
-export function useUserTableData() {
+export const useUserTableData = (): UseUserTableDataReturn => {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Departments list derived from users
   const [departments, setDepartments] = useState<string[]>([]);
-  
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+
   useEffect(() => {
-    const loadUsers = async () => {
+    const fetchData = async () => {
       try {
-        const data = await fetchUsers();
-        setUsers(data);
+        setLoading(true);
+        
+        // Simulate API call with timeout
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Mock user data
+        const mockUsers: User[] = Array.from({ length: 10 }).map((_, index) => ({
+          id: `user-${index + 1}`,
+          name: `Utilisateur ${index + 1}`,
+          email: `user${index + 1}@example.com`,
+          role: index === 0 ? 'b2b_admin' : 'b2b_user',
+          department: ['Marketing', 'Développement', 'RH', 'Finance', 'Support'][index % 5],
+          position: ['Manager', 'Senior Developer', 'Junior Developer', 'Analyst', 'Designer'][index % 5], 
+          emotional_score: Math.floor(Math.random() * 100),
+          createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
+          avatar_url: `https://i.pravatar.cc/150?u=${index}`,
+          joined_at: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
+          preferences: {
+            theme: 'light',
+            fontSize: 'medium',
+            fontFamily: 'system',
+            language: 'fr',
+            dashboardLayout: 'default',
+            onboardingCompleted: true,
+            soundEnabled: true,
+            animations: true,
+            notifications: {
+              enabled: true,
+              emailEnabled: true,
+              pushEnabled: false,
+              frequency: 'daily'
+            },
+            privacy: {
+              shareData: true,
+              anonymizeReports: true,
+              publicProfile: false
+            },
+            accessibility: {
+              highContrast: false,
+              reduceMotion: false,
+              largeText: false
+            },
+            emotionalCamouflage: false,
+            aiSuggestions: true,
+            fullAnonymity: false,
+            notifications_enabled: true
+          }
+        }));
+
+        setUsers(mockUsers);
         
         // Extract unique departments
-        const uniqueDepartments = Array.from(
-          new Set(data.map(user => user.department).filter(Boolean))
-        ) as string[];
+        const uniqueDepartments = Array.from(new Set(mockUsers.map(user => user.department || ''))).filter(Boolean);
         setDepartments(uniqueDepartments);
         
       } catch (err) {
-        console.error('Error loading users:', err);
-        setError('Failed to load users data');
+        console.error('Error fetching user data:', err);
+        setError('Une erreur est survenue lors du chargement des données utilisateurs');
       } finally {
         setLoading(false);
       }
     };
-    
-    loadUsers();
+
+    fetchData();
   }, []);
-  
-  return {
-    users,
-    departments,
-    loading,
-    error
-  };
-}
+
+  return { users, departments, loading, error };
+};
+
+export default useUserTableData;

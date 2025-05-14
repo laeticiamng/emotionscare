@@ -1,48 +1,36 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 import Shell from '@/Shell';
 
-const Login = () => {
+export default function B2CLogin() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login } = useAuth();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
+    
     try {
-      // Simulation de connexion réussie
+      // Simulate login process
       await new Promise(resolve => setTimeout(resolve, 1000));
-      await login({ email, password, role: 'b2c' });
-      
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue sur votre espace personnel",
+        description: "Bienvenue sur EmotionsCare",
       });
       navigate('/b2c/dashboard');
     } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: "Vérifiez vos identifiants et réessayez",
+        description: "Veuillez vérifier vos identifiants",
         variant: "destructive",
       });
     } finally {
@@ -52,22 +40,20 @@ const Login = () => {
 
   return (
     <Shell>
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="flex items-center justify-center min-h-[80vh] p-4">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Connexion</CardTitle>
-            <CardDescription className="text-center">
-              Connectez-vous à votre espace bien-être personnel
-            </CardDescription>
+          <CardHeader>
+            <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
+            <CardDescription>Accédez à votre espace personnel</CardDescription>
           </CardHeader>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Adresse email</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input 
                   id="email" 
                   type="email" 
-                  placeholder="exemple@domaine.com" 
+                  placeholder="votre@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -76,13 +62,13 @@ const Login = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Mot de passe</Label>
-                  <Button variant="link" className="px-0 text-xs text-muted-foreground" type="button">
+                  <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                     Mot de passe oublié?
-                  </Button>
+                  </Link>
                 </div>
                 <Input 
                   id="password" 
-                  type="password" 
+                  type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -93,31 +79,21 @@ const Login = () => {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Connexion en cours..." : "Se connecter"}
               </Button>
-              <div className="text-center text-sm">
-                <span className="text-muted-foreground">Pas encore de compte? </span>
-                <Button 
-                  variant="link" 
-                  className="p-0 text-sm" 
-                  onClick={() => navigate('/b2c/register')}
-                  type="button"
-                >
+              <div className="text-sm text-center mt-2">
+                Pas encore de compte?{' '}
+                <Link to="/b2c/register" className="text-primary hover:underline">
                   S'inscrire
-                </Button>
+                </Link>
               </div>
-              <Button 
-                variant="ghost" 
-                type="button"
-                className="mt-2" 
-                onClick={() => navigate('/')}
-              >
-                Retour à l'accueil
-              </Button>
+              <div className="text-sm text-center">
+                <Link to="/" className="text-muted-foreground hover:underline">
+                  Retour à l'accueil
+                </Link>
+              </div>
             </CardFooter>
           </form>
         </Card>
       </div>
     </Shell>
   );
-};
-
-export default Login;
+}

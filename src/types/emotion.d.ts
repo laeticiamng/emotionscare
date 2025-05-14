@@ -1,48 +1,35 @@
 
-export interface Emotion {
-  id: string;
-  user_id: string;
-  date: string;
-  emotion: string;
-  intensity: number;
-  notes?: string;
-  sources?: string[];
-  context?: Record<string, any>;
-}
-
-export interface EmotionPrediction {
-  name: string;
-  score: number;
-  intensity: number;
-  confidence: number;
-}
-
-export interface EmotionalData {
-  id?: string;
-  timestamp: string;
-  dominant_emotion: string;
-  valence: number;
-  arousal: number;
-  context?: string;
-  notes?: string;
-  source?: string;
-  feedback?: string;
+export interface EmotionalTeamViewProps {
+  teamId: string;
+  dateRange: {
+    start: Date;
+    end: Date;
+  };
 }
 
 export interface EmotionResult {
-  dominantEmotion: string;
-  emotions: EmotionPrediction[];
-  analysis: string;
-  recommendations: string[];
+  id: string;
+  user_id: string;
+  text?: string;
+  primaryEmotion: string;
+  secondaryEmotion?: string;
+  intensity: number;
+  score: number;
   timestamp: string;
-  audio_url?: string; // Optional field for audio analyses
+  ai_feedback?: string;
+  feedback?: string;
+  source?: string;
 }
 
-export interface EmotionStats {
-  mostFrequent: string;
-  averageIntensity: number;
-  positivePercentage: number;
-  negativePercentage: number;
-  neutralPercentage: number;
-  trend: 'improving' | 'stable' | 'declining' | 'mixed';
+export interface Emotion {
+  id: string;
+  user_id: string;
+  emojis: string;
+  text?: string;
+  timestamp: string;
+  created_at: string;
+  updated_at: string;
+  is_confidential: boolean;
+  share_with_coach: boolean;
+  audio_url?: string;
 }

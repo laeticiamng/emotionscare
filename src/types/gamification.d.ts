@@ -1,50 +1,55 @@
 
+export interface GamificationStats {
+  points: number;
+  level: number;
+  rank: number;
+  streak: number;
+  nextLevel: number;
+  nextLevelPoints: number;
+  progressToNextLevel: number;
+  achievements: Achievement[];
+  badges: Badge[];
+  challenges: Challenge[];
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  recentAchievements: Achievement[];
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string;
+  earned_at: string;
+}
+
 export interface Badge {
   id: string;
   name: string;
   description: string;
   image_url: string;
-  category: string;
-  unlocked: boolean;
-  unlock_date?: string;
-  level?: number; // Adding the level property
+  earned_at?: string;
+  level?: number; // Some badges have levels
 }
 
 export interface Challenge {
   id: string;
-  title: string;
+  name: string;
   description: string;
+  image_url: string;
   points: number;
-  difficulty: 'easy' | 'medium' | 'hard' | 'expert';
-  category: string;
-  status: 'active' | 'completed' | 'failed' | 'locked' | 'ongoing' | 'available';
-  deadline?: string;
-  progress?: number;
-  completedAt?: string;
-  requirements?: string[];
-}
-
-export interface GamificationStats {
-  level: number;
-  points: number;
-  rank: string;
-  badges: Badge[];
-  completedChallenges: number;
-  streak: number;
-  nextLevel: number;
-  pointsToNextLevel: number;
   progress: number;
-  achievements: Badge[];
-  recentAchievements?: Badge[]; // Adding recentAchievements
+  total: number;
+  expires_at?: string;
 }
 
 export interface LeaderboardEntry {
-  id: string;
+  user_id: string;
   name: string;
-  avatar: string;
+  avatar_url: string;
   points: number;
   rank: number;
-  delta?: number; 
-  badge?: string;
-  level?: number; // Adding level property
+  level?: number;  // For compatibility
+  position?: number; // For compatibility
 }
