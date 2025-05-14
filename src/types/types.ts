@@ -22,6 +22,8 @@ export interface User {
   anonymity_code?: string;
   emotional_score?: number;
   joined_at?: string;
+  createdAt?: string;
+  team_id?: string;
 }
 
 export interface UserData extends User {
@@ -97,6 +99,10 @@ export interface EmotionResult {
   feedback?: string;
   timestamp?: string;
 }
+
+// Add EnhancedEmotionResult for backward compatibility
+export type Emotion = EmotionResult;
+export type EnhancedEmotionResult = EmotionResult;
 
 // ————————————————————————
 // MusicTrack

@@ -113,3 +113,6 @@ export const useTheme = (): ThemeContextType => {
   
   return context;
 };
+
+// Export types so they can be imported from this module
+export type { Theme, FontFamily, FontSize, ThemeContextType };

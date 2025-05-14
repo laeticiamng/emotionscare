@@ -1,13 +1,7 @@
 
 // This file is now obsolete and redirects to the main context
-import { 
-  ThemeProvider as MainThemeProvider, 
-  useTheme, 
-  Theme,
-  ThemeContextType,
-  FontFamily,
-  FontSize
-} from '@/contexts/ThemeContext';
+import { ThemeProvider as MainThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import type { Theme, ThemeContextType, FontFamily, FontSize } from '@/types/types';
 
 export type ThemeName = Theme;
 

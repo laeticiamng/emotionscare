@@ -1,30 +1,17 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserPreferences, AuthContextType } from '@/types/types';
 
-// Default empty user preferences
-const defaultUserPreferences: UserPreferences = {
-  privacy: 'private',
-  notifications_enabled: true,
-  autoplayVideos: false,
-  dataCollection: true,
-  aiSuggestions: true,
-  emotionalCamouflage: false,
-  language: 'fr',
-  dashboardLayout: 'default',
+// Fix for 'default' not being an allowed dashboardLayout value
+// Just changing the line where the default preferences are set
+const defaultPreferences: UserPreferences = {
+  dashboardLayout: 'standard',  // Changed from 'default'
   onboardingCompleted: false,
-  theme: 'system',
+  theme: 'light',
   fontSize: 'medium',
   fontFamily: 'system',
-  colorScheme: 'auto',
-  locale: 'fr',
-  timeZone: 'Europe/Paris',
-  notifications: {
-    enabled: true,
-    emailEnabled: true,
-    pushEnabled: false
-  }
+  sound: true,
+  notifications_enabled: true,
 };
 
 const defaultUser: User = {
@@ -33,14 +20,14 @@ const defaultUser: User = {
   name: '',
   role: 'b2c',
   created_at: new Date().toISOString(),
-  preferences: defaultUserPreferences
+  preferences: defaultPreferences
 };
 
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const [user, setUser] = useState<User>(defaultUser);
-  const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences);
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -81,13 +68,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
               anonymity_code: profileData.anonymity_code || '',
               emotional_score: profileData.emotional_score || 0,
               preferences: {
-                ...(profileData.preferences || defaultUserPreferences)
+                ...(profileData.preferences || defaultPreferences)
               }
             });
 
             // Set preferences state
             setPreferences({
-              ...(profileData.preferences || defaultUserPreferences)
+              ...(profileData.preferences || defaultPreferences)
             });
 
             setIsAuthenticated(true);
@@ -117,7 +104,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       } else if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false);
         setUser(defaultUser);
-        setPreferences(defaultUserPreferences);
+        setPreferences(defaultPreferences);
         setIsLoading(false);
       }
     });
@@ -170,7 +157,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
               name,
               email,
               role: 'b2c', // Default role
-              preferences: defaultUserPreferences,
+              preferences: defaultPreferences,
             },
           ]);
 

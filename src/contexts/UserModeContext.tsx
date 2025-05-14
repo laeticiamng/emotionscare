@@ -1,54 +1,30 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { UserModeType } from '@/types/types';
 
 interface UserModeContextType {
-  userMode: UserModeType | undefined;
+  userMode: UserModeType;
   setUserMode: (mode: UserModeType) => void;
-  isLoading: boolean;
 }
 
-const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
+const UserModeContext = createContext<UserModeContextType>({
+  userMode: 'b2c',
+  setUserMode: () => {},
+});
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+interface UserModeProviderProps {
+  children: ReactNode;
+}
 
-  useEffect(() => {
-    // Load user mode from localStorage if available
-    const storedMode = localStorage.getItem('userMode');
-    if (storedMode && [
-      'b2c', 'b2b-user', 'b2b-admin', 'personal', 'team', 'b2b-collaborator'
-    ].includes(storedMode)) {
-      setUserMode(storedMode as UserModeType);
-    }
-    setIsLoading(false);
-  }, []);
-
-  const handleSetUserMode = (mode: UserModeType) => {
-    setUserMode(mode);
-    localStorage.setItem('userMode', mode);
-  };
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserModeType>('b2c');
 
   return (
-    <UserModeContext.Provider
-      value={{
-        userMode,
-        setUserMode: handleSetUserMode,
-        isLoading
-      }}
-    >
+    <UserModeContext.Provider value={{ userMode, setUserMode }}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = (): UserModeContextType => {
-  const context = useContext(UserModeContext);
-  if (context === undefined) {
-    throw new Error('useUserMode must be used within a UserModeProvider');
-  }
-  return context;
-};
-
-export { UserModeType };
+export const useUserMode = () => useContext(UserModeContext);
+export type { UserModeType };
+export { UserModeProvider, useUserMode };
