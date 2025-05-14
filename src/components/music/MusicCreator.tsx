@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,10 @@ const MusicCreator: React.FC = () => {
   const [lyrics, setLyrics] = useState('');
   const [statusCheckInterval, setStatusCheckInterval] = useState<NodeJS.Timeout | null>(null);
   const [progress, setProgress] = useState(0);
+  const [trackLength, setTrackLength] = useState(180);
+  const [artist, setArtist] = useState('');
+  const [selectedAudioFile, setSelectedAudioFile] = useState<string | null>(null);
+  const [selectedCoverImage, setSelectedCoverImage] = useState<string | null>(null);
 
   const emotions = [
     { value: 'happy', label: 'Joie' },
@@ -232,6 +236,32 @@ const MusicCreator: React.FC = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleCreateTrack = () => {
+    if (!title || !artist) return;
+
+    const newTrack: MusicTrack = {
+      id: `track-${Date.now()}`,
+      title,
+      artist,
+      duration: trackLength,
+      url: selectedAudioFile || `/audio/${emotion.toLowerCase()}-${Math.floor(Math.random() * 5) + 1}.mp3`,
+      audioUrl: selectedAudioFile || `/audio/${emotion.toLowerCase()}-${Math.floor(Math.random() * 5) + 1}.mp3`,
+      coverUrl: selectedCoverImage || `/images/music/${emotion.toLowerCase()}-${Math.floor(Math.random() * 5) + 1}.jpg`,
+      emotion
+    };
+
+    // ... keep existing code (the rest of the function) the same
+  };
+
+  const handlePlayTrack = (track: MusicTrack) => {
+    const playableTrack = {
+      ...track,
+      url: track.url || track.audioUrl,
+      audioUrl: track.audioUrl || track.url
+    };
+    playTrack(playableTrack);
   };
 
   return (

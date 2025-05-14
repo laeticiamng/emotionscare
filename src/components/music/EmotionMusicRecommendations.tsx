@@ -153,6 +153,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
             isPlaying={isPlaying}
             onPlayPause={togglePlay}
             showEmotionTag={true}
+            compact={true}
           />
         ) : (
           <p className="text-muted-foreground text-center py-6">

@@ -1,66 +1,63 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { EmotionResult } from '@/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Smile, Meh, Frown } from 'lucide-react';
 
 interface EnhancedEmotionAnalysisProps {
-  result: EmotionResult;
-  className?: string;
+  emotion?: string | { emotion: string; score: number };
+  onAction?: (action: string) => void;
+  showHistory?: boolean;
 }
 
-const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({ result, className }) => {
-  // Assurons-nous que recommendations est bien un tableau de chaînes
-  const recommendations = result.recommendations || [];
-  
-  // Vous pouvez aussi structurer les recommandations si nécessaire
-  const structuredRecommendations = {
-    activities: recommendations.filter(r => r.includes('activité') || r.includes('exercice')),
-    music: recommendations.filter(r => r.includes('musique') || r.includes('son')),
-    breathingExercises: recommendations.filter(r => r.includes('respiration') || r.includes('souffle'))
+const EnhancedEmotionAnalysis = ({ emotion, onAction, showHistory }: EnhancedEmotionAnalysisProps) => {
+  const getEmotionIcon = (emotion: string) => {
+    switch (emotion) {
+      case 'joy': return <Smile className="h-4 w-4 mr-2 text-yellow-500" />;
+      case 'sadness': return <Frown className="h-4 w-4 mr-2 text-blue-500" />;
+      case 'neutral': return <Meh className="h-4 w-4 mr-2 text-gray-500" />;
+      default: return null;
+    }
+  };
+
+  const renderEmotionCard = () => {
+    if (!emotion) return null;
+    
+    // Handle both string and object emotion types
+    const emotionName = typeof emotion === 'string' ? emotion : emotion.emotion;
+    const emotionLabel = emotionName.charAt(0).toUpperCase() + emotionName.slice(1);
+    
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            {getEmotionIcon(emotionName)}
+            {emotionLabel}
+          </CardTitle>
+          <CardDescription>Analyse émotionnelle</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Badge variant="secondary">Emotion détectée</Badge>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Nous avons détecté que vous ressentez principalement de l'émotion {emotionName}.
+          </p>
+          <div className="mt-4 space-x-2">
+            <Button size="sm" onClick={() => onAction && onAction('meditation')}>
+              Lancer une méditation
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => onAction && onAction('journal')}>
+              Ecrire dans mon journal
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>Analyse Émotionnelle Avancée</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <h3 className="text-lg font-medium">Émotion Primaire</h3>
-          <div className="flex gap-2 mt-1">
-            <Badge variant="outline" className="text-base py-1 px-3">
-              {result.primaryEmotion?.name || result.emotion}
-            </Badge>
-            <Badge variant="secondary" className="text-base py-1 px-3">
-              {Math.round((result.intensity || 0.5) * 100)}% d'intensité
-            </Badge>
-          </div>
-        </div>
-
-        <Separator />
-
-        <div>
-          <h3 className="text-lg font-medium">Recommandations</h3>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            {recommendations.map((rec, index) => (
-              <li key={index} className="text-muted-foreground">{rec}</li>
-            ))}
-          </ul>
-        </div>
-
-        {result.feedback && (
-          <>
-            <Separator />
-            <div>
-              <h3 className="text-lg font-medium">Feedback IA</h3>
-              <p className="mt-2 text-muted-foreground">{result.feedback}</p>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+    <div>
+      {renderEmotionCard()}
+    </div>
   );
 };
 

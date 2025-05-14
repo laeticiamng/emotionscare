@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +15,7 @@ const NotificationPreferences = () => {
   
   // Default preferences if user has none
   const defaultPreferences = {
+    enabled: true,
     type: 'all' as NotificationType,
     frequency: 'immediate' as NotificationFrequency,
     tone: 'supportive' as NotificationTone,
@@ -27,10 +27,15 @@ const NotificationPreferences = () => {
   // Get existing preferences or use defaults
   const userNotifPrefs = user?.preferences?.notifications || {};
   
+  // Convert to object if it's a boolean
+  const notificationSettings = typeof userNotifPrefs === 'boolean' 
+    ? { enabled: userNotifPrefs } 
+    : userNotifPrefs;
+  
   // State for the form
   const [preferences, setPreferences] = useState({
     ...defaultPreferences,
-    ...userNotifPrefs
+    ...notificationSettings
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);

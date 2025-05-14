@@ -17,8 +17,8 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ sessions }) => {
         <h3 className="text-lg font-medium mb-4">Impact de vos sessions précédentes</h3>
         <div className="space-y-4">
           {sessions.map((session) => {
-            // Ensure we have a proper date value, using start_time as fallback
-            const sessionDate = session.date ? session.date : session.start_time;
+            // Ensure we have a proper date value, using different properties based on what's available
+            const sessionDate = session.date || session.startedAt || session.startTime || '';
             const durationMinutes = (session.duration_seconds || session.duration || 0) / 60;
             
             return (

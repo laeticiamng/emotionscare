@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
@@ -11,7 +12,9 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   isAudioOnly, 
   videoUrl, 
   audioUrl, 
-  emotion 
+  emotion,
+  sessionId,
+  templateId
 }) => {
   // Utiliser les props directes ou depuis le template
   const activeTemplate = session?.template || template;
@@ -19,7 +22,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   
   const targetEmotion = emotion || (
     // Check if emotions array exists before trying to access it
-    (activeTemplate && 'emotions' in activeTemplate && Array.isArray(activeTemplate.emotions) && activeTemplate.emotions.length > 0) 
+    (activeTemplate && activeTemplate.emotions && activeTemplate.emotions.length > 0) 
       ? activeTemplate.emotions[0] 
       : 'calm'
   );

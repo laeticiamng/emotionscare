@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { TrackInfoProps } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Music } from 'lucide-react';
+import { Disc } from 'lucide-react';
+import { MusicTrack } from '@/types/music';
+import { TrackInfoProps } from '@/types/music';
 
 const TrackInfo: React.FC<TrackInfoProps> = ({
-  track,
   title,
   artist,
   coverUrl,
@@ -14,51 +13,37 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   currentTrack,
   loadingTrack = false,
   audioError = false,
-  className = ''
+  className = '',
 }) => {
-  // Use provided values or default to track properties
-  const displayTitle = title || track?.title || 'Unknown Track';
-  const displayArtist = artist || track?.artist || 'Unknown Artist';
-  const displayCoverUrl = coverUrl || track?.coverUrl || track?.cover_url;
+  // Use provided info or track info
+  const displayTitle = title || currentTrack?.title || 'Aucun titre';
+  const displayArtist = artist || currentTrack?.artist || 'Artiste inconnu';
+  const displayCover = coverUrl || currentTrack?.coverUrl || currentTrack?.cover_url || '/images/music/default-cover.jpg';
   
   return (
-    <div className={`flex items-center ${className}`}>
+    <div className={`flex items-center gap-3 ${className}`}>
       {showCover && (
-        <div className="relative mr-3 rounded-md overflow-hidden w-12 h-12 flex-shrink-0">
-          {loadingTrack ? (
-            <Skeleton className="w-12 h-12" />
-          ) : displayCoverUrl ? (
-            <img
-              src={displayCoverUrl}
-              alt={displayTitle}
-              className="w-full h-full object-cover"
+        <div className="h-12 w-12 rounded bg-primary/10 flex items-center justify-center overflow-hidden">
+          {displayCover ? (
+            <img 
+              src={displayCover} 
+              alt={displayTitle} 
+              className="h-full w-full object-cover" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
+              }}
             />
           ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <Music className="h-6 w-6 text-muted-foreground" />
-            </div>
+            <Disc className="h-6 w-6 text-muted-foreground" />
           )}
         </div>
       )}
       
-      <div className="truncate">
-        <div className="font-medium truncate">
-          {loadingTrack ? (
-            <Skeleton className="h-4 w-32" />
-          ) : audioError ? (
-            <span className="text-destructive">Error loading track</span>
-          ) : (
-            displayTitle
-          )}
-        </div>
-        
-        <div className="text-sm text-muted-foreground truncate">
-          {loadingTrack ? (
-            <Skeleton className="h-3 w-24 mt-1" />
-          ) : (
-            displayArtist
-          )}
-        </div>
+      <div className="overflow-hidden">
+        <p className="font-medium truncate">{loadingTrack ? 'Chargement...' : displayTitle}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {loadingTrack ? '...' : audioError ? 'Erreur audio' : displayArtist}
+        </p>
       </div>
     </div>
   );

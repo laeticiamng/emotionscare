@@ -20,6 +20,11 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({
   totalMinutes = 0,
   averageHeartRateReduction = 0
 }) => {
+  const getSessionDate = () => {
+    if (!lastSession) return new Date().toISOString();
+    return lastSession.date || lastSession.startedAt || lastSession.startTime || new Date().toISOString();
+  };
+
   return (
     <div>
       <h3 className="text-lg font-medium mb-3">Statistiques de vos sessions</h3>
@@ -37,8 +42,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({
             {lastSession && (
               <p className="text-xs text-muted-foreground">
                 Dernière session: {formatDistanceToNow(
-                  parseISO(typeof lastSession.date === 'string' ? lastSession.date : 
-                          typeof lastSession.start_time === 'string' ? lastSession.start_time : 
+                  parseISO(typeof getSessionDate() === 'string' ? getSessionDate() : 
                           new Date().toISOString()), 
                   { addSuffix: true, locale: fr }
                 )}

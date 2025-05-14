@@ -1,69 +1,64 @@
 
-export type UserRole = 'admin' | 'manager' | 'employee' | 'coach' | 'wellbeing_manager' | 'b2c' | 'user';
+export type UserRole = 'admin' | 'user' | 'therapist' | 'coach' | 'pending' | 'manager';
+export type ThemeName = 'light' | 'dark' | 'pastel' | 'system';
+export type FontFamily = 'system' | 'serif' | 'mono' | 'comic';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
 
-export type ThemeName = 'light' | 'dark' | 'system';
-export type FontFamily = 'sans' | 'serif' | 'mono';
-export type FontSize = 'small' | 'medium' | 'large';
-
-export interface UserPreferencesState {
-  theme: ThemeName;
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  reduceMotion: boolean;
-  highContrast: boolean;
+export interface InvitationVerificationResult {
+  valid: boolean;
+  email?: string;
+  role?: UserRole;
+  name?: string;
+  error?: string;
+  invitation_id?: string;
 }
 
-export interface UserPreferences extends UserPreferencesState {
-  language: string;
-  timezone: string;
-  notifications?: {
+export interface UserPreferences {
+  theme?: ThemeName;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  highContrast?: boolean;
+  reduceAnimations?: boolean;
+  language?: string;
+  notifications?: boolean | {
     enabled: boolean;
     emailEnabled: boolean;
     pushEnabled: boolean;
-    frequency: string;
-    types: Record<string, boolean>;
-    tone: string;
+    frequency?: string;
+    types?: Record<string, boolean>;
+    tone?: string;
     quietHours?: {
       enabled: boolean;
       start: string;
       end: string;
     };
+    type?: string;
+    soundEnabled?: boolean;
   };
-  privacy?: {
-    profileVisibility: 'public' | 'private' | 'team';
-    shareEmotionalData: boolean;
-    allowCoaching: boolean;
-  };
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  onboardingCompleted?: boolean;
-  musicPreferences?: {
-    autoplay: boolean;
-    volume: number;
-    preferredGenres: string[];
-  };
-  notifications_enabled?: boolean;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
+  privacy?: 'public' | 'private' | 'friends';
+  experimental?: boolean;
+}
+
+export interface UserPreferencesState extends UserPreferences {
+  isLoading: boolean;
+  setPreference: (key: keyof UserPreferences, value: any) => void;
+  savePreferences: () => Promise<void>;
 }
 
 export interface User {
   id: string;
   email: string;
-  name: string;
-  role: UserRole;
-  created_at?: string;
-  joined_at?: string;
-  onboarded?: boolean;
-  preferences: UserPreferences;
+  name?: string;
   avatar_url?: string;
-  avatar?: string;
-  emotional_score?: number;
-  position?: string;
-  department?: string;
-}
-
-export interface InvitationVerificationResult {
-  isValid: boolean;
-  role?: UserRole;
-  email?: string;
-  error?: string;
+  role: UserRole;
+  isActive?: boolean;
+  onboarded?: boolean;
+  preferences?: UserPreferences;
+  created_at?: string;
+  last_sign_in_at?: string;
+  company_id?: string;
+  company_role?: string;
+  job_title?: string;
 }

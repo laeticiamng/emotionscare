@@ -36,6 +36,11 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
       setIsSaving(false);
     }
   };
+
+  // Get notifications object or create default
+  const notificationsObj = formData.notifications && typeof formData.notifications === 'object'
+    ? formData.notifications
+    : { enabled: !!formData.notifications, emailEnabled: false, pushEnabled: false };
   
   return (
     <form onSubmit={handleSave}>
@@ -46,7 +51,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
               <label className="block font-medium">Thème</label>
               <select
                 className="w-full border rounded p-2"
-                value={formData.theme}
+                value={formData.theme as string}
                 onChange={(e) => handleChange('theme', e.target.value)}
               >
                 <option value="light">Clair</option>
@@ -59,7 +64,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
               <label className="block font-medium">Taille de police</label>
               <select
                 className="w-full border rounded p-2"
-                value={formData.fontSize}
+                value={formData.fontSize as string}
                 onChange={(e) => handleChange('fontSize', e.target.value)}
               >
                 <option value="small">Petite</option>
@@ -73,10 +78,10 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications</span>
               <Switch
-                checked={formData.notifications?.enabled || false}
+                checked={notificationsObj.enabled}
                 onCheckedChange={(checked) => {
                   handleChange('notifications', {
-                    ...formData.notifications,
+                    ...notificationsObj,
                     enabled: checked
                   });
                 }}
@@ -86,9 +91,9 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications par email</span>
               <Switch
-                checked={formData.notifications?.emailEnabled || false}
+                checked={notificationsObj.emailEnabled}
                 onCheckedChange={(checked) => handleChange('notifications', {
-                  ...formData.notifications,
+                  ...notificationsObj,
                   emailEnabled: checked
                 })}
               />
@@ -97,9 +102,9 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications push</span>
               <Switch
-                checked={formData.notifications?.pushEnabled || false}
+                checked={notificationsObj.pushEnabled}
                 onCheckedChange={(checked) => handleChange('notifications', {
-                  ...formData.notifications,
+                  ...notificationsObj,
                   pushEnabled: checked
                 })}
               />

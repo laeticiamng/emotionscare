@@ -142,21 +142,20 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
   const recommendedTemplate: VRSessionTemplate = latestEmotion ? {
     id: 'recommended',
     name: 'Session recommandée',
-    title: 'Session recommandée',
     description: 'Session recommandée basée sur votre état émotionnel',
-    duration: 5,
+    duration: 5 * 60, // Convert to seconds
+    emotions: [latestEmotion.emotion],
+    thumbnailUrl: '/images/thumbnail-default.jpg',
+    intensity: 1,
+    // Additional properties for backward compatibility
+    title: 'Session recommandée',
     theme: 'Méditation guidée',
     is_audio_only: true,
     preview_url: '',
     audio_url: '/audio/meditation-guided.mp3',
-    category: 'recommended',
+    emotion_target: latestEmotion.emotion,
     difficulty: 'easy',
-    tags: [],
-    benefits: ['Réduction du stress', 'Amélioration de la concentration'],
-    emotions: [latestEmotion.emotion],
-    popularity: 100,
-    thumbnail: '/images/thumbnail-default.jpg',
-    intensity: 'low'
+    benefits: ['Réduction du stress', 'Amélioration de la concentration']
   } : undefined;
   
   return (
