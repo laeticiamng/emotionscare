@@ -46,10 +46,42 @@ export const canViewReports = (role: UserRole): boolean => {
   return isAdminRole(role) || isManagerRole(role) || role === 'coach';
 };
 
+export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
+  return allowedRoles.includes(userRole);
+};
+
+export const getRoleLoginPath = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+    case 'b2b_admin':
+    case 'b2b-admin':
+      return '/admin/login';
+    default:
+      return '/login';
+  }
+};
+
+export const getRoleHomePath = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+    case 'b2b_admin':
+    case 'b2b-admin':
+      return '/admin/dashboard';
+    case 'manager':
+    case 'wellbeing_manager':
+      return '/manager/dashboard';
+    default:
+      return '/dashboard';
+  }
+};
+
 export default {
   getRoleName,
   isAdminRole,
   isManagerRole,
   canManageUsers,
-  canViewReports
+  canViewReports,
+  hasRoleAccess,
+  getRoleLoginPath,
+  getRoleHomePath
 };

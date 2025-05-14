@@ -1,85 +1,96 @@
 
-import { EmotionResult } from '@/types/types';
+import { v4 as uuid } from 'uuid';
+import { EmotionResult } from '@/types';
 
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  try {
-    // This is a mock implementation
-    return {
-      id: `audio-${Date.now()}`,
-      emotion: 'calm',
-      confidence: 0.85,
-      score: 75,
-      date: new Date().toISOString(),
-      transcript: 'Audio transcript would appear here',
-      audio_url: URL.createObjectURL(audioBlob)
-    };
-  } catch (error) {
-    console.error('Error analyzing audio stream:', error);
-    throw error;
+// Mock data for demonstration purposes
+const mockEmotionHistory: EmotionResult[] = [
+  {
+    id: '1',
+    user_id: 'user-1',
+    date: new Date('2023-01-15').toISOString(),
+    emotion: 'joy',
+    score: 85,
+    confidence: 0.85,
+    intensity: 85,
+    text: "I'm feeling really great today!",
+    ai_feedback: 'Your joy is contagious. Keep up the positive mindset!'
+  },
+  {
+    id: '2',
+    user_id: 'user-1',
+    date: new Date('2023-01-17').toISOString(),
+    emotion: 'calm',
+    score: 65,
+    confidence: 0.75,
+    intensity: 65,
+    text: "Today was peaceful.",
+    ai_feedback: 'Your calmness is a strength. Consider sharing this energy with others.'
   }
-};
+];
 
-export const fetchEmotionHistory = async (userId?: string): Promise<EmotionResult[]> => {
-  try {
-    // This is a mock implementation
-    const mockEmotions = [
-      {
-        id: '1',
-        emotion: 'joy',
-        score: 87,
-        confidence: 0.92,
+// Analyze emotion from text
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  // In a real app, this would call an AI service API
+  // For now, we'll use a simple mock response
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const emotions = ['happy', 'sad', 'angry', 'calm', 'anxious', 'excited'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const confidence = 0.5 + Math.random() * 0.4; // 0.5 to 0.9
+      const score = Math.round(confidence * 100);
+      
+      resolve({
+        id: uuid(),
+        user_id: 'current-user',
         date: new Date().toISOString(),
-        timestamp: new Date().toISOString()
-      },
-      {
-        id: '2',
-        emotion: 'calm',
-        score: 75,
-        confidence: 0.85,
-        date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-        timestamp: new Date(Date.now() - 86400000).toISOString()
-      }
-    ];
-
-    return mockEmotions;
-  } catch (error) {
-    console.error('Error fetching emotion history:', error);
-    throw error;
-  }
+        emotion: randomEmotion,
+        score: score,
+        confidence: confidence,
+        intensity: score,
+        text: text,
+        ai_feedback: `I detect that you're feeling ${randomEmotion}.`
+      });
+    }, 500);
+  });
 };
 
-export const createEmotionEntry = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
-  try {
-    // Ensure required fields
-    const emotion: EmotionResult = {
-      id: emotionData.id || `emotion-${Date.now()}`,
-      emotion: emotionData.emotion || 'neutral',
-      date: emotionData.date || new Date().toISOString(),
-      score: emotionData.score,
-      confidence: emotionData.confidence,
-      timestamp: emotionData.timestamp || new Date().toISOString()
-    };
-
-    // In a real app, you would save this to a database
-    console.log('Created emotion entry:', emotion);
-
-    return emotion;
-  } catch (error) {
-    console.error('Error creating emotion entry:', error);
-    throw error;
-  }
+// Save emotion data to the database
+export const saveEmotion = async (emotion: EmotionResult): Promise<EmotionResult> => {
+  // In a real app, this would save to a database
+  // For now, just simulate an API call
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const savedEmotion = {
+        ...emotion,
+        id: emotion.id || uuid(),
+        date: emotion.date || new Date().toISOString(),
+      };
+      
+      // Add to mock history (in a real app, this would be a database operation)
+      mockEmotionHistory.push(savedEmotion);
+      
+      resolve(savedEmotion);
+    }, 300);
+  });
 };
 
-export const saveEmotion = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
-  return createEmotionEntry(emotionData);
+// Fetch emotion history for a user
+export const fetchEmotionHistory = async (userId: string, limit: number = 10): Promise<EmotionResult[]> => {
+  // In a real app, this would query a database
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const userHistory = mockEmotionHistory
+        .filter(e => e.user_id === userId)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, limit);
+        
+      resolve(userHistory);
+    }, 300);
+  });
 };
 
-export const fetchLatestEmotion = async (userId?: string): Promise<EmotionResult | null> => {
-  try {
-    const emotions = await fetchEmotionHistory(userId);
-    return emotions.length > 0 ? emotions[0] : null;
-  } catch (error) {
-    console.error('Error fetching latest emotion:', error);
-    throw error;
-  }
+export default {
+  analyzeEmotion,
+  saveEmotion,
+  fetchEmotionHistory
 };

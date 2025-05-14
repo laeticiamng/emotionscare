@@ -1,8 +1,18 @@
 
 import { User } from "@/types/types";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+// Utility function for combining class names with clsx and tailwind-merge
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 // Generate user initials from name
-export function getUserInitials(name: string): string {
+export function getUserInitials(user: User | string): string {
+  // If user is a string, use it directly
+  const name = typeof user === 'string' ? user : (user?.name || '');
+  
   if (!name) return '';
   
   const parts = name.split(' ');
@@ -19,7 +29,7 @@ export function getUserAvatarUrl(user: User): string {
   if (user.avatar) return user.avatar;
   
   // Default avatar using initials
-  const initials = getUserInitials(user.name);
+  const initials = getUserInitials(user);
   const colors = [
     'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
     'bg-pink-500', 'bg-purple-500', 'bg-indigo-500'
