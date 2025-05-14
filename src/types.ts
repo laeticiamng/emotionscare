@@ -51,46 +51,11 @@ export interface ChatMessage {
   role?: string;
 }
 
-export interface Emotion {
-  id: string;
-  user_id: string;
-  date: any;
-  emotion: string;
-  score: number;
-  text?: string;
-  emojis?: string;
-  audio_url?: string | null;
-  ai_feedback?: string;
-  created_at?: string;
-  confidence?: number;
-  intensity?: number;
-  name?: string;
-  category?: string;
-  primaryEmotion?: {
-    name: string;
-    intensity?: number;
-  };
-}
-
-export interface EmotionResult {
-  id?: string;
-  user_id?: string;
-  date?: string;
-  emotion?: string;
-  score?: number;
-  confidence?: number;
-  feedback?: string;
-  text?: string;
-  emojis?: string;
-  ai_feedback?: string;
-  intensity?: number;
-  transcript?: string;
-  recommendations?: string[];
-  primaryEmotion?: {
-    name: string;
-    intensity?: number;
-  };
-}
+export type { 
+  Emotion,
+  EmotionResult,
+  EnhancedEmotionResult
+} from './types/emotion';
 
 // Adding additional required types
 export interface MoodData {
@@ -140,6 +105,7 @@ export interface Badge {
   image_url?: string;
   icon?: string;
   threshold?: number;
+  type?: string;
 }
 
 export interface EmotionPrediction {
@@ -193,3 +159,4 @@ export interface InvitationFormData {
   message?: string;
   expires_in_days: number;
 }
+

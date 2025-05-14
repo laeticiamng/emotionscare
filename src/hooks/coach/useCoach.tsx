@@ -1,148 +1,94 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { ChatMessage } from '@/types';
-import { getCoachMessages, sendCoachMessage } from '@/lib/coach/coach-service';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { ChatMessage } from '@/types';
+import { 
+  getCoachMessages, 
+  sendCoachMessage, 
+  createConversation 
+} from '@/lib/coachService';
 import { useCoachEvents } from './useCoachEvents';
 
 export const useCoach = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { user } = useAuth();
-  const userId = user?.id;
-  const { addEvent } = useCoachEvents(userId || '');
-  const [lastEmotion, setLastEmotion] = useState<string>('neutral');
-  const [recommendations, setRecommendations] = useState<string[]>([]);
-  
-  // Initial greeting message
-  const initialMessage: ChatMessage = {
-    id: 'greeting',
-    text: "Bonjour, je suis votre coach émotionnel. Comment puis-je vous aider aujourd'hui ?",
-    sender: 'coach',
-    timestamp: new Date().toISOString(),
-  };
-  
-  // Load messages on mount
-  useEffect(() => {
-    loadMessages();
-  }, [userId]);
-  
-  // Load messages from API or storage
-  const loadMessages = async () => {
-    if (!userId) {
-      setMessages([initialMessage]);
-      return;
+  const coachEvents = useCoachEvents();
+
+  // Add triggerCoachEvent function
+  const triggerCoachEvent = useCallback((eventType: string, eventData: any = {}) => {
+    if (coachEvents.addEvent) {
+      coachEvents.addEvent(eventType, eventData);
     }
+  }, [coachEvents]);
+
+  const loadMessages = useCallback(async () => {
+    if (!user) return;
     
     setLoading(true);
-    
     try {
-      const messages = await getCoachMessages(userId);
-      
-      if (messages.length === 0) {
-        setMessages([initialMessage]);
-      } else {
-        setMessages(messages);
-      }
+      const loadedMessages = await getCoachMessages(user.id);
+      setMessages(loadedMessages || []);
     } catch (error) {
-      console.error('Error loading coach messages:', error);
-      setMessages([initialMessage]);
+      console.error('Failed to load coach messages:', error);
     } finally {
       setLoading(false);
     }
-  };
-  
-  // Send a message to the coach
-  const sendMessage = async (text: string): Promise<void> => {
-    if (!text.trim() || !userId) return;
+  }, [user]);
+
+  const sendMessage = useCallback(async (text: string) => {
+    if (!user) return;
     
-    // Add user message immediately
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      text,
-      sender: 'user',
-      timestamp: new Date().toISOString(),
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    
+    setLoading(true);
     try {
-      // Send to API and get response
-      const response = await sendCoachMessage(userId, text);
+      // Add user message to the chat
+      const userMessage: ChatMessage = {
+        id: `tmp-${Date.now()}`,
+        text,
+        sender: 'user',
+        timestamp: new Date().toISOString()
+      };
       
-      // Notify relevant components about the message
-      addEvent('message_sent', { text });
+      setMessages(prev => [...prev, userMessage]);
       
-      // Add coach response
-      setMessages(prev => [...prev, {
-        id: `coach-${Date.now()}`,
-        text: response,
-        sender: 'coach',
-        timestamp: new Date().toISOString(),
-      }]);
+      // Log coaching interaction event
+      triggerCoachEvent('coach_interaction', { 
+        type: 'message_sent', 
+        content_length: text.length 
+      });
+      
+      // Get coach's response
+      const response = await sendCoachMessage(user.id, text);
+      
+      if (response) {
+        setMessages(prev => [...prev, response]);
+      }
     } catch (error) {
-      console.error('Error sending message to coach:', error);
-      
-      // Add error message from coach
-      setMessages(prev => [...prev, {
-        id: `error-${Date.now()}`,
-        text: "Je suis désolé, je n'ai pas pu traiter votre message. Veuillez réessayer plus tard.",
-        sender: 'coach',
-        timestamp: new Date().toISOString(),
-      }]);
+      console.error('Failed to send message to coach:', error);
+    } finally {
+      setLoading(false);
     }
-  };
-  
+  }, [user, triggerCoachEvent]);
+
   const clearMessages = useCallback(() => {
-    setMessages([initialMessage]);
+    setMessages([]);
   }, []);
 
-  // Generate recommendations based on emotional state
-  const generateRecommendation = useCallback((emotion: string = 'neutral') => {
-    setLastEmotion(emotion);
-    
-    const recommendationMap: Record<string, string[]> = {
-      'happy': [
-        'Maintenez cette énergie positive avec une activité créative',
-        'Partagez votre bonheur avec quelqu\'un d\'autre aujourd\'hui',
-        'Notez ce moment dans votre journal de gratitude'
-      ],
-      'sad': [
-        'Accordez-vous un moment de repos et d\'autocompassion',
-        'Écoutez une playlist apaisante',
-        'Faites une courte promenade en plein air'
-      ],
-      'neutral': [
-        'Essayez une méditation de 5 minutes',
-        'Prenez un moment pour définir vos priorités',
-        'Hydratez-vous et faites quelques étirements'
-      ],
-      'anxious': [
-        'Pratiquez l\'exercice de respiration 4-7-8',
-        'Écrivez vos préoccupations sur papier',
-        'Concentrez-vous sur une tâche simple et concrète'
-      ]
-    };
-    
-    const defaultRecommendations = [
-      'Prenez une pause de 5 minutes',
-      'Respirez profondément plusieurs fois',
-      'Faites le point sur vos émotions actuelles'
-    ];
-    
-    const newRecommendations = recommendationMap[emotion.toLowerCase()] || defaultRecommendations;
-    setRecommendations(newRecommendations);
-    return newRecommendations;
-  }, []);
-  
+  // Load messages on mount
+  useEffect(() => {
+    if (user) {
+      loadMessages();
+    }
+  }, [user, loadMessages]);
+
   return {
     messages,
     loading,
     sendMessage,
     clearMessages,
     loadMessages,
-    lastEmotion,
-    recommendations,
-    generateRecommendation
+    triggerCoachEvent
   };
 };
+
+export default useCoach;

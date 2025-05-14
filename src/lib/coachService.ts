@@ -1,17 +1,39 @@
 
-// Re-export everything from the refactored coach module
-import * as coachService from './coach/coach-service';
-import * as coachTypes from './coach/types';
-
-export type { CoachMessage } from './coach/types';
-export type { CoachEvent } from './coach/types';
-
-export const {
-  getCoachMessages,
-  sendCoachMessage,
-  createCoachConversation,
-  getCoachConversations,
+// Re-export from coach service modules
+export { 
+  getCoachMessages, 
+  sendCoachMessage, 
+  createConversation, 
+  listConversations,
   updateConversationTitle
-} = coachService;
+} from './coach/coach-service';
 
-export * from './coach/types';
+// Explicitly re-export the types to avoid ambiguity
+export type { 
+  CoachMessage,
+  CoachEvent 
+} from './coach/coach-service';
+
+// Export other coach-related services
+export {
+  getEmotionalTrends,
+  getRecentEmotions,
+  recordEmotion
+} from './coach/emotional-data-service';
+
+export {
+  createNotification,
+  markNotificationAsRead,
+  getUserNotifications
+} from './coach/notification-service';
+
+export {
+  executeAction,
+  getSupportedActions
+} from './coach/action-executor';
+
+export {
+  scheduleRoutine,
+  cancelRoutine
+} from './coach/routines';
+

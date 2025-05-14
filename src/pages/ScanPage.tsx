@@ -1,74 +1,78 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
-import HistoryTabContent from '@/components/scan/HistoryTabContent';
+import Shell from '@/Shell';
 import ScanPageHeader from '@/components/scan/ScanPageHeader';
-import { EmotionResult } from '@/types/emotion';
+import EmotionScanForm from '@/components/scan/EmotionScanForm';
+import HistoryTabContent from '@/components/scan/HistoryTabContent';
+import { EmotionResult } from '@/types';
+import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
 
-interface ScanPageProps {
-  
-}
-
-// Add missing props for components
 interface ScanPageHeaderProps {
   showScanForm: boolean;
   activeTab: string;
   setShowScanForm: (show: boolean) => void;
 }
 
-interface HistoryTabContentProps {
-  emotionHistory: EmotionResult[];
-}
+const ScanPage: React.FC = () => {
+  const [showScanForm, setShowScanForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('scan');
+  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
 
-const ScanPage: React.FC<ScanPageProps> = () => {
-  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
-  const [showScanForm, setShowScanForm] = useState(true);
-  const [activeTab, setActiveTab] = useState("scan");
-  const { toast } = useToast();
-  
-  const handleScanComplete = (result: EmotionResult) => {
-    setScanHistory(prevHistory => [result, ...prevHistory]);
-    
-    toast({
-      title: "Analyse émotionnelle terminée",
-      description: `Émotion principale détectée: ${result.dominantEmotion?.name || 'N/A'}`,
-    });
-  };
-  
+  // Mock data for demonstration purposes
+  const mockEmotionHistory: EmotionResult[] = [
+    {
+      id: '1',
+      date: '2025-05-13T10:45:00Z',
+      emotion: 'joy',
+      score: 0.85,
+      text: 'I feel great today!'
+    },
+    {
+      id: '2',
+      date: '2025-05-12T15:30:00Z',
+      emotion: 'calm',
+      score: 0.65,
+      text: 'Pretty relaxed afternoon'
+    },
+  ];
+
   return (
-    <div className="container mx-auto py-6">
-      <ScanPageHeader 
-        showScanForm={showScanForm} 
-        activeTab={activeTab} 
-        setShowScanForm={setShowScanForm} 
-      />
-      
-      <Tabs defaultValue="scan" className="mt-4">
-        <TabsList>
-          <TabsTrigger value="scan">Nouveau Scan</TabsTrigger>
-          <TabsTrigger value="history">Historique</TabsTrigger>
-        </TabsList>
+    <Shell>
+      <div className="container py-6">
+        <ScanPageHeader 
+          showScanForm={showScanForm} 
+          activeTab={activeTab}
+          setShowScanForm={setShowScanForm}
+        />
         
-        <TabsContent value="scan" className="outline-none">
-          <Card className="border-none shadow-none">
-            <Card className="p-4">
-              <UnifiedEmotionCheckin onScanComplete={handleScanComplete} />
-            </Card>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="history" className="outline-none">
-          <Card className="border-none shadow-none">
-            <HistoryTabContent emotionHistory={scanHistory} />
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+        <Tabs
+          defaultValue="scan"
+          className="mt-6"
+          onValueChange={(value) => setActiveTab(value)}
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="scan">Scanner</TabsTrigger>
+            <TabsTrigger value="history">Historique</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="scan" className="mt-6">
+            {showScanForm ? (
+              <EmotionScanForm onComplete={(result) => {
+                setShowScanForm(false);
+                setEmotionHistory(prev => [result, ...prev]);
+              }} />
+            ) : (
+              <UnifiedEmotionCheckin />
+            )}
+          </TabsContent>
+          
+          <TabsContent value="history" className="mt-6">
+            <HistoryTabContent emotionHistory={mockEmotionHistory} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Shell>
   );
 };
 

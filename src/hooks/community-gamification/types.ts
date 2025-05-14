@@ -1,49 +1,44 @@
 
-import { Badge as SystemBadge } from '@/types';
+import { Badge } from '@/types/user';
+import { User } from '@/types/user';
 
-// Re-export the Badge type to avoid conflicts
-export type Badge = SystemBadge;
-
+// Export the Challenge interface
 export interface Challenge {
   id: string;
-  name: string;
+  title: string;
   description: string;
   type: string;
-  category: string;
   difficulty: 'easy' | 'medium' | 'hard';
   points: number;
-  status: 'available' | 'in-progress' | 'completed';
-  progress: number;
+  category: string;
+  status?: string;
+  progress?: number;
   completedAt?: string;
-  deadline?: string;
-  requirements?: string[];
-  rewards?: string[];
   completed?: boolean;
+  icon?: string;
+  duration?: string;
+  requirements?: string[];
 }
 
 export interface Achievement {
   id: string;
   name: string;
-  description: string;
-  image_url?: string;
   icon?: string;
-  threshold?: number;
-  category: string;
-  awardedAt?: string;
-  level?: number;
+  unlocked: boolean;
+  progress?: number;
+  total?: number;
+  description?: string;
 }
 
 export interface GamificationStats {
   level: number;
-  points: number;
-  nextMilestone: number;
-  progressToNextLevel: number;
-  streakDays: number;
-  totalBadges: number;
-  totalChallenges: number;
-  totalScans: number;
-  badges: string[];
-  recentAchievements: Achievement[];
+  xp: number;
+  xpToNextLevel: number;
+  totalChallengesCompleted: number;
+  streak: number;
+  badges: number;
+  rank?: string;
+  percentile?: number;
   lastActivityDate?: string;
 }
 
@@ -52,9 +47,23 @@ export interface UseCommunityGamificationResult {
   error: string;
   markChallengeCompleted: (challengeId: string) => Promise<Challenge>;
   trackChallengeProgress: (challengeId: string, progress: number) => Promise<Challenge>;
+  achievements: Achievement[];
+  stats: GamificationStats;
   activeChallenges: Challenge[];
   recommendedChallenges: Challenge[];
   acceptChallenge: (challengeId: string) => Promise<Challenge>;
   generatePersonalizedChallenges: () => Promise<Challenge[]>;
   completeChallenge: (challengeId: string) => Promise<Challenge>;
+  badges: Badge[];
 }
+
+export interface BadgeData {
+  id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
+}
+

@@ -1,47 +1,76 @@
 
-import { useContext } from 'react';
-import { BrandingContextType, Theme, BrandingOptions, VisualDensity } from '@/types/branding';
+import { createContext, useContext, useState, useEffect } from 'react';
 
-// Create context interface
-interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+export interface BrandingContextType {
+  logoUrl: string;
+  companyName: string;
+  primaryColor: string;
+  accentColor: string;
+  setPrimaryColor: (color: string) => void;
+  setAccentColor: (color: string) => void;
+  setLogoUrl: (url: string) => void;
+  setCompanyName: (name: string) => void;
 }
 
-// Mock ThemeContext for temporary use
-const ThemeContext = {
-  Provider: ({ children }: { children: React.ReactNode }) => children,
-  Consumer: ({ children }: { children: (value: any) => React.ReactNode }) => children({}),
-};
+const BrandingContext = createContext<BrandingContextType>({
+  logoUrl: '/logo.svg',
+  companyName: 'EmotionsCare',
+  primaryColor: '#4f46e5',
+  accentColor: '#10b981',
+  setPrimaryColor: () => {},
+  setAccentColor: () => {},
+  setLogoUrl: () => {},
+  setCompanyName: () => {},
+});
 
-export const useBranding = (): BrandingContextType => {
-  // This would typically use an actual context
-  const themeContext = { theme: 'light' as Theme, setTheme: (t: Theme) => {} };
-
-  const isDarkMode = themeContext.theme === 'dark';
-  const isPastelTheme = themeContext.theme === 'pastel';
-
-  const getContrastText = (color: string): 'black' | 'white' => {
-    // Simple implementation, would ideally check color brightness
-    if (color === '#ffffff' || color === '#f8f8f8' || color === '#f0f0f0') {
-      return 'black';
+export const BrandingProvider = ({ children }: { children: React.ReactNode }) => {
+  const [logoUrl, setLogoUrl] = useState<string>('/logo.svg');
+  const [companyName, setCompanyName] = useState<string>('EmotionsCare');
+  const [primaryColor, setPrimaryColor] = useState<string>('#4f46e5');
+  const [accentColor, setAccentColor] = useState<string>('#10b981');
+  
+  // Load branding from localStorage on mount
+  useEffect(() => {
+    const savedBranding = localStorage.getItem('branding');
+    if (savedBranding) {
+      const { logoUrl, companyName, primaryColor, accentColor } = JSON.parse(savedBranding);
+      if (logoUrl) setLogoUrl(logoUrl);
+      if (companyName) setCompanyName(companyName);
+      if (primaryColor) setPrimaryColor(primaryColor);
+      if (accentColor) setAccentColor(accentColor);
     }
-    return 'white';
-  };
-
-  return {
-    theme: themeContext.theme,
-    setTheme: themeContext.setTheme,
-    isDarkMode,
-    getContrastText,
-    primaryColor: '#9b87f5',
-    brandName: 'EmotionAI',
-    soundEnabled: true,
-    visualDensity: 'balanced' as VisualDensity,
-    setThemePreference: themeContext.setTheme
-  };
+  }, []);
+  
+  // Save branding to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('branding', JSON.stringify({
+      logoUrl,
+      companyName,
+      primaryColor,
+      accentColor,
+    }));
+    
+    // Apply branding as CSS variables
+    document.documentElement.style.setProperty('--primary', primaryColor);
+    document.documentElement.style.setProperty('--accent', accentColor);
+  }, [logoUrl, companyName, primaryColor, accentColor]);
+  
+  return (
+    <BrandingContext.Provider value={{
+      logoUrl,
+      companyName,
+      primaryColor,
+      accentColor,
+      setLogoUrl,
+      setCompanyName,
+      setPrimaryColor,
+      setAccentColor,
+    }}>
+      {children}
+    </BrandingContext.Provider>
+  );
 };
 
-export type { BrandingOptions };
+export const useBranding = () => useContext(BrandingContext);
 
 export default useBranding;

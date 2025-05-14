@@ -26,6 +26,13 @@ export type EmotionalData = {
   context?: string;
 };
 
+export type EmotionalTrend = {
+  emotion: string;
+  count: number;
+  average_intensity: number;
+  timeframe: 'day' | 'week' | 'month';
+};
+
 export type CoachNotification = {
   id: string;
   title: string;
@@ -63,5 +70,15 @@ export const AI_MODEL_CONFIG = {
     stream: false,
     cacheEnabled: true,
     cacheTTL: 3600
+  },
+  scan: {
+    model: 'gpt-4o-mini',
+    temperature: 0.2,
+    max_tokens: 300,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 1800
   }
 };
+

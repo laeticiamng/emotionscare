@@ -1,16 +1,23 @@
 
+export interface OpenAIMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 export interface OpenAIHookResult {
-  loading: boolean;
+  messages: OpenAIMessage[];
+  addMessage: (message: OpenAIMessage) => void;
+  removeMessage: (index: number) => void;
+  generateResponse: (systemPrompt?: string) => Promise<string>;
+  isLoading: boolean;
   error: string | null;
-  analyze: (text: string) => Promise<any>;
-  generateText: (prompt: string) => Promise<string>;
-  summarize: (text: string) => Promise<string>;
   admin?: {
-    analyzeGroupTrends: (data: any) => Promise<any>;
-    generateReport: (data: any) => Promise<any>;
+    createReport: (data: any) => Promise<any>;
+    analyzeTeamHealth: (teamId: string) => Promise<any>;
   };
   moderation?: {
-    checkContent: (text: string) => Promise<{safe: boolean, issues: string[]}>;
-    suggestImprovements: (text: string) => Promise<string>;
+    checkContent: (content: string) => Promise<any>;
+    flagContent: (contentId: string, reason: string) => Promise<void>;
   };
 }
+

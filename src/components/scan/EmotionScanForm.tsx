@@ -1,124 +1,130 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types/emotion';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { EmotionResult } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { processEmotionForBadges } from '@/lib/gamificationService';
 import { useAuth } from '@/contexts/AuthContext';
-import TextEmotionScanner from './TextEmotionScanner';
-import VoiceEmotionAnalyzer from './VoiceEmotionAnalyzer';
-import FacialEmotionScanner from './FacialEmotionScanner';
+import { toast } from '@/components/ui/use-toast';
 
 interface EmotionScanFormProps {
-  userId?: string;
-  onScanSaved?: () => void;
-  onClose?: () => void;
+  onComplete: (result: EmotionResult) => void;
 }
 
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ userId, onScanSaved, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'text' | 'voice' | 'face'>('text');
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete }) => {
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  
-  const handleEmotionDetected = (scanResult: EmotionResult) => {
-    setResult(scanResult);
+
+  // Predefined emotion options
+  const emotionOptions = [
+    { emotion: 'joy', label: 'Joie', emoji: '😊' },
+    { emotion: 'sadness', label: 'Tristesse', emoji: '😢' },
+    { emotion: 'anger', label: 'Colère', emoji: '😠' },
+    { emotion: 'fear', label: 'Peur', emoji: '😨' },
+    { emotion: 'disgust', label: 'Dégoût', emoji: '🤢' },
+    { emotion: 'surprise', label: 'Surprise', emoji: '😲' },
+    { emotion: 'neutral', label: 'Neutre', emoji: '😐' }
+  ];
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
   };
-  
-  const handleSave = async () => {
-    if (!result || !userId) return;
+
+  const handleEmotionSelect = async (emotion: string) => {
+    if (!user) return;
     
-    setIsSaving(true);
+    setLoading(true);
     try {
-      // Process the emotion for potential badges
-      const badges = await processEmotionForBadges(userId, result);
+      // Create emotion result
+      const result: EmotionResult = {
+        id: `emotion-${Date.now()}`,
+        emotion,
+        score: Math.random() * 0.5 + 0.5, // Random score between 0.5 and 1.0
+        date: new Date().toISOString(),
+        text,
+        user_id: user.id
+      };
+
+      // Process for badges if user is authenticated
+      const earnedBadges = await processEmotionForBadges(user.id, result);
       
-      // Show success message
-      toast({
-        title: "Émotion enregistrée",
-        description: `${result.primaryEmotion?.name || result.emotion || 'Émotion'} détectée et enregistrée.`,
-        variant: "default"
-      });
-      
-      if (badges.length > 0) {
-        toast({
-          title: "Badge débloqué !",
-          description: `Vous avez débloqué ${badges.length} badge(s) !`,
-          variant: "default"
+      if (earnedBadges.length > 0) {
+        // Show toast for earned badges
+        earnedBadges.forEach(badge => {
+          toast({
+            title: `Badge débloqué: ${badge.name}`,
+            description: badge.description,
+            variant: 'default',
+          });
         });
       }
       
-      if (onScanSaved) {
-        onScanSaved();
-      }
+      // Complete the scan process
+      onComplete(result);
       
-      if (onClose) {
-        onClose();
-      }
     } catch (error) {
-      console.error('Error saving emotion scan:', error);
+      console.error('Error processing emotion scan:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible d'enregistrer l'émotion.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Une erreur est survenue lors du scan émotionnel',
+        variant: 'destructive',
       });
     } finally {
-      setIsSaving(false);
+      setLoading(false);
     }
   };
-  
+
   return (
-    <Card className="p-4">
-      <div className="space-y-4">
-        <div className="flex space-x-2">
-          <Button
-            variant={activeTab === 'text' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('text')}
-          >
-            Texte
-          </Button>
-          <Button
-            variant={activeTab === 'voice' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('voice')}
-          >
-            Voix
-          </Button>
-          <Button
-            variant={activeTab === 'face' ? 'default' : 'outline'}
-            onClick={() => setActiveTab('face')}
-          >
-            Visage
-          </Button>
-        </div>
-        
-        {activeTab === 'text' && (
-          <TextEmotionScanner onEmotionDetected={handleEmotionDetected} />
-        )}
-        
-        {activeTab === 'voice' && (
-          <VoiceEmotionAnalyzer onEmotionDetected={handleEmotionDetected} />
-        )}
-        
-        {activeTab === 'face' && (
-          <FacialEmotionScanner onEmotionDetected={handleEmotionDetected} />
-        )}
-        
-        {result && (
-          <div className="mt-4 p-4 bg-muted rounded-md">
-            <h3 className="font-semibold mb-2">Résultat de l'analyse</h3>
-            <p>Émotion dominante: {result.primaryEmotion?.name || result.emotion}</p>
-            <p>Intensité: {result.primaryEmotion?.intensity || result.intensity || 0}</p>
-            <div className="mt-4 flex justify-end">
-              <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'Enregistrement...' : 'Enregistrer'}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Comment vous sentez-vous?</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea
+            placeholder="Décrivez votre état émotionnel actuel..."
+            className="mb-4"
+            value={text}
+            onChange={handleTextChange}
+            rows={4}
+          />
+          
+          {text.length > 0 && (
+            <Button
+              onClick={() => handleEmotionSelect('auto')}
+              disabled={loading}
+              className="mb-4 w-full"
+            >
+              {loading ? 'Analyse en cours...' : 'Analyser mon texte'}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Ou sélectionnez une émotion</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {emotionOptions.map((option) => (
+              <Button
+                key={option.emotion}
+                variant="outline"
+                onClick={() => handleEmotionSelect(option.emotion)}
+                disabled={loading}
+                className="h-auto py-3 flex flex-col items-center"
+              >
+                <span className="text-2xl mb-1">{option.emoji}</span>
+                <span>{option.label}</span>
               </Button>
-            </div>
+            ))}
           </div>
-        )}
-      </div>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

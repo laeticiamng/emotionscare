@@ -1,101 +1,51 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import TextEmotionScanner from './TextEmotionScanner';
-import VoiceEmotionAnalyzer from './VoiceEmotionAnalyzer';
-import FacialEmotionScanner from './FacialEmotionScanner';
-import { EmotionResult } from '@/types/emotion';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Smile, LineChart, Clock, Award } from 'lucide-react';
 
-interface UnifiedEmotionCheckinProps {
-  onScanComplete?: (result: EmotionResult) => void;
-}
-
-const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({ onScanComplete }) => {
-  const [activeTab, setActiveTab] = useState<string>('text');
-  const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
-
-  const handleEmotionDetected = (result: EmotionResult) => {
-    setScanResult(result);
-  };
-
-  const handleSave = async () => {
-    if (!scanResult) return;
-    
-    setIsSaving(true);
-    try {
-      // In a real implementation, this would save to a database
-      
-      // Show success message
-      toast({
-        title: "Émotion enregistrée",
-        description: `${scanResult.dominantEmotion?.name || 'Émotion'} détectée avec une intensité de ${scanResult.dominantEmotion?.intensity || 0}.`,
-        variant: "default" // Changed from "success" to "default"
-      });
-      
-      // Pass result to parent
-      if (onScanComplete) {
-        onScanComplete(scanResult);
-      }
-      
-    } catch (error) {
-      console.error('Error saving scan:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'enregistrer l'émotion.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
+const UnifiedEmotionCheckin: React.FC = () => {
   return (
-    <Card className="p-4">
-      <Tabs defaultValue="text" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="text">Texte</TabsTrigger>
-          <TabsTrigger value="voice">Voix</TabsTrigger>
-          <TabsTrigger value="face">Visage</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="text">
-          <TextEmotionScanner onEmotionDetected={handleEmotionDetected} />
-        </TabsContent>
-        
-        <TabsContent value="voice">
-          <VoiceEmotionAnalyzer onEmotionDetected={handleEmotionDetected} />
-        </TabsContent>
-        
-        <TabsContent value="face">
-          <FacialEmotionScanner onEmotionDetected={handleEmotionDetected} />
-        </TabsContent>
-      </Tabs>
-      
-      {scanResult && (
-        <div className="mt-4">
-          <h3 className="text-lg font-medium">Résultat de l'analyse</h3>
-          <div className="mt-2 p-4 bg-muted rounded-md">
-            <p className="mb-2">
-              <span className="font-semibold">Émotion détectée:</span> {scanResult.dominantEmotion?.name || 'Non détectée'}
-            </p>
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-primary text-primary-foreground">
+          <CardTitle>Scanner émotionnel</CardTitle>
+          <CardDescription className="text-primary-foreground/90">
+            Comment vous sentez-vous aujourd'hui?
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="space-y-2">
             <p>
-              <span className="font-semibold">Intensité:</span> {scanResult.dominantEmotion?.intensity || 0}/1
+              Suivez quotidiennement vos émotions pour mieux comprendre vos tendances et améliorer votre bien-être. 
+              Plus vous réalisez de scans, plus votre profil émotionnel devient précis.
             </p>
             
-            <div className="mt-4 flex justify-end">
-              <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'Enregistrement...' : 'Enregistrer cette émotion'}
-              </Button>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+              <div className="flex flex-col items-center p-3 bg-muted/50 rounded-md">
+                <Smile className="h-6 w-6 mb-1 text-primary" />
+                <span className="text-sm font-medium">Identifier vos émotions</span>
+              </div>
+              <div className="flex flex-col items-center p-3 bg-muted/50 rounded-md">
+                <LineChart className="h-6 w-6 mb-1 text-primary" />
+                <span className="text-sm font-medium">Analyser vos tendances</span>
+              </div>
+              <div className="flex flex-col items-center p-3 bg-muted/50 rounded-md">
+                <Clock className="h-6 w-6 mb-1 text-primary" />
+                <span className="text-sm font-medium">Suivi dans le temps</span>
+              </div>
+              <div className="flex flex-col items-center p-3 bg-muted/50 rounded-md">
+                <Award className="h-6 w-6 mb-1 text-primary" />
+                <span className="text-sm font-medium">Gagnez des badges</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </Card>
+        </CardContent>
+        <CardFooter>
+          <Button className="w-full">Commencer un scan</Button>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

@@ -1,74 +1,70 @@
 
-// Mock OpenAI client for development
+// OpenAI API client facade
+
 export interface OpenAIMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
 }
 
-export interface OpenAIRequest {
+export interface OpenAICompletionOptions {
   model: string;
-  messages: OpenAIMessage[];
-  temperature?: number;
-  max_tokens?: number;
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  frequency_penalty?: number;
+  presence_penalty?: number;
+  stream?: boolean;
 }
 
-export interface OpenAIResponse {
-  choices: {
-    message: {
-      role: string;
-      content: string;
-    };
-  }[];
-}
+class OpenAIClient {
+  private apiKey: string | null = null;
+  private defaultOptions: Partial<OpenAICompletionOptions> = {
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    max_tokens: 500,
+    top_p: 1,
+  };
 
-// Mock function that simulates calling the OpenAI API
-export async function callOpenAI(request: OpenAIRequest): Promise<string> {
-  console.log('Mock OpenAI API call:', request);
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Generate responses based on the last user message
-  const lastUserMessage = request.messages
-    .filter(m => m.role === 'user')
-    .pop()?.content || '';
-  
-  if (lastUserMessage.toLowerCase().includes('anxiété') || lastUserMessage.toLowerCase().includes('stress')) {
-    return "L'anxiété est une réponse naturelle au stress. Je vous recommande des exercices de respiration et de pleine conscience pour vous aider à gérer ces moments difficiles.";
-  }
-  
-  if (lastUserMessage.toLowerCase().includes('triste') || lastUserMessage.toLowerCase().includes('déprimé')) {
-    return "La tristesse est une émotion importante qui nous aide à traiter les expériences difficiles. Accordez-vous du temps pour ressentir cette émotion, tout en veillant à pratiquer des activités qui vous apportent un sentiment de bien-être.";
-  }
-  
-  if (lastUserMessage.toLowerCase().includes('heureux') || lastUserMessage.toLowerCase().includes('content')) {
-    return "C'est merveilleux d'entendre que vous vous sentez bien ! Savourez ces moments positifs et réfléchissez à ce qui contribue à ce bonheur dans votre vie.";
-  }
-  
-  // Default response
-  return "Merci de partager cela avec moi. Les émotions sont des guides précieux pour comprendre nos besoins et nos valeurs. Comment puis-je vous aider à approfondir cette réflexion ?";
-}
-
-// Export a mock client
-const OpenAIClient = {
-  chat: {
-    completions: {
-      create: async (request: OpenAIRequest): Promise<OpenAIResponse> => {
-        const content = await callOpenAI(request);
-        
-        return {
-          choices: [
-            {
-              message: {
-                role: 'assistant',
-                content
-              }
-            }
-          ]
-        };
-      }
+  constructor(apiKey?: string) {
+    if (apiKey) {
+      this.apiKey = apiKey;
     }
   }
-};
 
-export default OpenAIClient;
+  async chatCompletion(
+    messages: OpenAIMessage[],
+    options?: Partial<OpenAICompletionOptions>
+  ): Promise<string> {
+    console.log('OpenAI Chat Completion', messages, options);
+    
+    if (!this.apiKey) {
+      console.warn('OpenAI API key not set');
+      return 'Mock response: OpenAI API key not configured';
+    }
+    
+    // In development, we can return mock responses
+    const lastUserMessage = [...messages].findLast(m => m.role === 'user')?.content || '';
+    return `Mock response to: ${lastUserMessage.substring(0, 30)}...`;
+  }
+
+  async moderation(text: string): Promise<{ flagged: boolean; categories: Record<string, boolean> }> {
+    console.log('OpenAI Moderation', text);
+    
+    // Mock implementation
+    return {
+      flagged: text.toLowerCase().includes('inappropriate'),
+      categories: {
+        harassment: false,
+        'hate/threatening': false,
+        'self-harm': false,
+        sexual: false,
+        'violence/graphic': false,
+      }
+    };
+  }
+}
+
+// Create a singleton instance
+const openAIClient = new OpenAIClient();
+
+export default openAIClient;
