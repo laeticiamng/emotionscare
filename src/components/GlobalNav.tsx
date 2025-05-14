@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,7 +44,7 @@ const GlobalNav = () => {
   
   // Check if user has admin role
   const isAdmin = user ? isAdminRole(user.role) : false;
-  const isB2BMode = userMode === 'b2b-admin' || userMode === 'b2b-user';
+  const isB2BMode = userMode === 'b2b_admin' || userMode === 'b2b_user';
   
   // Define menu items based on user role and mode
   const standardMenuItems = [

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { NavLink } from 'react-router-dom';
@@ -58,7 +59,7 @@ const SidebarNav: React.FC = () => {
         </>
       )}
       
-      {normalizedUserMode === 'b2b-user' && (
+      {normalizedUserMode === 'b2b_user' && (
         <>
           <NavItem href="/dashboard" icon={Home} title="Tableau de bord" />
           <NavItem href="/team" icon={Users} title="Mon équipe" />
@@ -69,7 +70,7 @@ const SidebarNav: React.FC = () => {
         </>
       )}
       
-      {normalizedUserMode === 'b2b-admin' && (
+      {normalizedUserMode === 'b2b_admin' && (
         <>
           <NavItem href="/admin/dashboard" icon={BarChart2} title="Dashboard" />
           <NavItem href="/admin/organization" icon={Building} title="Organisation" />
@@ -83,7 +84,8 @@ const SidebarNav: React.FC = () => {
         </>
       )}
       
-      {normalizedUserMode === 'b2b-collaborator' && (
+      {/* Additional compatibility check for other user modes */}
+      {(normalizedUserMode !== 'b2c' && normalizedUserMode !== 'b2b_user' && normalizedUserMode !== 'b2b_admin') && (
         <>
           <NavItem href="/dashboard" icon={Home} title="Tableau de bord" />
           <NavItem href="/team" icon={Users} title="Mon équipe" />

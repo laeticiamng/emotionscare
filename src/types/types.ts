@@ -1,4 +1,3 @@
-
 // ————————————————————————
 // UserRole
 // ————————————————————————
@@ -79,6 +78,7 @@ export interface EmotionalTeamViewProps {
 // ————————————————————————
 // EmotionResult - Unified type for all emotion-related data
 // ————————————————————————
+// Mise à jour d'EmotionResult pour corriger les problèmes de compatibilité
 export interface EmotionResult {
   id?: string;
   emotion: string;
@@ -86,7 +86,7 @@ export interface EmotionResult {
   confidence?: number;
   intensity?: number;
   transcript?: string;
-  date?: string;
+  date?: string | null;
   emojis?: string[] | string;
   ai_feedback?: string;
   recommendations?: string[];
@@ -305,7 +305,7 @@ export interface ThemeContextType {
 // ————————————————————————
 // UserMode
 // ————————————————————————
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'b2b-collaborator' | 'anonymous';
+export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | 'personal' | 'team' | 'anonymous';
 
 export interface UserMode {
   mode: UserModeType;

@@ -43,8 +43,8 @@ export const getRoleLoginPath = (role: string): string => {
 };
 
 // Check if a user has access to a specific route based on their role
-export const hasRoleAccess = (userRole: string, requiredRoles: string[]): boolean => {
-  return requiredRoles.includes(userRole);
+export const hasRoleAccess = (userRole: string, requiredRole: string): boolean => {
+  return userRole === requiredRole;
 };
 
 // Export for backward compatibility and for the TS errors mentioned

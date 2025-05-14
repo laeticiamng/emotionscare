@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import DashboardHeader from './DashboardHeader';
 import ModulesSection from '@/components/home/ModulesSection';
 import DashboardHero from './DashboardHero';
-import type { User } from '@/types';
+import type { User } from '@/types/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDashboardHero } from '@/hooks/useDashboardHero';
 import DashboardViewToggle from './DashboardViewToggle';
@@ -85,7 +85,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
       />
       
       {/* Only show modules section for non-admin users */}
-      {userMode !== 'b2b-admin' && (
+      {userMode !== 'b2b_admin' && (
         <ModulesSection 
           collapsed={collapsedSections.modules} 
           onToggle={() => toggleSection('modules')} 

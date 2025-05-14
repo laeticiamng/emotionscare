@@ -27,7 +27,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to={redirectTo || getRoleLoginPath(role)} state={{ from: location }} replace />;
   }
   
-  if (!hasRoleAccess(user?.role, role)) {
+  if (user?.role && !hasRoleAccess(user.role, role)) {
     // Authenticated but wrong role, redirect to unauthorized
     return <Navigate to="/unauthorized" replace />;
   }

@@ -126,3 +126,6 @@ export const useTheme = (): ThemeContextType => {
 
 // Export the ThemeContext for use-theme.ts
 export { ThemeContext };
+
+// Export the types for components that need them
+export type { Theme, FontFamily, FontSize, ThemeContextType };

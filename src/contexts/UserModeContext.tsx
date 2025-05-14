@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-
-type UserModeType = 'personal' | 'team' | 'b2c' | 'b2b_user' | 'b2b_admin';
+import { UserModeType } from '@/types/types';
 
 interface UserModeContextType {
   mode: UserModeType;
