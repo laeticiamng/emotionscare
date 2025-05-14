@@ -1,77 +1,64 @@
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'moderator';
+import { NotificationPreference } from './notification';
 
-export type Theme = 'light' | 'dark' | 'system';
-export type ThemeName = Theme | string;
-
-export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'extra-large';
-export type FontFamily = 'default' | 'serif' | 'mono' | 'sans' | 'inter';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';
+export type PrivacyLevel = 'high' | 'medium' | 'low' | 'balanced';
+export type UserRole = 'admin' | 'user' | 'coach' | 'manager' | 'guest';
 
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
   avatar?: string;
-  avatar_url?: string;
+  image?: string; // Ajout de 'image' pour compatibilité
   role: UserRole;
-  created_at?: string;
-  joined_at?: string;
+  createdAt: string;
+  lastLoginAt?: string;
+  organizations?: string[];
+  teams?: string[];
   preferences?: UserPreferences;
-  onboarded?: boolean;
-  department?: string;
-  position?: string;
-  emotional_score?: number;
-  team_id?: string;
-  anonymity_code?: string;
-  job_title?: string;
+  isOnboarded?: boolean;
+  isActive?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface UserPreferences {
   theme: ThemeName;
   fontSize: FontSize;
   fontFamily: FontFamily;
-  notifications: {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    frequency: string;
-  };
+  language: string;
+  notifications: NotificationPreference;
   autoplayVideos: boolean;
   dataCollection: boolean;
-  highContrast?: boolean;
-  reduceAnimations?: boolean;
-  soundEffects?: boolean;
-  colorAccent?: string;
-  language: string;
-  privacyLevel: string;
-  onboardingCompleted?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
-  notifications_enabled?: boolean;
-  privacy?: {
-    anonymousMode?: boolean;
-    dataSharing?: boolean;
-    profileVisibility?: 'public' | 'team' | 'private';
+  accessibilityFeatures: {
+    highContrast: boolean;
+    reducedMotion: boolean;
+    screenReader: boolean;
   };
-  dashboardLayout?: string;
+  dashboardLayout: string;
+  onboardingCompleted: boolean;
+  privacyLevel: PrivacyLevel;
+  soundEnabled?: boolean;
+  fullAnonymity?: boolean;
 }
 
 export interface UserPreferencesState {
   preferences: UserPreferences;
+  setPreference: (key: string, value: any) => void;
   setPreferences: (preferences: UserPreferences) => void;
+  resetPreferences: () => void;
   loading: boolean;
-  error: string | null;
+  error: Error | null;
 }
 
 export interface InvitationVerificationResult {
-  isValid: boolean;
-  invitation?: {
-    id: string;
-    email: string;
-    role: string;
-    expires_at: string;
-  };
-  error?: string;
+  valid: boolean;
+  email?: string;
+  role?: UserRole;
   message?: string;
+  expiresAt?: string;
 }

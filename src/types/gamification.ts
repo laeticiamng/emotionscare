@@ -18,10 +18,13 @@ export interface GamificationStats {
   totalPoints: number;
   badgesCount: number;
   streakDays: number;
-  lastActivityDate?: string;
   activeChallenges: number;
   completedChallenges: number;
+  lastActivityDate?: string;
   nextLevelPoints?: number;
+  // Nouvelle propriété
+  recentAchievements?: Badge[];
+  progress?: number;
 }
 
 export interface Challenge {
@@ -29,7 +32,7 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  status: 'completed' | 'locked' | 'active' | 'ongoing' | 'available';
+  status: 'completed' | 'locked' | 'active' | 'ongoing' | 'available' | 'failed';
   category: string;
   type?: string;
   progress?: number;
@@ -48,6 +51,7 @@ export interface Badge {
   name: string;
   description: string;
   image_url?: string;
+  imageUrl?: string;
   icon?: string;
   threshold?: number;
   type?: string;
@@ -75,10 +79,11 @@ export interface LeaderboardEntry {
   userId: string;
   name: string;
   avatar?: string;
-  avatarUrl?: string; // Added to fix type error
+  avatarUrl?: string;
   points: number;
   rank: number;
   badges: number;
   streak: number;
   department?: string;
+  level?: number;
 }

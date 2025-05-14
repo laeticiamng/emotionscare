@@ -1,41 +1,27 @@
 
-import { Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
+import { NotificationPreference } from './notification';
 
-export type ThemeName = Theme;
-export type PrivacyLevel = 'private' | 'friends' | 'public';
-export type DashboardLayout = 'compact' | 'standard' | 'expanded';
-
-// Re-export FontSize and FontFamily from ThemeContext using 'export type'
-export type { FontSize, FontFamily };
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';
+export type PrivacyLevel = 'high' | 'medium' | 'low' | 'balanced';
 
 export interface UserPreferences {
   theme: ThemeName;
-  language: string;
   fontSize: FontSize;
   fontFamily: FontFamily;
-  notifications: {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    frequency: string;
+  language: string;
+  notifications: NotificationPreference;
+  autoplayVideos: boolean;
+  dataCollection: boolean;
+  accessibilityFeatures: {
+    highContrast: boolean;
+    reducedMotion: boolean;
+    screenReader: boolean;
   };
-  soundEnabled: boolean;
-  privacyLevel: PrivacyLevel;
+  dashboardLayout: string;
   onboardingCompleted: boolean;
-  dashboardLayout: DashboardLayout;
-  
-  // Propriétés supplémentaires utilisées dans l'application
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  privacy?: {
-    anonymousMode?: boolean;
-    dataSharing?: boolean;
-    profileVisibility?: 'public' | 'team' | 'private';
-  };
-  autoplayVideos?: boolean;
-  dataCollection?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
+  privacyLevel: PrivacyLevel;
+  soundEnabled?: boolean;
   fullAnonymity?: boolean;
 }

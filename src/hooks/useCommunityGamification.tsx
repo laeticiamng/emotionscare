@@ -49,15 +49,11 @@ export const useCommunityGamification = (): UseCommunityGamificationResult => {
     try {
       // Fetch stats
       const statsData = await fetchGamificationStats(user.id);
-      setStats({
-        ...statsData,
-        badgesCount: statsData.badgesCount || stats.badgesCount,
-        streakDays: statsData.streakDays || stats.streakDays
-      });
+      setStats(statsData);
       
       // Fetch challenges
       const challengesData = await fetchChallenges(user.id);
-      setChallenges(challengesData);
+      setChallenges(challengesData as unknown as Challenge[]);
       
       // Mock badges data
       setBadges([

@@ -1,86 +1,62 @@
 
 import { useState, useEffect } from 'react';
-import { GamificationStats } from '@/types/gamification';
-import { fetchGamificationStats, syncGamificationData } from '@/lib/gamificationService';
+import { useAuth } from '@/contexts/AuthContext';
+import { fetchGamificationStats } from '@/lib/gamificationService';
+import { GamificationStats } from './types';
 
-export const useGamificationStats = (userId: string) => {
+export const useGamificationStats = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState<GamificationStats>({
     points: 0,
     level: 1,
-    nextLevelPoints: 100,
+    rank: 'Débutant',
     badges: [],
-    completedChallenges: 0,
-    activeChallenges: 0,
-    streakDays: 0,
-    progressToNextLevel: 0,
-    challenges: [],
+    streak: 0,
+    nextLevelPoints: 100,
+    progress: 0,
     recentAchievements: []
   });
   
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastSynced, setLastSynced] = useState<Date | null>(null);
-
-  const loadStats = async () => {
-    if (!userId) {
-      setError("User ID is required");
-      return;
-    }
+  
+  const fetchStats = async () => {
+    if (!user) return;
     
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
     
     try {
-      const data = await fetchGamificationStats(userId);
+      const data = await fetchGamificationStats(user.id);
       
-      if (data) {
-        setStats({
-          ...data,
-          progressToNextLevel: calculateProgress(data.points, data.nextLevelPoints)
-        });
-      }
-      
-      setLastSynced(new Date());
+      // Adapter les données du serveur à notre format local
+      setStats({
+        points: data.points,
+        level: data.level,
+        rank: data.rank,
+        badges: data.badges || [],
+        streak: data.streak,
+        nextLevelPoints: data.pointsToNextLevel,
+        progress: (data.progressToNextLevel / data.pointsToNextLevel) * 100,
+        recentAchievements: data.recentAchievements || []
+      });
     } catch (err) {
-      setError("Failed to load gamification stats");
-      console.error('Error loading gamification stats:', err);
+      const errorMessage = err instanceof Error ? err.message : "Erreur lors de la récupération des statistiques";
+      setError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
-
-  const syncStats = async () => {
-    if (!userId) return;
-    
-    try {
-      const syncResult = await syncGamificationData(userId);
-      if (syncResult) {
-        await loadStats();
-      }
-    } catch (err) {
-      console.error('Error syncing gamification data:', err);
-    }
-  };
-
-  const calculateProgress = (current: number, target: number): number => {
-    if (target <= 0) return 0;
-    const progress = (current / target) * 100;
-    return Math.min(Math.max(progress, 0), 100);
-  };
-
+  
   useEffect(() => {
-    if (userId) {
-      loadStats();
-    }
-  }, [userId]);
-
+    fetchStats();
+  }, [user]);
+  
   return {
     stats,
-    isLoading,
+    loading,
     error,
-    lastSynced,
-    refreshStats: loadStats,
-    syncStats
+    refetch: fetchStats
   };
 };
 

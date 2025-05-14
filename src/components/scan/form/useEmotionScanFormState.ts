@@ -93,7 +93,7 @@ export default function useEmotionScanFormState(onScanSaved: () => void, onSaveC
         user_id: userId || '',
         emojis,
         text,
-        audio_url: audioUrl,
+        audio_url: audioUrl || undefined,
         is_confidential: isConfidential,
         share_with_coach: shareWithCoach
       });

@@ -26,6 +26,7 @@ export function useEmotionScan() {
     try {
       const emotion = await createEmotionEntry({
         user_id: user.id,
+        date: new Date().toISOString(),
         ...input
       });
       

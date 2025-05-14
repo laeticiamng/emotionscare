@@ -1,32 +1,4 @@
 
-export interface EmotionRecord {
-  id: string;
-  user_id: string;
-  date: string;
-  emotion: string;
-  name: string;
-  score: number;
-  intensity?: number;
-  confidence?: number;
-  category?: string;
-  source?: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  ai_feedback?: string;
-}
-
-export interface EmotionResultRecord {
-  emotion: string;
-  score: number;
-  text?: string;
-  emojis?: string;
-  feedback?: string;
-  ai_feedback?: string;
-  timestamp?: string;
-  confidence?: number;
-}
-
 export interface Emotion {
   id: string;
   user_id: string;
@@ -39,6 +11,7 @@ export interface Emotion {
   text?: string;
   emojis?: string;
   ai_feedback?: string;
+  audio_url?: string;
   source?: string;
   category?: string;
 }
@@ -69,10 +42,32 @@ export interface EmotionResult {
   timestamp?: string;
 }
 
+export type EnhancedEmotionResult = EmotionResult & {
+  detailedAnalysis?: string;
+  triggers?: string[];
+  coping_strategies?: string[];
+  historical_context?: {
+    previous_emotions: string[];
+    trend: 'improving' | 'worsening' | 'stable';
+  };
+};
+
 export interface EmotionalTeamViewProps {
   className?: string;
   teamId: string;
   userId?: string;
   period?: string;
   onRefresh?: () => void;
+}
+
+export interface EmotionalData {
+  id?: string;
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  context?: string;
+  source?: string;
+  feedback?: string;
+  userId?: string;
+  user_id?: string;
 }

@@ -1,66 +1,77 @@
-import { Challenge, Badge } from '@/types';
 
-// Mock data for active challenges
-export const activeChallenges: Challenge[] = [
+import { Challenge } from './types';
+import { Badge } from '@/types/gamification';
+
+export const mockChallenges: Challenge[] = [
   {
-    id: "challenge1",
-    title: "Semaine de Gratitude",
-    description: "Exprimez votre gratitude chaque jour pendant une semaine",
-    points: 150,
-    status: "active", // Changed from "ongoing"
-    category: "mindfulness",
+    id: '1',
+    title: 'Scanner chaque jour',
+    description: 'Effectuez un scan émotionnel chaque jour pendant 5 jours consécutifs',
+    points: 100,
+    status: 'ongoing',
+    category: 'scan',
     progress: 3,
-    goal: 7,
-    total: 7, // keeping this for backward compatibility
-    icon: "Heart"
-  },
-  {
-    id: "challenge2",
-    title: "Méditation Quotidienne",
-    description: "Méditez pendant 15 minutes chaque jour",
-    points: 200,
-    status: "active", // Changed from "available"
-    category: "mindfulness",
-    progress: 0,
-    goal: 7,
-    total: 7, // keeping this for backward compatibility
-    icon: "Aura"
-  },
-  {
-    id: "challenge3",
-    title: "Partage de Bienveillance",
-    description: "Partagez un acte de gentillesse chaque jour",
-    points: 180,
-    status: "active",
-    category: "social",
-    progress: 5,
     goal: 5,
-    total: 5, // keeping this for backward compatibility
-    icon: "Smile"
+    icon: 'BarChart2'
+  },
+  {
+    id: '2',
+    title: 'Journal introspectif',
+    description: 'Écrivez au moins 3 entrées dans votre journal cette semaine',
+    points: 75,
+    status: 'ongoing',
+    category: 'journal',
+    progress: 1,
+    goal: 3,
+    icon: 'Book'
+  },
+  {
+    id: '3',
+    title: 'Méditation quotidienne',
+    description: 'Complétez une session VR de méditation chaque jour pendant 3 jours',
+    points: 150,
+    status: 'locked',
+    category: 'vr',
+    progress: 0,
+    goal: 3,
+    icon: 'Cloud'
+  },
+  {
+    id: '4',
+    title: 'Connectez-vous à votre coach',
+    description: 'Ayez une conversation avec votre coach IA',
+    points: 50,
+    status: 'completed',
+    category: 'coach',
+    progress: 1,
+    goal: 1,
+    icon: 'MessageSquare'
   }
 ];
 
-// Mock data for badges
 export const mockBadges: Badge[] = [
   {
-    id: "badge1",
-    name: "Explorateur Émotionnel", // Ensure name is present
-    description: "Votre première analyse émotionnelle",
-    image_url: "/images/badges/emotional-explorer.png",
-    level: "Débutant" // keeping for backward compatibility
+    id: '1',
+    name: 'Premier Pas',
+    description: 'Vous avez effectué votre premier scan émotionnel',
+    image_url: '/badges/first-scan.svg',
+    type: 'achievement',
+    level: 'Bronze'
   },
   {
-    id: "badge2",
-    name: "Maître de la Gratitude", // Ensure name is present
-    description: "Badge pour avoir complété une semaine de gratitude",
-    image_url: "/images/badges/gratitude-master.png",
-    level: "Avancé" // keeping for backward compatibility
+    id: '2',
+    name: 'Introspection',
+    description: 'Vous avez écrit 5 entrées dans votre journal',
+    image_url: '/badges/journal-5.svg',
+    type: 'milestone',
+    level: 'Silver'
   },
   {
-    id: "badge3",
-    name: "Zenith Méditatif", // Ensure name is present
-    description: "Badge pour la méditation quotidienne",
-    image_url: "/images/badges/meditative-zenith.png",
-    level: "Expert" // keeping for backward compatibility
+    id: '3',
+    name: 'Explorateur VR',
+    description: 'Vous avez essayé toutes les expériences VR disponibles',
+    image_url: '/badges/vr-explorer.svg',
+    type: 'completion',
+    level: 'Gold'
   }
 ];

@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/contexts/AuthContext';
-import { Notification } from '@/types/notification';
 import { CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -20,7 +19,7 @@ const NotificationsPanel = () => {
   useEffect(() => {
     // Update badge count based on unread notifications
     if (badge && notifications) {
-      const unreadCount = notifications.filter(n => !n.read && !n.isRead).length;
+      const unreadCount = notifications.filter(n => !n.isRead && !n.read).length;
       badge.setBadgesCount?.(unreadCount);
     }
   }, [notifications, badge]);
@@ -79,7 +78,7 @@ const NotificationsPanel = () => {
                     {notification.message}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.createdAt || notification.date), {
+                    {formatDistanceToNow(new Date(notification.timestamp || notification.date || notification.createdAt || new Date()), {
                       addSuffix: true,
                       locale: fr,
                     })}

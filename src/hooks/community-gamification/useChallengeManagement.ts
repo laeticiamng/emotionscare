@@ -1,61 +1,44 @@
 
-import { useState, useEffect } from 'react';
-import { Challenge } from '@/types/gamification';
-import { fetchChallenges } from '@/lib/gamificationService';
+import { useState } from 'react';
+import { completeChallenge } from '@/lib/gamificationService';
+import { Challenge } from './types';
 
-export const useChallengeManagement = (userId: string) => {
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [activeChallenges, setActiveChallenges] = useState<Challenge[]>([]);
-  const [completedChallenges, setCompletedChallenges] = useState<Challenge[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const useChallengeManagement = () => {
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadChallenges = async () => {
-    setIsLoading(true);
+  const markChallengeAsComplete = async (challengeId: string) => {
+    setIsProcessing(true);
     setError(null);
+
     try {
-      const data = await fetchChallenges(userId, 'all');
-      setChallenges(data);
-      
-      // Filter challenges into active and completed
-      setActiveChallenges(data.filter(c => c.status === 'active' || c.status === 'ongoing' || c.status === 'available'));
-      setCompletedChallenges(data.filter(c => c.status === 'completed'));
+      await completeChallenge(challengeId);
+      return true;
     } catch (err) {
-      setError('Failed to load challenges');
-      console.error('Error loading challenges:', err);
+      const errorMessage = err instanceof Error ? err.message : "Une erreur s'est produite";
+      setError(errorMessage);
+      return false;
     } finally {
-      setIsLoading(false);
+      setIsProcessing(false);
     }
   };
 
-  useEffect(() => {
-    loadChallenges();
-  }, [userId]);
-
-  const joinChallenge = async (challengeId: string) => {
-    // Here would be API call to join a challenge
-    console.log('Joining challenge:', challengeId);
-    // Reload challenges after joining
-    await loadChallenges();
-    return true;
-  };
-
-  const completeChallenge = async (challengeId: string) => {
-    // Here would be API call to mark challenge as complete
-    console.log('Completing challenge:', challengeId);
-    // Reload challenges after completion
-    await loadChallenges();
-    return true;
+  const updateChallengeProgress = (challenge: Challenge, progress: number) => {
+    // Dans une implémentation réelle, cette fonction mettrait à jour la progression
+    // dans une base de données ou un service externe
+    console.log(`Challenge ${challenge.id} progress updated to ${progress}`);
+    return {
+      ...challenge,
+      progress
+    };
   };
 
   return {
-    challenges,
-    activeChallenges,
-    completedChallenges,
-    isLoading,
-    error,
-    joinChallenge,
-    completeChallenge,
-    refreshChallenges: loadChallenges
+    markChallengeAsComplete,
+    updateChallengeProgress,
+    isProcessing,
+    error
   };
 };
+
+export default useChallengeManagement;

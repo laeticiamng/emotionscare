@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { analyzeAudioStream } from '@/lib/scanService';
@@ -10,7 +11,7 @@ interface AudioProcessorProps {
   onProgressUpdate: (progress: string) => void;
   onAnalysisComplete: (emotion: any, result: EmotionResult) => void;
   onError: (error: string) => void;
-  isListening: boolean; // Added this property
+  isListening: boolean; // Added this property explicitly
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({

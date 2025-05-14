@@ -1,4 +1,5 @@
-import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/preferences';
+
+import { UserPreferences, ThemeName, FontSize, FontFamily, PrivacyLevel } from '@/types/preferences';
 
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   theme: 'system' as ThemeName,
@@ -20,7 +21,8 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   },
   dashboardLayout: 'standard',
   onboardingCompleted: false,
-  privacyLevel: 'balanced'
+  privacyLevel: 'balanced' as PrivacyLevel,
+  soundEnabled: true
 };
 
 // Alias for backward compatibility

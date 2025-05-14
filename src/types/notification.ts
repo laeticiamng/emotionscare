@@ -1,85 +1,59 @@
 
-// Notification types and interfaces
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'monthly' | 'immediate';
+export type NotificationType = 'success' | 'warning' | 'info' | 'error' | 'reminder' | 'wellness' | 'tip' | 'recommendation' | 'system' | 'in_app';
+export type NotificationTone = 'standard' | 'friendly' | 'professional' | 'urgent' | 'minimal' | 'formal' | 'casual' | 'encouraging';
 
-/**
- * Notification frequency options
- */
-export enum NotificationFrequency {
-  REALTIME = 'realtime',
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  IMMEDIATE = 'immediate' // Adding this to fix the error
-}
+export const NotificationFrequency = {
+  REALTIME: 'realtime' as NotificationFrequency,
+  DAILY: 'daily' as NotificationFrequency,
+  WEEKLY: 'weekly' as NotificationFrequency,
+  MONTHLY: 'monthly' as NotificationFrequency,
+  IMMEDIATE: 'immediate' as NotificationFrequency
+};
 
-/**
- * Notification type options
- */
-export enum NotificationType {
-  INFO = 'info',
-  WARNING = 'warning',
-  SUCCESS = 'success',
-  ERROR = 'error',
-  SYSTEM = 'system',
-  REMINDER = 'reminder',
-  WELLNESS = 'wellness',
-  TIP = 'tip',
-  IN_APP = 'in_app' // Adding this to fix the error
-}
+export const NotificationType = {
+  SUCCESS: 'success' as NotificationType,
+  WARNING: 'warning' as NotificationType,
+  INFO: 'info' as NotificationType,
+  ERROR: 'error' as NotificationType,
+  SYSTEM: 'system' as NotificationType,
+  REMINDER: 'reminder' as NotificationType,
+  WELLNESS: 'wellness' as NotificationType,
+  TIP: 'tip' as NotificationType,
+  IN_APP: 'in_app' as NotificationType,
+  RECOMMENDATION: 'recommendation' as NotificationType
+};
 
-/**
- * Notification tone options
- */
-export enum NotificationTone {
-  STANDARD = 'standard',
-  FRIENDLY = 'friendly',
-  PROFESSIONAL = 'professional',
-  URGENT = 'urgent',
-  MINIMAL = 'minimal',
-  FORMAL = 'formal', // Adding these to fix the errors
-  CASUAL = 'casual',
-  ENCOURAGING = 'encouraging'
-}
+export const NotificationTone = {
+  STANDARD: 'standard' as NotificationTone,
+  FRIENDLY: 'friendly' as NotificationTone,
+  PROFESSIONAL: 'professional' as NotificationTone,
+  URGENT: 'urgent' as NotificationTone,
+  MINIMAL: 'minimal' as NotificationTone,
+  FORMAL: 'formal' as NotificationTone,
+  CASUAL: 'casual' as NotificationTone,
+  ENCOURAGING: 'encouraging' as NotificationTone
+};
 
-/**
- * Notification model
- */
 export interface Notification {
   id: string;
-  user_id: string;
   title: string;
-  body: string;
+  message: string;
   type: NotificationType;
-  created_at: string;
-  read: boolean;
-  read_at?: string;
-  action_url?: string;
-  icon?: string;
-  image_url?: string;
-  priority?: 'low' | 'normal' | 'high';
-  category?: string;
-  sender?: string;
-  context_data?: Record<string, any>;
-  createdAt?: string; // Alias for created_at
+  date?: string;
+  createdAt?: string;
+  timestamp?: string;
+  read?: boolean;
+  isRead?: boolean;
+  actionUrl?: string;
+  userId?: string;
 }
 
-/**
- * Notification preferences
- */
 export interface NotificationPreference {
-  id?: string;
-  user_id: string;
   enabled: boolean;
-  email_enabled: boolean;
-  push_enabled: boolean;
-  frequency: NotificationFrequency;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  frequency: NotificationFrequency | string;
   types?: NotificationType[];
-  quiet_hours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-    timezone: string;
-  };
-  categories?: string[];
   tone?: NotificationTone;
 }
