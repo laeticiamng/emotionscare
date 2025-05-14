@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { analyzeEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/types';
 
 const EnhancedCoachAI = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,9 @@ const EnhancedCoachAI = () => {
 
   // Mise à jour de la fonction où l'erreur apparaît
   const handleEmotionDetected = (result: EmotionResult) => {
-    setAnalysisResult(result);
+    if (result) {
+      setAnalysisResult(result);
+    }
     setIsLoading(false);
     
     // Corriger l'erreur avec les émojis
@@ -53,8 +55,10 @@ const EnhancedCoachAI = () => {
     setIsLoading(true);
     try {
       const result = await analyzeEmotion(userText, userEmojis);
-      setAnalysisResult(result);
-      handleEmotionDetected(result);
+      if (result) {
+        setAnalysisResult(result);
+        handleEmotionDetected(result);
+      }
     } catch (error) {
       console.error('Error analyzing emotion:', error);
       setIsLoading(false);

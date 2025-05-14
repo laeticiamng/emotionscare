@@ -54,6 +54,7 @@ export interface UserPreferences {
   colorScheme?: string;
   locale?: string;
   timeZone?: string;
+  sound?: boolean;
 }
 
 // ————————————————————————
@@ -96,8 +97,8 @@ export interface EmotionResult {
   feedback?: string;
 }
 
-// Remove Emotion interface to avoid confusion
 // Use EmotionResult for all emotion related data
+export type Emotion = EmotionResult;
 
 export type EnhancedEmotionResult = EmotionResult;
 
@@ -297,7 +298,7 @@ export interface ThemeContextType {
 
 // ————————————————————————
 // UserMode
-// ————————————————————————
+// ————————————���———————————
 export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'b2b-collaborator' | 'anonymous';
 
 export interface UserMode {
@@ -320,6 +321,8 @@ export interface AuthContextType {
   updateProfile: (data: Partial<User>) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
+  logout?: () => Promise<void>; // Added for compatibility with existing components
+  updateUser?: (data: Partial<User>) => Promise<void>; // Added for compatibility
 }
 
 // ————————————————————————

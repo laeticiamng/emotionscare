@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
+import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/types';
 
 // Création du contexte
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -113,5 +113,3 @@ export const useTheme = (): ThemeContextType => {
   
   return context;
 };
-
-export type { Theme, FontFamily, FontSize, ThemeContextType };
