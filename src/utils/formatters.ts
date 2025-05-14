@@ -1,23 +1,24 @@
 
 /**
- * Format duration in seconds to MM:SS format
+ * Formats a duration in seconds to a string in the format MM:SS
  */
 export const formatDuration = (seconds: number): string => {
-  if (!seconds && seconds !== 0) return '0:00';
+  if (!seconds || isNaN(seconds)) return '0:00';
   
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 /**
- * Format date to locale string
+ * Formats a date to a human-readable string
  */
-export const formatDate = (date: string | Date): string => {
+export const formatDate = (date: Date | string): string => {
   if (!date) return '';
   
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('fr-FR', {
+  return dateObj.toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -25,12 +26,14 @@ export const formatDate = (date: string | Date): string => {
 };
 
 /**
- * Format time in seconds to MM:SS format
+ * Formats a time to a human-readable string
  */
-export const formatTime = (seconds: number): string => {
-  if (!seconds && seconds !== 0) return '0:00';
+export const formatTime = (date: Date | string): string => {
+  if (!date) return '';
   
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 };

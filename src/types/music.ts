@@ -1,55 +1,65 @@
-
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration?: number;
-  url?: string;
-  audioUrl?: string;
-  coverUrl?: string;
-  cover?: string;
-  cover_url?: string;
-  audio_url?: string; // Added for compatibility
-  emotion?: string;
-  genre?: string;
-  album?: string;
-  year?: number;
-  isPlaying?: boolean;
-  isFavorite?: boolean;
-}
-
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  title?: string;
-  description?: string;
-  tracks: MusicTrack[];
-  coverUrl?: string;
-  duration?: number;
-  trackCount?: number;
-  createdBy?: string;
-  emotion?: string;
-}
+import type { MusicTrack, MusicPlaylist } from '@/types/types';
 
 export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  queue: MusicTrack[];
-  isPlaying: boolean;
-  volume: number;
-  progress: number;
-  duration: number;
+  // Playback control
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   togglePlay: () => void;
   nextTrack: () => void;
-  prevTrack: () => void;
+  previousTrack: () => void;
+
+  // Drawer control
+  setOpenDrawer: (open: boolean) => void;
+
+  // Track & playlist state
+  tracks: MusicTrack[];
+  currentTrack: MusicTrack | null;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => void;
+
+  // Emotion-based recommendation
+  currentEmotion: string;
+  setEmotion: (emotion: string) => void;
+
+  // Volume & mute control
+  isMuted: boolean;
+  toggleMute: () => void;
+  adjustVolume: (value: number) => void;
+
+  // System state
+  isInitialized: boolean;
+  initializeMusicSystem: () => void;
+  error?: string | null;
+  
+  // Additional properties for backward compatibility
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  isPlaying: boolean;
+  volume: number;
+  play: () => void;
+  pause: () => void;
   setVolume: (volume: number) => void;
-  setProgress: (progress: number) => void;
-  addToQueue: (track: MusicTrack) => void;
-  clearQueue: () => void;
-  shuffleQueue: () => void;
-  repeatMode: 'none' | 'one' | 'all';
-  toggleRepeatMode: () => void;
+  openDrawer: boolean;
+  currentPlaylist: MusicPlaylist | null;
+  resumeTrack: () => void;
+  progress: number;
+  duration: number;
+  seekTo: (time: number) => void;
+  formatTime: (seconds: number) => string;
+  isShuffled: boolean;
+  isRepeating: boolean;
+  toggleShuffle: () => void;
+  toggleRepeat: () => void;
+}
+
+export interface TrackListProps {
+  tracks: MusicTrack[];
+  onTrackSelect: (track: MusicTrack) => void;
+  onPlayPause?: (track: MusicTrack) => void;
+  currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
+  compact?: boolean;
+  showEmotionTag?: boolean;
+  onPlay?: (track: MusicTrack) => void;
 }
 
 export interface MusicDrawerProps {

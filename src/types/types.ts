@@ -1,4 +1,3 @@
-
 // ————————————————————————
 // UserRole
 // ————————————————————————
@@ -41,19 +40,6 @@ export interface UserPreferences {
 }
 
 // ————————————————————————
-// AuthContext
-// ————————————————————————
-export interface AuthContextType {
-  user: User | null;
-  preferences: UserPreferences;
-  setSinglePreference: (key: string, value: any) => void;
-  updateUser: (updates: Partial<User>) => Promise<void>;
-  logout: () => void;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-}
-
-// ————————————————————————
 // Period & TeamView
 // ————————————————————————
 export type Period = 'day' | 'week' | 'month';
@@ -84,25 +70,6 @@ export interface EmotionResult {
   recommendations?: string[];
   category?: string;
   audio_url?: string;
-  score?: number;
-  text?: string;
-  feedback?: string;
-  id?: string;
-  user_id?: string;
-}
-
-export interface Emotion {
-  id: string;
-  user_id: string;
-  date: string;
-  emotion: string;
-  score: number;
-  confidence?: number;
-  intensity?: number;
-  text?: string;
-  ai_feedback?: string;
-  emojis?: string[];
-  category?: string;
 }
 
 // ————————————————————————
@@ -111,17 +78,33 @@ export interface Emotion {
 export interface MusicTrack {
   id: string;
   title: string;
-  artist?: string;
-  genre?: string;
-  duration?: number;
+  artist: string;
+  duration: number;
+  url: string;
+  audioUrl: string;
+  coverUrl: string;
   cover?: string;
+  cover_url?: string;
   audio_url?: string;
+  emotion?: string;
+  genre?: string;
+  album?: string;
+  year?: number;
+  isPlaying?: boolean;
+  isFavorite?: boolean;
 }
 
 export interface MusicPlaylist {
   id: string;
+  name: string;
   title: string;
+  description?: string;
   tracks: MusicTrack[];
+  coverUrl?: string;
+  duration?: number;
+  trackCount?: number;
+  createdBy?: string;
+  emotion?: string;
 }
 
 export interface MusicDrawerProps {
@@ -223,3 +206,29 @@ export interface VoiceEmotionScannerProps {
 // GÉNÉRAL
 // ————————————————————————
 export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+
+// ————————————————————————
+// ThemeContext
+// ————————————————————————
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
+export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
+export type ThemeName = 'light' | 'dark' | 'system';
+
+export interface ThemeContextType {
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
+  isDarkMode: boolean;
+  fontFamily: FontFamily;
+  setFontFamily: (font: FontFamily) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+}
+
+// ————————————————————————
+// UserMode
+// ————————————————————————
+export type UserModeType = 'team' | 'personal';
+export interface UserMode {
+  mode: UserModeType;
+  setMode: (mode: UserModeType) => void;
+}
