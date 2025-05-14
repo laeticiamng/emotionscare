@@ -1,92 +1,98 @@
 
 import React from 'react';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 import { Button } from '@/components/ui/button';
-import { Play, Pause } from 'lucide-react';
+import { PlayCircle, PauseCircle, ChevronRight } from 'lucide-react';
 
 interface TrackListProps {
   tracks: MusicTrack[];
-  onPlay: (track: MusicTrack) => void;
   currentTrack?: MusicTrack | null;
-  isPlaying?: boolean;
-  compact?: boolean;
-  className?: string;
+  isPlaying: boolean;
+  onTrackSelect: (track: MusicTrack) => void;
+  onPlayPause: () => void;
+  emptyMessage?: string;
+  showEmotionTag?: boolean;
 }
 
-export const TrackList: React.FC<TrackListProps> = ({ 
-  tracks, 
-  onPlay,
+const TrackList: React.FC<TrackListProps> = ({
+  tracks,
   currentTrack,
-  isPlaying = false,
-  compact = false,
-  className = ''
+  isPlaying,
+  onTrackSelect,
+  onPlayPause,
+  emptyMessage = "Aucune piste disponible",
+  showEmotionTag = false
 }) => {
   if (!tracks || tracks.length === 0) {
     return (
-      <div className="text-center py-4 text-muted-foreground">
-        Aucune piste disponible
+      <div className="p-4 text-center text-muted-foreground">
+        {emptyMessage}
       </div>
     );
   }
 
-  const formatDuration = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const isCurrentTrack = (track: MusicTrack) => {
-    return currentTrack?.id === track.id;
-  };
-
   return (
-    <div className={`space-y-2 ${className}`}>
-      {tracks.map((track) => (
-        <div 
-          key={track.id}
-          className={`flex items-center p-2 rounded-md hover:bg-secondary/50 transition-colors ${
-            isCurrentTrack(track) ? 'bg-secondary/30' : ''
-          } ${compact ? 'gap-2' : 'gap-3'}`}
-        >
-          <div className={`${compact ? 'w-8 h-8' : 'w-10 h-10'} flex-shrink-0`}>
-            <img 
-              src={track.coverUrl || track.cover_url || track.cover || '/images/music/default-cover.jpg'} 
-              alt={track.title}
-              className="w-full h-full object-cover rounded"
-            />
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`font-medium truncate ${compact ? 'text-sm' : ''}`}>{track.title}</p>
-                <p className={`text-muted-foreground truncate ${compact ? 'text-xs' : 'text-sm'}`}>
-                  {track.artist}
-                </p>
-              </div>
-              
-              {!compact && track.duration > 0 && (
-                <span className="text-xs text-muted-foreground ml-2">
-                  {formatDuration(track.duration)}
-                </span>
+    <div className="space-y-2">
+      {tracks.map((track) => {
+        const isActive = currentTrack?.id === track.id;
+        
+        return (
+          <div 
+            key={track.id}
+            className={`flex items-center p-2 rounded-md hover:bg-muted/50 transition-colors ${
+              isActive ? 'bg-muted' : ''
+            }`}
+          >
+            <div className="flex-shrink-0 mr-3">
+              {isActive ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full"
+                  onClick={onPlayPause}
+                >
+                  {isPlaying ? (
+                    <PauseCircle className="h-8 w-8 text-primary" />
+                  ) : (
+                    <PlayCircle className="h-8 w-8 text-primary" />
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100"
+                  onClick={() => onTrackSelect(track)}
+                >
+                  <PlayCircle className="h-8 w-8" />
+                </Button>
               )}
             </div>
-          </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 rounded-full p-0 flex-shrink-0"
-            onClick={() => onPlay(track)}
-          >
-            {isCurrentTrack(track) && isPlaying ? (
-              <Pause className={`${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
-            ) : (
-              <Play className={`${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
+            
+            <div className="min-w-0 flex-1">
+              <div 
+                className="cursor-pointer"
+                onClick={() => onTrackSelect(track)}
+              >
+                <div className="font-medium truncate">{track.title}</div>
+                <div className="text-sm text-muted-foreground truncate">{track.artist}</div>
+              </div>
+            </div>
+            
+            {showEmotionTag && track.emotion && (
+              <div className="ml-2">
+                <span className="px-2 py-1 text-xs rounded-full bg-muted">
+                  {track.emotion}
+                </span>
+              </div>
             )}
-          </Button>
-        </div>
-      ))}
+            
+            <ChevronRight className="h-4 w-4 ml-2 text-muted-foreground" />
+          </div>
+        );
+      })}
     </div>
   );
 };
+
+export default TrackList;

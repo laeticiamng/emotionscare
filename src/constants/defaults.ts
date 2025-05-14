@@ -1,9 +1,30 @@
 
-export const TIME_OF_DAY = {
-  MORNING: "MORNING",
-  AFTERNOON: "AFTERNOON",
-  EVENING: "EVENING",
-  NIGHT: "NIGHT"
-} as const;
+import { UserPreferences } from '@/types/user';
 
-export type TimeOfDay = typeof TIME_OF_DAY[keyof typeof TIME_OF_DAY];
+export const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  theme: 'system',
+  fontSize: 'medium',
+  fontFamily: 'sans',
+  notifications: true,
+  notifications_enabled: true,
+  sound: true,
+  language: 'fr',
+  dashboardLayout: 'standard',
+  emotionalCamouflage: false,
+  aiSuggestions: true,
+  onboardingCompleted: false,
+  autoplayVideos: false,
+  dataCollection: true,
+  privacy: {
+    showEmotionalScore: true,
+    shareJournalInsights: false,
+    anonymousDataContribution: true
+  }
+};
+
+export enum TIME_OF_DAY {
+  MORNING = "MORNING",
+  AFTERNOON = "AFTERNOON",
+  EVENING = "EVENING",
+  NIGHT = "NIGHT"
+}

@@ -7,6 +7,7 @@ export interface User {
   name: string;
   email: string;
   avatar_url?: string;
+  avatar?: string;  // Adding this field for compatibility
   role: UserRole;
   createdAt?: string;
   created_at?: string;
@@ -15,6 +16,9 @@ export interface User {
   emotional_score?: number;
   anonymity_code?: string;
   last_active?: string;
+  department?: string;
+  position?: string;
+  joined_at?: string;
   preferences?: UserPreferences;
   onboarded?: boolean;
 }
@@ -28,12 +32,20 @@ export interface UserPreferences {
   fontSize: FontSize;
   fontFamily: FontFamily;
   notifications: boolean;
+  notifications_enabled?: boolean;
   sound: boolean;
   language: string;
   dashboardLayout: 'standard' | 'compact' | 'focused';
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   onboardingCompleted?: boolean;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
+  privacy?: {
+    showEmotionalScore?: boolean;
+    shareJournalInsights?: boolean;
+    anonymousDataContribution?: boolean;
+  };
 }
 
 export interface UserPreferencesState {
