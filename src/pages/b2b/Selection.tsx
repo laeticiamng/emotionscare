@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Building, Shield } from 'lucide-react';
+import { User, Building } from 'lucide-react';
 import Shell from '@/Shell';
 import { motion } from 'framer-motion';
 
@@ -83,7 +83,7 @@ const Selection = () => {
               <CardHeader>
                 <div className="flex justify-center mb-4">
                   <div className="p-4 rounded-full bg-purple-100 dark:bg-purple-900/30">
-                    <Shield className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                    <Building className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                   </div>
                 </div>
                 <CardTitle className="text-center text-xl">Administration / RH</CardTitle>

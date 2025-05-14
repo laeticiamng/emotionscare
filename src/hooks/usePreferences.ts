@@ -1,119 +1,86 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/preferences';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserPreferences } from '@/types';
-import { defaultPreferences } from '@/constants/defaults';
+import { DEFAULT_USER_PREFERENCES } from '@/constants/defaults';
 
 export const usePreferences = () => {
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    ...defaultPreferences,
-    notifications: {
-      enabled: false,
-      emailEnabled: false,
-      pushEnabled: false,
-      frequency: 'daily'
-    }
+  const { user, updateUser } = useAuth();
+  const [preferences, setPreferences] = useState<UserPreferences>(user?.preferences || {
+    ...DEFAULT_USER_PREFERENCES,
+    notifications: { 
+      enabled: false, 
+      emailEnabled: false, 
+      pushEnabled: false, 
+      frequency: 'daily' 
+    },
+    theme: 'system' as ThemeName,
+    fontSize: 'medium' as FontSize,
+    fontFamily: 'system' as FontFamily,
+    language: 'fr',
+    autoplayVideos: false,
+    dataCollection: true,
+    accessibilityFeatures: {
+      highContrast: false,
+      reducedMotion: false,
+      screenReader: false
+    },
+    dashboardLayout: 'standard',
+    onboardingCompleted: false,
+    privacyLevel: 'balanced'
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
-
-  const fetchPreferences = async () => {
-    if (!user) return;
-    
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Simulate fetching preferences from an API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // In a real app, this would be a real API call
-      // const { data, error } = await supabase
-      //   .from('profiles')
-      //   .select('preferences')
-      //   .eq('id', user.id)
-      //   .single();
-      
-      // if (error) throw error;
-      
-      // Mock data for now
-      const mockData = {
-        preferences: {
-          theme: 'system',
-          fontSize: 'medium',
-          fontFamily: 'inter',
-          notifications: {
-            enabled: true,
-            emailEnabled: false,
-            pushEnabled: true,
-            frequency: 'daily'
-          },
-          autoplayVideos: false,
-          dataCollection: true,
-          emotionalCamouflage: false,
-          aiSuggestions: true,
-          fullAnonymity: false,
-          language: 'fr',
-          privacy: 'private',
-          privacyLevel: 'private'
-        }
-      };
-      
-      setPreferences(mockData.preferences);
-    } catch (error) {
-      console.error('Error fetching preferences:', error);
-      setError('Failed to fetch preferences');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
-    if (!user) return;
-    
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // Merge the current preferences with the new ones
-      const updatedPreferences = {
-        ...preferences,
-        ...newPreferences
-      };
-      
-      // In a real app, this would be a real API call
-      // const { error } = await supabase
-      //   .from('profiles')
-      //   .update({ preferences: updatedPreferences })
-      //   .eq('id', user.id);
-      
-      // if (error) throw error;
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Update local state
-      setPreferences(updatedPreferences);
-    } catch (error) {
-      console.error('Error updating preferences:', error);
-      setError('Failed to update preferences');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  
+  // Sync preferences when user changes
   useEffect(() => {
-    fetchPreferences();
+    if (user?.preferences) {
+      setPreferences(user.preferences);
+    }
   }, [user]);
-
+  
+  const updatePreference = async <K extends keyof UserPreferences>(
+    key: K, 
+    value: UserPreferences[K]
+  ): Promise<void> => {
+    if (!user) return;
+    
+    const updatedPreferences = {
+      ...preferences,
+      [key]: value
+    };
+    
+    setPreferences(updatedPreferences);
+    
+    await updateUser({
+      ...user,
+      preferences: updatedPreferences
+    });
+  };
+  
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>): Promise<void> => {
+    if (!user) return;
+    
+    const updatedPreferences: UserPreferences = {
+      ...preferences,
+      ...newPreferences,
+      theme: (newPreferences.theme as ThemeName) || preferences.theme,
+      fontSize: (newPreferences.fontSize as FontSize) || preferences.fontSize,
+      fontFamily: (newPreferences.fontFamily as FontFamily) || preferences.fontFamily,
+      language: newPreferences.language || preferences.language
+    };
+    
+    setPreferences(updatedPreferences);
+    
+    await updateUser({
+      ...user,
+      preferences: updatedPreferences
+    });
+  };
+  
   return {
     preferences,
-    isLoading,
-    error,
+    updatePreference,
     updatePreferences,
-    refreshPreferences: fetchPreferences
+    isLoading: !user
   };
 };
 

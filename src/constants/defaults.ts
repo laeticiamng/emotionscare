@@ -1,23 +1,26 @@
+import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/preferences';
 
-import { FontFamily, FontSize, ThemeName } from '@/types';
-
-export const DEFAULT_USER_PREFERENCES = {
+export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   theme: 'system' as ThemeName,
   fontSize: 'medium' as FontSize,
-  fontFamily: 'sans' as FontFamily,
+  fontFamily: 'system' as FontFamily,
+  language: 'fr',
   notifications: {
     enabled: true,
-    emailEnabled: false,
-    pushEnabled: true,
-    frequency: 'daily',
+    emailEnabled: true,
+    pushEnabled: false,
+    frequency: 'daily'
   },
-  autoplayVideos: true,
+  autoplayVideos: false,
   dataCollection: true,
-  animations: true,
-  soundEffects: true,
-  highContrast: false,
-  reducedMotion: false,
-  privacyLevel: 'standard',
+  accessibilityFeatures: {
+    highContrast: false,
+    reducedMotion: false,
+    screenReader: false
+  },
+  dashboardLayout: 'standard',
+  onboardingCompleted: false,
+  privacyLevel: 'balanced'
 };
 
 // Alias for backward compatibility

@@ -1,147 +1,78 @@
 
-import { Emotion, EmotionResult } from '@/types';
+import type { Emotion, EmotionResult, EmotionPrediction } from '@/types/emotion';
 
-/**
- * Analyze emotion from text, emojis, or audio
- * @param data Data containing content to analyze
- * @returns Promise with the emotion analysis result
- */
-export const analyzeEmotion = async (data: {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}): Promise<EmotionResult> => {
-  console.log('Analyzing emotion with data:', data);
+// Analyze emotion based on text input
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  // Mock implementation
+  const randomEmotion = ['happy', 'sad', 'neutral', 'anxious', 'excited'][Math.floor(Math.random() * 5)];
+  const randomScore = Math.random();
   
-  // Mock response for development
   return {
-    id: crypto.randomUUID(),
-    user_id: data.user_id,
-    emotion: data.emojis?.includes('😃') ? 'happy' : data.emojis?.includes('😢') ? 'sad' : 'neutral',
-    score: Math.floor(Math.random() * 100),
-    confidence: 0.85,
-    text: data.text || '',
-    transcript: data.text || '',
-    feedback: "Votre émotion a été analysée avec succès.",
-    recommendations: [
-      "Prenez quelques minutes pour noter ce qui a influencé votre humeur aujourd'hui",
-      "Essayez une séance de musicothérapie adaptée à votre état émotionnel"
+    dominantEmotion: randomEmotion,
+    emotions: [
+      { name: randomEmotion, score: randomScore, intensity: randomScore * 100, confidence: 0.8 }
     ],
-    timestamp: new Date().toISOString(),
-    source: data.audio_url ? 'voice' : data.emojis ? 'emoji' : 'text'
+    analysis: `Detected primarily ${randomEmotion} emotion in the text.`,
+    recommendations: ['Take a break', 'Listen to calming music', 'Write in your journal'],
+    timestamp: new Date().toISOString()
   };
 };
 
-/**
- * Analyze audio stream for emotional content
- * @param audioBlob Audio recording blob
- * @returns Promise with the audio analysis result
- */
+// Analyze audio stream for emotions
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  console.log('Analyzing audio stream, blob size:', audioBlob.size);
+  // Mock implementation
+  const randomEmotion = ['happy', 'calm', 'neutral', 'stressed', 'tired'][Math.floor(Math.random() * 5)];
+  const randomScore = Math.random();
   
-  // Mock response for development
   return {
-    id: crypto.randomUUID(),
-    emotion: 'calm',
-    dominantEmotion: 'calm',
-    score: 75,
-    confidence: 0.82,
-    text: "Je me sens plutôt calme aujourd'hui.",
-    transcript: "Je me sens plutôt calme aujourd'hui et j'apprécie ce moment de tranquillité.",
-    feedback: "Vous semblez être dans un état de calme. C'est un bon moment pour la réflexion.",
-    recommendations: [
-      "Profitez de ce calme pour faire une séance de méditation",
-      "Écrivez vos pensées dans votre journal"
+    dominantEmotion: randomEmotion,
+    emotions: [
+      { name: randomEmotion, score: randomScore, intensity: randomScore * 100, confidence: 0.75 }
     ],
-    timestamp: new Date().toISOString(),
-    source: 'voice'
+    analysis: `Voice tone indicates ${randomEmotion} state.`,
+    recommendations: ['Practice breathing exercises', 'Take a short walk', 'Listen to uplifting music'],
+    timestamp: new Date().toISOString()
   };
 };
 
-/**
- * Create a new emotion entry
- * @param data Emotion data to save
- * @returns Promise with the created emotion
- */
-export const createEmotionEntry = async (data: {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-}): Promise<Emotion> => {
-  console.log('Creating emotion entry:', data);
-  
-  // Mock response
+// Save emotion record
+export const saveEmotion = async (emotion: Partial<Emotion>): Promise<Emotion> => {
+  // Mock implementation
   return {
-    id: crypto.randomUUID(),
-    user_id: data.user_id,
+    id: Math.random().toString(36).substr(2, 9),
+    user_id: emotion.user_id || 'current-user',
     date: new Date().toISOString(),
-    emotion: 'happy',
-    score: 85,
-    confidence: 0.9,
-    text: data.text,
-    emojis: data.emojis,
-    audio_url: data.audio_url,
-    ai_feedback: "Vous semblez être dans un état positif aujourd'hui!",
-    source: data.audio_url ? 'voice' : data.emojis ? 'emoji' : 'text'
+    emotion: emotion.emotion || 'neutral',
+    intensity: emotion.intensity || 50,
+    notes: emotion.notes || '',
+    sources: emotion.sources || ['manual'],
+    context: emotion.context || {}
   };
 };
 
-/**
- * Fetch the latest emotion for a user
- * @param userId User ID
- * @returns Promise with the latest emotion
- */
-export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
-  console.log('Fetching latest emotion for user:', userId);
-  
-  // Mock response
-  return {
-    id: crypto.randomUUID(),
-    user_id: userId,
-    date: new Date().toISOString(),
-    emotion: 'focused',
-    score: 70,
-    confidence: 0.75,
-    text: "Je me concentre sur mes tâches aujourd'hui",
-    ai_feedback: "Votre niveau de concentration est bon. Continuez ainsi!",
-    source: 'text'
-  };
-};
-
-/**
- * Fetch emotion history for a user
- * @param userId User ID
- * @param days Number of days to look back (default: 7)
- * @returns Promise with array of emotions
- */
-export const fetchEmotionHistory = async (userId: string, days: number = 7): Promise<Emotion[]> => {
-  console.log(`Fetching emotion history for user ${userId} for the last ${days} days`);
-  
-  // Generate mock data
-  const emotions: Emotion[] = [];
-  const today = new Date();
+// Fetch emotion history for a user
+export const fetchEmotionHistory = async (userId: string, days: number = 30): Promise<Emotion[]> => {
+  // Mock implementation
+  const history: Emotion[] = [];
+  const now = new Date();
   
   for (let i = 0; i < days; i++) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
+    const date = new Date();
+    date.setDate(now.getDate() - i);
     
-    emotions.push({
-      id: crypto.randomUUID(),
-      user_id: userId,
-      date: date.toISOString(),
-      emotion: ['happy', 'calm', 'focused', 'excited', 'tired', 'anxious'][Math.floor(Math.random() * 6)],
-      score: Math.floor(Math.random() * 100),
-      confidence: Math.random() * 0.5 + 0.5,
-      text: "Entrée du journal",
-      ai_feedback: "Feedback de l'IA",
-      source: ['text', 'voice', 'emoji'][Math.floor(Math.random() * 3)]
-    });
+    if (Math.random() > 0.3) { // Some days might not have entries
+      history.push({
+        id: `history-${i}`,
+        user_id: userId,
+        date: date.toISOString(),
+        emotion: ['happy', 'sad', 'neutral', 'anxious', 'excited'][Math.floor(Math.random() * 5)],
+        intensity: Math.floor(Math.random() * 100),
+        notes: '',
+        sources: ['history'],
+        context: {}
+      });
+    }
   }
   
-  return emotions;
+  return history;
 };
