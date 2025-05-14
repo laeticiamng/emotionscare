@@ -83,7 +83,7 @@ const ImmersiveHomePage: React.FC = () => {
       timeBasedGreeting = 'Bon après-midi. Prenez un moment pour vous reconnecter.';
     } else {
       timeOfDay = 'evening';
-      timeBasedGreeting = 'Bonsoir. Laissez les tensions de la journée s'apaiser.';
+      timeBasedGreeting = 'Bonsoir. Laissez les tensions de la journée s\'apaiser.';
     }
 
     setBackgroundState(timeOfDay);

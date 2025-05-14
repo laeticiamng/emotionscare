@@ -1,76 +1,110 @@
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseSoundOptions {
+  src: string;
   volume?: number;
-  interrupt?: boolean;
+  loop?: boolean;
   autoPlay?: boolean;
 }
 
-const useSound = (
-  soundUrl: string, 
-  { volume = 0.5, interrupt = true, autoPlay = false }: UseSoundOptions = {}
-) => {
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+interface UseSoundReturn {
+  play: () => Promise<void>;
+  pause: () => void;
+  stop: () => void;
+  isPlaying: boolean;
+  setVolume: (volume: number) => void;
+  duration: number | null;
+  currentTime: number;
+}
+
+const useSound = ({ src, volume = 0.5, loop = false, autoPlay = false }: UseSoundOptions): UseSoundReturn => {
   const [isPlaying, setIsPlaying] = useState(false);
-  
+  const [duration, setDuration] = useState<number | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   useEffect(() => {
     // Create audio element
-    const audioElement = new Audio(soundUrl);
-    audioElement.volume = volume;
-    audioElement.preload = 'auto';
-    setAudio(audioElement);
+    const audio = new Audio(src);
+    audioRef.current = audio;
     
+    // Configure audio
+    audio.volume = volume;
+    audio.loop = loop;
+    
+    // Set up event listeners
+    audio.addEventListener('loadedmetadata', () => {
+      setDuration(audio.duration);
+    });
+    
+    audio.addEventListener('timeupdate', () => {
+      setCurrentTime(audio.currentTime);
+    });
+    
+    audio.addEventListener('ended', () => {
+      if (!loop) {
+        setIsPlaying(false);
+      }
+    });
+    
+    // Autoplay if enabled
     if (autoPlay) {
-      audioElement.play().catch(e => {
-        // Handle autoplay restrictions gracefully
-        console.log('Audio autoplay prevented:', e);
-      });
-    }
-    
-    audioElement.addEventListener('playing', () => setIsPlaying(true));
-    audioElement.addEventListener('pause', () => setIsPlaying(false));
-    audioElement.addEventListener('ended', () => setIsPlaying(false));
-    
-    return () => {
-      audioElement.pause();
-      audioElement.src = '';
-      audioElement.removeEventListener('playing', () => setIsPlaying(true));
-      audioElement.removeEventListener('pause', () => setIsPlaying(false));
-      audioElement.removeEventListener('ended', () => setIsPlaying(false));
-    };
-  }, [soundUrl, volume, autoPlay]);
-  
-  const play = useCallback(() => {
-    if (!audio) return;
-    
-    if (interrupt || audio.paused) {
-      // Either interrupt current playback or only play if paused
-      audio.currentTime = 0;
       audio.play().catch(e => {
-        // Handle autoplay restrictions gracefully
-        console.log('Audio play prevented:', e);
+        console.warn('Autoplay prevented:', e);
       });
+      setIsPlaying(true);
     }
-  }, [audio, interrupt]);
+    
+    // Cleanup
+    return () => {
+      audio.pause();
+      audio.src = '';
+      audioRef.current = null;
+    };
+  }, [src, volume, loop, autoPlay]);
+
+  const play = async (): Promise<void> => {
+    if (!audioRef.current) return;
+    
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
+  };
   
-  const pause = useCallback(() => {
-    if (!audio) return;
-    audio.pause();
-  }, [audio]);
+  const pause = (): void => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.pause();
+    setIsPlaying(false);
+  };
   
-  const stop = useCallback(() => {
-    if (!audio) return;
-    audio.pause();
-    audio.currentTime = 0;
-  }, [audio]);
+  const stop = (): void => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    setIsPlaying(false);
+  };
   
-  const setVolume = useCallback((newVolume: number) => {
-    if (!audio) return;
-    audio.volume = Math.max(0, Math.min(1, newVolume));
-  }, [audio]);
-  
-  return { play, pause, stop, setVolume, isPlaying };
+  const setVolume = (newVolume: number): void => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.volume = Math.max(0, Math.min(1, newVolume));
+  };
+
+  return {
+    play,
+    pause,
+    stop,
+    isPlaying,
+    setVolume,
+    duration,
+    currentTime
+  };
 };
 
 export default useSound;
