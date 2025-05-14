@@ -8,6 +8,7 @@ import BadgeGrid from './BadgeGrid';
 import ChallengesList from './ChallengesList';
 import { useGamification } from '@/hooks/useGamification';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
+import { GamificationStats, Challenge } from '@/types/gamification';
 
 const GamificationDashboard: React.FC = () => {
   const { 
@@ -25,6 +26,20 @@ const GamificationDashboard: React.FC = () => {
     return <LoadingSkeleton />;
   }
 
+  // Ensure stats has all required properties with default values
+  const safeStats: GamificationStats = {
+    totalPoints: stats.totalPoints || 0,
+    currentLevel: stats.currentLevel || 1,
+    pointsToNextLevel: stats.pointsToNextLevel || 100,
+    progressToNextLevel: stats.progressToNextLevel || 0,
+    badgesCount: stats.badgesCount || 0,
+    streak: stats.streak || 0,
+    streakDays: stats.streakDays || 0,
+    lastActivityDate: stats.lastActivityDate || new Date().toISOString(),
+    activeChallenges: stats.activeChallenges || 0,
+    completedChallenges: stats.completedChallenges || 0,
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -36,12 +51,12 @@ const GamificationDashboard: React.FC = () => {
             <Medal className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.currentLevel}</div>
+            <div className="text-2xl font-bold">{safeStats.currentLevel}</div>
             <div className="mt-2 space-y-1">
               <p className="text-xs text-muted-foreground">
-                {stats.pointsToNextLevel} points jusqu'au niveau suivant
+                {safeStats.pointsToNextLevel} points jusqu'au niveau suivant
               </p>
-              <Progress value={stats.progressToNextLevel} className="h-1" />
+              <Progress value={safeStats.progressToNextLevel} className="h-1" />
             </div>
           </CardContent>
         </Card>
@@ -54,9 +69,9 @@ const GamificationDashboard: React.FC = () => {
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalPoints}</div>
+            <div className="text-2xl font-bold">{safeStats.totalPoints}</div>
             <p className="text-xs text-muted-foreground mt-2">
-              {stats.badgesCount} badges débloqués
+              {safeStats.badgesCount} badges débloqués
             </p>
           </CardContent>
         </Card>
@@ -69,9 +84,9 @@ const GamificationDashboard: React.FC = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.streakDays} jours</div>
+            <div className="text-2xl font-bold">{safeStats.streakDays} jours</div>
             <p className="text-xs text-muted-foreground mt-2">
-              Dernière activité: {stats.lastActivityDate ? new Date(stats.lastActivityDate).toLocaleDateString() : 'Jamais'}
+              Dernière activité: {safeStats.lastActivityDate ? new Date(safeStats.lastActivityDate).toLocaleDateString() : 'Jamais'}
             </p>
           </CardContent>
         </Card>
@@ -84,9 +99,9 @@ const GamificationDashboard: React.FC = () => {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeChallenges}</div>
+            <div className="text-2xl font-bold">{safeStats.activeChallenges}</div>
             <p className="text-xs text-muted-foreground mt-2">
-              {stats.completedChallenges} défis complétés au total
+              {safeStats.completedChallenges} défis complétés au total
             </p>
           </CardContent>
         </Card>
@@ -102,14 +117,15 @@ const GamificationDashboard: React.FC = () => {
         </TabsContent>
         <TabsContent value="challenges" className="space-y-4">
           <div className="challenges-list">
-            <ChallengesList challenges={challenges.map(challenge => ({
+            <ChallengesList challenges={challenges.map((challenge: any) => ({
               id: challenge.id,
-              title: challenge.title || challenge.name,
-              description: challenge.description,
-              points: challenge.points,
+              title: challenge.title || challenge.name || '',
+              description: challenge.description || '',
+              points: challenge.points || 0,
               status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
-              category: challenge.category || 'general'
-            }))} />
+              category: challenge.category || 'general',
+              name: challenge.name || challenge.title || '',
+            } as Challenge))} />
           </div>
         </TabsContent>
       </Tabs>

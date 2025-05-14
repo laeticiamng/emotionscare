@@ -15,12 +15,17 @@ const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => 
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  // Get cover URL with fallback
+  const getCoverUrl = () => {
+    return currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover || '';
+  };
+
   return (
     <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30">
       <div className="w-12 h-12 rounded overflow-hidden bg-primary/10">
-        {currentTrack.coverUrl || currentTrack.cover_url ? (
+        {getCoverUrl() ? (
           <img 
-            src={currentTrack.coverUrl || currentTrack.cover_url} 
+            src={getCoverUrl()} 
             alt={currentTrack.title} 
             className="w-full h-full object-cover"
           />

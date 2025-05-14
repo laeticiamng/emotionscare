@@ -36,7 +36,7 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const createDefaultPreferences = (): UserPreferences => {
+export const createDefaultPreferences = (): UserPreferences => {
   return {
     dashboardLayout: "standard",
     onboardingCompleted: false,

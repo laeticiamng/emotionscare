@@ -6,7 +6,7 @@ export interface Emotion {
   date: string | Date;
   notes?: string;
   color?: string;
-  anxiety?: number; // Add this property to resolve errors
+  anxiety?: number;
   user_id?: string;
   created_at?: string;
   updated_at?: string;
@@ -15,6 +15,16 @@ export interface Emotion {
   sentiment?: number;
   trigger?: string;
   context?: string;
+  
+  // Additional properties needed for components
+  emotion?: string;
+  score?: number;
+  confidence?: number;
+  text?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  timestamp?: string;
+  feedback?: string;
 }
 
 export interface EmotionEntry {
@@ -72,10 +82,32 @@ export interface EmotionStats {
   };
 }
 
-export interface EmotionScanResult {
+export interface EmotionResult {
+  id?: string;
+  emotion?: string;
+  dominantEmotion?: string;
+  primaryEmotion?: string;
+  score?: number;
+  confidence?: number;
+  source?: string;
+  text?: string;
+  emojis?: string;
+  timestamp?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  user_id?: string;
+}
+
+export interface EmotionScanResult extends EmotionResult {
   primaryEmotion: EmotionType;
   secondaryEmotion?: EmotionType;
   intensity: number;
   confidence: number;
   timestamp: string;
+}
+
+export interface EmotionalTeamViewProps {
+  teamId: string;
+  period?: 'day' | 'week' | 'month';
 }

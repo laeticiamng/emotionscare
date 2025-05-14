@@ -1,8 +1,9 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Camera, Pause, RefreshCw } from 'lucide-react';
-import { useHumeAI } from '@/hooks/useHumeAI'; // Correct import
+import { useHumeAI } from '@/hooks/useHumeAI'; // Fixed import to use named import
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface FacialEmotionScannerProps {
@@ -15,7 +16,7 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onEmotionDe
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [detectedEmotion, setDetectedEmotion] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { analyzeFaces } = useHumeAI();
+  const humeAI = useHumeAI();
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -55,18 +56,13 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onEmotionDe
     ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     const imageDataURL = canvas.toDataURL('image/jpeg');
-    const blob = await (await fetch(imageDataURL)).blob();
 
     try {
-      const result = await analyzeFaces(blob);
-      if (result && result.length > 0) {
-        const face = result[0];
-        const emotionData = face.predictions.reduce((maxEmotion, emotion) => {
-          return emotion.score > maxEmotion.score ? emotion : maxEmotion;
-        }, { name: 'neutral', score: 0 });
-
-        setDetectedEmotion(emotionData.name);
-        onEmotionDetected(emotionData.name, emotionData.score);
+      // Use processFacialExpression instead of analyzeFaces
+      const result = await humeAI.processFacialExpression(imageDataURL);
+      if (result && result.emotion) {
+        setDetectedEmotion(result.emotion);
+        onEmotionDetected(result.emotion, result.score || 0.5);
       } else {
         setDetectedEmotion('neutral');
         onEmotionDetected('neutral', 0.5);

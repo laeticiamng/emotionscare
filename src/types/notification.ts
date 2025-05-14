@@ -1,28 +1,42 @@
 
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
+
+export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community';
+
+export type NotificationTone = 'neutral' | 'supportive' | 'professional' | 'friendly';
+
 export interface Notification {
   id: string;
-  type: 'system' | 'emotion' | 'coach' | 'journal' | 'community';
   title: string;
   message: string;
-  read: boolean;
+  type: NotificationType;
   timestamp: string;
-  actionUrl?: string;
-  actionLabel?: string;
+  read: boolean;
+  userId?: string;
+  action?: string;
   icon?: string;
-  priority?: 'low' | 'normal' | 'high';
+  priority?: number;
+  category?: string;
+  source?: string;
+  createdAt?: string;
+  body?: string;
 }
 
 export interface NotificationBadge {
   count: number;
-  isRead: boolean;
+  active: boolean;
+  badgesCount?: number;
+  notificationsCount?: number;
 }
 
-export interface NotificationPreferences {
+export interface NotificationPreference {
+  type: NotificationType;
   enabled: boolean;
-  emailEnabled: boolean; 
-  pushEnabled: boolean;
-  frequency: 'immediate' | 'hourly' | 'daily' | 'weekly';
-  types?: {
-    [key in Notification['type']]?: boolean;
+  frequency: NotificationFrequency;
+  tone?: NotificationTone;
+  channels?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
   };
 }
