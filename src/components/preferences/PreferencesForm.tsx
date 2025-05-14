@@ -20,7 +20,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
   
   const [isSaving, setIsSaving] = useState(false);
   
-  const handleChange = (key: keyof UserPreferences, value: string | boolean) => {
+  const handleChange = (key: keyof UserPreferences, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
   
@@ -73,9 +73,12 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications</span>
               <Switch
-                checked={formData.notifications || false}
+                checked={formData.notifications?.enabled || false}
                 onCheckedChange={(checked) => {
-                  handleChange('notifications', checked);
+                  handleChange('notifications', {
+                    ...formData.notifications,
+                    enabled: checked
+                  });
                 }}
               />
             </div>
@@ -83,34 +86,45 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             <div className="flex items-center justify-between">
               <span>Notifications par email</span>
               <Switch
-                checked={formData.notifications || false}
-                onCheckedChange={(checked) => handleChange('notifications', checked)}
+                checked={formData.notifications?.emailEnabled || false}
+                onCheckedChange={(checked) => handleChange('notifications', {
+                  ...formData.notifications,
+                  emailEnabled: checked
+                })}
               />
             </div>
             
             <div className="flex items-center justify-between">
               <span>Notifications push</span>
               <Switch
-                checked={formData.notifications || false}
-                onCheckedChange={(checked) => handleChange('notifications', checked)}
+                checked={formData.notifications?.pushEnabled || false}
+                onCheckedChange={(checked) => handleChange('notifications', {
+                  ...formData.notifications,
+                  pushEnabled: checked
+                })}
               />
             </div>
             
-            <div className="flex items-center justify-between">
-              <span>Autoplay des vidéos</span>
-              <Switch
-                checked={formData.autoplayVideos || false}
-                onCheckedChange={(checked) => handleChange('autoplayVideos', checked)}
-              />
-            </div>
+            {/* Add optional properties with type checking */}
+            {formData.autoplayVideos !== undefined && (
+              <div className="flex items-center justify-between">
+                <span>Autoplay des vidéos</span>
+                <Switch
+                  checked={!!formData.autoplayVideos}
+                  onCheckedChange={(checked) => handleChange('autoplayVideos', checked)}
+                />
+              </div>
+            )}
             
-            <div className="flex items-center justify-between">
-              <span>Collecte de données</span>
-              <Switch
-                checked={formData.dataCollection || false}
-                onCheckedChange={(checked) => handleChange('dataCollection', checked)}
-              />
-            </div>
+            {formData.dataCollection !== undefined && (
+              <div className="flex items-center justify-between">
+                <span>Collecte de données</span>
+                <Switch
+                  checked={!!formData.dataCollection}
+                  onCheckedChange={(checked) => handleChange('dataCollection', checked)}
+                />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

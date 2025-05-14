@@ -9,23 +9,28 @@ const NotificationPreferences: React.FC = () => {
   
   const handleNotificationsChange = (checked: boolean) => {
     updatePreferences({ 
-      notifications: checked
+      notifications: {
+        ...preferences.notifications,
+        enabled: checked
+      }
     });
   };
   
   const handleEmailNotificationsChange = (checked: boolean) => {
-    // Using a temporary custom property for email notifications
     updatePreferences({ 
-      // Create a custom property for the preferences object
-      notifications: checked
+      notifications: {
+        ...preferences.notifications,
+        emailEnabled: checked
+      }
     });
   };
   
   const handlePushNotificationsChange = (checked: boolean) => {
-    // Using a temporary custom property for push notifications
     updatePreferences({ 
-      // Create a custom property for the preferences object
-      notifications: checked
+      notifications: {
+        ...preferences.notifications,
+        pushEnabled: checked
+      }
     });
   };
   
@@ -41,7 +46,7 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Activer les notifications</p>
             </div>
             <Switch 
-              checked={preferences.notifications || false}
+              checked={preferences.notifications?.enabled || false}
               onCheckedChange={handleNotificationsChange}
               disabled={isLoading}
             />
@@ -53,7 +58,7 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Recevoir des notifications par email</p>
             </div>
             <Switch 
-              checked={preferences.notifications || false}
+              checked={preferences.notifications?.emailEnabled || false}
               onCheckedChange={handleEmailNotificationsChange}
               disabled={isLoading}
             />
@@ -65,7 +70,7 @@ const NotificationPreferences: React.FC = () => {
               <p className="text-sm text-muted-foreground">Recevoir des notifications push</p>
             </div>
             <Switch 
-              checked={preferences.notifications || false}
+              checked={preferences.notifications?.pushEnabled || false}
               onCheckedChange={handlePushNotificationsChange}
               disabled={isLoading}
             />

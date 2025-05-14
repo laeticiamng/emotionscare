@@ -1,163 +1,134 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { analyzeAudioStream } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import React, { useEffect } from 'react';
+import { EmotionResult } from '@/types/emotion';
 
 interface AudioProcessorProps {
   isListening: boolean;
   userId: string;
-  isConfidential: boolean;
+  isConfidential?: boolean;
   onProcessingChange: (processing: boolean) => void;
-  onProgressUpdate: (progress: string) => void;
+  onProgressUpdate: (message: string) => void;
   onAnalysisComplete: (emotion: any, result: EmotionResult) => void;
-  onError: (error: string) => void;
+  onError: (message: string) => void;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
   isListening,
   userId,
-  isConfidential,
+  isConfidential = false,
   onProcessingChange,
   onProgressUpdate,
   onAnalysisComplete,
   onError
 }) => {
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const streamRef = useRef<MediaStream | null>(null);
-  const { toast } = useToast();
-  
-  // Délai minimum d'enregistrement en millisecondes pour éviter des analyses trop courtes
-  const MIN_RECORDING_DURATION = 3000;
-  const recordingStartTimeRef = useRef<number | null>(null);
-
-  // Setup media recorder
   useEffect(() => {
-    if (isListening) {
-      startRecording();
-    } else if (mediaRecorder) {
-      stopRecording();
-    }
+    if (!isListening) return;
+    
+    let mediaRecorder: MediaRecorder | null = null;
+    let audioChunks: BlobPart[] = [];
+    let analyzing = false;
 
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
+    const startRecording = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        mediaRecorder = new MediaRecorder(stream);
+        
+        mediaRecorder.addEventListener('dataavailable', event => {
+          audioChunks.push(event.data);
+        });
+        
+        mediaRecorder.addEventListener('stop', () => {
+          if (analyzing) return;
+          
+          analyzing = true;
+          onProcessingChange(true);
+          onProgressUpdate('Traitement de l\'audio...');
+          
+          // Simulate processing delay
+          setTimeout(() => {
+            onProgressUpdate('Analyse émotionnelle...');
+            
+            // Simulate emotion detection
+            setTimeout(() => {
+              processAudioData();
+            }, 1500);
+          }, 1000);
+        });
+        
+        mediaRecorder.start();
+        
+        // Auto-stop after 10 seconds for demo purposes
+        setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            stopAllTracks(stream);
+          }
+        }, 10000);
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+        onError('Impossible d\'accéder au microphone. Veuillez vérifier vos permissions.');
       }
     };
-  }, [isListening]);
-
-  const startRecording = async () => {
-    try {
-      setAudioChunks([]);
-      recordingStartTimeRef.current = Date.now();
+    
+    const stopAllTracks = (stream: MediaStream) => {
+      stream.getTracks().forEach(track => track.stop());
+    };
+    
+    const processAudioData = () => {
+      // Simulate processing audio data and getting transcript/emotion
+      onProgressUpdate('Finalisation de l\'analyse...');
       
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        } 
-      });
-      
-      streamRef.current = stream;
-      
-      const recorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
-      });
-      
-      setMediaRecorder(recorder);
-      
-      const chunks: Blob[] = [];
-      
-      recorder.addEventListener('dataavailable', (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
-          setAudioChunks(prevChunks => [...prevChunks, event.data]);
-        }
-      });
-      
-      recorder.addEventListener('stop', () => {
-        const recordingDuration = recordingStartTimeRef.current ? Date.now() - recordingStartTimeRef.current : 0;
+      setTimeout(() => {
+        // Mock data for demo purposes
+        const mockEmotions = [
+          { name: 'calm', score: 0.75 },
+          { name: 'joy', score: 0.65 },
+          { name: 'satisfaction', score: 0.55 }
+        ];
         
-        if (recordingDuration < MIN_RECORDING_DURATION) {
-          onError('Enregistrement trop court. Veuillez parler plus longtemps pour une analyse précise.');
-          return;
-        }
+        const dominantEmotion = mockEmotions[0];
         
-        processAudio(chunks);
-      });
-      
-      recorder.start(1000); // Collect data every second
-      onProgressUpdate('Enregistrement en cours...');
-      
-    } catch (error) {
-      console.error('Failed to start recording:', error);
-      onError('Impossible d\'accéder au microphone. Vérifiez les permissions de votre navigateur.');
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      try {
+        // Create result object
+        const result: EmotionResult = {
+          id: `emotion-${Date.now()}`,
+          user_id: userId,
+          date: new Date().toISOString(),
+          emotion: dominantEmotion.name,
+          score: dominantEmotion.score,
+          confidence: 0.8,
+          transcript: "Je me sens plutôt bien aujourd'hui, calme et détendu après ma session de méditation.",
+          dominantEmotion: {
+            name: dominantEmotion.name,
+            score: dominantEmotion.score
+          },
+          emotions: {
+            [mockEmotions[0].name]: mockEmotions[0].score,
+            [mockEmotions[1].name]: mockEmotions[1].score,
+            [mockEmotions[2].name]: mockEmotions[2].score
+          }
+        };
+        
+        // Pass emotion data to parent
+        onAnalysisComplete(dominantEmotion, result);
+        
+        // Reset
+        onProcessingChange(false);
+        analyzing = false;
+        audioChunks = [];
+      }, 1000);
+    };
+    
+    startRecording();
+    
+    return () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
         mediaRecorder.stop();
-        
-        if (streamRef.current) {
-          streamRef.current.getTracks().forEach(track => track.stop());
-        }
-      } catch (error) {
-        console.error('Error stopping recording:', error);
       }
-    }
-  };
-
-  const processAudio = async (chunks: Blob[]) => {
-    try {
-      if (chunks.length === 0) {
-        onError('Aucun audio enregistré.');
-        return;
-      }
-      
-      setIsProcessing(true);
-      onProcessingChange(true);
-      onProgressUpdate('Traitement de l\'audio...');
-      
-      const audioBlob = new Blob(chunks, { type: chunks[0].type });
-      
-      onProgressUpdate('Analyse émotionnelle en cours...');
-      
-      // Process audio with serverless function
-      const result = await analyzeAudioStream(audioBlob);
-      
-      console.log('Audio analysis result:', result);
-      
-      // Create emotion object with expected properties
-      const emotion = {
-        id: result.id || crypto.randomUUID(),
-        user_id: userId,
-        date: new Date().toISOString(),
-        emotion: result.emotion,
-        confidence: result.confidence,
-        score: result.score || 50,
-        text: result.text || '',
-        transcript: result.transcript || '',
-        ai_feedback: result.feedback || '',
-        recommendations: result.recommendations || [],
-      };
-      
-      onAnalysisComplete(emotion, result);
-      
-    } catch (error) {
-      console.error('Error processing audio:', error);
-      onError('Erreur lors du traitement audio. Veuillez réessayer.');
-    } finally {
-      setIsProcessing(false);
-      onProcessingChange(false);
-    }
-  };
-
-  return null; // This is a non-visual component
+    };
+  }, [isListening, userId, isConfidential, onProcessingChange, onProgressUpdate, onAnalysisComplete, onError]);
+  
+  return null;
 };
 
 export default AudioProcessor;

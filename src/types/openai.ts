@@ -14,10 +14,10 @@ export interface OpenAIHookResult {
   admin?: {
     createReport: (data: any) => Promise<any>;
     analyzeTeamHealth: (teamId: string) => Promise<any>;
+    generateAnalytics?: (data: any) => Promise<any>;
   };
   moderation?: {
     checkContent: (content: string) => Promise<any>;
     flagContent: (contentId: string, reason: string) => Promise<void>;
   };
 }
-

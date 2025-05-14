@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import EmotionScanForm from './EmotionScanForm';
 
-const ScanTabContent: React.FC<{ onScanSaved: () => void, onClose: () => void }> = ({ 
+const ScanTabContent: React.FC<{ onScanSaved?: () => void, onClose?: () => void }> = ({ 
   onScanSaved, 
   onClose 
 }) => {
@@ -10,9 +11,8 @@ const ScanTabContent: React.FC<{ onScanSaved: () => void, onClose: () => void }>
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Pass the required userId prop */}
       <EmotionScanForm 
-        userId={user?.id || ''} 
+        userId={user?.id} 
         onScanSaved={onScanSaved} 
         onClose={onClose} 
       />

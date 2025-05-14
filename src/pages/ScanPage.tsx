@@ -7,14 +7,14 @@ import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import HistoryTabContent from '@/components/scan/HistoryTabContent';
 import { EmotionResult } from '@/types';
 import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface ScanPageHeaderProps {
-  showScanForm: boolean;
-  activeTab: string;
-  setShowScanForm: (show: boolean) => void;
+interface ScanPageProps {
+  // Add any props if needed
 }
 
-const ScanPage: React.FC = () => {
+const ScanPage: React.FC<ScanPageProps> = () => {
+  const { user } = useAuth();
   const [showScanForm, setShowScanForm] = useState(false);
   const [activeTab, setActiveTab] = useState('scan');
   const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
@@ -37,6 +37,11 @@ const ScanPage: React.FC = () => {
     },
   ];
 
+  const handleScanComplete = (result: EmotionResult) => {
+    setShowScanForm(false);
+    setEmotionHistory(prev => [result, ...prev]);
+  };
+
   return (
     <Shell>
       <div className="container py-6">
@@ -58,10 +63,12 @@ const ScanPage: React.FC = () => {
           
           <TabsContent value="scan" className="mt-6">
             {showScanForm ? (
-              <EmotionScanForm onComplete={(result) => {
-                setShowScanForm(false);
-                setEmotionHistory(prev => [result, ...prev]);
-              }} />
+              <EmotionScanForm 
+                userId={user?.id} 
+                onComplete={handleScanComplete}
+                onScanSaved={() => setShowScanForm(false)} 
+                onClose={() => setShowScanForm(false)}
+              />
             ) : (
               <UnifiedEmotionCheckin />
             )}

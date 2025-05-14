@@ -154,7 +154,7 @@ const NotificationPreferences: React.FC = () => {
                   <SelectValue placeholder="Sélectionnez un style" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NotificationTone.MINIMALIST}>Minimaliste</SelectItem>
+                  <SelectItem value={NotificationTone.MINIMAL}>Minimaliste</SelectItem>
                   <SelectItem value={NotificationTone.POETIC}>Poétique</SelectItem>
                   <SelectItem value={NotificationTone.DIRECTIVE}>Directif</SelectItem>
                   <SelectItem value={NotificationTone.MOTIVATING}>Motivant</SelectItem>

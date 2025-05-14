@@ -17,6 +17,7 @@ export interface User {
   position?: string;
   emotional_score?: number;
   team_id?: string;
+  anonymity_code?: string;
 }
 
 export interface UserPreferences {
@@ -50,7 +51,7 @@ export interface UserPreferencesState extends UserPreferences {
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'inter' | 'rounded';
 
 export interface InvitationVerificationResult {
   valid: boolean;
@@ -59,7 +60,15 @@ export interface InvitationVerificationResult {
     email: string;
     role: string;
   };
+  expired?: boolean;
+  alreadyAccepted?: boolean;
+  error?: string;
+  invitation?: {
+    id: string;
+    email: string;
+    role: string;
+    expiresAt: string;
+  };
 }
 
 export type UserRole = 'user' | 'admin' | 'therapist' | 'coach' | 'team_manager' | 'client' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'employee' | 'manager' | 'analyst' | 'wellbeing_manager';
-

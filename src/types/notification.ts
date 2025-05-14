@@ -1,7 +1,7 @@
 
-export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'never';
-export type NotificationType = 'emotion' | 'journal' | 'coach' | 'system' | 'achievement';
-export type NotificationTone = 'gentle' | 'neutral' | 'assertive' | 'cheerful' | 'minimal';
+export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'never' | 'flexible' | 'none';
+export type NotificationType = 'emotion' | 'journal' | 'coach' | 'system' | 'achievement' | 'all';
+export type NotificationTone = 'gentle' | 'neutral' | 'assertive' | 'cheerful' | 'minimal' | 'minimalist' | 'poetic' | 'directive' | 'motivating';
 
 export interface Notification {
   id: string;
@@ -12,6 +12,16 @@ export interface Notification {
   read: boolean;
   actionUrl?: string;
   timestamp?: string;
+}
+
+export interface EnhancedNotification extends Notification {
+  priority: number;
+  category: string;
+  sender?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
 }
 
 export interface NotificationPreference {
@@ -27,6 +37,8 @@ export const NotificationFrequency = {
   DAILY: 'daily' as NotificationFrequency,
   WEEKLY: 'weekly' as NotificationFrequency,
   NEVER: 'never' as NotificationFrequency,
+  FLEXIBLE: 'flexible' as NotificationFrequency,
+  NONE: 'none' as NotificationFrequency
 };
 
 export const NotificationType = {
@@ -35,6 +47,7 @@ export const NotificationType = {
   COACH: 'coach' as NotificationType,
   SYSTEM: 'system' as NotificationType,
   ACHIEVEMENT: 'achievement' as NotificationType,
+  ALL: 'all' as NotificationType
 };
 
 export const NotificationTone = {
@@ -43,5 +56,8 @@ export const NotificationTone = {
   ASSERTIVE: 'assertive' as NotificationTone,
   CHEERFUL: 'cheerful' as NotificationTone,
   MINIMAL: 'minimal' as NotificationTone,
+  MINIMALIST: 'minimalist' as NotificationTone,
+  POETIC: 'poetic' as NotificationTone,
+  DIRECTIVE: 'directive' as NotificationTone,
+  MOTIVATING: 'motivating' as NotificationTone
 };
-

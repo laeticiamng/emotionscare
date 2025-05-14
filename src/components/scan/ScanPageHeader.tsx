@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, ArrowLeft } from 'lucide-react';
+import { PlusCircle, BarChart3, ArrowLeft } from 'lucide-react';
 
 interface ScanPageHeaderProps {
   showScanForm: boolean;
@@ -15,33 +15,40 @@ const ScanPageHeader: React.FC<ScanPageHeaderProps> = ({
   setShowScanForm
 }) => {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div>
-        <h1 className="text-3xl font-bold">Scanner émotionnel</h1>
-        <p className="text-muted-foreground">
-          Comprenez et suivez vos émotions quotidiennes
-        </p>
-      </div>
-      
-      <div>
-        {activeTab === 'scan' ? (
-          showScanForm ? (
-            <Button 
-              variant="outline" 
-              onClick={() => setShowScanForm(false)}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
-            </Button>
+    <div className="flex flex-col space-y-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Scan Émotionnel</h1>
+          <p className="text-muted-foreground">
+            Analysez vos émotions et suivez votre bien-être émotionnel
+          </p>
+        </div>
+        
+        <div>
+          {activeTab === 'scan' ? (
+            showScanForm ? (
+              <Button 
+                variant="outline" 
+                onClick={() => setShowScanForm(false)}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Retour
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => setShowScanForm(true)}
+              >
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Nouveau scan
+              </Button>
+            )
           ) : (
-            <Button 
-              onClick={() => setShowScanForm(true)}
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Scanner maintenant
+            <Button variant="outline" onClick={() => setShowScanForm(true)}>
+              <BarChart3 className="mr-2 h-4 w-4" />
+              Analyser les tendances
             </Button>
-          )
-        ) : null}
+          )}
+        </div>
       </div>
     </div>
   );

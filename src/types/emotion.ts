@@ -55,5 +55,20 @@ export interface Emotion {
 export interface EmotionalTeamViewProps {
   teamId: string;
   timeframe?: string;
+  userId?: string;
+  period?: string;
+  className?: string;
+  onRefresh?: () => Promise<void>;
 }
 
+export interface FacialEmotionScannerProps {
+  onEmotionDetected: (emotion: { name: string; score: number; }) => void;
+  className?: string;
+}
+
+export interface EmotionScanFormProps {
+  onComplete?: (result: EmotionResult) => void;
+  userId?: string;
+  onScanSaved?: () => void;
+  onClose?: () => void;
+}

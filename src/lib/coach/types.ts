@@ -73,5 +73,14 @@ export const AI_MODEL_CONFIG = {
     stream: false,
     cacheEnabled: true,
     cacheTTL: 3600
+  },
+  scan: {
+    model: 'gpt-4o-mini',
+    temperature: 0.4,
+    max_tokens: 800,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 1800
   }
 };

@@ -1,85 +1,124 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 import { ChatMessage } from '@/types';
-import { 
-  getCoachMessages, 
-  sendCoachMessage, 
-  createConversation 
-} from '@/lib/coachService';
-import { useCoachEvents } from './useCoachEvents';
+import { CoachEvent } from '@/lib/coach/types';
 
 export const useCoach = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { user } = useAuth();
-  const coachEvents = useCoachEvents();
+  const [loading, setLoading] = useState(false);
+  const [events, setEvents] = useState<CoachEvent[]>([]);
+  const [lastEmotion, setLastEmotion] = useState<any>(null);
 
-  // Add triggerCoachEvent function
-  const triggerCoachEvent = useCallback((eventType: string, eventData: any = {}) => {
-    if (coachEvents.addEvent) {
-      coachEvents.addEvent(eventType, eventData);
-    }
-  }, [coachEvents]);
-
-  const loadMessages = useCallback(async () => {
-    if (!user) return;
-    
+  // Function to send a message to the coach
+  const sendMessage = async (text: string) => {
     setLoading(true);
     try {
-      const loadedMessages = await getCoachMessages(user.id);
-      setMessages(loadedMessages || []);
-    } catch (error) {
-      console.error('Failed to load coach messages:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  const sendMessage = useCallback(async (text: string) => {
-    if (!user) return;
-    
-    setLoading(true);
-    try {
-      // Add user message to the chat
+      // Create a new user message
       const userMessage: ChatMessage = {
-        id: `tmp-${Date.now()}`,
-        text,
+        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        text: text,
         sender: 'user',
         timestamp: new Date().toISOString()
       };
       
-      setMessages(prev => [...prev, userMessage]);
+      // Add the user message to the messages state
+      setMessages(prevMessages => [...prevMessages, userMessage]);
       
-      // Log coaching interaction event
-      triggerCoachEvent('coach_interaction', { 
-        type: 'message_sent', 
-        content_length: text.length 
-      });
+      // Simulate an API call to get a response from the coach
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Get coach's response
-      const response = await sendCoachMessage(user.id, text);
+      // Create a mock response
+      const coachResponse: ChatMessage = {
+        id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        text: `Merci pour votre message. En tant que coach IA, je suis là pour vous aider.`,
+        sender: 'coach',
+        timestamp: new Date().toISOString()
+      };
       
-      if (response) {
-        setMessages(prev => [...prev, response]);
-      }
+      // Add the coach response to the messages state
+      setMessages(prevMessages => [...prevMessages, coachResponse]);
     } catch (error) {
-      console.error('Failed to send message to coach:', error);
+      console.error('Error sending message to coach:', error);
     } finally {
       setLoading(false);
     }
-  }, [user, triggerCoachEvent]);
-
-  const clearMessages = useCallback(() => {
+  };
+  
+  // Function to clear all messages
+  const clearMessages = () => {
     setMessages([]);
-  }, []);
-
-  // Load messages on mount
-  useEffect(() => {
-    if (user) {
-      loadMessages();
+  };
+  
+  // Function to load messages from storage or API
+  const loadMessages = async () => {
+    setLoading(true);
+    try {
+      // Simulate loading messages
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Set mock messages
+      setMessages([
+        {
+          id: 'msg-1',
+          text: 'Bonjour, comment puis-je vous aider aujourd\'hui?',
+          sender: 'coach',
+          timestamp: new Date(Date.now() - 86400000).toISOString()
+        }
+      ]);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [user, loadMessages]);
+  };
+  
+  // Function to add an event
+  const addEvent = (eventType: string, eventData: any = {}) => {
+    const newEvent: CoachEvent = {
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type: eventType,
+      data: eventData,
+      timestamp: new Date()
+    };
+    
+    setEvents(prevEvents => [...prevEvents, newEvent]);
+    
+    // If the event is an emotion update, also update lastEmotion
+    if (eventType === 'emotion_detected' && eventData.emotion) {
+      setLastEmotion(eventData.emotion);
+    }
+  };
+  
+  // Function to fetch events
+  const fetchEvents = async () => {
+    setLoading(true);
+    try {
+      // Simulate fetching events
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Set mock events
+      setEvents([
+        {
+          id: 'event-1',
+          type: 'session_start',
+          data: {},
+          timestamp: new Date()
+        }
+      ]);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Function to trigger a coach event
+  const triggerCoachEvent = (eventType: string, eventData: any = {}) => {
+    addEvent(eventType, eventData);
+    
+    // In a real implementation, we might want to do something with this event
+    console.log(`Coach event triggered: ${eventType}`, eventData);
+  };
 
   return {
     messages,
@@ -87,8 +126,11 @@ export const useCoach = () => {
     sendMessage,
     clearMessages,
     loadMessages,
-    triggerCoachEvent
+    events,
+    isLoading: loading,
+    addEvent,
+    fetchEvents,
+    triggerCoachEvent,
+    lastEmotion
   };
 };
-
-export default useCoach;
