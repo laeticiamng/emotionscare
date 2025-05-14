@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mic, Camera, HelpCircle, ArrowRight } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/types';
 import FacialEmotionScanner from './FacialEmotionScanner';
 import VoiceEmotionScanner from './VoiceEmotionScanner';
 import EmojiPicker from './EmojiPicker';
@@ -61,7 +62,9 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
 
   const handleVoiceScanComplete = (result: EmotionResult) => {
     setVoiceResult(result);
-    onAudioChange(result.audio_url || null);
+    if (result.audio_url) {
+      onAudioChange(result.audio_url);
+    }
     
     if (onEmotionDetected) {
       onEmotionDetected(result);
@@ -130,12 +133,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
           </TabsContent>
 
           <TabsContent value="voice">
-            <VoiceEmotionScanner onScanComplete={(result) => {
-              if (onEmotionDetected) {
-                onEmotionDetected(result);
-              }
-              handleVoiceScanComplete(result);
-            }} />
+            <VoiceEmotionScanner onScanComplete={handleVoiceScanComplete} />
           </TabsContent>
 
           <TabsContent value="face">

@@ -36,7 +36,9 @@ const EmotionScanLive = () => {
     setResult(null);
 
     // Convert string to array if needed
-    const emojiArray = typeof emojis === 'string' ? emojis.split('') : emojis;
+    const emojiArray = emojis && emojis.length > 0 ? 
+      (typeof emojis === 'string' ? emojis.split('') : emojis) : 
+      [];
 
     analyzeEmotion(text, emojiArray, audioUrl)
       .then(data => {

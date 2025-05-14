@@ -1,3 +1,4 @@
+
 // ————————————————————————
 // UserRole
 // ————————————————————————
@@ -33,9 +34,14 @@ export interface UserData extends User {
 // UserPreferences
 // ————————————————————————
 export interface UserPreferences {
-  privacy?: 'public' | 'private' | 'team';
-  profileVisibility?: 'public' | 'private' | 'team';
-  notifications_enabled?: boolean;
+  dashboardLayout: 'standard' | 'compact' | 'focused';
+  onboardingCompleted: boolean;
+  theme: Theme;
+  fontSize: FontSize;
+  fontFamily: FontFamily;
+  sound: boolean;
+  notifications_enabled: boolean;
+  privacy?: string;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   aiSuggestions?: boolean;
@@ -46,15 +52,9 @@ export interface UserPreferences {
     emailEnabled: boolean;
     pushEnabled: boolean;
   };
-  dashboardLayout?: string;
-  onboardingCompleted?: boolean;
-  theme?: string;
-  fontSize?: string;
-  fontFamily?: string;
-  colorScheme?: string;
+  profileVisibility?: 'public' | 'private' | 'team';
   locale?: string;
   timeZone?: string;
-  sound?: boolean;
 }
 
 // ————————————————————————
@@ -201,7 +201,8 @@ export interface MusicContextType {
   isInitialized: boolean;
   initializeMusicSystem: () => void;
   error?: string | null;
-  isPlaying?: boolean; // Ajouté pour corriger les erreurs
+  isPlaying?: boolean;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
 }
 
 // ————————————————————————
@@ -298,7 +299,7 @@ export interface ThemeContextType {
 
 // ————————————————————————
 // UserMode
-// ————————————���———————————
+// ————————————————————————
 export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'b2b-collaborator' | 'anonymous';
 
 export interface UserMode {
@@ -323,6 +324,8 @@ export interface AuthContextType {
   updatePassword: (password: string) => Promise<void>;
   logout?: () => Promise<void>; // Added for compatibility with existing components
   updateUser?: (data: Partial<User>) => Promise<void>; // Added for compatibility
+  preferences?: UserPreferences;
+  setSinglePreference?: (key: string, value: any) => void;
 }
 
 // ————————————————————————
@@ -348,3 +351,11 @@ export interface NotificationPreference {
   enabled: boolean;
   frequency: NotificationFrequency;
 }
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message: string;
+  role?: UserRole;
+  email?: string;
+}
+

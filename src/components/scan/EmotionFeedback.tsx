@@ -13,30 +13,37 @@ interface EmotionFeedbackProps {
 const EmotionFeedback = ({ emotion }: EmotionFeedbackProps) => {
   const navigate = useNavigate();
   
-  if (!emotion?.ai_feedback) return null;
-  
+  if (!emotion) {
+    return null;
+  }
+
   return (
-    <Card className="mt-8 bg-gradient-to-r from-indigo-50 to-indigo-100 border-indigo-200">
+    <Card className="mt-6">
       <CardHeader>
-        <CardTitle className="flex items-center text-indigo-800">
-          Résultat de l'analyse IA
-        </CardTitle>
+        <CardTitle>Votre état émotionnel</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="text-indigo-700">
-          {emotion.ai_feedback}
+      <CardContent className="space-y-4">
+        <div>
+          <p className="font-medium">Émotion détectée : {emotion.emotion}</p>
+          {emotion.score && <p>Intensité : {emotion.score} / 100</p>}
         </div>
         
-        <div className="mt-6">
-          <Button 
-            onClick={() => navigate('/vr')}
-            variant="outline"
-            className="gap-2 border-indigo-300 hover:bg-indigo-100"
-          >
-            Planifier une micro-pause VR
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+        <div>
+          <h3 className="font-medium mb-2">Recommandations personnalisées</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Prenez un moment pour respirer profondément</li>
+            <li>Essayez une session de relaxation guidée</li>
+            <li>Écrivez dans votre journal ce qui vous a affecté</li>
+          </ul>
         </div>
+        
+        <Button 
+          className="w-full"
+          onClick={() => navigate('/journal/new')}
+        >
+          Exprimer cette émotion dans mon journal
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </CardContent>
     </Card>
   );

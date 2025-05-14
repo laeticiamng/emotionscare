@@ -2,14 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { analyzeAudioStream } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/types';
 
 interface AudioProcessorProps {
   userId: string;
   isConfidential: boolean;
   onProcessingChange: (processing: boolean) => void;
   onProgressUpdate: (progress: string) => void;
-  onAnalysisComplete: (emotion: any, result: EmotionResult) => void;
+  onAnalysisComplete: (emotion: EmotionResult, result: EmotionResult) => void;
   onError: (error: string) => void;
   isListening: boolean;
 }
@@ -133,7 +133,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       console.log('Audio analysis result:', result);
       
       // Create emotion object with expected properties
-      const emotion = {
+      const emotion: EmotionResult = {
         id: result.id || crypto.randomUUID(),
         user_id: userId,
         date: new Date().toISOString(),

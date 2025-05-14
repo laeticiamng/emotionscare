@@ -1,15 +1,15 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { FontFamily, FontSize } from '@/contexts/ThemeContext';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { FontFamily, FontSize } from '@/types/types';
 
 interface FontSettingsProps {
   currentFontFamily: FontFamily;
-  onChangeFontFamily: (fontFamily: FontFamily) => void;
+  onChangeFontFamily: (font: FontFamily) => void;
   currentFontSize: FontSize;
-  onChangeFontSize: (fontSize: FontSize) => void;
+  onChangeFontSize: (size: FontSize) => void;
 }
 
 const FontSettings: React.FC<FontSettingsProps> = ({
@@ -18,57 +18,64 @@ const FontSettings: React.FC<FontSettingsProps> = ({
   currentFontSize,
   onChangeFontSize
 }) => {
+  const handleFontFamilyChange = (value: string) => {
+    onChangeFontFamily(value as FontFamily);
+  };
+
+  const handleFontSizeChange = (value: string) => {
+    onChangeFontSize(value as FontSize);
+  };
+
   return (
     <Card>
-      <CardContent className="space-y-6 p-6">
+      <CardHeader>
+        <CardTitle className="text-lg">Typographie</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
         <div>
-          <h3 className="text-lg font-medium mb-4">Police d'écriture</h3>
+          <h4 className="font-medium mb-4">Police</h4>
           <RadioGroup
             value={currentFontFamily}
-            onValueChange={(value) => onChangeFontFamily(value as FontFamily)}
-            className="space-y-2"
+            onValueChange={handleFontFamilyChange}
+            className="grid grid-cols-2 gap-4"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="inter" id="font-inter" />
-              <Label htmlFor="font-inter" className="font-['Inter']">Inter</Label>
+              <RadioGroupItem value="system" id="system-font" />
+              <Label htmlFor="system-font" className="font-system">Système</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="roboto" id="font-roboto" />
-              <Label htmlFor="font-roboto" className="font-['Roboto']">Roboto</Label>
+              <RadioGroupItem value="sans-serif" id="sans" />
+              <Label htmlFor="sans" className="font-sans">Sans Serif</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="poppins" id="font-poppins" />
-              <Label htmlFor="font-poppins" className="font-['Poppins']">Poppins</Label>
+              <RadioGroupItem value="serif" id="serif" />
+              <Label htmlFor="serif" className="font-serif">Serif</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="montserrat" id="font-montserrat" />
-              <Label htmlFor="font-montserrat" className="font-['Montserrat']">Montserrat</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="raleway" id="font-raleway" />
-              <Label htmlFor="font-raleway" className="font-['Raleway']">Raleway</Label>
+              <RadioGroupItem value="mono" id="mono" />
+              <Label htmlFor="mono" className="font-mono">Monospace</Label>
             </div>
           </RadioGroup>
         </div>
-        
+
         <div>
-          <h3 className="text-lg font-medium mb-4">Taille du texte</h3>
+          <h4 className="font-medium mb-4">Taille</h4>
           <RadioGroup
             value={currentFontSize}
-            onValueChange={(value) => onChangeFontSize(value as FontSize)}
-            className="space-y-2"
+            onValueChange={handleFontSizeChange}
+            className="grid grid-cols-3 gap-4"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="small" id="font-small" />
-              <Label htmlFor="font-small" className="text-sm">Petit</Label>
+              <RadioGroupItem value="small" id="small" />
+              <Label htmlFor="small" className="text-sm">Petite</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="medium" id="font-medium" />
-              <Label htmlFor="font-medium">Moyen</Label>
+              <RadioGroupItem value="medium" id="medium" />
+              <Label htmlFor="medium">Moyenne</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="large" id="font-large" />
-              <Label htmlFor="font-large" className="text-lg">Grand</Label>
+              <RadioGroupItem value="large" id="large" />
+              <Label htmlFor="large" className="text-lg">Grande</Label>
             </div>
           </RadioGroup>
         </div>

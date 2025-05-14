@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuid } from 'uuid';
 import { supabase } from '@/integrations/supabase/client'; 
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/types';
 
 export function useEmotionScanFormState(userId: string, onScanComplete?: () => void) {
   const [text, setText] = useState('');
@@ -45,7 +45,8 @@ export function useEmotionScanFormState(userId: string, onScanComplete?: () => v
       ai_feedback: `Je détecte une émotion de ${randomEmotion} dans votre analyse. C'est intéressant de voir comment vous exprimez cette émotion.`,
       score: Math.round(randomConfidence * 100),
       id: uuid(),
-      user_id: userId
+      user_id: userId,
+      audio_url: audioUrl
     } as EmotionResult;
   };
 
@@ -59,7 +60,8 @@ export function useEmotionScanFormState(userId: string, onScanComplete?: () => v
         emotion: emotionData.emotion,
         score: emotionData.score || Math.round((emotionData.confidence || 0.5) * 100),
         text: emotionData.text || emotionData.transcript || '',
-        emojis: Array.isArray(emotionData.emojis) ? emotionData.emojis : [],
+        emojis: Array.isArray(emotionData.emojis) ? emotionData.emojis : 
+               (emotionData.emojis ? emotionData.emojis.split('') : []),
         audio_url: emotionData.audio_url || '',
         ai_feedback: emotionData.ai_feedback || emotionData.feedback || ''
       };

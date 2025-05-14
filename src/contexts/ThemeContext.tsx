@@ -113,3 +113,6 @@ export const useTheme = (): ThemeContextType => {
   
   return context;
 };
+
+// Export types for use in other components
+export type { Theme, FontFamily, FontSize, ThemeContextType };

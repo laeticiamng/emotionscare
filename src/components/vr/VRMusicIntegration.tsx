@@ -2,9 +2,9 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicPropsType } from '@/types';
+import { VRSessionWithMusicProps } from '@/types/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
   onComplete, 
   session, 
@@ -17,7 +17,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({
   templateId
 }) => {
   // Use direct props or from the session
-  const activeTemplate = session?.template || template;
+  const activeTemplate = session || template;
   const handleComplete = onSessionComplete || onComplete;
   
   const targetEmotion = emotion || (
@@ -31,7 +31,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({
     // Load a playlist based on the session's target emotion
     const loadMusic = async () => {
       try {
-        if (targetEmotion) {
+        if (targetEmotion && loadPlaylistForEmotion) {
           const playlist = await loadPlaylistForEmotion(targetEmotion);
           
           if (playlist && playlist.tracks.length > 0) {
