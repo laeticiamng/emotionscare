@@ -1,117 +1,101 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ThemeName, FontFamily, FontSize, ThemeContextType } from '@/types';
+import { FontFamily, FontSize, ThemeName, ThemeContextType } from '@/types';
 
-// Création du contexte
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'system',
+  setTheme: () => {},
+  isDarkMode: false,
+  fontFamily: 'system',
+  setFontFamily: () => {},
+  fontSize: 'medium',
+  setFontSize: () => {},
+});
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<ThemeName>('light');
+  const [theme, setTheme] = useState<ThemeName>('system');
   const [fontFamily, setFontFamily] = useState<FontFamily>('system');
   const [fontSize, setFontSize] = useState<FontSize>('medium');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-
-  // Effet pour vérifier la préférence utilisateur
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
   useEffect(() => {
-    // Vérifier la préférence de thème dans localStorage
-    const storedTheme = localStorage.getItem('theme') as ThemeName | null;
+    // Load theme from localStorage or default to system
+    const savedTheme = localStorage.getItem('theme') as ThemeName;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
     
-    if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'pastel') {
-      setTheme(storedTheme);
-      setIsDarkMode(storedTheme === 'dark');
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-      setIsDarkMode(true);
+    // Load font family from localStorage
+    const savedFontFamily = localStorage.getItem('fontFamily') as FontFamily;
+    if (savedFontFamily) {
+      setFontFamily(savedFontFamily);
     }
-
-    // Vérifier les préférences de police et taille
-    const storedFontFamily = localStorage.getItem('fontFamily') as FontFamily | null;
-    if (storedFontFamily) {
-      setFontFamily(storedFontFamily);
-    }
-
-    const storedFontSize = localStorage.getItem('fontSize') as FontSize | null;
-    if (storedFontSize) {
-      setFontSize(storedFontSize);
+    
+    // Load font size from localStorage
+    const savedFontSize = localStorage.getItem('fontSize') as FontSize;
+    if (savedFontSize) {
+      setFontSize(savedFontSize);
     }
   }, []);
-
-  // Effet pour appliquer le thème à l'élément HTML
+  
   useEffect(() => {
-    const html = document.documentElement;
+    // Apply theme to document
+    const root = window.document.documentElement;
+    root.classList.remove('light', 'dark');
     
-    if (theme === 'dark') {
-      html.classList.add('dark');
+    // Determine if dark mode should be applied
+    let shouldUseDark = theme === 'dark';
+    if (theme === 'system') {
+      shouldUseDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    
+    if (shouldUseDark) {
+      root.classList.add('dark');
       setIsDarkMode(true);
     } else {
-      html.classList.remove('dark');
+      root.classList.add('light');
       setIsDarkMode(false);
     }
     
-    // Stockage de la préférence
+    // Save to localStorage
     localStorage.setItem('theme', theme);
   }, [theme]);
-
-  // Effet pour appliquer la famille de police
+  
   useEffect(() => {
-    const html = document.documentElement;
-    html.style.fontFamily = getFontFamilyValue(fontFamily);
+    // Apply font family to document
+    const root = window.document.documentElement;
+    root.style.setProperty('--font-family', fontFamily);
+    
+    // Save to localStorage
     localStorage.setItem('fontFamily', fontFamily);
   }, [fontFamily]);
-
-  // Effet pour appliquer la taille de police
+  
   useEffect(() => {
-    const html = document.documentElement;
-    html.style.fontSize = getFontSizeValue(fontSize);
+    // Apply font size to document
+    const root = window.document.documentElement;
+    root.style.setProperty('--font-size', fontSize);
+    
+    // Save to localStorage
     localStorage.setItem('fontSize', fontSize);
   }, [fontSize]);
-
-  // Helpers pour obtenir les valeurs CSS
-  const getFontFamilyValue = (family: FontFamily): string => {
-    switch (family) {
-      case 'sans-serif': return 'ui-sans-serif, system-ui, sans-serif';
-      case 'serif': return 'ui-serif, Georgia, serif';
-      case 'mono': return 'ui-monospace, SFMono-Regular, monospace';
-      case 'rounded': return 'ui-rounded, system-ui, sans-serif';
-      case 'inter': return 'Inter var, system-ui, sans-serif';
-      default: return 'Inter var, system-ui, sans-serif';
-    }
-  };
-
-  const getFontSizeValue = (size: FontSize): string => {
-    switch (size) {
-      case 'small': return '0.875rem';
-      case 'large': return '1.125rem';
-      default: return '1rem'; // medium
-    }
-  };
-
-  const value: ThemeContextType = {
-    theme,
-    setTheme,
-    isDarkMode,
-    fontFamily,
-    fontSize,
-    setFontFamily,
-    setFontSize
-  };
-
+  
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider value={{ 
+      theme, 
+      setTheme, 
+      isDarkMode,
+      fontFamily, 
+      setFontFamily, 
+      fontSize, 
+      setFontSize 
+    }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = (): ThemeContextType => {
-  const context = useContext(ThemeContext);
-  
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  
-  return context;
-};
+export const useTheme = () => useContext(ThemeContext);
 
-// Export the ThemeContext for use-theme.ts
-export { ThemeContext };
+// Export for other files to import
+export type { ThemeName, FontFamily, FontSize };
+export type { ThemeContextType };

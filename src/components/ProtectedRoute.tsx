@@ -3,10 +3,11 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { hasRoleAccess, getRoleLoginPath } from '@/utils/roleUtils';
+import { UserRole } from '@/types';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  role: string;
+  role: UserRole;
   redirectTo?: string;
 }
 
@@ -27,7 +28,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to={redirectTo || getRoleLoginPath(role)} state={{ from: location }} replace />;
   }
   
-  if (user?.role && !hasRoleAccess(user.role, role)) {
+  if (user?.role && !hasRoleAccess(user.role, [role])) {
     // Authenticated but wrong role, redirect to unauthorized
     return <Navigate to="/unauthorized" replace />;
   }

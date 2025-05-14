@@ -1,125 +1,92 @@
 
 import { EmotionResult } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
-/**
- * Create a new emotion entry for the user
- */
-export async function createEmotionEntry(userId: string, data: Partial<EmotionResult>): Promise<EmotionResult> {
+export async function analyzeEmotion(text: string): Promise<EmotionResult> {
   try {
-    // This would normally be an API call
-    const newEntry: EmotionResult = {
-      id: `emotion-${Date.now()}`,
-      emotion: data.emotion || 'neutral',
+    // Simulate API call for now
+    return {
+      id: crypto.randomUUID(),
+      emotion: 'neutral',
+      score: 0.75,
+      confidence: 0.8,
       date: new Date().toISOString(),
-      user_id: userId,
-      ...data
+      text: text
     };
-    
-    // Here you would normally save to the database
-    console.log('Creating emotion entry:', newEntry);
-    
-    return newEntry;
-  } catch (error) {
-    console.error('Error creating emotion entry:', error);
-    throw new Error('Failed to create emotion entry');
-  }
-}
-
-/**
- * Analyze emotion from text or audio
- */
-export async function analyzeEmotion(
-  data: { text?: string; audio?: Blob },
-  userId?: string
-): Promise<EmotionResult> {
-  try {
-    // Mock implementation - would normally call an API
-    const mockEmotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
-    const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)];
-    
-    const result: EmotionResult = {
-      id: `emotion-${Date.now()}`,
-      emotion: randomEmotion,
-      confidence: Math.random() * 0.5 + 0.5, // Random confidence between 50-100%
-      transcript: data.text || "Sample transcription of detected speech...",
-      date: new Date().toISOString(),
-      ai_feedback: `Analysis detected ${randomEmotion} as the primary emotion.`,
-      recommendations: [
-        "Take a few deep breaths",
-        "Consider mindfulness exercises",
-        "Listen to calming music"
-      ],
-      user_id: userId
-    };
-    
-    console.log('Analyzed emotion:', result);
-    return result;
   } catch (error) {
     console.error('Error analyzing emotion:', error);
-    throw new Error('Failed to analyze emotion');
+    throw error;
   }
 }
 
-/**
- * Save emotion result to database
- */
-export async function saveEmotion(emotionResult: EmotionResult, userId: string): Promise<EmotionResult> {
+export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
   try {
-    // This would normally save to the database
-    const savedEmotion = {
-      ...emotionResult,
-      user_id: userId,
-      id: emotionResult.id || `emotion-${Date.now()}`
+    // Simulate API call for now
+    return {
+      id: crypto.randomUUID(),
+      emotion: 'neutral',
+      score: 0.65,
+      confidence: 0.7,
+      date: new Date().toISOString(),
+      audio_url: URL.createObjectURL(audioBlob)
     };
-    
-    console.log('Saving emotion result:', savedEmotion);
-    return savedEmotion;
-  } catch (error) {
-    console.error('Error saving emotion:', error);
-    throw new Error('Failed to save emotion');
-  }
-}
-
-/**
- * Analyze audio stream for emotion
- */
-export async function analyzeAudioStream(
-  audioBlob: Blob,
-  userId?: string
-): Promise<EmotionResult> {
-  try {
-    // This would normally send the audio to an API for analysis
-    console.log('Analyzing audio stream...');
-    
-    // Create a fake delay to simulate processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    return analyzeEmotion({ audio: audioBlob }, userId);
   } catch (error) {
     console.error('Error analyzing audio stream:', error);
-    throw new Error('Failed to analyze audio stream');
+    throw error;
   }
 }
 
-/**
- * Fetch emotion history for a user
- */
-export async function fetchEmotionHistory(userId: string): Promise<EmotionResult[]> {
+export async function createEmotionEntry(userId: string, data: Partial<EmotionResult>): Promise<EmotionResult> {
   try {
-    // Mock implementation - would normally call an API
-    const mockEmotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
-    
-    const mockHistory: EmotionResult[] = Array.from({ length: 10 }).map((_, index) => ({
-      id: `emotion-${Date.now() - index * 86400000}`,
-      emotion: mockEmotions[Math.floor(Math.random() * mockEmotions.length)],
-      confidence: Math.random() * 0.5 + 0.5,
-      date: new Date(Date.now() - index * 86400000).toISOString(),
-      user_id: userId
-    }));
-    
-    return mockHistory;
+    // Set default values
+    const emotionEntry: Partial<EmotionResult> = {
+      ...data,
+      id: data.id || crypto.randomUUID(),
+      user_id: userId,
+      date: data.date || new Date().toISOString(),
+    };
+
+    // Use this for mock purposes
+    return emotionEntry as EmotionResult;
   } catch (error) {
-    console.error('Error fetching emotion history:', error);
-    throw new Error('Failed to fetch emotion history');
+    console.error('Error creating emotion entry:', error);
+    throw error;
+  }
+}
+
+export async function saveEmotion(userId: string, emotion: EmotionResult): Promise<EmotionResult> {
+  try {
+    if (!userId) {
+      throw new Error('User ID is required to save emotion');
+    }
+
+    // For now just return the emotion as if it was saved
+    return {
+      ...emotion,
+      user_id: userId,
+      id: emotion.id || crypto.randomUUID(),
+      date: emotion.date || new Date().toISOString(),
+    };
+  } catch (error) {
+    console.error('Error saving emotion:', error);
+    throw error;
+  }
+}
+
+export async function getEmotionalHistory(userId: string, limit = 10): Promise<EmotionResult[]> {
+  try {
+    // Simulate fetching from database
+    return Array(limit).fill(null).map((_, i) => ({
+      id: `emotion-${i}`,
+      user_id: userId,
+      emotion: ['joy', 'sadness', 'anger', 'fear', 'neutral'][Math.floor(Math.random() * 5)],
+      score: Math.random(),
+      confidence: Math.random(),
+      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+      text: `Emotion entry ${i}`
+    }));
+  } catch (error) {
+    console.error('Error fetching emotional history:', error);
+    return [];
   }
 }

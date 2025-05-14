@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { UserModeType } from '@/types';
 import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
 import EmotionalCheckIn from '@/components/dashboard/EmotionScanSection';
@@ -14,7 +16,6 @@ import NewUsersCard from '@/components/admin/NewUsersCard';
 import EmotionalHealthOverview from '@/components/admin/EmotionalHealthOverview';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
 
 // Mock data pour team overview
