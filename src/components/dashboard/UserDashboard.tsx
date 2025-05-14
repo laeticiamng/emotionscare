@@ -85,7 +85,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
       />
       
       {/* Only show modules section for non-admin users */}
-      {userMode !== 'b2b_admin' && (
+      {userMode !== 'b2b_admin' && userMode !== 'b2b-admin' && (
         <ModulesSection 
           collapsed={collapsedSections.modules} 
           onToggle={() => toggleSection('modules')} 

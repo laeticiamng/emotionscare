@@ -256,6 +256,7 @@ export interface VRSessionTemplate {
   theme?: string;
   preview_url?: string;
   type?: string; // Added for mockVRTemplates.ts compatibility
+  thumbnail?: string; // Added for compatibility
 }
 
 export interface VRSession {

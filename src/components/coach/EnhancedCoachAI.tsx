@@ -54,7 +54,7 @@ const EnhancedCoachAI = () => {
   const handleAnalyze = async () => {
     setIsLoading(true);
     try {
-      const result = await analyzeEmotion(userText, userEmojis);
+      const result = await analyzeEmotion(userText);
       if (result) {
         setAnalysisResult(result);
         handleEmotionDetected(result);
