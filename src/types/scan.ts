@@ -26,3 +26,29 @@ export interface EmotionGamificationStats {
   highest_emotion: string;
   emotional_balance: number; // 0-100 score of emotional health balance
 }
+
+export interface GamificationStats {
+  points: number;
+  level: number;
+  nextLevelPoints: number;
+  rank: number;
+  streak: number;
+  nextLevel: number;
+  achievements: any[];
+  badges: any[];
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  progressToNextLevel: number;
+  challenges: any[];
+  recentAchievements: any[];
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  points: number;
+  level: number;
+  position: number;
+  avatar?: string;
+}

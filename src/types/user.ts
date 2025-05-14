@@ -1,4 +1,3 @@
-
 import { NotificationPreference } from './notification';
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
@@ -32,6 +31,8 @@ export interface User {
   emotional_score?: number;
   anonymity_code?: string;
   team_id?: string;
+  position?: string;
+  joined_at?: string;
 }
 
 export interface UserPreferences {
@@ -54,6 +55,12 @@ export interface UserPreferences {
   fullAnonymity?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
+  notifications_enabled?: boolean;
+  privacy?: {
+    showRealName?: boolean;
+    showAvatar?: boolean;
+    shareData?: boolean;
+  };
 }
 
 export interface UserPreferencesState {
