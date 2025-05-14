@@ -1,4 +1,3 @@
-
 import '../polyfills';
 import OpenAI from 'openai';
 import { ChatMessage } from '@/types';
@@ -152,7 +151,7 @@ export const generateChatResponse = async (
   stream: boolean = false
 ): Promise<OpenAI.Chat.Completions.ChatCompletion | string | null> => {
   try {
-    const lastUserMessage = messages.find(m => m.role === 'user');
+    const lastUserMessage = messages.findLast(m => m.role === 'user');
     const systemPrompt = lastUserMessage
       ? `You are an AI assistant. The user's last message was: ${lastUserMessage.text || lastUserMessage.content}.`
       : 'You are an AI assistant.';

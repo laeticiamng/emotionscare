@@ -13,7 +13,12 @@ export interface UserPreferences {
   language: string;
   fontSize: FontSize;
   fontFamily: FontFamily;
-  notifications: boolean;
+  notifications: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    frequency: string;
+  };
   soundEnabled: boolean;
   privacyLevel: PrivacyLevel;
   onboardingCompleted: boolean;
@@ -23,7 +28,11 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   push_notifications?: boolean;
-  privacy?: string;
+  privacy?: {
+    anonymousMode?: boolean;
+    dataSharing?: boolean;
+    profileVisibility?: 'public' | 'team' | 'private';
+  };
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   emotionalCamouflage?: boolean;

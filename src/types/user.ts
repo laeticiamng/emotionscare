@@ -1,5 +1,4 @@
-
-export type UserRole = 'user' | 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee';
+export type UserRole = 'user' | 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'moderator';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type ThemeName = Theme | string;
@@ -35,13 +34,23 @@ export interface UserPreferences {
   };
   autoplayVideos: boolean;
   dataCollection: boolean;
-  highContrast: boolean;
-  reduceAnimations: boolean;
-  soundEffects: boolean;
-  colorAccent: string;
+  highContrast?: boolean;
+  reduceAnimations?: boolean;
+  soundEffects?: boolean;
+  colorAccent?: string;
   language: string;
   privacyLevel: string;
   onboardingCompleted?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+  notifications_enabled?: boolean;
+  privacy?: {
+    anonymousMode?: boolean;
+    dataSharing?: boolean;
+    profileVisibility?: 'public' | 'team' | 'private';
+  };
+  dashboardLayout?: string;
 }
 
 export interface UserPreferencesState {

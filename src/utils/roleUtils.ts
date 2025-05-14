@@ -48,6 +48,18 @@ export function getRoleName(role: UserRole): string {
       return 'Administrateur B2B';
     case 'admin':
       return 'Administrateur';
+    case 'manager':
+      return 'Manager';
+    case 'wellbeing_manager':
+      return 'Responsable bien-être';
+    case 'coach':
+      return 'Coach';
+    case 'employee':
+      return 'Employé';
+    case 'moderator':
+      return 'Modérateur';
+    case 'user':
+      return 'Utilisateur';
     default:
       return 'Utilisateur';
   }
@@ -70,4 +82,11 @@ export function hasRoleAccess(userRole: UserRole, requiredRole: 'b2c' | 'b2b_use
   if (userRole === 'b2b_admin' && requiredUserRole === 'b2b_user') return true;
   
   return false;
+}
+
+/**
+ * Check if a role is an admin role
+ */
+export function isAdminRole(role: UserRole): boolean {
+  return role === 'admin' || role === 'b2b_admin';
 }

@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   email: string;
@@ -14,7 +13,7 @@ export interface User {
   preferences?: UserPreferences;
 }
 
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | 'user' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee' | 'moderator';
 
 export interface AuthContextType {
   user: User | null;
@@ -49,7 +48,7 @@ export interface RegisterCredentials {
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system';
-  fontSize: 'small' | 'medium' | 'large' | 'x-large' | 'xx-large';
+  fontSize: 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'extra-large';
   fontFamily: 'default' | 'serif' | 'mono' | 'sans' | 'inter';
   notifications: {
     enabled: boolean;
@@ -75,4 +74,5 @@ export interface UserPreferences {
     dataSharing?: boolean;
     profileVisibility?: 'public' | 'team' | 'private';
   };
+  dashboardLayout?: string;
 }

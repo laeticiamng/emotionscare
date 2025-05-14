@@ -1,20 +1,44 @@
-
 export interface Emotion {
   id?: string;
   user_id?: string;
-  date?: string;
+  date?: string | Date;
   emotion?: string;
-  score?: number;
   name?: string;
+  score?: number;
   intensity?: number;
   confidence?: number;
+  text?: string;
+  emojis?: string;
+  ai_feedback?: string;
+  feedback?: string;
+  audio_url?: string;
+  transcript?: string;
+  category?: string;
 }
 
 export interface EmotionResult {
+  id?: string;
+  user_id?: string;
+  date?: string | Date;
   emotion: string;
   score: number;
   confidence?: number;
   intensity?: number;
+  text?: string;
+  emojis?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  transcript?: string;
+  recommendations?: string[];
+  primaryEmotion?: {
+    name: string;
+    score: number;
+    confidence?: number;
+  };
+  dominantEmotion?: {
+    name: string;
+    score: number;
+  };
 }
 
 export interface EmotionalData {
@@ -50,4 +74,11 @@ export interface FacialEmotionScannerProps {
   onEmotionDetected: (emotion: string, result: EmotionResult) => void;
   isScanning?: boolean;
   onToggleScanning?: () => void;
+}
+
+export interface EmotionalTeamViewProps {
+  teamId: string;
+  period?: string;
+  showFilters?: boolean;
+  className?: string;
 }

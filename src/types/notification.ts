@@ -1,31 +1,33 @@
 
+export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never';
+export type NotificationType = 'alert' | 'info' | 'success' | 'warning' | 'error';
+export type NotificationTone = 'positive' | 'negative' | 'neutral';
+
 export interface Notification {
   id: string;
-  user_id: string;
   title: string;
-  message: string;
-  type: 'system' | 'success' | 'warning' | 'info' | 'error' | 'invitation' | 'reminder';
-  read: boolean;
-  createdAt: string;
+  message?: string;
+  content?: string;
+  type?: NotificationType;
+  read?: boolean;
+  createdAt?: string;
   timestamp?: string;
-  date?: string;
-  isRead?: boolean;
-  linkTo?: string;
-  priority?: 'high' | 'medium' | 'low';
+  user_id?: string;
+  action_url?: string;
+  action_text?: string;
+  icon?: string;
+  priority?: number;
   category?: string;
+  metadata?: Record<string, any>;
 }
 
-export interface NotificationOptions {
-  id?: string;
-  title: string;
-  message: string;
-  type?: 'system' | 'success' | 'warning' | 'info' | 'error' | 'invitation' | 'reminder';
-  linkTo?: string;
-  priority?: 'high' | 'medium' | 'low';
-  category?: string;
-}
-
-export interface EnhancedNotification extends Notification {
-  priority: 'high' | 'medium' | 'low';
-  category: string;
+export interface NotificationPreference {
+  type: string;
+  enabled: boolean;
+  channel: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+  };
+  frequency: NotificationFrequency;
 }
