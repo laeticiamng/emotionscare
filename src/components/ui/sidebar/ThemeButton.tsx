@@ -2,7 +2,13 @@
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun } from 'lucide-react';
-import { Theme, ThemeButtonProps } from '@/types';
+import { ThemeName } from '@/types/types';
+
+export interface ThemeButtonProps {
+  theme?: ThemeName;
+  onClick?: () => void;
+  collapsed?: boolean;
+}
 
 export function ThemeButton({ theme, onClick, collapsed }: ThemeButtonProps) {
   const { isDarkMode, setTheme } = useTheme();

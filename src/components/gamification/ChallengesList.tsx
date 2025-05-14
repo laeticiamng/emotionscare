@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Challenge } from '@/types';
+import { Challenge } from '@/types/types';
 import ChallengeItem from './ChallengeItem';
 
 interface ChallengesListProps {

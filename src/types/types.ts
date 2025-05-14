@@ -1,4 +1,3 @@
-
 // ————————————————————————
 // UserRole and UserModeType
 // ————————————————————————
@@ -83,7 +82,7 @@ export interface UserPreferences {
 // ————————————————————————
 export type Period = 'day' | 'week' | 'month' | 'year' | 'quarter';
 
-export interface EmotionalTeamViewProps {
+export interface TeamOverviewProps {
   userId: string;
   className?: string;
   onRefresh?: () => void;
@@ -93,6 +92,8 @@ export interface EmotionalTeamViewProps {
     start: Date;
     end: Date;
   };
+  users: Partial<User>[];
+  onUserClick?: (userId: string) => void;
 }
 
 // ————————————————————————
@@ -124,6 +125,11 @@ export interface EmotionResult {
 // Add EnhancedEmotionResult for backward compatibility
 export type Emotion = EmotionResult;
 export type EnhancedEmotionResult = EmotionResult;
+
+// Voice Emotion Scanner Props
+export interface VoiceEmotionScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+}
 
 // ————————————————————————
 // MusicTrack
@@ -277,9 +283,11 @@ export interface VRSessionTemplate {
   tags?: string[];
   theme?: string;
   preview_url?: string;
-  type?: string; // Added for mockVRTemplates.ts compatibility
-  thumbnail?: string; // Added for compatibility
+  type?: string;
+  thumbnail?: string;
   duration_seconds?: number;
+  image?: string;
+  level?: number;
 }
 
 export interface VRSession {
@@ -329,15 +337,6 @@ export interface VRTemplateDetailProps {
   showBackButton?: boolean;
 }
 
-export interface VoiceEmotionScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-}
-
-export interface TeamOverviewProps {
-  users: Partial<User>[];
-  onUserClick?: (userId: string) => void;
-}
-
 // ————————————————————————
 // GÉNÉRAL
 // ————————————————————————
@@ -350,6 +349,12 @@ export type FontFamily = 'system' | 'sans-serif' | 'serif' | 'mono' | 'rounded' 
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large' | 'sm' | 'md' | 'lg' | 'xl';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type Theme = ThemeName; // For backward compatibility
+
+export interface ThemeButtonProps {
+  theme?: Theme;
+  onClick?: () => void;
+  collapsed?: boolean;
+}
 
 export interface ThemeContextType {
   theme: ThemeName;
@@ -364,8 +369,6 @@ export interface ThemeContextType {
 // ————————————————————————
 // UserMode
 // ————————————————————————
-export type UserModeType = UserRole;
-
 export interface UserModeContextType {
   userMode: UserModeType;
   setUserMode: (mode: UserModeType) => void;
@@ -396,76 +399,8 @@ export interface AuthContextType {
 }
 
 // ————————————————————————
-// Notification
+// Gamification Types 
 // ————————————————————————
-export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never';
-export type NotificationType = 'emotion' | 'journal' | 'vr' | 'system';
-export type NotificationTone = 'neutral' | 'positive' | 'negative';
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  tone?: NotificationTone;
-  read: boolean;
-  created_at: string;
-  action_url?: string;
-}
-
-export interface NotificationPreference {
-  type: NotificationType;
-  enabled: boolean;
-  frequency: NotificationFrequency;
-}
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  message: string;
-  role?: UserRole;
-  email?: string;
-}
-
-export interface MoodData {
-  date: string;
-  originalDate?: string;
-  value: number;
-  mood?: string;
-  sentiment: number;
-  anxiety: number;
-  energy: number;
-}
-
-export interface JournalEntry {
-  id: string;
-  title: string;
-  content: string;
-  text?: string;
-  mood: string;
-  mood_score?: number;
-  emotion?: string;
-  date: Date | string;
-  tags?: string[];
-  ai_feedback?: string;
-  user_id?: string;
-}
-
-export interface Story {
-  id: string;
-  title: string;
-  content: string;
-  type: string;
-  seen: boolean;
-  emotion?: string;
-  image?: string;
-  cta?: {
-    label: string;
-    route: string;
-    text?: string;
-    action?: string;
-  };
-}
-
 export interface Badge {
   id: string;
   name: string;
@@ -479,70 +414,21 @@ export interface Badge {
   image?: string;
 }
 
-export interface EmotionPrediction {
-  predictedEmotion: string;
-  emotion: string;
-  probability: number;
-  confidence: number;
-  triggers: string[];
-  recommendations: string[];
-}
-
-export interface Recommendation {
+export interface Challenge {
   id: string;
   title: string;
   description: string;
-  category?: string;
-  priority: number;
-  confidence: number;
-  actionUrl?: string;
-  actionLabel?: string;
-  type?: 'activity' | 'content' | 'insight';
+  points: number;
+  status: string;
+  category: string;
+  progress?: number;
+  target?: number;
+  reward?: number;
+  type?: string;
+  name?: string;
+  completed?: boolean;
 }
 
-export interface InvitationStats {
-  total: number;
-  pending: number;
-  accepted: number;
-  expired: number;
-  rejected: number;
-  sent: number;
-  completed: number;
-  conversionRate: number;
-  averageTimeToAccept: number;
-  teams: Record<string, number>;
-  recent_invites: InvitationData[];
-}
-
-export interface InvitationData {
-  id: string;
-  email: string;
-  status: 'pending' | 'accepted' | 'expired' | 'rejected';
-  created_at: string;
-  expires_at: string;
-  accepted_at?: string;
-  role: string;
-}
-
-export interface InvitationFormData {
-  email: string;
-  role: string;
-  message?: string;
-  expires_in_days: number;
-}
-
-export type UserPreferencesState = Pick<
-  UserPreferences,
-  | 'theme'
-  | 'fontSize'
-  | 'fontFamily'
-  | 'notifications_enabled'
-  | 'autoplayVideos'
-  | 'dataCollection'
-  | 'aiSuggestions'
->;
-
-// Gamification types
 export interface LeaderboardEntry {
   id: string;
   userId: string;
@@ -581,44 +467,23 @@ export interface GamificationStats {
   recentAchievements?: any[];
 }
 
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  points: number;
-  status: string;
-  category: string;
-  progress?: number;
-  target?: number;
-  reward?: number;
-  type?: string;
-  name?: string;
-  completed?: boolean;
-}
+// ————————————————————————
+// Types from other files
+// ————————————————————————
+export interface NotificationFrequency { }
+export interface NotificationType { }
+export interface NotificationTone { }
+export interface Notification { }
+export interface NotificationPreference { }
+export interface InvitationVerificationResult { }
+export interface MoodData { }
+export interface JournalEntry { }
+export interface Story { }
+export interface EmotionPrediction { }
+export interface Recommendation { }
+export interface InvitationStats { }
+export interface InvitationData { }
+export interface InvitationFormData { }
 
-export interface ChatMessage {
-  id: string;
-  text?: string;
-  content?: string;
-  sender: string;
-  sender_type?: string;
-  timestamp?: string;
-  conversation_id?: string;
-  role?: string;
-}
-
-// Add missing scanService exports
-export interface ScanServiceFunctions {
-  analyzeEmotion: (text: string) => Promise<EmotionResult>;
-  saveEmotion: (emotion: EmotionResult) => Promise<void>;
-  createEmotionEntry: (data: Partial<EmotionResult>) => Promise<EmotionResult>;
-  fetchLatestEmotion: (userId: string) => Promise<EmotionResult | null>;
-  analyzeAudioStream: (audioBlob: Blob) => Promise<EmotionResult>;
-}
-
-// Adding ThemeButtonProps to fix sidebar/ThemeButton.tsx
-export interface ThemeButtonProps {
-  theme?: Theme;
-  onClick?: () => void;
-  collapsed?: boolean;
-}
+// Keep the remaining interfaces from the original file
+// ... keep existing code

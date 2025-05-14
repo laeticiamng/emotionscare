@@ -27,7 +27,7 @@ interface UserDashboardProps {
 const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) => {
   const logger = useLogger('UserDashboard');
   const isMobile = useIsMobile();
-  const { kpis, shortcuts, isLoading, refetch: refetchDashboardHero } = useDashboardHero(user?.id);
+  const { kpis, shortcuts, isLoading, refetch } = useDashboardHero(user?.id);
   const { 
     minimalView, 
     collapsedSections, 
@@ -39,27 +39,10 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
   // Refresh all user dashboard data
   const refreshDashboardData = useCallback(async () => {
     logger.debug('Refreshing dashboard data');
-    await refetchDashboardHero();
-  }, [refetchDashboardHero, logger]);
+    await refetch();
+  }, [refetch, logger]);
 
   logger.debug('Rendering UserDashboard component');
-  
-  // Map the KPI and shortcut types correctly between different interfaces
-  const typedKpis: DashboardKpi[] = kpis ? kpis.map((kpi: any) => ({
-    key: kpi.id || kpi.key || kpi.label,
-    value: kpi.value,
-    label: kpi.label,
-    trend: kpi.trend || kpi.change,
-    icon: kpi.icon as LucideIcon
-  })) : [];
-
-  const typedShortcuts: DashboardShortcut[] = shortcuts ? shortcuts.map((shortcut: any) => ({
-    name: shortcut.name || shortcut.label,
-    label: shortcut.label || shortcut.name,
-    icon: shortcut.icon as LucideIcon,
-    to: shortcut.to || shortcut.url || shortcut.route || '/',
-    description: shortcut.description
-  })) : [];
   
   return (
     <div className="animate-fade-in w-full">
@@ -79,8 +62,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, latestEmotion }) =>
       {/* Hero Section */}
       <DashboardHero 
         userName={user?.name || 'Utilisateur'}
-        kpis={typedKpis}
-        shortcuts={typedShortcuts}
+        kpis={kpis}
+        shortcuts={shortcuts}
         isLoading={isLoading}
       />
       

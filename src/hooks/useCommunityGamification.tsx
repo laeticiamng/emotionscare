@@ -1,96 +1,102 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { fetchGamificationStats, fetchChallenges } from '@/lib/gamificationService';
-import type { GamificationStats, Challenge } from '@/types/gamification';
-import type { Badge } from '@/types';
+import { mockBadges, mockChallenges, mockLeaderboard, mockGamificationStats } from './community-gamification/mockData';
 
-interface UseCommunityGamificationResult {
-  stats: GamificationStats;
-  badges: Badge[];
-  challenges: Challenge[];
+// Define the return type for clarity
+interface CommunityGamificationState {
+  badges: any[];
+  challenges: any[];
+  leaderboard: any[];
+  stats: {
+    level: number;
+    points: number;
+    badgesCount: number;
+    streak: number;
+    nextLevelPoints: number;
+    recentAchievements: any[];
+  };
   loading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
+  error: string | null;
 }
 
-export const useCommunityGamification = (): UseCommunityGamificationResult => {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<GamificationStats>({
-    points: 0,
-    level: 1,
-    rank: '',
-    badges: [], 
+export const useCommunityGamification = () => {
+  const [state, setState] = useState<CommunityGamificationState>({
+    badges: [],
     challenges: [],
-    streak: 0,
-    nextLevel: { points: 100, rewards: [] },
-    achievements: [],
-    currentLevel: 1,
-    pointsToNextLevel: 100,
-    progressToNextLevel: 0,
-    totalPoints: 0,
-    badgesCount: 0,
-    streakDays: 0,
-    activeChallenges: 0,
-    completedChallenges: 0,
-    lastActivityDate: new Date().toISOString()
+    leaderboard: [],
+    stats: {
+      level: 1,
+      points: 0,
+      badgesCount: 0,
+      streak: 0,
+      nextLevelPoints: 100,
+      recentAchievements: []
+    },
+    loading: true,
+    error: null
   });
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  
-  const fetchData = async () => {
-    if (!user?.id) return;
-    
-    setLoading(true);
-    setError(null);
-    
+
+  useEffect(() => {
+    // Simulate API call
+    const fetchData = async () => {
+      try {
+        // In a real app, this would be an API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        setState({
+          badges: mockBadges,
+          challenges: mockChallenges,
+          leaderboard: mockLeaderboard,
+          stats: {
+            level: mockGamificationStats.level,
+            points: mockGamificationStats.points,
+            badgesCount: mockGamificationStats.badges,
+            streak: mockGamificationStats.streak,
+            nextLevelPoints: mockGamificationStats.nextLevelPoints,
+            recentAchievements: mockGamificationStats.recentAchievements
+          },
+          loading: false,
+          error: null
+        });
+      } catch (error) {
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: 'Failed to load gamification data'
+        }));
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const completeChallenge = async (id: string) => {
     try {
-      // Fetch stats
-      const statsData = await fetchGamificationStats(user.id);
-      setStats(statsData);
-      
-      // Fetch challenges
-      const challengesData = await fetchChallenges(user.id);
-      setChallenges(challengesData as unknown as Challenge[]);
-      
-      // Mock badges data
-      setBadges([
-        {
-          id: '1',
-          name: 'Premier scan',
-          description: 'Félicitations pour votre premier scan émotionnel !',
-          image_url: '/badges/first-scan.png',
-          type: 'achievement'
-        },
-        {
-          id: '2',
-          name: 'Série de 3 jours',
-          description: 'Vous avez utilisé l\'application 3 jours de suite',
-          image_url: '/badges/streak-3.png',
-          type: 'streak'
+      // In a real app, this would be an API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setState(prev => ({
+        ...prev,
+        challenges: prev.challenges.map(challenge => 
+          challenge.id === id 
+            ? { ...challenge, status: 'completed', progress: challenge.target } 
+            : challenge
+        ),
+        stats: {
+          ...prev.stats,
+          points: prev.stats.points + (prev.challenges.find(c => c.id === id)?.points || 0)
         }
-      ]);
-    } catch (err) {
-      console.error('Error fetching gamification data:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch gamification data'));
-    } finally {
-      setLoading(false);
+      }));
+
+      return true;
+    } catch (error) {
+      return false;
     }
   };
-  
-  useEffect(() => {
-    fetchData();
-  }, [user?.id]);
-  
+
   return {
-    stats,
-    badges,
-    challenges,
-    loading,
-    error,
-    refetch: fetchData
+    ...state,
+    completeChallenge
   };
 };
 

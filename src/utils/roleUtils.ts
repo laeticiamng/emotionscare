@@ -1,48 +1,58 @@
+
 import { UserRole } from '@/types';
 
 /**
- * Checks if the provided role has admin privileges
+ * Check if a role is an admin role
  */
-export const isAdminRole = (role: UserRole): boolean => {
-  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin' || role === 'wellbeing_manager' || role === 'manager';
-};
+export function isAdminRole(role: UserRole): boolean {
+  return ['admin', 'b2b_admin', 'b2b-admin', 'wellbeing_manager', 'manager'].includes(role);
+}
 
 /**
- * Checks if a user has access based on their role
+ * Get a human-readable name for a role
  */
-export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
-  // If admin roles should have access to everything
-  if (isAdminRole(userRole)) return true;
-  // Otherwise check if the user's role is in the allowed roles
-  return allowedRoles.includes(userRole);
-};
+export function getRoleName(role: UserRole): string {
+  const roleNames: Record<string, string> = {
+    'b2c': 'Utilisateur Personnel',
+    'b2b_user': 'Utilisateur Entreprise',
+    'b2b-user': 'Utilisateur Entreprise',
+    'b2b_admin': 'Administrateur Entreprise',
+    'b2b-admin': 'Administrateur Entreprise',
+    'admin': 'Administrateur',
+    'team': 'Équipe',
+    'manager': 'Manager',
+    'wellbeing_manager': 'Responsable Bien-être',
+    'coach': 'Coach',
+    'employee': 'Employé',
+    'user': 'Utilisateur'
+  };
+
+  return roleNames[role] || 'Utilisateur';
+}
 
 /**
- * Get the home path based on user role
+ * Get the home path for a specific role
  */
-export const getRoleHomePath = (role: UserRole): string => {
+export function getRoleHomePath(role: UserRole): string {
   if (isAdminRole(role)) {
     return '/admin/dashboard';
-  } else if (role === 'coach') {
-    return '/coach/dashboard';
-  } else if (role === 'b2b_user' || role === 'b2b-user' || role === 'team') {
-    return '/team/dashboard';
-  } else {
-    return '/dashboard';
   }
-};
+  return '/dashboard';
+}
 
 /**
- * Get the login path based on user role
+ * Get the login path for a specific role
  */
-export const getRoleLoginPath = (role: UserRole): string => {
-  if (isAdminRole(role)) {
+export function getRoleLoginPath(role: UserRole): string {
+  if (role === 'b2b_admin' || role === 'b2b-admin') {
     return '/admin/login';
-  } else if (role === 'coach') {
-    return '/coach/login';
-  } else if (role === 'b2b_user' || role === 'b2b-user' || role === 'team') {
-    return '/team/login';
-  } else {
-    return '/login';
   }
-};
+  return '/login';
+}
+
+/**
+ * Check if a user has access to specific roles
+ */
+export function hasRoleAccess(userRole: UserRole, allowedRoles: UserRole[]): boolean {
+  return allowedRoles.includes(userRole);
+}

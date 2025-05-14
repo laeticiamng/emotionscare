@@ -1,135 +1,142 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, StopCircle } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mic, Square, Loader2 } from 'lucide-react';
 import { EmotionResult, VoiceEmotionScannerProps } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-import { v4 as uuid } from 'uuid';
+import { toast } from 'sonner';
+import useHumeAI from '@/hooks/useHumeAI';
 
-const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onScanComplete }) => {
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
+  onScanComplete
+}) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const { toast } = useToast();
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { analyzeAudio } = useHumeAI();
 
-  // Fonction pour gérer les erreurs d'accès au micro
-  const handleMicrophoneError = (error: any) => {
-    console.error('Microphone access error:', error);
-    toast({
-      title: "Erreur d'accès au micro",
-      description: "Veuillez autoriser l'accès au microphone pour utiliser cette fonctionnalité.",
-      variant: "destructive"
-    });
-  };
-
-  // Fonction pour démarrer l'enregistrement
-  const startRecording = async () => {
+  // Handle starting audio recording
+  const startRecording = useCallback(async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+
+      mediaRecorder.start();
       setIsRecording(true);
       
-      recorder.ondataavailable = (event) => {
-        setAudioBlob(event.data);
-        setAudioUrl(URL.createObjectURL(event.data));
-      };
-      
-      recorder.onstop = () => {
-        stream.getTracks().forEach(track => track.stop());
-      };
-      
-      recorder.start();
-    } catch (error) {
-      handleMicrophoneError(error);
-      setIsRecording(false);
-    }
-  };
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prevTime) => prevTime + 1);
+      }, 1000);
 
-  // Fonction pour arrêter l'enregistrement
-  const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-      setIsRecording(false);
+      toast.info('Enregistrement en cours...');
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      toast.error('Impossible d\'accéder au microphone. Veuillez vérifier les permissions.');
     }
-  };
+  }, []);
 
-  // Fonction pour analyser l'enregistrement
-  const analyzeRecording = async () => {
-    if (!audioBlob) return;
+  // Handle stopping audio recording
+  const stopRecording = useCallback(async () => {
+    if (!mediaRecorderRef.current) return;
+
+    mediaRecorderRef.current.stop();
+    mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     
-    try {
-      // Simuler l'analyse de l'émotion à partir de la voix
-      // Dans une implémentation réelle, ceci enverrait l'audio à une API
-      
-      // Création d'un résultat fictif pour la démonstration
-      const result: EmotionResult = {
-        id: uuid(),
-        date: new Date().toISOString(),
-        emotion: 'calm',
-        confidence: 0.75,
-        transcript: "J'ai l'impression d'être plutôt détendu aujourd'hui.",
-        audio_url: audioUrl || undefined
-      };
-      
-      // Appeler le callback si fourni
-      if (onScanComplete) {
-        onScanComplete(result);
-      }
-      
-      toast({
-        title: "Analyse vocale terminée",
-        description: `Émotion détectée : ${result.emotion}`,
-      });
-    } catch (error) {
-      console.error('Error analyzing voice recording:', error);
-      toast({
-        title: "Erreur d'analyse",
-        description: "Impossible d'analyser votre enregistrement vocal.",
-        variant: "destructive"
-      });
+    // Clear timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
+
+    setIsRecording(false);
+    setIsProcessing(true);
+
+    setTimeout(async () => {
+      if (audioChunksRef.current.length > 0) {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        
+        try {
+          // Generate a unique ID for this scan and use current date
+          const result = await analyzeAudio(audioBlob);
+          
+          if (onScanComplete) {
+            onScanComplete(result);
+          }
+        } catch (error) {
+          console.error('Error analyzing audio:', error);
+          toast.error('Une erreur est survenue lors de l\'analyse audio.');
+        }
+      } else {
+        toast.error('Aucun audio enregistré. Veuillez réessayer.');
+      }
+      setIsProcessing(false);
+      setRecordingTime(0);
+    }, 1000);
+  }, [onScanComplete, analyzeAudio]);
+
+  // Format recording time as MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-center">
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Analyse émotionnelle vocale</CardTitle>
+      </CardHeader>
+      <CardContent className="flex justify-center items-center pb-4">
+        <div className="text-center">
+          <div className="mb-4 text-2xl font-bold">
+            {formatTime(recordingTime)}
+          </div>
+          <div className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
+            isRecording ? 'bg-red-100 animate-pulse' : 'bg-primary/10'
+          }`}>
+            {isProcessing ? (
+              <Loader2 className="h-12 w-12 text-primary animate-spin" />
+            ) : (
+              <Mic className={`h-12 w-12 ${isRecording ? 'text-red-500' : 'text-primary'}`} />
+            )}
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-center">
         {isRecording ? (
-          <Button
-            variant="destructive"
-            onClick={stopRecording}
-            disabled={!isRecording}
+          <Button 
+            variant="destructive" 
+            onClick={stopRecording} 
+            disabled={isProcessing}
+            className="px-8"
           >
-            <StopCircle className="mr-2 h-4 w-4" />
-            Arrêter l'enregistrement
+            <Square className="mr-2 h-4 w-4" />
+            Arrêter
           </Button>
         ) : (
-          <Button
-            variant="outline"
-            onClick={startRecording}
-            disabled={isRecording}
+          <Button 
+            onClick={startRecording} 
+            disabled={isProcessing}
+            className="px-8"
           >
             <Mic className="mr-2 h-4 w-4" />
-            Démarrer l'enregistrement
+            Commencer l'enregistrement
           </Button>
         )}
-      </div>
-      
-      {audioUrl && (
-        <div className="flex justify-center">
-          <audio controls src={audioUrl} />
-        </div>
-      )}
-      
-      {audioBlob && (
-        <div className="flex justify-center">
-          <Button onClick={analyzeRecording}>
-            Analyser l'enregistrement
-          </Button>
-        </div>
-      )}
-    </div>
+      </CardFooter>
+    </Card>
   );
 };
 

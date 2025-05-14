@@ -1,8 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FontFamily, FontSize, ThemeName, ThemeContextType } from '@/types';
+import { FontFamily, FontSize, ThemeName, ThemeContextType } from '@/types/types';
 
-const ThemeContext = createContext<ThemeContextType>({
+export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
   isDarkMode: false,

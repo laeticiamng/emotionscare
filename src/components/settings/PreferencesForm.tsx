@@ -15,18 +15,27 @@ interface PreferencesFormProps {
 }
 
 const preferencesSchema = z.object({
-  theme: z.enum(['light', 'dark', 'pastel']),
+  theme: z.enum(['light', 'dark', 'system', 'pastel']),
   notifications_enabled: z.boolean(),
-  font_size: z.enum(['small', 'medium', 'large']),
+  fontSize: z.enum(['small', 'medium', 'large']),
   language: z.string(),
+  privacy: z.object({
+    profileVisibility: z.enum(['public', 'private', 'team'])
+  }).optional()
 });
 
 const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }) => {
   const [isSaving, setIsSaving] = useState(false);
 
+  // Ensure preferences has the correct structure
+  const defaultValues = {
+    ...preferences,
+    privacy: preferences.privacy || { profileVisibility: 'public' }
+  };
+
   const form = useForm<UserPreferences>({
     resolver: zodResolver(preferencesSchema),
-    defaultValues: preferences,
+    defaultValues,
   });
 
   const handleSubmit = async (data: UserPreferences) => {
@@ -56,6 +65,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
                 <SelectContent>
                   <SelectItem value="light">Clair</SelectItem>
                   <SelectItem value="dark">Sombre</SelectItem>
+                  <SelectItem value="system">Système</SelectItem>
                   <SelectItem value="pastel">Pastel</SelectItem>
                 </SelectContent>
               </Select>
@@ -117,7 +127,35 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
 
         <FormField
           control={form.control}
-          name="notifications"
+          name="privacy.profileVisibility"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Visibilité du profil</FormLabel>
+              <Select 
+                onValueChange={field.onChange} 
+                defaultValue={field.value || 'public'}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner la visibilité" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="public">Public</SelectItem>
+                  <SelectItem value="private">Privé</SelectItem>
+                  <SelectItem value="team">Équipe</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Choisissez qui peut voir votre profil.
+              </FormDescription>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="notifications_enabled"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">

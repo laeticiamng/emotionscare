@@ -1,130 +1,205 @@
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Mic, Square, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mic, Square, AlertCircle } from 'lucide-react';
 import { EmotionResult } from '@/types';
-import { v4 as uuid } from 'uuid';
+import { toast } from 'sonner';
 
 interface VoiceEmotionAnalyzerProps {
-  onEmotionDetected?: (result: EmotionResult) => void;
-  isListening?: boolean;
-  onToggleListening?: () => void;
+  onResult?: (result: EmotionResult) => void;
+  onError?: (error: string) => void;
+  maxDuration?: number; // in seconds
+  autoStart?: boolean;
 }
 
 const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({
-  onEmotionDetected,
-  isListening: externalIsListening,
-  onToggleListening: externalToggleListening
+  onResult,
+  onError,
+  maxDuration = 30,
+  autoStart = false
 }) => {
-  const [isListening, setIsListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState("");
-
-  const toggleListening = () => {
-    if (externalToggleListening) {
-      externalToggleListening();
-      return;
-    }
-
-    if (isProcessing) return;
-
-    const newIsListening = !isListening;
-    setIsListening(newIsListening);
-
-    if (newIsListening) {
-      startListening();
-    } else {
-      stopListening();
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Format time as MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Start recording
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      setError(null);
+      
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          audioChunksRef.current.push(e.data);
+        }
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      // Start timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prevTime) => {
+          // Auto-stop if max duration reached
+          if (prevTime >= maxDuration - 1) {
+            stopRecording();
+            return maxDuration;
+          }
+          return prevTime + 1;
+        });
+      }, 1000);
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      const errorMessage = 'Impossible d\'accéder au microphone. Veuillez vérifier les permissions.';
+      setError(errorMessage);
+      if (onError) onError(errorMessage);
+      toast.error(errorMessage);
     }
   };
-
-  const startListening = () => {
-    setTranscript("");
+  
+  // Stop recording and process audio
+  const stopRecording = () => {
+    if (!mediaRecorderRef.current) return;
     
-    // In a real implementation, this would start recording audio and send to Whisper API
-    console.log('Simulating voice recording start...');
+    mediaRecorderRef.current.stop();
+    mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     
-    // Simulate recording for 5 seconds
-    setTimeout(() => {
-      if (isListening) {
-        stopListening();
-      }
-    }, 5000);
-  };
-
-  const stopListening = () => {
-    setIsListening(false);
+    // Clear timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    setIsRecording(false);
     setIsProcessing(true);
     
-    // In a real implementation, this would stop recording and process the audio
-    console.log('Simulating voice recording stop and processing...');
-    
-    // Simulate processing delay
     setTimeout(() => {
-      const mockTranscript = "Aujourd'hui je me sens plutôt calme et détendu après une bonne journée de travail.";
-      setTranscript(mockTranscript);
+      processAudio();
+    }, 500);
+  };
+  
+  // Process recorded audio
+  const processAudio = () => {
+    if (audioChunksRef.current.length === 0) {
+      const errorMessage = 'Aucun audio enregistré. Veuillez réessayer.';
+      setError(errorMessage);
+      if (onError) onError(errorMessage);
+      toast.error(errorMessage);
+      setIsProcessing(false);
+      return;
+    }
+    
+    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+    
+    // In a real app, you would send this to your API
+    // For demo purposes, we'll simulate the analysis with a timeout
+    setTimeout(() => {
+      const mockResult: EmotionResult = {
+        id: `voice-${Date.now()}`,
+        emotion: 'calm',
+        score: 75,
+        confidence: 0.87,
+        text: 'Transcription would appear here...',
+        timestamp: new Date().toISOString(),
+        date: new Date().toISOString() // Add the required date property
+      };
       
-      // Simulate emotion analysis
-      setTimeout(() => {
-        const emotionResult: EmotionResult = {
-          id: uuid(),
-          date: new Date().toISOString(),
-          emotion: "calm",
-          score: 70,
-          confidence: 0.7,
-          text: mockTranscript,
-          timestamp: new Date().toISOString()
-        };
-        
-        if (onEmotionDetected) {
-          onEmotionDetected(emotionResult);
-        }
-        
-        setIsProcessing(false);
-      }, 1000);
+      if (onResult) onResult(mockResult);
+      setIsProcessing(false);
+      setRecordingTime(0);
     }, 1500);
   };
-
-  // Use either internal or external state for listening status
-  const currentlyListening = externalIsListening !== undefined ? externalIsListening : isListening;
-
+  
+  // Auto-start if enabled
+  useEffect(() => {
+    if (autoStart) {
+      startRecording();
+    }
+    
+    return () => {
+      // Cleanup on unmount
+      if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop();
+        mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      }
+      
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   return (
-    <Card className="p-4">
-      <div className="space-y-4">
-        <div className="flex justify-center p-4">
-          <Button
-            variant={currentlyListening ? "destructive" : "default"}
-            size="lg"
-            className={`h-16 w-16 rounded-full ${currentlyListening ? 'animate-pulse' : ''}`}
-            onClick={toggleListening}
-            disabled={isProcessing}
-          >
-            {isProcessing ? (
-              <Loader2 className="h-8 w-8 animate-spin" />
-            ) : currentlyListening ? (
-              <Square className="h-8 w-8" />
-            ) : (
-              <Mic className="h-8 w-8" />
-            )}
-          </Button>
-        </div>
-        
-        <div className="text-center">
-          {isProcessing ? (
-            <p>Analyse en cours...</p>
-          ) : currentlyListening ? (
-            <p>Parlez maintenant... Exprimez votre ressenti émotionnel</p>
-          ) : transcript ? (
-            <div className="p-3 bg-muted rounded-md">
-              <p className="font-medium mb-1">Transcription:</p>
-              <p className="text-sm text-muted-foreground">{transcript}</p>
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle>Analyse Vocale</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col items-center pb-6">
+        {error ? (
+          <div className="text-center text-red-500 mb-4">
+            <AlertCircle className="h-12 w-12 mx-auto mb-2" />
+            <p>{error}</p>
+          </div>
+        ) : (
+          <>
+            <div className="text-2xl font-bold mb-4">
+              {formatTime(recordingTime)}
             </div>
-          ) : (
-            <p>Cliquez sur le bouton pour commencer l'enregistrement</p>
-          )}
-        </div>
-      </div>
+            <div 
+              className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${
+                isRecording ? 'bg-red-100 animate-pulse' : 'bg-slate-100 dark:bg-slate-800'
+              }`}
+            >
+              <Mic className={`h-12 w-12 ${isRecording ? 'text-red-500' : ''}`} />
+            </div>
+            
+            {isRecording ? (
+              <Button 
+                variant="destructive" 
+                onClick={stopRecording}
+                disabled={isProcessing}
+                className="px-8"
+              >
+                <Square className="mr-2 h-4 w-4" />
+                Arrêter
+              </Button>
+            ) : (
+              <Button 
+                variant="default" 
+                onClick={startRecording}
+                disabled={isProcessing}
+                className="px-8"
+              >
+                <Mic className="mr-2 h-4 w-4" />
+                {isProcessing ? 'Traitement en cours...' : 'Commencer l\'enregistrement'}
+              </Button>
+            )}
+            
+            {isRecording && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Parlez naturellement. Enregistrement automatique jusqu'à {maxDuration} secondes.
+              </p>
+            )}
+          </>
+        )}
+      </CardContent>
     </Card>
   );
 };

@@ -1,80 +1,101 @@
 
-import { v4 as uuid } from 'uuid';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/types';
 
-// Analyze emotion from text input
+/**
+ * Analyzes the emotional content of text
+ */
 export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  // Simulate API call with delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Mock response
-  return {
-    id: uuid(),
-    date: new Date().toISOString(),
-    emotion: 'calm',
-    score: 0.75,
-    confidence: 0.75,
-    text: text,
-    recommendations: ['Take a short break', 'Practice deep breathing']
-  };
+  // In a real app, this would make an API call to an emotion analysis service
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: `text-${Date.now()}`,
+        emotion: 'joy',
+        score: 0.85,
+        confidence: 0.75,
+        text: text,
+        date: new Date().toISOString(),
+        recommendations: [
+          'Continue activities that bring you joy',
+          'Share your positive emotions with others'
+        ]
+      });
+    }, 1000);
+  });
 };
 
-// Save emotion result to database
+/**
+ * Saves an emotion result to the database
+ */
 export const saveEmotion = async (emotion: EmotionResult): Promise<void> => {
-  // Simulate API call with delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  console.log('Emotion saved:', emotion);
+  // In a real app, this would save to a database
+  console.log('Saving emotion:', emotion);
+  return Promise.resolve();
 };
 
-// Create emotion entry
+/**
+ * Creates a new emotion entry
+ */
 export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<EmotionResult> => {
-  // Ensure required fields
-  const emotion: EmotionResult = {
-    id: data.id || uuid(),
-    date: data.date || new Date().toISOString(),
+  // In a real app, this would create a new entry in the database
+  const newEmotion: EmotionResult = {
+    id: `emotion-${Date.now()}`,
     emotion: data.emotion || 'neutral',
     score: data.score || 0.5,
     confidence: data.confidence || 0.5,
+    date: data.date || new Date().toISOString(),
     text: data.text || '',
-    user_id: data.user_id
+    // Add required properties
+    ...data
   };
-  
-  // Simulate API call with delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return emotion;
+
+  console.log('Creating emotion entry:', newEmotion);
+  return Promise.resolve(newEmotion);
 };
 
-// Fetch latest emotion for a user
+/**
+ * Fetches the latest emotion for a user
+ */
 export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
-  // Simulate API call with delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  // Return mock data
-  return {
-    id: uuid(),
-    date: new Date().toISOString(),
-    emotion: 'content',
-    score: 0.82,
-    confidence: 0.85,
-    text: "I'm feeling quite good today",
-    user_id: userId
-  };
+  // In a real app, this would fetch from a database
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: `latest-${Date.now()}`,
+        emotion: 'contentment',
+        score: 0.75,
+        confidence: 0.8,
+        date: new Date().toISOString(),
+        user_id: userId
+      });
+    }, 500);
+  });
 };
 
-// Analyze emotion from audio stream
+/**
+ * Analyzes audio stream to detect emotion
+ */
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // Simulate API call with delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Mock result
-  return {
-    id: uuid(),
-    date: new Date().toISOString(),
-    emotion: 'calm',
-    score: 0.7,
-    confidence: 0.68,
-    transcript: "I feel relaxed and at ease today.",
-    audio_url: URL.createObjectURL(audioBlob)
-  };
+  // In a real app, this would send the audio to an API for analysis
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        id: `audio-${Date.now()}`,
+        emotion: 'calm',
+        score: 0.7,
+        confidence: 0.65,
+        date: new Date().toISOString(),
+        audio_url: URL.createObjectURL(audioBlob),
+        transcript: 'This would be the transcript of what was said.',
+      });
+    }, 1500);
+  });
+};
+
+export default {
+  analyzeEmotion,
+  saveEmotion,
+  createEmotionEntry,
+  fetchLatestEmotion,
+  analyzeAudioStream
 };

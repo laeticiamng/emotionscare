@@ -1,120 +1,83 @@
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import { EmotionResult } from '@/types';
-import { v4 as uuid } from 'uuid';
+import useHumeAI from '@/hooks/useHumeAI';
+import { toast } from 'sonner';
 
 interface TextEmotionScannerProps {
-  text?: string;
-  onTextChange?: (text: string) => void;
-  onResult?: (result: EmotionResult) => void;
-  onAnalyze?: () => void;
-  isAnalyzing?: boolean;
+  onScanComplete?: (result: EmotionResult) => void;
+  initialText?: string;
 }
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
-  text: externalText, 
-  onTextChange: externalOnTextChange,
-  onResult,
-  onAnalyze: externalOnAnalyze,
-  isAnalyzing: externalIsAnalyzing
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
+  onScanComplete,
+  initialText = ''
 }) => {
-  const [internalText, setInternalText] = useState('');
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-  
-  // Determine if we're in controlled or uncontrolled mode
-  const isControlled = typeof externalText !== 'undefined';
-  const text = isControlled ? externalText : internalText;
-  const isAnalyzing = externalIsAnalyzing || isLoading;
+  const [text, setText] = useState(initialText);
+  const [scanning, setScanning] = useState(false);
+  const { analyzeText } = useHumeAI();
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-    if (isControlled && externalOnTextChange) {
-      externalOnTextChange(newText);
-    } else {
-      setInternalText(newText);
-    }
-  };
-
-  const handleAnalyze = async () => {
-    if (!text) {
-      toast({
-        title: "Veuillez entrer du texte",
-        description: "Vous devez entrer du texte pour effectuer une analyse émotionnelle.",
-        variant: "destructive",
-      });
+  const handleScan = useCallback(async () => {
+    if (!text.trim()) {
+      toast.error('Veuillez entrer du texte pour analyser vos émotions.');
       return;
     }
 
-    // If we have an external analyze handler, use it
-    if (externalOnAnalyze) {
-      externalOnAnalyze();
-      return;
-    }
-
-    // Otherwise, do our own analysis
-    setIsLoading(true);
+    setScanning(true);
     try {
-      // Simulate analysis with a mock response
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await analyzeText(text);
       
-      const mockAnalysis: EmotionResult = {
-        id: uuid(),
-        date: new Date().toISOString(),
-        emotion: 'calm',
-        score: 0.75,
-        confidence: 0.75,
-        text: text
-      };
-
-      setResult(mockAnalysis);
-
-      if (onResult) {
-        onResult(mockAnalysis);
+      if (onScanComplete) {
+        onScanComplete(result);
       }
     } catch (error) {
-      console.error("Error analyzing text:", error);
-      toast({
-        title: "Erreur d'analyse",
-        description: "Une erreur s'est produite lors de l'analyse du texte.",
-        variant: "destructive",
-      });
-      setResult(null);
+      console.error('Error analyzing text:', error);
+      toast.error('Une erreur est survenue lors de l\'analyse. Veuillez réessayer.');
     } finally {
-      setIsLoading(false);
+      setScanning(false);
     }
-  };
+  }, [text, analyzeText, onScanComplete]);
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Analyse émotionnelle par texte</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <Textarea
-          placeholder="Entrez votre texte ici..."
+          placeholder="Décrivez comment vous vous sentez en ce moment..."
+          className="min-h-[150px]"
           value={text}
-          onChange={handleTextChange}
-          disabled={isAnalyzing}
+          onChange={(e) => setText(e.target.value)}
+          disabled={scanning}
         />
-        <div className="flex justify-end">
-          <Button onClick={handleAnalyze} disabled={isAnalyzing}>
-            {isAnalyzing ? "Analyse en cours..." : "Analyser"}
-          </Button>
-        </div>
-        {result && (
-          <div className="mt-4">
-            <p>
-              Émotion dominante: {result.emotion} (Confiance: {result.confidence?.toFixed(2)})
-            </p>
-          </div>
-        )}
       </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button
+          variant="outline"
+          onClick={() => setText('')}
+          disabled={scanning || !text}
+        >
+          Effacer
+        </Button>
+        <Button 
+          onClick={handleScan}
+          disabled={scanning || !text.trim()}
+        >
+          {scanning ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            'Analyser mes émotions'
+          )}
+        </Button>
+      </CardFooter>
     </Card>
   );
 };
