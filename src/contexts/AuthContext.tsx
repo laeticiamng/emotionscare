@@ -233,6 +233,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
       updatePassword,
       setUser,
       setPreferences,
+      logout: signOut, // Added for compatibility
+      updateUser: updateProfile, // Added for compatibility
     }}>
       {children}
     </AuthContext.Provider>

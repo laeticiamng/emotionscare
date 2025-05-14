@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Theme, FontFamily, FontSize } from '@/types/types';
 
 // Interface for ThemeContext
-export interface ThemeContextType {
+interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
@@ -93,7 +93,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     switch (size) {
       case 'small': return '0.875rem';
       case 'large': return '1.125rem';
-      case 'extra-large': return '1.25rem';
       default: return '1rem'; // medium
     }
   };
@@ -125,5 +124,5 @@ export const useTheme = (): ThemeContextType => {
   return context;
 };
 
-// Export types
-export type { Theme, FontFamily, FontSize, ThemeContextType };
+// Export the ThemeContext for use-theme.ts
+export { ThemeContext };

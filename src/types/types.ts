@@ -87,7 +87,7 @@ export interface EmotionResult {
   intensity?: number;
   transcript?: string;
   date?: string;
-  emojis?: string[];
+  emojis?: string[] | string;
   ai_feedback?: string;
   recommendations?: string[];
   category?: string;
@@ -98,6 +98,7 @@ export interface EmotionResult {
   source?: string;
   feedback?: string;
   timestamp?: string;
+  name?: string; // Added for compatibility
 }
 
 // Add EnhancedEmotionResult for backward compatibility
@@ -189,6 +190,7 @@ export interface MusicContextType {
   currentTrack: MusicTrack | null;
   playlists: MusicPlaylist[];
   loadPlaylistById: (id: string) => void;
+  currentPlaylist: MusicPlaylist | null;
   
   // Emotion-based recommendation
   currentEmotion: string;
@@ -198,6 +200,8 @@ export interface MusicContextType {
   isMuted: boolean;
   toggleMute: () => void;
   adjustVolume: (value: number) => void;
+  volume: number;
+  setVolume: (volume: number) => void;
   
   // System state
   isInitialized: boolean;
@@ -473,3 +477,31 @@ export type UserPreferencesState = Pick<
   | 'dataCollection'
   | 'aiSuggestions'
 >;
+
+// Gamification types
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  name: string;
+  score: number;
+  avatar?: string;
+  rank: number;
+  change?: number;
+  streak?: number;
+}
+
+export interface GamificationStats {
+  level: number;
+  points: number;
+  badges: Badge[];
+  streaks: {
+    current: number;
+    longest: number;
+    lastActivity: string;
+  };
+  leaderboard: LeaderboardEntry[];
+  nextLevel: number;
+  pointsToNextLevel: number;
+  nextLevelPoints: number;
+  challenges?: any[];
+}

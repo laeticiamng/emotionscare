@@ -19,6 +19,7 @@ const MusicContext = createContext<MusicContextType>({
   currentTrack: null,
   playlists: [],
   loadPlaylistById: () => {},
+  currentPlaylist: null,
   
   // Emotion-based recommendation
   currentEmotion: '',
@@ -28,16 +29,13 @@ const MusicContext = createContext<MusicContextType>({
   isMuted: false,
   toggleMute: () => {},
   adjustVolume: () => {},
+  volume: 0.5,
+  setVolume: () => {},
   
   // System state
   isInitialized: false,
   initializeMusicSystem: () => {},
   isPlaying: false,
-  
-  // Additional properties
-  volume: 0.5,
-  loadPlaylistForEmotion: async () => null,
-  currentPlaylist: null,
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -114,6 +112,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isPlaying,
         isMuted,
         volume,
+        setVolume, // Added for compatibility
         playTrack,
         pauseTrack,
         togglePlay,
@@ -127,7 +126,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         playlists,
         loadPlaylistById,
         loadPlaylistForEmotion,
-        currentPlaylist,
+        currentPlaylist, // Added for compatibility
       }}
     >
       {children}
