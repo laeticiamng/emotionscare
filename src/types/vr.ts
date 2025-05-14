@@ -1,17 +1,26 @@
 
 export interface VRSessionTemplate {
   id: string;
-  title: string;
-  description: string;
+  name?: string;
+  description?: string;
   duration: number;
-  imageUrl?: string;
-  settings?: {
-    environment?: string;
-    music?: string;
-    guidance?: string;
-    intensity?: number;
-  };
+  type?: string;
+  thumbnail?: string;
+  videoUrl?: string;
+  emotion?: string;
+  
+  // Add missing properties that are used
+  title: string;
+  audio_url?: string;
+  emotion_target?: string;
+  lastUsed?: string | Date;
+  preview_url?: string;
+  is_audio_only?: boolean;
+  benefits?: string[];
+  difficulty?: string;
+  theme?: string;
   tags?: string[];
+  imageUrl?: string;
 }
 
 export interface VRSession {
@@ -22,27 +31,41 @@ export interface VRSession {
   endTime?: string;
   duration: number;
   completed: boolean;
-  feedback?: {
-    rating: number;
-    comments?: string;
-    emotionBefore?: string;
-    emotionAfter?: string;
-  };
-  settings?: {
-    environment: string;
-    music?: string;
-    guidance?: boolean;
-    intensity?: number;
-  };
+  emotionBefore?: string;
+  emotionAfter?: string;
+  notes?: string;
+  rating?: number;
+  
+  // Add missing properties that are used
+  date?: string;
+  startedAt?: string;
+  duration_seconds?: number;
+  is_audio_only?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  isCompleted?: boolean;
 }
 
 export interface VRHistoryListProps {
-  sessions: VRSession[];
-  onSessionSelect?: (session: VRSession) => void;
+  templates?: VRSessionTemplate[];
+  sessions?: VRSession[];
+  onSelectTemplate?: (template: VRSessionTemplate) => void;
+  onSelectSession?: (session: VRSession) => void;
+  loading?: boolean;
 }
 
 export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
+  template?: VRSessionTemplate;
   onComplete?: (sessionData: VRSession) => void;
   onExit?: () => void;
+  
+  // Add missing properties
+  session?: VRSession;
+  onSessionComplete?: () => void;
+  isAudioOnly?: boolean;
+  videoUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
+  sessionId?: string;
+  templateId?: string;
 }

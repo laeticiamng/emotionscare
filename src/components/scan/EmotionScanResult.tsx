@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { saveEmotion } from '@/lib/scanService';
 import { Emotion, EmotionResult } from '@/types';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 interface EmotionScanResultProps {
   result: EmotionResult | null;

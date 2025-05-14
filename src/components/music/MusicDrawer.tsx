@@ -12,18 +12,22 @@ import { X } from 'lucide-react';
 import { MusicDrawerProps } from '@/types/music';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
-  open, 
+  isOpen, 
+  open,
   onClose,
   onOpenChange,
   playlist, 
 }) => {
+  // Use isOpen or open prop for backward compatibility
+  const isDrawerOpen = isOpen || open;
+  
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={isDrawerOpen} onOpenChange={onOpenChange}>
       <DrawerContent className="h-[85vh]">
         <DrawerHeader className="border-b">
           <div className="flex justify-between items-center">
             <DrawerTitle>
-              {playlist ? playlist.name : 'Bibliothèque musicale'}
+              {playlist ? (playlist.name || playlist.title) : 'Bibliothèque musicale'}
             </DrawerTitle>
             <DrawerClose asChild>
               <Button variant="ghost" size="icon" onClick={onClose}>
@@ -39,11 +43,11 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
               {playlist.coverUrl && (
                 <img 
                   src={playlist.coverUrl} 
-                  alt={playlist.name} 
+                  alt={playlist.name || playlist.title} 
                   className="w-32 h-32 rounded-lg mb-2 object-cover"
                 />
               )}
-              <h3 className="text-lg font-medium">{playlist.name}</h3>
+              <h3 className="text-lg font-medium">{playlist.name || playlist.title}</h3>
               <p className="text-sm text-muted-foreground">{playlist.description}</p>
             </div>
           )}
@@ -55,7 +59,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                 className="flex items-center p-2 hover:bg-secondary rounded-lg cursor-pointer"
               >
                 <img 
-                  src={track.coverUrl || '/images/music/default-cover.jpg'} 
+                  src={track.coverUrl || track.cover || '/images/music/default-cover.jpg'} 
                   alt={track.title}
                   className="h-10 w-10 rounded object-cover mr-3"
                 />

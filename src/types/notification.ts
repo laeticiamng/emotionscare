@@ -39,4 +39,6 @@ export interface NotificationPreference {
     push: boolean;
     inApp: boolean;
   };
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
 }

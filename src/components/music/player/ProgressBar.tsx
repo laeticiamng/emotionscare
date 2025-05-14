@@ -1,77 +1,72 @@
 
-import React, { useState } from 'react';
-import { ProgressBarProps } from '@/types/music';
-import { formatDuration } from '@/utils/formatters';
+import React from 'react';
+import { Progress } from '@/components/ui/progress';
+import { ProgressBarProps } from '@/types/progress-bar';
 
-// Default format time function
+// Default time formatter
 const defaultFormatTime = (seconds: number): string => {
-  return formatDuration(seconds);
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
-  currentTime,
-  duration,
+  value,
+  max = 100,
+  onChange,
+  formatTime = defaultFormatTime,
+  currentTime = 0,
+  duration = 0,
   onSeek,
   className = '',
   showTimestamps = true,
-  formatTime = defaultFormatTime,
+  handleProgressClick,
+  progress,
+  variant = 'default',
+  showLabel = false
 }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragPosition, setDragPosition] = useState<number | null>(null);
+  // Use either value or progress for backward compatibility
+  const progressValue = progress !== undefined ? progress : value;
   
-  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const displayPosition = isDragging && dragPosition !== null ? dragPosition : progressPercentage;
-  
-  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const clickPositionX = e.clientX - rect.left;
-    const progressBarWidth = rect.width;
-    const clickPercentage = (clickPositionX / progressBarWidth) * 100;
-    const newTime = (clickPercentage / 100) * duration;
-    
-    onSeek(newTime);
+  // Handle seeking
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (handleProgressClick) {
+      handleProgressClick(e);
+      return;
+    }
+
+    if (onSeek) {
+      const container = e.currentTarget;
+      const rect = container.getBoundingClientRect();
+      const position = (e.clientX - rect.left) / rect.width;
+      const seekTime = position * duration;
+      onSeek(seekTime);
+    } else if (onChange) {
+      const container = e.currentTarget;
+      const rect = container.getBoundingClientRect();
+      const position = (e.clientX - rect.left) / rect.width;
+      const newValue = position * max;
+      onChange(newValue);
+    }
   };
-  
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    
-    const rect = e.currentTarget.getBoundingClientRect();
-    const mousePositionX = e.clientX - rect.left;
-    const progressBarWidth = rect.width;
-    const percentage = (mousePositionX / progressBarWidth) * 100;
-    
-    setDragPosition(Math.max(0, Math.min(100, percentage)));
-  };
-  
-  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging || dragPosition === null) return;
-    
-    const newTime = (dragPosition / 100) * duration;
-    onSeek(newTime);
-    setIsDragging(false);
-    setDragPosition(null);
-  };
-  
+
   return (
     <div className={`space-y-1 ${className}`}>
       <div 
-        className="h-1 bg-muted relative rounded-full cursor-pointer"
-        onClick={handleProgressClick}
-        onMouseDown={() => setIsDragging(true)}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={() => isDragging && setIsDragging(false)}
+        className="relative w-full h-2 cursor-pointer"
+        onClick={handleClick}
       >
-        <div 
-          className="absolute top-0 left-0 h-full bg-primary rounded-full"
-          style={{ width: `${displayPosition}%` }}
+        <Progress 
+          value={progressValue} 
+          max={max} 
+          className="h-2"
         />
       </div>
       
       {showTimestamps && (
         <div className="flex justify-between text-xs text-muted-foreground">
-          <div>{formatTime(currentTime)}</div>
-          <div>{formatTime(duration)}</div>
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
         </div>
       )}
     </div>

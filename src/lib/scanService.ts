@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Emotion, EmotionResult } from '@/types/emotion';
 
@@ -88,6 +89,7 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<{
   text?: string;
   feedback?: string;
   recommendations?: string[];
+  intensity?: number;
 }> => {
   try {
     // For development, just return mock data
@@ -97,6 +99,7 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<{
       transcript: 'This is a simulated transcript from audio analysis.',
       id: 'mock-id',
       score: 70,
+      intensity: 65,
       text: 'This is a simulated transcript from audio analysis.',
       feedback: 'You seem calm and collected.',
       recommendations: ['Take a moment to appreciate this calm state', 'Practice mindfulness']
@@ -155,8 +158,10 @@ export const analyzeEmotion = async (data: string | {
       id: 'generated-id-' + Date.now(),
       emotion: 'calm',
       score: 70,
+      intensity: 65,
       confidence: 0.8,
       timestamp: new Date().toISOString(),
+      date: new Date().toISOString(),
       feedback: "Vous semblez calme et équilibré. C'est un excellent état pour prendre des décisions réfléchies.",
       recommendations: [
         "Profitez de cette clarté mentale pour planifier votre journée",
@@ -178,8 +183,10 @@ export const analyzeEmotion = async (data: string | {
     return {
       emotion: 'neutral',
       score: 50,
+      intensity: 50,
       confidence: 0.5,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      date: new Date().toISOString()
     };
   }
 };
@@ -197,7 +204,7 @@ export const saveEmotion = async (emotion: Emotion): Promise<void> => {
         user_id: emotion.user_id,
         date: new Date().toISOString(),
         score: emotion.score || emotion.intensity || 5,
-        emojis: '',
+        emojis: emotion.emojis || '',
         text: emotion.text || '',
         ai_feedback: emotion.ai_feedback || ''
       });

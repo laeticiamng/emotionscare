@@ -12,4 +12,5 @@ export interface ProgressBarProps {
   formatTime?: (seconds: number) => string;
   handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   showTimestamps?: boolean;
+  onChange?: (value: number) => void;
 }

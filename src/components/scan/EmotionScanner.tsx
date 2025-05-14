@@ -1,12 +1,16 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import TextEmotionScanner from './TextEmotionScanner';
-import EmojiEmotionScanner from './EmojiEmotionScanner';
-import AudioEmotionScanner from './AudioEmotionScanner';
-import FacialEmotionScanner from './FacialEmotionScanner';
-import { MessageSquare, Smile, Mic, Webcam } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mic, Camera, HelpCircle, ArrowRight } from 'lucide-react';
+import { Label } from '@/components/ui/label';
 import { EmotionResult } from '@/types/emotion';
+import FacialEmotionScanner from './FacialEmotionScanner';
+import VoiceEmotionScanner from './VoiceEmotionScanner';
+import EmojiPicker from './EmojiPicker';
+import { useToast } from '@/hooks/use-toast';
 
 interface EmotionScannerProps {
   text: string;
@@ -17,6 +21,7 @@ interface EmotionScannerProps {
   onAudioChange: (url: string | null) => void;
   onAnalyze: () => void;
   isAnalyzing: boolean;
+  onEmotionDetected?: (result: EmotionResult) => void;
 }
 
 const EmotionScanner: React.FC<EmotionScannerProps> = ({
@@ -27,124 +32,129 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
   onEmojiChange,
   onAudioChange,
   onAnalyze,
-  isAnalyzing
+  isAnalyzing,
+  onEmotionDetected
 }) => {
-  const [activeTab, setActiveTab] = useState<string>("text");
-  
-  const handleFacialEmotionDetected = (emotion: EmotionResult) => {
-    if (emotion.dominantEmotion) {
-      // Map the emotion to relevant emoji
-      const emotionToEmoji: Record<string, string> = {
-        'happy': '😊',
-        'sad': '😔',
-        'angry': '😠',
-        'fearful': '😨',
-        'surprised': '😲',
-        'disgusted': '🤢',
-        'neutral': '😐',
-        'calm': '😌',
-        'anxious': '😰',
-        'stressed': '😩',
-        'tired': '😴',
-        'bored': '🥱'
-      };
-      
-      const emoji = emotionToEmoji[emotion.dominantEmotion] || '😐';
-      
-      // Add the emoji to our emojis
-      if (!emojis.includes(emoji)) {
-        onEmojiChange(emojis + emoji);
-      }
-      
-      // Add a simple text description if text field is empty
-      if (!text) {
-        const emotionTexts: Record<string, string> = {
-          'happy': "Je me sens heureux aujourd'hui.",
-          'sad': "Je ressens de la tristesse.",
-          'angry': "Je suis en colère.",
-          'fearful': "J'ai peur en ce moment.",
-          'surprised': "Je suis surpris.",
-          'disgusted': "Je suis dégoûté.",
-          'neutral': "Je me sens neutre.",
-          'calm': "Je me sens calme et serein.",
-          'anxious': "Je ressens de l'anxiété.",
-          'stressed': "Je me sens stressé.",
-          'tired': "Je me sens fatigué.",
-          'bored': "Je m'ennuie."
-        };
-        
-        onTextChange(emotionTexts[emotion.dominantEmotion] || "Je ressens des émotions que j'ai du mal à décrire.");
-      }
+  const [activeTab, setActiveTab] = useState('text');
+  const [facialResult, setFacialResult] = useState<EmotionResult | null>(null);
+  const [voiceResult, setVoiceResult] = useState<EmotionResult | null>(null);
+  const { toast } = useToast();
+
+  const handleEmojiSelect = (emoji: string) => {
+    onEmojiChange(emojis + emoji);
+  };
+
+  const handleClearEmojis = () => {
+    onEmojiChange('');
+  };
+
+  const handleFacialScanComplete = (result: EmotionResult) => {
+    setFacialResult(result);
+    if (onEmotionDetected) {
+      onEmotionDetected(result);
+    }
+    
+    toast({
+      title: "Scan facial complété",
+      description: `Émotion détectée : ${result.emotion || 'inconnue'}`,
+    });
+  };
+
+  const handleVoiceScanComplete = (result: EmotionResult) => {
+    setVoiceResult(result);
+    onAudioChange(result.audio_url || null);
+    
+    if (onEmotionDetected) {
+      onEmotionDetected(result);
+    }
+    
+    toast({
+      title: "Analyse vocale complétée",
+      description: `Émotion détectée : ${result.emotion || 'inconnue'}`,
+    });
+  };
+
+  const isTabValid = () => {
+    switch (activeTab) {
+      case 'text':
+        return text.trim().length > 0;
+      case 'voice':
+        return audioUrl !== null || voiceResult !== null;
+      case 'face':
+        return facialResult !== null;
+      default:
+        return false;
     }
   };
-  
-  // Create placeholder components if they don't exist
-  const EmojiEmotionScannerComponent = EmojiEmotionScanner || ((props: any) => (
-    <div className="p-4 text-center">
-      <p>Composant d'analyse par emoji en développement</p>
-    </div>
-  ));
-  
-  const AudioEmotionScannerComponent = AudioEmotionScanner || ((props: any) => (
-    <div className="p-4 text-center">
-      <p>Composant d'analyse vocale en développement</p>
-    </div>
-  ));
-  
+
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid grid-cols-4 mb-6">
-        <TabsTrigger value="text" className="flex flex-col py-2 px-1 h-auto items-center">
-          <MessageSquare className="h-4 w-4 mb-1" />
-          <span className="text-xs">Texte</span>
-        </TabsTrigger>
-        <TabsTrigger value="emoji" className="flex flex-col py-2 px-1 h-auto items-center">
-          <Smile className="h-4 w-4 mb-1" />
-          <span className="text-xs">Emoji</span>
-        </TabsTrigger>
-        <TabsTrigger value="audio" className="flex flex-col py-2 px-1 h-auto items-center">
-          <Mic className="h-4 w-4 mb-1" />
-          <span className="text-xs">Audio</span>
-        </TabsTrigger>
-        <TabsTrigger value="facial" className="flex flex-col py-2 px-1 h-auto items-center">
-          <Webcam className="h-4 w-4 mb-1" />
-          <span className="text-xs">Facial</span>
-        </TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="text">
-        <TextEmotionScanner 
-          text={text}
-          onTextChange={onTextChange}
-          onAnalyze={onAnalyze}
-          isAnalyzing={isAnalyzing}
-        />
-      </TabsContent>
-      
-      <TabsContent value="emoji">
-        <EmojiEmotionScannerComponent 
-          emojis={emojis}
-          onEmojiChange={onEmojiChange}
-          onAnalyze={onAnalyze}
-          isAnalyzing={isAnalyzing}
-        />
-      </TabsContent>
-      
-      <TabsContent value="audio">
-        <AudioEmotionScannerComponent 
-          audioUrl={audioUrl}
-          onAudioChange={onAudioChange}
-          onAnalyze={onAnalyze}
-          isAnalyzing={isAnalyzing}
-        />
-      </TabsContent>
-      
-      <TabsContent value="facial">
-        <FacialEmotionScanner 
-          onEmotionDetected={handleFacialEmotionDetected}
-        />
-      </TabsContent>
-    </Tabs>
+    <Card>
+      <CardHeader>
+        <CardTitle>Scanner mon émotion</CardTitle>
+        <CardDescription>
+          Choisissez la méthode qui vous convient le mieux
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="text" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="text">Texte</TabsTrigger>
+            <TabsTrigger value="voice">Voix</TabsTrigger>
+            <TabsTrigger value="face">Expression</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="text" className="space-y-4">
+            <div className="space-y-2">
+              <Label>Décrivez ce que vous ressentez</Label>
+              <Textarea
+                placeholder="Je me sens..."
+                value={text}
+                onChange={(e) => onTextChange(e.target.value)}
+                rows={4}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label>Exprimez-vous avec des emojis</Label>
+                {emojis && (
+                  <Button variant="ghost" size="sm" onClick={handleClearEmojis}>
+                    Effacer
+                  </Button>
+                )}
+              </div>
+              <div className="bg-muted/30 p-3 rounded-md min-h-[40px] text-lg">
+                {emojis || <span className="text-muted-foreground text-sm">Cliquez ci-dessous pour ajouter des emojis</span>}
+              </div>
+              <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="voice">
+            <VoiceEmotionScanner onScanComplete={handleVoiceScanComplete} />
+          </TabsContent>
+
+          <TabsContent value="face">
+            <FacialEmotionScanner onScanComplete={handleFacialScanComplete} />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <HelpCircle className="h-4 w-4" />
+          <span>Aide</span>
+        </Button>
+        
+        <Button 
+          onClick={onAnalyze}
+          disabled={!isTabValid() || isAnalyzing}
+          className="flex items-center gap-1"
+        >
+          <span>Analyser</span>
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

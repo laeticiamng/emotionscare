@@ -1,159 +1,101 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionalTeamViewProps } from '@/types/emotion';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Users, TrendingUp, BarChart } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate } from 'react-router-dom';
+import { RefreshCw } from 'lucide-react';
+import { EmotionalTeamViewProps } from '@/types/emotion';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
-  userId, 
-  period, 
-  teamId, 
-  className,
-  onRefresh 
+  teamId,
+  period = 'week',
+  userId,
+  className = '',
+  dateRange,
+  onRefresh
 }) => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState(period);
+  const [teamData, setTeamData] = useState<any[]>([]);
 
-  // Simulation de données pour la démo
-  const teamMoodScore = 7.2; // Score sur 10
-  const teamMoodTrend = +0.5; // +0.5 points par rapport à la période précédente
-  const dominantEmotion = 'satisfaction';
+  useEffect(() => {
+    loadTeamData();
+  }, [teamId, selectedPeriod, dateRange]);
 
-  const handleRefresh = async () => {
-    if (onRefresh) {
-      setLoading(true);
-      try {
-        await onRefresh();
-      } finally {
-        setLoading(false);
-      }
+  const loadTeamData = async () => {
+    setIsLoading(true);
+    try {
+      // Here you would fetch real data
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock data for demonstration
+      setTeamData([
+        { id: 1, name: 'Alice', dominantEmotion: 'joy', averageIntensity: 78 },
+        { id: 2, name: 'Bob', dominantEmotion: 'calm', averageIntensity: 65 },
+        { id: 3, name: 'Charlie', dominantEmotion: 'stress', averageIntensity: 82 },
+        { id: 4, name: 'Diana', dominantEmotion: 'focus', averageIntensity: 71 }
+      ]);
+    } catch (error) {
+      console.error('Error loading team data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Simuler des données de l'équipe
-  const teamEmotions = [
-    { emotion: 'satisfaction', percentage: 40 },
-    { emotion: 'calme', percentage: 25 },
-    { emotion: 'concentration', percentage: 15 },
-    { emotion: 'stress', percentage: 10 },
-    { emotion: 'inquiétude', percentage: 10 }
-  ];
-
-  // Indicateurs d'équipe simulés
-  const teamIndicators = [
-    { name: 'Cohésion', score: 8.3, trend: +0.2 },
-    { name: 'Engagement', score: 7.5, trend: -0.1 },
-    { name: 'Communication', score: 6.8, trend: +0.4 },
-    { name: 'Bien-être', score: 7.9, trend: +0.3 }
-  ];
+  const handleRefresh = () => {
+    loadTeamData();
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
 
   return (
     <Card className={className}>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          État émotionnel de l'équipe
-        </CardTitle>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleRefresh} 
-          disabled={loading}
-        >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-        </Button>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-xl">État émotionnel de l'équipe</CardTitle>
+        <div className="flex items-center gap-2">
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Période" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Jour</SelectItem>
+              <SelectItem value="week">Semaine</SelectItem>
+              <SelectItem value="month">Mois</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="icon" onClick={handleRefresh}>
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-            <TabsTrigger value="details">Détails</TabsTrigger>
-          </TabsList>
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="flex justify-center py-8">
+              <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            teamData.map(member => (
+              <div key={member.id} className="flex items-center justify-between border-b pb-2">
+                <div>
+                  <p className="font-medium">{member.name}</p>
+                  <p className="text-sm text-muted-foreground capitalize">{member.dominantEmotion}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">{member.averageIntensity}%</p>
+                  <p className="text-sm text-muted-foreground">Intensité</p>
+                </div>
+              </div>
+            ))
+          )}
           
-          <TabsContent value="overview" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-muted-foreground">Humeur d'équipe</div>
-                <div className="text-3xl font-bold mt-1">{teamMoodScore.toFixed(1)}/10</div>
-                <div className="flex items-center mt-1 text-sm">
-                  <TrendingUp className={`h-3 w-3 mr-1 ${teamMoodTrend >= 0 ? 'text-green-500' : 'text-red-500'}`} />
-                  <span className={teamMoodTrend >= 0 ? 'text-green-500' : 'text-red-500'}>
-                    {teamMoodTrend >= 0 ? '+' : ''}{teamMoodTrend} pts
-                  </span>
-                </div>
-              </div>
-              
-              <div className="text-right">
-                <div className="text-sm text-muted-foreground">Émotion dominante</div>
-                <div className="mt-1">
-                  <Badge variant="secondary" className="font-medium capitalize">
-                    {dominantEmotion}
-                  </Badge>
-                </div>
-                <div className="text-sm text-muted-foreground mt-2">
-                  Période: {period || '7 jours'}
-                </div>
-              </div>
+          {!isLoading && teamData.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              Aucune donnée disponible pour cette période
             </div>
-            
-            <div className="mt-4">
-              <div className="text-sm font-medium mb-2">Répartition des émotions</div>
-              <div className="space-y-2">
-                {teamEmotions.map((item) => (
-                  <div key={item.emotion} className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="capitalize">{item.emotion}</span>
-                      <span>{item.percentage}%</span>
-                    </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div 
-                        className="bg-primary rounded-full h-2" 
-                        style={{ width: `${item.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="details">
-            <div className="space-y-4">
-              <div className="text-sm font-medium">Indicateurs d'équipe</div>
-              <div className="grid grid-cols-2 gap-3">
-                {teamIndicators.map((indicator) => (
-                  <Card key={indicator.name} className="overflow-hidden">
-                    <CardContent className="p-3">
-                      <div className="text-xs text-muted-foreground">{indicator.name}</div>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="font-semibold">{indicator.score.toFixed(1)}</span>
-                        <span className={`text-xs ${indicator.trend >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                          {indicator.trend >= 0 ? '+' : ''}{indicator.trend}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-              
-              <div className="flex justify-center mt-6">
-                <Button 
-                  variant="outline"
-                  className="text-sm"
-                  onClick={() => navigate('/admin/teams/report')}
-                >
-                  <BarChart className="h-4 w-4 mr-2" />
-                  Voir rapport détaillé
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

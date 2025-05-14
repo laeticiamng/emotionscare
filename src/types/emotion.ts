@@ -1,9 +1,9 @@
 
 export interface Emotion {
   id: string;
-  name: string;
-  intensity: number;
-  date: string | Date;
+  name?: string;
+  intensity?: number;
+  date?: string | Date;
   notes?: string;
   color?: string;
   anxiety?: number;
@@ -25,6 +25,10 @@ export interface Emotion {
   recommendations?: string[];
   timestamp?: string;
   feedback?: string;
+  emojis?: string;
+  audio_url?: string;
+  category?: string;
+  transcript?: string;
 }
 
 export interface EmotionEntry {
@@ -97,6 +101,10 @@ export interface EmotionResult {
   ai_feedback?: string;
   recommendations?: string[];
   user_id?: string;
+  date?: string;
+  intensity?: number;
+  transcript?: string;
+  category?: string;
 }
 
 export interface EmotionScanResult extends EmotionResult {
@@ -110,4 +118,8 @@ export interface EmotionScanResult extends EmotionResult {
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
+  userId?: string;
+  className?: string;
+  dateRange?: { start: Date; end: Date };
+  onRefresh?: () => void;
 }

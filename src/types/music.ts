@@ -20,6 +20,7 @@ export interface MusicTrack {
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
   description?: string;
   tracks: MusicTrack[];
   coverUrl?: string;
@@ -52,16 +53,33 @@ export interface MusicContextType {
 
 export interface MusicDrawerProps {
   isOpen: boolean;
+  open?: boolean;
   onClose: () => void;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack;
 }
 
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration?: number;
-  url?: string;
+export interface TrackInfoProps {
+  track?: MusicTrack;
+  className?: string;
+  compact?: boolean;
+  title?: string;
+  artist?: string;
   coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onChange: (value: number) => void;
+  onVolumeChange?: (value: number) => void;
+  showLabel?: boolean;
+  className?: string;
 }
 
 export interface ProgressBarProps {
@@ -69,14 +87,13 @@ export interface ProgressBarProps {
   max: number;
   onChange?: (value: number) => void;
   formatTime?: (seconds: number) => string;
-}
-
-export interface TrackInfoProps {
-  track: MusicTrack;
-  isPlaying?: boolean;
-}
-
-export interface VolumeControlProps {
-  volume: number;
-  onChange: (value: number) => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
+  className?: string;
+  showTimestamps?: boolean;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  progress?: number;
+  variant?: 'default' | 'success' | 'warning' | 'danger';
+  showLabel?: boolean;
 }
