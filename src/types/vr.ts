@@ -6,6 +6,7 @@ export interface VRSessionTemplate {
   thumbnailUrl?: string;
   duration?: number;
   emotion?: string;
+  emotions?: string[];
   type?: string;
   category?: string;
   authorId?: string;
@@ -14,6 +15,19 @@ export interface VRSessionTemplate {
   isPublic?: boolean;
   usageCount?: number;
   rating?: number;
+  
+  // Additional properties needed by VR components
+  title?: string;
+  theme?: string;
+  audio_url?: string;
+  preview_url?: string;
+  is_audio_only?: boolean;
+  emotion_target?: string;
+  benefits?: string[];
+  difficulty?: string;
+  lastUsed?: string | Date;
+  completion_rate?: number;
+  recommended_mood?: string;
 }
 
 export interface VRSession {
@@ -29,6 +43,20 @@ export interface VRSession {
   };
   feedback?: string;
   isCompleted?: boolean;
+  
+  // Additional properties for backwards compatibility
+  user_id?: string;
+  template_id?: string;
+  startedAt?: string | Date;
+  date?: string | Date;
+  duration_seconds?: number;
+  completed?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  is_audio_only?: boolean;
+  template?: VRSessionTemplate;
+  emotion_before?: string;
+  emotion_after?: string;
 }
 
 export interface VRHistoryListProps {
@@ -43,4 +71,14 @@ export interface VRSessionWithMusicProps {
   templateId?: string;
   onComplete?: () => void;
   onCancel?: () => void;
+  
+  // Additional properties needed by components
+  template?: VRSessionTemplate;
+  session?: VRSession;
+  onSessionComplete?: () => void;
+  isAudioOnly?: boolean;
+  videoUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
 }
+

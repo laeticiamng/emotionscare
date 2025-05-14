@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -157,6 +157,7 @@ const MusicCreator: React.FC = () => {
             artist: 'TopMedia AI',
             duration: 180, // Default duration
             url: status.url,
+            audioUrl: status.url,
             coverUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
             emotion: selectedEmotion || undefined
           };

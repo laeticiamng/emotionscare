@@ -1,17 +1,16 @@
 
 import React from 'react';
-import { Play, Pause, Music } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { MusicTrack } from '@/types/music';
+import { Play, Pause } from 'lucide-react';
 
-interface TrackListProps {
+export interface TrackListProps {
   tracks: MusicTrack[];
   onTrackSelect: (track: MusicTrack) => void;
-  onPlayPause?: () => void;
+  onPlayPause: (track: MusicTrack) => void;
   currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
-  showEmotionTag?: boolean;
   compact?: boolean;
+  onPlay?: (track: MusicTrack) => void;
 }
 
 const TrackList: React.FC<TrackListProps> = ({
@@ -19,79 +18,83 @@ const TrackList: React.FC<TrackListProps> = ({
   onTrackSelect,
   onPlayPause,
   currentTrack,
-  isPlaying = false,
-  showEmotionTag = false,
+  isPlaying,
   compact = false,
+  onPlay
 }) => {
+  const handlePlay = (track: MusicTrack) => {
+    if (onPlay) {
+      onPlay(track);
+    } else {
+      onPlayPause(track);
+    }
+  };
+
   return (
-    <div className="space-y-2">
+    <div className={`space-y-1 ${compact ? 'text-sm' : ''}`}>
       {tracks.map((track) => {
-        const isActive = currentTrack?.id === track.id;
+        const isActive = currentTrack && currentTrack.id === track.id;
         
         return (
           <div
             key={track.id}
-            className={`flex items-center gap-3 p-2 rounded-md ${
-              isActive ? 'bg-muted' : 'hover:bg-muted/50'
+            className={`flex items-center p-2 rounded-md ${
+              isActive ? 'bg-primary/10' : 'hover:bg-secondary/80'
             } cursor-pointer transition-colors`}
             onClick={() => onTrackSelect(track)}
           >
-            <div className="relative h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-primary/10">
-              <img
-                src={track.coverUrl || track.cover_url || '/images/music/default-cover.jpg'}
-                alt={track.title}
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
-                }}
-              />
-              
-              {isActive && (
-                <div
-                  className="absolute inset-0 flex items-center justify-center bg-black/30"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (onPlayPause) onPlayPause();
-                  }}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-5 w-5 text-white" />
-                  ) : (
-                    <Play className="h-5 w-5 text-white" />
-                  )}
-                </div>
-              )}
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{track.title}</p>
-              <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-            </div>
-            
-            {showEmotionTag && track.emotion && !compact && (
-              <div className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">
-                {track.emotion}
-              </div>
-            )}
-            
-            {!isActive && compact && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
+            <div className="mr-3">
+              <button
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  isActive ? 'bg-primary text-white' : 'bg-muted hover:bg-primary/20'
+                }`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onTrackSelect(track);
+                  handlePlay(track);
                 }}
               >
-                <Play className="h-4 w-4" />
-              </Button>
+                {isActive && isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            
+            {!compact && track.coverUrl && (
+              <img
+                src={track.coverUrl}
+                alt={track.title}
+                className="w-10 h-10 rounded object-cover mr-3"
+              />
+            )}
+            
+            <div className="flex-grow min-w-0">
+              <p className={`font-medium truncate ${isActive ? 'text-primary' : ''}`}>
+                {track.title}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {track.artist}
+              </p>
+            </div>
+            
+            {!compact && (
+              <div className="text-xs text-muted-foreground ml-2">
+                {formatDuration(track.duration)}
+              </div>
             )}
           </div>
         );
       })}
     </div>
   );
+};
+
+// Helper function to format duration in seconds to MM:SS
+const formatDuration = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
 export default TrackList;

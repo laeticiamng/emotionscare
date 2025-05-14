@@ -1,63 +1,84 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Smile, Meh, Frown } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Emotion } from '@/types';
 
 interface EnhancedEmotionAnalysisProps {
-  emotion?: string | { emotion: string; score: number };
-  onAction?: (action: string) => void;
-  showHistory?: boolean;
+  emotion: string | Emotion;
+  score?: number;
+  confidence?: number;
+  triggers?: string[];
+  recommendations?: string[];
 }
 
-const EnhancedEmotionAnalysis = ({ emotion, onAction, showHistory }: EnhancedEmotionAnalysisProps) => {
-  const getEmotionIcon = (emotion: string) => {
-    switch (emotion) {
-      case 'joy': return <Smile className="h-4 w-4 mr-2 text-yellow-500" />;
-      case 'sadness': return <Frown className="h-4 w-4 mr-2 text-blue-500" />;
-      case 'neutral': return <Meh className="h-4 w-4 mr-2 text-gray-500" />;
-      default: return null;
-    }
-  };
-
-  const renderEmotionCard = () => {
-    if (!emotion) return null;
-    
-    // Handle both string and object emotion types
-    const emotionName = typeof emotion === 'string' ? emotion : emotion.emotion;
-    const emotionLabel = emotionName.charAt(0).toUpperCase() + emotionName.slice(1);
-    
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            {getEmotionIcon(emotionName)}
-            {emotionLabel}
-          </CardTitle>
-          <CardDescription>Analyse émotionnelle</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Badge variant="secondary">Emotion détectée</Badge>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Nous avons détecté que vous ressentez principalement de l'émotion {emotionName}.
-          </p>
-          <div className="mt-4 space-x-2">
-            <Button size="sm" onClick={() => onAction && onAction('meditation')}>
-              Lancer une méditation
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => onAction && onAction('journal')}>
-              Ecrire dans mon journal
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
+const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
+  emotion,
+  score,
+  confidence,
+  triggers = [],
+  recommendations = []
+}) => {
+  // Handle emotion being either a string or an Emotion object
+  const emotionName = typeof emotion === 'string' ? emotion : emotion.emotion || 'unknown';
+  const emotionScore = score || (typeof emotion !== 'string' ? emotion.score : 0);
+  const confidenceValue = confidence || (typeof emotion !== 'string' && emotion.confidence ? emotion.confidence : 0.8);
+  
   return (
-    <div>
-      {renderEmotionCard()}
-    </div>
+    <Card className="overflow-hidden">
+      <CardContent className="p-6">
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold mb-2">Analyse émotionnelle</h2>
+          <p className="text-muted-foreground">
+            Votre état émotionnel actuel est principalement:
+          </p>
+        </div>
+        
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <Badge variant="outline" className="text-lg px-3 py-2 mb-2">
+              {emotionName.charAt(0).toUpperCase() + emotionName.slice(1)}
+            </Badge>
+            <div className="text-sm text-muted-foreground">
+              Intensité: {Math.round(emotionScore * 100)}%
+            </div>
+          </div>
+          
+          <div className="text-sm text-muted-foreground text-right">
+            Confiance: {Math.round(confidenceValue * 100)}%
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold mb-2">Déclencheurs</h3>
+          {triggers.length > 0 ? (
+            <ul className="list-disc list-inside text-sm text-muted-foreground">
+              {triggers.map((trigger, index) => (
+                <li key={index}>{trigger}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Aucun déclencheur détecté.
+            </p>
+          )}
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Recommandations</h3>
+          {recommendations.length > 0 ? (
+            <ul className="list-disc list-inside text-sm text-muted-foreground">
+              {recommendations.map((recommendation, index) => (
+                <li key={index}>{recommendation}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Aucune recommandation disponible pour le moment.
+            </p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

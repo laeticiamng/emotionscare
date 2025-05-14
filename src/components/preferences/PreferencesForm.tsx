@@ -38,9 +38,13 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
   };
 
   // Get notifications object or create default
-  const notificationsObj = formData.notifications && typeof formData.notifications === 'object'
+  const notificationsObj = typeof formData.notifications === 'object'
     ? formData.notifications
-    : { enabled: !!formData.notifications, emailEnabled: false, pushEnabled: false };
+    : { 
+        enabled: !!formData.notifications, 
+        emailEnabled: false, 
+        pushEnabled: false 
+      };
   
   return (
     <form onSubmit={handleSave}>

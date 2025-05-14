@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -144,9 +145,8 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
     name: 'Session recommandée',
     description: 'Session recommandée basée sur votre état émotionnel',
     duration: 5 * 60, // Convert to seconds
-    emotions: [latestEmotion.emotion],
+    emotion: latestEmotion.emotion,
     thumbnailUrl: '/images/thumbnail-default.jpg',
-    intensity: 1,
     // Additional properties for backward compatibility
     title: 'Session recommandée',
     theme: 'Méditation guidée',

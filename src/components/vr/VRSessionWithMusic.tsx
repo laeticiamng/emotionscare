@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
@@ -19,9 +20,9 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   
   const targetEmotion = emotion || (
     // Check if emotions array exists before trying to access it
-    (activeTemplate && 'emotions' in activeTemplate && Array.isArray(activeTemplate.emotions) && activeTemplate.emotions.length > 0) 
+    (activeTemplate && activeTemplate.emotions && activeTemplate.emotions.length > 0) 
       ? activeTemplate.emotions[0] 
-      : 'calm'
+      : activeTemplate?.emotion || 'calm'
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
@@ -29,18 +30,24 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   useEffect(() => {
     // Charger une playlist basée sur l'émotion cible de la session
     const loadMusic = async () => {
-      if (targetEmotion) {
-        const playlist = await loadPlaylistForEmotion?.(targetEmotion);
-        
-        if (playlist && playlist.tracks.length > 0) {
-          // S'assurer que la track a les propriétés requises
-          const track = {
-            ...playlist.tracks[0],
-            duration: playlist.tracks[0].duration || 0,
-            url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].coverUrl || ''
-          };
-          playTrack(track);
+      try {
+        if (targetEmotion) {
+          const playlist = await loadPlaylistForEmotion?.(targetEmotion);
+          
+          if (playlist && playlist.tracks.length > 0) {
+            // S'assurer que la track a les propriétés requises
+            const track = {
+              ...playlist.tracks[0],
+              duration: playlist.tracks[0].duration || 0,
+              url: playlist.tracks[0].url || '',
+              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].url || '',
+              coverUrl: playlist.tracks[0].coverUrl || ''
+            };
+            playTrack(track);
+          }
         }
+      } catch (error) {
+        console.error("Erreur lors du chargement de la musique pour VR:", error);
       }
     };
     
