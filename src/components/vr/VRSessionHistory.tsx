@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { VRSession } from '@/types';
+import { VRSession } from '@/types/types';
 import { Headphones } from 'lucide-react';
 
 interface VRSessionHistoryProps {
@@ -17,8 +17,8 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ sessions }) => {
         <h3 className="text-lg font-medium mb-4">Impact de vos sessions précédentes</h3>
         <div className="space-y-4">
           {sessions.map((session) => {
-            // Ensure we have a proper date value, using different properties based on what's available
-            const sessionDate = session.date || session.startedAt || session.startTime || '';
+            // S'assurer d'avoir une valeur de date correcte, en utilisant différentes propriétés selon ce qui est disponible
+            const sessionDate = session.date || session.startDate || session.startedAt || session.startTime || '';
             const durationMinutes = (session.duration_seconds || session.duration || 0) / 60;
             
             return (

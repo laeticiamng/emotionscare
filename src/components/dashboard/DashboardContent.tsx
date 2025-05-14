@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { UserModeType } from '@/contexts/UserModeContext';
@@ -19,8 +18,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
 import { User } from '@/types/user';
 
-// Mock data for team overview
-const mockTeamUsers: User[] = [
+// Mock data pour team overview
+const mockTeamUsers = [
   {
     id: '1',
     name: 'Jane Smith',
@@ -28,8 +27,8 @@ const mockTeamUsers: User[] = [
     emotional_score: 82,
     anonymity_code: 'JS-2022',
     email: 'jane.smith@example.com',
-    role: 'b2b_user',
-    createdAt: new Date().toISOString()
+    role: 'b2b_user' as const,
+    created_at: new Date().toISOString() // Correction ici
   },
   {
     id: '2',
@@ -38,8 +37,8 @@ const mockTeamUsers: User[] = [
     emotional_score: 65,
     anonymity_code: 'JD-2022',
     email: 'john.doe@example.com',
-    role: 'b2b_user',
-    createdAt: new Date().toISOString()
+    role: 'b2b_user' as const,
+    created_at: new Date().toISOString() // Correction ici
   },
   {
     id: '3',
@@ -48,8 +47,8 @@ const mockTeamUsers: User[] = [
     emotional_score: 78,
     anonymity_code: 'AJ-2022',
     email: 'amy.johnson@example.com',
-    role: 'b2b_user',
-    createdAt: new Date().toISOString()
+    role: 'b2b_user' as const,
+    created_at: new Date().toISOString() // Correction ici
   }
 ];
 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -131,7 +130,12 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
           </TabsContent>
 
           <TabsContent value="voice">
-            <VoiceEmotionScanner onScanComplete={handleVoiceScanComplete} />
+            <VoiceEmotionScanner onScanComplete={(result) => {
+              if (onEmotionDetected) {
+                onEmotionDetected(result);
+              }
+              handleVoiceScanComplete(result);
+            }} />
           </TabsContent>
 
           <TabsContent value="face">

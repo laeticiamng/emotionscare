@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
-import { EmotionalTeamViewProps, Period } from '@/types';
+import { Period, EmotionalTeamViewProps } from '@/types/types';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   teamId,

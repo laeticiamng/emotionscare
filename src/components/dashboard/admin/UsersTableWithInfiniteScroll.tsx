@@ -1,141 +1,164 @@
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { useState } from "react"
+import { UserData } from "@/types/types"
 
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Table } from '@/components/ui/table';
-import InfiniteScroll from '@/components/ui/data-table/InfiniteScroll';
-import { useSortableTable } from '@/hooks/useSortableTable';
-import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField, UserData } from './types/tableTypes';
-import UserTableHeader from './table-components/UserTableHeader';
-import UserTableBody from './table-components/UserTableBody';
-import { useSelectedUsers } from '@/hooks/useSelectedUsers';
-import BulkActionsBar from './table-components/BulkActionsBar';
-import { User } from '@/types/user';
+export function UsersTableWithInfiniteScroll() {
+  const [users] = useState<UserData[]>([
+    {
+      id: "728ed52f",
+      name: "John Doe",
+      email: "john@example.com",
+      role: 'b2b_user',
+      status: "pending",
+      location: "Paris, FR",
+      preferences: {
+        privacy: "public",
+        notifications_enabled: true
+      },
+      created_at: "2023-01-10",
+      createdAt: "2023-01-10"
+    },
+    {
+      id: "728ed52g",
+      name: "Jane Smith",
+      email: "jane@example.com",
+      role: 'b2b_user',
+      status: "active",
+      location: "London, UK",
+      preferences: {
+        privacy: "private",
+        notifications_enabled: false
+      },
+      created_at: "2023-02-15",
+      createdAt: "2023-02-15"
+    },
+    {
+      id: "728ed52h",
+      name: "Alice Johnson",
+      email: "alice@example.com",
+      role: 'b2b_user',
+      status: "active",
+      location: "New York, US",
+      preferences: {
+        privacy: "team",
+        notifications_enabled: true
+      },
+      created_at: "2023-03-20",
+      createdAt: "2023-03-20"
+    },
+    {
+      id: "728ed52i",
+      name: "Bob Williams",
+      email: "bob@example.com",
+      role: 'b2b_user',
+      status: "pending",
+      location: "Sydney, AU",
+      preferences: {
+        privacy: "public",
+        notifications_enabled: false
+      },
+      created_at: "2023-04-25",
+      createdAt: "2023-04-25"
+    },
+    {
+      id: "728ed52j",
+      name: "Emily Brown",
+      email: "emily@example.com",
+      role: 'b2b_user',
+      status: "active",
+      location: "Berlin, DE",
+      preferences: {
+        privacy: "private",
+        notifications_enabled: true
+      },
+      created_at: "2023-05-30",
+      createdAt: "2023-05-30"
+    },
+  ]);
 
-// Helper function to convert User to UserData
-const convertUserToUserData = (user: User): UserData => {
-  return {
-    ...user,
-    location: user.department || 'Non spécifié',
-    status: user.onboarded ? 'active' : 'pending',
-    createdAt: user.created_at?.toString() || new Date().toISOString()
-  };
-};
+  const columns: ColumnDef<UserData>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+    },
+    {
+      accessorKey: "location",
+      header: "Location",
+    },
+    {
+      accessorKey: "created_at",
+      header: "Created At",
+    },
+  ]
 
-interface UsersTableWithInfiniteScrollProps {
-  pageSize?: number;
-}
+  const table = useReactTable({
+    data: users,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  })
 
-const UsersTableWithInfiniteScroll: React.FC<UsersTableWithInfiniteScrollProps> = ({
-  pageSize = 25,
-}) => {
-  // Sorting state management
-  const { sortField, sortDirection, handleSort, isSorted } = useSortableTable<SortableField>({
-    storageKey: 'user-table-infinite-sort',
-    persistInUrl: true,
-    defaultField: 'name',
-    defaultDirection: 'asc'
-  });
-  
-  // Table data management
-  const {
-    users,
-    isLoading,
-    error,
-    hasMore,
-    totalItems,
-    fetchUsers,
-    handleLoadMore,
-    handleRetry
-  } = useUserTableData({
-    defaultPageSize: pageSize,
-    defaultSortField: sortField,
-    defaultSortDirection: sortDirection
-  });
-  
-  // Convert users to UserData format
-  const userDataItems: UserData[] = React.useMemo(() => 
-    users.map(convertUserToUserData), 
-    [users]
-  );
-  
-  // Selected users management
-  const {
-    selectedUsers,
-    toggleUserSelection,
-    toggleSelectAll,
-    clearSelection,
-    allSelected,
-    hasSelectedUsers
-  } = useSelectedUsers(userDataItems.map(u => u.id));
-  
-  // Fetch users when sorting changes
-  React.useEffect(() => {
-    fetchUsers(1, pageSize, sortField, sortDirection);
-  }, [fetchUsers, pageSize, sortField, sortDirection]);
-  
   return (
-    <Card className="w-full">
-      <div className="px-4 py-2 flex items-center justify-between border-b">
-        <h3 className="font-medium">Utilisateurs avec défilement infini ({totalItems})</h3>
-      </div>
-      
-      {/* Show bulk actions bar only when users are selected */}
-      {hasSelectedUsers && (
-        <div className="px-4 py-2">
-          <BulkActionsBar 
-            selectedUsers={selectedUsers} 
-            onClearSelection={clearSelection}
-          />
-        </div>
-      )}
-      
-      <div className="overflow-x-auto">
-        <InfiniteScroll
-          onLoadMore={handleLoadMore}
-          hasMore={hasMore}
-          loading={isLoading}
-          threshold={0.8}
-        >
-          <Table>
-            <UserTableHeader 
-              onSort={handleSort} 
-              isSorted={isSorted} 
-              onSelectAll={toggleSelectAll}
-              allSelected={allSelected}
-              hasSelectionEnabled={true}
-            />
-            <UserTableBody 
-              users={userDataItems} 
-              isLoading={isLoading} 
-              error={error ? String(error) : ''}
-              hasData={users.length > 0}
-              onRetry={handleRetry}
-              isLoadingMore={false}
-              selectedUsers={selectedUsers}
-              onSelectUser={toggleUserSelection}
-              hasSelectionEnabled={true}
-            />
-          </Table>
-        </InfiniteScroll>
-      </div>
-      
-      {/* Error display when loading more fails */}
-      {error && users.length > 0 && (
-        <div className="p-4 border-t flex justify-center">
-          <div className="flex flex-col items-center">
-            <p className="text-destructive mb-2">{String(error)}</p>
-            <button
-              onClick={handleRetry}
-              className="px-4 py-2 bg-primary text-primary-foreground text-sm rounded-md hover:bg-primary/90"
-            >
-              Réessayer
-            </button>
-          </div>
-        </div>
-      )}
-    </Card>
-  );
-};
-
-export default UsersTableWithInfiniteScroll;
+    <div className="w-full">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => {
+            return (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}

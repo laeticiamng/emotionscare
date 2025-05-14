@@ -1,210 +1,88 @@
-import { supabase } from '@/integrations/supabase/client';
-import { Emotion, EmotionResult } from '@/types';
 
-export const createEmotionEntry = async (data: string | {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}) => {
-  try {
-    if (typeof data === 'string') {
-      // Legacy API for backward compatibility
-      return { id: 'mock-id', created_at: new Date().toISOString() };
+import { EmotionResult } from '@/types/types';
+
+export const analyzeEmotion = async (text: string, emojis?: string[], audioUrl?: string): Promise<EmotionResult> => {
+  // Simulation de l'analyse d'émotion
+  // Dans un environnement de production, ceci appellerait une API
+  console.log('Analyzing emotion from:', { text, emojis, audioUrl });
+  
+  // Analyse simplifiée basée sur les mots clés
+  const emotions = [
+    { keyword: 'heureux', emotion: 'joy', confidence: 0.9 },
+    { keyword: 'content', emotion: 'joy', confidence: 0.85 },
+    { keyword: 'triste', emotion: 'sadness', confidence: 0.9 },
+    { keyword: 'déprimé', emotion: 'sadness', confidence: 0.95 },
+    { keyword: 'en colère', emotion: 'anger', confidence: 0.9 },
+    { keyword: 'frustré', emotion: 'anger', confidence: 0.85 },
+    { keyword: 'effrayé', emotion: 'fear', confidence: 0.9 },
+    { keyword: 'anxieux', emotion: 'fear', confidence: 0.85 },
+    { keyword: 'surpris', emotion: 'surprise', confidence: 0.9 },
+    { keyword: 'calme', emotion: 'calm', confidence: 0.9 },
+    { keyword: 'détendu', emotion: 'calm', confidence: 0.85 }
+  ];
+  
+  // Recherche de mots clés dans le texte
+  const textLower = text.toLowerCase();
+  let detectedEmotion = 'neutral';
+  let confidence = 0.5;
+  
+  for (const item of emotions) {
+    if (textLower.includes(item.keyword)) {
+      detectedEmotion = item.emotion;
+      confidence = item.confidence;
+      break;
     }
-    
-    // Modern implementation
-    const { user_id, text, emojis, audio_url, is_confidential, share_with_coach } = data;
-    
-    const { data: entry, error } = await supabase
-      .from('emotion_entries')
-      .insert({
-        user_id,
-        text: text || '',
-        emojis: emojis || '',
-        audio_url: audio_url || null,
-        is_confidential: is_confidential || false,
-        share_with_coach: share_with_coach || false,
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('Error creating emotion entry:', error);
-      throw error;
-    }
-    
-    return entry;
-  } catch (error) {
-    console.error('Error in createEmotionEntry:', error);
-    // Return mock data for development
-    return { id: 'mock-id', created_at: new Date().toISOString() };
   }
+  
+  // Créer des recommandations basées sur l'émotion détectée
+  const recommendations = [];
+  
+  if (detectedEmotion === 'sadness') {
+    recommendations.push(
+      'Essayez une séance de méditation guidée',
+      'Appelez un ami proche pour discuter'
+    );
+  } else if (detectedEmotion === 'anger') {
+    recommendations.push(
+      'Faites une pause de 5 minutes loin des écrans',
+      'Pratiquez des exercices de respiration profonde'
+    );
+  } else if (detectedEmotion === 'fear') {
+    recommendations.push(
+      'Écrivez vos inquiétudes sur papier',
+      'Concentrez-vous sur votre respiration pendant 2 minutes'
+    );
+  } else if (detectedEmotion === 'joy') {
+    recommendations.push(
+      'Partagez ce moment positif avec un proche',
+      'Notez cette expérience dans votre journal'
+    );
+  }
+  
+  // Simuler un délai de traitement (API)
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return {
+    emotion: detectedEmotion,
+    confidence,
+    transcript: text,
+    emojis: Array.isArray(emojis) ? emojis : emojis ? [emojis] : [],
+    recommendations,
+    ai_feedback: `Votre émotion dominante semble être ${detectedEmotion}. Prenez le temps d'observer comment cette émotion se manifeste dans votre corps et votre esprit.`,
+    audio_url: audioUrl || undefined
+  };
 };
 
-export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('emotion_entries')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-      
-    if (error) {
-      console.error('Error fetching latest emotion:', error);
-      return null;
-    }
-    
-    if (!data) return null;
-    
-    // Map database entry to Emotion type
-    return {
-      id: data.id,
-      name: data.emotion_name || 'neutral',
-      intensity: data.intensity || 5,
-      date: data.created_at,
-      notes: data.text || '',
-      color: data.color || '#7C7C7C',
-      emotion: data.emotion_name || 'neutral',
-      score: data.intensity || 5,
-    };
-  } catch (error) {
-    console.error('Error in fetchLatestEmotion:', error);
-    return null;
-  }
+export const saveEmotion = async (emotion: EmotionResult): Promise<void> => {
+  // Simulation de sauvegarde
+  // Dans un environnement de production, ceci sauvegarderait les données dans une base de données
+  console.log('Saving emotion:', emotion);
+  
+  // Simuler un délai de traitement (API)
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Simuler le succès (ou gérer les erreurs dans un cas réel)
+  return Promise.resolve();
 };
 
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  try {
-    // For development, just return mock data
-    return {
-      emotion: 'calm',
-      confidence: 0.85,
-      transcript: 'This is a simulated transcript from audio analysis.',
-      id: 'mock-id',
-      score: 70,
-      intensity: 65,
-      text: 'This is a simulated transcript from audio analysis.',
-      feedback: 'You seem calm and collected.',
-      recommendations: ['Take a moment to appreciate this calm state', 'Practice mindfulness'],
-      audio_url: 'mock-audio-url'
-    };
-  } catch (error) {
-    console.error('Error analyzing audio:', error);
-    return {
-      emotion: 'neutral',
-      confidence: 0.5,
-    };
-  }
-};
-
-export const getEmotionHistory = async (userId: string, limit = 10) => {
-  try {
-    const { data, error } = await supabase
-      .from('emotion_entries')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-      
-    if (error) {
-      console.error('Error fetching emotion history:', error);
-      return [];
-    }
-    
-    return data.map(entry => ({
-      id: entry.id,
-      name: entry.emotion_name || 'neutral',
-      intensity: entry.intensity || 5,
-      date: entry.created_at,
-      notes: entry.text || '',
-      color: entry.color || '#7C7C7C',
-      emotion: entry.emotion_name || 'neutral',
-      score: entry.intensity || 5,
-      text: entry.text || '',
-    }));
-  } catch (error) {
-    console.error('Error in getEmotionHistory:', error);
-    return [];
-  }
-};
-
-export const analyzeEmotion = async (data: string | {
-  user_id: string;
-  emojis?: string;
-  text?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}): Promise<EmotionResult> => {
-  try {
-    // For demo purposes, create a mock analysis result
-    const mockResult: EmotionResult = {
-      id: 'generated-id-' + Date.now(),
-      emotion: 'calm',
-      score: 70,
-      intensity: 65,
-      confidence: 0.8,
-      timestamp: new Date().toISOString(),
-      date: new Date().toISOString(),
-      feedback: "Vous semblez calme et équilibré. C'est un excellent état pour prendre des décisions réfléchies.",
-      recommendations: [
-        "Profitez de cette clarté mentale pour planifier votre journée",
-        "Pratiquez la méditation pour renforcer cet état de calme"
-      ],
-      audio_url: typeof data !== 'string' ? data.audio_url : undefined
-    };
-    
-    // In a real implementation, we would call an API endpoint to analyze the emotion
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-    
-    // Also save this emotion to the database
-    if (typeof data !== 'string') {
-      await createEmotionEntry(data);
-    }
-    
-    return mockResult;
-  } catch (error) {
-    console.error('Error analyzing emotion:', error);
-    return {
-      emotion: 'neutral',
-      score: 50,
-      intensity: 50,
-      confidence: 0.5,
-      timestamp: new Date().toISOString(),
-      date: new Date().toISOString()
-    };
-  }
-};
-
-export const saveEmotion = async (emotion: Emotion): Promise<void> => {
-  try {
-    if (!emotion.user_id) {
-      console.error('Cannot save emotion without user_id');
-      return;
-    }
-    
-    const { error } = await supabase
-      .from('emotions')
-      .insert({
-        user_id: emotion.user_id,
-        date: new Date().toISOString(),
-        score: emotion.score || emotion.intensity || 5,
-        emojis: emotion.emojis || '',
-        text: emotion.text || '',
-        ai_feedback: emotion.ai_feedback || emotion.feedback || '',
-        audio_url: emotion.audio_url || null
-      });
-    
-    if (error) {
-      console.error('Error saving emotion:', error);
-    }
-  } catch (error) {
-    console.error('Error in saveEmotion:', error);
-  }
-};
+// Autres fonctions potentielles du service scanService...

@@ -1,140 +1,129 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { analyzeEmotion } from '@/lib/scanService';
+import { EmotionResult } from '@/types/types';
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { EmotionResult, Emotion } from '@/types';
-import { Loader2, RefreshCcw } from 'lucide-react';
-import { v4 as uuid } from 'uuid';
-import { saveEmotion } from '@/lib/scanService';
+const EnhancedCoachAI = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<EmotionResult | null>(null);
+  const [userText, setUserText] = useState('');
+  const [userEmojis, setUserEmojis] = useState<string[]>([]);
 
-interface EnhancedCoachAIProps {
-  emotionResult: EmotionResult;
-  onRequestNewScan?: () => void;
-}
+  useEffect(() => {
+    // Charger les données initiales ou effectuer d'autres opérations au montage du composant
+  }, []);
 
-/**
- * AI Coach component that provides personalized feedback based on emotional scan
- */
-const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
-  emotionResult,
-  onRequestNewScan
-}) => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [aiFeedback, setAiFeedback] = useState<string | null>(
-    emotionResult.feedback || emotionResult.ai_feedback || null
-  );
-  
-  const generateMoreFeedback = async () => {
-    if (isGenerating) return;
+  const handleTextChange = (text: string) => {
+    setUserText(text);
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setUserEmojis(prevEmojis => [...prevEmojis, emoji]);
+  };
+
+  const handleClearEmojis = () => {
+    setUserEmojis([]);
+  };
+
+  // Corriger la gestion des émojis pour qu'ils soient toujours un tableau
+  const ensureArrayEmojis = (emojis: string | string[]): string[] => {
+    if (Array.isArray(emojis)) {
+      return emojis;
+    }
+    return emojis ? [emojis] : [];
+  };
+
+  // Mise à jour de la fonction où l'erreur apparaît
+  const handleEmotionDetected = (result: EmotionResult) => {
+    setAnalysisResult(result);
+    setIsLoading(false);
     
-    setIsGenerating(true);
+    // Corriger l'erreur avec les émojis
+    const safeEmojis = ensureArrayEmojis(result.emojis || []);
+    
+    // Utiliser safeEmojis au lieu de result.emojis
+    console.log('Emotion detected:', result.emotion, 'with emojis:', safeEmojis);
+  };
+
+  const handleAnalyze = async () => {
+    setIsLoading(true);
     try {
-      // In a real app, this would call an API with the emotion data
-      // For demo purposes, we'll generate some basic feedback
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const emotion = emotionResult.emotion || emotionResult.primaryEmotion || 'neutral';
-      const intensity = emotionResult.score || 5;
-      
-      const newFeedback = `
-        J'ai analysé plus en profondeur votre état de ${emotion}.
-        
-        Pour un état émotionnel d'intensité ${intensity}/10, voici quelques recommandations supplémentaires :
-        
-        ${getRecommendationsForEmotion(emotion)}
-        
-        N'hésitez pas à me solliciter si vous souhaitez approfondir un aspect particulier.
-      `;
-      
-      setAiFeedback(newFeedback);
-      
-      // Save the enhanced feedback
-      const emotionToSave: Emotion = {
-        id: emotionResult.id || uuid(),
-        user_id: emotionResult.user_id || 'user-id',
-        date: new Date().toISOString(),
-        emotion: emotionResult.emotion || emotionResult.primaryEmotion || 'neutral',
-        score: emotionResult.score || 5,
-        text: emotionResult.text || '',
-        emojis: emotionResult.emojis || '',
-        ai_feedback: newFeedback
-      };
-      
-      // In a real app, we would save this to the database
-      await saveEmotion(emotionToSave);
-      
+      const result = await analyzeEmotion(userText, userEmojis);
+      setAnalysisResult(result);
+      handleEmotionDetected(result);
     } catch (error) {
-      console.error('Error generating feedback:', error);
-      setAiFeedback("Désolé, je n'ai pas pu générer plus de conseils pour le moment. Veuillez réessayer plus tard.");
+      console.error('Error analyzing emotion:', error);
     } finally {
-      setIsGenerating(false);
+      setIsLoading(false);
     }
   };
-  
-  const getRecommendationsForEmotion = (emotion: string): string => {
-    // Simple recommendations based on emotion type
-    const recommendations: {[key: string]: string} = {
-      joy: "Profitez de cette énergie positive pour accomplir des tâches créatives ou socialiser. La joie est contagieuse, partagez-la avec votre entourage.",
-      sadness: "Accordez-vous du temps pour ressentir cette émotion. La méditation et l'écriture peuvent vous aider à comprendre sa source. N'hésitez pas à contacter un proche.",
-      anger: "Pratiquez des exercices de respiration profonde. L'activité physique peut aussi être un excellent moyen de canaliser cette énergie.",
-      fear: "Identifiez la source de cette peur et évaluez si elle est fondée. La pleine conscience peut vous aider à rester ancré dans le présent.",
-      surprise: "Profitez de cette ouverture d'esprit pour explorer de nouvelles idées ou perspectives.",
-      calm: "C'est un excellent moment pour pratiquer la pleine conscience ou pour vous concentrer sur des tâches qui demandent de l'attention.",
-      anxious: "Essayez des techniques de respiration 4-7-8 : inspirez pendant 4 secondes, retenez pendant 7, expirez pendant 8. Répétez 3-4 fois.",
-      neutral: "C'est un bon moment pour faire le point sur vos objectifs et vos priorités. La neutralité offre une clarté cognitive précieuse."
-    };
-    
-    return recommendations[emotion.toLowerCase()] || 
-      "Prenez un moment pour observer cette émotion sans jugement. Qu'est-ce qu'elle essaie de vous communiquer ?";
-  };
-  
+
   return (
-    <Card className="border border-primary/20 bg-background/50">
-      <CardContent className="p-4">
-        <div className="space-y-4">
-          <div className="text-sm text-muted-foreground">
-            <p className="font-medium text-foreground mb-1">Feedback IA personnalisé :</p>
-            <p className="whitespace-pre-line">
-              {aiFeedback || (
-                emotionResult.feedback || 
-                emotionResult.ai_feedback ||
-                `Je détecte une émotion de type ${emotionResult.emotion || emotionResult.primaryEmotion || 'neutre'}. 
-                Souhaitez-vous des conseils personnalisés ?`
-              )}
-            </p>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {onRequestNewScan && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={onRequestNewScan}
-                className="text-xs"
-              >
-                <RefreshCcw className="h-3 w-3 mr-1" />
-                Nouveau scan
-              </Button>
-            )}
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateMoreFeedback}
-              disabled={isGenerating}
-              className="text-xs ml-auto"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                  Génération...
-                </>
-              ) : (
-                "Plus de conseils"
-              )}
-            </Button>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Votre Coach Émotionnel</CardTitle>
+        <CardDescription>Recevez des conseils personnalisés basés sur votre état émotionnel.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center space-x-4">
+          <Avatar>
+            <AvatarImage src="/images/avatars/coach-ai.png" alt="Coach AI" />
+            <AvatarFallback>AI</AvatarFallback>
+          </Avatar>
+          <div>
+            <h3 className="text-lg font-semibold">Coach AI</h3>
+            <p className="text-sm text-muted-foreground">Votre assistant émotionnel personnel</p>
           </div>
         </div>
+
+        <div className="space-y-2">
+          <h4 className="text-md font-medium">Comment vous sentez-vous aujourd'hui ?</h4>
+          <p className="text-sm text-muted-foreground">Décrivez vos émotions ou utilisez le scanner pour une analyse plus approfondie.</p>
+        </div>
+
+        {/* Emotion Scanner Integration */}
+        {/* <EmotionScanner
+          text={userText}
+          emojis={userEmojis.join('')}
+          onTextChange={handleTextChange}
+          onEmojiChange={(emojis) => setUserEmojis(emojis.split(''))}
+          onAnalyze={handleAnalyze}
+          isAnalyzing={isLoading}
+          onEmotionDetected={handleEmotionDetected}
+        /> */}
+
+        {analysisResult && (
+          <div className="rounded-md border p-4">
+            <h4 className="text-md font-medium">Analyse émotionnelle :</h4>
+            <p className="text-sm text-muted-foreground">
+              Émotion détectée : <Badge variant="secondary">{analysisResult.emotion}</Badge>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Confiance : {Math.round(analysisResult.confidence * 100)}%
+            </p>
+            {analysisResult.ai_feedback && (
+              <div className="mt-2">
+                <h5 className="text-sm font-medium">Feedback de l'IA :</h5>
+                <p className="text-xs text-muted-foreground">{analysisResult.ai_feedback}</p>
+              </div>
+            )}
+            {analysisResult.recommendations && analysisResult.recommendations.length > 0 && (
+              <div className="mt-2">
+                <h5 className="text-sm font-medium">Recommandations :</h5>
+                <ScrollArea className="h-20">
+                  <ul className="list-disc list-inside text-xs text-muted-foreground">
+                    {analysisResult.recommendations.map((recommendation, index) => (
+                      <li key={index}>{recommendation}</li>
+                    ))}
+                  </ul>
+                </ScrollArea>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

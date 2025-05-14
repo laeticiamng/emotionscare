@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/types';
 import { PauseCircle, PlayCircle, SkipBack, X } from 'lucide-react';
 
 interface VRSessionPlayerProps {
@@ -123,7 +122,7 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
             
             <h3 className="font-medium text-sm mb-1">Benefits</h3>
             <ul className="list-disc list-inside text-sm text-muted-foreground mb-4">
-              {template.benefits?.map((benefit, index) => (
+              {template.benefits && template.benefits.map((benefit, index) => (
                 <li key={index}>{benefit}</li>
               ))}
             </ul>
@@ -135,7 +134,7 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
               </div>
               <div>
                 <p className="font-medium">Difficulty</p>
-                <p className="text-muted-foreground capitalize">{template.difficulty}</p>
+                <p className="text-muted-foreground capitalize">{template.difficulty || 'Standard'}</p>
               </div>
             </div>
           </div>

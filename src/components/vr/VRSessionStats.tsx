@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VRSession } from '@/types';
+import { VRSession } from '@/types/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 
@@ -31,6 +31,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session }) => {
   // Use date or startedAt or startTime for session date
   const sessionDate = 
     session.date || 
+    session.startDate || 
     session.startedAt || 
     session.startTime || 
     null;

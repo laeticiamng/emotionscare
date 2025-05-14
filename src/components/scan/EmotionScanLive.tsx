@@ -1,203 +1,192 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from '@/contexts/AuthContext';
+import { Mic, StopCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { analyzeEmotion, saveEmotion } from '@/lib/scanService';
-import { Emotion, EmotionResult } from '@/types';
-import EmotionScanner from './EmotionScanner';
-import EnhancedCoachAI from '../coach/EnhancedCoachAI';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { analyzeEmotion } from '@/lib/scanService';
+import EmotionResultDisplay from './live/EmotionResult';
+import { Slider } from "@/components/ui/slider"
+import { Label } from '@/components/ui/label';
+import { EmotionResult } from '@/types/types';
 
-interface EmotionScanLiveProps {
-  userId: string;
-  isConfidential?: boolean;
-  onScanComplete?: () => void;
-  onResultSaved?: () => Promise<void>;
-}
-
-const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({
-  userId,
-  isConfidential = false,
-  onScanComplete = () => {},
-  onResultSaved = async () => {}
-}) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [text, setText] = useState('');
-  const [emojis, setEmojis] = useState('');
+const EmotionScanLive = () => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  
-  const resetScan = () => {
-    setText('');
-    setEmojis('');
-    setAudioUrl(null);
-    setEmotionResult(null);
-    setError(null);
+  const [emojis, setEmojis] = useState<string>('');
+  const [text, setText] = useState<string>('');
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [confidenceThreshold, setConfidenceThreshold] = useState(0.5);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
+  // Fonction pour s'assurer que les émojis sont toujours un tableau
+  const ensureArrayEmojis = (emojis: string | string[]): string[] => {
+    if (Array.isArray(emojis)) {
+      return emojis;
+    }
+    return emojis ? [emojis] : [];
   };
 
-  const handleRequestNewScan = () => {
-    resetScan();
-  };
-  
-  const handleAnalyze = async () => {
-    if (!text && !emojis && !audioUrl) {
+  // Mise à jour de la fonction où l'erreur apparaît
+  const handleEmotionAnalysis = () => {
+    if (!text && !audioUrl) {
       toast({
-        title: "Données insuffisantes",
-        description: "Veuillez fournir du texte, des emojis ou un enregistrement audio pour l'analyse.",
-        variant: "destructive"
+        title: "Avertissement",
+        description: "Veuillez entrer du texte ou enregistrer votre voix.",
       });
       return;
     }
-    
-    if (!userId) {
-      toast({
-        title: "Non connecté",
-        description: "Vous devez être connecté pour analyser vos émotions.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsAnalyzing(true);
-    setError(null);
-    
-    try {
-      // Créer un objet avec les données d'analyse
-      const analysisData = {
-        user_id: userId,
-        text,
-        emojis,
-        audio_url: audioUrl || undefined,
-        is_confidential: isConfidential,
-        share_with_coach: true
-      };
-      
-      // Analyser l'émotion
-      const result = await analyzeEmotion(analysisData);
-      
-      setEmotionResult(result);
-      
-      if (result) {
-        // Sauvegarder l'émotion
-        const emotion: Emotion = {
-          id: result.id || '',
-          user_id: userId,
-          date: new Date().toISOString(),
-          emotion: result.emotion,
-          score: result.score,
-          text: text || result.text || '',
-          emojis: emojis || result.emojis || '',
-          audio_url: audioUrl || undefined,
-          ai_feedback: result.feedback || result.ai_feedback || ''
-        };
-        
-        await saveEmotion(emotion);
-        
-        toast({
-          title: "Analyse complétée",
-          description: `Votre émotion dominante : ${result.emotion}`,
-        });
-        
-        if (onResultSaved) {
-          await onResultSaved();
+
+    setIsLoading(true);
+    setResult(null);
+
+    const formattedEmojis = ensureArrayEmojis(emojis);
+
+    analyzeEmotion(text, formattedEmojis, audioUrl)
+      .then(data => {
+        if (data.confidence >= confidenceThreshold) {
+          setResult(data);
+        } else {
+          setResult({
+            ...data,
+            emotion: 'Non détectée',
+            confidence: 0
+          });
+          toast({
+            title: "Confiance faible",
+            description: `La confiance de l'analyse est inférieure au seuil de ${confidenceThreshold * 100}%.`,
+          });
         }
-      }
-      
+      })
+      .catch(error => {
+        console.error('Error analyzing emotion:', error);
+        toast({
+          title: "Erreur d'analyse",
+          description: "Impossible d'analyser votre émotion.",
+          variant: "destructive"
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  // Fonction pour démarrer l'enregistrement
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioBlob(audioBlob);
+        setAudioUrl(audioUrl);
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
     } catch (error) {
-      console.error('Error analyzing emotion:', error);
-      const errorMessage = error instanceof Error ? error.message : "Une erreur inconnue s'est produite";
-      
-      setError(errorMessage);
-      
+      console.error('Error starting recording:', error);
       toast({
-        title: "Erreur d'analyse",
-        description: "Une erreur s'est produite lors de l'analyse. Veuillez réessayer.",
+        title: "Erreur d'enregistrement",
+        description: "Impossible de démarrer l'enregistrement. Veuillez vérifier les permissions du microphone.",
         variant: "destructive"
       });
-    } finally {
-      setIsAnalyzing(false);
     }
   };
-  
+
+  // Fonction pour arrêter l'enregistrement
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   return (
-    <Card className="overflow-hidden shadow-md">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>{emotionResult ? "Résultat de l'analyse" : "Scanner mon émotion actuelle"}</CardTitle>
+        <CardTitle>Analyse en direct</CardTitle>
+        <CardDescription>
+          Exprimez-vous et voyez votre émotion en temps réel
+        </CardDescription>
       </CardHeader>
-      <CardContent className="p-6">
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        
-        {isAnalyzing && (
-          <div className="flex flex-col items-center justify-center py-10">
-            <Loader2 className="h-10 w-10 animate-spin mb-4 text-primary" />
-            <p className="text-muted-foreground">Analyse de votre état émotionnel en cours...</p>
-          </div>
-        )}
-        
-        {!isAnalyzing && !emotionResult && (
-          <EmotionScanner
-            text={text}
-            emojis={emojis}
-            audioUrl={audioUrl}
-            onTextChange={setText}
-            onEmojiChange={setEmojis}
-            onAudioChange={setAudioUrl}
-            onAnalyze={handleAnalyze}
-            isAnalyzing={isAnalyzing}
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="text">Votre texte</Label>
+          <textarea
+            id="text"
+            className="w-full border rounded-md p-2"
+            placeholder="Je me sens..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
           />
-        )}
-        
-        {!isAnalyzing && emotionResult && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="text-4xl">
-                  {emotionResult.emojis || (emotionResult.emotion === 'joy' ? '😊' : 
-                  emotionResult.emotion === 'sadness' ? '😔' : 
-                  emotionResult.emotion === 'anger' ? '😡' : 
-                  emotionResult.emotion === 'fear' ? '😨' : 
-                  emotionResult.emotion === 'calm' ? '😌' : '😐')}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold capitalize">{emotionResult.emotion}</h3>
-                  <p className="text-muted-foreground">
-                    Intensité: {emotionResult.score}/10
-                  </p>
-                </div>
-              </div>
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  onScanComplete && onScanComplete();
-                  resetScan();
-                }}
-              >
-                Terminer
-              </Button>
-            </div>
-            
-            <EnhancedCoachAI 
-              emotionResult={emotionResult}
-              onRequestNewScan={handleRequestNewScan}
-            />
-            
-            {text && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm font-medium mb-1">Votre texte analysé:</p>
-                <p className="text-sm italic text-muted-foreground">"{text}"</p>
-              </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Enregistrement vocal</Label>
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isLoading}
+            >
+              {isRecording ? (
+                <>
+                  <StopCircle className="h-4 w-4 mr-2" />
+                  Arrêter
+                </>
+              ) : (
+                <>
+                  <Mic className="h-4 w-4 mr-2" />
+                  Enregistrer
+                </>
+              )}
+            </Button>
+            {audioUrl && (
+              <audio src={audioUrl} controls className="w-64" />
             )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="confidence">Seuil de confiance ({confidenceThreshold * 100}%)</Label>
+          <Slider
+            id="confidence"
+            defaultValue={[confidenceThreshold * 100]}
+            max={100}
+            step={5}
+            onValueChange={(value) => setConfidenceThreshold(value[0] / 100)}
+          />
+        </div>
+
+        <Button onClick={handleEmotionAnalysis} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            "Analyser"
+          )}
+        </Button>
+
+        {result && (
+          <div className="mt-4">
+            <EmotionResultDisplay
+              emotion={result.emotion}
+              confidence={result.confidence}
+              transcript={result.transcript}
+            />
           </div>
         )}
       </CardContent>

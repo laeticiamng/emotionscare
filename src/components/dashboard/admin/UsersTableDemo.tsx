@@ -1,163 +1,169 @@
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table"
 
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Table } from '@/components/ui/table';
-import Pagination from '@/components/ui/data-table/Pagination';
-import { useSortableTable } from '@/hooks/useSortableTable';
-import { useUserTableData } from '@/hooks/useUserTableData';
-import { SortableField, UserData } from './types/tableTypes';
-import UserTableHeader from './table-components/UserTableHeader';
-import UserTableBody from './table-components/UserTableBody';
-import { useSelectedUsers } from '@/hooks/useSelectedUsers';
-import BulkActionsBar from './table-components/BulkActionsBar';
-import { User } from '@/types/user';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { useState } from "react"
+import { UserData } from "@/types/types"
 
-// Helper function to convert User to UserData
-const convertUserToUserData = (user: User): UserData => {
-  return {
-    ...user,
-    location: user.department || 'Non spécifié',
-    status: user.onboarded ? 'active' : 'pending',
-    createdAt: user.created_at?.toString() || new Date().toISOString()
-  };
-};
+const columns: ColumnDef<UserData>[] = [
+  {
+    accessorKey: "name",
+    header: "Name",
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+  },
+  {
+    accessorKey: "location",
+    header: "Location",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created At",
+  },
+]
 
-interface UsersTableDemoProps {
-  defaultPageSize?: number;
-  pageSizeOptions?: number[];
-  showLoadMoreButton?: boolean; 
-}
+export function UsersTableDemo() {
+  const [users] = useState<UserData[]>([
+    {
+      id: "728ed52f",
+      name: "John Doe",
+      email: "john@example.com",
+      role: 'b2b_user',
+      status: "pending",
+      location: "Paris, FR",
+      preferences: {
+        privacy: "public",
+        notifications_enabled: true
+      },
+      created_at: "2023-01-10",
+      createdAt: "2023-01-10"
+    },
+    {
+      id: "728ed52a",
+      name: "Jane Smith",
+      email: "jane@example.com",
+      role: 'b2b_user',
+      status: "active",
+      location: "London, UK",
+      preferences: {
+        privacy: "private",
+        notifications_enabled: false
+      },
+      created_at: "2023-02-15",
+      createdAt: "2023-02-15"
+    },
+    {
+      id: "728ed52b",
+      name: "Alice Johnson",
+      email: "alice@example.com",
+      role: 'b2b_user',
+      status: "active",
+      location: "New York, US",
+      preferences: {
+        privacy: "team",
+        notifications_enabled: true
+      },
+      created_at: "2023-03-20",
+      createdAt: "2023-03-20"
+    },
+    {
+      id: "728ed52c",
+      name: "Bob Williams",
+      email: "bob@example.com",
+      role: 'b2b_user',
+      status: "pending",
+      location: "Sydney, AU",
+      preferences: {
+        privacy: "public",
+        notifications_enabled: false
+      },
+      created_at: "2023-04-25",
+      createdAt: "2023-04-25"
+    },
+    {
+      id: "728ed52d",
+      name: "Emily Brown",
+      email: "emily@example.com",
+      role: 'b2b_user',
+      status: "active",
+      location: "Berlin, DE",
+      preferences: {
+        privacy: "private",
+        notifications_enabled: true
+      },
+      created_at: "2023-05-30",
+      createdAt: "2023-05-30"
+    },
+  ])
 
-const UsersTableDemo: React.FC<UsersTableDemoProps> = ({
-  defaultPageSize = 25,
-  pageSizeOptions = [10, 25, 50, 100],
-  showLoadMoreButton = false,
-}) => {
-  // Sorting state management
-  const { sortField, sortDirection, handleSort, isSorted } = useSortableTable<SortableField>({
-    storageKey: 'user-table-sort',
-    persistInUrl: true,
-    defaultField: 'name',
-    defaultDirection: 'asc'
-  });
-  
-  // Table data management with extended properties
-  const {
-    users,
-    isLoading,
-    error,
-    currentPage,
-    pageSize,
-    totalItems,
-    totalPages,
-    hasMore,
-    fetchUsers,
-    handlePageChange,
-    handlePageSizeChange,
-    handleLoadMore,
-    handleRetry
-  } = useUserTableData({
-    defaultPageSize,
-    defaultSortField: sortField,
-    defaultSortDirection: sortDirection
-  });
-  
-  // Convert users to UserData format
-  const userDataItems: UserData[] = React.useMemo(() => 
-    users.map(convertUserToUserData), 
-    [users]
-  );
-  
-  // Selected users management
-  const {
-    selectedUsers,
-    toggleUserSelection,
-    toggleSelectAll,
-    clearSelection,
-    allSelected,
-    hasSelectedUsers
-  } = useSelectedUsers(userDataItems.map(u => u.id));
-  
-  // Fetch users when sort, page or page size changes
-  React.useEffect(() => {
-    fetchUsers(currentPage, pageSize, sortField, sortDirection);
-  }, [fetchUsers, currentPage, pageSize, sortField, sortDirection]);
-  
+  const table = useReactTable({
+    data: users,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
   return (
-    <Card className="w-full">
-      <div className="px-4 py-2 flex items-center justify-between border-b">
-        <h3 className="font-medium">Utilisateurs ({totalItems})</h3>
-      </div>
-      
-      {/* Show bulk actions bar only when users are selected */}
-      {hasSelectedUsers && (
-        <div className="px-4 py-2">
-          <BulkActionsBar 
-            selectedUsers={selectedUsers} 
-            onClearSelection={clearSelection}
-          />
-        </div>
-      )}
-      
-      <div className="overflow-x-auto">
-        <Table>
-          <UserTableHeader 
-            onSort={handleSort} 
-            isSorted={isSorted} 
-            onSelectAll={toggleSelectAll}
-            allSelected={allSelected}
-            hasSelectionEnabled={true}
-          />
-          <UserTableBody 
-            users={userDataItems} 
-            isLoading={isLoading} 
-            error={error ? String(error) : ''} 
-            hasData={users.length > 0}
-            onRetry={handleRetry}
-            isLoadingMore={isLoading && users.length > 0}
-            selectedUsers={selectedUsers}
-            onSelectUser={toggleUserSelection}
-            hasSelectionEnabled={true}
-          />
-        </Table>
-      </div>
-      
-      {/* Pagination or Load More Button */}
-      {!showLoadMoreButton ? (
-        <div className="px-4 py-4">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            totalItems={totalItems}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            isLoading={isLoading}
-            pageSizeOptions={pageSizeOptions}
-          />
-        </div>
-      ) : (
-        <div className="px-4 py-4 flex justify-center">
-          {currentPage < totalPages && (
-            <button
-              onClick={handleLoadMore}
-              disabled={isLoading || currentPage >= totalPages}
-              className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 disabled:opacity-50 flex items-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="h-4 w-4 border-2 border-t-secondary-foreground border-r-secondary-foreground border-b-secondary-foreground/30 border-l-secondary-foreground/30 rounded-full animate-spin"></div>
-                  Chargement...
-                </>
-              ) : (
-                'Charger plus'
-              )}
-            </button>
+    <div className="w-full">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} data-row={JSON.stringify(row.original)}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
           )}
-        </div>
-      )}
-    </Card>
-  );
-};
-
-export default UsersTableDemo;
+        </TableBody>
+      </Table>
+    </div>
+  )
+}

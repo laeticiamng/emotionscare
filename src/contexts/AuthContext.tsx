@@ -1,325 +1,193 @@
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase';
+import { User, UserPreferences, AuthContextType, UserRole } from '@/types/types';
 
-import React, {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  ReactNode,
-} from "react";
-import {
-  User,
-  UserPreferences,
-  UserPreferencesState,
-  ThemeName,
-  FontFamily,
-  AuthContextType
-} from "@/types/user";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const createDefaultPreferences = (): UserPreferences => {
-  return {
-    dashboardLayout: "standard",
-    onboardingCompleted: false,
-    theme: "light" as ThemeName,
-    fontSize: "medium",
-    language: "fr",
-    fontFamily: "system-ui" as FontFamily,
-    sound: true,
-    notifications: {
-      enabled: true,
-      emailEnabled: true,
-      pushEnabled: true,
-      frequency: "daily",
-      types: {
-        system: true,
-        emotion: true,
-        coach: true,
-        journal: true,
-        community: true,
-      },
-      tone: "supportive",
-      quietHours: {
-        enabled: false,
-        start: "22:00",
-        end: "08:00",
-      },
-    },
-  };
-};
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
-
-  // Preferences state and methods
-  const [preferences, setPreferences] = useState<UserPreferences>(
-    createDefaultPreferences()
-  );
-  const [preferencesLoading, setPreferencesLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [preferences, setPreferences] = useState<UserPreferences>({});
 
   useEffect(() => {
-    const getSession = async () => {
-      setIsLoading(true);
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (session) {
-          const {
-            data: { user: sbUser },
-          } = await supabase.auth.getUser();
-
-          if (sbUser) {
-            // Fetch user data from the public.users table directly
-            const { data: userData, error: userError } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', sbUser.id)
-              .single();
-
-            if (userError) {
-              console.error("Error fetching user data:", userError);
-            }
-
-            if (userData) {
-              // Ensure we're properly typing the userData
-              if (typeof userData === 'object') {
-                const userWithCorrectTypes: User = {
-                  id: userData.id || sbUser.id,
-                  email: userData.email || sbUser.email || '',
-                  name: userData.name || sbUser.email?.split("@")[0] || '',
-                  role: userData.role || 'user',
-                  preferences: {
-                    ...createDefaultPreferences(),
-                    ...(userData.preferences || {}),
-                  },
-                  avatar_url: userData.avatar_url || '',
-                  created_at: userData.created_at || new Date().toISOString(),
-                  department: userData.department,
-                  position: userData.position,
-                  emotional_score: userData.emotional_score,
-                  onboarded: userData.onboarded,
-                  anonymity_code: userData.anonymity_code,
-                };
-
-                setUser(userWithCorrectTypes);
-                setPreferences(userWithCorrectTypes.preferences);
-              }
-            } else {
-              // If user data doesn't exist, create it
-              const newUser = {
-                id: sbUser.id,
-                email: sbUser.email!,
-                name: sbUser.email!.split("@")[0],
-                role: "user",
-                preferences: createDefaultPreferences(),
-              };
-
-              // Insert the new user directly into the users table
-              const { error: createUserError } = await supabase
-                .from('users')
-                .insert([newUser]);
-
-              if (createUserError) {
-                console.error("Error creating user:", createUserError);
-              } else {
-                setUser(newUser as User);
-                setPreferences(newUser.preferences);
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error in getSession:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getSession();
+    const session = supabase.auth.getSession();
 
     supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        getSession();
+      if (session?.user?.id) {
+        fetchUser(session.user.id);
       } else {
         setUser(null);
-        setPreferences(createDefaultPreferences());
+        setIsLoading(false);
       }
     });
-  }, [navigate]);
 
-  const signIn = async (email: string) => {
-    setIsLoading(true);
+    if (session?.data?.session?.user?.id) {
+      fetchUser(session.data.session.user.id);
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const loadUserData = async (userId: string) => {
     try {
-      await supabase.auth.signInWithOtp({ email });
-      alert("Check your email for the magic link.");
+      // Vérifier si la fonction RPC existe
+      try {
+        const { data, error } = await supabase.rpc('get_user_by_id', { user_id: userId });
+        
+        if (error) throw new Error('RPC error: ' + error.message);
+        if (data) {
+          // Traiter les données de l'utilisateur
+          return data;
+        }
+      } catch (rpcError) {
+        console.warn('RPC get_user_by_id failed, falling back to direct query', rpcError);
+        
+        // Fallback: query direct si RPC échoue
+        const { data: userData, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        if (error) throw error;
+        return userData;
+      }
     } catch (error) {
-      console.error("Error signing in:", error);
-    } finally {
+      console.error('Error loading user data:', error);
+      return null;
+    }
+  };
+  
+  const fetchUser = async (userId: string) => {
+    try {
+      const userData = await loadUserData(userId);
+      
+      if (userData) {
+        // Vérification de type avant d'accéder aux propriétés
+        const safeUserData = userData as Record<string, any>;
+        
+        setUser({
+          id: userId,
+          email: safeUserData.email || '',
+          name: safeUserData.name || '',
+          role: (safeUserData.role || 'b2c') as UserRole,
+          created_at: safeUserData.created_at || new Date().toISOString(),
+          avatar: safeUserData.avatar_url || undefined
+        });
+        
+        setPreferences({
+          privacy: safeUserData.privacy || 'public',
+          notifications_enabled: safeUserData.notifications_enabled || true,
+          autoplayVideos: safeUserData.autoplayVideos || false,
+          dataCollection: safeUserData.dataCollection || true,
+          aiSuggestions: safeUserData.aiSuggestions || true,
+          emotionalCamouflage: safeUserData.emotionalCamouflage || false
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
       setIsLoading(false);
     }
   };
 
-  const signUp = async (email: string, name: string) => {
-    setIsLoading(true);
+  const signIn = async (email: string): Promise<void> => {
     try {
-      await supabase.auth.signUp({
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing in:', error);
+      throw error;
+    }
+  };
+
+  const signOut = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+  };
+
+  const signUp = async (email: string, name: string): Promise<void> => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
         email,
         password: Math.random().toString(36).slice(-8),
         options: {
           data: {
-            name: name,
-            preferences: createDefaultPreferences(),
+            name,
+            avatar_url: '',
           },
         },
       });
-      alert("Check your email to verify your account.");
+      if (error) throw error;
+      if (data.user) {
+        fetchUser(data.user.id);
+      }
     } catch (error) {
-      console.error("Error signing up:", error);
-    } finally {
-      setIsLoading(false);
+      console.error('Error signing up:', error);
+      throw error;
     }
   };
 
-  const signOut = async () => {
-    setIsLoading(true);
+  const updateUser = async (updates: Partial<User>): Promise<void> => {
     try {
-      await supabase.auth.signOut();
-      setUser(null);
-      setPreferences(createDefaultPreferences());
-      navigate("/login");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  // Alias for compatibility with other components
-  const logout = signOut;
-
-  const updateUser = async (updates: Partial<User>) => {
-    setIsLoading(true);
-    try {
-      if (!user) return;
-      
-      // Update user in the users table
       const { error } = await supabase
         .from('users')
         .update(updates)
-        .eq('id', user.id);
-
-      if (error) {
-        console.error("Error updating user:", error);
-      } else {
-        // Optimistically update the user in the context
-        setUser((prevUser) =>
-          prevUser ? { ...prevUser, ...updates } : prevUser
-        );
-      }
+        .eq('id', user?.id);
+      if (error) throw error;
+      setUser({ ...user!, ...updates });
     } catch (error) {
-      console.error("Error updating user:", error);
-    } finally {
+      console.error('Error updating user:', error);
+      throw error;
+    }
+  };
+
+  const setSinglePreference = (key: string, value: any) => {
+    setPreferences(prev => ({ ...prev, [key]: value }));
+  };
+
+  const logout = useCallback(async () => {
+    await signOut();
+    setUser(null);
+  }, [signOut]);
+
+  useEffect(() => {
+    if (!user) {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
-  const setSinglePreference = async (key: string, value: any) => {
-    setPreferencesLoading(true);
-    try {
-      const newPreferences = { ...preferences, [key]: value };
-      
-      // Update preferences in the users table
-      const { error } = await supabase
-        .from('users')
-        .update({ preferences: newPreferences })
-        .eq('id', user?.id);
-
-      if (error) {
-        console.error("Error updating preferences:", error);
-      } else {
-        setPreferences(newPreferences);
-        setUser((prevUser) =>
-          prevUser
-            ? { ...prevUser, preferences: newPreferences }
-            : prevUser
-        );
-      }
-    } catch (error) {
-      console.error("Error updating preferences:", error);
-    } finally {
-      setPreferencesLoading(false);
-    }
-  };
-
-  const resetPreferences = async () => {
-    setPreferencesLoading(true);
-    try {
-      const defaultPreferences = createDefaultPreferences();
-      
-      // Update preferences in the users table
-      const { error } = await supabase
-        .from('users')
-        .update({ preferences: defaultPreferences })
-        .eq('id', user?.id);
-
-      if (error) {
-        console.error("Error resetting preferences:", error);
-      } else {
-        setPreferences(defaultPreferences);
-        setUser((prevUser) =>
-          prevUser
-            ? { ...prevUser, preferences: defaultPreferences }
-            : prevUser
-        );
-      }
-    } catch (error) {
-      console.error("Error resetting preferences:", error);
-    } finally {
-      setPreferencesLoading(false);
-    }
-  };
-
-  const preferencesValue: UserPreferencesState = {
-    preferences,
-    setPreferences,
-    setSinglePreference,
-    resetPreferences,
-    loading: preferencesLoading,
-  };
-
-  const isAuthenticated = !!user;
-
-  const value: AuthContextType = {
+  const value = {
     user,
     setUser,
-    isAuthenticated,
+    isAuthenticated: !!user,
     isLoading,
     setIsLoading,
     signIn,
     signOut,
     signUp,
     updateUser,
-    preferences: preferencesValue,
-    logout, // Added for compatibility
+    preferences,
+    setSinglePreference,
+    logout
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {!isLoading && children}
+    </AuthContext.Provider>
+  );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

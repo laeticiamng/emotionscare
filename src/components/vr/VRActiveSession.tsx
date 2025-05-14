@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { VRSessionTemplate, VRSession } from '@/types/vr';
+import { VRSessionTemplate, VRSession } from '@/types/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -43,9 +42,9 @@ const VRActiveSession: React.FC<VRActiveSessionProps> = ({
             // Create session data
             const sessionData: VRSession = {
               id: crypto.randomUUID(),
-              templateId: template.id,
+              templateId: template.templateId,
               userId: 'current-user', // This should come from authentication context
-              startTime: new Date(Date.now() - template.duration * 1000).toISOString(),
+              startDate: new Date(Date.now() - template.duration * 1000).toISOString(),
               endTime: new Date().toISOString(),
               duration: template.duration,
               completed: true
@@ -70,7 +69,7 @@ const VRActiveSession: React.FC<VRActiveSessionProps> = ({
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [isPlaying, sessionCompleted, template.duration, onComplete, toast]);
+  }, [isPlaying, sessionCompleted, template.duration, onComplete]);
   
   // Load appropriate music if specified
   useEffect(() => {

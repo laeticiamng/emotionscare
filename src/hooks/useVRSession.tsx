@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useCallback } from 'react';
-import { VRSession, VRSessionTemplate } from '@/types/vr';
+import { VRSession, VRSessionTemplate } from '@/types/types';
 import { mockVRTemplates } from '@/data/mockVRTemplates';
 
 export const useVRSession = (userId: string) => {
@@ -14,7 +13,12 @@ export const useVRSession = (userId: string) => {
     const loadTemplates = async () => {
       try {
         // In a real application, this would fetch from an API
-        setTemplates(mockVRTemplates);
+        // Set default title to name if needed
+        const processedTemplates = mockVRTemplates.map(template => ({
+          ...template,
+          title: template.title || template.name || '',
+        }));
+        setTemplates(processedTemplates);
       } catch (error) {
         console.error("Error loading VR templates:", error);
       }
@@ -26,25 +30,25 @@ export const useVRSession = (userId: string) => {
         const mockSessions: VRSession[] = [
           {
             id: 'session-1',
-            user_id: userId,
-            template_id: '1',
-            start_time: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            end_time: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
+            userId: userId,
+            templateId: '1',
+            startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+            endTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
             duration_seconds: 300,
             completed: true,
-            emotion_before: 'stressed',
-            emotion_after: 'calm'
+            heart_rate_before: 75,
+            heart_rate_after: 68
           },
           {
             id: 'session-2',
-            user_id: userId,
-            template_id: '3',
-            start_time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            end_time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
+            userId: userId,
+            templateId: '3',
+            startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            endTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
             duration_seconds: 900,
             completed: true,
-            emotion_before: 'anxious',
-            emotion_after: 'relaxed'
+            heart_rate_before: 82,
+            heart_rate_after: 70
           }
         ];
 
@@ -69,9 +73,9 @@ export const useVRSession = (userId: string) => {
 
     const newSession: VRSession = {
       id: `session-${Date.now()}`,
-      user_id: userId,
-      template_id: templateId,
-      start_time: new Date().toISOString(),
+      userId: userId,
+      templateId: templateId,
+      startDate: new Date().toISOString(),
       duration_seconds: template.duration * 60,
       completed: false
     };
@@ -87,7 +91,7 @@ export const useVRSession = (userId: string) => {
         if (session.id === sessionId) {
           return {
             ...session,
-            end_time: new Date().toISOString(),
+            endTime: new Date().toISOString(),
             completed: true,
             emotion_after: emotionAfter || session.emotion_after
           };
@@ -111,7 +115,7 @@ export const useVRSession = (userId: string) => {
       sessionsCount: sessions.length,
       completedCount,
       totalDurationMinutes: Math.floor(totalDuration / 60),
-      lastSessionDate: sessions.length > 0 ? new Date(sessions[0].start_time) : null
+      lastSessionDate: sessions.length > 0 ? new Date(sessions[0].startDate) : null
     };
   }, [sessions]);
 
