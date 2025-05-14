@@ -1,30 +1,32 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { UserModeType } from '@/types/types';
+
+import React, { createContext, useContext, useState } from 'react';
+import { UserMode } from '@/types/types';
 
 interface UserModeContextType {
-  userMode: UserModeType;
-  setUserMode: (mode: UserModeType) => void;
+  mode: UserMode;
+  setMode: (mode: UserMode) => void;
+  isLoading: boolean;
 }
 
-const UserModeContext = createContext<UserModeContextType>({
-  userMode: 'b2c',
-  setUserMode: () => {},
-});
+const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-interface UserModeProviderProps {
-  children: ReactNode;
-}
-
-export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType>('b2c');
+const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [mode, setMode] = useState<UserMode>('personal');
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode }}>
+    <UserModeContext.Provider value={{ mode, setMode, isLoading }}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => useContext(UserModeContext);
-export type { UserModeType };
+const useUserMode = (): UserModeContextType => {
+  const context = useContext(UserModeContext);
+  if (context === undefined) {
+    throw new Error('useUserMode must be used within a UserModeProvider');
+  }
+  return context;
+};
+
 export { UserModeProvider, useUserMode };

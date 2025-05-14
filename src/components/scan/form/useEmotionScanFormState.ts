@@ -35,13 +35,16 @@ export function useEmotionScanFormState(userId: string, onScanComplete?: () => v
     const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
     const randomConfidence = 0.7 + (Math.random() * 0.3);
     
+    // Ensure emojis is handled as string[]
+    const emojiArray = emojis ? emojis.split('') : [];
+    
     return {
       emotion: randomEmotion,
       confidence: randomConfidence,
       intensity: randomConfidence * 100,
       transcript: text,
       date: new Date().toISOString(),
-      emojis: emojis.split(''),
+      emojis: emojiArray,
       ai_feedback: `Je détecte une émotion de ${randomEmotion} dans votre analyse. C'est intéressant de voir comment vous exprimez cette émotion.`,
       score: Math.round(randomConfidence * 100),
       id: uuid(),
@@ -61,7 +64,7 @@ export function useEmotionScanFormState(userId: string, onScanComplete?: () => v
         score: emotionData.score || Math.round((emotionData.confidence || 0.5) * 100),
         text: emotionData.text || emotionData.transcript || '',
         emojis: Array.isArray(emotionData.emojis) ? emotionData.emojis : 
-               (emotionData.emojis ? emotionData.emojis.split('') : []),
+               (emotionData.emojis ? emotionData.emojis.toString().split('') : []),
         audio_url: emotionData.audio_url || '',
         ai_feedback: emotionData.ai_feedback || emotionData.feedback || ''
       };

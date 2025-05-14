@@ -1,6 +1,17 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/types';
+import { Theme, FontFamily, FontSize } from '@/types/types';
+
+// Interface for ThemeContext
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  isDarkMode: boolean;
+  fontFamily: FontFamily;
+  setFontFamily: (font: FontFamily) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+}
 
 // Création du contexte
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -114,5 +125,5 @@ export const useTheme = (): ThemeContextType => {
   return context;
 };
 
-// Export types so they can be imported from this module
+// Export types
 export type { Theme, FontFamily, FontSize, ThemeContextType };

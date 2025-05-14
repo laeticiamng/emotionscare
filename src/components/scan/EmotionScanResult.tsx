@@ -37,9 +37,11 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ result, onEmotion
       // Ensure data is in the correct format
       const payload = {
         ...result,
-        // Make sure date is a string
-        date: result.date ? (typeof result.date === 'object' ? result.date.toISOString() : result.date) : new Date().toISOString(),
-        // Convert emojis to string if needed for the API
+        // Make sure date is a string and handle null case
+        date: result.date ? 
+              (typeof result.date === 'object' ? result.date.toISOString() : result.date) 
+              : new Date().toISOString(),
+        // Convert emojis to array if needed for the API
         emojis: Array.isArray(result.emojis) ? result.emojis : 
                 (result.emojis ? [result.emojis] : [])
       };

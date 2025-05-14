@@ -1,49 +1,63 @@
 
 import { UserRole } from '@/types/types';
 
-/**
- * Check if a user role is an admin role
- */
-export const isAdminRole = (role: string): boolean => {
-  return role === 'b2b_admin' || role === 'admin';
-};
-
-/**
- * Get the display name for a user role
- */
+// Get the name of a role
 export const getRoleName = (role: string): string => {
   switch (role) {
-    case 'b2c': return 'Utilisateur particulier';
-    case 'b2b_user': return 'Collaborateur';
-    case 'b2b_admin': return 'RH / Manager';
-    default: return 'Utilisateur';
+    case 'b2c':
+      return 'Utilisateur particulier';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'RH / Manager';
+    default:
+      return 'Utilisateur';
   }
 };
 
-/**
- * Check if a role has specific permissions
- */
-export const hasPermission = (role: UserRole, permission: string): boolean => {
-  if (role === 'b2b_admin') {
-    return true; // Admin has all permissions
+// Get the home path for a given role
+export const getRoleHomePath = (role: UserRole): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/dashboard';
+    case 'b2b_admin':
+      return '/admin/dashboard';
+    default:
+      return '/dashboard';
   }
-  
-  // Define permission sets for other roles
-  const permissions: Record<UserRole, string[]> = {
-    'b2b_admin': ['all'],
-    'b2b_user': ['view_own_data', 'edit_own_profile', 'participate_sessions'],
-    'b2c': ['view_own_data', 'edit_own_profile', 'participate_sessions']
-  };
-  
-  return permissions[role]?.includes(permission) || false;
 };
 
-/**
- * Safe conversion of string to UserRole
- */
-export const toUserRole = (role: string): UserRole => {
-  if (role === 'b2c' || role === 'b2b_user' || role === 'b2b_admin') {
-    return role as UserRole;
+// Get the login path for a given role
+export const getRoleLoginPath = (role: UserRole): string => {
+  switch (role) {
+    case 'b2c':
+      return '/auth/login?mode=personal';
+    case 'b2b_user':
+    case 'b2b_admin':
+      return '/auth/login?mode=professional';
+    default:
+      return '/auth/login';
   }
-  return 'b2c'; // Default fallback
+};
+
+// Check if a user has access to a specific route based on their role
+export const hasRoleAccess = (userRole: UserRole, requiredRoles: UserRole[]): boolean => {
+  return requiredRoles.includes(userRole);
+};
+
+// Export for backward compatibility
+export const isAdmin = (role: UserRole): boolean => {
+  return role === 'b2b_admin';
+};
+
+// Export for backward compatibility
+export const isB2BUser = (role: UserRole): boolean => {
+  return role === 'b2b_user';
+};
+
+// Export for backward compatibility
+export const isB2C = (role: UserRole): boolean => {
+  return role === 'b2c';
 };

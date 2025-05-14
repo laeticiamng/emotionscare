@@ -1,146 +1,122 @@
 
-import type { EmotionResult } from '@/types/types';
+import { v4 as uuid } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
+import { EmotionResult } from '@/types/types';
 
-// —————————————————————————————————
-// Fonction : analyzeEmotion
-// —————————————————————————————————
-export const analyzeEmotion = async (
-  text: string, 
-  emojis?: string[], 
-  audioUrl?: string | null
-): Promise<EmotionResult> => {
-  // Mock API call for development
-  console.log('Analyzing text:', text, 'emojis:', emojis, 'audio:', audioUrl);
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Return mock result
-  return {
-    id: Math.random().toString(36).substring(2, 9),
-    emotion: determineEmotion(text, emojis),
-    confidence: 0.85,
-    intensity: 0.7,
-    transcript: text,
-    text: text,
-    date: new Date().toISOString(),
-    emojis: emojis || [],
-    ai_feedback: generateAIFeedback(text),
-  };
-};
-
-// Helper to determine emotion based on text
-const determineEmotion = (text: string, emojis?: string[]): string => {
-  const lowerText = text.toLowerCase();
-  
-  // Simple keyword matching
-  if (/happy|joy|excited|glad|wonderful|fantastic/.test(lowerText)) return 'joy';
-  if (/sad|unhappy|depressed|disappointed|down/.test(lowerText)) return 'sadness';
-  if (/angry|mad|frustrated|annoyed/.test(lowerText)) return 'anger';
-  if (/scared|afraid|fearful|anxious|worried/.test(lowerText)) return 'fear';
-  if (/surprised|amazed|astonished|shocked/.test(lowerText)) return 'surprise';
-  if (/disgusted|dislike|gross|repulsed/.test(lowerText)) return 'disgust';
-  if (/calm|relaxed|peaceful|serene/.test(lowerText)) return 'calm';
-  
-  // Check emojis
-  if (emojis && emojis.length > 0) {
-    if (emojis.some(e => ['😀', '😃', '😄', '😁', '🥰', '😊'].includes(e))) return 'joy';
-    if (emojis.some(e => ['😢', '😭', '😞', '😔'].includes(e))) return 'sadness';
-    if (emojis.some(e => ['😠', '😡', '🤬'].includes(e))) return 'anger';
-    if (emojis.some(e => ['😨', '😱', '😰', '😓'].includes(e))) return 'fear';
-    if (emojis.some(e => ['😲', '😮', '😯'].includes(e))) return 'surprise';
-  }
-  
-  return 'neutral';
-};
-
-// Generate mock AI feedback
-const generateAIFeedback = (text: string): string => {
-  const lowerText = text.toLowerCase();
-  
-  if (/happy|joy|excited|glad/.test(lowerText)) {
-    return "Je détecte de la joie dans vos mots. C'est une excellente énergie à cultiver et à partager avec votre entourage.";
-  }
-  
-  if (/sad|unhappy|depressed|disappointed/.test(lowerText)) {
-    return "Je perçois de la tristesse dans votre message. N'hésitez pas à parler à quelqu'un de confiance de ce que vous ressentez.";
-  }
-  
-  if (/angry|mad|frustrated|annoyed/.test(lowerText)) {
-    return "Je sens de la colère dans vos mots. Prenez quelques respirations profondes et essayez d'identifier précisément ce qui vous irrite.";
-  }
-  
-  return "Votre message reflète votre état émotionnel actuel. La conscience de nos émotions est le premier pas vers le bien-être.";
-};
-
-// —————————————————————————————————
-// Fonction : saveEmotion
-// —————————————————————————————————
-export const saveEmotion = async (result: EmotionResult): Promise<boolean> => {
-  console.log('Saving emotion:', result);
-  
-  // In a real app, this would be a call to your backend
+// Create a new emotion entry
+export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<EmotionResult> => {
   try {
-    // Convert to appropriate format if needed
-    const payload = {
-      ...result,
-      // Convert Date to string if needed
-      date: typeof result.date === 'object' && result.date instanceof Date 
-        ? result.date.toISOString() 
-        : result.date,
-      // Convert array to string if the API expects it
-      emojis: Array.isArray(result.emojis) ? result.emojis.join(',') : result.emojis,
+    // Ensure required fields are present
+    const emotionData = {
+      id: data.id || uuid(),
+      user_id: data.user_id,
+      date: data.date || new Date().toISOString(),
+      emotion: data.emotion || 'neutral',
+      score: data.score || Math.round((data.confidence || 0.5) * 100),
+      confidence: data.confidence || 0.5,
+      text: data.text || '',
+      emojis: Array.isArray(data.emojis) ? data.emojis : [],
+      audio_url: data.audio_url || '',
+      ai_feedback: data.ai_feedback || ''
     };
+
+    const { data: insertedData, error } = await supabase
+      .from('emotions')
+      .insert(emotionData)
+      .select()
+      .single();
+
+    if (error) throw error;
     
-    // Mock successful API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    console.log('Emotion saved successfully');
-    return true;
+    return insertedData as EmotionResult;
   } catch (error) {
-    console.error('Error saving emotion:', error);
-    return false;
+    console.error('Error creating emotion entry:', error);
+    throw error;
   }
 };
 
-// —————————————————————————————————
-// Fonction : analyzeAudioStream
-// —————————————————————————————————
+// Fetch the latest emotion for a user
+export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('emotions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No rows returned (not an error, just no data yet)
+        return null;
+      }
+      throw error;
+    }
+
+    return data as EmotionResult;
+  } catch (error) {
+    console.error('Error fetching latest emotion:', error);
+    return null;
+  }
+};
+
+// Analyze audio stream (placeholder implementation)
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  console.log('Analyzing audio stream...');
+  // In a real app, this would send the audio to an API for processing
+  // For now, we'll return a mock response
+  await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API latency
   
-  // Simulate processing delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  // Mock result
   return {
-    id: Math.random().toString(36).substring(2, 9),
-    emotion: ['joy', 'sadness', 'anger', 'fear', 'surprise'][Math.floor(Math.random() * 5)],
-    confidence: 0.7 + Math.random() * 0.25,
-    text: "Transcript would appear here in a real implementation",
-    transcript: "This is a mock transcript from the audio recording",
-    date: new Date().toISOString(),
+    id: uuid(),
+    emotion: ['happy', 'sad', 'neutral', 'calm', 'excited'][Math.floor(Math.random() * 5)],
+    confidence: 0.7 + Math.random() * 0.3,
     score: Math.floor(Math.random() * 100),
-    feedback: "This is mock feedback based on the analyzed emotion"
+    transcript: "Ceci est une transcription simulée de l'enregistrement audio.",
+    date: new Date().toISOString(),
+    ai_feedback: "Analyse IA simulée basée sur l'audio soumis."
   };
 };
 
-// —————————————————————————————————
-// Fonction : fetchLatestEmotion
-// —————————————————————————————————
-export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
-  console.log('Fetching latest emotion for user:', userId);
+// Save an emotion record
+export const saveEmotion = async (emotion: EmotionResult): Promise<void> => {
+  // Ensure the emotion object has the required fields
+  const emotionToSave = {
+    ...emotion,
+    id: emotion.id || uuid(),
+    date: emotion.date || new Date().toISOString(),
+    score: emotion.score || Math.round((emotion.confidence || 0.5) * 100)
+  };
+
+  const { error } = await supabase
+    .from('emotions')
+    .upsert(emotionToSave);
+
+  if (error) throw error;
+};
+
+// Analyze text/emoji input
+export const analyzeEmotion = async (text?: string, emojis?: string[]): Promise<EmotionResult> => {
+  // In a real app, this would call an API
+  // For now, we'll return a mock response
+  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API latency
   
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 800));
+  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral', 'calm'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
   
-  // Mock data
   return {
-    id: Math.random().toString(36).substring(2, 9),
-    emotion: ['joy', 'calm', 'sadness'][Math.floor(Math.random() * 3)],
-    score: Math.floor(Math.random() * 10) + 1,
+    id: uuid(),
+    emotion: randomEmotion,
+    confidence: 0.7 + Math.random() * 0.3,
+    score: Math.floor(Math.random() * 100),
+    text: text || '',
+    emojis: emojis || [],
     date: new Date().toISOString(),
-    text: "This was my feeling earlier today",
-    user_id: userId
+    ai_feedback: `Basé sur votre entrée, je détecte principalement de la ${randomEmotion}.`,
+    recommendations: [
+      "Prenez 5 minutes pour méditer",
+      "Essayez une séance de respiration profonde",
+      "Écoutez une playlist relaxante"
+    ]
   };
 };
