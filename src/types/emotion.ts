@@ -18,6 +18,7 @@ export interface Emotion {
 
 export interface EmotionResult {
   id?: string;
+  user_id?: string;
   emotion: string;
   dominantEmotion?: string;  // Adding for compatibility
   primaryEmotion?: string;   // Some components expect this property
@@ -28,7 +29,6 @@ export interface EmotionResult {
   feedback?: string;
   ai_feedback?: string;
   source?: "audio" | "text" | "camera" | "manual" | "voice";
-  user_id?: string;
   date?: string;
   timestamp?: string;
   confidence?: number;
@@ -36,7 +36,22 @@ export interface EmotionResult {
   recommendations?: string[];
 }
 
-export type EmotionType = "neutral" | "positive" | "negative" | "other";
+export type EmotionType = {
+  name: string;
+  color: string;
+  icon?: string;
+  description?: string;
+  category?: "positive" | "negative" | "neutral" | "other";
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  category?: "positive" | "negative" | "neutral" | "other";
+  trend?: "increasing" | "decreasing" | "stable";
+  previousScore?: number;
+  changePercentage?: number;
+  triggers?: string[];
+  recommendations?: string[];
+}
 
 export interface EmotionalTeamViewProps {
   teamId: string;

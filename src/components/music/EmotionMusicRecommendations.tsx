@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { MusicPlaylist, MusicTrack } from '@/types/music';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Emotion } from '@/types/emotion';
-import TrackList from '@/components/music/TrackList';
 import { useMusic } from '@/contexts/MusicContext';
 import { Music, Activity } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import TrackList from './TrackList';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
@@ -72,7 +72,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   userMood,
   isLoading = false
 }) => {
-  const { playTrack, currentTrack, isPlaying } = useMusic();
+  const { playTrack, currentTrack, isPlaying, togglePlay } = useMusic();
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -100,9 +100,9 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     // Make sure track has the required properties
     const normalizedTrack: MusicTrack = {
       ...track,
-      url: track.url || track.audioUrl || track.audio_url || '',
-      audioUrl: track.audioUrl || track.audio_url || track.url || '',
-      coverUrl: track.coverUrl || track.cover_url || track.cover || ''
+      url: track.url || track.audioUrl || '',
+      audioUrl: track.audioUrl || track.url || '',
+      coverUrl: track.coverUrl || ''
     };
     
     playTrack(normalizedTrack);
@@ -147,11 +147,12 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       <CardContent>
         {recommendedTracks.length > 0 ? (
           <TrackList 
-            tracks={recommendedTracks} 
-            onPlay={handlePlayTrack}
+            tracks={recommendedTracks}
+            onTrackSelect={handlePlayTrack}
             currentTrack={currentTrack}
             isPlaying={isPlaying}
-            compact
+            onPlayPause={togglePlay}
+            showEmotionTag={true}
           />
         ) : (
           <p className="text-muted-foreground text-center py-6">

@@ -1,8 +1,15 @@
-
 // Default constants for the application
 
-// Time of day
-export const TIME_OF_DAY = ['morning', 'afternoon', 'evening'];
+// Time of day as enum
+export enum TimeOfDay {
+  MORNING = 'morning',
+  AFTERNOON = 'afternoon',
+  EVENING = 'evening',
+  NIGHT = 'night'
+}
+
+// Time of day as array (keep for backward compatibility)
+export const TIME_OF_DAY = [TimeOfDay.MORNING, TimeOfDay.AFTERNOON, TimeOfDay.EVENING, TimeOfDay.NIGHT];
 
 // Default user preferences
 export const DEFAULT_USER_PREFERENCES = {

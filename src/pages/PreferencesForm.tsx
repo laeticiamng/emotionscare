@@ -7,7 +7,27 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { UserPreferences, FontSize, FontFamily, ThemeName } from '@/types/user';
+
+// Define the interface for user preferences
+interface UserPreferences {
+  theme?: 'light' | 'dark' | 'pastel' | 'system';
+  fontSize?: 'small' | 'medium' | 'large';
+  language?: string;
+  privacy?: 'public' | 'private' | 'friends';
+  notifications?: boolean | {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    frequency?: string;
+    types?: Record<string, boolean>;
+    tone?: string;
+    quietHours?: {
+      enabled: boolean;
+      start: string;
+      end: string;
+    };
+  };
+}
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
@@ -16,7 +36,21 @@ interface PreferencesFormProps {
 
 const preferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'pastel', 'system']).optional(),
-  notifications_enabled: z.boolean().optional(),
+  notifications: z.boolean().or(
+    z.object({
+      enabled: z.boolean().optional(),
+      emailEnabled: z.boolean().optional(),
+      pushEnabled: z.boolean().optional(),
+      frequency: z.string().optional(),
+      types: z.record(z.boolean()).optional(),
+      tone: z.string().optional(),
+      quietHours: z.object({
+        enabled: z.boolean().optional(),
+        start: z.string().optional(),
+        end: z.string().optional()
+      }).optional()
+    })
+  ).optional(),
   fontSize: z.enum(['small', 'medium', 'large']).optional(),
   language: z.string().optional(),
   privacy: z.enum(['public', 'private', 'friends']).optional()
@@ -38,6 +72,12 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
       setIsSaving(false);
     }
   };
+
+  // Get notifications as an object
+  const notificationsValue = form.watch('notifications');
+  const notificationsObj = typeof notificationsValue === 'boolean' 
+    ? { enabled: notificationsValue, emailEnabled: false, pushEnabled: false } 
+    : notificationsValue || { enabled: false, emailEnabled: false, pushEnabled: false };
 
   return (
     <Form {...form}>
@@ -155,8 +195,21 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
               </div>
               <FormControl>
                 <Switch
-                  checked={Boolean(field.value)}
-                  onCheckedChange={field.onChange}
+                  checked={
+                    typeof field.value === 'boolean' 
+                      ? field.value 
+                      : field.value?.enabled || false
+                  }
+                  onCheckedChange={(checked) => {
+                    if (typeof field.value === 'boolean') {
+                      field.onChange(checked);
+                    } else {
+                      field.onChange({
+                        ...notificationsObj,
+                        enabled: checked
+                      });
+                    }
+                  }}
                 />
               </FormControl>
             </FormItem>

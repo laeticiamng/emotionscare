@@ -1,81 +1,53 @@
 
 import React from 'react';
-import { useAmbientSound } from './useAmbientSound';
+import useAmbientSound from './useAmbientSound';
 import { Button } from '@/components/ui/button';
+import { Volume, VolumeX, Volume2 } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Music, HeadphonesIcon } from 'lucide-react';
 
 interface AudioControllerProps {
-  autoplay?: boolean;
-  initialVolume?: number;
   className?: string;
-  minimal?: boolean;
 }
 
-export function AudioController({ 
-  autoplay = false, 
-  initialVolume = 0.3,
-  className = '',
-  minimal = false
-}: AudioControllerProps) {
+const AudioController: React.FC<AudioControllerProps> = ({ className }) => {
+  const ambientSound = useAmbientSound();
+  
   const { 
     isPlaying, 
     toggle, 
     volume, 
     changeVolume, 
-    currentMood 
-  } = useAmbientSound({
-    autoplay,
-    volume: initialVolume,
-    fadeIn: true
-  });
-  
-  const handleVolumeChange = (value: number[]) => {
-    changeVolume(value[0]);
+    currentMood, 
+    changeMood 
+  } = ambientSound;
+
+  const handleVolumeChange = (values: number[]) => {
+    changeVolume(values[0]);
   };
-  
-  if (minimal) {
-    return (
-      <Button
-        variant="ghost"
-        size="sm"
-        className={`p-2 h-9 w-9 rounded-full ${className}`}
-        onClick={toggle}
-        title={isPlaying ? "Désactiver l'ambiance sonore" : "Activer l'ambiance sonore"}
-      >
-        <HeadphonesIcon className="h-4 w-4" />
-      </Button>
-    );
-  }
-  
+
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="p-2 h-9 w-9 rounded-full"
+    <div className={`flex items-center gap-2 ${className}`}>
+      <Button 
+        variant="ghost" 
+        size="icon" 
         onClick={toggle}
+        title={isPlaying ? "Mute ambient sound" : "Play ambient sound"}
       >
-        <Music className="h-4 w-4" />
+        {isPlaying ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
       </Button>
       
-      <div className="flex flex-col">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-medium">
-            {isPlaying ? 'Ambiance sonore active' : 'Ambiance sonore'}
-          </span>
-          <span className="text-xs capitalize">{currentMood}</span>
-        </div>
-        
-        <Slider
-          defaultValue={[initialVolume]}
-          max={1}
-          step={0.01}
-          value={[volume]}
-          onValueChange={handleVolumeChange}
-          className="w-32"
+      {isPlaying && (
+        <Slider 
+          className="w-24" 
+          value={[volume]} 
+          min={0} 
+          max={1} 
+          step={0.01} 
+          onValueChange={handleVolumeChange} 
         />
-      </div>
+      )}
     </div>
   );
-}
+};
+
+export default AudioController;

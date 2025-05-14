@@ -1,58 +1,68 @@
-import { useState, useEffect } from 'react';
-import { useSettings } from '@/contexts/SettingsContext';
-import { TIME_OF_DAY } from '@/constants/defaults';
 
-const audioFiles = {
-  morning: '/audio/morning-ambient.mp3',
-  afternoon: '/audio/afternoon-ambient.mp3',
-  evening: '/audio/evening-ambient.mp3',
-};
+import { useCallback, useEffect, useState } from 'react';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext'; 
+import { TimeOfDay } from '@/constants/defaults';
 
-export const useAmbientSound = () => {
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [currentAudioFile, setCurrentAudioFile] = useState<string | null>(null);
-  const { settings } = useSettings();
+export function useAmbientSound() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.3);
+  const [currentMood, setCurrentMood] = useState<string>('calm');
+  const { preferences } = useUserPreferences?.() || { preferences: { ambientSound: true } };
+
+  const toggle = useCallback(() => {
+    setIsPlaying(prev => !prev);
+  }, []);
+
+  const changeVolume = useCallback((newVolume: number) => {
+    setVolume(newVolume);
+  }, []);
+
+  const changeMood = useCallback((mood: string) => {
+    setCurrentMood(mood);
+  }, []);
 
   useEffect(() => {
-    const timeOfDay = getTimeOfDay();
-    const newAudioFile = audioFiles[timeOfDay] || null;
-
-    if (settings?.ambientSound && newAudioFile) {
-      if (!audio) {
-        const newAudio = new Audio(newAudioFile);
-        newAudio.loop = true;
-        setAudio(newAudio);
-        setCurrentAudioFile(newAudioFile);
-      } else if (newAudioFile !== currentAudioFile) {
-        audio.pause();
-        const newAudio = new Audio(newAudioFile);
-        newAudio.loop = true;
-        setAudio(newAudio);
-        setCurrentAudioFile(newAudioFile);
-        newAudio.play();
-      } else {
-        audio.play();
-      }
-    } else if (audio) {
-      audio.pause();
-    }
-
-    return () => {
-      if (audio) {
-        audio.pause();
-      }
-    };
-  }, [settings?.ambientSound]);
-
-  const getTimeOfDay = (): string => {
+    // Determine time of day to set appropriate mood
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) {
-      return TIME_OF_DAY[0]; // morning
-    } else if (hour >= 12 && hour < 17) {
-      return TIME_OF_DAY[1]; // afternoon
-    } else {
-      return TIME_OF_DAY[2]; // evening
+    let timeOfDay: TimeOfDay;
+    
+    if (hour >= 5 && hour < 12) timeOfDay = TimeOfDay.MORNING;
+    else if (hour >= 12 && hour < 18) timeOfDay = TimeOfDay.AFTERNOON;
+    else if (hour >= 18 && hour < 22) timeOfDay = TimeOfDay.EVENING;
+    else timeOfDay = TimeOfDay.NIGHT;
+    
+    // Set default mood based on time of day
+    switch(timeOfDay) {
+      case TimeOfDay.MORNING:
+        setCurrentMood('calm');
+        break;
+      case TimeOfDay.AFTERNOON:
+        setCurrentMood('focus');
+        break;
+      case TimeOfDay.EVENING:
+        setCurrentMood('relax');
+        break;
+      case TimeOfDay.NIGHT:
+        setCurrentMood('sleep');
+        break;
+      default:
+        setCurrentMood('calm');
     }
-  };
-};
 
+    // Auto-play based on user preferences
+    if (preferences?.ambientSound) {
+      setIsPlaying(true);
+    }
+  }, [preferences]);
+
+  return {
+    isPlaying,
+    toggle,
+    volume,
+    changeVolume,
+    currentMood,
+    changeMood
+  };
+}
+
+export default useAmbientSound;

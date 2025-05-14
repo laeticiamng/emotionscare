@@ -11,7 +11,7 @@ interface AudioProcessorProps {
   onProgressUpdate: (progress: string) => void;
   onAnalysisComplete: (emotion: any, result: EmotionResult) => void;
   onError: (error: string) => void;
-  isListening: boolean; // Added this property explicitly
+  isListening: boolean;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
