@@ -26,10 +26,10 @@ export const enhanceEmotionAnalysis = async (emotion: Partial<EmotionResult>): P
 
 const generateInsightsForEmotion = (emotion: string): string => {
   const insights: Record<string, string> = {
-    'happiness': 'Vous semblez être dans un état positif aujourd'hui. La joie est associée à une libération de dopamine et d'endorphines.',
+    'happiness': 'Vous semblez être dans un état positif aujourd\'hui. La joie est associée à une libération de dopamine et d\'endorphines.',
     'sadness': 'La tristesse est une émotion naturelle qui nous aide à traiter les pertes. Elle peut nous inciter à chercher du soutien.',
-    'anger': 'La colère est souvent liée à un sentiment d'injustice ou de frustration. La reconnaître est la première étape pour la gérer.',
-    'fear': 'La peur est un mécanisme de protection, mais elle peut parfois nous empêcher d'avancer.',
+    'anger': 'La colère est souvent liée à un sentiment d\'injustice ou de frustration. La reconnaître est la première étape pour la gérer.',
+    'fear': 'La peur est un mécanisme de protection, mais elle peut parfois nous empêcher d\'avancer.',
     'surprise': 'La surprise nous aide à nous adapter rapidement à de nouvelles situations et stimule notre curiosité.',
     'disgust': 'Le dégoût est une émotion protectrice qui nous aide à éviter des situations potentiellement nuisibles.',
     'neutral': 'Un état émotionnel neutre peut indiquer un équilibre ou une période de transition.'
@@ -41,13 +41,13 @@ const generateInsightsForEmotion = (emotion: string): string => {
 const generateRecommendationsForEmotion = (emotion: string): string[] => {
   const recommendations: Record<string, string[]> = {
     'happiness': [
-      'Partagez votre joie avec d'autres personnes pour renforcer ce sentiment',
+      'Partagez votre joie avec d\'autres personnes pour renforcer ce sentiment',
       'Notez ce qui vous rend heureux dans un journal de gratitude',
       'Utilisez cette énergie positive pour accomplir des tâches difficiles'
     ],
     'sadness': [
       'Accordez-vous le droit de ressentir cette tristesse sans jugement',
-      'Parlez à quelqu'un de confiance ou écrivez vos pensées',
+      'Parlez à quelqu\'un de confiance ou écrivez vos pensées',
       'Écoutez de la musique qui résonne avec votre humeur actuelle'
     ],
     'anger': [
@@ -56,14 +56,14 @@ const generateRecommendationsForEmotion = (emotion: string): string[] => {
       'Exprimez vos sentiments de façon constructive'
     ],
     'fear': [
-      'Pratiquez des exercices de respiration pour apaiser l'anxiété',
+      'Pratiquez des exercices de respiration pour apaiser l\'anxiété',
       'Concentrez-vous sur ce que vous pouvez contrôler',
       'Imaginez le meilleur scénario possible'
     ],
     'surprise': [
       'Prenez un moment pour assimiler les nouvelles informations',
       'Identifiez comment cette surprise peut être une opportunité',
-      'Partagez votre expérience avec d'autres'
+      'Partagez votre expérience avec d\'autres'
     ],
     'disgust': [
       'Essayez de comprendre la source de ce sentiment',
@@ -72,7 +72,7 @@ const generateRecommendationsForEmotion = (emotion: string): string[] => {
     ],
     'neutral': [
       'Profitez de cet équilibre pour réfléchir à vos objectifs',
-      'C'est un bon moment pour pratiquer la pleine conscience',
+      'C\'est un bon moment pour pratiquer la pleine conscience',
       'Envisagez de nouvelles activités qui pourraient vous stimuler'
     ]
   };
