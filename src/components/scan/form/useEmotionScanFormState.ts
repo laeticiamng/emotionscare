@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { v4 as uuid } from 'uuid';
-import { supabase } from '@/integrations/supabase'; 
+import { supabase } from '@/integrations/supabase/client'; 
 import { EmotionResult } from '@/types';
 
 export function useEmotionScanFormState(userId: string, onScanComplete?: () => void) {

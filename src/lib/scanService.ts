@@ -1,6 +1,6 @@
 
 import { EmotionResult, Emotion, Json } from '@/types';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { v4 as uuid } from 'uuid';
 
 // Analyze emotion from text and emojis

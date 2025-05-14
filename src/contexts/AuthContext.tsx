@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase';
-import { User, UserPreferences, AuthContextType, UserRole } from '@/types/types';
+import { supabase } from '@/integrations/supabase/client';
+import { User, UserPreferences, AuthContextType, UserRole } from '@/types';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = useCallback(async () => {
     await signOut();
     setUser(null);
-  }, [signOut]);
+  }, []);
 
   useEffect(() => {
     if (!user) {
