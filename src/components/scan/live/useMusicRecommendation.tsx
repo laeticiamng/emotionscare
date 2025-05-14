@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 import { EmotionResult, MusicTrack } from '@/types';
@@ -36,7 +37,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
         // Make sure all tracks have required properties
         const tracksWithRequiredProps = playlist.tracks.map(track => ({
           ...track,
-          url: track.url || track.audioUrl || track.audio_url || track.coverUrl || '',
+          url: track.url || '',
           duration: track.duration || 0
         }));
         setRecommendedTracks(tracksWithRequiredProps);
@@ -55,7 +56,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     if (track) {
       playTrack({
         ...track,
-        url: track.url || track.audioUrl || track.audio_url || track.coverUrl || '',
+        url: track.url || '',
         duration: track.duration || 0
       });
     }

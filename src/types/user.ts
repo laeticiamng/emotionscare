@@ -1,6 +1,6 @@
 
 // Updated User type with additional fields
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | 'user' | 'manager';
 
 export interface User {
   id: string;
@@ -32,9 +32,9 @@ export type FontFamily = 'inter' | 'poppins' | 'roboto' | 'opensans';
 // Extended UserPreferences interface with all required fields
 export interface UserPreferences {
   theme: ThemeName;
-  dynamicTheme: 'none' | 'time' | 'emotion' | 'weather';
-  highContrast: boolean;
-  reducedAnimations: boolean;
+  dynamicTheme?: 'none' | 'time' | 'emotion' | 'weather';
+  highContrast?: boolean;
+  reducedAnimations?: boolean;
   fontSize: FontSize;
   font: FontFamily;
   customBackground?: string;
@@ -46,17 +46,17 @@ export interface UserPreferences {
   avatarUrl?: string;
   
   // Accessibility
-  screenReader: boolean;
-  keyboardNavigation: boolean;
-  audioGuidance: boolean;
+  screenReader?: boolean;
+  keyboardNavigation?: boolean;
+  audioGuidance?: boolean;
   
   // Notifications
-  notificationsEnabled: boolean;
+  notificationsEnabled?: boolean;
   notifications_enabled?: boolean; // For backward compatibility
-  notificationTypes: {
-    journal: boolean;
-    breathing: boolean;
-    music: boolean;
+  notificationTypes?: {
+    journal?: boolean;
+    breathing?: boolean;
+    music?: boolean;
   };
   // Added notifications for backward compatibility
   notifications?: {
@@ -64,8 +64,8 @@ export interface UserPreferences {
     emailEnabled?: boolean;
     pushEnabled?: boolean;
   };
-  notificationFrequency: string;
-  notificationTone: string;
+  notificationFrequency?: string;
+  notificationTone?: string;
   reminderTime?: string;
   reminder_time?: string;
   
@@ -78,38 +78,25 @@ export interface UserPreferences {
   };
   
   // Data
-  dataExport: 'pdf' | 'json';
-  incognitoMode: boolean;
-  lockJournals: boolean;
+  dataExport?: 'pdf' | 'json';
+  incognitoMode?: boolean;
+  lockJournals?: boolean;
   
   // Premium features
-  emotionalCamouflage: boolean; // For PremiumFeatures
-  aiSuggestions: boolean; // For PremiumFeatures
+  emotionalCamouflage?: boolean; // For PremiumFeatures
+  aiSuggestions?: boolean; // For PremiumFeatures
   duoModeEnabled?: boolean;
   trustedContact?: string;
-  customPresets: {
+  customPresets?: {
     name: string;
     theme: ThemeName;
     audioPreset: string;
   }[];
   
   // Additional features
-  autoplayVideos: boolean; // For PreferencesForm
+  autoplayVideos?: boolean; // For PreferencesForm
   dataCollection?: boolean; // For PreferencesForm
   language?: string; // For language preference
-}
-
-// For state management in useUserPreferences
-export type UserPreferencesState = UserPreferences;
-
-// Result of invitation verification
-export interface InvitationVerificationResult {
-  isValid: boolean;
-  error?: string;
-  invitation?: {
-    id: string;
-    role: string;
-    email: string;
-    expires_at: string;
-  };
+  onboardingCompleted?: boolean; // For completed onboarding
+  dashboardLayout?: string; // For dashboard layout preference
 }

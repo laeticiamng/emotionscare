@@ -1,6 +1,5 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User } from '@/types';
+import { User, UserRole } from '@/types/user';
 import { DEFAULT_USER_PREFERENCES } from '@/constants/defaults';
 
 interface AuthContextType {
@@ -61,12 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: '1',
         name: 'Utilisateur Test',
         email,
-        role: 'user',
+        role: 'b2c' as UserRole,
         avatar_url: '',
         createdAt: new Date().toISOString(),
         preferences: {
           ...DEFAULT_USER_PREFERENCES,
-          onboardingCompleted: false,
           dashboardLayout: 'standard'
         },
         onboarded: true
@@ -97,11 +95,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: Math.random().toString(36).substr(2, 9),
         name,
         email,
-        role: 'user',
+        role: 'b2c' as UserRole,
         createdAt: new Date().toISOString(),
         preferences: {
           ...DEFAULT_USER_PREFERENCES,
-          onboardingCompleted: false,
           dashboardLayout: 'standard'
         },
         onboarded: false

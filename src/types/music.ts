@@ -1,45 +1,4 @@
 
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  cover?: string;
-  coverUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
-}
-
-export interface Playlist {
-  id: string;
-  name: string;
-  emotion?: string;
-  tracks: Track[];
-  title?: string;
-  description?: string;
-  coverImage?: string;
-}
-
-export interface MusicContextType {
-  currentTrack: Track | null;
-  isPlaying: boolean;
-  volume: number;
-  progress: number;
-  playlist: Track[];
-  loadPlaylist: (tracks: Track[]) => void;
-  loadPlaylistForEmotion: (emotion: string) => Promise<void>;
-  playTrack: (track: Track) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  prevTrack: () => void;
-  togglePlay: () => void;
-  setVolume: (volume: number) => void;
-  seekTo: (progress: number) => void;
-  openDrawer: boolean;
-  setOpenDrawer: (open: boolean) => void;
-}
-
 export interface MusicTrack {
   id: string;
   title: string;
@@ -47,39 +6,86 @@ export interface MusicTrack {
   duration: number;
   url: string;
   coverUrl?: string;
+  cover?: string;
+  cover_url?: string;
+  audioUrl?: string;
+  audio_url?: string;
   emotion?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
+  description?: string;
+  coverUrl?: string;
+  emotion?: string;
   tracks: MusicTrack[];
-}
-
-export interface MusicRecommendation {
-  playlistId?: string;
-  playlistName?: string;
-  emotion: string;
-  description: string;
-  tracks?: Track[];
 }
 
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
-}
-
-export interface ProgressBarProps {
-  progress: number;
-  onSeek: (value: number) => void;
-  duration: number;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist | null;
 }
 
 export interface TrackInfoProps {
-  track: Track | null;
+  track?: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: boolean;
+  className?: string;
+}
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+  formatTime?: (time: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  showTimestamps?: boolean;
+  className?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (value: number) => void;
+  onChange: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  showLabel?: boolean;
+  className?: string;
+}
+
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  isMuted: boolean;
+  playlists: MusicPlaylist[];
+  currentEmotion: string | null;
+  error: string | null;
+  currentPlaylist: MusicPlaylist | null;
+  isInitialized: boolean;
+  openDrawer: boolean;
+  
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  adjustVolume: (amount: number) => void;
+  
+  loadPlaylistById: (id: string) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  
+  setOpenDrawer: (isOpen: boolean) => void;
+  
+  initializeMusicSystem: () => Promise<void>;
 }

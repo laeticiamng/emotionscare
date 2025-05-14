@@ -1,40 +1,30 @@
 
-import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
+import { UserPreferences } from '@/types/user';
 
-export const DEFAULT_USER_PREFERENCES = {
+export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   theme: 'system',
   fontSize: 'medium',
-  fontFamily: 'inter',
+  font: 'inter',
+  dynamicTheme: 'none',
+  notificationsEnabled: true,
   notifications: {
     enabled: true,
-    emailEnabled: true,
-    pushEnabled: true,
-    frequency: 'daily' as NotificationFrequency,
   },
-  autoplayVideos: true,
-  dataCollection: true,
-  highContrast: false,
-  reduceAnimations: false,
-  soundEffects: true,
-  colorAccent: '#6366f1',
-  language: 'fr',
-  privacyLevel: 'balanced',
-  onboardingCompleted: false,
-  emotionalCamouflage: false,
-  aiSuggestions: true,
-  fullAnonymity: false,
-  notifications_enabled: true,
   privacy: {
-    anonymousMode: false,
-    dataSharing: true,
-    profileVisibility: 'public',
+    profileVisibility: 'private',
   },
-  dashboardLayout: 'standard'
-};
-
-export const TIME_OF_DAY = {
-  MORNING: 'morning',
-  AFTERNOON: 'afternoon',
-  EVENING: 'evening',
-  NIGHT: 'night'
+  dataExport: 'pdf',
+  incognitoMode: false,
+  lockJournals: false,
+  emotionalCamouflage: false, 
+  aiSuggestions: true,
+  screenReader: false,
+  keyboardNavigation: false,
+  audioGuidance: false,
+  autoplayVideos: false,
+  highContrast: false,
+  reducedAnimations: false,
+  language: 'fr',
+  notificationFrequency: 'daily',
+  notificationTone: 'friendly'
 };

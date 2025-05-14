@@ -64,7 +64,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       const track = recommendedPlaylist.tracks[0];
       const trackWithRequiredProps: MusicTrack = {
         ...track,
-        url: track.url || track.audioUrl || track.audio_url || '',
+        url: track.url || '',
         duration: track.duration || 0
       };
       
@@ -102,21 +102,24 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
           </div>
           
           <div className="mt-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-2">
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                <span className="text-xs">Chargement de la playlist...</span>
-              </div>
-            ) : (
-              <Button 
-                className="w-full"
-                onClick={handlePlay}
-                disabled={!recommendedPlaylist}
-              >
-                <PlayCircle className="mr-2 h-4 w-4" />
-                Écouter la playlist recommandée
-              </Button>
-            )}
+            <Button 
+              onClick={handlePlay}
+              className="w-full" 
+              variant="outline"
+              disabled={isLoading || !recommendedPlaylist}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Chargement...
+                </>
+              ) : (
+                <>
+                  <PlayCircle className="mr-2 h-4 w-4" />
+                  Écouter maintenant
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </CardContent>
