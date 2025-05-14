@@ -1,21 +1,5 @@
 
-import { Badge, Challenge } from '@/types/gamification';
-
-// Re-export for convenience
-export type { Badge, Challenge };
-
-export interface GamificationStats {
-  points: number;
-  level: number;
-  nextLevelPoints: number;
-  badges: Badge[];
-  completedChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  progressToNextLevel: number;
-  challenges: Challenge[];
-  recentAchievements: any[];
-}
+import { GamificationStats, Badge, Challenge } from '@/types/gamification';
 
 export interface UseCommunityGamificationResult {
   stats: GamificationStats;
@@ -25,6 +9,8 @@ export interface UseCommunityGamificationResult {
   completed_challenges: number;
   loading: boolean;
   error: string | null;
-  refresh: () => Promise<void>;
+  refresh: () => void;
   claimBadge: (badgeId: string) => Promise<void>;
 }
+
+export type { Badge, Challenge, GamificationStats };

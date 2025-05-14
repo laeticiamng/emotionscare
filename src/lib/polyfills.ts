@@ -1,23 +1,32 @@
 
-/**
- * Polyfill for Array.findLast method
- * @returns The last element that satisfies the predicate, or undefined if none is found
- */
+// Polyfill for Array.prototype.findLast
 if (!Array.prototype.findLast) {
-  Array.prototype.findLast = function(predicate: (value: any, index: number, obj: any[]) => boolean): any {
-    for (let i = this.length - 1; i >= 0; i--) {
-      if (predicate(this[i], i, this)) {
-        return this[i];
+  Array.prototype.findLast = function(predicate: (value: any, index: number, obj: any[]) => unknown) {
+    if (this == null) {
+      throw new TypeError('Array.prototype.findLast called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    
+    const array = Object(this);
+    let length = array.length >>> 0;
+    
+    while (length--) {
+      const value = array[length];
+      if (predicate(value, length, array)) {
+        return value;
       }
     }
+    
     return undefined;
   };
 }
 
-// Extend ArrayLike types to include our polyfills
+// Add declarations to TypeScript
 declare global {
   interface Array<T> {
-    findLast(predicate: (value: T, index: number, obj: T[]) => boolean): T | undefined;
+    findLast(predicate: (value: T, index: number, obj: T[]) => unknown): T | undefined;
   }
 }
 

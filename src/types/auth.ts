@@ -8,6 +8,10 @@ export interface User {
   onboarded?: boolean;
   job_title?: string;
   department?: string;
+  team_id?: string;
+  anonymity_code?: string;
+  created_at?: string;
+  preferences?: UserPreferences;
 }
 
 export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
@@ -21,6 +25,7 @@ export interface AuthContextType {
   register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
+  updateUser: (user: User) => Promise<User>;
 }
 
 export interface AuthState {
@@ -40,4 +45,34 @@ export interface RegisterCredentials {
   password: string;
   name: string;
   role?: UserRole;
+}
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  fontSize: 'small' | 'medium' | 'large' | 'x-large' | 'xx-large';
+  fontFamily: 'default' | 'serif' | 'mono' | 'sans' | 'inter';
+  notifications: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    frequency: string;
+  };
+  autoplayVideos: boolean;
+  dataCollection: boolean;
+  highContrast: boolean;
+  reduceAnimations: boolean;
+  soundEffects: boolean;
+  colorAccent: string;
+  language: string;
+  privacyLevel: string;
+  onboardingCompleted?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+  notifications_enabled?: boolean;
+  privacy?: {
+    anonymousMode?: boolean;
+    dataSharing?: boolean;
+    profileVisibility?: 'public' | 'team' | 'private';
+  };
 }

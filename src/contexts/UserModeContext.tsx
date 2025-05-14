@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { UserRole } from '@/types/auth';
 
 export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'b2b-collaborator';
 
@@ -38,6 +39,9 @@ export const UserModeProvider: React.FC<{children: ReactNode}> = ({ children }) 
         break;
       case 'b2b_user':
         setUserMode('b2b-user');
+        break;
+      case 'b2c':
+        setUserMode('b2c');
         break;
       default:
         setUserMode('b2c');

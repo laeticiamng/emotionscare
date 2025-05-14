@@ -89,8 +89,8 @@ export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setRecommendations([
       {
         id: '1',
-        title: 'Take a break',
-        description: 'You\'ve been working for a while, consider taking a short break.',
+        title: 'Prendre une pause',
+        description: 'Vous travaillez depuis un moment, pensez à faire une courte pause.',
         priority: 1,
         confidence: 0.8,
       }

@@ -1,4 +1,4 @@
-// Import the polyfills
+
 import '../polyfills';
 import OpenAI from 'openai';
 import { ChatMessage } from '@/types';
@@ -6,7 +6,7 @@ import { ChatMessage } from '@/types';
 const apiKey = process.env.OPENAI_API_KEY;
 
 if (!apiKey) {
-  throw new Error('OPENAI_API_KEY is not set in environment variables.');
+  console.warn('OPENAI_API_KEY is not set in environment variables.');
 }
 
 export const openAIClient = new OpenAI({
@@ -152,16 +152,18 @@ export const generateChatResponse = async (
   stream: boolean = false
 ): Promise<OpenAI.Chat.Completions.ChatCompletion | string | null> => {
   try {
-    const lastUserMessage = this.messages.findLast((m) => m.role === 'user');
+    const lastUserMessage = messages.find(m => m.role === 'user');
     const systemPrompt = lastUserMessage
-      ? `You are an AI assistant. The user's last message was: ${lastUserMessage.content}.`
+      ? `You are an AI assistant. The user's last message was: ${lastUserMessage.text || lastUserMessage.content}.`
       : 'You are an AI assistant.';
 
+    const chatMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.text || m.content || '' }))
+    ];
+
     const chatCompletion = await openAIClient.chat.completions.create({
-      messages: [
-        { role: 'system', content: systemPrompt },
-        ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.text || '' }))
-      ],
+      messages: chatMessages,
       model: model,
       temperature: temperature,
       max_tokens: max_tokens,
@@ -182,3 +184,5 @@ export const generateChatResponse = async (
     return null;
   }
 };
+
+export default openAIClient;

@@ -3,7 +3,7 @@ import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { getRoleLoginPath } from '@/utils/roleUtils';
+import { getRoleLoginPath, hasRoleAccess } from '@/utils/roleUtils';
 
 type ProtectedRouteProps = {
   children?: React.ReactNode;
@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
   
   // Check if the user has the required role
-  if (role && user?.role !== role) {
+  if (role && user && !hasRoleAccess(user.role, role)) {
     console.log(`User does not have the required role (${role})`);
     toast({
       title: "Accès refusé",

@@ -1,87 +1,73 @@
 
-import { UserRole } from '@/types/user';
+import { UserRole } from '@/types/auth';
 
-export const isAdminRole = (role?: string): boolean => {
-  return role === 'admin';
-};
-
-export const isManagerRole = (role?: string): boolean => {
-  return role === 'manager' || role === 'wellbeing_manager';
-};
-
-export const isCoachRole = (role?: string): boolean => {
-  return role === 'coach';
-};
-
-export const isEmployeeRole = (role?: string): boolean => {
-  return role === 'employee';
-};
-
-export const isUserRole = (role?: string): boolean => {
-  return role === 'user';
-};
-
-export const getHighestRole = (roles: string[]): string => {
-  if (roles.includes('admin')) return 'admin';
-  if (roles.includes('manager') || roles.includes('wellbeing_manager')) return 'manager';
-  if (roles.includes('coach')) return 'coach';
-  if (roles.includes('employee')) return 'employee';
-  return 'user';
-};
-
-export const getRoleLabel = (role?: string): string => {
+/**
+ * Get the login path for a specific role
+ */
+export function getRoleLoginPath(role: 'b2c' | 'b2b_user' | 'b2b_admin'): string {
   switch (role) {
-    case 'admin':
-      return 'Administrator';
-    case 'manager':
-      return 'Manager';
-    case 'wellbeing_manager':
-      return 'Wellbeing Manager';
-    case 'coach':
-      return 'Coach';
-    case 'employee':
-      return 'Employee';
-    case 'user':
-      return 'User';
+    case 'b2c':
+      return '/b2c/login';
+    case 'b2b_user':
+      return '/b2b/user/login';
+    case 'b2b_admin':
+      return '/b2b/admin/login';
     default:
-      return 'User';
+      return '/login';
   }
-};
+}
 
-export const getRoleBadgeColor = (role?: string): string => {
+/**
+ * Get the home path for a specific role
+ */
+export function getRoleHomePath(role: UserRole): string {
   switch (role) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
     case 'admin':
-      return 'bg-red-500';
-    case 'manager':
-      return 'bg-blue-500';
-    case 'wellbeing_manager':
-      return 'bg-teal-500';
-    case 'coach':
-      return 'bg-green-500';
-    case 'employee':
-      return 'bg-yellow-500';
+      return '/admin/dashboard';
     default:
-      return 'bg-gray-500';
+      return '/dashboard';
   }
-};
+}
 
-// Fix the error with the moderator role by using a type guard
-export const hasModeratorAccess = (role?: string): boolean => {
-  if (!role) return false;
+/**
+ * Get the display name for a role
+ */
+export function getRoleName(role: UserRole): string {
+  switch (role) {
+    case 'b2c':
+      return 'Utilisateur particulier';
+    case 'b2b_user':
+      return 'Utilisateur professionnel';
+    case 'b2b_admin':
+      return 'Administrateur B2B';
+    case 'admin':
+      return 'Administrateur';
+    default:
+      return 'Utilisateur';
+  }
+}
+
+/**
+ * Check if a user has access to a specific role
+ */
+export function hasRoleAccess(userRole: UserRole, requiredRole: 'b2c' | 'b2b_user' | 'b2b_admin'): boolean {
+  // Convert string role to UserRole type
+  const requiredUserRole = requiredRole as UserRole;
   
-  // Compare as strings to avoid type issues
-  const moderatorRoles = ['admin', 'manager', 'wellbeing_manager', 'moderator'];
-  return moderatorRoles.includes(role);
-};
-
-export const canAccessAdminFeatures = (role?: string): boolean => {
-  return isAdminRole(role) || isManagerRole(role);
-};
-
-export const canAccessAnalytics = (role?: string): boolean => {
-  return isAdminRole(role) || isManagerRole(role) || isCoachRole(role);
-};
-
-export const canManageUsers = (role?: string): boolean => {
-  return isAdminRole(role) || isManagerRole(role);
-};
+  // Admin has access to everything
+  if (userRole === 'admin') return true;
+  
+  // Direct role match
+  if (userRole === requiredUserRole) return true;
+  
+  // B2B admin has access to b2b_user
+  if (userRole === 'b2b_admin' && requiredUserRole === 'b2b_user') return true;
+  
+  return false;
+}
