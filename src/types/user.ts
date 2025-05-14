@@ -20,6 +20,9 @@ export interface User {
   bio?: string;
   anonymity_code?: string;
   avatar?: string;
+  team_id?: string;
+  job_title?: string;
+  image?: string;
 }
 
 export interface UserPreferences {
@@ -36,9 +39,11 @@ export interface UserPreferences {
   dataCollection?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
   language?: string;
   privacy?: string;
   notifications_enabled?: boolean;
+  privacyLevel?: string;
 }
 
 export interface UserPreferencesState {

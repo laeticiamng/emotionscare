@@ -1,73 +1,31 @@
 
-import { Challenge, Badge as GamificationBadge } from '@/types/gamification';
+import { Badge, Challenge, GamificationStats } from '@/types/gamification';
 
-export interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  unlockedAt?: Date | string;
-  level?: number;
-  image?: string;
-  category?: string;
+export interface ChallengeProgressUpdatePayload {
+  challengeId: string;
+  progress: number;
 }
 
-export interface ActivityData {
-  totalActivity: number;
-  recentActivities: Activity[];
-  activityByDay: Record<string, number>;
-}
-
-export interface Activity {
-  id: string;
-  type: string;
-  description: string;
-  timestamp: Date | string;
-}
-
-export interface RewardItem {
-  id: string;
-  name: string;
-  description: string;
-  pointsRequired: number;
-  image?: string;
-  unlocked: boolean;
-}
-
-export interface GamificationContext {
-  stats: GamificationStatsState;
-  challenges: ChallengeState;
-  rewards: RewardState;
-}
-
-export interface GamificationStatsState {
-  isLoading: boolean;
+export interface UseChallengeManagementResult {
+  activeChallenges: Challenge[];
+  completedChallenges: Challenge[];
+  updateChallengeProgress: (payload: ChallengeProgressUpdatePayload) => Promise<void>;
+  completeChallenge: (challengeId: string) => Promise<void>;
+  joinChallenge: (challengeId: string) => Promise<void>;
+  loading: boolean;
   error: string | null;
-  data: GamificationStats | null;
 }
 
-export interface ChallengeState {
-  isLoading: boolean;
-  error: string | null;
-  data: Challenge[] | null;
-  current: Challenge | null;
-}
-
-export interface RewardState {
-  isLoading: boolean;
-  error: string | null;
-  data: RewardItem[] | null;
-}
-
-export interface GamificationStats {
-  points: number;
-  level: number;
-  nextLevelPoints: number;
-  badges: GamificationBadge[];
-  completedChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  progressToNextLevel: number;
+export interface UseCommunityGamificationResult {
+  stats: GamificationStats;
+  badges: Badge[];
   challenges: Challenge[];
-  recentAchievements: GamificationBadge[];
-  totalPoints?: number;
+  badges_count?: number;
+  completed_challenges?: number;
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+  claimBadge: (badgeId: string) => Promise<void>;
 }
+
+export { Badge, Challenge }; // Re-export these types

@@ -1,6 +1,6 @@
 
 export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'never' | 'flexible' | 'none';
-export type NotificationType = 'emotion' | 'journal' | 'coach' | 'system' | 'achievement' | 'all';
+export type NotificationType = 'emotion' | 'journal' | 'coach' | 'system' | 'achievement' | 'all' | 'success' | 'warning' | 'info' | 'error' | 'reminder' | 'invitation';
 export type NotificationTone = 'gentle' | 'neutral' | 'assertive' | 'cheerful' | 'minimal' | 'minimalist' | 'poetic' | 'directive' | 'motivating';
 
 export interface Notification {
@@ -50,6 +50,12 @@ export const NotificationType = {
   COACH: 'coach' as NotificationType,
   SYSTEM: 'system' as NotificationType,
   ACHIEVEMENT: 'achievement' as NotificationType,
+  SUCCESS: 'success' as NotificationType,
+  WARNING: 'warning' as NotificationType,
+  INFO: 'info' as NotificationType,
+  ERROR: 'error' as NotificationType,
+  REMINDER: 'reminder' as NotificationType,
+  INVITATION: 'invitation' as NotificationType,
   ALL: 'all' as NotificationType
 };
 

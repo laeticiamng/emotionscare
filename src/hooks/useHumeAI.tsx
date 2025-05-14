@@ -66,7 +66,7 @@ export function useHumeAI() {
     }
   }, [toast]);
   
-  const processEmotions = useCallback((faceData: any) => {
+  const processEmotions = useCallback(() => {
     // Mock emotions data with properly typed confidence
     return [
       { name: 'happiness', score: 0.8 },

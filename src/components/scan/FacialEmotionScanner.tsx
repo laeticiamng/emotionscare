@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Camera } from 'lucide-react';
-import { EmotionResult, FacialEmotionScannerProps } from '@/types/emotion';
+import { FacialEmotionScannerProps } from '@/types/emotion';
 import { useHumeAI } from '@/hooks/useHumeAI';
 
 const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ 
@@ -76,15 +76,15 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
       const result = await processFacialExpression(imageData);
       
       // Ensure we have a proper dominantEmotion object
-      if (!result.dominantEmotion && result.emotion) {
-        result.dominantEmotion = {
+      if (result && result.dominantEmotion) {
+        onEmotionDetected(result.dominantEmotion);
+      } else if (result && result.emotion) {
+        // Create dominantEmotion object if it doesn't exist
+        const dominantEmotion = {
           name: result.emotion,
           score: result.score || 0
         };
-      }
-      
-      if (onEmotionDetected && result.dominantEmotion) {
-        onEmotionDetected(result.dominantEmotion);
+        onEmotionDetected(dominantEmotion);
       }
     } catch (err) {
       console.error('Error analyzing facial expression:', err);

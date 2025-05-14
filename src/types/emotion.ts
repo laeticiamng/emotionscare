@@ -4,6 +4,7 @@ export interface EmotionResult {
   user_id?: string;
   date?: string;
   emotion?: string;
+  emotions?: any;
   score?: number;
   confidence?: number;
   feedback?: string;
@@ -21,8 +22,8 @@ export interface EmotionResult {
   dominantEmotion?: {
     name: string;
     score: number;
+    confidence?: number;
   };
-  emotions?: any;
   source?: string;
   faceDetected?: boolean;
   error?: string;
@@ -80,4 +81,12 @@ export interface EmotionScanFormProps {
   userId?: string;
   onScanSaved?: () => void;
   onClose?: () => void;
+}
+
+export interface EmotionalData {
+  userId?: string;
+  emotions?: Emotion[];
+  lastEmotion?: Emotion;
+  streakDays?: number;
+  emotionalBalance?: number;
 }

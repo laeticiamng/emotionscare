@@ -1,101 +1,79 @@
 
-import { useEffect } from 'react';
-import { useBranding } from '@/hooks/useBranding';
-import { useMusic } from '@/contexts/MusicContext';
-import { useRouter } from '@/hooks/router';
+import { useContext } from 'react';
+import { BrandingContext, BrandingContextType } from '@/contexts/BrandingContext';
 
-interface PremiumBrandingOptions {
-  enableSoundBranding?: boolean;
-  enableAdaptiveBranding?: boolean;
-  emotion?: string;
-  route?: string;
-}
-
-/**
- * Hook for advanced branding features with premium sound and visual identity
- */
-export function usePremiumBranding(options: PremiumBrandingOptions = {}) {
+export const usePremiumBranding = () => {
+  const context = useContext(BrandingContext);
+  
+  if (context === undefined) {
+    throw new Error("usePremiumBranding must be used within a BrandingProvider");
+  }
+  
   const {
-    enableSoundBranding = true,
-    enableAdaptiveBranding = true,
-    emotion,
-    route,
-  } = options;
+    primaryColor,
+    setPrimaryColor,
+    secondaryColor,
+    setSecondaryColor,
+    logoUrl,
+    setLogoUrl,
+    companyName,
+    setCompanyName,
+    customCss,
+    setCustomCss,
+    theme,
+    setTheme
+  } = context;
   
-  const branding = useBranding();
-  const { pathname } = useRouter();
-  const { currentPlaylist, loadPlaylistForEmotion } = useMusic();
-  
-  // Apply route-based branding
-  useEffect(() => {
-    const currentRoute = route || pathname;
-    
-    // Apply different branding based on routes
-    if (currentRoute.includes('onboarding')) {
-      // Welcoming, calm branding
-      if (branding.setTheme) {
-        branding.setTheme('light');
-      }
-    } else if (currentRoute.includes('scan')) {
-      // More focused branding for scan
-      if (branding.setTheme) {
-        branding.setTheme('light');
-      }
-    } else if (currentRoute.includes('music')) {
-      // Energetic branding for music sections
-      if (branding.setTheme) {
-        branding.setTheme('light');
-      }
-    } else if (currentRoute.includes('profile')) {
-      // Neutral, professional branding for profile
-      if (branding.setTheme) {
-        branding.setTheme('light');
-      }
-    } else if (currentRoute.includes('dashboard')) {
-      // Default to calm for dashboard
-      if (branding.setTheme) {
-        branding.setTheme('light');
-      }
+  // Predefined themes
+  const applyTheme = (themeName: string) => {
+    switch (themeName) {
+      case 'ocean':
+        setPrimaryColor('#1a73e8');
+        setSecondaryColor('#34a853');
+        theme === 'dark' ? setTheme('dark') : setTheme('light');
+        break;
+      case 'sunset':
+        setPrimaryColor('#ff7043');
+        setSecondaryColor('#ffb74d');
+        theme === 'dark' ? setTheme('dark') : setTheme('light');
+        break;
+      case 'forest':
+        setPrimaryColor('#4caf50');
+        setSecondaryColor('#8bc34a');
+        theme === 'dark' ? setTheme('dark') : setTheme('light');
+        break;
+      case 'purple':
+        setPrimaryColor('#673ab7');
+        setSecondaryColor('#9c27b0');
+        theme === 'dark' ? setTheme('dark') : setTheme('light');
+        break;
+      case 'corporate':
+        setPrimaryColor('#0277bd');
+        setSecondaryColor('#0288d1');
+        theme === 'dark' ? setTheme('dark') : setTheme('light');
+        break;
+      default:
+        setPrimaryColor('#1a73e8');
+        setSecondaryColor('#34a853');
+        theme === 'dark' ? setTheme('dark') : setTheme('light');
     }
-  }, [pathname, route, branding]);
-
-  // Apply emotion-based branding when emotion changes
-  useEffect(() => {
-    if (emotion && enableAdaptiveBranding) {
-      if (branding.setTheme) {
-        branding.setTheme('light');
-      }
-    }
-  }, [emotion, enableAdaptiveBranding, branding]);
-
-  // Apply sound branding
-  useEffect(() => {
-    if (enableSoundBranding && !currentPlaylist) {
-      // Map emotional tone to playlist type
-      const playlistType = 'calm';
-      loadPlaylistForEmotion(playlistType);
-    }
-  }, [enableSoundBranding, currentPlaylist]);
-
-  // Build the appropriate CSS classes based on current branding
-  const getCssClasses = () => {
-    const densityClass = 'space-y-4 gap-4';
-    const themeClass = 'premium-branding';
-    
-    return `${densityClass} ${themeClass}`;
   };
-
+  
   return {
-    brandingTheme: 'premium',
-    emotionalTone: 'calm',
-    soundEnabled: true,
-    brandName: 'EmotionAI',
-    cssClasses: getCssClasses(),
-    primaryColor: branding.primaryColor || '#9b87f5',
-    secondaryColor: '#6c63ff',
-    accentColor: '#ff6584',
-    highlightColor: '#8be9fd'
+    primaryColor,
+    setPrimaryColor,
+    secondaryColor,
+    setSecondaryColor,
+    logoUrl,
+    setLogoUrl,
+    companyName,
+    setCompanyName,
+    customCss,
+    setCustomCss,
+    theme,
+    setTheme,
+    applyTheme
   };
-}
+};
 
 export default usePremiumBranding;

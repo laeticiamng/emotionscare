@@ -8,6 +8,10 @@ export interface Badge {
   unlockedAt?: string;
   level?: number;
   category?: string;
+  image_url?: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
 }
 
 export type ChallengeStatus = 
@@ -21,7 +25,7 @@ export type ChallengeStatus =
 
 export interface Challenge {
   id: string;
-  name: string;
+  name?: string;
   description: string;
   points: number;
   startDate?: string;
@@ -32,9 +36,18 @@ export interface Challenge {
   badgeId?: string;
   imageUrl?: string;
   total?: number;
-  title: string; // Making this required to fix the error
+  title: string; 
   type?: string;
   completed?: boolean;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  unlockedAt?: string;
+  category?: string;
+  image_url?: string;
 }
 
 export interface GamificationStats {
@@ -51,10 +64,10 @@ export interface GamificationStats {
   badgesCount?: number;
   pointsToNextLevel?: number;
   lastActivityDate?: string | null;
-  challenges: Challenge[]; // Make this required
-  recentAchievements: Badge[]; // Make this required
-  challengesCompleted?: number; // For backward compatibility
-  streak?: number;  // For backward compatibility
+  challenges: Challenge[]; 
+  recentAchievements: Badge[];
+  challengesCompleted?: number;
+  streak?: number;
 }
 
 export interface GamificationLevel {

@@ -1,21 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { UserPreferences } from '@/types/user';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { UserPreferences } from '@/types';
+import { defaultPreferences } from '@/constants/defaults';
 
-interface UsePreferencesReturn {
-  preferences: UserPreferences;
-  isLoading: boolean;
-  error: string | null;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
-}
-
-export const usePreferences = (): UsePreferencesReturn => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const usePreferences = () => {
   const [preferences, setPreferences] = useState<UserPreferences>({
-    theme: 'system',
-    fontSize: 'medium',
-    fontFamily: 'inter',
+    ...defaultPreferences,
     notifications: {
       enabled: false,
       emailEnabled: false,
@@ -23,73 +15,105 @@ export const usePreferences = (): UsePreferencesReturn => {
       frequency: 'daily'
     }
   });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    // Load preferences from storage or API
-    loadPreferences();
-  }, []);
-
-  const loadPreferences = async () => {
-    setIsLoading(true);
+  const fetchPreferences = async () => {
+    if (!user) return;
+    
     try {
-      // In a real app, we'd load from an API or local storage
-      // For now, we'll just simulate loading with a timeout
+      setIsLoading(true);
+      setError(null);
+      
+      // Simulate fetching preferences from an API
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Mock data
-      const storedPreferences = localStorage.getItem('userPreferences');
-      if (storedPreferences) {
-        setPreferences(JSON.parse(storedPreferences));
-      }
+      // In a real app, this would be a real API call
+      // const { data, error } = await supabase
+      //   .from('profiles')
+      //   .select('preferences')
+      //   .eq('id', user.id)
+      //   .single();
       
-    } catch (err) {
-      setError('Failed to load preferences');
-      console.error('Error loading preferences:', err);
+      // if (error) throw error;
+      
+      // Mock data for now
+      const mockData = {
+        preferences: {
+          theme: 'system',
+          fontSize: 'medium',
+          fontFamily: 'inter',
+          notifications: {
+            enabled: true,
+            emailEnabled: false,
+            pushEnabled: true,
+            frequency: 'daily'
+          },
+          autoplayVideos: false,
+          dataCollection: true,
+          emotionalCamouflage: false,
+          aiSuggestions: true,
+          fullAnonymity: false,
+          language: 'fr',
+          privacy: 'private',
+          privacyLevel: 'private'
+        }
+      };
+      
+      setPreferences(mockData.preferences);
+    } catch (error) {
+      console.error('Error fetching preferences:', error);
+      setError('Failed to fetch preferences');
     } finally {
       setIsLoading(false);
     }
   };
 
   const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
-    setIsLoading(true);
-    setError(null);
+    if (!user) return;
     
     try {
-      // Merge new preferences with existing ones
+      setIsLoading(true);
+      setError(null);
+      
+      // Merge the current preferences with the new ones
       const updatedPreferences = {
         ...preferences,
-        ...newPreferences,
-        // If updating notifications, make sure we properly merge the nested object
-        notifications: newPreferences.notifications 
-          ? {
-              ...preferences.notifications,
-              ...newPreferences.notifications
-            }
-          : preferences.notifications
+        ...newPreferences
       };
       
-      // In a real app, we'd save to an API
-      // For now, we'll just simulate saving with a timeout
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // In a real app, this would be a real API call
+      // const { error } = await supabase
+      //   .from('profiles')
+      //   .update({ preferences: updatedPreferences })
+      //   .eq('id', user.id);
       
-      // Save to local storage for demo purposes
-      localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
+      // if (error) throw error;
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Update local state
       setPreferences(updatedPreferences);
-    } catch (err) {
+    } catch (error) {
+      console.error('Error updating preferences:', error);
       setError('Failed to update preferences');
-      console.error('Error updating preferences:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchPreferences();
+  }, [user]);
+
   return {
     preferences,
     isLoading,
     error,
-    updatePreferences
+    updatePreferences,
+    refreshPreferences: fetchPreferences
   };
 };
 

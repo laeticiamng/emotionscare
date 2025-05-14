@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/contexts/AuthContext';
-import { Notification, EnhancedNotification } from '@/types/notification';
+import { Notification, EnhancedNotification, NotificationType } from '@/types/notification';
 import { CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -20,11 +20,12 @@ const NotificationsPanel = () => {
   // Cast and enhance notifications to include required properties
   const enhancedNotifications: EnhancedNotification[] = notifications ? notifications.map(notification => ({
     ...notification,
-    read: 'isRead' in notification ? notification.isRead : false,
-    timestamp: 'date' in notification ? notification.date : new Date().toISOString(),
+    read: notification.read !== undefined ? notification.read : false,
+    createdAt: notification.createdAt || notification.timestamp || new Date().toISOString(),
+    timestamp: notification.timestamp || notification.createdAt || new Date().toISOString(),
     priority: 1, // Default priority
     category: notification.type, // Use type as category
-    createdAt: notification.timestamp || new Date().toISOString()
+    isRead: notification.read !== undefined ? notification.read : false,
   })) : [];
 
   useEffect(() => {
@@ -95,7 +96,7 @@ const NotificationsPanel = () => {
                     {notification.message}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.timestamp), {
+                    {formatDistanceToNow(new Date(notification.timestamp || notification.createdAt), {
                       addSuffix: true,
                       locale: fr,
                     })}

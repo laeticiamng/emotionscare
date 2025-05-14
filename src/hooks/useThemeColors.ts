@@ -1,15 +1,12 @@
 
-import { useEffect, useState } from 'react';
-import { useBranding } from './useBranding';
-import { Theme } from '@/types/branding';
+import { useContext } from 'react';
+import { BrandingContext } from '@/contexts/BrandingContext';
 
-export interface ColorPalette {
+interface ThemeColors {
   primary: string;
   secondary: string;
-  accent: string;
   background: string;
   text: string;
-  muted: string;
   border: string;
   success: string;
   warning: string;
@@ -17,91 +14,29 @@ export interface ColorPalette {
   info: string;
 }
 
-export const useThemeColors = () => {
-  const { theme, isDarkMode } = useBranding();
-  const [colors, setColors] = useState<ColorPalette>({
-    primary: '',
-    secondary: '',
-    accent: '',
-    background: '',
-    text: '',
-    muted: '',
-    border: '',
-    success: '',
-    warning: '',
-    error: '',
-    info: ''
-  });
-
-  useEffect(() => {
-    let newColors: ColorPalette;
-    
-    if (isDarkMode) {
-      newColors = {
-        primary: 'hsl(210, 100%, 52%)',
-        secondary: 'hsl(280, 60%, 52%)',
-        accent: 'hsl(330, 80%, 52%)',
-        background: 'hsl(220, 13%, 18%)',
-        text: 'hsl(220, 6%, 90%)',
-        muted: 'hsl(220, 6%, 50%)',
-        border: 'hsl(220, 13%, 25%)',
-        success: 'hsl(160, 84%, 39%)',
-        warning: 'hsl(30, 100%, 50%)',
-        error: 'hsl(0, 84%, 60%)',
-        info: 'hsl(210, 100%, 77%)',
-      };
-    } else {
-      newColors = {
-        primary: 'hsl(210, 100%, 45%)',
-        secondary: 'hsl(280, 60%, 45%)',
-        accent: 'hsl(330, 80%, 45%)',
-        background: 'hsl(0, 0%, 100%)',
-        text: 'hsl(220, 13%, 10%)',
-        muted: 'hsl(220, 13%, 40%)',
-        border: 'hsl(220, 13%, 91%)',
-        success: 'hsl(160, 84%, 39%)',
-        warning: 'hsl(30, 100%, 50%)',
-        error: 'hsl(0, 84%, 60%)',
-        info: 'hsl(210, 100%, 60%)',
-      };
-    }
-    
-    // Apply "pastel" theme colors if that theme is active
-    const isPastel = theme === 'pastel' as Theme;
-    
-    if (isPastel) {
-      newColors = {
-        ...newColors,
-        primary: 'hsl(180, 60%, 60%)',
-        secondary: 'hsl(310, 50%, 75%)',
-        accent: 'hsl(30, 70%, 75%)',
-        background: isDarkMode ? 'hsl(240, 10%, 20%)' : 'hsl(50, 30%, 96%)',
-        text: isDarkMode ? 'hsl(240, 10%, 90%)' : 'hsl(240, 10%, 30%)',
-        muted: isDarkMode ? 'hsl(240, 5%, 60%)' : 'hsl(240, 5%, 50%)',
-        border: isDarkMode ? 'hsl(240, 10%, 28%)' : 'hsl(240, 20%, 90%)',
-      };
-    }
-    
-    setColors(newColors);
-  }, [theme, isDarkMode]);
+export function useThemeColors(): ThemeColors {
+  const brandingContext = useContext(BrandingContext);
   
-  // Color scheme detection helper
-  const getPrimaryColorScheme = () => {
-    // Check if pastel theme
-    const isPastel = theme === 'pastel' as Theme;
-    
-    if (isPastel) {
-      return 'pastel';
-    }
-    
-    return isDarkMode ? 'dark' : 'light';
+  if (!brandingContext) {
+    throw new Error("useThemeColors must be used within BrandingProvider");
+  }
+  
+  const { theme, isDarkMode, primaryColor, secondaryColor } = brandingContext;
+  
+  // Default colors based on theme
+  const colors: ThemeColors = {
+    primary: primaryColor || '#1a73e8',
+    secondary: secondaryColor || '#34a853',
+    background: isDarkMode ? '#121212' : '#ffffff',
+    text: isDarkMode ? '#e0e0e0' : '#1f2937',
+    border: isDarkMode ? '#333333' : '#e5e7eb',
+    success: '#34a853',
+    warning: '#fbbc05',
+    error: '#ea4335',
+    info: '#4285f4',
   };
   
-  return {
-    colors,
-    getPrimaryColorScheme,
-    isDarkMode
-  };
-};
+  return colors;
+}
 
 export default useThemeColors;
