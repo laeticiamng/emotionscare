@@ -31,8 +31,10 @@ export const useMusicService = ({ initialTracks = mockTracks }: UseMusicServiceP
         artist: 'AI Composer',
         url: '/audio/adaptive-melody.mp3',
         audioUrl: '/audio/adaptive-melody.mp3',
+        audio_url: '/audio/adaptive-melody.mp3', // For backward compatibility
         duration: 240,
         coverUrl: '/images/music/adaptive.jpg',
+        cover_url: '/images/music/adaptive.jpg', // For backward compatibility
         emotion
       },
       {
@@ -41,8 +43,10 @@ export const useMusicService = ({ initialTracks = mockTracks }: UseMusicServiceP
         artist: 'Mood Match',
         url: '/audio/emotional-response.mp3',
         audioUrl: '/audio/emotional-response.mp3',
+        audio_url: '/audio/emotional-response.mp3', // For backward compatibility
         duration: 210,
         coverUrl: '/images/music/response.jpg',
+        cover_url: '/images/music/response.jpg', // For backward compatibility
         emotion
       }
     ];

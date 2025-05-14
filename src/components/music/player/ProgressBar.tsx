@@ -3,21 +3,21 @@ import React from 'react';
 import { Slider } from "@/components/ui/slider";
 import { ProgressBarProps } from '@/types/music';
 
+// Define default time formatter function outside the component
+function defaultFormatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 const ProgressBar: React.FC<ProgressBarProps> = ({
   duration,
   currentTime,
-  onSeek, // Add onSeek prop
+  onSeek,
   formatTime = defaultFormatTime,
   showTimestamps = true,
   className = ''
 }) => {
-  // Default time formatter
-  function defaultFormatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
-
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (

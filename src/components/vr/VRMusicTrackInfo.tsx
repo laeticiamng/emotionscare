@@ -18,9 +18,9 @@ const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => 
   return (
     <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30">
       <div className="w-12 h-12 rounded overflow-hidden bg-primary/10">
-        {currentTrack.coverUrl || currentTrack.cover ? (
+        {currentTrack.coverUrl || currentTrack.cover_url ? (
           <img 
-            src={currentTrack.coverUrl || currentTrack.cover} 
+            src={currentTrack.coverUrl || currentTrack.cover_url} 
             alt={currentTrack.title} 
             className="w-full h-full object-cover"
           />

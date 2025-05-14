@@ -1,3 +1,4 @@
+
 export interface MusicTrack {
   id: string;
   title: string;
@@ -6,19 +7,14 @@ export interface MusicTrack {
   url: string;
   audioUrl: string;
   coverUrl: string;
-  cover?: string; // Add cover for backward compatibility
+  cover?: string; // Added for backward compatibility
+  cover_url?: string; // Added for backward compatibility
+  audio_url?: string; // Added for backward compatibility
   emotion?: string;
-  
-  // For backward compatibility
-  cover_url?: string;
-  audio_url?: string;
 }
 
 export interface Track extends MusicTrack {
   // Additional properties if needed
-  coverUrl: string;
-  cover?: string;
-  cover_url?: string;
 }
 
 export interface MusicPlaylist {

@@ -52,9 +52,9 @@ const TrackList: React.FC<TrackListProps> = ({
           >
             {/* Track cover/icon */}
             <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded overflow-hidden">
-              {track.coverUrl || track.cover ? (
+              {track.coverUrl || track.cover_url ? (
                 <img
-                  src={track.coverUrl || track.cover}
+                  src={track.coverUrl || track.cover_url}
                   alt={track.title}
                   className="w-full h-full object-cover"
                 />

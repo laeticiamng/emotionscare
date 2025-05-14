@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -10,13 +11,15 @@ import {
   UserPreferences,
   UserPreferencesState,
   ThemeName,
+  FontFamily,
 } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
+  isAuthenticated: boolean;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   signIn: (email: string) => Promise<void>;
@@ -24,6 +27,7 @@ interface AuthContextType {
   signUp: (email: string, name: string) => Promise<void>;
   updateUser: (updates: Partial<User>) => Promise<void>;
   preferences: UserPreferencesState;
+  logout: () => Promise<void>; // Added for compatibility
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,7 +43,7 @@ const createDefaultPreferences = (): UserPreferences => {
     theme: "light",
     fontSize: "medium",
     language: "fr",
-    fontFamily: "system-ui", // Add missing properties
+    fontFamily: "system-ui" as FontFamily, // Explicit cast
     sound: true,
     notifications: {
       enabled: true,
@@ -66,7 +70,7 @@ const createDefaultPreferences = (): UserPreferences => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   // Preferences state and methods
   const [preferences, setPreferences] = useState<UserPreferences>(
@@ -111,8 +115,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 },
                 avatar_url: userData.avatar_url,
                 created_at: userData.created_at,
-                last_seen: userData.last_seen,
-                profile: userData.profile,
               };
 
               setUser(userWithCorrectTypes);
@@ -157,7 +159,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setPreferences(createDefaultPreferences());
       }
     });
-  }, [router]);
+  }, [navigate]);
 
   const signIn = async (email: string) => {
     setIsLoading(true);
@@ -198,27 +200,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await supabase.auth.signOut();
       setUser(null);
       setPreferences(createDefaultPreferences());
-      router.push("/login");
+      navigate("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     } finally {
       setIsLoading(false);
     }
   };
+  
+  // Alias for compatibility with other components
+  const logout = signOut;
 
   const updateUser = async (updates: Partial<User>) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      if (!user) return;
+      
+      const { error } = await supabase
         .from("users")
         .update(updates)
-        .eq("id", user?.id);
+        .eq("id", user.id);
 
       if (error) {
         console.error("Error updating user:", error);
-      }
-
-      if (data && data.length > 0) {
+      } else {
         // Optimistically update the user in the context
         setUser((prevUser) =>
           prevUser ? { ...prevUser, ...updates } : prevUser
@@ -293,9 +298,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading: preferencesLoading,
   };
 
+  const isAuthenticated = !!user;
+
   const value = {
     user,
     setUser,
+    isAuthenticated,
     isLoading,
     setIsLoading,
     signIn,
@@ -303,6 +311,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signUp,
     updateUser,
     preferences: preferencesValue,
+    logout, // Added for compatibility
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
