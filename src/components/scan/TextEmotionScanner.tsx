@@ -1,124 +1,100 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
+import { useToast } from '@/hooks/use-toast';
+import { analyzeTextEmotion } from '@/lib/ai/emotion-service';
+import { EmotionResult } from '@/types';
 
 interface TextEmotionScannerProps {
-  onEmotionDetected?: (result: EmotionResult) => void;
-  text?: string;
-  onTextChange?: (text: string) => void;
-  onAnalyze?: () => void;
-  isAnalyzing?: boolean;
+  onResult?: (result: EmotionResult) => void;
 }
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
-  onEmotionDetected,
-  text: initialText = '',
-  onTextChange,
-  onAnalyze: externalAnalyze,
-  isAnalyzing: externalAnalyzing = false
-}) => {
-  const [text, setText] = useState(initialText);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newText = e.target.value;
-    setText(newText);
-    
-    if (onTextChange) {
-      onTextChange(newText);
-    }
-  };
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ onResult }) => {
+  const [text, setText] = useState('');
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleAnalyze = async () => {
-    if (externalAnalyze) {
-      externalAnalyze();
+    if (!text) {
+      toast({
+        title: "Veuillez entrer du texte",
+        description: "Vous devez entrer du texte pour effectuer une analyse émotionnelle.",
+        variant: "destructive",
+      });
       return;
     }
 
-    if (!text.trim()) return;
-    
-    setIsAnalyzing(true);
-    
+    setIsLoading(true);
     try {
-      // In a real implementation, this would call an API for sentiment analysis
-      // For now, we'll simulate a response with mock data
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create mock result based on text length and content
-      const textLower = text.toLowerCase();
-      
-      // Very simple emotion detection based on keywords
-      let dominantEmotion = { name: 'neutral', score: 0.5 };
-      
-      if (textLower.includes('heureux') || textLower.includes('content') || textLower.includes('joie')) {
-        dominantEmotion = { name: 'joy', score: 0.8 };
-      } else if (textLower.includes('triste') || textLower.includes('peine') || textLower.includes('chagrin')) {
-        dominantEmotion = { name: 'sadness', score: 0.7 };
-      } else if (textLower.includes('colère') || textLower.includes('énervé') || textLower.includes('furieux')) {
-        dominantEmotion = { name: 'anger', score: 0.9 };
-      } else if (textLower.includes('peur') || textLower.includes('effrayé') || textLower.includes('terrifié')) {
-        dominantEmotion = { name: 'fear', score: 0.85 };
-      } else if (textLower.includes('dégoût') || textLower.includes('répugnant')) {
-        dominantEmotion = { name: 'disgust', score: 0.65 };
-      } else if (textLower.includes('surprise') || textLower.includes('étonné')) {
-        dominantEmotion = { name: 'surprise', score: 0.75 };
-      } else if (textLower.includes('calme') || textLower.includes('paisible') || textLower.includes('serein')) {
-        dominantEmotion = { name: 'calm', score: 0.6 };
-      } else if (textLower.includes('fatigué') || textLower.includes('épuisé')) {
-        dominantEmotion = { name: 'fatigue', score: 0.7 };
+      const analysis = await analyzeTextEmotion(text);
+      if (analysis && analysis.length > 0) {
+        const mainEmotion = analysis[0].emotion;
+        const confidence = analysis[0].score;
+
+        setResult({
+          emotion: mainEmotion,
+          dominantEmotion: mainEmotion, // This is now allowed in our type
+          score: confidence * 100,
+          confidence: confidence,
+          text: text
+        });
+
+        if (onResult) {
+          onResult({
+            emotion: mainEmotion,
+            dominantEmotion: mainEmotion,
+            score: confidence * 100,
+            confidence: confidence,
+            text: text
+          });
+        }
+      } else {
+        toast({
+          title: "Aucune émotion détectée",
+          description: "Aucune émotion significative n'a été détectée dans le texte.",
+        });
+        setResult(null);
       }
-      
-      // Create emotion result
-      const emotionResult: EmotionResult = {
-        dominantEmotion,
-        source: 'text',
-        text,
-        timestamp: new Date().toISOString()
-      };
-      
-      if (onEmotionDetected) {
-        onEmotionDetected(emotionResult);
-      }
-      
     } catch (error) {
-      console.error('Error analyzing text:', error);
+      console.error("Error analyzing text:", error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Une erreur s'est produite lors de l'analyse du texte.",
+        variant: "destructive",
+      });
+      setResult(null);
     } finally {
-      setIsAnalyzing(false);
+      setIsLoading(false);
     }
   };
-  
+
   return (
-    <Card className="p-4">
-      <div className="space-y-4">
+    <Card>
+      <CardHeader>
+        <CardTitle>Analyse émotionnelle par texte</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <Textarea
-          placeholder="Comment vous sentez-vous aujourd'hui ? Décrivez votre état émotionnel..."
+          placeholder="Entrez votre texte ici..."
           value={text}
-          onChange={handleTextChange}
-          className="min-h-[120px]"
-          disabled={isAnalyzing || externalAnalyzing}
+          onChange={(e) => setText(e.target.value)}
+          disabled={isLoading}
         />
-        
-        <Button
-          onClick={handleAnalyze}
-          disabled={!text.trim() || isAnalyzing || externalAnalyzing}
-          className="w-full"
-        >
-          {(isAnalyzing || externalAnalyzing) ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse en cours...
-            </>
-          ) : (
-            'Analyser mon texte'
-          )}
-        </Button>
-      </div>
+        <div className="flex justify-end">
+          <Button onClick={handleAnalyze} disabled={isLoading}>
+            {isLoading ? "Analyse en cours..." : "Analyser"}
+          </Button>
+        </div>
+        {result && (
+          <div className="mt-4">
+            <p>
+              Émotion dominante: {result.emotion} (Confiance: {result.confidence?.toFixed(2)})
+            </p>
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 };

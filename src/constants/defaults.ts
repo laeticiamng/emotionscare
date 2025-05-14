@@ -1,7 +1,7 @@
 
 import { UserPreferences } from '@/types';
 
-export const defaultPreferences: UserPreferences = {
+export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   theme: 'system',
   fontSize: 'medium',
   fontFamily: 'inter',
@@ -12,5 +12,7 @@ export const defaultPreferences: UserPreferences = {
     frequency: 'daily'
   },
   language: 'fr',
-  privacyLevel: 'private'
+  privacyLevel: 'private',
+  autoplayVideos: false,
+  dataCollection: true
 };

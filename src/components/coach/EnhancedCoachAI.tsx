@@ -32,16 +32,16 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
       
       // Only show VR for certain emotions
       const vrEmotions = ['stressed', 'anxious', 'sad', 'angry'];
-      const primaryEmotion = emotionResult.primaryEmotion?.name?.toLowerCase() || emotionResult.emotion?.toLowerCase() || '';
-      if (vrEmotions.includes(primaryEmotion)) {
+      const primaryEmotion = emotionResult.primaryEmotion ? emotionResult.primaryEmotion.name : emotionResult.emotion;
+      if (vrEmotions.includes(primaryEmotion.toLowerCase())) {
         setShowVRRec(true);
       }
     }
   }, [emotionResult]);
   
   const handlePlayMusic = async () => {
-    const emotion = emotionResult.primaryEmotion?.name?.toLowerCase() || emotionResult.emotion?.toLowerCase() || 'neutral';
-    await loadPlaylistForEmotion(emotion);
+    const emotion = emotionResult.primaryEmotion ? emotionResult.primaryEmotion.name : emotionResult.emotion;
+    await loadPlaylistForEmotion(emotion.toLowerCase());
     // Use our safeOpen utility properly
     setOpenDrawer(true);
     
@@ -58,12 +58,12 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
     return {
       id: emotionResult.id || 'temp-id',
       user_id: emotionResult.user_id || 'user-id',
-      date: new Date(),
-      emotion: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
+      date: new Date().toISOString(),
+      emotion: emotionResult.primaryEmotion ? emotionResult.primaryEmotion.name : emotionResult.emotion,
       score: emotionResult.score || 0,
       confidence: emotionResult.confidence || 0.5,
       intensity: emotionResult.intensity || 0.5,
-      name: emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral',
+      name: emotionResult.primaryEmotion ? emotionResult.primaryEmotion.name : emotionResult.emotion,
       category: "emotion"
     };
   };
@@ -85,7 +85,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
             </h3>
             <p className="mt-2 text-sm">
               {emotionResult.feedback || emotionResult.ai_feedback || 
-                `Votre état émotionnel actuel est "${emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutre'}" avec une intensité de ${Math.round((emotionResult.intensity || 0.5) * 100)}%. 
+                `Votre état émotionnel actuel est "${emotionResult.primaryEmotion ? emotionResult.primaryEmotion.name : emotionResult.emotion}" avec une intensité de ${Math.round((emotionResult.intensity || 0.5) * 100)}%. 
                 Voici quelques recommandations personnalisées pour vous aider à optimiser votre bien-être.`
               }
             </p>
@@ -105,7 +105,7 @@ const EnhancedCoachAI: React.FC<EnhancedCoachAIProps> = ({
             <>
               <Separator />
               <MusicRecommendationCard 
-                emotion={emotionResult.primaryEmotion?.name || emotionResult.emotion || 'neutral'} 
+                emotion={emotionResult.primaryEmotion ? emotionResult.primaryEmotion.name : emotionResult.emotion} 
                 intensity={Math.round((emotionResult.intensity || 0.5) * 100)}
                 standalone={true}
                 className="mt-4"

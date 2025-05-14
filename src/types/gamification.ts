@@ -11,6 +11,16 @@ export interface GamificationStats {
     rewards: string[];
   };
   achievements: Achievement[];
+  // Additional properties needed by GamificationDashboard
+  currentLevel: number;
+  pointsToNextLevel: number;
+  progressToNextLevel: number;
+  totalPoints: number;
+  badgesCount: number;
+  streakDays: number;
+  lastActivityDate?: string;
+  activeChallenges: number;
+  completedChallenges: number;
 }
 
 export interface Challenge {
@@ -18,7 +28,7 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  status: 'completed' | 'locked' | 'active';
+  status: 'completed' | 'locked' | 'active' | 'ongoing' | 'available';
   category: string;
   type?: string;
   progress?: number;
@@ -26,6 +36,9 @@ export interface Challenge {
   icon?: string;
   startDate?: string;
   endDate?: string;
+  name?: string;
+  completed?: boolean;
+  total?: number; // For mock data
 }
 
 export interface Badge {
@@ -38,6 +51,7 @@ export interface Badge {
   type?: string;
   image?: string;
   date?: string;
+  level?: string | number; // For mock data
 }
 
 export interface Achievement {

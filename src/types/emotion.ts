@@ -40,6 +40,7 @@ export interface Emotion {
   emojis?: string;
   ai_feedback?: string;
   source?: string;
+  category?: string; // Adding category property
 }
 
 export interface EmotionResult {
@@ -47,6 +48,11 @@ export interface EmotionResult {
   user_id?: string;
   date?: string;
   emotion: string;
+  primaryEmotion?: {
+    name: string;
+    score?: number;
+  };
+  dominantEmotion?: string; // Adding for scanners
   name?: string;
   score: number;
   intensity?: number;
@@ -56,7 +62,6 @@ export interface EmotionResult {
   emojis?: string;
   feedback?: string;
   ai_feedback?: string;
-  primaryEmotion?: string;
   recommendations?: string[];
   source?: string;
 }

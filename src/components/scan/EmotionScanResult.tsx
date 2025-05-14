@@ -1,128 +1,129 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MusicRecommendation from './MusicRecommendation';
-import VREmotionRecommendation from '../vr/VREmotionRecommendation';
-import type { Emotion, EmotionResult } from '@/types';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from '@/hooks/use-toast';
+import { saveEmotion } from '@/lib/scanService';
+import { Emotion, EmotionResult } from '@/types';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 
 interface EmotionScanResultProps {
-  data: EmotionResult;
+  result: EmotionResult | null;
+  onEmotionSaved?: (emotion: Emotion) => void;
 }
 
-const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ data }) => {
-  // Derive an emotion label from available properties
-  const emotionLabel = getEmotionLabel(data);
+const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ result, onEmotionSaved }) => {
+  const { toast } = useToast();
+  const [isSaved, setIsSaved] = useState(false);
   
-  // Convert EmotionResult to compatible Emotion object when needed
-  const emotionCompatible: Emotion = {
-    id: data.id || `emotion-${Date.now()}`,
-    user_id: data.user_id || '',
-    date: data.date || new Date().toISOString(),
-    emotion: data.emotion,
-    name: data.emotion,
-    score: data.score !== undefined ? data.score : (data.confidence ? Math.round((data.confidence * 100)) : 50),
-    text: data.text || data.transcript || '',
-    emojis: data.emojis || '',
-    ai_feedback: data.feedback || '',
-    intensity: data.intensity || 0.5,
-    category: "emotion"
+  if (!result || !result.emotion) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Aucun résultat</CardTitle>
+          <CardDescription>Aucune émotion détectée.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Veuillez réessayer.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const saveEmotionResult = async () => {
+    if (!result || !result.emotion) return;
+    
+    const emotion: Emotion = {
+      id: result.id || 'temp-id',
+      user_id: result.user_id || 'user-id',
+      date: result.date || new Date().toISOString(),
+      emotion: result.emotion,
+      score: result.score,
+      text: result.text || result.transcript || '',
+      emojis: result.emojis || '',
+      ai_feedback: result.feedback || '',
+      category: determineEmotionCategory(result.emotion) // Add category
+    };
+    
+    try {
+      await saveEmotion(emotion);
+      setIsSaved(true);
+      
+      if (onEmotionSaved) {
+        onEmotionSaved(emotion);
+      }
+      
+      toast({
+        title: "Émotion sauvegardée",
+        description: "Votre état émotionnel a été enregistré avec succès.",
+      });
+    } catch (error) {
+      console.error('Error saving emotion:', error);
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder votre émotion.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Helper function to determine emotion category
+  const determineEmotionCategory = (emotion: string): string => {
+    const positiveEmotions = ['joy', 'happiness', 'excitement', 'satisfaction', 'content'];
+    const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust', 'anxiety'];
+    const neutralEmotions = ['surprise', 'neutral', 'calm'];
+    
+    const lowerEmotion = emotion.toLowerCase();
+    
+    if (positiveEmotions.includes(lowerEmotion)) return 'positive';
+    if (negativeEmotions.includes(lowerEmotion)) return 'negative';
+    if (neutralEmotions.includes(lowerEmotion)) return 'neutral';
+    
+    return 'other';
   };
   
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Votre résultat émotionnel: {emotionLabel}</CardTitle>
+        <CardTitle>Résultat de l'analyse</CardTitle>
+        <CardDescription>Votre émotion détectée : {result.emotion}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="recommendations" className="w-full">
-          <TabsList className="grid grid-cols-2 mb-4">
-            <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
-            <TabsTrigger value="details">Détails</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="recommendations" className="space-y-4">
-            <p className="text-muted-foreground mb-4">
-              Basé sur votre état émotionnel actuel, voici quelques recommandations pour votre bien-être:
-            </p>
-            
-            <div className="space-y-6">
-              <MusicRecommendation emotion={emotionCompatible} />
-              <VREmotionRecommendation emotion={emotionCompatible} />
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="details">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-1">Émotion détectée</h3>
-                <p className="text-2xl font-bold">{emotionLabel}</p>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold">Émotion : {result.emotion}</h3>
+            <p className="text-muted-foreground">Score : {result.score}</p>
+          </div>
+          <div>
+            {isSaved ? (
+              <div className="flex items-center text-green-500">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Sauvegardé
               </div>
-              
-              {data.emojis && (
-                <div>
-                  <h3 className="font-medium mb-1">Émojis</h3>
-                  <p className="text-2xl">{data.emojis}</p>
-                </div>
-              )}
-              
-              {data.score !== undefined && (
-                <div>
-                  <h3 className="font-medium mb-1">Intensité</h3>
-                  <p className="text-2xl font-bold">{data.score}/10</p>
-                </div>
-              )}
-              
-              {(data.feedback || data.ai_feedback) && (
-                <div>
-                  <h3 className="font-medium mb-1">Analyse IA</h3>
-                  <p className="text-muted-foreground">{data.feedback || data.ai_feedback}</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+            ) : (
+              <Button onClick={saveEmotionResult}>
+                Sauvegarder
+              </Button>
+            )}
+          </div>
+        </div>
+        
+        {result.feedback && (
+          <div className="rounded-md border p-4">
+            <p className="text-sm font-medium">Feedback :</p>
+            <p className="text-sm text-muted-foreground">{result.feedback}</p>
+          </div>
+        )}
+        
+        {result.ai_feedback && (
+          <div className="rounded-md border p-4">
+            <p className="text-sm font-medium">Analyse IA :</p>
+            <p className="text-sm text-muted-foreground">{result.ai_feedback}</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 };
-
-// Helper function to derive an emotion label
-function getEmotionLabel(emotion: EmotionResult | Partial<Emotion>): string {
-  // If it's an EmotionResult with a direct emotion property
-  if ('emotion' in emotion && emotion.emotion) {
-    return emotion.emotion;
-  }
-  
-  // If it has emojis, try to derive emotion
-  if ('emojis' in emotion && emotion.emojis && typeof emotion.emojis === 'string') {
-    if (emotion.emojis.includes('😊') || emotion.emojis.includes('😄')) return 'Heureux';
-    if (emotion.emojis.includes('😢') || emotion.emojis.includes('😭')) return 'Triste';
-    if (emotion.emojis.includes('😡') || emotion.emojis.includes('😠')) return 'En colère';
-    if (emotion.emojis.includes('😰') || emotion.emojis.includes('😨')) return 'Anxieux';
-    if (emotion.emojis.includes('😌') || emotion.emojis.includes('🧘')) return 'Calme';
-  }
-  
-  // Try to derive from text
-  if ('text' in emotion && emotion.text && typeof emotion.text === 'string') {
-    const text = emotion.text.toLowerCase();
-    if (text.includes('heureux') || text.includes('joie')) return 'Heureux';
-    if (text.includes('triste') || text.includes('peine')) return 'Triste';
-    if (text.includes('colère') || text.includes('frustré')) return 'En colère';
-    if (text.includes('anxieux') || text.includes('stress')) return 'Anxieux';
-    if (text.includes('calme') || text.includes('apaisé')) return 'Calme';
-  }
-  
-  // Fallback to score-based label
-  if ('score' in emotion && emotion.score !== undefined) {
-    if (emotion.score > 80) return 'Très positif';
-    if (emotion.score > 60) return 'Positif';
-    if (emotion.score > 40) return 'Neutre';
-    if (emotion.score > 20) return 'Négatif';
-    return 'Très négatif';
-  }
-  
-  return 'État émotionnel';
-}
 
 export default EmotionScanResult;

@@ -276,7 +276,11 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user, onUpdate, onClose
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">Confidentialité</p>
-                    <p>{user.preferences.privacy === 'public' ? 'Public' : user.preferences.privacy === 'private' ? 'Privé' : user.preferences.privacy === 'friends' ? 'Amis seulement' : 'Standard'}</p>
+                    <span className="text-xs">
+                      {user.preferences?.privacy?.profileVisibility === 'public' ? 'Public' : 
+                       user.preferences?.privacy?.profileVisibility === 'private' ? 'Privé' : 
+                       user.preferences?.privacy?.profileVisibility === 'team' ? 'Équipe' : 'Inconnu'}
+                    </span>
                   </div>
                 </div>
               ) : (

@@ -1,47 +1,30 @@
 
-export enum NotificationFrequency {
-  IMMEDIATE = 'immediate',
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly'
-}
-
-export enum NotificationType {
-  EMAIL = 'email',
-  PUSH = 'push',
-  SMS = 'sms',
-  IN_APP = 'in_app'
-}
-
-export enum NotificationTone {
-  FORMAL = 'formal',
-  FRIENDLY = 'friendly',
-  PROFESSIONAL = 'professional',
-  CASUAL = 'casual',
-  ENCOURAGING = 'encouraging'
-}
-
-export interface NotificationPreference {
-  id: string;
-  user_id: string;
-  type: NotificationType;
-  enabled: boolean;
-  frequency: NotificationFrequency;
-  tone: NotificationTone;
-  created_at?: string;
-  updated_at?: string;
-}
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
+export type NotificationType = 'emotion' | 'achievement' | 'reminder' | 'social' | 'system';
+export type NotificationTone = 'positive' | 'neutral' | 'urgent';
 
 export interface Notification {
   id: string;
   user_id: string;
+  type: NotificationType;
   title: string;
   message: string;
-  type: string;
-  read: boolean;
+  date: Date | string;
+  tone?: NotificationTone;
   action_url?: string;
-  action_label?: string;
+  action_text?: string;
   icon?: string;
+  read: boolean;
   createdAt: string;
-  updatedAt?: string;
+}
+
+export interface NotificationPreference {
+  type: NotificationType;
+  enabled: boolean;
+  frequency: NotificationFrequency;
+  channels: {
+    email: boolean;
+    push: boolean;
+    in_app: boolean;
+  };
 }

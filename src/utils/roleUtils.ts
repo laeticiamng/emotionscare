@@ -21,6 +21,24 @@ export const canAccessRoute = (userRole: UserRole, requiredRole?: UserRole | Use
 };
 
 /**
+ * Checks if a user has access to a specific role
+ */
+export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boolean => {
+  // Admin roles can access everything
+  if (userRole === 'admin' || userRole === 'b2b_admin') return true;
+  
+  // Direct role match
+  if (userRole === requiredRole) return true;
+  
+  // Handle special role relationships
+  if (requiredRole === 'moderator' && (userRole === 'admin' || userRole === 'b2b_admin')) {
+    return true;
+  }
+  
+  return false;
+};
+
+/**
  * Checks if a role is an admin role
  */
 export const isAdminRole = (role: UserRole): boolean => {
@@ -42,6 +60,42 @@ export const getRedirectForRole = (role: UserRole): string => {
       return '/admin/dashboard';
     case 'moderator':
       return '/admin/moderation';
+    default:
+      return '/dashboard';
+  }
+};
+
+/**
+ * Gets the login path for a specific role
+ */
+export const getRoleLoginPath = (role: UserRole): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/login';
+    case 'b2b_user':
+      return '/b2b/user/login';
+    case 'b2b_admin':
+      return '/b2b/admin/login';
+    case 'admin':
+      return '/admin/login';
+    default:
+      return '/login';
+  }
+};
+
+/**
+ * Gets the home path for a specific role
+ */
+export const getRoleHomePath = (role: UserRole): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
     default:
       return '/dashboard';
   }
