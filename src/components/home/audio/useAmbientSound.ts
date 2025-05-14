@@ -5,152 +5,149 @@ import { TIME_OF_DAY } from '@/constants/defaults';
 interface AmbientSoundOptions {
   autoplay?: boolean;
   volume?: number;
-  loop?: boolean;
   fadeIn?: boolean;
-  fadeOutOnUnmount?: boolean;
+  defaultMood?: string;
 }
 
-const getTimeOfDay = (): string => {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return TIME_OF_DAY.MORNING;
-  if (hour >= 12 && hour < 18) return TIME_OF_DAY.AFTERNOON;
-  if (hour >= 18 && hour < 22) return TIME_OF_DAY.EVENING;
-  return TIME_OF_DAY.NIGHT;
-};
-
-// These would typically come from your API
-const getMoodByTimeOfDay = (timeOfDay: string): string => {
-  switch(timeOfDay) {
-    case TIME_OF_DAY.MORNING: return 'calm';
-    case TIME_OF_DAY.AFTERNOON: return 'focus';
-    case TIME_OF_DAY.EVENING: return 'relaxed';
-    case TIME_OF_DAY.NIGHT: return 'sleep';
-    default: return 'calm';
-  }
-};
-
-const DEFAULT_SOUNDS = {
-  morning: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3',  
-  afternoon: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8a439581b.mp3',
-  evening: 'https://cdn.pixabay.com/audio/2021/08/09/audio_88447803bd.mp3',
-  night: 'https://cdn.pixabay.com/audio/2022/03/31/audio_18318e369a.mp3',
-};
-
-export function useAmbientSound(options: AmbientSoundOptions = {}) {
-  const {
-    autoplay = false,
+export const useAmbientSound = (options: AmbientSoundOptions = {}) => {
+  const { 
+    autoplay = false, 
     volume: initialVolume = 0.3,
-    loop = true,
     fadeIn = true,
-    fadeOutOnUnmount = true
+    defaultMood = 'neutral'
   } = options;
   
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(initialVolume);
-  const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay());
-  const [sound, setSound] = useState<string>('');
-  const [mood, setMood] = useState('');
+  const [currentMood, setCurrentMood] = useState(defaultMood);
+  const [timeOfDay, setTimeOfDay] = useState<keyof typeof TIME_OF_DAY>(TIME_OF_DAY.MORNING);
+  
+  // Get sound URL based on mood and time of day
+  const getSoundUrl = useCallback((mood: string, timeOfDay: string): string => {
+    // Map moods to sound files
+    const soundMap: Record<string, Record<string, string>> = {
+      [TIME_OF_DAY.MORNING]: {
+        calm: '/audio/morning-calm.mp3',
+        joy: '/audio/morning-joy.mp3',
+        neutral: '/audio/morning-neutral.mp3',
+        sadness: '/audio/morning-calm.mp3', // Fallback to calm for negative emotions
+        default: '/audio/morning-neutral.mp3'
+      },
+      [TIME_OF_DAY.AFTERNOON]: {
+        calm: '/audio/afternoon-calm.mp3',
+        joy: '/audio/afternoon-joy.mp3',
+        neutral: '/audio/afternoon-neutral.mp3',
+        sadness: '/audio/afternoon-calm.mp3',
+        default: '/audio/afternoon-neutral.mp3'
+      },
+      [TIME_OF_DAY.EVENING]: {
+        calm: '/audio/evening-calm.mp3',
+        joy: '/audio/evening-joy.mp3',
+        neutral: '/audio/evening-neutral.mp3',
+        sadness: '/audio/evening-calm.mp3',
+        default: '/audio/evening-neutral.mp3'
+      },
+      [TIME_OF_DAY.NIGHT]: {
+        calm: '/audio/night-calm.mp3',
+        joy: '/audio/night-joy.mp3',
+        neutral: '/audio/night-calm.mp3',
+        sadness: '/audio/night-calm.mp3',
+        default: '/audio/night-calm.mp3'
+      },
+      default: {
+        default: '/audio/neutral-ambient.mp3'
+      }
+    };
+    
+    // Get sounds for the current time of day
+    const timeSounds = soundMap[timeOfDay] || soundMap.default;
+    
+    // Get the specific sound for the mood, or fallback to default
+    return timeSounds[mood] || timeSounds.default || soundMap.default.default;
+  }, []);
+  
+  // Determine time of day
+  useEffect(() => {
+    const hour = new Date().getHours();
+    
+    if (hour >= 5 && hour < 12) setTimeOfDay(TIME_OF_DAY.MORNING);
+    else if (hour >= 12 && hour < 18) setTimeOfDay(TIME_OF_DAY.AFTERNOON);
+    else if (hour >= 18 && hour < 22) setTimeOfDay(TIME_OF_DAY.EVENING);
+    else setTimeOfDay(TIME_OF_DAY.NIGHT);
+  }, []);
   
   // Initialize audio
   useEffect(() => {
-    const timeOfDay = getTimeOfDay();
-    setTimeOfDay(timeOfDay);
-    const mood = getMoodByTimeOfDay(timeOfDay);
-    setMood(mood);
+    // Create audio element
+    const audioElement = new Audio();
+    audioElement.loop = true;
+    audioElement.volume = fadeIn ? 0 : volume;
     
-    // In a real implementation, you would call your Music Generator API here
-    // For now, use a preset based on time of day
-    const soundUrl = DEFAULT_SOUNDS[timeOfDay as keyof typeof DEFAULT_SOUNDS];
-    setSound(soundUrl);
+    // Set source based on mood and time
+    const soundUrl = getSoundUrl(currentMood, timeOfDay);
+    audioElement.src = soundUrl;
     
-    const audioElement = new Audio(soundUrl);
-    audioElement.loop = loop;
-    audioElement.volume = 0; // Start silent for fade-in
+    // Load audio
+    audioElement.load();
+    
+    // Set audio element
     setAudio(audioElement);
     
+    // Autoplay if enabled
+    if (autoplay) {
+      audioElement.play()
+        .then(() => {
+          setIsPlaying(true);
+          
+          // Fade in if enabled
+          if (fadeIn) {
+            let vol = 0;
+            const interval = setInterval(() => {
+              if (vol < volume) {
+                vol += 0.05;
+                audioElement.volume = vol > volume ? volume : vol;
+              } else {
+                clearInterval(interval);
+              }
+            }, 200);
+          }
+        })
+        .catch(error => {
+          console.error('Error autoplaying ambient sound:', error);
+        });
+    }
+    
+    // Clean up
     return () => {
       if (audioElement) {
         audioElement.pause();
         audioElement.src = '';
       }
     };
-  }, [loop]);
+  }, [timeOfDay, getSoundUrl, currentMood, autoplay, fadeIn, volume]);
   
-  // Fade in effect
+  // Change volume
   useEffect(() => {
-    if (audio && fadeIn && isPlaying) {
-      let currentVolume = 0;
-      const fadeInterval = setInterval(() => {
-        currentVolume = Math.min(currentVolume + 0.05, volume);
-        if (audio) audio.volume = currentVolume;
-        
-        if (currentVolume >= volume) {
-          clearInterval(fadeInterval);
-        }
-      }, 100);
-      
-      return () => clearInterval(fadeInterval);
+    if (audio && isPlaying) {
+      audio.volume = volume;
     }
-  }, [audio, fadeIn, isPlaying, volume]);
+  }, [audio, volume, isPlaying]);
   
-  // Autoplay effect
-  useEffect(() => {
-    if (audio && autoplay) {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.error('Autoplay failed:', error);
-            // Most browsers require user interaction before audio can play
-            setIsPlaying(false);
-          });
-      }
-    }
-  }, [audio, autoplay]);
-  
-  // Handle fade out on unmount
-  useEffect(() => {
-    return () => {
-      if (audio && fadeOutOnUnmount && isPlaying) {
-        const originalVolume = audio.volume;
-        let currentVolume = originalVolume;
-        
-        const fadeOutInterval = setInterval(() => {
-          currentVolume = Math.max(currentVolume - 0.05, 0);
-          audio.volume = currentVolume;
-          
-          if (currentVolume <= 0) {
-            clearInterval(fadeOutInterval);
-            audio.pause();
-          }
-        }, 50);
-        
-        // Clear interval after 1 second as a safety measure
-        setTimeout(() => clearInterval(fadeOutInterval), 1000);
-      }
-    };
-  }, [audio, fadeOutOnUnmount, isPlaying]);
-  
+  // Play audio
   const play = useCallback(() => {
     if (audio) {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((error) => {
-            console.error('Play failed:', error);
-            setIsPlaying(false);
-          });
-      }
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(error => {
+          console.error('Error playing ambient sound:', error);
+        });
     }
   }, [audio]);
   
+  // Pause audio
   const pause = useCallback(() => {
     if (audio) {
       audio.pause();
@@ -158,6 +155,7 @@ export function useAmbientSound(options: AmbientSoundOptions = {}) {
     }
   }, [audio]);
   
+  // Toggle play/pause
   const toggle = useCallback(() => {
     if (isPlaying) {
       pause();
@@ -166,32 +164,46 @@ export function useAmbientSound(options: AmbientSoundOptions = {}) {
     }
   }, [isPlaying, pause, play]);
   
-  const adjustVolume = useCallback((newVolume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setVolume(clampedVolume);
-    if (audio) {
-      audio.volume = clampedVolume;
-    }
-  }, [audio]);
+  // Change volume
+  const changeVolume = useCallback((newVolume: number) => {
+    setVolume(newVolume);
+  }, []);
   
-  const changeSoundByMood = useCallback((newMood: string) => {
-    setMood(newMood);
-    // In a real implementation, you would call your Music Generator API here
-    // For demo purposes, we're using fixed sounds
-    pause();
-    // This would be replaced with a call to your music API
-  }, [pause]);
+  // Change sound based on mood
+  const changeSoundByMood = useCallback((mood: string) => {
+    setCurrentMood(mood);
+    
+    if (audio) {
+      const soundUrl = getSoundUrl(mood, timeOfDay);
+      
+      // Only change source if it's different
+      if (audio.src !== soundUrl) {
+        // Remember if it was playing
+        const wasPlaying = !audio.paused;
+        
+        // Change source
+        audio.src = soundUrl;
+        audio.load();
+        
+        // Resume playback if it was playing
+        if (wasPlaying) {
+          audio.play()
+            .catch(error => {
+              console.error('Error playing ambient sound after mood change:', error);
+            });
+        }
+      }
+    }
+  }, [audio, getSoundUrl, timeOfDay]);
   
   return {
     isPlaying,
+    volume,
+    currentMood,
     play,
     pause,
     toggle,
-    volume,
-    adjustVolume,
-    timeOfDay,
-    mood,
-    changeSoundByMood,
-    sound
+    changeVolume,
+    changeSoundByMood
   };
-}
+};

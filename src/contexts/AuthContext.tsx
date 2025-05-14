@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User, UserRole } from '@/types/user';
 import { DEFAULT_USER_PREFERENCES } from '@/constants/defaults';
@@ -65,7 +66,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date().toISOString(),
         preferences: {
           ...DEFAULT_USER_PREFERENCES,
-          dashboardLayout: 'standard'
+          dashboardLayout: 'standard',
+          onboardingCompleted: true
         },
         onboarded: true
       };
@@ -99,7 +101,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date().toISOString(),
         preferences: {
           ...DEFAULT_USER_PREFERENCES,
-          dashboardLayout: 'standard'
+          dashboardLayout: 'standard',
+          onboardingCompleted: false
         },
         onboarded: false
       };

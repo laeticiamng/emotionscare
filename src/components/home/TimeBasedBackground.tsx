@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { TIME_OF_DAY } from '@/constants/defaults';
 
 interface TimeBasedBackgroundProps {
@@ -8,38 +9,75 @@ interface TimeBasedBackgroundProps {
 }
 
 export function TimeBasedBackground({ children, className = '' }: TimeBasedBackgroundProps) {
-  const [timeOfDay, setTimeOfDay] = useState('');
+  const [timeOfDay, setTimeOfDay] = useState<keyof typeof TIME_OF_DAY>(TIME_OF_DAY.MORNING);
   
   useEffect(() => {
     const hour = new Date().getHours();
+    
+    // Set time of day based on current hour
     if (hour >= 5 && hour < 12) setTimeOfDay(TIME_OF_DAY.MORNING);
     else if (hour >= 12 && hour < 18) setTimeOfDay(TIME_OF_DAY.AFTERNOON);
     else if (hour >= 18 && hour < 22) setTimeOfDay(TIME_OF_DAY.EVENING);
     else setTimeOfDay(TIME_OF_DAY.NIGHT);
   }, []);
   
-  const getBackgroundClasses = () => {
-    switch(timeOfDay) {
+  // Background colors for different times of day with smooth gradient transitions
+  const getBackgroundStyle = () => {
+    switch (timeOfDay) {
       case TIME_OF_DAY.MORNING:
-        return 'bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 dark:from-sky-950 dark:via-blue-900 dark:to-indigo-950';
+        return {
+          light: 'from-amber-50 via-sky-50 to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950',
+          accent1: 'bg-amber-100/40 dark:bg-amber-950/20',
+          accent2: 'bg-sky-100/40 dark:bg-sky-950/20'
+        };
       case TIME_OF_DAY.AFTERNOON:
-        return 'bg-gradient-to-br from-blue-100 via-sky-50 to-cyan-100 dark:from-blue-950 dark:via-sky-900 dark:to-cyan-950';
+        return {
+          light: 'from-blue-50 via-sky-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950/20 dark:to-slate-900',
+          accent1: 'bg-blue-100/40 dark:bg-blue-950/20',
+          accent2: 'bg-indigo-100/40 dark:bg-indigo-950/20'
+        };
       case TIME_OF_DAY.EVENING:
-        return 'bg-gradient-to-br from-amber-100 via-orange-50 to-rose-100 dark:from-amber-950 dark:via-orange-900 dark:to-rose-950';
+        return {
+          light: 'from-violet-50 via-purple-50 to-pink-50 dark:from-slate-950 dark:via-purple-950/20 dark:to-slate-900',
+          accent1: 'bg-violet-100/40 dark:bg-violet-950/20',
+          accent2: 'bg-pink-100/40 dark:bg-pink-950/20'
+        };
       case TIME_OF_DAY.NIGHT:
-        return 'bg-gradient-to-br from-indigo-200 via-purple-100 to-slate-200 dark:from-indigo-950 dark:via-purple-900 dark:to-slate-950';
+        return {
+          light: 'from-slate-900 via-blue-950 to-violet-950 dark:from-slate-950 dark:via-blue-950/30 dark:to-slate-900',
+          accent1: 'bg-blue-900/20 dark:bg-blue-950/30',
+          accent2: 'bg-violet-900/20 dark:bg-violet-950/30'
+        };
       default:
-        return 'bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-950';
+        return {
+          light: 'from-blue-50 to-purple-50 dark:from-slate-950 dark:to-slate-900',
+          accent1: 'bg-blue-100/40 dark:bg-blue-950/20',
+          accent2: 'bg-purple-100/40 dark:bg-purple-950/20'
+        };
     }
   };
   
+  const bg = getBackgroundStyle();
+  
   return (
-    <div className={`min-h-full transition-all duration-1000 ease-in-out ${getBackgroundClasses()} ${className}`}>
-      <div className="relative z-10 min-h-full">
+    <div className={`relative w-full min-h-screen overflow-hidden bg-gradient-to-b ${bg.light} ${className}`}>
+      {/* Decorative elements */}
+      <motion.div 
+        className={`absolute top-20 left-10 w-96 h-96 rounded-full blur-3xl opacity-30 ${bg.accent1}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ duration: 3, ease: "easeInOut" }}
+      />
+      <motion.div 
+        className={`absolute bottom-20 right-10 w-96 h-96 rounded-full blur-3xl opacity-30 ${bg.accent2}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ duration: 3, ease: "easeInOut", delay: 0.5 }}
+      />
+      
+      {/* Main content */}
+      <div className="relative z-10">
         {children}
-      </div>
-      <div className="absolute inset-0 bg-cover bg-center mix-blend-soft-light opacity-20 z-0">
-        <div className="absolute inset-0 backdrop-blur-3xl"></div>
       </div>
     </div>
   );

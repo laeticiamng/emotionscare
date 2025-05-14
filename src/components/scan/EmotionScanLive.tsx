@@ -68,30 +68,36 @@ const EmotionScanLive: React.FC<EmotionScanLiveProps> = ({
     setError(null);
     
     try {
-      // Analyser l'émotion
-      const result = await analyzeEmotion({
+      // Créer un objet avec les données d'analyse
+      const analysisData = {
         user_id: userId,
         text,
         emojis,
         audio_url: audioUrl || undefined,
         is_confidential: isConfidential,
         share_with_coach: true
-      });
+      };
+      
+      // Analyser l'émotion
+      const result = await analyzeEmotion(analysisData);
       
       setEmotionResult(result);
       
       if (result) {
         // Sauvegarder l'émotion
-        await saveEmotion({
+        const emotion: Emotion = {
+          id: result.id || '',
           user_id: userId,
           date: new Date().toISOString(),
           emotion: result.emotion,
           score: result.score,
-          text: text || result.text || undefined,
-          emojis: emojis || result.emojis || undefined,
+          text: text || result.text || '',
+          emojis: emojis || result.emojis || '',
           audio_url: audioUrl || undefined,
-          ai_feedback: result.feedback || result.ai_feedback
-        });
+          ai_feedback: result.feedback || result.ai_feedback || ''
+        };
+        
+        await saveEmotion(emotion);
         
         toast({
           title: "Analyse complétée",

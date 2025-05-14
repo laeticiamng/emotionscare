@@ -1,127 +1,157 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Music, PlayCircle, Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types';
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import React, { useEffect, useState } from 'react';
+import { MusicPlaylist, MusicTrack } from '@/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Emotion } from '@/types';
+import { TrackList } from './TrackList';
 import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
+import { Music, Activity } from 'lucide-react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface EmotionMusicRecommendationsProps {
-  emotionResult?: EmotionResult;
+  emotion?: string;
+  userMood?: Emotion | null;
+  isLoading?: boolean;
 }
 
-const EMOTION_TO_GENRE: Record<string, string> = {
-  'happy': 'Positive et énergisante',
-  'calm': 'Relaxante et apaisante',
-  'focused': 'Concentrée et productive',
-  'energetic': 'Dynamique et motivante',
-  'creative': 'Inspirante et imaginative',
-  'sad': 'Mélancolique et réconfortante',
-  'anxious': 'Apaisante et rassurante',
-  'angry': 'Calmante et stabilisante',
-  'neutral': 'Équilibrée et harmonieuse'
+// Map emotions to music moods
+const EMOTION_TO_MOOD_MAP: Record<string, string> = {
+  joy: 'happy',
+  happiness: 'happy',
+  calm: 'calm',
+  neutral: 'neutral',
+  sadness: 'melancholic',
+  anger: 'energetic',
+  fear: 'ambient',
+  anxiety: 'soothing',
+  surprise: 'upbeat'
 };
 
-const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = ({ 
-  emotionResult 
+// Mock API call
+const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Return mock tracks
+  return [
+    {
+      id: '1',
+      title: 'Calm Waters',
+      artist: 'Serenity',
+      coverUrl: '/images/music/calm-1.jpg',
+      audioUrl: '/audio/calm-1.mp3',
+      duration: 180,
+      emotion: 'calm'
+    },
+    {
+      id: '2',
+      title: 'Peaceful Mind',
+      artist: 'Zen Masters',
+      coverUrl: '/images/music/calm-2.jpg',
+      audioUrl: '/audio/calm-2.mp3',
+      duration: 240,
+      emotion: 'calm'
+    },
+    {
+      id: '3',
+      title: 'Morning Light',
+      artist: 'Nature Sounds',
+      coverUrl: '/images/music/calm-3.jpg',
+      audioUrl: '/audio/calm-3.mp3',
+      duration: 210,
+      emotion: 'joy'
+    }
+  ];
+};
+
+const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = ({
+  emotion = 'neutral',
+  userMood,
+  isLoading = false
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [recommendedGenre, setRecommendedGenre] = useState<string>('');
-  const [recommendedPlaylist, setRecommendedPlaylist] = useState<MusicPlaylist | null>(null);
-  const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
-  const { toast } = useToast();
+  const { playTrack } = useMusic();
+  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Determine the emotion to use for recommendations
+  const targetEmotion = userMood?.emotion || emotion;
+  const mood = EMOTION_TO_MOOD_MAP[targetEmotion.toLowerCase()] || 'neutral';
   
   useEffect(() => {
-    if (emotionResult && emotionResult.emotion) {
-      const emotion = emotionResult.emotion.toLowerCase();
-      const genre = EMOTION_TO_GENRE[emotion] || EMOTION_TO_GENRE.neutral;
-      setRecommendedGenre(genre);
-      
-      // Charger la playlist selon l'émotion
-      const loadPlaylist = async () => {
-        if (loadPlaylistForEmotion) {
-          setIsLoading(true);
-          try {
-            const playlist = await loadPlaylistForEmotion(emotion);
-            setRecommendedPlaylist(playlist);
-          } catch (err) {
-            console.error('Erreur lors du chargement de la playlist:', err);
-          } finally {
-            setIsLoading(false);
-          }
-        }
-      };
-      
-      loadPlaylist();
-    }
-  }, [emotionResult, loadPlaylistForEmotion]);
+    const fetchRecommendations = async () => {
+      setLoading(true);
+      try {
+        const tracks = await getRecommendedTracks(targetEmotion);
+        setRecommendedTracks(tracks);
+      } catch (error) {
+        console.error('Error fetching music recommendations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchRecommendations();
+  }, [targetEmotion]);
   
-  const handlePlay = () => {
-    if (recommendedPlaylist && recommendedPlaylist.tracks.length > 0) {
-      // Ensure track has required fields
-      const track = recommendedPlaylist.tracks[0];
-      const trackWithRequiredProps: MusicTrack = {
-        ...track,
-        url: track.url || '',
-        duration: track.duration || 0
-      };
-      
-      playTrack(trackWithRequiredProps);
-      setOpenDrawer?.(true);
-      
-      toast({
-        title: "Lecture en cours",
-        description: `Playlist "${recommendedPlaylist.name}" basée sur votre humeur`,
-      });
-    }
+  const handlePlayTrack = (track: MusicTrack) => {
+    // Make sure track has the required properties
+    const normalizedTrack: MusicTrack = {
+      ...track,
+      audioUrl: track.audioUrl || track.audio_url || '',
+      coverUrl: track.coverUrl || track.cover_url || track.cover || ''
+    };
+    
+    playTrack(normalizedTrack);
   };
   
-  if (!emotionResult) {
-    return null;
+  if (isLoading || loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2 mt-2" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="h-10 w-10 rounded-md" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
   
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center">
-          <Music className="mr-2 h-5 w-5 text-primary" />
-          Recommandation musicale
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Music className="h-5 w-5" />
+          Musique recommandée
         </CardTitle>
+        <CardDescription className="flex items-center gap-1">
+          <Activity className="h-3.5 w-3.5" />
+          Sélection basée sur vos émotions actuelles
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-sm">
-          <p>Selon votre humeur actuelle, nous vous proposons :</p>
-          
-          <div className="mt-3 p-3 bg-muted/30 rounded-md">
-            <div className="font-medium">{recommendedGenre}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Musique adaptée pour {emotionResult.emotion === "joy" ? "amplifier" : "équilibrer"} votre état émotionnel
-            </p>
-          </div>
-          
-          <div className="mt-4">
-            <Button 
-              onClick={handlePlay}
-              className="w-full" 
-              variant="outline"
-              disabled={isLoading || !recommendedPlaylist}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Chargement...
-                </>
-              ) : (
-                <>
-                  <PlayCircle className="mr-2 h-4 w-4" />
-                  Écouter maintenant
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
+        {recommendedTracks.length > 0 ? (
+          <TrackList 
+            tracks={recommendedTracks} 
+            onPlay={handlePlayTrack}
+            compact
+          />
+        ) : (
+          <p className="text-muted-foreground text-center py-6">
+            Aucune recommandation musicale disponible pour le moment.
+          </p>
+        )}
       </CardContent>
     </Card>
   );

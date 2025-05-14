@@ -1,175 +1,177 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { Bell, Clock, Volume2 } from 'lucide-react';
 
-export default function NotificationPreferences() {
-  const { preferences, updatePreferences } = useUserPreferences();
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
+
+const NotificationPreferences = () => {
+  const { user, updateUser } = useAuth();
+  const { toast } = useToast();
   
-  const handleToggleNotifications = (enabled: boolean) => {
-    updatePreferences({
-      notificationsEnabled: enabled,
-      notifications: {
-        ...preferences.notifications,
-        enabled: enabled
-      }
-    });
+  // Default preferences if user has none
+  const defaultPreferences = {
+    type: 'all' as NotificationType,
+    frequency: 'immediate' as NotificationFrequency,
+    tone: 'supportive' as NotificationTone,
+    emailEnabled: true,
+    pushEnabled: true,
+    soundEnabled: true
   };
   
-  const handleToggleEmailNotifications = (enabled: boolean) => {
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        emailEnabled: enabled
-      }
-    });
-  };
+  // Get existing preferences or use defaults
+  const userNotifPrefs = user?.preferences?.notifications || {};
   
-  const handleTogglePushNotifications = (enabled: boolean) => {
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        pushEnabled: enabled
-      }
-    });
-  };
+  // State for the form
+  const [preferences, setPreferences] = useState({
+    ...defaultPreferences,
+    ...userNotifPrefs
+  });
   
-  const handleFrequencyChange = (value: string) => {
-    updatePreferences({
-      notificationFrequency: value
-    });
-  };
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleToneChange = (value: string) => {
-    updatePreferences({
-      notificationTone: value
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Update user preferences
+      const updatedUser = {
+        ...user,
+        preferences: {
+          ...user.preferences,
+          notifications: preferences
+        }
+      };
+      
+      await updateUser(updatedUser);
+      
+      toast({
+        title: "Préférences mises à jour",
+        description: "Vos préférences de notification ont été enregistrées."
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder vos préférences.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          Préférences de notifications
-        </CardTitle>
-        <CardDescription>
-          Configurez comment et quand vous souhaitez recevoir des notifications
-        </CardDescription>
+        <CardTitle>Préférences de notification</CardTitle>
+        <CardDescription>Configurez comment et quand vous souhaitez être notifié</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="notifications" className="font-medium">Notifications</Label>
-              <p className="text-sm text-muted-foreground">
-                Activer ou désactiver toutes les notifications
-              </p>
+              <h3 className="text-sm font-medium mb-3">Types de notifications</h3>
+              <RadioGroup 
+                value={preferences.type} 
+                onValueChange={(value) => setPreferences({...preferences, type: value as NotificationType})}
+                className="space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="all" id="all" />
+                  <Label htmlFor="all">Toutes les notifications</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="important" id="important" />
+                  <Label htmlFor="important">Uniquement les notifications importantes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="none" id="none" />
+                  <Label htmlFor="none">Aucune notification</Label>
+                </div>
+              </RadioGroup>
             </div>
-            <Switch 
-              id="notifications" 
-              checked={preferences.notificationsEnabled || preferences.notifications?.enabled} 
-              onCheckedChange={handleToggleNotifications}
-            />
-          </div>
-          
-          <Separator />
-          
-          <div className="flex items-center justify-between">
+            
             <div>
-              <Label htmlFor="email-notifications" className="font-medium">Notifications par email</Label>
-              <p className="text-sm text-muted-foreground">
-                Recevoir des notifications par email
-              </p>
+              <h3 className="text-sm font-medium mb-3">Fréquence des notifications</h3>
+              <Select 
+                value={preferences.frequency} 
+                onValueChange={(value) => setPreferences({...preferences, frequency: value as NotificationFrequency})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir une fréquence" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="immediate">Immédiatement</SelectItem>
+                  <SelectItem value="daily">Résumé quotidien</SelectItem>
+                  <SelectItem value="weekly">Résumé hebdomadaire</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Switch 
-              id="email-notifications" 
-              checked={preferences.notifications?.emailEnabled} 
-              onCheckedChange={handleToggleEmailNotifications}
-              disabled={!preferences.notificationsEnabled && !preferences.notifications?.enabled}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
+            
             <div>
-              <Label htmlFor="push-notifications" className="font-medium">Notifications push</Label>
-              <p className="text-sm text-muted-foreground">
-                Recevoir des notifications dans votre navigateur
-              </p>
+              <h3 className="text-sm font-medium mb-3">Ton des notifications</h3>
+              <Select 
+                value={preferences.tone} 
+                onValueChange={(value) => setPreferences({...preferences, tone: value as NotificationTone})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir un ton" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="professional">Professionnel</SelectItem>
+                  <SelectItem value="casual">Décontracté</SelectItem>
+                  <SelectItem value="supportive">Bienveillant</SelectItem>
+                  <SelectItem value="minimal">Minimaliste</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <Switch 
-              id="push-notifications" 
-              checked={preferences.notifications?.pushEnabled} 
-              onCheckedChange={handleTogglePushNotifications}
-              disabled={!preferences.notificationsEnabled && !preferences.notifications?.enabled}
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <Label className="font-medium">Fréquence des notifications</Label>
+            
+            <div className="space-y-2 pt-2">
+              <h3 className="text-sm font-medium mb-3">Canaux de notification</h3>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-notifications">Notifications par email</Label>
+                <Switch 
+                  id="email-notifications" 
+                  checked={preferences.emailEnabled}
+                  onCheckedChange={(checked) => setPreferences({...preferences, emailEnabled: checked})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="push-notifications">Notifications push</Label>
+                <Switch 
+                  id="push-notifications" 
+                  checked={preferences.pushEnabled}
+                  onCheckedChange={(checked) => setPreferences({...preferences, pushEnabled: checked})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="sound-notifications">Sons de notification</Label>
+                <Switch 
+                  id="sound-notifications" 
+                  checked={preferences.soundEnabled}
+                  onCheckedChange={(checked) => setPreferences({...preferences, soundEnabled: checked})}
+                />
+              </div>
             </div>
-            <Select 
-              value={preferences.notificationFrequency || 'daily'} 
-              onValueChange={handleFrequencyChange}
-              disabled={!preferences.notificationsEnabled && !preferences.notifications?.enabled}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir une fréquence" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="instant">Instantanée</SelectItem>
-                <SelectItem value="hourly">Toutes les heures</SelectItem>
-                <SelectItem value="daily">Quotidienne</SelectItem>
-                <SelectItem value="weekly">Hebdomadaire</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">
-              Définit à quelle fréquence vous recevez des notifications récapitulatives
-            </p>
           </div>
           
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Volume2 className="h-4 w-4 text-muted-foreground" />
-              <Label className="font-medium">Ton des notifications</Label>
-            </div>
-            <Select 
-              value={preferences.notificationTone || 'friendly'} 
-              onValueChange={handleToneChange}
-              disabled={!preferences.notificationsEnabled && !preferences.notifications?.enabled}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir un ton" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="neutral">Neutre</SelectItem>
-                <SelectItem value="friendly">Amical</SelectItem>
-                <SelectItem value="professional">Professionnel</SelectItem>
-                <SelectItem value="encouraging">Encourageant</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground mt-1">
-              Définit le style de communication utilisé dans vos notifications
-            </p>
-          </div>
-        </div>
-        
-        <div className="pt-4">
-          <Button variant="outline" className="w-full">
-            Tester les notifications
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Enregistrement..." : "Enregistrer les préférences"}
           </Button>
-        </div>
+        </form>
       </CardContent>
     </Card>
   );
-}
+};
+
+export default NotificationPreferences;

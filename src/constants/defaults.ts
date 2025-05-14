@@ -1,30 +1,26 @@
 
-import { UserPreferences } from '@/types/user';
-
-export const DEFAULT_USER_PREFERENCES: UserPreferences = {
+// User preferences defaults
+export const DEFAULT_USER_PREFERENCES = {
   theme: 'system',
   fontSize: 'medium',
-  font: 'inter',
-  dynamicTheme: 'none',
-  notificationsEnabled: true,
-  notifications: {
-    enabled: true,
-  },
-  privacy: {
-    profileVisibility: 'private',
-  },
-  dataExport: 'pdf',
-  incognitoMode: false,
-  lockJournals: false,
-  emotionalCamouflage: false, 
-  aiSuggestions: true,
-  screenReader: false,
-  keyboardNavigation: false,
-  audioGuidance: false,
-  autoplayVideos: false,
-  highContrast: false,
-  reducedAnimations: false,
+  fontFamily: 'sans',
+  notifications: true,
+  sound: true,
   language: 'fr',
-  notificationFrequency: 'daily',
-  notificationTone: 'friendly'
+  dashboardLayout: 'standard'
+};
+
+// Time of day constants for greeting messages and UI adaptations
+export enum TIME_OF_DAY {
+  MORNING = 'morning',
+  AFTERNOON = 'afternoon',
+  EVENING = 'evening',
+  NIGHT = 'night'
+}
+
+// Default emotion values
+export const DEFAULT_EMOTION = {
+  emotion: 'neutral',
+  score: 5,
+  confidence: 0.7
 };

@@ -1,120 +1,196 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { 
+  Sheet, 
+  SheetClose, 
+  SheetContent, 
+  SheetDescription, 
+  SheetFooter, 
+  SheetHeader, 
+  SheetTitle 
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useNotifications } from '@/hooks/useNotifications';
-import { useAuth } from '@/contexts/AuthContext';
-import { CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Bell, 
+  BellOff, 
+  Check, 
+  Clock, 
+  Trash
+} from "lucide-react";
+import { Notification } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useNotificationBadge } from '@/hooks/useNotificationBadge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { useTheme } from '@/hooks/use-theme';
 
-const NotificationsPanel = () => {
-  const { notifications, markAsRead, markAllAsRead } = useNotifications();
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const badge = useNotificationBadge();
+interface NotificationsPanelProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  notifications: Notification[];
+  onMarkAllAsRead: () => void;
+  onDeleteAll: () => void;
+  onMarkAsRead: (id: string) => void;
+  onDelete: (id: string) => void;
+}
 
-  useEffect(() => {
-    // Update badge count based on unread notifications
-    if (badge && notifications) {
-      const unreadCount = notifications.filter(n => !n.isRead && !n.read).length;
-      badge.setBadgesCount?.(unreadCount);
-    }
-  }, [notifications, badge]);
+function getUnreadCount(notifications: Notification[]): number {
+  return notifications.filter(notification => !notification.read).length;
+}
 
-  const handleMarkAsRead = async (notificationId: string) => {
-    setLoading(true);
+const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
+  open,
+  onOpenChange,
+  notifications,
+  onMarkAllAsRead,
+  onDeleteAll,
+  onMarkAsRead,
+  onDelete
+}) => {
+  const [activeTab, setActiveTab] = useState('all');
+  const { theme } = useTheme();
+  
+  const unreadNotifications = notifications.filter(notification => !notification.read);
+  const hasUnread = unreadNotifications.length > 0;
+  
+  const formatTime = (date: string) => {
     try {
-      await markAsRead(notificationId);
-    } finally {
-      setLoading(false);
+      return formatDistanceToNow(new Date(date), { 
+        addSuffix: true,
+        locale: fr
+      });
+    } catch (error) {
+      return 'Date inconnue';
     }
   };
-
-  const handleClearAll = async () => {
-    setLoading(true);
-    try {
-      await markAllAsRead();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'error':
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Info className="h-4 w-4 text-blue-500" />;
-    }
+  
+  // Render a single notification
+  const renderNotification = (notification: Notification) => {
+    const timeFormatted = formatTime(notification.timestamp || notification.createdAt || new Date().toISOString());
+    
+    return (
+      <div 
+        key={notification.id} 
+        className={`p-3 border-b last:border-b-0 transition-colors ${!notification.read ? 'bg-accent/10' : ''}`}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex-1 mr-4">
+            <h4 className={`text-sm font-medium ${!notification.read ? 'font-semibold' : ''}`}>
+              {notification.title}
+            </h4>
+            <p className="text-sm text-muted-foreground mt-1">{notification.body}</p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-xs text-muted-foreground">{timeFormatted}</span>
+              {!notification.read && (
+                <Badge variant="outline" className="text-[10px] py-0 h-4 bg-primary/10 hover:bg-primary/20">
+                  Nouveau
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex items-start space-x-1">
+            {!notification.read && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-8 w-8" 
+                onClick={() => onMarkAsRead(notification.id)}
+                title="Marquer comme lu"
+              >
+                <Check className="h-4 w-4" />
+              </Button>
+            )}
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-8 w-8 text-destructive" 
+              onClick={() => onDelete(notification.id)}
+              title="Supprimer"
+            >
+              <Trash className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Notifications</CardTitle>
-        <Button variant="ghost" size="sm" onClick={handleClearAll} disabled={loading}>
-          Marquer tout comme lu
-        </Button>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[300px] w-full">
-          {notifications && notifications.length > 0 ? (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className="flex items-start space-x-4 p-4 border-b last:border-b-0"
-              >
-                {getIcon(notification.type)}
-                <div className="flex-1">
-                  <div className="text-sm font-medium">{notification.title}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {notification.message}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.timestamp || notification.date || notification.createdAt || new Date()), {
-                      addSuffix: true,
-                      locale: fr,
-                    })}
-                  </div>
-                </div>
-                {!(notification.read || notification.isRead) && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleMarkAsRead(notification.id)}
-                    disabled={loading}
-                  >
-                    <span className="sr-only">Marquer comme lu</span>
-                    <CheckCircle className="h-4 w-4" />
-                  </Button>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="sm:max-w-md p-0 flex flex-col">
+        <SheetHeader className="p-6 pb-2">
+          <SheetTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5" />
+            Notifications 
+            {hasUnread && (
+              <Badge className="ml-2 bg-primary text-primary-foreground">{unreadNotifications.length}</Badge>
+            )}
+          </SheetTitle>
+          <SheetDescription>
+            Restez informé de vos avancées et des recommandations
+          </SheetDescription>
+        </SheetHeader>
+        
+        <div className="px-6 pb-2">
+          <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full">
+              <TabsTrigger value="all" className="flex-1">Toutes</TabsTrigger>
+              <TabsTrigger value="unread" className="flex-1">
+                Non lues
+                {hasUnread && (
+                  <Badge variant="outline" className="ml-2 bg-background">{unreadNotifications.length}</Badge>
                 )}
-              </div>
-            ))
-          ) : (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              Aucune notification pour le moment.
-            </div>
-          )}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
+        <ScrollArea className="flex-1 overflow-y-auto">
+          <div className="px-1 py-2">
+            <TabsContent value="all" className="m-0">
+              {notifications.length > 0 ? (
+                notifications.map(renderNotification)
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                  <Clock className="h-10 w-10 mb-3 text-muted-foreground/50" />
+                  <p>Aucune notification pour le moment</p>
+                  <p className="text-sm mt-1">Nous vous informerons des mises à jour importantes</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="unread" className="m-0">
+              {unreadNotifications.length > 0 ? (
+                unreadNotifications.map(renderNotification)
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
+                  <BellOff className="h-10 w-10 mb-3 text-muted-foreground/50" />
+                  <p>Aucune notification non lue</p>
+                  <p className="text-sm mt-1">Toutes vos notifications ont été consultées</p>
+                </div>
+              )}
+            </TabsContent>
+          </div>
         </ScrollArea>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <p className="text-xs text-muted-foreground">
-          {notifications ? notifications.length : 0} Notifications
-        </p>
-        {user && (
-          <p className="text-xs text-muted-foreground">
-            Connecté en tant que {user.email}
-          </p>
-        )}
-      </CardFooter>
-    </Card>
+        
+        <SheetFooter className="px-6 py-4 border-t">
+          <div className="flex items-center justify-between w-full">
+            <Button variant="outline" size="sm" onClick={onMarkAllAsRead} disabled={!hasUnread}>
+              <Check className="h-4 w-4 mr-2" />
+              Tout marquer comme lu
+            </Button>
+            <Button variant="outline" size="sm" onClick={onDeleteAll} disabled={notifications.length === 0}>
+              <Trash className="h-4 w-4 mr-2" />
+              Tout supprimer
+            </Button>
+            <SheetClose asChild>
+              <Button variant="secondary" size="sm">Fermer</Button>
+            </SheetClose>
+          </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ result, onEmotion
       score: result.score,
       text: result.text || result.transcript || '',
       emojis: result.emojis || '',
-      ai_feedback: result.feedback || '',
+      ai_feedback: result.feedback || result.ai_feedback || '',
       category: determineEmotionCategory(result.emotion) // Add category
     };
     
