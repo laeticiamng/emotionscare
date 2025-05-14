@@ -75,6 +75,7 @@ export interface LeaderboardEntry {
   userId: string;
   name: string;
   avatar?: string;
+  avatarUrl?: string; // Added to fix type error
   points: number;
   rank: number;
   badges: number;

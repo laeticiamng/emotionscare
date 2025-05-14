@@ -1,58 +1,61 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useMusic } from '@/contexts/MusicContext';
-import { Music2 } from 'lucide-react';
+import { Music, Heart } from 'lucide-react';
 
 interface MusicEmotionRecommendationProps {
-  emotion: any;
-  intensity: number;
+  emotion: string;
+  onSelect: (playlist: any) => void;
 }
 
-const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotion, intensity }) => {
-  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
-
-  // Update emotion handling when primaryEmotion is a string, not an object with name
-  const getEmotionText = () => {
-    if (typeof emotion === 'string') {
-      return emotion;
-    } else if (emotion?.primaryEmotion) {
-      return typeof emotion.primaryEmotion === 'string' 
-        ? emotion.primaryEmotion 
-        : emotion.primaryEmotion.name;
-    } else if (emotion?.emotion) {
-      return emotion.emotion;
-    }
-    return 'neutral';
+const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotion, onSelect }) => {
+  // Mock playlists based on emotions
+  const playlists = {
+    happy: { id: 'happy-1', name: 'Énergie positive', tracks: 12 },
+    sad: { id: 'sad-1', name: 'Réconfort et douceur', tracks: 8 },
+    angry: { id: 'angry-1', name: 'Libération et calme', tracks: 10 },
+    anxious: { id: 'anxious-1', name: 'Apaisement et sérénité', tracks: 9 },
+    calm: { id: 'calm-1', name: 'Pleine conscience', tracks: 7 },
+    neutral: { id: 'neutral-1', name: 'Equilibre émotionnel', tracks: 11 }
   };
-
-  const handlePlayMusic = async () => {
-    const emotionText = getEmotionText().toLowerCase();
-    await loadPlaylistForEmotion(emotionText);
-    setOpenDrawer(true);
-  };
-
+  
+  // Get playlist based on emotion or fallback to neutral
+  const playlist = playlists[emotion as keyof typeof playlists] || playlists.neutral;
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Music2 className="mr-2 h-4 w-4" />
-          Recommandation Musicale
+    <Card className="mt-4">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Music className="h-5 w-5" />
+          Musique recommandée pour votre état émotionnel
         </CardTitle>
-        <CardDescription>
-          Musique adaptée à votre état émotionnel
-        </CardDescription>
       </CardHeader>
       <CardContent>
-        <p>
-          Nous vous recommandons une playlist basée sur votre émotion actuelle: 
-          {getEmotionText()} (intensité: {intensity}%)
-        </p>
-        <Button onClick={handlePlayMusic} className="mt-4">
-          Écouter maintenant
-        </Button>
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">{playlist.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                {playlist.tracks} morceaux • Adaptés à l'émotion <span className="font-medium">{emotion}</span>
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Heart className="h-5 w-5 text-primary" />
+            </div>
+          </div>
+          
+          <p className="text-sm">
+            Cette sélection musicale est spécialement conçue pour harmoniser votre état émotionnel 
+            actuel et favoriser votre bien-être.
+          </p>
+        </div>
       </CardContent>
+      <CardFooter className="pt-0">
+        <Button className="w-full" onClick={() => onSelect(playlist)}>
+          Écouter cette playlist
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

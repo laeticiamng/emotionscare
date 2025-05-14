@@ -87,3 +87,23 @@ export function getRoleNavigationPaths(role: string | undefined): string[] {
       return [];
   }
 }
+
+/**
+ * Get a user-friendly name for a role
+ * @param role User role
+ * @returns User-friendly role name
+ */
+export function getRoleName(role: string | undefined): string {
+  switch(role) {
+    case 'b2c':
+      return 'Utilisateur Particulier';
+    case 'b2b_user':
+      return 'Collaborateur Entreprise';
+    case 'b2b_admin':
+      return 'Administrateur RH';
+    case 'super_admin':
+      return 'Super Administrateur';
+    default:
+      return 'Utilisateur';
+  }
+}

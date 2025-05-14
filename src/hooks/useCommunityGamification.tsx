@@ -2,18 +2,35 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGamificationStats, fetchChallenges } from '@/lib/gamificationService';
-import type { UseCommunityGamificationResult, GamificationStats, Challenge } from './community-gamification/types';
+import type { GamificationStats, Challenge } from '@/types/gamification';
 import type { Badge } from '@/types';
+
+interface UseCommunityGamificationResult {
+  stats: GamificationStats;
+  badges: Badge[];
+  challenges: Challenge[];
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
 
 export const useCommunityGamification = (): UseCommunityGamificationResult => {
   const { user } = useAuth();
   const [stats, setStats] = useState<GamificationStats>({
+    points: 0,
+    level: 1,
+    rank: '',
+    badges: [], 
+    challenges: [],
+    streak: 0,
+    nextLevel: { points: 100, rewards: [] },
+    achievements: [],
     currentLevel: 1,
+    pointsToNextLevel: 100,
+    progressToNextLevel: 0,
     totalPoints: 0,
     badgesCount: 0,
     streakDays: 0,
-    pointsToNextLevel: 100,
-    progressToNextLevel: 0,
     activeChallenges: 0,
     completedChallenges: 0,
     lastActivityDate: new Date().toISOString()
@@ -33,15 +50,9 @@ export const useCommunityGamification = (): UseCommunityGamificationResult => {
       // Fetch stats
       const statsData = await fetchGamificationStats(user.id);
       setStats({
-        currentLevel: statsData.level,
-        totalPoints: statsData.points,
-        badgesCount: statsData.badges,
-        streakDays: statsData.streakDays,
-        pointsToNextLevel: statsData.nextLevel - statsData.points,
-        progressToNextLevel: statsData.progress,
-        activeChallenges: 3, // Mock data
-        completedChallenges: 12, // Mock data
-        lastActivityDate: new Date().toISOString()
+        ...statsData,
+        badgesCount: statsData.badgesCount || stats.badgesCount,
+        streakDays: statsData.streakDays || stats.streakDays
       });
       
       // Fetch challenges

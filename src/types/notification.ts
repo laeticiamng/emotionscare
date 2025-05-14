@@ -1,56 +1,85 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'monthly';
-export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'system' | 'reminder' | 'wellness' | 'tip';
-export type NotificationTone = 'standard' | 'friendly' | 'professional' | 'urgent' | 'minimal';
+// Notification types and interfaces
 
-// Create objects for these enums to use as values
-export const NotificationFrequency = {
-  REALTIME: 'realtime' as NotificationFrequency,
-  DAILY: 'daily' as NotificationFrequency,
-  WEEKLY: 'weekly' as NotificationFrequency,
-  MONTHLY: 'monthly' as NotificationFrequency
-};
-
-export const NotificationType = {
-  INFO: 'info' as NotificationType,
-  WARNING: 'warning' as NotificationType,
-  SUCCESS: 'success' as NotificationType,
-  ERROR: 'error' as NotificationType,
-  SYSTEM: 'system' as NotificationType,
-  REMINDER: 'reminder' as NotificationType,
-  WELLNESS: 'wellness' as NotificationType,
-  TIP: 'tip' as NotificationType
-};
-
-export const NotificationTone = {
-  STANDARD: 'standard' as NotificationTone,
-  FRIENDLY: 'friendly' as NotificationTone,
-  PROFESSIONAL: 'professional' as NotificationTone,
-  URGENT: 'urgent' as NotificationTone,
-  MINIMAL: 'minimal' as NotificationTone
-};
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  date: string;
-  read: boolean;
-  isRead?: boolean; // Adding for compatibility
-  createdAt?: string; // Adding for compatibility
-  userId?: string;
-  linkTo?: string;
+/**
+ * Notification frequency options
+ */
+export enum NotificationFrequency {
+  REALTIME = 'realtime',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
+  IMMEDIATE = 'immediate' // Adding this to fix the error
 }
 
-export interface NotificationPreference {
+/**
+ * Notification type options
+ */
+export enum NotificationType {
+  INFO = 'info',
+  WARNING = 'warning',
+  SUCCESS = 'success',
+  ERROR = 'error',
+  SYSTEM = 'system',
+  REMINDER = 'reminder',
+  WELLNESS = 'wellness',
+  TIP = 'tip',
+  IN_APP = 'in_app' // Adding this to fix the error
+}
+
+/**
+ * Notification tone options
+ */
+export enum NotificationTone {
+  STANDARD = 'standard',
+  FRIENDLY = 'friendly',
+  PROFESSIONAL = 'professional',
+  URGENT = 'urgent',
+  MINIMAL = 'minimal',
+  FORMAL = 'formal', // Adding these to fix the errors
+  CASUAL = 'casual',
+  ENCOURAGING = 'encouraging'
+}
+
+/**
+ * Notification model
+ */
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  body: string;
   type: NotificationType;
+  created_at: string;
+  read: boolean;
+  read_at?: string;
+  action_url?: string;
+  icon?: string;
+  image_url?: string;
+  priority?: 'low' | 'normal' | 'high';
+  category?: string;
+  sender?: string;
+  context_data?: Record<string, any>;
+  createdAt?: string; // Alias for created_at
+}
+
+/**
+ * Notification preferences
+ */
+export interface NotificationPreference {
+  id?: string;
+  user_id: string;
   enabled: boolean;
+  email_enabled: boolean;
+  push_enabled: boolean;
   frequency: NotificationFrequency;
-  tone?: NotificationTone;
-  channels?: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
+  types?: NotificationType[];
+  quiet_hours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+    timezone: string;
   };
+  categories?: string[];
+  tone?: NotificationTone;
 }

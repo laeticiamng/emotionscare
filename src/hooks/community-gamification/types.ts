@@ -1,6 +1,22 @@
 
 import { Badge } from '@/types';
 
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  status: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
+  category: string;
+  type?: string;
+  progress?: number;
+  goal?: number;
+  icon?: string;
+  startDate?: string;
+  endDate?: string;
+  level?: string | number;
+}
+
 export interface GamificationStats {
   currentLevel: number;
   totalPoints: number;
@@ -10,18 +26,9 @@ export interface GamificationStats {
   progressToNextLevel: number;
   activeChallenges: number;
   completedChallenges: number;
-  lastActivityDate: string;
-}
-
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  points: number;
-  status: 'completed' | 'ongoing' | 'failed' | 'locked';
-  category: string;
-  dueDate?: string;
-  progressPercentage?: number;
+  lastActivityDate?: string;
+  nextLevelPoints?: number;
+  recentAchievements?: any[];
 }
 
 export interface UseCommunityGamificationResult {
@@ -32,5 +39,3 @@ export interface UseCommunityGamificationResult {
   error: Error | null;
   refetch: () => Promise<void>;
 }
-
-export type { Badge };

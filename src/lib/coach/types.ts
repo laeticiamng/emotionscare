@@ -22,10 +22,13 @@ export type CoachAction = {
 };
 
 export type EmotionalData = {
+  id?: string;
   emotion: string;
   intensity: number;
   timestamp: Date | string;
   context?: string;
+  userId?: string; // Added to fix type errors
+  user_id?: string; // Added to fix type errors
 };
 
 export type EmotionalTrend = {
