@@ -1,55 +1,53 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationType = 'alert' | 'reminder' | 'insight' | 'achievement';
-export type NotificationTone = 'formal' | 'friendly' | 'motivational' | 'minimal' | 'technical';
+export type NotificationFrequency = 'instant' | 'daily' | 'weekly' | 'never';
+export type NotificationType = 'all' | 'important' | 'mentions' | 'none';
+export type NotificationTone = 'gentle' | 'neutral' | 'assertive' | 'silent' | 'custom';
 
-export const NotificationFrequency = {
-  IMMEDIATE: 'immediate' as NotificationFrequency,
-  DAILY: 'daily' as NotificationFrequency,
-  WEEKLY: 'weekly' as NotificationFrequency,
-  NEVER: 'never' as NotificationFrequency
-};
+// Adding enums for use in components referencing them
+export enum NotificationFrequencyEnum {
+  INSTANT = 'instant',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  NEVER = 'never'
+}
 
-export const NotificationType = {
-  ALERT: 'alert' as NotificationType,
-  REMINDER: 'reminder' as NotificationType,
-  INSIGHT: 'insight' as NotificationType,
-  ACHIEVEMENT: 'achievement' as NotificationType
-};
+export enum NotificationTypeEnum {
+  ALL = 'all',
+  IMPORTANT = 'important',
+  MENTIONS = 'mentions',
+  NONE = 'none'
+}
 
-export const NotificationTone = {
-  FORMAL: 'formal' as NotificationTone,
-  FRIENDLY: 'friendly' as NotificationTone,
-  MOTIVATIONAL: 'motivational' as NotificationTone,
-  MINIMAL: 'minimal' as NotificationTone,
-  TECHNICAL: 'technical' as NotificationTone
-};
+export enum NotificationToneEnum {
+  GENTLE = 'gentle',
+  NEUTRAL = 'neutral',
+  ASSERTIVE = 'assertive',
+  SILENT = 'silent',
+  CUSTOM = 'custom'
+}
 
 export interface NotificationPreference {
-  emailFrequency: NotificationFrequency;
-  pushFrequency: NotificationFrequency;
-  types: NotificationType[];
-  tone: NotificationTone;
-  muteAll: boolean;
-  quiet_hours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
+  id?: string;
+  type: string;
+  frequency: NotificationFrequency;
+  channels?: string[];
+  user_id?: string;
+  tone?: NotificationTone;
+  enabled?: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
 }
 
 export interface Notification {
   id: string;
+  user_id: string;
   title: string;
   message: string;
-  type: string;
-  isRead?: boolean;
+  type?: string;
   read?: boolean;
-  createdAt?: string;
-  date?: string;
   timestamp?: string;
-  action?: {
-    type: string;
-    payload?: any;
-  };
+  createdAt?: string;
+  link?: string;
+  action?: string;
+  source?: string;
 }

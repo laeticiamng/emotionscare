@@ -1,42 +1,56 @@
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface NotificationBadge {
   count: number;
-  setBadgesCount?: (count: number) => void;
-  clearBadges?: () => void;
+  setBadgeCount: (count: number) => void;
+  countUnread: () => Promise<number>;
+  resetCount: () => void;
+  markAllAsRead: () => Promise<void>;
 }
 
 export const useNotificationBadge = (): NotificationBadge => {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number>(0);
+  const { user } = useAuth();
 
-  const setBadgesCount = (newCount: number) => {
-    setCount(newCount);
+  const countUnread = async (): Promise<number> => {
+    if (!user) return 0;
+    
+    // Mock implementation - replace with actual API call
+    const mockCount = Math.floor(Math.random() * 5);
+    setCount(mockCount);
+    return mockCount;
   };
 
-  const clearBadges = () => {
+  const resetCount = () => {
     setCount(0);
   };
 
-  // Add badge to document title when count changes
+  const markAllAsRead = async (): Promise<void> => {
+    // Mock implementation - replace with actual API call
+    setCount(0);
+    return Promise.resolve();
+  };
+
+  // Count unread notifications on mount
   useEffect(() => {
-    const originalTitle = document.title.replace(/^\(\d+\) /, '');
+    countUnread();
     
-    if (count > 0) {
-      document.title = `(${count}) ${originalTitle}`;
-    } else {
-      document.title = originalTitle;
-    }
+    // Check for new notifications periodically
+    const interval = setInterval(() => {
+      countUnread();
+    }, 60000);
     
-    return () => {
-      document.title = originalTitle;
-    };
-  }, [count]);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return {
     count,
-    setBadgesCount,
-    clearBadges
+    setBadgeCount: setCount,
+    countUnread,
+    resetCount,
+    markAllAsRead
   };
 };
 

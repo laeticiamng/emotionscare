@@ -3,88 +3,51 @@ export interface Emotion {
   id: string;
   user_id: string;
   date: string;
-  emotion?: string;
   name?: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  ai_feedback?: string;
+  emotion?: string;
   sentiment: number;
   anxiety: number;
   energy: number;
+  text?: string;
+  emojis?: string;
+  audio_url?: string;
   is_confidential?: boolean;
   share_with_coach?: boolean;
-  score?: number;
-  confidence?: number;
+  ai_feedback?: string;
   category?: string;
+  score?: number;
+  intensity?: number; // Adding this for components that need it
 }
 
 export interface EmotionResult {
   id?: string;
   user_id?: string;
-  emotion: string;
-  confidence: number;
-  score?: number;
+  emotion?: string;
+  confidence?: number;
   intensity?: number;
-  dominantEmotion?: string;
   primaryEmotion?: {
     name: string;
-    score?: number;
+    score: number;
   };
-  secondaryEmotion?: string;
   secondaryEmotions?: string[];
-  triggers?: string[];
-  recommendations?: string[];
-  text?: string;
   transcript?: string;
-  feedback?: string;
-  ai_feedback?: string;
+  text?: string;
   emojis?: string;
-  timestamp?: string;
+  feedback?: string;
+  score?: number;
+  ai_feedback?: string;
+  date?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  analysis: {
-    intensity: number;
-    valencia: number;
-    duration: number;
-  };
-  historical: {
-    trend: 'improving' | 'worsening' | 'stable';
-    comparedToLastWeek: number;
-  };
-  insights: string[];
-}
-
-export interface EmotionalData {
-  primaryEmotion: string;
-  secondaryEmotions: string[];
-  intensity: number;
-  triggers: string[];
-  timestamp: string;
-  userId: string;
-  audioAnalysis?: {
-    tone: string;
-    pitch: number;
-    speed: number;
-    pauses: number;
-  };
-  textAnalysis?: {
-    sentiment: number;
-    keywords: string[];
-    negations: number;
-    intensifiers: number;
-  };
+  recommendations?: string[];
+  triggers?: string[];
+  suggestions?: string[];
 }
 
 export interface EmotionalTeamViewProps {
-  userId: string;
-  period?: string;
   teamId: string;
-  className?: string;
-  onRefresh?: () => Promise<void>;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
+  startDate?: Date;
+  endDate?: Date;
+  anonymized?: boolean;
 }

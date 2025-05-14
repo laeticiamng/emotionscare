@@ -1,4 +1,3 @@
-
 import { Emotion, EmotionResult } from '@/types';
 
 // Mock database
@@ -81,7 +80,8 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult
     ],
     transcript: "Ceci est une transcription simulée de l'audio analysé. Le système génèrerait normalement ici le texte reconnu à partir de l'enregistrement vocal.",
     feedback: `Votre voix révèle des niveaux de ${randomEmotion} qui pourraient indiquer ${randomEmotion === 'stressed' || randomEmotion === 'anxious' ? 'un besoin de prendre du recul' : 'une bonne gestion émotionnelle'}.`,
-    score: Math.round(Math.random() * 10)
+    score: Math.round(Math.random() * 10),
+    date: new Date().toISOString()
   };
 };
 
