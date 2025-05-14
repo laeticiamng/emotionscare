@@ -1,101 +1,133 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FontFamily, FontSize, ThemeName, ThemeContextType } from '@/types/types';
+import { ThemeContextType, ThemeName, FontFamily, FontSize } from '@/types/types';
 
-export const ThemeContext = createContext<ThemeContextType>({
+// Create the theme context with default values
+const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
   isDarkMode: false,
   fontFamily: 'system',
   setFontFamily: () => {},
   fontSize: 'medium',
-  setFontSize: () => {},
+  setFontSize: () => {}
 });
 
+export const useTheme = () => useContext(ThemeContext);
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<ThemeName>('system');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('system');
-  const [fontSize, setFontSize] = useState<FontSize>('medium');
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
+  // Initialize states from localStorage or default values
+  const [theme, setThemeState] = useState<ThemeName>(() => {
+    const savedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+    return (savedTheme as ThemeName) || 'system';
+  });
+
+  const [fontFamily, setFontFamilyState] = useState<FontFamily>(() => {
+    const savedFont = typeof window !== 'undefined' ? localStorage.getItem('fontFamily') : null;
+    return (savedFont as FontFamily) || 'system';
+  });
+
+  const [fontSize, setFontSizeState] = useState<FontSize>(() => {
+    const savedSize = typeof window !== 'undefined' ? localStorage.getItem('fontSize') : null;
+    return (savedSize as FontSize) || 'medium';
+  });
+
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    if (theme === 'dark') return true;
+    if (theme === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  // Update theme state and localStorage
+  const setTheme = (newTheme: ThemeName) => {
+    setThemeState(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  // Update font family state and localStorage
+  const setFontFamily = (newFont: FontFamily) => {
+    setFontFamilyState(newFont);
+    localStorage.setItem('fontFamily', newFont);
+  };
+
+  // Update font size state and localStorage
+  const setFontSize = (newSize: FontSize) => {
+    setFontSizeState(newSize);
+    localStorage.setItem('fontSize', newSize);
+  };
+
+  // Listen for system theme changes
   useEffect(() => {
-    // Load theme from localStorage or default to system
-    const savedTheme = localStorage.getItem('theme') as ThemeName;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-    
-    // Load font family from localStorage
-    const savedFontFamily = localStorage.getItem('fontFamily') as FontFamily;
-    if (savedFontFamily) {
-      setFontFamily(savedFontFamily);
-    }
-    
-    // Load font size from localStorage
-    const savedFontSize = localStorage.getItem('fontSize') as FontSize;
-    if (savedFontSize) {
-      setFontSize(savedFontSize);
-    }
-  }, []);
-  
+    if (theme !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDarkMode(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
+
+  // Update document classes when theme changes
   useEffect(() => {
-    // Apply theme to document
-    const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
+    const root = document.documentElement;
     
-    // Determine if dark mode should be applied
-    let shouldUseDark = theme === 'dark';
+    // Remove all theme classes
+    root.classList.remove('theme-light', 'theme-dark', 'theme-system', 'theme-pastel');
+    
+    // Add current theme class
+    root.classList.add(`theme-${theme}`);
+    
+    // Set dark or light mode
     if (theme === 'system') {
-      shouldUseDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    
-    if (shouldUseDark) {
+      if (isDarkMode) {
+        root.classList.add('dark');
+        root.classList.remove('light');
+      } else {
+        root.classList.add('light');
+        root.classList.remove('dark');
+      }
+    } else if (theme === 'dark') {
       root.classList.add('dark');
-      setIsDarkMode(true);
+      root.classList.remove('light');
     } else {
       root.classList.add('light');
-      setIsDarkMode(false);
+      root.classList.remove('dark');
     }
-    
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-  
+  }, [theme, isDarkMode]);
+
+  // Update font classes when font or size changes
   useEffect(() => {
-    // Apply font family to document
-    const root = window.document.documentElement;
-    root.style.setProperty('--font-family', fontFamily);
+    const root = document.documentElement;
     
-    // Save to localStorage
-    localStorage.setItem('fontFamily', fontFamily);
-  }, [fontFamily]);
-  
-  useEffect(() => {
-    // Apply font size to document
-    const root = window.document.documentElement;
-    root.style.setProperty('--font-size', fontSize);
+    // Remove all font family classes
+    root.classList.remove('font-system', 'font-sans-serif', 'font-serif', 'font-mono', 'font-rounded', 'font-inter');
     
-    // Save to localStorage
-    localStorage.setItem('fontSize', fontSize);
-  }, [fontSize]);
-  
+    // Add current font family class
+    root.classList.add(`font-${fontFamily}`);
+    
+    // Remove all font size classes
+    root.classList.remove('text-small', 'text-medium', 'text-large', 'text-extra-large');
+    
+    // Add current font size class
+    root.classList.add(`text-${fontSize}`);
+  }, [fontFamily, fontSize]);
+
   return (
     <ThemeContext.Provider value={{ 
       theme, 
       setTheme, 
       isDarkMode,
-      fontFamily, 
-      setFontFamily, 
-      fontSize, 
-      setFontSize 
+      fontFamily,
+      setFontFamily,
+      fontSize,
+      setFontSize
     }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
-
-// Export for other files to import
-export type { ThemeName, FontFamily, FontSize };
+// Export the context for direct usage
 export { ThemeContext };

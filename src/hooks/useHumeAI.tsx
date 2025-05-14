@@ -31,7 +31,7 @@ export const useHumeAI = () => {
             source: 'text',
             text: text,
             timestamp: new Date().toISOString(),
-            date: new Date().toISOString(), // Add the date property
+            date: new Date().toISOString(),
             anxiety: 25,
             recommendations: [
               'Continue practices that bring you joy',
@@ -76,7 +76,7 @@ export const useHumeAI = () => {
             confidence: 0.92,
             source: 'audio',
             timestamp: new Date().toISOString(),
-            date: new Date().toISOString(), // Add the date property
+            date: new Date().toISOString(),
             anxiety: 15,
             recommendations: [
               'Practice mindfulness to maintain your calm state',
@@ -121,7 +121,7 @@ export const useHumeAI = () => {
             confidence: 0.78,
             source: 'facial',
             timestamp: new Date().toISOString(),
-            date: new Date().toISOString(), // Add the date property
+            date: new Date().toISOString(),
             anxiety: 30,
             recommendations: [
               'Consider activities that energize you',
@@ -170,7 +170,7 @@ export const useHumeAI = () => {
             confidence: 0.89,
             source: 'multimodal',
             timestamp: new Date().toISOString(),
-            date: new Date().toISOString(), // Add the date property
+            date: new Date().toISOString(),
             recommendations: [
               'Continue your current positive activities',
               'Consider journaling about what makes you content'

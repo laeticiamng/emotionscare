@@ -1,44 +1,56 @@
 
 import React from 'react';
 import TeamOverview from '@/components/scan/TeamOverview';
-import { useAuth } from '@/contexts/AuthContext';
-import { User } from '@/types';
+import { User, TeamOverviewProps } from '@/types/types';
 
 interface TeamTabContentProps {
   teamId?: string;
+  userId: string;
 }
 
-const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId }) => {
-  const { user } = useAuth();
+// Sample team members data for demonstration
+const mockTeamMembers: Partial<User>[] = [
+  {
+    id: '1',
+    name: 'Alice Martin',
+    position: 'Développeur',
+    emotional_score: 85
+  },
+  {
+    id: '2',
+    name: 'Thomas Dupont',
+    position: 'Designer',
+    emotional_score: 72
+  },
+  {
+    id: '3',
+    name: 'Sophie Bernard',
+    position: 'Chef de projet',
+    emotional_score: 68
+  }
+];
 
-  // Mock user data for demonstration
-  const mockUsers: Partial<User>[] = [
-    { id: '1', name: 'Alice', avatar: '/avatars/avatar-1.png', emotional_score: 75 },
-    { id: '2', name: 'Bob', avatar: '/avatars/avatar-2.png', emotional_score: 60 },
-    { id: '3', name: 'Charlie', avatar: '/avatars/avatar-3.png', emotional_score: 80 },
-    { id: '4', name: 'David', avatar: '/avatars/avatar-4.png', emotional_score: 90 },
-    { id: '5', name: 'Eve', avatar: '/avatars/avatar-5.png', emotional_score: 70 },
-  ];
-
-  // Filter users based on team ID (if provided)
-  const filteredUsers = teamId
-    ? mockUsers.filter(u => u.team_id === teamId)
-    : mockUsers;
-
+const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId, userId }) => {
+  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null);
+  
+  // Handler for when a team member is clicked
   const handleUserClick = (userId: string) => {
-    alert(`Clicked user with ID: ${userId}`);
+    setSelectedUserId(userId);
+    console.log(`Selected user: ${userId}`);
   };
-
+  
   return (
-    <div>
-      <p className="text-sm text-muted-foreground mb-4">
-        Aperçu de l'équipe et de leur état émotionnel.
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Vue d'équipe</h2>
+      <p className="text-muted-foreground">
+        Visualisez l'état émotionnel de votre équipe et identifiez les tendances collectives.
       </p>
       
-      {/* Team Overview Component */}
       <TeamOverview 
-        users={filteredUsers} 
-        onUserClick={handleUserClick} 
+        users={mockTeamMembers} 
+        onUserClick={handleUserClick}
+        userId={userId}
+        teamId={teamId}
       />
     </div>
   );

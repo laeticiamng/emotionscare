@@ -1,3 +1,4 @@
+
 // ————————————————————————
 // UserRole and UserModeType
 // ————————————————————————
@@ -13,7 +14,8 @@ export type UserRole =
   | 'wellbeing_manager'
   | 'coach'
   | 'employee'
-  | 'user';
+  | 'user'
+  | 'personal';
 
 export type UserModeType = UserRole;
 
@@ -28,15 +30,17 @@ export interface User {
   created_at: string;
   preferences: UserPreferences;
   avatar_url?: string;
-  avatar?: string;
+  avatar?: string;  // Adding for compatibility
   onboarded?: boolean;
   department?: string;
   position?: string;
+  job_title?: string; // Added for B2BUserLayout
   anonymity_code?: string;
   emotional_score?: number;
   joined_at?: string;
   createdAt?: string;
   team_id?: string;
+  status?: 'pending' | 'active'; // Added for useUserTableData
 }
 
 export interface UserData extends User {
@@ -96,6 +100,18 @@ export interface TeamOverviewProps {
   onUserClick?: (userId: string) => void;
 }
 
+export interface EmotionalTeamViewProps {
+  teamId?: string;
+  period?: Period;
+  userId?: string;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  onRefresh?: () => void;
+}
+
 // ————————————————————————
 // EmotionResult - Unified type for all emotion-related data
 // ————————————————————————
@@ -120,6 +136,15 @@ export interface EmotionResult {
   timestamp?: string;
   name?: string; // Added for compatibility
   anxiety?: number; // Added for mockEmotions.ts compatibility
+}
+
+export interface EmotionalData {
+  userId: string;
+  emotion: string;
+  intensity?: number;
+  timestamp: string;
+  source?: string;
+  feedback?: string;
 }
 
 // Add EnhancedEmotionResult for backward compatibility
@@ -307,6 +332,7 @@ export interface VRSession {
   isCompleted?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
+  emotion_after?: string; // Added for useVRSession
 }
 
 export interface VRSessionWithMusicProps {
@@ -410,8 +436,11 @@ export interface Badge {
   icon?: string;
   threshold?: number;
   type?: string;
-  level?: number;
+  level?: number | string;
   image?: string;
+  unlockedAt?: string;
+  category?: string;
+  dateEarned?: string;
 }
 
 export interface Challenge {
@@ -485,5 +514,30 @@ export interface InvitationStats { }
 export interface InvitationData { }
 export interface InvitationFormData { }
 
-// Keep the remaining interfaces from the original file
-// ... keep existing code
+// Dashboard
+export interface DashboardHeroData {
+  greeting: string;
+  subtitle: string;
+  stats: {
+    emotion: {
+      current: string;
+      score: number;
+      previous?: string;
+      trend?: 'up' | 'down' | 'stable';
+      change?: number;
+    };
+    streak: {
+      current: number;
+      longest: number;
+    };
+    completion: {
+      value: number;
+      total: number;
+    };
+    badges: {
+      count: number;
+      latest?: string;
+    };
+  };
+  recommendations: Recommendation[];
+}

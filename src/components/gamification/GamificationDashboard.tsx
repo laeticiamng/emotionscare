@@ -8,7 +8,7 @@ import BadgeGrid from './BadgeGrid';
 import ChallengesList from './ChallengesList';
 import { useGamification } from '@/hooks/useGamification';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
-import { GamificationStats, Challenge, Badge } from '@/types';
+import { GamificationStats, Challenge, Badge } from '@/types/types';
 
 const GamificationDashboard: React.FC = () => {
   const { 
@@ -131,19 +131,7 @@ const GamificationDashboard: React.FC = () => {
         <TabsContent value="challenges" className="space-y-4">
           <div className="challenges-list">
             <ChallengesList 
-              challenges={challenges.map((challenge: any): Challenge => ({
-                id: challenge.id,
-                title: challenge.title || challenge.name || '',
-                description: challenge.description || '',
-                points: challenge.points || 0,
-                status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
-                category: challenge.category || 'general',
-                name: challenge.name || challenge.title || '',
-                progress: challenge.progress || 0,
-                target: challenge.target || 100,
-                reward: challenge.reward || challenge.points || 0,
-                type: challenge.type || 'standard'
-              }))} 
+              challenges={challenges} 
               onComplete={completeChallenge}
             />
           </div>

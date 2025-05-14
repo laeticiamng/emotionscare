@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge as BadgeType } from '@/types';
+import { Badge as BadgeType } from '@/types/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Award, Lock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -54,6 +54,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
 
 const renderBadge = (badge: BadgeType) => {
   const isLocked = badge.id.includes('locked') || badge.name.includes('Locked');
+  const badgeImage = badge.image_url || badge.imageUrl || badge.image;
   
   return (
     <TooltipProvider key={badge.id}>
@@ -66,9 +67,9 @@ const renderBadge = (badge: BadgeType) => {
                   <Lock className="h-6 w-6 text-muted-foreground" />
                 ) : badge.icon ? (
                   <span className="text-2xl">{badge.icon}</span>
-                ) : badge.image_url || badge.imageUrl || badge.image ? (
+                ) : badgeImage ? (
                   <img
-                    src={badge.image_url || badge.imageUrl || badge.image}
+                    src={badgeImage}
                     alt={badge.name}
                     className="w-10 h-10 rounded-full object-cover"
                   />
