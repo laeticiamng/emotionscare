@@ -1,96 +1,76 @@
 
-import { v4 as uuid } from 'uuid';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 
-// Mock data for demonstration purposes
-const mockEmotionHistory: EmotionResult[] = [
-  {
-    id: '1',
-    user_id: 'user-1',
-    date: new Date('2023-01-15').toISOString(),
-    emotion: 'joy',
-    score: 85,
-    confidence: 0.85,
-    intensity: 85,
-    text: "I'm feeling really great today!",
-    ai_feedback: 'Your joy is contagious. Keep up the positive mindset!'
-  },
-  {
-    id: '2',
-    user_id: 'user-1',
-    date: new Date('2023-01-17').toISOString(),
-    emotion: 'calm',
-    score: 65,
-    confidence: 0.75,
-    intensity: 65,
-    text: "Today was peaceful.",
-    ai_feedback: 'Your calmness is a strength. Consider sharing this energy with others.'
-  }
-];
-
-// Analyze emotion from text
 export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  // In a real app, this would call an AI service API
-  // For now, we'll use a simple mock response
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const emotions = ['happy', 'sad', 'angry', 'calm', 'anxious', 'excited'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const confidence = 0.5 + Math.random() * 0.4; // 0.5 to 0.9
-      const score = Math.round(confidence * 100);
-      
-      resolve({
-        id: uuid(),
-        user_id: 'current-user',
-        date: new Date().toISOString(),
-        emotion: randomEmotion,
-        score: score,
-        confidence: confidence,
-        intensity: score,
-        text: text,
-        ai_feedback: `I detect that you're feeling ${randomEmotion}.`
-      });
-    }, 500);
+  // This would be an API call to your emotion analysis service
+  // For now, we'll simulate a response
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Mock emotions based on keywords in the text
+  const emotions = [
+    { emotion: 'happy', keywords: ['joy', 'happy', 'excited', 'great', 'wonderful', 'amazing'] },
+    { emotion: 'sad', keywords: ['sad', 'unhappy', 'depressed', 'down', 'upset', 'terrible'] },
+    { emotion: 'angry', keywords: ['angry', 'mad', 'frustrated', 'annoyed', 'irritated'] },
+    { emotion: 'fear', keywords: ['afraid', 'scared', 'anxious', 'worried', 'terrified'] },
+    { emotion: 'neutral', keywords: ['neutral', 'ok', 'fine', 'alright', 'normal'] },
+    { emotion: 'calm', keywords: ['calm', 'relaxed', 'peaceful', 'tranquil', 'serene'] },
+  ];
+  
+  // Default emotion
+  let detectedEmotion = 'neutral';
+  let highestMatchCount = 0;
+  
+  // Simple keyword matching
+  const lowercasedText = text.toLowerCase();
+  emotions.forEach(emotionData => {
+    const matchCount = emotionData.keywords.filter(keyword => 
+      lowercasedText.includes(keyword)
+    ).length;
+    
+    if (matchCount > highestMatchCount) {
+      highestMatchCount = matchCount;
+      detectedEmotion = emotionData.emotion;
+    }
   });
+  
+  // Generate a random score between 50-100 to simulate confidence level
+  const randomScore = Math.floor(Math.random() * 50) + 50;
+  
+  return {
+    emotion: detectedEmotion,
+    score: randomScore,
+    intensity: randomScore,
+    date: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
+    triggers: ['detected from text'],
+    recommendations: ['Take a moment to acknowledge your feelings']
+  };
 };
 
-// Save emotion data to the database
-export const saveEmotion = async (emotion: EmotionResult): Promise<EmotionResult> => {
-  // In a real app, this would save to a database
-  // For now, just simulate an API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const savedEmotion = {
-        ...emotion,
-        id: emotion.id || uuid(),
-        date: emotion.date || new Date().toISOString(),
-      };
-      
-      // Add to mock history (in a real app, this would be a database operation)
-      mockEmotionHistory.push(savedEmotion);
-      
-      resolve(savedEmotion);
-    }, 300);
-  });
-};
-
-// Fetch emotion history for a user
-export const fetchEmotionHistory = async (userId: string, limit: number = 10): Promise<EmotionResult[]> => {
-  // In a real app, this would query a database
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const userHistory = mockEmotionHistory
-        .filter(e => e.user_id === userId)
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, limit);
-        
-      resolve(userHistory);
-    }, 300);
-  });
-};
-
-export default {
-  analyzeEmotion,
-  saveEmotion,
-  fetchEmotionHistory
+export const fetchEmotionHistory = async (userId: string): Promise<EmotionResult[]> => {
+  // This would be an API call to fetch emotion history for a user
+  // For now, we'll simulate a response
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Generate mock data for the past 7 days
+  const history: EmotionResult[] = [];
+  const emotions = ['happy', 'sad', 'angry', 'fear', 'neutral', 'calm'];
+  
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    
+    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    const randomScore = Math.floor(Math.random() * 50) + 50;
+    
+    history.push({
+      emotion: randomEmotion,
+      score: randomScore,
+      intensity: randomScore,
+      date: date.toISOString(),
+      timestamp: date.toISOString()
+    });
+  }
+  
+  return history;
 };

@@ -1,3 +1,4 @@
+
 export type {
   User,
   UserPreferences,
@@ -7,7 +8,7 @@ export type {
   ThemeName,
   InvitationVerificationResult,
   UserRole
-} from './types/user';
+} from './types/types';
 
 export type {
   VRSessionTemplate,
@@ -97,16 +98,12 @@ export interface Story {
   };
 }
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image_url?: string;
-  imageUrl?: string;
-  icon?: string;
-  threshold?: number;
-  type?: string;
-}
+export type { Badge } from './types/types';
+export type { GamificationStats } from './types/types';
+export type { Challenge } from './types/types';
+export type { Period } from './types/types';
+export type { EmotionalTeamViewProps } from './types/types';
+export type { UserModeType } from './types/types';
 
 export interface EmotionPrediction {
   predictedEmotion: string;

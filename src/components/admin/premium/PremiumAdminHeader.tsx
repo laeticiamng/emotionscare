@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Moon, Sun, Bell } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { User } from '@/types/user';
+import { User } from '@/types/types';
 
 interface PremiumAdminHeaderProps {
   user?: User | null;

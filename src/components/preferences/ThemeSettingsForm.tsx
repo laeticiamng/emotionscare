@@ -8,14 +8,15 @@ const ThemeSettingsForm = () => {
   const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
 
   const themes: Theme[] = ['light', 'dark', 'system', 'pastel'];
-  const fontSizes: FontSize[] = ['small', 'medium', 'large'];
-  const fontFamilies: FontFamily[] = ['system', 'sans-serif', 'serif', 'mono'];
+  const fontSizes: FontSize[] = ['small', 'medium', 'large', 'extra-large'];
+  const fontFamilies: FontFamily[] = ['system', 'system-ui', 'sans-serif', 'serif', 'mono', 'rounded'];
 
   const getFontSizeName = (size: FontSize): string => {
     switch (size) {
       case 'small': return 'Petit';
       case 'medium': return 'Moyen';
       case 'large': return 'Grand';
+      case 'extra-large': return 'Très grand';
       default: return 'Moyen';
     }
   };
@@ -23,6 +24,7 @@ const ThemeSettingsForm = () => {
   const getFontFamilyName = (family: FontFamily): string => {
     switch (family) {
       case 'system': return 'Système';
+      case 'system-ui': return 'Système';
       case 'sans-serif': return 'Sans-serif';
       case 'serif': return 'Serif';
       case 'mono': return 'Monospace';
@@ -61,7 +63,7 @@ const ThemeSettingsForm = () => {
 
       <div>
         <h3 className="text-lg font-medium mb-2">Taille de police</h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {fontSizes.map((size) => (
             <Button
               key={size}
@@ -77,7 +79,7 @@ const ThemeSettingsForm = () => {
 
       <div>
         <h3 className="text-lg font-medium mb-2">Police</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {fontFamilies.map((font) => (
             <Button
               key={font}

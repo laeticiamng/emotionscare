@@ -1,50 +1,43 @@
 
-// Define types for emotion tracking and analysis
-
 export interface Emotion {
   id: string;
   name: string;
-  emoji?: string;
-  color?: string;
-  intensity?: number;
+  color: string;
+  icon?: string;
   description?: string;
   category?: string;
+  intensity?: number;
 }
 
 export interface EmotionResult {
-  id: string;
   emotion: string;
-  date: string;
-  score: number;
+  score?: number;
   intensity?: number;
-  confidence?: number;
-  dominantEmotion?: string;
-  text?: string;
-  source?: string;
-  feedback?: string;
-  ai_feedback?: string;
+  date?: string;
   timestamp?: string;
-  anxiety?: number;
-  recommendations?: string[];
   triggers?: string[];
-  emojis?: string;
+  recommendations?: string[];
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  analysis?: {
-    triggers: string[];
-    patterns: string[];
-    recommendations: string[];
-  };
-  relatedEntries?: any[];
+  icon?: string;
+  color?: string;
+  textColor?: string;
+  description?: string;
+  category?: string;
+  triggers?: string[];
+  coping_strategies?: string[];
+  recommendations?: string[];
 }
 
 export interface EmotionalData {
+  id: string;
+  user_id: string;
   emotion: string;
   intensity: number;
   source?: string;
+  context?: string;
+  timestamp: string;
   feedback?: string;
-  triggers?: string[];
-  timestamp?: string;
-  date?: string;
+  notes?: string;
 }

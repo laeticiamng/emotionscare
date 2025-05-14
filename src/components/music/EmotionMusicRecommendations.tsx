@@ -38,7 +38,6 @@ const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
       title: 'Calm Waters',
       artist: 'Serenity',
       coverUrl: '/images/music/calm-1.jpg',
-      audioUrl: '/audio/calm-1.mp3',
       url: '/audio/calm-1.mp3',
       duration: 180,
       emotion: 'calm'
@@ -48,7 +47,6 @@ const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
       title: 'Peaceful Mind',
       artist: 'Zen Masters',
       coverUrl: '/images/music/calm-2.jpg',
-      audioUrl: '/audio/calm-2.mp3',
       url: '/audio/calm-2.mp3',
       duration: 240,
       emotion: 'calm'
@@ -58,7 +56,6 @@ const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
       title: 'Morning Light',
       artist: 'Nature Sounds',
       coverUrl: '/images/music/calm-3.jpg',
-      audioUrl: '/audio/calm-3.mp3',
       url: '/audio/calm-3.mp3',
       duration: 210,
       emotion: 'joy'

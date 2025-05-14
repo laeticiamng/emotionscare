@@ -29,28 +29,25 @@ const GamificationDashboard: React.FC = () => {
   const safeStats: GamificationStats = {
     level: stats?.level || 1,
     points: stats?.points || 0,
-    badges: stats?.badges || [],
-    streaks: stats?.streaks || {
-      current: stats?.streak || 0,
-      longest: stats?.streak || 0,
-      lastActivity: stats?.lastActivityDate || new Date().toISOString()
-    },
-    leaderboard: stats?.leaderboard || [],
+    badges: stats?.badges || 0,
+    streak: stats?.streak || 0,
+    completedChallenges: stats?.completedChallenges || 0,
+    totalChallenges: stats?.totalChallenges || 0,
+    // Additional properties
     nextLevel: stats?.nextLevel || 2,
     pointsToNextLevel: stats?.pointsToNextLevel || 100,
     nextLevelPoints: stats?.nextLevelPoints || 100,
     challenges: stats?.challenges || [],
-    streak: stats?.streak || 0,
     totalPoints: stats?.totalPoints || 0,
     currentLevel: stats?.currentLevel || 1,
     progressToNextLevel: stats?.progressToNextLevel || 0,
     streakDays: stats?.streakDays || 0,
     lastActivityDate: stats?.lastActivityDate || new Date().toISOString(),
     activeChallenges: stats?.activeChallenges || 0,
-    completedChallenges: stats?.completedChallenges || 0,
     badgesCount: stats?.badgesCount || 0,
     rank: stats?.rank || 'Beginner',
-    recentAchievements: stats?.recentAchievements || []
+    recentAchievements: stats?.recentAchievements || [],
+    leaderboard: stats?.leaderboard || []
   };
 
   return (

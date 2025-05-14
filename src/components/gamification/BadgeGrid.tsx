@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge } from '@/types/gamification';
+import { Badge } from '@/types/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Award, Lock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';

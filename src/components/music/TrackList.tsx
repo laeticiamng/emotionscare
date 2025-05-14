@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MusicTrack } from '@/types/music';
+import { MusicTrack } from '@/types/types';
 import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDuration } from '@/utils/formatters';
@@ -44,6 +44,7 @@ const TrackList: React.FC<TrackListProps> = ({
     <div className="space-y-2">
       {tracks.map((track) => {
         const isCurrentTrack = currentTrack?.id === track.id;
+        const coverImage = track.coverUrl || track.cover || '';
         
         return (
           <div
@@ -56,9 +57,9 @@ const TrackList: React.FC<TrackListProps> = ({
           >
             <div className="flex-shrink-0 mr-3">
               <div className="w-10 h-10 rounded overflow-hidden bg-muted">
-                {(track.coverUrl || track.cover_url || track.cover) ? (
+                {coverImage ? (
                   <img
-                    src={track.coverUrl || track.cover_url || track.cover}
+                    src={coverImage}
                     alt={track.title}
                     className="w-full h-full object-cover"
                   />

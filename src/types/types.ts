@@ -1,12 +1,13 @@
+
 import { ReactNode } from "react";
 
 // User types
 export type UserRole = 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'team' | 'employee' | 'personal' | 'b2b_admin' | 'b2b-admin' | 'b2b_user' | 'b2b-user' | 'b2c' | 'user';
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type ThemeName = Theme;
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'merriweather' | 'system';
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'merriweather' | 'system' | 'system-ui' | 'sans-serif' | 'serif' | 'mono' | 'rounded';
 
 export interface User {
   id: string;
@@ -92,6 +93,7 @@ export interface ThemeContextType {
   setFontFamily?: (font: FontFamily) => void;
   fontSize?: FontSize;
   setFontSize?: (size: FontSize) => void;
+  isDarkMode?: boolean;
 }
 
 export interface ThemeButtonProps {
@@ -140,15 +142,19 @@ export interface Challenge {
   total?: number;
   type: 'daily' | 'weekly' | 'one-time';
   category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity';
-  status?: 'complete' | 'in-progress' | 'not-started';
+  status?: 'complete' | 'in-progress' | 'not-started' | 'completed';
+  completed?: boolean;
+  target?: number;
+  reward?: number | string;
+  title?: string;
 }
 
-// Add GamificationStats type definition
+// Add GamificationStats type definition with all needed properties
 export interface GamificationStats {
   points: number;
   level: number;
   rank?: string;
-  badges: number;
+  badges: number | Badge[];
   completedChallenges: number;
   totalChallenges: number;
   streak: number;
@@ -156,6 +162,40 @@ export interface GamificationStats {
     date: string;
     points: number;
   }[];
+  
+  // Additional properties found in code
+  nextLevel?: number;
+  pointsToNextLevel?: number;
+  nextLevelPoints?: number;
+  challenges?: Challenge[];
+  totalPoints?: number;
+  currentLevel?: number;
+  progressToNextLevel?: number;
+  streakDays?: number;
+  lastActivityDate?: string;
+  activeChallenges?: number;
+  badgesCount?: number;
+  recentAchievements?: any[];
+  leaderboard?: any[];
+  streaks?: {
+    current: number;
+    longest: number;
+    lastActivity: string;
+  };
+}
+
+// Add Badge type definition
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  image_url?: string;
+  imageUrl?: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
+  image?: string;
+  level?: number | string;
 }
 
 // Add LeaderboardEntry type definition
@@ -189,3 +229,103 @@ export interface EmotionalTeamViewProps {
 
 // Add UserModeType
 export type UserModeType = 'b2b_admin' | 'b2b_user' | 'b2c' | 'personal' | string;
+
+// Add music-related types that were missing
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  audioUrl?: string;
+  coverUrl?: string;
+  duration?: number;
+  emotion?: string;
+  cover?: string;
+  cover_url?: string;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  title?: string;
+  tracks: MusicTrack[];
+  coverUrl?: string;
+  description?: string;
+  emotion?: string;
+}
+
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
+  volume: number;
+  setVolume: (volume: number) => void;
+  progress: number;
+  duration: number;
+  seek: (time: number) => void;
+  playlists: MusicPlaylist[];
+  currentPlaylist: MusicPlaylist | null;
+  setCurrentPlaylist: (playlist: MusicPlaylist | null) => void;
+  addToQueue: (track: MusicTrack) => void;
+  queue: MusicTrack[];
+  removeFromQueue: (trackId: string) => void;
+  clearQueue: () => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
+}
+
+export interface MusicDrawerProps {
+  isOpen?: boolean;
+  side?: 'left' | 'right' | 'top' | 'bottom';
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack;
+}
+
+export interface TrackInfoProps {
+  track?: MusicTrack;
+  className?: string;
+  compact?: boolean;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (value: number) => void;
+  className?: string;
+  onChange?: (volume: number) => void;
+  showLabel?: boolean;
+}
+
+// Emotion types
+export interface Emotion {
+  id: string;
+  name: string;
+  color: string;
+  icon?: string;
+  description?: string;
+  category?: string;
+  intensity?: number;
+}
+
+export interface EmotionResult {
+  emotion: string;
+  score?: number;
+  intensity?: number;
+  date?: string;
+  timestamp?: string;
+  triggers?: string[];
+  recommendations?: string[];
+}

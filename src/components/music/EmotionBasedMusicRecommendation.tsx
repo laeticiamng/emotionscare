@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Loader2, PlayCircle } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/types';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -48,6 +48,11 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
     emotion: string; 
     intensity: number 
   }) => {
+    if (!loadPlaylistForEmotion) {
+      console.error("loadPlaylistForEmotion function is not available");
+      return false;
+    }
+    
     try {
       const playlist = await loadPlaylistForEmotion(emotion);
       
