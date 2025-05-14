@@ -1,68 +1,64 @@
 
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'roboto' | 'lato' | 'poppins' | 'montserrat';
-export type UserRole = 'admin' | 'user' | 'manager' | 'guest' | 'b2b_admin' | 'b2b_user' | 'b2c' | 'employee' | 'wellbeing_manager' | 'coach';
+export type UserRole = 'user' | 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee';
+
+export type Theme = 'light' | 'dark' | 'system';
+export type ThemeName = Theme | string;
+
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'extra-large';
+export type FontFamily = 'default' | 'serif' | 'mono' | 'sans';
 
 export interface User {
   id: string;
   email: string;
-  role: UserRole;
   name?: string;
-  created_at?: string;
-  createdAt?: string;
+  avatar?: string;
   avatar_url?: string;
+  role: UserRole;
+  created_at?: string;
+  joined_at?: string;
   preferences?: UserPreferences;
   onboarded?: boolean;
   department?: string;
   position?: string;
-  joined_at?: string;
-  last_active?: string;
   emotional_score?: number;
-  bio?: string;
-  anonymity_code?: string;
-  avatar?: string;
-  team_id?: string;
-  job_title?: string;
-  image?: string;
 }
 
 export interface UserPreferences {
-  theme: Theme;
+  theme: ThemeName;
   fontSize: FontSize;
-  fontFamily?: FontFamily;
+  fontFamily: FontFamily;
   notifications: {
     enabled: boolean;
     emailEnabled: boolean;
     pushEnabled: boolean;
     frequency: string;
   };
-  autoplayVideos?: boolean;
-  dataCollection?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
-  language?: string;
-  privacy?: string;
-  notifications_enabled?: boolean;
-  privacyLevel?: string;
+  autoplayVideos: boolean;
+  dataCollection: boolean;
+  highContrast: boolean;
+  reduceAnimations: boolean;
+  soundEffects: boolean;
+  colorAccent: string;
+  language: string;
+  privacyLevel: string;
   onboardingCompleted?: boolean;
-  dashboardLayout?: string;
-  soundEnabled?: boolean;
 }
 
 export interface UserPreferencesState {
-  isLoading: boolean;
-  error: string | null;
   preferences: UserPreferences;
+  setPreferences: (preferences: UserPreferences) => void;
+  loading: boolean;
+  error: string | null;
 }
 
 export interface InvitationVerificationResult {
   isValid: boolean;
-  data?: {
+  invitation?: {
+    id: string;
     email: string;
     role: string;
     expires_at: string;
   };
   error?: string;
+  message?: string;
 }

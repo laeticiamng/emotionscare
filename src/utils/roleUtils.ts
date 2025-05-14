@@ -1,106 +1,87 @@
 
 import { UserRole } from '@/types/user';
 
-/**
- * Check if a user role is an admin role
- */
-export function isAdminRole(role?: UserRole): boolean {
-  return role === 'admin' || role === 'b2b_admin';
-}
+export const isAdminRole = (role?: string): boolean => {
+  return role === 'admin';
+};
 
-/**
- * Get the appropriate login path based on user role
- */
-export function getRoleLoginPath(role?: UserRole): string {
-  if (!role) return '/login';
-  
+export const isManagerRole = (role?: string): boolean => {
+  return role === 'manager' || role === 'wellbeing_manager';
+};
+
+export const isCoachRole = (role?: string): boolean => {
+  return role === 'coach';
+};
+
+export const isEmployeeRole = (role?: string): boolean => {
+  return role === 'employee';
+};
+
+export const isUserRole = (role?: string): boolean => {
+  return role === 'user';
+};
+
+export const getHighestRole = (roles: string[]): string => {
+  if (roles.includes('admin')) return 'admin';
+  if (roles.includes('manager') || roles.includes('wellbeing_manager')) return 'manager';
+  if (roles.includes('coach')) return 'coach';
+  if (roles.includes('employee')) return 'employee';
+  return 'user';
+};
+
+export const getRoleLabel = (role?: string): string => {
   switch (role) {
     case 'admin':
-    case 'b2b_admin':
-      return '/b2b/admin/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
+      return 'Administrator';
+    case 'manager':
+      return 'Manager';
+    case 'wellbeing_manager':
+      return 'Wellbeing Manager';
+    case 'coach':
+      return 'Coach';
+    case 'employee':
+      return 'Employee';
     case 'user':
-    case 'b2c':
+      return 'User';
     default:
-      return '/b2c/login';
+      return 'User';
   }
-}
+};
 
-/**
- * Get the appropriate home path based on user role
- */
-export function getRoleHomePath(role?: UserRole): string {
-  if (!role) return '/';
-  
+export const getRoleBadgeColor = (role?: string): string => {
   switch (role) {
     case 'admin':
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'user':
-    case 'b2c':
+      return 'bg-red-500';
+    case 'manager':
+      return 'bg-blue-500';
+    case 'wellbeing_manager':
+      return 'bg-teal-500';
+    case 'coach':
+      return 'bg-green-500';
+    case 'employee':
+      return 'bg-yellow-500';
     default:
-      return '/b2c/dashboard';
+      return 'bg-gray-500';
   }
-}
+};
 
-/**
- * Get friendly display name for a role
- */
-export function getRoleName(role?: UserRole): string {
-  if (!role) return 'Utilisateur';
-  
-  switch (role) {
-    case 'admin':
-      return 'Administrateur';
-    case 'b2b_admin':
-      return 'Admin B2B';
-    case 'b2b_user':
-      return 'Utilisateur B2B';
-    case 'moderator':
-      return 'Modérateur';
-    case 'user':
-    case 'b2c':
-    default:
-      return 'Utilisateur B2C';
-  }
-}
-
-/**
- * Check if a user has access to a specific route based on role
- */
-export function userHasRouteAccess(role: UserRole | undefined, routeType: 'b2c' | 'b2b-user' | 'b2b-admin'): boolean {
+// Fix the error with the moderator role by using a type guard
+export const hasModeratorAccess = (role?: string): boolean => {
   if (!role) return false;
   
-  switch (routeType) {
-    case 'b2c':
-      return role === 'user' || role === 'b2c';
-    case 'b2b-user':
-      return role === 'b2b_user' || isAdminRole(role);
-    case 'b2b-admin':
-      return isAdminRole(role);
-    default:
-      return false;
-  }
-}
+  // Compare as strings to avoid type issues
+  const moderatorRoles = ['admin', 'manager', 'wellbeing_manager', 'moderator'];
+  return moderatorRoles.includes(role);
+};
 
-/**
- * Get the appropriate redirect path based on user role
- */
-export function getRedirectPathForRole(role?: UserRole): string {
-  if (!role) return '/';
-  
-  switch (role) {
-    case 'admin':
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'user':
-    case 'b2c':
-    default:
-      return '/b2c/dashboard';
-  }
-}
+export const canAccessAdminFeatures = (role?: string): boolean => {
+  return isAdminRole(role) || isManagerRole(role);
+};
+
+export const canAccessAnalytics = (role?: string): boolean => {
+  return isAdminRole(role) || isManagerRole(role) || isCoachRole(role);
+};
+
+export const canManageUsers = (role?: string): boolean => {
+  return isAdminRole(role) || isManagerRole(role);
+};

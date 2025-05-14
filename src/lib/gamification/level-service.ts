@@ -1,38 +1,29 @@
 
 /**
- * Calculates the progress towards the next level as a percentage
- * @param currentXp Current XP of the user
- * @returns A number between 0 and 100 representing the progress percentage
+ * Calculate user level based on points
+ * @param points Total points earned by user
+ * @returns Object containing level information
  */
-export const calculateProgressToNextLevel = (currentXp: number): number => {
-  // Sample implementation - can be adjusted based on level formula
-  const baseXP = 100;
-  const level = Math.floor(Math.sqrt(currentXp / baseXP)) + 1;
-  const currentLevelMinXP = Math.pow(level - 1, 2) * baseXP;
-  const nextLevelMinXP = Math.pow(level, 2) * baseXP;
+export const calculateLevel = (points: number) => {
+  // Simple level calculation: level = 1 + Math.floor(points / 100)
+  const level = 1 + Math.floor(points / 100);
+  const nextLevelPoints = level * 100;
+  const pointsToNextLevel = nextLevelPoints - points;
+  const progressToNextLevel = Math.min(100, Math.max(0, (points % 100)));
   
-  // Calculate the progress percentage
-  const xpForThisLevel = nextLevelMinXP - currentLevelMinXP;
-  const xpGainedInThisLevel = currentXp - currentLevelMinXP;
-  const progressPercentage = (xpGainedInThisLevel / xpForThisLevel) * 100;
-  
-  return Math.min(Math.max(progressPercentage, 0), 100);
+  return {
+    level,
+    nextLevelPoints,
+    pointsToNextLevel,
+    progressToNextLevel,
+    totalPointsNeeded: nextLevelPoints,
+  };
 };
 
 /**
- * Returns the progress percentage to the next level
+ * Get level thresholds
+ * Returns an array of point thresholds for each level
  */
-export const getProgressToNextLevel = (userId: string): Promise<number> => {
-  // This would normally fetch user XP from a database
-  // For now, we return a mock value
-  return Promise.resolve(calculateProgressToNextLevel(1250));
-};
-
-/**
- * Calculates the amount of XP needed to reach the next level
- */
-export const calculateXpToNextLevel = (userId: string): Promise<number> => {
-  // This would normally calculate based on current XP and level formula
-  // For now, we return a mock value
-  return Promise.resolve(350);
+export const getLevelThresholds = () => {
+  return [0, 100, 250, 450, 700, 1000, 1500, 2000, 3000, 5000];
 };

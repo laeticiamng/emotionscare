@@ -20,8 +20,8 @@ export interface Notification {
     avatar?: string;
   };
   date?: string;
-  isRead?: boolean;
-  linkTo?: string;
+  isRead?: boolean; // For backward compatibility
+  linkTo?: string; // For backward compatibility
 }
 
 export interface EnhancedNotification extends Notification {

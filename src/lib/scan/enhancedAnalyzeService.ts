@@ -1,6 +1,5 @@
-
 import { EmotionResult, EnhancedEmotionResult } from '@/types/emotion';
-import openAIClient from '../api/openAIClient';
+import { openAIClient } from '../api/openAIClient';
 
 // Enhanced analysis service for emotion scans
 export const analyzeEmotion = async (text: string): Promise<EnhancedEmotionResult> => {

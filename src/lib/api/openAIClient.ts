@@ -1,163 +1,184 @@
+// Import the polyfills
+import '../polyfills';
 import OpenAI from 'openai';
+import { ChatMessage } from '@/types';
 
 const apiKey = process.env.OPENAI_API_KEY;
 
 if (!apiKey) {
-  throw new Error("OPENAI_API_KEY is not set");
+  throw new Error('OPENAI_API_KEY is not set in environment variables.');
 }
 
-export const openai = new OpenAI({ apiKey });
+export const openAIClient = new OpenAI({
+  apiKey: apiKey,
+  dangerouslyAllowBrowser: true,
+});
 
-interface OpenAIMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
-
-export async function generateStory(topic: string): Promise<string> {
+export const createAssistant = async (name: string, instructions: string, model: string = 'gpt-4'): Promise<OpenAI.Beta.Assistants.Assistant> => {
   try {
-    const prompt = `Write a short story about ${topic}. The story should be engaging and have a clear beginning, middle, and end.`;
-    
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 200,
-      temperature: 0.7,
+    const assistant = await openAIClient.beta.assistants.create({
+      name: name,
+      instructions: instructions,
+      model: model,
+      tools: [{ type: "code_interpreter" }]
+    });
+    return assistant;
+  } catch (error) {
+    console.error("Error creating assistant:", error);
+    throw error;
+  }
+};
+
+export const getAssistant = async (assistantId: string): Promise<OpenAI.Beta.Assistants.Assistant | null> => {
+  try {
+    const assistant = await openAIClient.beta.assistants.retrieve(assistantId);
+    return assistant;
+  } catch (error: any) {
+    console.error("Error retrieving assistant:", error);
+    return null;
+  }
+};
+
+export const updateAssistant = async (assistantId: string, name: string, instructions: string, model: string = 'gpt-4'): Promise<OpenAI.Beta.Assistants.Assistant | null> => {
+  try {
+    const assistant = await openAIClient.beta.assistants.update(assistantId, {
+      name: name,
+      instructions: instructions,
+      model: model,
+      tools: [{ type: "code_interpreter" }]
+    });
+    return assistant;
+  } catch (error) {
+    console.error("Error updating assistant:", error);
+    return null;
+  }
+};
+
+export const deleteAssistant = async (assistantId: string): Promise<boolean> => {
+  try {
+    await openAIClient.beta.assistants.del(assistantId);
+    return true;
+  } catch (error) {
+    console.error("Error deleting assistant:", error);
+    return false;
+  }
+};
+
+export const createThread = async (): Promise<OpenAI.Beta.Threads.Thread> => {
+  try {
+    const thread = await openAIClient.beta.threads.create();
+    return thread;
+  } catch (error) {
+    console.error("Error creating thread:", error);
+    throw error;
+  }
+};
+
+export const getThread = async (threadId: string): Promise<OpenAI.Beta.Threads.Thread | null> => {
+  try {
+    const thread = await openAIClient.beta.threads.retrieve(threadId);
+    return thread;
+  } catch (error) {
+    console.error("Error retrieving thread:", error);
+    return null;
+  }
+};
+
+export const addMessageToThread = async (threadId: string, content: string, role: string = 'user'): Promise<OpenAI.Beta.Threads.Messages.ThreadMessage> => {
+  try {
+    const message = await openAIClient.beta.threads.messages.create(threadId, {
+      role: role,
+      content: content
+    });
+    return message;
+  } catch (error) {
+    console.error("Error adding message to thread:", error);
+    throw error;
+  }
+};
+
+export const getThreadMessages = async (threadId: string): Promise<OpenAI.Beta.Threads.Messages.ThreadMessage[]> => {
+  try {
+    const messages = await openAIClient.beta.threads.messages.list(threadId);
+    return messages.data;
+  } catch (error) {
+    console.error("Error getting thread messages:", error);
+    return [];
+  }
+};
+
+export const runThread = async (threadId: string, assistantId: string, instructions?: string): Promise<OpenAI.Beta.Threads.Runs.Run> => {
+  try {
+    const run = await openAIClient.beta.threads.runs.create(threadId, {
+      assistant_id: assistantId,
+      instructions: instructions,
+      model: "gpt-4o"
+    });
+    return run;
+  } catch (error) {
+    console.error("Error running thread:", error);
+    throw error;
+  }
+};
+
+export const getRun = async (threadId: string, runId: string): Promise<OpenAI.Beta.Threads.Runs.Run | null> => {
+  try {
+    const run = await openAIClient.beta.threads.runs.retrieve(threadId, runId);
+    return run;
+  } catch (error) {
+    console.error("Error getting run:", error);
+    return null;
+  }
+};
+
+export const getRunSteps = async (threadId: string, runId: string): Promise<OpenAI.Beta.Threads.Runs.RunStep[]> => {
+  try {
+    const steps = await openAIClient.beta.threads.runs.steps.list(threadId, runId);
+    return steps.data;
+  } catch (error) {
+    console.error("Error getting run steps:", error);
+    return [];
+  }
+};
+
+export const generateChatResponse = async (
+  messages: ChatMessage[],
+  model: string = 'gpt-4',
+  temperature: number = 0.7,
+  max_tokens: number = 500,
+  top_p: number = 1,
+  frequency_penalty: number = 0,
+  presence_penalty: number = 0,
+  stream: boolean = false
+): Promise<OpenAI.Chat.Completions.ChatCompletion | string | null> => {
+  try {
+    const lastUserMessage = this.messages.findLast((m) => m.role === 'user');
+    const systemPrompt = lastUserMessage
+      ? `You are an AI assistant. The user's last message was: ${lastUserMessage.content}.`
+      : 'You are an AI assistant.';
+
+    const chatCompletion = await openAIClient.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.text || '' }))
+      ],
+      model: model,
+      temperature: temperature,
+      max_tokens: max_tokens,
+      top_p: top_p,
+      frequency_penalty: frequency_penalty,
+      presence_penalty: presence_penalty,
+      stream: stream,
     });
 
-    if (!response.choices || response.choices.length === 0) {
-      throw new Error("No choices returned from OpenAI API");
+    if (stream) {
+      return chatCompletion as string;
+    } else {
+      return chatCompletion;
     }
 
-    return response.choices[0].message?.content || "No story generated.";
   } catch (error) {
-    console.error("Error generating story:", error);
-    return "Failed to generate story.";
+    console.error("Error generating chat response:", error);
+    return null;
   }
-}
-
-export async function analyzeSentiment(text: string): Promise<string> {
-  try {
-    const prompt = `Analyze the sentiment of the following text: "${text}". 
-                    Provide a concise answer indicating whether the sentiment is positive, negative, or neutral.`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 50,
-      temperature: 0.2,
-    });
-
-    if (!response.choices || response.choices.length === 0) {
-      throw new Error("No choices returned from OpenAI API");
-    }
-
-    return response.choices[0].message?.content || "Sentiment analysis failed.";
-  } catch (error) {
-    console.error("Error analyzing sentiment:", error);
-    return "Sentiment analysis failed.";
-  }
-}
-
-export async function generateResponse(messages: OpenAIMessage[]): Promise<string | undefined> {
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: messages,
-      max_tokens: 150,
-      temperature: 0.7,
-    });
-
-    if (!response.choices || response.choices.length === 0) {
-      throw new Error("No choices returned from OpenAI API");
-    }
-
-    return response.choices[0].message?.content;
-  } catch (error) {
-    console.error("Error generating response:", error);
-    return "Failed to generate response.";
-  }
-}
-
-export async function summarizeText(text: string): Promise<string | undefined> {
-  try {
-    const prompt = `Summarize the following text in a concise manner: "${text}"`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 100,
-      temperature: 0.5,
-    });
-
-    if (!response.choices || response.choices.length === 0) {
-      throw new Error("No choices returned from OpenAI API");
-    }
-
-    return response.choices[0].message?.content;
-  } catch (error) {
-    console.error("Error summarizing text:", error);
-    return "Failed to summarize text.";
-  }
-}
-
-export async function correctGrammar(text: string): Promise<string | undefined> {
-  try {
-    const prompt = `Correct the grammar and spelling in the following text: "${text}"`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 100,
-      temperature: 0.3,
-    });
-
-    if (!response.choices || response.choices.length === 0) {
-      throw new Error("No choices returned from OpenAI API");
-    }
-
-    return response.choices[0].message?.content;
-  } catch (error) {
-    console.error("Error correcting grammar:", error);
-    return "Failed to correct grammar.";
-  }
-}
-
-export async function translateText(text: string, targetLanguage: string): Promise<string | undefined> {
-    try {
-        const prompt = `Translate the following text to ${targetLanguage}: "${text}"`;
-
-        const response = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 100,
-            temperature: 0.3,
-        });
-
-        if (!response.choices || response.choices.length === 0) {
-            throw new Error("No choices returned from OpenAI API");
-        }
-
-        return response.choices[0].message?.content;
-    } catch (error) {
-        console.error("Error translating text:", error);
-        return "Failed to translate text.";
-    }
-}
-
-// Implementing polyfill for findLast if it's not available
-if (!Array.prototype.findLast) {
-  Array.prototype.findLast = function<T>(
-    predicate: (value: T, index: number, array: T[]) => boolean
-  ): T | undefined {
-    for (let i = this.length - 1; i >= 0; i--) {
-      const value = this[i];
-      if (predicate(value, i, this)) {
-        return value;
-      }
-    }
-    return undefined;
-  };
-}
-
-// Use the findLast method safely after the polyfill
-const lastMessage = messages.findLast(msg => msg.role === 'assistant');
+};

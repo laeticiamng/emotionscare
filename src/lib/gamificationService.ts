@@ -1,12 +1,6 @@
 
 import { EmotionResult } from '@/types';
-import { Badge } from '@/types/gamification';
-
-interface BadgeResult {
-  points: number;
-  newBadges: Badge[];
-  challengesUpdated: any[];
-}
+import { Badge, Challenge, GamificationStats } from '@/types/gamification';
 
 /**
  * Process emotion data for badges and gamification
@@ -14,7 +8,7 @@ interface BadgeResult {
  * @param result Emotion result data
  * @returns Object with badges earned and points
  */
-export const processEmotionForBadges = async (userId: string, result: EmotionResult): Promise<BadgeResult> => {
+export const processEmotionForBadges = async (userId: string, result: EmotionResult): Promise<{ points: number; newBadges: Badge[]; challengesUpdated: any[] }> => {
   console.log(`Processing emotion for badges: ${userId}`, result);
   
   // Mock implementation - in a real app this would call the backend
@@ -44,19 +38,19 @@ export const processEmotionForBadges = async (userId: string, result: EmotionRes
  * @param status Optional status filter
  * @returns Array of challenges
  */
-export const fetchChallenges = async (userId: string, status?: string) => {
+export const fetchChallenges = async (userId: string, status?: string): Promise<Challenge[]> => {
   console.log(`Fetching challenges for user: ${userId}, status: ${status}`);
   // Mock implementation
   return [];
 };
 
 /**
- * Sync gamification data
+ * Fetch gamification stats
  * @param userId User ID
- * @returns Updated gamification stats
+ * @returns Gamification stats
  */
-export const syncGamificationData = async (userId: string) => {
-  console.log(`Syncing gamification data for user: ${userId}`);
+export const fetchGamificationStats = async (userId: string): Promise<GamificationStats> => {
+  console.log(`Fetching gamification stats for user: ${userId}`);
   // Mock implementation
   return {
     points: 120,
@@ -70,4 +64,22 @@ export const syncGamificationData = async (userId: string) => {
     challenges: [],
     recentAchievements: []
   };
+};
+
+/**
+ * Sync gamification data
+ * @param userId User ID
+ * @returns Updated gamification stats
+ */
+export const syncGamificationData = async (userId: string): Promise<GamificationStats> => {
+  return fetchGamificationStats(userId);
+};
+
+/**
+ * Get user gamification stats
+ * @param userId User ID
+ * @returns User gamification stats
+ */
+export const getUserGamificationStats = async (userId: string): Promise<GamificationStats> => {
+  return fetchGamificationStats(userId);
 };

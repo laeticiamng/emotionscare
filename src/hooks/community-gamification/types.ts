@@ -1,27 +1,30 @@
 
-import { Achievement, Badge, Challenge, GamificationStats } from '@/types/gamification';
+import { Badge, Challenge } from '@/types/gamification';
 
-export type { Achievement, Badge, Challenge, GamificationStats };
+// Re-export for convenience
+export type { Badge, Challenge };
 
-export interface ChallengeProgressUpdate {
-  userId: string;
-  challengeId: string;
-  progress: number;
-  completed?: boolean;
+export interface GamificationStats {
+  points: number;
+  level: number;
+  nextLevelPoints: number;
+  badges: Badge[];
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  progressToNextLevel: number;
+  challenges: Challenge[];
+  recentAchievements: any[];
 }
 
-export interface BadgeAward {
-  userId: string;
-  badgeId: string;
-  date: Date;
+export interface UseCommunityGamificationResult {
+  stats: GamificationStats;
+  badges: Badge[];
+  challenges: Challenge[];
+  badges_count: number;
+  completed_challenges: number;
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+  claimBadge: (badgeId: string) => Promise<void>;
 }
-
-export interface GamificationAction {
-  type: string;
-  userId: string;
-  points?: number;
-  data?: any;
-}
-
-// Re-export types using proper syntax for isolatedModules
-export type { GamificationLevel, LeaderboardEntry } from '@/types/gamification';

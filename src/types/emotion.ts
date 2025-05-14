@@ -71,7 +71,7 @@ export interface EmotionalTeamViewProps {
 }
 
 export interface FacialEmotionScannerProps {
-  onEmotionDetected: (emotion: { name: string; score: number; }) => void;
+  onEmotionDetected: (emotion: { name: string; score: number; intensity?: number; }) => void;
   className?: string;
   isScanning?: boolean;
   onToggleScanning?: () => void;

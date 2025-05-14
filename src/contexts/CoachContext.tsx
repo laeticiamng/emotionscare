@@ -1,62 +1,126 @@
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { ChatMessage, CoachEvent } from '@/lib/coachService';
 
-// Define the service type
-interface CoachService {
-  askQuestion: (question: string) => Promise<string>;
-}
-
-// Create a mock service implementation
-const mockCoachService: CoachService = {
-  askQuestion: async (question: string) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Very simple response generator
-    if (question.toLowerCase().includes('stress')) {
-      return "Pour gérer le stress, essayez la respiration profonde, la méditation ou une courte promenade. Prenez des pauses régulières pendant votre journée de travail.";
-    } else if (question.toLowerCase().includes('fatigue')) {
-      return "La fatigue peut être combattue en améliorant votre sommeil, en faisant de l'exercice régulièrement et en maintenant une alimentation équilibrée.";
-    } else if (question.toLowerCase().includes('anxiété') || question.toLowerCase().includes('anxiete')) {
-      return "Pour l'anxiété, essayez des techniques de pleine conscience, limitez votre consommation de caféine et n'hésitez pas à parler à un professionnel.";
-    } else {
-      return "Je suis là pour vous aider avec vos questions concernant votre bien-être émotionnel et mental. N'hésitez pas à me poser des questions spécifiques sur la gestion du stress, de l'anxiété ou des émotions au travail.";
-    }
-  }
-};
-
-// Define the context type
 interface CoachContextType {
-  coachService: CoachService | null;
-  isAIAvailable: boolean;
-  toggleAIAvailability: () => void;
+  messages: ChatMessage[];
+  loading: boolean;
+  sendMessage: (text: string) => Promise<void>;
+  clearMessages: () => void;
+  loadMessages: () => Promise<void>;
+  events: CoachEvent[];
+  addEvent: (event: CoachEvent) => void;
+  clearEvents: () => void;
+  status: string;
+  userContext: any;
+  lastEmotion: any;
+  recommendations: any[];
+  generateRecommendation: () => void;
 }
 
-// Create the context
 const CoachContext = createContext<CoachContextType | undefined>(undefined);
 
-// Create the provider component
-export const CoachProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAIAvailable, setIsAIAvailable] = useState(true);
-  const [service] = useState<CoachService>(mockCoachService);
+export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [events, setEvents] = useState<CoachEvent[]>([]);
+  const [status, setStatus] = useState<string>('idle');
+  const [userContext, setUserContext] = useState<any>(null);
+  const [lastEmotion, setLastEmotion] = useState<any>(null);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
 
-  const toggleAIAvailability = useCallback(() => {
-    setIsAIAvailable(prev => !prev);
-  }, []);
+  const sendMessage = async (text: string): Promise<void> => {
+    setLoading(true);
+    try {
+      const newMessage: ChatMessage = {
+        id: Date.now().toString(),
+        text,
+        sender: 'user',
+        role: 'user',
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      
+      // Mock response
+      setTimeout(() => {
+        const response: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          text: `Echo: ${text}`,
+          sender: 'coach',
+          role: 'assistant',
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prevMessages) => [...prevMessages, response]);
+        setLoading(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setLoading(false);
+    }
+  };
+
+  const clearMessages = (): void => {
+    setMessages([]);
+  };
+
+  const loadMessages = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      // Mock load
+      setTimeout(() => {
+        setMessages([]);
+        setLoading(false);
+      }, 500);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      setLoading(false);
+    }
+  };
+
+  const addEvent = (event: CoachEvent): void => {
+    setEvents((prevEvents) => [...prevEvents, event]);
+  };
+
+  const clearEvents = (): void => {
+    setEvents([]);
+  };
+
+  const generateRecommendation = (): void => {
+    setRecommendations([
+      {
+        id: '1',
+        title: 'Take a break',
+        description: 'You\'ve been working for a while, consider taking a short break.',
+        priority: 1,
+        confidence: 0.8,
+      }
+    ]);
+  };
 
   return (
-    <CoachContext.Provider value={{
-      coachService: isAIAvailable ? service : null,
-      isAIAvailable,
-      toggleAIAvailability
-    }}>
+    <CoachContext.Provider
+      value={{
+        messages,
+        loading,
+        sendMessage,
+        clearMessages,
+        loadMessages,
+        events,
+        addEvent,
+        clearEvents,
+        status,
+        userContext,
+        lastEmotion,
+        recommendations,
+        generateRecommendation,
+      }}
+    >
       {children}
     </CoachContext.Provider>
   );
 };
 
-// Create a custom hook to use the context
-export const useCoach = () => {
+export const useCoach = (): CoachContextType => {
   const context = useContext(CoachContext);
   if (context === undefined) {
     throw new Error('useCoach must be used within a CoachProvider');
