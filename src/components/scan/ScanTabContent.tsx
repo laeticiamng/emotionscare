@@ -10,7 +10,7 @@ interface ScanTabContentProps {
 const ScanTabContent: React.FC<ScanTabContentProps> = ({ onScanComplete }) => {
   const { user } = useAuth();
   
-  const handleScanSaved = () => {
+  const handleEmotionDetected = () => {
     if (onScanComplete) {
       onScanComplete();
     }
@@ -25,7 +25,7 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({ onScanComplete }) => {
   return (
     <div className="space-y-6">
       <EmotionScanForm 
-        onScanSaved={handleScanSaved}
+        onEmotionDetected={handleEmotionDetected}
         onClose={handleClose}
         userId={user?.id}
       />

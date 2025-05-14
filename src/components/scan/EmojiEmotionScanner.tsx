@@ -1,12 +1,12 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Smile } from "lucide-react";
+import EmojiPicker from './EmojiPicker';
 
-export interface EmojiEmotionScannerProps {
+interface EmojiEmotionScannerProps {
   emojis: string;
-  onEmojiChange?: (emojis: string) => void;
-  onChange?: (emojis: string) => void; // For backward compatibility
+  onEmojiChange: (emojis: string) => void;
   onAnalyze: () => void;
   isAnalyzing: boolean;
 }
@@ -14,90 +14,39 @@ export interface EmojiEmotionScannerProps {
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   emojis,
   onEmojiChange,
-  onChange,
   onAnalyze,
   isAnalyzing
 }) => {
-  // Use the appropriate change handler
-  const handleEmojiClick = (emoji: string) => {
-    const newEmojis = emojis.includes(emoji)
-      ? emojis.replace(emoji, '')
-      : emojis + emoji;
-    
-    if (onChange) {
-      onChange(newEmojis);
-    } else if (onEmojiChange) {
-      onEmojiChange(newEmojis);
-    }
+  const handleEmojiSelect = (emoji: string) => {
+    onEmojiChange(emojis + emoji);
   };
 
-  // Common emoji groups
-  const emojiGroups = [
-    ["😊", "🙂", "😀", "😄", "😁"], // happy
-    ["😔", "😢", "😭", "😞", "🥺"], // sad
-    ["😠", "😡", "🤬", "😤", "😒"], // angry
-    ["😨", "😰", "😱", "😓", "😳"], // scared
-    ["😌", "😴", "🥱", "😪", "🙄"]  // tired/bored
-  ];
+  const handleClear = () => {
+    onEmojiChange('');
+  };
 
   return (
-    <div className="space-y-4">
-      <div className="border rounded-md p-4 min-h-32 flex flex-wrap items-start gap-1">
-        {emojis ? (
-          <div className="text-4xl leading-relaxed tracking-wider">
-            {Array.from(emojis).map((emoji, index) => (
-              <span 
-                key={index} 
-                className="cursor-pointer hover:opacity-80 transition-opacity"
-                onClick={() => handleEmojiClick(emoji)}
-              >
-                {emoji}
-              </span>
-            ))}
-          </div>
-        ) : (
-          <div className="text-muted-foreground text-center w-full">
-            Sélectionnez des emojis qui représentent votre humeur
-          </div>
-        )}
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Analyse émotionnelle par emoji</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="p-4 bg-muted rounded-md min-h-[80px] flex items-center justify-center text-2xl">
+          {emojis || <span className="text-muted-foreground text-sm">Sélectionnez des emojis qui représentent votre humeur</span>}
+        </div>
 
-      <div className="space-y-2">
-        {emojiGroups.map((group, groupIndex) => (
-          <div key={groupIndex} className="flex gap-2 justify-center">
-            {group.map((emoji) => (
-              <button
-                key={emoji}
-                className={`text-2xl p-2 rounded-md hover:bg-muted transition-colors ${
-                  emojis.includes(emoji) ? 'bg-muted' : ''
-                }`}
-                onClick={() => handleEmojiClick(emoji)}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        ))}
-      </div>
+        <EmojiPicker onEmojiSelect={handleEmojiSelect} />
 
-      <Button
-        onClick={onAnalyze}
-        disabled={isAnalyzing || !emojis}
-        className="w-full"
-      >
-        {isAnalyzing ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Analyse en cours...
-          </>
-        ) : (
-          <>
-            <Smile className="mr-2 h-4 w-4" />
-            Analyser mes émojis
-          </>
-        )}
-      </Button>
-    </div>
+        <div className="flex justify-between">
+          <Button variant="outline" onClick={handleClear} disabled={!emojis || isAnalyzing}>
+            Effacer
+          </Button>
+          <Button onClick={onAnalyze} disabled={!emojis || isAnalyzing}>
+            {isAnalyzing ? "Analyse en cours..." : "Analyser"}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

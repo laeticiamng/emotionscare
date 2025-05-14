@@ -66,13 +66,11 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({
       
       // Simulate emotion analysis
       setTimeout(() => {
-        const dominantEmotion = {
-          name: "calm",
-          score: 0.7
-        };
-
         const emotionResult: EmotionResult = {
-          dominantEmotion: dominantEmotion,
+          emotion: "calm",
+          dominantEmotion: "calm",
+          score: 70,
+          confidence: 0.7,
           source: 'voice',
           text: mockTranscript,
           timestamp: new Date().toISOString()

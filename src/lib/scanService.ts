@@ -1,256 +1,231 @@
-import { EmotionResult, Emotion } from '@/types';
 
-// Type pour les paramètres d'analyse d'émotion
-interface AnalyzeEmotionParams {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}
+import { Emotion, EmotionResult } from '@/types';
+import { v4 as uuid } from 'uuid';
 
-// Type pour sauvegarder une émotion
-interface SaveEmotionParams {
-  user_id: string;
-  date: string;
-  emotion: string;
-  score: number;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  ai_feedback?: string;
-}
+// Mock database of emotions
+let emotionsDB: Emotion[] = [];
 
-// Fonction simulée pour analyser les émotions
-export const analyzeEmotion = async (params: AnalyzeEmotionParams): Promise<EmotionResult> => {
-  // Simulation d'un délai d'analyse
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  
-  // Détermination de l'émotion basée sur les entrées
-  let emotion = 'neutral';
-  let score = 5;
-  let feedback = '';
-  
-  // Analyse basée sur le texte
-  if (params.text) {
-    const lowerText = params.text.toLowerCase();
-    
-    if (lowerText.includes('heureux') || lowerText.includes('content') || lowerText.includes('joie')) {
-      emotion = 'joy';
-      score = 8;
-    } else if (lowerText.includes('triste') || lowerText.includes('malheureux') || lowerText.includes('déprimé')) {
-      emotion = 'sadness';
-      score = 3;
-    } else if (lowerText.includes('énervé') || lowerText.includes('colère') || lowerText.includes('frustré')) {
-      emotion = 'anger';
-      score = 4;
-    } else if (lowerText.includes('peur') || lowerText.includes('anxieux') || lowerText.includes('inquiet')) {
-      emotion = 'fear';
-      score = 2;
-    } else if (lowerText.includes('calme') || lowerText.includes('serein') || lowerText.includes('paisible')) {
-      emotion = 'calm';
-      score = 7;
-    }
-    
-    feedback = `Basé sur votre description, vous semblez ressentir de la ${emotion === 'joy' ? 'joie' : 
-      emotion === 'sadness' ? 'tristesse' : 
-      emotion === 'anger' ? 'colère' : 
-      emotion === 'fear' ? 'peur' : 
-      emotion === 'calm' ? 'sérénité' : 'neutralité'}.`;
+// Save a new emotion entry
+export async function saveEmotion(emotion: Emotion): Promise<Emotion> {
+  // Ensure the emotion has an ID
+  if (!emotion.id) {
+    emotion.id = uuid();
   }
   
-  // Analyse basée sur les emoji
-  if (params.emojis) {
-    if (params.emojis.includes('😊') || params.emojis.includes('😃')) {
-      emotion = 'joy';
-      score = Math.max(score, 8);
-    } else if (params.emojis.includes('😔') || params.emojis.includes('😢')) {
-      emotion = 'sadness';
-      score = Math.min(score, 3);
-    } else if (params.emojis.includes('😡') || params.emojis.includes('😤')) {
-      emotion = 'anger';
-      score = 2;
-    } else if (params.emojis.includes('😰') || params.emojis.includes('😨')) {
-      emotion = 'fear';
-      score = 2;
-    } else if (params.emojis.includes('😌') || params.emojis.includes('☺️')) {
-      emotion = 'calm';
-      score = 9;
-    }
-    
-    feedback += ' Les emojis utilisés reflètent cette émotion.';
+  // Set date if not provided
+  if (!emotion.date) {
+    emotion.date = new Date().toISOString();
   }
   
-  // Résultat simulé de l'analyse
-  return {
-    emotion,
-    score,
-    confidence: 0.85,
-    feedback,
-    date: new Date().toISOString(),
-    ai_feedback: `Je détecte une émotion dominante de ${emotion} avec une intensité de ${score}/10. ${feedback}`
-  };
-};
-
-// Fonction simulée pour sauvegarder une émotion
-export const saveEmotion = async (params: SaveEmotionParams): Promise<Emotion> => {
-  // Simulation d'un délai de sauvegarde
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  // Add to "database"
+  emotionsDB.push(emotion);
   
-  // Simule la sauvegarde et retourne une émotion formatée
-  const savedEmotion: Emotion = {
-    id: `em-${Date.now()}`,
-    user_id: params.user_id,
-    date: params.date,
-    emotion: params.emotion,
-    score: params.score,
-    text: params.text || '',
-    emojis: params.emojis || '',
-    audio_url: params.audio_url || null,
-    ai_feedback: params.ai_feedback || '',
-    created_at: new Date().toISOString()
-  };
-  
-  // Stockage local pour simulation
-  const storedEmotions = localStorage.getItem('emotions') || '[]';
-  const emotions = JSON.parse(storedEmotions);
-  emotions.push(savedEmotion);
-  localStorage.setItem('emotions', JSON.stringify(emotions));
-  
-  return savedEmotion;
-};
-
-// Fonction simulée pour récupérer l'historique des émotions
-export const fetchEmotionHistory = async (userId: string): Promise<Emotion[]> => {
-  // Simulation d'un délai de chargement
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  
-  // Récupération depuis le stockage local
-  const storedEmotions = localStorage.getItem('emotions') || '[]';
-  const emotions = JSON.parse(storedEmotions);
-  
-  // Filtrer pour l'utilisateur spécifié
-  return emotions.filter((e: Emotion) => e.user_id === userId);
-};
-
-// Fonction pour supprimer une émotion
-export const deleteEmotion = async (emotionId: string): Promise<void> => {
-  // Simulation d'un délai pour la suppression
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  
-  // Récupération depuis le stockage local
-  const storedEmotions = localStorage.getItem('emotions') || '[]';
-  let emotions = JSON.parse(storedEmotions);
-  
-  // Filtrer pour supprimer l'émotion
-  emotions = emotions.filter((e: Emotion) => e.id !== emotionId);
-  
-  // Mise à jour du stockage local
-  localStorage.setItem('emotions', JSON.stringify(emotions));
-};
-
-// Fonctions manquantes pour l'analyse audio
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // Simulation d'un délai d'analyse
-  await new Promise(resolve => setTimeout(resolve, 2500));
-  
-  // Simuler un résultat d'analyse
-  const emotions = ['joy', 'sadness', 'anger', 'fear', 'calm', 'neutral'];
-  const randomIndex = Math.floor(Math.random() * emotions.length);
-  const emotion = emotions[randomIndex];
-  
-  // Générer un score en fonction de l'émotion
-  let score = 5;
-  if (emotion === 'joy') score = Math.floor(Math.random() * 3) + 7; // 7-9
-  else if (emotion === 'sadness') score = Math.floor(Math.random() * 3) + 2; // 2-4
-  else if (emotion === 'anger') score = Math.floor(Math.random() * 3) + 3; // 3-5
-  else if (emotion === 'fear') score = Math.floor(Math.random() * 3) + 2; // 2-4
-  else if (emotion === 'calm') score = Math.floor(Math.random() * 3) + 7; // 7-9
-  else score = Math.floor(Math.random() * 3) + 4; // 4-6
-  
-  return {
-    id: `emotion-${Date.now()}`,
-    emotion,
-    score,
-    confidence: parseFloat((Math.random() * 0.3 + 0.6).toFixed(2)), // 0.6-0.9
-    transcript: "Transcription simulée de l'audio...", // Simule une transcription
-    feedback: `Basé sur votre ton de voix, vous semblez ressentir de la ${
-      emotion === 'joy' ? 'joie' : 
-      emotion === 'sadness' ? 'tristesse' : 
-      emotion === 'anger' ? 'colère' : 
-      emotion === 'fear' ? 'peur' : 
-      emotion === 'calm' ? 'sérénité' : 'neutralité'
-    }.`,
-    date: new Date().toISOString(),
-    recommendations: [
-      "Prenez quelques respirations profondes",
-      "Essayez une courte session de méditation",
-      "Écoutez une musique qui vous détend"
-    ]
-  };
-};
-
-// Fonction pour créer une entrée d'émotion
-export const createEmotionEntry = async (params: {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-}): Promise<Emotion> => {
-  // Simuler une analyse de l'émotion
-  const analysis: EmotionResult = {
-    emotion: 'calm',
-    score: 7,
-    confidence: 0.85,
-    feedback: "Vous semblez calme aujourd'hui.",
-    date: new Date().toISOString()
-  };
-  
-  // Simuler la sauvegarde d'une émotion
-  const savedEmotion: Emotion = {
-    id: `em-${Date.now()}`,
-    user_id: params.user_id,
-    date: new Date(),
-    emotion: analysis.emotion,
-    score: analysis.score,
-    text: params.text || '',
-    emojis: params.emojis || '',
-    audio_url: params.audio_url || null,
-    ai_feedback: analysis.feedback || '',
-    created_at: new Date().toISOString(),
-    name: analysis.emotion,
-    category: "emotion",
-    confidence: analysis.confidence || 0.5,
-    intensity: 0.7
-  };
-  
-  // Simuler un délai d'attente
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  return savedEmotion;
-};
+  return emotion;
+}
 
-// Fonction pour récupérer la dernière émotion
-export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
-  // Simuler un délai d'attente
+// Fetch the latest emotion for a user
+export async function fetchLatestEmotion(userId: string): Promise<Emotion | null> {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 300));
   
-  // Retourner une fausse dernière émotion
-  return {
-    id: `em-latest-${Date.now()}`,
+  // Find emotions for this user, sorted by date (newest first)
+  const userEmotions = emotionsDB
+    .filter(e => e.user_id === userId)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  return userEmotions.length > 0 ? userEmotions[0] : null;
+}
+
+// Fetch all emotions for a user
+export async function fetchUserEmotions(userId: string): Promise<Emotion[]> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  // Find emotions for this user, sorted by date (newest first)
+  return emotionsDB
+    .filter(e => e.user_id === userId)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
+// Process an emotion scan result
+export async function processEmotionScan(
+  userId: string, 
+  scanData: { text?: string; emojis?: string; audio_url?: string }
+): Promise<EmotionResult> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Mock emotion detection based on input
+  let emotion = 'neutral';
+  let score = 50 + Math.floor(Math.random() * 30);
+  
+  // Very basic emotion detection for demo purposes
+  if (scanData.text) {
+    const text = scanData.text.toLowerCase();
+    if (text.includes('happy') || text.includes('glad') || text.includes('joy')) emotion = 'happy';
+    else if (text.includes('sad') || text.includes('upset')) emotion = 'sad';
+    else if (text.includes('angry') || text.includes('mad')) emotion = 'angry';
+    else if (text.includes('scared') || text.includes('afraid')) emotion = 'fearful';
+    else if (text.includes('calm') || text.includes('relaxed')) emotion = 'calm';
+    else if (text.includes('tired') || text.includes('exhausted')) emotion = 'tired';
+    else if (text.includes('stressed') || text.includes('overwhelmed')) emotion = 'stressed';
+  }
+  
+  // Emoji-based detection
+  if (scanData.emojis) {
+    if (scanData.emojis.includes('😊') || scanData.emojis.includes('😃')) emotion = 'happy';
+    else if (scanData.emojis.includes('😔') || scanData.emojis.includes('😢')) emotion = 'sad';
+    else if (scanData.emojis.includes('😡') || scanData.emojis.includes('😠')) emotion = 'angry';
+    else if (scanData.emojis.includes('😨') || scanData.emojis.includes('😰')) emotion = 'fearful';
+    else if (scanData.emojis.includes('😌') || scanData.emojis.includes('🧘')) emotion = 'calm';
+    else if (scanData.emojis.includes('😴') || scanData.emojis.includes('🥱')) emotion = 'tired';
+    else if (scanData.emojis.includes('😩') || scanData.emojis.includes('😫')) emotion = 'stressed';
+  }
+  
+  // Generate a mock result
+  const result: EmotionResult = {
+    id: uuid(),
     user_id: userId,
-    date: new Date(),
-    emotion: 'calm',
-    score: 7,
-    text: "Je me sens plutôt bien aujourd'hui.",
-    emojis: "😊",
-    audio_url: null,
-    ai_feedback: "Vous semblez être dans un état émotionnel calme et positif.",
-    created_at: new Date().toISOString(),
-    name: "calm",
-    category: "emotion",
-    confidence: 0.85,
-    intensity: 0.7
+    date: new Date().toISOString(),
+    emotion: emotion,
+    score: score,
+    confidence: score / 100,
+    intensity: (score - 40) / 60, // Scale to 0-1
+    text: scanData.text,
+    emojis: scanData.emojis,
+    feedback: generateFeedback(emotion),
+    recommendations: generateRecommendations(emotion)
   };
-};
+  
+  return result;
+}
+
+// Create a new emotion entry from user input
+export async function createEmotionEntry(data: {
+  user_id: string;
+  text?: string;
+  emojis?: string;
+  audio_url?: string;
+}): Promise<Emotion> {
+  // Process the scan
+  const scanResult = await processEmotionScan(data.user_id, {
+    text: data.text,
+    emojis: data.emojis,
+    audio_url: data.audio_url
+  });
+  
+  // Create and save the emotion
+  const emotion: Emotion = {
+    id: scanResult.id || uuid(),
+    user_id: data.user_id,
+    date: scanResult.date || new Date().toISOString(),
+    emotion: scanResult.emotion,
+    name: scanResult.emotion,
+    score: scanResult.score,
+    confidence: scanResult.confidence,
+    intensity: scanResult.intensity,
+    text: scanResult.text,
+    emojis: scanResult.emojis,
+    ai_feedback: scanResult.feedback,
+    source: 'manual',
+    category: 'emotion'
+  };
+  
+  return await saveEmotion(emotion);
+}
+
+// Helper function to generate feedback
+function generateFeedback(emotion: string): string {
+  const feedbacks: Record<string, string[]> = {
+    'happy': [
+      'Vous semblez être dans un état de joie et de bien-être. C\'est le moment idéal pour accomplir des tâches créatives.',
+      'Votre bonne humeur peut être contagieuse! Profitez-en pour collaborer avec vos collègues.'
+    ],
+    'sad': [
+      'Vous semblez ressentir de la tristesse. C\'est une émotion normale qui nous rappelle ce qui compte pour nous.',
+      'La tristesse peut parfois nous aider à réfléchir et à prendre du recul. Une petite pause pourrait vous faire du bien.'
+    ],
+    'angry': [
+      'Vous semblez ressentir de la colère. Cette énergie peut être canalisée de façon constructive.',
+      'La colère nous signale souvent qu\'une limite a été franchie. Essayez de prendre quelques respirations profondes.'
+    ],
+    'fearful': [
+      'Vous semblez ressentir de la peur ou de l\'anxiété. Ces émotions nous aident à identifier des risques potentiels.',
+      'L\'anxiété peut parfois nous submerger. Une courte méditation pourrait vous aider à retrouver votre calme.'
+    ],
+    'calm': [
+      'Vous semblez être dans un état de calme. C\'est idéal pour la concentration et la réflexion.',
+      'Le calme est un état précieux. Profitez-en pour avancer sur des tâches qui demandent de la précision.'
+    ],
+    'tired': [
+      'Vous semblez être fatigué. Votre corps vous envoie peut-être un signal qu\'il est temps de ralentir.',
+      'La fatigue peut affecter notre concentration et notre humeur. Une courte pause pourrait vous revitaliser.'
+    ],
+    'stressed': [
+      'Vous semblez être stressé. Le stress est une réponse naturelle face aux défis, mais il est important de le gérer.',
+      'Face au stress, essayez de décomposer vos tâches en étapes plus petites et plus gérables.'
+    ],
+    'neutral': [
+      'Votre état émotionnel semble équilibré. C\'est un bon moment pour planifier ou prendre des décisions.',
+      'Un état neutre offre une clarté mentale qui peut être bénéfique pour évaluer des situations complexes.'
+    ]
+  };
+  
+  // Get feedback for this emotion or default to neutral
+  const emotionFeedbacks = feedbacks[emotion] || feedbacks['neutral'];
+  
+  // Return a random feedback
+  return emotionFeedbacks[Math.floor(Math.random() * emotionFeedbacks.length)];
+}
+
+// Helper function to generate recommendations
+function generateRecommendations(emotion: string): string[] {
+  const allRecommendations: Record<string, string[]> = {
+    'happy': [
+      'Partagez cette énergie positive avec votre équipe',
+      'Profitez de cet élan pour des tâches créatives',
+      'Notez ce qui vous a mis dans cet état pour le reproduire'
+    ],
+    'sad': [
+      'Prenez une courte pause de 5 minutes',
+      'Écoutez une musique apaisante',
+      'Parlez à quelqu\'un en qui vous avez confiance'
+    ],
+    'angry': [
+      'Faites quelques respirations profondes',
+      'Prenez un moment pour identifier la source de cette colère',
+      'Reportez les décisions importantes à plus tard'
+    ],
+    'fearful': [
+      'Essayez notre exercice de respiration guidée',
+      'Écrivez ce qui vous préoccupe pour prendre du recul',
+      'Divisez les grands défis en petites étapes gérables'
+    ],
+    'calm': [
+      'C\'est le moment idéal pour des tâches nécessitant de la concentration',
+      'Profitez de cette clarté mentale pour planifier',
+      'Notez ce qui vous aide à maintenir cet état'
+    ],
+    'tired': [
+      'Considérez une courte pause ou micro-sieste',
+      'Hydratez-vous et prenez une collation nutritive',
+      'Faites quelques étirements pour vous revitaliser'
+    ],
+    'stressed': [
+      'Essayez notre session de micro-méditation de 2 minutes',
+      'Réorganisez votre liste de tâches par priorité',
+      'Faites une courte marche pour vous aérer l\'esprit'
+    ],
+    'neutral': [
+      'C\'est un bon moment pour planifier votre journée',
+      'Essayez une session de brainstorming sur un projet',
+      'Réfléchissez à vos priorités actuelles'
+    ]
+  };
+  
+  const recommendations = allRecommendations[emotion] || allRecommendations['neutral'];
+  return recommendations;
+}

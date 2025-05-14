@@ -20,7 +20,7 @@ const NotificationsPanel = () => {
   useEffect(() => {
     // Update badge count based on unread notifications
     if (badge && notifications) {
-      const unreadCount = notifications.filter(n => !n.read).length;
+      const unreadCount = notifications.filter(n => !n.read && !n.isRead).length;
       badge.setBadgesCount?.(unreadCount);
     }
   }, [notifications, badge]);
@@ -79,13 +79,13 @@ const NotificationsPanel = () => {
                     {notification.message}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(notification.createdAt || new Date().toISOString()), {
+                    {formatDistanceToNow(new Date(notification.createdAt || notification.date), {
                       addSuffix: true,
                       locale: fr,
                     })}
                   </div>
                 </div>
-                {!notification.read && (
+                {!(notification.read || notification.isRead) && (
                   <Button
                     variant="ghost"
                     size="icon"

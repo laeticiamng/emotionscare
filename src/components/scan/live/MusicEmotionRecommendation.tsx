@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useMusic } from '@/contexts/MusicContext';
 import { Music2 } from 'lucide-react';
 
@@ -12,18 +14,23 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
 
   // Update emotion handling when primaryEmotion is a string, not an object with name
-  const emotionText = typeof emotion === 'string' 
-    ? emotion 
-    : (emotion?.primaryEmotion || emotion?.emotion);
+  const getEmotionText = () => {
+    if (typeof emotion === 'string') {
+      return emotion;
+    } else if (emotion?.primaryEmotion) {
+      return typeof emotion.primaryEmotion === 'string' 
+        ? emotion.primaryEmotion 
+        : emotion.primaryEmotion.name;
+    } else if (emotion?.emotion) {
+      return emotion.emotion;
+    }
+    return 'neutral';
+  };
 
   const handlePlayMusic = async () => {
-    if (typeof emotionText === 'string') {
-      await loadPlaylistForEmotion(emotionText.toLowerCase());
-      setOpenDrawer(true);
-    } else if (emotionText && typeof emotionText.name === 'string') {
-      await loadPlaylistForEmotion(emotionText.name.toLowerCase());
-      setOpenDrawer(true);
-    }
+    const emotionText = getEmotionText().toLowerCase();
+    await loadPlaylistForEmotion(emotionText);
+    setOpenDrawer(true);
   };
 
   return (
@@ -40,7 +47,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
       <CardContent>
         <p>
           Nous vous recommandons une playlist basée sur votre émotion actuelle: 
-          {typeof emotionText === 'string' ? emotionText : emotionText?.name} (intensité: {intensity}%)
+          {getEmotionText()} (intensité: {intensity}%)
         </p>
         <Button onClick={handlePlayMusic} className="mt-4">
           Écouter maintenant

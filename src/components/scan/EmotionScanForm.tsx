@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Button } from "@/components/ui/button";
@@ -9,14 +10,50 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { saveEmotion } from '@/lib/scanService';
 import { Emotion, EmotionResult } from '@/types';
-import { processEmotionForBadges } from '@/lib/gamificationService';
 import EmojiPicker from './EmojiPicker';
 
 interface EmotionScanFormProps {
   onEmotionDetected?: (emotion: Emotion) => void;
+  onScanComplete?: () => void;
+  onClose?: () => void;
+  userId?: string;
 }
 
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onEmotionDetected }) => {
+// Mock gamification service function
+const processEmotionForBadges = async (emotion: string, userId: string) => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Randomly decide if a new badge is earned (20% chance)
+  const earnedNewBadge = Math.random() < 0.2;
+  
+  if (earnedNewBadge) {
+    return {
+      points: Math.floor(Math.random() * 50) + 10,
+      newBadges: [
+        {
+          id: uuid(),
+          name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Explorer`,
+          description: `Vous avez exploré l'émotion ${emotion} de manière consciente.`,
+          image_url: '',
+          icon: 'award'
+        }
+      ]
+    };
+  }
+  
+  return {
+    points: Math.floor(Math.random() * 20) + 5,
+    newBadges: []
+  };
+};
+
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ 
+  onEmotionDetected, 
+  onScanComplete,
+  onClose,
+  userId
+}) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [text, setText] = useState('');
@@ -28,54 +65,59 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onEmotionDetected }) 
   }, []);
   
   // Update the component's handlers to use the correct types
-const handleAnalysisComplete = async (result: EmotionResult) => {
-  if (!result || !user) return;
+  const handleAnalysisComplete = async (result: EmotionResult) => {
+    if (!result || (!user && !userId)) return;
 
-  try {
-    // Store the emotion
-    const emotion: Emotion = {
-      id: result.id || uuid(),
-      user_id: user.id,
-      date: new Date().toISOString(),
-      emotion: result.emotion,
-      score: result.score,
-      // Add other properties from result as needed
-      confidence: result.confidence,
-      intensity: result.intensity,
-      text: result.text,
-      ai_feedback: result.feedback || result.ai_feedback,
-      category: 'neutral'
-    };
+    try {
+      // Store the emotion
+      const emotion: Emotion = {
+        id: result.id || uuid(),
+        user_id: userId || user?.id || '',
+        date: new Date().toISOString(),
+        emotion: result.emotion,
+        score: result.score,
+        // Add other properties from result as needed
+        confidence: result.confidence,
+        intensity: result.intensity,
+        text: result.text,
+        ai_feedback: result.feedback || result.ai_feedback,
+        category: 'neutral'
+      };
 
-    // Process for badges and points
-    const gamificationResult = await processEmotionForBadges(result.emotion, user.id);
-    
-    if (gamificationResult && gamificationResult.newBadges.length > 0) {
+      // Process for badges and points
+      const gamificationResult = await processEmotionForBadges(result.emotion, userId || user?.id || '');
+      
+      if (gamificationResult && gamificationResult.newBadges.length > 0) {
+        toast({
+          title: "Nouveau badge obtenu !",
+          description: `Vous avez obtenu le badge "${gamificationResult.newBadges[0].name}"`,
+          variant: "default"
+        });
+      }
+
+      // Save in database
+      await saveEmotion(emotion);
+      
+      // Update state and call callback
+      setMostRecentEmotion(emotion);
+      if (onEmotionDetected) {
+        onEmotionDetected(emotion);
+      }
+      
+      // Call completion handler if provided
+      if (onScanComplete) {
+        onScanComplete();
+      }
+      
+    } catch (error) {
+      console.error('Error saving emotion:', error);
       toast({
-        title: "Nouveau badge obtenu !",
-        description: `Vous avez obtenu le badge "${gamificationResult.newBadges[0].name}"`,
-        variant: "default"
+        title: "Erreur",
+        description: "Impossible de sauvegarder votre analyse émotionnelle.",
+        variant: "destructive"
       });
     }
-
-    // Save in database
-    await saveEmotion(emotion);
-    
-    // Update state and call callback
-    setMostRecentEmotion(emotion);
-    if (onEmotionDetected) {
-      onEmotionDetected(emotion);
-    }
-    
-  } catch (error) {
-    console.error('Error saving emotion:', error);
-    toast({
-      title: "Erreur",
-      description: "Impossible de sauvegarder votre analyse émotionnelle.",
-      variant: "destructive"
-    });
-  }
-};
+  };
 
   return (
     <Card className="overflow-hidden shadow-md">

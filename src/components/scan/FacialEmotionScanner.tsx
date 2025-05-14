@@ -7,7 +7,7 @@ import useHumeAI from '@/hooks/useHumeAI';
 import { EmotionResult } from '@/types/emotion';
 
 export interface FacialEmotionScannerProps {
-  onEmotionDetected: (emotion: { name: string; score: number; }) => void;
+  onEmotionDetected: (emotion: EmotionResult) => void;
   className?: string;
   isScanning?: boolean;
   onToggleScanning?: () => void;
@@ -81,10 +81,8 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
         try {
           const result = await processFacialExpression(imgData);
           if (result && result.dominantEmotion) {
-            onEmotionDetected({
-              name: result.dominantEmotion.name,
-              score: result.dominantEmotion.score
-            });
+            // Pass the complete emotion result
+            onEmotionDetected(result);
           }
         } catch (err) {
           console.error('Error processing facial expression:', err);

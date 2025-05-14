@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Mic, Square, Play, Trash2 } from "lucide-react";
+import { Mic, Square, Play, Trash } from 'lucide-react';
 
-export interface AudioEmotionScannerProps {
+interface AudioEmotionScannerProps {
   audioUrl: string | null;
-  onAudioChange?: (url: string | null) => void;
-  setAudioUrl?: (url: string | null) => void; // For backward compatibility
+  onAudioChange: (url: string | null) => void;
   onAnalyze: () => void;
   isAnalyzing: boolean;
 }
@@ -14,171 +14,155 @@ export interface AudioEmotionScannerProps {
 const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
   audioUrl,
   onAudioChange,
-  setAudioUrl,
   onAnalyze,
   isAnalyzing
 }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
-
-  // Use the appropriate setter
-  const updateAudioUrl = (url: string | null) => {
-    if (onAudioChange) {
-      onAudioChange(url);
-    } else if (setAudioUrl) {
-      setAudioUrl(url);
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      
-      setAudioChunks([]);
-      setMediaRecorder(recorder);
-      
-      recorder.addEventListener('dataavailable', (event) => {
-        setAudioChunks((prev) => [...prev, event.data]);
-      });
-      
-      recorder.addEventListener('stop', () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const url = URL.createObjectURL(audioBlob);
-        updateAudioUrl(url);
-        
-        // Stop all audio tracks
-        stream.getTracks().forEach(track => track.stop());
-      });
-      
-      recorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Failed to start recording:', error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const togglePlayback = () => {
-    if (!audioRef.current) return;
+  const [recordingTime, setRecordingTime] = useState(0);
+  
+  // Simulated recording
+  const startRecording = () => {
+    setIsRecording(true);
+    setRecordingTime(0);
     
-    if (isPlaying) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-    } else {
-      audioRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const deleteRecording = () => {
-    updateAudioUrl(null);
-    setAudioChunks([]);
-    setIsPlaying(false);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  };
-
-  React.useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('ended', () => {
-        setIsPlaying(false);
+    // Mock recording timer
+    const interval = setInterval(() => {
+      setRecordingTime(prev => {
+        if (prev >= 30) { // Max 30 seconds
+          clearInterval(interval);
+          stopRecording();
+          return 30;
+        }
+        return prev + 1;
       });
-    }
-  }, [audioUrl]);
+    }, 1000);
+    
+    // Cleanup
+    setTimeout(() => {
+      clearInterval(interval);
+    }, 31000);
+  };
+  
+  const stopRecording = () => {
+    setIsRecording(false);
+    
+    // Mock audio URL creation
+    const mockAudioUrl = "data:audio/wav;base64,MOCK_AUDIO_DATA";
+    onAudioChange(mockAudioUrl);
+  };
+  
+  const playAudio = () => {
+    if (!audioUrl) return;
+    
+    setIsPlaying(true);
+    
+    // Simulate audio playing
+    setTimeout(() => {
+      setIsPlaying(false);
+    }, recordingTime * 1000);
+  };
+  
+  const clearAudio = () => {
+    onAudioChange(null);
+    setRecordingTime(0);
+  };
+  
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div className="space-y-4">
-      <div className="border rounded-md p-4 min-h-32 flex flex-col items-center justify-center">
-        {!audioUrl ? (
-          <div className="flex flex-col items-center gap-2 text-center">
-            <Mic className="h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-muted-foreground">
-              {isRecording
-                ? "Enregistrement en cours..."
-                : "Appuyez sur le bouton d'enregistrement pour commencer"}
-            </p>
+    <Card>
+      <CardHeader>
+        <CardTitle>Analyse émotionnelle par audio</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex flex-col items-center">
+          <div className="text-xl font-mono mb-2">
+            {formatTime(recordingTime)}
           </div>
-        ) : (
-          <div className="w-full">
-            <audio ref={audioRef} src={audioUrl} className="hidden" />
-            <div className="flex justify-center gap-4">
-              <Button
-                variant="outline"
+          
+          <div className="flex justify-center gap-4">
+            {!isRecording && !audioUrl && (
+              <Button 
+                onClick={startRecording} 
+                className="w-12 h-12 rounded-full"
                 size="icon"
-                onClick={togglePlayback}
-                disabled={isAnalyzing}
               >
-                {isPlaying ? <Square size={16} /> : <Play size={16} />}
+                <Mic className="h-6 w-6" />
               </Button>
-              <Button
-                variant="outline"
+            )}
+            
+            {isRecording && (
+              <Button 
+                onClick={stopRecording} 
+                variant="destructive"
+                className="w-12 h-12 rounded-full"
                 size="icon"
-                onClick={deleteRecording}
-                disabled={isAnalyzing}
               >
-                <Trash2 size={16} />
+                <Square className="h-6 w-6" />
               </Button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex gap-4">
-        {!audioUrl && (
-          <Button
-            variant={isRecording ? "destructive" : "secondary"}
-            className="flex-1"
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isAnalyzing}
-          >
-            {isRecording ? (
+            )}
+            
+            {audioUrl && !isRecording && (
               <>
-                <Square className="mr-2 h-4 w-4" />
-                Arrêter
-              </>
-            ) : (
-              <>
-                <Mic className="mr-2 h-4 w-4" />
-                Enregistrer
+                <Button 
+                  onClick={playAudio} 
+                  variant="secondary"
+                  className="w-12 h-12 rounded-full"
+                  size="icon"
+                  disabled={isPlaying}
+                >
+                  <Play className="h-6 w-6" />
+                </Button>
+                
+                <Button 
+                  onClick={clearAudio} 
+                  variant="outline"
+                  className="w-12 h-12 rounded-full"
+                  size="icon"
+                >
+                  <Trash className="h-6 w-6" />
+                </Button>
               </>
             )}
-          </Button>
+          </div>
+        </div>
+        
+        {audioUrl && (
+          <div className="text-center text-sm text-muted-foreground">
+            {isPlaying 
+              ? "Lecture en cours..." 
+              : "Enregistrement audio prêt pour analyse"}
+          </div>
+        )}
+        
+        {!audioUrl && !isRecording && (
+          <div className="text-center text-sm text-muted-foreground">
+            Appuyez sur le bouton du microphone pour commencer l'enregistrement
+          </div>
+        )}
+        
+        {isRecording && (
+          <div className="text-center text-sm text-muted-foreground animate-pulse">
+            Enregistrement en cours... Parlez de votre état émotionnel
+          </div>
         )}
         
         {audioUrl && (
-          <Button
-            onClick={onAnalyze}
-            disabled={isAnalyzing}
-            className="flex-1"
+          <Button 
+            onClick={onAnalyze} 
+            className="w-full"
+            disabled={isAnalyzing || isPlaying}
           >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyse en cours...
-              </>
-            ) : (
-              <>
-                <Mic className="mr-2 h-4 w-4" />
-                Analyser mon audio
-              </>
-            )}
+            {isAnalyzing ? "Analyse en cours..." : "Analyser ma voix"}
           </Button>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,129 +1,171 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Mic, Square, Play, Pause } from 'lucide-react';
 import { EmotionResult } from '@/types/emotion';
 
 interface AudioProcessorProps {
-  isListening: boolean;
-  userId: string;
-  isConfidential?: boolean;
-  onProcessingChange: (processing: boolean) => void;
-  onProgressUpdate: (message: string) => void;
-  onAnalysisComplete: (emotion: any, result: EmotionResult) => void;
-  onError: (message: string) => void;
+  onEmotionDetected?: (result: EmotionResult) => void;
+  showTitle?: boolean;
 }
 
-const AudioProcessor: React.FC<AudioProcessorProps> = ({
-  isListening,
-  userId,
-  isConfidential = false,
-  onProcessingChange,
-  onProgressUpdate,
-  onAnalysisComplete,
-  onError
+const AudioProcessor: React.FC<AudioProcessorProps> = ({ 
+  onEmotionDetected,
+  showTitle = true
 }) => {
-  useEffect(() => {
-    if (!isListening) return;
-    
-    let mediaRecorder: MediaRecorder | null = null;
-    let audioChunks: BlobPart[] = [];
-    let analyzing = false;
-
-    const startRecording = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        mediaRecorder = new MediaRecorder(stream);
-        
-        mediaRecorder.addEventListener('dataavailable', event => {
-          audioChunks.push(event.data);
-        });
-        
-        mediaRecorder.addEventListener('stop', () => {
-          if (analyzing) return;
-          
-          analyzing = true;
-          onProcessingChange(true);
-          onProgressUpdate('Traitement de l\'audio...');
-          
-          // Simulate processing delay
-          setTimeout(() => {
-            onProgressUpdate('Analyse émotionnelle...');
-            
-            // Simulate emotion detection
-            setTimeout(() => {
-              processAudioData();
-            }, 1500);
-          }, 1000);
-        });
-        
-        mediaRecorder.start();
-        
-        // Auto-stop after 10 seconds for demo purposes
-        setTimeout(() => {
-          if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            stopAllTracks(stream);
-          }
-        }, 10000);
-      } catch (error) {
-        console.error('Error accessing microphone:', error);
-        onError('Impossible d\'accéder au microphone. Veuillez vérifier vos permissions.');
-      }
-    };
-    
-    const stopAllTracks = (stream: MediaStream) => {
-      stream.getTracks().forEach(track => track.stop());
-    };
-    
-    const processAudioData = () => {
-      // Simulate processing audio data and getting transcript/emotion
-      onProgressUpdate('Finalisation de l\'analyse...');
-      
-      setTimeout(() => {
-        // Mock data for demo purposes
-        const mockEmotions = [
-          { name: 'calm', score: 0.75 },
-          { name: 'joy', score: 0.65 },
-          { name: 'satisfaction', score: 0.55 }
-        ];
-        
-        const dominantEmotion = mockEmotions[0];
-        
-        // Create result object
-        const result: EmotionResult = {
-          id: `emotion-${Date.now()}`,
-          user_id: userId,
-          date: new Date().toISOString(),
-          emotion: dominantEmotion.name,
-          score: dominantEmotion.score,
-          confidence: 0.8,
-          transcript: "Je me sens plutôt bien aujourd'hui, calme et détendu après ma session de méditation.",
-          dominantEmotion: {
-            name: dominantEmotion.name,
-            score: dominantEmotion.score
-          }
-        };
-        
-        // Pass emotion data to parent
-        onAnalysisComplete(dominantEmotion, result);
-        
-        // Reset
-        onProcessingChange(false);
-        analyzing = false;
-        audioChunks = [];
-      }, 1000);
-    };
-    
-    startRecording();
-    
-    return () => {
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-      }
-    };
-  }, [isListening, userId, isConfidential, onProcessingChange, onProgressUpdate, onAnalysisComplete, onError]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [transcript, setTranscript] = useState<string | null>(null);
   
-  return null;
+  // Simulate start recording
+  const startRecording = useCallback(() => {
+    setIsRecording(true);
+    setAudioUrl(null);
+    setTranscript(null);
+    
+    // Simulate recording for 5 seconds
+    setTimeout(() => {
+      stopRecording();
+    }, 5000);
+  }, []);
+  
+  // Simulate stop recording
+  const stopRecording = useCallback(() => {
+    setIsRecording(false);
+    setIsProcessing(true);
+    
+    // Simulate creating audio URL
+    setTimeout(() => {
+      setAudioUrl('data:audio/wav;base64,MOCK_AUDIO_DATA');
+      setTranscript("Aujourd'hui, je me sens vraiment bien et plein d'énergie.");
+      setIsProcessing(false);
+    }, 1500);
+  }, []);
+  
+  // Simulate audio playback
+  const togglePlay = useCallback(() => {
+    if (!audioUrl) return;
+    
+    setIsPlaying(prev => !prev);
+    
+    // If we're starting playback, simulate it finishing after 5 seconds
+    if (!isPlaying) {
+      setTimeout(() => {
+        setIsPlaying(false);
+      }, 5000);
+    }
+  }, [audioUrl, isPlaying]);
+  
+  // Analyze the audio
+  const analyzeAudio = useCallback(() => {
+    if (!audioUrl || !transcript) return;
+    
+    setIsProcessing(true);
+    
+    // Simulate analysis
+    setTimeout(() => {
+      // Generate a result
+      const result: EmotionResult = {
+        emotion: "happy",
+        dominantEmotion: "happy",
+        source: 'voice',
+        text: transcript,
+        score: 85,
+        confidence: 0.85,
+        timestamp: new Date().toISOString(),
+        feedback: "Vous semblez être dans un état positif et énergique. C'est un excellent moment pour des activités créatives ou des tâches qui demandent de l'enthousiasme.",
+        recommendations: [
+          "Profitez de cette énergie positive pour avancer sur vos projets créatifs",
+          "Partagez votre bonne humeur avec votre équipe",
+          "Notez ce qui vous a mis dans cet état pour reproduire ces conditions à l'avenir"
+        ]
+      };
+      
+      // Call the callback
+      if (onEmotionDetected) {
+        onEmotionDetected(result);
+      }
+      
+      setIsProcessing(false);
+    }, 2000);
+  }, [audioUrl, transcript, onEmotionDetected]);
+  
+  return (
+    <Card className="w-full">
+      {showTitle && (
+        <CardHeader>
+          <CardTitle>Analyse vocale</CardTitle>
+        </CardHeader>
+      )}
+      <CardContent className="space-y-6 pt-4">
+        <div className="flex justify-center">
+          <Button
+            className="h-16 w-16 rounded-full"
+            variant={isRecording ? "destructive" : "default"}
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isProcessing || isPlaying}
+          >
+            {isRecording ? (
+              <Square className="h-6 w-6" />
+            ) : (
+              <Mic className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
+        
+        <div className="text-center text-sm">
+          {isRecording ? (
+            <p className="text-primary animate-pulse">Enregistrement en cours...</p>
+          ) : isProcessing ? (
+            <p>Traitement en cours...</p>
+          ) : audioUrl ? (
+            <p>Enregistrement prêt pour analyse</p>
+          ) : (
+            <p>Cliquez sur le microphone pour commencer à parler</p>
+          )}
+        </div>
+        
+        {transcript && (
+          <div className="bg-muted p-3 rounded-md">
+            <h3 className="text-sm font-medium mb-1">Transcription :</h3>
+            <p className="text-sm text-muted-foreground">{transcript}</p>
+            
+            <div className="flex justify-between mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={togglePlay}
+                className="text-xs flex items-center gap-1"
+                disabled={isProcessing}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="h-3 w-3" /> Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-3 w-3" /> Écouter
+                  </>
+                )}
+              </Button>
+              
+              <Button
+                size="sm"
+                onClick={analyzeAudio}
+                className="text-xs"
+                disabled={isProcessing || isPlaying}
+              >
+                Analyser
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 };
 
 export default AudioProcessor;

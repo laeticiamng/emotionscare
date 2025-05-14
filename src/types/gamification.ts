@@ -21,6 +21,7 @@ export interface GamificationStats {
   lastActivityDate?: string;
   activeChallenges: number;
   completedChallenges: number;
+  nextLevelPoints?: number;
 }
 
 export interface Challenge {
@@ -38,7 +39,8 @@ export interface Challenge {
   endDate?: string;
   name?: string;
   completed?: boolean;
-  total?: number; // For mock data
+  total?: number;
+  level?: string | number;
 }
 
 export interface Badge {
@@ -51,7 +53,7 @@ export interface Badge {
   type?: string;
   image?: string;
   date?: string;
-  level?: string | number; // For mock data
+  level?: string | number;
 }
 
 export interface Achievement {
@@ -67,4 +69,15 @@ export interface Achievement {
 export interface GamificationAction {
   type: 'SCAN' | 'JOURNAL' | 'COACH' | 'VR' | 'CHALLENGE' | 'STREAK' | 'LOGIN';
   data?: any;
+}
+
+export interface LeaderboardEntry {
+  userId: string;
+  name: string;
+  avatar?: string;
+  points: number;
+  rank: number;
+  badges: number;
+  streak: number;
+  department?: string;
 }

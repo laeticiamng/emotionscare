@@ -40,7 +40,7 @@ export interface Emotion {
   emojis?: string;
   ai_feedback?: string;
   source?: string;
-  category?: string; // Adding category property
+  category?: string;
 }
 
 export interface EmotionResult {
@@ -52,7 +52,7 @@ export interface EmotionResult {
     name: string;
     score?: number;
   };
-  dominantEmotion?: string; // Adding for scanners
+  dominantEmotion?: string;
   name?: string;
   score: number;
   intensity?: number;
@@ -64,6 +64,9 @@ export interface EmotionResult {
   ai_feedback?: string;
   recommendations?: string[];
   source?: string;
+  error?: string;
+  faceDetected?: boolean;
+  timestamp?: string;
 }
 
 export interface EmotionalTeamViewProps {

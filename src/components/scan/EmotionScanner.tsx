@@ -6,6 +6,7 @@ import EmojiEmotionScanner from './EmojiEmotionScanner';
 import AudioEmotionScanner from './AudioEmotionScanner';
 import FacialEmotionScanner from './FacialEmotionScanner';
 import { MessageSquare, Smile, Mic, Webcam } from 'lucide-react';
+import { EmotionResult } from '@/types/emotion';
 
 interface EmotionScannerProps {
   text: string;
@@ -30,7 +31,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<string>("text");
   
-  const handleFacialEmotionDetected = (emotion: any) => {
+  const handleFacialEmotionDetected = (emotion: EmotionResult) => {
     if (emotion.dominantEmotion) {
       // Map the emotion to relevant emoji
       const emotionToEmoji: Record<string, string> = {
@@ -77,6 +78,19 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
     }
   };
   
+  // Create placeholder components if they don't exist
+  const EmojiEmotionScannerComponent = EmojiEmotionScanner || ((props: any) => (
+    <div className="p-4 text-center">
+      <p>Composant d'analyse par emoji en développement</p>
+    </div>
+  ));
+  
+  const AudioEmotionScannerComponent = AudioEmotionScanner || ((props: any) => (
+    <div className="p-4 text-center">
+      <p>Composant d'analyse vocale en développement</p>
+    </div>
+  ));
+  
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid grid-cols-4 mb-6">
@@ -108,7 +122,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
       </TabsContent>
       
       <TabsContent value="emoji">
-        <EmojiEmotionScanner 
+        <EmojiEmotionScannerComponent 
           emojis={emojis}
           onEmojiChange={onEmojiChange}
           onAnalyze={onAnalyze}
@@ -117,7 +131,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
       </TabsContent>
       
       <TabsContent value="audio">
-        <AudioEmotionScanner 
+        <AudioEmotionScannerComponent 
           audioUrl={audioUrl}
           onAudioChange={onAudioChange}
           onAnalyze={onAnalyze}

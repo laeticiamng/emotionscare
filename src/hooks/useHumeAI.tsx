@@ -30,15 +30,12 @@ export function useHumeAI() {
         { name: 'surprise', score: 0.2, confidence: 0.7 }
       ];
       
-      const dominantEmotion = {
-        name: simulatedEmotions[0].name,
-        score: simulatedEmotions[0].score
-      };
-      
       const emotionResult: EmotionResult = {
-        dominantEmotion,
+        emotion: simulatedEmotions[0].name,
+        score: simulatedEmotions[0].score * 100,
+        confidence: simulatedEmotions[0].confidence,
+        dominantEmotion: simulatedEmotions[0].name,
         source: 'facial',
-        faceDetected: true,
         timestamp: new Date().toISOString()
       };
       
@@ -56,10 +53,12 @@ export function useHumeAI() {
       
       // Return error result
       const errorResult: EmotionResult = {
-        dominantEmotion: { name: 'neutral', score: 0 },
+        emotion: 'neutral',
+        score: 0,
+        dominantEmotion: 'neutral',
         source: 'facial',
-        error: 'Failed to process facial expression',
-        faceDetected: false
+        confidence: 0,
+        error: 'Failed to process facial expression'
       };
       
       setResult(errorResult);
