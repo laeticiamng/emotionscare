@@ -19,6 +19,9 @@ export const normalizeTrack = (track: MusicTrack): MusicTrack => {
     cover: track.cover || track.coverUrl || track.cover_url,
     coverUrl: track.coverUrl || track.cover || track.cover_url,
     cover_url: track.cover_url || track.cover || track.coverUrl,
+    audio_url: track.audio_url || track.audioUrl || track.url,
+    audioUrl: track.audioUrl || track.audio_url || track.url,
+    url: track.url || track.audioUrl || track.audio_url,
   };
 };
 
@@ -60,6 +63,8 @@ export const normalizeVRSessionTemplate = (template: VRSessionTemplate): VRSessi
     ...template,
     title: template.title || template.name || '',
     name: template.name || template.title || '',
+    completion_rate: template.completion_rate || 0,
+    recommended_mood: template.recommended_mood || template.emotion || '',
   };
 };
 

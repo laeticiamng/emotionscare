@@ -1,10 +1,5 @@
 
-import { NotificationPreference } from './types';
-
-export type UserRole = 'user' | 'admin' | 'coach' | 'therapist';
-export type ThemeName = 'light' | 'dark' | 'system';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'system-ui' | 'serif' | 'mono';
+export type UserRole = 'user' | 'admin' | 'coach' | 'therapist' | 'b2b_user';
 
 export interface UserPreferences {
   dashboardLayout?: string;
@@ -15,7 +10,20 @@ export interface UserPreferences {
   fontFamily?: FontFamily;
   sound?: boolean;
   notifications?: NotificationPreference;
+  // Added fields from error messages
+  privacy?: {
+    profileVisibility?: 'public' | 'private' | 'team';
+  };
+  notifications_enabled?: boolean;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
+  aiSuggestions?: boolean;
+  emotionalCamouflage?: boolean;
 }
+
+export type ThemeName = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'system-ui' | 'serif' | 'mono';
 
 export interface User {
   id: string;
@@ -25,6 +33,14 @@ export interface User {
   preferences: UserPreferences;
   avatar_url?: string;
   created_at?: string;
+  // Added fields from error messages
+  avatar?: string;
+  joined_at?: string;
+  onboarded?: boolean;
+  department?: string;
+  position?: string;
+  anonymity_code?: string;
+  emotional_score?: number;
 }
 
 export interface UserPreferencesState {
@@ -33,6 +49,20 @@ export interface UserPreferencesState {
   setSinglePreference: (key: string, value: any) => void;
   resetPreferences: () => void;
   loading: boolean;
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  role?: string;
+  email?: string;
+  expired?: boolean;
+  error?: string;
+}
+
+export interface UserData extends User {
+  status: 'pending' | 'active';
+  createdAt: string;
+  location?: any;
 }
 
 export interface AuthContextType {
@@ -47,12 +77,4 @@ export interface AuthContextType {
   updateUser: (updates: Partial<User>) => Promise<void>;
   preferences: UserPreferencesState;
   logout: () => Promise<void>;
-}
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  role?: string;
-  email?: string;
-  expired?: boolean;
-  error?: string;
 }

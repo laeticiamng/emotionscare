@@ -9,6 +9,7 @@ export interface MusicTrack {
   coverUrl?: string;
   cover?: string;
   cover_url?: string;
+  audio_url?: string; // Added for compatibility
   emotion?: string;
   genre?: string;
   album?: string;
@@ -52,9 +53,9 @@ export interface MusicContextType {
 }
 
 export interface MusicDrawerProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   open?: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onOpenChange?: (open: boolean) => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;

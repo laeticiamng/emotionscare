@@ -1,66 +1,41 @@
 
-export interface VRSessionTemplate {
-  id: string;
-  name?: string;
-  description?: string;
-  duration: number;
-  type?: string;
-  thumbnail?: string;
-  videoUrl?: string;
-  emotion?: string;
-  
-  // Add missing properties that are used
-  title: string;
-  audio_url?: string;
-  emotion_target?: string;
-  lastUsed?: string | Date;
-  preview_url?: string;
-  is_audio_only?: boolean;
-  benefits?: string[];
-  difficulty?: string;
-  theme?: string;
-  tags?: string[];
-  imageUrl?: string;
-}
-
 export interface VRSession {
   id: string;
-  templateId: string;
   userId: string;
-  startTime: string;
-  endTime?: string;
+  templateId: string;
+  startDate: Date | string;
   duration: number;
   completed: boolean;
-  emotionBefore?: string;
-  emotionAfter?: string;
-  notes?: string;
-  rating?: number;
-  
-  // Add missing properties that are used
-  date?: string;
-  startedAt?: string;
-  duration_seconds?: number;
-  is_audio_only?: boolean;
-  heart_rate_before?: number;
-  heart_rate_after?: number;
-  isCompleted?: boolean;
+  emotion?: string;
+  template?: VRSessionTemplate; // Added for compatibility
 }
 
-export interface VRHistoryListProps {
-  templates?: VRSessionTemplate[];
-  sessions?: VRSession[];
-  onSelectTemplate?: (template: VRSessionTemplate) => void;
-  onSelectSession?: (session: VRSession) => void;
-  loading?: boolean;
+export interface VRSessionTemplate {
+  id?: string;
+  name?: string;
+  title?: string;
+  theme?: string;
+  duration: number;
+  audio_url?: string;
+  videoUrl?: string;
+  preview_url?: string;
+  emotion_target?: string;
+  emotion?: string;
+  is_audio_only?: boolean;
+  lastUsed?: string;
+  completion_rate?: number;
+  recommended_mood?: string;
+  templateId?: string;
+  description?: string;
 }
 
 export interface VRSessionWithMusicProps {
   template?: VRSessionTemplate;
-  onComplete?: (sessionData: VRSession) => void;
-  onExit?: () => void;
-  
-  // Add missing properties
-  session?: VRSession;
+  session?: { 
+    template?: VRSessionTemplate;
+    templateId?: string;
+  };
+  onComplete?: () => void;
   onSessionComplete?: () => void;
   isAudioOnly?: boolean;
   videoUrl?: string;
@@ -68,4 +43,10 @@ export interface VRSessionWithMusicProps {
   emotion?: string;
   sessionId?: string;
   templateId?: string;
+}
+
+export interface VRHistoryListProps {
+  userId: string;
+  limit?: number;
+  onSessionSelect?: (session: VRSession) => void;
 }

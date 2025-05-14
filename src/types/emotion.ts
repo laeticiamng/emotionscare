@@ -1,6 +1,6 @@
 
 export interface Emotion {
-  id: string;
+  id?: string;
   name?: string;
   intensity?: number;
   date?: string | Date;
@@ -25,65 +25,10 @@ export interface Emotion {
   recommendations?: string[];
   timestamp?: string;
   feedback?: string;
-  emojis?: string;
+  emojis?: string[];
   audio_url?: string;
   category?: string;
   transcript?: string;
-}
-
-export interface EmotionEntry {
-  id: string;
-  user_id: string;
-  emotion_name: string;
-  emotion_id?: string;
-  intensity: number;
-  notes?: string;
-  created_at: string;
-  updated_at?: string;
-  color?: string;
-  is_confidential: boolean;
-  share_with_coach: boolean;
-  audio_url?: string;
-  text?: string;
-  emojis?: string;
-}
-
-export interface EmotionLog {
-  id: string;
-  name: string;
-  intensity: number;
-  timestamp: Date | string;
-  notes?: string;
-  color?: string;
-}
-
-export type EmotionType = 'joy' | 'sadness' | 'anger' | 'fear' | 'disgust' | 'surprise' | 'neutral' | 'love' | 'anticipation' | 'trust';
-
-export interface EmotionData {
-  name: EmotionType;
-  value: number;
-  color: string;
-}
-
-export interface EmotionTrend {
-  date: string;
-  emotions: {
-    [key in EmotionType]?: number;
-  };
-}
-
-export interface EmotionStats {
-  mostFrequent: {
-    emotion: EmotionType;
-    count: number;
-  };
-  averageIntensity: number;
-  positivePercentage: number;
-  negativePercentage: number;
-  totalEntries: number;
-  emotionCounts: {
-    [key in EmotionType]?: number;
-  };
 }
 
 export interface EmotionResult {
@@ -95,7 +40,7 @@ export interface EmotionResult {
   confidence?: number;
   source?: string;
   text?: string;
-  emojis?: string;
+  emojis?: string[];
   timestamp?: string;
   feedback?: string;
   ai_feedback?: string;
@@ -105,21 +50,5 @@ export interface EmotionResult {
   intensity?: number;
   transcript?: string;
   category?: string;
-}
-
-export interface EmotionScanResult extends EmotionResult {
-  primaryEmotion: EmotionType;
-  secondaryEmotion?: EmotionType;
-  intensity: number;
-  confidence: number;
-  timestamp: string;
-}
-
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: 'day' | 'week' | 'month';
-  userId?: string;
-  className?: string;
-  dateRange?: { start: Date; end: Date };
-  onRefresh?: () => void;
+  audio_url?: string; // Added for VoiceEmotionScanner
 }

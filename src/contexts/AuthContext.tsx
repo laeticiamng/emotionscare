@@ -79,10 +79,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } = await supabase.auth.getUser();
 
           if (sbUser) {
-            // We need to use RPC or a function to fetch user data since 'users' table
-            // is not in the Supabase public schema
+            // Fetch user data from the public.users table directly
             const { data: userData, error: userError } = await supabase
-              .rpc('get_user_by_id', { user_id: sbUser.id })
+              .from('users')
+              .select('*')
+              .eq('id', sbUser.id)
               .single();
 
             if (userError) {
@@ -90,21 +91,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
 
             if (userData) {
-              const userWithCorrectTypes: User = {
-                id: userData.id || sbUser.id,
-                email: userData.email || sbUser.email || '',
-                name: userData.name || sbUser.email?.split("@")[0] || '',
-                role: userData.role || 'user',
-                preferences: {
-                  ...createDefaultPreferences(),
-                  ...(userData.preferences || {}),
-                },
-                avatar_url: userData.avatar_url || '',
-                created_at: userData.created_at || new Date().toISOString(),
-              };
+              // Ensure we're properly typing the userData
+              if (typeof userData === 'object') {
+                const userWithCorrectTypes: User = {
+                  id: userData.id || sbUser.id,
+                  email: userData.email || sbUser.email || '',
+                  name: userData.name || sbUser.email?.split("@")[0] || '',
+                  role: userData.role || 'user',
+                  preferences: {
+                    ...createDefaultPreferences(),
+                    ...(userData.preferences || {}),
+                  },
+                  avatar_url: userData.avatar_url || '',
+                  created_at: userData.created_at || new Date().toISOString(),
+                  department: userData.department,
+                  position: userData.position,
+                  emotional_score: userData.emotional_score,
+                  onboarded: userData.onboarded,
+                  anonymity_code: userData.anonymity_code,
+                };
 
-              setUser(userWithCorrectTypes);
-              setPreferences(userWithCorrectTypes.preferences);
+                setUser(userWithCorrectTypes);
+                setPreferences(userWithCorrectTypes.preferences);
+              }
             } else {
               // If user data doesn't exist, create it
               const newUser = {
@@ -115,17 +124,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 preferences: createDefaultPreferences(),
               };
 
-              // Use RPC or function to create user
+              // Insert the new user directly into the users table
               const { error: createUserError } = await supabase
-                .rpc('create_user', { 
-                  user_data: {
-                    id: newUser.id,
-                    email: newUser.email,
-                    name: newUser.name,
-                    role: newUser.role,
-                    preferences: newUser.preferences
-                  }
-                });
+                .from('users')
+                .insert([newUser]);
 
               if (createUserError) {
                 console.error("Error creating user:", createUserError);
@@ -210,12 +212,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       if (!user) return;
       
-      // Use RPC or function to update user
+      // Update user in the users table
       const { error } = await supabase
-        .rpc('update_user', { 
-          user_id: user.id,
-          user_updates: updates
-        });
+        .from('users')
+        .update(updates)
+        .eq('id', user.id);
 
       if (error) {
         console.error("Error updating user:", error);
@@ -236,12 +237,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setPreferencesLoading(true);
     try {
       const newPreferences = { ...preferences, [key]: value };
-      // Use RPC or function to update preferences
+      
+      // Update preferences in the users table
       const { error } = await supabase
-        .rpc('update_user_preferences', { 
-          user_id: user?.id,
-          new_preferences: newPreferences
-        });
+        .from('users')
+        .update({ preferences: newPreferences })
+        .eq('id', user?.id);
 
       if (error) {
         console.error("Error updating preferences:", error);
@@ -264,12 +265,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setPreferencesLoading(true);
     try {
       const defaultPreferences = createDefaultPreferences();
-      // Use RPC or function to update preferences
+      
+      // Update preferences in the users table
       const { error } = await supabase
-        .rpc('update_user_preferences', { 
-          user_id: user?.id,
-          new_preferences: defaultPreferences
-        });
+        .from('users')
+        .update({ preferences: defaultPreferences })
+        .eq('id', user?.id);
 
       if (error) {
         console.error("Error resetting preferences:", error);
