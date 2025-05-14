@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,13 +8,13 @@ import { analyzeEmotion } from '@/lib/scanService';
 import EmotionResultDisplay from './live/EmotionResult';
 import { Slider } from "@/components/ui/slider"
 import { Label } from '@/components/ui/label';
-import { EmotionResult } from '@/types/types';
+import { EmotionResult } from '@/types/emotion';
 
 const EmotionScanLive = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [emojis, setEmojis] = useState<string>('');
+  const [emojis, setEmojis] = useState<string[]>([]);
   const [text, setText] = useState<string>('');
   const [result, setResult] = useState<EmotionResult | null>(null);
   const [confidenceThreshold, setConfidenceThreshold] = useState(0.5);
@@ -22,15 +23,6 @@ const EmotionScanLive = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  // Fonction pour s'assurer que les émojis sont toujours un tableau
-  const ensureArrayEmojis = (emojis: string | string[]): string[] => {
-    if (Array.isArray(emojis)) {
-      return emojis;
-    }
-    return emojis ? [emojis] : [];
-  };
-
-  // Mise à jour de la fonction où l'erreur apparaît
   const handleEmotionAnalysis = () => {
     if (!text && !audioUrl) {
       toast({
@@ -43,11 +35,12 @@ const EmotionScanLive = () => {
     setIsLoading(true);
     setResult(null);
 
-    const formattedEmojis = ensureArrayEmojis(emojis);
+    // Convert string to array if needed
+    const emojiArray = typeof emojis === 'string' ? emojis.split('') : emojis;
 
-    analyzeEmotion(text, formattedEmojis, audioUrl)
+    analyzeEmotion(text, emojiArray, audioUrl)
       .then(data => {
-        if (data.confidence >= confidenceThreshold) {
+        if (data.confidence && data.confidence >= confidenceThreshold) {
           setResult(data);
         } else {
           setResult({
@@ -184,8 +177,8 @@ const EmotionScanLive = () => {
           <div className="mt-4">
             <EmotionResultDisplay
               emotion={result.emotion}
-              confidence={result.confidence}
-              transcript={result.transcript}
+              confidence={result.confidence || 0}
+              transcript={result.transcript || ''}
             />
           </div>
         )}

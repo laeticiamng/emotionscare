@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { saveEmotion, analyzeEmotion, convertToEmotionResult } from '@/lib/scanService';
-import { Emotion, EmotionResult } from '@/types';
+import { saveEmotion, analyzeEmotion } from '@/lib/scanService';
+import { Emotion, EmotionResult } from '@/types/emotion';
 import EmojiPicker from './EmojiPicker';
 
 interface EmotionScanFormProps {
@@ -64,29 +64,36 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     setEmojis(prevEmojis => prevEmojis + emoji);
   }, []);
   
-  // Update the component's handlers to use the correct types
+  // Convert EmotionResult to Emotion
+  const resultToEmotion = (result: EmotionResult, userId: string): Emotion => {
+    return {
+      id: result.id || uuid(),
+      user_id: userId,
+      date: result.date || new Date().toISOString(),
+      emotion: result.emotion,
+      score: result.score || Math.round((result.confidence || 0.5) * 100),
+      confidence: result.confidence,
+      intensity: result.intensity || result.score,
+      text: result.text || result.transcript || '',
+      ai_feedback: result.feedback || result.ai_feedback || '',
+      category: result.category || 'neutral',
+      emojis: Array.isArray(result.emojis) ? result.emojis : 
+              (typeof result.emojis === 'string' ? result.emojis.split('') : [])
+    };
+  };
+  
   const handleAnalysisComplete = async (result: EmotionResult) => {
     if (!result || (!user && !userId)) return;
 
     try {
-      // Store the emotion
-      const emotion: Emotion = {
-        id: result.id || uuid(),
-        user_id: userId || user?.id || '',
-        date: new Date().toISOString(),
-        emotion: result.emotion || '',
-        score: result.score || Math.round((result.confidence || 0.5) * 100),
-        // Add other properties from result as needed
-        confidence: result.confidence,
-        intensity: result.intensity || result.score,
-        text: result.text || result.transcript || '',
-        ai_feedback: result.feedback || result.ai_feedback || '',
-        category: result.category || 'neutral',
-        emojis: Array.isArray(result.emojis) ? result.emojis : []
-      };
+      // Get the correct user ID
+      const currentUserId = userId || user?.id || '';
+      
+      // Convert result to Emotion
+      const emotion = resultToEmotion(result, currentUserId);
 
       // Process for badges and points
-      const gamificationResult = await processEmotionForBadges(result.emotion || 'neutral', userId || user?.id || '');
+      const gamificationResult = await processEmotionForBadges(result.emotion || 'neutral', currentUserId);
       
       if (gamificationResult && gamificationResult.newBadges.length > 0) {
         toast({

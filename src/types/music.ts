@@ -1,4 +1,7 @@
+
 import type { MusicTrack, MusicPlaylist } from '@/types/types';
+
+export type { MusicTrack, MusicPlaylist };
 
 export interface MusicContextType {
   // Playback control
@@ -31,7 +34,7 @@ export interface MusicContextType {
   initializeMusicSystem: () => void;
   error?: string | null;
   
-  // Additional properties for backward compatibility
+  // For backward compatibility
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
   isPlaying: boolean;
   volume: number;

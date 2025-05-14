@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { saveEmotion, convertToEmotionResult } from '@/lib/scanService';
-import { Emotion, EmotionResult } from '@/types';
+import { saveEmotion } from '@/lib/scanService';
+import { EmotionResult } from '@/types/emotion';
 import { CheckCircle } from 'lucide-react';
 
 interface EmotionScanResultProps {
@@ -30,26 +30,25 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ result, onEmotion
     );
   }
 
-  // Fonction pour s'assurer que les émojis sont toujours un tableau
-  const ensureArrayEmojis = (emojis: string | string[]): string[] => {
-    if (Array.isArray(emojis)) {
-      return emojis;
-    }
-    return emojis ? [emojis] : [];
-  };
-
   const saveEmotionResult = async () => {
     if (!result || !result.emotion) return;
     
-    // Convert to a consistent format
-    const emotionData = convertToEmotionResult(result);
-    
     try {
-      await saveEmotion(emotionData);
+      // Ensure data is in the correct format
+      const payload = {
+        ...result,
+        // Make sure date is a string
+        date: typeof result.date === 'object' ? result.date.toISOString() : result.date,
+        // Convert emojis to string if needed for the API
+        emojis: Array.isArray(result.emojis) ? result.emojis : 
+                (result.emojis ? [result.emojis] : [])
+      };
+      
+      await saveEmotion(payload);
       setIsSaved(true);
       
       if (onEmotionSaved) {
-        onEmotionSaved(emotionData);
+        onEmotionSaved(payload);
       }
       
       toast({

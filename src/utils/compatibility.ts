@@ -6,7 +6,7 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { EmotionResult } from '@/types/emotion';
-import { VRSessionTemplate } from '@/types/vr';
+import { VRSessionTemplate } from '@/types/types';
 
 /**
  * Make sure a MusicTrack has both cover and coverUrl for backward compatibility
