@@ -1,138 +1,89 @@
 
-import { UserRole } from '@/types/auth';
-import { ROUTES } from '@/types/navigation';
+// Role utility functions for navigation and access control
 
 /**
- * Checks if a user can access a specific route based on their role
+ * Determine if the user has access to a specific role-based section
+ * @param userRole Current user role
+ * @param requiredRole Required role to access a feature/page
+ * @returns boolean indicating if the user has access
  */
-export const canAccessRoute = (userRole: UserRole, requiredRole?: UserRole | UserRole[]): boolean => {
-  // If no role is required, allow access
-  if (!requiredRole) return true;
+export function hasRoleAccess(userRole: string | undefined, requiredRole: string): boolean {
+  if (!userRole) return false;
   
-  // Admin roles can access everything
-  if (userRole === 'admin' || userRole === 'b2b_admin') return true;
+  // Special case for admin roles - they have access to everything
+  if (userRole === 'b2b_admin' || userRole === 'super_admin') return true;
   
-  // Check against an array of allowed roles
-  if (Array.isArray(requiredRole)) {
-    return requiredRole.includes(userRole);
-  }
-  
-  // Check against a single required role
-  return userRole === requiredRole;
-};
-
-/**
- * Checks if a user has access to a specific role
- */
-export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boolean => {
-  // Admin roles can access everything
-  if (userRole === 'admin' || userRole === 'b2b_admin') return true;
-  
-  // Direct role match
+  // Direct role matching
   if (userRole === requiredRole) return true;
   
-  // Handle special role relationships
-  if (requiredRole === 'moderator' && (userRole === 'admin' || userRole === 'b2b_admin')) {
-    return true;
-  }
+  // B2B user can access B2C content but not vice versa
+  if (requiredRole === 'b2c' && userRole === 'b2b_user') return true;
   
   return false;
-};
+}
 
 /**
- * Checks if a role is an admin role
+ * Get the home path for a specific user role
+ * @param role User role
+ * @returns Path to redirect to based on role
  */
-export const isAdminRole = (role?: UserRole): boolean => {
-  return role === 'admin' || role === 'b2b_admin' || role === 'wellbeing_manager';
-};
-
-/**
- * Returns the appropriate redirect URL based on user role
- */
-export const getRedirectForRole = (role: UserRole): string => {
-  switch (role) {
+export function getRoleHomePath(role: string | undefined): string {
+  switch(role) {
     case 'b2c':
-      return ROUTES.b2c.dashboard;
+      return '/b2c/dashboard';
     case 'b2b_user':
-      return ROUTES.b2bUser.dashboard;
+      return '/b2b/user/dashboard';
     case 'b2b_admin':
-      return ROUTES.b2bAdmin.dashboard;
-    case 'admin':
-      return '/admin/dashboard';
-    case 'moderator':
-      return '/admin/moderation';
+      return '/b2b/admin/dashboard';
     default:
-      return ROUTES.common.home;
+      return '/';
   }
-};
+}
 
 /**
- * Gets the login path for a specific role
+ * Get the login path for a specific user role
+ * @param role User role
+ * @returns Path to the login page for the role
  */
-export const getRoleLoginPath = (role: UserRole): string => {
-  switch (role) {
+export function getRoleLoginPath(role: string | undefined): string {
+  switch(role) {
     case 'b2c':
-      return ROUTES.b2c.login;
+      return '/b2c/login';
     case 'b2b_user':
-      return ROUTES.b2bUser.login;
+      return '/b2b/user/login';
     case 'b2b_admin':
-      return ROUTES.b2bAdmin.login;
-    case 'admin':
-      return '/admin/login';
+      return '/b2b/admin/login';
     default:
-      return '/login';
+      return '/';
   }
-};
+}
 
 /**
- * Gets the home path for a specific role
+ * Check if the provided role is an admin role
+ * @param role User role
+ * @returns boolean indicating if the role has admin privileges
  */
-export const getRoleHomePath = (role: UserRole): string => {
-  switch (role) {
+export function isAdminRole(role: string | undefined): boolean {
+  return role === 'b2b_admin' || role === 'super_admin';
+}
+
+/**
+ * Get the appropriate navigation items based on user role
+ * @param role User role
+ * @returns Array of allowed navigation paths for the role
+ */
+export function getRoleNavigationPaths(role: string | undefined): string[] {
+  switch(role) {
     case 'b2c':
-      return ROUTES.b2c.dashboard;
+      return ['/b2c/dashboard', '/b2c/journal', '/b2c/music', '/b2c/scan', 
+              '/b2c/coach', '/b2c/vr', '/b2c/gamification', '/b2c/preferences', '/b2c/cocon'];
     case 'b2b_user':
-      return ROUTES.b2bUser.dashboard;
+      return ['/b2b/user/dashboard', '/b2b/user/journal', '/b2b/user/music', '/b2b/user/scan', 
+              '/b2b/user/coach', '/b2b/user/vr', '/b2b/user/gamification', '/b2b/user/preferences', '/b2b/user/cocon'];
     case 'b2b_admin':
-      return ROUTES.b2bAdmin.dashboard;
-    case 'admin':
-      return '/admin/dashboard';
+      return ['/b2b/admin/dashboard', '/b2b/admin/teams', '/b2b/admin/reports', 
+              '/b2b/admin/events', '/b2b/admin/settings'];
     default:
-      return ROUTES.common.home;
+      return [];
   }
-};
-
-/**
- * Gets the name for a given role
- */
-export const getRoleName = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-      return 'Administrateur';
-    case 'b2b_admin':
-      return 'Administrateur B2B';
-    case 'b2b_user':
-      return 'Collaborateur';
-    case 'b2c':
-      return 'Utilisateur';
-    case 'manager':
-      return 'Manager';
-    case 'wellbeing_manager':
-      return 'Responsable bien-être';
-    case 'coach':
-      return 'Coach';
-    case 'employee':
-      return 'Employé';
-    case 'moderator':
-      return 'Modérateur';
-    default:
-      return 'Utilisateur';
-  }
-};
-
-/**
- * Validates if a string is a valid UserRole
- */
-export const isValidRole = (role: string): role is UserRole => {
-  return ['user', 'admin', 'manager', 'wellbeing_manager', 'coach', 'employee', 'b2c', 'b2b_user', 'b2b_admin', 'moderator'].includes(role as UserRole);
-};
+}

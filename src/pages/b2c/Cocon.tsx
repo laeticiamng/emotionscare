@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { BellRing, Heart, MessageCircle, Share, Users } from 'lucide-react';
 
 const B2CCocon: React.FC = () => {
@@ -12,7 +13,7 @@ const B2CCocon: React.FC = () => {
     <div className="container mx-auto py-6">
       <h1 className="text-3xl font-bold mb-6">Cocon social</h1>
       <p className="text-muted-foreground mb-4">
-        Un espace social positif où partager vos émotions et échanger avec d'autres utilisateurs
+        Un espace social positif et bienveillant pour échanger sur votre bien-être émotionnel
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
@@ -21,7 +22,7 @@ const B2CCocon: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Mon espace</CardTitle>
-              <CardDescription>Gérez vos interactions sociales</CardDescription>
+              <CardDescription>Votre vie sociale émotionnelle</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-4">
@@ -43,15 +44,6 @@ const B2CCocon: React.FC = () => {
                   <p className="text-xs text-muted-foreground">2 nouvelles interactions</p>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <Users className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Mes cercles</p>
-                  <p className="text-xs text-muted-foreground">3 cercles actifs</p>
-                </div>
-              </div>
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full">Voir mon profil</Button>
@@ -60,18 +52,18 @@ const B2CCocon: React.FC = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Cercles suggérés</CardTitle>
+              <CardTitle>Groupes suggérés</CardTitle>
               <CardDescription>Basés sur vos intérêts</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
-                    <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Users className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">Méditation quotidienne</p>
-                    <p className="text-xs text-muted-foreground">128 membres</p>
+                    <p className="text-xs text-muted-foreground">34 membres</p>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm">Rejoindre</Button>
@@ -82,11 +74,30 @@ const B2CCocon: React.FC = () => {
                     <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Bien-être au quotidien</p>
-                    <p className="text-xs text-muted-foreground">85 membres</p>
+                    <p className="text-sm font-medium">Gestion du stress</p>
+                    <p className="text-xs text-muted-foreground">28 membres</p>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm">Rejoindre</Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Événements à venir</CardTitle>
+              <CardDescription>Recommandés pour vous</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="bg-primary/5 p-3 rounded-lg">
+                <p className="text-sm font-medium">Atelier bien-être</p>
+                <p className="text-xs text-muted-foreground">Samedi, 15h-16h, En ligne</p>
+                <Badge className="mt-2" variant="outline">Virtuel</Badge>
+              </div>
+              <div className="bg-purple-50 dark:bg-purple-900/10 p-3 rounded-lg">
+                <p className="text-sm font-medium">Séance de méditation</p>
+                <p className="text-xs text-muted-foreground">Dimanche, 10h-11h</p>
+                <Badge className="mt-2" variant="outline">Virtuel</Badge>
               </div>
             </CardContent>
           </Card>
@@ -97,7 +108,7 @@ const B2CCocon: React.FC = () => {
           <Card>
             <CardContent className="pt-6">
               <Textarea 
-                placeholder="Partagez une pensée positive ou un moment qui vous a fait du bien aujourd'hui..." 
+                placeholder="Partagez une pensée positive ou une expérience qui vous a apporté du bien-être..." 
                 className="min-h-20 mb-3"
               />
               <div className="flex justify-between items-center">
@@ -117,29 +128,28 @@ const B2CCocon: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <Avatar>
                     <AvatarImage src="/avatar-1.jpg" alt="@marie" />
-                    <AvatarFallback>MA</AvatarFallback>
+                    <AvatarFallback>MR</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">Marie A.</p>
-                    <p className="text-xs text-muted-foreground">Il y a 2 heures</p>
+                    <p className="font-medium">Marie R.</p>
+                    <p className="text-xs text-muted-foreground">Il y a 3 heures</p>
                   </div>
                 </div>
                 <div className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs rounded-full">
-                  Sérénité
+                  Satisfaction
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="mb-3">J'ai essayé la méditation guidée ce matin, et je me sens vraiment plus calme pour commencer la journée. Quelqu'un d'autre pratique cela régulièrement?</p>
-              <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWVkaXRhdGlvbnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" alt="Méditation" className="rounded-lg w-full h-48 object-cover" />
+              <p className="mb-3">Aujourd'hui, j'ai pris 10 minutes pour méditer avant de commencer ma journée et cela a fait une énorme différence ! Je me sens plus sereine et concentrée. Quelqu'un d'autre pratique la méditation matinale ?</p>
             </CardContent>
             <CardFooter className="flex justify-between">
               <div className="flex space-x-4">
                 <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                  <Heart className="h-4 w-4" /> 24
+                  <Heart className="h-4 w-4" /> 12
                 </Button>
                 <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4" /> 8
+                  <MessageCircle className="h-4 w-4" /> 5
                 </Button>
               </div>
               <Button variant="ghost" size="sm" className="flex items-center gap-1">
@@ -155,28 +165,28 @@ const B2CCocon: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <Avatar>
                     <AvatarImage src="/avatar-2.jpg" alt="@thomas" />
-                    <AvatarFallback>TD</AvatarFallback>
+                    <AvatarFallback>TM</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-medium">Thomas D.</p>
-                    <p className="text-xs text-muted-foreground">Il y a 5 heures</p>
+                    <p className="font-medium">Thomas M.</p>
+                    <p className="text-xs text-muted-foreground">Il y a 1 jour</p>
                   </div>
                 </div>
                 <div className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">
-                  Inspiration
+                  Conseil
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <p>Petite citation qui m'a beaucoup aidé aujourd'hui: "Les émotions sont comme des vagues, nous ne pouvons pas les arrêter, mais nous pouvons apprendre à surfer dessus."</p>
+              <p>J'ai découvert une technique de respiration qui m'aide beaucoup contre l'anxiété : inspirer sur 4 temps, tenir sur 4 temps, expirer sur 6 temps. À essayer si vous vous sentez stressé !</p>
             </CardContent>
             <CardFooter className="flex justify-between">
               <div className="flex space-x-4">
                 <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                  <Heart className="h-4 w-4" /> 42
+                  <Heart className="h-4 w-4" /> 18
                 </Button>
                 <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4" /> 12
+                  <MessageCircle className="h-4 w-4" /> 7
                 </Button>
               </div>
               <Button variant="ghost" size="sm" className="flex items-center gap-1">
