@@ -65,13 +65,13 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   const { userMode: contextUserMode } = useUserMode();
   const { user } = useAuth();
   
-  // Convert personal to b2c for backwards compatibility
-  const normalizedUserMode = userMode === 'personal' ? 'b2c' as UserRole : userMode;
+  // Use provided userMode or fallback to context
+  const effectiveUserMode = userMode || contextUserMode;
   
   // Update comparisons to match normalized userMode
-  const isB2BUser = normalizedUserMode === 'b2b-user' || normalizedUserMode === 'b2b_user';
-  const isB2BAdmin = normalizedUserMode === 'b2b-admin' || normalizedUserMode === 'b2b_admin';
-  const isB2C = normalizedUserMode === 'b2c';
+  const isB2BUser = effectiveUserMode === 'b2b-user' || effectiveUserMode === 'b2b_user';
+  const isB2BAdmin = effectiveUserMode === 'b2b-admin' || effectiveUserMode === 'b2b_admin';
+  const isB2C = effectiveUserMode === 'b2c';
   const isAdmin = user ? isAdminRole(user.role) : false;
   
   // Render different dashboard based on user mode

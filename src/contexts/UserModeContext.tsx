@@ -1,11 +1,11 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserModeType, UserModeContextType } from '@/types';
+import { UserRole, UserModeContextType } from '@/types';
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType>('b2c');
+  const [userMode, setUserMode] = useState<UserRole>('b2c');
   const [isLoading, setIsLoading] = useState(false);
 
   return (

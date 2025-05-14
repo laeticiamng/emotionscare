@@ -1,6 +1,6 @@
 
 // ————————————————————————
-// UserRole
+// UserRole and UserModeType
 // ————————————————————————
 export type UserRole = 
   | 'b2c' 
@@ -107,6 +107,7 @@ export interface EmotionResult {
   feedback?: string;
   timestamp?: string;
   name?: string; // Added for compatibility
+  anxiety?: number; // Added for mockEmotions.ts compatibility
 }
 
 // Add EnhancedEmotionResult for backward compatibility
@@ -190,8 +191,14 @@ export interface MusicContextType {
   nextTrack: () => void;
   previousTrack: () => void;
   
+  // Backward compatibility
+  play?: (track: MusicTrack) => void;
+  pause?: () => void;
+  resumeTrack?: () => void;
+  
   // Drawer control
   setOpenDrawer: (open: boolean) => void;
+  openDrawer?: boolean;
   
   // Track & playlist state
   tracks: MusicTrack[];
@@ -217,6 +224,11 @@ export interface MusicContextType {
   error?: string | null;
   isPlaying?: boolean;
   loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  
+  // Metadata
+  currentTrackDuration?: number;
+  currentTime?: number;
+  loading?: boolean;
 }
 
 // ————————————————————————
@@ -243,6 +255,7 @@ export interface VRSessionTemplate {
   tags?: string[];
   theme?: string;
   preview_url?: string;
+  type?: string; // Added for mockVRTemplates.ts compatibility
 }
 
 export interface VRSession {
@@ -284,8 +297,20 @@ export interface VRHistoryListProps {
   onItemClick?: (session: VRSession) => void;
 }
 
+export interface VRTemplateDetailProps {
+  template: VRSessionTemplate;
+  onStartSession: () => void;
+  onBack: () => void;
+  heartRate?: number;
+}
+
 export interface VoiceEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+}
+
+export interface TeamOverviewProps {
+  users: Partial<User>[];
+  onUserClick?: (userId: string) => void;
 }
 
 // ————————————————————————

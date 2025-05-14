@@ -1,14 +1,13 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
 import './index.css';
 import './styles/branding.css';
 import './styles/modals.css';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { MusicProvider } from './contexts/MusicContext';
 import { Toaster } from './components/ui/toaster';
-import ErrorBoundary from './components/ErrorBoundary.tsx';
+import ErrorBoundary from './components/ErrorBoundary';
 import { SoundscapeProvider } from './providers/SoundscapeProvider';
 import { StorytellingProvider } from './providers/StorytellingProvider';
 import { BrandingProvider } from './contexts/BrandingContext';

@@ -1,6 +1,6 @@
 
 import { useContext } from 'react';
-import { ThemeContext } from '@/contexts/ThemeContext';
+import { ThemeContext, useTheme as useThemeOriginal } from '@/contexts/ThemeContext';
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
@@ -9,3 +9,6 @@ export const useTheme = () => {
   }
   return context;
 };
+
+// Re-export the hook from ThemeContext for backward compatibility
+export { useThemeOriginal };

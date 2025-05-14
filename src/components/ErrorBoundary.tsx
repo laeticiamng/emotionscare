@@ -1,52 +1,97 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
 
 interface Props {
   children: ReactNode;
-  fallback?: ReactNode;
 }
 
 interface State {
   hasError: boolean;
   error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
+export default class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null
+    };
+  }
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
+    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('Uncaught error:', error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    // Log the error to an error reporting service
+    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    this.setState({
+      error,
+      errorInfo
+    });
   }
-  
-  public resetError = () => {
-    this.setState({ hasError: false, error: null });
-    window.location.href = '/';
-  };
 
-  public render(): ReactNode {
+  render(): ReactNode {
     if (this.state.hasError) {
-      return this.props.fallback || (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          <div className="bg-card p-8 rounded-lg shadow-lg max-w-lg w-full text-center">
-            <h2 className="text-2xl font-bold mb-4">Oups ! Une erreur est survenue</h2>
-            <p className="mb-6 text-muted-foreground">{this.state.error?.message || "Une erreur inattendue est survenue dans l'application."}</p>
-            <div className="flex flex-col space-y-2">
-              <Button variant="destructive" onClick={() => window.location.reload()}>
-                Recharger la page
-              </Button>
-              <Button variant="outline" onClick={this.resetError}>
-                Retour à la page d'accueil
-              </Button>
-            </div>
-          </div>
+      // You can render any custom fallback UI
+      return (
+        <div style={{ 
+          padding: '20px', 
+          margin: '20px', 
+          borderRadius: '8px',
+          border: '1px solid #EF4444', 
+          backgroundColor: '#FEF2F2',
+          color: '#B91C1C'
+        }}>
+          <h1 style={{ margin: '0 0 16px 0' }}>Une erreur est survenue</h1>
+          <p>L'application a rencontré une erreur inattendue.</p>
+          
+          <details style={{ 
+            marginTop: '16px', 
+            padding: '12px',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #E5E7EB',
+            borderRadius: '6px'
+          }}>
+            <summary style={{ 
+              fontWeight: 'bold', 
+              cursor: 'pointer',
+              marginBottom: '8px'
+            }}>
+              Détails techniques
+            </summary>
+            <p style={{ fontFamily: 'monospace', margin: '8px 0' }}>
+              {this.state.error && this.state.error.toString()}
+            </p>
+            <pre style={{ 
+              padding: '12px',
+              overflow: 'auto',
+              backgroundColor: '#F3F4F6',
+              borderRadius: '4px',
+              fontSize: '14px'
+            }}>
+              {this.state.errorInfo && this.state.errorInfo.componentStack}
+            </pre>
+          </details>
+          
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: '16px',
+              padding: '8px 16px',
+              backgroundColor: '#2563EB',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Recharger la page
+          </button>
         </div>
       );
     }
@@ -54,5 +99,3 @@ class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
-
-export default ErrorBoundary;
