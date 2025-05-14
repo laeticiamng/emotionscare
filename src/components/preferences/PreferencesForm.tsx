@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { UserPreferences } from '@/types';
+import { UserPreferences } from '@/types/types';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
@@ -37,14 +37,12 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
     }
   };
 
-  // Get notifications object or create default
-  const notificationsObj = typeof formData.notifications === 'object'
-    ? formData.notifications
-    : { 
-        enabled: !!formData.notifications, 
-        emailEnabled: false, 
-        pushEnabled: false 
-      };
+  // Create notifications object if it doesn't exist
+  const notificationsObj = formData.notifications || { 
+    enabled: !!formData.notifications_enabled, 
+    emailEnabled: false, 
+    pushEnabled: false 
+  };
   
   return (
     <form onSubmit={handleSave}>
@@ -55,12 +53,13 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
               <label className="block font-medium">Thème</label>
               <select
                 className="w-full border rounded p-2"
-                value={formData.theme as string}
+                value={(formData.theme as string) || 'light'}
                 onChange={(e) => handleChange('theme', e.target.value)}
               >
                 <option value="light">Clair</option>
                 <option value="dark">Sombre</option>
                 <option value="system">Système</option>
+                <option value="pastel">Pastel</option>
               </select>
             </div>
             
@@ -68,7 +67,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
               <label className="block font-medium">Taille de police</label>
               <select
                 className="w-full border rounded p-2"
-                value={formData.fontSize as string}
+                value={(formData.fontSize as string) || 'medium'}
                 onChange={(e) => handleChange('fontSize', e.target.value)}
               >
                 <option value="small">Petite</option>

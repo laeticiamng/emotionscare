@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
-import type { Emotion } from '@/types';
+import { Emotion } from '@/types/types';
 
 interface EmotionFeedbackProps {
   emotion: Emotion | null;

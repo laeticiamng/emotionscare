@@ -1,8 +1,3 @@
 
-// Exporte tous les types de types.ts
+// Export all types from the types.ts file
 export * from './types';
-export * from './theme';
-export * from './branding';
-export * from './userMode';
-export * from './vr';
-export * from './emotion';

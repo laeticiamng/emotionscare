@@ -2,7 +2,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Emotion } from '@/types';
+import { Emotion } from '@/types/types';
 
 export interface EmotionTrendChartProps {
   emotions: Emotion[];
@@ -26,8 +26,8 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ emotions, loading
   // Format data for the chart, using date field directly since timestamp and created_at are not guaranteed
   const chartData = emotions.slice(-30).map(emotion => ({
     date: new Date(emotion.date || Date.now()).toLocaleDateString(),
-    score: emotion.score,
-    emotion: emotion.emotion,
+    score: emotion.score || 0,
+    emotion: emotion.emotion || 'unknown',
   }));
   
   return (

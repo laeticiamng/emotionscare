@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Emotion } from '@/types';
+import { Emotion } from '@/types/types';
 
 interface EnhancedEmotionAnalysisProps {
   emotion: string | Emotion;
@@ -20,7 +21,7 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
 }) => {
   // Handle emotion being either a string or an Emotion object
   const emotionName = typeof emotion === 'string' ? emotion : emotion.emotion || 'unknown';
-  const emotionScore = score || (typeof emotion !== 'string' ? emotion.score : 0);
+  const emotionScore = score || (typeof emotion !== 'string' ? emotion.score || 0 : 0);
   const confidenceValue = confidence || (typeof emotion !== 'string' && emotion.confidence ? emotion.confidence : 0.8);
   
   return (

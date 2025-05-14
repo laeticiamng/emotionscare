@@ -1,3 +1,4 @@
+
 // ————————————————————————
 // UserRole
 // ————————————————————————
@@ -14,11 +15,13 @@ export interface User {
   created_at: string;
   preferences: UserPreferences;
   avatar_url?: string;
+  avatar?: string;
   onboarded?: boolean;
   department?: string;
   position?: string;
   anonymity_code?: string;
   emotional_score?: number;
+  joined_at?: string;
 }
 
 export interface UserData extends User {
@@ -32,11 +35,18 @@ export interface UserData extends User {
 // ————————————————————————
 export interface UserPreferences {
   privacy?: 'public' | 'private' | 'team';
+  profileVisibility?: 'public' | 'private' | 'team';
   notifications_enabled?: boolean;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   aiSuggestions?: boolean;
   emotionalCamouflage?: boolean;
+  language?: string;
+  notifications?: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+  };
 }
 
 // ————————————————————————
@@ -59,7 +69,26 @@ export interface EmotionalTeamViewProps {
 // ————————————————————————
 // Emotion
 // ————————————————————————
-export interface EmotionResult {
+export interface Emotion {
+  id?: string;
+  emotion: string;
+  score?: number;
+  confidence?: number;
+  intensity?: number;
+  transcript?: string;
+  date?: string;
+  emojis?: string[];
+  ai_feedback?: string;
+  recommendations?: string[];
+  category?: string;
+  audio_url?: string;
+  text?: string;
+  user_id?: string;
+  dominantEmotion?: string;
+}
+
+export interface EmotionResult extends Emotion {
+  id?: string;
   emotion: string;
   confidence: number;
   intensity?: number;
@@ -70,7 +99,14 @@ export interface EmotionResult {
   recommendations?: string[];
   category?: string;
   audio_url?: string;
-  dominantEmotion?: string; // Ajouté pour utilisation dans VoiceEmotionAnalyzer
+  dominantEmotion?: string;
+  text?: string;
+  user_id?: string;
+  score?: number;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  // Additional fields for enhanced results
 }
 
 // ————————————————————————
@@ -142,6 +178,39 @@ export interface ProgressBarProps {
   showTimestamps?: boolean;
 }
 
+export interface MusicContextType {
+  // Playback control
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  
+  // Drawer control
+  setOpenDrawer: (open: boolean) => void;
+  
+  // Track & playlist state
+  tracks: MusicTrack[];
+  currentTrack: MusicTrack | null;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => void;
+  
+  // Emotion-based recommendation
+  currentEmotion: string;
+  setEmotion: (emotion: string) => void;
+  
+  // Volume & mute control
+  isMuted: boolean;
+  toggleMute: () => void;
+  adjustVolume: (value: number) => void;
+  
+  // System state
+  isInitialized: boolean;
+  initializeMusicSystem: () => void;
+  error?: string | null;
+  isPlaying?: boolean; // Ajouté pour corriger les erreurs
+}
+
 // ————————————————————————
 // VR
 // ————————————————————————
@@ -163,7 +232,7 @@ export interface VRSessionTemplate {
   emotions?: string[];
   benefits?: string[];
   difficulty?: string;
-  tags?: string[]; // Ajouté pour UserDashboardSections
+  tags?: string[];
   theme?: string;
   preview_url?: string;
 }
@@ -199,6 +268,13 @@ export interface VRSessionWithMusicProps {
   templateId?: string;
 }
 
+export interface VRHistoryListProps {
+  userId?: string;
+  limit?: number;
+  showLoadMore?: boolean;
+  onItemClick?: (session: VRSession) => void;
+}
+
 export interface VoiceEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
 }
@@ -211,13 +287,14 @@ export type Json = string | number | boolean | null | Json[] | { [key: string]: 
 // ————————————————————————
 // ThemeContext
 // ————————————————————————
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
-export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
-export type ThemeName = 'light' | 'dark' | 'system';
+export type FontFamily = 'system' | 'sans-serif' | 'serif' | 'mono' | 'rounded' | 'inter';
+export type FontSize = 'small' | 'medium' | 'large' | 'extra-large' | 'sm' | 'md' | 'lg' | 'xl';
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export interface ThemeContextType {
-  theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
   fontFamily: FontFamily;
   setFontFamily: (font: FontFamily) => void;
@@ -233,4 +310,28 @@ export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team
 export interface UserMode {
   mode: UserModeType;
   setMode: (mode: UserModeType) => void;
+}
+
+// ————————————————————————
+// Notification
+// ————————————————————————
+export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never';
+export type NotificationType = 'emotion' | 'journal' | 'vr' | 'system';
+export type NotificationTone = 'neutral' | 'positive' | 'negative';
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  tone?: NotificationTone;
+  read: boolean;
+  created_at: string;
+  action_url?: string;
+}
+
+export interface NotificationPreference {
+  type: NotificationType;
+  enabled: boolean;
+  frequency: NotificationFrequency;
 }

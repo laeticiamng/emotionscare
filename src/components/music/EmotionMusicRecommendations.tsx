@@ -1,12 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { MusicPlaylist, MusicTrack, Emotion } from '@/types/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Emotion } from '@/types/emotion';
-import { useMusic } from '@/contexts/MusicContext';
 import { Music, Activity } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import TrackList from './TrackList';
+import { useMusic } from '@/contexts/MusicContext';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
