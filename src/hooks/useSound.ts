@@ -4,34 +4,45 @@ import { useEffect, useState, useCallback } from 'react';
 interface UseSoundOptions {
   volume?: number;
   interrupt?: boolean;
+  autoPlay?: boolean;
 }
 
 const useSound = (
   soundUrl: string, 
-  { volume = 0.5, interrupt = true }: UseSoundOptions = {}
+  { volume = 0.5, interrupt = true, autoPlay = false }: UseSoundOptions = {}
 ) => {
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   
   useEffect(() => {
-    // Create audio element but don't load it yet
-    const audioElement = new Audio();
+    // Create audio element
+    const audioElement = new Audio(soundUrl);
     audioElement.volume = volume;
-    audioElement.preload = 'none';
+    audioElement.preload = 'auto';
     setAudio(audioElement);
+    
+    if (autoPlay) {
+      audioElement.play().catch(e => {
+        // Handle autoplay restrictions gracefully
+        console.log('Audio autoplay prevented:', e);
+      });
+    }
+    
+    audioElement.addEventListener('playing', () => setIsPlaying(true));
+    audioElement.addEventListener('pause', () => setIsPlaying(false));
+    audioElement.addEventListener('ended', () => setIsPlaying(false));
     
     return () => {
       audioElement.pause();
       audioElement.src = '';
+      audioElement.removeEventListener('playing', () => setIsPlaying(true));
+      audioElement.removeEventListener('pause', () => setIsPlaying(false));
+      audioElement.removeEventListener('ended', () => setIsPlaying(false));
     };
-  }, [soundUrl, volume]);
+  }, [soundUrl, volume, autoPlay]);
   
   const play = useCallback(() => {
     if (!audio) return;
-    
-    // Set the source only when playing to avoid unnecessary network requests
-    if (audio.src !== soundUrl) {
-      audio.src = soundUrl;
-    }
     
     if (interrupt || audio.paused) {
       // Either interrupt current playback or only play if paused
@@ -41,7 +52,12 @@ const useSound = (
         console.log('Audio play prevented:', e);
       });
     }
-  }, [audio, soundUrl, interrupt]);
+  }, [audio, interrupt]);
+  
+  const pause = useCallback(() => {
+    if (!audio) return;
+    audio.pause();
+  }, [audio]);
   
   const stop = useCallback(() => {
     if (!audio) return;
@@ -49,7 +65,12 @@ const useSound = (
     audio.currentTime = 0;
   }, [audio]);
   
-  return { play, stop };
+  const setVolume = useCallback((newVolume: number) => {
+    if (!audio) return;
+    audio.volume = Math.max(0, Math.min(1, newVolume));
+  }, [audio]);
+  
+  return { play, pause, stop, setVolume, isPlaying };
 };
 
 export default useSound;

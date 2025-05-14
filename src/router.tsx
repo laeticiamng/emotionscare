@@ -50,7 +50,7 @@ import B2BAdminEvents from '@/pages/b2b/admin/Events';
 import B2BAdminSettings from '@/pages/b2b/admin/Settings';
 
 export const router = createBrowserRouter([
-  // Root route
+  // Root route - Immersive Homepage
   {
     path: '/',
     element: <Home />,
@@ -219,3 +219,4 @@ export const router = createBrowserRouter([
     element: <NotFound /> 
   },
 ]);
+

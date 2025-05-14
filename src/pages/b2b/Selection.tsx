@@ -1,87 +1,72 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import Shell from '@/Shell';
+import { User, Building } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function SelectionEntreprise() {
   const navigate = useNavigate();
   
+  const navigateToUserLogin = () => {
+    navigate('/b2b/user/login');
+  };
+  
+  const navigateToAdminLogin = () => {
+    navigate('/b2b/admin/login');
+  };
+
   return (
-    <Shell>
-      <div className="container mx-auto py-12 px-4">
-        <div className="max-w-3xl mx-auto text-center mb-10">
-          <h1 className="text-3xl font-bold mb-3">Bienvenue dans EmotionsCare Entreprise</h1>
-          <p className="text-xl text-muted-foreground">Qui êtes-vous ?</p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          <Card className="shadow-md hover:shadow-lg transition-shadow border-blue-200 dark:border-blue-900">
-            <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/20">
-                  <User className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-              <CardTitle>Collaborateur</CardTitle>
-              <CardDescription>
-                Accédez à votre espace de bien-être personnel au travail
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-sm text-muted-foreground mb-6">
-                Suivi émotionnel, musicothérapie adaptée, coaching IA et scan émotionnel quotidien
-              </p>
-            </CardContent>
-            <CardFooter className="flex justify-center">
-              <Button 
-                onClick={() => navigate('/b2b/user/login')} 
-                size="lg" 
-                className="w-full"
-              >
-                Je suis un collaborateur
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          <Card className="shadow-md hover:shadow-lg transition-shadow border-purple-200 dark:border-purple-900">
-            <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-full bg-purple-100 dark:bg-purple-900/20">
-                  <Users className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                </div>
-              </div>
-              <CardTitle>RH / Manager</CardTitle>
-              <CardDescription>
-                Pilotez le bien-être émotionnel de vos équipes
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-sm text-muted-foreground mb-6">
-                Tableau de bord collectif, signaux faibles, organisation d'activités et analytics
-              </p>
-            </CardContent>
-            <CardFooter className="flex justify-center">
-              <Button 
-                onClick={() => navigate('/b2b/admin/login')} 
-                variant="outline"
-                size="lg"
-                className="w-full border-purple-200 dark:border-purple-800"
-              >
-                Je suis RH ou manager
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-        
-        <div className="text-center mt-8">
-          <Button variant="ghost" onClick={() => navigate('/')}>
-            Retour à l'accueil
-          </Button>
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 dark:from-blue-900/20 dark:via-indigo-900/10 dark:to-blue-900/30">
+      <div className="container max-w-6xl z-10 relative">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-500">
+            Bienvenue dans EmotionsCare Entreprise
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Choisissez votre profil pour accéder à l'espace adapté
+          </p>
+        </motion.div>
+
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <motion.div whileHover={{ scale: 1.03 }}>
+            <Button 
+              onClick={navigateToUserLogin}
+              size="lg" 
+              className="w-full py-10 text-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-blue-500/90 to-blue-600/80"
+            >
+              <User className="mr-3 h-6 w-6" /> Je suis un collaborateur
+            </Button>
+          </motion.div>
+
+          <motion.div whileHover={{ scale: 1.03 }}>
+            <Button 
+              onClick={navigateToAdminLogin}
+              variant="outline" 
+              size="lg"
+              className="w-full py-10 text-lg shadow border-2 border-blue-300/50 hover:border-blue-400/80 hover:shadow-xl transition-all duration-300"
+            >
+              <Building className="mr-3 h-6 w-6" /> Je suis RH ou manager
+            </Button>
+          </motion.div>
+        </motion.div>
       </div>
-    </Shell>
+      
+      {/* Ambient background blur */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl"></div>
+      </div>
+    </div>
   );
 }

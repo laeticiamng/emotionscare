@@ -1,24 +1,24 @@
 
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import MainNavbar from './components/navigation/MainNavbar';
-import MainFooter from './components/navigation/MainFooter';
+import React, { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 
-// Define the props interface correctly
 interface ShellProps {
-  children?: React.ReactNode;
+  children: ReactNode;
 }
 
 const Shell: React.FC<ShellProps> = ({ children }) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  // Pour la page d'accueil immersive, n'appliquons pas de conteneur ou de styles supplémentaires
+  if (isHomePage) {
+    return <>{children}</>;
+  }
+
+  // Pour les autres pages, conservons le Shell existant
   return (
-    <div className="flex flex-col min-h-screen">
-      <MainNavbar />
-
-      <main className="flex-1 bg-gradient-to-b from-background to-muted/20">
-        {children || <Outlet />}
-      </main>
-
-      <MainFooter />
+    <div className="min-h-screen bg-background">
+      {children}
     </div>
   );
 };

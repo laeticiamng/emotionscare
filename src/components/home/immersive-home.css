@@ -1,0 +1,105 @@
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(-15px) translateX(5px);
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+}
+
+@keyframes float-reverse {
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+  50% {
+    transform: translateY(15px) translateX(-5px);
+  }
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(var(--primary-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0);
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-reverse-animation {
+  animation: float-reverse 7s ease-in-out infinite;
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Background ambiance styles */
+.bg-morning {
+  background-image: linear-gradient(135deg, rgba(246,249,252,1) 0%, rgba(233,243,255,1) 100%);
+}
+
+.dark .bg-morning {
+  background-image: linear-gradient(135deg, rgba(30,41,59,1) 0%, rgba(28,52,86,1) 100%);
+}
+
+.bg-afternoon {
+  background-image: linear-gradient(135deg, rgba(242,252,255,1) 0%, rgba(236,253,245,1) 100%);
+}
+
+.dark .bg-afternoon {
+  background-image: linear-gradient(135deg, rgba(26,41,52,1) 0%, rgba(21,48,44,1) 100%);
+}
+
+.bg-evening {
+  background-image: linear-gradient(135deg, rgba(237,233,254,1) 0%, rgba(228,233,255,1) 100%);
+}
+
+.dark .bg-evening {
+  background-image: linear-gradient(135deg, rgba(38,32,64,1) 0%, rgba(30,35,60,1) 100%);
+}
+
+/* Button hover effects */
+.immersive-button {
+  transition: all 0.3s ease;
+}
+
+.immersive-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px -5px rgba(var(--primary-rgb), 0.3);
+}
+
+/* iOS-like blur effect */
+.blur-backdrop {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Text gradient animation */
+.animated-gradient-text {
+  background-size: 200% auto;
+  background-image: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 50%, var(--primary) 100%);
+  animation: shine 3s linear infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
