@@ -1,23 +1,11 @@
 
 import * as React from "react";
-import { 
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-  ToastAction
-} from "@/components/ui/toast";
-import {
-  type ToastActionElement,
-  type ToastProps,
-} from "@/components/ui/toast";
+import { Toast, ToastActionElement } from "@/types/toast";
 
 const TOAST_LIMIT = 5;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ToasterToast = ToastProps & {
+type ToasterToast = Toast & {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
@@ -80,7 +68,7 @@ const addToRemoveQueue = (toastId: string) => {
   toastTimeouts.set(toastId, timeout);
 };
 
-export const reducer = (state: State, action: Action): State => {
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case actionTypes.ADD_TOAST:
       return {
