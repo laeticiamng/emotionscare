@@ -1,24 +1,12 @@
 
-export interface VRSession {
-  id: string;
-  userId: string;
-  templateId: string;
-  startDate: Date | string;
-  duration: number;
-  completed: boolean;
-  emotion?: string;
-  template?: VRSessionTemplate; // Added for compatibility
-}
-
 export interface VRSessionTemplate {
   id?: string;
-  name?: string;
-  title?: string;
-  theme?: string;
+  title: string;
+  name?: string; // For backward compatibility
+  description?: string;
   duration: number;
   audio_url?: string;
   videoUrl?: string;
-  preview_url?: string;
   emotion_target?: string;
   emotion?: string;
   is_audio_only?: boolean;
@@ -26,27 +14,48 @@ export interface VRSessionTemplate {
   completion_rate?: number;
   recommended_mood?: string;
   templateId?: string;
-  description?: string;
+  emotions?: string[];
+  benefits?: string[];
+  difficulty?: string;
+  tags?: string[]; // Added for UserDashboardSections
+  theme?: string;
+  preview_url?: string;
+}
+
+export interface VRSession {
+  id: string;
+  userId?: string;
+  templateId?: string;
+  date?: string;
+  startDate?: string;
+  startedAt?: string;
+  startTime?: string;
+  endTime?: string;
+  duration?: number;
+  duration_seconds?: number;
+  is_audio_only?: boolean;
+  completed?: boolean;
+  isCompleted?: boolean;
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+}
+
+export interface VRHistoryListProps {
+  userId: string;
+  limit?: number;
+  showHeading?: boolean;
+  className?: string;
 }
 
 export interface VRSessionWithMusicProps {
+  session?: VRSessionTemplate;
   template?: VRSessionTemplate;
-  session?: { 
-    template?: VRSessionTemplate;
-    templateId?: string;
-  };
-  onComplete?: () => void;
   onSessionComplete?: () => void;
+  onComplete?: () => void;
   isAudioOnly?: boolean;
   videoUrl?: string;
   audioUrl?: string;
   emotion?: string;
   sessionId?: string;
   templateId?: string;
-}
-
-export interface VRHistoryListProps {
-  userId: string;
-  limit?: number;
-  onSessionSelect?: (session: VRSession) => void;
 }

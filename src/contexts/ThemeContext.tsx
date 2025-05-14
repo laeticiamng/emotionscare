@@ -1,21 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// Types de thème
-export type Theme = 'light' | 'dark' | 'system';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
-export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
-
-// Interface du contexte de thème
-export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  isDarkMode: boolean;
-  fontFamily: FontFamily;
-  fontSize: FontSize;
-  setFontFamily: (font: FontFamily) => void;
-  setFontSize: (size: FontSize) => void;
-}
+import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
 
 // Création du contexte
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -23,7 +8,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
   const [fontFamily, setFontFamily] = useState<FontFamily>('system');
-  const [fontSize, setFontSize] = useState<FontSize>('md');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   // Effet pour vérifier la préférence utilisateur
@@ -31,7 +16,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Vérifier la préférence de thème dans localStorage
     const storedTheme = localStorage.getItem('theme') as Theme | null;
     
-    if (storedTheme === 'dark' || storedTheme === 'light') {
+    if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'pastel') {
       setTheme(storedTheme);
       setIsDarkMode(storedTheme === 'dark');
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -84,19 +69,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Helpers pour obtenir les valeurs CSS
   const getFontFamilyValue = (family: FontFamily): string => {
     switch (family) {
-      case 'sans': return 'ui-sans-serif, system-ui, sans-serif';
+      case 'sans-serif': return 'ui-sans-serif, system-ui, sans-serif';
       case 'serif': return 'ui-serif, Georgia, serif';
       case 'mono': return 'ui-monospace, SFMono-Regular, monospace';
+      case 'rounded': return 'ui-rounded, system-ui, sans-serif';
+      case 'inter': return 'Inter var, system-ui, sans-serif';
       default: return 'Inter var, system-ui, sans-serif';
     }
   };
 
   const getFontSizeValue = (size: FontSize): string => {
     switch (size) {
-      case 'sm': return '0.875rem';
-      case 'lg': return '1.125rem';
-      case 'xl': return '1.25rem';
-      default: return '1rem'; // md
+      case 'small': return '0.875rem';
+      case 'large': return '1.125rem';
+      case 'extra-large': return '1.25rem';
+      default: return '1rem'; // medium
     }
   };
 
@@ -126,3 +113,5 @@ export const useTheme = (): ThemeContextType => {
   
   return context;
 };
+
+export type { Theme, FontFamily, FontSize, ThemeContextType };

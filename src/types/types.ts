@@ -42,7 +42,7 @@ export interface UserPreferences {
 // ————————————————————————
 // Period & TeamView
 // ————————————————————————
-export type Period = 'day' | 'week' | 'month';
+export type Period = 'day' | 'week' | 'month' | 'year' | 'quarter';
 
 export interface EmotionalTeamViewProps {
   userId: string;
@@ -228,7 +228,7 @@ export interface ThemeContextType {
 // ————————————————————————
 // UserMode
 // ————————————————————————
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'b2b-collaborator';
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'b2b-collaborator' | 'anonymous';
 
 export interface UserMode {
   mode: UserModeType;

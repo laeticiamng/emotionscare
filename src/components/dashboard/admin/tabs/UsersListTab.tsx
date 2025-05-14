@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import UsersTableDemo from '../UsersTableDemo';
-import UsersTableWithInfiniteScroll from '../UsersTableWithInfiniteScroll';
+import { UsersTableDemo } from '../UsersTableDemo';
+import { UsersTableWithInfiniteScroll } from '../UsersTableWithInfiniteScroll';
 import PaginationSettings from '../settings/PaginationSettings';
 
 const UsersListTab: React.FC = () => {

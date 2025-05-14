@@ -7,23 +7,22 @@ export type FontFamily =
   | 'serif'
   | 'mono'
   | 'rounded'
-  | string; // Add string to fix type errors
+  | 'sans-serif';
 
 export type FontSize = 
   | 'small' 
   | 'medium' 
   | 'large'
-  | 'extra-large'
-  | string; // Add string to fix type errors
+  | 'extra-large';
 
 export interface ThemePreviewProps {
   theme: Theme;
-  isActive?: boolean; // Added for compatibility
+  isActive?: boolean;
   onClick?: () => void;
 }
 
 export interface ThemeButtonProps {
-  collapsed?: boolean; // Added for compatibility
+  collapsed?: boolean;
 }
 
 export interface AppTheme {
@@ -32,4 +31,14 @@ export interface AppTheme {
   fontSize: FontSize;
   animations: boolean;
   soundEffects: boolean;
+}
+
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  isDarkMode: boolean;
+  fontFamily: FontFamily;
+  fontSize: FontSize;
+  setFontFamily: (font: FontFamily) => void;
+  setFontSize: (size: FontSize) => void;
 }

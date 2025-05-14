@@ -17,10 +17,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
-import { User } from '@/types/types';
+import { User } from '@/types/user';
 
 // Mock data pour team overview
-const mockTeamUsers: User[] = [
+const mockTeamUsers = [
   {
     id: '1',
     name: 'Jane Smith',
@@ -28,7 +28,7 @@ const mockTeamUsers: User[] = [
     emotional_score: 82,
     anonymity_code: 'JS-2022',
     email: 'jane.smith@example.com',
-    role: 'b2b_user',
+    role: 'b2b_user' as const,
     created_at: new Date().toISOString(),
     preferences: {} // Ajouté pour satisfaire le type User
   },
@@ -39,7 +39,7 @@ const mockTeamUsers: User[] = [
     emotional_score: 65,
     anonymity_code: 'JD-2022',
     email: 'john.doe@example.com',
-    role: 'b2b_user',
+    role: 'b2b_user' as const,
     created_at: new Date().toISOString(),
     preferences: {} // Ajouté pour satisfaire le type User
   },
@@ -50,7 +50,7 @@ const mockTeamUsers: User[] = [
     emotional_score: 78,
     anonymity_code: 'AJ-2022',
     email: 'amy.johnson@example.com',
-    role: 'b2b_user',
+    role: 'b2b_user' as const,
     created_at: new Date().toISOString(),
     preferences: {} // Ajouté pour satisfaire le type User
   }

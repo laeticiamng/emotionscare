@@ -4,10 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon, Laptop, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-export interface ThemeButtonProps {
-  collapsed?: boolean;
-}
+import { ThemeButtonProps } from '@/types/theme';
 
 const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed = false }) => {
   const { theme, setTheme } = useTheme();

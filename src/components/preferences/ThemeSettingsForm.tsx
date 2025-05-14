@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { useTheme, Theme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Theme } from '@/types/theme';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import ThemePreview from './ThemePreview';
@@ -43,7 +44,7 @@ const ThemeSettingsForm: React.FC = () => {
         <ThemePreview 
           theme="pastel" 
           isActive={theme === 'pastel'}
-          onClick={() => handleThemeChange('pastel' as Theme)}
+          onClick={() => handleThemeChange('pastel')}
         />
       </div>
       

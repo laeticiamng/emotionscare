@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Check, Sun, Moon, Laptop, Palette } from 'lucide-react';
-import { Theme } from '@/contexts/ThemeContext';
+import { Theme } from '@/types/theme';
 
 interface ThemeColorExampleProps {
   initialTheme?: Theme;

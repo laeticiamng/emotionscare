@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Theme } from '@/contexts/ThemeContext';
+import { Theme } from '@/types/theme';
 import { cn } from '@/lib/utils';
 
 export interface ThemePreviewProps {
