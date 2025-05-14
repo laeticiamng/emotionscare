@@ -1,81 +1,73 @@
 
-import { useState, useEffect } from 'react';
-import { Emotion, MusicTrack } from '@/types';
+import { useState } from 'react';
+import { useMusic } from '@/contexts/MusicContext';
+import { useToast } from '@/hooks/use-toast';
 
-interface MusicRecommendation {
-  trackId: string;
-  title: string;
-  artist: string;
-  url: string;
-  coverUrl: string;
+export interface EmotionMusicParams {
   emotion: string;
   intensity: number;
-  confidence: number;
 }
 
-export const useMusicEmotionIntegration = (emotion?: Emotion | null) => {
-  const [recommendation, setRecommendation] = useState<MusicRecommendation | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+export function useMusicEmotionIntegration() {
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [recommendation, setRecommendation] = useState<any>(null);
+  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
+  const { toast } = useToast();
 
-  useEffect(() => {
-    if (!emotion) return;
-
-    const fetchRecommendation = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Default intensity if not provided
-        const intensityValue = emotion.intensity || 0.5;
-        
-        // Mock music recommendation based on emotion
-        const mockTrack: MusicRecommendation = {
-          trackId: `track-${Date.now()}`,
-          title: getTrackTitleByEmotion(emotion.emotion || 'neutral', intensityValue),
-          artist: "AI Composer",
-          url: "#", // In a real app, this would be an actual audio URL
-          coverUrl: "/images/music-cover.jpg",
-          emotion: emotion.emotion || 'neutral',
-          intensity: intensityValue,
-          confidence: 0.85
-        };
-        
-        setRecommendation(mockTrack);
-      } catch (err: any) {
-        setError(new Error(err.message || 'Failed to get music recommendation'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRecommendation();
-  }, [emotion]);
-
-  return { recommendation, isLoading, error };
-};
-
-// Helper function to generate track titles based on emotion and intensity
-function getTrackTitleByEmotion(emotion: string, intensity: number): string {
-  const intensityLabel = intensity < 0.4 ? "Douce" : intensity > 0.7 ? "Intense" : "Modérée";
-  
-  const emotionTitles: Record<string, string> = {
-    calm: `Sérénité ${intensityLabel}`,
-    happy: `Joie ${intensityLabel}`,
-    sad: `Mélancolie ${intensityLabel}`,
-    angry: `Transformation de Colère ${intensityLabel}`,
-    excited: `Énergie ${intensityLabel}`,
-    focused: `Concentration ${intensityLabel}`,
-    anxious: `Apaisement d'Anxiété ${intensityLabel}`,
-    tired: `Revitalisation ${intensityLabel}`,
-    stressed: `Relaxation Anti-Stress ${intensityLabel}`,
-    neutral: `Équilibre ${intensityLabel}`
+  const emotionDescriptions: Record<string, string> = {
+    happy: "Des mélodies joyeuses et énergisantes pour accompagner votre bonne humeur.",
+    sad: "Des morceaux apaisants pour vous accompagner et vous réconforter.",
+    angry: "De la musique pour canaliser votre énergie et retrouver votre calme.",
+    anxious: "Des sons relaxants qui vous aideront à apaiser votre anxiété.",
+    neutral: "Une ambiance sonore équilibrée pour maintenir votre concentration.",
+    calm: "Des mélodies douces pour préserver votre tranquillité d'esprit.",
+    stressed: "Des morceaux décompressants pour diminuer votre niveau de stress.",
+    excited: "Des rythmes dynamiques qui s'accordent avec votre enthousiasme.",
+    tired: "Des sons apaisants pour vous aider à vous ressourcer.",
+    focused: "De la musique qui favorise votre concentration et productivité."
   };
 
-  return emotionTitles[emotion] || `Harmonie ${intensityLabel}`;
-}
+  const getEmotionMusicDescription = (emotion: string): string => {
+    const normalizedEmotion = emotion.toLowerCase();
+    return emotionDescriptions[normalizedEmotion] || 
+      "Une sélection musicale adaptée à votre état émotionnel actuel.";
+  };
 
-export default useMusicEmotionIntegration;
+  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await loadPlaylistForEmotion(params.emotion);
+      setOpenDrawer(true);
+      
+      toast({
+        title: "Musique activée",
+        description: `Playlist adaptée à votre humeur "${params.emotion}" chargée.`
+      });
+      
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Erreur inconnue'));
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger la playlist",
+        variant: "destructive"
+      });
+      
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    recommendation,
+    isLoading,
+    error,
+    activateMusicForEmotion,
+    getEmotionMusicDescription
+  };
+}

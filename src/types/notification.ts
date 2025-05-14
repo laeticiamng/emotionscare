@@ -1,31 +1,40 @@
 
-// Notification types
-export type NotificationFrequency = 'hourly' | 'daily' | 'weekly' | 'custom';
-export type NotificationType = 'reminder' | 'alert' | 'achievement' | 'suggestion' | 'update';
-export type NotificationTone = 'gentle' | 'neutral' | 'energetic';
+export type NotificationType = 'info' | 'warning' | 'success' | 'error';
+export type NotificationFrequency = 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'default' | 'gentle' | 'energetic' | 'calm';
 
-// Notification interface
 export interface Notification {
   id: string;
-  user_id: string;
-  type: NotificationType;
   title: string;
-  content: string;
-  createdAt: string | Date;
-  read: boolean; // For NotificationsPanel
-  timestamp?: string | Date; // For NotificationsPanel
-  action_url?: string;
+  message: string;
+  type: NotificationType;
+  date?: string;
+  timestamp?: string;
+  createdAt?: string;
+  isRead?: boolean;
+  read?: boolean; // For backward compatibility
+  action?: {
+    type: string;
+    payload?: any;
+    label?: string;
+    url?: string;
+  };
+  user_id?: string;
   priority?: 'low' | 'medium' | 'high';
-  action_label?: string;
-  category?: string;
-  seen?: boolean;
 }
 
-// Notification preference for user settings
 export interface NotificationPreference {
-  type: NotificationType;
-  enabled: boolean; // For PreferencesForm
-  emailEnabled: boolean; // For PreferencesForm
-  pushEnabled: boolean; // For PreferencesForm
+  type: string;
+  enabled: boolean;
   frequency?: NotificationFrequency;
+  time?: string;
+}
+
+export interface NotificationBadge {
+  count: number;
+  badgeCount?: number;
+  notificationsCount?: number;
+  setBadgeCount: (count: number) => void;
+  badgesCount?: number; // For backward compatibility
+  setBadgesCount?: (count: number) => void; // For backward compatibility
 }

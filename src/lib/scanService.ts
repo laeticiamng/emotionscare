@@ -1,69 +1,38 @@
 
-// Implementing missing analyzeAudioStream function for AudioProcessor
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<any> => {
+import { EmotionResult } from '@/types';
+
+export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
   try {
-    // This is a mock implementation - in a real app, this would send the audio to a server for analysis
-    console.log('Analyzing audio stream of size:', audioBlob.size);
+    // In a real implementation, this would send the audio to a server for processing
+    // For now, we'll just mock a response
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate processing time
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Return mock emotion analysis data
-    return {
-      dominantEmotion: ['happy', 'neutral', 'calm', 'focused'][Math.floor(Math.random() * 4)],
-      confidence: 0.75 + Math.random() * 0.2,
-      intensity: 0.5 + Math.random() * 0.4,
+    const mockResult: EmotionResult = {
+      id: crypto.randomUUID(),
+      primaryEmotion: {
+        name: randomEmotion(),
+        score: Math.random() * 100
+      },
+      emotion: randomEmotion(),
+      intensity: Math.random(),
+      score: Math.floor(Math.random() * 100),
+      confidence: 0.7 + Math.random() * 0.3,
+      feedback: "Votre voix révèle un sentiment de calme mêlé à de l'enthousiasme. Je perçois une énergie positive dans votre intonation.",
       recommendations: [
-        'Take a short break',
-        'Listen to calming music',
-        'Practice deep breathing',
-        'Write in your journal'
+        "Prenez un moment pour apprécier cette émotion positive",
+        "Essayez de partager cette énergie avec votre entourage",
+        "Notez ce qui a contribué à cet état émotionnel pour y revenir plus tard"
       ]
     };
+    
+    return mockResult;
   } catch (error) {
-    console.error('Error analyzing audio stream:', error);
-    throw new Error('Failed to analyze audio');
+    console.error("Error analyzing audio:", error);
+    throw new Error("Failed to analyze audio");
   }
-};
+}
 
-export const analyzeText = async (text: string): Promise<any> => {
-  // Mock text analysis
-  console.log('Analyzing text:', text);
-  
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Return mock emotion analysis data
-  return {
-    dominantEmotion: ['happy', 'neutral', 'reflective', 'anxious'][Math.floor(Math.random() * 4)],
-    confidence: 0.8 + Math.random() * 0.15,
-    score: 65 + Math.floor(Math.random() * 30),
-    recommendations: [
-      'Journal about this feeling',
-      'Try a guided meditation',
-      'Connect with a friend',
-      'Take a nature walk'
-    ]
-  };
-};
-
-export const analyzeFacialExpression = async (imageBlob: Blob): Promise<any> => {
-  // Mock facial expression analysis
-  console.log('Analyzing facial expression from image of size:', imageBlob.size);
-  
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1200));
-  
-  // Return mock emotion analysis data
-  return {
-    dominantEmotion: ['happy', 'neutral', 'surprised', 'contemplative'][Math.floor(Math.random() * 4)],
-    confidence: 0.7 + Math.random() * 0.25,
-    intensity: 0.4 + Math.random() * 0.5,
-    recommendations: [
-      'Take a moment to appreciate this emotion',
-      'Share your feelings with someone',
-      'Record this in your emotional journal',
-      'Use this energy for creative activities'
-    ]
-  };
-};
+function randomEmotion(): string {
+  const emotions = ['calm', 'happy', 'focused', 'anxious', 'neutral', 'excited', 'contemplative', 'hopeful'];
+  return emotions[Math.floor(Math.random() * emotions.length)];
+}

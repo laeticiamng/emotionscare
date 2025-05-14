@@ -15,7 +15,8 @@ export interface Emotion {
   audio_url?: string;
   ai_feedback?: string;
   category?: string;
-  confidence?: number; // Added for EmotionScanForm and EnhancedCoachAI
+  confidence?: number;
+  intensity?: number;
 }
 
 // Create a more comprehensive EmotionResult interface
@@ -23,8 +24,11 @@ export interface EmotionResult {
   id?: string;
   user_id?: string;
   date?: string;
-  dominantEmotion?: string; // For EmotionScanner
-  primaryEmotion?: string; // For EnhancedCoachAI
+  dominantEmotion?: string;
+  primaryEmotion?: {
+    name: string;
+    score: number;
+  };
   emotion?: string;
   score?: number;
   intensity?: number;

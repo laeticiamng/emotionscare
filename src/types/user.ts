@@ -10,13 +10,19 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
   avatar_url?: string;
-  department?: string; // For UsersTableDemo & UserDetailView
-  position?: string; // For UserDetailView
-  joined_at?: string; // For UserDetailView
+  avatar?: string; // Added for backward compatibility
+  department?: string;
+  position?: string;
+  joined_at?: string;
+  created_at?: string; // Added for backward compatibility
   team_id?: string;
   company_id?: string;
   last_active?: string;
   status?: 'active' | 'inactive' | 'pending';
+  onboarded?: boolean;
+  preferences?: UserPreferences;
+  emotional_score?: number;
+  anonymity_code?: string;
 }
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
@@ -46,30 +52,35 @@ export interface UserPreferences {
   
   // Notifications
   notificationsEnabled: boolean;
+  notifications_enabled?: boolean; // For backward compatibility
   notificationTypes: {
     journal: boolean;
     breathing: boolean;
     music: boolean;
   };
+  // Added notifications for backward compatibility
+  notifications?: {
+    enabled: boolean;
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+  };
   notificationFrequency: string;
   notificationTone: string;
   reminderTime?: string;
-  
-  // Backwards compatibility
-  notifications_enabled?: boolean;
   reminder_time?: string;
+  
+  // Privacy options
+  privacy?: {
+    shareJournal?: boolean;
+    shareActivity?: boolean;
+    shareEmotions?: boolean;
+    profileVisibility?: 'public' | 'private' | 'team';
+  };
   
   // Data
   dataExport: 'pdf' | 'json';
   incognitoMode: boolean;
   lockJournals: boolean;
-  
-  // Privacy
-  privacy?: {
-    shareJournal: boolean;
-    shareActivity: boolean;
-    shareEmotions: boolean;
-  };
   
   // Premium features
   emotionalCamouflage: boolean; // For PremiumFeatures
@@ -84,6 +95,8 @@ export interface UserPreferences {
   
   // Additional features
   autoplayVideos: boolean; // For PreferencesForm
+  dataCollection?: boolean; // For PreferencesForm
+  language?: string; // For language preference
 }
 
 // For state management in useUserPreferences
