@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { sidebarItems, adminSidebarItems, footerNavItems } from '@/components/navigation/navConfig';
@@ -7,6 +6,9 @@ import { SidebarProvider, useSidebar } from './SidebarContext';
 import SidebarNavGroup from './SidebarNavGroup';
 import SidebarFooter from './SidebarFooter';
 import ThemeButton from './ThemeButton';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 
 // Interface pour assurer la compatibilité avec NavItemConfig
 interface NavItemConfig {

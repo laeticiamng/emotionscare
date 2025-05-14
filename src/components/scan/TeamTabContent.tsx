@@ -1,86 +1,45 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
+import { TeamOverview } from '@/components/scan/TeamOverview';
+import { useAuth } from '@/contexts/AuthContext';
 import { User } from '@/types';
-import TeamOverview from './TeamOverview';
-import TeamActivityChart from './TeamActivityChart';
-import TeamMoodTimeline from './TeamMoodTimeline';
-
-// Mock user data
-const mockUsers: Partial<User>[] = [
-  {
-    id: '1',
-    name: 'Jean Dupont',
-    role: 'b2b-user',
-    emotional_score: 75,
-    anonymity_code: 'JD-123',
-    avatar_url: ''
-  },
-  {
-    id: '2',
-    name: 'Marie Leroy',
-    role: 'b2b-user',
-    emotional_score: 62,
-    anonymity_code: 'ML-456',
-    avatar_url: ''
-  },
-  {
-    id: '3',
-    name: 'Alex Moreau',
-    role: 'b2b-user',
-    emotional_score: 88,
-    anonymity_code: 'AM-789',
-    avatar_url: ''
-  },
-  {
-    id: '4',
-    name: 'Sophie Bernard',
-    role: 'b2b-user',
-    emotional_score: 45,
-    anonymity_code: 'SB-012',
-    avatar_url: ''
-  }
-];
+import { TeamOverviewProps } from '@/types';
 
 interface TeamTabContentProps {
-  onTeamMemberSelect?: (userId: string) => void;
+  teamId?: string;
 }
 
-const TeamTabContent: React.FC<TeamTabContentProps> = ({ onTeamMemberSelect }) => {
-  const [activeTab, setActiveTab] = useState('overview');
+const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId }) => {
+  const { user } = useAuth();
+
+  // Mock user data for demonstration
+  const mockUsers: Partial<User>[] = [
+    { id: '1', name: 'Alice', avatar: '/avatars/avatar-1.png', emotional_score: 75 },
+    { id: '2', name: 'Bob', avatar: '/avatars/avatar-2.png', emotional_score: 60 },
+    { id: '3', name: 'Charlie', avatar: '/avatars/avatar-3.png', emotional_score: 80 },
+    { id: '4', name: 'David', avatar: '/avatars/avatar-4.png', emotional_score: 90 },
+    { id: '5', name: 'Eve', avatar: '/avatars/avatar-5.png', emotional_score: 70 },
+  ];
+
+  // Filter users based on team ID (if provided)
+  const filteredUsers = teamId
+    ? mockUsers.filter(u => u.team_id === teamId)
+    : mockUsers;
+
+  const handleUserClick = (userId: string) => {
+    alert(`Clicked user with ID: ${userId}`);
+  };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>Vue d'équipe</CardTitle>
-          <CardDescription>
-            Aperçu anonymisé de l'état émotionnel de votre équipe
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="activity">Activité</TabsTrigger>
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="overview">
-              <TeamOverview users={mockUsers} onUserClick={onTeamMemberSelect} />
-            </TabsContent>
-            
-            <TabsContent value="activity">
-              <TeamActivityChart />
-            </TabsContent>
-            
-            <TabsContent value="timeline">
-              <TeamMoodTimeline />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <div>
+      <p className="text-sm text-muted-foreground mb-4">
+        Aperçu de l'équipe et de leur état émotionnel.
+      </p>
+      
+      {/* Team Overview Component */}
+      <TeamOverview 
+        users={filteredUsers} 
+        onUserClick={(userId) => handleUserClick(userId)} 
+      />
     </div>
   );
 };

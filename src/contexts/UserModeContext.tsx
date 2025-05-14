@@ -1,6 +1,14 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserRole, UserModeContextType } from '@/types';
+import { UserRole } from '@/types';
+
+interface UserModeContextType {
+  userMode: UserRole;
+  setUserMode: (mode: UserRole) => void;
+  mode?: UserRole; // For backward compatibility
+  setMode?: (mode: UserRole) => void; // For backward compatibility
+  isLoading: boolean;
+}
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
@@ -30,4 +38,5 @@ const useUserMode = (): UserModeContextType => {
   return context;
 };
 
-export { UserModeProvider, useUserMode };
+export { UserModeProvider, useUserMode, UserModeContext };
+export type { UserModeContextType };

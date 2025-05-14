@@ -1,6 +1,54 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types';
+
+interface MusicContextType {
+  // Playback control
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  
+  // Backward compatibility
+  play: (track: MusicTrack) => void;
+  pause: () => void;
+  resumeTrack: () => void;
+  
+  // Drawer control
+  setOpenDrawer: (open: boolean) => void;
+  openDrawer: boolean;
+  
+  // Track & playlist state
+  tracks: MusicTrack[];
+  currentTrack: MusicTrack | null;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => void;
+  currentPlaylist: MusicPlaylist | null;
+  
+  // Emotion-based recommendation
+  currentEmotion: string;
+  setEmotion: (emotion: string) => void;
+  
+  // Volume & mute control
+  isMuted: boolean;
+  toggleMute: () => void;
+  adjustVolume: (value: number) => void;
+  volume: number;
+  setVolume: (value: number) => void;
+  
+  // System state
+  isInitialized: boolean;
+  initializeMusicSystem: () => void;
+  error?: string | null;
+  isPlaying?: boolean;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  
+  // Metadata
+  currentTrackDuration?: number;
+  currentTime?: number;
+  loading?: boolean;
+}
 
 // Create context with default values
 const MusicContext = createContext<MusicContextType>({
@@ -11,8 +59,14 @@ const MusicContext = createContext<MusicContextType>({
   nextTrack: () => {},
   previousTrack: () => {},
   
+  // Backward compatibility
+  play: () => {},
+  pause: () => {},
+  resumeTrack: () => {},
+  
   // Drawer control
   setOpenDrawer: () => {},
+  openDrawer: false,
   
   // Track & playlist state
   tracks: [],
@@ -36,8 +90,6 @@ const MusicContext = createContext<MusicContextType>({
   isInitialized: false,
   initializeMusicSystem: () => {},
   isPlaying: false,
-  
-  // Added for compatibility
   loadPlaylistForEmotion: async () => null,
 });
 
@@ -51,6 +103,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentEmotion, setCurrentEmotion] = useState('');
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTrackDuration, setCurrentTrackDuration] = useState(0);
+  const [loading, setLoading] = useState(false);
   
   // Mock loading playlists function until real implementation
   const loadPlaylistById = (id: string) => {
@@ -77,6 +133,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsPlaying(false);
   };
   
+  const resumeTrack = () => {
+    setIsPlaying(true);
+  };
+  
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
   };
@@ -86,10 +146,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
   
   const previousTrack = () => {
-    // Implementation would go here
-  };
-  
-  const setOpenDrawer = (open: boolean) => {
     // Implementation would go here
   };
   
@@ -121,6 +177,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         togglePlay,
         nextTrack,
         previousTrack,
+        openDrawer,
         setOpenDrawer,
         currentEmotion,
         setEmotion,
@@ -130,6 +187,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         loadPlaylistById,
         loadPlaylistForEmotion,
         currentPlaylist,
+        currentTime,
+        currentTrackDuration,
+        loading,
+        // Add backward compatibility properties
+        play: playTrack,
+        pause: pauseTrack,
+        resumeTrack
       }}
     >
       {children}

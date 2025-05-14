@@ -98,4 +98,4 @@ export const useTheme = () => useContext(ThemeContext);
 
 // Export for other files to import
 export type { ThemeName, FontFamily, FontSize };
-export type { ThemeContextType };
+export { ThemeContext };

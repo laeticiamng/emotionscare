@@ -1,4 +1,3 @@
-
 // ————————————————————————
 // UserRole and UserModeType
 // ————————————————————————
@@ -8,7 +7,15 @@ export type UserRole =
   | 'b2b-user' 
   | 'b2b_admin' 
   | 'b2b-admin'
-  | 'team';
+  | 'team'
+  | 'admin'
+  | 'manager'
+  | 'wellbeing_manager'
+  | 'coach'
+  | 'employee'
+  | 'user';
+
+export type UserModeType = UserRole;
 
 // ————————————————————————
 // User
@@ -49,7 +56,9 @@ export interface UserPreferences {
   fontFamily: FontFamily;
   sound: boolean;
   notifications_enabled: boolean;
-  privacy?: string;
+  privacy?: {
+    profileVisibility?: 'public' | 'private' | 'team';
+  };
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   aiSuggestions?: boolean;

@@ -47,7 +47,7 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center">
           <div className="mr-3">
-            {EmotionIcon && <EmotionIcon size={24} />}
+            {EmotionIcon && <EmotionIcon className="h-6 w-6" />}
           </div>
           <div>
             Résultat de l'analyse émotionnelle

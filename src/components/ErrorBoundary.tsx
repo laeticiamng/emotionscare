@@ -3,6 +3,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
@@ -11,87 +12,43 @@ interface State {
   errorInfo: ErrorInfo | null;
 }
 
-export default class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null
-    };
+export class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+    error: null,
+    errorInfo: null
+  };
+
+  public static getDerivedStateFromError(error: Error): State {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true, error, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<State> {
-    // Update state so the next render will show the fallback UI
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log the error to an error reporting service
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('Uncaught error:', error, errorInfo);
     this.setState({
+      hasError: true,
       error,
       errorInfo
     });
   }
 
-  render(): ReactNode {
+  public render(): ReactNode {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
       return (
-        <div style={{ 
-          padding: '20px', 
-          margin: '20px', 
-          borderRadius: '8px',
-          border: '1px solid #EF4444', 
-          backgroundColor: '#FEF2F2',
-          color: '#B91C1C'
-        }}>
-          <h1 style={{ margin: '0 0 16px 0' }}>Une erreur est survenue</h1>
-          <p>L'application a rencontré une erreur inattendue.</p>
-          
-          <details style={{ 
-            marginTop: '16px', 
-            padding: '12px',
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #E5E7EB',
-            borderRadius: '6px'
-          }}>
-            <summary style={{ 
-              fontWeight: 'bold', 
-              cursor: 'pointer',
-              marginBottom: '8px'
-            }}>
-              Détails techniques
-            </summary>
-            <p style={{ fontFamily: 'monospace', margin: '8px 0' }}>
+        <div className="p-6 m-4 border border-red-300 bg-red-50 dark:bg-red-900/20 rounded-lg">
+          <h2 className="text-lg font-medium text-red-800 dark:text-red-200 mb-2">Une erreur est survenue</h2>
+          <details className="whitespace-pre-wrap text-sm">
+            <summary className="text-red-600 dark:text-red-300 cursor-pointer mb-2">Voir les détails de l'erreur</summary>
+            <pre className="mt-2 p-4 bg-red-100 dark:bg-red-900/50 rounded overflow-auto text-xs">
               {this.state.error && this.state.error.toString()}
-            </p>
-            <pre style={{ 
-              padding: '12px',
-              overflow: 'auto',
-              backgroundColor: '#F3F4F6',
-              borderRadius: '4px',
-              fontSize: '14px'
-            }}>
+              <br />
               {this.state.errorInfo && this.state.errorInfo.componentStack}
             </pre>
           </details>
-          
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              marginTop: '16px',
-              padding: '8px 16px',
-              backgroundColor: '#2563EB',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Recharger la page
-          </button>
         </div>
       );
     }
@@ -99,3 +56,5 @@ export default class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+export default ErrorBoundary;

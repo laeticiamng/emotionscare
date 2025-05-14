@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Camera, RefreshCw, CheckCircle } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types';
 
 interface FacialEmotionScannerProps {
   onScanComplete: (result: EmotionResult) => void;
@@ -74,6 +74,7 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onScanCompl
         emotion: 'calm',
         score: 75,
         confidence: 0.82,
+        date: new Date().toISOString(),
         timestamp: new Date().toISOString()
       };
       

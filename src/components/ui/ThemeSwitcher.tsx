@@ -1,114 +1,41 @@
 
-import React from 'react';
-import { Moon, Sun, Laptop, Palette } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
+import { useTheme } from "@/hooks/use-theme";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun, Laptop } from "lucide-react";
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useTheme, Theme } from '@/contexts/ThemeContext';
+} from "@/components/ui/dropdown-menu";
+import { ThemeName } from "@/types";
 
-interface ThemeSwitcherProps {
-  size?: 'default' | 'sm' | 'lg' | 'icon';
-  variant?: 'default' | 'outline' | 'secondary' | 'ghost';
-  className?: string;
-  showLabel?: boolean;
-}
-
-const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({ 
-  size = 'icon', 
-  variant = 'ghost', 
-  className = '', 
-  showLabel = false 
-}) => {
-  const themeContext = useTheme();
-  
-  if (!themeContext) {
-    console.error('ThemeContext not available in ThemeSwitcher');
-    return null;
-  }
-  
-  const { theme, setTheme } = themeContext;
-  
-  // Function to handle theme changes
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
-  };
-
-  // Icons based on current theme
-  const getIcon = () => {
-    if (theme === 'system') {
-      return <Laptop size={size === 'icon' ? 18 : 16} />;
-    }
-    
-    if (theme === 'dark') {
-      return <Moon size={size === 'icon' ? 18 : 16} />;
-    }
-    
-    if (theme === 'pastel') {
-      return <Palette size={size === 'icon' ? 18 : 16} />;
-    }
-    
-    return <Sun size={size === 'icon' ? 18 : 16} />;
-  };
-  
-  // Text label for current theme
-  const getLabel = () => {
-    switch (theme) {
-      case 'light': return 'Clair';
-      case 'dark': return 'Sombre';
-      case 'system': return 'Système';
-      case 'pastel': return 'Pastel';
-      default: return 'Thème';
-    }
-  };
+export function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className={`gap-2 ${className}`} aria-label="Changer de thème">
-          {getIcon()}
-          {showLabel && <span>{getLabel()}</span>}
+        <Button variant="outline" size="icon">
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="z-50 bg-background border border-border">
-        <DropdownMenuItem 
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => handleThemeChange('light')}
-        >
-          <Sun size={16} />
-          <span>Clair</span>
-          {theme === 'light' && <span className="ml-auto text-xs text-green-500">✓</span>}
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme('light')}>
+          <Sun className="mr-2 h-4 w-4" />
+          <span>Light</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => handleThemeChange('dark')}
-        >
-          <Moon size={16} />
-          <span>Sombre</span>
-          {theme === 'dark' && <span className="ml-auto text-xs text-green-500">✓</span>}
+        <DropdownMenuItem onClick={() => setTheme('dark')}>
+          <Moon className="mr-2 h-4 w-4" />
+          <span>Dark</span>
         </DropdownMenuItem>
-        <DropdownMenuItem 
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => handleThemeChange('pastel')}
-        >
-          <Palette size={16} />
-          <span>Pastel</span>
-          {theme === 'pastel' && <span className="ml-auto text-xs text-green-500">✓</span>}
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => handleThemeChange('system')}
-        >
-          <Laptop size={16} />
-          <span>Système</span>
-          {theme === 'system' && <span className="ml-auto text-xs text-green-500">✓</span>}
+        <DropdownMenuItem onClick={() => setTheme('system')}>
+          <Laptop className="mr-2 h-4 w-4" />
+          <span>System</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
-
-export default ThemeSwitcher;
+}
