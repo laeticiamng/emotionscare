@@ -1,53 +1,62 @@
 
+// Update the Emotion type with more fields
 export interface Emotion {
-  id: string;
-  user_id: string;
-  date: string;
-  name?: string;
+  id?: string;
+  user_id?: string;
+  date?: string | Date;
   emotion?: string;
-  sentiment: number;
-  anxiety: number;
-  energy: number;
+  name?: string;
+  score?: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
   text?: string;
   emojis?: string;
   audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
   ai_feedback?: string;
   category?: string;
-  score?: number;
-  intensity?: number; // Adding this for components that need it
+  confidence?: number; // Added for EmotionScanForm and EnhancedCoachAI
 }
 
+// Create a more comprehensive EmotionResult interface
 export interface EmotionResult {
   id?: string;
   user_id?: string;
+  date?: string;
+  dominantEmotion?: string; // For EmotionScanner
+  primaryEmotion?: string; // For EnhancedCoachAI
   emotion?: string;
-  confidence?: number;
+  score?: number;
   intensity?: number;
-  primaryEmotion?: {
+  text?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  confidence?: number;
+}
+
+// Enhanced emotion result for detailed analysis
+export interface EnhancedEmotionResult extends EmotionResult {
+  detailedAnalysis?: {
+    triggers?: string[];
+    patterns?: string[];
+    suggestions?: string[];
+  };
+  relatedEmotions?: {
     name: string;
     score: number;
-  };
-  secondaryEmotions?: string[];
-  transcript?: string;
-  text?: string;
-  emojis?: string;
-  feedback?: string;
-  score?: number;
-  ai_feedback?: string;
-  date?: string;
+  }[];
+  trendData?: {
+    period: string;
+    value: number;
+  }[];
 }
 
-export interface EnhancedEmotionResult extends EmotionResult {
-  recommendations?: string[];
-  triggers?: string[];
-  suggestions?: string[];
-}
-
+// Add the EmotionalTeamViewProps interface
 export interface EmotionalTeamViewProps {
   teamId: string;
-  startDate?: Date;
-  endDate?: Date;
-  anonymized?: boolean;
+  userId: string;
+  period: string;
+  className?: string;
+  onRefresh?: () => void;
 }

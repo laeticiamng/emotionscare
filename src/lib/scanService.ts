@@ -1,159 +1,69 @@
-import { Emotion, EmotionResult } from '@/types';
 
-// Mock database
-const emotionEntries: Record<string, Emotion[]> = {};
-
-export const createEmotionEntry = async (data: {
-  user_id: string;
-  date: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}): Promise<Emotion> => {
-  // Create a new emotion entry
-  const newEntry: Emotion = {
-    id: `emotion-${Date.now()}`,
-    user_id: data.user_id,
-    date: data.date,
-    text: data.text || '',
-    emojis: data.emojis || '',
-    sentiment: Math.random() * 10, // Mock sentiment score
-    anxiety: Math.round(Math.random() * 10),
-    energy: Math.round(Math.random() * 10),
-    // Include optional fields if provided
-    audio_url: data.audio_url,
-    is_confidential: data.is_confidential,
-    share_with_coach: data.share_with_coach
-  };
-
-  // Add to mock database
-  if (!emotionEntries[data.user_id]) {
-    emotionEntries[data.user_id] = [];
+// Implementing missing analyzeAudioStream function for AudioProcessor
+export const analyzeAudioStream = async (audioBlob: Blob): Promise<any> => {
+  try {
+    // This is a mock implementation - in a real app, this would send the audio to a server for analysis
+    console.log('Analyzing audio stream of size:', audioBlob.size);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Return mock emotion analysis data
+    return {
+      dominantEmotion: ['happy', 'neutral', 'calm', 'focused'][Math.floor(Math.random() * 4)],
+      confidence: 0.75 + Math.random() * 0.2,
+      intensity: 0.5 + Math.random() * 0.4,
+      recommendations: [
+        'Take a short break',
+        'Listen to calming music',
+        'Practice deep breathing',
+        'Write in your journal'
+      ]
+    };
+  } catch (error) {
+    console.error('Error analyzing audio stream:', error);
+    throw new Error('Failed to analyze audio');
   }
-  emotionEntries[data.user_id].push(newEntry);
-
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  return newEntry;
 };
 
-export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
-  // Check if user has any emotions
-  if (!emotionEntries[userId] || emotionEntries[userId].length === 0) {
-    return null;
-  }
-
-  // Return latest emotion
-  const entries = emotionEntries[userId];
-  return entries[entries.length - 1];
-};
-
-export const fetchEmotions = async (userId: string): Promise<Emotion[]> => {
-  // Return all emotions for a user
-  return emotionEntries[userId] || [];
-};
-
-// New function to analyze an audio stream
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // Simulate processing delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
+export const analyzeText = async (text: string): Promise<any> => {
+  // Mock text analysis
+  console.log('Analyzing text:', text);
   
-  // Mock emotion detection result
-  const emotions = ['calm', 'happy', 'stressed', 'anxious', 'focused', 'sad', 'excited'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 800));
   
+  // Return mock emotion analysis data
   return {
-    id: `analysis-${Date.now()}`,
-    emotion: randomEmotion,
-    confidence: Math.random() * 0.4 + 0.6, // Random confidence between 0.6 and 1.0
-    intensity: Math.random() * 0.8 + 0.2, // Random intensity between 0.2 and 1.0
-    primaryEmotion: {
-      name: randomEmotion,
-      score: Math.round(Math.random() * 100)
-    },
-    secondaryEmotions: [
-      emotions[Math.floor(Math.random() * emotions.length)], 
-      emotions[Math.floor(Math.random() * emotions.length)]
-    ],
-    transcript: "Ceci est une transcription simulée de l'audio analysé. Le système génèrerait normalement ici le texte reconnu à partir de l'enregistrement vocal.",
-    feedback: `Votre voix révèle des niveaux de ${randomEmotion} qui pourraient indiquer ${randomEmotion === 'stressed' || randomEmotion === 'anxious' ? 'un besoin de prendre du recul' : 'une bonne gestion émotionnelle'}.`,
-    score: Math.round(Math.random() * 10),
-    date: new Date().toISOString()
+    dominantEmotion: ['happy', 'neutral', 'reflective', 'anxious'][Math.floor(Math.random() * 4)],
+    confidence: 0.8 + Math.random() * 0.15,
+    score: 65 + Math.floor(Math.random() * 30),
+    recommendations: [
+      'Journal about this feeling',
+      'Try a guided meditation',
+      'Connect with a friend',
+      'Take a nature walk'
+    ]
   };
 };
 
-// Function to analyze emotion based on text, emojis, or audio
-export const analyzeEmotion = async (data: {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}): Promise<EmotionResult> => {
-  // Simulate API delay
+export const analyzeFacialExpression = async (imageBlob: Blob): Promise<any> => {
+  // Mock facial expression analysis
+  console.log('Analyzing facial expression from image of size:', imageBlob.size);
+  
+  // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1200));
   
-  // Mock emotion detection
-  const emotions = ['calm', 'happy', 'stressed', 'anxious', 'focused', 'sad', 'excited'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  
+  // Return mock emotion analysis data
   return {
-    id: `analysis-${Date.now()}`,
-    user_id: data.user_id,
-    emotion: randomEmotion,
-    confidence: Math.random() * 0.4 + 0.6,
-    intensity: Math.random() * 0.8 + 0.2,
-    primaryEmotion: {
-      name: randomEmotion,
-      score: Math.round(Math.random() * 100)
-    },
-    text: data.text,
-    emojis: data.emojis,
-    feedback: `Notre analyse indique que vous vous sentez plutôt ${randomEmotion}. ${randomEmotion === 'stressed' || randomEmotion === 'anxious' ? 'Pensez à faire une pause et à pratiquer quelques exercices de respiration.' : 'Continuez ainsi, votre équilibre émotionnel semble bon.'}`,
-    score: Math.round(Math.random() * 10)
+    dominantEmotion: ['happy', 'neutral', 'surprised', 'contemplative'][Math.floor(Math.random() * 4)],
+    confidence: 0.7 + Math.random() * 0.25,
+    intensity: 0.4 + Math.random() * 0.5,
+    recommendations: [
+      'Take a moment to appreciate this emotion',
+      'Share your feelings with someone',
+      'Record this in your emotional journal',
+      'Use this energy for creative activities'
+    ]
   };
-};
-
-// Function to save an emotion
-export const saveEmotion = async (data: {
-  user_id: string;
-  date: string;
-  emotion: string;
-  score: number;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  ai_feedback?: string;
-}): Promise<Emotion> => {
-  const newEmotion: Emotion = {
-    id: `emotion-${Date.now()}`,
-    user_id: data.user_id,
-    date: data.date,
-    emotion: data.emotion,
-    name: data.emotion,
-    score: data.score,
-    sentiment: data.score,
-    anxiety: Math.round(Math.random() * 10),
-    energy: Math.round(Math.random() * 10),
-    text: data.text,
-    emojis: data.emojis,
-    audio_url: data.audio_url,
-    ai_feedback: data.ai_feedback,
-    category: 'mood'
-  };
-  
-  // Add to mock database
-  if (!emotionEntries[data.user_id]) {
-    emotionEntries[data.user_id] = [];
-  }
-  emotionEntries[data.user_id].push(newEmotion);
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  return newEmotion;
 };

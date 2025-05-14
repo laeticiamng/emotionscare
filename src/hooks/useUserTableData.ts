@@ -1,10 +1,14 @@
 
-import { useState, useEffect } from 'react';
-import { User, UserRole } from '@/types';
+import { useState, useEffect, useCallback } from 'react';
+import { User } from '@/types/user';
 
 export interface UseUserTableDataParams {
   initialPageSize?: number;
-  fetchLimit?: number;
+  defaultPageSize?: number; // For UsersTableDemo & UsersTableWithInfiniteScroll
+  initialPage?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  filters?: Record<string, any>;
 }
 
 export interface UseUserTableDataReturn {
@@ -19,117 +23,152 @@ export interface UseUserTableDataReturn {
   fetchUsers: () => Promise<void>;
   handlePageChange: (page: number) => void;
   handlePageSizeChange: (size: number) => void;
-  handleLoadMore: () => Promise<void>;
-  handleRetry: () => Promise<void>;
-  filterUsers: (filter: string) => void;
+  handleLoadMore: () => void;
+  handleRetry: () => void;
+  handleSort: (field: string) => void;
 }
 
-export const useUserTableData = (params?: UseUserTableDataParams): UseUserTableDataReturn => {
-  const defaultPageSize = params?.initialPageSize || 10;
-  const fetchLimit = params?.fetchLimit || 100;
+// Mock user data
+const generateMockUsers = (count: number): User[] => {
+  const roles: UserRole[] = ['b2c', 'b2b_user', 'b2b_admin'];
+  const departments = ['Engineering', 'Marketing', 'HR', 'Finance', 'Product', 'Design', 'Sales'];
+  const statuses = ['active', 'inactive', 'pending'];
   
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(defaultPageSize);
-  const [totalItems, setTotalItems] = useState<number>(0);
-  const [filter, setFilter] = useState<string>('');
-  
-  // Mock user data
-  const mockUsers: User[] = Array.from({ length: 35 }).map((_, index) => ({
-    id: `user-${index + 1}`,
-    name: `User ${index + 1}`,
-    email: `user${index + 1}@example.com`,
-    role: ((index % 3 === 0) ? 'b2b_admin' : (index % 2 === 0) ? 'b2b_user' : 'b2c') as UserRole,
-    emotional_score: Math.floor(Math.random() * 100),
+  return Array.from({ length: count }, (_, i) => ({
+    id: `user-${i + 1}`,
+    email: `user${i + 1}@example.com`,
+    name: `User ${i + 1}`,
+    role: roles[Math.floor(Math.random() * roles.length)],
     createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
-    position: ['Manager', 'Développeur', 'Designer', 'RH', 'Marketing', 'Support'][Math.floor(Math.random() * 6)]
+    avatar_url: `https://i.pravatar.cc/150?u=user${i + 1}`,
+    department: departments[Math.floor(Math.random() * departments.length)],
+    position: ['Manager', 'Associate', 'Director', 'VP', 'Specialist'][Math.floor(Math.random() * 5)],
+    team_id: `team-${Math.floor(Math.random() * 5) + 1}`,
+    status: statuses[Math.floor(Math.random() * statuses.length)] as 'active' | 'inactive' | 'pending',
+    last_active: new Date(Date.now() - Math.floor(Math.random() * 1000000)).toISOString()
   }));
+};
 
-  const fetchUsers = async (): Promise<void> => {
+// Total mock user count
+const TOTAL_MOCK_USERS = 256;
+const mockUsers = generateMockUsers(TOTAL_MOCK_USERS);
+
+export const useUserTableData = (params: UseUserTableDataParams = {}): UseUserTableDataReturn => {
+  const {
+    initialPageSize = 10,
+    initialPage = 1,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+    filters = {}
+  } = params;
+
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [pageSize, setPageSize] = useState(initialPageSize);
+  const [totalItems, setTotalItems] = useState(0);
+  const [sortField, setSortField] = useState(sortBy);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortOrder);
+  const [filterCriteria, setFilterCriteria] = useState(filters);
+
+  const totalPages = Math.ceil(totalItems / pageSize);
+  const hasMore = currentPage < totalPages;
+
+  const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Set mock users and total
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
-      setTotalItems(mockUsers.length);
+      // Apply filters if any
+      let filteredUsers = [...mockUsers];
       
-    } catch (err: any) {
-      setError(new Error(err.message || 'Failed to fetch users'));
+      Object.entries(filterCriteria).forEach(([key, value]) => {
+        if (value) {
+          filteredUsers = filteredUsers.filter(user => {
+            if (typeof value === 'string') {
+              return String(user[key as keyof User]).toLowerCase().includes(value.toLowerCase());
+            }
+            return user[key as keyof User] === value;
+          });
+        }
+      });
+      
+      // Apply sorting
+      filteredUsers.sort((a, b) => {
+        const aValue = a[sortField as keyof User];
+        const bValue = b[sortField as keyof User];
+        
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortDirection === 'asc' 
+            ? aValue.localeCompare(bValue) 
+            : bValue.localeCompare(aValue);
+        }
+        
+        // For dates
+        if (aValue && bValue && (aValue instanceof Date || typeof aValue === 'string') && 
+            (bValue instanceof Date || typeof bValue === 'string')) {
+          const dateA = new Date(aValue);
+          const dateB = new Date(bValue);
+          return sortDirection === 'asc' ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime();
+        }
+        
+        return 0;
+      });
+      
+      setTotalItems(filteredUsers.length);
+      
+      // Paginate
+      const startIndex = (currentPage - 1) * pageSize;
+      const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
+      
+      setUsers(paginatedUsers);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch users'));
     } finally {
       setIsLoading(false);
     }
-  };
-  
-  const filterUsers = (filterValue: string): void => {
-    setFilter(filterValue);
-    if (!filterValue) {
-      setFilteredUsers(users);
-      return;
-    }
-    
-    const filtered = users.filter(
-      user => 
-        user.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-        user.email.toLowerCase().includes(filterValue.toLowerCase()) ||
-        (user.position && user.position.toLowerCase().includes(filterValue.toLowerCase()))
-    );
-    
-    setFilteredUsers(filtered);
-    setTotalItems(filtered.length);
-    setCurrentPage(1);
-  };
-  
-  const handlePageChange = (page: number): void => {
-    setCurrentPage(page);
-  };
-  
-  const handlePageSizeChange = (size: number): void => {
-    setPageSize(size);
-    setCurrentPage(1);
-  };
-  
-  const handleLoadMore = async (): Promise<void> => {
-    if (users.length >= fetchLimit) return;
-    
-    setIsLoading(true);
-    
-    try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // No need to load more, we have all the mock data already
-      // In a real implementation, you'd load more data from the API
-      
-    } catch (err: any) {
-      setError(new Error(err.message || 'Failed to load more users'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  const handleRetry = async (): Promise<void> => {
-    return fetchUsers();
-  };
-  
-  // Initial data fetch
+  }, [currentPage, pageSize, sortField, sortDirection, filterCriteria]);
+
   useEffect(() => {
     fetchUsers();
-  }, []);
-  
-  // Calculate pagination values
-  const totalPages = Math.ceil(totalItems / pageSize);
-  const hasMore = currentPage < totalPages;
-  
+  }, [fetchUsers]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore && !isLoading) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const handleRetry = () => {
+    fetchUsers();
+  };
+
+  const handleSort = (field: string) => {
+    if (field === sortField) {
+      // Toggle sort direction if clicking the same field
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default to descending for new sort field
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
   return {
-    users: filteredUsers.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    users,
     isLoading,
     error,
     currentPage,
@@ -142,7 +181,7 @@ export const useUserTableData = (params?: UseUserTableDataParams): UseUserTableD
     handlePageSizeChange,
     handleLoadMore,
     handleRetry,
-    filterUsers
+    handleSort
   };
 };
 

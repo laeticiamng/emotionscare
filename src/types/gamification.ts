@@ -1,37 +1,29 @@
 
 export interface GamificationStats {
-  points: number;
   level: number;
+  points: number;
   nextLevelPoints: number;
-  rank?: string;
-  badges?: any[];
-  completedChallenges?: number;
-  activeChallenges?: number;
-  streakDays?: number;
-  progressToNextLevel?: number;
-  challenges?: any[];
-  recentAchievements?: any[];
-  streak?: number;
-  nextLevel?: { 
+  badgesCount: number; // For GamificationDashboard
+  totalPoints: number; // For GamificationDashboard
+  pointsToNextLevel: number; // For GamificationDashboard
+  streak: number;
+  completed_challenges: number;
+  available_challenges: number;
+  recent_achievements: {
+    id: string;
+    name: string;
+    acquired_at: string;
     points: number;
-    rewards: any[];
-  };
-  achievements?: any[];
-  currentLevel?: number;
-  milestones?: any[];
-  rewards?: any[];
-  leaderboard?: LeaderboardEntry[];
-  totalActions?: number;
-  lastActivityDate?: string;
+    icon?: string;
+  }[];
 }
 
 export interface LeaderboardEntry {
-  id: string;
+  user_id: string;
   name: string;
-  anonymityCode?: string;
   points: number;
   level: number;
-  rank?: number;
-  position?: number;
-  avatar?: string;
+  avatar_url?: string;
+  rank: number;
+  is_current_user?: boolean;
 }
