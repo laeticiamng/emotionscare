@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { UserModeType } from '@/types/types';
+import { UserRole } from '@/types/user';
 
 export interface UserSidePanelProps {
   collapsed: boolean;
   onToggle: () => void;
   userId?: string;
-  userMode?: UserModeType;
+  userMode?: UserRole;
 }
 
 const UserSidePanel: React.FC<UserSidePanelProps> = ({ collapsed, onToggle, userId, userMode }) => {

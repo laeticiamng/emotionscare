@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 
 // User types
@@ -22,6 +21,9 @@ export interface User {
   position?: string;
   created_at?: string;
   status?: 'active' | 'inactive' | 'pending';
+  department?: string;
+  joined_at?: string;
+  emotional_score?: number;
 }
 
 export interface UserPreferences {
@@ -168,11 +170,22 @@ export interface LeaderboardEntry {
   level?: number;
 }
 
-// Add EmotionalTeamViewProps type definition
+// Add this type definition for Period
+export type Period = 'day' | 'week' | 'month' | 'year' | string;
+
+// Add or update EmotionalTeamViewProps
 export interface EmotionalTeamViewProps {
   departmentId?: string;
   teamId?: string;
   users?: User[];
   anonymized?: boolean;
   onUserClick?: (userId: string) => void;
+  period?: Period;
+  userId?: string;
+  className?: string;
+  dateRange?: { start: Date; end: Date };
+  onRefresh?: () => void;
 }
+
+// Add UserModeType
+export type UserModeType = 'b2b_admin' | 'b2b_user' | 'b2c' | 'personal' | string;

@@ -1,140 +1,101 @@
-
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { Theme as ThemeType } from "@/types/types";
-
-// Define types for ThemeContext
-export type FontSize = "small" | "medium" | "large" | "extra-large";
-export type FontFamily = "inter" | "roboto" | "poppins" | "merriweather" | "system";
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { ThemeName, FontSize, FontFamily } from '@/types/user';
 
 export interface ThemeContextType {
-  theme: ThemeType;
-  setTheme: (theme: ThemeType) => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (font: FontFamily) => void;
-  fontSize?: FontSize;
-  setFontSize?: (size: FontSize) => void;
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  fontFamily: FontFamily;
+  setFontFamily: (font: FontFamily) => void;
 }
 
-// Create ThemeContext with default values
-export const ThemeContext = createContext<ThemeContextType>({
-  theme: "light",
+// Create the context with a default value
+const defaultThemeContext: ThemeContextType = {
+  theme: 'system',
   setTheme: () => {},
-});
+  fontSize: 'medium',
+  setFontSize: () => {},
+  fontFamily: 'system-ui',
+  setFontFamily: () => {},
+};
 
-interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: ThemeType;
-}
+// Create context once
+export const ThemeContext = createContext<ThemeContextType>(defaultThemeContext);
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ 
-  children,
-  defaultTheme = "light" 
-}) => {
-  // Initialize theme state from localStorage or defaultTheme
-  const [theme, setTheme] = useState<ThemeType>(() => {
-    const storedTheme = localStorage.getItem("theme");
-    return (storedTheme as ThemeType) || defaultTheme;
-  });
-  
-  // Initialize font family from localStorage or default
-  const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
-    const storedFont = localStorage.getItem("fontFamily");
-    return (storedFont as FontFamily) || "inter";
-  });
-  
-  // Initialize font size from localStorage or default
-  const [fontSize, setFontSize] = useState<FontSize>(() => {
-    const storedSize = localStorage.getItem("fontSize");
-    return (storedSize as FontSize) || "medium";
-  });
+// Provider component
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<ThemeName>('system');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('system-ui');
 
-  // Update theme in localStorage when it changes
   useEffect(() => {
-    const root = window.document.documentElement;
-    
-    // Remove existing theme class
-    root.classList.remove("light", "dark");
-    
-    // Add new theme class
-    root.classList.add(theme);
-    
-    // Save to localStorage
-    localStorage.setItem("theme", theme);
+    const storedTheme = localStorage.getItem('theme') as ThemeName || 'system';
+    setTheme(storedTheme);
+    document.documentElement.dataset.theme = storedTheme;
+
+    const storedFontSize = localStorage.getItem('fontSize') as FontSize || 'medium';
+    setFontSize(storedFontSize);
+    document.documentElement.style.fontSize = getFontSizeValue(storedFontSize);
+
+    const storedFontFamily = localStorage.getItem('fontFamily') as FontFamily || 'system-ui';
+    setFontFamily(storedFontFamily);
+    document.documentElement.style.fontFamily = getFontFamilyValue(storedFontFamily);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.dataset.theme = theme;
   }, [theme]);
 
-  // Update font family in DOM when it changes
   useEffect(() => {
-    const body = window.document.body;
-    
-    // Remove existing font family classes
-    body.classList.remove(
-      "font-inter", 
-      "font-roboto", 
-      "font-poppins", 
-      "font-merriweather", 
-      "font-system"
-    );
-    
-    // Add new font family class
-    body.classList.add(`font-${fontFamily}`);
-    
-    // Save to localStorage
-    localStorage.setItem("fontFamily", fontFamily);
-  }, [fontFamily]);
-
-  // Update font size in DOM when it changes
-  useEffect(() => {
-    const html = window.document.documentElement;
-    
-    // Remove existing font size classes
-    html.classList.remove(
-      "text-sm", // small
-      "text-base", // medium
-      "text-lg", // large
-      "text-xl" // extra-large
-    );
-    
-    // Add new font size class based on selected size
-    switch (fontSize) {
-      case "small":
-        html.classList.add("text-sm");
-        break;
-      case "medium":
-        html.classList.add("text-base");
-        break;
-      case "large":
-        html.classList.add("text-lg");
-        break;
-      case "extra-large":
-        html.classList.add("text-xl");
-        break;
-    }
-    
-    // Save to localStorage
-    localStorage.setItem("fontSize", fontSize);
+    localStorage.setItem('fontSize', fontSize);
+    document.documentElement.style.fontSize = getFontSizeValue(fontSize);
   }, [fontSize]);
 
+  useEffect(() => {
+    localStorage.setItem('fontFamily', fontFamily);
+    document.documentElement.style.fontFamily = getFontFamilyValue(fontFamily);
+  }, [fontFamily]);
+
+  const getFontSizeValue = (size: FontSize): string => {
+    switch (size) {
+      case 'small':
+        return '0.875rem';
+      case 'medium':
+        return '1rem';
+      case 'large':
+        return '1.125rem';
+      default:
+        return '1rem';
+    }
+  };
+
+  const getFontFamilyValue = (font: FontFamily): string => {
+    return font;
+  };
+
+  const contextValue: ThemeContextType = {
+    theme,
+    setTheme,
+    fontSize,
+    setFontSize,
+    fontFamily,
+    setFontFamily,
+  };
+
   return (
-    <ThemeContext.Provider value={{ 
-      theme, 
-      setTheme, 
-      fontFamily, 
-      setFontFamily, 
-      fontSize, 
-      setFontSize 
-    }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-// Custom hook to use the theme context
-export const useTheme = () => {
+// Custom hook
+export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
 };
-
-export default ThemeContext;

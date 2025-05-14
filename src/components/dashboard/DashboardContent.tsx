@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -150,7 +149,11 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           </TabsContent>
           
           <TabsContent value="team" className="space-y-4">
-            <TeamOverview users={mockTeamUsers} />
+            <TeamOverview users={mockTeamUsers.map(user => ({
+              ...user,
+              email: `${user.id}@example.com`, // Add required email property
+              role: 'employee'
+            }))} userId="admin" />
           </TabsContent>
         </Tabs>
       </div>

@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { MusicPlaylist, MusicTrack } from '@/types/music';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Emotion } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 import { useMusic } from '@/contexts/MusicContext';
 import { Music, Activity } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,7 +9,7 @@ import TrackList from '@/components/music/TrackList';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
-  userMood?: Emotion | null;
+  userMood?: EmotionResult | null;
   isLoading?: boolean;
 }
 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Challenge } from '@/types/types';
+import { Challenge } from '@/types/gamification';
 import ChallengeItem from './ChallengeItem';
 
 interface ChallengesListProps {
@@ -14,8 +14,10 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
 }) => {
   const sortedChallenges = [...challenges].sort((a, b) => {
     // First incomplete ones, then completed ones
-    if (a.status === 'completed' && b.status !== 'completed') return 1;
-    if (a.status !== 'completed' && b.status === 'completed') return -1;
+    if ((a.status === 'complete' || a.status === 'completed' || a.completed) && 
+        !(b.status === 'complete' || b.status === 'completed' || b.completed)) return 1;
+    if (!(a.status === 'complete' || a.status === 'completed' || a.completed) && 
+        (b.status === 'complete' || b.status === 'completed' || b.completed)) return -1;
     
     // Within the same completion status, sort by priority/points
     return b.points - a.points;
@@ -30,7 +32,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
           title={challenge.title || challenge.name || ''}
           description={challenge.description}
           points={challenge.points}
-          isCompleted={challenge.status === 'completed' || challenge.completed}
+          isCompleted={challenge.status === 'complete' || challenge.status === 'completed' || !!challenge.completed}
           onComplete={onComplete}
         />
       ))}

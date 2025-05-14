@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { Badge as BadgeType } from '@/types/types';
+import { Badge } from '@/types/gamification';
 import { Card, CardContent } from '@/components/ui/card';
 import { Award, Lock } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface BadgeGridProps {
-  badges: BadgeType[];
+  badges: Badge[];
 }
 
 const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
@@ -20,7 +20,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
   }
 
   // Group badges by type if available
-  const groupedBadges: Record<string, BadgeType[]> = {};
+  const groupedBadges: Record<string, Badge[]> = {};
   
   badges.forEach(badge => {
     const type = badge.type || 'other';
@@ -52,7 +52,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
   );
 };
 
-const renderBadge = (badge: BadgeType) => {
+const renderBadge = (badge: Badge) => {
   const isLocked = badge.id.includes('locked') || badge.name.includes('Locked');
   const badgeImage = badge.image_url || badge.imageUrl || badge.image;
   
