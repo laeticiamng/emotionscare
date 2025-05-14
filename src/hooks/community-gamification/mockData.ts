@@ -1,134 +1,133 @@
 
-import { Challenge, GamificationStats, Badge, Achievement } from './types';
-
-export const mockBadges: Badge[] = [
-  {
-    id: '1',
-    name: 'Scanner Débutant',
-    description: 'A effectué 5 scans émotionnels',
-    image_url: '/badges/scanner-debutant.svg',
-    threshold: 5
-  },
-  {
-    id: '2',
-    name: 'Expressif',
-    description: 'A exploré plus de 10 émotions différentes',
-    image_url: '/badges/expressif.svg',
-    threshold: 10
-  },
-  {
-    id: '3',
-    name: 'Journal intime',
-    description: 'A écrit 5 entrées de journal',
-    image_url: '/badges/journal-intime.svg',
-    threshold: 5
-  },
-  {
-    id: '4',
-    name: 'Mélomane',
-    description: 'A écouté 10 morceaux de musique thérapeutique',
-    image_url: '/badges/melomane.svg',
-    threshold: 10
-  }
-];
+import { GamificationStats, Challenge, Badge } from '@/types/gamification';
 
 export const mockChallenges: Challenge[] = [
   {
     id: '1',
-    name: 'Scanner quotidien',
-    description: 'Effectuez un scan émotionnel chaque jour pendant 7 jours',
-    category: 'scan',
-    type: 'streak',
-    difficulty: 'easy',
+    title: 'Journal quotidien',
+    description: 'Écrivez dans votre journal 5 jours consécutifs',
     points: 100,
-    status: 'available',
-    progress: 0,
-    requirements: ['Scan émotionnel quotidien'],
-    rewards: ['Badge "Scanner régulier"', '100 points']
+    status: 'active',
+    progress: 40,
+    total: 5,
+    type: 'streak'
   },
   {
     id: '2',
-    name: 'Expression complète',
-    description: 'Identifiez 5 émotions différentes dans vos scans',
-    category: 'scan',
-    type: 'milestone',
-    difficulty: 'medium',
-    points: 150,
-    status: 'in-progress',
-    progress: 60,
-    requirements: ['5 émotions différentes identifiées'],
-    rewards: ['Badge "Expressif"', '150 points']
+    title: 'Maître de la respiration',
+    description: 'Complétez 10 exercices de respiration',
+    points: 200,
+    status: 'ongoing',
+    progress: 7,
+    total: 10,
+    type: 'count'
   },
   {
     id: '3',
-    name: 'Journal hebdomadaire',
-    description: 'Écrivez 3 entrées dans votre journal cette semaine',
-    category: 'journal',
-    type: 'milestone',
-    difficulty: 'easy',
-    points: 100,
-    status: 'available',
-    progress: 0,
-    requirements: ['3 entrées de journal cette semaine'],
-    rewards: ['Badge "Écrivain régulier"', '100 points']
+    title: 'Explorer la pleine conscience',
+    description: 'Essayez 3 sessions différentes de méditation',
+    points: 150,
+    status: 'completed',
+    progress: 3,
+    total: 3,
+    type: 'exploration'
   },
   {
     id: '4',
-    name: 'Exploration musicale',
-    description: 'Écoutez 5 nouveaux morceaux de musique thérapeutique',
-    category: 'music',
-    type: 'discovery',
-    difficulty: 'easy',
+    title: 'Pause créative',
+    description: 'Prenez 5 pauses créatives pendant vos journées de travail',
     points: 100,
     status: 'available',
     progress: 0,
-    requirements: ['5 nouveaux morceaux écoutés'],
-    rewards: ['Badge "Explorateur musical"', '100 points']
+    total: 5,
+    type: 'count'
   },
   {
     id: '5',
-    name: 'Voyage immersif',
-    description: 'Effectuez 3 sessions de VR thérapeutique',
-    category: 'vr',
-    type: 'milestone',
-    difficulty: 'medium',
-    points: 200,
-    status: 'available',
-    progress: 0,
-    requirements: ['3 sessions VR complétées'],
-    rewards: ['Badge "Voyageur virtuel"', '200 points']
-  },
+    title: 'Analyste émotionnel',
+    description: 'Suivez vos émotions pendant 7 jours consécutifs',
+    points: 300,
+    status: 'active',
+    progress: 3,
+    total: 7,
+    type: 'streak'
+  }
 ];
 
-export const mockAchievements: Achievement[] = [
+export const mockAchievements = [
   {
     id: '1',
-    name: 'Premier scan',
-    description: 'Vous avez effectué votre premier scan émotionnel',
-    category: 'scan',
-    awardedAt: '2025-04-12T14:30:00Z',
-    image_url: '/badges/premier-scan.svg'
+    name: 'Premier pas',
+    description: 'Commencer votre parcours de bien-être',
+    unlockedAt: '2025-04-30T10:15:00Z',
+    level: 1,
+    category: 'engagement'
   },
   {
     id: '2',
-    name: 'Première entrée de journal',
-    description: 'Vous avez écrit votre première entrée de journal',
-    category: 'journal',
-    awardedAt: '2025-04-13T09:15:00Z',
-    image_url: '/badges/premiere-entree.svg'
+    name: 'Explorateur de méditation',
+    description: 'Essayer 5 types différents de méditation',
+    unlockedAt: '2025-05-05T16:30:00Z',
+    level: 2,
+    category: 'meditation'
+  },
+  {
+    id: '3',
+    name: 'Adepte du calme',
+    description: 'Maintenir des niveaux de stress bas pendant 15 jours',
+    level: 3,
+    category: 'excellence'
+  }
+];
+
+export const mockBadges: Badge[] = [
+  {
+    id: "1",
+    name: "Débutant en bien-être",
+    description: "Premier pas dans votre parcours de bien-être",
+    level: 1,
+    image: "beginner.png",
+    unlockedAt: "2025-04-15T09:30:00Z",
+    category: "milestone"
+  },
+  {
+    id: "2",
+    name: "Expert en respiration",
+    description: "Maîtrisé 10 exercices de respiration différents",
+    level: 2,
+    image: "breathing.png",
+    unlockedAt: "2025-04-22T14:15:00Z",
+    category: "skills"
+  },
+  {
+    id: "3",
+    name: "Suivi du stress",
+    description: "Suivi de votre stress pendant 30 jours consécutifs",
+    level: 3,
+    image: "streak.png",
+    category: "consistency"
+  },
+  {
+    id: "4",
+    name: "Explorateur de méditation",
+    description: "Essayé 5 types différents de méditation",
+    level: 2,
+    image: "meditation.png",
+    unlockedAt: "2025-05-03T11:45:00Z",
+    category: "exploration"
   }
 ];
 
 export const mockGamificationStats: GamificationStats = {
+  points: 850,
   level: 3,
-  points: 450,
-  nextMilestone: 600,
-  progressToNextLevel: 75,
-  streakDays: 5,
-  totalBadges: 2,
-  totalChallenges: 1,
-  totalScans: 12,
-  badges: ['Scanner Débutant', 'Expressif'],
-  recentAchievements: mockAchievements,
-  lastActivityDate: '2025-05-13T18:30:00Z'
+  nextLevelPoints: 1000,
+  badges: mockBadges,
+  completedChallenges: 2,
+  activeChallenges: 3,
+  streakDays: 8,
+  progressToNextLevel: 85,
+  challenges: mockChallenges,
+  recentAchievements: mockBadges.slice(0, 2),
+  totalPoints: 850
 };

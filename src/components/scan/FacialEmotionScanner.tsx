@@ -6,7 +6,12 @@ import { Camera } from 'lucide-react';
 import { EmotionResult, FacialEmotionScannerProps } from '@/types/emotion';
 import { useHumeAI } from '@/hooks/useHumeAI';
 
-const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onEmotionDetected, isScanning, onToggleScanning }) => {
+const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ 
+  onEmotionDetected, 
+  className,
+  isScanning,
+  onToggleScanning 
+}) => {
   const [image, setImage] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,12 +79,12 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onEmotionDe
       if (!result.dominantEmotion && result.emotion) {
         result.dominantEmotion = {
           name: result.emotion,
-          intensity: result.intensity || 0
+          score: result.score || 0
         };
       }
       
-      if (onEmotionDetected) {
-        onEmotionDetected(result);
+      if (onEmotionDetected && result.dominantEmotion) {
+        onEmotionDetected(result.dominantEmotion);
       }
     } catch (err) {
       console.error('Error analyzing facial expression:', err);

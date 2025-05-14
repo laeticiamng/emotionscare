@@ -1,6 +1,7 @@
+
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult, Emotion } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 
 export function useHumeAI() {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -23,20 +24,19 @@ export function useHumeAI() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Simulate a successful response
-      const simulatedEmotions: Emotion[] = [
-        { name: 'joy', intensity: 0.8, confidence: 0.9 },
-        { name: 'calm', intensity: 0.6, confidence: 0.85 },
-        { name: 'surprise', intensity: 0.2, confidence: 0.7 }
+      const simulatedEmotions = [
+        { name: 'joy', score: 0.8, confidence: 0.9 },
+        { name: 'calm', score: 0.6, confidence: 0.85 },
+        { name: 'surprise', score: 0.2, confidence: 0.7 }
       ];
       
       const dominantEmotion = simulatedEmotions[0];
       
       const emotionResult: EmotionResult = {
-        emotions: simulatedEmotions,
         dominantEmotion,
-        timestamp: new Date().toISOString(),
         source: 'facial',
-        faceDetected: true
+        faceDetected: true,
+        timestamp: new Date().toISOString()
       };
       
       setResult(emotionResult);
@@ -53,8 +53,7 @@ export function useHumeAI() {
       
       // Return error result
       const errorResult: EmotionResult = {
-        emotions: [],
-        dominantEmotion: { name: 'neutral', intensity: 0 },
+        dominantEmotion: { name: 'neutral', score: 0 },
         source: 'facial',
         error: 'Failed to process facial expression',
         faceDetected: false
@@ -67,12 +66,12 @@ export function useHumeAI() {
     }
   }, [toast]);
   
-  const processEmotions = useCallback((faceData: any): Emotion[] => {
+  const processEmotions = useCallback((faceData: any) => {
     // Mock emotions data with properly typed confidence
     return [
-      { name: 'happiness', intensity: 0.8, score: 0.8 },
-      { name: 'sadness', intensity: 0.2, score: 0.2 },
-      { name: 'anger', intensity: 0.1, score: 0.1 }
+      { name: 'happiness', score: 0.8 },
+      { name: 'sadness', score: 0.2 },
+      { name: 'anger', score: 0.1 }
     ];
   }, []);
   

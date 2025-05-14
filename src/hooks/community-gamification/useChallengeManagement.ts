@@ -1,64 +1,61 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Challenge } from '@/types/gamification';
-import { completeChallenge as completeGamificationChallenge } from '@/lib/gamificationService';
+import { fetchChallenges } from '@/lib/gamificationService';
 
-export const useChallengeManagement = () => {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const useChallengeManagement = (userId: string) => {
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [activeChallenges, setActiveChallenges] = useState<Challenge[]>([]);
-  const [recommendedChallenges, setRecommendedChallenges] = useState<Challenge[]>([]);
-  
-  const markChallengeCompleted = useCallback(async (challengeId: string) => {
-    setIsProcessing(true);
+  const [completedChallenges, setCompletedChallenges] = useState<Challenge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadChallenges = async () => {
+    setIsLoading(true);
     setError(null);
-    
     try {
-      const updatedChallenge = await completeGamificationChallenge(challengeId);
-      return updatedChallenge;
+      const data = await fetchChallenges(userId, 'all');
+      setChallenges(data);
+      
+      // Filter challenges into active and completed
+      setActiveChallenges(data.filter(c => c.status === 'active' || c.status === 'ongoing' || c.status === 'available'));
+      setCompletedChallenges(data.filter(c => c.status === 'completed'));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to complete challenge';
-      setError(errorMessage);
-      throw err;
+      setError('Failed to load challenges');
+      console.error('Error loading challenges:', err);
     } finally {
-      setIsProcessing(false);
+      setIsLoading(false);
     }
-  }, []);
-  
-  const trackChallengeProgress = useCallback(async (challengeId: string, progress: number) => {
-    // Implementation would update challenge progress
-    console.log(`Tracking progress for challenge ${challengeId}: ${progress}`);
+  };
+
+  useEffect(() => {
+    loadChallenges();
+  }, [userId]);
+
+  const joinChallenge = async (challengeId: string) => {
+    // Here would be API call to join a challenge
+    console.log('Joining challenge:', challengeId);
+    // Reload challenges after joining
+    await loadChallenges();
     return true;
-  }, []);
-  
-  const acceptChallenge = useCallback(async (challengeId: string) => {
-    console.log(`Accepting challenge ${challengeId}`);
+  };
+
+  const completeChallenge = async (challengeId: string) => {
+    // Here would be API call to mark challenge as complete
+    console.log('Completing challenge:', challengeId);
+    // Reload challenges after completion
+    await loadChallenges();
     return true;
-  }, []);
-  
-  const completeChallenge = useCallback(async (challengeId: string) => {
-    try {
-      await markChallengeCompleted(challengeId);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }, [markChallengeCompleted]);
-  
-  const generatePersonalizedChallenges = useCallback(async () => {
-    // Mock implementation - would fetch personalized challenges for user
-    console.log('Generating personalized challenges');
-  }, []);
-  
+  };
+
   return {
-    isProcessing,
-    error,
-    markChallengeCompleted,
-    trackChallengeProgress,
+    challenges,
     activeChallenges,
-    recommendedChallenges,
-    acceptChallenge,
+    completedChallenges,
+    isLoading,
+    error,
+    joinChallenge,
     completeChallenge,
-    generatePersonalizedChallenges
+    refreshChallenges: loadChallenges
   };
 };

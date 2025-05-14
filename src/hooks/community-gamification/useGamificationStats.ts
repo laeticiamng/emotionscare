@@ -1,10 +1,9 @@
 
-import { useState, useCallback } from 'react';
-import { GamificationStats } from './types';
-import { Badge, Challenge } from '@/types/gamification';
-import { getUserGamificationStats } from '@/lib/gamificationService';
+import { useState, useEffect } from 'react';
+import { GamificationStats } from '@/types/gamification';
+import { fetchGamificationStats, syncGamificationData } from '@/lib/gamificationService';
 
-export function useGamificationStats() {
+export const useGamificationStats = (userId: string) => {
   const [stats, setStats] = useState<GamificationStats>({
     points: 0,
     level: 1,
@@ -14,76 +13,75 @@ export function useGamificationStats() {
     activeChallenges: 0,
     streakDays: 0,
     progressToNextLevel: 0,
-    totalPoints: 0,
-    currentLevel: 1,
-    badgesCount: 0,
-    pointsToNextLevel: 100,
-    lastActivityDate: null,
     challenges: [],
     recentAchievements: []
   });
   
   const [isLoading, setIsLoading] = useState(true);
-  
-  const loadGamificationStats = useCallback(async () => {
+  const [error, setError] = useState<string | null>(null);
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
+
+  const loadStats = async () => {
+    if (!userId) {
+      setError("User ID is required");
+      return;
+    }
+    
     setIsLoading(true);
+    setError(null);
+    
     try {
-      const userId = 'current-user'; // This would normally come from auth context
-      const userStats = await getUserGamificationStats(userId);
+      const data = await fetchGamificationStats(userId);
       
-      setStats({
-        ...userStats,
-        challenges: userStats.challenges || [],
-        recentAchievements: userStats.recentAchievements || []
-      });
-    } catch (error) {
-      console.error('Error loading gamification stats:', error);
+      if (data) {
+        setStats({
+          ...data,
+          progressToNextLevel: calculateProgress(data.points, data.nextLevelPoints)
+        });
+      }
+      
+      setLastSynced(new Date());
+    } catch (err) {
+      setError("Failed to load gamification stats");
+      console.error('Error loading gamification stats:', err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
-  
-  const updateStatsForCompletedChallenge = useCallback(
-    (challengeId: string, activeChallenges: Challenge[]) => {
-      const challenge = activeChallenges.find(c => c.id === challengeId);
-      
-      if (!challenge) return;
-      
-      setStats(prevStats => {
-        const pointsEarned = challenge.points || 0;
-        const newTotalPoints = (prevStats.totalPoints || prevStats.points) + pointsEarned;
-        const newLevel = Math.floor(Math.sqrt(newTotalPoints / 100)) + 1;
-        const nextLevelPoints = (newLevel + 1) * (newLevel + 1) * 100;
-        const pointsToNext = nextLevelPoints - newTotalPoints;
-        const progress = Math.floor((newTotalPoints / nextLevelPoints) * 100);
-        
-        return {
-          ...prevStats,
-          points: newTotalPoints,
-          totalPoints: newTotalPoints,
-          level: newLevel,
-          currentLevel: newLevel,
-          nextLevelPoints,
-          pointsToNextLevel: pointsToNext,
-          progressToNextLevel: progress,
-          completedChallenges: prevStats.completedChallenges + 1,
-          challenges: prevStats.challenges.map(c => 
-            c.id === challengeId ? { ...c, status: 'completed' as const, completed: true } : c
-          )
-        };
-      });
-    }, []
-  );
-  
-  // Initialize data on first render
-  useCallback(() => {
-    loadGamificationStats();
-  }, [loadGamificationStats]);
-  
+  };
+
+  const syncStats = async () => {
+    if (!userId) return;
+    
+    try {
+      const syncResult = await syncGamificationData(userId);
+      if (syncResult) {
+        await loadStats();
+      }
+    } catch (err) {
+      console.error('Error syncing gamification data:', err);
+    }
+  };
+
+  const calculateProgress = (current: number, target: number): number => {
+    if (target <= 0) return 0;
+    const progress = (current / target) * 100;
+    return Math.min(Math.max(progress, 0), 100);
+  };
+
+  useEffect(() => {
+    if (userId) {
+      loadStats();
+    }
+  }, [userId]);
+
   return {
     stats,
     isLoading,
-    loadGamificationStats,
-    updateStatsForCompletedChallenge
+    error,
+    lastSynced,
+    refreshStats: loadStats,
+    syncStats
   };
-}
+};
+
+export default useGamificationStats;

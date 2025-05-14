@@ -21,7 +21,10 @@ const NotificationsPanel = () => {
   const enhancedNotifications: EnhancedNotification[] = notifications ? notifications.map(notification => ({
     ...notification,
     read: 'isRead' in notification ? notification.isRead : false,
-    timestamp: 'date' in notification ? notification.date : new Date().toISOString()
+    timestamp: 'date' in notification ? notification.date : new Date().toISOString(),
+    priority: 1, // Default priority
+    category: notification.type, // Use type as category
+    createdAt: notification.timestamp || new Date().toISOString()
   })) : [];
 
   useEffect(() => {

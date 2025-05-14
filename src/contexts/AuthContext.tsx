@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { User } from '@/types';
 
@@ -67,8 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           fontSize: 'medium',
           fontFamily: 'inter',
           language: 'fr',
-          notifications: true,
-          soundEnabled: true,
+          notifications: {
+            enabled: false,
+            emailEnabled: false,
+            pushEnabled: false,
+            frequency: 'daily'
+          },
           privacyLevel: 'private',
           onboardingCompleted: false,
           dashboardLayout: 'standard'
@@ -107,8 +110,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           fontSize: 'medium',
           fontFamily: 'inter',
           language: 'fr',
-          notifications: false,
-          soundEnabled: true,
+          notifications: {
+            enabled: false,
+            emailEnabled: false,
+            pushEnabled: false,
+            frequency: 'daily'
+          },
           privacyLevel: 'private',
           onboardingCompleted: false,
           dashboardLayout: 'standard'

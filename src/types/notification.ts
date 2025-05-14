@@ -22,6 +22,9 @@ export interface EnhancedNotification extends Notification {
     name: string;
     avatar?: string;
   };
+  date?: string;
+  isRead?: boolean;
+  linkTo?: string;
 }
 
 export interface NotificationPreference {

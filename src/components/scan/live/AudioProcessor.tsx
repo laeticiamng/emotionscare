@@ -101,11 +101,6 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
           dominantEmotion: {
             name: dominantEmotion.name,
             score: dominantEmotion.score
-          },
-          emotions: {
-            [mockEmotions[0].name]: mockEmotions[0].score,
-            [mockEmotions[1].name]: mockEmotions[1].score,
-            [mockEmotions[2].name]: mockEmotions[2].score
           }
         };
         

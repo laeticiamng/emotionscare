@@ -16,11 +16,17 @@ export interface EmotionResult {
   primaryEmotion?: {
     name: string;
     intensity?: number;
+    score?: number;
   };
   dominantEmotion?: {
     name: string;
     score: number;
   };
+  emotions?: any;
+  source?: string;
+  faceDetected?: boolean;
+  error?: string;
+  timestamp?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -49,6 +55,7 @@ export interface Emotion {
   primaryEmotion?: {
     name: string;
     intensity?: number;
+    score?: number;
   };
 }
 
@@ -64,6 +71,8 @@ export interface EmotionalTeamViewProps {
 export interface FacialEmotionScannerProps {
   onEmotionDetected: (emotion: { name: string; score: number; }) => void;
   className?: string;
+  isScanning?: boolean;
+  onToggleScanning?: () => void;
 }
 
 export interface EmotionScanFormProps {

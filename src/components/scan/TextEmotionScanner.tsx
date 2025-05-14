@@ -54,29 +54,28 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
       const textLower = text.toLowerCase();
       
       // Very simple emotion detection based on keywords
-      let dominantEmotion = { name: 'neutral', intensity: 0.5 };
+      let dominantEmotion = { name: 'neutral', score: 0.5 };
       
       if (textLower.includes('heureux') || textLower.includes('content') || textLower.includes('joie')) {
-        dominantEmotion = { name: 'joy', intensity: 0.8 };
+        dominantEmotion = { name: 'joy', score: 0.8 };
       } else if (textLower.includes('triste') || textLower.includes('peine') || textLower.includes('chagrin')) {
-        dominantEmotion = { name: 'sadness', intensity: 0.7 };
+        dominantEmotion = { name: 'sadness', score: 0.7 };
       } else if (textLower.includes('colère') || textLower.includes('énervé') || textLower.includes('furieux')) {
-        dominantEmotion = { name: 'anger', intensity: 0.9 };
+        dominantEmotion = { name: 'anger', score: 0.9 };
       } else if (textLower.includes('peur') || textLower.includes('effrayé') || textLower.includes('terrifié')) {
-        dominantEmotion = { name: 'fear', intensity: 0.85 };
+        dominantEmotion = { name: 'fear', score: 0.85 };
       } else if (textLower.includes('dégoût') || textLower.includes('répugnant')) {
-        dominantEmotion = { name: 'disgust', intensity: 0.65 };
+        dominantEmotion = { name: 'disgust', score: 0.65 };
       } else if (textLower.includes('surprise') || textLower.includes('étonné')) {
-        dominantEmotion = { name: 'surprise', intensity: 0.75 };
+        dominantEmotion = { name: 'surprise', score: 0.75 };
       } else if (textLower.includes('calme') || textLower.includes('paisible') || textLower.includes('serein')) {
-        dominantEmotion = { name: 'calm', intensity: 0.6 };
+        dominantEmotion = { name: 'calm', score: 0.6 };
       } else if (textLower.includes('fatigué') || textLower.includes('épuisé')) {
-        dominantEmotion = { name: 'fatigue', intensity: 0.7 };
+        dominantEmotion = { name: 'fatigue', score: 0.7 };
       }
       
       // Create emotion result
       const emotionResult: EmotionResult = {
-        emotions: [dominantEmotion],
         dominantEmotion,
         source: 'text',
         text,

@@ -1,69 +1,73 @@
 
-import { Badge } from '@/types/user';
-import { User } from '@/types/user';
-
-// Export the Challenge interface
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  type: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  points: number;
-  category: string;
-  status?: string;
-  progress?: number;
-  completedAt?: string;
-  completed?: boolean;
-  icon?: string;
-  duration?: string;
-  requirements?: string[];
-}
+import { Challenge, Badge as GamificationBadge } from '@/types/gamification';
 
 export interface Achievement {
   id: string;
   name: string;
-  icon?: string;
-  unlocked: boolean;
-  progress?: number;
-  total?: number;
-  description?: string;
+  description: string;
+  unlockedAt?: Date | string;
+  level?: number;
+  image?: string;
+  category?: string;
 }
 
-export interface GamificationStats {
-  level: number;
-  xp: number;
-  xpToNextLevel: number;
-  totalChallengesCompleted: number;
-  streak: number;
-  badges: number;
-  rank?: string;
-  percentile?: number;
-  lastActivityDate?: string;
+export interface ActivityData {
+  totalActivity: number;
+  recentActivities: Activity[];
+  activityByDay: Record<string, number>;
 }
 
-export interface UseCommunityGamificationResult {
-  isProcessing: boolean;
-  error: string;
-  markChallengeCompleted: (challengeId: string) => Promise<Challenge>;
-  trackChallengeProgress: (challengeId: string, progress: number) => Promise<Challenge>;
-  achievements: Achievement[];
-  stats: GamificationStats;
-  activeChallenges: Challenge[];
-  recommendedChallenges: Challenge[];
-  acceptChallenge: (challengeId: string) => Promise<Challenge>;
-  generatePersonalizedChallenges: () => Promise<Challenge[]>;
-  completeChallenge: (challengeId: string) => Promise<Challenge>;
-  badges: Badge[];
+export interface Activity {
+  id: string;
+  type: string;
+  description: string;
+  timestamp: Date | string;
 }
 
-export interface BadgeData {
+export interface RewardItem {
   id: string;
   name: string;
   description: string;
-  image_url?: string;
-  icon?: string;
-  threshold?: number;
-  type?: string;
+  pointsRequired: number;
+  image?: string;
+  unlocked: boolean;
 }
 
+export interface GamificationContext {
+  stats: GamificationStatsState;
+  challenges: ChallengeState;
+  rewards: RewardState;
+}
+
+export interface GamificationStatsState {
+  isLoading: boolean;
+  error: string | null;
+  data: GamificationStats | null;
+}
+
+export interface ChallengeState {
+  isLoading: boolean;
+  error: string | null;
+  data: Challenge[] | null;
+  current: Challenge | null;
+}
+
+export interface RewardState {
+  isLoading: boolean;
+  error: string | null;
+  data: RewardItem[] | null;
+}
+
+export interface GamificationStats {
+  points: number;
+  level: number;
+  nextLevelPoints: number;
+  badges: GamificationBadge[];
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  progressToNextLevel: number;
+  challenges: Challenge[];
+  recentAchievements: GamificationBadge[];
+  totalPoints?: number;
+}

@@ -1,58 +1,96 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserPreferences } from '@/types';
+import { useState, useEffect } from 'react';
+import { UserPreferences } from '@/types/user';
 
-export const usePreferences = () => {
-  const { user, updateUser } = useAuth();
+interface UsePreferencesReturn {
+  preferences: UserPreferences;
+  isLoading: boolean;
+  error: string | null;
+  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
+}
+
+export const usePreferences = (): UsePreferencesReturn => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [preferences, setPreferences] = useState<UserPreferences>({
     theme: 'system',
-    language: 'fr',
     fontSize: 'medium',
     fontFamily: 'inter',
-    notifications: false,
-    soundEnabled: true,
-    privacyLevel: 'private',
-    onboardingCompleted: false,
-    dashboardLayout: 'standard'
+    notifications: {
+      enabled: false,
+      emailEnabled: false,
+      pushEnabled: false,
+      frequency: 'daily'
+    }
   });
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user?.preferences) {
-      setPreferences(user.preferences);
-    }
-    setIsLoading(false);
-  }, [user]);
+    // Load preferences from storage or API
+    loadPreferences();
+  }, []);
 
-  const updatePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
+  const loadPreferences = async () => {
     setIsLoading(true);
     try {
-      if (!user) return;
-
-      const updatedPreferences = {
-        ...preferences,
-        ...newPreferences,
-      };
-
-      await updateUser({
-        ...user,
-        preferences: updatedPreferences,
-      });
-
-      setPreferences(updatedPreferences);
-      return updatedPreferences;
-    } catch (error) {
-      console.error('Failed to update preferences:', error);
-      throw error;
+      // In a real app, we'd load from an API or local storage
+      // For now, we'll just simulate loading with a timeout
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mock data
+      const storedPreferences = localStorage.getItem('userPreferences');
+      if (storedPreferences) {
+        setPreferences(JSON.parse(storedPreferences));
+      }
+      
+    } catch (err) {
+      setError('Failed to load preferences');
+      console.error('Error loading preferences:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [preferences, user, updateUser]);
+  };
+
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Merge new preferences with existing ones
+      const updatedPreferences = {
+        ...preferences,
+        ...newPreferences,
+        // If updating notifications, make sure we properly merge the nested object
+        notifications: newPreferences.notifications 
+          ? {
+              ...preferences.notifications,
+              ...newPreferences.notifications
+            }
+          : preferences.notifications
+      };
+      
+      // In a real app, we'd save to an API
+      // For now, we'll just simulate saving with a timeout
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Save to local storage for demo purposes
+      localStorage.setItem('userPreferences', JSON.stringify(updatedPreferences));
+      
+      // Update local state
+      setPreferences(updatedPreferences);
+    } catch (err) {
+      setError('Failed to update preferences');
+      console.error('Error updating preferences:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     preferences,
     isLoading,
-    updatePreferences,
+    error,
+    updatePreferences
   };
 };
+
+export default usePreferences;

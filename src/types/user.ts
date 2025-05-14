@@ -1,74 +1,58 @@
 
-// Create or update the file with the corrected type
+export type Theme = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'inter' | 'roboto' | 'lato' | 'poppins' | 'montserrat';
+export type UserRole = 'admin' | 'user' | 'manager' | 'guest' | 'b2b_admin' | 'b2b_user' | 'b2c';
+
 export interface User {
   id: string;
-  name: string;
   email: string;
-  avatar_url?: string;
-  avatar?: string;
-  role: UserRole;
+  role?: UserRole;
+  name?: string;
   created_at?: string;
-  createdAt?: string;
-  joined_at?: string;
+  avatar_url?: string;
   preferences?: UserPreferences;
-  bio?: string;
   onboarded?: boolean;
   department?: string;
   position?: string;
+  joined_at?: string;
   emotional_score?: number;
-  team_id?: string;
+  bio?: string;
   anonymity_code?: string;
+  avatar?: string;
 }
 
 export interface UserPreferences {
-  theme: ThemeName;
+  theme: Theme;
   fontSize: FontSize;
-  fontFamily: FontFamily;
-  language?: string;
+  fontFamily?: FontFamily;
   notifications: {
     enabled: boolean;
     emailEnabled: boolean;
     pushEnabled: boolean;
     frequency: string;
   };
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  privacy?: string;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
+  language?: string;
+  privacy?: string;
+  notifications_enabled?: boolean;
 }
 
-export interface UserPreferencesState extends UserPreferences {
-  setTheme: (theme: ThemeName) => void;
-  setFontSize: (size: FontSize) => void;
-  setFontFamily: (family: FontFamily) => void;
-  setNotifications: (prefs: any) => void;
+export interface UserPreferencesState {
+  isLoading: boolean;
+  error: string | null;
+  preferences: UserPreferences;
 }
-
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'inter' | 'rounded';
 
 export interface InvitationVerificationResult {
-  valid: boolean;
-  message?: string;
+  isValid: boolean;
   data?: {
     email: string;
     role: string;
+    expires_at: string;
   };
-  expired?: boolean;
-  alreadyAccepted?: boolean;
   error?: string;
-  invitation?: {
-    id: string;
-    email: string;
-    role: string;
-    expiresAt: string;
-  };
 }
-
-export type UserRole = 'user' | 'admin' | 'therapist' | 'coach' | 'team_manager' | 'client' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'employee' | 'manager' | 'analyst' | 'wellbeing_manager';

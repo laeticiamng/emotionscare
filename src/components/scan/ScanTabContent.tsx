@@ -7,15 +7,17 @@ const ScanTabContent: React.FC<{ onScanSaved?: () => void, onClose?: () => void 
   onScanSaved, 
   onClose 
 }) => {
-  const { user } = useAuth(); // Import and use the Auth context to get the user
+  const { user } = useAuth();
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <EmotionScanForm 
-        userId={user?.id} 
-        onScanSaved={onScanSaved} 
-        onClose={onClose} 
-      />
+      {user && (
+        <EmotionScanForm 
+          userId={user.id} 
+          onScanSaved={onScanSaved} 
+          onClose={onClose} 
+        />
+      )}
     </div>
   );
 };
