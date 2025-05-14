@@ -1,4 +1,3 @@
-
 export type {
   User,
   UserPreferences,
@@ -103,6 +102,7 @@ export interface Badge {
   name: string;
   description: string;
   image_url?: string;
+  imageUrl?: string;
   icon?: string;
   threshold?: number;
   type?: string;
@@ -159,4 +159,3 @@ export interface InvitationFormData {
   message?: string;
   expires_in_days: number;
 }
-

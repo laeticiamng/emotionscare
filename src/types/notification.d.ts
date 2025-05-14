@@ -1,34 +1,33 @@
 
-export type NotificationFrequency = 'daily' | 'weekly' | 'immediate' | 'digest' | 'none';
-export type NotificationType = 'journal' | 'breathing' | 'music' | 'coaching' | 'system' | 'all' | 'important';
-export type NotificationTone = 'professional' | 'casual' | 'supportive' | 'minimal' | 'gentle' | 'neutral' | 'energetic';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'custom';
+export type NotificationType = 'all' | 'emotion' | 'journal' | 'coach' | 'vr' | 'community' | 'system';
+export type NotificationTone = 'supportive' | 'direct' | 'gentle' | 'motivational';
 
 export interface Notification {
   id: string;
-  userId: string;
   title: string;
-  body?: string;
-  message?: string;
+  message: string;
   type: NotificationType;
-  read?: boolean;
-  isRead?: boolean;
-  timestamp?: string;
-  createdAt: string;
-  link?: string;
+  read: boolean;
+  date: string;
+  actionUrl?: string;
+  actionLabel?: string;
   image?: string;
+  icon?: string;
+  user_id?: string;
 }
 
 export interface NotificationPreference {
-  enabled?: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  soundEnabled?: boolean;
-  frequency?: NotificationFrequency;
-  type?: NotificationType;
-  tone?: NotificationTone;
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
+  type: NotificationType;
+  frequency: NotificationFrequency;
+  tone: NotificationTone;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  soundEnabled: boolean;
+}
+
+export interface NotificationBadge {
+  count: number;
+  hasNew: boolean;
+  lastSeen?: string;
 }

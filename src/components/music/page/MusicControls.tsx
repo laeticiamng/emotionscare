@@ -47,7 +47,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
 }) => {
   const getCoverImage = (track?: MusicTrack) => {
     if (!track) return '';
-    return track.coverUrl || track.cover || track.cover_url || '';
+    return track.coverUrl || track.cover || '';
   };
   
   const formatTime = (seconds: number) => {

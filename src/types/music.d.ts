@@ -1,30 +1,35 @@
-
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
   duration: number;
   url: string;
-  coverUrl?: string;
-  audioUrl?: string;
-  audio_url?: string;
+  audioUrl: string;
+  coverUrl: string;
+  cover?: string;
+  emotion?: string;
+  
+  // For backward compatibility
   cover_url?: string;
-  lyrics?: string;
-  mood?: string;
-  tempo?: number;
-  genre?: string;
+  audio_url?: string;
+}
+
+export interface Track extends MusicTrack {
+  // Additional properties if needed
+  coverUrl: string;
+  cover?: string;
+  cover_url?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  title: string;
-  name: string; // Adding name as required by the interface
+  name: string;
+  title: string; 
   description?: string;
   coverUrl?: string;
-  emotion?: string;
   tracks: MusicTrack[];
-  createdAt?: string;
-  updatedAt?: string;
+  category?: string;
+  emotion?: string; 
 }
 
 export interface MusicContextType {
@@ -72,4 +77,53 @@ export interface MusicContextType {
   currentEmotion: string | null;
   isMuted: boolean;
   toggleMute: () => void;
+}
+
+export interface MusicDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
+  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack;
+}
+
+export interface ProgressBarProps {
+  duration: number;
+  currentTime: number;
+  onSeek: (time: number) => void;
+  formatTime?: (time: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  showTimestamps?: boolean;
+  className?: string;
+}
+
+export interface TrackInfoProps {
+  title: string;
+  artist: string;
+  coverUrl: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack | null;
+  loadingTrack?: boolean;
+  audioError?: boolean;
+  className?: string;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onChange: (volume: number) => void;
+  onVolumeChange: (volume: number) => void;
+  showLabel?: boolean;
+  className?: string;
+}
+
+export interface TrackListProps {
+  tracks: MusicTrack[];
+  onTrackSelect: (track: MusicTrack) => void;
+  onPlayPause: (track: MusicTrack) => void;
+  currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
+  compact?: boolean;
+  showEmotionTag?: boolean;
+  onPlay?: (track: MusicTrack) => void;
 }

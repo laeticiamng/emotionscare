@@ -1,89 +1,148 @@
 
-import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types/emotion';
+import { useState } from 'react';
+import { Emotion } from '@/types';
 
-export function useHumeAI() {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const { toast } = useToast();
+export type EmotionSource = 'audio' | 'text' | 'camera' | 'manual' | 'voice' | 'facial';
 
-  // Process facial expression image
-  const processFacialExpression = useCallback(async (imageData: string): Promise<EmotionResult | null> => {
+interface UseHumeAIProps {
+  onEmotionDetected?: (emotion: Emotion) => void;
+}
+
+export const useHumeAI = ({ onEmotionDetected }: UseHumeAIProps = {}) => {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastDetectedEmotion, setLastDetectedEmotion] = useState<Emotion | null>(null);
+
+  // Mock function to analyze audio
+  const analyzeAudio = async (audioBlob: Blob): Promise<Emotion> => {
     try {
-      setIsProcessing(true);
-      setIsError(false);
-
-      // In a real implementation, this would call the Hume AI API
-      // For now, we'll simulate a successful API response
-      
-      console.log('Processing facial expression with Hume AI...');
-      
+      setIsAnalyzing(true);
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate a successful response
-      const simulatedEmotions = [
-        { name: 'joy', score: 0.8, confidence: 0.9 },
-        { name: 'calm', score: 0.6, confidence: 0.85 },
-        { name: 'surprise', score: 0.2, confidence: 0.7 }
-      ];
-      
-      const emotionResult: EmotionResult = {
-        emotion: simulatedEmotions[0].name,
-        score: simulatedEmotions[0].score * 100,
-        confidence: simulatedEmotions[0].confidence,
-        dominantEmotion: simulatedEmotions[0].name,
-        source: 'facial',
-        timestamp: new Date().toISOString()
+
+      // Mock detected emotion
+      const detectedEmotion: Emotion = {
+        id: Math.random().toString(36).substring(2, 9),
+        date: new Date().toISOString(),
+        emotion: ['joy', 'calm', 'neutral'][Math.floor(Math.random() * 3)],
+        sentiment: Math.random() * 10,
+        anxiety: Math.floor(Math.random() * 10),
+        energy: Math.floor(Math.random() * 10),
+        score: Math.random() * 10,
+        intensity: Math.random()
       };
-      
-      setResult(emotionResult);
-      return emotionResult;
-    } catch (error) {
-      console.error('Error processing facial expression:', error);
-      setIsError(true);
-      
-      toast({
-        title: "Erreur de traitement",
-        description: "Impossible d'analyser l'expression faciale",
-        variant: "destructive"
-      });
-      
-      // Return error result
-      const errorResult: EmotionResult = {
-        emotion: 'neutral',
-        score: 0,
-        dominantEmotion: 'neutral',
-        source: 'facial',
-        confidence: 0,
-        error: 'Failed to process facial expression'
-      };
-      
-      setResult(errorResult);
-      return errorResult;
+
+      setLastDetectedEmotion(detectedEmotion);
+      if (onEmotionDetected) {
+        onEmotionDetected(detectedEmotion);
+      }
+      return detectedEmotion;
+    } catch (err) {
+      setError('Failed to analyze audio');
+      throw err;
     } finally {
-      setIsProcessing(false);
+      setIsAnalyzing(false);
     }
-  }, [toast]);
-  
-  const processEmotions = useCallback(() => {
-    // Mock emotions data with properly typed scores
-    return [
-      { name: 'happiness', score: 0.8 },
-      { name: 'sadness', score: 0.2 },
-      { name: 'anger', score: 0.1 }
-    ];
-  }, []);
-  
+  };
+
+  // Mock function to analyze facial expression
+  const analyzeFacial = async (imageBlob: Blob): Promise<Emotion> => {
+    try {
+      setIsAnalyzing(true);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Mock detected emotion
+      const detectedEmotion: Emotion = {
+        id: Math.random().toString(36).substring(2, 9),
+        date: new Date().toISOString(),
+        emotion: ['joy', 'calm', 'neutral'][Math.floor(Math.random() * 3)],
+        sentiment: Math.random() * 10,
+        anxiety: Math.floor(Math.random() * 10),
+        energy: Math.floor(Math.random() * 10),
+        score: Math.random() * 10,
+        intensity: Math.random()
+      };
+
+      setLastDetectedEmotion(detectedEmotion);
+      if (onEmotionDetected) {
+        onEmotionDetected(detectedEmotion);
+      }
+      return detectedEmotion;
+    } catch (err) {
+      setError('Failed to analyze facial expression');
+      throw err;
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Common method to analyze emotions from any source
+  const analyzeEmotion = async (
+    data: Blob | string,
+    source: EmotionSource = 'text'
+  ): Promise<Emotion | null> => {
+    try {
+      setIsAnalyzing(true);
+      setError(null);
+
+      let result: Emotion;
+      
+      if (source === 'audio' || source === 'voice') {
+        result = await analyzeAudio(data as Blob);
+      } else if (source === 'facial' || source === 'camera') {
+        result = await analyzeFacial(data as Blob);
+      } else if (source === 'text') {
+        // Mock text analysis
+        result = {
+          id: Math.random().toString(36).substring(2, 9),
+          date: new Date().toISOString(),
+          emotion: data.toString().toLowerCase().includes('happy') ? 'joy' : 'neutral',
+          sentiment: Math.random() * 10,
+          anxiety: Math.floor(Math.random() * 10),
+          energy: Math.floor(Math.random() * 10),
+          score: Math.random() * 10,
+          intensity: Math.random(),
+          text: data.toString()
+        };
+      } else if (source === 'manual') {
+        result = {
+          id: Math.random().toString(36).substring(2, 9),
+          date: new Date().toISOString(),
+          emotion: data.toString(),
+          sentiment: Math.random() * 10,
+          anxiety: Math.floor(Math.random() * 10),
+          energy: Math.floor(Math.random() * 10),
+          score: Math.random() * 10,
+          intensity: Math.random()
+        };
+      } else {
+        throw new Error(`Unsupported emotion source: ${source}`);
+      }
+
+      setLastDetectedEmotion(result);
+      if (onEmotionDetected) {
+        onEmotionDetected(result);
+      }
+      
+      return result;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(message);
+      console.error(`Error analyzing emotion (${source}):`, err);
+      return null;
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   return {
-    isProcessing,
-    isError,
-    result,
-    processFacialExpression,
-    processEmotions
+    isAnalyzing,
+    analyzeEmotion,
+    analyzeAudio,
+    analyzeFacial,
+    lastDetectedEmotion,
+    error,
+    clearError: () => setError(null)
   };
 };
-
-export default useHumeAI;

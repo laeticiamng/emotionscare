@@ -102,7 +102,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       ...track,
       url: track.url || track.audioUrl || '',
       audioUrl: track.audioUrl || track.audio_url || track.url || '',
-      coverUrl: track.coverUrl || track.cover || ''
+      coverUrl: track.coverUrl || ''
     };
     
     playTrack(normalizedTrack);
@@ -151,7 +151,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
             onTrackSelect={handlePlayTrack}
             currentTrack={currentTrack}
             isPlaying={isPlaying}
-            onPlayPause={togglePlay}
+            onPlayPause={handlePlayTrack}
             showEmotionTag={true}
           />
         ) : (

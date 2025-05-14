@@ -1,24 +1,37 @@
 
-export type UserRole = 'admin' | 'user' | 'therapist' | 'coach' | 'pending' | 'manager';
-export type ThemeName = 'light' | 'dark' | 'pastel' | 'system';
-export type FontFamily = 'system' | 'serif' | 'mono' | 'comic';
-export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  email?: string;
+export interface User {
+  id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  avatar_url?: string;
+  created_at?: string;
+  updated_at?: string;
+  preferences?: UserPreferences;
   role?: UserRole;
-  name?: string;
-  error?: string;
-  invitation_id?: string;
+  department?: string;
+  team?: string;
+  position?: string;
+  company?: string;
+  bio?: string;
+  location?: string;
+  phone?: string;
+  website?: string;
+  social?: Record<string, string>;
+  is_active?: boolean;
+  is_verified?: boolean;
+  last_login?: string;
+  last_seen?: string;
+  badge_count?: number;
+  has_password?: boolean;
+  job_title?: string;
 }
 
 export interface UserPreferences {
-  theme?: ThemeName;
-  fontSize?: FontSize;
-  fontFamily?: FontFamily;
-  highContrast?: boolean;
-  reduceAnimations?: boolean;
+  theme?: string;
+  fontSize?: string;
+  fontFamily?: string;
   language?: string;
   notifications?: boolean | {
     enabled: boolean;
@@ -32,33 +45,43 @@ export interface UserPreferences {
       start: string;
       end: string;
     };
-    type?: string;
-    soundEnabled?: boolean;
   };
+  dashboardLayout?: string;
   autoplayVideos?: boolean;
   dataCollection?: boolean;
-  privacy?: 'public' | 'private' | 'friends';
-  experimental?: boolean;
+  onboardingCompleted?: boolean;
+  sound?: {
+    enabled: boolean;
+    volume: number;
+    effects: boolean;
+  };
+  accessibility?: {
+    highContrast: boolean;
+    reducedMotion: boolean;
+    screenReader: boolean;
+    largeText: boolean;
+  };
 }
 
-export interface UserPreferencesState extends UserPreferences {
-  isLoading: boolean;
-  setPreference: (key: keyof UserPreferences, value: any) => void;
-  savePreferences: () => Promise<void>;
-}
+export type UserPreferencesState = UserPreferences & {
+  updatePreference: (key: keyof UserPreferences, value: any) => void;
+  resetPreferences: () => void;
+  loading: boolean;
+  error: Error | null;
+};
 
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  avatar_url?: string;
-  role: UserRole;
-  isActive?: boolean;
-  onboarded?: boolean;
-  preferences?: UserPreferences;
-  created_at?: string;
-  last_sign_in_at?: string;
-  company_id?: string;
-  company_role?: string;
-  job_title?: string;
+export type FontFamily = 'system' | 'serif' | 'mono' | 'sans';
+export type FontSize = 'small' | 'medium' | 'large';
+export type ThemeName = 'light' | 'dark' | 'system';
+export type UserRole = 'user' | 'admin' | 'manager' | 'guest';
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message: string;
+  invitation?: {
+    id: string;
+    email: string;
+    role: UserRole;
+    expires_at: string;
+  };
 }

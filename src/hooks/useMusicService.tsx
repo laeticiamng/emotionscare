@@ -1,55 +1,62 @@
 
-import { useCallback, useState } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { MusicTrack } from '@/types';
+import { mockTracks } from '@/data/mockMusic';
 
-// Creating a mock implementation for useMusicService
-export const useMusicService = () => {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+interface UseMusicServiceProps {
+  initialTracks?: MusicTrack[];
+}
+
+export const useMusicService = ({ initialTracks = mockTracks }: UseMusicServiceProps = {}) => {
+  const [tracks, setTracks] = useState<MusicTrack[]>(initialTracks);
   
-  const getRecommendedTracks = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
-    setIsLoading(true);
-    try {
-      // Mock implementation
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const tracks: MusicTrack[] = [
-        {
-          id: `${emotion}-track-1`,
-          title: 'Sample Track 1',
-          artist: 'Sample Artist',
-          url: 'https://example.com/track1.mp3',
-          duration: 180,
-          coverUrl: '/images/track1.jpg'
-        },
-        {
-          id: `${emotion}-track-2`,
-          title: 'Sample Track 2',
-          artist: 'Sample Artist',
-          url: 'https://example.com/track2.mp3',
-          duration: 210,
-          coverUrl: '/images/track2.jpg'
-        }
-      ];
-      
-      return tracks;
-    } catch (error) {
-      console.error('Error fetching tracks:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load recommended tracks',
-        variant: 'destructive'
-      });
-      return [];
-    } finally {
-      setIsLoading(false);
+  const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Filter tracks by emotion, or return random tracks if no matches
+    const matchingTracks = tracks.filter(track => 
+      track.emotion?.toLowerCase() === emotion.toLowerCase()
+    );
+    
+    if (matchingTracks.length > 0) {
+      return matchingTracks;
     }
-  }, [toast]);
+    
+    // Return some random tracks as fallback
+    return [
+      {
+        id: '101',
+        title: 'Adaptive Melody',
+        artist: 'AI Composer',
+        url: '/audio/adaptive-melody.mp3',
+        audioUrl: '/audio/adaptive-melody.mp3',
+        duration: 240,
+        coverUrl: '/images/music/adaptive.jpg',
+        emotion
+      },
+      {
+        id: '102',
+        title: 'Emotional Response',
+        artist: 'Mood Match',
+        url: '/audio/emotional-response.mp3',
+        audioUrl: '/audio/emotional-response.mp3',
+        duration: 210,
+        coverUrl: '/images/music/response.jpg',
+        emotion
+      }
+    ];
+  };
+  
+  const getTrackById = async (id: string): Promise<MusicTrack | null> => {
+    const track = tracks.find(track => track.id === id);
+    return track || null;
+  };
   
   return {
+    tracks,
     getRecommendedTracks,
-    isLoading
+    getTrackById
   };
 };
 

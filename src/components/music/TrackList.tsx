@@ -1,7 +1,9 @@
 
 import React from 'react';
-import { MusicTrack } from '@/types/music';
-import { Play, Pause } from 'lucide-react';
+import { MusicTrack } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, Music } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export interface TrackListProps {
   tracks: MusicTrack[];
@@ -10,6 +12,7 @@ export interface TrackListProps {
   currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
   compact?: boolean;
+  showEmotionTag?: boolean;
   onPlay?: (track: MusicTrack) => void;
 }
 
@@ -18,83 +21,92 @@ const TrackList: React.FC<TrackListProps> = ({
   onTrackSelect,
   onPlayPause,
   currentTrack,
-  isPlaying,
+  isPlaying = false,
   compact = false,
-  onPlay
+  showEmotionTag = false
 }) => {
-  const handlePlay = (track: MusicTrack) => {
-    if (onPlay) {
-      onPlay(track);
-    } else {
-      onPlayPause(track);
-    }
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const isCurrentTrack = (track: MusicTrack) => {
+    return currentTrack?.id === track.id;
   };
 
   return (
-    <div className={`space-y-1 ${compact ? 'text-sm' : ''}`}>
-      {tracks.map((track) => {
-        const isActive = currentTrack && currentTrack.id === track.id;
-        
-        return (
+    <div className="space-y-2">
+      {tracks.length === 0 ? (
+        <div className="text-center py-4 text-muted-foreground">
+          No tracks available
+        </div>
+      ) : (
+        tracks.map((track) => (
           <div
             key={track.id}
-            className={`flex items-center p-2 rounded-md ${
-              isActive ? 'bg-primary/10' : 'hover:bg-secondary/80'
+            className={`flex items-center gap-3 p-2 rounded-md ${
+              isCurrentTrack(track) ? 'bg-secondary/40' : 'hover:bg-muted/50'
             } cursor-pointer transition-colors`}
             onClick={() => onTrackSelect(track)}
           >
-            <div className="mr-3">
-              <button
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  isActive ? 'bg-primary text-white' : 'bg-muted hover:bg-primary/20'
-                }`}
+            {/* Track cover/icon */}
+            <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded overflow-hidden">
+              {track.coverUrl || track.cover ? (
+                <img
+                  src={track.coverUrl || track.cover}
+                  alt={track.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Music className="h-5 w-5 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+
+            {/* Track info */}
+            <div className="flex-grow min-w-0">
+              <div className="font-medium text-sm truncate">{track.title}</div>
+              <div className="text-xs text-muted-foreground truncate flex items-center gap-2">
+                <span>{track.artist}</span>
+                {showEmotionTag && track.emotion && (
+                  <Badge variant="outline" className="px-1.5 py-0 h-4 text-[10px]">
+                    {track.emotion}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Duration & Play button */}
+            <div className="flex items-center gap-3">
+              {!compact && (
+                <span className="text-xs text-muted-foreground min-w-[40px] text-right">
+                  {formatTime(track.duration)}
+                </span>
+              )}
+
+              <Button
+                size="sm"
+                variant={isCurrentTrack(track) ? "secondary" : "ghost"}
+                className="h-8 w-8 p-0 rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handlePlay(track);
+                  onPlayPause(track);
                 }}
               >
-                {isActive && isPlaying ? (
+                {isCurrentTrack(track) && isPlaying ? (
                   <Pause className="h-4 w-4" />
                 ) : (
                   <Play className="h-4 w-4" />
                 )}
-              </button>
+              </Button>
             </div>
-            
-            {!compact && track.coverUrl && (
-              <img
-                src={track.coverUrl}
-                alt={track.title}
-                className="w-10 h-10 rounded object-cover mr-3"
-              />
-            )}
-            
-            <div className="flex-grow min-w-0">
-              <p className={`font-medium truncate ${isActive ? 'text-primary' : ''}`}>
-                {track.title}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {track.artist}
-              </p>
-            </div>
-            
-            {!compact && (
-              <div className="text-xs text-muted-foreground ml-2">
-                {formatDuration(track.duration)}
-              </div>
-            )}
           </div>
-        );
-      })}
+        ))
+      )}
     </div>
   );
-};
-
-// Helper function to format duration in seconds to MM:SS
-const formatDuration = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
 export default TrackList;
