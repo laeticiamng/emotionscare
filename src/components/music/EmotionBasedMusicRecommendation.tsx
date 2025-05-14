@@ -3,10 +3,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Loader2, PlayCircle } from 'lucide-react';
-import { EmotionResult, MusicPlaylist, MusicTrack } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface EmotionBasedMusicRecommendationProps {
   emotionResult: EmotionResult;
@@ -22,20 +21,63 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
   const { loadPlaylistForEmotion, playTrack, setOpenDrawer } = useMusic();
   const { toast } = useToast();
   const [isLoadingMusic, setIsLoadingMusic] = useState(false);
-  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
+  // Default intensity if not available
+  const emotionIntensity = emotionResult.intensity !== undefined ? emotionResult.intensity : 50;
+  
+  const getEmotionMusicDescription = (emotion: string) => {
+    const descriptions: Record<string, string> = {
+      happy: "Des mélodies entraînantes et positives pour amplifier votre bonne humeur",
+      sad: "Des compositions douces et apaisantes pour vous accompagner dans ce moment",
+      angry: "Des sons calmes et apaisants pour réduire le stress et retrouver l'équilibre",
+      fear: "Des mélodies rassurantes et structurées pour vous ancrer dans le présent",
+      neutral: "Une ambiance musicale équilibrée pour maintenir votre harmonie émotionnelle",
+      joy: "Des rythmes entraînants pour célébrer votre joie",
+      calm: "Des sons doux qui soutiennent votre sérénité",
+      anxiety: "Des compositions structurées pour apaiser l'inquiétude"
+    };
+    
+    return descriptions[emotion?.toLowerCase()] || 
+      "Une sélection musicale harmonisée avec votre état émotionnel actuel";
+  };
+  
+  const activateMusicForEmotion = async ({ 
+    emotion, 
+    intensity = 50 
+  }: { 
+    emotion: string; 
+    intensity: number 
+  }) => {
+    try {
+      const playlist = await loadPlaylistForEmotion(emotion);
+      
+      if (playlist?.tracks?.length > 0) {
+        playTrack(playlist.tracks[0]);
+        toast({
+          title: "Musique activée",
+          description: `Écoute adaptée à votre état émotionnel: ${emotion}`
+        });
+        return true;
+      } else {
+        console.error("No tracks found for emotion", emotion);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error activating music for emotion:", error);
+      return false;
+    }
+  };
+
   const handlePlayMusic = async () => {
     if (!emotionResult.emotion) return;
     
     setIsLoadingMusic(true);
     try {
       const emotion = emotionResult.emotion.toLowerCase();
-      const intensity = emotionResult.intensity || 0.5;
       
-      // Use our integrated function that now properly uses the TopMedia API
       const success = await activateMusicForEmotion({
         emotion,
-        intensity: intensity * 100
+        intensity: emotionIntensity
       });
       
       if (!success) {

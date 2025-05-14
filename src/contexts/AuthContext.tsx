@@ -12,23 +12,10 @@ import {
   UserPreferencesState,
   ThemeName,
   FontFamily,
+  AuthContextType
 } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-
-interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  setIsLoading: (isLoading: boolean) => void;
-  signIn: (email: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  signUp: (email: string, name: string) => Promise<void>;
-  updateUser: (updates: Partial<User>) => Promise<void>;
-  preferences: UserPreferencesState;
-  logout: () => Promise<void>; // Added for compatibility
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -40,10 +27,10 @@ export const createDefaultPreferences = (): UserPreferences => {
   return {
     dashboardLayout: "standard",
     onboardingCompleted: false,
-    theme: "light",
+    theme: "light" as ThemeName,
     fontSize: "medium",
     language: "fr",
-    fontFamily: "system-ui" as FontFamily, // Explicit cast
+    fontFamily: "system-ui" as FontFamily,
     sound: true,
     notifications: {
       enabled: true,

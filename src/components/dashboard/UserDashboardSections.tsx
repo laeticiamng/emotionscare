@@ -142,13 +142,12 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
   // Find a suitable VR template based on the latest emotion
   const recommendedTemplate: VRSessionTemplate = latestEmotion ? {
     id: 'recommended',
-    name: 'Session recommandée',
+    title: 'Session recommandée',
     description: 'Session recommandée basée sur votre état émotionnel',
     duration: 5 * 60, // Convert to seconds
     emotion: latestEmotion.emotion,
-    thumbnailUrl: '/images/thumbnail-default.jpg',
+    tags: ['recommandation', 'personnalisé'],
     // Additional properties for backward compatibility
-    title: 'Session recommandée',
     theme: 'Méditation guidée',
     is_audio_only: true,
     preview_url: '',

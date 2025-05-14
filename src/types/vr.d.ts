@@ -1,16 +1,16 @@
 
 export interface VRSessionTemplate {
   id: string;
-  name: string;
+  name?: string;
   description?: string;
   duration: number;
-  type: string;
+  type?: string;
   thumbnail?: string;
   videoUrl?: string;
   emotion?: string;
   
   // Add missing properties that are used
-  title?: string;
+  title: string;
   audio_url?: string;
   emotion_target?: string;
   lastUsed?: string | Date;
@@ -19,7 +19,8 @@ export interface VRSessionTemplate {
   benefits?: string[];
   difficulty?: string;
   theme?: string;
-  tags?: string[]; // Add tags property
+  tags?: string[];
+  imageUrl?: string;
 }
 
 export interface VRSession {
@@ -29,7 +30,7 @@ export interface VRSession {
   startTime: string;
   endTime?: string;
   duration: number;
-  isCompleted: boolean;
+  completed: boolean;
   emotionBefore?: string;
   emotionAfter?: string;
   notes?: string;
@@ -42,23 +43,29 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
+  isCompleted?: boolean;
 }
 
 export interface VRHistoryListProps {
-  templates: VRSessionTemplate[];
-  sessions: VRSession[];
-  onSelectTemplate: (template: VRSessionTemplate) => void;
-  onSelectSession: (session: VRSession) => void;
+  templates?: VRSessionTemplate[];
+  sessions?: VRSession[];
+  onSelectTemplate?: (template: VRSessionTemplate) => void;
+  onSelectSession?: (session: VRSession) => void;
   loading?: boolean;
 }
 
-// Update VRSessionWithMusicProps
 export interface VRSessionWithMusicProps {
   template?: VRSessionTemplate;
+  onComplete?: (sessionData: VRSession) => void;
+  onExit?: () => void;
+  
+  // Add missing properties
   session?: VRSession;
   onSessionComplete?: () => void;
   isAudioOnly?: boolean;
   videoUrl?: string;
   audioUrl?: string;
   emotion?: string;
+  sessionId?: string;
+  templateId?: string;
 }

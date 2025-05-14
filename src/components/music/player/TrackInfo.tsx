@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Disc } from 'lucide-react';
-import { MusicTrack } from '@/types/music';
-import { TrackInfoProps } from '@/types/music';
+import { MusicTrack, TrackInfoProps } from '@/types/music';
 
 const TrackInfo: React.FC<TrackInfoProps> = ({
+  track,
   title,
   artist,
   coverUrl,
@@ -12,18 +12,19 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   showControls = false,
   currentTrack,
   loadingTrack = false,
-  audioError = false,
+  audioError = null,
   className = '',
+  compact = false
 }) => {
   // Use provided info or track info
-  const displayTitle = title || currentTrack?.title || 'Aucun titre';
-  const displayArtist = artist || currentTrack?.artist || 'Artiste inconnu';
-  const displayCover = coverUrl || currentTrack?.coverUrl || currentTrack?.cover_url || '/images/music/default-cover.jpg';
+  const displayTitle = title || track?.title || currentTrack?.title || 'Aucun titre';
+  const displayArtist = artist || track?.artist || currentTrack?.artist || 'Artiste inconnu';
+  const displayCover = coverUrl || track?.coverUrl || track?.cover || currentTrack?.coverUrl || currentTrack?.cover || '/images/music/default-cover.jpg';
   
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {showCover && (
-        <div className="h-12 w-12 rounded bg-primary/10 flex items-center justify-center overflow-hidden">
+        <div className={`${compact ? 'h-10 w-10' : 'h-12 w-12'} rounded bg-primary/10 flex items-center justify-center overflow-hidden`}>
           {displayCover ? (
             <img 
               src={displayCover} 
@@ -40,7 +41,7 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
       )}
       
       <div className="overflow-hidden">
-        <p className="font-medium truncate">{loadingTrack ? 'Chargement...' : displayTitle}</p>
+        <p className={`font-medium truncate ${compact ? 'text-sm' : ''}`}>{loadingTrack ? 'Chargement...' : displayTitle}</p>
         <p className="text-xs text-muted-foreground truncate">
           {loadingTrack ? '...' : audioError ? 'Erreur audio' : displayArtist}
         </p>

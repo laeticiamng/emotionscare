@@ -15,6 +15,9 @@ export interface Notification {
   image?: string;
   icon?: string;
   user_id?: string;
+  body?: string;
+  createdAt?: string;
+  timestamp?: string;
 }
 
 export interface NotificationPreference {
@@ -23,11 +26,18 @@ export interface NotificationPreference {
   tone: NotificationTone;
   emailEnabled: boolean;
   pushEnabled: boolean;
-  soundEnabled: boolean;
+  soundEnabled?: boolean;
+  channels?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+  };
 }
 
 export interface NotificationBadge {
   count: number;
   hasNew: boolean;
   lastSeen?: string;
+  badgesCount?: number;
+  notificationsCount?: number;
 }

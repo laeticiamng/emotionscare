@@ -8,7 +8,7 @@ import { VolumeControlProps } from '@/types/music';
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onChange,
-  onVolumeChange, // Add onVolumeChange prop
+  onVolumeChange,
   showLabel = true,
   className = ''
 }) => {

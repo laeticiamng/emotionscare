@@ -7,7 +7,7 @@ export interface Badge {
   threshold?: number;
   type?: string;
   imageUrl?: string;
-  image_url?: string; // Add this for backward compatibility
+  image_url?: string; // For backward compatibility
 }
 
 export interface Challenge {
@@ -17,14 +17,15 @@ export interface Challenge {
   progress: number;
   target: number;
   reward: number | string;
-  status: 'active' | 'completed' | 'expired';
+  status: 'active' | 'completed' | 'expired' | 'pending';
   type: string;
   expiresAt?: string;
   category?: string;
+  title?: string; // For backward compatibility
 }
 
 export interface GamificationStats {
-  points: number; // Add required properties
+  points: number;
   level: number;
   rank: string;
   badges: Badge[];
@@ -36,20 +37,27 @@ export interface GamificationStats {
   progressToNextLevel: number;
   challenges: Challenge[];
   recentAchievements: Badge[];
-  nextLevel: {
+  nextLevel?: {
     points: number;
     rewards: any[];
   };
-  achievements: any[];
+  achievements?: any[];
+  
+  // Additional properties for compatibility
+  totalPoints?: number;
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  badgesCount?: number;
+  lastActivityDate?: string;
 }
 
 export interface LeaderboardEntry {
   userId: string;
-  name?: string; // Add name property
-  avatarUrl: string;
+  name?: string;
+  avatarUrl?: string;
   points: number;
   rank: number;
-  badges: number;
+  badges?: number;
   level: number;
-  completedChallenges: number;
+  completedChallenges?: number;
 }

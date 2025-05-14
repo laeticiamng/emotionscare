@@ -16,44 +16,42 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   sessionId,
   templateId
 }) => {
-  // Utiliser les props directes ou depuis le template
+  // Use direct props or from the template
   const activeTemplate = session?.template || template;
   const handleComplete = onSessionComplete || onComplete;
   
   const targetEmotion = emotion || (
-    // Check if emotions array exists before trying to access it
-    (activeTemplate && activeTemplate.emotions && activeTemplate.emotions.length > 0) 
-      ? activeTemplate.emotions[0] 
-      : 'calm'
+    // Check if emotion property exists before trying to access it
+    activeTemplate?.emotion || 'calm'
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
   
   useEffect(() => {
-    // Charger une playlist basée sur l'émotion cible de la session
+    // Load a playlist based on the session's target emotion
     const loadMusic = async () => {
       try {
         if (targetEmotion) {
           const playlist = await loadPlaylistForEmotion(targetEmotion);
           
           if (playlist && playlist.tracks.length > 0) {
-            // S'assurer que la track a les propriétés requises
+            // Ensure the track has the required properties
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].coverUrl || ''
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
             };
             playTrack(track);
           }
         }
       } catch (error) {
-        console.error("Erreur lors du chargement de la musique pour VR:", error);
+        console.error("Error loading music for VR:", error);
       }
     };
     
     loadMusic();
     
-    // Nettoyage
+    // Cleanup
     return () => {
       pauseTrack();
     };

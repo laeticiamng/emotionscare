@@ -1,70 +1,70 @@
 
 /**
- * Formats a duration in seconds to MM:SS format
- * @param seconds - Duration in seconds
- * @returns Formatted string in MM:SS format
+ * Format a time duration in seconds to MM:SS format
  */
 export const formatDuration = (seconds: number): string => {
   if (!seconds || isNaN(seconds)) return '0:00';
   
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
 /**
- * Formats a date to a localized string representation
- * @param date - Date to format
- * @param options - Intl.DateTimeFormatOptions
- * @returns Formatted date string
+ * Format a date string or Date object to a readable format
  */
-export const formatDate = (
-  date: Date | string,
-  options: Intl.DateTimeFormatOptions = { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  }
-): string => {
+export const formatDate = (date: string | Date, short: boolean = false): string => {
   if (!date) return '';
   
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return new Intl.DateTimeFormat('fr-FR', options).format(dateObj);
+  const options: Intl.DateTimeFormatOptions = short 
+    ? { month: 'short', day: 'numeric' } 
+    : { year: 'numeric', month: 'long', day: 'numeric' };
+  
+  return new Date(date).toLocaleDateString('fr-FR', options);
 };
 
 /**
- * Formats a number with comma separators for thousands
- * @param num - Number to format
- * @returns Formatted number string
+ * Format a date string or Date object to include the time
  */
-export const formatNumber = (num: number): string => {
-  return num.toLocaleString('fr-FR');
+export const formatDateTime = (date: string | Date): string => {
+  if (!date) return '';
+  
+  const options: Intl.DateTimeFormatOptions = { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  
+  return new Date(date).toLocaleDateString('fr-FR', options);
 };
 
 /**
- * Formats a timestamp to a relative time string (e.g., "il y a 5 minutes")
- * @param timestamp - Timestamp to format
- * @returns Relative time string
+ * Calculate time elapsed since a given date
  */
-export const formatRelativeTime = (timestamp: string | Date): string => {
+export const timeAgo = (date: string | Date): string => {
   const now = new Date();
-  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  const past = new Date(date);
+  const diffMs = now.getTime() - past.getTime();
+  const diffSec = Math.round(diffMs / 1000);
+  const diffMin = Math.round(diffSec / 60);
+  const diffHour = Math.round(diffMin / 60);
+  const diffDay = Math.round(diffHour / 24);
   
-  const diffMs = now.getTime() - date.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
+  if (diffSec < 60) return 'À l\'instant';
+  if (diffMin < 60) return `Il y a ${diffMin} min`;
+  if (diffHour < 24) return `Il y a ${diffHour} h`;
+  if (diffDay < 7) return `Il y a ${diffDay} j`;
   
-  if (diffSecs < 60) {
-    return 'à l\'instant';
-  } else if (diffMins < 60) {
-    return `il y a ${diffMins} minute${diffMins > 1 ? 's' : ''}`;
-  } else if (diffHours < 24) {
-    return `il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
-  } else if (diffDays < 30) {
-    return `il y a ${diffDays} jour${diffDays > 1 ? 's' : ''}`;
-  } else {
-    return formatDate(date, { day: 'numeric', month: 'short' });
-  }
+  return formatDate(date, true);
+};
+
+/**
+ * Format a number with a specified number of decimal places
+ */
+export const formatNumber = (num: number, decimals: number = 0): string => {
+  if (isNaN(num)) return '0';
+  
+  return num.toFixed(decimals);
 };

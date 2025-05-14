@@ -6,10 +6,10 @@ export interface MusicTrack {
   duration: number;
   url: string;
   audioUrl: string;
+  audio_url?: string; // Added for backward compatibility
   coverUrl: string;
   cover?: string; // Added for backward compatibility
   cover_url?: string; // Added for backward compatibility
-  audio_url?: string; // Added for backward compatibility
   emotion?: string;
 }
 
@@ -44,8 +44,8 @@ export interface MusicContextType {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   seekTo: (time: number) => void;
-  togglePlay: () => void; // Adding missing method
-  adjustVolume: (change: number) => void; // Adding missing method
+  togglePlay: () => void;
+  adjustVolume: (change: number) => void;
   
   // Playlist management
   playlists: MusicPlaylist[];
@@ -94,21 +94,23 @@ export interface ProgressBarProps {
 }
 
 export interface TrackInfoProps {
-  title: string;
-  artist: string;
-  coverUrl: string;
+  track?: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
   showCover?: boolean;
   showControls?: boolean;
   currentTrack?: MusicTrack | null;
   loadingTrack?: boolean;
   audioError?: boolean;
   className?: string;
+  compact?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
   onChange: (volume: number) => void;
-  onVolumeChange: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;
   showLabel?: boolean;
   className?: string;
 }
@@ -116,7 +118,7 @@ export interface VolumeControlProps {
 export interface TrackListProps {
   tracks: MusicTrack[];
   onTrackSelect: (track: MusicTrack) => void;
-  onPlayPause: (track: MusicTrack) => void;
+  onPlayPause?: (track: MusicTrack) => void;
   currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
   compact?: boolean;
