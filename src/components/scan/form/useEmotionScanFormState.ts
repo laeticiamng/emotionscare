@@ -1,162 +1,139 @@
-import { useState } from 'react';
-import { analyzeEmotion } from '@/lib/scanService';
-import { useToast } from "@/hooks/use-toast";
 
-export default function useEmotionScanFormState(onScanSaved: () => void, onSaveComplete?: () => void, userId?: string) {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<string>('text');
-  const [emojis, setEmojis] = useState<string>('');
-  const [text, setText] = useState<string>('');
+import { useState, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { v4 as uuid } from 'uuid';
+import { supabase } from '@/integrations/supabase'; 
+import { EmotionResult } from '@/types';
+
+export function useEmotionScanFormState(userId: string, onScanComplete?: () => void) {
+  const [text, setText] = useState('');
+  const [emojis, setEmojis] = useState('');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState<boolean>(false);
-  const [isConfidential, setIsConfidential] = useState<boolean>(false);
-  const [shareWithCoach, setShareWithCoach] = useState<boolean>(true);
-  const [charCount, setCharCount] = useState<number>(0);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [quickMode, setQuickMode] = useState<boolean>(false);
-  const [skipDay, setSkipDay] = useState<boolean>(false);
-  const [audioRecording, setAudioRecording] = useState<boolean>(false);
-  const MAX_CHARS = 500;
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [detectedEmotion, setDetectedEmotion] = useState<EmotionResult | null>(null);
+  const { toast } = useToast();
 
-  const handleEmojiClick = (emoji: string) => {
-    if (quickMode) {
-      setEmojis(emoji);
-      handleQuickSubmit(emoji);
-    } else {
-      setEmojis(prev => prev + emoji);
-    }
-  };
+  const handleTextChange = useCallback((value: string) => {
+    setText(value);
+  }, []);
 
-  const handleTextChange = (value: string) => {
-    if (value.length <= MAX_CHARS) {
-      setText(value);
-      setCharCount(value.length);
-    }
-  };
+  const handleEmojiChange = useCallback((value: string) => {
+    setEmojis(value);
+  }, []);
 
-  const clearForm = () => {
-    setText('');
-    setEmojis('');
-    setAudioUrl(null);
-    setCharCount(0);
-    setActiveTab('text');
-  };
+  const handleAudioChange = useCallback((url: string | null) => {
+    setAudioUrl(url);
+  }, []);
 
-  const handleQuickSubmit = async (emojiValue: string) => {
-    setAnalyzing(true);
+  // Mock function - would be replaced with actual AI analysis in a real app
+  const analyzeEmotionData = async () => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
+    // Simulate AI analysis
+    const emotions = ['joy', 'sadness', 'anger', 'surprise', 'fear', 'disgust', 'neutral'];
+    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    const randomConfidence = 0.7 + (Math.random() * 0.3);
+    
+    return {
+      emotion: randomEmotion,
+      confidence: randomConfidence,
+      intensity: randomConfidence * 100,
+      transcript: text,
+      date: new Date().toISOString(),
+      emojis: emojis.split(''),
+      ai_feedback: `Je détecte une émotion de ${randomEmotion} dans votre analyse. C'est intéressant de voir comment vous exprimez cette émotion.`,
+      score: Math.round(randomConfidence * 100),
+      id: uuid(),
+      user_id: userId
+    } as EmotionResult;
+  };
+
+  const saveEmotion = async (emotionData: EmotionResult) => {
     try {
-      const result = await analyzeEmotion({
-        user_id: userId || '',
-        emojis: emojiValue,
-        is_confidential: isConfidential,
-        share_with_coach: shareWithCoach
-      });
+      // Format the data for storage
+      const dataToStore = {
+        id: emotionData.id || uuid(),
+        user_id: userId,
+        date: new Date().toISOString(),
+        emotion: emotionData.emotion,
+        score: emotionData.score || Math.round((emotionData.confidence || 0.5) * 100),
+        text: emotionData.text || emotionData.transcript || '',
+        emojis: Array.isArray(emotionData.emojis) ? emotionData.emojis : [],
+        audio_url: emotionData.audio_url || '',
+        ai_feedback: emotionData.ai_feedback || emotionData.feedback || ''
+      };
+
+      const { error } = await supabase
+        .from('emotions')
+        .insert(dataToStore);
+
+      if (error) throw error;
       
-      setAnalysisResult(result);
-      
-      toast({
-        title: "Scan rapide complété",
-        description: `Votre état émotionnel: ${result.emotion}`,
-      });
-      
-      onScanSaved();
-      if (onSaveComplete) onSaveComplete();
-      clearForm();
+      return true;
     } catch (error) {
-      console.error('Error analyzing emotion:', error);
-      toast({
-        title: "Erreur d'analyse",
-        description: "Impossible d'analyser votre état émotionnel. Veuillez réessayer.",
-        variant: "destructive"
-      });
-    } finally {
-      setAnalyzing(false);
+      console.error('Error saving emotion:', error);
+      return false;
     }
   };
 
-  const handleSubmit = async () => {
-    if (!emojis && !text && !audioUrl) {
+  const handleAnalyze = useCallback(async () => {
+    if (!text && !emojis && !audioUrl) {
       toast({
-        title: "Formulaire incomplet",
-        description: "Veuillez ajouter au moins un emoji, du texte ou un enregistrement audio.",
+        title: "Information manquante",
+        description: "Veuillez fournir du texte, des emojis ou un enregistrement audio.",
         variant: "destructive"
       });
       return;
     }
 
+    setIsAnalyzing(true);
+
     try {
-      setAnalyzing(true);
+      const result = await analyzeEmotionData();
+      setDetectedEmotion(result);
       
-      const result = await analyzeEmotion({
-        user_id: userId || '',
-        emojis,
-        text,
-        audio_url: audioUrl || undefined,
-        is_confidential: isConfidential,
-        share_with_coach: shareWithCoach
-      });
+      const saved = await saveEmotion(result);
       
-      setAnalysisResult(result);
-      
-      toast({
-        title: "Analyse complétée",
-        description: `Votre état émotionnel: ${result.emotion}`,
-      });
-      
-      onScanSaved();
-      if (onSaveComplete) onSaveComplete();
-      clearForm();
+      if (saved) {
+        toast({
+          title: "Analyse complétée",
+          description: `Émotion détectée : ${result.emotion}`,
+        });
+        
+        if (onScanComplete) {
+          onScanComplete();
+        }
+      } else {
+        toast({
+          title: "Avertissement",
+          description: "Analyse complétée mais non sauvegardée.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('Error analyzing emotion:', error);
       toast({
-        title: "Erreur d'analyse",
-        description: "Impossible d'analyser votre état émotionnel. Veuillez réessayer.",
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'analyse.",
         variant: "destructive"
       });
     } finally {
-      setAnalyzing(false);
+      setIsAnalyzing(false);
     }
-  };
-
-  const handleCorrection = () => {
-    setActiveTab('text');
-    setAnalysisResult(null);
-  };
-
-  const toggleAudioRecording = (isRecording: boolean) => {
-    setAudioRecording(isRecording);
-  };
+  }, [text, emojis, audioUrl, userId, toast, onScanComplete]);
 
   return {
-    activeTab,
-    setActiveTab,
-    emojis,
-    setEmojis,
     text,
-    setText,
+    emojis,
     audioUrl,
-    setAudioUrl,
-    analyzing,
-    setAnalyzing,
-    isConfidential,
-    setIsConfidential,
-    shareWithCoach,
-    setShareWithCoach,
-    charCount,
-    analysisResult,
-    setAnalysisResult,
-    quickMode,
-    setQuickMode,
-    skipDay,
-    setSkipDay,
-    audioRecording,
-    toggleAudioRecording,
-    MAX_CHARS,
-    handleEmojiClick,
+    isAnalyzing,
+    detectedEmotion,
     handleTextChange,
-    handleSubmit,
-    handleCorrection,
-    clearForm
+    handleEmojiChange,
+    handleAudioChange,
+    handleAnalyze
   };
 }
+
+export default useEmotionScanFormState;

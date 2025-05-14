@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { analyzeEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types/types';
+import { EmotionResult } from '@/types';
 
 const EnhancedCoachAI = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,7 +30,7 @@ const EnhancedCoachAI = () => {
   };
 
   // Corriger la gestion des émojis pour qu'ils soient toujours un tableau
-  const ensureArrayEmojis = (emojis: string | string[]): string[] => {
+  const ensureArrayEmojis = (emojis: string | string[] | undefined): string[] => {
     if (Array.isArray(emojis)) {
       return emojis;
     }
@@ -42,7 +43,7 @@ const EnhancedCoachAI = () => {
     setIsLoading(false);
     
     // Corriger l'erreur avec les émojis
-    const safeEmojis = ensureArrayEmojis(result.emojis || []);
+    const safeEmojis = ensureArrayEmojis(result.emojis);
     
     // Utiliser safeEmojis au lieu de result.emojis
     console.log('Emotion detected:', result.emotion, 'with emojis:', safeEmojis);
@@ -56,7 +57,6 @@ const EnhancedCoachAI = () => {
       handleEmotionDetected(result);
     } catch (error) {
       console.error('Error analyzing emotion:', error);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -84,17 +84,6 @@ const EnhancedCoachAI = () => {
           <p className="text-sm text-muted-foreground">Décrivez vos émotions ou utilisez le scanner pour une analyse plus approfondie.</p>
         </div>
 
-        {/* Emotion Scanner Integration */}
-        {/* <EmotionScanner
-          text={userText}
-          emojis={userEmojis.join('')}
-          onTextChange={handleTextChange}
-          onEmojiChange={(emojis) => setUserEmojis(emojis.split(''))}
-          onAnalyze={handleAnalyze}
-          isAnalyzing={isLoading}
-          onEmotionDetected={handleEmotionDetected}
-        /> */}
-
         {analysisResult && (
           <div className="rounded-md border p-4">
             <h4 className="text-md font-medium">Analyse émotionnelle :</h4>
@@ -102,7 +91,7 @@ const EnhancedCoachAI = () => {
               Émotion détectée : <Badge variant="secondary">{analysisResult.emotion}</Badge>
             </p>
             <p className="text-sm text-muted-foreground">
-              Confiance : {Math.round(analysisResult.confidence * 100)}%
+              Confiance : {Math.round((analysisResult.confidence || 0.5) * 100)}%
             </p>
             {analysisResult.ai_feedback && (
               <div className="mt-2">

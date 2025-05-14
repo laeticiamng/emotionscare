@@ -7,8 +7,8 @@ import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import GamificationWidget from './GamificationWidget';
-import { User } from '@/types/user';
-import { VRSessionTemplate } from '@/types/vr';
+import { User } from '@/types';
+import { VRSessionTemplate } from '@/types';
 
 interface SectionProps {
   title: string;

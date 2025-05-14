@@ -1,47 +1,86 @@
 
-import { User } from '@/types/user';
-import { type ClassValue, clsx } from 'clsx';
-import { format } from 'date-fns';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { User } from '@/types';
 
-/**
- * Merge class names with Tailwind CSS
- */
+// Utility for combining Tailwind classes
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Format a date using date-fns
- */
-export function formatDate(date: Date | string, formatString: string = 'PP') {
-  if (!date) return '';
-  return format(new Date(date), formatString);
-}
-
-/**
- * Get the user's avatar URL from the user object
- * @param user User object
- * @returns Avatar URL or empty string
- */
-export function getUserAvatarUrl(user: User | null) {
+// Get user avatar URL with fallback
+export function getUserAvatarUrl(user?: User | null): string {
   if (!user) return '';
-  
-  return user.avatar_url || user.avatar || user.image || '';
+  return user.avatar_url || `/images/avatars/default-${user.role || 'b2c'}.png`;
 }
 
-/**
- * Get the user's initials from the user object
- * @param user User object
- * @returns Initials (up to 2 characters)
- */
-export function getUserInitials(user: User | null) {
+// Get user initials for avatar
+export function getUserInitials(user?: User | null): string {
   if (!user || !user.name) return 'U';
   
-  const names = user.name.split(' ');
-  if (names.length === 1) {
-    return names[0].charAt(0).toUpperCase();
+  const nameParts = user.name.split(' ');
+  if (nameParts.length > 1) {
+    return `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
   }
   
-  return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+  return nameParts[0][0].toUpperCase();
+}
+
+// Format date for display
+export function formatDate(date: Date | string, format: 'short' | 'medium' | 'long' = 'medium'): string {
+  if (!date) return '';
+  
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  try {
+    switch (format) {
+      case 'short':
+        return dateObj.toLocaleDateString('fr-FR');
+      case 'long':
+        return dateObj.toLocaleDateString('fr-FR', { 
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      case 'medium':
+      default:
+        return dateObj.toLocaleDateString('fr-FR', { 
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+    }
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
+}
+
+// Safe JSON parse with fallback
+export function safeJsonParse<T>(json: string, fallback: T): T {
+  try {
+    return JSON.parse(json) as T;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+// Format number with thousand separator
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat('fr-FR').format(num);
+}
+
+// Truncate text with ellipsis
+export function truncateText(text: string, maxLength: number): string {
+  if (!text || text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength)}...`;
+}
+
+// Format time duration (seconds to MM:SS)
+export function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 }

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { saveEmotion } from '@/lib/scanService';
+import { saveEmotion, analyzeEmotion, convertToEmotionResult } from '@/lib/scanService';
 import { Emotion, EmotionResult } from '@/types';
 import EmojiPicker from './EmojiPicker';
 
@@ -75,14 +75,14 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         user_id: userId || user?.id || '',
         date: new Date().toISOString(),
         emotion: result.emotion || '',
-        score: result.score,
+        score: result.score || Math.round((result.confidence || 0.5) * 100),
         // Add other properties from result as needed
         confidence: result.confidence,
         intensity: result.intensity || result.score,
-        text: result.text,
-        ai_feedback: result.feedback || result.ai_feedback,
-        category: 'neutral',
-        emojis: result.emojis
+        text: result.text || result.transcript || '',
+        ai_feedback: result.feedback || result.ai_feedback || '',
+        category: result.category || 'neutral',
+        emojis: Array.isArray(result.emojis) ? result.emojis : []
       };
 
       // Process for badges and points
@@ -120,6 +120,26 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     }
   };
 
+  const handleAnalyze = async () => {
+    try {
+      // Convert emojis string to array
+      const emojiArray = emojis.split('');
+      
+      // Analyze the text and emojis
+      const result = await analyzeEmotion(text, emojiArray);
+      
+      // Process the analysis result
+      await handleAnalysisComplete(result);
+    } catch (error) {
+      console.error('Error during analysis:', error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Une erreur s'est produite lors de l'analyse de votre émotion.",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <Card className="overflow-hidden shadow-md">
       <CardHeader>
@@ -151,7 +171,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
             <EmojiPicker onEmojiSelect={handleEmojiSelect} />
           </div>
           
-          <Button className="w-full">
+          <Button className="w-full" onClick={handleAnalyze}>
             Analyser mes émotions
           </Button>
         </div>

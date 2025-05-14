@@ -1,100 +1,61 @@
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'roboto' | 'poppins' | 'montserrat' | 'raleway' | 'default';
+type Theme = 'light' | 'dark';
 
-export interface ThemeContextType {
+interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  isDarkMode?: boolean;
-  fontFamily?: FontFamily;
-  fontSize?: FontSize;
-  setFontFamily?: (font: FontFamily) => void;
-  setFontSize?: (size: FontSize) => void;
 }
 
-const defaultContext: ThemeContextType = {
-  theme: 'system',
-  setTheme: () => null,
-};
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeContext = createContext<ThemeContextType>(defaultContext);
-
-export interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-}
-
-export function ThemeProvider({
-  children,
-  defaultTheme = 'system',
-  storageKey = 'theme',
-  ...props
-}: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Get stored theme from localStorage if available
-    const storedTheme = localStorage.getItem(storageKey);
-    return (storedTheme as Theme) || defaultTheme;
-  });
-
-  const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
-    return (localStorage.getItem('fontFamily') as FontFamily) || 'sans';
-  });
-
-  const [fontSize, setFontSize] = useState<FontSize>(() => {
-    return (localStorage.getItem('fontSize') as FontSize) || 'medium';
-  });
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
-    const root = window.document.documentElement;
+    // Check user preference in localStorage or system preference
+    const storedTheme = localStorage.getItem('theme');
     
-    // Remove previous theme classes
-    root.classList.remove('light', 'dark', 'pastel');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      setTheme(storedTheme);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    // Apply the theme to the document
+    const html = document.documentElement;
     
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-      root.classList.add(systemTheme);
+    if (theme === 'dark') {
+      html.classList.add('dark');
     } else {
-      root.classList.add(theme);
+      html.classList.remove('dark');
     }
     
-    // Store theme preference
-    localStorage.setItem(storageKey, theme);
-  }, [theme, storageKey]);
-
-  // Store font preferences
-  useEffect(() => {
-    if (fontFamily) localStorage.setItem('fontFamily', fontFamily);
-  }, [fontFamily]);
-
-  useEffect(() => {
-    if (fontSize) localStorage.setItem('fontSize', fontSize);
-  }, [fontSize]);
-
-  // Calculate if current mode is dark
-  const isDarkMode = theme === 'dark' || 
-    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // Store the preference
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const value = {
     theme,
-    setTheme,
-    isDarkMode,
-    fontFamily,
-    fontSize,
-    setFontFamily,
-    setFontSize,
+    setTheme
   };
 
   return (
-    <ThemeContext.Provider value={value} {...props}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
-}
+};
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  
+  return context;
+};

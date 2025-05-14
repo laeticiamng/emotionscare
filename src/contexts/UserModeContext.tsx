@@ -1,65 +1,51 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useAuth } from './AuthContext';
-import { UserRole } from '@/types/auth';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'b2b-collaborator';
-
-// Export UserMode type for other components to use
-export type UserMode = UserModeType;
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin';
 
 interface UserModeContextType {
-  userMode: UserModeType;
+  userMode: UserModeType | undefined;
   setUserMode: (mode: UserModeType) => void;
   isLoading: boolean;
 }
 
-const UserModeContext = createContext<UserModeContextType>({
-  userMode: 'b2c',
-  setUserMode: () => {},
-  isLoading: false
-});
+const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-export const UserModeProvider: React.FC<{children: ReactNode}> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType>('b2c');
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserModeType | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { user } = useAuth();
 
-  // Set initial user mode based on user role
   useEffect(() => {
-    setIsLoading(true);
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-    
-    switch(user.role) {
-      case 'b2b_admin':
-        setUserMode('b2b-admin');
-        break;
-      case 'b2b_user':
-        setUserMode('b2b-user');
-        break;
-      case 'b2c':
-        setUserMode('b2c');
-        break;
-      default:
-        setUserMode('b2c');
-        break;
+    // Load user mode from localStorage if available
+    const storedMode = localStorage.getItem('userMode');
+    if (storedMode && ['b2c', 'b2b-user', 'b2b-admin'].includes(storedMode)) {
+      setUserMode(storedMode as UserModeType);
     }
     setIsLoading(false);
-  }, [user]);
+  }, []);
 
-  // Save user mode preference
-  useEffect(() => {
-    localStorage.setItem('userMode', userMode);
-  }, [userMode]);
+  const handleSetUserMode = (mode: UserModeType) => {
+    setUserMode(mode);
+    localStorage.setItem('userMode', mode);
+  };
 
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode, isLoading }}>
+    <UserModeContext.Provider
+      value={{
+        userMode,
+        setUserMode: handleSetUserMode,
+        isLoading
+      }}
+    >
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => useContext(UserModeContext);
+export const useUserMode = (): UserModeContextType => {
+  const context = useContext(UserModeContext);
+  if (context === undefined) {
+    throw new Error('useUserMode must be used within a UserModeProvider');
+  }
+  return context;
+};

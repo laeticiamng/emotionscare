@@ -1,18 +1,20 @@
 
-// 📁 src/types/types.ts – Types 100% finalisés pour EmotionsCare
-
-// ——————————————————————
-// USER
-// ——————————————————————
+// ————————————————————————
+// UserRole
+// ————————————————————————
 export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin';
 
+// ————————————————————————
+// User
+// ————————————————————————
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
   created_at: string;
-  avatar?: string;
+  preferences: UserPreferences;
+  avatar_url?: string;
   onboarded?: boolean;
   department?: string;
   position?: string;
@@ -24,12 +26,11 @@ export interface UserData extends User {
   status: 'pending' | 'active';
   createdAt: string;
   location?: any;
-  preferences: UserPreferences;
 }
 
-// ——————————————————————
-// USER PREFERENCES
-// ——————————————————————
+// ————————————————————————
+// UserPreferences
+// ————————————————————————
 export interface UserPreferences {
   privacy?: 'public' | 'private' | 'team';
   notifications_enabled?: boolean;
@@ -39,20 +40,39 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
 }
 
-// ——————————————————————
-// PERIOD / TEAM VIEW
-// ——————————————————————
+// ————————————————————————
+// AuthContext
+// ————————————————————————
+export interface AuthContextType {
+  user: User | null;
+  preferences: UserPreferences;
+  setSinglePreference: (key: string, value: any) => void;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  logout: () => void;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+}
+
+// ————————————————————————
+// Period & TeamView
+// ————————————————————————
 export type Period = 'day' | 'week' | 'month';
 
 export interface EmotionalTeamViewProps {
   userId: string;
   className?: string;
   onRefresh?: () => void;
+  teamId?: string;
+  period?: Period;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
 }
 
-// ——————————————————————
-// EMOTION
-// ——————————————————————
+// ————————————————————————
+// Emotion
+// ————————————————————————
 export interface EmotionResult {
   emotion: string;
   confidence: number;
@@ -64,11 +84,30 @@ export interface EmotionResult {
   recommendations?: string[];
   category?: string;
   audio_url?: string;
+  score?: number;
+  text?: string;
+  feedback?: string;
+  id?: string;
+  user_id?: string;
 }
 
-// ——————————————————————
-// MUSIC
-// ——————————————————————
+export interface Emotion {
+  id: string;
+  user_id: string;
+  date: string;
+  emotion: string;
+  score: number;
+  confidence?: number;
+  intensity?: number;
+  text?: string;
+  ai_feedback?: string;
+  emojis?: string[];
+  category?: string;
+}
+
+// ————————————————————————
+// MusicTrack
+// ————————————————————————
 export interface MusicTrack {
   id: string;
   title: string;
@@ -119,12 +158,14 @@ export interface ProgressBarProps {
   showTimestamps?: boolean;
 }
 
-// ——————————————————————
+// ————————————————————————
 // VR
-// ——————————————————————
+// ————————————————————————
 export interface VRSessionTemplate {
+  id?: string;
   title: string;
-  name?: string; // Pour compatibilité
+  name?: string; // For backward compatibility
+  description?: string;
   duration: number;
   audio_url?: string;
   videoUrl?: string;
@@ -139,6 +180,8 @@ export interface VRSessionTemplate {
   benefits?: string[];
   difficulty?: string;
   tags?: string[];
+  theme?: string;
+  preview_url?: string;
 }
 
 export interface VRSession {
@@ -172,23 +215,11 @@ export interface VRSessionWithMusicProps {
   templateId?: string;
 }
 
-// ——————————————————————
-// Voice/Scan
-// ——————————————————————
 export interface VoiceEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
 }
 
-// ——————————————————————
-// CONTEXT
-// ——————————————————————
-export interface AuthContextType {
-  user: User | null;
-  preferences: UserPreferences;
-  setSinglePreference: (key: string, value: any) => void;
-}
-
-// ——————————————————————
+// ————————————————————————
 // GÉNÉRAL
-// ——————————————————————
+// ————————————————————————
 export type Json = string | number | boolean | null | Json[] | { [key: string]: Json };

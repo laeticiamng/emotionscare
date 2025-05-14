@@ -23,8 +23,8 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
   const coach = useCoach();
   const { toast } = useToast();
   
-  // Access lastEmotion from coach
-  const emotionToUse = coach.lastEmotion || emotion;
+  // Access lastEmotion from coach (assuming it exists in the coach context/hook)
+  const emotionToUse = coach?.lastEmotion || emotion;
   
   // Synchronisation automatique si activée
   useEffect(() => {
@@ -37,7 +37,7 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
         description: `L'ambiance musicale s'est adaptée automatiquement à votre humeur: ${emotionToUse}`
       });
     }
-  }, [autoSync, emotionToUse, loadPlaylistForEmotion]);
+  }, [autoSync, emotionToUse, loadPlaylistForEmotion, toast]);
   
   return null; // Composant sans rendu visuel
 };

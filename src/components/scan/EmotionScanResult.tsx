@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
-import { saveEmotion } from '@/lib/scanService';
+import { saveEmotion, convertToEmotionResult } from '@/lib/scanService';
 import { Emotion, EmotionResult } from '@/types';
 import { CheckCircle } from 'lucide-react';
 
@@ -11,10 +12,7 @@ interface EmotionScanResultProps {
   onEmotionSaved?: (emotion: EmotionResult) => void;
 }
 
-const EmotionScanResult: React.FC<{
-  result: EmotionResult | null;
-  onEmotionSaved?: (emotion: EmotionResult) => void;
-}> = ({ result, onEmotionSaved }) => {
+const EmotionScanResult: React.FC<EmotionScanResultProps> = ({ result, onEmotionSaved }) => {
   const { toast } = useToast();
   const [isSaved, setIsSaved] = useState(false);
   
@@ -43,24 +41,15 @@ const EmotionScanResult: React.FC<{
   const saveEmotionResult = async () => {
     if (!result || !result.emotion) return;
     
-    const emotion: EmotionResult = {
-      id: result.id || 'temp-id',
-      user_id: result.user_id || 'user-id',
-      date: result.date || new Date().toISOString(),
-      emotion: result.emotion,
-      score: result.score,
-      text: result.text || result.transcript || '',
-      emojis: ensureArrayEmojis(result.emojis || []),
-      ai_feedback: result.feedback || result.ai_feedback || '',
-      category: determineEmotionCategory(result.emotion) // Ajouter category
-    };
+    // Convert to a consistent format
+    const emotionData = convertToEmotionResult(result);
     
     try {
-      await saveEmotion(emotion);
+      await saveEmotion(emotionData);
       setIsSaved(true);
       
       if (onEmotionSaved) {
-        onEmotionSaved(emotion);
+        onEmotionSaved(emotionData);
       }
       
       toast({
@@ -77,21 +66,6 @@ const EmotionScanResult: React.FC<{
       });
     }
   };
-
-  // Helper function to determine emotion category
-  const determineEmotionCategory = (emotion: string): string => {
-    const positiveEmotions = ['joy', 'happiness', 'excitement', 'satisfaction', 'content'];
-    const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust', 'anxiety'];
-    const neutralEmotions = ['surprise', 'neutral', 'calm'];
-    
-    const lowerEmotion = emotion.toLowerCase();
-    
-    if (positiveEmotions.includes(lowerEmotion)) return 'positive';
-    if (negativeEmotions.includes(lowerEmotion)) return 'negative';
-    if (neutralEmotions.includes(lowerEmotion)) return 'neutral';
-    
-    return 'other';
-  };
   
   return (
     <Card className="w-full">
@@ -103,7 +77,7 @@ const EmotionScanResult: React.FC<{
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold">Émotion : {result.emotion}</h3>
-            <p className="text-muted-foreground">Score : {result.score}</p>
+            <p className="text-muted-foreground">Score : {result.score || Math.round((result.confidence || 0) * 100)}</p>
           </div>
           <div>
             {isSaved ? (
