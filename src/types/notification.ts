@@ -12,11 +12,8 @@ export interface Notification {
   read: boolean;
   actionUrl?: string;
   timestamp?: string;
-}
-
-export interface EnhancedNotification extends Notification {
-  priority: number;
-  category: string;
+  priority?: number;
+  category?: string;
   sender?: {
     id: string;
     name: string;
@@ -25,6 +22,11 @@ export interface EnhancedNotification extends Notification {
   date?: string;
   isRead?: boolean;
   linkTo?: string;
+}
+
+export interface EnhancedNotification extends Notification {
+  priority: number;
+  category: string;
 }
 
 export interface NotificationPreference {

@@ -30,7 +30,10 @@ export function useHumeAI() {
         { name: 'surprise', score: 0.2, confidence: 0.7 }
       ];
       
-      const dominantEmotion = simulatedEmotions[0];
+      const dominantEmotion = {
+        name: simulatedEmotions[0].name,
+        score: simulatedEmotions[0].score
+      };
       
       const emotionResult: EmotionResult = {
         dominantEmotion,
@@ -67,7 +70,7 @@ export function useHumeAI() {
   }, [toast]);
   
   const processEmotions = useCallback(() => {
-    // Mock emotions data with properly typed confidence
+    // Mock emotions data with properly typed scores
     return [
       { name: 'happiness', score: 0.8 },
       { name: 'sadness', score: 0.2 },

@@ -2,6 +2,7 @@
 export interface EmotionResult {
   id?: string;
   user_id?: string;
+  userId?: string;
   date?: string;
   emotion?: string;
   emotions?: any;
@@ -89,4 +90,14 @@ export interface EmotionalData {
   lastEmotion?: Emotion;
   streakDays?: number;
   emotionalBalance?: number;
+  feedback?: string;
+}
+
+export interface EmotionPrediction {
+  predictedEmotion: string;
+  emotion: string;
+  probability: number;
+  confidence: number;
+  triggers: string[];
+  recommendations: string[];
 }

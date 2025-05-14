@@ -3,21 +3,32 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import EmotionScanForm from './EmotionScanForm';
 
-const ScanTabContent: React.FC<{ onScanSaved?: () => void, onClose?: () => void }> = ({ 
-  onScanSaved, 
-  onClose 
-}) => {
-  const { user } = useAuth();
+interface ScanTabContentProps {
+  onScanComplete?: () => void;
+}
 
+const ScanTabContent: React.FC<ScanTabContentProps> = ({ onScanComplete }) => {
+  const { user } = useAuth();
+  
+  const handleScanSaved = () => {
+    if (onScanComplete) {
+      onScanComplete();
+    }
+  };
+  
+  const handleClose = () => {
+    if (onScanComplete) {
+      onScanComplete();
+    }
+  };
+  
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {user && (
-        <EmotionScanForm 
-          userId={user.id} 
-          onScanSaved={onScanSaved} 
-          onClose={onClose} 
-        />
-      )}
+    <div className="space-y-6">
+      <EmotionScanForm 
+        onScanSaved={handleScanSaved}
+        onClose={handleClose}
+        userId={user?.id}
+      />
     </div>
   );
 };

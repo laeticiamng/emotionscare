@@ -1,21 +1,23 @@
 
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'roboto' | 'lato' | 'poppins' | 'montserrat';
-export type UserRole = 'admin' | 'user' | 'manager' | 'guest' | 'b2b_admin' | 'b2b_user' | 'b2c';
+export type UserRole = 'admin' | 'user' | 'manager' | 'guest' | 'b2b_admin' | 'b2b_user' | 'b2c' | 'employee' | 'wellbeing_manager' | 'coach';
 
 export interface User {
   id: string;
   email: string;
-  role?: UserRole;
+  role: UserRole;
   name?: string;
   created_at?: string;
+  createdAt?: string;
   avatar_url?: string;
   preferences?: UserPreferences;
   onboarded?: boolean;
   department?: string;
   position?: string;
   joined_at?: string;
+  last_active?: string;
   emotional_score?: number;
   bio?: string;
   anonymity_code?: string;
@@ -44,6 +46,9 @@ export interface UserPreferences {
   privacy?: string;
   notifications_enabled?: boolean;
   privacyLevel?: string;
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
+  soundEnabled?: boolean;
 }
 
 export interface UserPreferencesState {

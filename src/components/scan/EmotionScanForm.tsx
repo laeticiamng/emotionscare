@@ -9,10 +9,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 
 interface EmotionScanFormProps {
-  onComplete: (result: EmotionResult) => void;
+  onComplete?: (result: EmotionResult) => void;
+  userId?: string;
+  onScanSaved?: () => void;
+  onClose?: () => void;
 }
 
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete }) => {
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ 
+  onComplete,
+  userId,
+  onScanSaved,
+  onClose
+}) => {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
@@ -33,7 +41,8 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete }) => {
   };
 
   const handleEmotionSelect = async (emotion: string) => {
-    if (!user) return;
+    const effectiveUserId = userId || user?.id;
+    if (!effectiveUserId) return;
     
     setLoading(true);
     try {
@@ -44,15 +53,15 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete }) => {
         score: Math.random() * 0.5 + 0.5, // Random score between 0.5 and 1.0
         date: new Date().toISOString(),
         text,
-        user_id: user.id
+        user_id: effectiveUserId
       };
 
       // Process for badges if user is authenticated
-      const earnedBadges = await processEmotionForBadges(user.id, result);
+      const badgeResult = await processEmotionForBadges(effectiveUserId, result);
       
-      if (earnedBadges.length > 0) {
+      if (badgeResult && badgeResult.newBadges && badgeResult.newBadges.length > 0) {
         // Show toast for earned badges
-        earnedBadges.forEach(badge => {
+        badgeResult.newBadges.forEach(badge => {
           toast({
             title: `Badge débloqué: ${badge.name}`,
             description: badge.description,
@@ -62,7 +71,8 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete }) => {
       }
       
       // Complete the scan process
-      onComplete(result);
+      if (onComplete) onComplete(result);
+      if (onScanSaved) onScanSaved();
       
     } catch (error) {
       console.error('Error processing emotion scan:', error);

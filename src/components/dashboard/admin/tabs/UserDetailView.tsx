@@ -240,7 +240,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user, onUpdate, onClose
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Date d'inscription</p>
-                  <p>{formatDate(user.created_at || user.createdAt || user.joined_at || '')}</p>
+                  <p>{formatDate(user.created_at || user.joined_at || '')}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-muted-foreground">Onboarding complété</p>
