@@ -1,62 +1,87 @@
 
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import TeamOverview from '@/components/scan/TeamOverview';
-import TeamFilterControls from '@/components/scan/TeamFilterControls';
-import TeamStatCards from '@/components/scan/TeamStatCards';
-import AISuggestions from '@/components/scan/AISuggestions';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import TeamOverview from './TeamOverview';
+import TeamActivityChart from './TeamActivityChart';
+import TeamMoodTimeline from './TeamMoodTimeline';
+
+// Mock user data
+const mockUsers: Partial<User>[] = [
+  {
+    id: '1',
+    name: 'Jean Dupont',
+    role: 'b2b-user',
+    emotional_score: 75,
+    anonymity_code: 'JD-123',
+    avatar_url: ''
+  },
+  {
+    id: '2',
+    name: 'Marie Leroy',
+    role: 'b2b-user',
+    emotional_score: 62,
+    anonymity_code: 'ML-456',
+    avatar_url: ''
+  },
+  {
+    id: '3',
+    name: 'Alex Moreau',
+    role: 'b2b-user',
+    emotional_score: 88,
+    anonymity_code: 'AM-789',
+    avatar_url: ''
+  },
+  {
+    id: '4',
+    name: 'Sophie Bernard',
+    role: 'b2b-user',
+    emotional_score: 45,
+    anonymity_code: 'SB-012',
+    avatar_url: ''
+  }
+];
 
 interface TeamTabContentProps {
-  filteredUsers: User[];
-  selectedFilter: string;
-  filterUsers: (filter: string) => void;
-  periodFilter: '7' | '30' | '90';
-  setPeriodFilter: (period: '7' | '30' | '90') => void;
-  isLoading?: boolean;
+  onTeamMemberSelect?: (userId: string) => void;
 }
 
-const TeamTabContent: React.FC<TeamTabContentProps> = ({
-  filteredUsers,
-  selectedFilter,
-  filterUsers,
-  periodFilter,
-  setPeriodFilter,
-  isLoading = false
-}) => {
+const TeamTabContent: React.FC<TeamTabContentProps> = ({ onTeamMemberSelect }) => {
+  const [activeTab, setActiveTab] = useState('overview');
+
   return (
-    <Card className="p-6 shadow-md rounded-3xl">
-      <div className="flex flex-col sm:flex-row justify-between items-start mb-6">
-        <h3 className="text-xl font-semibold">Scans Émotionnels de l'Équipe</h3>
-        <TeamFilterControls 
-          periodFilter={periodFilter}
-          setPeriodFilter={setPeriodFilter}
-          selectedFilter={selectedFilter}
-          filterUsers={filterUsers}
-          isLoading={isLoading}
-        />
-      </div>
-      
-      <Separator className="my-6" />
-      
-      {isLoading ? (
-        <div className="space-y-6">
-          <Skeleton className="w-full h-20" />
-          <Skeleton className="w-full h-64" />
-          <Skeleton className="w-full h-40" />
-        </div>
-      ) : (
-        <>
-          <TeamStatCards />
-          
-          <TeamOverview users={filteredUsers} />
-  
-          <AISuggestions />
-        </>
-      )}
-    </Card>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle>Vue d'équipe</CardTitle>
+          <CardDescription>
+            Aperçu anonymisé de l'état émotionnel de votre équipe
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+              <TabsTrigger value="activity">Activité</TabsTrigger>
+              <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview">
+              <TeamOverview users={mockUsers} onUserClick={onTeamMemberSelect} />
+            </TabsContent>
+            
+            <TabsContent value="activity">
+              <TeamActivityChart />
+            </TabsContent>
+            
+            <TabsContent value="timeline">
+              <TeamMoodTimeline />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

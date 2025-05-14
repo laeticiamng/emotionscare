@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types/types';
+import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types';
 
 // Create context with default values
 const MusicContext = createContext<MusicContextType>({
@@ -36,6 +36,9 @@ const MusicContext = createContext<MusicContextType>({
   isInitialized: false,
   initializeMusicSystem: () => {},
   isPlaying: false,
+  
+  // Added for compatibility
+  loadPlaylistForEmotion: async () => null,
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -112,7 +115,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         isPlaying,
         isMuted,
         volume,
-        setVolume, // Added for compatibility
+        setVolume,
         playTrack,
         pauseTrack,
         togglePlay,
@@ -126,7 +129,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         playlists,
         loadPlaylistById,
         loadPlaylistForEmotion,
-        currentPlaylist, // Added for compatibility
+        currentPlaylist,
       }}
     >
       {children}

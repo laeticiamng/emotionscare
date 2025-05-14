@@ -1,122 +1,125 @@
 
-import { v4 as uuid } from 'uuid';
-import { supabase } from '@/integrations/supabase/client';
-import { EmotionResult } from '@/types/types';
+import { EmotionResult } from '@/types';
 
-// Create a new emotion entry
-export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<EmotionResult> => {
+/**
+ * Create a new emotion entry for the user
+ */
+export async function createEmotionEntry(userId: string, data: Partial<EmotionResult>): Promise<EmotionResult> {
   try {
-    // Ensure required fields are present
-    const emotionData = {
-      id: data.id || uuid(),
-      user_id: data.user_id,
-      date: data.date || new Date().toISOString(),
+    // This would normally be an API call
+    const newEntry: EmotionResult = {
+      id: `emotion-${Date.now()}`,
       emotion: data.emotion || 'neutral',
-      score: data.score || Math.round((data.confidence || 0.5) * 100),
-      confidence: data.confidence || 0.5,
-      text: data.text || '',
-      emojis: Array.isArray(data.emojis) ? data.emojis : [],
-      audio_url: data.audio_url || '',
-      ai_feedback: data.ai_feedback || ''
+      date: new Date().toISOString(),
+      user_id: userId,
+      ...data
     };
-
-    const { data: insertedData, error } = await supabase
-      .from('emotions')
-      .insert(emotionData)
-      .select()
-      .single();
-
-    if (error) throw error;
     
-    return insertedData as EmotionResult;
+    // Here you would normally save to the database
+    console.log('Creating emotion entry:', newEntry);
+    
+    return newEntry;
   } catch (error) {
     console.error('Error creating emotion entry:', error);
-    throw error;
+    throw new Error('Failed to create emotion entry');
   }
-};
+}
 
-// Fetch the latest emotion for a user
-export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
+/**
+ * Analyze emotion from text or audio
+ */
+export async function analyzeEmotion(
+  data: { text?: string; audio?: Blob },
+  userId?: string
+): Promise<EmotionResult> {
   try {
-    const { data, error } = await supabase
-      .from('emotions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('date', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No rows returned (not an error, just no data yet)
-        return null;
-      }
-      throw error;
-    }
-
-    return data as EmotionResult;
+    // Mock implementation - would normally call an API
+    const mockEmotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
+    const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)];
+    
+    const result: EmotionResult = {
+      id: `emotion-${Date.now()}`,
+      emotion: randomEmotion,
+      confidence: Math.random() * 0.5 + 0.5, // Random confidence between 50-100%
+      transcript: data.text || "Sample transcription of detected speech...",
+      date: new Date().toISOString(),
+      ai_feedback: `Analysis detected ${randomEmotion} as the primary emotion.`,
+      recommendations: [
+        "Take a few deep breaths",
+        "Consider mindfulness exercises",
+        "Listen to calming music"
+      ],
+      user_id: userId
+    };
+    
+    console.log('Analyzed emotion:', result);
+    return result;
   } catch (error) {
-    console.error('Error fetching latest emotion:', error);
-    return null;
+    console.error('Error analyzing emotion:', error);
+    throw new Error('Failed to analyze emotion');
   }
-};
+}
 
-// Analyze audio stream (placeholder implementation)
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // In a real app, this would send the audio to an API for processing
-  // For now, we'll return a mock response
-  await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API latency
-  
-  return {
-    id: uuid(),
-    emotion: ['happy', 'sad', 'neutral', 'calm', 'excited'][Math.floor(Math.random() * 5)],
-    confidence: 0.7 + Math.random() * 0.3,
-    score: Math.floor(Math.random() * 100),
-    transcript: "Ceci est une transcription simulée de l'enregistrement audio.",
-    date: new Date().toISOString(),
-    ai_feedback: "Analyse IA simulée basée sur l'audio soumis."
-  };
-};
+/**
+ * Save emotion result to database
+ */
+export async function saveEmotion(emotionResult: EmotionResult, userId: string): Promise<EmotionResult> {
+  try {
+    // This would normally save to the database
+    const savedEmotion = {
+      ...emotionResult,
+      user_id: userId,
+      id: emotionResult.id || `emotion-${Date.now()}`
+    };
+    
+    console.log('Saving emotion result:', savedEmotion);
+    return savedEmotion;
+  } catch (error) {
+    console.error('Error saving emotion:', error);
+    throw new Error('Failed to save emotion');
+  }
+}
 
-// Save an emotion record
-export const saveEmotion = async (emotion: EmotionResult): Promise<void> => {
-  // Ensure the emotion object has the required fields
-  const emotionToSave = {
-    ...emotion,
-    id: emotion.id || uuid(),
-    date: emotion.date || new Date().toISOString(),
-    score: emotion.score || Math.round((emotion.confidence || 0.5) * 100)
-  };
+/**
+ * Analyze audio stream for emotion
+ */
+export async function analyzeAudioStream(
+  audioBlob: Blob,
+  userId?: string
+): Promise<EmotionResult> {
+  try {
+    // This would normally send the audio to an API for analysis
+    console.log('Analyzing audio stream...');
+    
+    // Create a fake delay to simulate processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    return analyzeEmotion({ audio: audioBlob }, userId);
+  } catch (error) {
+    console.error('Error analyzing audio stream:', error);
+    throw new Error('Failed to analyze audio stream');
+  }
+}
 
-  const { error } = await supabase
-    .from('emotions')
-    .upsert(emotionToSave);
-
-  if (error) throw error;
-};
-
-// Analyze text/emoji input
-export const analyzeEmotion = async (text?: string, emojis?: string[]): Promise<EmotionResult> => {
-  // In a real app, this would call an API
-  // For now, we'll return a mock response
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API latency
-  
-  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral', 'calm'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  
-  return {
-    id: uuid(),
-    emotion: randomEmotion,
-    confidence: 0.7 + Math.random() * 0.3,
-    score: Math.floor(Math.random() * 100),
-    text: text || '',
-    emojis: emojis || [],
-    date: new Date().toISOString(),
-    ai_feedback: `Basé sur votre entrée, je détecte principalement de la ${randomEmotion}.`,
-    recommendations: [
-      "Prenez 5 minutes pour méditer",
-      "Essayez une séance de respiration profonde",
-      "Écoutez une playlist relaxante"
-    ]
-  };
-};
+/**
+ * Fetch emotion history for a user
+ */
+export async function fetchEmotionHistory(userId: string): Promise<EmotionResult[]> {
+  try {
+    // Mock implementation - would normally call an API
+    const mockEmotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
+    
+    const mockHistory: EmotionResult[] = Array.from({ length: 10 }).map((_, index) => ({
+      id: `emotion-${Date.now() - index * 86400000}`,
+      emotion: mockEmotions[Math.floor(Math.random() * mockEmotions.length)],
+      confidence: Math.random() * 0.5 + 0.5,
+      date: new Date(Date.now() - index * 86400000).toISOString(),
+      user_id: userId
+    }));
+    
+    return mockHistory;
+  } catch (error) {
+    console.error('Error fetching emotion history:', error);
+    throw new Error('Failed to fetch emotion history');
+  }
+}

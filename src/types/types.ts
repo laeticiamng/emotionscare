@@ -1,7 +1,8 @@
+
 // ————————————————————————
 // UserRole
 // ————————————————————————
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin';
+export type UserRole = 'b2c' | 'b2b-user' | 'b2b-admin';
 
 // ————————————————————————
 // User
@@ -37,7 +38,7 @@ export interface UserData extends User {
 export interface UserPreferences {
   dashboardLayout: 'standard' | 'compact' | 'focused';
   onboardingCompleted: boolean;
-  theme: Theme;
+  theme: ThemeName;
   fontSize: FontSize;
   fontFamily: FontFamily;
   sound: boolean;
@@ -56,6 +57,8 @@ export interface UserPreferences {
   profileVisibility?: 'public' | 'private' | 'team';
   locale?: string;
   timeZone?: string;
+  accessibilityFeatures?: string[];
+  privacyLevel?: string;
 }
 
 // ————————————————————————
@@ -78,15 +81,14 @@ export interface EmotionalTeamViewProps {
 // ————————————————————————
 // EmotionResult - Unified type for all emotion-related data
 // ————————————————————————
-// Mise à jour d'EmotionResult pour corriger les problèmes de compatibilité
 export interface EmotionResult {
-  id?: string;
+  id: string;
   emotion: string;
   score?: number;
   confidence?: number;
   intensity?: number;
   transcript?: string;
-  date?: string | null;
+  date: string | null;
   emojis?: string[] | string;
   ai_feedback?: string;
   recommendations?: string[];
@@ -208,7 +210,7 @@ export interface MusicContextType {
   initializeMusicSystem: () => void;
   error?: string | null;
   isPlaying?: boolean;
-  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
 }
 
 // ————————————————————————
@@ -290,11 +292,11 @@ export type Json = string | number | boolean | null | Json[] | { [key: string]: 
 // ————————————————————————
 export type FontFamily = 'system' | 'sans-serif' | 'serif' | 'mono' | 'rounded' | 'inter';
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large' | 'sm' | 'md' | 'lg' | 'xl';
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
   isDarkMode: boolean;
   fontFamily: FontFamily;
   setFontFamily: (font: FontFamily) => void;
@@ -305,11 +307,14 @@ export interface ThemeContextType {
 // ————————————————————————
 // UserMode
 // ————————————————————————
-export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | 'personal' | 'team' | 'anonymous';
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'anonymous';
 
-export interface UserMode {
-  mode: UserModeType;
-  setMode: (mode: UserModeType) => void;
+export interface UserModeContextType {
+  userMode: UserModeType;
+  setUserMode: (mode: UserModeType) => void;
+  mode?: UserModeType; // For backward compatibility
+  setMode?: (mode: UserModeType) => void; // For backward compatibility
+  isLoading?: boolean;
 }
 
 // ————————————————————————
@@ -413,6 +418,8 @@ export interface Badge {
   icon?: string;
   threshold?: number;
   type?: string;
+  level?: number;
+  image?: string;
 }
 
 export interface EmotionPrediction {
@@ -503,5 +510,31 @@ export interface GamificationStats {
   nextLevel: number;
   pointsToNextLevel: number;
   nextLevelPoints: number;
-  challenges?: any[];
+  challenges?: Challenge[];
+  rank?: string;
+  streak?: number;
+  totalPoints?: number;
+  currentLevel?: number;
+  progressToNextLevel?: number;
+  streakDays?: number;
+  lastActivityDate?: string;
+  activeChallenges?: number;
+  completedChallenges?: number;
+  badgesCount?: number;
+  recentAchievements?: any[];
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  status: string;
+  category: string;
+  progress?: number;
+  target?: number;
+  reward?: number;
+  type?: string;
+  name?: string;
+  completed?: boolean;
 }

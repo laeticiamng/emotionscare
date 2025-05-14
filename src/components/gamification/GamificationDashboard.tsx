@@ -8,7 +8,7 @@ import BadgeGrid from './BadgeGrid';
 import ChallengesList from './ChallengesList';
 import { useGamification } from '@/hooks/useGamification';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
-import { GamificationStats, Challenge } from '@/types/gamification';
+import { GamificationStats, Challenge, Badge } from '@/types';
 
 const GamificationDashboard: React.FC = () => {
   const { 
@@ -28,16 +28,27 @@ const GamificationDashboard: React.FC = () => {
 
   // Ensure stats has all required properties with default values
   const safeStats: GamificationStats = {
+    level: stats.level || 1,
+    points: stats.points || 0,
+    badges: stats.badges || [],
+    streak: stats.streak || 0,
     totalPoints: stats.totalPoints || 0,
     currentLevel: stats.currentLevel || 1,
     pointsToNextLevel: stats.pointsToNextLevel || 100,
     progressToNextLevel: stats.progressToNextLevel || 0,
     badgesCount: stats.badgesCount || 0,
-    streak: stats.streak || 0,
     streakDays: stats.streakDays || 0,
     lastActivityDate: stats.lastActivityDate || new Date().toISOString(),
     activeChallenges: stats.activeChallenges || 0,
     completedChallenges: stats.completedChallenges || 0,
+    leaderboard: [],
+    nextLevel: 2,
+    nextLevelPoints: 100,
+    streaks: {
+      current: stats.streak || 0,
+      longest: stats.streak || 0,
+      lastActivity: stats.lastActivityDate || new Date().toISOString()
+    }
   };
 
   return (
@@ -117,7 +128,7 @@ const GamificationDashboard: React.FC = () => {
         </TabsContent>
         <TabsContent value="challenges" className="space-y-4">
           <div className="challenges-list">
-            <ChallengesList challenges={challenges.map((challenge: any) => ({
+            <ChallengesList challenges={challenges.map((challenge: any): Challenge => ({
               id: challenge.id,
               title: challenge.title || challenge.name || '',
               description: challenge.description || '',
@@ -125,7 +136,11 @@ const GamificationDashboard: React.FC = () => {
               status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
               category: challenge.category || 'general',
               name: challenge.name || challenge.title || '',
-            } as Challenge))} />
+              progress: challenge.progress || 0,
+              target: challenge.target || 100,
+              reward: challenge.reward || challenge.points || 0,
+              type: challenge.type || 'standard'
+            }))} />
           </div>
         </TabsContent>
       </Tabs>

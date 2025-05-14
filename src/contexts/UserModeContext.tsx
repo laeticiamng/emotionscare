@@ -1,26 +1,21 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserModeType } from '@/types/types';
-
-interface UserModeContextType {
-  mode: UserModeType;
-  setMode: (mode: UserModeType) => void;
-  isLoading: boolean;
-  userMode: UserModeType; // Added for compatibility
-}
+import { UserModeType, UserModeContextType } from '@/types';
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mode, setMode] = useState<UserModeType>('personal');
+  const [userMode, setUserMode] = useState<UserModeType>('personal');
   const [isLoading, setIsLoading] = useState(false);
 
   return (
     <UserModeContext.Provider value={{ 
-      mode, 
-      setMode, 
+      userMode, 
+      setUserMode, 
       isLoading,
-      userMode: mode // Added for compatibility
+      // For backward compatibility
+      mode: userMode,
+      setMode: setUserMode
     }}>
       {children}
     </UserModeContext.Provider>

@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { UserModeType } from '@/types/types';
+import { UserModeType } from '@/types';
 import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
 import EmotionalCheckIn from '@/components/dashboard/EmotionScanSection';
 import EmotionalTrends from '@/components/dashboard/EmotionalTrends';

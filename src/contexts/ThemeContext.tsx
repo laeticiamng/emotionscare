@@ -1,23 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Theme, FontFamily, FontSize } from '@/types/types';
-
-// Interface for ThemeContext
-interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  isDarkMode: boolean;
-  fontFamily: FontFamily;
-  setFontFamily: (font: FontFamily) => void;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-}
+import { ThemeName, FontFamily, FontSize, ThemeContextType } from '@/types';
 
 // Création du contexte
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [theme, setTheme] = useState<ThemeName>('light');
   const [fontFamily, setFontFamily] = useState<FontFamily>('system');
   const [fontSize, setFontSize] = useState<FontSize>('medium');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -25,7 +14,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Effet pour vérifier la préférence utilisateur
   useEffect(() => {
     // Vérifier la préférence de thème dans localStorage
-    const storedTheme = localStorage.getItem('theme') as Theme | null;
+    const storedTheme = localStorage.getItem('theme') as ThemeName | null;
     
     if (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'pastel') {
       setTheme(storedTheme);
@@ -126,6 +115,3 @@ export const useTheme = (): ThemeContextType => {
 
 // Export the ThemeContext for use-theme.ts
 export { ThemeContext };
-
-// Export the types for components that need them
-export type { Theme, FontFamily, FontSize, ThemeContextType };

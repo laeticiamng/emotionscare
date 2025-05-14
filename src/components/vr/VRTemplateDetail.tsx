@@ -1,170 +1,242 @@
 
-import React from 'react';
-import { Clock, Play, CheckCircle, Heart, Headphones } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import YoutubeEmbed from './YoutubeEmbed';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/card";
+import { ArrowLeft, Calendar, Clock3, Play } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { VRSessionTemplate } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Progress } from "@/components/ui/progress";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMusicRecommendations } from "@/hooks/useMusicRecommendations";
 
 interface VRTemplateDetailProps {
   template: VRSessionTemplate;
-  heartRate: number;
-  onStartSession: () => void;
-  onBack: () => void;
-  isLoading?: boolean;
+  onStartSession?: () => void;
+  showBackButton?: boolean;
 }
 
-const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({ 
-  template, 
-  heartRate, 
-  onStartSession, 
-  onBack,
-  isLoading = false
+const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
+  template,
+  onStartSession,
+  showBackButton = true
 }) => {
-  const title = template?.title || template?.name || template?.theme || "Session VR";
-  const duration = template?.duration || 0;
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("details");
+  const { recommendations } = useMusicRecommendations(template.emotion || "");
+
+  const handleStartSession = () => {
+    if (onStartSession) {
+      onStartSession();
+    } else {
+      navigate(`/vr/session/${template.id}`);
+    }
+  };
+
+  const handleBack = () => {
+    navigate(-1);
+  };
   
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <Card>
-            <CardContent className="p-0">
-              <Skeleton className="w-full aspect-video" />
-              <div className="p-6">
-                <Skeleton className="h-8 w-3/4 mb-4" />
-                <Skeleton className="h-4 w-1/2 mb-6" />
-                <Skeleton className="h-10 w-40" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div>
-          <Card>
-            <CardContent className="p-6">
-              <Skeleton className="h-6 w-1/2 mb-4" />
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (remainingMinutes === 0) {
+      return `${hours} heure${hours > 1 ? 's' : ''}`;
+    }
+    
+    return `${hours}h ${remainingMinutes}min`;
+  };
   
+  const getEmotionColor = (emotion?: string) => {
+    switch (emotion?.toLowerCase()) {
+      case 'calme':
+      case 'sérénité':
+      case 'relaxation':
+        return 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200';
+      case 'joie':
+      case 'bonheur':
+      case 'optimisme':
+        return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200';
+      case 'concentration':
+      case 'focus':
+        return 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200';
+      case 'énergie':
+      case 'dynamisme':
+        return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200';
+      default:
+        return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200';
+    }
+  };
+  
+  // Generate a list of template benefits if none are provided
+  const benefits = template.benefits || [
+    "Réduit le stress",
+    "Améliore le bien-être mental",
+    "Favorise la concentration",
+    "Renforce la résilience émotionnelle"
+  ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="md:col-span-2">
-        <Card>
-          <CardContent className="p-0">
-            {template.is_audio_only ? (
-              <div className="aspect-video bg-gradient-to-br from-purple-900 to-indigo-600 flex items-center justify-center">
-                <Headphones className="h-16 w-16 text-white opacity-75" />
-              </div>
-            ) : (
-              <AspectRatio ratio={16/9}>
-                <YoutubeEmbed 
-                  videoUrl={template.preview_url}
-                  controls={true}
-                  showInfo={false}
-                />
-              </AspectRatio>
-            )}
-            
-            <div className="p-6">
-              <h2 className="text-xl font-semibold">{title}</h2>
-              <div className="flex items-center mt-2 text-muted-foreground">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>{duration} minutes</span>
-                
-                {template.is_audio_only && (
-                  <span className="ml-3 flex items-center">
-                    <Headphones className="h-4 w-4 mr-1" />
-                    <span>Audio uniquement</span>
-                  </span>
-                )}
-              </div>
-              
-              {template.description && (
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {template.description}
-                </p>
-              )}
-              
-              {template.completion_rate !== undefined && (
-                <div className="mt-3 text-sm text-muted-foreground">
-                  Vous avez complété {template.completion_rate}% de ce type de session
+    <div className="max-w-4xl mx-auto">
+      {/* Header with back button */}
+      {showBackButton && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mb-4 flex items-center"
+          onClick={handleBack}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+        </Button>
+      )}
+
+      {/* Cover image */}
+      <div className="mb-6">
+        <AspectRatio ratio={16 / 9} className="bg-muted rounded-lg overflow-hidden">
+          <img
+            src={template.preview_url || "/images/vr-banner-bg.jpg"}
+            alt={template.title}
+            className="object-cover w-full h-full"
+          />
+          
+          {/* Completion overlay */}
+          {template.completion_rate ? (
+            <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/80 text-primary-foreground px-3 py-1 rounded-md text-xs font-medium">
+              <div className="w-28">
+                <div className="flex justify-between text-xs mb-1">
+                  <span>Progression</span>
+                  <span>{Math.round(template.completion_rate * 100)}%</span>
                 </div>
-              )}
-              
-              <div className="flex gap-2 flex-wrap mt-4">
-                <Button 
-                  className="flex items-center" 
-                  onClick={onStartSession}
-                >
-                  <Play className="h-4 w-4 mr-2" /> Démarrer la session
-                </Button>
-                
-                <Button 
-                  variant="outline"
-                  onClick={onBack}
-                >
-                  Retour
-                </Button>
+                <Progress value={template.completion_rate * 100} className="h-1" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          ) : null}
+          
+          {/* Play button */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Button
+              size="lg"
+              className="rounded-full h-16 w-16 flex items-center justify-center"
+              onClick={handleStartSession}
+            >
+              <Play className="h-8 w-8" />
+            </Button>
+          </div>
+        </AspectRatio>
       </div>
-      
-      <div>
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="text-lg font-medium mb-2">Bénéfices</h3>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                <span>Réduction du stress</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                <span>Amélioration de la concentration</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                <span>Récupération mentale</span>
-              </li>
-              {template.is_audio_only && (
-                <li className="flex items-start">
-                  <CheckCircle className="h-5 w-5 mr-2 text-primary flex-shrink-0" />
-                  <span>Pratique de pleine conscience</span>
-                </li>
-              )}
-            </ul>
-            
-            <div className="mt-6">
-              <h3 className="text-lg font-medium mb-2">Suivi santé</h3>
-              <div className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-red-500" />
-                <span>Rythme cardiaque: {heartRate} bpm</span>
+
+      {/* Title and metadata */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">{template.title}</h1>
+        
+        <div className="flex flex-wrap gap-3 mb-4">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Clock3 className="mr-1 h-4 w-4" />
+            {formatDuration(template.duration)}
+          </div>
+          
+          {template.lastUsed && (
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Calendar className="mr-1 h-4 w-4" />
+              Dernière séance: {new Date(template.lastUsed).toLocaleDateString()}
+            </div>
+          )}
+          
+          {template.recommended_mood && (
+            <div className="flex items-center">
+              <span 
+                className={`text-xs px-3 py-1 rounded-full ${getEmotionColor(template.recommended_mood)}`}
+              >
+                Recommandé pour: {template.recommended_mood}
+              </span>
+            </div>
+          )}
+        </div>
+        
+        <p className="text-muted-foreground">
+          {template.description}
+        </p>
+      </div>
+
+      {/* Tabs for different content */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="details">Détails</TabsTrigger>
+          <TabsTrigger value="benefits">Bienfaits</TabsTrigger>
+          <TabsTrigger value="music">Musique recommandée</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="details" className="space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">À propos de cette session</h3>
+            <p className="text-sm text-muted-foreground">
+              Cette session {template.is_audio_only ? 'audio' : 'immersive'} est conçue pour vous aider à 
+              {template.emotion ? ` cultiver un état de ${template.emotion.toLowerCase()}` : ' améliorer votre bien-être'}. 
+              Elle utilise des techniques de visualisation guidée et de respiration pour maximiser les bienfaits.
+            </p>
+          </div>
+          
+          {template.tags && template.tags.length > 0 && (
+            <div>
+              <h3 className="font-medium mb-2">Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                {template.tags.map((tag, index) => (
+                  <Badge key={index} variant="outline">
+                    {tag}
+                  </Badge>
+                ))}
               </div>
             </div>
-            
-            {template.recommended_mood && (
-              <div className="bg-primary/10 p-3 rounded-lg mt-6">
-                <p className="text-sm">
-                  <span className="font-medium">Ambiance recommandée:</span>{' '}
-                  <span className="capitalize">{template.recommended_mood}</span>
-                </p>
-              </div>
+          )}
+          
+          <div>
+            <h3 className="font-medium mb-2">Niveau de difficulté</h3>
+            <Badge variant="secondary">
+              {template.difficulty || 'Débutant'}
+            </Badge>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="benefits" className="space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">Bienfaits</h3>
+            <ul className="list-disc pl-5 space-y-2 text-sm text-muted-foreground">
+              {benefits.map((benefit, index) => (
+                <li key={index}>{benefit}</li>
+              ))}
+            </ul>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="music" className="space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">Musique recommandée</h3>
+            {recommendations && recommendations.length > 0 ? (
+              <ul className="list-disc pl-5 space-y-2 text-sm text-muted-foreground">
+                {recommendations.slice(0, 5).map((track, index) => (
+                  <li key={index}>{track.title} - {track.artist}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Aucune recommandation musicale disponible pour cette session.
+              </p>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+
+      {/* Start button */}
+      <div className="flex justify-center mb-8">
+        <Button size="lg" onClick={handleStartSession} className="w-full sm:w-auto">
+          <Play className="mr-2 h-4 w-4" />
+          Démarrer cette session
+        </Button>
       </div>
     </div>
   );
