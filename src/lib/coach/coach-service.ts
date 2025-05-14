@@ -1,92 +1,87 @@
 
+import { supabase } from '@/lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
+import OpenAIClient from '../api/openAIClient';
 import { ChatMessage } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface CoachMessage {
   id: string;
+  conversation_id: string;
+  sender: string;
   text: string;
-  sender: 'user' | 'coach';
   timestamp: string;
 }
 
-// Get coach messages for a user
+// Get all messages for a user's coach conversation
 export async function getCoachMessages(userId: string): Promise<ChatMessage[]> {
   try {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('user_id', userId)
-      .order('timestamp', { ascending: true });
-
-    if (error) throw error;
-
-    return data.map((message: any) => ({
-      id: message.id,
-      text: message.text,
-      sender: message.sender,
-      timestamp: message.timestamp,
-    }));
+    // For now, return mock messages
+    const mockMessages: ChatMessage[] = [
+      {
+        id: '1',
+        text: "Bonjour, je suis votre coach émotionnel. Comment puis-je vous aider aujourd'hui ?",
+        sender: 'coach',
+        timestamp: new Date(Date.now() - 3600000).toISOString()
+      }
+    ];
+    
+    return mockMessages;
   } catch (error) {
     console.error('Error fetching coach messages:', error);
     return [];
   }
 }
 
-// Send a message to the coach
-export async function sendCoachMessage(userId: string, text: string): Promise<string> {
+// Send a message to the coach and get a response
+export async function sendCoachMessage(userId: string, messageText: string): Promise<string> {
   try {
-    // In a real implementation, this would send the message to an AI service
-    // and get a response back
+    // Create conversation if it doesn't exist
+    const conversationId = uuidv4();
+
+    // Store user message
+    const userMessageId = uuidv4();
+    const timestamp = new Date().toISOString();
     
-    // Store the user's message
-    const { error } = await supabase
-      .from('chat_messages')
-      .insert({
-        user_id: userId,
-        text,
-        sender: 'user',
-      });
+    // In a real implementation, we would store the message in the database
+    console.log('Storing user message:', {
+      id: userMessageId,
+      conversation_id: conversationId,
+      sender: 'user',
+      text: messageText,
+      timestamp
+    });
 
-    if (error) throw error;
+    // Get coach response from OpenAI
+    const response = await OpenAIClient.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are an emotional coach helping users understand and process their emotions.' },
+        { role: 'user', content: messageText }
+      ]
+    });
 
-    // Generate a mock response
-    const response = generateMockResponse(text);
-    
-    // Store the coach's response
-    await supabase
-      .from('chat_messages')
-      .insert({
-        user_id: userId,
-        text: response,
-        sender: 'coach',
-      });
+    const coachResponse = response.choices[0].message.content;
+    const coachMessageId = uuidv4();
 
-    return response;
+    // Store coach response
+    console.log('Storing coach response:', {
+      id: coachMessageId,
+      conversation_id: conversationId,
+      sender: 'coach',
+      text: coachResponse,
+      timestamp: new Date().toISOString()
+    });
+
+    return coachResponse;
   } catch (error) {
     console.error('Error sending coach message:', error);
-    throw error;
+    throw new Error('Failed to get response from coach');
   }
 }
 
-// Generate a mock response for development
-function generateMockResponse(userMessage: string): string {
-  const responses = [
-    "Je comprends ce que vous ressentez. Comment puis-je vous aider davantage ?",
-    "C'est une observation intéressante. Pouvez-vous m'en dire plus ?",
-    "Je vous remercie de partager cela avec moi. Continuez à explorer ces émotions.",
-    "Cette expérience semble significative pour vous. Qu'est-ce qui vous a le plus marqué ?",
-    "Je suis là pour vous accompagner dans ce processus.",
-  ];
-  
-  // Check for keywords to customize response
-  if (userMessage.toLowerCase().includes('stress') || userMessage.toLowerCase().includes('anxiété')) {
-    return "Le stress et l'anxiété sont des expériences communes. Avez-vous essayé de pratiquer des exercices de respiration profonde ? Cela peut aider à calmer votre système nerveux.";
-  }
-  
-  if (userMessage.toLowerCase().includes('triste') || userMessage.toLowerCase().includes('déprimé')) {
-    return "Je suis désolé d'entendre que vous vous sentez ainsi. Ces émotions sont valides, et il est important de les reconnaître. Qu'est-ce qui vous apporte habituellement du réconfort ?";
-  }
-  
-  // Return a random response for other messages
-  return responses[Math.floor(Math.random() * responses.length)];
-}
+export type CoachEvent = {
+  id: string;
+  type: string;
+  data: any;
+  timestamp: Date;
+};

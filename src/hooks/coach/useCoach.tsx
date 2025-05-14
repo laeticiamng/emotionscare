@@ -10,7 +10,7 @@ export const useCoach = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const userId = user?.id;
-  const { triggerCoachEvent } = useCoachEvents();
+  const { addEvent } = useCoachEvents(userId || '');
   const [lastEmotion, setLastEmotion] = useState<string>('neutral');
   const [recommendations, setRecommendations] = useState<string[]>([]);
   
@@ -71,7 +71,7 @@ export const useCoach = () => {
       const response = await sendCoachMessage(userId, text);
       
       // Notify relevant components about the message
-      triggerCoachEvent('message_sent', { text });
+      addEvent('message_sent', { text });
       
       // Add coach response
       setMessages(prev => [...prev, {

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge, Challenge } from '@/types/gamification';
-import { getBadgesForUser, getChallengesForUser } from '@/lib/gamificationService';
+import { getUserGamificationStats } from '@/lib/gamificationService';
 import { useAuth } from '@/contexts/AuthContext';
 
 const GamificationPage = () => {
@@ -18,11 +18,10 @@ const GamificationPage = () => {
         setLoading(true);
         
         if (user?.id) {
-          const badgesData = await getBadgesForUser(user.id);
-          const challengesData = await getChallengesForUser(user.id);
+          const stats = await getUserGamificationStats(user.id);
           
-          setBadges(badgesData);
-          setChallenges(challengesData);
+          setBadges(stats.badges);
+          setChallenges(stats.challenges);
         }
       } catch (error) {
         console.error('Error loading gamification data:', error);
@@ -57,6 +56,12 @@ const GamificationPage = () => {
                   <p className="text-sm text-muted-foreground">{badge.description}</p>
                 </div>
               ))}
+              
+              {badges.length === 0 && (
+                <div className="col-span-3 text-center py-8 text-muted-foreground">
+                  Aucun badge disponible pour le moment.
+                </div>
+              )}
             </div>
           </TabsContent>
           
@@ -71,6 +76,12 @@ const GamificationPage = () => {
                   </Button>
                 </div>
               ))}
+              
+              {challenges.length === 0 && (
+                <div className="col-span-3 text-center py-8 text-muted-foreground">
+                  Aucun challenge disponible pour le moment.
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>

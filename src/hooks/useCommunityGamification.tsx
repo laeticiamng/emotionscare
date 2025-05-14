@@ -22,11 +22,13 @@ export function useCommunityGamification(): UseCommunityGamificationResult {
   } = useGamificationStats();
   
   const {
-    activeChallenges,
-    recommendedChallenges,
-    acceptChallenge,
-    generatePersonalizedChallenges,
-    completeChallenge: completeBasicChallenge
+    markChallengeCompleted,
+    trackChallengeProgress,
+    activeChallenges = [],
+    recommendedChallenges = [],
+    acceptChallenge = async () => true,
+    generatePersonalizedChallenges = async () => {},
+    completeChallenge: completeBasicChallenge = async () => true
   } = useChallengeManagement();
   
   // Enhanced completeChallenge that also updates stats

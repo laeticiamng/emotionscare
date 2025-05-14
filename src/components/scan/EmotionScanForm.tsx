@@ -3,12 +3,18 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult, EmotionScanFormProps } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 import { processEmotionForBadges } from '@/lib/gamificationService';
 import { useAuth } from '@/contexts/AuthContext';
 import TextEmotionScanner from './TextEmotionScanner';
 import VoiceEmotionAnalyzer from './VoiceEmotionAnalyzer';
 import FacialEmotionScanner from './FacialEmotionScanner';
+
+interface EmotionScanFormProps {
+  userId?: string;
+  onScanSaved?: () => void;
+  onClose?: () => void;
+}
 
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ userId, onScanSaved, onClose }) => {
   const [activeTab, setActiveTab] = useState<'text' | 'voice' | 'face'>('text');
@@ -32,7 +38,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ userId, onScanSaved, 
       // Show success message
       toast({
         title: "Émotion enregistrée",
-        description: `${result.dominantEmotion?.name || result.emotion || 'Émotion'} détectée et enregistrée.`,
+        description: `${result.primaryEmotion?.name || result.emotion || 'Émotion'} détectée et enregistrée.`,
         variant: "default"
       });
       
@@ -102,8 +108,8 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ userId, onScanSaved, 
         {result && (
           <div className="mt-4 p-4 bg-muted rounded-md">
             <h3 className="font-semibold mb-2">Résultat de l'analyse</h3>
-            <p>Émotion dominante: {result.dominantEmotion?.name || result.emotion}</p>
-            <p>Intensité: {result.dominantEmotion?.intensity || result.intensity || 0}</p>
+            <p>Émotion dominante: {result.primaryEmotion?.name || result.emotion}</p>
+            <p>Intensité: {result.primaryEmotion?.intensity || result.intensity || 0}</p>
             <div className="mt-4 flex justify-end">
               <Button onClick={handleSave} disabled={isSaving}>
                 {isSaving ? 'Enregistrement...' : 'Enregistrer'}

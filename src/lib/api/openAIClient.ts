@@ -29,7 +29,9 @@ export async function callOpenAI(request: OpenAIRequest): Promise<string> {
   await new Promise(resolve => setTimeout(resolve, 1500));
   
   // Generate responses based on the last user message
-  const lastUserMessage = request.messages.findLast(m => m.role === 'user')?.content || '';
+  const lastUserMessage = request.messages
+    .filter(m => m.role === 'user')
+    .pop()?.content || '';
   
   if (lastUserMessage.toLowerCase().includes('anxiété') || lastUserMessage.toLowerCase().includes('stress')) {
     return "L'anxiété est une réponse naturelle au stress. Je vous recommande des exercices de respiration et de pleine conscience pour vous aider à gérer ces moments difficiles.";
@@ -48,7 +50,7 @@ export async function callOpenAI(request: OpenAIRequest): Promise<string> {
 }
 
 // Export a mock client
-export default {
+const OpenAIClient = {
   chat: {
     completions: {
       create: async (request: OpenAIRequest): Promise<OpenAIResponse> => {
@@ -68,3 +70,5 @@ export default {
     }
   }
 };
+
+export default OpenAIClient;
