@@ -1,36 +1,30 @@
 
+export type NotificationFrequency = 'daily' | 'weekly' | 'immediate' | 'digest' | 'none';
+export type NotificationType = 'journal' | 'breathing' | 'music' | 'coaching' | 'system' | 'all';
+export type NotificationTone = 'gentle' | 'neutral' | 'energetic' | 'minimal';
+
 export interface Notification {
   id: string;
+  userId: string;
   title: string;
   message: string;
   type: NotificationType;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
-  userId?: string;
-  action?: string;
   link?: string;
+  image?: string;
 }
-
-export type NotificationType =
-  | 'INFO'
-  | 'WARNING'
-  | 'SUCCESS'
-  | 'ERROR'
-  | 'SYSTEM'
-  | 'REMINDER'
-  | 'WELLNESS'
-  | 'TIP';
-
-export type NotificationChannel = 'EMAIL' | 'PUSH' | 'IN_APP' | 'SMS';
-
-export type NotificationFrequency = 'REALTIME' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'IMMEDIATE';
-
-export type NotificationTone = 'STANDARD' | 'FRIENDLY' | 'PROFESSIONAL' | 'URGENT' | 'MINIMAL' | 'FORMAL' | 'CASUAL' | 'ENCOURAGING';
 
 export interface NotificationPreference {
   enabled: boolean;
-  channels: NotificationChannel[];
+  emailEnabled: boolean;
+  pushEnabled: boolean;
   frequency: NotificationFrequency;
+  types: Record<NotificationType, boolean>;
   tone: NotificationTone;
-  types: NotificationType[];
+  quietHours: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }

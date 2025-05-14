@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import Shell from '@/Shell';
+import { TimeBasedBackground } from '@/components/home/TimeBasedBackground';
+import { WelcomeMessage } from '@/components/home/WelcomeMessage';
+import { VoiceCommandButton } from '@/components/home/voice/VoiceCommandButton';
+import { AudioController } from '@/components/home/audio/AudioController';
+import { motion } from 'framer-motion';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function B2CRegister() {
   const [name, setName] = useState('');
@@ -16,16 +22,29 @@ export default function B2CRegister() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Preload dashboard in the background
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = '/b2c/dashboard';
+    document.head.appendChild(link);
+    
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
       toast({
-        title: "Erreur",
-        description: "Les mots de passe ne correspondent pas",
+        title: "Les mots de passe ne correspondent pas",
+        description: "Vérifions ensemble que les mots de passe sont identiques",
         variant: "destructive",
       });
       return;
@@ -33,8 +52,8 @@ export default function B2CRegister() {
 
     if (!agreedToTerms) {
       toast({
-        title: "Erreur",
-        description: "Vous devez accepter les conditions d'utilisation",
+        title: "Conditions d'utilisation",
+        description: "Merci d'accepter les conditions d'utilisation pour continuer",
         variant: "destructive",
       });
       return;
@@ -45,15 +64,22 @@ export default function B2CRegister() {
     try {
       // Simulate registration process
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Play haptic feedback on mobile devices
+      if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+      }
+      
       toast({
-        title: "Inscription réussie",
-        description: "Bienvenue sur EmotionsCare",
+        title: "Bienvenue dans votre cocon",
+        description: "Vous venez de rejoindre une plateforme pensée pour vous",
       });
+      
       navigate('/b2c/dashboard');
     } catch (error) {
       toast({
-        title: "Erreur d'inscription",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        title: "Une petite difficulté",
+        description: "Nous n'avons pas pu finaliser votre inscription. Réessayons ensemble.",
         variant: "destructive",
       });
     } finally {
@@ -61,90 +87,208 @@ export default function B2CRegister() {
     }
   };
 
+  // Handle voice command for registration
+  const handleVoiceRegistration = (transcript: string) => {
+    const registrationPhrases = [
+      'inscription vocale',
+      'créer un compte',
+      'je veux m\'inscrire'
+    ];
+    
+    if (registrationPhrases.some(phrase => transcript.toLowerCase().includes(phrase))) {
+      if (name && email && password && confirmPassword && agreedToTerms) {
+        handleRegister(new Event('submit') as any);
+      } else {
+        toast({
+          title: "Information",
+          description: "Veuillez d'abord remplir tous les champs du formulaire",
+        });
+      }
+    }
+  };
+
   return (
     <Shell>
-      <div className="flex items-center justify-center min-h-[80vh] p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl">Inscription Particulier</CardTitle>
-            <CardDescription>Créez votre compte EmotionsCare</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleRegister}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom complet</Label>
-                <Input 
-                  id="name" 
-                  placeholder="Jean Dupont"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Input 
-                  id="password" 
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                <Input 
-                  id="confirmPassword" 
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="terms" 
-                  checked={agreedToTerms} 
-                  onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} 
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      <TimeBasedBackground>
+        <div className="absolute top-4 right-4 flex items-center gap-4">
+          <VoiceCommandButton 
+            onTranscript={handleVoiceRegistration} 
+            commands={{
+              'inscription vocale': () => {
+                if (name && email && password && confirmPassword && agreedToTerms) handleRegister(new Event('submit') as any);
+                else toast({ title: "Veuillez remplir tous les champs" });
+              }
+            }}
+            variant="ghost"
+          />
+          <AudioController minimal autoplay={true} initialVolume={0.2} />
+        </div>
+        
+        <motion.div 
+          className="flex items-center justify-center min-h-[80vh] p-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <Card className="w-full max-w-md backdrop-blur-md bg-background/80 shadow-xl">
+            <CardHeader>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 1 }}
+              >
+                <CardTitle className="text-2xl">Inscription Particulier</CardTitle>
+                <CardDescription>
+                  <WelcomeMessage className="mt-2" />
+                </CardDescription>
+              </motion.div>
+            </CardHeader>
+            <form onSubmit={handleRegister}>
+              <CardContent className="space-y-4">
+                <motion.div 
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.7 }}
                 >
-                  J'accepte les conditions d'utilisation et la politique de confidentialité
-                </label>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Inscription en cours..." : "S'inscrire"}
-              </Button>
-              <div className="text-sm text-center mt-2">
-                Déjà un compte?{' '}
-                <Link to="/b2c/login" className="text-primary hover:underline">
-                  Se connecter
-                </Link>
-              </div>
-              <div className="text-sm text-center">
-                <Link to="/" className="text-muted-foreground hover:underline">
-                  Retour à l'accueil
-                </Link>
-              </div>
-            </CardFooter>
-          </form>
-        </Card>
-      </div>
+                  <Label htmlFor="name">Nom complet</Label>
+                  <Input 
+                    id="name" 
+                    placeholder="Jean Dupont"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    className="bg-background/60"
+                  />
+                </motion.div>
+                <motion.div 
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5, duration: 0.7 }}
+                >
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="bg-background/60"
+                  />
+                </motion.div>
+                <motion.div 
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6, duration: 0.7 }}
+                >
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <div className="relative">
+                    <Input 
+                      id="password" 
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-background/60"
+                    />
+                    <Button 
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="sr-only">
+                        {showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
+                      </span>
+                    </Button>
+                  </div>
+                </motion.div>
+                <motion.div 
+                  className="space-y-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.7, duration: 0.7 }}
+                >
+                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                  <Input 
+                    id="confirmPassword" 
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    className="bg-background/60"
+                  />
+                </motion.div>
+                <motion.div 
+                  className="flex items-center space-x-2"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8, duration: 0.7 }}
+                >
+                  <Checkbox 
+                    id="terms" 
+                    checked={agreedToTerms} 
+                    onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)} 
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    J'accepte les conditions d'utilisation et la politique de confidentialité
+                  </label>
+                </motion.div>
+              </CardContent>
+              <CardFooter className="flex flex-col gap-4">
+                <motion.div 
+                  className="w-full"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9, duration: 0.7 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Inscription en cours..." : "S'inscrire"}
+                  </Button>
+                </motion.div>
+                <motion.div 
+                  className="text-sm text-center mt-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.0, duration: 0.7 }}
+                >
+                  Déjà un compte?{' '}
+                  <Link to="/b2c/login" className="text-primary hover:underline">
+                    Se connecter
+                  </Link>
+                </motion.div>
+                <motion.div 
+                  className="text-sm text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.1, duration: 0.7 }}
+                >
+                  <Link to="/" className="text-muted-foreground hover:underline">
+                    Retour à l'accueil
+                  </Link>
+                </motion.div>
+              </CardFooter>
+            </form>
+          </Card>
+        </motion.div>
+      </TimeBasedBackground>
     </Shell>
   );
 }

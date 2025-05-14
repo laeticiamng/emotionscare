@@ -1,41 +1,40 @@
-import { 
-  NotificationFrequency, 
-  NotificationType, 
-  NotificationTone,
-  NotificationFrequencyEnum,
-  NotificationTypeEnum,
-  NotificationToneEnum
-} from '@/types/notification';
 
-// Default notification preferences
-export const DEFAULT_NOTIFICATION_PREFERENCES = [
-  {
-    id: 'general',
-    type: 'general',
-    frequency: NotificationFrequencyEnum.DAILY as NotificationFrequency,
-    tone: NotificationToneEnum.NEUTRAL as NotificationTone,
+import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
+
+export const DEFAULT_USER_PREFERENCES = {
+  theme: 'system',
+  fontSize: 'medium',
+  fontFamily: 'inter',
+  notifications: {
     enabled: true,
     emailEnabled: true,
-    pushEnabled: true
+    pushEnabled: true,
+    frequency: 'daily' as NotificationFrequency,
   },
-  {
-    id: 'reminders',
-    type: 'reminders',
-    frequency: NotificationFrequencyEnum.DAILY as NotificationFrequency,
-    tone: NotificationToneEnum.GENTLE as NotificationTone,
-    enabled: true,
-    emailEnabled: false,
-    pushEnabled: true
+  autoplayVideos: true,
+  dataCollection: true,
+  highContrast: false,
+  reduceAnimations: false,
+  soundEffects: true,
+  colorAccent: '#6366f1',
+  language: 'fr',
+  privacyLevel: 'balanced',
+  onboardingCompleted: false,
+  emotionalCamouflage: false,
+  aiSuggestions: true,
+  fullAnonymity: false,
+  notifications_enabled: true,
+  privacy: {
+    anonymousMode: false,
+    dataSharing: true,
+    profileVisibility: 'public',
   },
-  {
-    id: 'scan',
-    type: 'scan',
-    frequency: NotificationFrequencyEnum.WEEKLY as NotificationFrequency,
-    tone: NotificationToneEnum.NEUTRAL as NotificationTone,
-    enabled: true,
-    emailEnabled: true,
-    pushEnabled: true
-  }
-];
+  dashboardLayout: 'standard'
+};
 
-// Other default values can be added here
+export const TIME_OF_DAY = {
+  MORNING: 'morning',
+  AFTERNOON: 'afternoon',
+  EVENING: 'evening',
+  NIGHT: 'night'
+};
