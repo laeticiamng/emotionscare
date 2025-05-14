@@ -1,78 +1,59 @@
+
 export interface VRSessionTemplate {
   id: string;
   name: string;
   description?: string;
-  thumbnailUrl?: string;
-  duration?: number;
+  duration: number;
+  type: string;
+  thumbnail?: string;
+  videoUrl?: string;
   emotion?: string;
-  emotions?: string[];
-  type?: string;
-  category?: string;
-  authorId?: string;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-  isPublic?: boolean;
-  usageCount?: number;
-  rating?: number;
   
-  // Additional properties needed by VR components
+  // Add missing properties that are used
   title?: string;
-  theme?: string;
   audio_url?: string;
+  emotion_target?: string;
+  lastUsed?: string | Date;
   preview_url?: string;
   is_audio_only?: boolean;
-  emotion_target?: string;
   benefits?: string[];
   difficulty?: string;
-  lastUsed?: string | Date;
-  completion_rate?: number;
-  recommended_mood?: string;
-  tags?: string[];
+  theme?: string;
+  tags?: string[]; // Add tags property
 }
 
 export interface VRSession {
   id: string;
-  userId: string;
   templateId: string;
-  startTime: Date | string;
-  endTime?: Date | string;
-  duration?: number;
-  mood?: {
-    before?: string;
-    after?: string;
-  };
-  feedback?: string;
-  isCompleted?: boolean;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  duration: number;
+  isCompleted: boolean;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  notes?: string;
+  rating?: number;
   
-  // Additional properties for backwards compatibility
-  user_id?: string;
-  template_id?: string;
-  startedAt?: string | Date;
-  date?: string | Date;
+  // Add missing properties that are used
+  date?: string;
+  startedAt?: string;
   duration_seconds?: number;
-  completed?: boolean;
+  is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
-  is_audio_only?: boolean;
-  template?: VRSessionTemplate;
-  emotion_before?: string;
-  emotion_after?: string;
 }
 
 export interface VRHistoryListProps {
-  sessions?: VRSession[];
-  isLoading?: boolean;
-  onSessionClick?: (session: VRSession) => void;
-  showEmptyState?: boolean;
+  templates: VRSessionTemplate[];
+  sessions: VRSession[];
+  onSelectTemplate: (template: VRSessionTemplate) => void;
+  onSelectSession: (session: VRSession) => void;
+  loading?: boolean;
 }
 
+// Update VRSessionWithMusicProps
 export interface VRSessionWithMusicProps {
-  sessionId: string;
-  templateId?: string;
-  onComplete?: () => void;
-  onCancel?: () => void;
-  
-  // Additional properties needed by components
   template?: VRSessionTemplate;
   session?: VRSession;
   onSessionComplete?: () => void;

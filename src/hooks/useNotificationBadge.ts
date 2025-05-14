@@ -1,6 +1,11 @@
 
 import { useState } from 'react';
-import { NotificationBadge } from '@/types/notification';
+
+export interface NotificationBadge {
+  count: number;
+  hasNew: boolean;
+  lastSeen?: string;
+}
 
 export const useNotificationBadge = (initialCount = 0) => {
   const [badgeState, setBadgeState] = useState<NotificationBadge>({
@@ -33,8 +38,10 @@ export const useNotificationBadge = (initialCount = 0) => {
     }));
   };
   
+  // Return the count directly along with the badge and methods
   return {
     badge: badgeState,
+    count: badgeState.count, // Add direct count access
     incrementCount,
     decrementCount,
     markAsRead

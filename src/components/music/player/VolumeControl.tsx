@@ -1,53 +1,52 @@
 
 import React from 'react';
-import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
-import { VolumeControlProps } from '@/types';
+import { Slider } from "@/components/ui/slider";
+import { Volume, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { VolumeControlProps } from '@/types/music';
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onChange,
-  onVolumeChange,
-  showLabel = false,
+  onVolumeChange, // Add onVolumeChange prop
+  showLabel = true,
   className = ''
 }) => {
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
-    onChange(newVolume);
+  const handleVolumeChange = (values: number[]) => {
+    onChange(values[0]);
     if (onVolumeChange) {
-      onVolumeChange(newVolume);
+      onVolumeChange(values[0]);
     }
   };
 
-  const VolumeIcon = () => {
-    if (volume === 0) return <VolumeX size={18} />;
-    if (volume < 0.33) return <Volume size={18} />;
-    if (volume < 0.66) return <Volume1 size={18} />;
-    return <Volume2 size={18} />;
-  };
+  const isMuted = volume === 0;
 
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
-      <button
-        onClick={() => onChange(volume > 0 ? 0 : 1)}
-        className="text-muted-foreground hover:text-foreground focus:outline-none"
-        aria-label={volume > 0 ? "Mute" : "Unmute"}
+    <div className={`flex items-center gap-2 ${className}`}>
+      <Button 
+        variant="ghost" 
+        size="icon"
+        className="h-8 w-8 p-0"
+        onClick={() => handleVolumeChange([isMuted ? 50 : 0])}
       >
-        <VolumeIcon />
-      </button>
+        {isMuted ? (
+          <VolumeX className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <Volume className="h-4 w-4 text-muted-foreground" />
+        )}
+      </Button>
       
       <Slider
-        value={[volume * 100]}
-        min={0}
+        value={[volume]}
         max={100}
         step={1}
-        onValueChange={(value) => handleVolumeChange([value[0] / 100])}
         className="w-24"
+        onValueChange={handleVolumeChange}
       />
       
       {showLabel && (
-        <span className="text-xs text-muted-foreground w-8 text-right">
-          {Math.round(volume * 100)}%
+        <span className="text-xs text-muted-foreground w-8">
+          {Math.round(volume)}%
         </span>
       )}
     </div>

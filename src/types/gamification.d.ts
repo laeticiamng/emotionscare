@@ -1,52 +1,55 @@
 
-export interface GamificationStats {
-  id?: string;
-  userId?: string;
-  points?: number;
-  level?: number;
-  rank?: string;
-  badges?: Badge[];
-  streak?: number;
-  totalSessions?: number;
-  totalEmotionScans?: number;
-  completedChallenges?: number;
-  recentAchievements?: {
-    id: string;
-    name: string;
-    date: string;
-    points: number;
-    description: string;
-  }[];
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  userId: string;
-  name?: string;
-  avatarUrl?: string;
-  points: number;
-  rank: number;
-  level: number;
-  department?: string;
-}
-
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
   icon?: string;
   threshold?: number;
   type?: string;
+  imageUrl?: string;
+  image_url?: string; // Add this for backward compatibility
 }
 
 export interface Challenge {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  points: number;
   progress: number;
-  completed: boolean;
+  target: number;
+  reward: number | string;
+  status: 'active' | 'completed' | 'expired';
   type: string;
+  expiresAt?: string;
+  category?: string;
+}
+
+export interface GamificationStats {
+  points: number; // Add required properties
+  level: number;
+  rank: string;
+  badges: Badge[];
+  streak: number;
+  nextLevelPoints: number;
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  progressToNextLevel: number;
+  challenges: Challenge[];
+  recentAchievements: Badge[];
+  nextLevel: {
+    points: number;
+    rewards: any[];
+  };
+  achievements: any[];
+}
+
+export interface LeaderboardEntry {
+  userId: string;
+  name?: string; // Add name property
+  avatarUrl: string;
+  points: number;
+  rank: number;
+  badges: number;
+  level: number;
+  completedChallenges: number;
 }

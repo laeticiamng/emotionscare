@@ -1,80 +1,99 @@
-
 import React from 'react';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetClose,
-} from '@/components/ui/sheet';
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
-import { MusicDrawerProps } from '@/types/music';
+import { MusicDrawerProps, MusicTrack } from '@/types/music';
 
-const MusicDrawer: React.FC<MusicDrawerProps> = ({ 
-  open, 
-  onClose,
+const MusicDrawer: React.FC<MusicDrawerProps> = ({
+  open,
   onOpenChange,
-  playlist, 
+  onClose,
+  playlist,
+  currentTrack
 }) => {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[320px] sm:w-[400px] overflow-y-auto">
-        <SheetHeader className="border-b pb-4">
-          <div className="flex justify-between items-center">
-            <SheetTitle>
-              {playlist ? playlist.name : 'Bibliothèque musicale'}
-            </SheetTitle>
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </SheetClose>
-          </div>
-        </SheetHeader>
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Music Player</DrawerTitle>
+          <DrawerDescription>
+            {playlist ? `Playing from ${playlist.name}` : 'Current track'}
+          </DrawerDescription>
+        </DrawerHeader>
         
-        <div className="pt-4 overflow-y-auto">
-          {playlist && (
-            <div className="flex flex-col items-center mb-6">
-              {playlist.coverUrl && (
-                <img 
-                  src={playlist.coverUrl} 
-                  alt={playlist.name} 
-                  className="w-32 h-32 rounded-lg mb-2 object-cover"
-                />
-              )}
-              <h3 className="text-lg font-medium">{playlist.name}</h3>
-              <p className="text-sm text-muted-foreground">{playlist.description}</p>
+        <div className="p-4">
+          {currentTrack ? (
+            <div className="flex flex-col items-center">
+              <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
+                {currentTrack.coverUrl ? (
+                  <img 
+                    src={currentTrack.coverUrl} 
+                    alt={currentTrack.title} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                    ♪
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-center mb-6">
+                <h3 className="font-medium">{currentTrack.title}</h3>
+                <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No track currently playing
             </div>
           )}
           
-          <div className="space-y-2">
-            {playlist && playlist.tracks.map((track) => (
-              <div 
-                key={track.id}
-                className="flex items-center p-2 hover:bg-secondary rounded-lg cursor-pointer"
-              >
-                <img 
-                  src={track.coverUrl || '/images/music/default-cover.jpg'} 
-                  alt={track.title}
-                  className="h-10 w-10 rounded object-cover mr-3"
-                />
-                <div>
-                  <p className="font-medium">{track.title}</p>
-                  <p className="text-xs text-muted-foreground">{track.artist}</p>
-                </div>
+          {playlist && playlist.tracks && playlist.tracks.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-medium mb-2">Playlist: {playlist.name}</h4>
+              <div className="max-h-[200px] overflow-y-auto">
+                {playlist.tracks.map((track) => (
+                  <div 
+                    key={track.id}
+                    className={`flex items-center p-2 rounded ${
+                      currentTrack?.id === track.id ? 'bg-secondary/50' : 'hover:bg-muted/50'
+                    } cursor-pointer mb-1`}
+                  >
+                    <div className="w-8 h-8 bg-muted/50 rounded overflow-hidden mr-3">
+                      {track.coverUrl && (
+                        <img 
+                          src={track.coverUrl} 
+                          alt={track.title} 
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">{track.title}</div>
+                      <div className="text-xs text-muted-foreground truncate">{track.artist}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-            
-            {!playlist && (
-              <p className="text-center text-muted-foreground my-8">
-                Sélectionnez une playlist pour voir les pistes disponibles
-              </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      </SheetContent>
-    </Sheet>
+        
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant="outline" onClick={onClose}>Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

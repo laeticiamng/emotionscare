@@ -1,89 +1,72 @@
+import { VRSessionTemplate } from '@/types/vr';
 
-import { VRSessionTemplate } from '@/types';
-
-// Mock VR session templates
 export const mockVRTemplates: VRSessionTemplate[] = [
   {
     id: '1',
-    name: 'Ocean Calm',
-    title: 'Ocean Calm',
-    description: 'Une immersion relaxante sur une plage au coucher de soleil avec le son apaisant des vagues.',
-    duration: 5,
-    theme: 'Relaxation',
+    name: 'Ocean Meditation',
+    description: 'Relax to the sound of waves and guided meditation',
+    duration: 600, // 10 minutes
+    type: 'meditation',
+    thumbnail: '/images/vr/ocean-meditation.jpg',
+    videoUrl: '/videos/vr/ocean-meditation.mp4',
+    emotion: 'calm',
+    title: 'Ocean Meditation',
+    audio_url: '/audio/meditation/ocean.mp3',
+    preview_url: '/images/vr/ocean-meditation-preview.jpg',
     is_audio_only: false,
-    preview_url: '/images/vr/ocean-preview.jpg',
-    audio_url: '/audio/ocean-waves.mp3',
-    category: 'relaxation',
-    difficulty: 'easy', // Updated from 'beginner'
-    tags: ['relaxation', 'débutant', 'plage', 'nature'],
-    benefits: ['Réduction de l\'anxiété', 'Calme mental', 'Détente musculaire'],
-    emotions: ['calme', 'sérénité', 'paix'],
-    popularity: 92,
-    emotion_target: 'calme',
-    thumbnail: '/images/vr/ocean-preview.jpg', // Ajouté pour compatibilité
-    intensity: 'low', // Ajouté pour compatibilité
+    difficulty: 'beginner',
+    theme: 'nature',
+    tags: ['meditation', 'ocean', 'relaxation'] // Add tags field
   },
   {
     id: '2',
-    name: 'Méditation Guidée',
-    title: 'Méditation Guidée',
-    description: 'Une session de méditation guidée pour débutants, avec focus sur la respiration et la pleine conscience.',
-    duration: 10,
-    theme: 'Méditation',
-    is_audio_only: true,
-    preview_url: '/images/vr/meditation-preview.jpg',
-    audio_url: '/audio/guided-meditation.mp3',
-    category: 'meditation',
-    difficulty: 'easy',
-    tags: ['méditation', 'débutant', 'guidée', 'respiration'],
-    benefits: ['Amélioration de la concentration', 'Réduction du stress', 'Clarté mentale'],
-    emotions: ['paix', 'concentration', 'présence'],
-    popularity: 85,
-    emotion_target: 'concentration',
-    thumbnail: '/images/vr/meditation-preview.jpg', // Ajouté pour compatibilité
-    intensity: 'low', // Ajouté pour compatibilité
+    name: 'Forest Walk',
+    description: 'A calming walk through a lush green forest',
+    duration: 900, // 15 minutes
+    type: 'relaxation',
+    thumbnail: '/images/vr/forest-walk.jpg',
+    videoUrl: '/videos/vr/forest-walk.mp4',
+    emotion: 'calm',
+    title: 'Forest Walk',
+    audio_url: '/audio/relaxation/forest.mp3',
+    preview_url: '/images/vr/forest-walk-preview.jpg',
+    is_audio_only: false,
+    difficulty: 'beginner',
+    theme: 'nature',
+    tags: ['relaxation', 'forest', 'nature'] // Add tags field
   },
   {
     id: '3',
-    name: 'Forêt Enchantée',
-    title: 'Forêt Enchantée',
-    description: 'Une promenade virtuelle dans une forêt luxuriante avec des sons d\'oiseaux et une légère brise.',
-    duration: 15,
-    theme: 'Nature',
+    name: 'Mountain View',
+    description: 'Enjoy the serene view from a high mountain peak',
+    duration: 1200, // 20 minutes
+    type: 'scenic',
+    thumbnail: '/images/vr/mountain-view.jpg',
+    videoUrl: '/videos/vr/mountain-view.mp4',
+    emotion: 'joy',
+    title: 'Mountain View',
+    audio_url: '/audio/scenic/mountain.mp3',
+    preview_url: '/images/vr/mountain-view-preview.jpg',
     is_audio_only: false,
-    preview_url: '/images/vr/forest-preview.jpg',
-    audio_url: '/audio/forest-sounds.mp3',
-    category: 'nature',
-    difficulty: 'medium', // Updated from 'intermediate'
-    tags: ['nature', 'forêt', 'arbres', 'oiseaux'],
-    benefits: ['Connexion avec la nature', 'Rafraîchissement mental', 'Inspiration'],
-    emotions: ['émerveillement', 'curiosité', 'joie'],
-    popularity: 78,
-    emotion_target: 'émerveillement',
-    thumbnail: '/images/vr/forest-preview.jpg', // Ajouté pour compatibilité
-    intensity: 'medium', // Ajouté pour compatibilité
+    difficulty: 'intermediate',
+    theme: 'nature',
+    tags: ['scenic', 'mountain', 'nature'] // Add tags field
   },
   {
     id: '4',
-    name: 'Respiration 4-7-8',
-    title: 'Respiration 4-7-8',
-    description: 'Une technique de respiration pour réduire l\'anxiété et favoriser l\'endormissement.',
-    duration: 5,
-    theme: 'Respiration',
-    is_audio_only: true,
-    preview_url: '/images/vr/breathing-preview.jpg',
-    audio_url: '/audio/breathing-exercise.mp3',
-    category: 'breathing',
-    difficulty: 'easy',
-    tags: ['respiration', 'anxiété', 'sommeil'],
-    benefits: ['Réduction de l\'anxiété', 'Amélioration du sommeil', 'Régulation du système nerveux'],
-    emotions: ['calme', 'détente', 'apaisement'],
-    popularity: 95,
-    emotion_target: 'calme',
-    thumbnail: '/images/vr/breathing-preview.jpg', // Ajouté pour compatibilité
-    intensity: 'low', // Ajouté pour compatibilité
+    name: 'Sunset Beach',
+    description: 'Watch a beautiful sunset on a tropical beach',
+    duration: 720, // 12 minutes
+    type: 'relaxation',
+    thumbnail: '/images/vr/sunset-beach.jpg',
+    videoUrl: '/videos/vr/sunset-beach.mp4',
+    emotion: 'joy',
+    title: 'Sunset Beach',
+    audio_url: '/audio/relaxation/beach.mp3',
+    preview_url: '/images/vr/sunset-beach-preview.jpg',
+    is_audio_only: false,
+    difficulty: 'beginner',
+    theme: 'nature',
+    tags: ['relaxation', 'beach', 'nature'] // Add tags field
   }
 ];
-
-// Export for backwards compatibility
-export { mockVRTemplates as mockVRTemplatesData };

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Camera, Loader2 } from 'lucide-react';
-import useHumeAI from '@/hooks/useHumeAI';
+import { useHumeAI } from '@/hooks/useHumeAI'; // Fix import
 import { EmotionResult } from '@/types/emotion';
 
 export interface FacialEmotionScannerProps {

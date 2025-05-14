@@ -6,7 +6,7 @@ export interface MusicTrack {
   url: string;
   audioUrl: string;
   coverUrl: string;
-  cover?: string;
+  cover?: string; // Add cover for backward compatibility
   emotion?: string;
   
   // For backward compatibility
