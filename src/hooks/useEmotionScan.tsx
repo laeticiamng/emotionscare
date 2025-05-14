@@ -14,6 +14,8 @@ export function useEmotionScan() {
     text?: string;
     emojis?: string;
     audio_url?: string;
+    is_confidential?: boolean;
+    share_with_coach?: boolean;
   }) => {
     if (!user) {
       setError("Vous devez être connecté pour enregistrer une émotion");

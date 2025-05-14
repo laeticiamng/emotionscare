@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
-import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
+import { NotificationFrequencyEnum, NotificationTypeEnum, NotificationToneEnum } from '@/types/notification';
 
 interface NotificationPreferencesProps {
   initialPreferences?: {
@@ -29,9 +29,9 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     enabled: true,
     emailEnabled: false,
     pushEnabled: true,
-    frequency: NotificationFrequency.DAILY,
-    notificationType: NotificationType.IN_APP,
-    tone: NotificationTone.FRIENDLY
+    frequency: NotificationFrequencyEnum.DAILY,
+    notificationType: NotificationTypeEnum.IN_APP,
+    tone: NotificationToneEnum.FRIENDLY
   };
   
   // Combined preferences
@@ -120,19 +120,19 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
               
               <RadioGroup value={frequency} onValueChange={setFrequency}>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationFrequency.IMMEDIATE} id="immediate" />
+                  <RadioGroupItem value={NotificationFrequencyEnum.IMMEDIATE} id="immediate" />
                   <Label htmlFor="immediate">Immédiate</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationFrequency.DAILY} id="daily" />
+                  <RadioGroupItem value={NotificationFrequencyEnum.DAILY} id="daily" />
                   <Label htmlFor="daily">Quotidienne</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationFrequency.WEEKLY} id="weekly" />
+                  <RadioGroupItem value={NotificationFrequencyEnum.WEEKLY} id="weekly" />
                   <Label htmlFor="weekly">Hebdomadaire</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationFrequency.MONTHLY} id="monthly" />
+                  <RadioGroupItem value={NotificationFrequencyEnum.MONTHLY} id="monthly" />
                   <Label htmlFor="monthly">Mensuelle</Label>
                 </div>
               </RadioGroup>
@@ -143,23 +143,23 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
               
               <RadioGroup value={tone} onValueChange={setTone}>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationTone.FORMAL} id="formal" />
+                  <RadioGroupItem value={NotificationToneEnum.FORMAL} id="formal" />
                   <Label htmlFor="formal">Formel</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationTone.FRIENDLY} id="friendly" />
+                  <RadioGroupItem value={NotificationToneEnum.FRIENDLY} id="friendly" />
                   <Label htmlFor="friendly">Amical</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationTone.PROFESSIONAL} id="professional" />
+                  <RadioGroupItem value={NotificationToneEnum.PROFESSIONAL} id="professional" />
                   <Label htmlFor="professional">Professionnel</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationTone.CASUAL} id="casual" />
+                  <RadioGroupItem value={NotificationToneEnum.CASUAL} id="casual" />
                   <Label htmlFor="casual">Décontracté</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={NotificationTone.ENCOURAGING} id="encouraging" />
+                  <RadioGroupItem value={NotificationToneEnum.ENCOURAGING} id="encouraging" />
                   <Label htmlFor="encouraging">Encourageant</Label>
                 </div>
               </RadioGroup>

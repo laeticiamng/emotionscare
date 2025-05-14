@@ -63,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         role: 'user',
         avatar_url: '',
+        createdAt: new Date().toISOString(),
         preferences: {
           ...DEFAULT_USER_PREFERENCES,
           onboardingCompleted: false,
@@ -97,6 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name,
         email,
         role: 'user',
+        createdAt: new Date().toISOString(),
         preferences: {
           ...DEFAULT_USER_PREFERENCES,
           onboardingCompleted: false,

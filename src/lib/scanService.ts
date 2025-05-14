@@ -1,108 +1,58 @@
 
-import { Emotion, EmotionResult } from '@/types';
+import { Emotion } from '@/types';
 
-// Mock implementation to handle type errors in EmotionScanLive and useEmotionScanFormState
-export async function analyzeEmotion(data: {
-  user_id: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential: boolean;
-  share_with_coach: boolean;
-}): Promise<EmotionResult> {
-  // Mock implementation
-  return {
-    id: crypto.randomUUID(),
-    emotion: data.emojis?.includes('😊') ? 'joy' : 
-             data.emojis?.includes('😢') ? 'sadness' :
-             data.emojis?.includes('😡') ? 'anger' :
-             data.text?.includes('heureux') ? 'joy' : 'neutral',
-    score: Math.floor(Math.random() * 10) + 1,
-    confidence: Math.random(),
-    text: data.text,
-    transcript: data.text,
-    emojis: data.emojis,
-    feedback: `Analyse basée sur ${data.text || data.emojis || 'votre entrée'}`,
-    ai_feedback: `Conseils basés sur votre état émotionnel actuel.`,
-    recommendations: ['Prendre une pause', 'Exercice de respiration', 'Écouter de la musique'],
-  };
-}
+// Mock database
+const emotionEntries: Record<string, Emotion[]> = {};
 
-export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
-  // Mock implementation
-  return {
-    id: crypto.randomUUID(),
-    emotion: 'calm',
-    score: 7,
-    confidence: 0.85,
-    transcript: "J'ai passé une journée plutôt agréable aujourd'hui.",
-    feedback: "Vous semblez calme et détendu. Continuez ainsi.",
-    ai_feedback: "Votre niveau de stress semble bas, c'est très positif.",
-    recommendations: ['Continuez votre routine positive', 'Notez vos succès de la journée'],
-  };
-}
-
-export async function createEmotionEntry(data: {
+export const createEmotionEntry = async (data: {
   user_id: string;
   date: string;
-  emotion?: string;
-  score?: number;
   text?: string;
   emojis?: string;
   audio_url?: string;
-  ai_feedback?: string;
-}): Promise<Emotion> {
-  // Mock implementation
-  return {
-    id: crypto.randomUUID(),
+  is_confidential?: boolean;
+  share_with_coach?: boolean;
+}): Promise<Emotion> => {
+  // Create a new emotion entry
+  const newEntry: Emotion = {
+    id: `emotion-${Date.now()}`,
     user_id: data.user_id,
     date: data.date,
-    emotion: data.emotion || 'neutral',
-    score: data.score || 5,
-    intensity: data.score || 5,
-    text: data.text,
-    emojis: data.emojis,
-    ai_feedback: data.ai_feedback
+    text: data.text || '',
+    emojis: data.emojis || '',
+    sentiment: Math.random() * 10, // Mock sentiment score
+    anxiety: Math.round(Math.random() * 10),
+    energy: Math.round(Math.random() * 10),
+    // Include optional fields if provided
+    audio_url: data.audio_url,
+    is_confidential: data.is_confidential,
+    share_with_coach: data.share_with_coach
   };
-}
 
-export async function fetchLatestEmotion(userId: string): Promise<Emotion | null> {
-  // Mock implementation
-  return {
-    id: crypto.randomUUID(),
-    user_id: userId,
-    date: new Date().toISOString(),
-    emotion: 'joy',
-    score: 8,
-    intensity: 8,
-    text: "Je me sens vraiment bien aujourd'hui!",
-    emojis: '😊'
-  };
-}
+  // Add to mock database
+  if (!emotionEntries[data.user_id]) {
+    emotionEntries[data.user_id] = [];
+  }
+  emotionEntries[data.user_id].push(newEntry);
 
-export async function fetchEmotionHistory(userId: string): Promise<Emotion[]> {
-  // Mock implementation
-  return [
-    {
-      id: crypto.randomUUID(),
-      user_id: userId,
-      date: new Date().toISOString(),
-      emotion: 'joy',
-      score: 8,
-      intensity: 8
-    },
-    {
-      id: crypto.randomUUID(),
-      user_id: userId,
-      date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      emotion: 'sadness',
-      score: 3,
-      intensity: 3
-    }
-  ];
-}
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
 
-export async function saveEmotion(data: Partial<Emotion>): Promise<void> {
-  // Mock implementation
-  console.log("Emotion saved:", data);
-}
+  return newEntry;
+};
+
+export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null> => {
+  // Check if user has any emotions
+  if (!emotionEntries[userId] || emotionEntries[userId].length === 0) {
+    return null;
+  }
+
+  // Return latest emotion
+  const entries = emotionEntries[userId];
+  return entries[entries.length - 1];
+};
+
+export const fetchEmotions = async (userId: string): Promise<Emotion[]> => {
+  // Return all emotions for a user
+  return emotionEntries[userId] || [];
+};

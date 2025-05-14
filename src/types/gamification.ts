@@ -4,32 +4,31 @@ export interface GamificationStats {
   level: number;
   rank: string;
   badges: Badge[];
-  challenges: Challenge[];
+  completedChallenges: number;
+  activeChallenges: number;
   streak: number;
-  nextLevel: {
+  nextLevelPoints: number;
+  progressToNextLevel: number;
+  totalPoints?: number;
+  badgesCount?: number;
+  streakDays?: number;
+  challenges?: Challenge[];
+  nextLevel?: {
     points: number;
     rewards: string[];
   };
-  achievements: Achievement[];
-  // Additional properties needed by GamificationDashboard
-  currentLevel: number;
-  pointsToNextLevel: number;
-  progressToNextLevel: number;
-  totalPoints: number;
-  badgesCount: number;
-  streakDays: number;
-  activeChallenges: number;
-  completedChallenges: number;
+  achievements?: Achievement[];
+  currentLevel?: number;
+  pointsToNextLevel?: number;
   lastActivityDate?: string;
-  nextLevelPoints?: number;
-  // Nouvelle propriété
   recentAchievements?: Badge[];
   progress?: number;
 }
 
 export interface Challenge {
   id: string;
-  title: string;
+  title?: string;
+  name?: string;
   description: string;
   points: number;
   status: 'completed' | 'locked' | 'active' | 'ongoing' | 'available' | 'failed';
@@ -40,7 +39,6 @@ export interface Challenge {
   icon?: string;
   startDate?: string;
   endDate?: string;
-  name?: string;
   completed?: boolean;
   total?: number;
   level?: string | number;
@@ -58,6 +56,9 @@ export interface Badge {
   image?: string;
   date?: string;
   level?: string | number;
+  unlocked?: boolean;
+  unlock_date?: string;
+  category?: string;
 }
 
 export interface Achievement {
@@ -70,20 +71,19 @@ export interface Achievement {
   icon?: string;
 }
 
-export interface GamificationAction {
-  type: 'SCAN' | 'JOURNAL' | 'COACH' | 'VR' | 'CHALLENGE' | 'STREAK' | 'LOGIN';
-  data?: any;
-}
-
 export interface LeaderboardEntry {
-  userId: string;
+  userId?: string;
+  id?: string;
   name: string;
   avatar?: string;
   avatarUrl?: string;
   points: number;
-  rank: number;
-  badges: number;
-  streak: number;
+  rank?: number;
+  position?: number;
+  badges?: number;
+  streak?: number;
   department?: string;
   level?: number;
+  delta?: number;
+  badge?: string;
 }

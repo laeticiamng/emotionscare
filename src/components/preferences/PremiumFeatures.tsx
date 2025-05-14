@@ -22,7 +22,7 @@ const PremiumFeatures: React.FC = () => {
               checked={preferences.emotionalCamouflage || false}
               onCheckedChange={(checked) => updatePreferences({ 
                 emotionalCamouflage: checked 
-              } as any)}
+              })}
             />
           </div>
           
@@ -35,7 +35,7 @@ const PremiumFeatures: React.FC = () => {
               checked={preferences.aiSuggestions || false}
               onCheckedChange={(checked) => updatePreferences({ 
                 aiSuggestions: checked 
-              } as any)}
+              })}
             />
           </div>
           
@@ -48,7 +48,7 @@ const PremiumFeatures: React.FC = () => {
               checked={preferences.fullAnonymity || false}
               onCheckedChange={(checked) => updatePreferences({ 
                 fullAnonymity: checked 
-              } as any)}
+              })}
             />
           </div>
         </div>

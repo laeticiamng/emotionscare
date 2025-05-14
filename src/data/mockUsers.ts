@@ -1,4 +1,3 @@
-
 import { User, UserRole } from '@/types';
 
 export const mockUsers: User[] = [
@@ -9,6 +8,7 @@ export const mockUsers: User[] = [
     role: 'user' as UserRole,
     avatar: '/avatars/avatar-1.jpg',
     created_at: '2023-01-15T09:23:45Z',
+    createdAt: '2023-01-15T09:23:45Z',
     emotional_score: 72,
     onboarded: true,
     team_id: 'team-1'
@@ -20,6 +20,7 @@ export const mockUsers: User[] = [
     role: 'employee' as UserRole,
     avatar: '/avatars/avatar-2.jpg',
     created_at: '2023-02-28T11:12:30Z',
+    createdAt: '2023-02-28T11:12:30Z',
     emotional_score: 60,
     onboarded: true,
     team_id: 'team-1'
@@ -31,6 +32,7 @@ export const mockUsers: User[] = [
     role: 'analyst' as UserRole,
     avatar: '/avatars/avatar-3.jpg',
     created_at: '2023-03-05T16:55:00Z',
+    createdAt: '2023-03-05T16:55:00Z',
     emotional_score: 55,
     onboarded: true,
     team_id: 'team-2'
@@ -42,6 +44,7 @@ export const mockUsers: User[] = [
     role: 'manager' as UserRole,
     avatar: '/avatars/avatar-4.jpg',
     created_at: '2023-03-12T14:45:10Z',
+    createdAt: '2023-03-12T14:45:10Z',
     emotional_score: 88,
     onboarded: true,
     team_id: 'team-2'
@@ -53,6 +56,7 @@ export const mockUsers: User[] = [
     role: 'wellbeing_manager' as UserRole,
     avatar: '/avatars/avatar-5.jpg',
     created_at: '2023-04-01T08:00:00Z',
+    createdAt: '2023-04-01T08:00:00Z',
     emotional_score: 92,
     onboarded: true,
     team_id: 'team-3'
@@ -64,6 +68,7 @@ export const mockUsers: User[] = [
     role: 'user' as UserRole,
     avatar: '/avatars/avatar-6.jpg',
     created_at: '2023-04-15T10:30:00Z',
+    createdAt: '2023-04-15T10:30:00Z',
     emotional_score: 45,
     onboarded: false,
     team_id: 'team-3'
@@ -75,6 +80,7 @@ export const mockUsers: User[] = [
     role: 'coach' as UserRole,
     avatar: '/avatars/avatar-7.jpg',
     created_at: '2023-05-02T09:15:00Z',
+    createdAt: '2023-05-02T09:15:00Z',
     emotional_score: 85,
     onboarded: true,
     team_id: 'team-4'
@@ -86,6 +92,7 @@ export const mockUsers: User[] = [
     role: 'admin' as UserRole,
     avatar: '/avatars/avatar-8.jpg',
     created_at: '2023-05-10T11:00:00Z',
+    createdAt: '2023-05-10T11:00:00Z',
     emotional_score: 79,
     onboarded: true,
     team_id: 'team-4'
@@ -97,6 +104,7 @@ export const mockUsers: User[] = [
     role: 'employee' as UserRole,
     avatar: '/avatars/avatar-9.jpg',
     created_at: '2023-05-20T14:20:00Z',
+    createdAt: '2023-05-20T14:20:00Z',
     emotional_score: 62,
     onboarded: true,
     team_id: 'team-5'
@@ -108,6 +116,7 @@ export const mockUsers: User[] = [
     role: 'user' as UserRole,
     avatar: '/avatars/avatar-10.jpg',
     created_at: '2023-06-01T08:45:00Z',
+    createdAt: '2023-06-01T08:45:00Z',
     emotional_score: 40,
     onboarded: true,
     team_id: 'team-5'
@@ -119,6 +128,7 @@ export const mockUsers: User[] = [
     role: 'employee' as UserRole,
     avatar: '/avatars/avatar-default.jpg',
     created_at: '2023-06-15T09:30:00Z',
+    createdAt: '2023-06-15T09:30:00Z',
     emotional_score: 50,
     anonymity_code: 'USR-5921',
     onboarded: true,

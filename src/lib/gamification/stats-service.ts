@@ -2,25 +2,31 @@
 import { GamificationStats } from '@/types/gamification';
 
 export const getGamificationStats = async (userId: string): Promise<GamificationStats> => {
-  // Mock implementation
+  // This would normally fetch data from an API
+  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+  
   return {
-    level: 3,
-    points: 450,
-    nextLevelPoints: 600,
-    badges: [],
-    completedChallenges: 7,
+    points: 530,
+    level: 5,
+    rank: "Emotional Explorer",
+    badges: [], // This would typically contain badge objects
+    streak: 7,
+    completedChallenges: 12,
     activeChallenges: 3,
-    streakDays: 5,
-    progressToNextLevel: 75,
-    currentLevel: 3,
-    totalPoints: 450,
-    pointsToNextLevel: 150,
-    badgesCount: 5,
-    lastActivityDate: new Date().toISOString(),
+    streakDays: 7,
+    nextLevelPoints: 1000,
+    progressToNextLevel: 53,
+    totalPoints: 530,
+    badgesCount: 8,
     challenges: [],
-    recentAchievements: []
+    recentAchievements: [],
+    nextLevel: {
+      points: 1000,
+      rewards: ["New Badge", "Meditation Access"]
+    },
+    achievements: [],
+    currentLevel: 5,
+    pointsToNextLevel: 470,
+    lastActivityDate: new Date().toISOString()
   };
 };
-
-// Added this function
-export const getUserStats = getGamificationStats;

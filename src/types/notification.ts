@@ -3,7 +3,8 @@ export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'monthly' 
 export type NotificationType = 'success' | 'warning' | 'info' | 'error' | 'reminder' | 'wellness' | 'tip' | 'recommendation' | 'system' | 'in_app';
 export type NotificationTone = 'standard' | 'friendly' | 'professional' | 'urgent' | 'minimal' | 'formal' | 'casual' | 'encouraging';
 
-export const NotificationFrequency = {
+// Constants for use in components
+export const NotificationFrequencyEnum = {
   REALTIME: 'realtime' as NotificationFrequency,
   DAILY: 'daily' as NotificationFrequency,
   WEEKLY: 'weekly' as NotificationFrequency,
@@ -11,7 +12,7 @@ export const NotificationFrequency = {
   IMMEDIATE: 'immediate' as NotificationFrequency
 };
 
-export const NotificationType = {
+export const NotificationTypeEnum = {
   SUCCESS: 'success' as NotificationType,
   WARNING: 'warning' as NotificationType,
   INFO: 'info' as NotificationType,
@@ -24,7 +25,7 @@ export const NotificationType = {
   RECOMMENDATION: 'recommendation' as NotificationType
 };
 
-export const NotificationTone = {
+export const NotificationToneEnum = {
   STANDARD: 'standard' as NotificationTone,
   FRIENDLY: 'friendly' as NotificationTone,
   PROFESSIONAL: 'professional' as NotificationTone,

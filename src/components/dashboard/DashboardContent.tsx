@@ -28,7 +28,8 @@ const mockTeamUsers: User[] = [
     emotional_score: 82,
     anonymity_code: 'JS-2022',
     email: 'jane.smith@example.com',
-    role: 'b2b_user'
+    role: 'b2b_user',
+    createdAt: new Date().toISOString()
   },
   {
     id: '2',
@@ -37,7 +38,8 @@ const mockTeamUsers: User[] = [
     emotional_score: 65,
     anonymity_code: 'JD-2022',
     email: 'john.doe@example.com',
-    role: 'b2b_user'
+    role: 'b2b_user',
+    createdAt: new Date().toISOString()
   },
   {
     id: '3',
@@ -46,7 +48,8 @@ const mockTeamUsers: User[] = [
     emotional_score: 78,
     anonymity_code: 'AJ-2022',
     email: 'amy.johnson@example.com',
-    role: 'b2b_user'
+    role: 'b2b_user',
+    createdAt: new Date().toISOString()
   }
 ];
 

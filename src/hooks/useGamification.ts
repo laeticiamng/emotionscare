@@ -15,15 +15,23 @@ export const useGamification = () => {
   const [stats, setStats] = useState<GamificationStats>({
     points: 0,
     level: 1,
-    nextLevelPoints: 100,
+    rank: "Beginner",
     badges: [],
+    streak: 0,
+    nextLevelPoints: 100,
     completedChallenges: 0,
-    activeChallenges: 0,
+    activeChallenges: 0, 
     streakDays: 0,
     progressToNextLevel: 0,
     challenges: [],
-    recentAchievements: []
+    recentAchievements: [],
+    nextLevel: {
+      points: 100,
+      rewards: []
+    },
+    achievements: []
   });
+  
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -52,9 +60,9 @@ export const useGamification = () => {
           name: 'User 1',
           avatarUrl: '/avatars/user1.jpg',
           points: 1200,
-          level: 5,
-          position: 1,
+          rank: 1,
           badges: 8,
+          level: 5,
           completedChallenges: 12
         },
         {
@@ -62,9 +70,9 @@ export const useGamification = () => {
           name: 'User 2',
           avatarUrl: '/avatars/user2.jpg',
           points: 950,
-          level: 4,
-          position: 2,
+          rank: 2,
           badges: 6,
+          level: 4,
           completedChallenges: 9
         }
       ]);
