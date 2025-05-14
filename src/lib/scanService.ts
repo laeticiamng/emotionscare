@@ -1,108 +1,71 @@
 
-import { v4 as uuid } from 'uuid';
 import { Emotion, EmotionResult } from '@/types';
 
-// Mock data for emotions
-const EMOTION_TYPES = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral', 'calm', 'anxious'];
-
-// In-memory storage for emotions (in a real app, this would be a database)
-let emotionsStore: Emotion[] = [];
-
-/**
- * Analyze text and emoji input to determine emotional state
- */
-export const analyzeEmotion = async (input: any): Promise<EmotionResult> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // For demo purposes, we'll generate a random emotion
-  const emotion = EMOTION_TYPES[Math.floor(Math.random() * EMOTION_TYPES.length)];
-  const score = Math.floor(Math.random() * 10) + 1;
-  
-  // Extract text if the input is an object
-  const text = typeof input === 'string' ? input : input.text || '';
-  const emojis = typeof input === 'string' ? '' : input.emojis || '';
-  
-  return {
-    id: uuid(),
-    user_id: typeof input === 'string' ? 'user-id' : input.user_id,
-    emotion,
-    primaryEmotion: emotion, // For backward compatibility
-    score,
-    text,
-    emojis,
-    transcript: typeof input === 'string' ? '' : input.text || '',
-    confidence: Math.random() * 0.5 + 0.5,
-    feedback: `Based on your input, I detect a ${emotion} emotion with an intensity of ${score}/10. This might be related to ${Math.random() > 0.5 ? 'recent events' : 'your current environment'}.`,
-    ai_feedback: `Based on your input, I detect a ${emotion} emotion with an intensity of ${score}/10. This might be related to ${Math.random() > 0.5 ? 'recent events' : 'your current environment'}.`,
-  };
+export const analyzeEmotion = async (data: any): Promise<EmotionResult> => {
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    
+    // Return mock response
+    const mockResult: EmotionResult = {
+      id: `emotion-${Date.now()}`,
+      user_id: data.user_id,
+      emotion: 'calm',
+      score: 7.5,
+      text: data.text || '',
+      emojis: data.emojis || '😌',
+      transcript: data.text || '',
+      feedback: "Vous semblez être dans un état calme et détendu. C'est un excellent moment pour la réflexion ou la méditation.",
+      ai_feedback: "Vous semblez être dans un état calme et détendu. C'est un excellent moment pour la réflexion ou la méditation.",
+      confidence: 0.85,
+      intensity: 0.65,
+      source: data.audio_url ? 'audio' : (data.emojis ? 'manual' : 'text')
+    };
+    
+    return mockResult;
+  } catch (error) {
+    console.error("Error analyzing emotion:", error);
+    throw new Error("Failed to analyze emotion");
+  }
 };
 
-/**
- * Analyze audio stream to determine emotional state
- */
-export const analyzeAudioStream = async (audioBlob: Blob, userId: string): Promise<EmotionResult> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  // For demo purposes, we'll generate a random emotion
-  const emotion = EMOTION_TYPES[Math.floor(Math.random() * EMOTION_TYPES.length)];
-  const score = Math.floor(Math.random() * 10) + 1;
-  
-  return {
-    id: uuid(),
-    user_id: userId,
-    emotion,
-    primaryEmotion: emotion, // For backward compatibility
-    score,
-    transcript: "This is a simulated transcript of what you said.",
-    confidence: Math.random() * 0.5 + 0.5,
-    feedback: `Based on your voice patterns, I detect ${emotion} with an intensity of ${score}/10.`,
-    ai_feedback: `Based on your voice patterns, I detect ${emotion} with an intensity of ${score}/10.`,
-  };
-};
-
-/**
- * Save emotion to storage
- */
 export const saveEmotion = async (emotion: Emotion): Promise<Emotion> => {
-  // Ensure the emotion has an ID
-  if (!emotion.id) {
-    emotion.id = uuid();
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    // Return the emotion with an ID if it doesn't have one
+    return {
+      ...emotion,
+      id: emotion.id || `emotion-${Date.now()}`
+    };
+  } catch (error) {
+    console.error("Error saving emotion:", error);
+    throw new Error("Failed to save emotion");
   }
-  
-  // Ensure the emotion has a date
-  if (!emotion.date) {
-    emotion.date = new Date().toISOString();
+};
+
+export const getEmotionHistory = async (userId: string, limit = 10): Promise<Emotion[]> => {
+  try {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    
+    // Return mock history
+    const mockHistory: Emotion[] = Array.from({ length: limit }).map((_, index) => ({
+      id: `emotion-${Date.now() - index * 86400000}`,
+      user_id: userId,
+      date: new Date(Date.now() - index * 86400000).toISOString(),
+      emotion: index % 3 === 0 ? 'joy' : (index % 3 === 1 ? 'calm' : 'neutral'),
+      score: 5 + Math.floor(Math.random() * 5),
+      emojis: index % 3 === 0 ? '😊' : (index % 3 === 1 ? '😌' : '😐'),
+      text: "Entry from emotional journal",
+      is_confidential: false,
+      share_with_coach: true
+    }));
+    
+    return mockHistory;
+  } catch (error) {
+    console.error("Error fetching emotion history:", error);
+    throw new Error("Failed to fetch emotion history");
   }
-  
-  // Store the emotion
-  emotionsStore.push(emotion);
-  
-  // Return the stored emotion
-  return emotion;
-};
-
-/**
- * Get emotions for a specific user
- */
-export const getUserEmotions = async (userId: string): Promise<Emotion[]> => {
-  return emotionsStore.filter(emotion => emotion.user_id === userId);
-};
-
-/**
- * Get a specific emotion by ID
- */
-export const getEmotionById = async (emotionId: string): Promise<Emotion | null> => {
-  const emotion = emotionsStore.find(emotion => emotion.id === emotionId);
-  return emotion || null;
-};
-
-/**
- * Delete an emotion by ID
- */
-export const deleteEmotion = async (emotionId: string): Promise<boolean> => {
-  const initialLength = emotionsStore.length;
-  emotionsStore = emotionsStore.filter(emotion => emotion.id !== emotionId);
-  return emotionsStore.length < initialLength;
 };

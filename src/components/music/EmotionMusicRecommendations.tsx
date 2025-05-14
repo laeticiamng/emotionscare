@@ -40,6 +40,7 @@ const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
       artist: 'Serenity',
       coverUrl: '/images/music/calm-1.jpg',
       audioUrl: '/audio/calm-1.mp3',
+      url: '/audio/calm-1.mp3',
       duration: 180,
       emotion: 'calm'
     },
@@ -49,6 +50,7 @@ const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
       artist: 'Zen Masters',
       coverUrl: '/images/music/calm-2.jpg',
       audioUrl: '/audio/calm-2.mp3',
+      url: '/audio/calm-2.mp3',
       duration: 240,
       emotion: 'calm'
     },
@@ -58,6 +60,7 @@ const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
       artist: 'Nature Sounds',
       coverUrl: '/images/music/calm-3.jpg',
       audioUrl: '/audio/calm-3.mp3',
+      url: '/audio/calm-3.mp3',
       duration: 210,
       emotion: 'joy'
     }
@@ -69,7 +72,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   userMood,
   isLoading = false
 }) => {
-  const { playTrack } = useMusic();
+  const { playTrack, currentTrack, isPlaying } = useMusic();
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -97,7 +100,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     // Make sure track has the required properties
     const normalizedTrack: MusicTrack = {
       ...track,
-      audioUrl: track.audioUrl || track.audio_url || '',
+      url: track.url || track.audioUrl || track.audio_url || '',
+      audioUrl: track.audioUrl || track.audio_url || track.url || '',
       coverUrl: track.coverUrl || track.cover_url || track.cover || ''
     };
     
@@ -145,6 +149,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
           <TrackList 
             tracks={recommendedTracks} 
             onPlay={handlePlayTrack}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
             compact
           />
         ) : (

@@ -8,6 +8,7 @@ export interface MusicTrack {
   cover_url?: string;
   audioUrl: string;
   audio_url?: string;
+  url?: string;
   duration: number;
   mood?: string;
   emotion?: string;
@@ -23,6 +24,7 @@ export interface Track extends MusicTrack {
 export interface MusicPlaylist {
   id: string;
   title: string;
+  name: string; 
   description?: string;
   coverUrl: string;
   tracks: MusicTrack[];
@@ -58,6 +60,7 @@ export interface MusicContextType {
 export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
   onTrackSelect?: (track: MusicTrack) => void;
@@ -71,13 +74,15 @@ export interface ProgressBarProps {
   duration: number;
   formatTime: (time: number) => string;
   handleProgressClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onSeek?: (time: number) => void;
   showTimestamps?: boolean;
   className?: string;
 }
 
 export interface TrackInfoProps {
-  title: string;
-  artist: string;
+  track?: MusicTrack;
+  title?: string;
+  artist?: string;
   coverUrl?: string;
   showCover?: boolean;
   showControls?: boolean;
@@ -90,6 +95,7 @@ export interface TrackInfoProps {
 export interface VolumeControlProps {
   volume: number;
   onChange: (value: number) => void;
+  onVolumeChange?: (value: number) => void;
   showLabel?: boolean;
   className?: string;
 }

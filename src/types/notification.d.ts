@@ -1,28 +1,32 @@
 
 export type NotificationFrequency = 'daily' | 'weekly' | 'immediate' | 'digest' | 'none';
-export type NotificationType = 'journal' | 'breathing' | 'music' | 'coaching' | 'system' | 'all';
-export type NotificationTone = 'gentle' | 'neutral' | 'energetic' | 'minimal';
+export type NotificationType = 'journal' | 'breathing' | 'music' | 'coaching' | 'system' | 'all' | 'important';
+export type NotificationTone = 'professional' | 'casual' | 'supportive' | 'minimal' | 'gentle' | 'neutral' | 'energetic';
 
 export interface Notification {
   id: string;
   userId: string;
   title: string;
-  message: string;
+  body?: string;
+  message?: string;
   type: NotificationType;
-  isRead: boolean;
+  read?: boolean;
+  isRead?: boolean;
+  timestamp?: string;
   createdAt: string;
   link?: string;
   image?: string;
 }
 
 export interface NotificationPreference {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  frequency: NotificationFrequency;
-  types: Record<NotificationType, boolean>;
-  tone: NotificationTone;
-  quietHours: {
+  enabled?: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  soundEnabled?: boolean;
+  frequency?: NotificationFrequency;
+  type?: NotificationType;
+  tone?: NotificationTone;
+  quietHours?: {
     enabled: boolean;
     start: string;
     end: string;

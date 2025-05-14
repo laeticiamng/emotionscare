@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { TIME_OF_DAY } from '@/constants/defaults';
+import { TIME_OF_DAY, TimeOfDay } from '@/constants/defaults';
 
 interface TimeBasedBackgroundProps {
   children: React.ReactNode;
@@ -9,7 +9,7 @@ interface TimeBasedBackgroundProps {
 }
 
 export function TimeBasedBackground({ children, className = '' }: TimeBasedBackgroundProps) {
-  const [timeOfDay, setTimeOfDay] = useState<keyof typeof TIME_OF_DAY>(TIME_OF_DAY.MORNING);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TIME_OF_DAY.MORNING);
   
   useEffect(() => {
     const hour = new Date().getHours();

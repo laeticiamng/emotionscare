@@ -22,8 +22,8 @@ export function AudioController({
     isPlaying, 
     toggle, 
     volume, 
-    adjustVolume, 
-    mood 
+    changeVolume, 
+    currentMood 
   } = useAmbientSound({
     autoplay,
     volume: initialVolume,
@@ -31,7 +31,7 @@ export function AudioController({
   });
   
   const handleVolumeChange = (value: number[]) => {
-    adjustVolume(value[0]);
+    changeVolume(value[0]);
   };
   
   if (minimal) {
@@ -64,7 +64,7 @@ export function AudioController({
           <span className="text-xs font-medium">
             {isPlaying ? 'Ambiance sonore active' : 'Ambiance sonore'}
           </span>
-          <span className="text-xs capitalize">{mood}</span>
+          <span className="text-xs capitalize">{currentMood}</span>
         </div>
         
         <Slider

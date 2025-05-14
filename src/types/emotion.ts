@@ -68,7 +68,10 @@ export interface EnhancedEmotionResult extends EmotionResult {
 
 export interface EmotionalTeamViewProps {
   teamId: string;
+  userId?: string;
   anonymized?: boolean;
   period?: 'day' | 'week' | 'month';
   onUserClick?: (userId: string) => void;
+  className?: string;
+  onRefresh?: () => Promise<void>;
 }

@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { TIME_OF_DAY } from '@/constants/defaults';
+import { TIME_OF_DAY, TimeOfDay } from '@/constants/defaults';
 
 interface AmbientSoundOptions {
   autoplay?: boolean;
@@ -21,12 +21,12 @@ export const useAmbientSound = (options: AmbientSoundOptions = {}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(initialVolume);
   const [currentMood, setCurrentMood] = useState(defaultMood);
-  const [timeOfDay, setTimeOfDay] = useState<keyof typeof TIME_OF_DAY>(TIME_OF_DAY.MORNING);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TIME_OF_DAY.MORNING);
   
   // Get sound URL based on mood and time of day
-  const getSoundUrl = useCallback((mood: string, timeOfDay: string): string => {
+  const getSoundUrl = useCallback((mood: string, timeOfDay: TimeOfDay): string => {
     // Map moods to sound files
-    const soundMap: Record<string, Record<string, string>> = {
+    const soundMap: Record<TimeOfDay, Record<string, string>> = {
       [TIME_OF_DAY.MORNING]: {
         calm: '/audio/morning-calm.mp3',
         joy: '/audio/morning-joy.mp3',
@@ -54,17 +54,19 @@ export const useAmbientSound = (options: AmbientSoundOptions = {}) => {
         neutral: '/audio/night-calm.mp3',
         sadness: '/audio/night-calm.mp3',
         default: '/audio/night-calm.mp3'
-      },
-      default: {
-        default: '/audio/neutral-ambient.mp3'
       }
     };
     
+    // Default to morning sounds if the time of day isn't recognized
+    const defaultSounds = {
+      default: '/audio/neutral-ambient.mp3'
+    };
+    
     // Get sounds for the current time of day
-    const timeSounds = soundMap[timeOfDay] || soundMap.default;
+    const timeSounds = soundMap[timeOfDay] || defaultSounds;
     
     // Get the specific sound for the mood, or fallback to default
-    return timeSounds[mood] || timeSounds.default || soundMap.default.default;
+    return timeSounds[mood] || timeSounds.default || defaultSounds.default;
   }, []);
   
   // Determine time of day
