@@ -1,77 +1,25 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Sun, Moon, Laptop, Palette } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ThemeButtonProps } from '@/types/theme';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun } from 'lucide-react';
+import { Theme } from '@/types/types';
 
-const ThemeButton: React.FC<ThemeButtonProps> = ({ collapsed = false }) => {
-  const { theme, setTheme } = useTheme();
+interface ThemeButtonProps {
+  theme: Theme;
+  onClick: () => void;
+}
 
-  const toggleTheme = () => {
-    switch (theme) {
-      case 'dark':
-        setTheme('system');
-        break;
-      case 'system':
-        setTheme('light');
-        break;
-      case 'light':
-        setTheme('pastel');
-        break;
-      case 'pastel':
-        setTheme('dark');
-        break;
-      default:
-        setTheme('light');
-    }
-  };
-
-  const getIcon = () => {
-    switch (theme) {
-      case 'dark':
-        return <Moon className="h-4 w-4" />;
-      case 'system':
-        return <Laptop className="h-4 w-4" />;
-      case 'light':
-        return <Sun className="h-4 w-4" />;
-      case 'pastel':
-        return <Palette className="h-4 w-4" />;
-      default:
-        return <Sun className="h-4 w-4" />;
-    }
-  };
-
-  const getLabel = () => {
-    switch (theme) {
-      case 'dark':
-        return 'Thème: Sombre';
-      case 'system':
-        return 'Thème: Système';
-      case 'light':
-        return 'Thème: Clair';
-      case 'pastel':
-        return 'Thème: Pastel';
-      default:
-        return 'Thème';
-    }
-  };
+export function ThemeButton({ theme, onClick }: ThemeButtonProps) {
+  const { isDarkMode } = useTheme();
 
   return (
     <Button
       variant="ghost"
-      size="sm"
-      onClick={toggleTheme}
-      className={cn(
-        "flex items-center", 
-        collapsed ? "justify-center w-10 h-10 p-0" : "justify-start w-full"
-      )}
+      size="icon"
+      onClick={onClick}
+      aria-label="Toggle theme"
     >
-      {getIcon()}
-      {!collapsed && <span className="ml-2">{getLabel()}</span>}
+      {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>
   );
-};
-
-export default ThemeButton;
+}

@@ -1,6 +1,6 @@
 
 import React, { useMemo } from 'react';
-import { Emotion } from '@/types';
+import { EmotionResult } from '@/types/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -8,7 +8,7 @@ import { CalendarIcon, ClockIcon, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface EmotionHistoryProps {
-  emotions: Emotion[];
+  emotions: EmotionResult[];
   isLoading?: boolean;
   error?: string | null;
   onRefresh?: () => void;
@@ -98,7 +98,9 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({
     );
   }
 
-  const formatDate = (dateStr: string | Date) => {
+  const formatDate = (dateStr: string | Date | undefined) => {
+    if (!dateStr) return "Date inconnue";
+    
     try {
       const date = typeof dateStr === 'string' || dateStr instanceof Date ? new Date(dateStr) : new Date();
       return format(date, 'PPP', { locale: fr });
@@ -107,7 +109,9 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({
     }
   };
 
-  const formatTime = (dateStr: string | Date) => {
+  const formatTime = (dateStr: string | Date | undefined) => {
+    if (!dateStr) return "--:--";
+    
     try {
       const date = typeof dateStr === 'string' || dateStr instanceof Date ? new Date(dateStr) : new Date();
       return format(date, 'HH:mm', { locale: fr });
@@ -138,11 +142,11 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({
                     <div className="flex items-center text-sm text-muted-foreground gap-3">
                       <span className="flex items-center gap-1">
                         <CalendarIcon className="h-3 w-3" />
-                        {formatDate(emotion.date || new Date())}
+                        {formatDate(emotion.date)}
                       </span>
                       <span className="flex items-center gap-1">
                         <ClockIcon className="h-3 w-3" />
-                        {formatTime(emotion.date || new Date())}
+                        {formatTime(emotion.date)}
                       </span>
                     </div>
                   </div>

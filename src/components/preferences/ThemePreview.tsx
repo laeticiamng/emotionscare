@@ -1,64 +1,35 @@
 
 import React from 'react';
-import { Theme } from '@/types/theme';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
+import { Theme } from '@/types/types';
 
-export interface ThemePreviewProps {
+interface ThemePreviewProps {
   theme: Theme;
-  isActive: boolean;
-  onClick: () => void;
 }
 
-const ThemePreview: React.FC<ThemePreviewProps> = ({ theme, isActive, onClick }) => {
-  const getPreviewClassName = () => {
-    let baseClasses = "w-full aspect-video rounded-md border-2 cursor-pointer transition-all";
-    
-    if (isActive) {
-      baseClasses += " ring-2 ring-primary border-primary";
-    }
-    
-    switch (theme) {
-      case 'dark':
-        return cn(baseClasses, "bg-slate-900");
-      case 'light':
-        return cn(baseClasses, "bg-slate-50");
-      case 'system':
-        return cn(baseClasses, "bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800");
-      case 'pastel':
-        return cn(baseClasses, "bg-gradient-to-br from-pink-100 to-blue-100");
-      default:
-        return baseClasses;
-    }
-  };
-  
-  const getLabel = () => {
-    switch (theme) {
-      case 'dark': return 'Mode sombre';
-      case 'light': return 'Mode clair';
-      case 'system': return 'Système';
-      case 'pastel': return 'Pastel';
-      default: return theme;
-    }
-  };
-  
+const ThemePreview: React.FC<ThemePreviewProps> = ({ theme }) => {
   return (
-    <div className="text-center space-y-2">
-      <div 
-        className={getPreviewClassName()}
-        onClick={onClick}
-        aria-label={`Thème ${getLabel()}`}
-      >
-        <div className="h-full w-full flex items-center justify-center">
-          {theme === 'system' && (
-            <div className="text-xs font-medium text-center">
-              {window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Sombre' : 'Clair'} 
-              <br />
-              (basé système)
-            </div>
-          )}
-        </div>
-      </div>
-      <p className="text-xs font-medium">{getLabel()}</p>
+    <div className={`theme-${theme}`}>
+      <Card className="border shadow-sm">
+        <CardContent className="p-4 space-y-4">
+          <div className="space-y-2">
+            <div className="h-4 w-3/4 bg-primary rounded"></div>
+            <div className="h-4 w-1/2 bg-secondary rounded"></div>
+          </div>
+          
+          <div className="flex gap-2">
+            <div className="h-6 w-6 rounded-full bg-primary"></div>
+            <div className="h-6 w-6 rounded-full bg-secondary"></div>
+            <div className="h-6 w-6 rounded-full bg-accent"></div>
+          </div>
+          
+          <div className="space-y-1">
+            <div className="h-2 w-full bg-muted rounded"></div>
+            <div className="h-2 w-4/5 bg-muted rounded"></div>
+            <div className="h-2 w-2/3 bg-muted rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

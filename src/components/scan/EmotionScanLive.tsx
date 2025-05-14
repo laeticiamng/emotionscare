@@ -8,7 +8,7 @@ import { analyzeEmotion } from '@/lib/scanService';
 import EmotionResultDisplay from './live/EmotionResult';
 import { Slider } from "@/components/ui/slider"
 import { Label } from '@/components/ui/label';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/types';
 
 const EmotionScanLive = () => {
   const [isRecording, setIsRecording] = useState(false);

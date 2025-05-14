@@ -1,5 +1,5 @@
 
-import type { EmotionResult, Emotion } from '@/types/emotion';
+import type { EmotionResult } from '@/types/types';
 
 // —————————————————————————————————
 // Fonction : analyzeEmotion
@@ -76,7 +76,7 @@ const generateAIFeedback = (text: string): string => {
 // —————————————————————————————————
 // Fonction : saveEmotion
 // —————————————————————————————————
-export const saveEmotion = async (result: EmotionResult | Emotion): Promise<boolean> => {
+export const saveEmotion = async (result: EmotionResult): Promise<boolean> => {
   console.log('Saving emotion:', result);
   
   // In a real app, this would be a call to your backend
@@ -104,85 +104,43 @@ export const saveEmotion = async (result: EmotionResult | Emotion): Promise<bool
 };
 
 // —————————————————————————————————
-// Fonction : analyzeAudioStream (mock temporaire)
+// Fonction : analyzeAudioStream
 // —————————————————————————————————
 export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // Exemple fictif – à remplacer par un vrai appel API ou WebSocket
-  console.log('Analyse audio en cours...', audioBlob);
-
-  // Simulate processing delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-
-  return {
-    emotion: 'calm',
-    confidence: 0.92,
-    audio_url: 'https://example.com/audio/streamed',
-  };
-};
-
-// —————————————————————————————————
-// Fonction : convertToEmotionResult
-// —————————————————————————————————
-export const convertToEmotionResult = (input: any): EmotionResult => {
-  return {
-    id: input.id || Math.random().toString(36).substring(2, 9),
-    emotion: input.emotion || 'neutral',
-    confidence: input.confidence || input.score / 100 || 0.5,
-    score: input.score || Math.round((input.confidence || 0.5) * 100),
-    intensity: input.intensity || input.score || 50,
-    transcript: input.transcript || input.text || '',
-    text: input.text || input.transcript || '',
-    date: input.date || new Date().toISOString(),
-    emojis: Array.isArray(input.emojis) ? input.emojis : 
-           (typeof input.emojis === 'string' ? [input.emojis] : []),
-    ai_feedback: input.ai_feedback || input.feedback || '',
-    feedback: input.feedback || input.ai_feedback || '',
-    category: input.category || 'general',
-    audio_url: input.audio_url || '',
-  };
-};
-
-// —————————————————————————————————
-// Fonction : getUserEmotions
-// —————————————————————————————————
-export const getUserEmotions = async (userId: string): Promise<Emotion[]> => {
-  // Mock API call
-  console.log('Fetching emotions for user:', userId);
+  console.log('Analyzing audio stream...');
   
-  // Simulate network delay
+  // Simulate processing delay
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // Mock result
+  return {
+    id: Math.random().toString(36).substring(2, 9),
+    emotion: ['joy', 'sadness', 'anger', 'fear', 'surprise'][Math.floor(Math.random() * 5)],
+    confidence: 0.7 + Math.random() * 0.25,
+    text: "Transcript would appear here in a real implementation",
+    transcript: "This is a mock transcript from the audio recording",
+    date: new Date().toISOString(),
+    score: Math.floor(Math.random() * 100),
+    feedback: "This is mock feedback based on the analyzed emotion"
+  };
+};
+
+// —————————————————————————————————
+// Fonction : fetchLatestEmotion
+// —————————————————————————————————
+export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
+  console.log('Fetching latest emotion for user:', userId);
+  
+  // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  // Return mock data
-  return [
-    {
-      id: '1',
-      user_id: userId,
-      date: new Date(Date.now() - 86400000).toISOString(), // yesterday
-      emotion: 'joy',
-      score: 85,
-      text: "J'ai passé une excellente journée aujourd'hui !",
-      emojis: ['😀', '🥳'],
-      category: 'positive',
-    },
-    {
-      id: '2',
-      user_id: userId,
-      date: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
-      emotion: 'calm',
-      score: 70,
-      text: "Moment de détente après une journée productive",
-      emojis: ['😌', '🧘'],
-      category: 'positive',
-    },
-    {
-      id: '3',
-      user_id: userId,
-      date: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-      emotion: 'neutral',
-      score: 50,
-      text: "Rien de spécial à signaler",
-      emojis: ['😐'],
-      category: 'neutral',
-    },
-  ];
+  // Mock data
+  return {
+    id: Math.random().toString(36).substring(2, 9),
+    emotion: ['joy', 'calm', 'sadness'][Math.floor(Math.random() * 3)],
+    score: Math.floor(Math.random() * 10) + 1,
+    date: new Date().toISOString(),
+    text: "This was my feeling earlier today",
+    user_id: userId
+  };
 };

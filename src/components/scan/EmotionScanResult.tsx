@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { saveEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/types';
 import { CheckCircle } from 'lucide-react';
 
 interface EmotionScanResultProps {

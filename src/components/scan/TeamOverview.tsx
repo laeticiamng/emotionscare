@@ -1,76 +1,83 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { useAuth } from '@/contexts/AuthContext';
-import type { User } from '@/types';
+import { User } from '@/types/types';
 
 interface TeamOverviewProps {
-  users: User[];
+  users: Partial<User>[];
 }
 
-const TeamOverview = ({ users }: TeamOverviewProps) => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const getScoreColor = (score?: number) => {
+const TeamOverview: React.FC<TeamOverviewProps> = ({ users }) => {
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+  
+  const getEmotionalLevelText = (score?: number) => {
+    if (!score) return 'Non évalué';
+    if (score >= 80) return 'Excellent';
+    if (score >= 65) return 'Bon';
+    if (score >= 50) return 'Moyen';
+    if (score >= 30) return 'Préoccupé';
+    return 'Critique';
+  };
+  
+  const getEmotionalLevelColor = (score?: number) => {
     if (!score) return 'bg-gray-200';
-    if (score >= 70) return 'bg-green-500';
-    if (score >= 40) return 'bg-amber-500';
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 65) return 'bg-emerald-400';
+    if (score >= 50) return 'bg-yellow-400';
+    if (score >= 30) return 'bg-orange-400';
     return 'bg-red-500';
   };
 
-  const handleUserClick = (userId: string) => {
-    navigate(`/scan/${userId}`);
-  };
-
   return (
-    <>
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-4">Équipe</h2>
-        <p className="text-gray-600 mb-4">Consultez l'état émotionnel de votre équipe</p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {users.map((userData) => (
-          <Card 
-            key={userData.id}
-            className="cursor-pointer transition-all hover:shadow-md hover:bg-accent"
-            onClick={() => handleUserClick(userData.id)}
-          >
-            <CardContent className="flex items-center p-4">
-              <Avatar className="h-12 w-12 mr-4">
-                <AvatarImage src={userData.avatar} />
-                <AvatarFallback>{(userData.name?.substring(0, 2) || 'UN').toUpperCase()}</AvatarFallback>
+    <Card>
+      <CardHeader>
+        <CardTitle>Aperçu de l'équipe</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {users.map(user => (
+          <div key={user.id} className="space-y-2">
+            <div className="flex items-center">
+              <Avatar className="h-8 w-8 mr-3">
+                <AvatarImage src={user.avatar_url || ''} alt={user.name || 'Avatar'} />
+                <AvatarFallback>{user.name ? getInitials(user.name) : 'U'}</AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <div className="font-medium">
-                  {user?.id === userData.id ? 
-                    userData.name : 
-                    userData.anonymity_code || `Anonyme ${userData.id.substring(0, 4)}`
-                  }
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">
+                  {user.anonymity_code || user.name}
+                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground">
+                    {getEmotionalLevelText(user.emotional_score)}
+                  </p>
+                  <p className="text-xs font-medium">
+                    {user.emotional_score || 0}%
+                  </p>
                 </div>
-                <div className="text-sm text-muted-foreground">Utilisateur</div>
+                <Progress 
+                  value={user.emotional_score || 0} 
+                  className="h-1.5 mt-1" 
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={userData.emotional_score ? "default" : "outline"}>
-                  Score: {userData.emotional_score || 'N/A'}
-                </Badge>
-                <div className={`w-3 h-3 rounded-full ${getScoreColor(userData.emotional_score)}`}></div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
         
         {users.length === 0 && (
-          <div className="col-span-2 text-center p-8 text-muted-foreground">
-            Aucun utilisateur trouvé
+          <div className="text-center py-4 text-muted-foreground">
+            Aucun membre dans l'équipe pour le moment
           </div>
         )}
-      </div>
-    </>
+      </CardContent>
+    </Card>
   );
 };
 

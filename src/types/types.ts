@@ -1,4 +1,3 @@
-
 // ————————————————————————
 // UserRole
 // ————————————————————————
@@ -47,6 +46,14 @@ export interface UserPreferences {
     emailEnabled: boolean;
     pushEnabled: boolean;
   };
+  dashboardLayout?: string;
+  onboardingCompleted?: boolean;
+  theme?: string;
+  fontSize?: string;
+  fontFamily?: string;
+  colorScheme?: string;
+  locale?: string;
+  timeZone?: string;
 }
 
 // ————————————————————————
@@ -67,9 +74,9 @@ export interface EmotionalTeamViewProps {
 }
 
 // ————————————————————————
-// Emotion
+// EmotionResult - Unified type for all emotion-related data
 // ————————————————————————
-export interface Emotion {
+export interface EmotionResult {
   id?: string;
   emotion: string;
   score?: number;
@@ -85,29 +92,14 @@ export interface Emotion {
   text?: string;
   user_id?: string;
   dominantEmotion?: string;
+  source?: string;
+  feedback?: string;
 }
 
-export interface EmotionResult extends Emotion {
-  id?: string;
-  emotion: string;
-  confidence: number;
-  intensity?: number;
-  transcript?: string;
-  date?: string;
-  emojis?: string[];
-  ai_feedback?: string;
-  recommendations?: string[];
-  category?: string;
-  audio_url?: string;
-  dominantEmotion?: string;
-  text?: string;
-  user_id?: string;
-  score?: number;
-}
+// Remove Emotion interface to avoid confusion
+// Use EmotionResult for all emotion related data
 
-export interface EnhancedEmotionResult extends EmotionResult {
-  // Additional fields for enhanced results
-}
+export type EnhancedEmotionResult = EmotionResult;
 
 // ————————————————————————
 // MusicTrack
@@ -241,6 +233,7 @@ export interface VRSession {
   id: string;
   userId?: string;
   templateId?: string;
+  template?: VRSessionTemplate;  // Added for compatibility
   date?: string;
   startDate?: string;
   startedAt?: string;
@@ -310,6 +303,23 @@ export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team
 export interface UserMode {
   mode: UserModeType;
   setMode: (mode: UserModeType) => void;
+}
+
+// ————————————————————————
+// AuthContext
+// ————————————————————————
+export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string, name: string) => Promise<any>;
+  signOut: () => Promise<void>;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+  setPreferences: React.Dispatch<React.SetStateAction<UserPreferences>>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
 }
 
 // ————————————————————————

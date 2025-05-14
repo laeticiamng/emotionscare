@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
-import { Period, EmotionalTeamViewProps } from '@/types';
+import { Period, EmotionalTeamViewProps } from '@/types/types';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   teamId,
@@ -49,17 +49,12 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
     }
   };
 
-  // Fix the type here - specify that value is a Period
-  const handlePeriodChange = (value: Period) => {
-    setSelectedPeriod(value);
-  };
-
   return (
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xl">État émotionnel de l'équipe</CardTitle>
         <div className="flex items-center gap-2">
-          <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
+          <Select value={selectedPeriod} onValueChange={(value: string) => setSelectedPeriod(value as Period)}>
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Période" />
             </SelectTrigger>

@@ -1,78 +1,95 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Theme } from '@/types/theme';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import ThemePreview from './ThemePreview';
+import { Theme, FontFamily, FontSize } from '@/types/types';
 
-const ThemeSettingsForm: React.FC = () => {
-  const { theme, setTheme } = useTheme();
-  
-  const handleThemeChange = (value: Theme) => {
-    setTheme(value);
+const ThemeSettingsForm = () => {
+  const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
+
+  const themes: Theme[] = ['light', 'dark', 'system', 'pastel'];
+  const fontSizes: FontSize[] = ['small', 'medium', 'large'];
+  const fontFamilies: FontFamily[] = ['system', 'sans-serif', 'serif', 'mono'];
+
+  const getFontSizeName = (size: FontSize): string => {
+    switch (size) {
+      case 'small': return 'Petit';
+      case 'medium': return 'Moyen';
+      case 'large': return 'Grand';
+      default: return 'Moyen';
+    }
   };
-  
+
+  const getFontFamilyName = (family: FontFamily): string => {
+    switch (family) {
+      case 'system': return 'Système';
+      case 'sans-serif': return 'Sans-serif';
+      case 'serif': return 'Serif';
+      case 'mono': return 'Monospace';
+      case 'rounded': return 'Arrondi';
+      default: return 'Système';
+    }
+  };
+
+  const getThemeName = (theme: Theme): string => {
+    switch (theme) {
+      case 'light': return 'Clair';
+      case 'dark': return 'Sombre';
+      case 'system': return 'Système';
+      case 'pastel': return 'Pastel';
+      default: return 'Système';
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h3 className="text-lg font-medium">Thème de l'interface</h3>
-        <p className="text-sm text-muted-foreground">
-          Choisissez l'apparence visuelle de l'application
-        </p>
+      <div>
+        <h3 className="text-lg font-medium mb-2">Thème</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {themes.map((t) => (
+            <Button
+              key={t}
+              variant={theme === t ? "default" : "outline"}
+              onClick={() => setTheme(t)}
+              className="justify-center"
+            >
+              {getThemeName(t)}
+            </Button>
+          ))}
+        </div>
       </div>
-      
-      <div className="grid grid-cols-3 gap-4">
-        <ThemePreview 
-          theme="light" 
-          isActive={theme === 'light'}
-          onClick={() => handleThemeChange('light')}
-        />
-        
-        <ThemePreview 
-          theme="dark" 
-          isActive={theme === 'dark'}
-          onClick={() => handleThemeChange('dark')}
-        />
-        
-        <ThemePreview 
-          theme="system" 
-          isActive={theme === 'system'}
-          onClick={() => handleThemeChange('system')}
-        />
 
-        <ThemePreview 
-          theme="pastel" 
-          isActive={theme === 'pastel'}
-          onClick={() => handleThemeChange('pastel')}
-        />
+      <div>
+        <h3 className="text-lg font-medium mb-2">Taille de police</h3>
+        <div className="grid grid-cols-3 gap-2">
+          {fontSizes.map((size) => (
+            <Button
+              key={size}
+              variant={fontSize === size ? "default" : "outline"}
+              onClick={() => setFontSize(size)}
+              className="justify-center"
+            >
+              {getFontSizeName(size)}
+            </Button>
+          ))}
+        </div>
       </div>
-      
-      <RadioGroup 
-        value={theme} 
-        onValueChange={(value) => handleThemeChange(value as Theme)}
-        className="grid grid-cols-2 sm:grid-cols-4 gap-2"
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="light" id="theme-light" />
-          <Label htmlFor="theme-light">Clair</Label>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="dark" id="theme-dark" />
-          <Label htmlFor="theme-dark">Sombre</Label>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="system" id="theme-system" />
-          <Label htmlFor="theme-system">Système</Label>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="pastel" id="theme-pastel" />
-          <Label htmlFor="theme-pastel">Pastel</Label>
+      <div>
+        <h3 className="text-lg font-medium mb-2">Police</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {fontFamilies.map((font) => (
+            <Button
+              key={font}
+              variant={fontFamily === font ? "default" : "outline"}
+              onClick={() => setFontFamily(font)}
+              className={`justify-center font-${font}`}
+            >
+              {getFontFamilyName(font)}
+            </Button>
+          ))}
         </div>
-      </RadioGroup>
+      </div>
     </div>
   );
 };

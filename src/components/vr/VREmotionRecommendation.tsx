@@ -3,10 +3,10 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Glasses } from 'lucide-react';
-import { Emotion } from '@/types';
+import { EmotionResult } from '@/types/types';
 
 interface VREmotionRecommendationProps {
-  emotion: Emotion | null;
+  emotion: EmotionResult | null;
 }
 
 const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({ emotion }) => {

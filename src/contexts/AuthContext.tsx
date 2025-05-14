@@ -1,190 +1,258 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { User, UserPreferences, AuthContextType, UserRole } from '@/types';
+import { User, UserPreferences, AuthContextType } from '@/types/types';
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Default empty user preferences
+const defaultUserPreferences: UserPreferences = {
+  privacy: 'private',
+  notifications_enabled: true,
+  autoplayVideos: false,
+  dataCollection: true,
+  aiSuggestions: true,
+  emotionalCamouflage: false,
+  language: 'fr',
+  dashboardLayout: 'default',
+  onboardingCompleted: false,
+  theme: 'system',
+  fontSize: 'medium',
+  fontFamily: 'system',
+  colorScheme: 'auto',
+  locale: 'fr',
+  timeZone: 'Europe/Paris',
+  notifications: {
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: false
+  }
+};
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+const defaultUser: User = {
+  id: '',
+  email: '',
+  name: '',
+  role: 'b2c',
+  created_at: new Date().toISOString(),
+  preferences: defaultUserPreferences
+};
+
+export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  const [user, setUser] = useState<User>(defaultUser);
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultUserPreferences);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [preferences, setPreferences] = useState<UserPreferences>({});
 
   useEffect(() => {
-    const session = supabase.auth.getSession();
+    const getSession = async () => {
+      try {
+        const sessionResponse = await supabase.auth.getSession();
+        const session = sessionResponse.data?.session;
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user?.id) {
-        fetchUser(session.user.id);
-      } else {
-        setUser(null);
+        if (session) {
+          const { user: authUser } = session;
+
+          // Fetch user profile from profiles table
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', authUser.id)
+            .single();
+
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            throw profileError;
+          }
+
+          if (profileData) {
+            // Set user state
+            setUser({
+              id: authUser.id,
+              email: authUser.email,
+              name: profileData.name || authUser.email?.split('@')[0] || 'Utilisateur',
+              role: profileData.role || 'b2c',
+              created_at: authUser.created_at || new Date().toISOString(),
+              avatar: profileData.avatar_url || '',
+              avatar_url: profileData.avatar_url || '',
+              onboarded: profileData.onboarded || false,
+              department: profileData.department || '',
+              position: profileData.position || '',
+              anonymity_code: profileData.anonymity_code || '',
+              emotional_score: profileData.emotional_score || 0,
+              preferences: {
+                ...(profileData.preferences || defaultUserPreferences)
+              }
+            });
+
+            // Set preferences state
+            setPreferences({
+              ...(profileData.preferences || defaultUserPreferences)
+            });
+
+            setIsAuthenticated(true);
+          }
+        }
+      } catch (error) {
+        console.error('Auth session error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Get initial session
+    getSession();
+
+    // Set up auth state listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event);
+
+      if (event === 'SIGNED_IN' && session) {
+        // Similar to getSession logic
+        setIsAuthenticated(true);
+        
+        // For now just set loading to false to avoid duplicate logic
+        // getSession() will run anyways
+        setIsLoading(false);
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        setUser(defaultUser);
+        setPreferences(defaultUserPreferences);
         setIsLoading(false);
       }
     });
 
-    if (session?.data?.session?.user?.id) {
-      fetchUser(session.data.session.user.id);
-    } else {
-      setIsLoading(false);
-    }
+    return () => {
+      // Clean up subscription
+      if (authListener && authListener.subscription) {
+        authListener.subscription.unsubscribe();
+      }
+    };
   }, []);
 
-  const loadUserData = async (userId: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
-      // Vérifier si la fonction RPC existe
-      try {
-        const { data, error } = await supabase.rpc('get_user_by_id', { user_id: userId });
-        
-        if (error) throw new Error('RPC error: ' + error.message);
-        if (data) {
-          // Traiter les données de l'utilisateur
-          return data;
-        }
-      } catch (rpcError) {
-        console.warn('RPC get_user_by_id failed, falling back to direct query', rpcError);
-        
-        // Fallback: query direct si RPC échoue
-        const { data: userData, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', userId)
-          .maybeSingle();
-        
-        if (error) throw error;
-        return userData;
-      }
-    } catch (error) {
-      console.error('Error loading user data:', error);
-      return null;
-    }
-  };
-  
-  const fetchUser = async (userId: string) => {
-    try {
-      const userData = await loadUserData(userId);
-      
-      if (userData) {
-        // Vérification de type avant d'accéder aux propriétés
-        const safeUserData = userData as Record<string, any>;
-        
-        setUser({
-          id: userId,
-          email: safeUserData.email || '',
-          name: safeUserData.name || '',
-          role: (safeUserData.role || 'b2c') as UserRole,
-          created_at: safeUserData.created_at || new Date().toISOString(),
-          avatar: safeUserData.avatar_url || undefined
-        });
-        
-        setPreferences({
-          privacy: safeUserData.privacy || 'public',
-          notifications_enabled: safeUserData.notifications_enabled || true,
-          autoplayVideos: safeUserData.autoplayVideos || false,
-          dataCollection: safeUserData.dataCollection || true,
-          aiSuggestions: safeUserData.aiSuggestions || true,
-          emotionalCamouflage: safeUserData.emotionalCamouflage || false
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      setIsLoading(false);
-    }
-  };
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-  const signIn = async (email: string): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
       if (error) throw error;
+      
+      return { success: true, data };
     } catch (error) {
       console.error('Error signing in:', error);
-      throw error;
+      return { success: false, error };
     }
   };
 
-  const signOut = async (): Promise<void> => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      setUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
-      throw error;
-    }
-  };
-
-  const signUp = async (email: string, name: string): Promise<void> => {
+  const signUp = async (email: string, password: string, name: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
-        password: Math.random().toString(36).slice(-8),
+        password,
         options: {
           data: {
             name,
-            avatar_url: '',
           },
         },
       });
+
       if (error) throw error;
+      
+      // Create a profile
       if (data.user) {
-        fetchUser(data.user.id);
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              name,
+              email,
+              role: 'b2c', // Default role
+              preferences: defaultUserPreferences,
+            },
+          ]);
+
+        if (profileError) throw profileError;
       }
+
+      return { success: true, data };
     } catch (error) {
       console.error('Error signing up:', error);
-      throw error;
+      return { success: false, error };
     }
   };
 
-  const updateUser = async (updates: Partial<User>): Promise<void> => {
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const updateProfile = async (data: Partial<User>) => {
+    if (!user.id) return;
+
     try {
       const { error } = await supabase
-        .from('users')
-        .update(updates)
-        .eq('id', user?.id);
+        .from('profiles')
+        .update(data)
+        .eq('id', user.id);
+
       if (error) throw error;
-      setUser({ ...user!, ...updates });
+
+      // Update local state
+      setUser({ ...user, ...data });
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error resetting password:', error);
       throw error;
     }
   };
 
-  const setSinglePreference = (key: string, value: any) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
-  };
-
-  const logout = useCallback(async () => {
-    await signOut();
-    setUser(null);
-  }, []);
-
-  useEffect(() => {
-    if (!user) {
-      setIsLoading(false);
+  const updatePassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password,
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating password:', error);
+      throw error;
     }
-  }, [user]);
-
-  const value = {
-    user,
-    setUser,
-    isAuthenticated: !!user,
-    isLoading,
-    setIsLoading,
-    signIn,
-    signOut,
-    signUp,
-    updateUser,
-    preferences,
-    setSinglePreference,
-    logout
   };
 
   return (
-    <AuthContext.Provider value={value}>
-      {!isLoading && children}
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated,
+      isLoading,
+      signIn,
+      signUp,
+      signOut,
+      updateProfile,
+      resetPassword,
+      updatePassword,
+      setUser,
+      setPreferences,
+    }}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = (): AuthContextType => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');

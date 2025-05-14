@@ -9,14 +9,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { saveEmotion, analyzeEmotion } from '@/lib/scanService';
-import { Emotion, EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/types';
 import EmojiPicker from './EmojiPicker';
 
 interface EmotionScanFormProps {
-  onEmotionDetected?: (emotion: Emotion) => void;
+  onEmotionDetected?: (emotion: EmotionResult) => void;
   onScanComplete?: () => void;
   onClose?: () => void;
   userId?: string;
+  onScanSaved?: () => void;
+  onComplete?: (result: EmotionResult) => void;
 }
 
 // Mock gamification service function
@@ -52,35 +54,19 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   onEmotionDetected, 
   onScanComplete,
   onClose,
-  userId
+  userId,
+  onScanSaved,
+  onComplete
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [text, setText] = useState('');
   const [emojis, setEmojis] = useState('');
-  const [mostRecentEmotion, setMostRecentEmotion] = useState<Emotion | null>(null);
+  const [mostRecentEmotion, setMostRecentEmotion] = useState<EmotionResult | null>(null);
   
   const handleEmojiSelect = useCallback((emoji: string) => {
     setEmojis(prevEmojis => prevEmojis + emoji);
   }, []);
-  
-  // Convert EmotionResult to Emotion
-  const resultToEmotion = (result: EmotionResult, userId: string): Emotion => {
-    return {
-      id: result.id || uuid(),
-      user_id: userId,
-      date: result.date || new Date().toISOString(),
-      emotion: result.emotion,
-      score: result.score || Math.round((result.confidence || 0.5) * 100),
-      confidence: result.confidence,
-      intensity: result.intensity || result.score,
-      text: result.text || result.transcript || '',
-      ai_feedback: result.feedback || result.ai_feedback || '',
-      category: result.category || 'neutral',
-      emojis: Array.isArray(result.emojis) ? result.emojis : 
-              (typeof result.emojis === 'string' ? result.emojis.split('') : [])
-    };
-  };
   
   const handleAnalysisComplete = async (result: EmotionResult) => {
     if (!result || (!user && !userId)) return;
@@ -89,8 +75,19 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
       // Get the correct user ID
       const currentUserId = userId || user?.id || '';
       
-      // Convert result to Emotion
-      const emotion = resultToEmotion(result, currentUserId);
+      // Ensure result has the required properties
+      const emotion: EmotionResult = {
+        ...result,
+        id: result.id || uuid(),
+        user_id: currentUserId,
+        date: result.date || new Date().toISOString(),
+        emotion: result.emotion,
+        score: result.score || Math.round((result.confidence || 0.5) * 100),
+        confidence: result.confidence,
+        intensity: result.intensity || result.score,
+        text: result.text || result.transcript || '',
+        ai_feedback: result.feedback || result.ai_feedback || '',
+      };
 
       // Process for badges and points
       const gamificationResult = await processEmotionForBadges(result.emotion || 'neutral', currentUserId);
@@ -115,6 +112,14 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
       // Call completion handler if provided
       if (onScanComplete) {
         onScanComplete();
+      }
+      
+      if (onComplete) {
+        onComplete(emotion);
+      }
+      
+      if (onScanSaved) {
+        onScanSaved();
       }
       
     } catch (error) {

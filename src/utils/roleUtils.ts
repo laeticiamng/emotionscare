@@ -52,6 +52,13 @@ export const hasRoleAccess = (userRole: UserRole | string | undefined, requiredR
 };
 
 /**
+ * Check if user has any of the allowed roles
+ */
+export const hasAnyRole = (role: string, allowedRoles: string[]): boolean => {
+  return allowedRoles.includes(role);
+};
+
+/**
  * Get the login path for a specific role
  */
 export const getRoleLoginPath = (role: string): string => {
@@ -64,6 +71,8 @@ export const getRoleLoginPath = (role: string): string => {
       return '/login';
     case 'b2b-collaborator':
       return '/login';
+    case 'b2c':
+      return '/b2c/login';
     default:
       return '/login';
   }
@@ -82,6 +91,8 @@ export const getRoleHomePath = (role: string): string => {
       return '/dashboard';
     case 'b2b-collaborator':
       return '/dashboard';
+    case 'b2c':
+      return '/b2c/dashboard';
     default:
       return '/dashboard';
   }
