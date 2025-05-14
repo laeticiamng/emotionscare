@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { UserModeType } from '@/contexts/UserModeContext';
+import { UserModeType } from '@/types/types';
 import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
 import EmotionalCheckIn from '@/components/dashboard/EmotionScanSection';
 import EmotionalTrends from '@/components/dashboard/EmotionalTrends';
@@ -16,10 +17,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
-import { User } from '@/types/user';
+import { User } from '@/types/types';
 
 // Mock data pour team overview
-const mockTeamUsers = [
+const mockTeamUsers: User[] = [
   {
     id: '1',
     name: 'Jane Smith',
@@ -27,8 +28,9 @@ const mockTeamUsers = [
     emotional_score: 82,
     anonymity_code: 'JS-2022',
     email: 'jane.smith@example.com',
-    role: 'b2b_user' as const,
-    created_at: new Date().toISOString() // Correction ici
+    role: 'b2b_user',
+    created_at: new Date().toISOString(),
+    preferences: {} // Ajouté pour satisfaire le type User
   },
   {
     id: '2',
@@ -37,8 +39,9 @@ const mockTeamUsers = [
     emotional_score: 65,
     anonymity_code: 'JD-2022',
     email: 'john.doe@example.com',
-    role: 'b2b_user' as const,
-    created_at: new Date().toISOString() // Correction ici
+    role: 'b2b_user',
+    created_at: new Date().toISOString(),
+    preferences: {} // Ajouté pour satisfaire le type User
   },
   {
     id: '3',
@@ -47,8 +50,9 @@ const mockTeamUsers = [
     emotional_score: 78,
     anonymity_code: 'AJ-2022',
     email: 'amy.johnson@example.com',
-    role: 'b2b_user' as const,
-    created_at: new Date().toISOString() // Correction ici
+    role: 'b2b_user',
+    created_at: new Date().toISOString(),
+    preferences: {} // Ajouté pour satisfaire le type User
   }
 ];
 
@@ -75,7 +79,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   const { user } = useAuth();
   
   // Convert personal to b2c for backwards compatibility
-  const normalizedUserMode = userMode === 'personal' ? 'b2c' : userMode;
+  const normalizedUserMode = userMode === 'personal' ? 'b2c' as UserModeType : userMode;
   
   // Update comparisons to match normalized userMode
   const isB2BUser = normalizedUserMode === 'b2b-user';

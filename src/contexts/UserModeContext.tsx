@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin';
+import { UserModeType } from '@/types/types';
 
 interface UserModeContextType {
   userMode: UserModeType | undefined;
@@ -18,7 +17,9 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     // Load user mode from localStorage if available
     const storedMode = localStorage.getItem('userMode');
-    if (storedMode && ['b2c', 'b2b-user', 'b2b-admin'].includes(storedMode)) {
+    if (storedMode && [
+      'b2c', 'b2b-user', 'b2b-admin', 'personal', 'team', 'b2b-collaborator'
+    ].includes(storedMode)) {
       setUserMode(storedMode as UserModeType);
     }
     setIsLoading(false);
@@ -49,3 +50,5 @@ export const useUserMode = (): UserModeContextType => {
   }
   return context;
 };
+
+export { UserModeType };

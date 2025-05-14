@@ -70,6 +70,7 @@ export interface EmotionResult {
   recommendations?: string[];
   category?: string;
   audio_url?: string;
+  dominantEmotion?: string; // Ajouté pour utilisation dans VoiceEmotionAnalyzer
 }
 
 // ————————————————————————
@@ -162,7 +163,7 @@ export interface VRSessionTemplate {
   emotions?: string[];
   benefits?: string[];
   difficulty?: string;
-  tags?: string[];
+  tags?: string[]; // Ajouté pour UserDashboardSections
   theme?: string;
   preview_url?: string;
 }
@@ -227,7 +228,8 @@ export interface ThemeContextType {
 // ————————————————————————
 // UserMode
 // ————————————————————————
-export type UserModeType = 'team' | 'personal';
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'b2b-collaborator';
+
 export interface UserMode {
   mode: UserModeType;
   setMode: (mode: UserModeType) => void;

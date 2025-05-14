@@ -1,13 +1,16 @@
 
 import React from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
 import { Toaster } from 'sonner';
 
 const App: React.FC = () => {
+  console.log('🚀 App: Rendu du composant App');
+  
   return (
     <>
-      <RouterProvider router={router} />
+      <div className="min-h-screen bg-background">
+        <h1>Test Affichage</h1>
+        <p>Si ce texte s'affiche, le rendu de base fonctionne.</p>
+      </div>
       <Toaster position="top-right" />
     </>
   );

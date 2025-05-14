@@ -17,6 +17,9 @@ import { UserModeProvider } from './contexts/UserModeContext';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from './contexts/AuthContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import AppRouter from './AppRouter';
+
+console.log('📋 main.tsx: Initialisation de l\'application');
 
 // Create a query client
 const queryClient = new QueryClient({
@@ -27,6 +30,10 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Ajouter une variable globale pour le débogage
+window.__APP_DEBUG__ = true;
+console.log('🔍 Debug mode activé');
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -41,7 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                     <StorytellingProvider>
                       <PredictiveAnalyticsProvider>
                         <MusicProvider>
-                          <App />
+                          <AppRouter />
                           <Toaster />
                         </MusicProvider>
                       </PredictiveAnalyticsProvider>
@@ -56,3 +63,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </ErrorBoundary>
   </React.StrictMode>,
 );
+
+console.log('✅ main.tsx: Application montée avec succès');
