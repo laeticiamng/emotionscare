@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/types';
 
 interface TextEmotionScannerProps {
   text?: string;
@@ -61,9 +62,9 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
       // Simulate analysis with a mock response
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const mockAnalysis = {
+      const mockAnalysis: EmotionResult = {
         emotion: 'calm',
-        score: 75,
+        score: 0.75,
         confidence: 0.75,
         text: text
       };

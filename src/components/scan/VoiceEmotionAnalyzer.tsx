@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Mic, Square, Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/types';
 
 interface VoiceEmotionAnalyzerProps {
   onEmotionDetected?: (result: EmotionResult) => void;
@@ -68,10 +68,8 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({
       setTimeout(() => {
         const emotionResult: EmotionResult = {
           emotion: "calm",
-          dominantEmotion: "calm",
           score: 70,
           confidence: 0.7,
-          source: 'voice',
           text: mockTranscript,
           timestamp: new Date().toISOString()
         };

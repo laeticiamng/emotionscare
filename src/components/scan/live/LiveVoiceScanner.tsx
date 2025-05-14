@@ -1,16 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2, Volume2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import AudioProcessor from "./AudioProcessor";
+import { EmotionResult } from "@/types/types";
 import TranscriptDisplay from "./TranscriptDisplay";
-import { EmotionResult } from "@/types";
 
 interface LiveVoiceScannerProps {
-  onEmotionDetected?: (emotion: any, result: EmotionResult) => void;
+  onEmotionDetected?: (emotion: EmotionResult, result: EmotionResult) => void;
   className?: string;
 }
 
@@ -39,7 +38,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     setIsProcessing(processing);
   };
   
-  const handleAnalysisComplete = (emotion: any, result: EmotionResult) => {
+  const handleAnalysisComplete = (emotion: EmotionResult, result: EmotionResult) => {
     if (result.transcript) {
       setTranscript(result.transcript);
     }
@@ -117,19 +116,6 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         <span>La confidentialité est garantie</span>
         <span>Parlez clairement pour de meilleurs résultats</span>
       </CardFooter>
-      
-      {/* Hidden component to handle audio processing */}
-      {user && isListening && (
-        <AudioProcessor 
-          isListening={isListening}
-          userId={user.id}
-          isConfidential={false}
-          onProcessingChange={handleProcessingChange}
-          onProgressUpdate={handleProgressUpdate}
-          onAnalysisComplete={handleAnalysisComplete}
-          onError={handleError}
-        />
-      )}
     </Card>
   );
 };

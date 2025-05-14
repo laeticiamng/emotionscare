@@ -16,8 +16,12 @@ const PreferencesForm = () => {
   const { toast } = useToast();
   const [userPreferences, setUserPreferences] = useState<UserPreferences>(
     user?.preferences || {
-      privacy: 'private',
-      profileVisibility: 'private',
+      dashboardLayout: 'standard',
+      onboardingCompleted: false,
+      theme: 'light',
+      fontSize: 'medium',
+      fontFamily: 'system',
+      sound: true,
       notifications_enabled: true,
       autoplayVideos: false,
       dataCollection: true,
@@ -58,7 +62,7 @@ const PreferencesForm = () => {
     if (theme && userPreferences.theme !== theme) {
       const updatedPrefs = {
         ...userPreferences,
-        theme: theme as string
+        theme: theme
       };
       setUserPreferences(updatedPrefs);
       setPreferences(updatedPrefs);
@@ -70,7 +74,7 @@ const PreferencesForm = () => {
     if (fontSize && userPreferences.fontSize !== fontSize) {
       const updatedPrefs = {
         ...userPreferences,
-        fontSize: fontSize as string
+        fontSize: fontSize
       };
       setUserPreferences(updatedPrefs);
       setPreferences(updatedPrefs);
