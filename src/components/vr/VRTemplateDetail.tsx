@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock3, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { VRSessionTemplate } from '@/types';
@@ -8,22 +8,25 @@ import { Progress } from "@/components/ui/progress";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useMusicRecommendations } from "@/hooks/useMusicRecommendations";
 
 interface VRTemplateDetailProps {
   template: VRSessionTemplate;
   onStartSession?: () => void;
   showBackButton?: boolean;
+  heartRate?: number;
+  onBack?: () => void;
 }
 
 const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   template,
   onStartSession,
-  showBackButton = true
+  showBackButton = true,
+  heartRate,
+  onBack
 }) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("details");
-  const { recommendations } = useMusicRecommendations(template.emotion || "");
+  const recommendations = [] // For now, use empty array instead of missing hook
 
   const handleStartSession = () => {
     if (onStartSession) {
@@ -34,7 +37,11 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   };
 
   const handleBack = () => {
-    navigate(-1);
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(-1);
+    }
   };
   
   const formatDuration = (minutes: number) => {

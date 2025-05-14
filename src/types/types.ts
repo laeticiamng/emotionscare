@@ -157,7 +157,7 @@ export interface MusicDrawerProps {
 }
 
 export interface TrackInfoProps {
-  title: string;
+  title?: string;
   artist?: string;
   coverUrl?: string;
   showCover?: boolean;
@@ -167,20 +167,31 @@ export interface TrackInfoProps {
   audioError?: boolean;
   className?: string;
   compact?: boolean;
+  track?: MusicTrack;
 }
 
 export interface VolumeControlProps {
+  volume?: number;
+  onChange?: (value: number) => void;
   onVolumeChange: (volume: number) => void;
   showLabel?: boolean;
   className?: string;
 }
 
 export interface ProgressBarProps {
-  currentTime: number;
-  duration: number;
-  onSeek: (time: number) => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
   className?: string;
   showTimestamps?: boolean;
+  value?: number;
+  max?: number;
+  onChange?: (value: number) => void;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  progress?: number;
+  variant?: string;
+  showLabel?: boolean;
+  formatTime?: (seconds: number) => string;
 }
 
 export interface MusicContextType {
@@ -300,9 +311,10 @@ export interface VRHistoryListProps {
 
 export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
-  onStartSession: () => void;
-  onBack: () => void;
+  onStartSession?: () => void;
+  onBack?: () => void;
   heartRate?: number;
+  showBackButton?: boolean;
 }
 
 export interface VoiceEmotionScannerProps {
