@@ -6,8 +6,10 @@ export const getRoleName = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
       return 'Utilisateur particulier';
+    case 'b2b_user':
     case 'b2b-user':
       return 'Collaborateur';
+    case 'b2b_admin':
     case 'b2b-admin':
       return 'RH / Manager';
     default:
@@ -20,8 +22,10 @@ export const getRoleHomePath = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
       return '/b2c/dashboard';
+    case 'b2b_user':
     case 'b2b-user':
       return '/b2b/user/dashboard';
+    case 'b2b_admin':
     case 'b2b-admin':
       return '/b2b/admin/dashboard';
     default:
@@ -34,7 +38,9 @@ export const getRoleLoginPath = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
       return '/auth/login?mode=personal';
+    case 'b2b_user':
     case 'b2b-user':
+    case 'b2b_admin':
     case 'b2b-admin':
       return '/auth/login?mode=professional';
     default:
@@ -49,12 +55,12 @@ export const hasRoleAccess = (userRole: UserRole, requiredRoles: UserRole[]): bo
 
 // Export for backward compatibility and for the TS errors mentioned
 export const isAdminRole = (role: UserRole): boolean => {
-  return role === 'b2b-admin';
+  return role === 'b2b_admin' || role === 'b2b-admin';
 };
 
 // Export for backward compatibility
 export const isB2BUser = (role: UserRole): boolean => {
-  return role === 'b2b-user';
+  return role === 'b2b_user' || role === 'b2b-user';
 };
 
 // Export for backward compatibility

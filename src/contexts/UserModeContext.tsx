@@ -5,7 +5,7 @@ import { UserModeType, UserModeContextType } from '@/types';
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType>('personal');
+  const [userMode, setUserMode] = useState<UserModeType>('b2c');
   const [isLoading, setIsLoading] = useState(false);
 
   return (

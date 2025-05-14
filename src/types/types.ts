@@ -1,7 +1,14 @@
+
 // ————————————————————————
 // UserRole
 // ————————————————————————
-export type UserRole = 'b2c' | 'b2b-user' | 'b2b-admin';
+export type UserRole = 
+  | 'b2c' 
+  | 'b2b_user' 
+  | 'b2b-user' 
+  | 'b2b_admin' 
+  | 'b2b-admin'
+  | 'team';
 
 // ————————————————————————
 // User
@@ -292,6 +299,7 @@ export type Json = string | number | boolean | null | Json[] | { [key: string]: 
 export type FontFamily = 'system' | 'sans-serif' | 'serif' | 'mono' | 'rounded' | 'inter';
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large' | 'sm' | 'md' | 'lg' | 'xl';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type Theme = ThemeName; // For backward compatibility
 
 export interface ThemeContextType {
   theme: ThemeName;
@@ -306,7 +314,7 @@ export interface ThemeContextType {
 // ————————————————————————
 // UserMode
 // ————————————————————————
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'personal' | 'team' | 'anonymous';
+export type UserModeType = UserRole;
 
 export interface UserModeContextType {
   userMode: UserModeType;
@@ -536,4 +544,15 @@ export interface Challenge {
   type?: string;
   name?: string;
   completed?: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  text?: string;
+  content?: string;
+  sender: string;
+  sender_type?: string;
+  timestamp?: string;
+  conversation_id?: string;
+  role?: string;
 }

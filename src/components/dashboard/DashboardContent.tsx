@@ -2,7 +2,7 @@
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserModeType } from '@/types';
+import { UserRole } from '@/types';
 import DashboardHeader from '@/components/dashboard/admin/DashboardHeader';
 import EmotionalCheckIn from '@/components/dashboard/EmotionScanSection';
 import EmotionalTrends from '@/components/dashboard/EmotionalTrends';
@@ -50,7 +50,7 @@ export interface DashboardContentProps {
   toggleSection: (section: string) => void;
   userId: string;
   latestEmotion?: { emotion: string; score: number; };
-  userMode: UserModeType;
+  userMode: UserRole;
 }
 
 const DashboardContent: React.FC<DashboardContentProps> = ({
@@ -66,11 +66,11 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   const { user } = useAuth();
   
   // Convert personal to b2c for backwards compatibility
-  const normalizedUserMode = userMode === 'personal' ? 'b2c' as UserModeType : userMode;
+  const normalizedUserMode = userMode === 'personal' ? 'b2c' as UserRole : userMode;
   
   // Update comparisons to match normalized userMode
-  const isB2BUser = normalizedUserMode === 'b2b-user';
-  const isB2BAdmin = normalizedUserMode === 'b2b-admin';
+  const isB2BUser = normalizedUserMode === 'b2b-user' || normalizedUserMode === 'b2b_user';
+  const isB2BAdmin = normalizedUserMode === 'b2b-admin' || normalizedUserMode === 'b2b_admin';
   const isB2C = normalizedUserMode === 'b2c';
   const isAdmin = user ? isAdminRole(user.role) : false;
   

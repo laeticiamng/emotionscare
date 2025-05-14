@@ -1,110 +1,86 @@
 
 import { EmotionResult } from '@/types';
 
-export const formatEmotionScore = (score: number | undefined): string => {
-  if (score === undefined) return 'N/A';
-  return `${Math.round(score * 100)}%`;
-};
-
+// Get a color based on emotion type
 export const getEmotionColor = (emotion: string): string => {
-  const emotionColors: Record<string, string> = {
+  const emotionMap: Record<string, string> = {
     joy: '#FFD700',
     happiness: '#FFD700',
-    calm: '#90EE90',
-    surprise: '#87CEFA',
-    fear: '#9370DB',
-    anxiety: '#9370DB',
-    stress: '#FF6347',
+    sadness: '#6495ED',
     anger: '#FF4500',
-    sadness: '#4682B4',
+    fear: '#9370DB',
+    disgust: '#8FBC8F',
+    surprise: '#FF69B4',
     neutral: '#A9A9A9',
-    disgust: '#8B008B',
-    contentment: '#98FB98',
+    calm: '#87CEEB',
+    anxiety: '#DA70D6',
+    stress: '#FA8072',
     excitement: '#FFA500',
-    hopeful: '#00CED1',
-    grateful: '#BA55D3',
-    proud: '#FF69B4',
-    confident: '#1E90FF',
-    loved: '#FF1493',
-    optimistic: '#FFB6C1',
-    worried: '#6495ED',
-    frustrated: '#DC143C',
-    disappointed: '#708090',
-    overwhelmed: '#800000',
-    confused: '#9932CC',
-    bored: '#BDB76B'
+    depression: '#4682B4',
+    confusion: '#DDA0DD'
   };
 
-  return emotionColors[emotion.toLowerCase()] || '#A9A9A9';
+  return emotionMap[emotion.toLowerCase()] || '#A9A9A9';
 };
 
-export const getEmotionEmoji = (emotion: string): string => {
-  const emotionEmojis: Record<string, string> = {
+// Get an icon for a specific emotion
+export const getEmotionIcon = (emotion: string): string => {
+  const emotionIconMap: Record<string, string> = {
     joy: '😊',
-    happiness: '😄',
-    calm: '😌',
-    surprise: '😮',
+    happiness: '😃',
+    sadness: '😢',
+    anger: '😠',
     fear: '😨',
+    disgust: '🤢',
+    surprise: '😲',
+    neutral: '😐',
+    calm: '😌',
     anxiety: '😰',
     stress: '😓',
-    anger: '😠',
-    sadness: '😢',
-    neutral: '😐',
-    disgust: '🤢',
-    contentment: '☺️',
-    excitement: '🤩',
-    hopeful: '🙏',
-    grateful: '🙌',
-    proud: '😎',
-    confident: '💪',
-    loved: '❤️',
-    optimistic: '👍',
-    worried: '😟',
-    frustrated: '😤',
-    disappointed: '😞',
-    overwhelmed: '😩',
-    confused: '😕',
-    bored: '🥱'
+    excitement: '😃',
+    depression: '😞',
+    confusion: '🤔'
   };
 
-  return emotionEmojis[emotion.toLowerCase()] || '❓';
+  return emotionIconMap[emotion.toLowerCase()] || '😐';
 };
 
-export const createEmptyEmotionResult = (): EmotionResult => ({
-  id: '',
-  emotion: 'neutral',
-  score: 0,
-  confidence: 0,
-  date: null,
-  text: ''
-});
+// Get intensity description
+export const getIntensityDescription = (intensity: number): string => {
+  if (intensity >= 90) return 'Très fort';
+  if (intensity >= 70) return 'Fort';
+  if (intensity >= 50) return 'Modéré';
+  if (intensity >= 30) return 'Léger';
+  return 'Très léger';
+};
 
-export const analyzeEmotionTrend = (emotions: EmotionResult[], days: number = 7) => {
-  if (!emotions || emotions.length < 2) return { trend: 'stable', direction: 0 };
-  
-  const recentEmotions = emotions.slice(0, days);
-  const positiveEmotions = ['joy', 'happiness', 'calm', 'contentment', 'hopeful', 'grateful', 'proud', 'confident', 'loved', 'optimistic'];
-  const negativeEmotions = ['fear', 'anxiety', 'stress', 'anger', 'sadness', 'disgust', 'worried', 'frustrated', 'disappointed', 'overwhelmed', 'confused'];
-  
-  let positiveCount = 0;
-  let negativeCount = 0;
-  
-  recentEmotions.forEach(item => {
-    if (positiveEmotions.includes(item.emotion.toLowerCase())) {
-      positiveCount++;
-    } else if (negativeEmotions.includes(item.emotion.toLowerCase())) {
-      negativeCount++;
+// Format emotion result for display
+export const formatEmotionResult = (result: EmotionResult) => {
+  return {
+    ...result,
+    formattedDate: result.date ? new Date(result.date).toLocaleDateString() : 'N/A',
+    intensityDescription: getIntensityDescription(result.intensity || result.score || 0),
+    color: getEmotionColor(result.emotion || 'neutral'),
+    icon: getEmotionIcon(result.emotion || 'neutral')
+  };
+};
+
+// Group emotions by category
+export const categorizeEmotions = (emotions: EmotionResult[]) => {
+  return emotions.reduce((acc, emotion) => {
+    const category = emotion.category || 'uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
     }
-  });
-  
-  const direction = positiveCount - negativeCount;
-  let trend = 'stable';
-  
-  if (direction > 1) {
-    trend = 'improving';
-  } else if (direction < -1) {
-    trend = 'declining';
-  }
-  
-  return { trend, direction };
+    acc[category].push(emotion);
+    return acc;
+  }, {} as Record<string, EmotionResult[]>);
+};
+
+export default {
+  getEmotionColor,
+  getEmotionIcon,
+  getIntensityDescription,
+  formatEmotionResult,
+  categorizeEmotions
 };

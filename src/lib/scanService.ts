@@ -1,92 +1,161 @@
 
+import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
 
-export async function analyzeEmotion(text: string): Promise<EmotionResult> {
-  try {
-    // Simulate API call for now
-    return {
-      id: crypto.randomUUID(),
-      emotion: 'neutral',
-      score: 0.75,
-      confidence: 0.8,
-      date: new Date().toISOString(),
-      text: text
-    };
-  } catch (error) {
-    console.error('Error analyzing emotion:', error);
-    throw error;
-  }
+// Mock analysis based on text and emojis
+export async function analyzeEmotion(text: string, emojis: string[] = []): Promise<EmotionResult> {
+  return new Promise((resolve) => {
+    // Simulate API delay
+    setTimeout(() => {
+      // Very simple analysis for demo purposes
+      const lowerText = text.toLowerCase();
+      
+      // Simple emotion detection based on keywords
+      let emotion = 'neutral';
+      let score = 50;
+
+      if (lowerText.includes('heureux') || lowerText.includes('content') || lowerText.includes('joie')) {
+        emotion = 'joy';
+        score = 80;
+      } else if (lowerText.includes('triste') || lowerText.includes('déprimé')) {
+        emotion = 'sadness';
+        score = 30;
+      } else if (lowerText.includes('énervé') || lowerText.includes('colère')) {
+        emotion = 'anger';
+        score = 65;
+      } else if (lowerText.includes('effrayé') || lowerText.includes('peur')) {
+        emotion = 'fear';
+        score = 45;
+      } else if (lowerText.includes('calme') || lowerText.includes('détendu')) {
+        emotion = 'calm';
+        score = 70;
+      }
+
+      // Adjust score based on emoji if present
+      if (emojis.length > 0) {
+        // Simple emoji mapping
+        const emojiMap: Record<string, { emotion: string, value: number }> = {
+          '😊': { emotion: 'joy', value: 10 },
+          '😃': { emotion: 'joy', value: 15 },
+          '😢': { emotion: 'sadness', value: -20 },
+          '😠': { emotion: 'anger', value: -15 },
+          '😨': { emotion: 'fear', value: -10 },
+          '😌': { emotion: 'calm', value: 5 }
+        };
+
+        for (const emoji of emojis) {
+          if (emojiMap[emoji]) {
+            if (emojiMap[emoji].emotion !== emotion) {
+              // If emoji suggests a different emotion, consider adjusting the emotion
+              if (Math.random() > 0.5) {
+                emotion = emojiMap[emoji].emotion;
+              }
+            }
+            score = Math.min(100, Math.max(0, score + emojiMap[emoji].value));
+          }
+        }
+      }
+
+      // Create result
+      const result: EmotionResult = {
+        id: uuid(),
+        emotion,
+        score,
+        confidence: score / 100,
+        intensity: score,
+        text,
+        date: new Date().toISOString(),
+        emojis: emojis.join(''),
+        ai_feedback: `Vous semblez ressentir de la ${emotion === 'joy' ? 'joie' : 
+          emotion === 'sadness' ? 'tristesse' : 
+          emotion === 'anger' ? 'colère' : 
+          emotion === 'fear' ? 'peur' : 
+          emotion === 'calm' ? 'calme' : 'émotion neutre'} à un niveau ${score > 75 ? 'élevé' : score > 50 ? 'moyen' : 'bas'}.`
+      };
+      
+      resolve(result);
+    }, 800); // Simulate API delay
+  });
 }
 
+// Save emotion to database (mock)
+export async function saveEmotion(emotion: EmotionResult): Promise<EmotionResult> {
+  return new Promise((resolve) => {
+    // Simulate API delay
+    setTimeout(() => {
+      // In a real app, we would save to a database here
+      console.log('Saving emotion:', emotion);
+      
+      // Ensure required fields exist
+      const savedEmotion: EmotionResult = {
+        ...emotion,
+        id: emotion.id || uuid(),
+        date: emotion.date || new Date().toISOString()
+      };
+      
+      resolve(savedEmotion);
+    }, 300);
+  });
+}
+
+// Analyze audio stream (mock)
 export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
-  try {
-    // Simulate API call for now
-    return {
-      id: crypto.randomUUID(),
-      emotion: 'neutral',
-      score: 0.65,
-      confidence: 0.7,
-      date: new Date().toISOString(),
-      audio_url: URL.createObjectURL(audioBlob)
-    };
-  } catch (error) {
-    console.error('Error analyzing audio stream:', error);
-    throw error;
-  }
+  return new Promise((resolve) => {
+    // Simulate API delay
+    setTimeout(() => {
+      // Create a mock result
+      const emotions = ['joy', 'sadness', 'anger', 'fear', 'neutral', 'calm'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const randomScore = Math.floor(Math.random() * 70) + 30; // 30-100
+      
+      // Create URL for the audio blob
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const result: EmotionResult = {
+        id: uuid(),
+        emotion: randomEmotion,
+        score: randomScore,
+        confidence: randomScore / 100,
+        intensity: randomScore,
+        audio_url: audioUrl,
+        transcript: "Transcription simulée de l'audio...",
+        date: new Date().toISOString(),
+        ai_feedback: `L'analyse de votre voix révèle une tonalité ${randomEmotion === 'joy' ? 'joyeuse' : 
+          randomEmotion === 'sadness' ? 'triste' : 
+          randomEmotion === 'anger' ? 'en colère' : 
+          randomEmotion === 'fear' ? 'inquiète' : 
+          randomEmotion === 'calm' ? 'calme' : 'neutre'} à un niveau ${randomScore > 75 ? 'élevé' : randomScore > 50 ? 'moyen' : 'bas'}.`
+      };
+      
+      resolve(result);
+    }, 1500);
+  });
 }
 
-export async function createEmotionEntry(userId: string, data: Partial<EmotionResult>): Promise<EmotionResult> {
-  try {
-    // Set default values
-    const emotionEntry: Partial<EmotionResult> = {
-      ...data,
-      id: data.id || crypto.randomUUID(),
-      user_id: userId,
-      date: data.date || new Date().toISOString(),
-    };
-
-    // Use this for mock purposes
-    return emotionEntry as EmotionResult;
-  } catch (error) {
-    console.error('Error creating emotion entry:', error);
-    throw error;
-  }
+// Create a new emotion entry directly
+export async function createEmotionEntry(
+  userId: string, 
+  emotion: string, 
+  intensity: number, 
+  text?: string
+): Promise<EmotionResult> {
+  const entry: EmotionResult = {
+    id: uuid(),
+    user_id: userId,
+    emotion,
+    score: intensity,
+    intensity,
+    confidence: intensity / 100,
+    text,
+    date: new Date().toISOString()
+  };
+  
+  return saveEmotion(entry);
 }
 
-export async function saveEmotion(userId: string, emotion: EmotionResult): Promise<EmotionResult> {
-  try {
-    if (!userId) {
-      throw new Error('User ID is required to save emotion');
-    }
-
-    // For now just return the emotion as if it was saved
-    return {
-      ...emotion,
-      user_id: userId,
-      id: emotion.id || crypto.randomUUID(),
-      date: emotion.date || new Date().toISOString(),
-    };
-  } catch (error) {
-    console.error('Error saving emotion:', error);
-    throw error;
-  }
-}
-
-export async function getEmotionalHistory(userId: string, limit = 10): Promise<EmotionResult[]> {
-  try {
-    // Simulate fetching from database
-    return Array(limit).fill(null).map((_, i) => ({
-      id: `emotion-${i}`,
-      user_id: userId,
-      emotion: ['joy', 'sadness', 'anger', 'fear', 'neutral'][Math.floor(Math.random() * 5)],
-      score: Math.random(),
-      confidence: Math.random(),
-      date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-      text: `Emotion entry ${i}`
-    }));
-  } catch (error) {
-    console.error('Error fetching emotional history:', error);
-    return [];
-  }
-}
+export default {
+  analyzeEmotion,
+  saveEmotion,
+  analyzeAudioStream,
+  createEmotionEntry
+};
