@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicProps } from '@/types/vr';
+import { VRSessionWithMusicProps } from '@/types';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
@@ -16,7 +16,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   sessionId,
   templateId
 }) => {
-  // Use direct props or from the template
+  // Use direct props or from the session
   const activeTemplate = session?.template || template;
   const handleComplete = onSessionComplete || onComplete;
   
@@ -39,7 +39,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || ''
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
             };
             playTrack(track);
           }

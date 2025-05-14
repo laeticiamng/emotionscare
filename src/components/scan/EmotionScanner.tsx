@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mic, Camera, HelpCircle, ArrowRight } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types';
 import FacialEmotionScanner from './FacialEmotionScanner';
 import VoiceEmotionScanner from './VoiceEmotionScanner';
 import EmojiPicker from './EmojiPicker';

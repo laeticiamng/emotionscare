@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Clock, Play, CheckCircle, Heart, Headphones } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,7 +23,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   onBack,
   isLoading = false
 }) => {
-  const title = template?.title || template?.theme || "Session VR";
+  const title = template?.title || template?.name || template?.theme || "Session VR";
   const duration = template?.duration || 0;
   
   if (isLoading) {

@@ -1,100 +1,58 @@
 
-// User types for the application
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
+import { NotificationPreference } from './types';
+
+export type UserRole = 'user' | 'admin' | 'coach' | 'therapist';
+export type ThemeName = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'system-ui' | 'serif' | 'mono';
+
+export interface UserPreferences {
+  dashboardLayout?: string;
+  onboardingCompleted?: boolean;
+  theme?: ThemeName;
+  fontSize?: FontSize;
+  language?: string;
+  fontFamily?: FontFamily;
+  sound?: boolean;
+  notifications?: NotificationPreference;
+}
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name?: string;
+  role?: UserRole;
+  preferences: UserPreferences;
   avatar_url?: string;
-  avatar?: string;  // Adding this field for compatibility
-  role: UserRole;
-  createdAt?: string;
   created_at?: string;
-  company_id?: string;
-  team_id?: string;
-  emotional_score?: number;
-  anonymity_code?: string;
-  last_active?: string;
-  department?: string;
-  position?: string;
-  joined_at?: string;
-  preferences?: UserPreferences;
-  onboarded?: boolean;
-  job_title?: string;
-}
-
-export type FontFamily = 'sans' | 'serif' | 'mono';
-export type FontSize = 'small' | 'medium' | 'large' | 'xl';
-export type ThemeName = 'light' | 'dark' | 'system';
-
-export interface UserPreferences {
-  theme: ThemeName;
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  notifications: boolean | {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    frequency?: string;
-    types?: Record<string, boolean>;
-    tone?: string;
-    quietHours?: {
-      enabled: boolean;
-      start: string;
-      end: string;
-    };
-  };
-  notifications_enabled?: boolean;
-  sound: boolean;
-  language: string;
-  dashboardLayout: 'standard' | 'compact' | 'focused';
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  onboardingCompleted?: boolean;
-  autoplayVideos?: boolean;
-  dataCollection?: boolean;
-  privacy?: {
-    showEmotionalScore?: boolean;
-    shareJournalInsights?: boolean;
-    anonymousDataContribution?: boolean;
-    profileVisibility?: 'public' | 'private' | 'team';
-    shareData?: boolean;
-    anonymizeReports?: boolean;
-    publicProfile?: boolean;
-    shareEmotionalData?: boolean;
-    allowCoaching?: boolean;
-  };
-  timezone?: string;
-  musicPreferences?: {
-    autoplay: boolean;
-    volume: number;
-    preferredGenres: string[];
-  };
-  accessibilityFeatures?: {
-    highContrast: boolean;
-    reducedMotion: boolean;
-    screenReader: boolean;
-  };
-  reduceMotion?: boolean;
-  highContrast?: boolean;
 }
 
 export interface UserPreferencesState {
   preferences: UserPreferences;
-  setPreference: (key: keyof UserPreferences, value: any) => void;
-  savePreferences: () => Promise<void>;
+  setPreferences: (preferences: UserPreferences) => void;
+  setSinglePreference: (key: string, value: any) => void;
   resetPreferences: () => void;
+  loading: boolean;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
+  setIsLoading: (loading: boolean) => void;
+  signIn: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  signUp: (email: string, name: string) => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  preferences: UserPreferencesState;
+  logout: () => Promise<void>;
 }
 
 export interface InvitationVerificationResult {
   valid: boolean;
-  isValid?: boolean;
-  role?: UserRole;
-  teamId?: string;
-  companyId?: string;
+  role?: string;
   email?: string;
+  expired?: boolean;
   error?: string;
 }

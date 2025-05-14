@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
-import { EmotionalTeamViewProps } from '@/types/emotion';
+import { EmotionalTeamViewProps, Period } from '@/types';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   teamId,
@@ -15,7 +15,7 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   onRefresh
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState(period);
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>(period);
   const [teamData, setTeamData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -49,12 +49,17 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
     }
   };
 
+  // Fix the type here - specify that value is a Period
+  const handlePeriodChange = (value: Period) => {
+    setSelectedPeriod(value);
+  };
+
   return (
     <Card className={className}>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xl">État émotionnel de l'équipe</CardTitle>
         <div className="flex items-center gap-2">
-          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+          <Select value={selectedPeriod} onValueChange={handlePeriodChange}>
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Période" />
             </SelectTrigger>

@@ -13,7 +13,7 @@ import {
   ThemeName,
   FontFamily,
   AuthContextType
-} from "@/types";
+} from "@/types/user";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
@@ -79,11 +79,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } = await supabase.auth.getUser();
 
           if (sbUser) {
-            // Fetch user data and preferences from your database
+            // We need to use RPC or a function to fetch user data since 'users' table
+            // is not in the Supabase public schema
             const { data: userData, error: userError } = await supabase
-              .from("users")
-              .select("*")
-              .eq("id", sbUser.id)
+              .rpc('get_user_by_id', { user_id: sbUser.id })
               .single();
 
             if (userError) {
@@ -92,16 +91,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             if (userData) {
               const userWithCorrectTypes: User = {
-                id: userData.id,
-                email: userData.email,
-                name: userData.name,
-                role: userData.role,
+                id: userData.id || sbUser.id,
+                email: userData.email || sbUser.email || '',
+                name: userData.name || sbUser.email?.split("@")[0] || '',
+                role: userData.role || 'user',
                 preferences: {
                   ...createDefaultPreferences(),
-                  ...userData.preferences,
+                  ...(userData.preferences || {}),
                 },
-                avatar_url: userData.avatar_url,
-                created_at: userData.created_at,
+                avatar_url: userData.avatar_url || '',
+                created_at: userData.created_at || new Date().toISOString(),
               };
 
               setUser(userWithCorrectTypes);
@@ -116,9 +115,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 preferences: createDefaultPreferences(),
               };
 
+              // Use RPC or function to create user
               const { error: createUserError } = await supabase
-                .from("users")
-                .insert([newUser]);
+                .rpc('create_user', { 
+                  user_data: {
+                    id: newUser.id,
+                    email: newUser.email,
+                    name: newUser.name,
+                    role: newUser.role,
+                    preferences: newUser.preferences
+                  }
+                });
 
               if (createUserError) {
                 console.error("Error creating user:", createUserError);
@@ -203,10 +210,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       if (!user) return;
       
+      // Use RPC or function to update user
       const { error } = await supabase
-        .from("users")
-        .update(updates)
-        .eq("id", user.id);
+        .rpc('update_user', { 
+          user_id: user.id,
+          user_updates: updates
+        });
 
       if (error) {
         console.error("Error updating user:", error);
@@ -223,61 +232,63 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const setSinglePreference: UserPreferencesState["setSinglePreference"] =
-    async (key, value) => {
-      setPreferencesLoading(true);
-      try {
-        const newPreferences = { ...preferences, [key]: value };
-        const { error } = await supabase
-          .from("users")
-          .update({ preferences: newPreferences })
-          .eq("id", user?.id);
+  const setSinglePreference = async (key: string, value: any) => {
+    setPreferencesLoading(true);
+    try {
+      const newPreferences = { ...preferences, [key]: value };
+      // Use RPC or function to update preferences
+      const { error } = await supabase
+        .rpc('update_user_preferences', { 
+          user_id: user?.id,
+          new_preferences: newPreferences
+        });
 
-        if (error) {
-          console.error("Error updating preferences:", error);
-        } else {
-          setPreferences(newPreferences);
-          setUser((prevUser) =>
-            prevUser
-              ? { ...prevUser, preferences: newPreferences }
-              : prevUser
-          );
-        }
-      } catch (error) {
+      if (error) {
         console.error("Error updating preferences:", error);
-      } finally {
-        setPreferencesLoading(false);
+      } else {
+        setPreferences(newPreferences);
+        setUser((prevUser) =>
+          prevUser
+            ? { ...prevUser, preferences: newPreferences }
+            : prevUser
+        );
       }
-    };
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+    } finally {
+      setPreferencesLoading(false);
+    }
+  };
 
-  const resetPreferences: UserPreferencesState["resetPreferences"] =
-    async () => {
-      setPreferencesLoading(true);
-      try {
-        const defaultPreferences = createDefaultPreferences();
-        const { error } = await supabase
-          .from("users")
-          .update({ preferences: defaultPreferences })
-          .eq("id", user?.id);
+  const resetPreferences = async () => {
+    setPreferencesLoading(true);
+    try {
+      const defaultPreferences = createDefaultPreferences();
+      // Use RPC or function to update preferences
+      const { error } = await supabase
+        .rpc('update_user_preferences', { 
+          user_id: user?.id,
+          new_preferences: defaultPreferences
+        });
 
-        if (error) {
-          console.error("Error resetting preferences:", error);
-        } else {
-          setPreferences(defaultPreferences);
-          setUser((prevUser) =>
-            prevUser
-              ? { ...prevUser, preferences: defaultPreferences }
-              : prevUser
-          );
-        }
-      } catch (error) {
+      if (error) {
         console.error("Error resetting preferences:", error);
-      } finally {
-        setPreferencesLoading(false);
+      } else {
+        setPreferences(defaultPreferences);
+        setUser((prevUser) =>
+          prevUser
+            ? { ...prevUser, preferences: defaultPreferences }
+            : prevUser
+        );
       }
-    };
+    } catch (error) {
+      console.error("Error resetting preferences:", error);
+    } finally {
+      setPreferencesLoading(false);
+    }
+  };
 
-  const preferencesValue = {
+  const preferencesValue: UserPreferencesState = {
     preferences,
     setPreferences,
     setSinglePreference,
@@ -287,7 +298,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!user;
 
-  const value = {
+  const value: AuthContextType = {
     user,
     setUser,
     isAuthenticated,

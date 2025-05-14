@@ -12,6 +12,8 @@ interface VRTemplateCardProps {
 }
 
 const VRTemplateCard: React.FC<VRTemplateCardProps> = ({ template, onClick }) => {
+  const title = template.title || template.name || template.theme || 'Session VR';
+  
   return (
     <Card 
       className="cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
@@ -38,7 +40,7 @@ const VRTemplateCard: React.FC<VRTemplateCardProps> = ({ template, onClick }) =>
           )}
         </AspectRatio>
         <div className="p-4">
-          <h3 className="font-medium">{template.theme}</h3>
+          <h3 className="font-medium">{title}</h3>
           <div className="flex items-center justify-between mt-2">
             <div className="flex items-center text-muted-foreground">
               <Clock className="h-4 w-4 mr-1" />

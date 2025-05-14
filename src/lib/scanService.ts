@@ -1,6 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { Emotion, EmotionResult } from '@/types/emotion';
+import { Emotion, EmotionResult } from '@/types';
 
 export const createEmotionEntry = async (data: string | {
   user_id: string;
@@ -80,17 +79,7 @@ export const fetchLatestEmotion = async (userId: string): Promise<Emotion | null
   }
 };
 
-export const analyzeAudioStream = async (audioBlob: Blob): Promise<{
-  emotion: string;
-  confidence: number;
-  transcript?: string;
-  id?: string;
-  score?: number;
-  text?: string;
-  feedback?: string;
-  recommendations?: string[];
-  intensity?: number;
-}> => {
+export const analyzeAudioStream = async (audioBlob: Blob): Promise<EmotionResult> => {
   try {
     // For development, just return mock data
     return {
@@ -102,7 +91,8 @@ export const analyzeAudioStream = async (audioBlob: Blob): Promise<{
       intensity: 65,
       text: 'This is a simulated transcript from audio analysis.',
       feedback: 'You seem calm and collected.',
-      recommendations: ['Take a moment to appreciate this calm state', 'Practice mindfulness']
+      recommendations: ['Take a moment to appreciate this calm state', 'Practice mindfulness'],
+      audio_url: 'mock-audio-url'
     };
   } catch (error) {
     console.error('Error analyzing audio:', error);
@@ -166,7 +156,8 @@ export const analyzeEmotion = async (data: string | {
       recommendations: [
         "Profitez de cette clarté mentale pour planifier votre journée",
         "Pratiquez la méditation pour renforcer cet état de calme"
-      ]
+      ],
+      audio_url: typeof data !== 'string' ? data.audio_url : undefined
     };
     
     // In a real implementation, we would call an API endpoint to analyze the emotion
@@ -206,7 +197,8 @@ export const saveEmotion = async (emotion: Emotion): Promise<void> => {
         score: emotion.score || emotion.intensity || 5,
         emojis: emotion.emojis || '',
         text: emotion.text || '',
-        ai_feedback: emotion.ai_feedback || ''
+        ai_feedback: emotion.ai_feedback || emotion.feedback || '',
+        audio_url: emotion.audio_url || null
       });
     
     if (error) {
