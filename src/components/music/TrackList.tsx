@@ -12,6 +12,8 @@ interface TrackListProps {
   onPlayPause: () => void;
   emptyMessage?: string;
   showEmotionTag?: boolean;
+  onPlay?: (track: MusicTrack) => void;
+  compact?: boolean;
 }
 
 const TrackList: React.FC<TrackListProps> = ({
@@ -20,8 +22,10 @@ const TrackList: React.FC<TrackListProps> = ({
   isPlaying,
   onTrackSelect,
   onPlayPause,
+  onPlay,
   emptyMessage = "Aucune piste disponible",
-  showEmotionTag = false
+  showEmotionTag = false,
+  compact = false
 }) => {
   if (!tracks || tracks.length === 0) {
     return (
@@ -30,6 +34,14 @@ const TrackList: React.FC<TrackListProps> = ({
       </div>
     );
   }
+
+  const handlePlay = (track: MusicTrack) => {
+    if (onPlay) {
+      onPlay(track);
+    } else {
+      onTrackSelect(track);
+    }
+  };
 
   return (
     <div className="space-y-2">
@@ -62,7 +74,7 @@ const TrackList: React.FC<TrackListProps> = ({
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100"
-                  onClick={() => onTrackSelect(track)}
+                  onClick={() => handlePlay(track)}
                 >
                   <PlayCircle className="h-8 w-8" />
                 </Button>
@@ -72,7 +84,7 @@ const TrackList: React.FC<TrackListProps> = ({
             <div className="min-w-0 flex-1">
               <div 
                 className="cursor-pointer"
-                onClick={() => onTrackSelect(track)}
+                onClick={() => handlePlay(track)}
               >
                 <div className="font-medium truncate">{track.title}</div>
                 <div className="text-sm text-muted-foreground truncate">{track.artist}</div>

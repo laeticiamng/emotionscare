@@ -22,7 +22,7 @@ const actionTypes = {
 let count = 0;
 
 function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER;
+  count = (count + 1) % Number.MAX_VALUE;
   return count.toString();
 }
 
@@ -61,7 +61,7 @@ const addToRemoveQueue = (toastId: string) => {
     toastTimeouts.delete(toastId);
     dispatch({
       type: actionTypes.REMOVE_TOAST,
-      toastId,
+      toastId: toastId,
     });
   }, TOAST_REMOVE_DELAY);
 
@@ -107,7 +107,6 @@ const reducer = (state: State, action: Action): State => {
         ),
       };
     }
-
     case actionTypes.REMOVE_TOAST:
       if (action.toastId === undefined) {
         return {
@@ -119,6 +118,8 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
       };
+    default:
+      return state;
   }
 };
 
@@ -143,7 +144,6 @@ function toast({ ...props }: Toast) {
       type: actionTypes.UPDATE_TOAST,
       toast: { ...props, id },
     });
-
   const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
 
   dispatch({

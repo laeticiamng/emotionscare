@@ -23,8 +23,8 @@ export const DEFAULT_USER_PREFERENCES: UserPreferences = {
 };
 
 export enum TIME_OF_DAY {
-  MORNING = "MORNING",
-  AFTERNOON = "AFTERNOON",
-  EVENING = "EVENING",
-  NIGHT = "NIGHT"
+  MORNING = "morning",
+  AFTERNOON = "afternoon",
+  EVENING = "evening",
+  NIGHT = "night"
 }

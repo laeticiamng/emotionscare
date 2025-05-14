@@ -21,6 +21,7 @@ export interface User {
   joined_at?: string;
   preferences?: UserPreferences;
   onboarded?: boolean;
+  job_title?: string;
 }
 
 export type FontFamily = 'sans' | 'serif' | 'mono';
@@ -31,7 +32,19 @@ export interface UserPreferences {
   theme: ThemeName;
   fontSize: FontSize;
   fontFamily: FontFamily;
-  notifications: boolean;
+  notifications: boolean | {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    frequency?: string;
+    types?: Record<string, boolean>;
+    tone?: string;
+    quietHours?: {
+      enabled: boolean;
+      start: string;
+      end: string;
+    };
+  };
   notifications_enabled?: boolean;
   sound: boolean;
   language: string;
@@ -45,7 +58,26 @@ export interface UserPreferences {
     showEmotionalScore?: boolean;
     shareJournalInsights?: boolean;
     anonymousDataContribution?: boolean;
+    profileVisibility?: 'public' | 'private' | 'team';
+    shareData?: boolean;
+    anonymizeReports?: boolean;
+    publicProfile?: boolean;
+    shareEmotionalData?: boolean;
+    allowCoaching?: boolean;
   };
+  timezone?: string;
+  musicPreferences?: {
+    autoplay: boolean;
+    volume: number;
+    preferredGenres: string[];
+  };
+  accessibilityFeatures?: {
+    highContrast: boolean;
+    reducedMotion: boolean;
+    screenReader: boolean;
+  };
+  reduceMotion?: boolean;
+  highContrast?: boolean;
 }
 
 export interface UserPreferencesState {
@@ -59,8 +91,10 @@ export interface UserPreferencesState {
 
 export interface InvitationVerificationResult {
   valid: boolean;
+  isValid?: boolean;
   role?: UserRole;
   teamId?: string;
   companyId?: string;
+  email?: string;
   error?: string;
 }

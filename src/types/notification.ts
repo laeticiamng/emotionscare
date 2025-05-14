@@ -1,7 +1,8 @@
 
-export type NotificationType = 'all' | 'important' | 'minimal';
-export type NotificationFrequency = 'real-time' | 'hourly' | 'daily' | 'weekly';
-export type NotificationTone = 'friendly' | 'professional' | 'minimalist';
+export type NotificationType = 'all' | 'important' | 'minimal' | 'system' | 'emotion' | 'challenge' | 'achievement' | 'reminder' | 'info' | 'warning' | 'success' | 'error';
+export type NotificationFrequency = 'real-time' | 'hourly' | 'daily' | 'weekly' | 'immediate' | 'never';
+export type NotificationTone = 'friendly' | 'professional' | 'minimalist' | 'motivational' | 'direct' | 'calm';
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface NotificationPreference {
   type: NotificationType;
@@ -16,11 +17,18 @@ export interface NotificationPreference {
 export interface Notification {
   id: string;
   title: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
+  message?: string;
+  body?: string;
+  type: NotificationType;
   link?: string;
+  actionUrl?: string;
   read?: boolean;
   timestamp?: string;
   createdAt?: string;
+  created_at?: string;
   date?: string;
+  sender_id?: string;
+  recipient_id?: string;
+  priority?: NotificationPriority;
+  user_id?: string;
 }
