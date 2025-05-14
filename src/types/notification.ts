@@ -40,3 +40,15 @@ export interface NotificationFilter {
   type: string;
   read?: boolean;
 }
+
+export interface NotificationPreference {
+  frequency: NotificationFrequency;
+  types: NotificationType[];
+  tone: NotificationTone;
+  enabled: boolean;
+  quiet_hours: {
+    start: string;
+    end: string;
+    enabled: boolean;
+  };
+}

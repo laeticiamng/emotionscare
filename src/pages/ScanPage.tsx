@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -13,8 +14,21 @@ interface ScanPageProps {
   
 }
 
+// Add missing props for components
+interface ScanPageHeaderProps {
+  showScanForm: boolean;
+  activeTab: string;
+  setShowScanForm: (show: boolean) => void;
+}
+
+interface HistoryTabContentProps {
+  emotionHistory: EmotionResult[];
+}
+
 const ScanPage: React.FC<ScanPageProps> = () => {
   const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
+  const [showScanForm, setShowScanForm] = useState(true);
+  const [activeTab, setActiveTab] = useState("scan");
   const { toast } = useToast();
   
   const handleScanComplete = (result: EmotionResult) => {
@@ -28,9 +42,13 @@ const ScanPage: React.FC<ScanPageProps> = () => {
   
   return (
     <div className="container mx-auto py-6">
-      <ScanPageHeader />
+      <ScanPageHeader 
+        showScanForm={showScanForm} 
+        activeTab={activeTab} 
+        setShowScanForm={setShowScanForm} 
+      />
       
-      <Tabs defaultvalue="scan" className="mt-4">
+      <Tabs defaultValue="scan" className="mt-4">
         <TabsList>
           <TabsTrigger value="scan">Nouveau Scan</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -46,7 +64,7 @@ const ScanPage: React.FC<ScanPageProps> = () => {
         
         <TabsContent value="history" className="outline-none">
           <Card className="border-none shadow-none">
-            <HistoryTabContent history={scanHistory} />
+            <HistoryTabContent emotionHistory={scanHistory} />
           </Card>
         </TabsContent>
       </Tabs>

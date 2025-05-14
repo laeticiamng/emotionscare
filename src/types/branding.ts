@@ -21,4 +21,7 @@ export interface BrandingContextType {
   soundEnabled?: boolean;
   visualDensity?: VisualDensity;
   setThemePreference?: (theme: Theme) => void;
+  logoUrl: string;
+  companyName: string;
+  applyEmotionalBranding?: (emotion: string) => void;
 }

@@ -1,31 +1,60 @@
 
-import { Badge, Challenge, GamificationStats as BaseGamificationStats } from '@/types/gamification';
+import { Badge as SystemBadge } from '@/types';
 
-export interface GamificationStats extends BaseGamificationStats {
-  challenges: Challenge[];
-  recentAchievements: Badge[];
-}
+// Re-export the Badge type to avoid conflicts
+export type Badge = SystemBadge;
 
-export interface Challenge extends Omit<import('@/types/gamification').Challenge, 'title'> {
-  title: string;
+export interface Challenge {
+  id: string;
   name: string;
+  description: string;
+  type: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  status: 'available' | 'in-progress' | 'completed';
+  progress: number;
+  completedAt?: string;
+  deadline?: string;
+  requirements?: string[];
+  rewards?: string[];
+  completed?: boolean;
 }
 
 export interface Achievement {
   id: string;
   name: string;
   description: string;
-  unlockedAt?: string;
-  imageUrl?: string;
+  image_url?: string;
+  icon?: string;
+  threshold?: number;
+  category: string;
+  awardedAt?: string;
+  level?: number;
+}
+
+export interface GamificationStats {
+  level: number;
+  points: number;
+  nextMilestone: number;
+  progressToNextLevel: number;
+  streakDays: number;
+  totalBadges: number;
+  totalChallenges: number;
+  totalScans: number;
+  badges: string[];
+  recentAchievements: Achievement[];
+  lastActivityDate?: string;
 }
 
 export interface UseCommunityGamificationResult {
-  stats: GamificationStats;
-  isLoading: boolean;
+  isProcessing: boolean;
+  error: string;
+  markChallengeCompleted: (challengeId: string) => Promise<Challenge>;
+  trackChallengeProgress: (challengeId: string, progress: number) => Promise<Challenge>;
   activeChallenges: Challenge[];
   recommendedChallenges: Challenge[];
-  generatePersonalizedChallenges: () => Promise<void>;
-  acceptChallenge: (challengeId: string) => Promise<boolean>;
-  completeChallenge: (challengeId: string) => Promise<boolean>;
-  refresh: () => Promise<void>;
+  acceptChallenge: (challengeId: string) => Promise<Challenge>;
+  generatePersonalizedChallenges: () => Promise<Challenge[]>;
+  completeChallenge: (challengeId: string) => Promise<Challenge>;
 }

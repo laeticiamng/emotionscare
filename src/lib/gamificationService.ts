@@ -1,150 +1,122 @@
 
-import { Badge, Challenge } from '@/types/gamification';
-import { getBadges } from './gamification/badge-service';
-import { getChallenges } from './gamification/challenge-service';
-import { calculateLevel } from './gamification/level-service';
-import { calculateProgressToNextLevel } from './gamification/level-service';
-import { EmotionResult } from '@/types/emotion';
+import { Badge, EmotionResult } from '@/types';
+import { supabase } from './supabaseClient';
+import { calculateProgressToNextLevel, calculateXpToNextLevel } from './gamification/level-service';
+import { Challenge } from '@/hooks/community-gamification/types';
 
-export interface GamificationStats {
-  level: number;
-  points: number;
-  nextLevelPoints: number;
-  streakDays: number;
-  activeChallenges: number;
-  completedChallenges: number;
-  badges: Badge[];
-  totalPoints: number;
-  badgesCount: number;
-  currentLevel: number;
-  progressToNextLevel: number;
-  pointsToNextLevel: number;
-  lastActivityDate?: string | null;
-  challenges: Challenge[];
-  recentAchievements: Badge[];
-}
-
-/**
- * Get badges by user ID
- * @param userId User ID
- * @returns List of badges
- */
-export async function getBadgesForUser(userId: string): Promise<Badge[]> {
-  return getBadges(userId);
-}
-
-/**
- * Get challenges by user ID
- * @param userId User ID 
- * @returns List of challenges
- */
-export async function getChallengesForUser(userId: string): Promise<Challenge[]> {
-  return getChallenges(userId);
-}
-
-/**
- * Get gamification statistics by user ID
- * @param userId User ID
- * @returns Gamification statistics
- */
-export async function getUserGamificationStats(userId: string): Promise<GamificationStats> {
-  const badges = await getBadges(userId);
-  const challenges = await getChallenges(userId);
-  const completedChallenges = challenges.filter(c => c.status === 'completed').length;
-  const activeChallenges = challenges.filter(c => c.status === 'active' || c.status === 'ongoing').length;
-  const totalPoints = 340; // Mock total points
-  const level = calculateLevel(totalPoints);
-  const progress = calculateProgressToNextLevel(totalPoints);
-  const pointsToNextLevel = calculatePointsToNextLevel(level);
-
-  return {
-    level,
-    points: totalPoints,
-    nextLevelPoints: level * 200,
-    streakDays: 5,
-    activeChallenges,
-    completedChallenges,
-    badges,
-    totalPoints,
-    badgesCount: badges.length,
-    currentLevel: level,
-    progressToNextLevel: progress,
-    pointsToNextLevel,
-    lastActivityDate: new Date().toISOString(),
-    challenges,
-    recentAchievements: badges.slice(0, 3)
-  };
-}
-
-/**
- * Complete a challenge by ID
- * @param challengeId Challenge ID
- * @returns Updated challenge
- */
-export async function completeChallenge(challengeId: string) {
-  const challenges = await getChallenges('');
-  const challenge = challenges.find(c => c.id === challengeId);
-  
-  if (!challenge) {
-    throw new Error('Challenge not found');
-  }
-  
-  // In a real implementation, this would update the challenge in the database
-  return {
-    ...challenge,
-    status: 'completed' as const,
-    progress: challenge.total || 1,
-    completedAt: new Date().toISOString()
-  };
-}
-
-/**
- * Get challenge by ID
- * @param challengeId Challenge ID
- * @returns Challenge
- */
-export function getChallengeById(challengeId: string) {
-  return getChallenges('').then(challenges => {
-    const challenge = challenges.find(c => c.id === challengeId);
-    if (!challenge) {
-      throw new Error('Challenge not found');
-    }
-    return challenge;
-  });
-}
-
-/**
- * Get badge by ID
- * @param badgeId Badge ID
- * @returns Badge
- */
-export function getBadgeById(badgeId: string) {
-  return getBadges('').then(badges => {
-    const badge = badges.find(b => b.id === badgeId);
-    if (!badge) {
-      throw new Error('Badge not found');
-    }
-    return badge;
-  });
-}
-
-/**
- * Calculate points needed to reach next level
- * @param currentLevel Current level
- * @returns Points needed
- */
-export function calculatePointsToNextLevel(currentLevel: number): number {
-  return (currentLevel + 1) * 100;
-}
-
-/**
- * Process emotion results for potential badges
- * @param userId User ID
- * @param emotion Emotion result
- * @returns Array of earned badges
- */
+// Processes emotion data for potential badges
 export async function processEmotionForBadges(userId: string, emotion: EmotionResult): Promise<Badge[]> {
-  // Mock implementation - in real app would check if emotion qualifies for badges
-  console.log(`Processing emotion for badges: ${userId}`, emotion);
-  return [];
+  try {
+    // Mock implementation - would typically call a backend service
+    console.log('Processing emotion for badges:', userId, emotion);
+    
+    // Check for emotion-related badges
+    const earnedBadges: Badge[] = [];
+    
+    // Example: badge for experiencing joy
+    if (emotion.emotion === 'joy' || emotion.primaryEmotion?.name === 'joy') {
+      earnedBadges.push({
+        id: 'joy-badge-1',
+        name: 'Joyful Explorer',
+        description: 'Experienced joy and shared it with others',
+        image_url: '/badges/joy.svg'
+      });
+    }
+    
+    // Example: badge for managing anger
+    if (emotion.emotion === 'anger' || emotion.primaryEmotion?.name === 'anger') {
+      earnedBadges.push({
+        id: 'anger-badge-1',
+        name: 'Emotion Master',
+        description: 'Successfully recognized and managed feelings of anger',
+        image_url: '/badges/anger-management.svg'
+      });
+    }
+    
+    // In a real implementation, you would save these badges to the database
+    if (earnedBadges.length > 0) {
+      console.log('User earned badges:', earnedBadges);
+      
+      // Simulate saving to database
+      // await saveBadgesToDatabase(userId, earnedBadges);
+    }
+    
+    return earnedBadges;
+  } catch (error) {
+    console.error('Error processing emotion for badges:', error);
+    return [];
+  }
+}
+
+// Get all badges for a user
+export async function getBadgesForUser(userId: string): Promise<Badge[]> {
+  try {
+    // In a real implementation, you would fetch badges from the database
+    const { data, error } = await supabase
+      .from('badges')
+      .select('*')
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching badges:', error);
+    return [];
+  }
+}
+
+// Get all challenges for a user
+export async function getChallengesForUser(userId: string): Promise<Challenge[]> {
+  try {
+    // Mock implementation - would typically call a backend service
+    console.log('Fetching challenges for user:', userId);
+    
+    // Sample challenges (would normally come from a database)
+    const challenges: Challenge[] = [
+      {
+        id: 'challenge-1',
+        name: 'Daily Emotion Check-in',
+        description: 'Check in with your emotions for 7 consecutive days',
+        type: 'streak',
+        category: 'emotional',
+        difficulty: 'easy',
+        points: 100,
+        status: 'in-progress',
+        progress: 3,
+        requirements: ['Daily check-in for 7 days'],
+        rewards: ['Badge "Emotion Tracker"', '100 XP']
+      }
+    ];
+    
+    return challenges;
+  } catch (error) {
+    console.error('Error fetching challenges:', error);
+    return [];
+  }
+}
+
+// Get gamification stats for a user
+export async function getUserGamificationStats(userId: string) {
+  try {
+    // Mock implementation - would typically call a backend service
+    console.log('Fetching gamification stats for user:', userId);
+    
+    // Sample stats (would normally come from a database)
+    const stats = {
+      level: 3,
+      points: 450,
+      badges: 5,
+      challenges: 2,
+      streakDays: 7,
+      nextMilestone: 500,
+      progressToNextLevel: calculateProgressToNextLevel(userId),
+      xpToNextLevel: calculateXpToNextLevel(userId)
+    };
+    
+    return stats;
+  } catch (error) {
+    console.error('Error fetching gamification stats:', error);
+    return null;
+  }
 }
