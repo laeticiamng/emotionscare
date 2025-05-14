@@ -1,5 +1,6 @@
 
-import { UserRole } from '@/types/user';
+import { UserRole } from '@/types/auth';
+import { ROUTES } from '@/types/navigation';
 
 /**
  * Checks if a user can access a specific route based on their role
@@ -41,7 +42,7 @@ export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boole
 /**
  * Checks if a role is an admin role
  */
-export const isAdminRole = (role: UserRole): boolean => {
+export const isAdminRole = (role?: UserRole): boolean => {
   return role === 'admin' || role === 'b2b_admin' || role === 'wellbeing_manager';
 };
 
@@ -51,17 +52,17 @@ export const isAdminRole = (role: UserRole): boolean => {
 export const getRedirectForRole = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
-      return '/b2c/dashboard';
+      return ROUTES.b2c.dashboard;
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return ROUTES.b2bUser.dashboard;
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return ROUTES.b2bAdmin.dashboard;
     case 'admin':
       return '/admin/dashboard';
     case 'moderator':
       return '/admin/moderation';
     default:
-      return '/dashboard';
+      return ROUTES.common.home;
   }
 };
 
@@ -71,11 +72,11 @@ export const getRedirectForRole = (role: UserRole): string => {
 export const getRoleLoginPath = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
-      return '/b2c/login';
+      return ROUTES.b2c.login;
     case 'b2b_user':
-      return '/b2b/user/login';
+      return ROUTES.b2bUser.login;
     case 'b2b_admin':
-      return '/b2b/admin/login';
+      return ROUTES.b2bAdmin.login;
     case 'admin':
       return '/admin/login';
     default:
@@ -89,15 +90,15 @@ export const getRoleLoginPath = (role: UserRole): string => {
 export const getRoleHomePath = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
-      return '/b2c/dashboard';
+      return ROUTES.b2c.dashboard;
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return ROUTES.b2bUser.dashboard;
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return ROUTES.b2bAdmin.dashboard;
     case 'admin':
       return '/admin/dashboard';
     default:
-      return '/dashboard';
+      return ROUTES.common.home;
   }
 };
 

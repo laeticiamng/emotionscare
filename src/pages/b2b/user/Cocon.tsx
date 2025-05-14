@@ -1,228 +1,211 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MessageCircle, Users, Sparkles, Building } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { BellRing, Building, Heart, MessageCircle, Share, Users } from 'lucide-react';
 
 const B2BUserCocon: React.FC = () => {
-  const handlePost = () => {
-    toast({
-      title: "Publication en cours de modération",
-      description: "Votre message sera publié après vérification par notre IA"
-    });
-  };
-
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">COCON Pro</h1>
-          <p className="text-muted-foreground">Réseau social 100% positif pour votre entreprise</p>
-        </div>
-        <Button className="flex items-center gap-2" onClick={handlePost}>
-          <Sparkles className="h-4 w-4" />
-          Nouvelle publication
-        </Button>
-      </div>
+    <div className="container mx-auto py-6">
+      <h1 className="text-3xl font-bold mb-6">Cocon social d'entreprise</h1>
+      <p className="text-muted-foreground mb-4">
+        Un espace social positif et bienveillant réservé aux collaborateurs de votre entreprise
+      </p>
       
-      <Tabs defaultValue="feed">
-        <TabsList className="mb-4">
-          <TabsTrigger value="feed">Fil d'actualités</TabsTrigger>
-          <TabsTrigger value="teams">Équipes</TabsTrigger>
-          <TabsTrigger value="profile">Mon profil pro</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="feed">
-          <div className="space-y-4">
-            {/* Annonce d'entreprise */}
-            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Building className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-base">Direction RH</CardTitle>
-                      <p className="text-xs text-muted-foreground">Il y a 1 jour • Annonce importante</p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">📢 Rappel : Atelier de méditation collective ce vendredi à 12h30 en salle Mozart. La séance sera suivie d'un déjeuner bien-être. Inscrivez-vous via le lien dans votre email ! 🧘‍♀️</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-rose-600">
-                    <Heart className="h-4 w-4 mr-1" /> 42
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <MessageCircle className="h-4 w-4 mr-1" /> 16
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Publication exemple 1 */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-                      <span className="text-amber-600">FD</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-base">François D.</CardTitle>
-                      <p className="text-xs text-muted-foreground">Il y a 3 heures • Équipe Marketing</p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">Je tiens à remercier toute l'équipe pour son soutien lors de la présentation client d'hier. Votre énergie positive et vos encouragements m'ont vraiment aidé à donner le meilleur de moi-même ! 🙏</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-rose-600">
-                    <Heart className="h-4 w-4 mr-1" /> 28
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <MessageCircle className="h-4 w-4 mr-1" /> 7
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {/* Publication exemple 2 */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                      <span className="text-green-600">A</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-base">Anonyme</CardTitle>
-                      <p className="text-xs text-muted-foreground">Il y a 6 heures • Vibration: Reconnaissance</p>
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-4">Je voulais partager que la nouvelle politique de flexibilité au travail m'a permis de mieux équilibrer ma vie pro et perso. Je me sens plus productif et motivé. Merci à la direction pour cette initiative ! 🌟</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-rose-600">
-                    <Heart className="h-4 w-4 mr-1" /> 53
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <MessageCircle className="h-4 w-4 mr-1" /> 19
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="teams">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <CardTitle>Équipe Marketing</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">12 membres</p>
-                <p className="text-sm mb-4">Partagez vos réussites et trouvez de l'inspiration collective</p>
-                <Button size="sm" variant="outline" className="w-full">Consulter</Button>
-              </CardContent>
-            </Card>
-            
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <CardTitle>Tech & IT</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">18 membres</p>
-                <p className="text-sm mb-4">Conseils, entraide et célébration des succès techniques</p>
-                <Button size="sm" variant="outline" className="w-full">Consulter</Button>
-              </CardContent>
-            </Card>
-            
-            <Card className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-emerald-600" />
-                  </div>
-                  <CardTitle>Groupe Bien-être</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-2">27 membres</p>
-                <p className="text-sm mb-4">Activités, conseils et soutien pour votre équilibre</p>
-                <Button size="sm" variant="outline" className="w-full">Consulter</Button>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="profile">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        {/* Sidebar */}
+        <div className="md:col-span-1 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Mon profil professionnel</CardTitle>
+              <CardTitle>Mon espace pro</CardTitle>
+              <CardDescription>Votre vie sociale d'entreprise</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 flex items-center justify-center mx-auto">
-                    <span className="text-4xl font-bold text-indigo-600">MT</span>
-                  </div>
-                  
-                  <div className="flex-1 space-y-4">
-                    <div>
-                      <h3 className="text-xl font-medium">Martin T.</h3>
-                      <p className="text-muted-foreground">Chef de projet • Département R&D</p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="text-sm font-medium mb-1">Points forts professionnels</h4>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm">Communication</span>
-                        <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm">Leadership</span>
-                        <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm">Créativité</span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <Button size="sm" variant="outline">Modifier mon profil</Button>
-                    </div>
-                  </div>
+            <CardContent className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="/default-avatar.png" alt="@utilisateur" />
+                  <AvatarFallback>UT</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium">Mon profil pro</p>
+                  <p className="text-xs text-muted-foreground">Gérer mes informations</p>
                 </div>
-                
-                <div className="border-t pt-4">
-                  <h4 className="text-sm font-medium mb-3">Mes équipes</h4>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm flex items-center gap-1">
-                      <Users className="h-3 w-3" /> Tech & IT
-                    </span>
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm flex items-center gap-1">
-                      <Users className="h-3 w-3" /> Groupe Bien-être
-                    </span>
-                  </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
+                  <BellRing className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Notifications</p>
+                  <p className="text-xs text-muted-foreground">3 nouvelles interactions</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
+                  <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Mes équipes</p>
+                  <p className="text-xs text-muted-foreground">2 équipes actives</p>
                 </div>
               </div>
             </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">Voir mon profil</Button>
+            </CardFooter>
           </Card>
-        </TabsContent>
-      </Tabs>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Équipes suggérées</CardTitle>
+              <CardDescription>Basées sur votre département</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
+                    <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Bien-être au bureau</p>
+                    <p className="text-xs text-muted-foreground">24 collaborateurs</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">Rejoindre</Button>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
+                    <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Parentalité & Travail</p>
+                    <p className="text-xs text-muted-foreground">18 collaborateurs</p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm">Rejoindre</Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Événements à venir</CardTitle>
+              <CardDescription>Organisés par votre entreprise</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="bg-blue-50 dark:bg-blue-900/10 p-3 rounded-lg">
+                <p className="text-sm font-medium">Atelier gestion du stress</p>
+                <p className="text-xs text-muted-foreground">Mercredi, 15h-16h, Salle Zen</p>
+                <Badge className="mt-2" variant="outline">En présentiel</Badge>
+              </div>
+              <div className="bg-purple-50 dark:bg-purple-900/10 p-3 rounded-lg">
+                <p className="text-sm font-medium">Yoga en entreprise</p>
+                <p className="text-xs text-muted-foreground">Vendredi, 12h30-13h30</p>
+                <Badge className="mt-2" variant="outline">En présentiel</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Main feed */}
+        <div className="md:col-span-2 space-y-6">
+          <Card>
+            <CardContent className="pt-6">
+              <Textarea 
+                placeholder="Partagez une pensée positive ou une initiative qui vous inspire dans l'entreprise..." 
+                className="min-h-20 mb-3"
+              />
+              <div className="flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <Button variant="outline" size="sm">Photo</Button>
+                  <Button variant="outline" size="sm">Mood pro</Button>
+                </div>
+                <Button className="bg-blue-600 hover:bg-blue-700">Partager</Button>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Example post */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between">
+                <div className="flex items-center space-x-3">
+                  <Avatar>
+                    <AvatarImage src="/avatar-1.jpg" alt="@sophie" />
+                    <AvatarFallback>SL</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">Sophie L.</p>
+                    <p className="text-xs text-muted-foreground">Marketing • Il y a 3 heures</p>
+                  </div>
+                </div>
+                <div className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs rounded-full">
+                  Satisfaction
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-3">Notre atelier de gestion du temps a été un vrai succès hier ! Merci à tous les participants pour leurs retours positifs. Qui serait intéressé par une seconde session la semaine prochaine ?</p>
+              <img src="https://images.unsplash.com/photo-1557426272-fc759fdf7a8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8b2ZmaWNlJTIwd29ya3Nob3B8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60" alt="Atelier en entreprise" className="rounded-lg w-full h-48 object-cover" />
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <div className="flex space-x-4">
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <Heart className="h-4 w-4" /> 14
+                </Button>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <MessageCircle className="h-4 w-4" /> 6
+                </Button>
+              </div>
+              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                <Share className="h-4 w-4" /> Partager
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          {/* Another example post */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex justify-between">
+                <div className="flex items-center space-x-3">
+                  <Avatar>
+                    <AvatarImage src="/avatar-2.jpg" alt="@pierre" />
+                    <AvatarFallback>PD</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">Pierre D.</p>
+                    <p className="text-xs text-muted-foreground">RH • Il y a 1 jour</p>
+                  </div>
+                </div>
+                <div className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">
+                  Annonce
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p>Nous sommes heureux d'annoncer que la salle de détente a été réaménagée avec un espace méditation ! N'hésitez pas à l'utiliser pour vos pauses bien-être.</p>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <div className="flex space-x-4">
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <Heart className="h-4 w-4" /> 28
+                </Button>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <MessageCircle className="h-4 w-4" /> 9
+                </Button>
+              </div>
+              <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                <Share className="h-4 w-4" /> Partager
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

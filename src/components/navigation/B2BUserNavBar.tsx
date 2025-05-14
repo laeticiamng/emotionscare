@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Home, BookOpen, Music, Scan, MessageCircle, Glasses, Trophy, Settings } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Home, BookOpen, Music, Scan, MessageCircle, Glasses, Trophy, Settings, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
+import { ROUTES } from '@/types/navigation';
 
 const B2BUserNavBar: React.FC = () => {
   const location = useLocation();
@@ -19,19 +19,20 @@ const B2BUserNavBar: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     setShowConfirm(false);
-    window.location.href = '/b2b/user/login';
+    window.location.href = ROUTES.b2bUser.login;
   };
   
   return (
     <nav className="flex flex-col space-y-1 p-2 bg-background border-r h-full">
-      <NavItem to="/b2b/user/dashboard" isActive={isActive('/b2b/user/dashboard')} icon={<Home className="h-5 w-5" />} label="Accueil" />
-      <NavItem to="/b2b/user/journal" isActive={isActive('/b2b/user/journal')} icon={<BookOpen className="h-5 w-5" />} label="Journal" />
-      <NavItem to="/b2b/user/music" isActive={isActive('/b2b/user/music')} icon={<Music className="h-5 w-5" />} label="Musique" />
-      <NavItem to="/b2b/user/scan" isActive={isActive('/b2b/user/scan')} icon={<Scan className="h-5 w-5" />} label="Scan" />
-      <NavItem to="/b2b/user/coach" isActive={isActive('/b2b/user/coach')} icon={<MessageCircle className="h-5 w-5" />} label="Coach" />
-      <NavItem to="/b2b/user/vr" isActive={isActive('/b2b/user/vr')} icon={<Glasses className="h-5 w-5" />} label="VR" />
-      <NavItem to="/b2b/user/gamification" isActive={isActive('/b2b/user/gamification')} icon={<Trophy className="h-5 w-5" />} label="Défis" />
-      <NavItem to="/b2b/user/preferences" isActive={isActive('/b2b/user/preferences')} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
+      <NavItem to={ROUTES.b2bUser.dashboard} isActive={isActive(ROUTES.b2bUser.dashboard)} icon={<Home className="h-5 w-5" />} label="Accueil" />
+      <NavItem to={ROUTES.b2bUser.journal} isActive={isActive(ROUTES.b2bUser.journal)} icon={<BookOpen className="h-5 w-5" />} label="Journal" />
+      <NavItem to={ROUTES.b2bUser.music} isActive={isActive(ROUTES.b2bUser.music)} icon={<Music className="h-5 w-5" />} label="Musique" />
+      <NavItem to={ROUTES.b2bUser.scan} isActive={isActive(ROUTES.b2bUser.scan)} icon={<Scan className="h-5 w-5" />} label="Scan" />
+      <NavItem to={ROUTES.b2bUser.coach} isActive={isActive(ROUTES.b2bUser.coach)} icon={<MessageCircle className="h-5 w-5" />} label="Coach" />
+      <NavItem to={ROUTES.b2bUser.vr} isActive={isActive(ROUTES.b2bUser.vr)} icon={<Glasses className="h-5 w-5" />} label="VR" />
+      <NavItem to={ROUTES.b2bUser.gamification} isActive={isActive(ROUTES.b2bUser.gamification)} icon={<Trophy className="h-5 w-5" />} label="Défis" />
+      <NavItem to={ROUTES.b2bUser.cocon} isActive={isActive(ROUTES.b2bUser.cocon)} icon={<Users className="h-5 w-5" />} label="Cocon" />
+      <NavItem to={ROUTES.b2bUser.preferences} isActive={isActive(ROUTES.b2bUser.preferences)} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
       
       <button 
         onClick={() => setShowConfirm(true)}

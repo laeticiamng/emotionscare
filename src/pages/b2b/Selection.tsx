@@ -3,129 +3,131 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UserRound, Building, BuildingIcon, User } from 'lucide-react';
+import { User, Building, Shield } from 'lucide-react';
+import Shell from '@/Shell';
+import { motion } from 'framer-motion';
 
-const Selection: React.FC = () => {
+const Selection = () => {
   const navigate = useNavigate();
-  
-  const goToB2C = () => {
-    navigate('/b2c/login');
-  };
-  
-  const goToB2BUser = () => {
-    navigate('/b2b/user/login');
-  };
-  
-  const goToB2BAdmin = () => {
-    navigate('/b2b/admin/login');
-  };
-  
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-primary/20 to-background">
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold tracking-tight mb-2">EmotionsCare</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Plateforme d'intelligence émotionnelle pour votre bien-être personnel et professionnel
-          </p>
+    <Shell>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50/50 to-blue-100/50 dark:from-gray-900 dark:to-blue-900/20">
+        {/* Background subtle animation */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.1 }}
+            transition={{ duration: 1 }}
+            className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-br from-blue-200 to-transparent rounded-full filter blur-3xl"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.1 }}
+            transition={{ duration: 1 }}
+            className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-gradient-to-tr from-purple-200 to-transparent rounded-full filter blur-3xl"
+          />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Particulier (B2C) */}
-          <Card className="border-primary/20 hover:border-primary/50 transition-colors">
-            <CardHeader>
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <UserRound className="h-8 w-8 text-primary" />
+
+        <div className="container max-w-3xl z-10 relative">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">Espace Entreprise</h1>
+            <p className="text-lg text-muted-foreground">
+              Sélectionnez votre type d'accès
+            </p>
+          </motion.div>
+
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-6"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <Card className="hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-blue-200 dark:border-blue-900/50">
+              <CardHeader>
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                    <User className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                  </div>
                 </div>
-              </div>
-              <CardTitle className="text-center">Particulier</CardTitle>
-              <CardDescription className="text-center">
-                Accès individuel à la plateforme
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-2">
-              <p className="text-sm">
-                Gérez votre bien-être émotionnel avec nos outils personnalisés
-              </p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Journal émotionnel</li>
-                <li>• Coach IA personnalisé</li>
-                <li>• Scanner d'émotions</li>
-                <li>• Expériences VR immersives</li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={goToB2C} className="w-full">
-                Accéder
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          {/* Collaborateur (B2B User) */}
-          <Card className="border-blue-200 hover:border-blue-400 transition-colors">
-            <CardHeader>
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-full bg-blue-500/10">
-                  <User className="h-8 w-8 text-blue-500" />
+                <CardTitle className="text-center text-xl">Collaborateur</CardTitle>
+                <CardDescription className="text-center">
+                  Accès aux outils de bien-être personnel
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center space-y-6">
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Journal émotionnel personnel</li>
+                  <li>• Musicothérapie personnalisée</li>
+                  <li>• Coaching IA adapté au travail</li>
+                  <li>• Suivi de votre bien-être</li>
+                </ul>
+                
+                <Button 
+                  onClick={() => navigate('/b2b/user/login')} 
+                  size="lg" 
+                  variant="default"
+                  className="w-full"
+                >
+                  Espace Collaborateur
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] border-purple-200 dark:border-purple-900/50">
+              <CardHeader>
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                    <Shield className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                  </div>
                 </div>
-              </div>
-              <CardTitle className="text-center">Collaborateur</CardTitle>
-              <CardDescription className="text-center">
-                Accès professionnel individuel
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-2">
-              <p className="text-sm">
-                Améliorez votre bien-être et performance au travail
-              </p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Outils de gestion du stress</li>
-                <li>• Programmes d'équilibre travail-vie</li>
-                <li>• Défis d'équipe</li>
-                <li>• Micro-pauses régénérantes</li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={goToB2BUser} variant="outline" className="w-full border-blue-200 hover:border-blue-400 text-blue-600">
-                Accéder
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          {/* Administration (B2B Admin) */}
-          <Card className="border-purple-200 hover:border-purple-400 transition-colors">
-            <CardHeader>
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-full bg-purple-500/10">
-                  <BuildingIcon className="h-8 w-8 text-purple-500" />
-                </div>
-              </div>
-              <CardTitle className="text-center">RH / Administration</CardTitle>
-              <CardDescription className="text-center">
-                Gestion et supervision d'équipe
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-center space-y-2">
-              <p className="text-sm">
-                Pilotez le bien-être de vos équipes et favorisez l'engagement
-              </p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Tableaux de bord analytiques</li>
-                <li>• Suivi des tendances émotionnelles</li>
-                <li>• Gestion des équipes</li>
-                <li>• Création d'événements</li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={goToB2BAdmin} variant="outline" className="w-full border-purple-200 hover:border-purple-400 text-purple-600">
-                Accéder
-              </Button>
-            </CardFooter>
-          </Card>
+                <CardTitle className="text-center text-xl">Administration / RH</CardTitle>
+                <CardDescription className="text-center">
+                  Gestion d'équipe et analyse collective
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center space-y-6">
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Tableau de bord analytique</li>
+                  <li>• Monitoring d'équipe anonymisé</li>
+                  <li>• Organisation d'événements</li>
+                  <li>• Rapports et tendances</li>
+                </ul>
+                
+                <Button 
+                  onClick={() => navigate('/b2b/admin/login')} 
+                  variant="outline"
+                  size="lg"
+                  className="w-full border-2 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"
+                >
+                  Espace Administration
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div 
+            className="flex justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Retour à l'accueil
+            </Button>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </Shell>
   );
 };
 

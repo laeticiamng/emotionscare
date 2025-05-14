@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, FileBarChart, Calendar, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
+import { ROUTES } from '@/types/navigation';
 
 const B2BAdminNavBar: React.FC = () => {
   const location = useLocation();
@@ -19,16 +19,16 @@ const B2BAdminNavBar: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     setShowConfirm(false);
-    window.location.href = '/b2b/admin/login';
+    window.location.href = ROUTES.b2bAdmin.login;
   };
   
   return (
     <nav className="flex flex-col space-y-1 p-2 bg-slate-800 text-white border-r h-full">
-      <NavItem to="/b2b/admin/dashboard" isActive={isActive('/b2b/admin/dashboard')} icon={<LayoutDashboard className="h-5 w-5" />} label="Tableau de bord" />
-      <NavItem to="/b2b/admin/teams" isActive={isActive('/b2b/admin/teams')} icon={<Users className="h-5 w-5" />} label="Équipes" />
-      <NavItem to="/b2b/admin/reports" isActive={isActive('/b2b/admin/reports')} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
-      <NavItem to="/b2b/admin/events" isActive={isActive('/b2b/admin/events')} icon={<Calendar className="h-5 w-5" />} label="Événements" />
-      <NavItem to="/b2b/admin/settings" isActive={isActive('/b2b/admin/settings')} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
+      <NavItem to={ROUTES.b2bAdmin.dashboard} isActive={isActive(ROUTES.b2bAdmin.dashboard)} icon={<LayoutDashboard className="h-5 w-5" />} label="Tableau de bord" />
+      <NavItem to={ROUTES.b2bAdmin.teams} isActive={isActive(ROUTES.b2bAdmin.teams)} icon={<Users className="h-5 w-5" />} label="Équipes" />
+      <NavItem to={ROUTES.b2bAdmin.reports} isActive={isActive(ROUTES.b2bAdmin.reports)} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
+      <NavItem to={ROUTES.b2bAdmin.events} isActive={isActive(ROUTES.b2bAdmin.events)} icon={<Calendar className="h-5 w-5" />} label="Événements" />
+      <NavItem to={ROUTES.b2bAdmin.settings} isActive={isActive(ROUTES.b2bAdmin.settings)} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
       
       <button 
         onClick={() => setShowConfirm(true)}
