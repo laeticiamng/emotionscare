@@ -12,6 +12,8 @@ export interface Emotion {
   ai_feedback?: string;
   sentiment?: number; // Added for compatibility with mockEmotions
   category?: string; // Added for compatibility
+  intensity?: number; // Adding for MusicRecommendation component
+  confidence?: number; // Adding for EmotionScanForm
 }
 
 export interface EmotionResult {

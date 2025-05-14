@@ -55,7 +55,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                 className="flex items-center p-2 hover:bg-secondary rounded-lg cursor-pointer"
               >
                 <img 
-                  src={track.coverUrl || track.cover_url || '/images/music/default-cover.jpg'} 
+                  src={track.coverUrl || '/images/music/default-cover.jpg'} 
                   alt={track.title}
                   className="h-10 w-10 rounded object-cover mr-3"
                 />

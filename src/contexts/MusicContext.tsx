@@ -1,27 +1,5 @@
-
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  coverUrl?: string;
-  cover?: string;
-  audioUrl?: string;
-  audio_url?: string;
-}
-
-export interface MusicPlaylist {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  coverUrl: string;
-  emotion: string;
-  tracks: MusicTrack[];
-}
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 interface MusicContextType {
   currentTrack: MusicTrack | null;
@@ -100,14 +78,18 @@ const SAMPLE_PLAYLISTS: MusicPlaylist[] = [
         title: 'Océan paisible',
         artist: 'Nature Sounds',
         duration: 240,
-        url: '/music/calm-1.mp3'
+        url: '/music/calm-1.mp3',
+        coverUrl: '/images/music/calm-1.jpg',
+        audioUrl: '/music/calm-1.mp3'
       },
       {
         id: 'track-2',
         title: 'Méditation du soir',
         artist: 'Healing Vibes',
         duration: 320,
-        url: '/music/calm-2.mp3'
+        url: '/music/calm-2.mp3',
+        coverUrl: '/images/music/calm-2.jpg',
+        audioUrl: '/music/calm-2.mp3'
       }
     ]
   },
@@ -124,7 +106,9 @@ const SAMPLE_PLAYLISTS: MusicPlaylist[] = [
         title: 'Focus Flow',
         artist: 'Ambient Works',
         duration: 380,
-        url: '/music/focus-1.mp3'
+        url: '/music/focus-1.mp3',
+        coverUrl: '/images/music/focus-1.jpg',
+        audioUrl: '/music/focus-1.mp3'
       }
     ]
   },
@@ -141,7 +125,9 @@ const SAMPLE_PLAYLISTS: MusicPlaylist[] = [
         title: 'Sunshine Vibes',
         artist: 'Happy Days',
         duration: 210,
-        url: '/music/happy-1.mp3'
+        url: '/music/happy-1.mp3',
+        coverUrl: '/images/music/happy-1.jpg',
+        audioUrl: '/music/happy-1.mp3'
       }
     ]
   }

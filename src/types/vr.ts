@@ -1,39 +1,29 @@
-
 export interface VRSessionTemplate {
   id: string;
   name: string;
+  title?: string; // Added to fix error
   description: string;
   duration: number;
-  category: string;
-  imageUrl?: string;
-  recommendedFor?: string[];
-  benefits?: string[];
-  imageSrc?: string;
-  tags?: string[];
-  videoUrl?: string;
+  intensity: 'low' | 'medium' | 'high';
+  tags: string[];
+  image?: string;
+  previewUrl?: string;
+  category?: string;
 }
 
 export interface VRSession {
   id: string;
-  userId: string;
-  templateId: string;
-  startTime: string;
-  endTime?: string;
+  user_id: string;
+  template_id: string;
+  start_time: Date;
+  end_time?: Date;
+  notes?: string;
+  rating?: number;
   completed: boolean;
-  heartRateBefore?: number;
-  heartRateAfter?: number;
-  emotionalStateBefore?: string;
-  emotionalStateAfter?: string;
-  feedbackRating?: number;
-  feedbackComments?: string;
+  custom_fields?: Record<string, any>;
 }
 
 export interface VRHistoryListProps {
   sessions: VRSession[];
-}
-
-export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
-  onComplete: () => void;
-  onBack: () => void;
+  onSessionClick: (session: VRSession) => void;
 }

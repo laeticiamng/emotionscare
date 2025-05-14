@@ -1,30 +1,49 @@
 
-import { UserPreferences } from '@/types/user';
+// Default constants for the application
 
-export const DEFAULT_USER_PREFERENCES: UserPreferences = {
+// Time of day
+export const TIME_OF_DAY = ['morning', 'afternoon', 'evening'];
+
+// Default user preferences
+export const DEFAULT_USER_PREFERENCES = {
   theme: 'system',
   fontSize: 'medium',
-  fontFamily: 'sans',
-  notifications: true,
-  notifications_enabled: true,
-  sound: true,
   language: 'fr',
-  dashboardLayout: 'standard',
-  emotionalCamouflage: false,
-  aiSuggestions: true,
-  onboardingCompleted: false,
-  autoplayVideos: false,
-  dataCollection: true,
-  privacy: {
-    showEmotionalScore: true,
-    shareJournalInsights: false,
-    anonymousDataContribution: true
+  notifications: {
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: false,
+    frequency: 'daily',
+    types: {
+      tips: true,
+      reminders: true,
+      updates: true,
+      community: false
+    },
+    tone: 'friendly',
+    quietHours: {
+      enabled: false,
+      start: '22:00',
+      end: '08:00'
+    }
   }
 };
 
-export enum TIME_OF_DAY {
-  MORNING = "morning",
-  AFTERNOON = "afternoon",
-  EVENING = "evening",
-  NIGHT = "night"
-}
+// Default emotions
+export const DEFAULT_EMOTIONS = [
+  'joy',
+  'calm',
+  'sadness',
+  'anger',
+  'fear',
+  'surprise',
+  'neutral'
+];
+
+// Default wellbeing score thresholds
+export const WELLBEING_SCORE_THRESHOLDS = {
+  excellent: 80,
+  good: 60,
+  average: 40,
+  poor: 20
+};

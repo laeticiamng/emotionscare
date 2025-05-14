@@ -15,6 +15,16 @@ interface AdminPremiumInterfaceProps {
 }
 
 const AdminPremiumInterface: React.FC<AdminPremiumInterfaceProps> = ({ user }) => {
+  // Create a dateRange object for the EmotionalTeamView component
+  const today = new Date();
+  const oneWeekAgo = new Date(today);
+  oneWeekAgo.setDate(today.getDate() - 7);
+  
+  const dateRange = {
+    start: oneWeekAgo,
+    end: today,
+  };
+  
   return (
     <div className="container px-4 py-6">
       <PremiumAdminHeader user={user} />
@@ -30,6 +40,7 @@ const AdminPremiumInterface: React.FC<AdminPremiumInterfaceProps> = ({ user }) =
           teamId="team-1"
           userId={user?.id || 'admin'}
           period="week"
+          dateRange={dateRange}
         />
       </div>
     </div>

@@ -7,21 +7,22 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  url?: string;
+  url: string; // Making this required in both types
   cover?: string;
-  coverUrl: string;
+  coverUrl: string; // Required
   emotion?: string;
-  audioUrl: string;
-  audio_url?: string;
+  audioUrl: string; // Required
+  audio_url?: string; // Keeping for backward compatibility
 }
 
 export interface MusicPlaylist {
   id: string;
-  name?: string;
+  name: string; // Required for consistency
+  title?: string; // Optional for backward compatibility
+  description?: string;
+  coverUrl?: string;
   emotion?: string;
   tracks: MusicTrack[];
-  title?: string; // Ajouté pour la compatibilité
-  description?: string; // Ajouté pour la compatibilité
 }
 
 // Props pour les composants de musique
@@ -47,7 +48,10 @@ export interface MusicContextType {
 }
 
 export interface MusicDrawerProps {
+  open?: boolean;
   onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist | null;
 }
 
 export interface Track {
@@ -63,13 +67,31 @@ export interface ProgressBarProps {
   progress: number;
   duration: number;
   onSeek?: (position: number) => void;
+  currentTime?: number;
+  formatTime?: (seconds: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  showTimestamps?: boolean;
+  className?: string;
 }
 
 export interface TrackInfoProps {
   track?: Track;
+  className?: string;
+  compact?: boolean;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: Track;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange?: (volume: number) => void;
+  onVolumeChange: (volume: number) => void;
+  className?: string;
+  onChange?: (volume: number) => void;
+  showLabel?: boolean;
 }
