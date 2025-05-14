@@ -2,14 +2,9 @@
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun } from 'lucide-react';
-import { Theme } from '@/types';
+import { Theme, ThemeButtonProps } from '@/types';
 
-interface ThemeButtonProps {
-  theme?: Theme;
-  onClick?: () => void;
-}
-
-export function ThemeButton({ theme, onClick }: ThemeButtonProps) {
+export function ThemeButton({ theme, onClick, collapsed }: ThemeButtonProps) {
   const { isDarkMode, setTheme } = useTheme();
 
   const handleClick = () => {
@@ -26,8 +21,14 @@ export function ThemeButton({ theme, onClick }: ThemeButtonProps) {
       size="icon"
       onClick={handleClick}
       aria-label="Toggle theme"
+      className={collapsed ? "w-10 h-10 p-2" : ""}
     >
-      {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      {isDarkMode ? (
+        <Sun className={collapsed ? "h-4 w-4" : "h-5 w-5"} />
+      ) : (
+        <Moon className={collapsed ? "h-4 w-4" : "h-5 w-5"} />
+      )}
+      {!collapsed && <span className="ml-2">Theme</span>}
     </Button>
   );
 }

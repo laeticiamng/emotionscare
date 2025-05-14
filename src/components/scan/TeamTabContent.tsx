@@ -1,8 +1,8 @@
+
 import React from 'react';
-import { TeamOverview } from '@/components/scan/TeamOverview';
+import TeamOverview from '@/components/scan/TeamOverview';
 import { useAuth } from '@/contexts/AuthContext';
 import { User } from '@/types';
-import { TeamOverviewProps } from '@/types';
 
 interface TeamTabContentProps {
   teamId?: string;
@@ -38,7 +38,7 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId }) => {
       {/* Team Overview Component */}
       <TeamOverview 
         users={filteredUsers} 
-        onUserClick={(userId) => handleUserClick(userId)} 
+        onUserClick={handleUserClick} 
       />
     </div>
   );

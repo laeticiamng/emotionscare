@@ -1,6 +1,6 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { UserData } from '@/types';
 
 export interface UsersTableDemoProps {
   showLoadMoreButton?: boolean;

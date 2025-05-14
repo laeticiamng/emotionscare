@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types/types';
+import { EmotionResult } from '@/types';
+import { v4 as uuid } from 'uuid';
 
 interface TextEmotionScannerProps {
   text?: string;
@@ -63,6 +64,8 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       const mockAnalysis: EmotionResult = {
+        id: uuid(),
+        date: new Date().toISOString(),
         emotion: 'calm',
         score: 0.75,
         confidence: 0.75,

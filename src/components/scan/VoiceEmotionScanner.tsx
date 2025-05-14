@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle } from 'lucide-react';
-import { EmotionResult, VoiceEmotionScannerProps } from '@/types/types';
+import { EmotionResult, VoiceEmotionScannerProps } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { v4 as uuid } from 'uuid';
 
 const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onScanComplete }) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -63,6 +65,8 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onScanComplet
       
       // Création d'un résultat fictif pour la démonstration
       const result: EmotionResult = {
+        id: uuid(),
+        date: new Date().toISOString(),
         emotion: 'calm',
         confidence: 0.75,
         transcript: "J'ai l'impression d'être plutôt détendu aujourd'hui.",

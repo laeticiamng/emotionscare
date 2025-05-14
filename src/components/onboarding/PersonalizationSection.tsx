@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTheme } from '@/contexts/ThemeContext';
-import type { Theme, FontFamily, FontSize } from '@/contexts/ThemeContext';
+import { ThemeName, FontFamily, FontSize } from '@/types';
 import { motion } from 'framer-motion';
 
 interface PersonalizationSectionProps {
@@ -70,7 +70,7 @@ const PersonalizationSection: React.FC<PersonalizationSectionProps> = ({
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="theme" className="text-base font-medium">Thème</Label>
-                  <Select value={theme} onValueChange={(value) => setTheme(value as Theme)}>
+                  <Select value={theme} onValueChange={(value) => setTheme(value as ThemeName)}>
                     <SelectTrigger id="theme">
                       <SelectValue placeholder="Choisir un thème" />
                     </SelectTrigger>
@@ -91,10 +91,11 @@ const PersonalizationSection: React.FC<PersonalizationSectionProps> = ({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="inter">Inter (défaut)</SelectItem>
-                      <SelectItem value="poppins">Poppins</SelectItem>
-                      <SelectItem value="roboto">Roboto</SelectItem>
-                      <SelectItem value="montserrat">Montserrat</SelectItem>
+                      <SelectItem value="system">Système</SelectItem>
+                      <SelectItem value="sans-serif">Sans-serif</SelectItem>
+                      <SelectItem value="serif">Serif</SelectItem>
                       <SelectItem value="mono">Monospace</SelectItem>
+                      <SelectItem value="rounded">Rounded</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -109,6 +110,7 @@ const PersonalizationSection: React.FC<PersonalizationSectionProps> = ({
                       <SelectItem value="small">Petite</SelectItem>
                       <SelectItem value="medium">Normale (défaut)</SelectItem>
                       <SelectItem value="large">Grande</SelectItem>
+                      <SelectItem value="extra-large">Très grande</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

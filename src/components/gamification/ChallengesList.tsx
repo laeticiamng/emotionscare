@@ -27,10 +27,10 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
         <ChallengeItem
           key={challenge.id}
           id={challenge.id}
-          title={challenge.title}
+          title={challenge.title || challenge.name || ''}
           description={challenge.description}
           points={challenge.points}
-          isCompleted={challenge.status === 'completed'}
+          isCompleted={challenge.status === 'completed' || challenge.completed}
           onComplete={onComplete}
         />
       ))}

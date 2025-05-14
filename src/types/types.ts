@@ -1,3 +1,4 @@
+
 // ————————————————————————
 // UserRole and UserModeType
 // ————————————————————————
@@ -68,6 +69,7 @@ export interface UserPreferences {
     enabled: boolean;
     emailEnabled: boolean;
     pushEnabled: boolean;
+    frequency?: string;
   };
   profileVisibility?: 'public' | 'private' | 'team';
   locale?: string;
@@ -277,6 +279,7 @@ export interface VRSessionTemplate {
   preview_url?: string;
   type?: string; // Added for mockVRTemplates.ts compatibility
   thumbnail?: string; // Added for compatibility
+  duration_seconds?: number;
 }
 
 export interface VRSession {
@@ -602,4 +605,20 @@ export interface ChatMessage {
   timestamp?: string;
   conversation_id?: string;
   role?: string;
+}
+
+// Add missing scanService exports
+export interface ScanServiceFunctions {
+  analyzeEmotion: (text: string) => Promise<EmotionResult>;
+  saveEmotion: (emotion: EmotionResult) => Promise<void>;
+  createEmotionEntry: (data: Partial<EmotionResult>) => Promise<EmotionResult>;
+  fetchLatestEmotion: (userId: string) => Promise<EmotionResult | null>;
+  analyzeAudioStream: (audioBlob: Blob) => Promise<EmotionResult>;
+}
+
+// Adding ThemeButtonProps to fix sidebar/ThemeButton.tsx
+export interface ThemeButtonProps {
+  theme?: Theme;
+  onClick?: () => void;
+  collapsed?: boolean;
 }

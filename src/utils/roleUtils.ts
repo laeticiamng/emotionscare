@@ -1,69 +1,48 @@
-
 import { UserRole } from '@/types';
 
-// Get the name of a role
-export const getRoleName = (role: UserRole): string => {
-  switch (role) {
-    case 'b2c':
-      return 'Utilisateur particulier';
-    case 'b2b_user':
-    case 'b2b-user':
-      return 'Collaborateur';
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return 'RH / Manager';
-    default:
-      return 'Utilisateur';
-  }
-};
-
-// Get the home path for a given role
-export const getRoleHomePath = (role: UserRole): string => {
-  switch (role) {
-    case 'b2c':
-      return '/b2c/dashboard';
-    case 'b2b_user':
-    case 'b2b-user':
-      return '/b2b/user/dashboard';
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return '/b2b/admin/dashboard';
-    default:
-      return '/dashboard';
-  }
-};
-
-// Get the login path for a given role
-export const getRoleLoginPath = (role: UserRole): string => {
-  switch (role) {
-    case 'b2c':
-      return '/auth/login?mode=personal';
-    case 'b2b_user':
-    case 'b2b-user':
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return '/auth/login?mode=professional';
-    default:
-      return '/auth/login';
-  }
-};
-
-// Check if a user has access to a specific route based on their role
-export const hasRoleAccess = (userRole: UserRole, requiredRoles: UserRole[]): boolean => {
-  return requiredRoles.includes(userRole);
-};
-
-// Export for backward compatibility and for the TS errors mentioned
+/**
+ * Checks if the provided role has admin privileges
+ */
 export const isAdminRole = (role: UserRole): boolean => {
-  return role === 'b2b_admin' || role === 'b2b-admin';
+  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin' || role === 'wellbeing_manager' || role === 'manager';
 };
 
-// Export for backward compatibility
-export const isB2BUser = (role: UserRole): boolean => {
-  return role === 'b2b_user' || role === 'b2b-user';
+/**
+ * Checks if a user has access based on their role
+ */
+export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
+  // If admin roles should have access to everything
+  if (isAdminRole(userRole)) return true;
+  // Otherwise check if the user's role is in the allowed roles
+  return allowedRoles.includes(userRole);
 };
 
-// Export for backward compatibility
-export const isB2C = (role: UserRole): boolean => {
-  return role === 'b2c';
+/**
+ * Get the home path based on user role
+ */
+export const getRoleHomePath = (role: UserRole): string => {
+  if (isAdminRole(role)) {
+    return '/admin/dashboard';
+  } else if (role === 'coach') {
+    return '/coach/dashboard';
+  } else if (role === 'b2b_user' || role === 'b2b-user' || role === 'team') {
+    return '/team/dashboard';
+  } else {
+    return '/dashboard';
+  }
+};
+
+/**
+ * Get the login path based on user role
+ */
+export const getRoleLoginPath = (role: UserRole): string => {
+  if (isAdminRole(role)) {
+    return '/admin/login';
+  } else if (role === 'coach') {
+    return '/coach/login';
+  } else if (role === 'b2b_user' || role === 'b2b-user' || role === 'team') {
+    return '/team/login';
+  } else {
+    return '/login';
+  }
 };

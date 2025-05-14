@@ -20,7 +20,6 @@ const GamificationDashboard: React.FC = () => {
   } = useGamification();
 
   const isLoading = loading;
-  const loadGamificationData = completeChallenge;
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -28,27 +27,30 @@ const GamificationDashboard: React.FC = () => {
 
   // Ensure stats has all required properties with default values
   const safeStats: GamificationStats = {
-    level: stats.level || 1,
-    points: stats.points || 0,
-    badges: stats.badges || [],
-    streak: stats.streak || 0,
-    totalPoints: stats.totalPoints || 0,
-    currentLevel: stats.currentLevel || 1,
-    pointsToNextLevel: stats.pointsToNextLevel || 100,
-    progressToNextLevel: stats.progressToNextLevel || 0,
-    badgesCount: stats.badgesCount || 0,
-    streakDays: stats.streakDays || 0,
-    lastActivityDate: stats.lastActivityDate || new Date().toISOString(),
-    activeChallenges: stats.activeChallenges || 0,
-    completedChallenges: stats.completedChallenges || 0,
-    leaderboard: [],
-    nextLevel: 2,
-    nextLevelPoints: 100,
-    streaks: {
-      current: stats.streak || 0,
-      longest: stats.streak || 0,
-      lastActivity: stats.lastActivityDate || new Date().toISOString()
-    }
+    level: stats?.level || 1,
+    points: stats?.points || 0,
+    badges: stats?.badges || [],
+    streaks: stats?.streaks || {
+      current: stats?.streak || 0,
+      longest: stats?.streak || 0,
+      lastActivity: stats?.lastActivityDate || new Date().toISOString()
+    },
+    leaderboard: stats?.leaderboard || [],
+    nextLevel: stats?.nextLevel || 2,
+    pointsToNextLevel: stats?.pointsToNextLevel || 100,
+    nextLevelPoints: stats?.nextLevelPoints || 100,
+    challenges: stats?.challenges || [],
+    streak: stats?.streak || 0,
+    totalPoints: stats?.totalPoints || 0,
+    currentLevel: stats?.currentLevel || 1,
+    progressToNextLevel: stats?.progressToNextLevel || 0,
+    streakDays: stats?.streakDays || 0,
+    lastActivityDate: stats?.lastActivityDate || new Date().toISOString(),
+    activeChallenges: stats?.activeChallenges || 0,
+    completedChallenges: stats?.completedChallenges || 0,
+    badgesCount: stats?.badgesCount || 0,
+    rank: stats?.rank || 'Beginner',
+    recentAchievements: stats?.recentAchievements || []
   };
 
   return (
@@ -128,19 +130,22 @@ const GamificationDashboard: React.FC = () => {
         </TabsContent>
         <TabsContent value="challenges" className="space-y-4">
           <div className="challenges-list">
-            <ChallengesList challenges={challenges.map((challenge: any): Challenge => ({
-              id: challenge.id,
-              title: challenge.title || challenge.name || '',
-              description: challenge.description || '',
-              points: challenge.points || 0,
-              status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
-              category: challenge.category || 'general',
-              name: challenge.name || challenge.title || '',
-              progress: challenge.progress || 0,
-              target: challenge.target || 100,
-              reward: challenge.reward || challenge.points || 0,
-              type: challenge.type || 'standard'
-            }))} />
+            <ChallengesList 
+              challenges={challenges.map((challenge: any): Challenge => ({
+                id: challenge.id,
+                title: challenge.title || challenge.name || '',
+                description: challenge.description || '',
+                points: challenge.points || 0,
+                status: challenge.status || (challenge.completed ? 'completed' : 'ongoing'),
+                category: challenge.category || 'general',
+                name: challenge.name || challenge.title || '',
+                progress: challenge.progress || 0,
+                target: challenge.target || 100,
+                reward: challenge.reward || challenge.points || 0,
+                type: challenge.type || 'standard'
+              }))} 
+              onComplete={completeChallenge}
+            />
           </div>
         </TabsContent>
       </Tabs>
