@@ -1,167 +1,92 @@
+
+import { ChatMessage } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
-import { AIRecommendation, AIMessage } from '@/types/ai';
-import { ChatResponseType } from '@/types/chat';
-import { AI_MODEL_CONFIG } from '@/lib/ai/openai-config';
 
-/**
- * Service d'interaction avec le coach IA
- */
-export const getCoachResponse = async (
-  message: string,
-  userContext?: {
-    recentEmotions?: string;
-    currentScore?: number;
-    lastEmotionDate?: string;
-  }
-): Promise<ChatResponseType> => {
+export interface CoachMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'coach';
+  timestamp: string;
+}
+
+// Get coach messages for a user
+export async function getCoachMessages(userId: string): Promise<ChatMessage[]> {
   try {
-    // Utilise l'Edge Function Supabase pour communiquer avec OpenAI
-    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-      body: {
-        message,
-        userContext,
-        model: AI_MODEL_CONFIG.coach.model,
-        temperature: AI_MODEL_CONFIG.coach.temperature,
-        max_tokens: AI_MODEL_CONFIG.coach.max_tokens,
-        module: 'coach'
-      }
-    });
+    const { data, error } = await supabase
+      .from('chat_messages')
+      .select('*')
+      .eq('user_id', userId)
+      .order('timestamp', { ascending: true });
 
-    if (error) {
-      console.error('Erreur API Coach:', error);
-      toast({
-        title: "Erreur de communication",
-        description: "Impossible de contacter le service de coach IA",
-        variant: "destructive"
+    if (error) throw error;
+
+    return data.map((message: any) => ({
+      id: message.id,
+      text: message.text,
+      sender: message.sender,
+      timestamp: message.timestamp,
+    }));
+  } catch (error) {
+    console.error('Error fetching coach messages:', error);
+    return [];
+  }
+}
+
+// Send a message to the coach
+export async function sendCoachMessage(userId: string, text: string): Promise<string> {
+  try {
+    // In a real implementation, this would send the message to an AI service
+    // and get a response back
+    
+    // Store the user's message
+    const { error } = await supabase
+      .from('chat_messages')
+      .insert({
+        user_id: userId,
+        text,
+        sender: 'user',
       });
-      throw new Error(error.message);
-    }
 
-    // Retourne uniquement les propriétés qui sont définies dans le type ChatResponseType
-    return {
-      content: data.response,
-      emotion: 'neutral'
-    };
-  } catch (error) {
-    console.error('Erreur Coach IA:', error);
-    return {
-      content: "Je suis désolé, je rencontre des difficultés techniques. Veuillez réessayer dans quelques instants.",
-      emotion: 'error'
-    };
-  }
-};
+    if (error) throw error;
 
-/**
- * Générer une recommandation du coach basée sur l'état émotionnel
- */
-export const generateCoachRecommendation = async (
-  emotionalState: string,
-  context?: string
-): Promise<AIRecommendation> => {
-  try {
-    const prompt = `En tant que coach de bien-être, propose une recommandation courte et pratique pour quelqu'un qui se sent "${emotionalState}". ${context || ''} Sois concis (max 200 caractères) et directement utile.`;
+    // Generate a mock response
+    const response = generateMockResponse(text);
     
-    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-      body: {
-        message: prompt,
-        model: AI_MODEL_CONFIG.coach.model,
-        temperature: 0.3,
-        max_tokens: 120,
-        module: 'coach'
-      }
-    });
+    // Store the coach's response
+    await supabase
+      .from('chat_messages')
+      .insert({
+        user_id: userId,
+        text: response,
+        sender: 'coach',
+      });
 
-    if (error) throw new Error(error.message);
-
-    return {
-      id: crypto.randomUUID(),
-      type: 'activity',
-      title: 'Recommandation personnalisée',
-      description: data.response,
-      confidence: 0.85,
-      reasoning: `Basé sur votre état émotionnel: ${emotionalState}`,
-      emotion_context: emotionalState
-    };
+    return response;
   } catch (error) {
-    console.error('Erreur génération recommandation:', error);
-    
-    return {
-      id: crypto.randomUUID(),
-      type: 'activity',
-      title: 'Prenez soin de vous',
-      description: 'Prenez un moment pour respirer profondément et vous recentrer.',
-      confidence: 0.5,
-      reasoning: 'Recommandation générique suite à une erreur technique',
-      emotion_context: emotionalState
-    };
+    console.error('Error sending coach message:', error);
+    throw error;
   }
-};
+}
 
-/**
- * Analyser l'état émotionnel à partir d'un message
- */
-export const analyzeEmotionalState = async (message: string): Promise<{
-  primaryEmotion: string;
-  secondaryEmotion?: string;
-  intensity: number;
-  sentiment: 'positive' | 'neutral' | 'negative';
-}> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('analyze-emotion', {
-      body: { text: message }
-    });
-
-    if (error) throw new Error(error.message);
-    
-    return data;
-  } catch (error) {
-    console.error('Erreur analyse émotionnelle:', error);
-    return {
-      primaryEmotion: 'indéterminé',
-      intensity: 0.5,
-      sentiment: 'neutral'
-    };
+// Generate a mock response for development
+function generateMockResponse(userMessage: string): string {
+  const responses = [
+    "Je comprends ce que vous ressentez. Comment puis-je vous aider davantage ?",
+    "C'est une observation intéressante. Pouvez-vous m'en dire plus ?",
+    "Je vous remercie de partager cela avec moi. Continuez à explorer ces émotions.",
+    "Cette expérience semble significative pour vous. Qu'est-ce qui vous a le plus marqué ?",
+    "Je suis là pour vous accompagner dans ce processus.",
+  ];
+  
+  // Check for keywords to customize response
+  if (userMessage.toLowerCase().includes('stress') || userMessage.toLowerCase().includes('anxiété')) {
+    return "Le stress et l'anxiété sont des expériences communes. Avez-vous essayé de pratiquer des exercices de respiration profonde ? Cela peut aider à calmer votre système nerveux.";
   }
-};
-
-/**
- * Générer un message de réponse optimisé pour le support
- */
-export const getPremiumSupportResponse = async (
-  message: string,
-  userContext?: any
-): Promise<AIMessage> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
-      body: {
-        message,
-        userContext,
-        model: 'gpt-4o',
-        temperature: 0.4,
-        max_tokens: 1000,
-        module: 'premium-support'
-      }
-    });
-
-    if (error) throw new Error(error.message);
-
-    return {
-      id: crypto.randomUUID(),
-      role: 'assistant',
-      content: data.response,
-      timestamp: new Date().toISOString(),
-      emotions_detected: userContext?.detectedEmotion ? [userContext.detectedEmotion] : undefined,
-      confidence: 0.95
-    };
-  } catch (error) {
-    console.error('Erreur support premium:', error);
-    return {
-      id: crypto.randomUUID(),
-      role: 'assistant',
-      content: "Je vous présente mes excuses, mais je rencontre des difficultés techniques. Un membre de notre équipe d'assistance premium va vous contacter sous peu.",
-      timestamp: new Date().toISOString(),
-      confidence: 0.5
-    };
+  
+  if (userMessage.toLowerCase().includes('triste') || userMessage.toLowerCase().includes('déprimé')) {
+    return "Je suis désolé d'entendre que vous vous sentez ainsi. Ces émotions sont valides, et il est important de les reconnaître. Qu'est-ce qui vous apporte habituellement du réconfort ?";
   }
-};
+  
+  // Return a random response for other messages
+  return responses[Math.floor(Math.random() * responses.length)];
+}

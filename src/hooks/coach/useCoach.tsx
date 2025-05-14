@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChatMessage } from '@/types';
-import { getCoachMessages, sendCoachMessage } from '@/lib/coachService';
+import { getCoachMessages, sendCoachMessage } from '@/lib/coach/coach-service';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCoachEvents } from './useCoachEvents';
 
@@ -11,6 +11,8 @@ export const useCoach = () => {
   const { user } = useAuth();
   const userId = user?.id;
   const { triggerCoachEvent } = useCoachEvents();
+  const [lastEmotion, setLastEmotion] = useState<string>('neutral');
+  const [recommendations, setRecommendations] = useState<string[]>([]);
   
   // Initial greeting message
   const initialMessage: ChatMessage = {
@@ -94,12 +96,53 @@ export const useCoach = () => {
   const clearMessages = useCallback(() => {
     setMessages([initialMessage]);
   }, []);
+
+  // Generate recommendations based on emotional state
+  const generateRecommendation = useCallback((emotion: string = 'neutral') => {
+    setLastEmotion(emotion);
+    
+    const recommendationMap: Record<string, string[]> = {
+      'happy': [
+        'Maintenez cette énergie positive avec une activité créative',
+        'Partagez votre bonheur avec quelqu\'un d\'autre aujourd\'hui',
+        'Notez ce moment dans votre journal de gratitude'
+      ],
+      'sad': [
+        'Accordez-vous un moment de repos et d\'autocompassion',
+        'Écoutez une playlist apaisante',
+        'Faites une courte promenade en plein air'
+      ],
+      'neutral': [
+        'Essayez une méditation de 5 minutes',
+        'Prenez un moment pour définir vos priorités',
+        'Hydratez-vous et faites quelques étirements'
+      ],
+      'anxious': [
+        'Pratiquez l\'exercice de respiration 4-7-8',
+        'Écrivez vos préoccupations sur papier',
+        'Concentrez-vous sur une tâche simple et concrète'
+      ]
+    };
+    
+    const defaultRecommendations = [
+      'Prenez une pause de 5 minutes',
+      'Respirez profondément plusieurs fois',
+      'Faites le point sur vos émotions actuelles'
+    ];
+    
+    const newRecommendations = recommendationMap[emotion.toLowerCase()] || defaultRecommendations;
+    setRecommendations(newRecommendations);
+    return newRecommendations;
+  }, []);
   
   return {
     messages,
     loading,
     sendMessage,
     clearMessages,
-    loadMessages
+    loadMessages,
+    lastEmotion,
+    recommendations,
+    generateRecommendation
   };
 };

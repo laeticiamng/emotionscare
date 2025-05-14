@@ -18,9 +18,9 @@ const NotificationPreferences: React.FC = () => {
   const { toast } = useToast();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [frequency, setFrequency] = useState<NotificationFrequency>(NotificationFrequency.DAILY);
-  const [type, setType] = useState<NotificationType>(NotificationType.ALL);
-  const [tone, setTone] = useState<NotificationTone>(NotificationTone.GENTLE);
+  const [frequency, setFrequency] = useState<string>(NotificationFrequency.DAILY);
+  const [type, setType] = useState<string>(NotificationType.ALL);
+  const [tone, setTone] = useState<string>(NotificationTone.GENTLE);
   const [volume, setVolume] = useState(70);
   const [reminderTime, setReminderTime] = useState('09:00');
 
@@ -104,7 +104,7 @@ const NotificationPreferences: React.FC = () => {
               </div>
               <RadioGroup 
                 value={frequency} 
-                onValueChange={(val) => setFrequency(val as NotificationFrequency)}
+                onValueChange={(val) => setFrequency(val)}
                 className="grid grid-cols-2 gap-2"
               >
                 <div className="flex items-center space-x-2 rounded-md border p-3 cursor-pointer hover:bg-muted/50">
@@ -148,7 +148,7 @@ const NotificationPreferences: React.FC = () => {
               <h3 className="font-medium text-sm">Tonalité des messages</h3>
               <Select 
                 value={tone} 
-                onValueChange={(val) => setTone(val as NotificationTone)}
+                onValueChange={(val) => setTone(val)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez un style" />

@@ -1,29 +1,42 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export enum NotificationFrequency {
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  FLEXIBLE = "FLEXIBLE",
+  NONE = "NONE"
+}
 
-export type NotificationType = 'info' | 'success' | 'warning' | 'error';
+export enum NotificationType {
+  ALL = "ALL",
+  SYSTEM = "SYSTEM",
+  REMINDER = "REMINDER",
+  COACH = "COACH"
+}
 
-export type NotificationTone = 'professional' | 'friendly' | 'supportive' | 'direct';
+export enum NotificationTone {
+  MINIMALIST = "MINIMALIST",
+  POETIC = "POETIC",
+  DIRECTIVE = "DIRECTIVE",
+  MOTIVATING = "MOTIVATING",
+  GENTLE = "GENTLE"
+}
 
 export interface Notification {
   id: string;
+  type: 'info' | 'warning' | 'success' | 'error' | 'system' | 'invitation' | 'reminder';
   title: string;
   message: string;
-  type: NotificationType;
+  date: string;
+  isRead: boolean;
+  linkTo?: string;
+}
+
+export interface EnhancedNotification extends Notification {
   read: boolean;
   timestamp: string;
-  userId?: string;
-  linkTo?: string;
-  priority?: 'low' | 'medium' | 'high';
-  image?: string;
 }
 
-export interface NotificationPreference {
+export interface NotificationFilter {
   type: string;
-  email: boolean;
-  push: boolean;
-  inApp: boolean;
-  frequency: NotificationFrequency;
+  read?: boolean;
 }
-
-export type NotificationFilter = 'all' | 'unread' | 'read';

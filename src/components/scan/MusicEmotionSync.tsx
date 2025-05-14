@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
-import useCoach from '@/hooks/useCoach';
+import { useCoach } from '@/hooks/useCoach';
 import { useToast } from '@/hooks/use-toast';
 
 interface MusicEmotionSyncProps {
@@ -20,21 +20,24 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
   autoSync = false
 }) => {
   const { loadPlaylistForEmotion } = useMusic();
-  const { lastEmotion } = useCoach();
+  const coach = useCoach();
   const { toast } = useToast();
+  
+  // Access lastEmotion from coach
+  const emotionToUse = coach.lastEmotion || emotion;
   
   // Synchronisation automatique si activée
   useEffect(() => {
-    if (autoSync && emotion && emotion !== 'neutral') {
-      console.log(`Synchronisation automatique de la musique avec l'émotion: ${emotion}`);
-      loadPlaylistForEmotion(emotion.toLowerCase());
+    if (autoSync && emotionToUse && emotionToUse !== 'neutral') {
+      console.log(`Synchronisation automatique de la musique avec l'émotion: ${emotionToUse}`);
+      loadPlaylistForEmotion(emotionToUse.toLowerCase());
       
       toast({
         title: "Musique adaptée",
-        description: `L'ambiance musicale s'est adaptée automatiquement à votre humeur: ${emotion}`
+        description: `L'ambiance musicale s'est adaptée automatiquement à votre humeur: ${emotionToUse}`
       });
     }
-  }, [autoSync, emotion, loadPlaylistForEmotion]);
+  }, [autoSync, emotionToUse, loadPlaylistForEmotion]);
   
   return null; // Composant sans rendu visuel
 };

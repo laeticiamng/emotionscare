@@ -5,17 +5,11 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/contexts/AuthContext';
-import { Notification } from '@/types';
+import { Notification, EnhancedNotification } from '@/types/notification';
 import { CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNotificationBadge } from '@/hooks/useNotificationBadge';
-
-// Extend the Notification type to include required properties
-interface EnhancedNotification extends Notification {
-  read: boolean;
-  timestamp: string;
-}
 
 const NotificationsPanel = () => {
   const { notifications, markAsRead, markAllAsRead } = useNotifications();
@@ -23,8 +17,12 @@ const NotificationsPanel = () => {
   const [loading, setLoading] = useState(false);
   const badge = useNotificationBadge();
 
-  // Cast notifications to the enhanced type that includes the required properties
-  const typedNotifications = notifications as EnhancedNotification[];
+  // Cast and enhance notifications to include required properties
+  const enhancedNotifications: EnhancedNotification[] = notifications ? notifications.map(notification => ({
+    ...notification,
+    read: 'isRead' in notification ? notification.isRead : false,
+    timestamp: 'date' in notification ? notification.date : new Date().toISOString()
+  })) : [];
 
   useEffect(() => {
     // Update unread count based on count property if unreadCount is missing
@@ -35,10 +33,10 @@ const NotificationsPanel = () => {
     }
     
     if (notifications) {
-      const unread = typedNotifications.filter(n => !n.read).length;
+      const unread = enhancedNotifications.filter(n => !n.read).length;
       badge.setBadgesCount?.(unread);
     }
-  }, [notifications, badge]);
+  }, [notifications, badge, enhancedNotifications]);
 
   const handleMarkAsRead = async (notificationId: string) => {
     setLoading(true);
@@ -81,8 +79,8 @@ const NotificationsPanel = () => {
       </CardHeader>
       <CardContent className="p-0">
         <ScrollArea className="h-[300px] w-full">
-          {typedNotifications && typedNotifications.length > 0 ? (
-            typedNotifications.map((notification) => (
+          {enhancedNotifications && enhancedNotifications.length > 0 ? (
+            enhancedNotifications.map((notification) => (
               <div
                 key={notification.id}
                 className="flex items-start space-x-4 p-4 border-b last:border-b-0"
