@@ -1,33 +1,47 @@
 
-export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never';
-export type NotificationType = 'alert' | 'info' | 'success' | 'warning' | 'error';
-export type NotificationTone = 'positive' | 'negative' | 'neutral';
+export enum NotificationFrequency {
+  IMMEDIATE = 'immediate',
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly'
+}
 
-export interface Notification {
-  id: string;
-  title: string;
-  message?: string;
-  content?: string;
-  type?: NotificationType;
-  read?: boolean;
-  createdAt?: string;
-  timestamp?: string;
-  user_id?: string;
-  action_url?: string;
-  action_text?: string;
-  icon?: string;
-  priority?: number;
-  category?: string;
-  metadata?: Record<string, any>;
+export enum NotificationType {
+  EMAIL = 'email',
+  PUSH = 'push',
+  SMS = 'sms',
+  IN_APP = 'in_app'
+}
+
+export enum NotificationTone {
+  FORMAL = 'formal',
+  FRIENDLY = 'friendly',
+  PROFESSIONAL = 'professional',
+  CASUAL = 'casual',
+  ENCOURAGING = 'encouraging'
 }
 
 export interface NotificationPreference {
-  type: string;
+  id: string;
+  user_id: string;
+  type: NotificationType;
   enabled: boolean;
-  channel: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
-  };
   frequency: NotificationFrequency;
+  tone: NotificationTone;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  action_url?: string;
+  action_label?: string;
+  icon?: string;
+  createdAt: string;
+  updatedAt?: string;
 }

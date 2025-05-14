@@ -1,6 +1,8 @@
+
 import '../polyfills';
 import OpenAI from 'openai';
 import { ChatMessage } from '@/types';
+import '../utils/array-polyfills';  // Import the array polyfills
 
 const apiKey = process.env.OPENAI_API_KEY;
 
@@ -151,6 +153,7 @@ export const generateChatResponse = async (
   stream: boolean = false
 ): Promise<OpenAI.Chat.Completions.ChatCompletion | string | null> => {
   try {
+    // Use the polyfill for findLast
     const lastUserMessage = messages.findLast(m => m.role === 'user');
     const systemPrompt = lastUserMessage
       ? `You are an AI assistant. The user's last message was: ${lastUserMessage.text || lastUserMessage.content}.`

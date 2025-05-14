@@ -1,8 +1,15 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ChatMessage, CoachEvent } from '@/lib/coachService';
+import { ChatMessage } from '@/types';
 
-interface CoachContextType {
+export interface CoachEvent {
+  id: string;
+  type: string;
+  timestamp: string;
+  data?: any;
+}
+
+export interface CoachContextType {
   messages: ChatMessage[];
   loading: boolean;
   sendMessage: (text: string) => Promise<void>;
@@ -16,6 +23,7 @@ interface CoachContextType {
   lastEmotion: any;
   recommendations: any[];
   generateRecommendation: () => void;
+  coachService?: any;
 }
 
 const CoachContext = createContext<CoachContextType | undefined>(undefined);
@@ -97,6 +105,15 @@ export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     ]);
   };
 
+  const coachService = {
+    sendMessage,
+    getMessages: () => messages,
+    getContext: () => userContext,
+    updateContext: (newContext: any) => setUserContext(newContext),
+    getStatus: () => status,
+    updateStatus: (newStatus: string) => setStatus(newStatus)
+  };
+
   return (
     <CoachContext.Provider
       value={{
@@ -113,6 +130,7 @@ export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         lastEmotion,
         recommendations,
         generateRecommendation,
+        coachService
       }}
     >
       {children}

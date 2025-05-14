@@ -1,201 +1,174 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Bell, Mail, Clock } from 'lucide-react';
-import { NotificationFrequency, NotificationTone, NotificationType } from '@/types/notification';
+import { Bell } from "lucide-react";
+import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
 
-const NotificationPreferences: React.FC = () => {
-  const { toast } = useToast();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [frequency, setFrequency] = useState<string>(NotificationFrequency.DAILY);
-  const [type, setType] = useState<string>(NotificationType.ALL);
-  const [tone, setTone] = useState<string>(NotificationTone.GENTLE);
-  const [volume, setVolume] = useState(70);
-  const [reminderTime, setReminderTime] = useState('09:00');
-
-  const handleSave = () => {
-    toast({
-      title: "Préférences enregistrées",
-      description: "Vos préférences de notification ont été mises à jour."
-    });
+interface NotificationPreferencesProps {
+  initialPreferences?: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    frequency: string;
+    notificationType?: string;
+    tone?: string;
   };
+  onSave?: (preferences: any) => void;
+}
 
+const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ 
+  initialPreferences,
+  onSave
+}) => {
+  // Default values
+  const defaultPreferences = {
+    enabled: true,
+    emailEnabled: false,
+    pushEnabled: true,
+    frequency: NotificationFrequency.DAILY,
+    notificationType: NotificationType.IN_APP,
+    tone: NotificationTone.FRIENDLY
+  };
+  
+  // Combined preferences
+  const preferences = { ...defaultPreferences, ...initialPreferences };
+  
+  // State
+  const [notificationsEnabled, setNotificationsEnabled] = useState(preferences.enabled);
+  const [emailEnabled, setEmailEnabled] = useState(preferences.emailEnabled);
+  const [pushEnabled, setPushEnabled] = useState(preferences.pushEnabled);
+  const [frequency, setFrequency] = useState(preferences.frequency);
+  const [notificationType, setNotificationType] = useState(preferences.notificationType);
+  const [tone, setTone] = useState(preferences.tone);
+  
+  // Handle save
+  const handleSave = () => {
+    const updatedPreferences = {
+      enabled: notificationsEnabled,
+      emailEnabled,
+      pushEnabled,
+      frequency,
+      notificationType,
+      tone
+    };
+    
+    if (onSave) {
+      onSave(updatedPreferences);
+    }
+  };
+  
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          Préférences de notifications
+          Préférences de notification
         </CardTitle>
-        <CardDescription>
-          Personnalisez la façon dont vous souhaitez être informé des mises à jour et rappels.
-        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Activation des notifications */}
-        <div className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <Label className="text-base">Notifications</Label>
-            <div className="text-sm text-muted-foreground">
-              Activez ou désactivez toutes les notifications
-            </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-medium">Notifications</h3>
+            <p className="text-sm text-muted-foreground">
+              Recevoir des notifications sur votre activité
+            </p>
           </div>
-          <Switch
+          <Switch 
             checked={notificationsEnabled}
             onCheckedChange={setNotificationsEnabled}
           />
         </div>
-
+        
         {notificationsEnabled && (
-          <div className="space-y-6">
-            {/* Types de notifications */}
-            <div className="space-y-3">
-              <h3 className="font-medium text-sm">Types de rappels</h3>
-              <div className="grid gap-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="journal" className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-blue-500"></span>
-                    Journal émotionnel
-                  </Label>
-                  <Switch id="journal" defaultChecked />
+          <>
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Canaux de notification</h3>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-medium">Email</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Recevoir des notifications par email
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="breathing" className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                    Exercices de respiration
-                  </Label>
-                  <Switch id="breathing" defaultChecked />
+                <Switch 
+                  checked={emailEnabled}
+                  onCheckedChange={setEmailEnabled}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-medium">Notifications push</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Recevoir des notifications push dans le navigateur
+                  </p>
                 </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="music" className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-purple-500"></span>
-                    Suggestions musicales
-                  </Label>
-                  <Switch id="music" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="coach" className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-amber-500"></span>
-                    Coach IA
-                  </Label>
-                  <Switch id="coach" defaultChecked />
-                </div>
+                <Switch 
+                  checked={pushEnabled}
+                  onCheckedChange={setPushEnabled}
+                />
               </div>
             </div>
-
-            <Separator />
-
-            {/* Fréquence */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <h3 className="font-medium text-sm">Fréquence</h3>
-              </div>
-              <RadioGroup 
-                value={frequency} 
-                onValueChange={(val) => setFrequency(val)}
-                className="grid grid-cols-2 gap-2"
-              >
-                <div className="flex items-center space-x-2 rounded-md border p-3 cursor-pointer hover:bg-muted/50">
-                  <RadioGroupItem value={NotificationFrequency.DAILY} id="frequency-daily" />
-                  <Label htmlFor="frequency-daily" className="cursor-pointer">Quotidienne</Label>
+            
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Fréquence</h3>
+              
+              <RadioGroup value={frequency} onValueChange={setFrequency}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationFrequency.IMMEDIATE} id="immediate" />
+                  <Label htmlFor="immediate">Immédiate</Label>
                 </div>
-                <div className="flex items-center space-x-2 rounded-md border p-3 cursor-pointer hover:bg-muted/50">
-                  <RadioGroupItem value={NotificationFrequency.WEEKLY} id="frequency-weekly" />
-                  <Label htmlFor="frequency-weekly" className="cursor-pointer">Hebdomadaire</Label>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationFrequency.DAILY} id="daily" />
+                  <Label htmlFor="daily">Quotidienne</Label>
                 </div>
-                <div className="flex items-center space-x-2 rounded-md border p-3 cursor-pointer hover:bg-muted/50">
-                  <RadioGroupItem value={NotificationFrequency.FLEXIBLE} id="frequency-flexible" />
-                  <Label htmlFor="frequency-flexible" className="cursor-pointer">Flexible</Label>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationFrequency.WEEKLY} id="weekly" />
+                  <Label htmlFor="weekly">Hebdomadaire</Label>
                 </div>
-                <div className="flex items-center space-x-2 rounded-md border p-3 cursor-pointer hover:bg-muted/50">
-                  <RadioGroupItem value={NotificationFrequency.NONE} id="frequency-none" />
-                  <Label htmlFor="frequency-none" className="cursor-pointer">Aucune</Label>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationFrequency.MONTHLY} id="monthly" />
+                  <Label htmlFor="monthly">Mensuelle</Label>
                 </div>
               </RadioGroup>
             </div>
-
-            {/* Email notifications */}
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <div className="flex items-start gap-3">
-                <Mail className="h-5 w-5 mt-0.5 text-muted-foreground" />
-                <div className="space-y-0.5">
-                  <Label className="text-base">Notifications par email</Label>
-                  <div className="text-sm text-muted-foreground">
-                    Recevez des notifications par email en plus des notifications dans l'application
-                  </div>
+            
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="font-medium">Ton des notifications</h3>
+              
+              <RadioGroup value={tone} onValueChange={setTone}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationTone.FORMAL} id="formal" />
+                  <Label htmlFor="formal">Formel</Label>
                 </div>
-              </div>
-              <Switch
-                checked={emailNotifications}
-                onCheckedChange={setEmailNotifications}
-              />
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationTone.FRIENDLY} id="friendly" />
+                  <Label htmlFor="friendly">Amical</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationTone.PROFESSIONAL} id="professional" />
+                  <Label htmlFor="professional">Professionnel</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationTone.CASUAL} id="casual" />
+                  <Label htmlFor="casual">Décontracté</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={NotificationTone.ENCOURAGING} id="encouraging" />
+                  <Label htmlFor="encouraging">Encourageant</Label>
+                </div>
+              </RadioGroup>
             </div>
-
-            {/* Tonalité */}
-            <div className="space-y-3">
-              <h3 className="font-medium text-sm">Tonalité des messages</h3>
-              <Select 
-                value={tone} 
-                onValueChange={(val) => setTone(val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez un style" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NotificationTone.MINIMAL}>Minimaliste</SelectItem>
-                  <SelectItem value={NotificationTone.POETIC}>Poétique</SelectItem>
-                  <SelectItem value={NotificationTone.DIRECTIVE}>Directif</SelectItem>
-                  <SelectItem value={NotificationTone.MOTIVATING}>Motivant</SelectItem>
-                  <SelectItem value={NotificationTone.GENTLE}>Doux</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Volume */}
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <h3 className="font-medium text-sm">Volume des notifications</h3>
-                <span className="text-sm">{volume}%</span>
-              </div>
-              <Slider
-                value={[volume]}
-                min={0}
-                max={100}
-                step={10}
-                onValueChange={(val) => setVolume(val[0])}
-              />
-            </div>
-
-            {/* Horaires */}
-            <div className="space-y-3">
-              <h3 className="font-medium text-sm">Heure de rappel préférée</h3>
-              <Input 
-                type="time" 
-                value={reminderTime} 
-                onChange={e => setReminderTime(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Nous enverrons les notifications quotidiennes à cette heure.
-              </p>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline">Annuler</Button>
-              <Button onClick={handleSave}>Enregistrer</Button>
-            </div>
-          </div>
+            
+            <Button onClick={handleSave} className="w-full">
+              Enregistrer les préférences
+            </Button>
+          </>
         )}
       </CardContent>
     </Card>

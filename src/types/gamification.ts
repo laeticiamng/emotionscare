@@ -2,19 +2,15 @@
 export interface GamificationStats {
   points: number;
   level: number;
-  nextLevelPoints: number;
+  rank: string;
   badges: Badge[];
-  completedChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  progressToNextLevel: number;
-  challenges?: Challenge[];
-  recentAchievements?: Achievement[];
-  currentLevel?: number;
-  pointsToNextLevel?: number;
-  totalPoints?: number;
-  badgesCount?: number;
-  lastActivityDate?: string;
+  challenges: Challenge[];
+  streak: number;
+  nextLevel: {
+    points: number;
+    rewards: string[];
+  };
+  achievements: Achievement[];
 }
 
 export interface Challenge {
@@ -22,45 +18,39 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  status: 'active' | 'completed' | 'locked';
-  progress: number;
-  total: number;
+  status: 'completed' | 'locked' | 'active';
   category: string;
+  type?: string;
+  progress?: number;
+  goal?: number;
   icon?: string;
-  dueDate?: string;
-  rewards?: string[];
-  completed?: boolean;
-  name?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface Badge {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  icon: string;
-  obtained: boolean;
+  image_url?: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
+  image?: string;
   date?: string;
-  level?: number;
-  category?: string;
-  name?: string;
 }
 
 export interface Achievement {
   id: string;
   title: string;
   description: string;
-  icon: string;
   date: string;
-  points?: number;
-  category?: string;
+  type: string;
+  points: number;
+  icon?: string;
 }
 
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  points: number;
-  rank: number;
-  avatar?: string;
-  team?: string;
-  level?: number;
+export interface GamificationAction {
+  type: 'SCAN' | 'JOURNAL' | 'COACH' | 'VR' | 'CHALLENGE' | 'STREAK' | 'LOGIN';
+  data?: any;
 }

@@ -1,84 +1,70 @@
+
+export interface EmotionRecord {
+  id: string;
+  user_id: string;
+  date: string;
+  emotion: string;
+  name: string;
+  score: number;
+  intensity?: number;
+  confidence?: number;
+  category?: string;
+  source?: string;
+  text?: string;
+  emojis?: string;
+  audio_url?: string;
+  ai_feedback?: string;
+}
+
+export interface EmotionResultRecord {
+  emotion: string;
+  score: number;
+  text?: string;
+  emojis?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  timestamp?: string;
+  confidence?: number;
+}
+
 export interface Emotion {
-  id?: string;
-  user_id?: string;
-  date?: string | Date;
-  emotion?: string;
+  id: string;
+  user_id: string;
+  date: string;
+  emotion: string;
   name?: string;
-  score?: number;
+  score: number;
   intensity?: number;
   confidence?: number;
   text?: string;
   emojis?: string;
   ai_feedback?: string;
-  feedback?: string;
-  audio_url?: string;
-  transcript?: string;
-  category?: string;
+  source?: string;
 }
 
 export interface EmotionResult {
   id?: string;
   user_id?: string;
-  date?: string | Date;
+  date?: string;
   emotion: string;
+  name?: string;
   score: number;
-  confidence?: number;
   intensity?: number;
+  confidence?: number;
   text?: string;
-  emojis?: string;
-  feedback?: string;
-  ai_feedback?: string;
   transcript?: string;
-  recommendations?: string[];
-  primaryEmotion?: {
-    name: string;
-    score: number;
-    confidence?: number;
-  };
-  dominantEmotion?: {
-    name: string;
-    score: number;
-  };
-}
-
-export interface EmotionalData {
-  id?: string;
-  user_id?: string;
-  userId?: string;
-  date?: string | Date;
-  text?: string;
-  score?: number;
-  emotion?: string;
   emojis?: string;
-  audio_url?: string;
-  ai_feedback?: string;
   feedback?: string;
-}
-
-export interface EmotionPrediction {
-  predictedEmotion: string;
-  confidence: number;
-  emotion?: string;
-  probability?: number;
-  triggers?: string[];
+  ai_feedback?: string;
+  primaryEmotion?: string;
   recommendations?: string[];
-}
-
-export interface EmotionScanFormProps {
-  onScanSaved: () => void;
-  onClose: () => void;
-  userId?: string;
-}
-
-export interface FacialEmotionScannerProps {
-  onEmotionDetected: (emotion: string, result: EmotionResult) => void;
-  isScanning?: boolean;
-  onToggleScanning?: () => void;
+  source?: string;
 }
 
 export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: string;
-  showFilters?: boolean;
   className?: string;
+  teamId: string;
+  userId?: string;
+  period?: string;
+  onRefresh?: () => void;
 }

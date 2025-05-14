@@ -1,10 +1,11 @@
+
 export type UserRole = 'user' | 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'moderator';
 
 export type Theme = 'light' | 'dark' | 'system';
 export type ThemeName = Theme | string;
 
 export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'extra-large';
-export type FontFamily = 'default' | 'serif' | 'mono' | 'sans';
+export type FontFamily = 'default' | 'serif' | 'mono' | 'sans' | 'inter';
 
 export interface User {
   id: string;
@@ -20,6 +21,9 @@ export interface User {
   department?: string;
   position?: string;
   emotional_score?: number;
+  team_id?: string;
+  anonymity_code?: string;
+  job_title?: string;
 }
 
 export interface UserPreferences {
