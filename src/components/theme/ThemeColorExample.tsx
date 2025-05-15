@@ -1,41 +1,60 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTheme } from '@/contexts/ThemeContext';
 
 const ThemeColorExample = () => {
-  const { theme, isDarkMode } = useTheme();
-  
-  const colorSamples = [
-    { name: 'Primary', class: 'bg-primary text-primary-foreground' },
-    { name: 'Secondary', class: 'bg-secondary text-secondary-foreground' },
-    { name: 'Accent', class: 'bg-accent text-accent-foreground' },
-    { name: 'Background', class: 'bg-background text-foreground' },
-    { name: 'Muted', class: 'bg-muted text-muted-foreground' },
-    { name: 'Card', class: 'bg-card text-card-foreground border' },
-    { name: 'Destructive', class: 'bg-destructive text-destructive-foreground' },
-    { name: 'Success', class: 'bg-green-500 text-white' },
-    { name: 'Warning', class: 'bg-yellow-500 text-white' },
-  ];
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Theme Colors - {theme} mode</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {colorSamples.map((sample) => (
-          <div key={sample.name} className="flex flex-col gap-2">
-            <div 
-              className={`h-16 rounded-md flex items-center justify-center ${sample.class}`}
-            >
-              <span>{sample.name}</span>
-            </div>
-            <p className="text-xs text-center text-muted-foreground">{sample.name}</p>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-2">
+        <div className="h-16 rounded-md bg-primary flex items-center justify-center">
+          <span className="text-primary-foreground font-medium">Primary</span>
+        </div>
+        <div className="h-16 rounded-md bg-secondary flex items-center justify-center">
+          <span className="text-secondary-foreground font-medium">Secondary</span>
+        </div>
+        <div className="h-16 rounded-md bg-accent flex items-center justify-center">
+          <span className="text-accent-foreground font-medium">Accent</span>
+        </div>
+        <div className="h-16 rounded-md bg-muted flex items-center justify-center">
+          <span className="text-muted-foreground font-medium">Muted</span>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-4 gap-2">
+        <div className="h-10 rounded-md bg-success-light flex items-center justify-center">
+          <span className="text-xs">Success Light</span>
+        </div>
+        <div className="h-10 rounded-md bg-success flex items-center justify-center">
+          <span className="text-xs text-white">Success</span>
+        </div>
+        <div className="h-10 rounded-md bg-success-dark flex items-center justify-center">
+          <span className="text-xs text-white">Success Dark</span>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-4 gap-2">
+        <div className="h-10 rounded-md bg-warning-light flex items-center justify-center">
+          <span className="text-xs">Warning Light</span>
+        </div>
+        <div className="h-10 rounded-md bg-warning flex items-center justify-center">
+          <span className="text-xs">Warning</span>
+        </div>
+        <div className="h-10 rounded-md bg-warning-dark flex items-center justify-center">
+          <span className="text-xs text-white">Warning Dark</span>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-4 gap-2">
+        <div className="h-10 rounded-md bg-error-light flex items-center justify-center">
+          <span className="text-xs">Error Light</span>
+        </div>
+        <div className="h-10 rounded-md bg-error flex items-center justify-center">
+          <span className="text-xs text-white">Error</span>
+        </div>
+        <div className="h-10 rounded-md bg-error-dark flex items-center justify-center">
+          <span className="text-xs text-white">Error Dark</span>
+        </div>
+      </div>
+    </div>
   );
 };
 

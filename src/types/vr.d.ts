@@ -21,6 +21,11 @@ export interface VRSessionTemplate {
   theme?: string;
   tags?: string[];
   imageUrl?: string;
+  thumbnailUrl?: string;
+  video_url?: string;
+  emotionTarget?: string;
+  recommendedMood?: string;
+  completionRate?: number;
 }
 
 export interface VRSession {
@@ -44,6 +49,15 @@ export interface VRSession {
   heart_rate_before?: number;
   heart_rate_after?: number;
   isCompleted?: boolean;
+  template_id?: string;
+  user_id?: string;
+  start_time?: string;
+  end_time?: string;
+  emotionTarget?: string;
+  emotion_target?: string;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  template?: VRSessionTemplate;
 }
 
 export interface VRHistoryListProps {
@@ -52,6 +66,11 @@ export interface VRHistoryListProps {
   onSelectTemplate?: (template: VRSessionTemplate) => void;
   onSelectSession?: (session: VRSession) => void;
   loading?: boolean;
+  onSelect?: (template: VRSessionTemplate) => void;
+  title?: string;
+  emptyMessage?: string;
+  className?: string;
+  limit?: number;
 }
 
 export interface VRSessionWithMusicProps {
@@ -68,4 +87,15 @@ export interface VRSessionWithMusicProps {
   emotion?: string;
   sessionId?: string;
   templateId?: string;
+  musicEnabled?: boolean;
+}
+
+// This type is needed as an export
+export type VRSessionWithMusicPropsType = VRSessionWithMusicProps;
+
+export interface VRSessionHistoryProps {
+  userId?: string;
+  limit?: number;
+  showHeader?: boolean;
+  className?: string;
 }

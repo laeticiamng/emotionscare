@@ -1,7 +1,7 @@
 
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'realtime' | 'custom';
 export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'system' | 'user' | 'emotion' | 'coach' | 'journal' | 'community' | 'vr' | 'reminder' | string;
 export type NotificationPriority = 'high' | 'medium' | 'low';
-export type NotificationFrequency = 'immediately' | 'daily' | 'weekly' | 'never' | 'immediate' | 'realtime' | 'custom';
 export type NotificationTone = 'professional' | 'friendly' | 'direct' | 'supportive' | 'minimal' | 'casual';
 
 export interface NotificationChannels {
@@ -48,6 +48,10 @@ export type NotificationFilter = 'all' | 'unread' | 'alerts' | string;
 export interface NotificationBadge {
   count: number;
   type?: NotificationType;
+  hasNew?: boolean;
+  lastSeen?: string;
+  badgesCount?: number;
+  notificationsCount?: number;
 }
 
 export interface NotificationItemProps {

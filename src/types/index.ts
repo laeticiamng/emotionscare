@@ -32,7 +32,8 @@ export type {
 
 // Exports for sidebar types
 export type {
-  SidebarContextType
+  SidebarContextType,
+  SidebarProps
 } from './sidebar';
 
 // Exports for music-related types

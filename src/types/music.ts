@@ -42,6 +42,7 @@ export interface MusicContextType {
   prevTrack?: () => void;
   setVolume: (volume: number) => void;
   seekTo: (progress: number) => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
 }
 
 export interface MusicDrawerProps {
