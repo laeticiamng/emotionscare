@@ -1,31 +1,5 @@
 
-import { LucideIcon } from "lucide-react";
-import { ReactNode } from "react";
-
-export interface KpiCardProps {
-  title: string;
-  value: string | number | ReactNode;
-  icon?: LucideIcon;
-  delta?: {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  } | number;
-  subtitle?: ReactNode;
-  ariaLabel?: string;
-  className?: string;
-  isLoading?: boolean;
-  onClick?: () => void;
-  trend?: number;
-  variant?: 'default' | 'success' | 'warning' | 'danger';
-}
-
-export interface DraggableKpiCardsGridProps {
-  kpiCards: KpiCardProps[];
-  className?: string;
-  onLayoutChange?: (layout: any) => void;
-  initialLayout?: any;
-}
+import { ReactNode } from 'react';
 
 export interface GridPosition {
   x: number;
@@ -34,45 +8,73 @@ export interface GridPosition {
   h: number;
 }
 
-export interface GlobalOverviewTabProps {
+export interface DraggableKpiCardsGridProps {
   kpiCards: KpiCardProps[];
-  absenteeismChartData?: any;
-  emotionalScoreTrend?: any;
-  dashboardStats?: any;
-  gamificationData?: any;
-  isLoading?: boolean;
+  className?: string;
+}
+
+export interface KpiCardProps {
+  title: string;
+  value: string | number;
+  trend?: number;
+  icon?: ReactNode;
+  description?: string;
+  status?: 'positive' | 'negative' | 'neutral' | 'warning';
+  onClick?: () => void;
+  className?: string;
+  trendText?: string;
+  details?: string;
+  period?: string;
+  loading?: boolean;
 }
 
 export interface DashboardWidgetConfig {
   id: string;
   title: string;
-  description?: string;
-  component: React.ComponentType<any>;
-  defaultPosition?: GridPosition;
-  defaultSize?: { w: number; h: number };
-  minSize?: { w: number; h: number };
-  maxSize?: { w: number; h: number };
-  settings?: Record<string, any>;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  minW?: number;
+  minH?: number;
+  visible: boolean;
 }
 
-export interface DashboardStats {
-  userCount: number;
-  activeUsers: number;
-  avgEngagement: number;
-  totalSessions: number;
+export interface GlobalOverviewTabProps {
+  kpiCards: KpiCardProps[];
+  absenteeismChartData?: any[];
+  emotionalScoreTrend?: any[];
+  dashboardStats?: DashboardStats;
+  gamificationData?: GamificationData;
+  isLoading?: boolean;
 }
 
 export interface ChartData {
-  name: string;
+  date: string;
   value: number;
-  [key: string]: any;
+  category?: string;
+}
+
+export interface DashboardStats {
+  totalUsers: number;
+  activeUsers: number;
+  averageEmotionalScore: number;
+  absenteeismRate: number;
 }
 
 export interface GamificationData {
-  totalPoints: number;
-  recentBadges: any[];
-  challengesCompleted: number;
-  rank: string;
-  level: number;
-  nextLevelProgress: number;
+  totalBadges: number;
+  activeChallenges: number;
+  leaderboard: {
+    userId: string;
+    name: string;
+    score: number;
+    position: number;
+  }[];
+  recentAchievements: {
+    userId: string;
+    name: string;
+    badge: string;
+    date: string;
+  }[];
 }

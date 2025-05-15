@@ -1,173 +1,220 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { motion } from 'framer-motion';
+import { Shield, Lock, Download } from 'lucide-react';
 
 const DataPrivacySettings = () => {
-  const { toast } = useToast();
   const { preferences, updatePreferences } = useUserPreferences();
-
-  // Save settings
-  const saveSettings = () => {
-    toast({
-      title: "Paramètres de confidentialité mis à jour",
-      description: "Vos préférences de confidentialité ont été enregistrées."
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const handlePrivacyChange = (key: string, value: boolean) => {
+    if (!preferences.privacy || typeof preferences.privacy === 'string') {
+      // Initialize privacy object if it doesn't exist or is a string
+      updatePreferences({
+        privacy: {
+          [key]: value,
+          profileVisibility: 'private'
+        }
+      });
+    } else {
+      // Update existing privacy object
+      updatePreferences({
+        privacy: {
+          ...preferences.privacy,
+          [key]: value
+        }
+      });
+    }
+  };
+  
+  const handleProfileVisibilityChange = (visibility: 'public' | 'team' | 'private') => {
+    if (!preferences.privacy || typeof preferences.privacy === 'string') {
+      // Initialize privacy object if it doesn't exist or is a string
+      updatePreferences({
+        privacy: {
+          profileVisibility: visibility
+        }
+      });
+    } else {
+      // Update existing privacy object
+      updatePreferences({
+        privacy: {
+          ...preferences.privacy,
+          profileVisibility: visibility
+        }
+      });
+    }
+  };
+  
+  // Handle incognito mode toggle
+  const handleIncognitoModeToggle = () => {
+    const currentValue = preferences.incognitoMode || false;
+    updatePreferences({ 
+      incognitoMode: !currentValue 
     });
   };
-
-  // Reset emotional fingerprint
-  const resetEmotionalProfile = () => {
-    toast({
-      title: "Empreinte émotionnelle réinitialisée",
-      description: "L'analyse IA recommencera à partir de zéro, mais vos données existantes sont conservées.",
-      variant: "destructive"
+  
+  // Handle journal locking toggle
+  const handleJournalLockingToggle = () => {
+    const currentValue = preferences.lockJournals || false;
+    updatePreferences({ 
+      lockJournals: !currentValue 
     });
   };
-
+  
+  const getPrivacyValue = (key: string): boolean => {
+    if (!preferences.privacy || typeof preferences.privacy === 'string') {
+      return false;
+    }
+    return preferences.privacy[key] || false;
+  };
+  
+  const getProfileVisibility = (): 'public' | 'team' | 'private' => {
+    if (!preferences.privacy || typeof preferences.privacy === 'string') {
+      return 'private';
+    }
+    return preferences.privacy.profileVisibility || 'private';
+  };
+  
+  // Get export format
+  const getExportFormat = (): 'pdf' | 'json' | 'csv' => {
+    return preferences.dataExport || 'pdf';
+  };
+  
+  // Handle export format change
+  const handleExportFormatChange = (format: 'pdf' | 'json' | 'csv') => {
+    updatePreferences({
+      dataExport: format
+    });
+  };
+  
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="space-y-2"
-      >
-        <h3 className="text-lg font-medium">Confidentialité des données</h3>
-        <p className="text-sm text-muted-foreground">
-          Contrôlez comment vos données émotionnelles sont traitées et utilisées
-        </p>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="space-y-3"
-      >
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-          <div>
-            <p className="font-medium">Mode incognito</p>
-            <p className="text-sm text-muted-foreground">
-              Les données ne sont pas enregistrées durant la session
-            </p>
-          </div>
-          <Switch
-            checked={preferences.incognitoMode || false}
-            onCheckedChange={(checked) => updatePreferences({ incognitoMode: checked })}
-          />
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Confidentialité et protection des données
+        </CardTitle>
+        <CardDescription>
+          Gérez comment vos données sont utilisées et qui peut voir vos informations
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Confidentialité du profil</h3>
+          
+          <RadioGroup 
+            value={getProfileVisibility()} 
+            onValueChange={(value: 'public' | 'team' | 'private') => handleProfileVisibilityChange(value)}
+          >
+            <div className="flex items-start space-x-2 mb-3">
+              <RadioGroupItem value="public" id="public" className="mt-1" />
+              <div>
+                <Label htmlFor="public" className="font-medium">Public</Label>
+                <p className="text-sm text-muted-foreground">
+                  Votre profil et vos données émotionnelles sont visibles par tous les membres
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-2 mb-3">
+              <RadioGroupItem value="team" id="team" className="mt-1" />
+              <div>
+                <Label htmlFor="team" className="font-medium">Équipe uniquement</Label>
+                <p className="text-sm text-muted-foreground">
+                  Vos données ne sont visibles que par les membres de votre équipe
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-2">
+              <RadioGroupItem value="private" id="private" className="mt-1" />
+              <div>
+                <Label htmlFor="private" className="font-medium">Privé</Label>
+                <p className="text-sm text-muted-foreground">
+                  Vos données ne sont visibles que par vous et les administrateurs
+                </p>
+              </div>
+            </div>
+          </RadioGroup>
         </div>
-
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-          <div>
-            <p className="font-medium">Verrouiller les journaux</p>
-            <p className="text-sm text-muted-foreground">
-              Protéger les entrées de journal avec un mot de passe
-            </p>
-          </div>
-          <Switch
-            checked={preferences.lockJournals || false}
-            onCheckedChange={(checked) => updatePreferences({ lockJournals: checked })}
-          />
-        </div>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="space-y-3"
-      >
-        <h3 className="text-lg font-medium">Analyse IA</h3>
         
-        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-          <div>
-            <p className="font-medium">Pause IA</p>
-            <p className="text-sm text-muted-foreground">
-              Suspendre temporairement l'analyse émotionnelle
-            </p>
-          </div>
-          <Switch />
-        </div>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="space-y-3 border-t pt-6"
-      >
-        <h3 className="text-lg font-medium">Gestion des données</h3>
-        
-        <div className="grid gap-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
-            <div>
-              <p className="font-medium">Format d'exportation</p>
+        <div className="space-y-3">
+          <h3 className="text-lg font-medium">Options de confidentialité</h3>
+          
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Mode incognito</Label>
               <p className="text-sm text-muted-foreground">
-                Choisissez le format pour télécharger vos données
+                Masquez temporairement votre présence et votre activité
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button 
-                variant={preferences.dataExport === 'pdf' ? "default" : "outline"}
-                size="sm"
-                onClick={() => updatePreferences({ dataExport: 'pdf' })}
-              >
-                PDF
-              </Button>
-              <Button 
-                variant={preferences.dataExport === 'json' ? "default" : "outline"}
-                size="sm"
-                onClick={() => updatePreferences({ dataExport: 'json' })}
-              >
-                JSON
-              </Button>
-            </div>
+            <Switch
+              checked={preferences.incognitoMode || false}
+              onCheckedChange={handleIncognitoModeToggle}
+            />
           </div>
           
-          <Button variant="outline" className="w-full">
-            Télécharger mes données
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Verrouillage des journaux</Label>
+              <p className="text-sm text-muted-foreground">
+                Exige une authentification supplémentaire pour accéder à vos journaux
+              </p>
+            </div>
+            <Switch
+              checked={preferences.lockJournals || false}
+              onCheckedChange={handleJournalLockingToggle}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Partage de données anonymisées</Label>
+              <p className="text-sm text-muted-foreground">
+                Contribuer à l'amélioration des services avec des données anonymisées
+              </p>
+            </div>
+            <Switch
+              checked={getPrivacyValue('anonymousDataContribution')}
+              onCheckedChange={(checked) => handlePrivacyChange('anonymousDataContribution', checked)}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          <h3 className="text-lg font-medium">Exportation de données</h3>
+          <p className="text-sm text-muted-foreground">
+            Choisissez le format par défaut pour l'exportation de vos données
+          </p>
+          
+          <Select 
+            value={getExportFormat()}
+            onValueChange={(value) => handleExportFormatChange(value as 'pdf' | 'json' | 'csv')}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Format d'exportation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pdf">PDF</SelectItem>
+              <SelectItem value="json">JSON</SelectItem>
+              <SelectItem value="csv">CSV</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button variant="outline" className="w-full mt-2">
+            <Download className="mr-2 h-4 w-4" />
+            Exporter mes données
           </Button>
         </div>
-      </motion.div>
-      
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="space-y-3 border-t pt-6"
-      >
-        <h3 className="text-lg font-medium">Réinitialisation de l'empreinte émotionnelle</h3>
-        <p className="text-sm text-muted-foreground">
-          Cette action réinitialise uniquement la façon dont l'IA vous comprend, sans supprimer vos données.
-        </p>
-        
-        <Button 
-          variant="outline" 
-          className="border-destructive text-destructive hover:bg-destructive/10"
-          onClick={resetEmotionalProfile}
-        >
-          Réinitialiser mon empreinte émotionnelle
-        </Button>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-      >
-        <Button onClick={saveSettings} className="w-full">
-          Enregistrer les préférences
-        </Button>
-      </motion.div>
-    </motion.div>
+      </CardContent>
+    </Card>
   );
 };
 

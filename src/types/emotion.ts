@@ -22,6 +22,10 @@ export interface EmotionResult {
   date?: string | Date;
   timestamp?: string | Date;
   user_id?: string;
+  emojis?: string[] | string;
+  recommendations?: string[];
+  triggers?: string[];
+  historicalContext?: any;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

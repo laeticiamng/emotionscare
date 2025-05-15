@@ -1,20 +1,23 @@
 
-import { useCallback, useEffect, useState } from 'react';
-import { useUserPreferences } from '@/contexts/UserPreferencesContext'; 
-import { TimeOfDay } from '@/constants/defaults';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
-export function useAmbientSound() {
+export const useAmbientSound = (defaultMood: string = 'calm') => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
-  const [currentMood, setCurrentMood] = useState<string>('calm');
+  const [currentMood, setCurrentMood] = useState<string>(defaultMood);
   const { preferences } = useUserPreferences();
 
   const toggle = useCallback(() => {
     setIsPlaying(prev => !prev);
   }, []);
 
-  const changeVolume = useCallback((newVolume: number) => {
+  const updateVolume = useCallback((newVolume: number) => {
     setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
   }, []);
 
   const changeMood = useCallback((mood: string) => {
@@ -22,47 +25,55 @@ export function useAmbientSound() {
   }, []);
 
   useEffect(() => {
-    // Determine time of day to set appropriate mood
-    const hour = new Date().getHours();
-    let timeOfDay: TimeOfDay;
-    
-    if (hour >= 5 && hour < 12) timeOfDay = TimeOfDay.MORNING;
-    else if (hour >= 12 && hour < 18) timeOfDay = TimeOfDay.AFTERNOON;
-    else if (hour >= 18 && hour < 22) timeOfDay = TimeOfDay.EVENING;
-    else timeOfDay = TimeOfDay.NIGHT;
-    
-    // Set default mood based on time of day
-    switch(timeOfDay) {
-      case TimeOfDay.MORNING:
-        setCurrentMood('calm');
-        break;
-      case TimeOfDay.AFTERNOON:
-        setCurrentMood('focus');
-        break;
-      case TimeOfDay.EVENING:
-        setCurrentMood('relax');
-        break;
-      case TimeOfDay.NIGHT:
-        setCurrentMood('sleep');
-        break;
-      default:
-        setCurrentMood('calm');
+    // Create audio element if it doesn't exist
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
     }
 
-    // Auto-play based on user preferences
-    if (preferences?.ambientSound) {
-      setIsPlaying(true);
+    // Get sound URL based on mood
+    const getAudioSource = (mood: string) => {
+      const moodMap: Record<string, string> = {
+        calm: '/audio/calm-ambient.mp3',
+        focus: '/audio/focus-ambient.mp3',
+        relax: '/audio/relax-ambient.mp3',
+        energize: '/audio/energize-ambient.mp3',
+      };
+      return moodMap[mood.toLowerCase()] || moodMap.calm;
+    };
+
+    // Update audio source when mood changes
+    const audioSource = getAudioSource(currentMood);
+    audioRef.current.src = audioSource;
+    audioRef.current.loop = true;
+    audioRef.current.volume = volume;
+
+    // Check if ambient sound should be enabled based on user preferences
+    const ambientSoundEnabled = typeof preferences.ambientSound === 'boolean' 
+      ? preferences.ambientSound 
+      : true;
+
+    // Play or pause based on state and preferences
+    if (isPlaying && ambientSoundEnabled) {
+      audioRef.current.play().catch(err => console.error('Error playing audio:', err));
+    } else {
+      audioRef.current.pause();
     }
-  }, [preferences]);
+
+    // Cleanup function
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, [isPlaying, currentMood, volume, preferences]);
 
   return {
     isPlaying,
-    toggle,
     volume,
-    changeVolume,
     currentMood,
-    changeMood
+    toggle,
+    updateVolume,
+    changeMood,
   };
-}
-
-export default useAmbientSound;
+};
