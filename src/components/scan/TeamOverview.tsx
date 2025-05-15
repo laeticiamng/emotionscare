@@ -1,31 +1,27 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TeamOverviewProps } from '@/types';
+import { TeamOverviewProps } from '@/types/emotion';
 
-const TeamOverview: React.FC<TeamOverviewProps> = ({ 
-  teamId, 
-  period = 'week',
-  loading = false
+const TeamOverview: React.FC<TeamOverviewProps> = ({
+  teamId,
+  period = 'month',
+  showNames = true,
+  compact = false
 }) => {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Vue d'ensemble de l'équipe</CardTitle>
+    <Card className={compact ? 'p-2' : ''}>
+      <CardHeader className={compact ? 'p-2' : ''}>
+        <CardTitle className={compact ? 'text-lg' : ''}>Team Emotional Overview</CardTitle>
       </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="flex items-center justify-center h-40">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent"></div>
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <p>Données de l'équipe {teamId} pour la période: {period}</p>
-            <p className="text-muted-foreground mt-2">
-              Cette fonctionnalité est en cours de développement.
-            </p>
-          </div>
-        )}
+      <CardContent className={compact ? 'p-2' : ''}>
+        <div className="text-center py-4 text-muted-foreground">
+          {teamId ? (
+            <p>Loading team overview for {teamId}, period: {period}...</p>
+          ) : (
+            <p>No team selected. Please select a team to view their emotional overview.</p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

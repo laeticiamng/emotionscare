@@ -1,215 +1,214 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { NotificationFrequency, NotificationTone } from '@/types/notification';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { NotificationFrequency, NotificationTone } from '@/types';
 
 const NotificationPreferences = () => {
-  const { preferences, updatePreferences } = useUserPreferences();
+  const { user, updateUser } = useAuth();
+  const { toast } = useToast();
   
-  const notificationEnabled = preferences.notifications?.enabled ?? true;
-  const emailEnabled = preferences.notifications?.emailEnabled ?? true;
-  const pushEnabled = preferences.notifications?.pushEnabled ?? true;
-  const inAppEnabled = preferences.notifications?.inAppEnabled ?? true;
-  
-  const frequency = preferences.notifications?.frequency || 'immediate';
-  const tone = preferences.notifications?.tone || 'friendly';
-  
-  // Get types from preferences, use empty object if not available
-  const notificationTypes = preferences.notifications?.types || {};
-  
-  const handleToggleNotifications = () => {
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        enabled: !notificationEnabled
-      }
-    });
+  // Default preferences if user has none
+  const defaultPreferences = {
+    enabled: true,
+    types: { // Changed from 'type' to 'types'
+      all: true,
+      important: true,
+      system: true,
+      emotion: true,
+      journal: true,
+      coach: true,
+      community: true
+    },
+    frequency: 'immediate' as NotificationFrequency,
+    tone: 'supportive' as unknown as NotificationTone,
+    emailEnabled: true,
+    pushEnabled: true,
+    inAppEnabled: true, // Add this property
+    soundEnabled: true
   };
   
-  const handleToggleChannel = (channel: 'emailEnabled' | 'pushEnabled' | 'inAppEnabled') => {
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        [channel]: !preferences.notifications?.[channel]
-      }
-    });
-  };
+  // Get existing preferences or use defaults
+  const userNotifPrefs = user?.preferences?.notifications || {};
   
-  const handleFrequencyChange = (newFrequency: NotificationFrequency) => {
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        frequency: newFrequency
-      }
-    });
-  };
+  // Convert to object if it's a boolean
+  const notificationSettings = typeof userNotifPrefs === 'boolean' 
+    ? { enabled: userNotifPrefs } 
+    : userNotifPrefs;
   
-  const handleToneChange = (newTone: NotificationTone) => {
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        tone: newTone
-      }
-    });
-  };
+  // State for the form
+  const [preferences, setPreferences] = useState({
+    ...defaultPreferences,
+    ...notificationSettings
+  });
   
-  const handleTypeToggle = (type: string) => {
-    // Check if types exists, use empty object if not
-    const existingTypes = preferences.notifications?.types || {};
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
     
-    updatePreferences({
-      notifications: {
-        ...preferences.notifications,
-        types: {
-          ...existingTypes,
-          [type]: !existingTypes[type]
+    setIsSubmitting(true);
+    
+    try {
+      // Update user preferences
+      const updatedUser = {
+        ...user,
+        preferences: {
+          ...user.preferences,
+          notifications: preferences
         }
-      }
-    });
+      };
+      
+      await updateUser(updatedUser);
+      
+      toast({
+        title: "Préférences mises à jour",
+        description: "Vos préférences de notification ont été enregistrées."
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder vos préférences.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
-  const isTypeEnabled = (type: string): boolean => {
-    // Check if types exists, use empty object if not
-    const existingTypes = preferences.notifications?.types || {};
+  // Helper function to set notification type preferences
+  const setNotificationType = (value: 'all' | 'important' | 'none') => {
+    // Create default types object with all types
+    const typesObject = {
+      system: value === 'all',
+      emotion: value === 'all',
+      journal: value === 'all',
+      coach: value === 'all',
+      community: value === 'all',
+      important: value === 'all' || value === 'important'
+    };
     
-    // Default to true if not explicitly set
-    return existingTypes[type] !== false;
+    setPreferences({...preferences, types: typesObject});
+  };
+  
+  // Determine which radio button should be selected based on types
+  const getNotificationType = (): 'all' | 'important' | 'none' => {
+    if (!preferences.types) return 'none';
+    
+    const { system, emotion, journal, coach, community, important } = preferences.types;
+    
+    if (system && emotion && journal && coach && community) return 'all';
+    if (important && !system && !emotion && !journal && !coach && !community) return 'important';
+    return 'none';
   };
   
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notification Preferences</CardTitle>
-        <CardDescription>
-          Manage how you receive updates and information
-        </CardDescription>
+        <CardTitle>Préférences de notification</CardTitle>
+        <CardDescription>Configurez comment et quand vous souhaitez être notifié</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">General Settings</h3>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label className="text-base">Enable Notifications</Label>
-              <p className="text-sm text-muted-foreground">
-                Control whether you receive any notifications
-              </p>
-            </div>
-            <Switch
-              checked={notificationEnabled}
-              onCheckedChange={handleToggleNotifications}
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Delivery Channels</h3>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label className="text-base">Email Notifications</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive notifications via email
-              </p>
-            </div>
-            <Switch
-              checked={emailEnabled}
-              onCheckedChange={() => handleToggleChannel('emailEnabled')}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label className="text-base">Push Notifications</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive notifications on your device
-              </p>
-            </div>
-            <Switch
-              checked={pushEnabled}
-              onCheckedChange={() => handleToggleChannel('pushEnabled')}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label className="text-base">In-App Notifications</Label>
-              <p className="text-sm text-muted-foreground">
-                Receive notifications within the application
-              </p>
-            </div>
-            <Switch
-              checked={inAppEnabled}
-              onCheckedChange={() => handleToggleChannel('inAppEnabled')}
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Frequency & Tone</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="frequency">Frequency</Label>
-              <Select
-                value={frequency}
-                onValueChange={(value) => handleFrequencyChange(value as NotificationFrequency)}
+              <h3 className="text-sm font-medium mb-3">Types de notifications</h3>
+              <RadioGroup 
+                value={getNotificationType()} 
+                onValueChange={(value: 'all' | 'important' | 'none') => setNotificationType(value)}
+                className="space-y-2"
               >
-                <SelectTrigger id="frequency">
-                  <SelectValue placeholder="Select a frequency" />
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="all" id="all" />
+                  <Label htmlFor="all">Toutes les notifications</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="important" id="important" />
+                  <Label htmlFor="important">Uniquement les notifications importantes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="none" id="none" />
+                  <Label htmlFor="none">Aucune notification</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-3">Fréquence des notifications</h3>
+              <Select 
+                value={preferences.frequency} 
+                onValueChange={(value) => setPreferences({...preferences, frequency: value as NotificationFrequency})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir une fréquence" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="immediate">Immediate</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="never">Never</SelectItem>
+                  <SelectItem value="immediate">Immédiatement</SelectItem>
+                  <SelectItem value="daily">Résumé quotidien</SelectItem>
+                  <SelectItem value="weekly">Résumé hebdomadaire</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             
             <div>
-              <Label htmlFor="tone">Tone</Label>
-              <Select
-                value={tone}
-                onValueChange={(value) => handleToneChange(value as NotificationTone)}
+              <h3 className="text-sm font-medium mb-3">Ton des notifications</h3>
+              <Select 
+                value={preferences.tone as unknown as string} 
+                onValueChange={(value) => setPreferences({...preferences, tone: value as unknown as NotificationTone})}
               >
-                <SelectTrigger id="tone">
-                  <SelectValue placeholder="Select a tone" />
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir un ton" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="friendly">Friendly</SelectItem>
-                  <SelectItem value="professional">Professional</SelectItem>
-                  <SelectItem value="motivational">Motivational</SelectItem>
-                  <SelectItem value="direct">Direct</SelectItem>
-                  <SelectItem value="calm">Calm</SelectItem>
+                  <SelectItem value="professional">Professionnel</SelectItem>
+                  <SelectItem value="casual">Décontracté</SelectItem>
+                  <SelectItem value="supportive">Bienveillant</SelectItem>
+                  <SelectItem value="minimal">Minimaliste</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notification Types</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Example types - replace with your actual types */}
-            {['system', 'emotion', 'journal', 'coach', 'community', 'achievement'].map((type) => (
-              <div key={type} className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <Label className="text-base">{type.charAt(0).toUpperCase() + type.slice(1)}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive {type} related notifications
-                  </p>
-                </div>
-                <Switch
-                  checked={isTypeEnabled(type)}
-                  onCheckedChange={() => handleTypeToggle(type)}
+            
+            <div className="space-y-2 pt-2">
+              <h3 className="text-sm font-medium mb-3">Canaux de notification</h3>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-notifications">Notifications par email</Label>
+                <Switch 
+                  id="email-notifications" 
+                  checked={preferences.emailEnabled}
+                  onCheckedChange={(checked) => setPreferences({...preferences, emailEnabled: checked})}
                 />
               </div>
-            ))}
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="push-notifications">Notifications push</Label>
+                <Switch 
+                  id="push-notifications" 
+                  checked={preferences.pushEnabled}
+                  onCheckedChange={(checked) => setPreferences({...preferences, pushEnabled: checked})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="sound-notifications">Sons de notification</Label>
+                <Switch 
+                  id="sound-notifications" 
+                  checked={preferences.soundEnabled}
+                  onCheckedChange={(checked) => setPreferences({...preferences, soundEnabled: checked})}
+                />
+              </div>
+            </div>
           </div>
-        </div>
+          
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Enregistrement..." : "Enregistrer les préférences"}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

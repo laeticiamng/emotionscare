@@ -13,7 +13,8 @@ export type {
 export type {
   VRSessionTemplate,
   VRSession,
-  VRHistoryListProps
+  VRHistoryListProps,
+  VRSessionHistoryProps
 } from './types/vr';
 
 // Renamed to avoid export conflicts
@@ -49,7 +50,10 @@ export type {
 export type { 
   Theme, 
   FontFamily as ThemeFontFamily, 
-  FontSize as ThemeFontSize 
+  FontSize as ThemeFontSize,
+  ThemeContextType,
+  ThemeButtonProps,
+  SidebarContextType
 } from './types/theme';
 
 // Export from dashboard
@@ -78,7 +82,8 @@ export type {
   EnhancedEmotionResult,
   EmotionalTeamViewProps,
   LiveVoiceScannerProps,
-  VoiceEmotionScannerProps
+  VoiceEmotionScannerProps,
+  TeamOverviewProps
 } from './types/emotion';
 
 // Adding additional required types

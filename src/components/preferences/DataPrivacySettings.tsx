@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -73,7 +72,7 @@ const DataPrivacySettings = () => {
     if (!preferences.privacy || typeof preferences.privacy === 'string') {
       return false;
     }
-    return preferences.privacy[key] || false;
+    return !!preferences.privacy[key];
   };
   
   const getProfileVisibility = (): 'public' | 'team' | 'private' => {
@@ -85,7 +84,12 @@ const DataPrivacySettings = () => {
   
   // Get export format
   const getExportFormat = (): 'pdf' | 'json' | 'csv' => {
-    return preferences.dataExport as 'pdf' | 'json' | 'csv' || 'pdf';
+    // Fix for TypeScript error: convert to proper enum type
+    const format = preferences.dataExport;
+    if (format === 'pdf' || format === 'json' || format === 'csv') {
+      return format;
+    }
+    return 'pdf'; // Default value
   };
   
   // Handle export format change

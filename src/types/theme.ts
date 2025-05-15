@@ -35,3 +35,10 @@ export interface ColorPalette {
   muted: string;
   card: string;
 }
+
+export interface SidebarContextType {
+  isOpen: boolean;
+  toggle: () => void;
+  close: () => void;
+  open: () => void;
+}

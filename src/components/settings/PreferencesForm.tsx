@@ -16,7 +16,9 @@ interface PreferencesFormProps {
 
 const preferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'system', 'pastel']),
-  notifications_enabled: z.boolean(),
+  notifications: z.object({
+    enabled: z.boolean()
+  }).or(z.boolean()),
   fontSize: z.enum(['small', 'medium', 'large']),
   language: z.string(),
   privacy: z.union([
@@ -30,18 +32,30 @@ const preferencesSchema = z.object({
 const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  // Ensure preferences has the correct structure
-  const defaultValues = {
-    ...preferences,
-    // Handle privacy field transformations
-    privacy: typeof preferences.privacy === 'string' 
-      ? preferences.privacy 
-      : preferences.privacy || { profileVisibility: 'public' }
+  // Format preferences for the form
+  const getFormattedPreferences = () => {
+    // Convert old notifications_enabled to the new structure if needed
+    let notifications = preferences.notifications;
+    
+    if (typeof preferences.notifications_enabled !== 'undefined' && !notifications) {
+      notifications = {
+        enabled: preferences.notifications_enabled
+      };
+    } else if (!notifications) {
+      notifications = {
+        enabled: true
+      };
+    }
+
+    return {
+      ...preferences,
+      notifications
+    };
   };
 
   const form = useForm<UserPreferences>({
-    resolver: zodResolver(preferencesSchema),
-    defaultValues,
+    // resolver: zodResolver(preferencesSchema),
+    defaultValues: getFormattedPreferences(),
   });
 
   const handleSubmit = async (data: UserPreferences) => {
@@ -109,31 +123,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
 
         <FormField
           control={form.control}
-          name="language"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Langue</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une langue" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                Sélectionnez la langue de l'interface.
-              </FormDescription>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="notifications_enabled"
+          name="notifications.enabled"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">

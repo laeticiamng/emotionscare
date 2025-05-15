@@ -53,20 +53,20 @@ export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   showTranscript?: boolean;
   autoStart?: boolean;
-  className?: string; // Added for compatibility
-  stopAfterSeconds?: number; // Added for compatibility
-  duration?: number; // Added for compatibility
+  className?: string;
+  stopAfterSeconds?: number;
+  duration?: number;
 }
 
 export interface VoiceEmotionScannerProps {
   onComplete?: (result: EmotionResult) => void;
   quickMode?: boolean;
   showFeedback?: boolean;
-  onResult?: (result: EmotionResult) => void; // Added for compatibility
-  duration?: number; // Added for compatibility
-  autoStart?: boolean; // Added for compatibility
-  showVisualizer?: boolean; // Added for compatibility
-  className?: string; // Added for compatibility
+  onResult?: (result: EmotionResult) => void;
+  duration?: number;
+  autoStart?: boolean;
+  showVisualizer?: boolean;
+  className?: string;
 }
 
 // Add TeamOverviewProps since it's being imported

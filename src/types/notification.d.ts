@@ -34,13 +34,13 @@ export interface NotificationPreference {
   channels?: NotificationChannels;
   frequency?: NotificationFrequency;
   types?: Record<string, boolean>;
+  type?: string; // Added for backward compatibility
   quietHours?: {
     enabled: boolean;
     start: string;
     end: string;
   };
   tone?: NotificationTone;
-  type?: string; // Added for backward compatibility
 }
 
 export interface NotificationBadge {

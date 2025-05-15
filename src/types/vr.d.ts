@@ -2,6 +2,7 @@
 export interface VRSessionTemplate {
   id: string;
   name?: string;
+  title: string;
   description?: string;
   duration: number;
   type?: string;
@@ -10,53 +11,60 @@ export interface VRSessionTemplate {
   emotion?: string;
   
   // Add missing properties that are used
-  title: string;
   audio_url?: string;
+  audioUrl?: string;
   emotion_target?: string;
+  emotionTarget?: string;
   lastUsed?: string | Date;
   preview_url?: string;
   is_audio_only?: boolean;
+  isAudioOnly?: boolean;
   benefits?: string[];
   difficulty?: string;
   theme?: string;
   tags?: string[];
   imageUrl?: string;
   thumbnailUrl?: string;
+  coverUrl?: string;
   video_url?: string;
-  emotionTarget?: string;
   recommendedMood?: string;
   completionRate?: number;
 }
 
 export interface VRSession {
   id: string;
-  templateId: string;
-  userId: string;
-  startTime: string;
+  templateId?: string;
+  template_id?: string;
+  userId?: string;
+  user_id?: string;
+  startTime?: string;
   endTime?: string;
+  startedAt?: string;
+  started_at?: string;
+  completedAt?: string;
+  completed_at?: string;
+  completed?: boolean;
+  isCompleted?: boolean;
   duration: number;
-  completed: boolean;
+  duration_seconds?: number;
   emotionBefore?: string;
   emotionAfter?: string;
+  emotion_before?: string;
+  emotion_after?: string;
   notes?: string;
   rating?: number;
   
   // Add missing properties that are used
   date?: string;
-  startedAt?: string;
-  duration_seconds?: number;
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
-  isCompleted?: boolean;
-  template_id?: string;
-  user_id?: string;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
   start_time?: string;
   end_time?: string;
   emotionTarget?: string;
   emotion_target?: string;
-  heartRateBefore?: number;
-  heartRateAfter?: number;
   template?: VRSessionTemplate;
 }
 
@@ -98,4 +106,5 @@ export interface VRSessionHistoryProps {
   limit?: number;
   showHeader?: boolean;
   className?: string;
+  sessions?: VRSession[];
 }

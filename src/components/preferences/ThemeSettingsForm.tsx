@@ -15,7 +15,7 @@ const ThemeSettingsForm = () => {
   const fontFamilyOptions: FontFamily[] = ['sans', 'serif', 'mono', 'rounded'];
   
   // Map display names
-  const fontSizeDisplayNames: Record<FontSize, string> = {
+  const fontSizeDisplayNames: Record<string, string> = {
     sm: 'Small',
     md: 'Medium',
     lg: 'Large',
@@ -26,7 +26,7 @@ const ThemeSettingsForm = () => {
     'x-large': 'Extra Large'
   };
   
-  const fontFamilyDisplayNames: Record<FontFamily, string> = {
+  const fontFamilyDisplayNames: Record<string, string> = {
     sans: 'Sans-Serif',
     serif: 'Serif',
     mono: 'Monospace',
