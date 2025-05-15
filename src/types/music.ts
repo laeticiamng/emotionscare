@@ -6,18 +6,18 @@ export interface MusicTrack {
   url: string;
   audioUrl?: string;
   coverUrl?: string;
-  duration?: number;
-  emotion?: string;
   cover?: string;
   cover_url?: string;
+  duration?: number;
+  emotion?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
   title?: string;
-  tracks: MusicTrack[];
   coverUrl?: string;
+  tracks: MusicTrack[];
   description?: string;
   emotion?: string;
 }
@@ -49,8 +49,10 @@ export interface MusicContextType {
 
 export interface MusicDrawerProps {
   isOpen?: boolean;
+  open?: boolean;
   side?: 'left' | 'right' | 'top' | 'bottom';
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
 }
@@ -59,18 +61,15 @@ export interface Track {
   id: string;
   title: string;
   artist: string;
-  duration: number;
   url: string;
   cover?: string;
-  coverUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
+  duration?: number;
 }
 
 export interface ProgressBarProps {
   value: number;
   max: number;
-  onSeek?: (value: number) => void;
+  onChange?: (value: number) => void;
   className?: string;
 }
 
@@ -90,7 +89,7 @@ export interface TrackInfoProps {
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (value: number) => void;
+  onVolumeChange: (volume: number) => void;
   className?: string;
   onChange?: (volume: number) => void;
   showLabel?: boolean;

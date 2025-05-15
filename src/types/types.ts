@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 
 // User types
@@ -220,9 +221,6 @@ export interface LeaderboardEntry {
   level?: number;
 }
 
-// Add this type definition for Period
-export type Period = 'day' | 'week' | 'month' | 'year' | string;
-
 // Add or update EmotionalTeamViewProps
 export interface EmotionalTeamViewProps {
   departmentId?: string;
@@ -236,9 +234,6 @@ export interface EmotionalTeamViewProps {
   dateRange?: { start: Date; end: Date };
   onRefresh?: () => void;
 }
-
-// Add UserModeType
-export type UserModeType = 'b2b_admin' | 'b2b_user' | 'b2c' | 'personal' | string;
 
 // Add music-related types that were missing
 export interface MusicTrack {
@@ -315,7 +310,7 @@ export interface TrackInfoProps {
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (value: number) => void;
+  onVolumeChange: (volume: number) => void;
   className?: string;
   onChange?: (volume: number) => void;
   showLabel?: boolean;
@@ -330,14 +325,37 @@ export interface Emotion {
   description?: string;
   category?: string;
   intensity?: number;
+  score?: number;
+  confidence?: number;
+  emotion?: string;
+  date?: string | Date;
+  text?: string;
+  emojis?: string[] | string;
+  transcript?: string;
+  audio_url?: string;
+  ai_feedback?: string;
+  feedback?: string;
+  recommendations?: string[];
+  triggers?: string[];
+  [key: string]: any; // For flexibility
 }
 
 export interface EmotionResult {
   emotion: string;
+  id?: string;
+  user_id?: string;
   score?: number;
   intensity?: number;
+  confidence?: number;
+  text?: string;
+  transcript?: string;
   date?: string;
   timestamp?: string;
   triggers?: string[];
   recommendations?: string[];
+  ai_feedback?: string;
+  feedback?: string;
+  audio_url?: string;
+  emojis?: string[] | string;
+  [key: string]: any; // For flexibility
 }

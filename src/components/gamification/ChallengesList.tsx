@@ -1,49 +1,98 @@
-
 import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle, Circle } from 'lucide-react';
 import { Challenge } from '@/types/types';
-import ChallengeItem from './ChallengeItem';
 
 interface ChallengesListProps {
   challenges: Challenge[];
-  onComplete?: (id: string) => void;
+  className?: string;
 }
 
-const ChallengesList: React.FC<ChallengesListProps> = ({ 
-  challenges, 
-  onComplete = () => {} 
-}) => {
-  const sortedChallenges = [...challenges].sort((a, b) => {
-    // First incomplete ones, then completed ones
-    const aIsCompleted = a.status === 'complete' || a.status === 'completed' || !!a.completed;
-    const bIsCompleted = b.status === 'complete' || b.status === 'completed' || !!b.completed;
-    
-    if (aIsCompleted && !bIsCompleted) return 1;
-    if (!aIsCompleted && bIsCompleted) return -1;
-    
-    // Within the same completion status, sort by priority/points
-    return b.points - a.points;
-  });
+const ChallengesList = ({ challenges, className = '' }) => {
+  // Filter logic that handles both status formats
+  const completedChallenges = challenges.filter(
+    (challenge) => challenge.status === 'complete' || 
+                  challenge.status === 'completed' ||
+                  challenge.completed === true
+  );
   
+  const inProgressChallenges = challenges.filter(
+    (challenge) => challenge.status === 'in-progress' && 
+                  challenge.status !== 'complete' && 
+                  challenge.status !== 'completed' &&
+                  challenge.completed !== true
+  );
+  
+  const notStartedChallenges = challenges.filter(
+    (challenge) => challenge.status !== 'complete' &&
+                  challenge.status !== 'completed' &&
+                  challenge.status !== 'in-progress' &&
+                  challenge.completed !== true
+  );
+
   return (
-    <div className="space-y-4">
-      {sortedChallenges.map((challenge) => (
-        <ChallengeItem
-          key={challenge.id}
-          id={challenge.id}
-          title={challenge.title || challenge.name || ''}
-          description={challenge.description}
-          points={challenge.points}
-          isCompleted={challenge.status === 'complete' || 
-                      challenge.status === 'completed' || 
-                      !!challenge.completed}
-          onComplete={onComplete}
-        />
-      ))}
+    <div className={`space-y-4 ${className}`}>
+      {completedChallenges.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground">Terminées</h3>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {completedChallenges.map((challenge) => (
+              <Card key={challenge.id}>
+                <CardContent className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-sm">{challenge.title || challenge.name}</h4>
+                    <p className="text-xs text-muted-foreground">{challenge.description}</p>
+                  </div>
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {inProgressChallenges.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground">En cours</h3>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {inProgressChallenges.map((challenge) => (
+              <Card key={challenge.id}>
+                <CardContent className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-sm">{challenge.title || challenge.name}</h4>
+                    <p className="text-xs text-muted-foreground">{challenge.description}</p>
+                  </div>
+                  <Circle className="h-5 w-5 text-blue-500" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {notStartedChallenges.length > 0 && (
+        <div>
+          <h3 className="text-sm font-medium text-muted-foreground">Non commencées</h3>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {notStartedChallenges.map((challenge) => (
+              <Card key={challenge.id}>
+                <CardContent className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-sm">{challenge.title || challenge.name}</h4>
+                    <p className="text-xs text-muted-foreground">{challenge.description}</p>
+                  </div>
+                  <Circle className="h-5 w-5 text-gray-300" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
       
       {challenges.length === 0 && (
-        <p className="text-center py-4 text-muted-foreground">
-          Aucun défi disponible actuellement
-        </p>
+        <div className="text-center py-4 text-muted-foreground">
+          Aucun défi disponible pour le moment.
+        </div>
       )}
     </div>
   );
