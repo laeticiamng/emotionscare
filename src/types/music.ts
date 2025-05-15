@@ -3,47 +3,41 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
+  duration: number;
   url: string;
-  duration?: number;
   cover?: string;
   coverUrl?: string;
-  cover_url?: string;
+  audioUrl?: string;
   emotion?: string;
-  played?: boolean;
-  isPlaying?: boolean;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
   title: string;
-  description?: string;
-  tracks: MusicTrack[];
-  cover?: string;
-  coverUrl?: string;
-  cover_url?: string;
   emotion?: string;
-  category?: string;
+  tracks: MusicTrack[];
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
+  playlist: MusicPlaylist | null;
   isPlaying: boolean;
   volume: number;
-  playlist: MusicPlaylist | null;
-  play: (track?: MusicTrack) => void;
-  pause: () => void;
-  next: () => void;
-  previous: () => void;
+  progress: number;
+  duration: number;
+  playTrack: (track: MusicTrack, playlist?: MusicPlaylist) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
   setVolume: (volume: number) => void;
-  setPlaylist: (playlist: MusicPlaylist) => void;
+  seekTo: (progress: number) => void;
 }
 
 export interface MusicDrawerProps {
-  isOpen?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onClose?: () => void;
+  open: boolean;
+  onClose: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
 }
@@ -52,39 +46,46 @@ export interface Track {
   id: string;
   title: string;
   artist: string;
+  duration: number;
   url: string;
-  coverUrl?: string;
-  cover_url?: string;
   cover?: string;
-  duration?: number;
+  coverUrl?: string;
+  audioUrl?: string;
   emotion?: string;
 }
 
 export interface ProgressBarProps {
   value: number;
   max?: number;
+  showLabel?: boolean;
+  className?: string;
+  variant?: 'default' | 'success' | 'warning' | 'danger';
+  progress?: number;
+  onSeek?: (percentage: number) => void;
   currentTime?: number;
   duration?: number;
   formatTime?: (seconds: number) => string;
-  handleProgressClick?: (e: any) => void;
-  className?: string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  showTimestamps?: boolean;
+  onChange?: (value: number) => void;
 }
 
 export interface TrackInfoProps {
-  track: MusicTrack;
+  title: string;
+  artist: string;
+  cover?: string;
   className?: string;
+  coverUrl?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onChange: (volume: number) => void;
+  onChange: (value: number) => void;
   className?: string;
 }
 
 export interface EmotionMusicParams {
-  emotion?: string;
+  emotion: string;
   intensity?: number;
   tempo?: 'slow' | 'medium' | 'fast';
-  genre?: string;
-  mood?: string;
 }

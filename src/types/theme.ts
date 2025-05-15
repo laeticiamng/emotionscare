@@ -1,3 +1,4 @@
+
 // Types pour les thèmes
 export type ThemeName = 'light' | 'dark' | 'pastel';
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';

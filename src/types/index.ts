@@ -1,3 +1,4 @@
+
 // Central export file for all types used in the application
 // All components should import their types from this file
 
@@ -31,7 +32,7 @@ export type {
 // Exports for sidebar types
 export type {
   SidebarContextType
-} from './types';
+} from './sidebar';
 
 // Exports for music-related types
 export type {

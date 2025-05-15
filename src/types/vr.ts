@@ -1,73 +1,98 @@
 
+import { MusicTrack, MusicPlaylist } from './music';
+import { Emotion } from './emotion';
+
 export interface VRSessionTemplate {
   id: string;
   title: string;
   description?: string;
-  emotion?: string;
   duration?: number;
-  difficulty?: string;
+  image?: string;
+  videoUrl?: string;
+  audioUrl?: string;
+  tags?: string[];
   benefits?: string[];
-  preview_url?: string;
-  theme?: string;
   is_audio_only?: boolean;
-  cover?: string;
+  difficulty?: string;
   coverUrl?: string;
   cover_url?: string;
-  preview?: string;
-  audio_url?: string;
-  audioUrl?: string;
+  cover?: string;
   category?: string;
+  emotion?: string;
+  preview_url?: string;
+  audio_url?: string;
+  video_url?: string;
+  thumbnail?: string;
 }
 
 export interface VRSession {
   id: string;
   template_id: string;
   user_id: string;
-  start_time: string;
-  end_time?: string;
-  duration?: number;
-  completed?: boolean;
-  emotion_target?: string;
-  emotionTarget?: string;
-  emotion_before?: string;
-  emotionBefore?: string;
-  emotion_after?: string;
-  emotionAfter?: string;
+  start_time: Date | string;
+  end_time?: Date | string;
+  duration: number;
+  completed: boolean;
+  emotion_before?: Emotion | string;
+  emotion_after?: Emotion | string;
   notes?: string;
-  heart_rate_before?: number;
-  heartRateBefore?: number;
-  heart_rate_after?: number;
-  heartRateAfter?: number;
-  stress_level_before?: number;
-  stressLevelBefore?: number;
-  stress_level_after?: number;
-  stressLevelAfter?: number;
-  completed_at?: string;
-  completedAt?: string;
+  rating?: number;
   template?: VRSessionTemplate;
+  videoUrl?: string;
+  audioUrl?: string;
+  title?: string;
+  description?: string;
+  tags?: string[];
+  benefits?: string[];
+  is_audio_only?: boolean;
+  difficulty?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  cover?: string;
+  category?: string;
+  emotion?: string;
+  preview_url?: string;
+  audio_url?: string;
+  video_url?: string;
 }
 
 export interface VRHistoryListProps {
-  sessions?: VRSession[];
-  isLoading?: boolean;
+  sessions: VRSession[];
   onSessionClick?: (session: VRSession) => void;
 }
 
 export interface VRSessionWithMusicProps {
   session: VRSession;
-  onComplete?: (data: any) => void;
-  onExit?: () => void;
-  autoStart?: boolean;
+  onComplete?: () => void;
+  playlist?: MusicPlaylist;
 }
 
 export interface VRTemplateGridProps {
   templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
-  isLoading?: boolean;
+  onTemplateSelect: (template: VRSessionTemplate) => void;
+  featuredOnly?: boolean;
+}
+
+export interface VRSessionWithMusicPropsType {
+  session: VRSession;
+  onComplete?: () => void;
+  playlist?: MusicPlaylist;
 }
 
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;
-  onSessionClick?: (session: VRSession) => void;
+  showHeading?: boolean;
+}
+
+export interface VoiceEmotionScannerProps {
+  onResult?: (result: any) => void;
+  autoStart?: boolean;
+  duration?: number;
+}
+
+export interface LiveVoiceScannerProps {
+  onResult?: (result: any) => void;
+  autoStart?: boolean;
+  duration?: number;
 }
