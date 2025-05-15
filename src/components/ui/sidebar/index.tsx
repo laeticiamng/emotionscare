@@ -1,11 +1,14 @@
 
-import Sidebar from "./Sidebar";
-import { useSidebar, SidebarProvider } from "./SidebarContext";
-import SidebarHeader from "./SidebarHeader";
+import { Sidebar } from './Sidebar';
+import SidebarProvider from './SidebarContext';
+import { SidebarItem } from './SidebarItem';
+import { SidebarSection } from './SidebarSection';
 
-export {
-  Sidebar,
-  useSidebar,
-  SidebarProvider,
-  SidebarHeader
+export { 
+  Sidebar, 
+  SidebarProvider, 
+  SidebarItem, 
+  SidebarSection 
 };
+
+export default Sidebar;

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,7 +17,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole } from '@/utils/roleUtils';
 import { toast } from 'sonner';
-import { getUserAvatarUrl, getUserInitials } from '@/lib/utils';
+import { getUserAvatarUrl, getUserInitials, harmonizeUserType } from '@/utils/userUtils';
 
 const GlobalNav = () => {
   const { user, logout } = useAuth();
@@ -46,6 +45,11 @@ const GlobalNav = () => {
   const isAdmin = user ? isAdminRole(user.role) : false;
   const isB2BMode = userMode === 'b2b_admin' || userMode === 'b2b_user';
   
+  // Use harmonizeUserType to ensure type compatibility
+  const userForAvatar = user ? harmonizeUserType(user) : null;
+  const avatarUrl = getUserAvatarUrl(userForAvatar);
+  const userInitials = getUserInitials(userForAvatar);
+  
   // Define menu items based on user role and mode
   const standardMenuItems = [
     { icon: Home, title: 'Accueil', path: '/' },
@@ -61,9 +65,6 @@ const GlobalNav = () => {
   ];
   
   const menuItems = isB2BMode && isAdmin ? adminMenuItems : standardMenuItems;
-  
-  const avatarUrl = getUserAvatarUrl(user);
-  const userInitials = getUserInitials(user);
   
   return (
     <nav className="bg-background border-b sticky top-0 z-50">

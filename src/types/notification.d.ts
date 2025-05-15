@@ -1,7 +1,7 @@
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationType = 'all' | 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement' | 'important' | 'reminder' | 'success' | 'warning' | 'error' | 'none';
-export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm' | 'supportive' | 'casual' | 'minimal' | string;
+export type NotificationType = 'all' | 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement' | 'important' | 'reminder' | 'success' | 'warning' | 'error' | 'none' | 'info';
+export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm' | 'supportive' | 'casual' | 'minimal' | 'gentle' | 'standard' | 'subtle' | string;
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type NotificationChannels = {
   email: boolean;

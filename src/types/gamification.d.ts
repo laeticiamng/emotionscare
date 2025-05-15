@@ -52,4 +52,33 @@ export interface LeaderboardEntry {
   level?: number;
   badges?: number;
   streak?: number;
+  user_id?: string; // Added for compatibility
+  user_name?: string; // Added for compatibility
+  avatar_url?: string; // Added for compatibility
+  badges_count?: number; // Added for compatibility
+  challenges_completed?: number; // Added for compatibility
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
+  imageUrl?: string;
+  image_url?: string;
+  unlocked?: boolean;
+  unlockedAt?: Date | string;
+  category?: string;
+  level?: string | number;
+  points?: number;
+  user_id?: string;
+  icon_url?: string;
+  total_required?: number;
+  total?: number; // Added for compatibility
+  image?: string;
+  dateEarned?: string;
+  awarded_at?: Date | string;
+  progress?: number;
 }

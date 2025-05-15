@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTheme } from '@/contexts/ThemeContext';
-import { getUserAvatarUrl, getUserInitials } from '@/utils/userUtils';
+import { getUserAvatarUrl, getUserInitials, harmonizeUserType } from '@/utils/userUtils';
 import { toast } from 'sonner';
 
 interface NavItem {
@@ -47,8 +46,10 @@ export default function MobileNavigation({ items }: MobileNavigationProps) {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  const avatarUrl = getUserAvatarUrl(user);
-  const userInitials = getUserInitials(user);
+  // Use harmonizeUserType to ensure type compatibility
+  const userForAvatar = user ? harmonizeUserType(user) : null;
+  const avatarUrl = getUserAvatarUrl(userForAvatar);
+  const userInitials = getUserInitials(userForAvatar);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

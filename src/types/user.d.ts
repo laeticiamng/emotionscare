@@ -1,6 +1,6 @@
 
 import { Theme, FontFamily, FontSize, ThemeName } from './theme';
-import { NotificationPreferences } from './notification';
+import { NotificationPreferences, NotificationTone } from './notification';
 
 // Combined UserRole type to handle all possible roles
 export type UserRole = 
@@ -60,6 +60,7 @@ export interface UserPreferences {
   aiSuggestions?: boolean;
   notifications_enabled?: boolean;
   highContrast?: boolean;
+  sound?: boolean; // Added for compatibility with mockUsers.ts
   accessibility?: {
     highContrast?: boolean;
     largeText?: boolean;
@@ -71,7 +72,7 @@ export interface UserPreferences {
     reducedMotion: boolean;
     screenReader: boolean;
   };
-  notifications?: NotificationPreferences | boolean;
+  notifications?: NotificationPreferences;
   privacy?: {
     shareData?: boolean;
     anonymizeReports?: boolean;
@@ -99,27 +100,6 @@ export interface UserPreferences {
     volume: number;
     preferredGenres: string[];
   };
-}
-
-export interface NotificationPreferencesType {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  channels?: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
-  };
-  frequency?: string;
-  types?: Record<string, boolean>;
-  type?: string;
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
-  tone?: string;
 }
 
 export interface UserPreferencesState {

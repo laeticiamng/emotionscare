@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Loader } from 'lucide-react';
+import { harmonizeUserType } from '@/utils/userUtils';
 
 type PreferencesFormProps = {
   defaultActiveTab?: string;
@@ -53,8 +54,10 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
     }
   };
 
+  // Use harmonized user preferences
+  const harmonizedUser = user ? harmonizeUserType(user) : null;
   // Utilisation des préférences utilisateur ou des valeurs par défaut
-  const userPreferences = user?.preferences || initialPreferences;
+  const userPreferences = harmonizedUser?.preferences || initialPreferences;
 
   // État local pour les modifications en cours
   const [formPreferences, setFormPreferences] = useState<UserPreferences>(userPreferences);
@@ -87,16 +90,14 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
     
     try {
       if (user) {
-        // Ensure dashboardLayout is properly typed
-        const updatedPreferences = {
-          ...formPreferences,
-          dashboardLayout: formPreferences.dashboardLayout as string
-        };
-        
-        const updatedUser = await updateUser({
+        // Ensure correct type conversion
+        const updatedUser = harmonizeUserType({
           ...user,
-          preferences: updatedPreferences
+          preferences: formPreferences
         });
+        
+        await updateUser(updatedUser);
+        
         toast({
           title: "Préférences mises à jour",
           description: "Vos préférences ont été enregistrées avec succès.",
@@ -104,7 +105,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
         });
         
         if (onSave) {
-          onSave(updatedPreferences);
+          onSave(formPreferences);
         }
       }
     } catch (error) {

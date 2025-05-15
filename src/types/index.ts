@@ -52,7 +52,8 @@ export type {
 export type {
   Challenge,
   GamificationStats,
-  LeaderboardEntry
+  LeaderboardEntry,
+  Badge
 } from './gamification';
 
 // Audio player related types
@@ -74,7 +75,6 @@ export type {
 // Other shared types
 export type {
   Period,
-  Badge,
   UserModeType,
   UserModeContextType,
   JournalEntry

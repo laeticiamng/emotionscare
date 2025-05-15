@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -32,7 +31,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   isLoading = false
 }) => {
   // Mock data for other tabs
-  const gamificationData = {
+  const gamificationData: GamificationStats = {
     activeUsersPercent: 68,
     totalBadges: 24,
     badgeLevels: [
@@ -61,7 +60,10 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
     badgesCount: 0,
     challenges: [],
     recentAchievements: [],
-    nextLevel: 2,
+    nextLevel: {
+      points: 100, // Replace with the actual number
+      rewards: ["Badge Spécial", "Points bonus"]
+    },
     currentLevel: 1,
     pointsToNextLevel: 0,
     lastActivityDate: new Date().toISOString()

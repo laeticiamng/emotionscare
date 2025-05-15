@@ -1,108 +1,90 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { Notification, NotificationFilter } from '@/types';
+import { useState, useEffect } from 'react';
+import { Notification, NotificationType } from '@/types';
 
-// Mock data for notifications
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'New message',
-    message: 'You have a new message from Alex',
-    type: 'info',
-    timestamp: new Date(),
-    read: false,
-  },
-  {
-    id: '2',
-    title: 'Welcome to the app',
-    message: 'Thanks for joining! Check out these features...',
-    type: 'success',
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    read: true,
-  },
-  {
-    id: '3',
-    title: 'Reminder: Emotional check-in',
-    message: 'Time for your daily emotional check-in',
-    type: 'reminder',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    read: false,
-    actionUrl: '/scan',
-    actionLabel: 'Check-in now',
-  },
-];
-
-export const useNotifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-  const [isLoading, setIsLoading] = useState(false);
-  const [filter, setFilter] = useState<NotificationFilter>('all');
-
-  const fetchNotifications = useCallback(async () => {
-    setIsLoading(true);
-    // In a real app, this would be an API call
-    setTimeout(() => {
-      setNotifications(mockNotifications);
-      setIsLoading(false);
-    }, 500);
-  }, []);
-
-  const markAsRead = useCallback(async (id: string) => {
-    // In a real app, this would be an API call
+export default function useNotifications() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  
+  // Mock function to add a notification
+  const addNotification = (
+    title: string, 
+    message: string, 
+    type: NotificationType = 'system'
+  ) => {
+    const newNotification: Notification = {
+      id: Math.random().toString(36).substring(2, 11),
+      title,
+      message,
+      type,
+      read: false,
+      timestamp: new Date().toISOString()
+    };
+    
+    setNotifications(prev => [newNotification, ...prev]);
+    updateUnreadCount();
+    
+    return newNotification.id;
+  };
+  
+  // Mark a notification as read
+  const markAsRead = (id: string) => {
     setNotifications(prev => 
       prev.map(notification => 
-        notification.id === id ? { ...notification, read: true } : notification
+        notification.id === id 
+          ? { ...notification, read: true } 
+          : notification
       )
     );
-  }, []);
-
-  const markAllAsRead = useCallback(async () => {
-    // In a real app, this would be an API call
+    updateUnreadCount();
+  };
+  
+  // Mark all notifications as read
+  const markAllAsRead = () => {
     setNotifications(prev => 
       prev.map(notification => ({ ...notification, read: true }))
     );
-  }, []);
-
-  const clearNotification = useCallback(async (id: string) => {
-    // In a real app, this would be an API call
+    updateUnreadCount();
+  };
+  
+  // Remove a notification
+  const removeNotification = (id: string) => {
     setNotifications(prev => 
       prev.filter(notification => notification.id !== id)
     );
-  }, []);
-
-  const clearAllNotifications = useCallback(async () => {
-    // In a real app, this would be an API call
+    updateUnreadCount();
+  };
+  
+  // Remove all notifications
+  const clearNotifications = () => {
     setNotifications([]);
-  }, []);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const filteredNotifications = useCallback(() => {
-    switch (filter) {
-      case 'unread':
-        return notifications.filter(n => !n.read);
-      case 'system':
-        return notifications.filter(n => n.type === 'info' || n.type === 'warning');
-      case 'alerts':
-        return notifications.filter(n => n.type === 'warning' || n.type === 'error');
-      default:
-        return notifications;
-    }
-  }, [notifications, filter]);
-
+    updateUnreadCount();
+  };
+  
+  // Filter notifications by type
+  const filterByType = (type: NotificationType = 'all') => {
+    if (type === 'all') return notifications;
+    return notifications.filter(notification => notification.type === type);
+  };
+  
+  // Update unread count
+  const updateUnreadCount = () => {
+    const count = notifications.filter(n => !n.read).length;
+    setUnreadCount(count);
+  };
+  
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
+    updateUnreadCount();
+  }, [notifications]);
+  
   return {
-    notifications: filteredNotifications(),
+    notifications,
     unreadCount,
-    isLoading,
-    filter,
-    setFilter,
-    fetchNotifications,
+    addNotification,
     markAsRead,
     markAllAsRead,
-    clearNotification,
-    clearAllNotifications
+    removeNotification,
+    clearNotifications,
+    filterByType
   };
-};
+}

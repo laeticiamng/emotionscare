@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { LogOut, Settings, User } from 'lucide-react';
-import { getUserAvatarUrl, getUserInitials } from '@/utils/userUtils';
+import { getUserAvatarUrl, getUserInitials, harmonizeUserType } from '@/utils/userUtils';
 import { toast } from 'sonner';
 
 export default function UserMenu() {
@@ -32,8 +31,10 @@ export default function UserMenu() {
     }
   };
 
-  const avatarUrl = getUserAvatarUrl(user);
-  const userInitials = getUserInitials(user);
+  // Use harmonizeUserType to ensure type compatibility
+  const userForAvatar = harmonizeUserType(user);
+  const avatarUrl = getUserAvatarUrl(userForAvatar);
+  const userInitials = getUserInitials(userForAvatar);
 
   return (
     <DropdownMenu>

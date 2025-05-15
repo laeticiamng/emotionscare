@@ -83,6 +83,7 @@ export interface ProgressBarProps {
   showLabel?: boolean;
   variant?: string;
   progress?: number;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void; // Add for compatibility
 }
 
 export interface TrackInfoProps {

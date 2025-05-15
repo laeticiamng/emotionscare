@@ -1,6 +1,7 @@
 
 import { UserRole } from './user';
 import { FontFamily, FontSize, ThemeName } from './theme';
+import { NotificationTone, NotificationFrequency } from './notification';
 
 // Types de base pour la compatibilité
 export interface User {
@@ -47,6 +48,7 @@ export interface UserPreferences {
   onboardingCompleted?: boolean;
   highContrast?: boolean;
   soundEnabled?: boolean;
+  sound?: boolean; // For backward compatibility
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
 }
@@ -61,14 +63,14 @@ export interface NotificationPreferences {
     push: boolean;
     inApp: boolean;
   };
-  frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
-  types?: Record<'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement', boolean>;
+  frequency?: NotificationFrequency | string;
+  types?: Record<string, boolean>;
   quietHours?: {
     enabled: boolean;
     start: string;
     end: string;
   };
-  tone?: string;
+  tone?: NotificationTone | string;
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
@@ -94,6 +96,7 @@ export interface Badge {
   dateEarned?: string;
   awarded_at?: Date | string;
   progress?: number;
+  total?: number; // Added for compatibility with mockData
 }
 
 export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'b2b_user' | 'b2b_admin' | 'individual' | 'professional';

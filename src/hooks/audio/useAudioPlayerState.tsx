@@ -29,7 +29,7 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     if (err === null) {
       setErrorState(null);
     } else if (typeof err === 'string') {
-      setErrorState(err);
+      setErrorState(new Error(err));
     } else if (err && typeof err === 'object' && 'message' in err) {
       setErrorState(err);
     } else {
