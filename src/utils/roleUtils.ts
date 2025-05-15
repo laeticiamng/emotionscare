@@ -1,121 +1,126 @@
 
-import { UserRole } from "@/types/auth";
+import { UserRole } from '@/types/auth';
 
 /**
- * Normalize role names to a standard format
+ * Normalize a role string to a standard format
+ * @param role Role string to normalize
  */
-export const normalizeRole = (role: string): UserRole => {
-  const roleLower = role.toLowerCase();
+export function normalizeRole(role: string | UserRole): UserRole {
+  if (!role) return 'user';
   
-  if (roleLower === 'b2b-admin' || roleLower === 'b2badmin') {
-    return 'b2b_admin';
+  const roleString = role.toString().toLowerCase();
+  
+  // Convert dash to underscore for consistency
+  if (roleString.includes('-')) {
+    return roleString.replace('-', '_') as UserRole;
   }
   
-  if (roleLower === 'b2b-user' || roleLower === 'b2buser' || roleLower === 'b2b-collaborator' || roleLower === 'b2bcollaborator') {
-    return 'b2b_user';
-  }
-  
-  if (roleLower === 'individual' || roleLower === 'user' || roleLower === 'b2c') {
-    return 'b2c';
-  }
-  
-  return role as UserRole;
-};
-
-/**
- * Check if the user has one of the specified roles
- */
-export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
-  const normalizedUserRole = normalizeRole(userRole);
-  const normalizedAllowedRoles = allowedRoles.map(normalizeRole);
-  
-  // Admin always has access
-  if (normalizedUserRole === 'admin' || normalizedUserRole === 'b2b_admin') {
-    return true;
-  }
-  
-  return normalizedAllowedRoles.includes(normalizedUserRole);
-};
-
-/**
- * Get the login path for a specific role
- */
-export const getRoleLoginPath = (role: UserRole): string => {
-  const normalizedRole = normalizeRole(role);
-  
-  switch (normalizedRole) {
-    case 'b2b_admin':
-      return '/b2b/admin/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
+  // Map friendly names to actual roles
+  switch (roleString) {
+    case 'admin': return 'admin';
     case 'b2c':
-    default:
-      return '/b2c/login';
-  }
-};
-
-/**
- * Check if a user role is an admin role
- */
-export const isAdminRole = (role: UserRole): boolean => {
-  const normalizedRole = normalizeRole(role);
-  return normalizedRole === 'admin' || normalizedRole === 'b2b_admin';
-};
-
-/**
- * Get a display name for a user role
- */
-export const getRoleName = (role: UserRole): string => {
-  const normalizedRole = normalizeRole(role);
-  
-  switch (normalizedRole) {
-    case 'b2b_admin':
-      return 'Administrateur B2B';
-    case 'b2b_user':
-      return 'Collaborateur B2B';
-    case 'b2c':
-      return 'Particulier';
-    case 'admin':
-      return 'Administrateur';
-    case 'moderator':
-      return 'Modérateur';
-    case 'employee':
-      return 'Employé';
-    case 'manager':
-      return 'Manager';
-    case 'coach':
-      return 'Coach';
-    case 'wellbeing_manager':
-      return 'Responsable bien-être';
-    case 'team_lead':
-      return 'Chef d\'équipe';
-    case 'professional':
-      return 'Professionnel';
     case 'individual':
-      return 'Particulier';
-    case 'user':
-      return 'Utilisateur';
-    case 'guest':
-      return 'Invité';
-    default:
-      return role;
+    case 'user': return 'user';
+    case 'b2b_user':
+    case 'b2buser':
+    case 'collaborator': return 'b2b_user';
+    case 'b2b_admin':
+    case 'b2badmin':
+    case 'enterprise': return 'b2b_admin';
+    default: return roleString as UserRole;
   }
-};
+}
 
 /**
- * Get the home path for a specific role
+ * Check if a user role has access to a specific set of required roles
+ * @param userRole The user's current role
+ * @param requiredRoles Array of roles that grant access
  */
-export const getRoleHomePath = (role: UserRole): string => {
+export function hasRoleAccess(userRole: string, requiredRoles: string[]): boolean {
+  const normalizedUserRole = normalizeRole(userRole);
+  
+  // Admin role has access to everything
+  if (normalizedUserRole === 'admin') return true;
+  
+  // Check if user role matches any of the required roles
+  return requiredRoles.some(role => normalizeRole(role) === normalizedUserRole);
+}
+
+/**
+ * Get a user-friendly role name for display
+ * @param role Role identifier
+ */
+export function getRoleName(role: string): string {
   const normalizedRole = normalizeRole(role);
   
   switch (normalizedRole) {
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'b2c':
-      return '/b2c/dashboard';
-    default:
-      return '/';
+    case 'admin': return 'Administrateur';
+    case 'user': return 'Particulier';
+    case 'b2b_user': return 'Collaborateur';
+    case 'b2b_admin': return 'Admin B2B';
+    case 'coach': return 'Coach';
+    case 'moderator': return 'Modérateur';
+    case 'wellbeing_manager': return 'Responsable Bien-être';
+    case 'team_lead': return 'Chef d\'équipe';
+    case 'professional': return 'Professionnel';
+    default: return 'Utilisateur';
   }
-};
+}
+
+/**
+ * Get the home path for a given role
+ */
+export function getRoleHomePath(role: string): string {
+  const normalizedRole = normalizeRole(role);
+  
+  switch (normalizedRole) {
+    case 'admin': return '/admin/dashboard';
+    case 'b2b_user': return '/b2b/user/dashboard';
+    case 'b2b_admin': return '/b2b/admin/dashboard';
+    case 'user': return '/b2c/dashboard';
+    default: return '/b2c/dashboard';
+  }
+}
+
+/**
+ * Get the login path for a given role
+ */
+export function getRoleLoginPath(role: string): string {
+  const normalizedRole = normalizeRole(role);
+  
+  switch (normalizedRole) {
+    case 'b2b_admin': return '/b2b/admin/login';
+    case 'b2b_user': return '/b2b/user/login';
+    case 'user': return '/b2c/login';
+    default: return '/b2c/login';
+  }
+}
+
+/**
+ * Normalize user mode to standard format
+ * @param mode Mode string to normalize
+ */
+export function normalizeUserMode(mode: string): string {
+  if (!mode) return 'b2c';
+  
+  const modeString = mode.toString().toLowerCase();
+  
+  // Convert dash to underscore for consistency
+  if (modeString.includes('-')) {
+    return modeString.replace('-', '_');
+  }
+  
+  // Map friendly names to actual modes
+  switch (modeString) {
+    case 'b2c':
+    case 'individual':
+    case 'personal': return 'b2c';
+    case 'b2b_user':
+    case 'b2buser':
+    case 'collaborator': return 'b2b_user';
+    case 'b2b_admin':
+    case 'b2badmin':
+    case 'enterprise': return 'b2b_admin';
+    default: return modeString;
+  }
+}

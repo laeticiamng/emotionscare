@@ -1,62 +1,57 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { useGamificationStats } from '@/hooks/community-gamification/useGamificationStats';
 
 const B2BUserDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { stats, loading } = useGamificationStats(user?.id);
-
+  
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-3xl font-bold">Tableau de bord entreprise</h2>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Tableau de bord Collaborateur</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Bien-être</CardTitle>
+          <CardHeader>
+            <CardTitle>Journal émotionnel</CardTitle>
+            <CardDescription>Suivi de votre bien-être professionnel</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Score de bien-être: 85/100</p>
+            <p className="text-muted-foreground mb-4">
+              Accédez à votre journal émotionnel de travail.
+            </p>
           </CardContent>
         </Card>
         
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Challenges actifs</CardTitle>
+          <CardHeader>
+            <CardTitle>Musicothérapie</CardTitle>
+            <CardDescription>Sons pour votre productivité</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Vous avez {stats?.activeChallenges || 0} challenges en cours</p>
+            <p className="text-muted-foreground mb-4">
+              Découvrez des playlists adaptées à votre environnement de travail.
+            </p>
           </CardContent>
         </Card>
         
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Événements à venir</CardTitle>
+          <CardHeader>
+            <CardTitle>Coach IA</CardTitle>
+            <CardDescription>Votre assistant de bien-être</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>2 événements d'équipe cette semaine</p>
+            <p className="text-muted-foreground mb-4">
+              Discutez avec votre coach émotionnel professionnel.
+            </p>
           </CardContent>
         </Card>
       </div>
       
-      <div>
-        <h3 className="text-xl font-bold mb-4">Ressources recommandées</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <h4 className="font-medium">Méditation guidée pour la productivité</h4>
-              <p className="text-sm text-muted-foreground">15 min - Audio</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
-              <h4 className="font-medium">Gestion du stress en période de charge</h4>
-              <p className="text-sm text-muted-foreground">Article - 5 min</p>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="mt-8 p-4 bg-muted rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          Vous êtes connecté en tant que <strong>Collaborateur</strong> avec le compte: {user?.email || 'collaborateur@exemple.fr'}
+        </p>
       </div>
     </div>
   );

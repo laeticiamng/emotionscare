@@ -1,27 +1,31 @@
 
 import { useState, useEffect } from 'react';
 
+/**
+ * Custom hook to detect media query matches
+ * @param query The media query to match against
+ * @returns boolean indicating if the media query matches
+ */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState<boolean>(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    setMatches(mediaQuery.matches);
+    // Initial check
+    const media = window.matchMedia(query);
+    setMatches(media.matches);
 
-    const handler = (event: MediaQueryListEvent) => {
+    // Create listener for changes
+    const listener = (event: MediaQueryListEvent) => {
       setMatches(event.matches);
     };
 
-    // Modern browsers
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handler);
-      return () => mediaQuery.removeEventListener('change', handler);
-    } 
-    // Older browsers
-    else {
-      mediaQuery.addListener(handler);
-      return () => mediaQuery.removeListener(handler);
-    }
+    // Add listener
+    media.addEventListener('change', listener);
+
+    // Clean up
+    return () => {
+      media.removeEventListener('change', listener);
+    };
   }, [query]);
 
   return matches;

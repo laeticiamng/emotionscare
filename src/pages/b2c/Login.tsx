@@ -46,6 +46,11 @@ export default function B2CLogin() {
         description: "Bienvenue dans votre espace EmotionsCare",
       });
       
+      // Store session
+      localStorage.setItem('auth_session', 'mock_token');
+      localStorage.setItem('user_role', 'b2c');
+      localStorage.setItem('userMode', 'b2c');
+      
       // Play haptic feedback on mobile devices
       if ('vibrate' in navigator) {
         navigator.vibrate(100);

@@ -65,6 +65,11 @@ export default function B2CRegister() {
       // Simulate registration process
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Store session
+      localStorage.setItem('auth_session', 'mock_token');
+      localStorage.setItem('user_role', 'b2c');
+      localStorage.setItem('userMode', 'b2c');
+      
       // Play haptic feedback on mobile devices
       if ('vibrate' in navigator) {
         navigator.vibrate([100, 50, 100]);

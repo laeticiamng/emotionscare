@@ -21,7 +21,7 @@ const B2CLayout: React.FC = () => {
             <div className="flex-1">
               {user && (
                 <h1 className="text-xl font-semibold">
-                  Bienvenue, {user.name}
+                  Bienvenue, {user.name || 'Utilisateur'}
                 </h1>
               )}
             </div>

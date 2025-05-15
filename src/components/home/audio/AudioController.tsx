@@ -1,130 +1,108 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 
-export interface AudioControllerProps {
-  audioUrl?: string;
-  autoPlay?: boolean;
-  onPlay?: () => void;
-  onPause?: () => void;
-  onEnded?: () => void;
+interface AudioControllerProps {
+  minimal?: boolean;
   className?: string;
-  showControls?: boolean;
-  loop?: boolean;
+  autoplay?: boolean;
+  initialVolume?: number;
 }
 
 export const AudioController: React.FC<AudioControllerProps> = ({
-  audioUrl,
-  autoPlay = false,
-  onPlay,
-  onPause,
-  onEnded,
+  minimal = false,
   className = '',
-  showControls = true,
-  loop = false
+  autoplay = false,
+  initialVolume = 0.5
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [isMuted, setIsMuted] = useState(false);
-  
-  const audioRef = React.useRef<HTMLAudioElement>(null);
+  const [volume, setVolume] = useState(initialVolume);
+  const [muted, setMuted] = useState(false);
+  const [audio] = useState<HTMLAudioElement | null>(typeof Audio !== 'undefined' ? new Audio('/audio/ambient-calm.mp3') : null);
 
-  const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        onPause?.();
-      } else {
-        audioRef.current.play()
-          .then(() => {
-            onPlay?.();
-          })
-          .catch((error) => {
-            console.error('Error playing audio:', error);
+  // Setup audio when component mounts
+  useEffect(() => {
+    if (audio) {
+      audio.volume = volume;
+      audio.loop = true;
+      
+      if (autoplay) {
+        // We need to handle autoplay restrictions
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Auto-play was prevented, inform user
+            console.log("Autoplay prevented by browser policy");
           });
+        }
       }
-      setIsPlaying(!isPlaying);
     }
-  };
+    
+    return () => {
+      // Cleanup when component unmounts
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, [audio, autoplay]);
+
+  // Update volume when it changes
+  useEffect(() => {
+    if (audio) {
+      audio.volume = muted ? 0 : volume;
+    }
+  }, [audio, volume, muted]);
 
   const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
+    setMuted(prev => !prev);
   };
 
-  const handleVolumeChange = (newVolume: number[]) => {
-    const volumeValue = newVolume[0];
-    setVolume(volumeValue);
-    if (audioRef.current) {
-      audioRef.current.volume = volumeValue;
-    }
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
+    setMuted(value[0] === 0);
   };
 
-  const handleEnded = () => {
-    setIsPlaying(false);
-    onEnded?.();
-  };
-
-  React.useEffect(() => {
-    if (autoPlay && audioRef.current) {
-      audioRef.current.play()
-        .then(() => {
-          setIsPlaying(true);
-          onPlay?.();
-        })
-        .catch((error) => {
-          console.error('Auto-play error:', error);
-        });
-    }
-  }, [autoPlay, onPlay]);
+  if (minimal) {
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={toggleMute}
+        className={className}
+      >
+        {muted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
+      </Button>
+    );
+  }
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
-      <audio 
-        ref={audioRef} 
-        src={audioUrl} 
-        loop={loop}
-        onEnded={handleEnded}
+    <div className={`flex items-center gap-2 ${className}`}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={toggleMute}
+      >
+        {muted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
+      </Button>
+      <Slider
+        value={[muted ? 0 : volume]}
+        min={0}
+        max={1}
+        step={0.01}
+        onValueChange={handleVolumeChange}
+        className="w-24"
       />
-
-      {showControls && (
-        <div className="flex items-center gap-4">
-          <Button
-            size="sm"
-            variant="outline"
-            className="w-10 h-10 rounded-full"
-            onClick={togglePlayPause}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-          </Button>
-
-          <div className="flex items-center gap-2 flex-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="w-8 h-8 p-0"
-              onClick={toggleMute}
-              aria-label={isMuted ? 'Unmute' : 'Mute'}
-            >
-              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            </Button>
-            <Slider 
-              className="flex-1" 
-              defaultValue={[volume]} 
-              max={1} 
-              step={0.01}
-              onValueChange={handleVolumeChange}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
-
-export default AudioController;
