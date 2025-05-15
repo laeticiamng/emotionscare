@@ -1,53 +1,62 @@
 
-import { MusicTrack } from './music';
-
 export interface AudioTrack {
   id: string;
-  url: string;
   title: string;
   artist: string;
-  cover?: string;
   duration: number;
+  url: string;
+  type?: string;
+  coverUrl?: string; // Add this for compatibility
+  cover?: string;
+  description?: string; // Add this for AudioPlayerSection
 }
 
 export interface AudioPlayerState {
+  currentTrack: AudioTrack | null;
   isPlaying: boolean;
-  currentTime: number;
-  duration: number;
   volume: number;
-  muted: boolean;
+  isMuted: boolean;
+  progress: number;
+  duration: number;
   loading: boolean;
+  error: string | Error | null;
 }
 
 export interface AudioPlayerContextType {
-  play: () => void;
-  pause: () => void;
+  currentTrack: AudioTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  isMuted: boolean;
+  progress: number;
+  duration: number;
+  loading: boolean;
+  error: string | Error | null;
+  playTrack: (track: AudioTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   seekTo: (time: number) => void;
-  state: AudioPlayerState;
-  currentTrack: AudioTrack | null;
-  playTrack: (track: AudioTrack) => void;
+  formatTime: (seconds: number) => string;
 }
 
 export interface UseAudioPlayerStateReturn {
+  currentTrack: AudioTrack | null;
   isPlaying: boolean;
-  currentTrack: MusicTrack | null;
-  duration: number;
-  currentTime: number;
   volume: number;
-  muted: boolean;
+  isMuted: boolean;
+  progress: number;
+  duration: number;
   loading: boolean;
-  error: Error | null;
+  error: string | Error | null;
+  setCurrentTrack: (track: AudioTrack | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
-  setCurrentTrack: (track: MusicTrack | null) => void;
-  setDuration: (duration: number) => void;
-  setCurrentTime: (time: number) => void;
   setVolume: (volume: number) => void;
-  setMuted: (muted: boolean) => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setLoadingTrack: (loading: boolean) => void;
+  setIsMuted: (isMuted: boolean) => void;
   setProgress: (progress: number) => void;
+  setDuration: (duration: number) => void;
+  setLoading: (loading: boolean) => void;
+  setLoadingTrack: (loading: boolean) => void;
+  setError: (error: string | Error | null) => void;
 }

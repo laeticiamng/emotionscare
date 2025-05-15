@@ -1,57 +1,42 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { SidebarContextType } from '@/types';
+import React, { createContext, useContext, useState } from 'react';
+import { SidebarContextType } from '@/types/sidebar';
 
 const SidebarContext = createContext<SidebarContextType>({
   isOpen: false,
   toggle: () => {},
   close: () => {},
   open: () => {},
-  collapsed: false,
   expanded: true,
-  toggleCollapsed: () => {},
+  collapsed: false,
   setExpanded: () => {},
-  toggleExpanded: () => {}
+  toggleExpanded: () => {},
+  toggleCollapsed: () => {}
 });
 
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-};
+export const useSidebar = () => useContext(SidebarContext);
 
-type SidebarProviderProps = {
+interface SidebarProviderProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
-};
+  defaultExpanded?: boolean;
+}
 
-export const SidebarProvider = ({
+export const SidebarProvider: React.FC<SidebarProviderProps> = ({
   children,
   defaultOpen = false,
-}: SidebarProviderProps) => {
+  defaultExpanded = true
+}) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const [collapsed, setCollapsed] = useState(false);
-  
+
   const toggle = () => setIsOpen(prev => !prev);
   const close = () => setIsOpen(false);
   const open = () => setIsOpen(true);
-  const toggleCollapsed = () => setCollapsed(prev => !prev);
-  const setExpanded = (expanded: boolean) => setCollapsed(!expanded);
-  const toggleExpanded = () => setCollapsed(prev => !prev);
   
-  // Listen for escape key to close sidebar
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        close();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, []);
+  const toggleExpanded = () => setExpanded(prev => !prev);
+  const toggleCollapsed = () => setCollapsed(prev => !prev);
 
   return (
     <SidebarContext.Provider
@@ -60,16 +45,14 @@ export const SidebarProvider = ({
         toggle,
         close,
         open,
+        expanded,
         collapsed,
-        expanded: !collapsed,
-        toggleCollapsed,
         setExpanded,
-        toggleExpanded
+        toggleExpanded,
+        toggleCollapsed
       }}
     >
       {children}
     </SidebarContext.Provider>
   );
 };
-
-export { SidebarContext };

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ type PreferencesFormProps = {
   onCancel?: () => void;
 }
 
-const PreferencesForm = ({ defaultActiveTab = "theme", onSave, onCancel }: PreferencesFormProps) => {
+const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "theme", onSave, onCancel }) => {
   const { user, updateUser } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -25,8 +26,8 @@ const PreferencesForm = ({ defaultActiveTab = "theme", onSave, onCancel }: Prefe
   // Préférences initiales (utilisées si l'utilisateur n'a pas de préférences définies)
   const initialPreferences: UserPreferences = {
     theme: 'system', 
-    fontSize: 'md',
-    fontFamily: 'sans',
+    fontSize: 'medium',
+    fontFamily: 'system',
     reduceMotion: false,
     colorBlindMode: false,
     autoplayMedia: true,
@@ -86,9 +87,15 @@ const PreferencesForm = ({ defaultActiveTab = "theme", onSave, onCancel }: Prefe
     
     try {
       if (user) {
+        // Ensure dashboardLayout is properly typed
+        const updatedPreferences = {
+          ...formPreferences,
+          dashboardLayout: formPreferences.dashboardLayout as string
+        };
+        
         const updatedUser = await updateUser({
           ...user,
-          preferences: formPreferences
+          preferences: updatedPreferences
         });
         toast({
           title: "Préférences mises à jour",
@@ -97,7 +104,7 @@ const PreferencesForm = ({ defaultActiveTab = "theme", onSave, onCancel }: Prefe
         });
         
         if (onSave) {
-          onSave(formPreferences);
+          onSave(updatedPreferences);
         }
       }
     } catch (error) {

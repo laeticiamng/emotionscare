@@ -62,6 +62,7 @@ export interface NotificationPreferences {
     start: string;
     end: string;
   };
+  tone?: string; // Add tone to match mockUsers.ts
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
@@ -94,6 +95,7 @@ export interface UserModeContextType {
   setMode: (mode: UserModeType) => void;
   userMode?: UserModeType;
   setUserMode?: (mode: UserModeType) => void;
+  isLoading?: boolean; // Add isLoading property
 }
 
 export interface JournalEntry {
@@ -109,3 +111,6 @@ export interface JournalEntry {
   ai_feedback?: string;
   user_id?: string;
 }
+
+// Export UserRole to fix import issues
+export { UserRole } from './user';

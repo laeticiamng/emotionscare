@@ -1,3 +1,4 @@
+
 import { Theme, FontFamily, FontSize } from './theme';
 import { NotificationType, NotificationFrequency, NotificationTone } from './notification';
 
@@ -12,11 +13,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: UserRole; // Making role required
+  role: UserRole;
   avatar_url?: string;
-  avatar?: string; // Added for compatibility
-  created_at?: string;
-  createdAt?: string; // For compatibility
+  avatar?: string;
+  created_at: string; // Make created_at required to match types.ts
+  createdAt?: string;
   last_sign_in_at?: string;
   onboarded?: boolean;
   preferences?: UserPreferences;
@@ -56,8 +57,8 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   notifications_enabled?: boolean;
-  reduceMotion: boolean; // Making this required
-  colorBlindMode: boolean; // Making this required 
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
   highContrast?: boolean;
   accessibility?: {
     highContrast?: boolean;
@@ -98,7 +99,6 @@ export interface UserPreferences {
     volume: number;
     preferredGenres: string[];
   };
-  colorBlindMode?: boolean;
 }
 
 export interface NotificationPreferences {
@@ -113,13 +113,13 @@ export interface NotificationPreferences {
   };
   frequency?: NotificationFrequency;
   types?: Record<string, boolean> | Record<NotificationType, boolean>;
-  type?: string; // Added for backward compatibility
+  type?: string;
   quietHours?: {
     enabled: boolean;
     start: string;
     end: string;
   };
-  tone?: NotificationTone; // Adding tone since it appears in mockUsers.ts
+  tone?: NotificationTone; // Add tone to match mockUsers.ts
 }
 
 export interface UserPreferencesState {

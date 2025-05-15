@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { AudioTrack, AudioPlayerContextType } from '@/types/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -14,7 +13,7 @@ const SAMPLE_TRACKS: AudioTrack[] = [
     artist: 'Nature Sounds',
     duration: 296,
     url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773',
+    cover: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773',
     type: 'relaxation',
     description: 'Écoutez les sons apaisants de la forêt tropicale pour réduire votre stress.'
   },
@@ -24,7 +23,7 @@ const SAMPLE_TRACKS: AudioTrack[] = [
     artist: 'Mindfulness Masters',
     duration: 630,
     url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5',
+    cover: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5',
     type: 'meditation',
     description: 'Une séance guidée pour se recentrer sur le moment présent.'
   },
@@ -34,7 +33,7 @@ const SAMPLE_TRACKS: AudioTrack[] = [
     artist: 'Deep Sleep',
     duration: 945,
     url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c',
+    cover: 'https://images.unsplash.com/photo-1531353826977-0941b4779a1c',
     type: 'sleep',
     description: 'Sons blancs et berceuses pour un sommeil réparateur.'
   }
@@ -58,7 +57,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | Error | null>(null);
   
   // Formater le temps en MM:SS
   const formatTime = (seconds: number): string => {
@@ -161,7 +160,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
           setIsPlaying(true);
         })
         .catch(err => {
-          setError(err.message);
+          setError(err.message || 'Error resuming playback');
           toast({
             title: "Erreur",
             description: "Impossible de reprendre la lecture",

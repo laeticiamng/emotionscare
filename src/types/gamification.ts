@@ -1,20 +1,23 @@
+import { Period } from './types';
 
-import { User } from './user';
-
-export interface GamificationStats {
+export interface Challenge {
+  id: string;
+  title?: string;
+  name?: string; // Added for compatibility with ChallengesList
+  description: string;
   points: number;
-  level: number;
-  badges: number;
-  rank?: string;
-  streak?: number;
-  completedChallenges?: number;
-  totalChallenges?: number;
-  nextLevel?: {
-    points: number;
-    level: number;
-    progress: number;
-  };
-  progress?: number;
+  progress: number;
+  goal?: number; // Added for compatibility with ChallengesList
+  total?: number; // Added for compatibility with ChallengesList
+  completed?: boolean;
+  status?: 'active' | 'completed' | 'failed'; // Added for compatibility with ChallengesList
+  type?: string;
+  category?: string;
+  timeLeft?: number;
+  startDate?: string;
+  endDate?: string;
+  reward?: string;
+  user_id?: string;
 }
 
 export interface Badge {
@@ -40,43 +43,47 @@ export interface Badge {
   progress?: number; // Add for compatibility
 }
 
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
+export interface GamificationStats {
+  level: number;
   points: number;
-  deadline?: string;
-  completed?: boolean;
-  complete?: boolean; // Add for compatibility
-  progress?: number;
-  category?: string;
-  icon?: string;
-  difficulty?: string;
-  requiredCount?: number;
-  currentCount?: number;
-  imageUrl?: string;
-}
-
-export interface Period {
-  id: string;
-  name: string;
-  value: string;
-  label: string;
+  badges: Badge[] | number; // Make it flexible to accept both Badge[] and number
+  streak: number;
+  completedChallenges: number;
+  totalChallenges: number;
+  
+  // Additional properties used in GamificationDashboard.tsx
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  progressToNextLevel?: number;
+  totalPoints?: number;
+  badgesCount?: number;
+  streakDays?: number;
+  lastActivityDate?: string;
+  activeChallenges?: number;
+  
+  // Other optional properties
+  rank?: string;
+  nextLevel?: {
+    points: number;
+    rewards: string[];
+  };
+  challenges?: Challenge[];
+  achievements?: any[];
+  recentAchievements?: any[];
+  nextLevelPoints?: number;
 }
 
 export interface LeaderboardEntry {
   id: string;
-  user: User | string;
-  userId?: string;
-  user_id?: string;
-  rank: number;
-  points: number;
-  level?: number;
-  avatarUrl?: string;
+  user_id: string;
+  user_name: string;
   avatar_url?: string;
-  name?: string;
-  change?: number;
-  trend?: 'up' | 'down' | 'same';
+  points: number;
+  rank: number;
+  level: number;
+  badges_count: number;
+  challenges_completed: number;
+  department?: string;
 }
 
 export interface GamificationSettings {
