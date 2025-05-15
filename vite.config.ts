@@ -8,13 +8,13 @@ import { componentTagger } from "lovable-tagger";
 const debugPlugin = () => {
   return {
     name: 'debug-plugin',
-    configResolved(config) {
+    configResolved(config: any) {
       console.log('🔧 Configuration Vite résolue:');
       console.log('  - Mode:', config.mode);
       console.log('  - Base URL:', config.base);
       console.log('  - Env prefix:', config.envPrefix);
     },
-    transformIndexHtml(html) {
+    transformIndexHtml(html: any) {
       console.log('📄 Transformation de index.html');
       return html;
     }
