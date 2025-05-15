@@ -1,15 +1,8 @@
 
-/**
- * theme.ts
- * Définit les palettes de couleurs pour les différents thèmes de l'application
- * Facilite l'accès aux couleurs dans les composants React
- */
-
-// Types pour les thèmes
-export type ThemeName = 'light' | 'dark' | 'pastel';
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xl' | 'xx-large' | 'extra-large';
-export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded' | 'inter' | 'system-ui' | 'sans' | 'serif' | 'mono' | 'default';
+export type Theme = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large' | 'xl' | 'x-large' | 'xx-large' | 'extra-large';
+export type FontFamily = 'system' | 'system-ui' | 'sans' | 'sans-serif' | 'serif' | 'mono' | 'monospace' | 'rounded' | 'inter' | 'default';
+export type ThemeName = 'light' | 'dark' | 'system';
 
 export interface ThemeContextType {
   theme: Theme;
@@ -19,59 +12,30 @@ export interface ThemeContextType {
   setFontSize: (size: FontSize) => void;
   fontFamily: FontFamily;
   setFontFamily: (font: FontFamily) => void;
-  getContrastText?: (color: string) => 'black' | 'white';
-  primaryColor?: string;
+  getContrastText: (color: string) => 'black' | 'white';
 }
 
 export interface ThemeButtonProps {
-  theme?: Theme;
-  onClick?: () => void;
-  collapsed?: boolean;
-  size?: string;
+  theme: Theme;
+  onThemeChange: (theme: Theme) => void;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'outline' | 'ghost';
 }
 
 export interface ThemeSwitcherProps {
-  size?: string;
-  showLabel?: boolean;
+  className?: string;
 }
 
-// Interface pour définir la structure d'une palette de couleurs
 export interface ColorPalette {
-  name: string;
+  primary: string;
+  secondary: string;
+  accent: string;
   background: string;
   foreground: string;
-  card: string;
-  cardForeground: string;
-  primary: string;
-  primaryForeground: string;
-  secondary: string;
-  secondaryForeground: string;
-  accent: string;
-  accentForeground: string;
   muted: string;
-  mutedForeground: string;
+  card: string;
   border: string;
-  input: string;
-  ring: string;
-  // Semantic colors
-  success: {
-    light: string;
-    DEFAULT: string; 
-    dark: string;
-  };
-  warning: {
-    light: string;
-    DEFAULT: string;
-    dark: string;
-  };
-  info: {
-    light: string;
-    DEFAULT: string;
-    dark: string;
-  };
-  error: {
-    light: string;
-    DEFAULT: string;
-    dark: string;
-  };
+  success: string;
+  warning: string;
+  error: string;
 }

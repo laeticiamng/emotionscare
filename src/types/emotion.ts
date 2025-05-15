@@ -80,6 +80,8 @@ export interface LiveVoiceScannerProps {
   maxDuration?: number;
   className?: string;
   visualizationMode?: 'wave' | 'bars' | 'circle';
+  onScanComplete?: (result: EmotionResult) => void;
+  scanDuration?: number;
 }
 
 /**

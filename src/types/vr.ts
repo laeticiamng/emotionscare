@@ -1,139 +1,101 @@
 
 import { MusicTrack } from './music';
 
-/**
- * VR session template
- */
+// VR Session Template for pre-defined VR experiences
 export interface VRSessionTemplate {
   id: string;
   title: string;
   description: string;
-  duration: number;
-  thumbnailUrl: string;
-  name?: string;
+  duration: number; // in seconds
   tags: string[];
-  benefits: string[];
-  theme: string;
-  is_audio_only: boolean;
-  emotionTarget?: string;
-  emotion_target?: string;
-  emotion?: string;
+  thumbnailUrl?: string;
+  preview_url?: string;
+  audioUrl?: string;
+  audio_url?: string;
+  is_audio_only?: boolean;
+  isAudioOnly?: boolean;
   category?: string;
   difficulty?: string;
-  preview_url?: string;
-  audio_url?: string;
-  video_url?: string;
-  templateId?: string;
-  template_id?: string;
+  benefits?: string[];
+  emotion?: string;
+  emotion_target?: string;
+  emotionTarget?: string;
+  theme?: string;
   completionRate?: number;
   completion_rate?: number;
   recommendedMood?: string;
-  recommended_mood?: string;
-  lastUsed?: string;
-  imageUrl?: string;
-  thumbnail?: string;
-  videoUrl?: string;
+  userRating?: number;
+  creator_id?: string;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  is_public?: boolean;
 }
 
-/**
- * VR session
- */
+// User VR Session record
 export interface VRSession {
   id: string;
+  user_id?: string;
+  userId?: string;
   template_id: string;
   templateId?: string;
-  user_id: string;
-  title: string;
-  description?: string;
-  startTime?: string;
-  start_time?: string;
+  started_at: string;
   startedAt?: string;
-  date?: string;
+  completed_at?: string;
+  completedAt?: string;
   duration: number;
-  duration_seconds?: number;
-  completed?: boolean;
-  isCompleted?: boolean;
-  heartRateBefore?: number;
-  heart_rate_before?: number;
-  heartRateAfter?: number;
-  heart_rate_after?: number;
-  template?: VRSessionTemplate;
+  feedback?: string;
   emotion_before?: string;
   emotionBefore?: string;
   emotion_after?: string;
   emotionAfter?: string;
-  endTime?: string;
-  end_time?: string;
   rating?: number;
   notes?: string;
-}
-
-/**
- * Props for VR history list component
- */
-export interface VRHistoryListProps {
-  sessions?: VRSession[];
-  templates?: VRSessionTemplate[];
-  onSessionClick?: (session: VRSession) => void;
-  onTemplateClick?: (template: VRSessionTemplate) => void;
-  limit?: number;
-  showEmptyState?: boolean;
-  className?: string;
-  isLoading?: boolean;
-  onSelectTemplate?: (template: VRSessionTemplate) => void;
-  onSelectSession?: (session: VRSession) => void;
-  loading?: boolean;
-  onSelect?: (template: VRSessionTemplate) => void;
-  title?: string;
-  emptyMessage?: string;
-}
-
-/**
- * Props for VR template grid component
- */
-export interface VRTemplateGridProps {
-  templates: VRSessionTemplate[];
-  onTemplateClick?: (template: VRSessionTemplate) => void;
-  filterByEmotion?: string;
-  showRecommended?: boolean;
-  className?: string;
-  isLoading?: boolean;
-}
-
-/**
- * Props for VR session with music component
- */
-export interface VRSessionWithMusicProps {
-  session?: VRSession;
   template?: VRSessionTemplate;
-  playlist?: MusicTrack[];
-  onComplete?: (sessionData?: VRSession) => void;
-  onExit?: () => void;
+  music_track_id?: string;
+  musicTrackId?: string;
+  music_track?: MusicTrack;
+  musicTrack?: MusicTrack;
+}
+
+// Props for VR History List Component
+export interface VRHistoryListProps {
+  sessions: VRSession[];
+  onSelect?: (session: VRSession) => void;
+  loading?: boolean;
+  error?: Error | null;
+  className?: string;
+}
+
+// Props for VR Session With Music Component
+export interface VRSessionWithMusicProps {
+  template: VRSessionTemplate;
+  onComplete?: (sessionData: any) => void;
+  onCancel?: () => void;
   autoStart?: boolean;
   className?: string;
-  onSessionComplete?: () => void;
-  isAudioOnly?: boolean;
-  videoUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
-  sessionId?: string;
-  templateId?: string;
-  musicEnabled?: boolean;
+  userId?: string;
+  suggestedTrack?: MusicTrack;
 }
 
-/**
- * Alias for VRSessionWithMusicProps (for compatibility)
- */
+// Different name to avoid conflict
 export type VRSessionWithMusicPropsType = VRSessionWithMusicProps;
 
-/**
- * Props for VR session history component
- */
+// Props for VR Template Grid Component
+export interface VRTemplateGridProps {
+  templates: VRSessionTemplate[];
+  onSelect: (template: VRSessionTemplate) => void;
+  loading?: boolean;
+  error?: Error | null;
+  filter?: string;
+  className?: string;
+}
+
+// Props for VR Session History Component
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;
-  onSessionClick?: (session: VRSession) => void;
+  showFilters?: boolean;
   className?: string;
-  showHeader?: boolean;
-  title?: string;
+  onSessionSelect?: (session: VRSession) => void;
 }
