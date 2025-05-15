@@ -5,11 +5,26 @@ import { LucideIcon } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { KpiCardProps } from '@/types';
 
 /**
- * KpiCard component for displaying key performance indicators
+ * KPI Card component for displaying key performance indicators
  */
+export interface KpiCardProps { 
+  title: string; 
+  value: string | number | React.ReactNode; 
+  icon?: LucideIcon | React.ReactNode; 
+  delta?: {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: React.ReactNode;
+  ariaLabel?: string;
+  className?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
+}
+
 const KpiCard: React.FC<KpiCardProps> = ({ 
   title, 
   value, 

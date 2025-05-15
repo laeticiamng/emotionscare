@@ -144,5 +144,4 @@ export const useTheme = () => {
   return context;
 };
 
-// Make sure we're explicitly exporting ThemeContext
-export { ThemeContext as default };
+export default ThemeContext;

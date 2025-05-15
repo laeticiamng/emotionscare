@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { NotificationFrequency, NotificationType, NotificationTone } from '@/types/notification';
+import { NotificationFrequency, NotificationTone } from '@/types';
 
 const NotificationPreferences = () => {
   const { user, updateUser } = useAuth();
@@ -16,9 +17,9 @@ const NotificationPreferences = () => {
   // Default preferences if user has none
   const defaultPreferences = {
     enabled: true,
-    type: 'all' as NotificationType,
+    type: 'all' as 'all' | 'important' | 'none',
     frequency: 'immediate' as NotificationFrequency,
-    tone: 'supportive' as NotificationTone,
+    tone: 'supportive' as unknown as NotificationTone,
     emailEnabled: true,
     pushEnabled: true,
     soundEnabled: true
@@ -86,7 +87,7 @@ const NotificationPreferences = () => {
               <h3 className="text-sm font-medium mb-3">Types de notifications</h3>
               <RadioGroup 
                 value={preferences.type} 
-                onValueChange={(value) => setPreferences({...preferences, type: value as NotificationType})}
+                onValueChange={(value: 'all' | 'important' | 'none') => setPreferences({...preferences, type: value})}
                 className="space-y-2"
               >
                 <div className="flex items-center space-x-2">
@@ -124,8 +125,8 @@ const NotificationPreferences = () => {
             <div>
               <h3 className="text-sm font-medium mb-3">Ton des notifications</h3>
               <Select 
-                value={preferences.tone} 
-                onValueChange={(value) => setPreferences({...preferences, tone: value as NotificationTone})}
+                value={preferences.tone as unknown as string} 
+                onValueChange={(value) => setPreferences({...preferences, tone: value as unknown as NotificationTone})}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Choisir un ton" />

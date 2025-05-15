@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference, NotificationType, NotificationChannels } from '@/types';
+import { NotificationFrequency, NotificationPreference, NotificationChannels } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface NotificationPreferencesProps {
@@ -31,15 +31,12 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
       emailEnabled: !emailEnabled,
     };
     
-    // Add channels for backward compatibility if it exists in the original
-    if (preference.channels && typeof preference.channels !== 'string') {
+    // Add channels for backward compatibility
+    if (preference.channels && typeof preference.channels !== 'string' && !Array.isArray(preference.channels)) {
       updatedPreference.channels = {
         ...preference.channels,
         email: !emailEnabled
       };
-    } else if (preference.channels && Array.isArray(preference.channels)) {
-      // Handle string[] type of channels if needed
-      updatedPreference.channels = preference.channels;
     } else {
       // Create default channels object if none exists
       updatedPreference.channels = {
@@ -64,15 +61,12 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
       pushEnabled: !pushEnabled
     };
     
-    // Add channels for backward compatibility if it exists in the original
-    if (preference.channels && typeof preference.channels !== 'string') {
+    // Add channels for backward compatibility
+    if (preference.channels && typeof preference.channels !== 'string' && !Array.isArray(preference.channels)) {
       updatedPreference.channels = {
         ...preference.channels,
         push: !pushEnabled
       };
-    } else if (preference.channels && Array.isArray(preference.channels)) {
-      // Handle string[] type of channels if needed
-      updatedPreference.channels = preference.channels;
     } else {
       // Create default channels object if none exists
       updatedPreference.channels = {

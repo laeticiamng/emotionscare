@@ -38,6 +38,13 @@ export interface NotificationTone {
   sound: 'default' | 'subtle' | 'loud' | 'mute' | string;
   vibration: boolean;
   led: boolean;
+  supportive?: string;
+  professional?: string;
+  casual?: string;
+  minimal?: string;
+  direct?: string;
+  gentle?: string;
+  motivational?: string;
 }
 
 export interface NotificationPreference {

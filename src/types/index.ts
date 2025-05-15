@@ -48,7 +48,8 @@ export type {
   TrackInfoProps,
   ProgressBarProps,
   EmotionMusicParams,
-  Track
+  Track,
+  VolumeControlProps
 } from './music';
 
 // Exports for notification types
@@ -242,4 +243,3 @@ export interface InvitationFormData {
 
 // Re-exporting important types for backward compatibility
 export * from './types';
-

@@ -17,6 +17,14 @@ export interface Emotion {
   confidence?: number;
   text?: string;
   intensity?: number;
+  id?: string;
+  user_id?: string;
+  ai_feedback?: string;
+  feedback?: string;
+  transcript?: string;
+  audio_url?: string;
+  audioUrl?: string;
+  [key: string]: any; // For flexibility
 }
 
 /**
@@ -43,6 +51,7 @@ export interface EmotionResult {
   transcript?: string;
   audio_url?: string;
   audioUrl?: string;
+  [key: string]: any; // For flexibility
 }
 
 /**
@@ -92,6 +101,17 @@ export interface EmotionalTeamViewProps {
   period?: string;
   comparisonMode?: boolean;
   showIndividualData?: boolean;
+  departmentId?: string;
+  users?: any[];
+  anonymized?: boolean;
+  onUserClick?: (userId: string) => void;
+  userId?: string;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  onRefresh?: () => void;
 }
 
 /**

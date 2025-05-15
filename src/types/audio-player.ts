@@ -1,38 +1,30 @@
 
-/**
- * Return type for useAudioPlayer hook
- */
 export interface UseAudioPlayerStateReturn {
   isPlaying: boolean;
-  duration: number;
   currentTime: number;
+  duration: number;
   volume: number;
-  muted: boolean;
+  isMuted: boolean;
+  isLoading: boolean;
+  error: Error | null;
   play: () => void;
   pause: () => void;
   toggle: () => void;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  playbackRate: number;
-  setPlaybackRate: (rate: number) => void;
-  audioRef: React.RefObject<HTMLAudioElement>;
 }
 
-/**
- * Props for enhanced music visualizer component
- */
 export interface EnhancedMusicVisualizerProps {
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioUrl?: string;
+  isPlaying?: boolean;
+  type?: 'bars' | 'wave' | 'circle';
   color?: string;
   height?: number;
   width?: number;
   barCount?: number;
   barWidth?: number;
-  barSpacing?: number;
-  intensity?: number;
-  visualizationType?: 'bars' | 'wave' | 'circle' | 'particles';
+  barGap?: number;
+  sensitivity?: number;
   className?: string;
-  autoStart?: boolean;
-  responsive?: boolean;
 }

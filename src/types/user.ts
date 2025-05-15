@@ -33,6 +33,7 @@ export interface User {
     job_title?: string;
   };
   company_id?: string;
+  [key: string]: any; // Allow additional properties
 }
 
 export interface UserPreferences {

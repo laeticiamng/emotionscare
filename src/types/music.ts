@@ -24,6 +24,7 @@ export interface MusicTrack {
   isFavorite?: boolean;
   album?: string;
   genre?: string;
+  [key: string]: any; // For flexibility
 }
 
 export interface MusicPlaylist {
@@ -43,6 +44,7 @@ export interface MusicPlaylist {
   playCount?: number;
   trackCount?: number;
   duration?: number;
+  category?: string;
 }
 
 export interface MusicContextType {
@@ -96,4 +98,36 @@ export interface Track {
   coverUrl?: string;
   audioUrl?: string;
   emotion?: string;
+}
+
+export interface TrackInfoProps {
+  track?: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack | null;
+  loadingTrack?: boolean;
+  audioError?: boolean;
+  className?: string;
+  compact?: boolean;
+}
+
+export interface ProgressBarProps {
+  duration: number;
+  currentTime: number;
+  onSeek: (time: number) => void;
+  formatTime?: (time: number) => string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  showTimestamps?: boolean;
+  className?: string;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onChange: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  showLabel?: boolean;
+  className?: string;
 }

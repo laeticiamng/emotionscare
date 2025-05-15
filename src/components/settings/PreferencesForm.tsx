@@ -19,9 +19,12 @@ const preferencesSchema = z.object({
   notifications_enabled: z.boolean(),
   fontSize: z.enum(['small', 'medium', 'large']),
   language: z.string(),
-  privacy: z.object({
-    profileVisibility: z.enum(['public', 'private', 'team'])
-  }).optional()
+  privacy: z.union([
+    z.string(),
+    z.object({
+      profileVisibility: z.enum(['public', 'private', 'team'])
+    })
+  ]).optional()
 });
 
 const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }) => {
@@ -30,7 +33,10 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
   // Ensure preferences has the correct structure
   const defaultValues = {
     ...preferences,
-    privacy: preferences.privacy || { profileVisibility: 'public' }
+    // Handle privacy field transformations
+    privacy: typeof preferences.privacy === 'string' 
+      ? preferences.privacy 
+      : preferences.privacy || { profileVisibility: 'public' }
   };
 
   const form = useForm<UserPreferences>({
@@ -120,34 +126,6 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
               </Select>
               <FormDescription>
                 Sélectionnez la langue de l'interface.
-              </FormDescription>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="privacy.profileVisibility"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Visibilité du profil</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
-                defaultValue={field.value || 'public'}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner la visibilité" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="public">Public</SelectItem>
-                  <SelectItem value="private">Privé</SelectItem>
-                  <SelectItem value="team">Équipe</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                Choisissez qui peut voir votre profil.
               </FormDescription>
             </FormItem>
           )}

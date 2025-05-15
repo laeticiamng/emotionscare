@@ -1,12 +1,11 @@
 
-/**
- * Configuration for charts
- */
+import { ReactNode } from 'react';
+
 export interface ChartConfig {
-  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
+  type: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
   data: {
     labels: string[];
-    datasets: {
+    datasets: Array<{
       label: string;
       data: number[];
       backgroundColor?: string | string[];
@@ -14,17 +13,18 @@ export interface ChartConfig {
       borderWidth?: number;
       fill?: boolean;
       tension?: number;
-    }[];
+    }>;
   };
   options?: any;
+  height?: number;
+  width?: number;
 }
 
-/**
- * Props for chart context
- */
 export interface ChartContextProps {
-  defaultConfig: ChartConfig;
-  createChart: (canvas: HTMLCanvasElement, config: ChartConfig) => any;
-  updateChart: (chart: any, config: ChartConfig) => void;
-  destroyChart: (chart: any) => void;
+  chartConfig: ChartConfig;
+  setChartConfig: (config: ChartConfig) => void;
+  refreshChart: () => void;
+  loading: boolean;
+  error: Error | null;
+  children?: ReactNode;
 }
