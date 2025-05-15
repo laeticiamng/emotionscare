@@ -1,105 +1,81 @@
 
-// Create the scanService functions that were missing
+import { EmotionResult } from '@/types/types';
 import { v4 as uuid } from 'uuid';
-import { Emotion, EmotionResult } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
 
-/**
- * Analyze an audio recording and extract emotion data
- */
-export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
-  // For now this is a mock implementation
-  // In a real app, you would send the audio to a backend service
-  console.log('Analyzing audio stream');
+// Mock function for demo purposes - would connect to backend API
+export async function analyzeEmotion(text: string, emojis?: string): Promise<EmotionResult> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
-  // Simulating API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  // Mock analysis - in a real app this would call an API
+  const emotions = ['happy', 'sad', 'neutral', 'excited', 'anxious', 'calm'];
+  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
   
-  // Simulate emotion detection
-  const emotions = ['joy', 'sadness', 'anger', 'surprise', 'fear', 'disgust', 'neutral'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  const randomConfidence = 0.7 + (Math.random() * 0.3);
-  
-  const result: EmotionResult = {
+  return {
     id: uuid(),
-    emotion: randomEmotion,
-    confidence: randomConfidence,
-    score: Math.round(randomConfidence * 100),
-    transcript: 'Transcription would appear here in a real implementation.',
-    feedback: `I detect a ${randomEmotion} emotion in your voice.`,
-    ai_feedback: `Based on vocal analysis, your primary emotion is ${randomEmotion}.`,
+    emotion,
+    score: Math.floor(Math.random() * 100),
+    confidence: Math.random() * 0.9 + 0.1,
+    intensity: Math.floor(Math.random() * 100),
+    text,
+    transcript: text,
+    emojis: emojis?.split('') || [],
+    date: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
+    ai_feedback: `I detect a ${emotion} mood in your expression.`,
+    feedback: `Your ${emotion} mood suggests...`,
     recommendations: [
       'Take a moment to breathe deeply',
-      'Consider writing in your journal',
-      'Try a short meditation session'
+      'Consider journaling about your feelings',
+      'Listen to music that matches your mood'
     ]
   };
-  
-  return result;
 }
 
-/**
- * Create a new emotion entry for a user
- */
-export async function createEmotionEntry(data: Partial<Emotion>): Promise<Emotion> {
-  if (!data.user_id) {
-    throw new Error('User ID is required');
-  }
+export async function saveEmotion(emotion: EmotionResult): Promise<boolean> {
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 800));
+  console.log('Saving emotion:', emotion);
+  return true; // In a real app, return success/failure based on API response
+}
+
+export async function fetchEmotionHistory(userId: string, limit = 10): Promise<EmotionResult[]> {
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 800));
   
-  const emotion: Emotion = {
-    id: data.id || uuid(),
-    user_id: data.user_id,
-    date: data.date || new Date().toISOString(),
-    emotion: data.emotion || 'neutral',
-    score: data.score || 50,
-    ...data
+  // Generate mock history
+  return Array(limit).fill(null).map((_, i) => ({
+    id: uuid(),
+    user_id: userId,
+    emotion: ['happy', 'sad', 'neutral', 'excited', 'anxious', 'calm'][Math.floor(Math.random() * 6)],
+    score: Math.floor(Math.random() * 100),
+    confidence: Math.random() * 0.9 + 0.1,
+    intensity: Math.floor(Math.random() * 100),
+    date: new Date(Date.now() - i * 86400000).toISOString(),
+    timestamp: new Date(Date.now() - i * 86400000).toISOString(),
+    text: 'Historical emotion entry',
+    ai_feedback: 'Historical feedback'
+  }));
+}
+
+export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
+  // Simulate processing audio
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  const emotions = ['happy', 'sad', 'neutral', 'calm', 'anxious', 'excited'];
+  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+  
+  return {
+    id: uuid(),
+    emotion,
+    score: Math.floor(Math.random() * 100),
+    confidence: Math.random() * 0.9 + 0.1,
+    intensity: Math.floor(Math.random() * 100),
+    transcript: "This is a simulated transcript from audio analysis",
+    date: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
+    audio_url: URL.createObjectURL(audioBlob),
+    audioUrl: URL.createObjectURL(audioBlob),
+    ai_feedback: `The audio analysis indicates a ${emotion} emotional state.`
   };
-  
-  try {
-    const { data: savedEmotion, error } = await supabase
-      .from('emotions')
-      .insert(emotion)
-      .select()
-      .single();
-      
-    if (error) throw error;
-    
-    return savedEmotion as Emotion;
-  } catch (error) {
-    console.error('Error saving emotion:', error);
-    // Return the local emotion object if DB save fails
-    return emotion;
-  }
-}
-
-/**
- * Fetch the latest emotion entry for a user
- */
-export async function fetchLatestEmotion(userId: string): Promise<Emotion | null> {
-  if (!userId) {
-    throw new Error('User ID is required');
-  }
-  
-  try {
-    const { data, error } = await supabase
-      .from('emotions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('date', { ascending: false })
-      .limit(1)
-      .single();
-      
-    if (error) {
-      if (error.code === 'PGRST116') {
-        // No data found - not really an error
-        return null;
-      }
-      throw error;
-    }
-    
-    return data as Emotion;
-  } catch (error) {
-    console.error('Error fetching latest emotion:', error);
-    return null;
-  }
 }

@@ -244,6 +244,8 @@ export interface VRSessionTemplate {
   theme?: string;
   tags?: string[];
   imageUrl?: string;
+  completion_rate?: number;
+  recommended_mood?: string;
 }
 
 export interface VRSession {
@@ -545,6 +547,13 @@ export interface VolumeControlProps {
   showLabel?: boolean;
 }
 
+export interface ProgressBarProps {
+  value: number;
+  max: number;
+  onChange?: (value: number) => void;
+  className?: string;
+}
+
 // ========================
 // Other types
 // ========================
@@ -676,78 +685,10 @@ export interface DashboardShortcut {
   color?: string;
 }
 
-export interface ActivityStats {
-  activity_type: string;
-  total_count: number;
-  percentage: number;
-}
-
-export interface ActivityFiltersState {
-  searchTerm: string;
-  activityType: string;
-  startDate?: Date | string;
-  endDate?: Date | string;
-}
-
-export type ActivityTabView = 'daily' | 'stats';
-
-export interface AnonymousActivity {
-  id: string;
-  activity_type: string;
-  category: string;
-  count: number;
-  timestamp_day: string;
-}
-
-export interface ChartData {
-  date: string;
-  value: number;
-}
-
-export interface DashboardStats {
-  totalUsers: number;
-  activeToday: number;
-  averageScore: number;
-  criticalAlerts: number;
-  completion: number;
-  productivity: {
-    current: number;
-    trend: number;
-  };
-  emotionalScore: {
-    current: number;
-    trend: number;
-  };
-}
-
-export interface GamificationData {
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels: {
-    level: string;
-    count: number;
-  }[];
-  topChallenges: {
-    name: string;
-    completions: number;
-  }[];
-}
-
-export interface KpiCardData {
-  id: string;
-  title: string;
-  value: string | React.ReactNode;
-  icon: any; // LucideIcon
-  delta?: {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: React.ReactNode;
-  ariaLabel?: string;
-  onClick?: () => void;
-}
-
-export interface DraggableCardProps extends KpiCardData {
-  handle?: boolean;
+// VR Template Grid Props
+export interface VRTemplateGridProps {
+  templates: VRSessionTemplate[];
+  onSelect: (template: VRSessionTemplate) => void;
+  filter?: string;
+  className?: string;
 }

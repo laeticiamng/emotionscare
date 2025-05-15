@@ -1,203 +1,191 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Badge, Challenge, GamificationStats } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
+import { GamificationStats, Badge, Challenge } from '@/types/types';
 
-export function useGamification(userId?: string) {
+interface UseGamificationReturn {
+  stats: GamificationStats;
+  badges: Badge[];
+  challenges: Challenge[];
+  isLoading: boolean;
+  error: string;
+  fetchGamificationStats: () => Promise<void>;
+  completeChallenge: (challengeId: string) => Promise<boolean>;
+}
+
+export const useGamification = (): UseGamificationReturn => {
   const [stats, setStats] = useState<GamificationStats>({
     points: 0,
     level: 1,
     badges: [],
     completedChallenges: 0,
     totalChallenges: 0,
-    streak: 0
+    streak: 0,
+    currentLevel: 1,
+    nextLevel: 2,
+    pointsToNextLevel: 100,
+    progressToNextLevel: 0,
+    activeChallenges: 0,
+    rank: 'Beginner'
   });
   
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
+  // Mock fetch gamification data
   const fetchGamificationStats = useCallback(async () => {
-    if (!userId) {
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
-    setError(null);
+    setError('');
     
     try {
-      // In a real app, this would fetch from backend
-      // For now, using mock data
-      const mockStats: GamificationStats = {
-        points: 2350,
-        level: 5,
-        rank: "Explorer",
-        badges: getMockBadges(),
-        completedChallenges: 8,
-        totalChallenges: 15,
-        streak: 7,
-        nextLevel: 6,
-        pointsToNextLevel: 650,
-        nextLevelPoints: 3000,
-        challenges: getMockChallenges(),
-        totalPoints: 2350,
-        currentLevel: 5,
-        progressToNextLevel: 70,
-        streakDays: 7,
-        lastActivityDate: new Date().toISOString(),
-        activeChallenges: 3,
-        badgesCount: 8,
-        recentAchievements: [],
-        leaderboard: []
-      };
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setStats(mockStats);
+      // Mock badges data
+      const mockBadges: Badge[] = [
+        {
+          id: '1',
+          name: 'Early Adopter',
+          description: 'Joined during the beta phase',
+          icon: 'star',
+          imageUrl: '/images/badges/early-adopter.png',
+        },
+        {
+          id: '2',
+          name: 'Emotion Explorer',
+          description: 'Recorded 10 different emotions',
+          icon: 'heart',
+          imageUrl: '/images/badges/emotion-explorer.png',
+        },
+        {
+          id: '3',
+          name: 'Journaling Pro',
+          description: 'Created 30 journal entries',
+          icon: 'book',
+          imageUrl: '/images/badges/journaling-pro.png',
+        }
+      ];
+      
+      // Mock challenges data
+      const mockChallenges: Challenge[] = [
+        {
+          id: '1',
+          name: 'Daily Check-in',
+          title: 'Daily Check-in',
+          description: 'Record your emotion every day for a week',
+          points: 50,
+          type: 'streak',
+          category: 'emotion',
+          status: 'in-progress',
+          progress: 3,
+          total: 7,
+          completions: 0
+        },
+        {
+          id: '2',
+          name: 'Journal Journey',
+          title: 'Journal Journey',
+          description: 'Write 5 journal entries',
+          points: 100,
+          type: 'count',
+          category: 'journal',
+          status: 'in-progress',
+          progress: 2,
+          total: 5,
+          completions: 0
+        },
+        {
+          id: '3',
+          name: 'VR Explorer',
+          title: 'VR Explorer',
+          description: 'Complete 3 different VR sessions',
+          points: 150,
+          type: 'count',
+          category: 'vr',
+          status: 'not-started',
+          progress: 0,
+          total: 3,
+          completions: 0
+        }
+      ];
+      
+      // Set the mock data
+      setStats({
+        points: 250,
+        level: 3,
+        rank: 'Explorer',
+        badges: mockBadges,
+        completedChallenges: 2,
+        totalChallenges: 5,
+        streak: 3,
+        currentLevel: 3,
+        nextLevel: 4,
+        pointsToNextLevel: 150,
+        progressToNextLevel: 65,
+        activeChallenges: 3,
+        streakDays: 3,
+        lastActivityDate: new Date().toISOString(),
+        badgesCount: mockBadges.length
+      });
+      
+      setBadges(mockBadges);
+      setChallenges(mockChallenges);
     } catch (err) {
-      console.error('Error fetching gamification stats:', err);
-      setError('Failed to load gamification data');
+      setError('Failed to fetch gamification data');
+      console.error('Error fetching gamification data:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, []);
 
-  // Fetch stats on component mount or userId change
+  // Simulate completing a challenge
+  const completeChallenge = useCallback(async (challengeId: string): Promise<boolean> => {
+    try {
+      // Find the challenge to complete
+      const challenge = challenges.find(c => c.id === challengeId);
+      if (!challenge) return false;
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Update challenges list
+      setChallenges(prev => prev.map(c => {
+        if (c.id === challengeId) {
+          return { ...c, status: 'completed', completed: true, progress: c.total || 0 };
+        }
+        return c;
+      }));
+      
+      // Update stats
+      setStats(prev => ({
+        ...prev,
+        points: prev.points + challenge.points,
+        completedChallenges: prev.completedChallenges + 1,
+        activeChallenges: prev.activeChallenges ? prev.activeChallenges - 1 : 0
+      }));
+      
+      return true;
+    } catch (error) {
+      console.error('Error completing challenge:', error);
+      return false;
+    }
+  }, [challenges]);
+
+  // Initial fetch on component mount
   useEffect(() => {
     fetchGamificationStats();
   }, [fetchGamificationStats]);
 
-  const completeChallenge = useCallback(async (challengeId: string) => {
-    if (!userId) return false;
-    
-    try {
-      // In a real app, this would call the backend API
-      console.log(`Completing challenge ${challengeId} for user ${userId}`);
-      
-      // Optimistically update UI
-      setStats(prev => {
-        const updatedChallenges = prev.challenges?.map(c => 
-          c.id === challengeId 
-            ? { ...c, status: 'completed' as const, completed: true } 
-            : c
-        ) || [];
-        
-        return {
-          ...prev,
-          points: prev.points + 100,
-          completedChallenges: prev.completedChallenges + 1,
-          challenges: updatedChallenges
-        };
-      });
-      
-      return true;
-    } catch (err) {
-      console.error('Error completing challenge:', err);
-      return false;
-    }
-  }, [userId]);
-
-  // Mock data helpers
-  const getMockBadges = (): Badge[] => {
-    return [
-      {
-        id: "badge1",
-        name: "First Scan",
-        description: "Complete your first emotion scan",
-        icon: "award",
-        type: "achievement",
-        level: "bronze"
-      },
-      {
-        id: "badge2",
-        name: "Week Streak",
-        description: "Log in for 7 consecutive days",
-        icon: "calendar",
-        type: "streak",
-        level: "silver"
-      },
-      {
-        id: "badge3",
-        name: "Journal Master",
-        description: "Write 10 journal entries",
-        icon: "book",
-        type: "achievement",
-        level: "gold"
-      }
-    ];
-  };
-  
-  const getMockChallenges = (): Challenge[] => {
-    return [
-      {
-        id: "c1",
-        name: "Daily Check-in",
-        description: "Log in to the app today",
-        points: 10,
-        type: "daily",
-        category: "activity",
-        status: "completed",
-        completed: true,
-        completions: 1,
-        total: 1
-      },
-      {
-        id: "c2",
-        name: "Emotion Explorer",
-        description: "Complete 3 emotion scans this week",
-        points: 50,
-        type: "weekly",
-        category: "emotion",
-        status: "in-progress",
-        progress: 1,
-        total: 3,
-        completions: 1
-      },
-      {
-        id: "c3",
-        name: "Mindfulness Streak",
-        description: "Complete a VR session 3 days in a row",
-        points: 100,
-        type: "streak",
-        category: "activity",
-        status: "not-started",
-        progress: 0,
-        total: 3,
-        completions: 0
-      },
-      {
-        id: "c4",
-        name: "Share an insight",
-        description: "Share an emotional insight with your team",
-        points: 30,
-        type: "one-time",
-        category: "community",
-        status: "not-started",
-        completions: 0,
-        total: 1
-      },
-      {
-        id: "c5",
-        name: "Journal Journey",
-        description: "Write 5 journal entries",
-        points: 75,
-        type: "count",
-        category: "journal",
-        status: "in-progress",
-        progress: 2,
-        total: 5,
-        completions: 2
-      }
-    ];
-  };
-
   return {
     stats,
+    badges,
+    challenges,
     isLoading,
     error,
     fetchGamificationStats,
     completeChallenge
   };
-}
+};
 
 export default useGamification;

@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicProps } from '@/types';
+import { VRSessionWithMusicProps } from '@/types/types';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
@@ -12,20 +12,23 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   isAudioOnly, 
   videoUrl, 
   audioUrl, 
-  emotion 
+  emotion,
+  sessionId,
+  templateId
 }) => {
-  // Use direct props or from the template
+  // Use direct props or from the session
   const activeTemplate = session || template;
   const handleComplete = onSessionComplete || onComplete;
   
   const targetEmotion = emotion || (
+    // Check if emotion property exists before trying to access it
     activeTemplate?.emotion || 'calm'
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
   
   useEffect(() => {
-    // Load a playlist based on the emotion target of the session
+    // Load a playlist based on the session's target emotion
     const loadMusic = async () => {
       try {
         if (targetEmotion && loadPlaylistForEmotion) {
@@ -36,14 +39,14 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || '',
-              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].url || ''
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
+              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
             };
             playTrack(track);
           }
         }
       } catch (error) {
-        console.error("Error loading music for VR session:", error);
+        console.error("Error loading music for VR:", error);
       }
     };
     

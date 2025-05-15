@@ -1,81 +1,131 @@
 
 import React, { useState, useEffect } from 'react';
-import { Badge, Clock } from 'lucide-react';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { VRSessionTemplate, VRSession } from '@/types';
+import { Progress } from '@/components/ui/progress';
+import { VRSessionTemplate, VRSession } from '@/types/types';
+import { Play, Pause, SkipForward } from 'lucide-react';
 
 interface VRActiveSessionProps {
-  session?: VRSession;
-  template?: VRSessionTemplate;
-  onResume?: () => void;
-  onCancel?: () => void;
+  template: VRSessionTemplate;
+  onComplete: (session: VRSession) => void;
+  onExit: () => void;
 }
 
 const VRActiveSession: React.FC<VRActiveSessionProps> = ({
-  session,
   template,
-  onResume,
-  onCancel
+  onComplete,
+  onExit
 }) => {
-  const [timeElapsed, setTimeElapsed] = useState<string>('');
-  
+  const [progress, setProgress] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const sessionDuration = template.duration || 300; // default 5 minutes if not specified
+
   useEffect(() => {
-    if (!session || !session.startTime) return;
+    let interval: number | null = null;
     
-    // Calculate time elapsed since session started
-    const calculateTimeElapsed = () => {
-      const start = new Date(session.startTime);
-      const now = new Date();
-      const diffMs = now.getTime() - start.getTime();
-      
-      // Format as HH:MM:SS
-      const hours = Math.floor(diffMs / (1000 * 60 * 60));
-      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-      
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    if (!isPaused) {
+      interval = window.setInterval(() => {
+        setTimeElapsed(prev => {
+          const next = prev + 1;
+          const newProgress = Math.min((next / sessionDuration) * 100, 100);
+          setProgress(newProgress);
+          
+          if (newProgress >= 100) {
+            clearInterval(interval as number);
+            completeSession();
+          }
+          return next;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPaused, sessionDuration]);
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  const togglePause = () => {
+    setIsPaused(prev => !prev);
+  };
+
+  const completeSession = () => {
+    const session: VRSession = {
+      id: Date.now().toString(),
+      templateId: template.id,
+      userId: 'current-user', // This would be the actual user ID
+      startTime: new Date(Date.now() - timeElapsed * 1000).toISOString(),
+      endTime: new Date().toISOString(),
+      duration: timeElapsed,
+      completed: true,
+      // Add other properties as needed
     };
     
-    // Update time elapsed every second
-    const intervalId = setInterval(() => {
-      setTimeElapsed(calculateTimeElapsed());
-    }, 1000);
-    
-    // Initial calculation
-    setTimeElapsed(calculateTimeElapsed());
-    
-    return () => clearInterval(intervalId);
-  }, [session]);
-  
-  if (!session && !template) return null;
-  
-  const sessionTitle = template?.title || template?.name || 'Session en cours';
-  
+    onComplete(session);
+  };
+
+  const skipSession = () => {
+    setProgress(100);
+    completeSession();
+  };
+
   return (
-    <div className="p-4 border rounded-lg bg-muted/20">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-medium">{sessionTitle}</h3>
-        {session?.is_audio_only ? (
-          <Badge variant="outline" className="px-2 py-1 text-xs">Audio</Badge>
-        ) : (
-          <Badge variant="outline" className="px-2 py-1 text-xs">VR</Badge>
-        )}
-      </div>
+    <Card className="w-full">
+      <CardContent className="p-6 space-y-4">
+        <h2 className="text-xl font-semibold">{template.title || template.name}</h2>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>{formatTime(timeElapsed)}</span>
+            <span>{formatTime(sessionDuration)}</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+        
+        {/* Video or audio representation would go here */}
+        <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
+          {template.is_audio_only ? (
+            <div className="text-4xl animate-pulse">🎵</div>
+          ) : (
+            <div className="text-4xl">🎬</div>
+          )}
+        </div>
+      </CardContent>
       
-      <div className="flex items-center text-muted-foreground text-sm mb-3">
-        <Clock className="h-4 w-4 mr-1" />
-        <span>{timeElapsed || '00:00:00'} écoulées</span>
-      </div>
-      
-      <div className="flex space-x-2">
-        <Button variant="default" className="flex-1" onClick={onResume}>
-          Reprendre
+      <CardFooter className="flex justify-between p-6">
+        <Button 
+          variant="outline"
+          onClick={onExit}
+        >
+          Quitter
         </Button>
-        <Button variant="outline" className="flex-1" onClick={onCancel}>
-          Annuler
-        </Button>
-      </div>
-    </div>
+        
+        <div className="flex gap-2">
+          <Button 
+            variant="secondary"
+            onClick={togglePause}
+          >
+            {isPaused ? <Play className="mr-2 h-4 w-4" /> : <Pause className="mr-2 h-4 w-4" />}
+            {isPaused ? 'Reprendre' : 'Pause'}
+          </Button>
+          
+          <Button 
+            variant="default"
+            onClick={skipSession}
+          >
+            <SkipForward className="mr-2 h-4 w-4" />
+            Terminer
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 };
 

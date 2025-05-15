@@ -1,3 +1,3 @@
 
-// Export all types from the central types.ts file
+// Export all types from the central types file
 export * from './types';
