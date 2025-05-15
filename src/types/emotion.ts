@@ -1,94 +1,46 @@
 
+// Types liés aux émotions
 export interface Emotion {
-  id?: string;
-  user_id?: string;
-  userId?: string;
-  date?: string | Date;
-  emotion?: string;
-  name?: string;
-  color?: string;
+  id: string;
+  name: string;
+  color: string;
+  intensity?: number;
   icon?: string;
   description?: string;
-  category?: string;
-  score?: number;
-  confidence?: number;
-  intensity?: number;
-  text?: string;
-  emojis?: string[] | string;
-  transcript?: string;
-  audio_url?: string;
-  audioUrl?: string;
-  ai_feedback?: string;
-  aiFeedback?: string;
-  recommendations?: string[];
-  triggers?: string[];
-  feedback?: string;
-  timestamp?: string;
-  anxiety?: number;
-  energy?: number;
 }
 
 export interface EmotionResult {
-  id?: string;
-  user_id?: string;
-  userId?: string;
   emotion: string;
-  score?: number;
-  confidence?: number;
-  dominantEmotion?: string;
-  primaryEmotion?: string;
-  intensity?: number;
-  text?: string;
-  transcript?: string;
-  emojis?: string[] | string;
-  timestamp?: string;
-  date?: string;
+  confidence: number;
+  timestamp?: Date | string;
   triggers?: string[];
-  feedback?: string;
-  ai_feedback?: string;
-  aiFeedback?: string;
-  recommendations?: string[];
-  audio_url?: string;
-  audioUrl?: string;
+  intensity?: number;
+  secondary?: string[];
+  userId?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  recommendations?: string[];
-  insights?: string[];
+  color: string;
   icon?: string;
-  color?: string;
-  textColor?: string;
-  description?: string;
-  category?: string;
-  coping_strategies?: string[];
-  copingStrategies?: string[];
-  relatedActivities?: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number;
-  }[];
-}
-
-export interface EmotionalTeamViewProps {
-  teamId?: string;
-  departmentId?: string;
-  users?: any[];
-  anonymized?: boolean;
-  onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year' | string;
-  userId?: string;
-  className?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  onRefresh?: () => void;
+  recommendations?: string[];
+  suggestedActivities?: string[];
 }
 
 export interface VoiceEmotionScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
+  onEmotionDetected?: (emotion: string, result: EmotionResult) => void;
+}
+
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onEmotionDetected?: (emotion: string, result: EmotionResult) => void;
+}
+
+export interface EmotionalTeamViewProps {
+  teamId: string;
+  period?: string;
+  anonymized?: boolean;
 }
 
 export interface TeamOverviewProps {

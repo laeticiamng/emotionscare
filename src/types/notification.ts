@@ -1,49 +1,45 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'custom';
-export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'invitation' | 'reminder' | 'info' | 'warning' | 'success' | 'error' | 'alert';
-export type NotificationTone = 'neutral' | 'supportive' | 'professional' | 'friendly' | 'direct' | 'gentle' | 'motivational';
-export type NotificationFilter = 'all' | 'unread' | NotificationType;
+// Types liés aux notifications
+export type NotificationType = 'info' | 'warning' | 'error' | 'success' | 'reminder' | 'alert';
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm';
+export type NotificationFilter = 'all' | 'unread' | 'system' | 'alerts';
 
 export interface Notification {
   id: string;
   title: string;
-  message: string;
+  message?: string;
   type: NotificationType;
-  timestamp: string | Date;
+  timestamp: Date | string;
   read: boolean;
-  userId?: string;
-  user_id?: string;
-  action?: string;
   actionUrl?: string;
   actionLabel?: string;
-  icon?: string;
-  priority?: number;
-  category?: string;
-  source?: string;
-  createdAt?: string;
-  body?: string;
-  date?: string | Date;
+  sender_id?: string;
+  recipient_id?: string;
+  priority?: NotificationPriority;
 }
 
 export interface NotificationBadge {
   count: number;
-  active: boolean;
-  badgesCount?: number;
-  notificationsCount?: number;
-  hasNew?: boolean;
-  lastSeen?: string;
+  variant?: 'default' | 'destructive' | 'outline';
+}
+
+export interface NotificationItemProps {
+  notification: Notification;
+  onRead?: (id: string) => Promise<void> | void;
 }
 
 export interface NotificationPreference {
-  type: NotificationType;
   enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
   frequency: NotificationFrequency;
   tone?: NotificationTone;
-  channels?: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
+  types?: Record<string, boolean>;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
   };
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
 }

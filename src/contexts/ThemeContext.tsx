@@ -1,15 +1,15 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Theme } from '@/types';
+import { Theme, FontFamily, FontSize } from '@/types';
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
-  fontSize?: string;
-  setFontSize?: (size: string) => void;
-  fontFamily?: string;
-  setFontFamily?: (font: string) => void;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (font: FontFamily) => void;
 }
 
 const defaultTheme: Theme = 'system';
@@ -25,8 +25,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     () => (localStorage.getItem('theme') as Theme) || defaultTheme
   );
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [fontSize, setFontSize] = useState('medium');
-  const [fontFamily, setFontFamily] = useState('system');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('system');
 
   useEffect(() => {
     const root = window.document.documentElement;

@@ -1,73 +1,75 @@
 
 import React from 'react';
+import { useTheme } from '@/hooks/use-theme';
 import { Theme } from '@/types';
 
 interface ThemeColorExampleProps {
-  theme: Theme;
+  theme?: Theme;
 }
 
 const ThemeColorExample: React.FC<ThemeColorExampleProps> = ({ theme }) => {
-  const getColors = () => {
-    switch (theme) {
-      case 'dark':
-        return {
-          background: '#1A1F2C',
-          primary: '#9b87f5',
-          secondary: '#7E69AB',
-          text: '#F6F6F7'
-        };
-      case 'light':
-        return {
-          background: '#FFFFFF',
-          primary: '#8B5CF6',
-          secondary: '#D6BCFA',
-          text: '#333333'
-        };
-      case 'system':
-        // This should depend on user's system setting but for demo purposes
-        return {
-          background: '#F6F6F7',
-          primary: '#8B5CF6',
-          secondary: '#D6BCFA',
-          text: '#333333'
-        };
-      case 'pastel':
-        return {
-          background: '#F1F0FB',
-          primary: '#E5DEFF',
-          secondary: '#FFDEE2',
-          text: '#403E43'
-        };
-      default:
-        return {
-          background: '#FFFFFF',
-          primary: '#8B5CF6',
-          secondary: '#D6BCFA',
-          text: '#333333'
-        };
+  const { isDarkMode } = useTheme();
+  const currentTheme = theme || (isDarkMode ? 'dark' : 'light');
+
+  const themeColors = {
+    light: {
+      background: '#ffffff',
+      foreground: '#111111',
+      primary: '#8b5cf6',
+      secondary: '#d946ef',
+      accent: '#f97316',
+      muted: '#f1f5f9'
+    },
+    dark: {
+      background: '#111111',
+      foreground: '#ffffff',
+      primary: '#a78bfa',
+      secondary: '#e879f9',
+      accent: '#fb923c',
+      muted: '#1e293b'
+    },
+    system: {
+      background: isDarkMode ? '#111111' : '#ffffff',
+      foreground: isDarkMode ? '#ffffff' : '#111111',
+      primary: isDarkMode ? '#a78bfa' : '#8b5cf6',
+      secondary: isDarkMode ? '#e879f9' : '#d946ef',
+      accent: isDarkMode ? '#fb923c' : '#f97316',
+      muted: isDarkMode ? '#1e293b' : '#f1f5f9'
+    },
+    pastel: {
+      background: '#f8fafc',
+      foreground: '#334155',
+      primary: '#c4b5fd',
+      secondary: '#fbcfe8',
+      accent: '#fed7aa',
+      muted: '#f1f5f9'
     }
   };
 
-  const colors = getColors();
+  const colors = themeColors[currentTheme];
 
   return (
-    <div 
-      className="rounded-md p-4 border"
-      style={{ backgroundColor: colors.background }}
-    >
-      <div className="flex flex-col gap-3">
-        <div 
-          className="rounded-md h-6"
-          style={{ backgroundColor: colors.primary }}
-        />
-        <div 
-          className="rounded-md h-6"
-          style={{ backgroundColor: colors.secondary }}
-        />
-        <p style={{ color: colors.text }}>
-          Text sample for {theme} theme
-        </p>
-      </div>
+    <div className="flex flex-col space-y-2">
+      <div 
+        className="h-10 rounded-md"
+        style={{ backgroundColor: colors.background, border: '1px solid #e2e8f0' }}
+      />
+      <div 
+        className="h-10 rounded-md"
+        style={{ backgroundColor: colors.primary }}
+      />
+      <div 
+        className="h-10 rounded-md"
+        style={{ backgroundColor: colors.secondary }}
+      />
+      <div 
+        className="h-10 rounded-md"
+        style={{ backgroundColor: colors.accent }}
+      />
+      <div 
+        className="h-10 rounded-md"
+        style={{ backgroundColor: colors.muted }}
+      />
     </div>
   );
 };

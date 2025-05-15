@@ -1,69 +1,45 @@
 
-export type Period = 'day' | 'week' | 'month' | 'year' | 'custom';
-
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
+// Types liés à la gamification
+export interface GamificationStats {
   points: number;
-  status: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
-  category: string;
-  progress?: number;
-  goal?: number;
-  icon?: string;
-  level?: string | number;
-  // Additional properties for compatibility
-  name?: string;
-  target?: number;
-  reward?: number | string;
-  expiresAt?: string;
-  type?: string;
+  level: number;
+  nextLevelPoints: number;
+  rank: number;
+  streak: number;
+  nextLevel: number;
+  achievements: any[];
+  badges: any[];
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  progressToNextLevel: number;
+  challenges: any[];
+  recentAchievements: any[];
 }
 
 export interface Badge {
   id: string;
   name: string;
-  description?: string;
-  image?: string;
+  description: string;
+  icon: string;
   level?: number;
-  acquired?: boolean;
-  date_acquired?: string;
-  category?: string;
-  points?: number;
-  // Additional properties for compatibility
-  icon?: string;
-  threshold?: number;
-  unlocked?: boolean;
-  imageUrl?: string;
-  image_url?: string;
-  awarded_at?: Date | string;
-  dateEarned?: string;
+  unlockedAt?: Date;
+  progress?: number;
+  total?: number;
+  color?: string;
 }
 
-export interface GamificationStats {
-  points: number;
-  level: number;
-  rank: string;
-  badges: Badge[];
-  streak: number;
-  nextLevelPoints: number;
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  reward: number;
   progress: number;
-  recentAchievements?: Badge[];
-  // Additional properties for compatibility
-  completedChallenges?: number;
-  activeChallenges?: number;
-  streakDays?: number;
-  progressToNextLevel?: number;
-  challenges?: Challenge[];
-  nextLevel?: {
-    points: number;
-    rewards: any[];
-  };
-  achievements?: any[];
-  totalPoints?: number;
-  currentLevel?: number;
-  pointsToNextLevel?: number;
-  badgesCount?: number;
-  lastActivityDate?: string;
-  totalChallenges?: number;
+  total: number;
+  complete: boolean;
+  icon: string;
+  dueDate?: Date;
+  category?: string;
 }
+
+export type Period = 'day' | 'week' | 'month' | 'year' | 'all';

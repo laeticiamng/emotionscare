@@ -8,6 +8,7 @@ import FontSettings from '@/components/settings/FontSettings';
 import { Button } from '@/components/ui/button';
 import { Save, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { FontFamily, FontSize, Theme } from '@/types';
 
 const ThemeSettingsTab: React.FC = () => {
   const themeContext = useTheme();
@@ -15,9 +16,9 @@ const ThemeSettingsTab: React.FC = () => {
   const { toast } = useToast();
   
   const [pendingChanges, setPendingChanges] = useState({
-    theme: themeContext?.theme || 'light',
-    fontFamily: themeContext?.fontFamily || 'inter',
-    fontSize: themeContext?.fontSize || 'medium'
+    theme: themeContext?.theme || 'light' as Theme,
+    fontFamily: (themeContext?.fontFamily || 'system') as FontFamily,
+    fontSize: (themeContext?.fontSize || 'medium') as FontSize
   });
   
   const handleSaveChanges = () => {
@@ -52,16 +53,16 @@ const ThemeSettingsTab: React.FC = () => {
   const handleReset = () => {
     // Reset to default values
     setPendingChanges({
-      theme: 'light',
-      fontFamily: 'inter',
-      fontSize: 'medium'
+      theme: 'light' as Theme,
+      fontFamily: 'system' as FontFamily,
+      fontSize: 'medium' as FontSize
     });
     
     // Apply resets immediately
     if (themeContext) {
       themeContext.setTheme('light');
-      if (themeContext.setFontFamily) themeContext.setFontFamily('inter');
-      if (themeContext.setFontSize) themeContext.setFontSize('medium');
+      if (themeContext.setFontFamily) themeContext.setFontFamily('system' as FontFamily);
+      if (themeContext.setFontSize) themeContext.setFontSize('medium' as FontSize);
     }
     
     resetPreferences();

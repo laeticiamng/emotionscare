@@ -3,16 +3,25 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TeamOverviewProps } from '@/types';
 
-const TeamOverview: React.FC<TeamOverviewProps> = ({ teamId, period = 'week', anonymized = true }) => {
+const TeamOverview: React.FC<TeamOverviewProps> = ({ 
+  teamId, 
+  period = 'week',
+  anonymized = false 
+}) => {
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
-        <CardTitle>Aperçu de l'équipe</CardTitle>
+        <CardTitle>Vue d'équipe émotionnelle</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Vue d'ensemble émotionnelle de l'équipe {teamId}</p>
-        <p>Période: {period}</p>
-        <p>Mode anonyme: {anonymized ? 'Oui' : 'Non'}</p>
+        <p className="text-muted-foreground">
+          Visualisation des données émotionnelles d'équipe pour la période: {period}
+        </p>
+        <div className="h-64 flex items-center justify-center bg-muted/20 rounded-md mt-4">
+          <span className="text-muted-foreground">
+            Données de l'équipe {anonymized ? 'anonymisées' : ''} (ID: {teamId})
+          </span>
+        </div>
       </CardContent>
     </Card>
   );

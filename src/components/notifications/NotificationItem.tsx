@@ -1,68 +1,77 @@
 
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { Bell, Calendar, CheckCircle2, Info, AlertTriangle, XCircle } from 'lucide-react';
-import { Notification } from '@/types';
-import { useNotifications } from '@/hooks/useNotifications';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Notification, NotificationItemProps } from '@/types';
 
-interface NotificationItemProps {
-  notification: Notification;
-  onSelect?: (notification: Notification) => void;
-}
-
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onSelect }) => {
-  const { markAsRead } = useNotifications();
-
-  const getTypeIcon = () => {
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRead }) => {
+  const getIcon = () => {
     switch (notification.type) {
       case 'reminder':
-        return <Calendar className="h-5 w-5 text-primary" />;
+        return <Calendar className="h-5 w-5 text-blue-500" />;
       case 'success':
-        return <CheckCircle2 className="h-5 w-5 text-success" />;
+        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
+        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
       case 'error':
-        return <XCircle className="h-5 w-5 text-destructive" />;
-      case 'alert':
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
+        return <XCircle className="h-5 w-5 text-red-500" />;
       default:
-        return <Info className="h-5 w-5 text-info" />;
+        return <Info className="h-5 w-5 text-blue-500" />;
     }
   };
 
   const handleClick = () => {
-    markAsRead(notification.id);
-    if (onSelect) {
-      onSelect(notification);
+    if (onRead) {
+      onRead(notification.id);
     }
   };
 
+  const formattedDate = notification.timestamp 
+    ? formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true, locale: fr })
+    : '';
+
   return (
-    <div
-      className={`flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer ${
-        !notification.read ? 'bg-primary/5' : ''
-      }`}
+    <div 
+      className={cn(
+        "p-4 border-b last:border-b-0 transition-colors",
+        notification.read ? "bg-background" : "bg-primary/5",
+        "hover:bg-muted/40 cursor-pointer"
+      )}
       onClick={handleClick}
     >
-      <div className="mt-1">{getTypeIcon()}</div>
-      <div className="flex-1">
-        <div className="flex justify-between items-start">
-          <span className="font-medium">{notification.title}</span>
-          <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-            {notification.timestamp && formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
-          </span>
+      <div className="flex gap-3">
+        <div className="mt-0.5">{getIcon()}</div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="font-medium text-sm">{notification.title}</h4>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">{formattedDate}</span>
+          </div>
+          
+          {notification.message && (
+            <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+          )}
+
+          <div className="flex items-center justify-between mt-2">
+            {!notification.read && (
+              <Badge variant="secondary" className="text-xs">Nouveau</Badge>
+            )}
+            
+            {notification.actionUrl && notification.actionLabel && (
+              <Button 
+                variant="link" 
+                size="sm" 
+                className="p-0 h-auto text-xs"
+                asChild
+              >
+                <a href={notification.actionUrl}>{notification.actionLabel}</a>
+              </Button>
+            )}
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{notification.message}</p>
-        
-        {notification.actionUrl && notification.actionLabel && (
-          <a
-            href={notification.actionUrl}
-            className="text-sm text-primary hover:underline mt-1 block"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {notification.actionLabel}
-          </a>
-        )}
       </div>
     </div>
   );

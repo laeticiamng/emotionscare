@@ -1,83 +1,73 @@
-
 import React from 'react';
-import { VRSession, VRSessionTemplate } from '@/types/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { Calendar, CheckCircle, Clock } from 'lucide-react';
+import { VRSession, VRSessionTemplate } from '@/types';
+
+interface VRSessionHistoryItemProps {
+  session: VRSession;
+  template: VRSessionTemplate;
+  onClick: (session: VRSession) => void;
+}
+
+const VRSessionHistoryItem: React.FC<VRSessionHistoryItemProps> = ({ session, template, onClick }) => {
+  const formattedDate = session.startTime
+    ? formatDistanceToNow(new Date(session.startTime), { addSuffix: true })
+    : 'Unknown';
+
+  return (
+    <div
+      className="flex items-center justify-between p-3 hover:bg-muted/50 cursor-pointer transition-colors"
+      onClick={() => onClick(session)}
+    >
+      <div>
+        <h4 className="font-medium text-sm">{template.title}</h4>
+        <p className="text-xs text-muted-foreground">
+          {formattedDate}
+        </p>
+      </div>
+      <span className="text-xs text-muted-foreground">
+        {session.duration} minutes
+      </span>
+    </div>
+  );
+};
 
 interface VRSessionHistoryProps {
   sessions: VRSession[];
-  title?: string;
-  onSelectSession?: (session: VRSession) => void;
-  templateMap?: Record<string, VRSessionTemplate>;
+  templates: VRSessionTemplate[];
+  onSelectSession: (session: VRSession) => void;
 }
 
-const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ 
-  sessions = [], 
-  title = 'Sessions récentes',
-  onSelectSession,
-  templateMap = {}
-}) => {
-  if (sessions.length === 0) {
-    return null;
-  }
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Date inconnue';
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: fr });
-    } catch (err) {
-      return 'Date invalide';
-    }
+const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ sessions, templates, onSelectSession }) => {
+  const getTemplateForSession = (sessionId: string): VRSessionTemplate | undefined => {
+    const session = sessions.find(s => s.id === sessionId);
+    return templates.find(template => template.id === session?.templateId);
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Historique des sessions</h3>
+      {sessions.length > 0 ? (
+        <div className="divide-y">
           {sessions.map(session => {
-            // Look up template by templateId or use embedded template if available
-            const templateName = session.templateId && templateMap[session.templateId]
-              ? templateMap[session.templateId].name || templateMap[session.templateId].title
-              : 'Session VR';
-              
+            const template = getTemplateForSession(session.id);
+            if (!template) return null;
+
             return (
-              <div 
-                key={session.id} 
-                className="flex items-start space-x-4 p-3 rounded-lg hover:bg-accent/50 cursor-pointer"
-                onClick={() => onSelectSession && onSelectSession(session)}
-              >
-                <div className="bg-primary/10 p-2 rounded-full">
-                  {session.completed ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <Clock className="h-5 w-5 text-blue-500" />
-                  )}
-                </div>
-                
-                <div className="flex flex-col flex-1">
-                  <h4 className="font-medium">{templateName}</h4>
-                  
-                  <div className="flex items-center text-sm text-muted-foreground mt-1">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>{formatDate(session.startDate?.toString() || session.startTime)}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-sm mt-1">
-                    <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
-                    <span>{Math.floor((session.duration_seconds || session.duration || 0) / 60)} min</span>
-                  </div>
-                </div>
-              </div>
+              <VRSessionHistoryItem
+                key={session.id}
+                session={session}
+                template={template}
+                onClick={onSelectSession}
+              />
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      ) : (
+        <div className="text-center py-4 text-muted-foreground">
+          Aucune session enregistrée pour le moment.
+        </div>
+      )}
+    </div>
   );
 };
 

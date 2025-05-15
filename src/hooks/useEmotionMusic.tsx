@@ -17,6 +17,7 @@ export const useEmotionMusic = () => {
           id: '1',
           title: `${emotion} melody`,
           artist: 'Wellness Music',
+          duration: 180, // Ajout de la propriété duration
           url: '/music/track1.mp3',
           audioUrl: '/music/track1.mp3',
           coverUrl: '/images/cover1.jpg'
@@ -25,6 +26,7 @@ export const useEmotionMusic = () => {
           id: '2',
           title: 'Peaceful sounds',
           artist: 'Mindful Artists',
+          duration: 240, // Ajout de la propriété duration
           url: '/music/track2.mp3',
           audioUrl: '/music/track2.mp3',
           coverUrl: '/images/cover2.jpg'
@@ -52,6 +54,7 @@ export const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promis
         id: '1',
         title: `${emotion} melody`,
         artist: 'Wellness Music',
+        duration: 180, // Ajout de la propriété duration
         url: '/music/track1.mp3',
         audioUrl: '/music/track1.mp3',
         coverUrl: '/images/cover1.jpg'
@@ -60,6 +63,7 @@ export const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promis
         id: '2',
         title: 'Peaceful sounds',
         artist: 'Mindful Artists',
+        duration: 240, // Ajout de la propriété duration
         url: '/music/track2.mp3',
         audioUrl: '/music/track2.mp3',
         coverUrl: '/images/cover2.jpg'

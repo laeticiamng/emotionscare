@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ const UnifiedEmotionCheckin: React.FC = () => {
   const [activeTab, setActiveTab] = useState('voice');
   const [emotionDetected, setEmotionDetected] = useState<EmotionResult | null>(null);
   
-  const handleEmotionDetected = (emotion: any, result: EmotionResult) => {
+  const handleEmotionDetected = (emotion: string, result: EmotionResult) => {
     setEmotionDetected(result);
     // Here you could also trigger other actions like updating user's emotional state
   };
@@ -48,7 +47,11 @@ const UnifiedEmotionCheckin: React.FC = () => {
           
           <TabsContent value="voice" className="p-0">
             <LiveVoiceScanner 
-              onEmotionDetected={handleEmotionDetected}
+              onResult={(result) => {
+                if (result.emotion) {
+                  handleEmotionDetected(result.emotion, result);
+                }
+              }} 
             />
           </TabsContent>
           

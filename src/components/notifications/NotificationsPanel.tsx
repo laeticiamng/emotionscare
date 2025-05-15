@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Notification, NotificationType, NotificationFilter } from '@/types';
-import { useNotifications } from '@/hooks/useNotifications';
+import { Notification, NotificationFilter } from '@/types';
+import { useNotifications } from '@/hooks/use-notifications';
 import { formatDistanceToNow } from 'date-fns';
 import { 
   Bell,
@@ -40,7 +40,7 @@ const NotificationsPanel: React.FC = () => {
     );
   }
 
-  const getTypeIcon = (type: NotificationType) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case "alert":
         return <AlertTriangle className="h-5 w-5 text-warning" />;

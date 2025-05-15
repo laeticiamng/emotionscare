@@ -1,33 +1,32 @@
 
-import { MusicTrack, MusicPlaylist } from './music';
-
+// Types liés à la réalité virtuelle
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  name?: string; // For backward compatibility 
+  name?: string; // Pour compatibilité
   description: string;
   thumbnailUrl: string;
-  thumbnail?: string; // For backward compatibility
+  thumbnail?: string; // Pour compatibilité
   duration: number;
   category: string;
   tags: string[];
   completionRate: number;
-  completion_rate?: number; // For backward compatibility
+  completion_rate?: number; // Pour compatibilité
   recommendedMood: string;
-  recommended_mood?: string; // For backward compatibility
-  emotionTarget?: string; // Added for components expecting this
-  emotion_target?: string; // For backward compatibility
+  recommended_mood?: string; // Pour compatibilité
+  emotionTarget?: string;
+  emotion_target?: string; // Pour compatibilité
   popularity?: number;
   difficulty?: string;
   intensity?: number;
   imageUrl?: string;
-  // Adding properties expected by components
   preview_url?: string;
   is_audio_only?: boolean;
   audio_url?: string;
+  audioUrl?: string;
   benefits?: string[];
   theme?: string;
-  emotion?: string; // Added for compatibility
+  emotion?: string;
   lastUsed?: string | Date;
 }
 
@@ -45,15 +44,16 @@ export interface VRSession {
   emotionTarget?: string;
   notes?: string;
   rating?: number;
-  // Adding properties expected by components
-  startTime?: string;
+  startTime?: string; // Pour compatibilité
+  endTime?: string;
   date?: string;
   duration_seconds?: number;
   completed?: boolean;
   isCompleted?: boolean;
-  heart_rate_before?: number; // For backward compatibility
-  heart_rate_after?: number; // For backward compatibility
-  started_at?: string; // For backward compatibility
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  started_at?: string;
+  is_audio_only?: boolean;
 }
 
 export interface VRHistoryListProps {
@@ -65,6 +65,10 @@ export interface VRHistoryListProps {
   onSelectTemplate?: (template: VRSessionTemplate) => void;
   onSelectSession?: (session: VRSession) => void;
   loading?: boolean;
+  onSelect?: (template: VRSessionTemplate) => void;
+  title?: string;
+  emptyMessage?: string;
+  className?: string;
 }
 
 export interface VRSessionWithMusicProps {
@@ -73,7 +77,6 @@ export interface VRSessionWithMusicProps {
   onComplete?: (sessionData?: VRSession) => void;
   onExit?: () => void;
   autoplay?: boolean;
-  // Adding properties expected by components
   onSessionComplete?: () => void;
   isAudioOnly?: boolean;
   videoUrl?: string;
@@ -92,3 +95,6 @@ export interface VRTemplateGridProps {
   limit?: number;
   className?: string;
 }
+
+// Type utilisé pour la compatibilité 
+export type VRSessionWithMusicPropsType = VRSessionWithMusicProps;

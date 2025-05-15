@@ -12,6 +12,7 @@ export const UserModeProvider = ({ children }: { children: React.ReactNode }) =>
   const contextValue: UserModeContextType = {
     mode,
     setMode,
+    userMode: mode, // Ajout de userMode pour compatibilité
   };
 
   return (
@@ -45,18 +46,21 @@ export const useUserMode = () => {
     navigate('/');
   };
 
-  const isAdmin = () => mode === 'B2B-ADMIN' || mode === 'B2B-ADMIN';
-  const isUser = () => mode === 'B2B-USER' || mode === 'B2B-USER';
+  const isAdmin = () => mode === 'B2B-ADMIN';
+  const isUser = () => mode === 'B2B-USER';
   const isB2C = () => mode === 'B2C'; 
 
   return {
     mode,
     setMode,
+    userMode: mode,  // Ajout de userMode pour compatibilité
+    setUserMode: setMode, // Ajout de setUserMode pour compatibilité
     setAdminMode,
     setUserMode,
     setB2CMode,
     isAdmin,
     isUser,
     isB2C,
+    isLoading: false, // Ajout de isLoading pour compatibilité
   };
 };

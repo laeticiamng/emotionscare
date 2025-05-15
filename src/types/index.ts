@@ -1,54 +1,146 @@
 
-// Central export file for all types
-import { Theme, FontFamily, FontSize, ThemeContextType, ThemeButtonProps } from './theme';
-import { User, UserRole, UserPreferences, AuthContextType } from './user';
-import { Emotion, EmotionResult, EnhancedEmotionResult, VoiceEmotionScannerProps, EmotionalTeamViewProps, TeamOverviewProps } from './emotion';
-import { Notification, NotificationFrequency, NotificationType, NotificationPreference, NotificationFilter, NotificationTone, NotificationBadge } from './notification';
-import { MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps, TrackInfoProps, ProgressBarProps, VolumeControlProps } from './music';
-import { VRSession, VRSessionTemplate, VRSessionWithMusicProps, VRHistoryListProps, VRTemplateGridProps } from './vr';
-import { SidebarContextType, UserModeType, UserModeContextType } from './types';
-import { GamificationStats, Challenge, Badge, Period } from './gamification';
-import { JournalEntry } from './journal';
-import { UseAudioPlayerStateReturn } from './audio-player';
+// Fichier d'export centralisé pour tous les types de l'application
+// Tous les composants doivent importer leurs types depuis ce fichier
 
-// Export everything
-export {
-  // Theme related
-  Theme, FontFamily, FontSize, ThemeContextType, ThemeButtonProps,
-  
-  // User related
-  User, UserRole, UserPreferences, AuthContextType,
-  
-  // Emotion related
-  Emotion, EmotionResult, EnhancedEmotionResult, VoiceEmotionScannerProps, 
-  EmotionalTeamViewProps, TeamOverviewProps,
-  
-  // Notification related
-  Notification, NotificationFrequency, NotificationType, NotificationPreference,
-  NotificationFilter, NotificationTone, NotificationBadge,
-  
-  // Music related
-  MusicTrack, MusicPlaylist, MusicContextType, MusicDrawerProps,
-  TrackInfoProps, ProgressBarProps, VolumeControlProps,
-  
-  // VR related
-  VRSession, VRSessionTemplate, VRSessionWithMusicProps, VRHistoryListProps,
+// Exports des types liés au thème
+export type {
+  Theme,
+  FontSize,
+  FontFamily,
+  ThemeContextType,
+  ThemeButtonProps,
+  ThemeSwitcherProps
+} from './theme';
+
+// Exports des types liés à l'utilisateur
+export type {
+  User,
+  UserRole,
+  UserPreferences,
+  UserPreferencesState,
+  AuthContextType,
+  InvitationVerificationResult,
+  ThemeName
+} from './user';
+
+// Exports des types liés au mode utilisateur
+export type {
+  UserModeType,
+  UserModeContextType
+} from './userMode';
+
+// Exports des types liés à la sidebar
+export type {
+  SidebarContextType
+} from './sidebar';
+
+// Exports des types liés à la musique
+export type {
+  MusicTrack,
+  MusicPlaylist,
+  MusicContextType,
+  MusicDrawerProps,
+  TrackInfoProps,
+  ProgressBarProps,
+  VolumeControlProps,
+  EmotionMusicParams
+} from './music';
+
+// Exports des types liés aux notifications
+export type {
+  Notification,
+  NotificationType,
+  NotificationPriority,
+  NotificationFrequency,
+  NotificationTone,
+  NotificationFilter,
+  NotificationBadge,
+  NotificationPreference,
+  NotificationItemProps
+} from './notification';
+
+// Exports des types liés à la réalité virtuelle
+export type {
+  VRSession,
+  VRSessionTemplate,
+  VRHistoryListProps,
+  VRSessionWithMusicProps,
   VRTemplateGridProps,
-  
-  // Sidebar related
-  SidebarContextType, UserModeType, UserModeContextType,
-  
-  // Gamification related
-  GamificationStats, Challenge, Badge, Period,
-  
-  // Journal related
-  JournalEntry,
-  
-  // Audio Player related
-  UseAudioPlayerStateReturn
-};
+  VRSessionWithMusicPropsType
+} from './vr';
 
-// Export any commonly used utility types or interfaces
+// Exports des types liés aux émotions
+export type {
+  Emotion,
+  EmotionResult,
+  EnhancedEmotionResult,
+  VoiceEmotionScannerProps,
+  LiveVoiceScannerProps,
+  EmotionalTeamViewProps,
+  TeamOverviewProps
+} from './emotion';
+
+// Exports des types liés au dashboard
+export type {
+  DashboardWidgetConfig,
+  DashboardKpi,
+  DashboardShortcut,
+  ChartData,
+  DashboardStats,
+  GamificationData
+} from './dashboard';
+
+// Exports des types liés à la gamification
+export type {
+  GamificationStats,
+  Badge,
+  Challenge,
+  Period
+} from './gamification';
+
+// Exports des types liés au journal
+export type {
+  JournalEntry
+} from './journal';
+
+// Exports des types liés au player audio
+export type {
+  UseAudioPlayerStateReturn
+} from './audio-player';
+
+// Exports des types liés aux graphiques
+export type {
+  ChartConfig,
+  ChartContextProps
+} from './chart';
+
+// Exports des types liés aux activités
+export type {
+  ActivityTabView,
+  ActivityFiltersState,
+  AnonymousActivity,
+  ActivityStats
+} from './activity';
+
+// Exports des types liés au scan d'émotions
+export type {
+  ScanResult,
+  EmotionScanData,
+  EmotionGamificationStats,
+  LeaderboardEntry
+} from './scan';
+
+// Exports des types liés au coaching
+export type {
+  CoachMessage,
+  CoachEvent,
+  CoachAction,
+  EmotionalData,
+  EmotionalTrend,
+  CoachNotification
+} from './coach';
+
+// Types génériques utilisés dans différentes parties de l'application
 export interface Story {
   id: string;
   title: string;
@@ -107,5 +199,33 @@ export interface Recommendation {
   type?: 'activity' | 'content' | 'insight';
 }
 
-// Re-export types from the ./types file
-export * from './types';
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  rejected: number;
+  sent: number;
+  completed: number;
+  conversionRate: number;
+  averageTimeToAccept: number;
+  teams: Record<string, number>;
+  recent_invites: InvitationData[];
+}
+
+export interface InvitationData {
+  id: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'expired' | 'rejected';
+  created_at: string;
+  expires_at: string;
+  accepted_at?: string;
+  role: string;
+}
+
+export interface InvitationFormData {
+  email: string;
+  role: string;
+  message?: string;
+  expires_in_days: number;
+}

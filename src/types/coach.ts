@@ -1,38 +1,90 @@
 
-export interface Coach {
+// Types liés au coaching
+export interface CoachMessage {
   id: string;
-  name: string;
-  avatar: string;
-  specialty: string;
-  experience: number;
-  bio: string;
-  rating: number;
-  availability: CoachAvailability[];
-  certifications?: string[];
-  languages?: string[];
+  conversation_id: string;
+  sender: string;
+  text: string;
+  timestamp: string;
 }
 
-export interface CoachSession {
+export type CoachEvent = {
   id: string;
-  coach_id: string;
-  user_id: string;
-  date: string;
-  duration: number;
-  status: 'scheduled' | 'completed' | 'cancelled';
-  notes?: string;
-  rating?: number;
-  feedback?: string;
-  focus_areas?: string[];
-}
+  type: string;
+  data: any;
+  timestamp: Date;
+};
 
-export interface CoachAvailability {
-  day: string;
-  start_time: string;
-  end_time: string;
-}
+export type CoachAction = {
+  id: string;
+  type: string;
+  payload: any;
+  created_at?: string;
+};
 
-export interface CoachRecommendation {
-  coach_id: string;
-  confidence: number;
-  reason: string;
-}
+export type EmotionalData = {
+  id?: string;
+  emotion: string;
+  intensity: number;
+  timestamp: Date | string;
+  context?: string;
+  userId?: string;
+  user_id?: string;
+};
+
+export type EmotionalTrend = {
+  trend: 'improving' | 'declining' | 'stable';
+  period: 'day' | 'week' | 'month';
+  startDate: Date;
+  endDate: Date;
+  emotions: EmotionalData[];
+};
+
+export type CoachNotification = {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date | string;
+  read?: boolean;
+  action?: CoachAction;
+};
+
+export const AI_MODEL_CONFIG = {
+  chat: {
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    max_tokens: 500,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 3600
+  },
+  journal: {
+    model: 'gpt-4o-mini',
+    temperature: 0.5,
+    max_tokens: 1000,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 7200
+  },
+  coach: {
+    model: 'gpt-4o-mini',
+    temperature: 0.3,
+    max_tokens: 500,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 3600
+  },
+  scan: {
+    model: 'gpt-4o-mini',
+    temperature: 0.4,
+    max_tokens: 800,
+    top_p: 1,
+    stream: false,
+    cacheEnabled: true,
+    cacheTTL: 1800
+  }
+};

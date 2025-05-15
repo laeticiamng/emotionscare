@@ -1,4 +1,5 @@
 
+// Types liés au scan d'émotions
 export interface ScanResult {
   id: string;
   user_id: string;
@@ -27,23 +28,6 @@ export interface EmotionGamificationStats {
   emotional_balance: number; // 0-100 score of emotional health balance
 }
 
-export interface GamificationStats {
-  points: number;
-  level: number;
-  nextLevelPoints: number;
-  rank: number;
-  streak: number;
-  nextLevel: number;
-  achievements: any[];
-  badges: any[];
-  completedChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  progressToNextLevel: number;
-  challenges: any[];
-  recentAchievements: any[];
-}
-
 export interface LeaderboardEntry {
   id: string;
   name: string;
@@ -52,15 +36,4 @@ export interface LeaderboardEntry {
   position: number;
   avatar?: string;
   badges?: any[];
-}
-
-export interface TeamOverviewProps {
-  teamId: string;
-  period?: string;
-  anonymized?: boolean;
-}
-
-export interface VoiceEmotionScannerProps {
-  onScanComplete?: (result: any) => void;
-  autoStart?: boolean;
 }

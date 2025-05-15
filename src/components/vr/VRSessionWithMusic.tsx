@@ -2,9 +2,9 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicPropsType } from '@/types';
+import { VRSessionWithMusicProps } from '@/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
   onComplete, 
   session, 
@@ -23,7 +23,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({
   // Use the emotion prop directly if provided, otherwise look for it in the template
   // with fallback to 'calm'
   const targetEmotion = emotion || (
-    activeTemplate?.emotionTarget || activeTemplate?.emotion_target || 'calm'
+    // Check if emotion property exists before trying to access it
+    activeTemplate?.emotionTarget || 'calm'
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();

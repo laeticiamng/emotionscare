@@ -1,4 +1,5 @@
 
+// Types liés au thème et à l'apparence de l'application
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
 export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';
@@ -6,7 +7,7 @@ export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'roun
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  isDarkMode?: boolean;
+  isDarkMode: boolean;
   fontSize?: FontSize;
   setFontSize?: (size: FontSize) => void;
   fontFamily?: FontFamily;

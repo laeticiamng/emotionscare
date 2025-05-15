@@ -1,135 +1,143 @@
 
-import React from 'react';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Bell, X } from 'lucide-react';
-import { useNotifications, NotificationFilter } from '@/hooks/useNotifications';
-import NotificationItem from './NotificationItem';
-import NotificationBadge from './NotificationBadge';
+import React, { useState } from 'react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bell, Check, Trash2 } from 'lucide-react';
+import { Notification, NotificationFilter } from '@/types';
+import { useNotifications } from '@/hooks/use-notifications';
+import NotificationItem from '@/components/notifications/NotificationItem';
 
 interface NotificationDrawerProps {
-  userId?: string;
+  open: boolean;
+  onClose: () => void;
 }
 
-const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ userId }) => {
-  const {
-    notifications,
-    unreadCount,
-    isLoading,
-    filter,
-    setFilter,
-    markAsRead,
-    markAllAsRead
+const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ open, onClose }) => {
+  const { 
+    notifications, 
+    unreadCount, 
+    isLoading, 
+    filter, 
+    setFilter, 
+    markAsRead, 
+    markAllAsRead,
+    clearAllNotifications
   } = useNotifications();
-  
-  const handleFilterChange = (value: string) => {
-    setFilter(value as NotificationFilter);
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
+
+  const handleMarkAllAsRead = () => {
+    markAllAsRead();
   };
-  
-  return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="relative"
-          aria-label="Afficher les notifications"
-        >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <NotificationBadge 
-              count={unreadCount} 
-              className="absolute -top-1 -right-1" 
-            />
-          )}
+
+  const handleClearConfirm = () => {
+    setShowConfirmClear(true);
+  };
+
+  const handleClearAll = () => {
+    clearAllNotifications();
+    setShowConfirmClear(false);
+  };
+
+  const handleCancelClear = () => {
+    setShowConfirmClear(false);
+  };
+
+  const handleMarkAsRead = async (id: string) => {
+    await markAsRead(id);
+  };
+
+  const notificationsList = (
+    <div className="divide-y">
+      {notifications.length > 0 ? (
+        notifications.map(notification => (
+          <NotificationItem 
+            key={notification.id} 
+            notification={notification} 
+            onRead={handleMarkAsRead}
+          />
+        ))
+      ) : (
+        <div className="flex flex-col items-center justify-center text-center py-12">
+          <Bell className="h-12 w-12 text-muted-foreground/30 mb-4" />
+          <h3 className="font-medium text-lg mb-2">Pas de notifications</h3>
+          <p className="text-muted-foreground text-sm max-w-xs">
+            Vous n'avez aucune notification{filter === 'unread' ? ' non lue' : ''} pour le moment.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+
+  const clearConfirmation = (
+    <div className="p-4 border rounded-md bg-muted/20 my-4">
+      <h4 className="font-medium mb-2">Effacer toutes les notifications ?</h4>
+      <p className="text-sm text-muted-foreground mb-4">
+        Cette action est irréversible et supprimera définitivement toutes vos notifications.
+      </p>
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" onClick={handleCancelClear}>
+          Annuler
         </Button>
-      </DrawerTrigger>
-      <DrawerContent className="max-h-[80vh] flex flex-col">
-        <DrawerHeader className="flex justify-between items-center border-b pb-2">
-          <DrawerTitle>Notifications</DrawerTitle>
-          <div className="flex gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={markAllAsRead}
-              disabled={unreadCount === 0}
-            >
-              Tout marquer comme lu
-            </Button>
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon">
-                <X className="h-4 w-4" />
+        <Button variant="destructive" size="sm" onClick={handleClearAll}>
+          Confirmer
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetContent className="sm:max-w-md">
+        <SheetHeader className="mb-4">
+          <SheetTitle className="flex justify-between items-center">
+            <span>Notifications {unreadCount > 0 && `(${unreadCount})`}</span>
+            <div className="flex gap-2">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleMarkAllAsRead}
+                disabled={unreadCount === 0}
+                title="Marquer tout comme lu"
+              >
+                <Check className="h-4 w-4" />
               </Button>
-            </DrawerClose>
-          </div>
-        </DrawerHeader>
-        
-        <Tabs 
-          value={filter} 
-          onValueChange={handleFilterChange} 
-          className="w-full flex-1 flex flex-col"
-        >
-          <div className="border-b px-4 py-2">
-            <TabsList className="w-full h-auto py-1 bg-transparent">
-              <TabsTrigger value="all" className="text-xs h-7 flex-1">
-                Tout
-              </TabsTrigger>
-              <TabsTrigger value="unread" className="text-xs h-7 flex-1">
-                Non lus ({unreadCount})
-              </TabsTrigger>
-              <TabsTrigger value="invitation" className="text-xs h-7 flex-1">
-                Invitations
-              </TabsTrigger>
-              <TabsTrigger value="reminder" className="text-xs h-7 flex-1">
-                Rappels
-              </TabsTrigger>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleClearConfirm}
+                disabled={notifications.length === 0}
+                title="Effacer tout"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </SheetTitle>
+        </SheetHeader>
+
+        {showConfirmClear ? (
+          clearConfirmation
+        ) : (
+          <Tabs defaultValue="all" value={filter} onValueChange={(v) => setFilter(v as NotificationFilter)} className="h-full">
+            <TabsList className="grid grid-cols-3 mb-4">
+              <TabsTrigger value="all">Toutes</TabsTrigger>
+              <TabsTrigger value="unread">Non lues{unreadCount > 0 && ` (${unreadCount})`}</TabsTrigger>
+              <TabsTrigger value="alerts">Alertes</TabsTrigger>
             </TabsList>
-          </div>
-          
-          {Object.entries({
-            all: 'Toutes les notifications',
-            unread: 'Notifications non lues',
-            invitation: 'Invitations',
-            reminder: 'Rappels',
-            system: 'Notifications système'
-          }).map(([key, title]) => (
-            <TabsContent 
-              key={key} 
-              value={key}
-              className="overflow-y-auto flex-1 p-0 mt-0"
-            >
+            
+            <TabsContent value={filter} className="h-[calc(100%-50px)] overflow-auto">
               {isLoading ? (
-                <div className="p-8 text-center text-muted-foreground">
-                  Chargement...
-                </div>
-              ) : notifications.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
-                  Aucune notification {key !== 'all' ? 'dans cette catégorie' : ''}
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
                 </div>
               ) : (
-                <div className="divide-y">
-                  {notifications.map(notification => (
-                    <NotificationItem
-                      key={notification.id}
-                      notification={notification}
-                      onRead={markAsRead}
-                    />
-                  ))}
-                </div>
+                notificationsList
               )}
             </TabsContent>
-          ))}
-        </Tabs>
-      </DrawerContent>
-    </Drawer>
+          </Tabs>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 };
 

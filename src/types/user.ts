@@ -1,4 +1,5 @@
 
+// Types liés aux utilisateurs et à l'authentification
 export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';
 export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
@@ -55,7 +56,7 @@ export interface UserPreferences {
   autoplayVideos?: boolean;
   soundEnabled?: boolean;
   fullAnonymity?: boolean;
-  profileVisibility?: 'public' | 'private' | 'team'; // Adding for direct access
+  profileVisibility?: 'public' | 'private' | 'team';
 }
 
 export interface UserPreferencesState {
@@ -82,7 +83,7 @@ export interface User {
   role: UserRole;
   preferences: UserPreferences;
   avatar_url?: string;
-  avatar?: string;  // Adding for compatibility
+  avatar?: string;
   created_at?: string;
   createdAt?: string;
   last_seen?: string;
@@ -123,7 +124,7 @@ export interface AuthContextType {
   setIsLoading: (isLoading: boolean) => void;
   signIn: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
-  logout: () => Promise<void>; // Added for compatibility
+  logout: () => Promise<void>;
   signUp: (email: string, name: string) => Promise<void>;
   updateUser: (updates: Partial<User>) => Promise<void>;
   preferences: UserPreferencesState;
