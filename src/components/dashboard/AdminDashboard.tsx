@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -70,7 +71,15 @@ const AdminDashboard: React.FC = () => {
         points: 120,
         completed: false
       }
-    ]
+    ],
+    completionRate: 65,
+    progress: 45,
+    challenges: [],
+    achievements: [],
+    leaderboard: [],
+    nextLevelPoints: 100,
+    rewardsEarned: 12,
+    userEngagement: 78
   };
 
   useEffect(() => {
@@ -128,7 +137,7 @@ const AdminDashboard: React.FC = () => {
         <SocialCocoonCard socialStats={socialCocoonData} />
         
         {/* Gamification Summary */}
-        <GamificationSummaryCard gamificationStats={stats} />
+        <GamificationSummaryCard gamificationData={stats} />
       </div>
     </div>
   );

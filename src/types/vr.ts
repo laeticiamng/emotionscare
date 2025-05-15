@@ -11,6 +11,13 @@ export interface VRSessionTemplate {
   is_premium: boolean;
   environment: string;
   objective: string;
+  // Add missing properties used in components
+  is_audio_only?: boolean;
+  theme?: string;
+  preview_url?: string;
+  audio_url?: string;
+  thumbnailUrl?: string;
+  image_url?: string;
 }
 
 export interface VRSession {

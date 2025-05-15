@@ -13,18 +13,37 @@ export interface KpiCardProps {
   description?: string;
   color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
   onClick?: () => void;
+  // Adding missing properties
+  delta?: {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: ReactNode | string;
+  ariaLabel?: string;
+  isLoading?: boolean;
+  className?: string;
 }
 
 export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
+  cards?: KpiCardProps[];
   onReorder?: (cards: KpiCardProps[]) => void;
   editable?: boolean;
+  // Add missing properties
+  kpiCards?: KpiCardProps[];
+  className?: string;
 }
 
 export interface GlobalOverviewTabProps {
   period?: 'day' | 'week' | 'month' | 'year';
   showTrends?: boolean;
   isLoading?: boolean;
+  // Add missing properties
+  kpiCards?: KpiCardProps[];
+  absenteeismChartData?: Array<{ date: string; value: number }>;
+  emotionalScoreTrend?: Array<{ date: string; value: number }>;
+  dashboardStats?: any;
+  gamificationData?: GamificationStats;
 }
 
 export interface DashboardWidgetConfig {
@@ -46,4 +65,12 @@ export interface GamificationData {
     date: string;
     completions: number;
   }[];
+}
+
+// Add missing GridPosition type
+export interface GridPosition {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }

@@ -3,13 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Period, EmotionalTeamViewProps } from '@/types';
+import { EmotionalTeamViewProps } from '@/types';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   teamId,
   period = 'week',
   userId,
-  anonymized = true
+  anonymized = true,
+  className
 }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('overview');
@@ -38,7 +39,7 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   }, [teamId, period, toast]);
   
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Team Emotional Health</CardTitle>
       </CardHeader>

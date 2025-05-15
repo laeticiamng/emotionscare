@@ -1,186 +1,131 @@
 
-import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types';
+import { v4 as uuid } from 'uuid';
 
-/**
- * Analyze text to detect emotion
- * @param text Text to analyze for emotional content
- * @returns Promise with emotion analysis result
- */
 export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  // In a real implementation, this would call an API like Hume AI
-  // For now, we'll implement a simple mock that returns random emotions
+  // Mock implementation for now - this would call an API in the real implementation
+  console.log('Analyzing emotion from text:', text);
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+  const emotions = ['happy', 'sad', 'angry', 'surprised', 'fearful', 'calm', 'excited'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
   
-  // Simple emotion keywords detection (very basic mock)
-  const emotions = [
-    { emotion: 'joy', keywords: ['happy', 'joy', 'great', 'excellent', 'good', 'smile'] },
-    { emotion: 'sadness', keywords: ['sad', 'down', 'bad', 'depressed', 'unhappy'] },
-    { emotion: 'anger', keywords: ['angry', 'mad', 'upset', 'frustrated', 'annoyed'] },
-    { emotion: 'fear', keywords: ['afraid', 'scared', 'worried', 'anxious', 'nervous'] },
-    { emotion: 'surprise', keywords: ['surprised', 'shocked', 'unexpected', 'wow'] },
-    { emotion: 'calm', keywords: ['calm', 'peaceful', 'relaxed', 'serene', 'tranquil'] }
-  ];
-  
-  // Default to neutral if no match
-  let detectedEmotion = 'neutral';
-  let confidenceScore = 0.5;
-  let intensity = 50;
-  
-  // Simple detection based on keyword presence
-  const textLower = text.toLowerCase();
-  
-  for (const emotionObj of emotions) {
-    for (const keyword of emotionObj.keywords) {
-      if (textLower.includes(keyword)) {
-        detectedEmotion = emotionObj.emotion;
-        // Random confidence between 0.7 and 0.95
-        confidenceScore = 0.7 + Math.random() * 0.25;
-        // Random intensity between 60 and 90
-        intensity = 60 + Math.floor(Math.random() * 30);
-        break;
-      }
-    }
-  }
-  
-  // Generate feedback based on detected emotion
-  const feedback = generateEmotionFeedback(detectedEmotion);
-  
+  // Return a mocked result
   return {
     id: uuid(),
+    emotion: randomEmotion,
+    score: Math.floor(Math.random() * 100),
+    confidence: Math.random() * 0.5 + 0.5, // Between 0.5 and 1.0
+    text: text,
     date: new Date().toISOString(),
-    emotion: detectedEmotion,
-    score: Math.round(confidenceScore * 100),
-    confidence: confidenceScore,
-    intensity,
-    text,
-    transcript: text,
-    feedback
+    emojis: getEmojisForEmotion(randomEmotion),
+    recommendations: getRecommendationsForEmotion(randomEmotion)
   };
 };
 
-/**
- * Save emotion data to storage/database
- * @param emotion Emotion data to save
- * @returns Promise with saved emotion data
- */
-export const saveEmotion = async (emotion: EmotionResult): Promise<EmotionResult> => {
-  // In a real implementation, this would save to database
-  // For now, we'll just simulate a successful save
+export const createEmotionEntry = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
+  // Mock implementation for saving to a database
+  console.log('Creating emotion entry:', emotionData);
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Save to localStorage for persistence in the demo
-  try {
-    const emotions = JSON.parse(localStorage.getItem('emotions') || '[]');
-    emotions.push(emotion);
-    localStorage.setItem('emotions', JSON.stringify(emotions));
-  } catch (error) {
-    console.error('Error saving to localStorage:', error);
-  }
-  
-  return emotion;
+  // In a real app, this would save to a database
+  // For now, just return the data with an ID
+  return {
+    ...emotionData,
+    id: emotionData.id || uuid(),
+    date: emotionData.date || new Date().toISOString(),
+    emotion: emotionData.emotion || 'neutral'
+  } as EmotionResult;
 };
 
-/**
- * Fetch most recent emotion entry for a user
- * @param userId User ID to fetch emotion for
- * @returns Promise with most recent emotion or null if none exists
- */
 export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
-  // In a real implementation, this would fetch from database
-  // For now, we'll return from localStorage if available
+  // Mock implementation for fetching data from a database
+  console.log('Fetching latest emotion for user:', userId);
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  try {
-    const emotions = JSON.parse(localStorage.getItem('emotions') || '[]');
-    const userEmotions = emotions.filter((e: EmotionResult) => e.user_id === userId);
-    
-    if (userEmotions.length === 0) {
-      return null;
-    }
-    
-    // Sort by date descending and get the most recent
-    userEmotions.sort((a: EmotionResult, b: EmotionResult) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
-    
-    return userEmotions[0];
-  } catch (error) {
-    console.error('Error fetching from localStorage:', error);
-    return null;
-  }
+  // In a real app, this would fetch from a database
+  // For now, return a mock result
+  return {
+    id: uuid(),
+    user_id: userId,
+    emotion: 'calm',
+    score: 75,
+    confidence: 0.85,
+    date: new Date().toISOString(),
+    emojis: ['😌', '🧘'],
+    recommendations: [
+      'Take a 5-minute breathing break',
+      'Listen to calming music',
+      'Go for a short walk outside'
+    ]
+  };
 };
 
-/**
- * Create a new emotion entry
- * @param data Emotion data to save
- * @returns Promise with created emotion
- */
-export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<EmotionResult> => {
-  // Ensure required fields
-  const emotion: EmotionResult = {
-    id: data.id || uuid(),
-    date: data.date || new Date().toISOString(),
-    emotion: data.emotion || 'neutral',
-    score: data.score || 50,
-    confidence: data.confidence || 0.5,
-    intensity: data.intensity || 50,
-    text: data.text || '',
-    transcript: data.transcript || '',
-    feedback: data.feedback || '',
-    user_id: data.user_id || '',
+export const saveEmotion = async (emotion: Partial<EmotionResult>): Promise<EmotionResult> => {
+  // This just wraps the createEmotionEntry function for backward compatibility
+  return createEmotionEntry(emotion);
+};
+
+// Helper functions
+function getEmojisForEmotion(emotion: string): string[] {
+  const emojiMap: Record<string, string[]> = {
+    happy: ['😊', '😁', '🙂'],
+    sad: ['😔', '😢', '😞'],
+    angry: ['😡', '😠', '💢'],
+    surprised: ['😲', '😮', '😯'],
+    fearful: ['😨', '😰', '😱'],
+    calm: ['😌', '🧘', '☺️'],
+    excited: ['🤩', '😃', '🎉'],
+    neutral: ['😐', '😶', '🤔']
   };
   
-  // Save the emotion
-  return await saveEmotion(emotion);
-};
+  return emojiMap[emotion] || ['😐'];
+}
 
-// Helper function to generate feedback based on emotion
-const generateEmotionFeedback = (emotion: string): string => {
-  const feedbacks: Record<string, string[]> = {
-    joy: [
-      "Votre joie est contagieuse ! Profitez de cette énergie positive.",
-      "Excellent ! Votre état émotionnel positif peut être partagé avec votre entourage.",
-      "Cette joie est précieuse. Pensez à noter ce qui l'a provoquée dans votre journal."
+function getRecommendationsForEmotion(emotion: string): string[] {
+  const recommendationMap: Record<string, string[]> = {
+    happy: [
+      'Share your positive feelings with someone',
+      'Keep that momentum going with some uplifting music',
+      'Use this energy to tackle a challenge'
     ],
-    sadness: [
-      "Je perçois de la tristesse. Prenez un moment pour respirer profondément.",
-      "C'est normal de se sentir triste parfois. Soyez bienveillant envers vous-même.",
-      "Votre vulnérabilité est une force. Acceptez cette émotion sans jugement."
+    sad: [
+      'Take a moment for self-care',
+      'Connect with a supportive friend',
+      'Try a guided meditation for emotional healing'
     ],
-    anger: [
-      "Votre colère est légitime. Prenez un moment pour vous calmer avant d'agir.",
-      "Respirez profondément et essayez d'identifier la source de cette colère.",
-      "Transformez cette énergie en action constructive quand vous serez plus calme."
+    angry: [
+      'Take deep breaths to calm your nervous system',
+      'Write down what's bothering you',
+      'Go for a brisk walk to release tension'
     ],
-    fear: [
-      "La peur nous protège mais peut parfois nous limiter. Identifiez sa source.",
-      "Respirez lentement pour calmer votre système nerveux face à cette peur.",
-      "Votre cerveau est en mode protection. Rassurez-le avec des pensées apaisantes."
+    surprised: [
+      'Take time to process this unexpected situation',
+      'Journal about what surprised you and why',
+      'Talk it through with someone you trust'
     ],
-    surprise: [
-      "La surprise ouvre notre esprit à de nouvelles possibilités !",
-      "Cet étonnement montre votre capacité à vous émerveiller.",
-      "Profitez de cette émotion qui élargit votre perception."
+    fearful: [
+      'Practice grounding techniques: name 5 things you can see',
+      'Remind yourself that you're safe right now',
+      'Try a quick breathing exercise'
     ],
     calm: [
-      "Votre calme est une ressource précieuse. Savourez cet équilibre.",
-      "Cet état de sérénité est idéal pour la réflexion et la créativité.",
-      "Votre tranquillité d'esprit favorise des décisions équilibrées."
+      'Enjoy this peaceful state with some mindfulness',
+      'It's a great time for creative thinking',
+      'Consider journaling about what brings you peace'
+    ],
+    excited: [
+      'Channel this energy into something productive',
+      'Share your excitement with someone close to you',
+      'Set some goals while you're feeling motivated'
     ],
     neutral: [
-      "Votre état émotionnel semble équilibré. C'est une belle base pour avancer.",
-      "Cette neutralité vous permet d'observer les situations avec clarté.",
-      "Un état stable est parfois exactement ce dont nous avons besoin."
+      'Check in with your body - how are you feeling physically?',
+      'This is a good time for planning and organizing',
+      'Consider what would boost your mood a little'
     ]
   };
   
-  const options = feedbacks[emotion] || feedbacks.neutral;
-  return options[Math.floor(Math.random() * options.length)];
-};
+  return recommendationMap[emotion] || [
+    'Take a moment to check in with yourself',
+    'Practice mindful breathing for a few minutes',
+    'Consider what would help you feel better right now'
+  ];
+}
