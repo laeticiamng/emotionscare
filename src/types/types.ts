@@ -2,7 +2,7 @@
 import { Theme, FontFamily, FontSize } from './theme';
 import { Badge } from './gamification';
 
-export type UserModeType = 'personal' | 'professional' | 'team' | 'admin';
+export type UserModeType = 'personal' | 'professional' | 'team' | 'admin' | 'b2b_admin' | 'b2b-admin';
 
 export interface UserModeContextType {
   userMode: UserModeType;
@@ -101,7 +101,7 @@ export interface UserPreferences {
     shareEmotionalData?: boolean;
     allowCoaching?: boolean;
   };
-  profileVisibility?: string;
+  profileVisibility?: 'public' | 'private' | 'team';
   dashboardLayout?: any;
   sound?: boolean;
   soundEnabled?: boolean;
@@ -183,6 +183,11 @@ export interface NotificationPreferences {
   enabled: boolean;
   email: boolean;
   push: boolean;
+  channels?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+  };
   categories?: {
     system: boolean;
     activity: boolean;
@@ -192,8 +197,71 @@ export interface NotificationPreferences {
   frequency: string;
 }
 
-// Re-export from dashboard.ts
-export type { KpiCardProps, DraggableKpiCardsGridProps, GlobalOverviewTabProps, GamificationData as GamificationStats } from './dashboard';
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
+  imageUrl?: string;
+  image_url?: string; // For backward compatibility
+}
 
-// Re-export from notification.ts
-export type { NotificationFilter, NotificationItemProps } from './notification';
+export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
+
+export type { KpiCardProps, DraggableKpiCardsGridProps, GlobalOverviewTabProps, GamificationData } from './dashboard';
+export type { GamificationStats, Challenge } from './gamification';
+export type { NotificationFilter, NotificationItemProps, NotificationType, NotificationTone, Notification, NotificationPreference, NotificationChannels } from './notification';
+
+export interface EmotionPrediction {
+  predictedEmotion: string;
+  emotion: string;
+  probability: number;
+  confidence: number;
+  triggers: string[];
+  recommendations: string[];
+}
+
+export interface Recommendation {
+  id: string;
+  title: string;
+  description: string;
+  category?: string;
+  priority: number;
+  confidence: number;
+  actionUrl?: string;
+  actionLabel?: string;
+  type?: 'activity' | 'content' | 'insight';
+}
+
+export interface InvitationStats {
+  total: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  rejected: number;
+  sent: number;
+  completed: number;
+  conversionRate: number;
+  averageTimeToAccept: number;
+  teams: Record<string, number>;
+  recent_invites: InvitationData[];
+}
+
+export interface InvitationData {
+  id: string;
+  email: string;
+  status: 'pending' | 'accepted' | 'expired' | 'rejected';
+  created_at: string;
+  expires_at: string;
+  accepted_at?: string;
+  role: string;
+}
+
+export interface InvitationFormData {
+  email: string;
+  role: string;
+  message?: string;
+  expires_in_days: number;
+}

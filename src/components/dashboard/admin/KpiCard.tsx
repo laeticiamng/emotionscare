@@ -1,86 +1,94 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { LucideIcon } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
-import { KpiCardProps } from '@/types';
+import { cva } from "class-variance-authority";
+import { KpiCardProps } from '@/types/dashboard';
+import { LucideIcon } from 'lucide-react';
 
-/**
- * KpiCard component for displaying key performance indicators
- */
-const KpiCard: React.FC<KpiCardProps> = ({ 
-  title, 
-  value, 
-  icon: Icon, 
-  delta, 
+const KpiCard: React.FC<KpiCardProps & {
+  icon?: React.ReactNode;
+  delta?: {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: React.ReactNode;
+  ariaLabel?: string;
+  isLoading?: boolean;
+}> = ({
+  title,
+  value,
+  icon,
+  delta,
   subtitle,
   ariaLabel,
-  className,
-  isLoading = false,
-  onClick
+  onClick,
+  isLoading,
+  className
 }) => {
-  // Determine if the card is interactive
-  const isInteractive = typeof onClick === 'function';
+  // CSS variant for trend colors
+  const trendVariants = cva("text-xs flex items-center gap-1", {
+    variants: {
+      trend: {
+        up: "text-green-600",
+        down: "text-red-600",
+        neutral: "text-gray-500"
+      }
+    },
+    defaultVariants: {
+      trend: "neutral"
+    }
+  });
+  
+  const renderIcon = () => {
+    if (!icon) return null;
+    return (
+      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+        {icon}
+      </div>
+    );
+  };
+  
+  const handleClick = () => {
+    if (onClick) onClick();
+  };
   
   return (
     <Card 
       className={cn(
-        "p-4 transition-all duration-200", 
-        isInteractive && "cursor-pointer hover:shadow-md hover:translate-y-[-2px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none", 
+        "overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer", 
         className
       )}
-      aria-label={ariaLabel || (isInteractive ? `Voir détails ${title}` : undefined)}
-      aria-busy={isLoading}
-      onClick={onClick}
-      role={isInteractive ? "button" : undefined}
-      tabIndex={isInteractive ? 0 : undefined}
+      onClick={handleClick}
+      aria-label={ariaLabel}
     >
-      <CardHeader className="p-0 pb-2 space-y-0">
-        <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-5 w-5 mr-2 rounded-full" />
-              <Skeleton className="h-6 w-32" />
-            </>
-          ) : (
-            <>
-              {Icon && (typeof Icon === 'function' ? <Icon size={20} className="mr-2 text-primary" /> : Icon)}
-              {title}
-            </>
-          )}
-        </CardTitle>
+      <CardHeader className="pb-2 flex flex-row justify-between items-start">
+        <CardTitle className="text-base font-medium">{title}</CardTitle>
+        {renderIcon()}
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent>
         {isLoading ? (
-          <Skeleton className="h-8 w-24 my-2" />
+          <div className="h-10 bg-gray-100 animate-pulse rounded-md" />
         ) : (
-          <div className="text-3xl font-bold">{value}</div>
-        )}
-        
-        {delta && (
-          isLoading ? (
-            <Skeleton className="h-5 w-20 mt-2" />
-          ) : (
-            <Badge 
-              variant={delta.trend === 'up' ? "outline" : delta.trend === 'down' ? "destructive" : "secondary"}
-              className="mt-2 font-normal"
-            >
-              {delta.trend === 'up' ? '↑' : delta.trend === 'down' ? '↓' : '○'} 
-              {delta.value}% {delta.label}
-            </Badge>
-          )
-        )}
-        
-        {subtitle && (
-          <div className="mt-2">
-            {isLoading ? (
-              <Skeleton className="h-4 w-full" />
-            ) : (
-              subtitle
+          <>
+            <div className="text-2xl font-bold mb-1">{value}</div>
+            
+            {delta && (
+              <div className={trendVariants({ trend: delta.trend })}>
+                {delta.trend === 'up' && <span>↑</span>}
+                {delta.trend === 'down' && <span>↓</span>}
+                {delta.trend === 'neutral' && <span>→</span>}
+                <span>{Math.abs(delta.value)}% {delta.label}</span>
+              </div>
             )}
-          </div>
+            
+            {subtitle && (
+              <div className="mt-2">
+                {subtitle}
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>

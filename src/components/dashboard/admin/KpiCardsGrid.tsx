@@ -4,24 +4,26 @@ import KpiCard from './KpiCard';
 import { Users, Activity, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-interface KpiCardsGridProps {
-  dashboardStats: {
-    productivity: {
-      current: number;
-      trend: number;
-    };
-    emotionalScore: {
-      current: number;
-      trend: number;
-    };
+interface KpiCardData {
+  productivity: {
+    current: number;
+    trend: number;
   };
-  gamificationData: {
+  emotionalScore: {
+    current: number;
+    trend: number;
+  };
+  gamification: {
     activeUsersPercent: number;
     totalBadges: number;
   };
 }
 
-const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificationData }) => {
+interface KpiCardsGridProps {
+  dashboardStats: KpiCardData;
+}
+
+const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats }) => {
   const navigate = useNavigate();
   
   // Define navigation handlers for drill-down
@@ -35,7 +37,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificatio
       <KpiCard 
         title="Productivité"
         value={`${dashboardStats.productivity.current}%`}
-        icon={TrendingUp}
+        icon={<TrendingUp className="h-6 w-6" />}
         delta={{
           value: dashboardStats.productivity.trend,
           label: "vs période précédente",
@@ -49,7 +51,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificatio
       <KpiCard 
         title="Score émotionnel moyen"
         value={`${dashboardStats.emotionalScore.current}/100`}
-        icon={Activity}
+        icon={<Activity className="h-6 w-6" />}
         delta={{
           value: dashboardStats.emotionalScore.trend,
           label: "vs période précédente",
@@ -62,10 +64,10 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats, gamificatio
       {/* Engagement Gamification Card */}
       <KpiCard 
         title="Engagement gamification"
-        value={`${gamificationData.activeUsersPercent}%`}
-        icon={Users}
-        subtitle={`${gamificationData.totalBadges} badges distribués ce mois`}
-        ariaLabel={`Engagement gamification: ${gamificationData.activeUsersPercent}%`}
+        value={`${dashboardStats.gamification.activeUsersPercent}%`}
+        icon={<Users className="h-6 w-6" />}
+        subtitle={`${dashboardStats.gamification.totalBadges} badges distribués ce mois`}
+        ariaLabel={`Engagement gamification: ${dashboardStats.gamification.activeUsersPercent}%`}
         onClick={navigateToEngagement}
       />
     </div>

@@ -15,7 +15,7 @@ export interface GamificationStats {
   progressToNextLevel: number;
   totalPoints: number;
   badgesCount: number;
-  challenges: any[];
+  challenges: Challenge[];
   recentAchievements: any[];
   nextLevel: number | {
     points: number;
@@ -42,4 +42,8 @@ export interface Challenge {
   category?: string;
   icon?: string;
   isTeamChallenge?: boolean;
+  total?: number;
+  completed?: boolean;
+  points?: number;
+  name?: string;
 }

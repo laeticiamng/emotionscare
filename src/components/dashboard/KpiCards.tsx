@@ -48,8 +48,8 @@ const KpiCards: React.FC<KpiCardsProps> = ({
         <>
           <KpiCard
             title="Score émotionnel moyen"
-            value={<CountUp end={avgEmotionalScore} duration={2} decimals={1} suffix="/100" enableScrollSpy scrollSpyOnce />}
-            icon={Brain}
+            value={avgEmotionalScore}
+            icon={<Brain className="h-6 w-6" />}
             subtitle={
               <Progress value={avgEmotionalScore} className="h-2 bg-gray-100 mt-2" />
             }
@@ -59,8 +59,8 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           
           <KpiCard
             title="Sessions VR ce mois"
-            value={<CountUp end={vrSessionsThisMonth} duration={2} enableScrollSpy scrollSpyOnce />}
-            icon={CalendarDays}
+            value={vrSessionsThisMonth}
+            icon={<CalendarDays className="h-6 w-6" />}
             delta={{
               value: sessionsDelta,
               label: "depuis le mois dernier",
@@ -72,8 +72,8 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           
           <KpiCard
             title="Badges gagnés"
-            value={<CountUp end={userBadgesCount} duration={2} enableScrollSpy scrollSpyOnce />}
-            icon={Trophy}
+            value={userBadgesCount}
+            icon={<Trophy className="h-6 w-6" />}
             subtitle="Félicitations!"
             ariaLabel={`Badges gagnés: ${userBadgesCount}`}
             onClick={navigateToBadges}

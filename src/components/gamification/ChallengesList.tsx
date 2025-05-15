@@ -37,27 +37,26 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className =
                 <div className="flex items-center gap-2">
                   <div 
                     className={`w-8 h-8 flex items-center justify-center rounded-full 
-                      ${challenge.status === 'completed' || challenge.status === 'complete' || challenge.completed 
+                      ${challenge.status === 'completed' || challenge.status === 'complete' 
                         ? 'bg-green-100 text-green-500' 
                         : 'bg-blue-100 text-blue-500'}`}
                   >
-                    {challenge.status === 'completed' || challenge.status === 'complete' || challenge.completed ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Clock className="h-4 w-4" />
-                    )}
+                    {challenge.status === 'completed' 
+                      ? <Check className="h-4 w-4" />
+                      : <Clock className="h-4 w-4" />
+                    }
                   </div>
-                  <h4 className="font-medium">{challenge.name || challenge.title}</h4>
+                  <h4 className="font-medium">{challenge.title || challenge.name}</h4>
                 </div>
                 <p className="text-sm text-muted-foreground">{challenge.description}</p>
 
-                {(challenge.progress !== undefined && challenge.total !== undefined) && (
+                {(challenge.progress !== undefined && challenge.goal !== undefined) && (
                   <div className="mt-2">
                     <div className="flex justify-between text-xs mb-1">
                       <span>Progression</span>
-                      <span>{challenge.progress}/{challenge.total}</span>
+                      <span>{challenge.progress}/{challenge.goal}</span>
                     </div>
-                    <Progress value={(challenge.progress / challenge.total) * 100} className="h-1.5" />
+                    <Progress value={(challenge.progress / challenge.goal) * 100} className="h-1.5" />
                   </div>
                 )}
               </div>
@@ -65,10 +64,10 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className =
               <div className="flex flex-col items-end gap-2 ml-4">
                 <div className="flex items-center gap-1 text-amber-500">
                   <Trophy className="h-4 w-4" />
-                  <span className="font-bold">{challenge.points}</span>
+                  <span className="font-bold">{challenge.reward || challenge.points}</span>
                 </div>
 
-                {onComplete && challenge.status !== 'completed' && challenge.status !== 'complete' && !challenge.completed && (
+                {onComplete && challenge.status !== 'completed' && (
                   <Button 
                     variant="outline" 
                     size="sm" 

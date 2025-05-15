@@ -44,7 +44,27 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       { name: 'Check-in quotidien', completions: 156 },
       { name: 'Partage d\'expérience', completions: 87 },
       { name: 'Lecture bien-être', completions: 63 }
-    ]
+    ],
+    // Add required properties from GamificationStats
+    points: 0,
+    level: 1,
+    rank: "",
+    badges: [],
+    streak: 0,
+    completedChallenges: 0,
+    totalChallenges: 0,
+    activeChallenges: 0,
+    streakDays: 0,
+    nextLevelPoints: 0,
+    progressToNextLevel: 0,
+    totalPoints: 0,
+    badgesCount: 0,
+    challenges: [],
+    recentAchievements: [],
+    nextLevel: 2,
+    currentLevel: 1,
+    pointsToNextLevel: 0,
+    lastActivityDate: new Date().toISOString()
   };
   
   const socialCocoonData = {
@@ -79,6 +99,14 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
     dataRetention: '90 jours',
     certifications: ['ISO 27001', 'RGPD', 'HDS', 'SOC 2']
   };
+
+  // Create compatible stats
+  const compatibleStats = {
+    ...dashboardStats,
+    activeUsers: dashboardStats.activeToday || 0,
+    averageEmotionalScore: dashboardStats.averageScore || 0,
+    absenteeismRate: 0
+  };
   
   return (
     <>
@@ -86,9 +114,10 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
         <GlobalOverviewTab 
           absenteeismChartData={absenteeismData}
           emotionalScoreTrend={emotionalScoreTrend}
-          dashboardStats={dashboardStats}
+          dashboardStats={compatibleStats}
           gamificationData={gamificationData}
           isLoading={isLoading}
+          kpiCards={[]}
         />
       </TabsContent>
       

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { KpiCardProps } from '@/types';
+import { KpiCardProps } from '@/types/dashboard';
 
 const DraggableKpiCard: React.FC<KpiCardProps> = ({
   title,

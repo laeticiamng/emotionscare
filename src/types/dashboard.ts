@@ -1,5 +1,6 @@
 
 import { ReactNode } from 'react';
+import { GamificationStats } from './gamification';
 
 export interface GridPosition {
   x: number;
@@ -15,7 +16,7 @@ export interface DraggableKpiCardsGridProps {
 
 export interface KpiCardProps {
   title: string;
-  value: string | number;
+  value: string | number | ReactNode;
   trend?: number;
   icon?: ReactNode;
   description?: string;
@@ -26,6 +27,14 @@ export interface KpiCardProps {
   details?: string;
   period?: string;
   loading?: boolean;
+  delta?: {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: ReactNode;
+  ariaLabel?: string;
+  isLoading?: boolean;
 }
 
 export interface DashboardWidgetConfig {
@@ -68,6 +77,18 @@ export interface DashboardStats {
   activeUsers: number;
   averageEmotionalScore: number;
   absenteeismRate: number;
+  activeToday?: number;
+  averageScore?: number;
+  criticalAlerts?: number;
+  completion?: number;
+  productivity?: {
+    current: number;
+    trend: number;
+  };
+  emotionalScore?: {
+    current: number;
+    trend: number;
+  };
 }
 
 export interface GamificationData extends GamificationStats {

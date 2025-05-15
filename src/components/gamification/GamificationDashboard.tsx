@@ -24,28 +24,26 @@ const GamificationDashboard: React.FC = () => {
   }
 
   // Ensure stats has all required properties with default values
-  const safeStats: GamificationStats = {
-    level: stats?.level || 1,
-    points: stats?.points || 0,
-    badges: Array.isArray(stats?.badges) ? stats.badges : [],
-    streak: stats?.streak || 0,
-    completedChallenges: stats?.completedChallenges || 0,
-    totalChallenges: stats?.totalChallenges || 0,
-    // Additional properties
-    nextLevel: stats?.nextLevel || 2,
-    pointsToNextLevel: stats?.pointsToNextLevel || 100,
-    nextLevelPoints: stats?.nextLevelPoints || 100,
-    challenges: stats?.challenges || [],
-    totalPoints: stats?.totalPoints || 0,
-    currentLevel: stats?.currentLevel || 1,
-    progressToNextLevel: stats?.progressToNextLevel || 0,
-    streakDays: stats?.streakDays || 0,
-    lastActivityDate: stats?.lastActivityDate || new Date().toISOString(),
-    activeChallenges: stats?.activeChallenges || 0,
-    badgesCount: stats?.badgesCount || 0,
-    rank: stats?.rank || 'Beginner',
-    recentAchievements: stats?.recentAchievements || [],
-    leaderboard: stats?.leaderboard || []
+  const safeStats: GamificationStats = stats || {
+    level: 1,
+    points: 0,
+    badges: [],
+    streak: 0,
+    completedChallenges: 0,
+    totalChallenges: 0,
+    nextLevel: 2,
+    pointsToNextLevel: 100,
+    nextLevelPoints: 100,
+    challenges: [],
+    totalPoints: 0,
+    currentLevel: 1,
+    progressToNextLevel: 0,
+    streakDays: 0,
+    lastActivityDate: new Date().toISOString(),
+    activeChallenges: 0,
+    badgesCount: 0,
+    rank: 'Beginner',
+    recentAchievements: []
   };
 
   return (

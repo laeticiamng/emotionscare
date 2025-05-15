@@ -8,8 +8,8 @@ import { Period, EmotionalTeamViewProps } from '@/types';
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   teamId,
   period = 'week',
-  anonymized = true,
-  userId
+  userId,
+  anonymized = true
 }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<string>('overview');
