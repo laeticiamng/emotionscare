@@ -1,5 +1,5 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Mock music tracks
 export const mockTracks: MusicTrack[] = [
@@ -88,7 +88,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'p2',
     name: 'Aide au sommeil',
-    tracks: mockTracks.filter(track => track.category === 'Sommeil' || track.mood.includes('peaceful')),
+    tracks: mockTracks.filter(track => track.category === 'Sommeil' || track.mood?.includes('peaceful')),
     coverUrl: '/images/playlists/sleep.jpg',
     description: 'Sons apaisants pour mieux dormir',
     category: 'Sommeil'
@@ -96,7 +96,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'p3',
     name: 'Gestion du stress',
-    tracks: mockTracks.filter(track => track.mood.includes('anxious') || track.mood.includes('stressed')),
+    tracks: mockTracks.filter(track => track.mood?.includes('anxious') || track.mood?.includes('stressed')),
     coverUrl: '/images/playlists/stress.jpg',
     description: 'Réduisez votre niveau de stress et d\'anxiété',
     category: 'Bien-être'

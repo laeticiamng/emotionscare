@@ -1,21 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-
-interface GamificationStats {
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels: {
-    level: string;
-    count: number;
-  }[];
-  topChallenges: {
-    name: string;
-    completions: number;
-  }[];
-}
+import { GamificationStats } from '@/types/gamification';
 
 interface GamificationSummaryCardProps {
   gamificationStats: GamificationStats;

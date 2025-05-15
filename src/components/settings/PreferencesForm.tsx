@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -52,7 +53,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
       anonymizeReports: true,
       profileVisibility: 'team'
     },
-    soundEnabled: false // Use soundEnabled instead of sound
+    soundEnabled: false
   };
 
   // Use harmonized user preferences
@@ -102,7 +103,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
         toast({
           title: "Préférences mises à jour",
           description: "Vos préférences ont été enregistrées avec succès.",
-          variant: "success",
+          variant: "default",
         });
         
         if (onSave) {

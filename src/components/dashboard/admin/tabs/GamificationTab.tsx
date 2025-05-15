@@ -1,17 +1,12 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
 import GamificationSummaryCard from '../GamificationSummaryCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GamificationStats } from '@/types/gamification';
 
 export interface GamificationTabProps {
-  gamificationData: {
-    activeUsersPercent: number;
-    totalBadges: number;
-    badgeLevels: Array<{ level: string; count: number }>;
-    topChallenges: Array<{ name: string; completions: number }>;
-  };
+  gamificationData: GamificationStats;
   isLoading?: boolean;
 }
 

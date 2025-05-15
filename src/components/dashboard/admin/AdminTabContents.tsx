@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -15,7 +14,7 @@ import UsersListTab from './tabs/UsersListTab';
 import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
 import InvitationsTab from './tabs/invitations/InvitationsTab';
-import { GamificationStats } from '@/types';
+import { GamificationStats } from '@/types/gamification';
 
 interface AdminTabContentsProps {
   activeTab: string;
@@ -32,7 +31,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   dashboardStats,
   isLoading = false
 }) => {
-  // Create gamification data with required dashboard properties
+  // Create gamification data with all required properties
   const gamificationData: GamificationStats = {
     // Required base properties from GamificationStats
     points: 0,

@@ -3,36 +3,25 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  coverUrl: string;
-  audioUrl: string;
   duration: number;
-  // Additional properties found in usage
-  category?: string;
-  mood?: string;
-  cover?: string;
   url?: string;
-  cover_url?: string;
+  cover?: string;
+  coverUrl?: string;
+  audioUrl?: string;
+  category?: string;
+  mood?: string[];
+  emotion?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
   tracks: MusicTrack[];
-  // Additional properties found in usage
-  description?: string;
-  category?: string;
-  coverUrl?: string;
   title?: string;
-}
-
-export interface MusicLibraryProps {
-  playlists: MusicPlaylist[];
-  onSelectPlaylist: (playlist: MusicPlaylist) => void;
-  // Add missing properties
-  onSelectTrack?: (track: MusicTrack) => void;
-  tracks?: MusicTrack[];
-  loading?: boolean;
-  error?: string | null;
+  description?: string;
+  coverUrl?: string;
+  category?: string;
+  emotion?: string;
 }
 
 export interface ProgressBarProps {
@@ -40,34 +29,67 @@ export interface ProgressBarProps {
   max?: number;
   currentTime?: number;
   duration?: number;
-  formatTime?: (seconds: number) => string;
-  // Add missing properties
   onSeek?: (value: number) => void;
   className?: string;
+  formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
   showLabel?: boolean;
   variant?: string;
   handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
+export interface TrackInfoProps {
+  track: MusicTrack;
+  onSelect?: (track: MusicTrack) => void;
+  isActive?: boolean;
+  className?: string;
+}
+
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange?: (volume: number) => void;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-  // Add missing properties
+  onVolumeChange?: (value: number) => void;
   onChange?: (value: number) => void;
   className?: string;
   showLabel?: boolean;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
 }
 
-// Add MusicDrawerProps interface
 export interface MusicDrawerProps {
-  children?: React.ReactNode;
   isOpen?: boolean;
   open?: boolean;
+  children?: React.ReactNode;
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
   currentTrack?: MusicTrack;
   playlist?: MusicPlaylist;
+}
+
+export interface MusicLibraryProps {
+  playlists: MusicPlaylist[];
+  onSelectTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  className?: string;
+}
+
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  volume: number;
+  setVolume: (volume: number) => void;
+  isMuted: boolean;
+  toggleMute: () => void;
+  currentPlaylist: MusicPlaylist | null;
+  playlists: MusicPlaylist[];
+  loadPlaylistById: (id: string) => void;
+  duration: number;
+  currentTime: number;
+  progress: number;
+  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
+  setOpenDrawer: (open: boolean) => void;
+  openDrawer: boolean;
 }

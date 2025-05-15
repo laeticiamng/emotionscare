@@ -1,59 +1,12 @@
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  level: string;
-  earnedAt?: string;
-  progress?: number;
-  total?: number;
-  color?: string;
-}
-
-export interface Challenge {
-  id: string;
-  name: string;
-  description: string;
-  points: number;
-  progress: number;
-  total: number;
-  completed: boolean;
-  deadline?: string;
-  icon?: string;
-  completions?: number;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  user_id: string;
-  name: string; // Added name property
-  points: number;
-  rank: number | string;
-  avatar?: string;
-  avatarUrl?: string;
-  department?: string;
-  trend?: 'up' | 'down' | 'same';
-  previousRank?: number;
-  userId?: string;
-}
-
 export interface GamificationStats {
   points: number;
   level: number;
+  rank?: string;
   badges: Badge[];
   streak: number;
   completedChallenges: number;
   totalChallenges: number;
-  
-  // Admin dashboard specific properties - required for AdminTabContents
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels: { level: string; count: number; }[];
-  topChallenges: { name: string; completions: number; }[];
-  
-  // Optional properties
-  rank?: string;
   activeChallenges?: number;
   streakDays?: number;
   nextLevelPoints?: number;
@@ -61,12 +14,54 @@ export interface GamificationStats {
   totalPoints?: number;
   badgesCount?: number;
   challenges?: Challenge[];
-  recentAchievements?: Badge[];
+  recentAchievements?: any[];
   nextLevel?: {
     points: number;
     rewards: string[];
   };
+  achievements?: any[];
   currentLevel?: number;
   pointsToNextLevel?: number;
   lastActivityDate?: string;
+  progress?: number;
+  
+  // Admin dashboard specific properties
+  activeUsersPercent?: number;
+  totalBadges?: number;
+  badgeLevels?: Array<{ level: string; count: number }>;
+  topChallenges?: Array<{ name: string; completions: number }>;
+}
+
+export interface Challenge {
+  id: string;
+  title?: string;
+  name?: string;
+  description: string;
+  points: number;
+  status: string;
+  category?: string;
+  progress?: number;
+  goal?: number;
+  type?: string;
+}
+
+export interface Badge {
+  id: string;
+  name?: string;
+  description: string;
+  image_url?: string;
+  type?: string;
+  level?: string;
+  total?: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  score: number;
+  rank: number;
+  name?: string;
+  avatarUrl?: string;
+  progress?: number;
+  level?: number;
 }
