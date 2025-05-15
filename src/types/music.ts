@@ -1,4 +1,3 @@
-
 export interface MusicTrack {
   id: string;
   title: string;
@@ -10,7 +9,7 @@ export interface MusicTrack {
   intensity?: number;
   tempo?: number;
   year?: number;
-  genre?: string;
+  genre?: string | string[];
   tags?: string[];
   isPlaying?: boolean;
   isFavorite?: boolean;
@@ -18,6 +17,7 @@ export interface MusicTrack {
   mood?: string;
   cover?: string;
   cover_url?: string;
+  audioUrl?: string;
 }
 
 export interface MusicPlaylist {
@@ -79,6 +79,7 @@ export interface ProgressBarProps {
   showTimestamps?: boolean;
   onSeek?: (value: number) => void;
   formatTime?: (time: number) => string;
+  handleProgressClick?: (e: any) => void;
 }
 
 export interface VolumeControlProps {

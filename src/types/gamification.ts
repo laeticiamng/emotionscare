@@ -1,4 +1,3 @@
-
 export interface Badge {
   id: string;
   name: string;
@@ -18,6 +17,7 @@ export interface Badge {
   type?: string;
   dateEarned?: string;
   awarded_at?: Date | string;
+  threshold?: number;
 }
 
 export interface Challenge {
@@ -37,7 +37,7 @@ export interface Challenge {
   goal?: number;
   total?: number;
   type?: string;
-  completions?: number; // Added for admin dashboard
+  completions?: number;
 }
 
 export interface Achievement {

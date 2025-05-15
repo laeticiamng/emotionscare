@@ -26,9 +26,9 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [userMode, setUserModeState] = useState<UserModeType>(storedMode);
   
   // Function to update both state and localStorage
-  const setUserMode = (newMode: UserModeType) => {
+  const setUserMode = (newMode: UserModeType | string) => {
     console.log("Setting user mode to:", newMode);
-    const normalizedMode = normalizeUserMode(newMode);
+    const normalizedMode = normalizeUserMode(newMode) as UserModeType;
     setUserModeState(normalizedMode);
     setStoredMode(normalizedMode);
   };

@@ -1,85 +1,63 @@
 
-import { UserRole } from '@/types/auth';
-import { ROUTES } from '@/types/navigation';
+import { UserRole } from "@/types/auth";
 
 /**
- * Checks if a user role has access to a protected resource
- */
-export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
-  // Allow admin access to all routes
-  if (userRole === 'admin') return true;
-
-  // For B2B roles, check for exact match or check if both are B2B types
-  if (userRole.startsWith('b2b') && allowedRoles.some(role => role.startsWith('b2b'))) {
-    return true;
-  }
-
-  // Direct role match
-  return allowedRoles.includes(userRole);
-};
-
-/**
- * Gets the appropriate login path for a given role
- */
-export const getRoleLoginPath = (role: UserRole): string => {
-  console.log("Getting login path for role:", role);
-  
-  if (role === 'b2c' || role === 'user' || role === 'individual') {
-    return ROUTES.b2c.login;
-  }
-  
-  if (role.includes('admin') || role === 'wellbeing_manager' || role === 'manager') {
-    return ROUTES.b2bAdmin.login;
-  }
-  
-  if (role.includes('b2b') || role === 'employee' || role === 'professional') {
-    return ROUTES.b2bUser.login;
-  }
-  
-  // Default path
-  return '/';
-};
-
-/**
- * Gets the home path for a given role after successful login
- */
-export const getRoleHomePath = (role: UserRole): string => {
-  console.log("Getting home path for role:", role);
-  
-  if (role === 'b2c' || role === 'user' || role === 'individual') {
-    return ROUTES.b2c.dashboard;
-  }
-  
-  if (role.includes('admin') || role === 'wellbeing_manager' || role === 'manager') {
-    return ROUTES.b2bAdmin.dashboard;
-  }
-  
-  if (role.includes('b2b') || role === 'employee' || role === 'professional') {
-    return ROUTES.b2bUser.dashboard;
-  }
-  
-  // Default path
-  return '/';
-};
-
-/**
- * Normalizes roles to ensure consistent checking
+ * Normalize role names to a standard format
  */
 export const normalizeRole = (role: string): UserRole => {
-  role = role.toLowerCase();
+  const roleLower = role.toLowerCase();
   
-  if (role === 'b2b-admin' || role === 'b2b_admin') return 'b2b_admin';
-  if (role === 'b2b-user' || role === 'b2b_user' || role === 'b2b-collaborator') return 'b2b_user';
-  if (role === 'b2c' || role === 'individual' || role === 'user') return 'b2c';
+  if (roleLower === 'b2b-admin' || roleLower === 'b2badmin') {
+    return 'b2b_admin';
+  }
+  
+  if (roleLower === 'b2b-user' || roleLower === 'b2buser' || roleLower === 'b2b-collaborator' || roleLower === 'b2bcollaborator') {
+    return 'b2b_user';
+  }
+  
+  if (roleLower === 'individual' || roleLower === 'user' || roleLower === 'b2c') {
+    return 'b2c';
+  }
   
   return role as UserRole;
 };
 
 /**
- * Check if the given role is an admin role
+ * Check if the user has one of the specified roles
  */
-export const isAdminRole = (role?: UserRole): boolean => {
-  if (!role) return false;
+export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
+  const normalizedUserRole = normalizeRole(userRole);
+  const normalizedAllowedRoles = allowedRoles.map(normalizeRole);
+  
+  // Admin always has access
+  if (normalizedUserRole === 'admin' || normalizedUserRole === 'b2b_admin') {
+    return true;
+  }
+  
+  return normalizedAllowedRoles.includes(normalizedUserRole);
+};
+
+/**
+ * Get the login path for a specific role
+ */
+export const getRoleLoginPath = (role: UserRole): string => {
+  const normalizedRole = normalizeRole(role);
+  
+  switch (normalizedRole) {
+    case 'b2b_admin':
+      return '/b2b/admin/login';
+    case 'b2b_user':
+      return '/b2b/user/login';
+    case 'b2c':
+    default:
+      return '/b2c/login';
+  }
+};
+
+/**
+ * Check if a user role is an admin role
+ */
+export const isAdminRole = (role: UserRole): boolean => {
   const normalizedRole = normalizeRole(role);
   return normalizedRole === 'admin' || normalizedRole === 'b2b_admin';
 };
@@ -90,22 +68,36 @@ export const isAdminRole = (role?: UserRole): boolean => {
 export const getRoleName = (role: UserRole): string => {
   const normalizedRole = normalizeRole(role);
   
-  switch(normalizedRole) {
+  switch (normalizedRole) {
+    case 'b2b_admin':
+      return 'Administrateur B2B';
+    case 'b2b_user':
+      return 'Collaborateur B2B';
     case 'b2c':
       return 'Particulier';
-    case 'b2b_admin':
-      return 'Administrateur';
-    case 'b2b_user':
-      return 'Collaborateur';
     case 'admin':
-      return 'Administrateur système';
-    case 'manager':
-    case 'wellbeing_manager':
-      return 'Manager';
+      return 'Administrateur';
+    case 'moderator':
+      return 'Modérateur';
     case 'employee':
+      return 'Employé';
+    case 'manager':
+      return 'Manager';
+    case 'coach':
+      return 'Coach';
+    case 'wellbeing_manager':
+      return 'Responsable bien-être';
+    case 'team_lead':
+      return 'Chef d\'équipe';
     case 'professional':
       return 'Professionnel';
-    default:
+    case 'individual':
+      return 'Particulier';
+    case 'user':
       return 'Utilisateur';
+    case 'guest':
+      return 'Invité';
+    default:
+      return role;
   }
 };

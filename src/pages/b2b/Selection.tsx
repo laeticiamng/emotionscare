@@ -4,15 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { User, Building } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 export default function SelectionEntreprise() {
   const navigate = useNavigate();
+  const { setUserMode } = useUserMode();
   
   const navigateToUserLogin = () => {
+    setUserMode('b2b_user');
     navigate('/b2b/user/login');
   };
   
   const navigateToAdminLogin = () => {
+    setUserMode('b2b_admin');
     navigate('/b2b/admin/login');
   };
 
