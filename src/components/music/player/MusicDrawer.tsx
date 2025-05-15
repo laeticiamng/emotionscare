@@ -15,21 +15,21 @@ import { MusicDrawerProps, MusicTrack } from '@/types';
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   open,
   onClose,
-  isOpen, // Added for backward compatibility
-  onOpenChange, // Added for backward compatibility
+  isOpen, // Compatible property
+  onOpenChange, // Compatible property
   playlist,
   currentTrack
 }) => {
   // Use either isOpen or open prop
-  const isDrawerOpen = isOpen || open;
+  const isDrawerOpen = isOpen !== undefined ? isOpen : open;
   
   return (
-    <Drawer open={isDrawerOpen} onOpenChange={onOpenChange}>
+    <Drawer open={isDrawerOpen} onOpenChange={onOpenChange || onClose}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Music Player</DrawerTitle>
           <DrawerDescription>
-            {playlist ? `Playing from ${playlist.name}` : 'Current track'}
+            {playlist ? `Playing from ${playlist.title || playlist.name}` : 'Current track'}
           </DrawerDescription>
         </DrawerHeader>
         
@@ -63,7 +63,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
           
           {playlist && playlist.tracks && playlist.tracks.length > 0 && (
             <div className="mt-4">
-              <h4 className="font-medium mb-2">Playlist: {playlist.name}</h4>
+              <h4 className="font-medium mb-2">Playlist: {playlist.title || playlist.name}</h4>
               <div className="max-h-[200px] overflow-y-auto">
                 {playlist.tracks.map((track) => (
                   <div 

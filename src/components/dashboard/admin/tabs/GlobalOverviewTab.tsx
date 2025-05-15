@@ -1,16 +1,21 @@
 
 import React from 'react';
-import { DashboardStats, GamificationData, KpiCardProps } from '@/types';
-import DraggableKpiCardsGrid from '@/components/dashboard/admin/DraggableKpiCardsGrid';
+import { DashboardStats, GamificationData, KpiCardProps, GlobalOverviewTabProps } from '@/types';
+import DraggableKpiCardsGrid from '@/components/dashboard/admin/draggable/DraggableKpiCardsGrid';
 
-interface GlobalOverviewTabProps {
-  kpiCards: KpiCardProps[];
-}
-
-const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ kpiCards }) => {
+const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ 
+  kpiCards,
+  absenteeismChartData,
+  emotionalScoreTrend,
+  dashboardStats,
+  gamificationData,
+  isLoading = false
+}) => {
   return (
     <div className="space-y-6">
       <DraggableKpiCardsGrid kpiCards={kpiCards} />
+      
+      {/* Autres visualisations du tableau de bord pourraient être ajoutées ici */}
     </div>
   );
 };

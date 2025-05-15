@@ -1,3 +1,4 @@
+
 import { Emotion } from '@/types';
 
 export const mockEmotions: Emotion[] = [
@@ -20,7 +21,7 @@ export const mockEmotions: Emotion[] = [
     score: 3,
     text: 'A bit disappointed with the project outcome.',
     emojis: '😔',
-    ai_feedback: 'I am here to support you. Let’s discuss ways to improve.',
+    ai_feedback: 'I am here to support you. Let's discuss ways to improve.',
     anxiety: 6
   },
   {
@@ -53,7 +54,7 @@ export const mockEmotions: Emotion[] = [
     score: 5,
     text: 'Worried about the upcoming presentation.',
     emojis: '😨',
-    ai_feedback: 'I can help you prepare. Let’s practice together.',
+    ai_feedback: 'I can help you prepare. Let's practice together.',
     anxiety: 9
   },
   {
@@ -75,7 +76,7 @@ export const mockEmotions: Emotion[] = [
     score: 4,
     text: 'Missing my family today.',
     emojis: '😔',
-    ai_feedback: 'It’s okay to feel that way. Maybe schedule a call?',
+    ai_feedback: 'It's okay to feel that way. Maybe schedule a call?',
     anxiety: 5
   },
   {
@@ -86,7 +87,7 @@ export const mockEmotions: Emotion[] = [
     score: 7,
     text: 'Arguments with a colleague.',
     emojis: '😡',
-    ai_feedback: 'Let’s explore constructive ways to resolve conflicts.',
+    ai_feedback: 'Let's explore constructive ways to resolve conflicts.',
     anxiety: 7
   },
   {
@@ -97,7 +98,7 @@ export const mockEmotions: Emotion[] = [
     score: 8,
     text: 'Enjoying a peaceful morning.',
     emojis: '😌',
-    ai_feedback: 'That’s a great way to start the day!',
+    ai_feedback: 'That's a great way to start the day!',
     anxiety: 2
   },
   {

@@ -1,74 +1,36 @@
 
 import React from 'react';
-import { Progress } from '@/components/ui/progress';
-import { ProgressBarProps } from '@/types/progress-bar';
-
-// Default time formatter
-const defaultFormatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-};
+import { ProgressBarProps } from '@/types';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
   max = 100,
-  onChange,
-  formatTime = defaultFormatTime,
   currentTime = 0,
   duration = 0,
-  onSeek,
-  className = '',
-  showTimestamps = true,
-  handleProgressClick,
-  progress,
-  variant = 'default',
-  showLabel = false
+  formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  },
+  handleProgressClick
 }) => {
-  // Use either value or progress for backward compatibility
-  const progressValue = progress !== undefined ? progress : value;
-  
-  // Handle seeking
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (handleProgressClick) {
-      handleProgressClick(e);
-      return;
-    }
-
-    if (onSeek) {
-      const container = e.currentTarget;
-      const rect = container.getBoundingClientRect();
-      const position = (e.clientX - rect.left) / rect.width;
-      const seekTime = position * duration;
-      onSeek(seekTime);
-    } else if (onChange) {
-      const container = e.currentTarget;
-      const rect = container.getBoundingClientRect();
-      const position = (e.clientX - rect.left) / rect.width;
-      const newValue = position * max;
-      onChange(newValue);
-    }
-  };
+  const progressWidth = `${(value / max) * 100}%`;
 
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className="space-y-1">
       <div 
-        className="relative w-full h-2 cursor-pointer"
-        onClick={handleClick}
+        className="h-2 bg-muted rounded-full relative cursor-pointer overflow-hidden"
+        onClick={handleProgressClick}
       >
-        <Progress 
-          value={progressValue} 
-          max={max} 
-          className="h-2"
+        <div 
+          className="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-100"
+          style={{ width: progressWidth }}
         />
       </div>
-      
-      {showTimestamps && (
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-      )}
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span>{formatTime(currentTime)}</span>
+        <span>{formatTime(duration)}</span>
+      </div>
     </div>
   );
 };

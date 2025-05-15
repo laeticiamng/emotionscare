@@ -1,66 +1,68 @@
 
-import { createContext, useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { UserModeType, UserModeContextType } from '@/types';
 
-const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
+const UserModeContext = createContext<UserModeContextType>({
+  userMode: 'b2c',
+  setUserMode: () => {},
+  isConsumerMode: true,
+  isBusinessMode: false,
+  isAdminMode: false,
+  isCoachMode: false,
+  switchToConsumer: () => {},
+  switchToBusiness: () => {},
+  switchToAdmin: () => {},
+  switchToCoach: () => {},
+});
 
-export const UserModeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [mode, setMode] = useState<UserModeType>('B2C');
-  const navigate = useNavigate();
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  const [userMode, setUserMode] = useState<UserModeType>('b2c');
 
-  const contextValue: UserModeContextType = {
-    mode,
-    setMode,
-    userMode: mode, // Ajout de userMode pour compatibilité
-  };
+  // Determine initial user mode based on user role
+  useEffect(() => {
+    if (!user) return;
+    
+    if (['admin', 'b2b_admin', 'b2b-admin'].includes(user.role)) {
+      setUserMode('b2b_admin');
+    } else if (['b2b_user', 'b2b-user', 'business', 'manager'].includes(user.role)) {
+      setUserMode('b2b_user');
+    } else if (['coach'].includes(user.role)) {
+      setUserMode('coach');
+    } else {
+      setUserMode('b2c');
+    }
+  }, [user]);
+
+  const isConsumerMode = userMode === 'b2c';
+  const isBusinessMode = userMode === 'b2b_user';
+  const isAdminMode = userMode === 'b2b_admin';
+  const isCoachMode = userMode === 'coach';
+
+  const switchToConsumer = () => setUserMode('b2c');
+  const switchToBusiness = () => setUserMode('b2b_user');
+  const switchToAdmin = () => setUserMode('b2b_admin');
+  const switchToCoach = () => setUserMode('coach');
 
   return (
-    <UserModeContext.Provider value={contextValue}>
+    <UserModeContext.Provider
+      value={{
+        userMode,
+        setUserMode,
+        isConsumerMode,
+        isBusinessMode,
+        isAdminMode,
+        isCoachMode,
+        switchToConsumer,
+        switchToBusiness,
+        switchToAdmin,
+        switchToCoach
+      }}
+    >
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => {
-  const context = useContext(UserModeContext);
-  if (context === undefined) {
-    throw new Error('useUserMode must be used within a UserModeProvider');
-  }
-
-  const { mode, setMode } = context;
-  const navigate = useNavigate();
-
-  const setAdminMode = () => {
-    setMode('B2B-ADMIN');
-    navigate('/admin/dashboard');
-  };
-
-  const setUserMode = () => {
-    setMode('B2B-USER');
-    navigate('/dashboard');
-  };
-
-  const setB2CMode = () => {
-    setMode('B2C');
-    navigate('/');
-  };
-
-  const isAdmin = () => mode === 'B2B-ADMIN';
-  const isUser = () => mode === 'B2B-USER';
-  const isB2C = () => mode === 'B2C'; 
-
-  return {
-    mode,
-    setMode,
-    userMode: mode,  // Ajout de userMode pour compatibilité
-    setUserMode: setMode, // Ajout de setUserMode pour compatibilité
-    setAdminMode,
-    setUserMode,
-    setB2CMode,
-    isAdmin,
-    isUser,
-    isB2C,
-    isLoading: false, // Ajout de isLoading pour compatibilité
-  };
-};
+export const useUserMode = () => useContext(UserModeContext);

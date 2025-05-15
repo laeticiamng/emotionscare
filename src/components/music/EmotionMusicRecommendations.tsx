@@ -83,7 +83,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
               className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50"
             >
               <div>
-                <h4 className="font-medium">{playlist.name || playlist.title}</h4>
+                <h4 className="font-medium">{playlist.title || playlist.name}</h4>
                 <p className="text-sm text-muted-foreground">
                   {playlist.tracks.length} morceaux
                 </p>

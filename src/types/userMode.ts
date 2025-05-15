@@ -1,16 +1,16 @@
 
 // Types liés au mode utilisateur
-export type UserModeType = 'B2C' | 'B2B-USER' | 'B2B-ADMIN' | 'B2B-SELECTION';
+export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | 'coach' | 'b2b-admin' | 'b2b-user';
 
 export interface UserModeContextType {
-  mode: UserModeType;
-  setMode: (mode: UserModeType) => void;
-  userMode?: UserModeType; // Pour compatibilité avec le code existant
-  setUserMode?: (mode: UserModeType) => void; // Pour compatibilité
-  setAdminMode?: () => void;
-  setUserMode?: () => void;
-  setB2CMode?: () => void;
-  isAdmin?: () => boolean;
-  isUser?: () => boolean;
-  isB2C?: () => boolean;
+  userMode: UserModeType;
+  setUserMode: (mode: UserModeType) => void;
+  isConsumerMode: boolean;
+  isBusinessMode: boolean;
+  isAdminMode: boolean;
+  isCoachMode: boolean;
+  switchToConsumer: () => void;
+  switchToBusiness: () => void;
+  switchToAdmin: () => void;
+  switchToCoach: () => void;
 }

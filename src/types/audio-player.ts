@@ -2,17 +2,18 @@
 // Types liés au player audio
 export interface UseAudioPlayerStateReturn {
   isPlaying: boolean;
+  isMuted: boolean;
+  volume: number;
   currentTime: number;
   duration: number;
-  volume: number;
-  muted: boolean;
-  playbackRate: number;
-  play: () => Promise<void> | void;
-  pause: () => void;
-  togglePlay: () => void;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  setPlaybackRate: (rate: number) => void;
+  isLoading: boolean;
+  error: Error | null;
+  progress: number;
   audioRef: React.RefObject<HTMLAudioElement>;
+  togglePlay: () => void;
+  toggleMute: () => void;
+  setVolume: (volume: number) => void;
+  seek: (time: number) => void;
+  load: (url: string) => void;
+  formatTime: (seconds: number) => string;
 }

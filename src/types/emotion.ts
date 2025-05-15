@@ -1,98 +1,75 @@
 
-// Types liés aux émotions
+// Types liés aux émotions et analyses d'émotions
 export interface Emotion {
-  id?: string;
-  name?: string;
-  color?: string;
-  icon?: string;
-  description?: string;
-  intensity?: number;
-  // Propriétés couramment utilisées mais manquantes
-  user_id?: string;
-  date?: string | Date;
-  emotion?: string;
-  score?: number;
-  confidence?: number;
-  category?: string;
+  id: string;
+  user_id: string;
+  date: string | Date;
+  emotion: string;
+  score: number;
   text?: string;
-  transcript?: string;
-  feedback?: string;
-  audio_url?: string;
+  emojis?: string;
   ai_feedback?: string;
-  recommendations?: string[];
-  triggers?: string[];
-  emojis?: string[] | string;
+  anxiety?: number;  // Ajouté pour compatibilité avec mockEmotions
 }
 
 export interface EmotionResult {
   id?: string;
-  user_id?: string;
   emotion: string;
-  // Ajout des propriétés manquantes selon les erreurs signalées
-  score?: number;
+  score: number;  // Ajouté car manquant
   confidence?: number;
-  dominantEmotion?: string;
-  primaryEmotion?: string;
+  timestamp?: Date | string;
   intensity?: number;
-  text?: string;
-  transcript?: string;
-  emojis?: string[] | string;
-  timestamp?: string;
-  date?: string;
   triggers?: string[];
-  feedback?: string;
-  ai_feedback?: string;
   recommendations?: string[];
-  audio_url?: string;
-  [key: string]: any;  // Pour permettre d'autres propriétés flexibles
+  metadata?: Record<string, any>;
+  date?: string | Date;
+  user_id?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  recommendations?: string[];
-  insights?: string[];
-  icon?: string;
-  color?: string;
-  textColor?: string;
-  description?: string;
-  category?: string;
-  coping_strategies?: string[];
-  relatedActivities?: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number;
-  }[];
+  history?: EmotionResult[];
+  streak?: number;
+  trend?: 'improving' | 'declining' | 'stable';
+  previousEmotion?: string;
+  emotionalBalance?: number;
+}
+
+export interface VoiceEmotionScannerProps {
+  onStart?: () => void;
+  onStop?: () => void;
+  onResult?: (result: EmotionResult) => void;
+  maxDuration?: number;
+  recordingDelay?: number;
+  autoStart?: boolean;
+  emotion?: string;
+  size?: 'sm' | 'md' | 'lg';
+  mode?: 'minimal' | 'full' | 'compact';
+  className?: string;
+}
+
+export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onScanStart?: () => void;
+  onScanError?: (error: Error) => void;
+  onResult?: (result: EmotionResult) => void;
+  autoStart?: boolean;
+}
+
+export interface TeamOverviewProps {
+  teamId?: string;
+  companyId?: string;
+  period?: 'day' | 'week' | 'month';
+  limit?: number;
+  compact?: boolean;
+  showFilters?: boolean;
+  className?: string;
 }
 
 export interface EmotionalTeamViewProps {
   teamId?: string;
-  departmentId?: string;
-  users?: any[];
+  view?: 'emotions' | 'trends' | 'risks';
+  period?: 'day' | 'week' | 'month' | 'year';
+  showIndividualScores?: boolean;
+  showAverageScore?: boolean;
   anonymized?: boolean;
-  onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year' | string;
-  userId?: string;
-  className?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  onRefresh?: () => void;
-}
-
-export interface TeamOverviewProps {
-  teamId: string;
-  period?: string;
-  anonymized?: boolean;
-}
-
-export interface VoiceEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  onEmotionDetected?: (emotion: string, result: EmotionResult) => void;
-}
-
-export interface LiveVoiceScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onEmotionDetected?: (emotion: string, result: EmotionResult) => void;
 }

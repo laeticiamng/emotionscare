@@ -1,9 +1,11 @@
 
 // Types liés à la barre latérale
 export interface SidebarContextType {
-  collapsed: boolean;
-  toggleCollapsed: () => void;
-  isOpen?: boolean;
-  setIsOpen?: (isOpen: boolean) => void;
-  isMobile?: boolean;
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+  openSidebar: () => void;
+  closeSidebar: () => void;
+  isOpen?: boolean;  // Pour compatibilité
+  setIsOpen?: (open: boolean) => void;  // Pour compatibilité
+  sidebarWidth?: number;
 }

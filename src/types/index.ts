@@ -227,4 +227,3 @@ export interface InvitationFormData {
   message?: string;
   expires_in_days: number;
 }
-

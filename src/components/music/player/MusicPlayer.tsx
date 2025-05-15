@@ -1,182 +1,183 @@
 
 import React, { useState, useEffect } from 'react';
-import { Disc, Volume2, VolumeX } from 'lucide-react';
-import { MusicTrack } from '@/types';
-import PlayerControls from './PlayerControls';
-import TrackInfo from '../TrackInfo';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Play, Pause, SkipForward, SkipBack, Volume2, Music, VolumeX } from 'lucide-react';
+import { useMusic } from '@/contexts/MusicContext';
+import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
+import { useActivityLogging } from '@/hooks/useActivityLogging';
 import ProgressBar from './ProgressBar';
-import VolumeControl from './VolumeControl';
 
-interface MusicPlayerProps {
-  currentTrack?: MusicTrack | null;
-  isPlaying?: boolean;
-  onPlay?: () => void;
-  onPause?: () => void;
-  onNext?: () => void;
-  onPrevious?: () => void;
-  onSeek?: (time: number) => void;
-  currentTime?: number;
-  duration?: number;
-  volume?: number;
-  onVolumeChange?: (volume: number) => void;
-  showPlaylist?: boolean;
-  hideControls?: boolean;
-  darkTheme?: boolean;
-  minimal?: boolean;
-  compact?: boolean;
-  className?: string;
-}
+const MusicPlayer: React.FC = () => {
+  const { 
+    currentTrack, 
+    isPlaying, 
+    playTrack, 
+    pauseTrack, 
+    nextTrack, 
+    previousTrack,
+    volume,
+    setVolume,
+    isMuted,
+    toggleMute
+  } = useMusic();
+  
+  const { logUserAction } = useActivityLogging('music');
+  const [progress, setProgress] = useState(0);
+  
+  // Simulate track playback for demo purposes
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    if (isPlaying && currentTrack) {
+      interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval!);
+            return 0;
+          }
+          return prev + 0.5;
+        });
+      }, 500);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, currentTrack]);
+  
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0] / 100;
+    setVolume(newVolume);
+    
+    // If user increases volume while muted, unmute
+    if (isMuted && newVolume > 0) {
+      toggleMute();
+    }
+  };
+  
+  const togglePlayPause = () => {
+    if (isPlaying) {
+      pauseTrack();
+      logUserAction('pause_music');
+    } else if (currentTrack) {
+      playTrack(currentTrack);
+      logUserAction('play_music');
+    }
+  };
 
-const MusicPlayer: React.FC<MusicPlayerProps> = ({
-  currentTrack = null,
-  isPlaying = false,
-  onPlay = () => {},
-  onPause = () => {},
-  onNext = () => {},
-  onPrevious = () => {},
-  onSeek = () => {},
-  currentTime = 0,
-  duration = 0,
-  volume = 1,
-  onVolumeChange = () => {},
-  showPlaylist = false,
-  hideControls = false,
-  darkTheme = false,
-  minimal = false,
-  compact = false,
-  className = ''
-}) => {
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const [loadingTrack, setLoadingTrack] = useState(false);
-  const [audioError, setAudioError] = useState<Error | null>(null);
-
-  // Format seconds to MM:SS
-  const formatTime = (seconds: number) => {
-    if (isNaN(seconds) || seconds < 0) return '0:00';
+  // Format time helper function
+  const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Reset states when track changes
-  useEffect(() => {
-    if (currentTrack) {
-      setLoadingTrack(true);
-      setAudioError(null);
-      
-      // Simulate loading time
-      const timer = setTimeout(() => {
-        setLoadingTrack(false);
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [currentTrack?.id]);
-
-  if (minimal) {
-    return (
-      <div className={`flex items-center gap-2 ${className}`}>
-        {currentTrack ? (
-          <>
-            <TrackInfo 
-              track={currentTrack} 
-              loadingTrack={loadingTrack}
-              compact={compact} 
-              className="flex-1"
-            />
-            {!hideControls && (
-              <PlayerControls 
-                isPlaying={isPlaying}
-                loadingTrack={loadingTrack}
-                onPlay={onPlay}
-                onPause={onPause}
-                onPrevious={onPrevious}
-                onNext={onNext}
-              />
-            )}
-          </>
-        ) : (
-          <div className="text-sm text-muted-foreground">Aucune piste en lecture</div>
-        )}
-      </div>
-    );
-  }
-
+  
   return (
-    <div className={`p-4 rounded-lg ${darkTheme ? 'bg-muted/20' : 'bg-card'} ${className}`}>
-      <div className="flex items-start mb-4 gap-4">
-        <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-          {currentTrack && (currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover) ? (
+    <div className="flex flex-col md:flex-row">
+      <div className="w-full md:w-1/3 bg-muted/20 p-6 flex flex-col justify-center items-center">
+        <div className="rounded-full h-32 w-32 bg-primary/10 flex items-center justify-center mb-4">
+          {currentTrack?.coverUrl ? (
             <img 
-              src={currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover}
+              src={currentTrack.coverUrl} 
               alt={currentTrack.title} 
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
-              }}
+              className="h-full w-full object-cover rounded-full"
             />
           ) : (
-            <Disc className="h-8 w-8 text-muted-foreground" />
+            <Music className="h-12 w-12 text-primary/80" />
           )}
         </div>
+        <h2 className="text-xl font-medium text-center">
+          {currentTrack?.title || "Aucune piste sélectionnée"}
+        </h2>
+        <p className="text-muted-foreground text-center">
+          {currentTrack?.artist || "Sélectionnez une piste pour commencer"}
+        </p>
+      </div>
+      
+      <div className="flex-1 p-6">
+        <div className="h-[180px] mb-6">
+          <EnhancedMusicVisualizer 
+            showControls={false}
+            height={180}
+          />
+        </div>
         
-        <div className="flex-1">
-          <h3 className="font-medium text-lg truncate">
-            {loadingTrack ? 'Chargement...' : currentTrack?.title || 'Aucune piste sélectionnée'}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {loadingTrack ? '...' : currentTrack?.artist || 'Artiste inconnu'}
-          </p>
-          
-          <div className="mt-2">
+        {/* Progress bar */}
+        {currentTrack && (
+          <div className="mb-4">
             <ProgressBar
-              currentTime={currentTime}
-              duration={duration}
+              value={progress}
+              max={100}
+              currentTime={(progress / 100) * (currentTrack?.duration || 0)}
+              duration={currentTrack?.duration || 0}
               formatTime={formatTime}
               handleProgressClick={(e) => {
                 const container = e.currentTarget;
                 const rect = container.getBoundingClientRect();
-                const percentage = (e.clientX - rect.left) / rect.width;
-                onSeek(percentage * duration);
+                const percent = ((e.clientX - rect.left) / rect.width) * 100;
+                setProgress(percent);
               }}
             />
           </div>
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-between">
-        <PlayerControls
-          isPlaying={isPlaying}
-          loadingTrack={loadingTrack}
-          onPlay={onPlay}
-          onPause={onPause}
-          onPrevious={onPrevious}
-          onNext={onNext}
-        />
+        )}
         
-        <div className="flex items-center gap-2">
-          <div
-            className="relative"
-            onMouseEnter={() => setShowVolumeSlider(true)}
-            onMouseLeave={() => setShowVolumeSlider(false)}
+        <div className="flex justify-center space-x-2 mb-4">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="h-10 w-10"
+            onClick={() => previousTrack()}
+            disabled={!currentTrack}
           >
-            <button className="p-2 hover:bg-muted/50 rounded-full">
-              {volume > 0 ? (
-                <Volume2 className="h-5 w-5" />
-              ) : (
-                <VolumeX className="h-5 w-5" />
-              )}
-            </button>
-            
-            {showVolumeSlider && (
-              <div className="absolute bottom-full mb-2 p-2 bg-background border rounded shadow-md">
-                <VolumeControl
-                  volume={volume}
-                  onVolumeChange={onVolumeChange}
-                />
-              </div>
+            <SkipBack className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="default" 
+            size="icon"
+            className="h-12 w-12" 
+            onClick={togglePlayPause}
+            disabled={!currentTrack}
+          >
+            {isPlaying ? (
+              <Pause className="h-6 w-6" />
+            ) : (
+              <Play className="h-6 w-6" />
             )}
-          </div>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="h-10 w-10"
+            onClick={() => nextTrack()}
+            disabled={!currentTrack}
+          >
+            <SkipForward className="h-5 w-5" />
+          </Button>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="h-8 w-8"
+            onClick={toggleMute}
+          >
+            {isMuted || volume === 0 ? (
+              <VolumeX className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Volume2 className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
+          <Slider
+            value={[isMuted ? 0 : volume * 100]}
+            max={100}
+            step={1}
+            onValueChange={handleVolumeChange}
+            className="flex-1"
+          />
         </div>
       </div>
     </div>

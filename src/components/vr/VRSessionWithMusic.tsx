@@ -24,7 +24,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({
   // with fallback to 'calm'
   const targetEmotion = emotion || (
     // Check if emotion property exists before trying to access it
-    activeTemplate?.emotionTarget || activeTemplate?.emotion_target || activeTemplate?.emotion || 'calm'
+    activeTemplate?.emotionTarget || 
+    (activeTemplate && 'emotion' in activeTemplate ? activeTemplate.emotion : 'calm')
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
@@ -41,8 +42,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || '',
-              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
+              audioUrl: playlist.tracks[0].audioUrl || ''
             };
             playTrack(track);
           }
