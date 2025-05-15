@@ -15,9 +15,9 @@ const DashboardContent: React.FC = () => {
     
     const normalizedRole = normalizeUserRole(user.role);
     
-    if (normalizedRole === 'b2b-user' || normalizedRole === 'b2b_user') {
+    if (normalizedRole === 'b2b_user') {
       return <B2BUserDashboard />;
-    } else if (normalizedRole === 'b2b-admin' || normalizedRole === 'b2b_admin') {
+    } else if (normalizedRole === 'b2b_admin') {
       return <AdminDashboard />;
     } else {
       return <UserDashboard />;

@@ -1,53 +1,92 @@
 
 import React from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Play, Pause } from 'lucide-react';
 import { MusicTrack } from '@/types';
 
-export interface TrackListProps {
+interface TrackListProps {
   tracks: MusicTrack[];
-  currentTrack: MusicTrack;
-  onSelect: (track: MusicTrack) => void;
-  onSelectTrack?: (track: MusicTrack) => void; // For backward compatibility
+  currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
+  onTrackSelect?: (track: MusicTrack) => void;
 }
 
-const TrackList = ({ tracks, currentTrack, onSelect, onSelectTrack }: TrackListProps) => {
-  const handleSelectTrack = (track: MusicTrack) => {
-    if (onSelectTrack) {
-      onSelectTrack(track);
-    } else {
-      onSelect(track);
-    }
+const TrackList: React.FC<TrackListProps> = ({ 
+  tracks, 
+  currentTrack, 
+  isPlaying = false,
+  onTrackSelect 
+}) => {
+  // Format duration to MM:SS
+  const formatDuration = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   return (
-    <div className="space-y-1 max-h-[300px] overflow-y-auto">
-      {tracks.map((track) => (
-        <div
-          key={track.id}
-          className={`flex items-center p-2 rounded-md cursor-pointer ${
-            currentTrack?.id === track.id ? 'bg-secondary' : 'hover:bg-secondary/30'
-          }`}
-          onClick={() => handleSelectTrack(track)}
-        >
-          <div className="h-10 w-10 rounded bg-primary/10 mr-3 overflow-hidden">
-            {track.coverUrl ? (
-              <img
-                src={track.coverUrl || track.cover}
-                alt={track.title}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-                ♪
-              </div>
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm truncate">{track.title}</p>
-            <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-          </div>
-        </div>
-      ))}
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[50px]"></TableHead>
+          <TableHead>Titre</TableHead>
+          <TableHead>Artiste</TableHead>
+          <TableHead className="text-right">Durée</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {tracks.map((track) => (
+          <TableRow 
+            key={track.id} 
+            className={`group ${currentTrack?.id === track.id ? 'bg-muted/50' : ''}`}
+          >
+            <TableCell>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                onClick={() => onTrackSelect?.(track)}
+              >
+                {currentTrack?.id === track.id && isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </Button>
+            </TableCell>
+            <TableCell className="flex items-center gap-2">
+              {track.cover_url ? (
+                <img 
+                  src={track.cover_url} 
+                  alt={track.title} 
+                  className="w-8 h-8 rounded object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 bg-primary/10 rounded flex items-center justify-center text-primary text-xs">
+                  ♪
+                </div>
+              )}
+              <span className="font-medium truncate">{track.title}</span>
+            </TableCell>
+            <TableCell className="text-muted-foreground">
+              {track.artist || 'Unknown Artist'}
+            </TableCell>
+            <TableCell className="text-right text-muted-foreground">
+              {formatDuration(track.duration)}
+            </TableCell>
+          </TableRow>
+        ))}
+
+        {tracks.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={4} className="text-center py-8">
+              <p className="text-muted-foreground">Aucun morceau disponible</p>
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 };
 

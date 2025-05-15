@@ -7,34 +7,31 @@ interface TrackInfoProps {
   className?: string;
 }
 
-/**
- * Component that displays information about a music track
- */
 const TrackInfo: React.FC<TrackInfoProps> = ({ 
-  track,
-  className = ""
+  track, 
+  className = '' 
 }) => {
-  // Determine the cover URL - handle different property names
-  const getCoverUrl = () => {
-    return track.coverUrl || track.cover || track.cover_url || '/images/music-placeholder.jpg';
-  };
-
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <div className="flex-shrink-0 relative w-12 h-12 rounded-md overflow-hidden">
-        <img 
-          src={getCoverUrl()} 
-          alt={`${track.title} cover`}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.src = '/images/music-placeholder.jpg';
-          }}
-        />
+      <div className="flex-shrink-0 w-10 h-10">
+        {track.cover_url ? (
+          <img 
+            src={track.cover_url} 
+            alt={track.title} 
+            className="w-full h-full object-cover rounded-md"
+          />
+        ) : (
+          <div className="w-full h-full bg-primary/10 rounded-md flex items-center justify-center text-primary">
+            ♪
+          </div>
+        )}
       </div>
       
-      <div className="min-w-0 overflow-hidden">
-        <h4 className="text-base font-medium truncate">{track.title}</h4>
-        <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+      <div className="min-w-0 flex-1">
+        <h4 className="font-medium truncate">{track.title}</h4>
+        <p className="text-sm text-muted-foreground truncate">
+          {track.artist || 'Unknown Artist'}
+        </p>
       </div>
     </div>
   );

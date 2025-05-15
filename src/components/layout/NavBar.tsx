@@ -1,62 +1,41 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/hooks/use-theme';
-import { Sun, Moon, Menu } from 'lucide-react';
-import VoiceAssistant from '@/components/navigation/VoiceAssistant';
-import { useAuth } from '@/contexts/AuthContext';
+import { Sun, Moon } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 interface NavBarProps {
-  onMenuToggle: () => void;
+  // Add any props here
 }
 
-const NavBar: React.FC<NavBarProps> = ({ onMenuToggle }) => {
+const NavBar: React.FC<NavBarProps> = () => {
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { userMode } = useUserMode();
   
-  // Create a toggle function since it doesn't exist in the hook
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
   
   return (
-    <nav className="fixed w-full top-0 bg-background border-b z-50 px-4 py-2 flex items-center justify-between">
-      <div className="flex items-center">
-        <Button variant="ghost" size="icon" onClick={onMenuToggle} className="mr-2 md:hidden">
-          <Menu />
-        </Button>
-        
-        <Link to="/" className="text-xl font-bold mr-4">EmotionsCare</Link>
-        
-        <div className="hidden md:flex items-center space-x-4">
-          <Link to="/dashboard" className="text-sm hover:text-primary">Tableau de bord</Link>
-          <Link to="/journal" className="text-sm hover:text-primary">Journal</Link>
-          <Link to="/coach-chat" className="text-sm hover:text-primary">Coach IA</Link>
-          <Link to="/scan" className="text-sm hover:text-primary">Scan émotionnel</Link>
+    <nav className="bg-background border-b">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <h1 className="text-lg font-medium">EmotionsCare</h1>
+          {/* Add navigation links here if needed */}
         </div>
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        {/* Assistant vocal flottant */}
-        <VoiceAssistant variant="icon" emotionalState="neutral" />
         
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
-        >
-          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </Button>
-        
-        {!user && (
-          <Link to="/login">
-            <Button variant="outline" size="sm">
-              Connexion
-            </Button>
-          </Link>
-        )}
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          
+          <span className="text-sm font-medium">
+            Mode: {userMode === 'b2c' ? 'Particulier' : 
+                  userMode === 'b2b-user' || userMode === 'b2b_user' ? 'Collaborateur' : 
+                  userMode === 'b2b-admin' || userMode === 'b2b_admin' ? 'Administration' : 'Standard'}
+          </span>
+        </div>
       </div>
     </nav>
   );

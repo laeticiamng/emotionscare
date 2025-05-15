@@ -1,207 +1,189 @@
+
 import React from 'react';
-import { TabsContent } from "@/components/ui/tabs";
-import GlobalOverviewTab from './tabs/GlobalOverviewTab';
-import ScanTeamTab from './tabs/ScanTeamTab';
-import SocialCocoonTab from './tabs/SocialCocoonTab';
-import GamificationTab from './tabs/GamificationTab';
-import EventsCalendarTab from './tabs/EventsCalendarTab';
-import JournalTrendsTab from './tabs/JournalTrendsTab';
-import HRActionsTab from './tabs/HRActionsTab';
-import ComplianceTab from './tabs/ComplianceTab';
-import WeatherActivitiesTab from './tabs/weather/WeatherActivitiesTab';
-import AdminSettingsTab from './tabs/AdminSettingsTab';
-import UsersListTab from './tabs/UsersListTab';
-import ActivityLogsTab from './tabs/ActivityLogsTab';
-import { DashboardStats } from './tabs/overview/types';
-import InvitationsTab from './tabs/invitations/InvitationsTab';
-import { GamificationStats, Badge, Challenge } from '@/types/gamification';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GamificationStats } from '@/types';
 
 interface AdminTabContentsProps {
   activeTab: string;
-  absenteeismData: Array<{ date: string; value: number }>;
-  emotionalScoreTrend: Array<{ date: string; value: number }>;
-  dashboardStats: DashboardStats;
-  isLoading?: boolean;
 }
 
-const AdminTabContents: React.FC<AdminTabContentsProps> = ({
-  activeTab,
-  absenteeismData,
-  emotionalScoreTrend,
-  dashboardStats,
-  isLoading = false
-}) => {
-  // Create gamification data with all required properties
-  const stats: GamificationStats = {
-    // Required base properties from GamificationStats
-    points: 0,
-    level: 1,
+const AdminTabContents: React.FC<AdminTabContentsProps> = ({ activeTab }) => {
+  // Mock data for admin dashboard
+  const mockTeamData = {
+    totalMembers: 42,
+    activeUsers: 38,
+    newUsersThisMonth: 5,
+    averageEngagement: '72%',
+  };
+  
+  const mockEmotionData = {
+    teamMood: 'Plutôt calme',
+    stressLevel: 'Modéré',
+    weeklyTrend: 'En amélioration',
+    topEmotions: ['Calme (35%)', 'Concentré (28%)', 'Stressé (15%)'],
+  };
+  
+  // Mock gamification stats that properly implements the GamificationStats interface
+  const mockGamificationStats: GamificationStats = {
+    points: 2150,
+    level: 4,
     badges: [],
-    streak: 0,
-    completedChallenges: 0,
-    totalChallenges: 0,
-    
-    // Admin dashboard specific properties
-    activeUsersPercent: 68,
-    totalBadges: 24,
+    streak: 12,
+    completedChallenges: 24,
+    totalChallenges: 30,
+    activeUsersPercent: 85,
+    totalBadges: 18,
     badgeLevels: [
-      { level: "Bronze", count: 120 },
-      { level: "Silver", count: 68 },
-      { level: "Gold", count: 23 }
+      { level: "Débutant", count: 5 },
+      { level: "Intermédiaire", count: 8 },
+      { level: "Expert", count: 5 }
     ],
-    topChallenges: [
-      { 
-        id: "challenge-1", 
-        name: "Méditation quotidienne", 
-        completions: 89,
-        description: "Méditez tous les jours pendant une semaine",
-        points: 100,
-        completed: false
-      },
-      { 
-        id: "challenge-2", 
-        name: "Journal émotionnel", 
-        completions: 76,
-        description: "Complétez votre journal pendant 5 jours consécutifs",
-        points: 150,
-        completed: false
-      },
-      { 
-        id: "challenge-3", 
-        name: "Scan émotionnel", 
-        completions: 45,
-        description: "Effectuez 3 scans émotionnels en une semaine",
-        points: 120,
-        completed: false
-      }
+    progress: { current: 75, target: 100 },
+    completionRate: 80,
+    achievements: [
+      { id: "1", name: "Première équipe", completed: true }
     ],
-    
-    // Optional properties
-    rank: "",
-    activeChallenges: 0,
-    streakDays: 0,
-    nextLevelPoints: 0,
-    progressToNextLevel: 0,
-    totalPoints: 0,
-    badgesCount: 0,
-    challenges: [],
-    recentAchievements: [],
-    nextLevel: {
-      points: 100,
-      rewards: ["Badge Spécial", "Points bonus"]
-    },
-    currentLevel: 1,
-    pointsToNextLevel: 0,
+    leaderboard: [
+      { userId: "u1", username: "Équipe Marketing", points: 3200 },
+      { userId: "u2", username: "Équipe Tech", points: 2950 },
+      { userId: "u3", username: "Équipe Finance", points: 2600 }
+    ],
     lastActivityDate: new Date().toISOString()
   };
-  
-  const socialCocoonData = {
-    totalPosts: 248,
-    moderationRate: 3.2,
-    topHashtags: [
-      { tag: '#bienetre', count: 42 },
-      { tag: '#entraide', count: 36 },
-      { tag: '#motivation', count: 31 },
-      { tag: '#teamspirit', count: 28 },
-      { tag: '#pausecafe', count: 22 }
-    ]
-  };
-  
-  const eventsData = [
-    { date: '2023-05-15', title: 'Atelier Mindfulness', status: 'upcoming', attendees: 24 },
-    { date: '2023-05-22', title: 'Webinaire Bien-être', status: 'upcoming', attendees: 31 },
-    { date: '2023-05-29', title: 'Session de Yoga', status: 'upcoming', attendees: 18 }
-  ];
-  
-  const hrActionsData = [
-    { title: 'Alerte Stress', description: 'Équipe Marketing', icon: 'alert-triangle' },
-    { title: 'Demande Entretien', description: 'Sarah Martin', icon: 'message-square' },
-    { title: 'Signalement Conflit', description: 'Département Tech', icon: 'flag' }
-  ];
-  
-  const complianceData = {
-    mfaEnabled: 87,
-    lastKeyRotation: '2023-04-15',
-    lastPentest: '2023-03-22',
-    gdprCompliance: 'Conforme',
-    dataRetention: '90 jours',
-    certifications: ['ISO 27001', 'RGPD', 'HDS', 'SOC 2']
+
+  // Render the appropriate content based on active tab
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'team':
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Aperçu de l'équipe</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <dl className="space-y-3">
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Membres</dt>
+                    <dd className="font-medium">{mockTeamData.totalMembers}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Utilisateurs actifs</dt>
+                    <dd className="font-medium">{mockTeamData.activeUsers}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Nouveaux ce mois</dt>
+                    <dd className="font-medium">{mockTeamData.newUsersThisMonth}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Engagement moyen</dt>
+                    <dd className="font-medium">{mockTeamData.averageEngagement}</dd>
+                  </div>
+                </dl>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Météo émotionnelle d'équipe</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <dl className="space-y-3">
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Humeur globale</dt>
+                    <dd className="font-medium">{mockEmotionData.teamMood}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Niveau de stress</dt>
+                    <dd className="font-medium">{mockEmotionData.stressLevel}</dd>
+                  </div>
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">Tendance hebdomadaire</dt>
+                    <dd className="font-medium text-green-600">{mockEmotionData.weeklyTrend}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground mb-2">Principales émotions</dt>
+                    <dd className="font-medium">
+                      <ul className="space-y-1">
+                        {mockEmotionData.topEmotions.map((emotion, i) => (
+                          <li key={i}>{emotion}</li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                </dl>
+              </CardContent>
+            </Card>
+          </div>
+        );
+        
+      case 'emotions':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapport émotionnel détaillé</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Contenu du rapport émotionnel détaillé</p>
+              {/* Detailed emotional report content would go here */}
+            </CardContent>
+          </Card>
+        );
+        
+      case 'engagement':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Statistiques de gamification</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="space-y-3">
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Utilisateurs actifs</dt>
+                  <dd className="font-medium">{mockGamificationStats.activeUsersPercent}%</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Défis complétés</dt>
+                  <dd className="font-medium">
+                    {mockGamificationStats.completedChallenges}/{mockGamificationStats.totalChallenges}
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Badges distribués</dt>
+                  <dd className="font-medium">{mockGamificationStats.totalBadges}</dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground mb-2">Badges par niveau</dt>
+                  <dd>
+                    <ul className="space-y-1">
+                      {mockGamificationStats.badgeLevels?.map((level, i) => (
+                        <li key={i} className="flex justify-between">
+                          <span>{level.level}</span>
+                          <span className="font-medium">{level.count}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
+        );
+        
+      default:
+        return (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-center text-muted-foreground">
+                Sélectionnez un onglet pour voir le contenu
+              </p>
+            </CardContent>
+          </Card>
+        );
+    }
   };
 
-  // Create compatible stats
-  const compatibleStats = {
-    ...dashboardStats,
-    activeUsers: dashboardStats.activeToday || 0,
-    averageEmotionalScore: dashboardStats.averageScore || 0,
-    absenteeismRate: 0
-  };
-  
-  return (
-    <>
-      <TabsContent value="vue-globale" className="mt-0">
-        <GlobalOverviewTab 
-          absenteeismChartData={absenteeismData}
-          emotionalScoreTrend={emotionalScoreTrend}
-          dashboardStats={compatibleStats}
-          gamificationData={stats}
-          isLoading={isLoading}
-          kpiCards={[]}
-        />
-      </TabsContent>
-      
-      <TabsContent value="scan-equipe" className="mt-0">
-        <ScanTeamTab 
-          emotionalScoreTrend={emotionalScoreTrend} 
-          currentScore={dashboardStats.averageScore || 75}
-          isLoading={isLoading} 
-        />
-      </TabsContent>
-      
-      <TabsContent value="social-cocoon" className="mt-0">
-        <SocialCocoonTab socialCocoonData={socialCocoonData} isLoading={isLoading} />
-      </TabsContent>
-      
-      <TabsContent value="gamification" className="mt-0">
-        <GamificationTab gamificationData={stats} isLoading={isLoading} />
-      </TabsContent>
-      
-      <TabsContent value="evenements" className="mt-0">
-        <EventsCalendarTab eventsData={eventsData} isLoading={isLoading} />
-      </TabsContent>
-      
-      <TabsContent value="journal-trends" className="mt-0">
-        <JournalTrendsTab isLoading={isLoading} />
-      </TabsContent>
-      
-      <TabsContent value="actions-rh" className="mt-0">
-        <HRActionsTab rhSuggestions={hrActionsData} isLoading={isLoading} />
-      </TabsContent>
-      
-      <TabsContent value="compliance" className="mt-0">
-        <ComplianceTab complianceData={complianceData} isLoading={isLoading} />
-      </TabsContent>
-      
-      <TabsContent value="weather-activities" className="mt-0">
-        <WeatherActivitiesTab />
-      </TabsContent>
-      
-      <TabsContent value="users-list" className="mt-0">
-        <UsersListTab />
-      </TabsContent>
-      
-      <TabsContent value="activity-logs">
-        <ActivityLogsTab />
-      </TabsContent>
-      
-      <TabsContent value="admin-settings" className="mt-0">
-        <AdminSettingsTab />
-      </TabsContent>
-      
-      <TabsContent value="invitations">
-        <InvitationsTab />
-      </TabsContent>
-    </>
-  );
+  return renderContent();
 };
 
 export default AdminTabContents;

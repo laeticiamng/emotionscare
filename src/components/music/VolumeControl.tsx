@@ -1,42 +1,56 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { VolumeControlProps } from '@/types/music';
+import { Volume, VolumeX } from 'lucide-react';
+import { VolumeControlProps } from '@/types';
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
-  volume,
+  volume = 0.5,
   onVolumeChange,
   onChange,
-  className = "",
+  className = '',
   showLabel = false,
   isMuted = false,
-  onMuteToggle = () => {}
+  onMuteToggle
 }) => {
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0];
-    
-    if (onVolumeChange) {
-      onVolumeChange(newVolume);
-    }
-    
-    if (onChange) {
-      onChange(newVolume);
-    }
+  const handleVolumeChange = (values: number[]) => {
+    const newVolume = values[0];
+    if (onVolumeChange) onVolumeChange(newVolume);
+    if (onChange) onChange(newVolume);
+  };
+
+  const handleMuteToggle = () => {
+    if (onMuteToggle) onMuteToggle();
   };
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {showLabel && (
-        <span className="text-xs text-muted-foreground w-8 text-right">{Math.round(volume * 100)}%</span>
-      )}
+      <button
+        onClick={handleMuteToggle}
+        className="text-muted-foreground hover:text-foreground transition"
+        aria-label={isMuted ? 'Unmute' : 'Mute'}
+      >
+        {isMuted ? (
+          <VolumeX size={18} />
+        ) : (
+          <Volume size={18} />
+        )}
+      </button>
+      
       <Slider
-        defaultValue={[volume]}
-        value={[volume]}
-        max={1}
-        step={0.01}
+        value={[isMuted ? 0 : volume * 100]}
+        min={0}
+        max={100}
+        step={1}
         onValueChange={handleVolumeChange}
-        className="flex-1"
+        className="w-24"
       />
+      
+      {showLabel && (
+        <span className="text-xs text-muted-foreground w-8">
+          {Math.round(isMuted ? 0 : volume * 100)}%
+        </span>
+      )}
     </div>
   );
 };

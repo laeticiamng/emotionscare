@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { normalizeUserMode } from '@/types/userMode';
+import { normalizeUserMode, UserModeType } from '@/types/userMode';
+import { compareRoles } from '@/utils/roleUtils';
 
 export interface DashboardKpi {
   key: string;
@@ -41,148 +42,132 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
 }) => {
   const navigate = useNavigate();
   const { userMode } = useUserMode();
+  const normalizedUserMode = normalizeUserMode(userMode);
   
   // Helper function to determine trend direction
   const getTrendDirection = (trend: number | { value: number; direction: 'up' | 'down' | 'neutral' }) => {
     if (typeof trend === 'number') {
       return trend > 0 ? 'up' : trend < 0 ? 'down' : 'neutral';
     }
-    return trend.direction;
-  };
-  
-  // Helper function to get trend value
-  const getTrendValue = (trend: number | { value: number; direction: 'up' | 'down' | 'neutral' }) => {
-    if (typeof trend === 'number') {
-      return Math.abs(trend);
-    }
-    return trend.value;
+    return trend?.direction || 'neutral';
   };
 
-  // Get greeting based on user mode
-  const getGreeting = () => {
-    const normalizedMode = normalizeUserMode(userMode);
+  // Helper function to determine if it's a B2B user mode
+  const isB2BUserMode = () => {
+    return normalizedUserMode === 'b2b-user' || normalizedUserMode === 'b2b_user';
+  };
+
+  // Helper function to determine if it's a B2B admin mode
+  const isB2BAdminMode = () => {
+    return normalizedUserMode === 'b2b-admin' || normalizedUserMode === 'b2b_admin';
+  };
+
+  // Helper function for determining shortcuts based on user mode
+  const getFilteredShortcuts = () => {
+    // For B2B users, filter out certain shortcuts
+    if (isB2BUserMode()) {
+      return shortcuts.filter(shortcut => !shortcut.to.includes('/marketplace'));
+    }
     
-    switch(normalizedMode) {
-      case 'b2b-admin':
-      case 'b2b_admin':
-        return "Tableau RH";
-      case 'b2b-user':
-      case 'b2b_user':
-        return "Bonjour";
-      case 'b2c':
-        return "Bienvenue";
-      default:
-        return "Bonjour";
+    // For B2B admins, show admin specific shortcuts
+    if (isB2BAdminMode()) {
+      return shortcuts.filter(shortcut => 
+        !shortcut.to.includes('/marketplace') && 
+        !shortcut.to.includes('/personal')
+      );
     }
-  };
-  
-  // Check if it's B2B mode
-  const isB2BMode = () => {
-    const normalizedMode = normalizeUserMode(userMode);
-    return normalizedMode === 'b2b-admin' || 
-           normalizedMode === 'b2b_admin' || 
-           normalizedMode === 'b2b-user' || 
-           normalizedMode === 'b2b_user';
+    
+    // For B2C users, show all shortcuts
+    return shortcuts;
   };
 
-  // Check if it's B2B Admin mode
-  const isB2BAdmin = () => {
-    const normalizedMode = normalizeUserMode(userMode);
-    return normalizedMode === 'b2b-admin' || normalizedMode === 'b2b_admin';
+  // Get greeting based on time of day
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    
+    if (hour < 12) {
+      return "Bonjour";
+    } else if (hour < 18) {
+      return "Bon après-midi";
+    } else {
+      return "Bonsoir";
+    }
   };
-  
-  // Check if it's B2B User mode
-  const isB2BUser = () => {
-    const normalizedMode = normalizeUserMode(userMode);
-    return normalizedMode === 'b2b-user' || normalizedMode === 'b2b_user';
+
+  // Get custom title based on user mode
+  const getTitle = () => {
+    if (isB2BUserMode()) {
+      return "Tableau de bord professionnel";
+    } else if (isB2BAdminMode()) {
+      return "Gestion d'équipe";
+    } else {
+      return "Votre espace personnel";
+    }
   };
-  
+
   return (
-    <div className={`p-6 rounded-2xl mb-8 animate-fade-in ${
-      isB2BUser() ? 'bg-blue-50 dark:bg-blue-900/20' : 
-      isB2BAdmin() ? 'bg-purple-50 dark:bg-purple-900/20' : 
-      'bg-primary-50 dark:bg-primary-900/20'
-    }`}>
-      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        {/* Welcome message */}
-        <div>
-          <h1 className={`text-h1 mb-1 ${
-            isB2BUser() ? 'text-blue-700 dark:text-blue-300' : 
-            isB2BAdmin() ? 'text-purple-700 dark:text-purple-300' : 
-            'text-primary-700 dark:text-primary-300'
-          }`}>
-            {getGreeting()}, {userName} 👋
-          </h1>
-          <p className="text-muted-foreground">
-            {isB2BAdmin() 
-              ? "Aperçu du bien-être collectif de l'équipe"
-              : "Voici un aperçu de votre journée"}
-          </p>
-        </div>
-        
-        {/* Quick shortcuts */}
-        <div className="flex flex-wrap gap-3">
-          {shortcuts.map((shortcut) => {
-            const Icon = shortcut.icon;
-            return (
-              <Button
-                key={shortcut.to}
-                variant="outline"
-                size="sm"
-                onClick={() => navigate(shortcut.to)}
-                className="shadow-sm hover:shadow-md"
-                aria-label={shortcut.label}
-              >
-                <Icon size={16} className="mr-2" />
-                {shortcut.label}
-              </Button>
-            );
-          })}
-        </div>
+    <div className="flex flex-col gap-6">
+      {/* Header with greeting */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">
+          {getGreeting()}, {userName}
+        </h1>
+        <p className="text-muted-foreground">
+          {getTitle()}
+        </p>
       </div>
       
-      {/* KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
-        {kpis.map((kpi) => {
-          const Icon = kpi.icon;
-          return (
-            <Card key={kpi.key} className="border border-primary-100 dark:border-primary-800 transition-all duration-300 hover:shadow-md">
-              <CardContent className="flex items-center p-4">
-                <div className={`p-2 rounded-full mr-4 ${
-                  isB2BUser() ? 'bg-blue-100 dark:bg-blue-800/50' : 
-                  isB2BAdmin() ? 'bg-purple-100 dark:bg-purple-800/50' : 
-                  'bg-primary-100 dark:bg-primary-800/50'
+      {/* KPIs section */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {kpis.map((kpi) => (
+          <Card key={kpi.key}>
+            <CardContent className="p-4 flex flex-col">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground text-sm">{kpi.label}</span>
+                <kpi.icon className="h-4 w-4 text-muted-foreground" />
+              </div>
+              
+              <div className="text-2xl font-bold mt-2">{kpi.value}</div>
+              
+              {kpi.trend && (
+                <div className={`text-xs mt-1 flex items-center ${
+                  getTrendDirection(kpi.trend) === 'up' ? 'text-green-600' : 
+                  getTrendDirection(kpi.trend) === 'down' ? 'text-red-600' : 'text-gray-500'
                 }`}>
-                  <Icon className={`w-6 h-6 ${
-                    isB2BUser() ? 'text-blue-500 dark:text-blue-300' : 
-                    isB2BAdmin() ? 'text-purple-500 dark:text-purple-300' : 
-                    'text-primary-500 dark:text-primary-300'
-                  }`} />
+                  {typeof kpi.trend === 'number' ? 
+                    `${kpi.trend > 0 ? '+' : ''}${kpi.trend}%` : 
+                    `${kpi.trend.value > 0 ? '+' : ''}${kpi.trend.value}%`
+                  }
+                  {' depuis la dernière semaine'}
                 </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">{kpi.label}</div>
-                  <div className="text-h3 text-foreground font-semibold">
-                    {isLoading ? "—" : kpi.value}
-                  </div>
-                  {kpi.trend && (
-                    <div className={`text-xs flex items-center ${
-                      getTrendDirection(kpi.trend) === 'up' 
-                        ? 'text-success-600 dark:text-success-400' 
-                        : getTrendDirection(kpi.trend) === 'down' 
-                          ? 'text-destructive-600 dark:text-destructive-400' 
-                          : 'text-muted-foreground'
-                    }`}>
-                      {getTrendDirection(kpi.trend) === 'up' && '↑ '}
-                      {getTrendDirection(kpi.trend) === 'down' && '↓ '}
-                      {getTrendDirection(kpi.trend) === 'neutral' && '• '}
-                      {getTrendValue(kpi.trend)}%
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Shortcuts section */}
+      <div>
+        <h2 className="text-lg font-medium mb-3">Actions rapides</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {getFilteredShortcuts().map((shortcut) => (
+            <Button
+              key={shortcut.to}
+              variant="outline"
+              className="h-auto p-4 justify-start text-left flex flex-col items-start gap-1"
+              onClick={() => navigate(shortcut.to)}
+            >
+              <div className="flex items-center gap-2">
+                <shortcut.icon className="h-5 w-5" />
+                <span>{shortcut.label}</span>
+              </div>
+              
+              {shortcut.description && (
+                <span className="text-xs text-muted-foreground">{shortcut.description}</span>
+              )}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );

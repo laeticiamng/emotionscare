@@ -25,6 +25,8 @@ const DraggableCard: React.FC<DraggableCardProps> = (props) => {
     position: 'relative' as 'relative',
   };
 
+  const valueString = props.value ? props.value.toString() : '';
+
   return (
     <div 
       ref={setNodeRef} 
@@ -46,7 +48,7 @@ const DraggableCard: React.FC<DraggableCardProps> = (props) => {
         </div>
         <KpiCard 
           title={props.title} 
-          value={props.value?.toString() || ''} 
+          value={valueString}
           icon={props.icon && <props.icon className="h-6 w-6" />}
           delta={props.delta} 
           subtitle={props.subtitle} 

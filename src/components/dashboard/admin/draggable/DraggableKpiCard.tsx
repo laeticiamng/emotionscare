@@ -1,97 +1,51 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from "@dnd-kit/utilities";
+import { KpiCardProps } from '@/types';
+import KpiCard from '../KpiCard';
 
-interface DraggableKpiCardProps {
-  title: string;
-  value: string | number;
-  icon?: React.ReactNode;
-  description?: string;
-  className?: string;
-  onClick?: () => void;
-  // Additional props for extended functionality
-  trend?: number;
-  status?: 'positive' | 'negative' | 'warning' | 'neutral';
-  trendText?: string;
-  details?: React.ReactNode;
-  period?: string;
-  loading?: boolean;
-}
+// Component for a draggable KPI card
+const DraggableKpiCard = (props: KpiCardProps & { id: string }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: props.id || props.title });
 
-const DraggableKpiCard: React.FC<DraggableKpiCardProps> = ({
-  title,
-  value,
-  trend,
-  icon,
-  description,
-  status = 'neutral',
-  onClick,
-  className = "",
-  trendText,
-  details,
-  period,
-  loading,
-}) => {
-  const getStatusColor = () => {
-    switch (status) {
-      case 'positive':
-        return 'text-green-600';
-      case 'negative':
-        return 'text-red-600';
-      case 'warning':
-        return 'text-yellow-600';
-      default:
-        return 'text-muted-foreground';
-    }
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : 1,
+    opacity: isDragging ? 0.8 : 1,
+    position: 'relative' as 'relative',
   };
 
-  const getTrendIcon = () => {
-    if (trend === undefined) return null;
-    
-    return trend > 0 ? (
-      <span className="text-green-600">↑</span>
-    ) : trend < 0 ? (
-      <span className="text-red-600">↓</span>
-    ) : (
-      <span className="text-gray-600">→</span>
-    );
+  // Pass only the KpiCard props without DnD specific props
+  const cardProps: KpiCardProps = {
+    title: props.title,
+    value: props.value,
+    icon: props.icon,
+    delta: props.delta,
+    subtitle: props.subtitle,
+    ariaLabel: props.ariaLabel,
+    onClick: props.onClick,
+    className: props.className
   };
 
   return (
-    <Card className={`${className} cursor-move`} onClick={onClick}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
-          {title}
-        </CardTitle>
-        {icon && <div className="h-4 w-4 text-muted-foreground">{icon}</div>}
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="animate-pulse h-9 bg-muted rounded" />
-        ) : (
-          <div className="text-2xl font-bold">{value}</div>
-        )}
-        
-        {(trend !== undefined || trendText) && (
-          <p className={`text-xs ${getStatusColor()} flex items-center gap-1 mt-1`}>
-            {getTrendIcon()}
-            {trendText || `${Math.abs(trend || 0)}% depuis ${period || 'le dernier mois'}`}
-          </p>
-        )}
-        
-        {description && (
-          <p className="text-xs text-muted-foreground mt-2">
-            {description}
-          </p>
-        )}
-        
-        {details && (
-          <div className="mt-2 pt-2 border-t text-xs text-muted-foreground">
-            {details}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className={`transition-all duration-300 ${isDragging ? 'scale-105 shadow-md' : ''}`}
+    >
+      <div {...attributes} {...listeners}>
+        <KpiCard {...cardProps} />
+      </div>
+    </div>
   );
 };
 

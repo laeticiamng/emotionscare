@@ -1,49 +1,43 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Moon, Sun, Bell } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { User } from '@/types/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 
 interface PremiumAdminHeaderProps {
-  user?: User | null;
+  title: string;
+  description?: string;
+  avatarUrl?: string;
+  userName?: string;
 }
 
-const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({ user }) => {
-  const { theme, setTheme, isDarkMode } = useTheme();
-  
-  const toggleTheme = () => {
-    setTheme(isDarkMode ? 'light' : 'dark');
-  };
-  
+const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
+  title,
+  description,
+  avatarUrl,
+  userName = 'Admin'
+}) => {
+  const { isDarkMode } = useTheme();
+
   return (
-    <div className="flex justify-between items-center mb-6 bg-card rounded-lg p-3">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Tableau de bord Premium</h1>
-        <p className="text-muted-foreground">
-          Bienvenue {user?.name || 'Administrateur'}, voici vos analytics émotionnelles
-        </p>
-      </div>
-      
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <Input
-            type="search"
-            placeholder="Rechercher..."
-            className="md:w-[200px] lg:w-[300px]"
-          />
+    <div className={`p-4 rounded-lg mb-6 ${
+      isDarkMode 
+        ? 'bg-slate-800/50 border border-slate-700' 
+        : 'bg-slate-50 border border-slate-100'
+    }`}>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold">{title}</h1>
+          {description && <p className="text-muted-foreground">{description}</p>}
         </div>
         
-        <Button variant="outline" size="icon" onClick={toggleTheme}>
-          {isDarkMode ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
-        </Button>
-        
-        <Button variant="outline" size="icon">
-          <Bell className="h-[1.2rem] w-[1.2rem]" />
-        </Button>
-        
-        <Button>Dashboard</Button>
+        <div className="flex items-center gap-4">
+          <Button variant="outline">Export</Button>
+          <Avatar>
+            <AvatarImage src={avatarUrl} />
+            <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        </div>
       </div>
     </div>
   );

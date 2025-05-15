@@ -1,42 +1,48 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
-interface ThemeContextType {
+export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  isDarkMode: boolean;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
+const initialState: ThemeContextType = {
   theme: 'system',
-  setTheme: () => {}
-});
+  setTheme: () => null,
+  isDarkMode: false,
+};
 
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+export const ThemeContext = createContext<ThemeContextType>(initialState);
+
+export const ThemeProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [theme, setTheme] = useState<Theme>(() => {
-    const storedTheme = localStorage.getItem('theme');
-    return (storedTheme as Theme) || 'system';
+    const storedTheme = localStorage.getItem('theme') as Theme;
+    return storedTheme || 'system';
   });
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
     
-    if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      
-      root.classList.remove('light', 'dark');
-      root.classList.add(systemTheme);
-      return;
-    }
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const currentTheme = theme === 'system' ? systemTheme : theme;
     
     root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+    root.classList.add(currentTheme);
+    
+    setIsDarkMode(currentTheme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, isDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -1,135 +1,128 @@
 
 import React from 'react';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerClose } from '@/components/ui/drawer';
-import { Separator } from '@/components/ui/separator';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward, Volume2, X } from 'lucide-react';
-import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types/music';
+import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import MusicProgressBar from './MusicProgressBar';
 import VolumeControl from './VolumeControl';
-import TrackInfo from './TrackInfo';
+import { MusicDrawerProps, MusicTrack } from '@/types';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   children,
-  isOpen,
-  open,
+  side = "bottom",
+  open = false,
   onOpenChange,
-  onClose,
-  currentTrack,
-  playlist
+  currentTrack = null,
+  playlist = null
 }) => {
-  // Mock values for the player state
-  const isPlaying = false;
-  const volume = 0.7;
-  const currentTime = 45;
-  const duration = 180;
-  const isMuted = false;
+  const [currentTime, setCurrentTime] = React.useState(0);
+  const [duration, setDuration] = React.useState(0);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [volume, setVolume] = React.useState(0.5);
+  const [isMuted, setIsMuted] = React.useState(false);
   
-  // Mock handlers
-  const handlePlay = () => console.log('Play');
-  const handlePause = () => console.log('Pause');
-  const handlePrev = () => console.log('Previous');
-  const handleNext = () => console.log('Next');
-  const handleVolumeChange = (value: number) => console.log('Volume:', value);
-  const handleMuteToggle = () => console.log('Toggle mute');
-  const handleSeek = (value: number) => console.log('Seek to:', value);
-
-  if (!currentTrack) return null;
+  // Handle play/pause
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+  
+  // Handle seeking
+  const handleSeek = (value: number) => {
+    setCurrentTime(value);
+  };
+  
+  // Handle volume change
+  const handleVolumeChange = (value: number) => {
+    setVolume(value / 100);
+  };
+  
+  // Handle mute toggle
+  const handleMuteToggle = () => {
+    setIsMuted(!isMuted);
+  };
+  
+  // Format time function
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
 
   return (
-    <Drawer open={isOpen || open} onOpenChange={onOpenChange}>
-      {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
-      <DrawerContent className="max-h-[85vh]">
-        <div className="container max-w-3xl">
-          <DrawerHeader className="flex flex-row justify-between items-center">
-            <DrawerTitle>{playlist ? playlist.name : 'Music Player'}</DrawerTitle>
-            <DrawerClose asChild>
-              <Button variant="ghost" size="icon" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
-            </DrawerClose>
-          </DrawerHeader>
-
-          <div className="p-4">
-            {/* Album cover and track info */}
-            <div className="flex flex-col items-center mb-6">
-              <div className="w-48 h-48 rounded-lg overflow-hidden bg-muted mb-4">
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="px-4 pt-3 pb-6">
+        <DrawerHeader className="px-0">
+          <DrawerTitle>
+            {currentTrack?.title || 'Musique'}
+          </DrawerTitle>
+        </DrawerHeader>
+        
+        {currentTrack && (
+          <div className="space-y-4">
+            {/* Album cover if available */}
+            {currentTrack.cover_url && (
+              <div className="flex justify-center">
                 <img 
-                  src={currentTrack?.coverUrl || currentTrack?.cover || '/images/music-placeholder.jpg'} 
-                  alt={currentTrack.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/music-placeholder.jpg';
-                  }}
+                  src={currentTrack.cover_url} 
+                  alt={currentTrack.title} 
+                  className="w-32 h-32 object-cover rounded-md shadow-md"
                 />
               </div>
-              <h3 className="text-lg font-semibold">{currentTrack.title}</h3>
-              <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
+            )}
+            
+            {/* Track info */}
+            <div className="text-center">
+              <h3 className="font-medium">{currentTrack.title}</h3>
+              <p className="text-sm text-muted-foreground">{currentTrack.artist || 'Unknown Artist'}</p>
             </div>
             
             {/* Progress bar */}
             <MusicProgressBar 
-              value={currentTime} 
-              max={duration}
+              value={currentTime}
+              max={duration} 
               currentTime={currentTime}
               duration={duration}
               onSeek={handleSeek}
-              className="mb-2"
+              className="px-2"
               showTimestamps={true}
             />
             
             {/* Playback controls */}
-            <div className="flex items-center justify-center gap-4 mt-6">
-              <Button variant="ghost" size="icon" onClick={handlePrev}>
-                <SkipBack className="h-6 w-6" />
+            <div className="flex items-center justify-center gap-4">
+              <Button variant="ghost" size="icon" aria-label="Previous track">
+                <SkipBack className="h-4 w-4" />
               </Button>
               
               <Button 
-                variant="default" 
+                variant="outline" 
                 size="icon" 
-                className="h-12 w-12 rounded-full"
-                onClick={isPlaying ? handlePause : handlePlay}
+                className="rounded-full w-10 h-10" 
+                onClick={handlePlayPause}
+                aria-label={isPlaying ? 'Pause' : 'Play'}
               >
-                {isPlaying ? (
-                  <Pause className="h-6 w-6" />
-                ) : (
-                  <Play className="h-6 w-6 ml-1" />
-                )}
+                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
               </Button>
               
-              <Button variant="ghost" size="icon" onClick={handleNext}>
-                <SkipForward className="h-6 w-6" />
+              <Button variant="ghost" size="icon" aria-label="Next track">
+                <SkipForward className="h-4 w-4" />
               </Button>
             </div>
             
             {/* Volume control */}
-            <div className="flex items-center gap-3 mt-6">
-              <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <div className="flex justify-center">
               <VolumeControl 
-                volume={volume} 
-                onVolumeChange={handleVolumeChange}
+                volume={volume}
+                onChange={handleVolumeChange}
                 isMuted={isMuted}
                 onMuteToggle={handleMuteToggle}
-                className="w-full"
-                onChange={handleVolumeChange}
-                showLabel={false}
+                className="mt-2"
+                showLabel={true}
               />
             </div>
-            
-            {/* Playlist tracks */}
-            {playlist && playlist.tracks && playlist.tracks.length > 0 && (
-              <>
-                <Separator className="my-6" />
-                <h4 className="font-medium mb-3">Playlist Tracks</h4>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {playlist.tracks.map(track => (
-                    <TrackInfo key={track.id} track={track} />
-                  ))}
-                </div>
-              </>
-            )}
           </div>
-        </div>
+        )}
+        
+        {children}
       </DrawerContent>
     </Drawer>
   );

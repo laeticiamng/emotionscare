@@ -1,47 +1,42 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types/music';
+import { ProgressBarProps } from '@/types';
 
 const MusicProgressBar: React.FC<ProgressBarProps> = ({
-  value,
+  value = 0,
   max = 100,
   currentTime = 0,
-  duration = 100,
+  duration = 0,
   onSeek,
-  className = "",
-  formatTime,
+  className = '',
+  formatTime = (seconds) => {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  },
   showTimestamps = true
 }) => {
-  const defaultFormatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
-  const timeFormatter = formatTime || defaultFormatTime;
-  const currentTimeValue = timeFormatter(currentTime);
-  const totalTimeValue = timeFormatter(duration);
-
   const handleValueChange = (values: number[]) => {
-    if (onSeek && values[0] !== undefined) {
+    if (onSeek) {
       onSeek(values[0]);
     }
   };
 
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`flex flex-col gap-1 w-full ${className}`}>
       <Slider
-        defaultValue={[0]}
         value={[value]}
         max={max}
         step={1}
         onValueChange={handleValueChange}
+        className="cursor-pointer"
       />
+      
       {showTimestamps && (
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{currentTimeValue}</span>
-          <span>{totalTimeValue}</span>
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
         </div>
       )}
     </div>
