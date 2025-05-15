@@ -1,19 +1,23 @@
 
-// Types liés au player audio
 export interface UseAudioPlayerStateReturn {
-  isPlaying: boolean;
-  isMuted: boolean;
+  playing: boolean;
+  muted: boolean;
   volume: number;
-  currentTime: number;
   duration: number;
-  isLoading: boolean;
-  error: Error | null;
+  currentTime: number;
   progress: number;
-  audioRef: React.RefObject<HTMLAudioElement>;
-  togglePlay: () => void;
+  loading: boolean;
+  togglePlayPause: () => void;
   toggleMute: () => void;
   setVolume: (volume: number) => void;
   seek: (time: number) => void;
-  load: (url: string) => void;
-  formatTime: (seconds: number) => string;
+}
+
+export interface EnhancedMusicVisualizerProps {
+  height?: number;
+  showControls?: boolean;
+  mood?: string;
+  intensity?: number;
+  volume?: number;
+  className?: string;
 }

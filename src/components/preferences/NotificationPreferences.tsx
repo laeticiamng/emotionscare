@@ -21,7 +21,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
 
   const handleToggleEmail = (preference: NotificationPreference) => {
     const emailEnabled = preference.emailEnabled !== undefined ? preference.emailEnabled : 
-                        (preference.channels?.email || false);
+                        (preference.channels && preference.channels.email || false);
     
     const updatedPreference = {
       ...preference,
@@ -41,7 +41,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
 
   const handleTogglePush = (preference: NotificationPreference) => {
     const pushEnabled = preference.pushEnabled !== undefined ? preference.pushEnabled : 
-                       (preference.channels?.push || false);
+                       (preference.channels && preference.channels.push || false);
     
     const updatedPreference = {
       ...preference,
@@ -107,9 +107,9 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
             const preferenceId = preference.type || String(index);
             const isUpdating = updatingId === preferenceId;
             const emailEnabled = preference.emailEnabled !== undefined ? preference.emailEnabled : 
-                                (preference.channels?.email || false);
+                                (preference.channels && preference.channels.email || false);
             const pushEnabled = preference.pushEnabled !== undefined ? preference.pushEnabled : 
-                               (preference.channels?.push || false);
+                               (preference.channels && preference.channels.push || false);
             
             // Get the type label, handling both strings and objects
             let typeName = 'Notification';

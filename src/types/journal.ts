@@ -1,5 +1,4 @@
 
-// Types liés au journal
 export interface JournalEntry {
   id: string;
   title: string;

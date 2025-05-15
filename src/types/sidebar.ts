@@ -1,10 +1,8 @@
 
-// Types liés à la sidebar
 export interface SidebarContextType {
   collapsed: boolean;
-  toggleCollapse: () => void;
-  setCollapsed: (collapsed: boolean) => void;
-  width: number;
-  collapsedWidth: number;
-  expandedWidth: number;
+  toggleCollapsed: () => void;
+  isOpen?: boolean;
+  setIsOpen?: (isOpen: boolean) => void;
+  isMobile?: boolean;
 }

@@ -1,20 +1,20 @@
 
-// Types liés aux graphiques
-import * as React from "react";
+export interface ChartConfig {
+  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar';
+  data: {
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor?: string | string[];
+      borderColor?: string | string[];
+      borderWidth?: number;
+    }[];
+  };
+  options?: any;
+}
 
-// Format: { THEME_NAME: CSS_SELECTOR }
-export const THEMES = { light: "", dark: ".dark" } as const;
-
-export type ChartConfig = {
-  [k in string]: {
-    label?: React.ReactNode;
-    icon?: React.ComponentType;
-  } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  );
-};
-
-export type ChartContextProps = {
-  config: ChartConfig;
-};
+export interface ChartContextProps {
+  period: 'day' | 'week' | 'month' | 'year';
+  setPeriod: (period: 'day' | 'week' | 'month' | 'year') => void;
+}

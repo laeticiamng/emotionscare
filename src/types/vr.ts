@@ -1,77 +1,74 @@
 
-// Types liés à la réalité virtuelle
 export interface VRSessionTemplate {
   id: string;
-  title: string;
+  name?: string;
   description?: string;
   duration: number;
+  type?: string;
+  thumbnail?: string;
+  videoUrl?: string;
   emotion?: string;
-  tags?: string[];
-  theme?: string;
-  is_audio_only?: boolean;
-  preview_url?: string;
+  
+  // Add missing properties
+  title: string;
   audio_url?: string;
-  audioUrl?: string;
   emotion_target?: string;
   emotionTarget?: string;
-  difficulty?: string;
+  lastUsed?: string | Date;
+  preview_url?: string;
+  is_audio_only?: boolean;
   benefits?: string[];
+  difficulty?: string;
+  theme?: string;
+  tags?: string[];
+  imageUrl?: string;
   thumbnailUrl?: string;
   category?: string;
   completionRate?: number;
-  completion_rate?: number;
   recommendedMood?: string;
-  recommended_mood?: string;
-  name?: string;
-  lastUsed?: string | Date;
-  thumbnail?: string;
-  imageUrl?: string;
-  videoUrl?: string;
 }
 
 export interface VRSession {
   id: string;
-  template_id: string;
-  user_id: string;
-  start_time: Date;
-  end_time?: Date;
+  templateId: string;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  duration?: number;
   completed: boolean;
-  mood_before?: string;
-  mood_after?: string;
-  score?: number;
+  emotionBefore?: string;
+  emotionAfter?: string;
   notes?: string;
+  rating?: number;
+  
+  // Add missing properties
   date?: string;
   startedAt?: string;
   duration_seconds?: number;
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
   isCompleted?: boolean;
-  templateId?: string;
-  userId?: string;
-  startTime?: string | Date;
-  endTime?: string | Date;
+  completedAt?: string | Date;
+  emotionTarget?: string;
 }
 
 export interface VRHistoryListProps {
-  userId?: string;
-  limit?: number;
-  showFilters?: boolean;
   templates?: VRSessionTemplate[];
   sessions?: VRSession[];
   onSelectTemplate?: (template: VRSessionTemplate) => void;
   onSelectSession?: (session: VRSession) => void;
   loading?: boolean;
-  onSelect?: (template: VRSessionTemplate) => void;
-  title?: string;
-  emptyMessage?: string;
-  className?: string;
 }
 
 export interface VRSessionWithMusicProps {
   template?: VRSessionTemplate;
   onComplete?: (sessionData: VRSession) => void;
   onExit?: () => void;
+  
+  // Add missing properties
   session?: VRSession;
   onSessionComplete?: () => void;
   isAudioOnly?: boolean;
@@ -82,21 +79,16 @@ export interface VRSessionWithMusicProps {
   templateId?: string;
 }
 
-export interface VRTemplateGridProps {
-  templates?: VRSessionTemplate[];
-  onSelectTemplate?: (template: VRSessionTemplate) => void;
-  filter?: string;
-  isLoading?: boolean;
-}
+export interface VRSessionWithMusicPropsType extends VRSessionWithMusicProps {}
 
-export interface VRSessionWithMusicPropsType {
-  template: VRSessionTemplate;
-  onComplete?: (sessionData: VRSession) => void;
-  onExit?: () => void;
+export interface VRTemplateGridProps {
+  templates: VRSessionTemplate[];
+  onSelectTemplate: (template: VRSessionTemplate) => void;
+  loading?: boolean;
 }
 
 export interface VRSessionHistoryProps {
-  sessions?: VRSession[];
-  isLoading?: boolean;
-  onViewDetails?: (sessionId: string) => void;
+  userId?: string;
+  limit?: number;
+  onViewDetails?: (session: VRSession) => void;
 }

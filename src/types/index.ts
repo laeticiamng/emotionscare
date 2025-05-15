@@ -109,7 +109,8 @@ export type {
 
 // Exports des types liés au player audio
 export type {
-  UseAudioPlayerStateReturn
+  UseAudioPlayerStateReturn,
+  EnhancedMusicVisualizerProps
 } from './audio-player';
 
 // Exports des types liés aux graphiques
@@ -124,7 +125,7 @@ export type {
   ActivityFiltersState,
   AnonymousActivity,
   ActivityStats
-} from './activity';
+} from './activity-logs/types';
 
 // Exports des types liés au coaching
 export type {
@@ -135,16 +136,6 @@ export type {
   EmotionalTrend,
   CoachNotification
 } from './coach';
-
-// Export du type EnhancedMusicVisualizerProps
-export interface EnhancedMusicVisualizerProps {
-  height?: number;
-  showControls?: boolean;
-  mood?: string;
-  intensity?: number;
-  volume?: number;
-  className?: string;
-}
 
 // Types génériques utilisés dans différentes parties de l'application
 export interface Story {
