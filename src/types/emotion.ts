@@ -39,7 +39,7 @@ export interface EmotionResult {
   transcript?: string;
   emojis?: string[] | string;
   timestamp?: string;
-  date?: string;
+  date?: string | Date;
   triggers?: string[];
   feedback?: string;
   ai_feedback?: string;
@@ -110,4 +110,15 @@ export interface EmotionPrediction {
   name?: string;
   intensity?: number;
   score?: number;
+}
+
+export interface VoiceEmotionScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  autoStart?: boolean;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  anonymized?: boolean;
 }

@@ -1,23 +1,52 @@
 
-// Export types for the gamification system
-export type { 
-  Challenge,
-  Badge,
-  GamificationStats,
-  LeaderboardEntry
-} from './types';
-
-// Define local types if needed
-export interface GamificationAction {
-  type: string;
-  payload: any;
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  iconUrl?: string;
+  level?: number;
+  unlocked?: boolean;
+  category?: string;
+  progress?: number;
+  unlockedAt?: string;
 }
 
-export interface GamificationEvent {
+export interface Challenge {
   id: string;
-  userId: string;
-  type: string;
+  title: string;
+  description: string;
   points: number;
-  metadata?: any;
-  timestamp: string;
+  progress: number;
+  completed: boolean;
+  deadline?: string;
+  category?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  iconUrl?: string;
+}
+
+export interface GamificationStats {
+  points: number;
+  level: number;
+  nextLevelPoints: number;
+  rank: number;
+  streak: number;
+  nextLevel: number;
+  achievements: Badge[];
+  badges: Badge[];
+  completedChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  progressToNextLevel: number;
+  challenges: Challenge[];
+  recentAchievements: Badge[];
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  points: number;
+  level: number;
+  position: number;
+  avatar?: string;
+  badges?: Badge[]; // Added to fix TS error
 }

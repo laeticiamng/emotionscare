@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Bell, Settings, X, Check, Clock, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,8 +24,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ onClose }) => {
   const { 
     notifications, 
     markAsRead, 
-    markAllAsRead, 
-    deleteNotification,
+    markAllAsRead,
     unreadCount 
   } = useNotifications();
   const [activeTab, setActiveTab] = useState<string>('all');
@@ -33,13 +33,13 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ onClose }) => {
   const filteredNotifications = notifications.filter(notification => {
     if (activeTab === 'all') return true;
     if (activeTab === 'unread') return !notification.read;
-    if (activeTab === 'alerts') return notification.type === 'alert';
-    return true;
+    return notification.type === activeTab as NotificationType;
   });
 
   // Get notification icon based on type
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
+      case 'warning':
       case 'alert':
         return <AlertTriangle className="h-4 w-4 text-warning" />;
       case 'reminder':
@@ -109,7 +109,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ onClose }) => {
           <TabsList className="w-full">
             <TabsTrigger value="all" className="flex-1">Toutes</TabsTrigger>
             <TabsTrigger value="unread" className="flex-1">Non lues</TabsTrigger>
-            <TabsTrigger value="alerts" className="flex-1">Alertes</TabsTrigger>
+            <TabsTrigger value="warning" className="flex-1">Alertes</TabsTrigger>
           </TabsList>
         </div>
         
