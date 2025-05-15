@@ -1,4 +1,3 @@
-
 // Central export file for all types used in the application
 // All components should import their types from this file
 
@@ -27,12 +26,12 @@ export type {
 export type {
   UserModeType,
   UserModeContextType
-} from './userMode';
+} from './types';
 
 // Exports for sidebar types
 export type {
   SidebarContextType
-} from './sidebar';
+} from './types';
 
 // Exports for music-related types
 export type {
@@ -108,7 +107,7 @@ export type {
 // Exports for journal types
 export type {
   JournalEntry
-} from './journal';
+} from './types';
 
 // Exports for audio player types
 export type {

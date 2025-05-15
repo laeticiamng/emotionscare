@@ -18,18 +18,25 @@ export interface Emotion {
 }
 
 export interface EmotionResult {
+  id?: string;
+  user_id?: string;
   emotion: string;
   score?: number;
   confidence?: number;
-  triggers?: string[];
-  recommendations?: string[];
-  feedback?: string;
+  dominantEmotion?: string;
+  primaryEmotion?: string;
   intensity?: number;
-  date?: string | Date;
-  emojis?: string[];
+  text?: string;
+  transcript?: string;
+  emojis?: string[] | string;
+  timestamp?: string;
+  date?: string;
+  triggers?: string[];
+  feedback?: string;
   ai_feedback?: string;
-  audioUrl?: string;
+  recommendations?: string[];
   audio_url?: string;
+  audioUrl?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -60,8 +67,18 @@ export interface LiveVoiceScannerProps {
 
 export interface EmotionalTeamViewProps {
   teamId?: string;
-  period?: string;
+  departmentId?: string;
+  users?: any[];
   anonymized?: boolean;
+  onUserClick?: (userId: string) => void;
+  period?: 'day' | 'week' | 'month' | 'year' | string;
+  userId?: string;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  onRefresh?: () => void;
 }
 
 export interface TeamOverviewProps {

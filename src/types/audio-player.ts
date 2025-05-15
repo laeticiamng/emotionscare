@@ -1,17 +1,16 @@
 
 export interface UseAudioPlayerStateReturn {
-  audioRef: React.RefObject<HTMLAudioElement>;
   isPlaying: boolean;
+  duration: number;
+  currentTime: number;
   volume: number;
   muted: boolean;
-  currentTime: number;
-  duration: number;
-  play: () => Promise<void>;
+  play: () => void;
   pause: () => void;
-  toggle: () => Promise<void>;
+  toggle: () => void;
+  seek: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  seek: (time: number) => void;
 }
 
 export interface EnhancedMusicVisualizerProps {

@@ -4,7 +4,7 @@ import { ProgressBarProps } from '@/types';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  max,
+  max = 100,
   currentTime = 0,
   duration = 0,
   formatTime = (seconds) => {
@@ -12,10 +12,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   },
-  handleProgressClick
+  handleProgressClick,
+  className = ''
 }) => {
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       <div 
         className="w-full h-2 bg-muted rounded-full overflow-hidden cursor-pointer"
         onClick={handleProgressClick}
