@@ -14,7 +14,10 @@ export interface User {
   preferences?: UserPreferences;
 }
 
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | 'user' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee' | 'moderator';
+// Add all roles that are used in both auth.ts and user.ts
+export type UserRole = 
+  'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | 'user' | 'manager' | 'wellbeing_manager' | 
+  'coach' | 'employee' | 'moderator' | 'professional' | 'individual';
 
 export interface AuthContextType {
   user: User | null;
@@ -70,7 +73,11 @@ export interface UserPreferences {
       end: string;
     };
   };
-  sound?: boolean;
+  sound?: boolean | {
+    volume?: number;
+    effects?: boolean;
+    music?: boolean;
+  };
   autoplayVideos?: boolean;
   dataCollection?: boolean;
   highContrast?: boolean;

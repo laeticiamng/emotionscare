@@ -74,3 +74,38 @@ export const normalizeRole = (role: string): UserRole => {
   
   return role as UserRole;
 };
+
+/**
+ * Check if the given role is an admin role
+ */
+export const isAdminRole = (role?: UserRole): boolean => {
+  if (!role) return false;
+  const normalizedRole = normalizeRole(role);
+  return normalizedRole === 'admin' || normalizedRole === 'b2b_admin';
+};
+
+/**
+ * Get a display name for a user role
+ */
+export const getRoleName = (role: UserRole): string => {
+  const normalizedRole = normalizeRole(role);
+  
+  switch(normalizedRole) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_admin':
+      return 'Administrateur';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'admin':
+      return 'Administrateur système';
+    case 'manager':
+    case 'wellbeing_manager':
+      return 'Manager';
+    case 'employee':
+    case 'professional':
+      return 'Professionnel';
+    default:
+      return 'Utilisateur';
+  }
+};

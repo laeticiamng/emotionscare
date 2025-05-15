@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserModeType, UserModeContextType } from '@/types/userMode';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { normalizeUserMode } from '@/utils/userModeUtils';
 
 // Create a default context value
 const defaultUserModeContext: UserModeContextType = {
@@ -27,8 +28,9 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Function to update both state and localStorage
   const setUserMode = (newMode: UserModeType) => {
     console.log("Setting user mode to:", newMode);
-    setUserModeState(newMode);
-    setStoredMode(newMode);
+    const normalizedMode = normalizeUserMode(newMode);
+    setUserModeState(normalizedMode);
+    setStoredMode(normalizedMode);
   };
 
   // Sync state with localStorage on mount
@@ -37,7 +39,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     console.log("Retrieved user mode from localStorage:", savedMode);
     
     if (savedMode) {
-      const normalizedMode = savedMode as UserModeType;
+      const normalizedMode = normalizeUserMode(savedMode) as UserModeType;
       setMode(normalizedMode);
       setUserModeState(normalizedMode);
       console.log("User mode set to:", normalizedMode);
