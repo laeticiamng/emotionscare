@@ -1,77 +1,87 @@
-
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from '@/contexts/AuthContext';
+import { useQuery } from 'react-query';
+import { fetchEmotionsHistory } from '@/lib/scanService';
 import { EmotionResult } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getEmotionIcon } from '@/lib/emotionUtils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 interface HistoryTabContentProps {
-  emotionHistory: EmotionResult[];
+  userId?: string;
 }
 
-const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ emotionHistory }) => {
-  const formatDate = (dateValue: string | Date | undefined) => {
-    if (!dateValue) return 'Date inconnue';
-    try {
-      return format(new Date(dateValue), 'PPP', { locale: fr });
-    } catch (error) {
-      return 'Date invalide';
+const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ userId }) => {
+  const { user } = useAuth();
+  const currentUserId = userId || user?.id || '';
+  
+  const { data: emotions, isLoading, error } = useQuery(
+    ['emotionsHistory', currentUserId],
+    () => fetchEmotionsHistory(currentUserId),
+    {
+      enabled: !!currentUserId,
     }
-  };
+  );
+  
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-4">
+          Chargement de l'historique...
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="p-4">
+          Erreur lors du chargement de l'historique.
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold mb-4">Historique des scans émotionnels</h2>
-      
-      {emotionHistory.length > 0 ? (
-        <div className="grid gap-4">
-          {emotionHistory.map((result, index) => (
-            <Card key={result.id || `emotion-${index}`} className="overflow-hidden">
-              <CardHeader className="bg-muted/30 pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg capitalize">{result.emotion}</CardTitle>
-                  <span className="text-sm text-muted-foreground">
-                    {formatDate(result.date || result.timestamp)}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Intensité:</span>
-                    <span className="font-semibold">{Math.round((result.score || 0) * 100)}%</span>
-                  </div>
-                  
-                  <div className="w-full bg-muted rounded-full h-2.5 mb-2">
-                    <div 
-                      className="bg-primary h-2.5 rounded-full" 
-                      style={{ width: `${Math.round((result.score || 0) * 100)}%` }}
-                    ></div>
-                  </div>
-                  
-                  {result.text && (
-                    <div className="mt-2">
-                      <p className="text-sm italic">{result.text}</p>
+    <Card>
+      <CardHeader>
+        <CardTitle>Historique des émotions</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <ScrollArea className="h-[400px]">
+          <div className="divide-y">
+            {emotions && emotions.length > 0 ? (
+              emotions.map((emotion: EmotionResult) => {
+                const EmotionIcon = getEmotionIcon(emotion.emotion);
+                const formattedDate = emotion.date
+                  ? format(new Date(emotion.date), 'dd MMMM yyyy, HH:mm', { locale: fr })
+                  : 'Date inconnue';
+                
+                return (
+                  <div key={emotion.id} className="p-4 flex items-center space-x-4">
+                    {EmotionIcon && <EmotionIcon className="h-6 w-6 text-gray-500" />}
+                    <div>
+                      <div className="text-sm font-medium">{emotion.emotion}</div>
+                      <div className="text-xs text-muted-foreground">{formattedDate}</div>
+                      <div className="text-sm text-muted-foreground mt-2">
+                        {emotion.feedback || "No AI feedback available"}
+                      </div>
                     </div>
-                  )}
-                  
-                  {(result.ai_feedback || result.feedback) && (
-                    <div className="mt-2 p-3 bg-muted/50 rounded-md">
-                      <p className="text-sm">{result.ai_feedback || result.feedback}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 bg-muted/30 rounded-lg">
-          <p className="text-muted-foreground">Aucun historique disponible</p>
-          <p className="text-sm text-muted-foreground">Effectuez votre premier scan pour commencer à suivre vos émotions.</p>
-        </div>
-      )}
-    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="p-4 text-center text-muted-foreground">
+                Aucune émotion enregistrée.
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 };
 

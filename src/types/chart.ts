@@ -1,10 +1,12 @@
 
+import React from 'react';
+
 export interface ChartConfig {
-  type: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
+  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'scatter';
   data: {
     labels: string[];
     datasets: {
-      label: string;
+      label?: string;
       data: number[];
       backgroundColor?: string | string[];
       borderColor?: string | string[];
@@ -13,9 +15,13 @@ export interface ChartConfig {
       tension?: number;
     }[];
   };
-  options?: any;
+  options?: Record<string, any>;
 }
 
 export interface ChartContextProps {
-  children: React.ReactNode;
+  chartConfigs: Record<string, ChartConfig>;
+  addChartConfig: (id: string, config: ChartConfig) => void;
+  removeChartConfig: (id: string) => void;
+  updateChartConfig: (id: string, config: Partial<ChartConfig>) => void;
+  getChartConfig: (id: string) => ChartConfig | undefined;
 }

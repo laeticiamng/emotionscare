@@ -1,3 +1,4 @@
+
 // Central export file for all types used in the application
 // All components should import their types from this file
 
@@ -57,12 +58,13 @@ export type {
   NotificationType,
   NotificationPriority,
   NotificationFrequency,
-  NotificationTone,
   NotificationFilter,
   NotificationBadge,
   NotificationPreference,
   NotificationItemProps,
-  NotificationChannels
+  NotificationChannels,
+  NotificationTone,
+  NotificationSettings
 } from './notification';
 
 // Exports for VR-related types
@@ -96,8 +98,7 @@ export type {
   ChartData,
   DashboardStats,
   GamificationData,
-  GridPosition,
-  TeamOverviewProps as DashboardTeamOverviewProps
+  GridPosition
 } from './dashboard';
 
 // Exports for gamification types
@@ -120,6 +121,17 @@ export type {
   ChartConfig,
   ChartContextProps
 } from './chart';
+
+// Exports for progress bar types
+export type {
+  ProgressBarProps
+} from './progress-bar';
+
+// Exports for track info types
+export type {
+  TrackInfoProps,
+  VolumeControlProps
+} from './track-info';
 
 // Exports for activity logs types
 export type {

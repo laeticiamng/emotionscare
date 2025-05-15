@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,14 +58,14 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({
         <LiveEmotionResult 
           emotion={result.emotion} 
           confidence={result.confidence || 0} 
-          transcript={result.text || result.transcript}
+          transcript={result.text || result.transcript || ''}
         />
         
         {/* Additional information */}
-        {result.ai_feedback && (
+        {result.feedback && (
           <div className="bg-primary/10 p-3 rounded-md text-sm">
             <h4 className="font-medium mb-1">Analyse IA</h4>
-            <p className="text-muted-foreground">{result.ai_feedback}</p>
+            <p className="text-muted-foreground">{result.feedback}</p>
           </div>
         )}
         

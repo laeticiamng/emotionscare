@@ -1,96 +1,6 @@
 
 import { ReactNode } from 'react';
 
-/**
- * Notification frequencies
- */
-export type NotificationFrequency = 'immediately' | 'daily' | 'weekly' | 'never';
-
-/**
- * Types of notifications
- */
-export type NotificationType = 
-  | 'system' 
-  | 'emotion' 
-  | 'session' 
-  | 'achievement' 
-  | 'reminder'
-  | 'message'
-  | 'update'
-  | 'alert'
-  | 'info';
-
-/**
- * Notification tone options
- */
-export type NotificationTone = 'professional' | 'friendly' | 'supportive' | 'minimal';
-
-/**
- * Notification priorities
- */
-export type NotificationPriority = 'high' | 'medium' | 'low';
-
-/**
- * Notification channels configuration
- */
-export interface NotificationChannels {
-  email: boolean;
-  push: boolean;
-  inApp: boolean;
-}
-
-/**
- * Filter options for notifications
- */
-export interface NotificationFilter {
-  type?: NotificationType[];
-  read?: boolean;
-  timeRange?: 'today' | 'week' | 'month' | 'all';
-  priority?: NotificationPriority[];
-}
-
-/**
- * Interface for badge component
- */
-export interface NotificationBadge {
-  count: number;
-  max?: number;
-  variant?: 'default' | 'dot';
-}
-
-/**
- * Notification preference settings
- */
-export interface NotificationPreference {
-  type: NotificationType;
-  channels: NotificationChannels;
-  frequency: NotificationFrequency;
-  enabled?: boolean;
-}
-
-/**
- * Props for notification item component
- */
-export interface NotificationItemProps {
-  id: string;
-  title: string;
-  message?: string;
-  type: NotificationType;
-  timestamp: string | Date;
-  read: boolean;
-  priority?: NotificationPriority;
-  onClick?: () => void;
-  onMarkAsRead?: (id: string) => void;
-  icon?: ReactNode;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-}
-
-/**
- * Basic notification interface
- */
 export interface Notification {
   id: string;
   title: string;
@@ -98,12 +8,73 @@ export interface Notification {
   type: NotificationType;
   timestamp: string | Date;
   read: boolean;
+  actionUrl?: string;
+  actionLabel?: string;
+  sender_id?: string;
+  recipient_id?: string;
   priority?: NotificationPriority;
   user_id?: string;
-  action?: {
-    label: string;
-    url?: string;
-    type?: string;
-  };
-  metadata?: Record<string, any>;
+  created_at?: string;
+  createdAt?: string;
+  action?: ReactNode;
+}
+
+export type NotificationType = 'info' | 'warning' | 'error' | 'success' | 'reminder' | 'system' | 'emotion' | 'challenge' | 'achievement';
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface NotificationSettings {
+  enabled: boolean;
+  email: boolean;
+  push: boolean;
+  frequency: NotificationFrequency;
+  doNotDisturb: boolean;
+  doNotDisturbStart?: string;
+  doNotDisturbEnd?: string;
+}
+
+export type NotificationFrequency = 'realtime' | 'immediate' | 'daily' | 'weekly' | 'never';
+
+export interface NotificationTone {
+  sound: 'default' | 'subtle' | 'loud' | 'mute';
+  vibration: boolean;
+  led: boolean;
+}
+
+export interface NotificationPreference {
+  id?: string;
+  type?: string;
+  frequency: NotificationFrequency;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  channels?: NotificationChannels | string[];
+  priority?: NotificationPriority;
+  tone?: NotificationTone;
+}
+
+export interface NotificationChannels {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+  sms?: boolean;
+}
+
+export interface NotificationFilter {
+  type?: NotificationType | 'all';
+  read?: boolean;
+  startDate?: string;
+  endDate?: string;
+}
+
+export type NotificationBadge = {
+  count: number;
+  type?: NotificationType;
+};
+
+export interface NotificationItemProps {
+  notification: Notification;
+  onRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onAction?: (notification: Notification) => void;
+  showActions?: boolean;
+  compact?: boolean;
 }

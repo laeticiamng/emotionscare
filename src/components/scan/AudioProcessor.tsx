@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,7 +26,7 @@ const analyzeAudio = async (audioBlob: Blob): Promise<EmotionResult> => {
       'Listen to calming music',
       'Write in your journal about your day'
     ],
-    ai_feedback: "You sound quite positive today, with good emotional balance. Keep up the great energy!"
+    feedback: "You sound quite positive today, with good emotional balance. Keep up the great energy!"
   };
 };
 

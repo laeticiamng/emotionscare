@@ -11,6 +11,11 @@ export interface Emotion {
   emoji?: string;
   timestamp?: string;
   description?: string;
+  date?: string;
+  score?: number;
+  emotion?: string;
+  confidence?: number;
+  text?: string;
 }
 
 /**
@@ -28,11 +33,14 @@ export interface EmotionResult {
   date?: string;
   recommendations?: string[];
   feedback?: string;
+  ai_feedback?: string;
   triggers?: string[];
   emojis?: string[];
   id?: string;
   user_id?: string;
   text?: string;
+  transcript?: string;
+  audio_url?: string;
 }
 
 /**

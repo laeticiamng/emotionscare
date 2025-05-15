@@ -1,50 +1,53 @@
 
 export interface CoachMessage {
   id: string;
-  conversation_id: string;
-  sender: string;
-  text: string;
+  content: string;
   timestamp: string;
+  type: 'text' | 'question' | 'suggestion' | 'info';
+  isBot: boolean;
 }
 
-export type CoachEvent = {
+export interface CoachEvent {
   id: string;
-  type: string;
-  data: any;
-  timestamp: Date;
-};
+  type: 'session' | 'emotion' | 'achievement' | 'milestone';
+  date: string;
+  title: string;
+  description: string;
+}
 
-export type CoachAction = {
+export interface CoachAction {
   id: string;
-  type: string;
-  payload: any;
-  created_at?: string;
-};
+  title: string;
+  description: string;
+  urgency: 'low' | 'medium' | 'high';
+  completed: boolean;
+  due?: string;
+}
 
-export type EmotionalData = {
-  id?: string;
+export interface EmotionalData {
   emotion: string;
   intensity: number;
-  timestamp: Date | string;
-  context?: string;
-  userId?: string;
-  user_id?: string;
-};
+  date: string;
+}
 
-export type EmotionalTrend = {
+export interface EmotionalTrend {
   trend: 'improving' | 'declining' | 'stable';
-  period: 'day' | 'week' | 'month';
-  startDate: Date;
-  endDate: Date;
-  emotions: EmotionalData[];
-};
+  primaryEmotion: string;
+  secondaryEmotion?: string;
+  startDate: string;
+  endDate: string;
+  data: EmotionalData[];
+}
 
-export type CoachNotification = {
+export interface CoachNotification {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  timestamp: Date | string;
-  read?: boolean;
-  action?: CoachAction;
-};
+  type: 'alert' | 'suggestion' | 'achievement';
+  timestamp: string;
+  read: boolean;
+  action?: {
+    label: string;
+    url: string;
+  };
+}

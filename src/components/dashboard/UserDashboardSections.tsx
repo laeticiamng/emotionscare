@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -15,15 +14,16 @@ const exampleVRTemplate: VRSessionTemplate = {
   title: "Méditation en forêt",
   description: "Une session de méditation dans un environnement forestier paisible",
   duration: 600,
-  emotion: "calm",
   tags: ["meditation", "nature", "beginner"],
   is_audio_only: true,
   preview_url: "/images/vr/forest-preview.jpg",
   audio_url: "/audio/forest-meditation.mp3",
-  emotionTarget: "calm", // Utilisation de camelCase
+  emotionTarget: "calm",
+  emotion_target: "calm",
+  emotion: "calm",
   difficulty: "beginner",
   benefits: ["Réduction du stress", "Amélioration du sommeil"],
-  thumbnailUrl: "/images/vr/forest-preview.jpg", // Propriétés obligatoires
+  thumbnailUrl: "/images/vr/forest-preview.jpg",
   category: "meditation",
   completionRate: 92,
   recommendedMood: "stressed",
@@ -165,7 +165,6 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
     title: 'Session recommandée',
     description: 'Session recommandée basée sur votre état émotionnel',
     duration: 5 * 60, // Convert to seconds
-    emotion: latestEmotion.emotion,
     tags: ['recommandation', 'personnalisé'],
     // Additional properties for backward compatibility
     theme: 'Méditation guidée',
@@ -173,9 +172,12 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
     preview_url: '',
     audio_url: '/audio/meditation-guided.mp3',
     emotion_target: latestEmotion.emotion,
+    emotionTarget: latestEmotion.emotion,
+    emotion: latestEmotion.emotion,
     difficulty: 'easy',
-    benefits: ['Réduction du stress', 'Amélioration de la concentration']
-  } : undefined;
+    benefits: ['Réduction du stress', 'Amélioration de la concentration'],
+    thumbnailUrl: '/images/vr/default.jpg',
+  } : exampleVRTemplate;
   
   return (
     <DashboardSection 

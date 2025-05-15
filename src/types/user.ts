@@ -1,97 +1,89 @@
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | string;
+import { Theme, FontFamily, FontSize } from './theme';
+
+export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest';
 
 export interface User {
   id: string;
   email: string;
-  name?: string;
-  avatar_url?: string;
-  avatar?: string; // Added for compatibility
-  role?: UserRole;
+  first_name?: string;
+  last_name?: string;
+  role: UserRole;
   preferences?: UserPreferences;
-  createdAt?: string;
-  created_at?: string; // Added for compatibility
-  updatedAt?: string;
-  last_login?: string;
-  organization_id?: string;
-  department_id?: string;
-  department?: string; // Added for compatibility
   team_id?: string;
-  status?: 'active' | 'inactive' | 'pending';
+  teamId?: string;
+  avatar?: string;
+  department?: string;
+  department_id?: string;
   position?: string;
+  created_at?: string;
+  createdAt?: string;
   joined_at?: string;
   onboarded?: boolean;
-  job_title?: string;
   emotional_score?: number;
 }
 
 export interface UserPreferences {
-  theme?: string;
-  fontFamily?: string;
-  fontSize?: string;
-  notifications?: boolean | NotificationPreferences;
+  theme?: Theme;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  notifications?: boolean;
+  language?: string;
+  notifications_enabled?: boolean;
+  privacy?: string;
+  profileVisibility?: string;
   dashboardLayout?: DashboardLayout;
-  dataCollection?: {
-    allowTracking?: boolean;
-    shareAnonymousData?: boolean;
-  };
-  language?: string; // Added
-  notifications_enabled?: boolean; // Added
-  privacy?: any; // Added
-  profileVisibility?: string; // Added
-  soundEnabled?: boolean; // Added
-  emotionalCamouflage?: boolean; // Added
-  aiSuggestions?: boolean; // Added
-  fullAnonymity?: boolean; // Added
-  autoplayVideos?: boolean; // Added
-}
-
-export interface DashboardLayout {
-  kpis?: {
-    order: string[];
-    visible: string[];
-  };
-  widgets?: {
-    order: string[];
-    visible: string[];
-  };
-}
-
-export interface NotificationPreferences {
-  email?: boolean;
-  push?: boolean;
-  inApp?: boolean;
-  frequency?: string;
-  types?: string[];
 }
 
 export interface UserPreferencesState {
-  theme: string;
-  fontSize: string;
-  fontFamily: string;
-  notifications: boolean;
-  loading: boolean;
-  error: string | null;
+  theme?: Theme;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
 }
 
 export interface AuthContextType {
   user: User | null;
+  profile?: User;
   loading: boolean;
   error: Error | null;
   login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   logout: () => Promise<void>;
-  signup: (email: string, password: string, name?: string) => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
-  updateUser: (user: User) => Promise<void>;
-  isAuthenticated: boolean;
-  refreshUser: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
+  updatePreferences: (prefs: Partial<UserPreferences>) => Promise<void>;
+  sendPasswordResetEmail: (email: string) => Promise<void>;
+  resetPassword: (token: string, password: string) => Promise<void>;
 }
 
 export interface InvitationVerificationResult {
   valid: boolean;
-  message: string;
-  email?: string;
-  role?: string;
-  invitation_id?: string;
+  expired?: boolean;
+  alreadyAccepted?: boolean;
   error?: string;
+  invitation?: {
+    id: string;
+    email: string;
+    role: string;
+    expiresAt: string;
+  };
+}
+
+export type DashboardLayout = Record<string, {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}>;
+
+export interface NotificationPreferences {
+  enabled: boolean;
+  email: boolean;
+  push: boolean;
+  categories?: {
+    system: boolean;
+    activity: boolean;
+    social: boolean;
+    marketing: boolean;
+  };
+  frequency: string;
 }

@@ -1,26 +1,32 @@
 
 import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 
-const ThemeColorExample = () => {
+const ThemeColorExample: React.FC = () => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-      <div className="flex flex-col">
-        <div className="h-16 w-full rounded bg-primary"></div>
-        <span className="text-xs mt-1">Primary</span>
-      </div>
-      <div className="flex flex-col">
-        <div className="h-16 w-full rounded bg-secondary"></div>
-        <span className="text-xs mt-1">Secondary</span>
-      </div>
-      <div className="flex flex-col">
-        <div className="h-16 w-full rounded bg-accent"></div>
-        <span className="text-xs mt-1">Accent</span>
-      </div>
-      <div className="flex flex-col">
-        <div className="h-16 w-full rounded bg-muted"></div>
-        <span className="text-xs mt-1">Muted</span>
-      </div>
-    </div>
+    <Card>
+      <CardContent className="p-4">
+        <h3 className="text-lg font-medium mb-4">Theme Color Examples</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="h-8 rounded-md bg-primary"></div>
+            <span className="text-sm">Primary</span>
+          </div>
+          <div className="space-y-2">
+            <div className="h-8 rounded-md bg-secondary"></div>
+            <span className="text-sm">Secondary</span>
+          </div>
+          <div className="space-y-2">
+            <div className="h-8 rounded-md bg-accent"></div>
+            <span className="text-sm">Accent</span>
+          </div>
+          <div className="space-y-2">
+            <div className="h-8 rounded-md bg-muted"></div>
+            <span className="text-sm">Muted</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

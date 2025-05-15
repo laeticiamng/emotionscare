@@ -85,7 +85,8 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         confidence: result.confidence,
         intensity: result.intensity || result.score,
         text: result.text || result.transcript || '',
-        ai_feedback: result.feedback || result.ai_feedback || '',
+        feedback: result.feedback || '',
+        transcript: result.transcript || '',
       };
 
       // Process for badges and points

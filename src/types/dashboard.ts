@@ -1,14 +1,20 @@
 
 import { ReactNode } from 'react';
+import { LucideIcon } from 'lucide-react';
 import { Period } from './gamification';
 
 // Types for KPI cards
 export interface KpiCardProps {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   change?: number | string;
+  delta?: {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
   status?: 'increase' | 'decrease' | 'neutral';
-  icon?: ReactNode;
+  icon?: ReactNode | LucideIcon;
   color?: string;
   children?: ReactNode;
   className?: string;
@@ -19,11 +25,14 @@ export interface KpiCardProps {
   timeRange?: string;
   tooltip?: string;
   isLoading?: boolean;
+  subtitle?: React.ReactNode;
+  ariaLabel?: string;
 }
 
 // DraggableKpiCardsGridProps interface
 export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
+  kpiCards: KpiCardProps[];
+  cards?: KpiCardProps[];
   onReorder?: (cards: KpiCardProps[]) => void;
   className?: string;
   allowReordering?: boolean;
@@ -52,6 +61,7 @@ export interface GlobalOverviewTabProps {
   data: DashboardStats;
   isLoading?: boolean;
   className?: string;
+  kpiCards?: KpiCardProps[];
 }
 
 // Interface for chart data
@@ -85,6 +95,19 @@ export interface GamificationData {
     date: string;
     icon?: string;
   }[];
+}
+
+// Dashboard widget configuration
+export interface DashboardWidgetConfig {
+  id: string;
+  title: string;
+  description?: string;
+  width?: number;
+  height?: number;
+  type: 'chart' | 'stats' | 'table' | 'custom';
+  component?: React.ReactNode;
+  data?: any;
+  settings?: Record<string, any>;
 }
 
 // Interface for grid position

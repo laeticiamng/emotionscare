@@ -1,45 +1,36 @@
 
-import { MusicTrack } from './music';
-
-/**
- * Return type for useAudioPlayerState hook
- */
 export interface UseAudioPlayerStateReturn {
-  currentTrack: MusicTrack | null;
   isPlaying: boolean;
-  volume: number;
-  repeat: boolean;
-  shuffle: boolean;
-  progress: number;
   currentTime: number;
   duration: number;
-  loadingTrack: boolean;
-  error: string | null;
-  setCurrentTrack?: (track: MusicTrack) => void;
-  setIsPlaying?: (isPlaying: boolean) => void;
-  setVolume?: (volume: number) => void;
-  setRepeat?: (repeat: boolean) => void;
-  setShuffle?: (shuffle: boolean) => void;
-  setProgress?: (progress: number) => void;
-  setCurrentTime?: (time: number) => void;
-  setDuration?: (duration: number) => void;
-  setLoadingTrack?: (loading: boolean) => void;
-  setError?: (error: string | Error | null) => void;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
-  togglePlay?: () => void;
+  volume: number;
+  isMuted: boolean;
+  isLoading: boolean;
+  error: Error | null;
+  progress: number;
+  audioElement: HTMLAudioElement | null;
+  play: () => Promise<void> | void;
+  pause: () => void;
+  toggle: () => void;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  setTrack: (url: string) => void;
+  onEnded?: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  loadTrack?: (track: any) => void;
+  isReady?: boolean;
 }
 
-/**
- * Props for enhanced music visualizer component
- */
 export interface EnhancedMusicVisualizerProps {
   audioElement?: HTMLAudioElement | null;
-  mode?: 'wave' | 'bars' | 'circle';
+  mode?: 'bars' | 'wave' | 'circle';
   color?: string;
-  height?: number;
-  width?: number;
   className?: string;
+  barCount?: number;
+  height?: number | string;
+  width?: number | string;
+  sensitivity?: number;
   isPlaying?: boolean;
-  emotionColor?: string;
 }

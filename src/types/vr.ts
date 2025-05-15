@@ -10,13 +10,14 @@ export interface VRSessionTemplate {
   description: string;
   duration: number;
   thumbnailUrl: string;
-  name: string;
+  name?: string;
   tags: string[];
   benefits: string[];
   theme: string;
   is_audio_only: boolean;
   emotionTarget?: string;
   emotion_target?: string;
+  emotion?: string;
   category?: string;
   difficulty?: string;
   preview_url?: string;
@@ -25,9 +26,13 @@ export interface VRSessionTemplate {
   templateId?: string;
   template_id?: string;
   completionRate?: number;
+  completion_rate?: number;
   recommendedMood?: string;
   recommended_mood?: string;
   lastUsed?: string;
+  imageUrl?: string;
+  thumbnail?: string;
+  videoUrl?: string;
 }
 
 /**
@@ -57,18 +62,30 @@ export interface VRSession {
   emotionBefore?: string;
   emotion_after?: string;
   emotionAfter?: string;
+  endTime?: string;
+  end_time?: string;
+  rating?: number;
+  notes?: string;
 }
 
 /**
  * Props for VR history list component
  */
 export interface VRHistoryListProps {
-  sessions: VRSession[];
+  sessions?: VRSession[];
+  templates?: VRSessionTemplate[];
   onSessionClick?: (session: VRSession) => void;
+  onTemplateClick?: (template: VRSessionTemplate) => void;
   limit?: number;
   showEmptyState?: boolean;
   className?: string;
   isLoading?: boolean;
+  onSelectTemplate?: (template: VRSessionTemplate) => void;
+  onSelectSession?: (session: VRSession) => void;
+  loading?: boolean;
+  onSelect?: (template: VRSessionTemplate) => void;
+  title?: string;
+  emptyMessage?: string;
 }
 
 /**
@@ -87,12 +104,21 @@ export interface VRTemplateGridProps {
  * Props for VR session with music component
  */
 export interface VRSessionWithMusicProps {
-  session: VRSession;
+  session?: VRSession;
+  template?: VRSessionTemplate;
   playlist?: MusicTrack[];
-  onComplete?: () => void;
+  onComplete?: (sessionData?: VRSession) => void;
   onExit?: () => void;
   autoStart?: boolean;
   className?: string;
+  onSessionComplete?: () => void;
+  isAudioOnly?: boolean;
+  videoUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
+  sessionId?: string;
+  templateId?: string;
+  musicEnabled?: boolean;
 }
 
 /**
