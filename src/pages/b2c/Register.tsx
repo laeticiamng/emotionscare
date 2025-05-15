@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,18 +25,6 @@ export default function B2CRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Preload dashboard in the background
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = '/b2c/dashboard';
-    document.head.appendChild(link);
-    
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,38 +80,11 @@ export default function B2CRegister() {
     }
   };
 
-  // Handle voice command for registration
-  const handleVoiceRegistration = (transcript: string) => {
-    const registrationPhrases = [
-      'inscription vocale',
-      'créer un compte',
-      'je veux m\'inscrire'
-    ];
-    
-    if (registrationPhrases.some(phrase => transcript.toLowerCase().includes(phrase))) {
-      if (name && email && password && confirmPassword && agreedToTerms) {
-        handleRegister(new Event('submit') as any);
-      } else {
-        toast({
-          title: "Information",
-          description: "Veuillez d'abord remplir tous les champs du formulaire",
-        });
-      }
-    }
-  };
-
   return (
     <Shell>
       <TimeBasedBackground>
         <div className="absolute top-4 right-4 flex items-center gap-4">
           <VoiceCommandButton 
-            onTranscript={handleVoiceRegistration} 
-            commands={{
-              'inscription vocale': () => {
-                if (name && email && password && confirmPassword && agreedToTerms) handleRegister(new Event('submit') as any);
-                else toast({ title: "Veuillez remplir tous les champs" });
-              }
-            }}
             variant="ghost"
           />
           <AudioController minimal autoplay={true} initialVolume={0.2} />
@@ -144,7 +105,7 @@ export default function B2CRegister() {
               >
                 <CardTitle className="text-2xl">Inscription Particulier</CardTitle>
                 <CardDescription>
-                  <WelcomeMessage className="mt-2" />
+                  <WelcomeMessage className="mt-2" customMessage="Bienvenue dans votre nouveau cocon émotionnel. Quelques informations et vous pourrez commencer l'expérience." />
                 </CardDescription>
               </motion.div>
             </CardHeader>

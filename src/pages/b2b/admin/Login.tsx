@@ -21,17 +21,27 @@ export default function B2BAdminLogin() {
     setIsLoading(true);
     
     try {
-      // Simulate login process
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre espace administration",
-      });
-      navigate('/b2b/admin/dashboard');
+      // Simulate login for test admin
+      if (email === 'admin@exemple.fr' && password === 'admin') {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        localStorage.setItem('auth_session', 'mock_token_admin');
+        localStorage.setItem('user_role', 'b2b_admin');
+        localStorage.setItem('userMode', 'b2b-admin');
+        
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue sur votre console d'administration",
+        });
+        
+        navigate('/b2b/admin/dashboard');
+      } else {
+        throw new Error("Identifiants incorrects");
+      }
     } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: "Veuillez vérifier vos identifiants",
+        description: "Utilisez admin@exemple.fr / admin pour tester",
         variant: "destructive",
       });
     } finally {
@@ -49,13 +59,13 @@ export default function B2BAdminLogin() {
                 <Shield className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-            <CardTitle className="text-2xl">Connexion RH / Direction</CardTitle>
-            <CardDescription>Accédez à l'espace de pilotage émotionnel de votre organisation</CardDescription>
+            <CardTitle className="text-2xl">Administration RH</CardTitle>
+            <CardDescription>Accédez à votre console de gestion</CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email administrateur</Label>
+                <Label htmlFor="email">Email professionnel</Label>
                 <Input 
                   id="email" 
                   type="email" 
@@ -80,11 +90,15 @@ export default function B2BAdminLogin() {
                   required
                 />
               </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Pour tester la connexion:</p>
+                <p>admin@exemple.fr / admin</p>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button 
                 type="submit" 
-                className="w-full bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600" 
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700" 
                 disabled={isLoading}
               >
                 {isLoading ? "Connexion en cours..." : "Se connecter"}

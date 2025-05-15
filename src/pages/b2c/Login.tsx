@@ -39,28 +39,32 @@ export default function B2CLogin() {
     setIsLoading(true);
     
     try {
-      // Simulate login process
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue dans votre espace EmotionsCare",
-      });
-      
-      // Store session
-      localStorage.setItem('auth_session', 'mock_token');
-      localStorage.setItem('user_role', 'b2c');
-      localStorage.setItem('userMode', 'b2c');
-      
-      // Play haptic feedback on mobile devices
-      if ('vibrate' in navigator) {
-        navigator.vibrate(100);
+      // Simulate login process for the demo with a simple test account
+      if (email === 'utilisateur@exemple.fr' && password === 'admin') {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue dans votre espace EmotionsCare",
+        });
+        
+        // Store session
+        localStorage.setItem('auth_session', 'mock_token');
+        localStorage.setItem('user_role', 'b2c');
+        localStorage.setItem('userMode', 'b2c');
+        
+        // Play haptic feedback on mobile devices
+        if ('vibrate' in navigator) {
+          navigator.vibrate(100);
+        }
+        
+        navigate('/b2c/dashboard');
+      } else {
+        throw new Error("Identifiants incorrects");
       }
-      
-      navigate('/b2c/dashboard');
     } catch (error) {
       toast({
         title: "Une petite erreur",
-        description: "On va y arriver ensemble. Essayez à nouveau.",
+        description: "On va y arriver ensemble. Utilisez utilisateur@exemple.fr / admin pour tester.",
         variant: "destructive",
       });
     } finally {
@@ -182,6 +186,10 @@ export default function B2CLogin() {
                     </Button>
                   </div>
                 </motion.div>
+                <div className="text-sm text-muted-foreground">
+                  <p>Pour tester la connexion:</p>
+                  <p>utilisateur@exemple.fr / admin</p>
+                </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-4">
                 <motion.div 

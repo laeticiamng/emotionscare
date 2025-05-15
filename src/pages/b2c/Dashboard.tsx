@@ -2,36 +2,14 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, Home, Smile, Music, BookOpen, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { TimeBasedBackground } from '@/components/home/TimeBasedBackground';
 import { AudioController } from '@/components/home/audio/AudioController';
-import { useAuth } from '@/contexts/AuthContext';
+import { Music, BookOpen, Heart, BookCheck } from 'lucide-react';
 
 const B2CDashboard = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, logout } = useAuth();
-  
-  const handleLogout = () => {
-    // Clear session
-    localStorage.removeItem('auth_session');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('userMode');
-    
-    if (logout) {
-      logout();
-    }
-    
-    toast({
-      title: "Déconnexion réussie",
-      description: "À bientôt !",
-    });
-    
-    navigate('/');
-  };
   
   // Animation variants for staggered children animations
   const containerVariants = {
@@ -67,26 +45,14 @@ const B2CDashboard = () => {
           <AudioController autoplay={true} initialVolume={0.2} />
         </div>
         
-        <div className="flex justify-between items-center mb-8">
-          <motion.h1 
-            className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Tableau de bord personnel
-          </motion.h1>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/')}>
-              <Home className="mr-2 h-4 w-4" />
-              Accueil
-            </Button>
-            <Button variant="destructive" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Déconnexion
-            </Button>
-          </div>
-        </div>
+        <motion.h1 
+          className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Votre tableau de bord émotionnel
+        </motion.h1>
         
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -99,7 +65,7 @@ const B2CDashboard = () => {
             <Card className="overflow-hidden bg-gradient-to-br from-blue-50/80 to-purple-50/80 dark:from-blue-900/10 dark:to-purple-900/20 border-blue-100 dark:border-blue-900/50">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Smile className="h-6 w-6 mr-2 text-blue-500" />
+                  <Heart className="h-6 w-6 mr-2 text-blue-500" />
                   Météo émotionnelle
                 </CardTitle>
                 <CardDescription>
@@ -192,7 +158,7 @@ const B2CDashboard = () => {
             <Card className="overflow-hidden bg-gradient-to-br from-green-50/80 to-teal-50/80 dark:from-green-900/10 dark:to-teal-900/20 border-green-100 dark:border-green-900/50">
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Calendar className="h-6 w-6 mr-2 text-green-500" />
+                  <BookCheck className="h-6 w-6 mr-2 text-green-500" />
                   Citation inspirante
                 </CardTitle>
                 <CardDescription>

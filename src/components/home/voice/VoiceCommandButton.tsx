@@ -1,89 +1,79 @@
 
 import React, { useState } from 'react';
-import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ButtonProps } from '@/components/ui/button';
 
-interface VoiceCommandButtonProps extends ButtonProps {
+interface VoiceCommandButtonProps {
   onTranscript?: (transcript: string) => void;
-  commands?: {
-    [command: string]: () => void;
-  };
+  commands?: Record<string, () => void>;
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 }
 
-export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({ 
+export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
   onTranscript,
   commands = {},
-  ...props
+  variant = "outline"
 }) => {
   const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
-  
-  const toggleListening = () => {
+
+  const toggleVoiceRecognition = () => {
     if (isListening) {
       stopListening();
     } else {
       startListening();
     }
   };
-  
+
   const startListening = () => {
     setIsListening(true);
     toast({
       title: "Commandes vocales activées",
-      description: "Parlez maintenant pour utiliser une commande vocale",
+      description: "Je vous écoute...",
     });
     
-    // Simulate voice recognition (in a real app, use actual Whisper API)
+    // Simulate voice recognition (in a real implementation, this would use Whisper API)
     setTimeout(() => {
-      const mockedTranscript = "connexion à mon espace";
+      const mockTranscript = "Connexion à mon espace";
       
       if (onTranscript) {
-        onTranscript(mockedTranscript);
+        onTranscript(mockTranscript);
       }
       
-      // Check if the transcript matches any command
+      // Check for command matches
       Object.entries(commands).forEach(([command, action]) => {
-        if (mockedTranscript.toLowerCase().includes(command.toLowerCase())) {
+        if (mockTranscript.toLowerCase().includes(command.toLowerCase())) {
           action();
         }
       });
       
       stopListening();
-      
-      toast({
-        title: "Commande reconnue",
-        description: `"${mockedTranscript}"`,
-      });
     }, 3000);
   };
-  
+
   const stopListening = () => {
     setIsListening(false);
-    // In a real app, stop the actual recognition service
     toast({
       title: "Commandes vocales désactivées",
-      description: "Le microphone est maintenant éteint",
+      description: "Le microphone est maintenant éteint.",
     });
   };
-  
+
   return (
     <Button
+      onClick={toggleVoiceRecognition}
+      variant={variant}
       size="icon"
-      variant={isListening ? "default" : "ghost"}
-      onClick={toggleListening}
-      className={isListening ? "animate-pulse" : ""}
-      {...props}
+      className={`rounded-full ${isListening ? 'bg-primary text-white' : ''}`}
     >
       {isListening ? (
         <MicOff className="h-4 w-4" />
       ) : (
         <Mic className="h-4 w-4" />
       )}
-      <span className="sr-only">
-        {isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}
-      </span>
     </Button>
   );
 };
+
+export default VoiceCommandButton;

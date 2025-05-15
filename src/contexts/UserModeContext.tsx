@@ -1,62 +1,45 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserModeType, UserModeContextType } from '@/types/userMode';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { normalizeUserMode } from '@/utils/userModeUtils';
+import { UserModeType, normalizeUserMode } from '@/types/userMode';
 
-// Create a default context value
-const defaultUserModeContext: UserModeContextType = {
-  mode: 'b2c',
-  setMode: () => {},
+interface UserModeContextProps {
+  userMode: UserModeType;
+  setUserMode: (mode: UserModeType | string) => void;
+  isLoading: boolean;
+}
+
+const UserModeContext = createContext<UserModeContextProps>({
   userMode: 'b2c',
   setUserMode: () => {},
-  isLoading: false
-};
-
-const UserModeContext = createContext<UserModeContextType>(defaultUserModeContext);
-
-export const useUserMode = () => useContext(UserModeContext);
+  isLoading: true
+});
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [storedMode, setStoredMode] = useLocalStorage<UserModeType>('userMode', 'b2c');
-  
-  // Use the stored mode from localStorage as the initial state
-  const [mode, setMode] = useState<UserModeType>(storedMode);
-  const [userMode, setUserModeState] = useState<UserModeType>(storedMode);
-  
-  // Function to update both state and localStorage
-  const setUserMode = (newMode: UserModeType | string) => {
-    console.log("Setting user mode to:", newMode);
-    const normalizedMode = normalizeUserMode(newMode) as UserModeType;
-    setUserModeState(normalizedMode);
-    setStoredMode(normalizedMode);
-  };
+  const [userMode, setUserModeState] = useState<UserModeType>('b2c');
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sync state with localStorage on mount
   useEffect(() => {
-    const savedMode = localStorage.getItem('userMode');
-    console.log("Retrieved user mode from localStorage:", savedMode);
-    
-    if (savedMode) {
-      const normalizedMode = normalizeUserMode(savedMode) as UserModeType;
-      setMode(normalizedMode);
-      setUserModeState(normalizedMode);
-      console.log("User mode set to:", normalizedMode);
+    // Load user mode from localStorage
+    const storedMode = localStorage.getItem('userMode');
+    if (storedMode) {
+      setUserModeState(normalizeUserMode(storedMode));
     }
+    setIsLoading(false);
   }, []);
 
+  const setUserMode = (mode: UserModeType | string) => {
+    const normalizedMode = normalizeUserMode(mode);
+    setUserModeState(normalizedMode);
+    localStorage.setItem('userMode', normalizedMode);
+  };
+
   return (
-    <UserModeContext.Provider value={{ 
-      mode, 
-      setMode, 
-      userMode, 
-      setUserMode,
-      isLoading
-    }}>
+    <UserModeContext.Provider value={{ userMode, setUserMode, isLoading }}>
       {children}
     </UserModeContext.Provider>
   );
 };
+
+export const useUserMode = () => useContext(UserModeContext);
 
 export default UserModeContext;

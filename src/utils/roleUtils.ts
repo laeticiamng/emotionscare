@@ -1,99 +1,68 @@
 
-import { UserRole } from '@/types';
+import { UserModeType } from "@/types/userMode";
 
-/**
- * Normalizes a role string to a standard format
- * @param role The role string to normalize
- * @returns Normalized role string
- */
-export const normalizeRole = (role?: string): string => {
-  if (!role) return 'user';
+export const hasRoleAccess = (userRole: string | null, requiredRole: string): boolean => {
+  if (!userRole) return false;
   
-  const lowerRole = role.toLowerCase();
+  // Direct match
+  if (userRole === requiredRole) return true;
   
-  // Map various admin roles to b2b_admin
-  if (lowerRole.includes('admin') || lowerRole.includes('manager') || lowerRole === 'hr') {
-    return 'b2b_admin';
-  }
+  // B2C specific role checks
+  if (requiredRole === 'b2c' && userRole === 'b2c') return true;
   
-  // Map various user/employee roles to b2b_user
-  if (lowerRole.includes('employee') || lowerRole.includes('collaborator') || lowerRole === 'user') {
-    return 'b2b_user';
-  }
+  // B2B user specific role checks
+  if (requiredRole === 'b2b_user' && 
+      (userRole === 'b2b-user' || userRole === 'b2b_user')) return true;
   
-  // Return the original role if no mapping found
-  return lowerRole;
+  // B2B admin specific role checks
+  if (requiredRole === 'b2b_admin' && 
+      (userRole === 'b2b-admin' || userRole === 'b2b_admin')) return true;
+  
+  return false;
 };
 
-/**
- * Checks if the given role is an admin role
- * @param role The role to check
- * @returns True if the role is an admin role, false otherwise
- */
-export const isAdminRole = (role?: string): boolean => {
-  if (!role) return false;
-  
-  const normalizedRole = normalizeRole(role);
-  return normalizedRole.includes('admin') || normalizedRole === 'superadmin';
-};
-
-/**
- * Checks if the user can access admin features
- * @param role The user's role
- * @returns True if the user has admin access, false otherwise
- */
-export const hasAdminAccess = (role?: string): boolean => {
-  return isAdminRole(role);
-};
-
-/**
- * Gets the display name for a role
- * @param role The role to get a display name for
- * @returns User-friendly display name for the role
- */
-export const getRoleDisplayName = (role?: string): string => {
-  if (!role) return 'User';
-  
-  const normalizedRole = normalizeRole(role);
-  
-  switch (normalizedRole) {
-    case 'b2b_admin':
-      return 'Administrator';
-    case 'b2b_user':
-      return 'Employee';
-    case 'superadmin':
-      return 'Super Administrator';
+export const getRoleLoginPath = (role: string): string => {
+  switch (role) {
     case 'b2c':
-      return 'Individual User';
+      return '/b2c/login';
+    case 'b2b_user':
+    case 'b2b-user':
+      return '/b2b/user/login';
+    case 'b2b_admin':
+    case 'b2b-admin':
+      return '/b2b/admin/login';
     default:
-      return role.charAt(0).toUpperCase() + role.slice(1);
+      return '/';
   }
 };
 
-/**
- * Gets the permission level of a role (higher number = more permissions)
- * @param role The role to get a permission level for
- * @returns Numeric permission level (0-10)
- */
-export const getRolePermissionLevel = (role?: string): number => {
-  if (!role) return 1; // Default user level
-  
-  const normalizedRole = normalizeRole(role);
-  
-  switch (normalizedRole) {
-    case 'superadmin':
-      return 10;
-    case 'b2b_admin':
-      return 8;
-    case 'hr':
-      return 7;
-    case 'manager':
-      return 6;
-    case 'b2b_user':
-      return 3;
+export const getRoleName = (role: string): string => {
+  switch (role) {
     case 'b2c':
-      return 2;
+      return 'Particulier';
+    case 'b2b_user':
+    case 'b2b-user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+    case 'b2b-admin':
+      return 'Administrateur';
     default:
-      return 1;
+      return 'Utilisateur';
   }
+};
+
+export const normalizeUserRole = (role?: string | null): UserModeType => {
+  if (!role) return 'b2c'; // Default role
+  
+  if (role === 'b2c' || role === 'particulier') return 'b2c';
+  
+  if (role === 'b2b-user' || role === 'b2b_user' || role === 'collaborateur') {
+    return 'b2b-user';
+  }
+  
+  if (role === 'b2b-admin' || role === 'b2b_admin' || role === 'admin' || role === 'rh') {
+    return 'b2b-admin';
+  }
+  
+  return 'b2c'; // Default fallback
 };

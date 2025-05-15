@@ -21,17 +21,27 @@ export default function B2BUserLogin() {
     setIsLoading(true);
     
     try {
-      // Simulate login process
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre espace collaborateur",
-      });
-      navigate('/b2b/user/dashboard');
+      // Simulate login for test user
+      if (email === 'collaborateur@exemple.fr' && password === 'admin') {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        localStorage.setItem('auth_session', 'mock_token_collaborateur');
+        localStorage.setItem('user_role', 'b2b_user');
+        localStorage.setItem('userMode', 'b2b-user');
+        
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue sur votre espace collaborateur",
+        });
+        
+        navigate('/b2b/user/dashboard');
+      } else {
+        throw new Error("Identifiants incorrects");
+      }
     } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: "Veuillez vérifier vos identifiants",
+        description: "Utilisez collaborateur@exemple.fr / admin pour tester",
         variant: "destructive",
       });
     } finally {
@@ -80,17 +90,15 @@ export default function B2BUserLogin() {
                   required
                 />
               </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Pour tester la connexion:</p>
+                <p>collaborateur@exemple.fr / admin</p>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Connexion en cours..." : "Se connecter"}
               </Button>
-              <div className="text-sm text-center">
-                <span className="text-muted-foreground">Nouvel utilisateur? </span>
-                <Link to="/b2b/user/register" className="text-primary hover:underline">
-                  Créer un compte
-                </Link>
-              </div>
               <div className="text-sm text-center">
                 <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
                   Retour à la sélection
