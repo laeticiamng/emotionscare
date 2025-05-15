@@ -1,68 +1,103 @@
 
 import React from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/types';
-import { Card } from '@/components/ui/card';
-import { Lock } from 'lucide-react';
+import { BadgeCheck, Lock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface BadgeGridProps {
   badges: Badge[];
+  className?: string;
+  columns?: number;
 }
 
-const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
-  // Group badges by category if available
-  const groupedBadges: Record<string, Badge[]> = {};
-  
-  badges.forEach(badge => {
-    const category = badge.category || 'Général';
-    if (!groupedBadges[category]) {
-      groupedBadges[category] = [];
-    }
-    groupedBadges[category].push(badge);
-  });
+const BadgeGrid: React.FC<BadgeGridProps> = ({ 
+  badges = [], 
+  className = '',
+  columns = 3
+}) => {
+  const gridClasses = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-1 sm:grid-cols-2',
+    3: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+    4: 'grid-cols-2 sm:grid-cols-2 md:grid-cols-4',
+    5: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5',
+  };
+
+  const columnsClass = gridClasses[columns as keyof typeof gridClasses] || gridClasses[3];
   
   return (
-    <div>
-      {Object.entries(groupedBadges).map(([category, categoryBadges]) => (
-        <div key={category} className="mb-6">
-          <h3 className="text-lg font-medium mb-3">{category}</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {categoryBadges.map(badge => (
-              <Card 
-                key={badge.id} 
-                className={`p-4 flex flex-col items-center text-center ${!badge.unlockedAt ? 'opacity-60' : ''}`}
-              >
-                <div className="relative mb-2">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    {badge.image_url ? (
-                      <img 
-                        src={badge.image_url} 
-                        alt={badge.name} 
-                        className="w-12 h-12"
-                      />
-                    ) : (
-                      <span className="text-2xl">{badge.icon || '🏆'}</span>
-                    )}
-                  </div>
-                  {!badge.unlockedAt && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full">
-                      <Lock className="w-6 h-6 text-white" />
-                    </div>
-                  )}
-                </div>
-                <h4 className="font-medium text-sm">{badge.name}</h4>
-                <p className="text-xs text-muted-foreground mt-1">{badge.description}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
+    <div className={cn('grid gap-4', columnsClass, className)}>
+      {badges.map((badge) => (
+        <BadgeCard 
+          key={badge.id} 
+          badge={badge} 
+          unlocked={badge.unlockedAt !== null && badge.unlockedAt !== undefined} 
+        />
       ))}
-      
-      {badges.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">Aucun badge n'a encore été débloqué.</p>
-        </div>
-      )}
     </div>
+  );
+};
+
+interface BadgeCardProps {
+  badge: Badge;
+  unlocked: boolean;
+}
+
+const BadgeCard: React.FC<BadgeCardProps> = ({ badge, unlocked }) => {
+  return (
+    <Card className={cn(
+      'overflow-hidden transition-all',
+      unlocked ? 'border-primary/30' : 'border-gray-200 opacity-70'
+    )}>
+      <div className="relative">
+        <div className="w-full aspect-square flex items-center justify-center bg-muted">
+          {badge.image_url ? (
+            <img 
+              src={badge.image_url} 
+              alt={badge.name} 
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-primary/10 text-primary">
+              {badge.icon || <BadgeCheck className="w-12 h-12" />}
+            </div>
+          )}
+          
+          {!unlocked && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+              <Lock className="w-10 h-10 text-muted-foreground" />
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <CardHeader className="py-2">
+        <h3 className="font-medium text-center">{badge.name}</h3>
+      </CardHeader>
+      
+      <CardContent className="py-2 text-center">
+        <CardDescription className="text-xs">
+          {badge.description}
+        </CardDescription>
+      </CardContent>
+      
+      <CardFooter className="pt-0 pb-3 justify-center">
+        <div className="text-xs text-muted-foreground">
+          {unlocked ? (
+            <span className="flex items-center">
+              <BadgeCheck className="w-3 h-3 mr-1 text-green-500" />
+              Débloqué {badge.unlockedAt && new Date(badge.unlockedAt).toLocaleDateString()}
+            </span>
+          ) : (
+            <span className="flex items-center">
+              <Lock className="w-3 h-3 mr-1" />
+              Non débloqué
+            </span>
+          )}
+        </div>
+      </CardFooter>
+    </Card>
   );
 };
 

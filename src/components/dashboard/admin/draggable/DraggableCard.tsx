@@ -1,62 +1,88 @@
 
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from "@dnd-kit/utilities";
-import KpiCard from '../KpiCard';
-import { GripVertical } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowDown, ArrowUp, GripHorizontal, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { DraggableCardProps } from './types';
 
-// Component for a single draggable card
-const DraggableCard: React.FC<DraggableCardProps> = (props) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: props.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 10 : 1,
-    opacity: isDragging ? 0.8 : 1,
-    position: 'relative' as 'relative',
+const DraggableCard: React.FC<DraggableCardProps> = ({
+  id,
+  title,
+  value,
+  icon: Icon,
+  delta,
+  subtitle,
+  ariaLabel,
+  onClick
+}) => {
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData('cardId', id);
   };
 
-  const valueString = props.value ? props.value.toString() : '';
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const draggedCardId = e.dataTransfer.getData('cardId');
+    // Handle drop logic here or pass to parent component
+  };
+
+  // Determine delta display
+  let deltaElement = null;
+  if (delta) {
+    const deltaValue = typeof delta === 'number' ? delta : delta.value;
+    const deltaLabel = typeof delta === 'number' ? undefined : delta.label;
+    const trend = typeof delta === 'number' 
+      ? (deltaValue > 0 ? 'up' : deltaValue < 0 ? 'down' : 'neutral')
+      : delta.trend;
+      
+    const trendColor = trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-gray-500';
+    
+    deltaElement = (
+      <div className={`flex items-center ${trendColor}`}>
+        {trend === 'up' && <ArrowUp className="h-4 w-4 mr-1" />}
+        {trend === 'down' && <ArrowDown className="h-4 w-4 mr-1" />}
+        {trend === 'neutral' && <Minus className="h-4 w-4 mr-1" />}
+        <span>
+          {Math.abs(deltaValue)}%
+          {deltaLabel && <span className="text-muted-foreground ml-1">{deltaLabel}</span>}
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      className={`transition-all duration-300 ${isDragging ? 'scale-105 shadow-md' : ''}`}
+    <Card
+      className={cn("relative group", onClick && "cursor-pointer hover:shadow-md transition-shadow")}
+      draggable={true}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onClick={onClick}
+      aria-label={ariaLabel}
     >
-      <div className="relative">
-        <div
-          className="absolute right-2 top-2 cursor-grab p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          {...attributes}
-          {...listeners}
-          aria-label="Drag to reorder"
-          tabIndex={0}
-          role="button"
-          aria-grabbed={isDragging}
-          aria-keyshortcuts="Space, ArrowUp, ArrowDown, ArrowLeft, ArrowRight"
-        >
-          <GripVertical size={16} />
-        </div>
-        <KpiCard 
-          title={props.title} 
-          value={valueString}
-          icon={props.icon && <props.icon className="h-6 w-6" />}
-          delta={props.delta} 
-          subtitle={props.subtitle} 
-          ariaLabel={props.ariaLabel}
-          onClick={props.onClick}
-        />
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab">
+        <GripHorizontal className="h-4 w-4 text-muted-foreground" />
       </div>
-    </div>
+      
+      <CardHeader className="flex flex-row items-start space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {Icon && <Icon className="h-4 w-4 text-muted-foreground ml-auto" />}
+      </CardHeader>
+      
+      <CardContent>
+        <div className="text-2xl font-bold">
+          {typeof value === 'string' || typeof value === 'number' ? value : '—'}
+        </div>
+        
+        <div className="flex items-center justify-between mt-1">
+          {subtitle && <CardDescription>{subtitle}</CardDescription>}
+          {deltaElement}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

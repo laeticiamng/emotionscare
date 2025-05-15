@@ -55,3 +55,49 @@ export const compareRoles = (userRole: string | null | undefined, roleToCheck: s
   const normalizedRoleToCheck = normalizeUserRole(roleToCheck);
   return normalizedUserRole === normalizedRoleToCheck;
 };
+
+// Check if user has access to a role-protected page
+export const hasRoleAccess = (userRole: string | null | undefined, requiredRole: string): boolean => {
+  if (!userRole) return false;
+  
+  const normalizedUserRole = normalizeUserRole(userRole);
+  const normalizedRequiredRole = normalizeUserRole(requiredRole);
+  
+  // Admin can access admin and user pages
+  if (normalizedUserRole === 'b2b_admin') {
+    return normalizedRequiredRole === 'b2b_admin' || normalizedRequiredRole === 'b2b_user';
+  }
+  
+  // User can only access user pages
+  return normalizedUserRole === normalizedRequiredRole;
+};
+
+// Get the login path for a specific role
+export const getRoleLoginPath = (role: string): string => {
+  const normalizedRole = normalizeUserRole(role);
+  
+  switch (normalizedRole) {
+    case 'b2b_admin':
+      return '/b2b/admin/login';
+    case 'b2b_user':
+      return '/b2b/user/login';
+    case 'b2c':
+    default:
+      return '/b2c/login';
+  }
+};
+
+// Get human-readable role name
+export const getRoleName = (role: string | null | undefined): string => {
+  const normalizedRole = normalizeUserRole(role);
+  
+  switch (normalizedRole) {
+    case 'b2b_admin':
+      return 'Administrateur';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2c':
+    default:
+      return 'Particulier';
+  }
+};

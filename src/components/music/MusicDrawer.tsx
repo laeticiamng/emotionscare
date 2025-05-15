@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import MusicProgressBar from './MusicProgressBar';
 import VolumeControl from './VolumeControl';
-import { MusicDrawerProps, MusicTrack } from '@/types';
+import { MusicDrawerProps } from '@/types';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   children,
   side = "bottom",
   open = false,
+  isOpen = false,
   onOpenChange,
+  onClose,
   currentTrack = null,
   playlist = null
 }) => {
@@ -48,8 +50,12 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  // Use either isOpen or open prop
+  const isDrawerOpen = isOpen || open;
+  const handleOpenChange = onOpenChange || onClose;
+
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={isDrawerOpen} onOpenChange={handleOpenChange}>
       <DrawerContent className="px-4 pt-3 pb-6">
         <DrawerHeader className="px-0">
           <DrawerTitle>
@@ -60,10 +66,10 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
         {currentTrack && (
           <div className="space-y-4">
             {/* Album cover if available */}
-            {currentTrack.cover_url && (
+            {(currentTrack.cover_url || currentTrack.coverUrl || currentTrack.cover) && (
               <div className="flex justify-center">
                 <img 
-                  src={currentTrack.cover_url} 
+                  src={currentTrack.cover_url || currentTrack.coverUrl || currentTrack.cover} 
                   alt={currentTrack.title} 
                   className="w-32 h-32 object-cover rounded-md shadow-md"
                 />
@@ -77,15 +83,15 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             </div>
             
             {/* Progress bar */}
-            <MusicProgressBar 
-              value={currentTime}
-              max={duration} 
-              currentTime={currentTime}
-              duration={duration}
-              onSeek={handleSeek}
-              className="px-2"
-              showTimestamps={true}
-            />
+            <div className="px-2">
+              <MusicProgressBar 
+                currentTime={currentTime}
+                duration={duration}
+                onSeek={handleSeek}
+                showTimestamps={true}
+                formatTime={formatTime}
+              />
+            </div>
             
             {/* Playback controls */}
             <div className="flex items-center justify-center gap-4">
@@ -111,11 +117,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             {/* Volume control */}
             <div className="flex justify-center">
               <VolumeControl 
-                volume={volume}
+                volume={volume * 100}
                 onChange={handleVolumeChange}
-                isMuted={isMuted}
                 onMuteToggle={handleMuteToggle}
-                className="mt-2"
                 showLabel={true}
               />
             </div>

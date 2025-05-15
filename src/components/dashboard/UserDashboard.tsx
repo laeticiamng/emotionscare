@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -5,7 +6,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { normalizeUserRole } from '@/utils/roleUtils';
 import { GamificationStats, VRSessionTemplate } from '@/types';
 import DashboardHero from './DashboardHero';
-import { CalendarClock, ListChecks, LucideIcon, Music2, Settings, Sparkles, UserCog, Wand2 } from 'lucide-react';
+import { CalendarClock, ListChecks, LucideIcon, Music2, Settings, Sparkles, UserCog, Wand2, PenLine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { EmotionDashboardSection, GamificationDashboardSection, ProfileDashboardSection, SocialDashboardSection, VRDashboardSection } from './UserDashboardSections';
 
@@ -101,9 +102,9 @@ const UserDashboard = () => {
       { id: '2', name: 'Maître zen', completed: false },
     ],
     leaderboard: [
-      { userId: '1', username: 'Sophie', points: 520 },
-      { userId: '2', username: 'Thomas', points: 505 },
-      { userId: '3', username: 'Emma', points: 480 },
+      { username: 'Sophie', points: 520 },
+      { username: 'Thomas', points: 505 },
+      { username: 'Emma', points: 480 },
     ]
   };
 

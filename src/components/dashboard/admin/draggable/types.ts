@@ -7,7 +7,11 @@ export interface DraggableCardProps {
   title: string;
   value: string | number;
   icon?: LucideIcon;
-  delta?: number;
+  delta?: number | {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
   subtitle?: string;
   ariaLabel?: string;
   onClick?: () => void;

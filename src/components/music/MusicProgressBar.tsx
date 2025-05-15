@@ -1,9 +1,19 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types';
 
-const MusicProgressBar: React.FC<ProgressBarProps> = ({
+interface MusicProgressBarProps {
+  value?: number;
+  max?: number;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (value: number) => void;
+  className?: string;
+  formatTime?: (seconds: number) => string;
+  showTimestamps?: boolean;
+}
+
+const MusicProgressBar: React.FC<MusicProgressBarProps> = ({
   value = 0,
   max = 100,
   currentTime = 0,
@@ -23,11 +33,14 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
     }
   };
 
+  const sliderValue = value || currentTime;
+  const sliderMax = max || duration || 100;
+
   return (
     <div className={`flex flex-col gap-1 w-full ${className}`}>
       <Slider
-        value={[value]}
-        max={max}
+        value={[sliderValue]}
+        max={sliderMax}
         step={1}
         onValueChange={handleValueChange}
         className="cursor-pointer"

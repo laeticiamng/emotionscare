@@ -1,3 +1,4 @@
+
 // Ajout des nouveaux types
 import { ReactNode } from 'react';
 
@@ -36,11 +37,7 @@ export interface VRSessionTemplate {
   description: string;
   duration: number;
   tags: string[];
-  is_audio_only?: boolean;
-  preview_url?: string;
-  audio_url?: string;
-  emotion_target?: string;
-  emotion?: string;
+  emotionTarget?: string;
   difficulty?: string;
   benefits?: string[];
   thumbnailUrl?: string;
@@ -48,6 +45,10 @@ export interface VRSessionTemplate {
   theme?: string;
   completionRate?: number;
   recommendedMood?: string;
+  is_audio_only?: boolean;
+  preview_url?: string;
+  audio_url?: string;
+  emotion?: string;
 }
 
 export interface Challenge {
@@ -65,6 +66,8 @@ export interface Challenge {
   deadline?: string;
   startDate?: string;
   endDate?: string;
+  total?: number;
+  status?: 'active' | 'completed' | 'failed';
 }
 
 export interface Badge {
@@ -76,6 +79,7 @@ export interface Badge {
   image_url?: string;
   icon?: string;
   unlockedAt?: string | null;
+  completed?: boolean;
 }
 
 export interface MusicTrack {
@@ -84,12 +88,14 @@ export interface MusicTrack {
   artist?: string;
   album?: string;
   duration: number;
-  url: string;
+  url?: string;
   cover_url?: string;
   genre?: string;
   emotion?: string;
   isPlaying?: boolean;
   isFavorite?: boolean;
+  coverUrl?: string;
+  cover?: string;
 }
 
 export interface MusicPlaylist {
@@ -113,7 +119,7 @@ export interface GamificationStats {
   activeUsersPercent?: number;
   totalBadges?: number;
   badgeLevels?: { level: string; count: number }[];
-  leaderboard?: Array<{ userId: string; username: string; points: number }>;
+  leaderboard?: Array<{ userId?: string; username: string; points: number }>;
   progress?: { current: number; target: number };
   completionRate?: number;
   achievements?: Array<{ id: string; name: string; completed: boolean }>;
@@ -123,10 +129,14 @@ export interface GamificationStats {
 export interface KpiCardProps {
   title: string;
   value: string | number;
-  icon?: React.ComponentType<any>;
+  icon?: ReactNode;
   ariaLabel?: string;
-  delta?: number;
-  subtitle?: string;
+  delta?: number | {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: ReactNode | string;
   onClick?: () => void;
   className?: string;
   trend?: {
@@ -165,6 +175,8 @@ export interface MusicDrawerProps {
   children?: React.ReactNode;
   side?: "left" | "right" | "top" | "bottom";
   open?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
   onOpenChange?: (open: boolean) => void;
   currentTrack?: MusicTrack | null;
   playlist?: MusicPlaylist | null;
@@ -174,4 +186,10 @@ export interface MusicLibraryProps {
   playlists?: MusicPlaylist[];
   onSelectTrack?: (track: MusicTrack) => void;
   onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+}
+
+export interface LeaderboardEntry {
+  userId?: string;
+  username: string;
+  points: number;
 }
