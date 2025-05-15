@@ -1,4 +1,3 @@
-
 // This file just contains the selected type definitions needed to fix errors
 
 export interface User {
@@ -81,8 +80,8 @@ export interface Badge {
   type?: string;
   imageUrl?: string;
   image_url?: string;
-  unlocked?: boolean;
-  category?: string;
+  unlocked?: boolean; // Added for BadgeGrid
+  category?: string;  // Added for BadgeGrid
 }
 
 export interface InvitationVerificationResult {

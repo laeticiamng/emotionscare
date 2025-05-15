@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -12,6 +11,7 @@ import { Shield, Lock, Download } from 'lucide-react';
 const DataPrivacySettings = () => {
   const { preferences, updatePreferences } = useUserPreferences();
   const [isSaving, setIsSaving] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'json' | 'csv'>('pdf');
   
   const handlePrivacyChange = (key: string, value: boolean) => {
     if (!preferences.privacy || typeof preferences.privacy === 'string') {
@@ -94,6 +94,15 @@ const DataPrivacySettings = () => {
     });
   };
   
+  const handleExportData = () => {
+    // Implement export data logic here
+  };
+
+  // Handle anonymous mode toggle
+  const handleAnonymousMode = (enabled: boolean) => {
+    // Implement anonymous mode logic here
+  };
+
   return (
     <Card>
       <CardHeader>

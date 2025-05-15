@@ -6,11 +6,15 @@ import { VolumeControlProps } from '@/types/music';
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onVolumeChange,
+  onChange, // Added for compatibility
   className = ""
 }) => {
   const handleVolumeChange = (value: number[]) => {
     if (onVolumeChange) {
       onVolumeChange(value[0]);
+    }
+    if (onChange) {
+      onChange(value[0]);
     }
   };
 

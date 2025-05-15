@@ -1,8 +1,10 @@
-
 import { Theme, FontFamily, FontSize } from './theme';
 import { NotificationType, NotificationFrequency, NotificationTone } from './notification';
 
-export type UserRole = 'admin' | 'user' | 'manager' | 'coach' | 'guest' | 'b2b-admin' | 'b2b-user' | 'b2c';
+// Combined UserRole type to handle all possible roles from different files
+export type UserRole = 'admin' | 'user' | 'manager' | 'coach' | 'guest' | 'b2b-admin' | 'b2b-user' | 'b2c' | 
+                      'moderator' | 'b2b_admin' | 'b2b_user' | 'wellbeing_manager' | 'employee' | 'team_lead' | 
+                      'professional' | 'b2b-selection';
 
 export interface User {
   id: string;
@@ -10,10 +12,16 @@ export interface User {
   email: string;
   role?: UserRole;
   avatar_url?: string;
+  avatar?: string; // Added for compatibility
   created_at?: string;
+  createdAt?: string; // For compatibility
   last_sign_in_at?: string;
   onboarded?: boolean;
   preferences?: UserPreferences;
+  department?: string; // Added for UserDetailView
+  position?: string; // Added for UserDetailView
+  joined_at?: string; // Added for UserDetailView
+  emotional_score?: number; // Added for UserDetailView
 }
 
 export interface UserPreferences {
@@ -71,6 +79,11 @@ export interface UserPreferences {
   lockJournals?: boolean;
   dataExport?: boolean;
   avatarUrl?: string;
+  profileVisibility?: 'public' | 'team' | 'private'; // Added for UserDetailView
+  displayName?: string; // Added for IdentitySettings
+  pronouns?: string; // Added for IdentitySettings
+  biography?: string; // Added for IdentitySettings
+  dashboardLayout?: string;
 }
 
 export interface UserPreferencesState {

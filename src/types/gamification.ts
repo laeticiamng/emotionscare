@@ -45,7 +45,25 @@ export interface Challenge {
   total?: number;
   completed?: boolean;
   points?: number;
-  name?: string;
+  name?: string; // Added for compatibility
+}
+
+// Update for type compatibility with Dashboard and GamificationDashboard
+export interface GamificationData extends GamificationStats {
+  totalBadges: number;
+  activeChallenges: number;
+  leaderboard: {
+    userId: string;
+    name: string;
+    score: number;
+    position: number;
+  }[];
+  recentAchievements: {
+    userId: string;
+    name: string;
+    badge: string;
+    date: string;
+  }[];
 }
 
 export interface LeaderboardEntry {

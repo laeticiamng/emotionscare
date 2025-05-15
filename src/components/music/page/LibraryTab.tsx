@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { MusicLibraryProps } from '@/types/music';
+import { MusicLibraryProps, MusicTrack, MusicPlaylist } from '@/types/music';
 
 const LibraryTab: React.FC<MusicLibraryProps> = ({ 
-  playlists, 
+  playlists = [], 
   onSelectTrack, 
-  onSelectPlaylist
+  onSelectPlaylist 
 }) => {
   return (
     <div>
@@ -13,7 +13,7 @@ const LibraryTab: React.FC<MusicLibraryProps> = ({
       <div className="space-y-6">
         {playlists.map(playlist => (
           <div key={playlist.id} className="space-y-2">
-            <h3 className="font-medium">{playlist.name}</h3>
+            <h3 className="font-medium">{playlist.name || playlist.title}</h3>
             <p className="text-sm text-muted-foreground">{playlist.description}</p>
             <button 
               onClick={() => onSelectPlaylist(playlist)}
@@ -23,6 +23,10 @@ const LibraryTab: React.FC<MusicLibraryProps> = ({
             </button>
           </div>
         ))}
+        
+        {playlists.length === 0 && (
+          <p className="text-muted-foreground">Aucune playlist disponible</p>
+        )}
       </div>
     </div>
   );

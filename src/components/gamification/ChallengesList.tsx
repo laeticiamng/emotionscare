@@ -1,13 +1,13 @@
 
-// This is a partial implementation to fix the specific errors
 import React from 'react';
 import { Challenge } from '@/types';
 
 interface ChallengesListProps {
   challenges: Challenge[];
+  onComplete?: (challengeId: string) => Promise<boolean>; // Added this prop
 }
 
-const ChallengesList: React.FC<ChallengesListProps> = ({ challenges }) => {
+const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, onComplete }) => {
   // Helper to render challenge status correctly
   const renderStatus = (challenge: Challenge) => {
     // Fix the comparison by ensuring we use the correct status values

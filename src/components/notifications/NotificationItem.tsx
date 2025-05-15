@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Bell, ScanLine, MessageSquare, Users, Award } from 'lucide-react';
@@ -10,6 +9,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   notification, onMarkAsRead, onDelete, onClick, compact = false, onRead
 }) => {
   const getIcon = (type: NotificationType) => {
+    // Handle all possible notification types
     switch (type) {
       case 'emotion':
         return <ScanLine className="h-5 w-5 text-purple-500" />;
@@ -19,6 +19,14 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         return <Users className="h-5 w-5 text-green-500" />;
       case 'achievement':
         return <Award className="h-5 w-5 text-amber-500" />;
+      case 'reminder':
+        return <Bell className="h-5 w-5 text-orange-500" />;
+      case 'success':
+        return <Bell className="h-5 w-5 text-green-500" />;
+      case 'warning':
+        return <Bell className="h-5 w-5 text-yellow-500" />;
+      case 'error':
+        return <Bell className="h-5 w-5 text-red-500" />;
       default:
         return <Bell className="h-5 w-5 text-primary" />;
     }

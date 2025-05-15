@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 
 export interface MusicTrack {
@@ -6,6 +5,7 @@ export interface MusicTrack {
   title: string;
   artist: string;
   audioUrl?: string;
+  url?: string; // Adding url property
   duration: number;
   coverUrl?: string;
   cover_url?: string;
@@ -19,6 +19,7 @@ export interface MusicTrack {
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string; // Adding title property for compatibility
   description?: string;
   tracks: MusicTrack[];
   coverUrl?: string;
@@ -63,9 +64,18 @@ export interface Track {
 }
 
 export interface ProgressBarProps {
-  progress: number | null;
+  progress?: number;
+  value?: number; // Added for compatibility
+  max?: number; // Added for compatibility
   onSeek?: (value: number) => void;
   className?: string;
+  showLabel?: boolean; // Added for compatibility
+  variant?: string; // Added for compatibility
+  currentTime?: number; // Added for compatibility
+  duration?: number; // Added for compatibility
+  formatTime?: (seconds: number) => string; // Added for compatibility
+  handleProgressClick?: (e: any) => void; // Added for compatibility
+  showTimestamps?: boolean; // Added for compatibility
 }
 
 export interface TrackInfoProps {
