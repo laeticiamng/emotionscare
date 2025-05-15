@@ -136,6 +136,16 @@ export type {
   CoachNotification
 } from './coach';
 
+// Export du type EnhancedMusicVisualizerProps
+export interface EnhancedMusicVisualizerProps {
+  height?: number;
+  showControls?: boolean;
+  mood?: string;
+  intensity?: number;
+  volume?: number;
+  className?: string;
+}
+
 // Types génériques utilisés dans différentes parties de l'application
 export interface Story {
   id: string;

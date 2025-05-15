@@ -35,6 +35,10 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result }) => {
     }
   };
 
+  // Get score value with fallback
+  const scoreValue = result.score || 0;
+  const displayFeedback = result.feedback || result.ai_feedback;
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -50,13 +54,13 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result }) => {
                 {result.emotion}
               </Badge>
               <span className="text-sm text-muted-foreground">
-                Confiance: {Math.round(result.confidence * 100)}%
+                Confiance: {Math.round((result.confidence || 0) * 100)}%
               </span>
             </div>
             
-            {(result.feedback) && (
+            {displayFeedback && (
               <div className="mt-4 p-3 bg-muted rounded-md">
-                <p className="text-sm">{result.feedback}</p>
+                <p className="text-sm">{displayFeedback}</p>
               </div>
             )}
           </div>
@@ -67,9 +71,9 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result }) => {
                 <BarChart2 className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">Intensité</span>
               </div>
-              <span className="text-sm">{result.score}%</span>
+              <span className="text-sm">{typeof scoreValue === 'number' ? Math.round(scoreValue * 100) : scoreValue}%</span>
             </div>
-            <Progress value={result.score} className="h-2 mt-2" />
+            <Progress value={typeof scoreValue === 'number' ? scoreValue * 100 : 0} className="h-2 mt-2" />
           </div>
         </div>
       </CardContent>

@@ -7,8 +7,9 @@ import { VoiceEmotionScannerProps } from '@/types';
 
 const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ 
   onResult, 
+  onEmotionDetected,
   autoStart = false,
-  onEmotionDetected = undefined
+  duration = 10
 }) => {
   const [isRecording, setIsRecording] = React.useState(autoStart);
   const [result, setResult] = React.useState<any>(null);
@@ -31,9 +32,10 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
       };
       setResult(mockResult);
       setIsRecording(false);
+      
       if (onResult) onResult(mockResult);
       if (onEmotionDetected) onEmotionDetected('calm', mockResult);
-    }, 3000);
+    }, duration * 300); // Simule la durée * 300ms
   };
 
   return (

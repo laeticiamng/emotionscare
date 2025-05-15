@@ -64,3 +64,10 @@ export interface GlobalOverviewTabProps {
   gamificationData?: GamificationData;
   isLoading?: boolean;
 }
+
+export type ChartData = {
+  name: string;
+  value: number;
+  date?: string;
+  [key: string]: any;
+};

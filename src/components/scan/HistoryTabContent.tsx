@@ -10,19 +10,28 @@ interface HistoryTabContentProps {
 }
 
 const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ emotionHistory }) => {
+  const formatDate = (dateValue: string | Date | undefined) => {
+    if (!dateValue) return 'Date inconnue';
+    try {
+      return format(new Date(dateValue), 'PPP', { locale: fr });
+    } catch (error) {
+      return 'Date invalide';
+    }
+  };
+  
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold mb-4">Historique des scans émotionnels</h2>
       
       {emotionHistory.length > 0 ? (
         <div className="grid gap-4">
-          {emotionHistory.map((result) => (
-            <Card key={result.id} className="overflow-hidden">
+          {emotionHistory.map((result, index) => (
+            <Card key={result.id || `emotion-${index}`} className="overflow-hidden">
               <CardHeader className="bg-muted/30 pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg capitalize">{result.emotion}</CardTitle>
                   <span className="text-sm text-muted-foreground">
-                    {result.date ? format(new Date(result.date), 'PPP', { locale: fr }) : 'Date inconnue'}
+                    {formatDate(result.date || result.timestamp)}
                   </span>
                 </div>
               </CardHeader>
@@ -30,13 +39,13 @@ const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ emotionHistory })
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Intensité:</span>
-                    <span className="font-semibold">{(result.score || 0) * 100}%</span>
+                    <span className="font-semibold">{Math.round((result.score || 0) * 100)}%</span>
                   </div>
                   
                   <div className="w-full bg-muted rounded-full h-2.5 mb-2">
                     <div 
                       className="bg-primary h-2.5 rounded-full" 
-                      style={{ width: `${(result.score || 0) * 100}%` }}
+                      style={{ width: `${Math.round((result.score || 0) * 100)}%` }}
                     ></div>
                   </div>
                   
@@ -46,9 +55,9 @@ const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ emotionHistory })
                     </div>
                   )}
                   
-                  {result.ai_feedback && (
+                  {(result.ai_feedback || result.feedback) && (
                     <div className="mt-2 p-3 bg-muted/50 rounded-md">
-                      <p className="text-sm">{result.ai_feedback}</p>
+                      <p className="text-sm">{result.ai_feedback || result.feedback}</p>
                     </div>
                   )}
                 </div>

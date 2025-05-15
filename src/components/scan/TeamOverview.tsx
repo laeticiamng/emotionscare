@@ -6,7 +6,8 @@ import { TeamOverviewProps } from '@/types';
 const TeamOverview: React.FC<TeamOverviewProps> = ({ 
   teamId, 
   period = 'week',
-  anonymized = false 
+  anonymized = false,
+  department = 'General'
 }) => {
   return (
     <Card>
@@ -19,7 +20,7 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
         </p>
         <div className="h-64 flex items-center justify-center bg-muted/20 rounded-md mt-4">
           <span className="text-muted-foreground">
-            Données de l'équipe {anonymized ? 'anonymisées' : ''} (ID: {teamId})
+            Données de l'équipe {anonymized ? 'anonymisées' : ''} (ID: {teamId}) - Département: {department}
           </span>
         </div>
       </CardContent>
