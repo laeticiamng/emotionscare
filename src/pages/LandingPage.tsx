@@ -6,6 +6,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { User, Building, Mic, MicOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
+import { ThemeSelector } from '@/components/theme/ThemeSelector';
+import { AudioController } from '@/components/home/audio/AudioController';
+import { WelcomeMessage } from '@/components/home/WelcomeMessage';
 import Shell from '@/Shell';
 
 const LandingPage = () => {
@@ -13,7 +16,6 @@ const LandingPage = () => {
   const { toast } = useToast();
   const [isListening, setIsListening] = useState(false);
   const [backgroundState, setBackgroundState] = useState('morning');
-  const [greeting, setGreeting] = useState('Bienvenue dans votre espace de bien-être émotionnel.');
 
   // Set background based on time of day
   useEffect(() => {
@@ -24,15 +26,6 @@ const LandingPage = () => {
       setBackgroundState('afternoon');
     } else {
       setBackgroundState('evening');
-    }
-
-    // Set greeting based on time
-    if (hour >= 5 && hour < 12) {
-      setGreeting('Bonjour, et bienvenue dans votre espace de bien-être émotionnel.');
-    } else if (hour >= 12 && hour < 18) {
-      setGreeting('Bienvenue dans votre cocon de bien-être pour cet après-midi.');
-    } else {
-      setGreeting('Bonsoir, et bienvenue dans votre espace de tranquillité.');
     }
 
     // Preload essential components
@@ -101,6 +94,12 @@ const LandingPage = () => {
           backgroundState === 'afternoon' ? 'bg-gradient-to-br from-blue-50 via-emerald-50 to-blue-100 dark:from-blue-900/20 dark:via-emerald-900/10 dark:to-blue-900/30' : 
           'bg-gradient-to-br from-indigo-900/20 via-purple-900/10 to-blue-900/30 dark:from-indigo-950 dark:via-purple-950 dark:to-blue-950'}`}
       >
+        {/* Theme selector position in top-right */}
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-4">
+          <AudioController minimal className="mr-2" />
+          <ThemeSelector minimal />
+        </div>
+
         {/* Ambient animations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -135,11 +134,9 @@ const LandingPage = () => {
             className="text-center mb-12"
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-              {greeting}
+              EmotionsCare
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Choisissez votre chemin.
-            </p>
+            <WelcomeMessage className="text-xl max-w-3xl mx-auto" />
           </motion.div>
 
           <motion.div 
