@@ -1,4 +1,3 @@
-
 export interface Emotion {
   id: string;
   name: string;
@@ -73,6 +72,20 @@ export interface VoiceEmotionScannerProps {
 export interface TeamOverviewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month' | 'year';
-  showNames?: boolean;
-  compact?: boolean;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  users?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    avatar_url?: string;
+    emotional_score?: number;
+    anonymity_code?: string;
+  }>;
 }

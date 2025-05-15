@@ -1,75 +1,64 @@
 
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { SidebarContextType } from '@/types';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { SidebarContextType } from '@/types/theme';
 
-// Create the context with a default value
-export const SidebarContext = createContext<SidebarContextType>({
-  isSidebarOpen: true,
-  toggleSidebar: () => {},
-  openSidebar: () => {},
-  closeSidebar: () => {},
-  isMobile: false,
-  isCollapsed: false,
-  toggleCollapse: () => {},
+const SidebarContext = createContext<SidebarContextType>({
+  isOpen: false,
+  toggle: () => {},
+  close: () => {},
+  open: () => {},
+  collapsed: false,
+  expanded: true,
+  toggleCollapsed: () => {}
 });
 
-interface SidebarProviderProps {
-  children: ReactNode;
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a SidebarProvider');
+  }
+  return context;
+};
+
+type SidebarProviderProps = {
+  children: React.ReactNode;
   defaultOpen?: boolean;
-  defaultCollapsed?: boolean;
-}
+};
 
-export const SidebarProvider = ({ 
+export const SidebarProvider = ({
   children,
-  defaultOpen = true,
-  defaultCollapsed = false
+  defaultOpen = false,
 }: SidebarProviderProps) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(defaultOpen);
-  const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Update isMobile based on window size
-  useState(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [collapsed, setCollapsed] = useState(false);
+  
+  const toggle = () => setIsOpen(prev => !prev);
+  const close = () => setIsOpen(false);
+  const open = () => setIsOpen(true);
+  const toggleCollapsed = () => setCollapsed(prev => !prev);
+  
+  // Listen for escape key to close sidebar
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+      }
     };
-    
-    // Check on mount
-    checkMobile();
-    
-    // Add resize listener
-    window.addEventListener('resize', checkMobile);
-    
-    // Clean up
-    return () => window.removeEventListener('resize', checkMobile);
-  });
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(prev => !prev);
-  };
-
-  const openSidebar = () => {
-    setIsSidebarOpen(true);
-  };
-
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-  };
-
-  const toggleCollapse = () => {
-    setIsCollapsed(prev => !prev);
-  };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, []);
 
   return (
-    <SidebarContext.Provider 
-      value={{ 
-        isSidebarOpen, 
-        toggleSidebar, 
-        openSidebar, 
-        closeSidebar,
-        isMobile,
-        isCollapsed,
-        toggleCollapse
+    <SidebarContext.Provider
+      value={{
+        isOpen,
+        toggle,
+        close,
+        open,
+        collapsed,
+        expanded: !collapsed,
+        toggleCollapsed
       }}
     >
       {children}
@@ -77,10 +66,4 @@ export const SidebarProvider = ({
   );
 };
 
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (context === undefined) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-};
+export { SidebarContext };

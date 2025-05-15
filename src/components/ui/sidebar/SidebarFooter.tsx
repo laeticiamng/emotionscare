@@ -1,28 +1,23 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useSidebar } from './SidebarContext';
 
-const SidebarFooter: React.FC = () => {
+export function SidebarFooter() {
   const { collapsed, toggleCollapsed } = useSidebar();
 
-  console.log("SidebarFooter rendering, collapsed:", collapsed);
-
   return (
-    <div className="p-2 border-t border-border mt-auto">
-      <Button 
-        variant="outline" 
-        size={collapsed ? "icon" : "sm"}
-        className={`${collapsed ? 'w-full' : 'w-full justify-between'} mt-2`}
+    <div className="mt-auto p-2">
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={toggleCollapsed}
-        aria-label={collapsed ? "Développer la sidebar" : "Réduire la sidebar"}
+        className="w-full justify-center"
       >
-        {!collapsed && <span className="text-xs">Réduire</span>}
-        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        <span className="sr-only">Toggle sidebar</span>
       </Button>
     </div>
   );
-};
-
-export default SidebarFooter;
+}

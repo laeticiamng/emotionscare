@@ -1,4 +1,3 @@
-
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'sm' | 'md' | 'lg' | 'xl';
 export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded' | 'sans' | 'mono' | 'inter';
@@ -13,12 +12,18 @@ export interface ThemeContextType {
   setFontSize: (size: FontSize) => void;
   isDarkMode: boolean;
   getContrastText?: (color: string) => 'black' | 'white';
+  isSidebarOpen?: boolean; // Add this property
+  collapsed?: boolean; // Add this property
+  expanded?: boolean; // Add this property
+  toggleCollapsed?: () => void; // Add this property
 }
 
 export interface ThemeButtonProps {
   variant?: 'icon' | 'text' | 'both';
   showLabel?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  onClick?: () => void; // Add this property
+  collapsed?: boolean; // Add this property
 }
 
 export interface ThemeSwitcherProps {

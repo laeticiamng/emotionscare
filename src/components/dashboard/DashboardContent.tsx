@@ -149,11 +149,14 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
           </TabsContent>
           
           <TabsContent value="team" className="space-y-4">
-            <TeamOverview users={mockTeamUsers.map(user => ({
-              ...user,
-              email: `${user.id}@example.com`, // Add required email property
-              role: 'employee'
-            }))} userId="admin" />
+            <TeamOverview 
+              teamId="team-1"
+              users={mockTeamUsers.map(user => ({
+                ...user,
+                email: `${user.id}@example.com`, // Add required email property
+                role: 'employee'
+              }))}
+            />
           </TabsContent>
         </Tabs>
       </div>

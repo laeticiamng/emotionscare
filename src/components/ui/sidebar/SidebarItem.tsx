@@ -1,76 +1,47 @@
-
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useSidebar } from './SidebarContext';
 
-export interface SidebarItemProps {
-  children: React.ReactNode;
+interface SidebarItemProps {
   icon?: React.ReactNode;
-  to?: string;
-  onClick?: () => void;
+  title: string;
   active?: boolean;
+  href?: string;
+  onClick?: () => void;
+  children?: React.ReactNode;
   disabled?: boolean;
-  className?: string;
-  tooltip?: string;
-  external?: boolean;
+  badge?: React.ReactNode;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({
-  children,
+export function SidebarItem({
   icon,
-  to,
+  title,
+  active,
+  href,
   onClick,
-  active = false,
-  disabled = false,
-  className,
-  tooltip,
-  external = false,
-}) => {
+  children,
+  disabled,
+  badge
+}: SidebarItemProps) {
   const { expanded } = useSidebar();
 
-  const content = (
-    <div
-      className={cn(
-        "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer",
-        active ? "bg-accent text-accent-foreground" : "transparent",
-        disabled && "pointer-events-none opacity-50",
-        className
-      )}
-      title={tooltip || (typeof children === 'string' ? children : undefined)}
-      onClick={disabled ? undefined : onClick}
-    >
-      {icon && (
-        <div className="mr-2 h-4 w-4">
-          {icon}
-        </div>
-      )}
-      {(expanded || !icon) && <span className="truncate">{children}</span>}
-    </div>
+  return (
+    <li className={cn("relative", disabled && "opacity-60 pointer-events-none")}>
+      <a
+        href={href}
+        onClick={onClick}
+        className={cn(
+          "flex items-center gap-2 rounded-md p-2 text-sm font-semibold transition-colors hover:bg-secondary/50",
+          active && "bg-secondary/50",
+          !expanded && "justify-center",
+          disabled && "cursor-not-allowed opacity-60 hover:bg-transparent"
+        )}
+      >
+        {icon}
+        {(expanded || (!icon && !expanded)) && <span>{title}</span>}
+        {badge && <span className="ml-auto">{badge}</span>}
+      </a>
+      {children}
+    </li>
   );
-
-  if (to) {
-    if (external) {
-      return (
-        <a 
-          href={to} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="block"
-        >
-          {content}
-        </a>
-      );
-    }
-    
-    return (
-      <Link to={to} className="block">
-        {content}
-      </Link>
-    );
-  }
-
-  return content;
-};
-
-export default SidebarItem;
+}

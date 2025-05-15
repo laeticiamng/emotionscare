@@ -38,7 +38,7 @@ const NotificationPreferences = () => {
   
   // Convert to object if it's a boolean
   const notificationSettings = typeof userNotifPrefs === 'boolean' 
-    ? { enabled: userNotifPrefs } 
+    ? { enabled: userNotifPrefs, emailEnabled: true } 
     : userNotifPrefs;
   
   // State for the form

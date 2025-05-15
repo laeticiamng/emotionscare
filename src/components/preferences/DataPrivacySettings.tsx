@@ -84,7 +84,7 @@ const DataPrivacySettings = () => {
   
   // Get export format
   const getExportFormat = (): 'pdf' | 'json' | 'csv' => {
-    // Fix for TypeScript error: convert to proper enum type
+    // Fix for TypeScript error: ensure a proper return type
     const format = preferences.dataExport;
     if (format === 'pdf' || format === 'json' || format === 'csv') {
       return format;
@@ -101,11 +101,23 @@ const DataPrivacySettings = () => {
   
   const handleExportData = () => {
     // Implement export data logic here
+    const format = getExportFormat();
+    // Export data in the selected format
   };
 
   // Handle anonymous mode toggle
   const handleAnonymousMode = (enabled: boolean) => {
-    // Implement anonymous mode logic here
+    // Fix boolean type mismatch
+    if (typeof enabled === 'string') {
+      // Convert string to boolean if needed
+      updatePreferences({
+        anonymousMode: enabled === 'true'
+      });
+    } else {
+      updatePreferences({
+        anonymousMode: enabled
+      });
+    }
   };
 
   return (

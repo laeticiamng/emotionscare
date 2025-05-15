@@ -17,7 +17,8 @@ interface PreferencesFormProps {
 const preferencesSchema = z.object({
   theme: z.enum(['light', 'dark', 'system', 'pastel']),
   notifications: z.object({
-    enabled: z.boolean()
+    enabled: z.boolean(),
+    emailEnabled: z.boolean()
   }).or(z.boolean()),
   fontSize: z.enum(['small', 'medium', 'large']),
   language: z.string(),
@@ -34,16 +35,20 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ preferences, onSave }
 
   // Format preferences for the form
   const getFormattedPreferences = () => {
-    // Convert old notifications_enabled to the new structure if needed
+    // Convert old notifications settings to the new structure if needed
     let notifications = preferences.notifications;
     
-    if (typeof preferences.notifications_enabled !== 'undefined' && !notifications) {
+    if (notifications === undefined) {
+      // If notifications is undefined, create a default notifications object
       notifications = {
-        enabled: preferences.notifications_enabled
+        enabled: true,
+        emailEnabled: true
       };
-    } else if (!notifications) {
+    } else if (typeof notifications === 'boolean') {
+      // If notifications is a boolean, convert it to an object
       notifications = {
-        enabled: true
+        enabled: notifications,
+        emailEnabled: true
       };
     }
 
