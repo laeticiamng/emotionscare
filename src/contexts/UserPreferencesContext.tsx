@@ -1,5 +1,5 @@
 
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { UserPreferences } from '@/types/user';
 
 // Define the context type
@@ -47,6 +47,17 @@ export const UserPreferencesContext = createContext<UserPreferencesContextType>(
   resetPreferences: () => {},
   loading: false,
 });
+
+// Custom hook to use the UserPreferences context
+export const useUserPreferences = () => {
+  const context = useContext(UserPreferencesContext);
+  
+  if (!context) {
+    throw new Error('useUserPreferences must be used within a UserPreferencesProvider');
+  }
+  
+  return context;
+};
 
 interface UserPreferencesProviderProps {
   children: React.ReactNode;

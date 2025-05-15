@@ -7,7 +7,7 @@ export function useAmbientSound() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [currentMood, setCurrentMood] = useState<string>('calm');
-  const { preferences } = useUserPreferences?.() || { preferences: { ambientSound: true } };
+  const { preferences } = useUserPreferences();
 
   const toggle = useCallback(() => {
     setIsPlaying(prev => !prev);
