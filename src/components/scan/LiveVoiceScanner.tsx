@@ -1,56 +1,51 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Mic, Square } from 'lucide-react';
+import { LiveVoiceScannerProps, EmotionResult } from '@/types';
 
-export interface LiveVoiceScannerProps {
-  onScanComplete?: (result: any) => void;
-  autoStart?: boolean;
-  scanDuration?: number; // in seconds
-  onEmotionDetected?: (emotion: any) => void;
-  onTranscriptUpdate?: (transcript: string) => void;
-  onStart?: () => void;
-  onStop?: () => void;
-  className?: string;
-  visualizationMode?: 'wave' | 'bars' | 'circle';
-}
-
-const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
-  onScanComplete,
+export const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({ 
+  onResult, 
   autoStart = false,
-  scanDuration = 10,
-  className
+  duration = 30 
 }) => {
+  const handleScan = () => {
+    // Mock implementation - in a real app this would record and analyze voice
+    const mockResult: EmotionResult = {
+      emotion: 'happy',
+      score: 0.85,
+      confidence: 0.9,
+      timestamp: new Date().toISOString(),
+      transcript: "This is a simulated voice transcript",
+      feedback: "You sound happy and positive"
+    };
+    
+    if (onResult) {
+      onResult(mockResult);
+    }
+  };
+
+  React.useEffect(() => {
+    if (autoStart) {
+      // Auto start the scanner if requested
+      const timer = setTimeout(handleScan, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [autoStart]);
+
   return (
-    <Card className={`w-full ${className}`}>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span>Scan vocal en direct</span>
-        </CardTitle>
-        <Progress value={0} className="h-2" />
-      </CardHeader>
-      
-      <CardContent className="flex flex-col items-center space-y-4 pt-2">
-        <div className="relative h-24 w-24">
-          <div className="absolute inset-0 rounded-full bg-muted"></div>
-          <div className="absolute inset-0 scale-[0.8] rounded-full bg-muted/80"></div>
-          <div className="absolute inset-0 scale-[0.6] rounded-full bg-background flex items-center justify-center">
-            <Mic className="h-10 w-10 text-muted-foreground" />
-          </div>
-        </div>
-        
-        <Button>
-          <Mic className="mr-2 h-4 w-4" />
-          Commencer l'analyse
-        </Button>
-        
-        <p className="text-xs text-muted-foreground text-center max-w-md">
-          L'analyse vocale permet de détecter les émotions à travers les modulations et intonations de votre voix.
-        </p>
-      </CardContent>
-    </Card>
+    <div className="p-4 bg-gray-50 rounded-lg">
+      <h3 className="text-lg font-medium mb-2">Voice Emotion Scanner</h3>
+      <div className="flex items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
+        <button
+          onClick={handleScan}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Start Voice Scan
+        </button>
+      </div>
+      <div className="mt-4 text-sm text-gray-500">
+        Speak clearly for {duration} seconds to analyze your emotional state
+      </div>
+    </div>
   );
 };
 

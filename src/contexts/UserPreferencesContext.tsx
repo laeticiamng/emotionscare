@@ -25,7 +25,8 @@ interface UserPreferencesContextType {
   updatePreferences: (newPreferences: Partial<UserPreferencesContextType['preferences']>) => void;
 }
 
-const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
+// Export the context so it can be imported in other files
+export const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
 
 export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [preferences, setPreferences] = useState(DEFAULT_USER_PREFERENCES);

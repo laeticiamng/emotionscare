@@ -1,3 +1,4 @@
+
 import { useContext } from 'react';
 import { UserPreferencesContext } from '@/contexts/UserPreferencesContext';
 import { Theme, FontFamily, FontSize } from '@/types';
@@ -10,10 +11,10 @@ export function useUserPreferences() {
   }
   
   // Get the current preferences
-  const { preferences, setPreferences } = context;
+  const { preferences, updatePreferences } = context;
   
   // Function to update specific preferences
-  const updatePreferences = (newPrefs: Partial<{
+  const updatePrefs = (newPrefs: Partial<{
     theme: Theme;
     font: FontFamily;
     fontSize: FontSize;
@@ -23,7 +24,7 @@ export function useUserPreferences() {
     language: string;
     [key: string]: any;
   }>) => {
-    setPreferences(prev => ({
+    updatePreferences(prev => ({
       ...prev,
       ...newPrefs
     }));
@@ -46,7 +47,7 @@ export function useUserPreferences() {
       language: 'fr'
     };
     
-    setPreferences(defaultPrefs);
+    updatePreferences(defaultPrefs);
     
     // Clear localStorage preferences
     Object.keys(defaultPrefs).forEach(key => {
@@ -56,7 +57,7 @@ export function useUserPreferences() {
   
   return {
     preferences,
-    updatePreferences,
+    updatePreferences: updatePrefs,
     resetPreferences
   };
 }

@@ -1,191 +1,142 @@
+// This is a mock implementation of a scan service for emotion detection
+// In a real application, this would connect to a backend API or ML model
 
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult, EnhancedEmotionResult } from '@/types';
 
-// Analyze audio stream and return emotion data
-export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
-  try {
-    // Mock implementation for demo purposes
-    // In a real app, this would call an API endpoint
-    console.log('Analyzing audio stream of size', audioBlob.size);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    return {
-      id: crypto.randomUUID(),
-      emotion: ['calm', 'happy', 'focused', 'anxious', 'excited'][Math.floor(Math.random() * 5)],
-      confidence: Math.random() * 0.5 + 0.5, // 0.5-1.0
-      score: Math.floor(Math.random() * 100),
-      intensity: Math.random() * 0.8 + 0.2, // 0.2-1.0
-      transcript: "Ce que j'ai ressenti aujourd'hui était plutôt positif, malgré quelques challenges.",
-      text: "Ce que j'ai ressenti aujourd'hui était plutôt positif, malgré quelques challenges.",
-      feedback: "Vous semblez être dans un bon état émotionnel aujourd'hui.",
-      ai_feedback: "Votre émotion principale est positive. Continuez à observer ces moments.",
-      recommendations: [
-        "Prenez 5 minutes pour noter ce qui a contribué à cette émotion",
-        "Pratiquez une courte méditation de gratitude"
-      ]
-    };
-  } catch (error) {
-    console.error('Error analyzing audio:', error);
-    throw new Error('Failed to analyze audio stream');
-  }
-}
-
-// Export the analyzeEmotion function that's being imported by components
-export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  try {
-    console.log('Analyzing emotion from text:', text);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    return {
-      id: crypto.randomUUID(),
-      emotion: ['joy', 'calm', 'focus', 'anxiety', 'excitement'][Math.floor(Math.random() * 5)],
-      confidence: Math.random() * 0.5 + 0.5, // 0.5-1.0
-      score: Math.floor(Math.random() * 100),
-      intensity: Math.random() * 0.8 + 0.2, // 0.2-1.0
-      text: text,
-      ai_feedback: "Votre texte révèle des émotions intéressantes. Continuez à explorer.",
-      recommendations: [
-        "Essayez de noter quand ces émotions apparaissent dans votre journée",
-        "Pratiquez la pleine conscience pour mieux les observer"
-      ]
-    };
-  } catch (error) {
-    console.error('Error analyzing emotion from text:', error);
-    throw new Error('Failed to analyze emotion');
-  }
+// Analyze text for emotional content
+export const analyzeText = async (text: string): Promise<EmotionResult> => {
+  // Mock implementation - would be replaced with actual API call
+  const emotions = ['happy', 'sad', 'angry', 'neutral', 'surprised', 'fearful'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  
+  return {
+    emotion: randomEmotion,
+    score: Math.random(),
+    confidence: 0.7 + Math.random() * 0.3,
+    timestamp: new Date().toISOString(),
+    text: text,
+    feedback: `Your text indicates a ${randomEmotion} emotional state.`
+  };
 };
 
-// Add the saveEmotion function
-export const saveEmotion = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
-  try {
-    console.log('Saving emotion data:', emotionData);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    return {
-      id: emotionData.id || crypto.randomUUID(),
-      emotion: emotionData.emotion || 'neutral',
-      confidence: emotionData.confidence || 0.7,
-      score: emotionData.score || 50,
-      intensity: emotionData.intensity || 0.5,
-      text: emotionData.text || '',
-      timestamp: new Date().toISOString(),
-      // Include any other properties
-      ...emotionData
-    };
-  } catch (error) {
-    console.error('Error saving emotion:', error);
-    throw new Error('Failed to save emotion data');
-  }
+// Analyze audio for emotional content
+export const analyzeAudio = async (audioBlob: Blob): Promise<EmotionResult> => {
+  // Mock implementation - would be replaced with actual API call
+  const emotions = ['calm', 'excited', 'stressed', 'relaxed', 'focused'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  
+  return {
+    emotion: randomEmotion,
+    score: Math.random(),
+    confidence: 0.6 + Math.random() * 0.4,
+    timestamp: new Date().toISOString(),
+    audioLength: Math.floor(Math.random() * 30) + 10, // seconds
+    feedback: `Your voice indicates a ${randomEmotion} emotional state.`
+  };
 };
 
-// Add the fetchEmotionHistory function
-export const fetchEmotionHistory = async (userId: string, limit = 10): Promise<EmotionResult[]> => {
-  try {
-    console.log('Fetching emotion history for user:', userId, 'limit:', limit);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    // Generate mock data
-    const history: EmotionResult[] = Array.from({ length: limit }).map((_, index) => {
-      const date = new Date();
-      date.setDate(date.getDate() - index);
-      
-      return {
-        id: `emotion-${Date.now() - index * 86400000}`,
-        user_id: userId,
-        emotion: ['joy', 'calm', 'focus', 'anxiety', 'excitement'][Math.floor(Math.random() * 5)],
-        confidence: Math.random() * 0.5 + 0.5,
-        score: Math.floor(Math.random() * 100),
-        intensity: Math.random() * 0.8 + 0.2,
-        text: "Journal entry for emotion tracking",
-        date: date.toISOString(),
-        ai_feedback: "Analysis of your emotional patterns shows interesting trends."
-      };
+// Analyze facial expression for emotional content
+export const analyzeFacial = async (imageBlob: Blob): Promise<EmotionResult> => {
+  // Mock implementation - would be replaced with actual API call
+  const emotions = ['happy', 'sad', 'angry', 'neutral', 'surprised'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  
+  return {
+    emotion: randomEmotion,
+    score: Math.random(),
+    confidence: 0.5 + Math.random() * 0.5,
+    timestamp: new Date().toISOString(),
+    faceDetected: true,
+    feedback: `Your facial expression indicates a ${randomEmotion} emotional state.`
+  };
+};
+
+// Get enhanced emotion analysis with recommendations
+export const getEnhancedAnalysis = async (result: EmotionResult): Promise<EnhancedEmotionResult> => {
+  // Mock implementation - would be replaced with actual API call
+  const recommendations = [
+    'Take a short break',
+    'Practice deep breathing',
+    'Listen to calming music',
+    'Go for a walk',
+    'Write in your journal'
+  ];
+  
+  const randomRecommendations = recommendations
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 2);
+  
+  return {
+    ...result,
+    triggers: ['Work stress', 'Lack of sleep'],
+    recommendations: randomRecommendations,
+    insights: `Your ${result.emotion} state might be affecting your productivity.`,
+    historicalContext: 'Your emotional pattern shows improvement over the last week.'
+  };
+};
+
+// Save emotion scan result to user history
+export const saveEmotionResult = async (userId: string, result: EmotionResult): Promise<boolean> => {
+  // Mock implementation - would save to database in real app
+  console.log(`Saving emotion result for user ${userId}:`, result);
+  return true;
+};
+
+export const fetchEmotionHistory = async (userId: string, startDate?: string, endDate?: string) => {
+  // Implement fetching emotion history
+  // This is a mock implementation
+  return [];
+};
+
+// Provide an alias for backwards compatibility
+export const fetchEmotionsHistory = fetchEmotionHistory;
+
+// Get emotion trends for a user
+export const getEmotionTrends = async (userId: string, period: string = 'week'): Promise<any> => {
+  // Mock implementation - would be replaced with actual API call
+  return {
+    dominant: 'calm',
+    improvement: 12,
+    trends: {
+      happy: [0.4, 0.5, 0.6, 0.7, 0.6, 0.8, 0.7],
+      sad: [0.3, 0.2, 0.2, 0.1, 0.2, 0.1, 0.1],
+      angry: [0.2, 0.3, 0.1, 0.1, 0.1, 0.0, 0.1],
+      neutral: [0.1, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1]
+    },
+    period: period,
+    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    endDate: new Date().toISOString()
+  };
+};
+
+// Get team emotion data
+export const getTeamEmotions = async (teamId: string): Promise<any[]> => {
+  // Mock implementation - would be replaced with actual API call
+  const mockTeamData = [];
+  const emotions = ['happy', 'calm', 'focused', 'stressed', 'neutral'];
+  
+  for (let i = 0; i < 8; i++) {
+    mockTeamData.push({
+      userId: `user-${i}`,
+      anonymousId: `anon-${i}`,
+      emotion: emotions[Math.floor(Math.random() * emotions.length)],
+      score: 0.5 + Math.random() * 0.5,
+      timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
     });
-    
-    return history;
-  } catch (error) {
-    console.error('Error fetching emotion history:', error);
-    return [];
   }
+  
+  return mockTeamData;
 };
 
-// Create emotion entry in the database
-export async function createEmotionEntry(data: {
-  user_id: string;
-  date: string;
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-  is_confidential?: boolean;
-  share_with_coach?: boolean;
-}): Promise<EmotionResult> {
-  try {
-    // Mock implementation for demo purposes
-    console.log('Creating emotion entry:', data);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Return a mock emotion result
-    return {
-      id: crypto.randomUUID(),
-      user_id: data.user_id,
-      date: data.date,
-      emotion: ['calm', 'happy', 'focused', 'anxious', 'excited'][Math.floor(Math.random() * 5)],
-      confidence: Math.random() * 0.5 + 0.5,
-      score: Math.floor(Math.random() * 100),
-      intensity: Math.random() * 0.8 + 0.2,
-      text: data.text || "",
-      transcript: data.text || "",
-      ai_feedback: "Votre émotion a été enregistrée avec succès.",
-      recommendations: [
-        "Continuez à pratiquer la pleine conscience",
-        "Essayez une séance de relaxation"
-      ]
-    };
-  } catch (error) {
-    console.error('Error creating emotion entry:', error);
-    throw new Error('Failed to create emotion entry');
-  }
-}
-
-// Fetch the most recent emotion for a user
-export async function fetchLatestEmotion(userId: string): Promise<EmotionResult | null> {
-  try {
-    // Mock implementation for demo purposes
-    console.log('Fetching latest emotion for user:', userId);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Return a mock emotion or null
-    const shouldHaveEmotion = Math.random() > 0.2; // 80% chance to have an emotion
-    
-    if (shouldHaveEmotion) {
-      return {
-        id: crypto.randomUUID(),
-        user_id: userId,
-        date: new Date().toISOString(),
-        emotion: ['calm', 'happy', 'focused', 'anxious', 'excited'][Math.floor(Math.random() * 5)],
-        confidence: Math.random() * 0.5 + 0.5,
-        score: Math.floor(Math.random() * 100),
-        intensity: Math.random() * 0.8 + 0.2,
-        text: "Dernière émotion enregistrée",
-        ai_feedback: "Voici votre dernière émotion enregistrée."
-      };
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error fetching latest emotion:', error);
-    return null;
-  }
-}
+// Export default for easier importing
+export default {
+  analyzeText,
+  analyzeAudio,
+  analyzeFacial,
+  getEnhancedAnalysis,
+  saveEmotionResult,
+  fetchEmotionHistory,
+  fetchEmotionsHistory,
+  getEmotionTrends,
+  getTeamEmotions
+};
