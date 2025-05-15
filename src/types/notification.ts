@@ -1,8 +1,14 @@
 
 export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'system' | 'user' | 'emotion' | string;
 export type NotificationPriority = 'high' | 'medium' | 'low';
-export type NotificationFrequency = 'immediately' | 'daily' | 'weekly' | 'never';
-export type NotificationTone = 'professional' | 'friendly' | 'direct';
+export type NotificationFrequency = 'immediately' | 'daily' | 'weekly' | 'never' | 'immediate' | 'realtime';
+export type NotificationTone = 'professional' | 'friendly' | 'direct' | 'supportive' | 'minimal' | 'casual';
+
+export interface NotificationChannels {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+}
 
 export interface NotificationPreference {
   id?: string;
@@ -10,12 +16,13 @@ export interface NotificationPreference {
   enabled?: boolean;
   type?: NotificationType | string;
   types?: NotificationType[];
-  channels?: { email: boolean; push: boolean; inApp: boolean } | string[];
+  channels?: NotificationChannels | string[];
   frequency?: NotificationFrequency;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
   tone?: NotificationTone;
+  soundEnabled?: boolean;
 }
 
 export interface Notification {

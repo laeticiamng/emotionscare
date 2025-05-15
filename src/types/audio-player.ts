@@ -1,24 +1,23 @@
 
 export interface UseAudioPlayerStateReturn {
+  audioRef: React.RefObject<HTMLAudioElement>;
   isPlaying: boolean;
   volume: number;
-  progress: number;
-  duration: number;
+  muted: boolean;
   currentTime: number;
-  playTrack: (track: any) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
+  duration: number;
+  play: () => Promise<void>;
+  pause: () => void;
+  toggle: () => Promise<void>;
   setVolume: (volume: number) => void;
-  togglePlayPause: () => void;
+  toggleMute: () => void;
   seek: (time: number) => void;
 }
 
 export interface EnhancedMusicVisualizerProps {
-  emotion?: string;
-  mood?: string;
   height?: number;
   showControls?: boolean;
+  mood?: string;
   intensity?: number;
   volume?: number;
   className?: string;

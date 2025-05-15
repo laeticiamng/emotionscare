@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference, NotificationType } from '@/types';
+import { NotificationFrequency, NotificationPreference, NotificationType, NotificationChannels } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface NotificationPreferencesProps {
@@ -20,8 +20,11 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const handleToggleEmail = (preference: NotificationPreference) => {
-    const emailEnabled = preference.emailEnabled !== undefined ? preference.emailEnabled : 
-                        (preference.channels && preference.channels.email || false);
+    const emailEnabled = preference.emailEnabled !== undefined 
+      ? preference.emailEnabled 
+      : (preference.channels && typeof preference.channels !== 'string' && 'email' in preference.channels)
+        ? preference.channels.email
+        : false;
     
     const updatedPreference = {
       ...preference,
@@ -29,10 +32,20 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     };
     
     // Add channels for backward compatibility if it exists in the original
-    if (preference.channels) {
+    if (preference.channels && typeof preference.channels !== 'string') {
       updatedPreference.channels = {
-        ...(preference.channels || { email: false, push: false, inApp: true }),
+        ...preference.channels,
         email: !emailEnabled
+      };
+    } else if (preference.channels && Array.isArray(preference.channels)) {
+      // Handle string[] type of channels if needed
+      updatedPreference.channels = preference.channels;
+    } else {
+      // Create default channels object if none exists
+      updatedPreference.channels = {
+        email: !emailEnabled,
+        push: !!preference.pushEnabled,
+        inApp: true
       };
     }
     
@@ -40,8 +53,11 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
   };
 
   const handleTogglePush = (preference: NotificationPreference) => {
-    const pushEnabled = preference.pushEnabled !== undefined ? preference.pushEnabled : 
-                       (preference.channels && preference.channels.push || false);
+    const pushEnabled = preference.pushEnabled !== undefined 
+      ? preference.pushEnabled 
+      : (preference.channels && typeof preference.channels !== 'string' && 'push' in preference.channels)
+        ? preference.channels.push
+        : false;
     
     const updatedPreference = {
       ...preference,
@@ -49,10 +65,20 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     };
     
     // Add channels for backward compatibility if it exists in the original
-    if (preference.channels) {
+    if (preference.channels && typeof preference.channels !== 'string') {
       updatedPreference.channels = {
-        ...(preference.channels || { email: false, push: false, inApp: true }),
+        ...preference.channels,
         push: !pushEnabled
+      };
+    } else if (preference.channels && Array.isArray(preference.channels)) {
+      // Handle string[] type of channels if needed
+      updatedPreference.channels = preference.channels;
+    } else {
+      // Create default channels object if none exists
+      updatedPreference.channels = {
+        email: !!preference.emailEnabled,
+        push: !pushEnabled,
+        inApp: true
       };
     }
     
@@ -96,6 +122,36 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     }
   };
 
+  // Helper to check if email is enabled for a preference
+  const isEmailEnabled = (preference: NotificationPreference): boolean => {
+    if (preference.emailEnabled !== undefined) {
+      return preference.emailEnabled;
+    }
+    
+    if (preference.channels) {
+      if (typeof preference.channels === 'object' && !Array.isArray(preference.channels)) {
+        return !!preference.channels.email;
+      }
+    }
+    
+    return false;
+  };
+  
+  // Helper to check if push is enabled for a preference
+  const isPushEnabled = (preference: NotificationPreference): boolean => {
+    if (preference.pushEnabled !== undefined) {
+      return preference.pushEnabled;
+    }
+    
+    if (preference.channels) {
+      if (typeof preference.channels === 'object' && !Array.isArray(preference.channels)) {
+        return !!preference.channels.push;
+      }
+    }
+    
+    return false;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -106,10 +162,8 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
           {preferences.map((preference, index) => {
             const preferenceId = preference.type || String(index);
             const isUpdating = updatingId === preferenceId;
-            const emailEnabled = preference.emailEnabled !== undefined ? preference.emailEnabled : 
-                                (preference.channels && preference.channels.email || false);
-            const pushEnabled = preference.pushEnabled !== undefined ? preference.pushEnabled : 
-                               (preference.channels && preference.channels.push || false);
+            const emailEnabled = isEmailEnabled(preference);
+            const pushEnabled = isPushEnabled(preference);
             
             // Get the type label, handling both strings and objects
             let typeName = 'Notification';

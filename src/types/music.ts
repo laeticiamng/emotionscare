@@ -1,77 +1,78 @@
 
+import { Emotion } from './emotion';
+
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
   duration: number;
   url: string;
+  cover?: string;
   coverUrl?: string;
   cover_url?: string;
-  cover?: string;
-  audioUrl?: string;
-  audio_url?: string;
   emotion?: string;
-  category?: string;
+  audioUrl?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
-  title?: string;
-  emotion?: string;
   tracks: MusicTrack[];
+  emotion?: string;
+  category?: string;
   coverUrl?: string;
   cover_url?: string;
   cover?: string;
-  category?: string;
+  title?: string;
 }
 
 export interface MusicContextType {
-  isPlaying: boolean;
   currentTrack: MusicTrack | null;
   playlist: MusicPlaylist | null;
-  playlists: MusicPlaylist[];
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
+  isPlaying: boolean;
   volume: number;
-  setVolume: (volume: number) => void;
-  progress: number;
-  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
-  togglePlayPause: () => void;
   duration: number;
   currentTime: number;
+  play: (track?: MusicTrack, playlist?: MusicPlaylist) => void;
+  pause: () => void;
+  toggle: () => void;
+  next: () => void;
+  previous: () => void;
+  setVolume: (volume: number) => void;
   seek: (time: number) => void;
+  playFromPlaylist: (playlist: MusicPlaylist, index?: number) => void;
+  playByEmotion: (emotion: string) => void;
 }
 
 export interface MusicDrawerProps {
   isOpen?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onClose?: () => void;
+  onOpenChange?: (isOpen: boolean) => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  className?: string;
+}
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+  className?: string;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (volume: number) => void;
+  className?: string;
 }
 
 export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
-  genre?: string;
-  tempo?: 'slow' | 'medium' | 'fast';
-  duration?: number;
+  mode?: 'focus' | 'relax' | 'energize' | 'comfort';
 }
 
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  cover?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  audioUrl?: string;
-  audio_url?: string;
-  emotion?: string;
-}
+export type Track = MusicTrack;

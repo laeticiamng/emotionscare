@@ -1,6 +1,8 @@
 
 export interface ChartConfig {
-  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar';
+  id: string;
+  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'polarArea' | 'bubble' | 'scatter';
+  title: string;
   data: {
     labels: string[];
     datasets: {
@@ -15,6 +17,9 @@ export interface ChartConfig {
 }
 
 export interface ChartContextProps {
-  period: 'day' | 'week' | 'month' | 'year';
-  setPeriod: (period: 'day' | 'week' | 'month' | 'year') => void;
+  activeCharts: string[];
+  toggleChart: (chartId: string) => void;
+  isChartActive: (chartId: string) => boolean;
+  chartConfigs: ChartConfig[];
+  updateChartConfig: (chartId: string, config: Partial<ChartConfig>) => void;
 }

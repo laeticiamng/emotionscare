@@ -7,7 +7,7 @@ export interface DashboardWidgetConfig {
   position: GridPosition;
   size?: { w: number; h: number };
   dataSource?: string;
-  settings?: any; // Required by the Admin dashboard kpi cards
+  settings?: any;
 }
 
 export interface KpiCardProps {
@@ -46,6 +46,7 @@ export interface DashboardStats {
   emotionAverage: number;
   sessionsCompleted: number;
   alerts: number;
+  activeUsersPercent?: number;
 }
 
 export interface GamificationData {
@@ -53,6 +54,9 @@ export interface GamificationData {
   badgesAwarded: number;
   completionRate: number;
   topChallenges: { name: string; count: number }[];
+  activeUsersPercent?: number; 
+  totalBadges?: number;
+  badgeLevels?: { level: string; count: number }[];
 }
 
 export interface GridPosition {

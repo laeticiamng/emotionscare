@@ -1,97 +1,53 @@
 
 export interface Emotion {
-  id?: string;
-  user_id?: string;
-  date?: string | Date;
-  emotion?: string;
-  name?: string;
-  color?: string;
-  icon?: string;
-  description?: string;
-  category?: string;
+  id: string;
+  name: string;
   score?: number;
-  confidence?: number;
-  intensity?: number;
-  text?: string;
-  emojis?: string[] | string;
-  transcript?: string;
-  audio_url?: string;
-  audioUrl?: string;
-  ai_feedback?: string;
+  color: string;
+  description?: string;
   recommendations?: string[];
-  triggers?: string[];
+  date?: string | Date;
+  emojis?: string[];
+  ai_feedback?: string;
   feedback?: string;
-  timestamp?: string;
-  anxiety?: number;
-  energy?: number;
-  [key: string]: any;  // Allow for flexible extension
+  intensity?: number;
+  confidence?: number;
+  audioUrl?: string;
+  audio_url?: string;
+  text?: string;
 }
 
 export interface EmotionResult {
-  id?: string;
-  user_id?: string;
   emotion: string;
   score?: number;
   confidence?: number;
-  dominantEmotion?: string;
-  primaryEmotion?: string;
-  intensity?: number;
-  text?: string;
-  transcript?: string;
-  emojis?: string[] | string;
-  timestamp?: string;
-  date?: string | Date;
   triggers?: string[];
-  feedback?: string;
-  ai_feedback?: string;
   recommendations?: string[];
-  audio_url?: string;
+  feedback?: string;
+  intensity?: number;
+  date?: string | Date;
+  emojis?: string[];
+  ai_feedback?: string;
   audioUrl?: string;
-  [key: string]: any;  // Allow for flexible extension
+  audio_url?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  recommendations?: string[];
   insights?: string[];
-  icon?: string;
-  color?: string;
-  textColor?: string;
-  description?: string;
-  category?: string;
-  coping_strategies?: string[];
-  relatedActivities?: {
-    id: string;
+  trendData?: { date: string; value: number }[];
+  historicalComparison?: {
+    improvement: number;
+    period: string;
+  };
+  suggestedActions?: {
     title: string;
     description: string;
-    duration: number;
+    priority: number;
   }[];
 }
 
-export interface EmotionalTeamViewProps {
-  teamId?: string;
-  departmentId?: string;
-  users?: any[];
-  anonymized?: boolean;
-  onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year' | string;
-  userId?: string;
-  className?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  onRefresh?: () => void;
-}
-
-export interface TeamOverviewProps {
-  teamId: string;
-  period?: string;
-  anonymized?: boolean;
-  department?: string;
-}
-
 export interface VoiceEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
+  onResult: (result: EmotionResult) => void;
   autoStart?: boolean;
   duration?: number;
 }
@@ -100,4 +56,17 @@ export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
   duration?: number;
+}
+
+export interface EmotionalTeamViewProps {
+  teamId?: string;
+  period?: string;
+  anonymized?: boolean;
+}
+
+export interface TeamOverviewProps {
+  teamId?: string;
+  period?: string;
+  anonymized?: boolean;
+  showAvatar?: boolean;
 }

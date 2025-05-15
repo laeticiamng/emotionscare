@@ -1,8 +1,8 @@
 
-// Fichier d'export centralisé pour tous les types de l'application
-// Tous les composants doivent importer leurs types depuis ce fichier
+// Central export file for all types used in the application
+// All components should import their types from this file
 
-// Exports des types liés au thème
+// Exports for theme-related types
 export type {
   Theme,
   FontSize,
@@ -12,7 +12,7 @@ export type {
   ThemeSwitcherProps
 } from './theme';
 
-// Exports des types liés à l'utilisateur
+// Exports for user-related types
 export type {
   User,
   UserRole,
@@ -23,18 +23,18 @@ export type {
   ThemeName
 } from './user';
 
-// Exports des types liés au mode utilisateur
+// Exports for user mode types
 export type {
   UserModeType,
   UserModeContextType
 } from './userMode';
 
-// Exports des types liés à la sidebar
+// Exports for sidebar types
 export type {
   SidebarContextType
 } from './sidebar';
 
-// Exports des types liés à la musique
+// Exports for music-related types
 export type {
   MusicTrack,
   MusicPlaylist,
@@ -47,7 +47,7 @@ export type {
   Track
 } from './music';
 
-// Exports des types liés aux notifications
+// Exports for notification types
 export type {
   Notification,
   NotificationType,
@@ -57,10 +57,11 @@ export type {
   NotificationFilter,
   NotificationBadge,
   NotificationPreference,
-  NotificationItemProps
+  NotificationItemProps,
+  NotificationChannels
 } from './notification';
 
-// Exports des types liés à la réalité virtuelle
+// Exports for VR-related types
 export type {
   VRSession,
   VRSessionTemplate,
@@ -68,10 +69,12 @@ export type {
   VRSessionWithMusicProps,
   VRTemplateGridProps,
   VRSessionWithMusicPropsType,
-  VRSessionHistoryProps
+  VRSessionHistoryProps,
+  VoiceEmotionScannerProps,
+  LiveVoiceScannerProps
 } from './vr';
 
-// Exports des types liés aux émotions
+// Exports for emotion types
 export type {
   Emotion,
   EmotionResult,
@@ -82,7 +85,7 @@ export type {
   TeamOverviewProps
 } from './emotion';
 
-// Exports des types liés au dashboard
+// Exports for dashboard types
 export type {
   DashboardWidgetConfig,
   KpiCardProps,
@@ -94,7 +97,7 @@ export type {
   GlobalOverviewTabProps
 } from './dashboard';
 
-// Exports des types liés à la gamification
+// Exports for gamification types
 export type {
   GamificationStats,
   Badge,
@@ -102,24 +105,24 @@ export type {
   Period
 } from './gamification';
 
-// Exports des types liés au journal
+// Exports for journal types
 export type {
   JournalEntry
 } from './journal';
 
-// Exports des types liés au player audio
+// Exports for audio player types
 export type {
   UseAudioPlayerStateReturn,
   EnhancedMusicVisualizerProps
 } from './audio-player';
 
-// Exports des types liés aux graphiques
+// Exports for chart types
 export type {
   ChartConfig,
   ChartContextProps
 } from './chart';
 
-// Exports des types liés aux activités
+// Exports for activity logs types
 export type {
   ActivityTabView,
   ActivityFiltersState,
@@ -127,7 +130,7 @@ export type {
   ActivityStats
 } from './activity-logs/types';
 
-// Exports des types liés au coaching
+// Exports for coaching types
 export type {
   CoachMessage,
   CoachEvent,
@@ -137,7 +140,7 @@ export type {
   CoachNotification
 } from './coach';
 
-// Types génériques utilisés dans différentes parties de l'application
+// Generic types used throughout the application
 export interface Story {
   id: string;
   title: string;

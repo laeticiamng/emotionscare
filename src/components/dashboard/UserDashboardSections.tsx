@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -6,8 +7,7 @@ import SocialCocoonWidget from './SocialCocoonWidget';
 import UserSidePanel from './UserSidePanel';
 import VRPromptWidget from '../vr/VRPromptWidget';
 import GamificationWidget from './GamificationWidget';
-import { User } from '@/types';
-import { VRSessionTemplate } from '@/types';
+import { User, VRSessionTemplate } from '@/types';
 
 // Création d'un mock VRSessionTemplate correctement typé
 const exampleVRTemplate: VRSessionTemplate = {
@@ -17,7 +17,6 @@ const exampleVRTemplate: VRSessionTemplate = {
   duration: 600,
   emotion: "calm",
   tags: ["meditation", "nature", "beginner"],
-  theme: "nature",
   is_audio_only: true,
   preview_url: "/images/vr/forest-preview.jpg",
   audio_url: "/audio/forest-meditation.mp3",
@@ -27,7 +26,8 @@ const exampleVRTemplate: VRSessionTemplate = {
   thumbnailUrl: "/images/vr/forest-preview.jpg", // Propriétés obligatoires
   category: "meditation",
   completionRate: 92,
-  recommendedMood: "stressed"
+  recommendedMood: "stressed",
+  theme: "nature"
 };
 
 interface SectionProps {
@@ -163,7 +163,7 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
   const recommendedTemplate: VRSessionTemplate = latestEmotion ? {
     id: 'recommended',
     title: 'Session recommandée',
-    description: 'Session recommandée basée sur votre ��tat émotionnel',
+    description: 'Session recommandée basée sur votre état émotionnel',
     duration: 5 * 60, // Convert to seconds
     emotion: latestEmotion.emotion,
     tags: ['recommandation', 'personnalisé'],

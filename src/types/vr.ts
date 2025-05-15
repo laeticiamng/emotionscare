@@ -27,6 +27,10 @@ export interface VRSession {
   emotion?: string;
   emotionTarget?: string;
   emotion_target?: string;
+  startTime?: string;
+  startedAt?: string;
+  duration_seconds?: number;
+  isCompleted?: boolean;
 }
 
 export interface VRSessionTemplate {
@@ -60,6 +64,10 @@ export interface VRSessionTemplate {
   emotionTarget?: string;
   emotion_target?: string;
   emotion?: string;
+  is_audio_only?: boolean;
+  benefits?: string[];
+  difficulty?: string;
+  theme?: string;
 }
 
 export interface VRHistoryListProps {
@@ -94,6 +102,20 @@ export interface VRTemplateGridProps {
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;
-  onSessionSelect?: (session: VRSession) => void;
+  onSelectSession?: (session: VRSession) => void;
   showDetails?: boolean;
+  sessions?: VRSession[];
+  templates?: VRSessionTemplate[];
+}
+
+export interface VoiceEmotionScannerProps {
+  onResult?: (result: any) => void;
+  autoStart?: boolean;
+  duration?: number;
+}
+
+export interface LiveVoiceScannerProps {
+  onResult?: (result: any) => void;
+  autoStart?: boolean;
+  duration?: number;
 }

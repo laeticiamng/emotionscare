@@ -1,21 +1,24 @@
 
 export interface GamificationStats {
-  level: number;
-  points: number;
-  badges: number;
-  streakDays: number;
+  totalPoints: number;
+  totalBadges: number;
   completedChallenges: number;
+  currentLevel: number;
   nextLevelPoints: number;
   progress: number;
+  streak: number;
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  image: string;
-  earnedAt?: string;
-  progress?: number;
+  image?: string;
+  unlocked: boolean;
+  unlockedAt?: string;
+  category?: string;
+  level?: number;
+  points?: number;
 }
 
 export interface Challenge {
@@ -23,10 +26,16 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  progress: number;
   completed: boolean;
-  endDate?: string;
-  badgeId?: string;
+  progress?: number;
+  deadline?: string;
+  category?: string;
+  difficulty?: string;
+  badge?: Badge;
 }
 
-export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
+export interface Period {
+  value: string;
+  label: string;
+  days?: number;
+}

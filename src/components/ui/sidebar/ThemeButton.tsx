@@ -1,32 +1,38 @@
 
-import { Moon, SunMedium } from "lucide-react";
-import { useTheme } from "@/hooks/use-theme";
-import { ThemeButtonProps } from "@/types";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { ThemeButtonProps, Theme } from '@/types';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 
-export function ThemeButton({ size = "md", collapsed = false }: ThemeButtonProps) {
+const ThemeButton: React.FC<ThemeButtonProps> = ({ onClick, collapsed, size }) => {
   const { theme, setTheme, isDarkMode } = useTheme();
-
+  
   const toggleTheme = () => {
-    setTheme(isDarkMode ? "light" : "dark");
+    const newTheme: Theme = isDarkMode ? 'light' : 'dark';
+    setTheme(newTheme);
+    
+    if (onClick) {
+      onClick();
+    }
   };
-
+  
   return (
-    <button
-      className={`flex items-center ${collapsed ? 'justify-center' : ''} gap-3 rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground w-full transition-colors`}
+    <Button 
+      variant="ghost" 
+      size={size as any || 'sm'}
       onClick={toggleTheme}
+      title={isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+      className={collapsed ? 'w-10 h-10 p-0' : ''}
     >
       {isDarkMode ? (
-        <Moon className={size === "sm" ? "h-4 w-4" : "h-5 w-5"} />
+        <Sun className="h-[1.2rem] w-[1.2rem]" />
       ) : (
-        <SunMedium className={size === "sm" ? "h-4 w-4" : "h-5 w-5"} />
+        <Moon className="h-[1.2rem] w-[1.2rem]" />
       )}
-      {!collapsed && (
-        <span className="text-sm">
-          {isDarkMode ? "Mode clair" : "Mode sombre"}
-        </span>
-      )}
-    </button>
+      {!collapsed && <span className="ml-2">Theme</span>}
+    </Button>
   );
-}
+};
 
 export default ThemeButton;

@@ -81,7 +81,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   };
   
   // Generate a list of template benefits if none are provided
-  const benefits = template.benefits || [
+  const templateBenefits = template.benefits || [
     "Réduit le stress",
     "Améliore le bien-être mental",
     "Favorise la concentration",
@@ -217,7 +217,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
           <div>
             <h3 className="font-medium mb-2">Bienfaits</h3>
             <ul className="list-disc pl-5 space-y-2 text-sm text-muted-foreground">
-              {benefits.map((benefit, index) => (
+              {templateBenefits.map((benefit, index) => (
                 <li key={index}>{benefit}</li>
               ))}
             </ul>

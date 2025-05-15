@@ -1,86 +1,54 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Theme, FontFamily, FontSize } from '@/types';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Theme } from '@/types';
 
-export interface ThemeContextType {
+interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
-  fontSize?: FontSize;
-  setFontSize?: (size: FontSize) => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (font: FontFamily) => void;
 }
 
-const defaultTheme: Theme = 'system';
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeContext = createContext<ThemeContextType>({
-  theme: defaultTheme,
-  setTheme: () => {},
-  isDarkMode: false,
-});
-
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem('theme') as Theme) || defaultTheme
-  );
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const [theme, setTheme] = useState<Theme>('system');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [fontSize, setFontSize] = useState<FontSize>('medium');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('system');
 
   useEffect(() => {
+    // Initialize theme from localStorage or default
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Apply theme to document
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
 
+    let appliedTheme = theme;
+
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      root.classList.add(systemTheme);
-      setIsDarkMode(systemTheme === 'dark');
-    } else {
-      root.classList.add(theme);
-      setIsDarkMode(theme === 'dark');
+      appliedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
 
+    root.classList.add(appliedTheme);
+    setIsDarkMode(appliedTheme === 'dark');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.forEach(className => {
-      if (className.startsWith('font-size-')) {
-        root.classList.remove(className);
-      }
-    });
-    root.classList.add(`font-size-${fontSize}`);
-    localStorage.setItem('fontSize', fontSize);
-  }, [fontSize]);
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.forEach(className => {
-      if (className.startsWith('font-family-')) {
-        root.classList.remove(className);
-      }
-    });
-    root.classList.add(`font-family-${fontFamily}`);
-    localStorage.setItem('fontFamily', fontFamily);
-  }, [fontFamily]);
-
   return (
-    <ThemeContext.Provider value={{ 
-      theme, 
-      setTheme, 
-      isDarkMode, 
-      fontSize,
-      setFontSize,
-      fontFamily,
-      setFontFamily
-    }}>
+    <ThemeContext.Provider value={{ theme, setTheme, isDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
-
-export default ThemeProvider;
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};

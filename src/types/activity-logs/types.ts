@@ -1,23 +1,26 @@
 
-export type ActivityTabView = 'daily' | 'stats';
+export type ActivityTabView = 'list' | 'calendar' | 'stats';
 
 export interface ActivityFiltersState {
-  searchTerm: string;
-  activityType: string;
-  startDate: string | Date;
-  endDate: string | Date;
+  period: string;
+  userIds?: string[];
+  types?: string[];
+  emotionRange?: [number, number];
+  dateRange?: [Date, Date];
 }
 
 export interface AnonymousActivity {
   id: string;
-  activity_type: string;
-  category: string;
-  count: number;
-  timestamp_day: string;
+  type: string;
+  timestamp: string;
+  emotion?: string;
+  emotion_score?: number;
+  duration?: number;
 }
 
 export interface ActivityStats {
-  activity_type: string;
-  total_count: number;
-  percentage: number;
+  total: number;
+  byType: Record<string, number>;
+  byEmotion: Record<string, number>;
+  byDay: Record<string, number>;
 }

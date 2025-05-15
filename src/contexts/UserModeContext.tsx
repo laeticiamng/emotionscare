@@ -1,42 +1,45 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { UserModeType, UserModeContextType } from '@/types';
-import useAuth from '@/hooks/useAuth';
 
-const UserModeContext = createContext<UserModeContextType>({
-  userMode: 'B2C',
-  setUserMode: () => {}
-});
+const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-export const UserModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Get stored mode or default to B2C
-  const storedMode = localStorage.getItem('userMode') as UserModeType || 'B2C';
-  const [userMode, setUserMode] = useState<UserModeType>(storedMode);
-  
-  // Get user from auth context
-  const { user } = useAuth();
-  
-  // Set user mode based on user role/preference
-  React.useEffect(() => {
-    if (user?.role === 'admin') {
-      setUserMode('B2B-ADMIN');
-    } else if (user?.role === 'user') {
-      setUserMode('B2B_USER');
-    } else if (user?.role === 'coach') {
-      setUserMode('coach');
+export const UserModeProvider = ({ children }: { children: ReactNode }) => {
+  const [mode, setMode] = useState<UserModeType>('B2C');
+
+  const handleSetMode = (newMode: UserModeType) => {
+    // Normalize b2b_user to B2B-USER, etc. if needed
+    let normalizedMode: UserModeType = newMode;
+    
+    if (newMode === 'b2b_user' || newMode === 'b2b-user') {
+      normalizedMode = 'B2B-USER';
+    } else if (newMode === 'b2b_admin' || newMode === 'b2b-admin') {
+      normalizedMode = 'B2B-ADMIN';
+    } else if (newMode === 'b2c') {
+      normalizedMode = 'B2C';
     }
-  }, [user]);
-  
-  const changeUserMode = (mode: UserModeType) => {
-    setUserMode(mode);
-    localStorage.setItem('userMode', mode);
+    
+    setMode(normalizedMode);
   };
-  
+
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode: changeUserMode }}>
+    <UserModeContext.Provider 
+      value={{ 
+        mode, 
+        setMode: handleSetMode,
+        userMode: mode,
+        setUserMode: handleSetMode
+      }}
+    >
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => useContext(UserModeContext);
+export const useUserMode = () => {
+  const context = useContext(UserModeContext);
+  if (!context) {
+    throw new Error('useUserMode must be used within UserModeProvider');
+  }
+  return context;
+};
