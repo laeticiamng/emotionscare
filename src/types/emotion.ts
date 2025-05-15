@@ -2,6 +2,7 @@
 export interface Emotion {
   id?: string;
   user_id?: string;
+  userId?: string;
   date?: string | Date;
   emotion?: string;
   name?: string;
@@ -16,7 +17,9 @@ export interface Emotion {
   emojis?: string[] | string;
   transcript?: string;
   audio_url?: string;
+  audioUrl?: string;
   ai_feedback?: string;
+  aiFeedback?: string;
   recommendations?: string[];
   triggers?: string[];
   feedback?: string;
@@ -28,6 +31,7 @@ export interface Emotion {
 export interface EmotionResult {
   id?: string;
   user_id?: string;
+  userId?: string;
   emotion: string;
   score?: number;
   confidence?: number;
@@ -42,8 +46,10 @@ export interface EmotionResult {
   triggers?: string[];
   feedback?: string;
   ai_feedback?: string;
+  aiFeedback?: string;
   recommendations?: string[];
   audio_url?: string;
+  audioUrl?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -55,6 +61,7 @@ export interface EnhancedEmotionResult extends EmotionResult {
   description?: string;
   category?: string;
   coping_strategies?: string[];
+  copingStrategies?: string[];
   relatedActivities?: {
     id: string;
     title: string;
@@ -69,7 +76,7 @@ export interface EmotionalTeamViewProps {
   users?: any[];
   anonymized?: boolean;
   onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year';
+  period?: 'day' | 'week' | 'month' | 'year' | string;
   userId?: string;
   className?: string;
   dateRange?: {

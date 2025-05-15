@@ -88,6 +88,10 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
     "Renforce la résilience émotionnelle"
   ];
 
+  // Use camelCase properties or fallback to snake_case for backward compatibility
+  const completionRate = template.completionRate || template.completion_rate;
+  const recommendedMood = template.recommendedMood || template.recommended_mood;
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header with back button */}
@@ -112,14 +116,14 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
           />
           
           {/* Completion overlay */}
-          {template.completion_rate ? (
+          {completionRate ? (
             <div className="absolute top-2 left-2 flex items-center gap-1 bg-primary/80 text-primary-foreground px-3 py-1 rounded-md text-xs font-medium">
               <div className="w-28">
                 <div className="flex justify-between text-xs mb-1">
                   <span>Progression</span>
-                  <span>{Math.round(template.completion_rate * 100)}%</span>
+                  <span>{Math.round(completionRate * 100)}%</span>
                 </div>
-                <Progress value={template.completion_rate * 100} className="h-1" />
+                <Progress value={completionRate * 100} className="h-1" />
               </div>
             </div>
           ) : null}
@@ -154,12 +158,12 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
             </div>
           )}
           
-          {template.recommended_mood && (
+          {recommendedMood && (
             <div className="flex items-center">
               <span 
-                className={`text-xs px-3 py-1 rounded-full ${getEmotionColor(template.recommended_mood)}`}
+                className={`text-xs px-3 py-1 rounded-full ${getEmotionColor(recommendedMood)}`}
               >
-                Recommandé pour: {template.recommended_mood}
+                Recommandé pour: {recommendedMood}
               </span>
             </div>
           )}

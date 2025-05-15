@@ -1,189 +1,121 @@
-import { User } from '@/types';
+
+import { User, UserRole } from '@/types';
 
 export const mockUsers: User[] = [
   {
-    id: "1",
-    name: "Emma Martin",
-    email: "emma.martin@example.com",
-    role: "admin",
-    avatar_url: "/avatars/emma.jpg",
-    emotional_score: 87,
-    department: "Management",
-    position: "CEO",
+    id: '1',
+    email: 'john.doe@example.com',
+    name: 'John Doe',
+    role: 'user' as UserRole,
+    avatar_url: '/avatars/john-doe.png',
+    created_at: '2023-04-15T10:30:00Z',
     preferences: {
-      dashboardLayout: "standard",
+      dashboardLayout: 'standard',
       onboardingCompleted: true,
-      theme: "light",
-      fontSize: "medium",
-      fontFamily: "system",
-      language: "fr",
+      theme: 'system',
+      fontSize: 'medium',
+      language: 'en',
+      fontFamily: 'system',
+      sound: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
-        frequency: "daily",
-        types: {
-          emotions: true,
-          coach: true,
-          journal: true
-        },
-        tone: "professional"
-      },
-      sound: true,
-      notifications_enabled: true,
-      profileVisibility: "private",
-      autoplayVideos: false,
-      dataCollection: true,
-      aiSuggestions: true,
-      emotionalCamouflage: false
+        frequency: 'daily',
+        tone: 'supportive',
+        quietHours: {
+          enabled: false,
+          start: '22:00',
+          end: '07:00'
+        }
+      }
     }
   },
   {
-    id: "2",
-    name: "Liam Johnson",
-    email: "liam.johnson@example.com",
-    role: "manager",
-    avatar_url: "/avatars/liam.jpg",
-    emotional_score: 76,
-    department: "HR",
-    position: "HR Manager",
+    id: '2',
+    email: 'jane.smith@example.com',
+    name: 'Jane Smith',
+    role: 'manager' as UserRole,
+    avatar_url: '/avatars/jane-smith.png',
+    created_at: '2023-05-20T14:45:00Z',
     preferences: {
-      dashboardLayout: "compact",
+      dashboardLayout: 'compact',
       onboardingCompleted: true,
-      theme: "dark",
-      fontSize: "large",
-      fontFamily: "sans-serif",
-      language: "en",
-      notifications: {
-        enabled: false,
-        emailEnabled: false,
-        pushEnabled: false,
-        frequency: "weekly",
-        types: {
-          emotions: false,
-          coach: false,
-          journal: false
-        },
-        tone: "friendly"
-      },
+      theme: 'dark',
+      fontSize: 'large',
+      language: 'en',
+      fontFamily: 'sans-serif',
       sound: false,
-      notifications_enabled: false,
-      profileVisibility: "team",
-      autoplayVideos: true,
-      dataCollection: false,
-      aiSuggestions: false,
-      emotionalCamouflage: true
-    }
-  },
-  {
-    id: "3",
-    name: "Olivia Smith",
-    email: "olivia.smith@example.com",
-    role: "employee",
-    avatar_url: "/avatars/olivia.jpg",
-    emotional_score: 92,
-    department: "Marketing",
-    position: "Marketing Specialist",
-    preferences: {
-      dashboardLayout: "focused",
-      onboardingCompleted: false,
-      theme: "system",
-      fontSize: "small",
-      fontFamily: "serif",
-      language: "es",
-      notifications: {
-        enabled: true,
-        emailEnabled: true,
-        pushEnabled: false,
-        frequency: "immediate",
-        types: {
-          emotions: true,
-          coach: false,
-          journal: true
-        },
-        tone: "motivational"
-      },
-      sound: true,
-      notifications_enabled: true,
-      profileVisibility: "public",
-      autoplayVideos: true,
-      dataCollection: true,
-      aiSuggestions: true,
-      emotionalCamouflage: true
-    }
-  },
-  {
-    id: "4",
-    name: "Noah Brown",
-    email: "noah.brown@example.com",
-    role: "coach",
-    avatar_url: "/avatars/noah.jpg",
-    emotional_score: 68,
-    department: "Coaching",
-    position: "Wellbeing Coach",
-    preferences: {
-      dashboardLayout: "standard",
-      onboardingCompleted: true,
-      theme: "pastel",
-      fontSize: "medium",
-      fontFamily: "monospace",
-      language: "de",
       notifications: {
         enabled: true,
         emailEnabled: false,
         pushEnabled: true,
-        frequency: "daily",
-        types: {
-          emotions: false,
-          coach: true,
-          journal: false
-        },
-        tone: "direct"
-      },
-      sound: false,
-      notifications_enabled: true,
-      profileVisibility: "team",
-      autoplayVideos: false,
-      dataCollection: false,
-      aiSuggestions: true,
-      emotionalCamouflage: false
+        frequency: 'immediate',
+        tone: 'direct',
+        quietHours: {
+          enabled: true,
+          start: '23:00',
+          end: '06:00'
+        }
+      }
     }
   },
   {
-    id: "5",
-    name: "Isabella Garcia",
-    email: "isabella.garcia@example.com",
-    role: "b2b_admin",
-    avatar_url: "/avatars/isabella.jpg",
-    emotional_score: 79,
-    department: "Administration",
-    position: "Office Manager",
+    id: '3',
+    email: 'alice.johnson@example.com',
+    name: 'Alice Johnson',
+    role: 'user' as UserRole,
+    avatar_url: '/avatars/alice-johnson.png',
+    created_at: '2023-06-10T09:15:00Z',
     preferences: {
-      dashboardLayout: "compact",
+      dashboardLayout: 'focused',
       onboardingCompleted: false,
-      theme: "light",
-      fontSize: "large",
-      fontFamily: "rounded",
-      language: "it",
+      theme: 'light',
+      fontSize: 'small',
+      language: 'en',
+      fontFamily: 'serif',
+      sound: true,
       notifications: {
         enabled: false,
-        emailEnabled: true,
+        emailEnabled: false,
         pushEnabled: false,
-        frequency: "weekly",
-        types: {
-          emotions: false,
-          coach: false,
-          journal: true
-        },
-        tone: "calm"
-      },
+        frequency: 'weekly',
+        tone: 'gentle',
+        quietHours: {
+          enabled: false,
+          start: '21:00',
+          end: '08:00'
+        }
+      }
+    }
+  },
+  {
+    id: '4',
+    email: 'robert.williams@example.com',
+    name: 'Robert Williams',
+    role: 'user' as UserRole,
+    avatar_url: '/avatars/robert-williams.png',
+    created_at: '2023-07-05T16:20:00Z',
+    preferences: {
+      dashboardLayout: 'standard',
+      onboardingCompleted: true,
+      theme: 'system',
+      fontSize: 'medium',
+      language: 'en',
+      fontFamily: 'monospace',
       sound: true,
-      notifications_enabled: false,
-      profileVisibility: "private",
-      autoplayVideos: true,
-      dataCollection: true,
-      aiSuggestions: false,
-      emotionalCamouflage: true
+      notifications: {
+        enabled: true,
+        emailEnabled: true,
+        pushEnabled: true,
+        frequency: 'daily',
+        tone: 'motivational',
+        quietHours: {
+          enabled: true,
+          start: '22:00',
+          end: '06:30'
+        }
+      }
     }
   }
 ];

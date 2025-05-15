@@ -7,12 +7,16 @@ export interface VRSessionTemplate {
   name?: string; // For backward compatibility 
   description: string;
   thumbnailUrl: string;
+  thumbnail?: string; // For backward compatibility
   duration: number;
   category: string;
   tags: string[];
   completionRate: number;
+  completion_rate?: number; // For backward compatibility
   recommendedMood: string;
+  recommended_mood?: string; // For backward compatibility
   emotionTarget?: string; // Added for components expecting this
+  emotion_target?: string; // For backward compatibility
   popularity?: number;
   difficulty?: string;
   intensity?: number;
@@ -56,12 +60,18 @@ export interface VRHistoryListProps {
   userId?: string;
   limit?: number;
   onSessionClick?: (session: VRSession) => void;
+  templates?: VRSessionTemplate[];
+  sessions?: VRSession[];
+  onSelectTemplate?: (template: VRSessionTemplate) => void;
+  onSelectSession?: (session: VRSession) => void;
+  loading?: boolean;
 }
 
 export interface VRSessionWithMusicProps {
   session?: VRSession;
   template?: VRSessionTemplate;
-  onComplete?: () => void;
+  onComplete?: (sessionData?: VRSession) => void;
+  onExit?: () => void;
   autoplay?: boolean;
   // Adding properties expected by components
   onSessionComplete?: () => void;
@@ -74,8 +84,11 @@ export interface VRSessionWithMusicProps {
 }
 
 export interface VRTemplateGridProps {
-  filter?: string;
+  templates: VRSessionTemplate[];
+  onSelect: (template: VRSessionTemplate) => void;
   onSelectTemplate?: (template: VRSessionTemplate) => void;
+  filter?: string;
   featuredOnly?: boolean;
   limit?: number;
+  className?: string;
 }

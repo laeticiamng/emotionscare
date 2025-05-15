@@ -1,99 +1,70 @@
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Bell, 
-  Calendar, 
-  Info, 
-  AlertCircle, 
-  UserPlus, 
-  CheckCircle,
-  AlertTriangle
-} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { Notification } from '@/hooks/useNotifications';
+import { Bell, Calendar, CheckCircle2, Info, AlertTriangle, XCircle } from 'lucide-react';
+import { Notification } from '@/types';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface NotificationItemProps {
   notification: Notification;
-  onRead: (id: string) => void;
+  onSelect?: (notification: Notification) => void;
 }
 
-export const NotificationIcon: React.FC<{ 
-  type: Notification['type']; 
-  className?: string 
-}> = ({ type, className }) => {
-  switch (type) {
-    case 'info':
-      return <Info className={className} />;
-    case 'warning':
-      return <AlertTriangle className={className} />;
-    case 'success':
-      return <CheckCircle className={className} />;
-    case 'error':
-      return <AlertCircle className={className} />;
-    case 'system':
-      return <Bell className={className} />;
-    case 'invitation':
-      return <UserPlus className={className} />;
-    case 'reminder':
-      return <Calendar className={className} />;
-    default:
-      return <Bell className={className} />;
-  }
-};
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onSelect }) => {
+  const { markAsRead } = useNotifications();
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ 
-  notification, 
-  onRead 
-}) => {
-  const navigate = useNavigate();
-  const { id, type, title, message, date, isRead, linkTo } = notification;
-  
-  const handleClick = () => {
-    if (!isRead) {
-      onRead(id);
-    }
-    
-    if (linkTo) {
-      navigate(linkTo);
+  const getTypeIcon = () => {
+    switch (notification.type) {
+      case 'reminder':
+        return <Calendar className="h-5 w-5 text-primary" />;
+      case 'success':
+        return <CheckCircle2 className="h-5 w-5 text-success" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-warning" />;
+      case 'error':
+        return <XCircle className="h-5 w-5 text-destructive" />;
+      case 'alert':
+        return <AlertTriangle className="h-5 w-5 text-warning" />;
+      default:
+        return <Info className="h-5 w-5 text-info" />;
     }
   };
-  
-  const formattedDate = formatDistanceToNow(new Date(date), { 
-    addSuffix: true,
-    locale: fr 
-  });
+
+  const handleClick = () => {
+    markAsRead(notification.id);
+    if (onSelect) {
+      onSelect(notification);
+    }
+  };
 
   return (
-    <button
-      className={`flex items-start p-3 space-x-3 w-full text-left transition-colors hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-        isRead ? "opacity-60" : "bg-accent/20"
+    <div
+      className={`flex items-start gap-3 p-3 hover:bg-muted/50 cursor-pointer ${
+        !notification.read ? 'bg-primary/5' : ''
       }`}
       onClick={handleClick}
-      role="button"
-      aria-pressed={isRead}
     >
-      <NotificationIcon 
-        type={type} 
-        className={`w-5 h-5 mt-1 ${
-          type === 'error' ? 'text-destructive' : 
-          type === 'warning' ? 'text-warning-500' : 
-          type === 'success' ? 'text-success-500' : 
-          'text-primary'
-        }`} 
-      />
+      <div className="mt-1">{getTypeIcon()}</div>
       <div className="flex-1">
-        <div className="text-sm font-semibold">{title}</div>
-        <div className="text-xs text-muted-foreground">{message}</div>
-        <div className="text-xs text-muted-foreground/70 mt-1">{formattedDate}</div>
+        <div className="flex justify-between items-start">
+          <span className="font-medium">{notification.title}</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+            {notification.timestamp && formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
+          </span>
+        </div>
+        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{notification.message}</p>
+        
+        {notification.actionUrl && notification.actionLabel && (
+          <a
+            href={notification.actionUrl}
+            className="text-sm text-primary hover:underline mt-1 block"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {notification.actionLabel}
+          </a>
+        )}
       </div>
-      {!isRead && (
-        <span
-          className="w-2 h-2 bg-destructive rounded-full self-center flex-shrink-0"
-          aria-label="Non lu"
-        />
-      )}
-    </button>
+    </div>
   );
 };
 

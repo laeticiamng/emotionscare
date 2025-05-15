@@ -1,56 +1,62 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth } from './AuthContext';
-import { UserModeContextType, UserModeType } from '@/types';
+import { createContext, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserModeType, UserModeContextType } from '@/types';
 
-// Create context with default values
-const UserModeContext = createContext<UserModeContextType>({
-  userMode: 'b2c',
-  setUserMode: () => {},
-  isB2BAdmin: false,
-  isB2BUser: false,
-  isB2C: true
-});
+const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
-  const [userMode, setUserMode] = useState<UserModeType>('b2c');
-  
-  // Determine user mode based on user role
-  useEffect(() => {
-    if (!user) {
-      setUserMode('b2c');
-      return;
-    }
-    
-    // Map user role to user mode
-    if (user.role === 'admin' || user.role === 'b2b_admin' || user.role === 'b2b-admin') {
-      setUserMode('b2b_admin');
-    } else if (user.role === 'b2b_user' || user.role === 'b2b-user' || user.role === 'team' || user.role === 'employee') {
-      setUserMode('b2b_user');
-    } else {
-      setUserMode('b2c');
-    }
-  }, [user]);
-  
-  // Derived values
-  const isB2BAdmin = userMode === 'b2b_admin' || userMode === 'b2b-admin';
-  const isB2BUser = userMode === 'b2b_user' || userMode === 'b2b-user';
-  const isB2C = userMode === 'b2c' || userMode === 'personal';
-  
+export const UserModeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [mode, setMode] = useState<UserModeType>('B2C');
+  const navigate = useNavigate();
+
+  const contextValue: UserModeContextType = {
+    mode,
+    setMode,
+  };
+
   return (
-    <UserModeContext.Provider value={{ 
-      userMode, 
-      setUserMode,
-      isB2BAdmin,
-      isB2BUser,
-      isB2C
-    }}>
+    <UserModeContext.Provider value={contextValue}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => useContext(UserModeContext);
+export const useUserMode = () => {
+  const context = useContext(UserModeContext);
+  if (context === undefined) {
+    throw new Error('useUserMode must be used within a UserModeProvider');
+  }
 
-export default UserModeContext;
+  const { mode, setMode } = context;
+  const navigate = useNavigate();
+
+  const setAdminMode = () => {
+    setMode('B2B-ADMIN');
+    navigate('/admin/dashboard');
+  };
+
+  const setUserMode = () => {
+    setMode('B2B-USER');
+    navigate('/dashboard');
+  };
+
+  const setB2CMode = () => {
+    setMode('B2C');
+    navigate('/');
+  };
+
+  const isAdmin = () => mode === 'B2B-ADMIN' || mode === 'B2B-ADMIN';
+  const isUser = () => mode === 'B2B-USER' || mode === 'B2B-USER';
+  const isB2C = () => mode === 'B2C'; 
+
+  return {
+    mode,
+    setMode,
+    setAdminMode,
+    setUserMode,
+    setB2CMode,
+    isAdmin,
+    isUser,
+    isB2C,
+  };
+};

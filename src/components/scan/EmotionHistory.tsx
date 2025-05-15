@@ -1,173 +1,89 @@
 
-import React, { useMemo } from 'react';
-import { EmotionResult } from '@/types/types';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { CalendarIcon, ClockIcon, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { EmotionResult } from '@/types';
+import { formatDistanceToNow } from 'date-fns';
 
 interface EmotionHistoryProps {
   emotions: EmotionResult[];
-  isLoading?: boolean;
-  error?: string | null;
-  onRefresh?: () => void;
+  onSelect?: (emotion: EmotionResult) => void;
 }
 
-const EmotionHistory: React.FC<EmotionHistoryProps> = ({ 
-  emotions, 
-  isLoading = false, 
-  error = null,
-  onRefresh 
-}) => {
-  // Fonction pour mapper un score à un emoji
-  const getEmotionEmoji = (emotion: string) => {
-    const emojiMap: {[key: string]: string} = {
-      'joy': '😊',
-      'happy': '😊',
-      'sadness': '😔',
-      'sad': '😔',
-      'anger': '😡',
-      'angry': '😡',
-      'fear': '😨',
-      'anxious': '😰',
-      'surprise': '😲',
-      'disgust': '🤢',
-      'neutral': '😐',
-      'calm': '😌',
-      'relaxed': '☺️',
-      'stressed': '😫',
-      'excited': '😃',
+const EmotionHistory: React.FC<EmotionHistoryProps> = ({ emotions, onSelect }) => {
+  if (!emotions || emotions.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Historique des émotions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">Aucune émotion enregistrée pour l'instant.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const handleSelect = (emotion: EmotionResult) => {
+    if (onSelect) {
+      onSelect(emotion);
+    }
+  };
+
+  // Get emotion color based on the emotion name
+  const getEmotionColor = (emotion: string) => {
+    const colors: Record<string, string> = {
+      joy: 'bg-yellow-100 text-yellow-800',
+      happy: 'bg-yellow-100 text-yellow-800',
+      calm: 'bg-blue-100 text-blue-800',
+      relaxed: 'bg-blue-100 text-blue-800',
+      sad: 'bg-indigo-100 text-indigo-800',
+      depressed: 'bg-indigo-100 text-indigo-800',
+      anxious: 'bg-purple-100 text-purple-800',
+      stressed: 'bg-purple-100 text-purple-800',
+      angry: 'bg-red-100 text-red-800',
+      frustrated: 'bg-red-100 text-red-800',
+      excited: 'bg-amber-100 text-amber-800',
+      motivated: 'bg-green-100 text-green-800',
+      focused: 'bg-cyan-100 text-cyan-800',
+      bored: 'bg-gray-100 text-gray-800',
+      tired: 'bg-gray-100 text-gray-800',
     };
 
-    return emojiMap[emotion.toLowerCase()] || '❓';
-  };
-
-  // Afficher un maximum de 10 entrées dans l'historique
-  const displayEmotions = useMemo(() => {
-    return emotions.slice(0, 10);
-  }, [emotions]);
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Historique des scans</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center p-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Historique des scans</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="p-6 text-center">
-            <p className="text-red-500 mb-4">Erreur: {error}</p>
-            <p className="text-muted-foreground mb-6">Impossible de charger l'historique des émotions.</p>
-            {onRefresh && (
-              <Button onClick={onRefresh} variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Réessayer
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (emotions.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Historique des scans</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="p-6 text-center">
-            <p className="text-muted-foreground mb-6">Aucune émotion enregistrée. Complétez un scan pour commencer à voir votre historique.</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const formatDate = (dateStr: string | Date | undefined) => {
-    if (!dateStr) return "Date inconnue";
-    
-    try {
-      const date = typeof dateStr === 'string' || dateStr instanceof Date ? new Date(dateStr) : new Date();
-      return format(date, 'PPP', { locale: fr });
-    } catch (e) {
-      return "Date invalide";
-    }
-  };
-
-  const formatTime = (dateStr: string | Date | undefined) => {
-    if (!dateStr) return "--:--";
-    
-    try {
-      const date = typeof dateStr === 'string' || dateStr instanceof Date ? new Date(dateStr) : new Date();
-      return format(date, 'HH:mm', { locale: fr });
-    } catch (e) {
-      return "--:--";
-    }
+    return colors[emotion.toLowerCase()] || 'bg-gray-100 text-gray-800';
   };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xl">Historique des scans</CardTitle>
-        {onRefresh && (
-          <Button onClick={onRefresh} variant="ghost" size="sm">
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-        )}
+      <CardHeader>
+        <CardTitle>Historique des émotions</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ul className="space-y-4 divide-y">
-          {displayEmotions.map((emotion) => (
-            <li key={emotion.id || `${emotion.date}-${emotion.emotion}`} className="pt-4 first:pt-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{getEmotionEmoji(emotion.emotion)}</div>
-                  <div>
-                    <p className="font-medium">{emotion.emotion.charAt(0).toUpperCase() + emotion.emotion.slice(1)}</p>
-                    <div className="flex items-center text-sm text-muted-foreground gap-3">
-                      <span className="flex items-center gap-1">
-                        <CalendarIcon className="h-3 w-3" />
-                        {formatDate(emotion.date)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <ClockIcon className="h-3 w-3" />
-                        {formatTime(emotion.date)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+      <CardContent className="p-0">
+        <div className="divide-y">
+          {emotions.map((emotion) => (
+            <div
+              key={emotion.id || emotion.timestamp}
+              className="p-4 hover:bg-muted/50 cursor-pointer"
+              onClick={() => handleSelect(emotion)}
+            >
+              <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">{emotion.score}/10</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${getEmotionColor(emotion.emotion)}`}>
+                    {emotion.emotion}
+                  </span>
+                  {emotion.intensity && (
+                    <span className="text-xs text-muted-foreground">
+                      Intensité: {Math.round(emotion.intensity * 100)}%
+                    </span>
+                  )}
                 </div>
+                <span className="text-xs text-muted-foreground">
+                  {emotion.timestamp && formatDistanceToNow(new Date(emotion.timestamp), { addSuffix: true })}
+                </span>
               </div>
-              {emotion.text && (
-                <div className="mt-2 text-sm border-l-2 border-muted pl-3 italic">
-                  "{emotion.text}"
-                </div>
-              )}
-              {emotion.ai_feedback && (
-                <div className="mt-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded">
-                  <strong>Feedback IA:</strong> {emotion.ai_feedback}
-                </div>
-              )}
-            </li>
+              {emotion.text && <p className="text-sm line-clamp-2">{emotion.text}</p>}
+            </div>
           ))}
-        </ul>
+        </div>
       </CardContent>
     </Card>
   );

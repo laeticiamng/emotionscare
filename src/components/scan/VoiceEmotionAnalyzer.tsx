@@ -1,143 +1,103 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { EmotionResult } from '@/types/types';
-import { MicIcon, StopCircleIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmotionResult } from '@/types';
+import { Mic, StopCircle } from 'lucide-react';
 
 interface VoiceEmotionAnalyzerProps {
-  onResult: (result: EmotionResult) => void;
-  autoStart?: boolean;
+  onResult?: (result: EmotionResult) => void;
 }
 
-const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({
-  onResult,
-  autoStart = false
-}) => {
+const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioChunks, setAudioChunks] = useState<BlobPart[]>([]);
-  const [transcript, setTranscript] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Auto-start recording if configured
-  useEffect(() => {
-    if (autoStart) {
-      startRecording();
-    }
-  }, [autoStart]);
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      
-      recorder.addEventListener('dataavailable', e => {
-        setAudioChunks(chunks => [...chunks, e.data]);
-      });
-      
-      recorder.addEventListener('stop', () => {
-        analyzeAudio();
-      });
-      
-      recorder.start();
-      setIsRecording(true);
-      setMediaRecorder(recorder);
-      setAudioChunks([]);
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-    }
+  const startRecording = () => {
+    setIsRecording(true);
+    
+    // Simulate recording for 5 seconds
+    setTimeout(() => {
+      stopRecording();
+    }, 5000);
   };
   
   const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-      
-      // Stop all tracks on the stream
-      mediaRecorder.stream.getTracks().forEach(track => track.stop());
-    }
-  };
-  
-  const analyzeAudio = async () => {
-    if (audioChunks.length === 0) return;
-    
+    setIsRecording(false);
     setIsAnalyzing(true);
-    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
     
-    try {
-      // In a real app, you'd send this to an API
-      // For demo, we'll simulate a response
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Generate mock transcript (would come from speech-to-text in reality)
-      const mockTranscript = "Voici un exemple de transcription qui serait générée à partir de l'audio enregistré.";
-      setTranscript(mockTranscript);
-      
-      const result: EmotionResult = {
-        id: `voice-${Date.now()}`,
-        emotion: getRandomEmotion(),
-        score: Math.floor(Math.random() * 40) + 60,
-        confidence: (Math.random() * 0.3) + 0.6,
-        text: mockTranscript,
-        timestamp: new Date().toISOString(),
-        date: new Date().toISOString()
-      };
-      
-      onResult(result);
-    } catch (error) {
-      console.error('Error analyzing audio:', error);
-    } finally {
+    // Simulate analysis
+    setTimeout(() => {
       setIsAnalyzing(false);
-    }
-  };
-  
-  // Helper to get a random emotion for the demo
-  const getRandomEmotion = () => {
-    const emotions = ['joy', 'calm', 'anxious', 'focused', 'tired', 'excited'];
-    return emotions[Math.floor(Math.random() * emotions.length)];
-  };
-  
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [mediaRecorder]);
-  
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-center">
-        <Button
-          type="button"
-          variant={isRecording ? "destructive" : "default"}
-          size="lg"
-          className="rounded-full h-16 w-16 flex items-center justify-center"
-          onClick={isRecording ? stopRecording : startRecording}
-          disabled={isAnalyzing}
-        >
-          {isRecording ? (
-            <StopCircleIcon className="h-8 w-8" />
-          ) : (
-            <MicIcon className="h-8 w-8" />
-          )}
-        </Button>
-      </div>
       
-      <div className="text-center text-sm">
-        {isRecording ? (
-          <p className="text-primary animate-pulse">Enregistrement en cours...</p>
-        ) : isAnalyzing ? (
-          <p className="text-muted-foreground">Analyse en cours...</p>
-        ) : transcript ? (
-          <p>{transcript}</p>
+      if (onResult) {
+        const mockResult: EmotionResult = {
+          id: 'voice-analysis-' + Date.now(),
+          user_id: 'user-123',
+          emotion: ['joy', 'calm', 'anxious', 'sad'][Math.floor(Math.random() * 4)],
+          score: Math.random() * 0.5 + 0.5,
+          confidence: Math.random() * 0.3 + 0.7,
+          timestamp: new Date().toISOString(),
+          recommendations: [
+            'Take a 5-minute breathing exercise',
+            'Listen to calming music',
+            'Write in your journal about your day'
+          ],
+          ai_feedback: "Your voice pattern suggests you're in a neutral to positive emotional state."
+        };
+        
+        onResult(mockResult);
+      }
+    }, 2000);
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Analyse Vocale</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 flex flex-col items-center">
+        <div className="relative h-24 w-24 flex items-center justify-center">
+          <div className={`absolute inset-0 rounded-full ${isRecording ? 'animate-pulse-fast bg-primary/20' : 'bg-muted'}`}></div>
+          <div className={`absolute inset-0 rounded-full scale-[0.85] ${isRecording ? 'animate-pulse bg-primary/30' : 'bg-muted/80'}`}></div>
+          <div className="absolute inset-0 rounded-full scale-75 bg-background flex items-center justify-center">
+            <Mic className={`h-10 w-10 ${isRecording ? 'text-primary' : 'text-muted-foreground'}`} />
+          </div>
+        </div>
+        
+        {isAnalyzing ? (
+          <div className="text-center">
+            <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full mx-auto"></div>
+            <p className="mt-2 text-sm">Analyse en cours...</p>
+          </div>
         ) : (
-          <p className="text-muted-foreground">Cliquez pour commencer l'enregistrement</p>
+          <Button 
+            variant={isRecording ? "destructive" : "default"}
+            size="lg"
+            className="w-40"
+            onClick={isRecording ? stopRecording : startRecording}
+          >
+            {isRecording ? (
+              <>
+                <StopCircle className="mr-2 h-4 w-4" />
+                Arrêter
+              </>
+            ) : (
+              <>
+                <Mic className="mr-2 h-4 w-4" />
+                Commencer
+              </>
+            )}
+          </Button>
         )}
-      </div>
-    </div>
+        
+        <p className="text-xs text-muted-foreground text-center max-w-xs mt-4">
+          {isRecording 
+            ? "Parlez naturellement pendant quelques secondes..." 
+            : "Cliquez sur le bouton pour commencer l'enregistrement vocal et l'analyse émotionnelle"}
+        </p>
+      </CardContent>
+    </Card>
   );
 };
 

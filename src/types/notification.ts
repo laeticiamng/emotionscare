@@ -12,6 +12,7 @@ export interface Notification {
   timestamp: string | Date;
   read: boolean;
   userId?: string;
+  user_id?: string;
   action?: string;
   actionUrl?: string;
   actionLabel?: string;
@@ -29,6 +30,8 @@ export interface NotificationBadge {
   active: boolean;
   badgesCount?: number;
   notificationsCount?: number;
+  hasNew?: boolean;
+  lastSeen?: string;
 }
 
 export interface NotificationPreference {

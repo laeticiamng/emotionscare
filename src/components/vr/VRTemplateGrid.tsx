@@ -44,9 +44,9 @@ const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({
           onClick={() => handleSelect(template)}
         >
           <div className="aspect-video relative overflow-hidden bg-primary/10">
-            {template.imageUrl || template.thumbnail ? (
+            {template.imageUrl || template.thumbnailUrl || template.thumbnail ? (
               <img 
-                src={template.imageUrl || template.thumbnail} 
+                src={template.imageUrl || template.thumbnailUrl || template.thumbnail} 
                 alt={template.title || template.name || 'VR Session'} 
                 className="object-cover w-full h-full"
               />

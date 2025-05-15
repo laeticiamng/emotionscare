@@ -1,39 +1,20 @@
 
 import React from 'react';
-import { TeamOverviewProps } from '@/types/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TeamOverviewProps } from '@/types';
 
-const TeamOverview: React.FC<TeamOverviewProps> = ({ 
-  users, 
-  onUserClick,
-  period = 'week',
-  dateRange,
-  onRefresh,
-  userId,
-  teamId,
-  className = ''
-}) => {
+const TeamOverview: React.FC<TeamOverviewProps> = ({ teamId, period = 'week', anonymized = true }) => {
   return (
-    <div className={className}>
-      <h2>Aperçu de l'équipe</h2>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4">
-        {users.map((user) => (
-          <div 
-            key={user.id} 
-            className="p-4 border rounded-md cursor-pointer hover:bg-accent/10"
-            onClick={() => onUserClick && onUserClick(user.id!)}
-          >
-            <h3 className="font-medium">{user.name}</h3>
-            <p className="text-sm text-muted-foreground">{user.position || user.job_title || 'Membre de l\'équipe'}</p>
-          </div>
-        ))}
-        
-        {users.length === 0 && (
-          <p className="text-muted-foreground col-span-full text-center py-8">
-            Aucun membre d'équipe trouvé.
-          </p>
-        )}
-      </div>
-    </div>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Aperçu de l'équipe</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>Vue d'ensemble émotionnelle de l'équipe {teamId}</p>
+        <p>Période: {period}</p>
+        <p>Mode anonyme: {anonymized ? 'Oui' : 'Non'}</p>
+      </CardContent>
+    </Card>
   );
 };
 

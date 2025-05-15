@@ -45,6 +45,9 @@ const VRTemplateCard: React.FC<VRTemplateCardProps> = ({
     return `${hours}h ${remainingMinutes}min`;
   };
   
+  // Use the camelCase property or fallback to snake_case for backward compatibility
+  const completionRate = template.completionRate || template.completion_rate;
+  
   return (
     <Card 
       className={`overflow-hidden hover:shadow-md transition-all cursor-pointer ${className}`}
@@ -56,10 +59,10 @@ const VRTemplateCard: React.FC<VRTemplateCardProps> = ({
           backgroundImage: `url(${template.preview_url || '/images/vr-banner-bg.jpg'})` 
         }}
       >
-        {template.completion_rate ? (
+        {completionRate ? (
           <div className="flex items-center gap-1 bg-primary/80 text-primary-foreground px-2 py-1 rounded-br-md text-xs font-medium w-fit">
             <CheckCircle size={12} />
-            <span>{Math.round(template.completion_rate * 100)}% complété</span>
+            <span>{Math.round(completionRate * 100)}% complété</span>
           </div>
         ) : null}
       </div>

@@ -1,147 +1,127 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Notification, NotificationFilter } from '@/types';
 
-export interface UseNotificationsReturn {
-  notifications: Notification[];
-  unreadCount: number;
-  isLoading: boolean;
-  filter: NotificationFilter;
-  setFilter: (filter: NotificationFilter) => void;
-  fetchNotifications: (selectedFilter?: NotificationFilter) => Promise<Notification[]>;
-  markAsRead: (id: string) => Promise<boolean>;
-  markAllAsRead: () => Promise<boolean>;
-  deleteNotification: (id: string) => Promise<boolean>;
-}
+// Mock notification data
+const mockNotifications: Notification[] = [
+  {
+    id: '1',
+    title: 'Nouvelle recommandation',
+    message: 'Découvrez une nouvelle activité de pleine conscience adaptée à votre profil.',
+    type: 'emotion',
+    timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15 minutes ago
+    read: false,
+    actionUrl: '/activities/mindfulness',
+    actionLabel: 'Voir l\'activité'
+  },
+  {
+    id: '2',
+    title: 'Rappel de scan émotionnel',
+    message: 'Il est temps de faire votre scan émotionnel quotidien.',
+    type: 'reminder',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    read: true
+  },
+  {
+    id: '3',
+    title: 'Nouveau badge débloqué',
+    message: 'Félicitations ! Vous avez obtenu le badge "Explorateur Émotionnel".',
+    type: 'success',
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+    read: false,
+    actionUrl: '/gamification/badges',
+    actionLabel: 'Voir mes badges'
+  },
+  {
+    id: '4',
+    title: 'Maintenance système prévue',
+    message: 'Une maintenance est prévue le 15 mai de 2h à 4h du matin.',
+    type: 'system',
+    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+    read: true
+  }
+];
 
-export const useNotifications = (): UseNotificationsReturn => {
+export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<NotificationFilter>('all');
-
-  const fetchNotifications = useCallback(
-    async (selectedFilter: NotificationFilter = filter): Promise<Notification[]> => {
-      setIsLoading(true);
-      try {
-        // Mock API call
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        
-        // Mock data
-        const mockNotifications: Notification[] = [
-          {
-            id: '1',
-            title: 'New Feature Available',
-            message: 'Check out our new emotional analysis tool!',
-            type: 'info',
-            timestamp: new Date(),
-            read: false,
-            actionUrl: '/features/new',
-            actionLabel: 'Explore'
-          },
-          {
-            id: '2',
-            title: 'Weekly Report',
-            message: 'Your emotional wellbeing report is ready.',
-            type: 'success',
-            timestamp: new Date(Date.now() - 86400000),
-            read: true,
-            actionUrl: '/reports',
-            actionLabel: 'View Report'
-          },
-          {
-            id: '3',
-            title: 'Reminder',
-            message: 'Don\'t forget your emotional check-in today.',
-            type: 'reminder',
-            timestamp: new Date(Date.now() - 172800000),
-            read: false
-          }
-        ];
-        
-        // Filter notifications
-        let filteredNotifications = [...mockNotifications];
-        if (selectedFilter === 'unread') {
-          filteredNotifications = filteredNotifications.filter(n => !n.read);
-        } else if (selectedFilter !== 'all') {
-          filteredNotifications = filteredNotifications.filter(n => n.type === selectedFilter);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Fetch notifications (mock implementation)
+  const fetchNotifications = async () => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulating API call latency
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Set the notifications from our mock data
+      setNotifications(mockNotifications);
+      
+      // Count unread notifications
+      const count = mockNotifications.filter(n => !n.read).length;
+      setUnreadCount(count);
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError('Failed to load notifications');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Mark a notification as read
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(notification => {
+        if (notification.id === id && !notification.read) {
+          setUnreadCount(count => Math.max(0, count - 1));
+          return { ...notification, read: true };
         }
-        
-        setNotifications(filteredNotifications);
-        setUnreadCount(mockNotifications.filter(n => !n.read).length);
-        
-        return filteredNotifications;
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-        return [];
-      } finally {
-        setIsLoading(false);
+        return notification;
+      })
+    );
+  };
+  
+  // Mark all notifications as read
+  const markAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+    setUnreadCount(0);
+  };
+  
+  // Delete a notification
+  const deleteNotification = (id: string) => {
+    setNotifications(prev => {
+      const notification = prev.find(n => n.id === id);
+      if (notification && !notification.read) {
+        setUnreadCount(count => Math.max(0, count - 1));
       }
-    },
-    [filter]
-  );
+      return prev.filter(notification => notification.id !== id);
+    });
+  };
   
-  const markAsRead = useCallback(async (id: string): Promise<boolean> => {
-    try {
-      // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      
-      setNotifications(prev => 
-        prev.map(notification => 
-          notification.id === id 
-            ? { ...notification, read: true } 
-            : notification
-        )
-      );
-      
-      setUnreadCount(prev => Math.max(0, prev - 1));
-      return true;
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      return false;
-    }
+  // Filter notifications based on the selected filter
+  const filteredNotifications = notifications.filter(notification => {
+    if (filter === 'all') return true;
+    if (filter === 'unread') return !notification.read;
+    return notification.type === filter;
+  });
+  
+  // Fetch notifications on mount and when filter changes
+  useEffect(() => {
+    fetchNotifications();
   }, []);
-  
-  const markAllAsRead = useCallback(async (): Promise<boolean> => {
-    try {
-      // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      
-      setNotifications(prev => 
-        prev.map(notification => ({ ...notification, read: true }))
-      );
-      
-      setUnreadCount(0);
-      return true;
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      return false;
-    }
-  }, []);
-  
-  const deleteNotification = useCallback(async (id: string): Promise<boolean> => {
-    try {
-      // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      
-      const notificationToRemove = notifications.find(n => n.id === id);
-      setNotifications(prev => prev.filter(notification => notification.id !== id));
-      
-      if (notificationToRemove && !notificationToRemove.read) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-      
-      return true;
-    } catch (error) {
-      console.error('Error deleting notification:', error);
-      return false;
-    }
-  }, [notifications]);
   
   return {
-    notifications,
+    notifications: filteredNotifications,
+    allNotifications: notifications,
     unreadCount,
     isLoading,
+    error,
     filter,
     setFilter,
     fetchNotifications,
@@ -149,6 +129,4 @@ export const useNotifications = (): UseNotificationsReturn => {
     markAllAsRead,
     deleteNotification
   };
-};
-
-export type { Notification, NotificationFilter };
+}

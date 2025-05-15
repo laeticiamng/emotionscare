@@ -1,53 +1,64 @@
 
 import React from 'react';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { Separator } from '../separator';
+import { Home, Moon, SunMedium, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import ThemeButton from './ThemeButton';
+import { useSidebar } from '@/contexts/SidebarContext';
+import { ThemeButton } from "./ThemeButton";
 
 interface SidebarProps {
-  children: React.ReactNode;
-  collapsed: boolean;
-  toggleCollapsed: () => void;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const Sidebar = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & SidebarProps
->(({ children, collapsed, toggleCollapsed, className, ...props }, ref) => {
+export const Sidebar = ({ className, children }: SidebarProps) => {
+  const { collapsed, toggleCollapsed, isMobile, isOpen, setIsOpen } = useSidebar();
+  const location = useLocation();
+
+  const handleToggle = () => {
+    if (isMobile && setIsOpen) {
+      setIsOpen(!isOpen);
+    } else {
+      toggleCollapsed();
+    }
+  };
+
   return (
-    <div
-      ref={ref}
+    <aside
       className={cn(
-        "relative flex h-full flex-col border-r bg-background transition-all duration-300",
-        collapsed ? "w-16" : "w-64",
+        'flex flex-col bg-background border-r transition-all duration-300 z-20',
+        isMobile ? 'fixed inset-y-0 left-0 h-full shadow-lg' : 'relative h-[calc(100vh-64px)]',
+        collapsed && !isMobile ? 'w-[70px]' : 'w-[240px]',
+        isMobile && !isOpen && 'translate-x-[-100%]',
         className
       )}
-      {...props}
     >
-      <div className="flex-1 overflow-y-auto p-3 pt-1">{children}</div>
-      <div className="p-3 pt-0">
-        <Separator className="my-2" />
-        <div className="flex items-center justify-between">
-          <ThemeButton collapsed={collapsed} />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9"
-            onClick={toggleCollapsed}
-          >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          </Button>
-        </div>
+      <div className={cn(
+        'flex items-center justify-between p-4',
+        collapsed && !isMobile && 'justify-center'
+      )}>
+        {!collapsed && <h3 className="text-lg font-semibold">Navigation</h3>}
+        <button 
+          className="p-1 rounded-md hover:bg-accent"
+          onClick={handleToggle}
+        >
+          {isMobile 
+            ? <X className="h-5 w-5" /> 
+            : (collapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />)
+          }
+        </button>
       </div>
-    </div>
+      <Separator />
+      <div className="flex-1 overflow-auto">
+        {children}
+      </div>
+      
+      <div className="p-3 mt-auto">
+        <ThemeButton collapsed={collapsed} />
+      </div>
+    </aside>
   );
-});
-Sidebar.displayName = "Sidebar";
+};
 
-export { default as SidebarSection } from './SidebarSection';
-export { default as SidebarItem } from './SidebarItem';
-export { default as SidebarTriggerItem } from './SidebarTriggerItem';
-export { default as ThemeButton } from './ThemeButton';
+export default Sidebar;

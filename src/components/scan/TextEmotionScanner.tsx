@@ -2,47 +2,49 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { EmotionResult } from '@/types/types';
+import { EmotionResult } from '@/types';
+import { Send } from 'lucide-react';
 
 interface TextEmotionScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  placeholder?: string;
 }
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
-  onScanComplete 
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
+  onResult,
+  placeholder = "Décrivez comment vous vous sentez aujourd'hui..."
 }) => {
   const [text, setText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  };
+  const analyzeText = async () => {
+    if (!text.trim()) return;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!text.trim()) {
-      return;
-    }
-    
     setIsAnalyzing(true);
     
     try {
-      // In a real app, this would call an API
-      // For this demo, we'll simulate a response after a delay
+      // Mock API call with a delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Mock result
       const result: EmotionResult = {
-        id: `text-${Date.now()}`,
-        emotion: getRandomEmotion(),
-        score: Math.floor(Math.random() * 40) + 60, // 60-99
-        confidence: (Math.random() * 0.3) + 0.6, // 0.6-0.9
+        id: 'text-analysis-' + Date.now(),
+        user_id: 'user-123',
+        emotion: ['joy', 'calm', 'anxious', 'sad', 'excited'][Math.floor(Math.random() * 5)],
+        score: Math.random() * 0.5 + 0.5,
+        confidence: Math.random() * 0.3 + 0.7,
         text: text,
-        date: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        recommendations: [
+          'Take a moment to reflect on your feelings',
+          'Consider journaling about your thoughts',
+          'Practice a short breathing exercise'
+        ],
+        ai_feedback: "Votre texte révèle un état émotionnel intéressant. Continuez à être attentif à vos émotions."
       };
       
-      if (onScanComplete) {
-        onScanComplete(result);
+      if (onResult) {
+        onResult(result);
       }
     } catch (error) {
       console.error('Error analyzing text:', error);
@@ -50,37 +52,39 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
       setIsAnalyzing(false);
     }
   };
-  
-  // Helper to get a random emotion for the demo
-  const getRandomEmotion = () => {
-    const emotions = ['joy', 'calm', 'anxious', 'focused', 'tired', 'excited'];
-    return emotions[Math.floor(Math.random() * emotions.length)];
-  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <Textarea
-          placeholder="Comment vous sentez-vous aujourd'hui ? Décrivez vos pensées et émotions..."
-          value={text}
-          onChange={handleTextChange}
-          className="min-h-32 resize-none"
-          disabled={isAnalyzing}
-        />
-        <p className="text-xs text-muted-foreground mt-1">
-          {text.length} caractères
-        </p>
-      </div>
+    <div className="space-y-4">
+      <Textarea
+        placeholder={placeholder}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={5}
+        className="resize-none"
+      />
       
-      <div className="flex justify-end">
-        <Button
-          type="submit"
-          disabled={!text.trim() || isAnalyzing}
-        >
-          {isAnalyzing ? 'Analyse en cours...' : 'Analyser'}
-        </Button>
-      </div>
-    </form>
+      <Button 
+        onClick={analyzeText} 
+        disabled={!text.trim() || isAnalyzing}
+        className="w-full"
+      >
+        {isAnalyzing ? (
+          <>
+            <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+            Analyse en cours...
+          </>
+        ) : (
+          <>
+            <Send className="mr-2 h-4 w-4" />
+            Analyser mon texte
+          </>
+        )}
+      </Button>
+      
+      <p className="text-xs text-muted-foreground text-center">
+        Pour une analyse plus précise, écrivez au moins quelques phrases décrivant vos émotions actuelles.
+      </p>
+    </div>
   );
 };
 

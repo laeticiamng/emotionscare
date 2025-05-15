@@ -11,6 +11,8 @@ export interface ThemeContextType {
   setFontSize?: (size: FontSize) => void;
   fontFamily?: FontFamily;
   setFontFamily?: (font: FontFamily) => void;
+  getContrastText?: (color: string) => 'black' | 'white';
+  primaryColor?: string;
 }
 
 export interface ThemeButtonProps {

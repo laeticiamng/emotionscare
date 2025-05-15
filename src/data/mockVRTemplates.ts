@@ -1,65 +1,84 @@
-import { VRSessionTemplate } from '@/types/types';
+
+import { VRSessionTemplate } from '@/types';
 
 export const mockVRTemplates: VRSessionTemplate[] = [
   {
-    id: 'vr-1',
-    name: 'Relaxation plage',
-    title: 'Relaxation plage',
-    description: 'Détendez-vous sur une plage paisible avec le son des vagues',
-    duration: 300,
-    type: 'relaxation',
-    thumbnail: '/images/vr/beach.jpg',
-    videoUrl: '/videos/beach-relaxation.mp4',
+    id: '1',
+    title: 'Méditation en forêt',
+    description: 'Une expérience immersive dans une forêt paisible avec des sons naturels apaisants.',
+    thumbnailUrl: '/images/vr/forest-meditation.jpg',
+    duration: 10,
+    category: 'meditation',
+    tags: ['détente', 'nature', 'méditation'],
+    completionRate: 0.8,
+    recommendedMood: 'anxious',
     emotion: 'calm',
-    completion_rate: 85,
-    recommended_mood: 50, // Conversion en number
-    benefits: ['Réduction du stress', 'Amélioration du sommeil', 'Clarté mentale'],
-    is_audio_only: false
+    difficulty: 'débutant'
   },
   {
-    id: 'vr-2',
-    name: 'Méditation forêt',
-    title: 'Méditation forêt',
-    description: 'Une méditation guidée dans une forêt apaisante',
-    duration: 600,
-    type: 'meditation',
-    thumbnail: '/images/vr/forest.jpg',
-    videoUrl: '/videos/forest-meditation.mp4',
-    emotion: 'mindful',
-    completion_rate: 72,
-    recommended_mood: 60, // Conversion en number
-    benefits: ['Focus amélioré', 'Réduction de l\'anxiété', 'Présence'],
-    is_audio_only: false
+    id: '2',
+    title: 'Plage tropicale',
+    description: 'Échappez au stress quotidien avec cette expérience sur une plage tropicale idyllique.',
+    thumbnailUrl: '/images/vr/beach.jpg',
+    duration: 15,
+    category: 'relaxation',
+    tags: ['plage', 'océan', 'relaxation'],
+    completionRate: 0.5,
+    recommendedMood: 'stressed',
+    emotion: 'calm',
+    difficulty: 'débutant'
   },
   {
-    id: 'vr-3',
-    name: 'Respiration guidée',
-    title: 'Respiration guidée',
-    description: 'Exercices de respiration pour trouver le calme intérieur',
-    duration: 180,
-    type: 'breathing',
-    thumbnail: '/images/vr/breathing.jpg',
-    audio_url: '/audio/guided-breathing.mp3',
+    id: '3',
+    title: 'Ascension de montagne',
+    description: 'Une expérience motivante de randonnée virtuelle avec des vues panoramiques à couper le souffle.',
+    thumbnailUrl: '/images/vr/mountain.jpg',
+    duration: 20,
+    category: 'motivation',
+    tags: ['montagne', 'aventure', 'motivation'],
+    completionRate: 0.3,
+    recommendedMood: 'sad',
+    emotion: 'joy',
+    difficulty: 'intermédiaire'
+  },
+  {
+    id: '4',
+    title: 'Méditation guidée',
+    description: 'Une méditation guidée par un expert pour vous aider à atteindre un état de pleine conscience.',
+    thumbnailUrl: '/images/vr/guided-meditation.jpg',
+    duration: 12,
+    category: 'meditation',
+    tags: ['méditation', 'guidé', 'pleine conscience'],
+    completionRate: 0.9,
+    recommendedMood: 'anxious',
+    emotion: 'calm',
+    difficulty: 'débutant'
+  },
+  {
+    id: '5',
+    title: 'Session de respiration profonde',
+    description: 'Techniques de respiration profonde pour réduire l\'anxiété et augmenter la concentration.',
+    thumbnailUrl: '/images/vr/breathing.jpg',
+    duration: 8,
+    category: 'breathing',
+    tags: ['respiration', 'anxiété', 'concentration'],
+    completionRate: 0.7,
+    recommendedMood: 'stressed',
     emotion: 'focused',
-    completion_rate: 95,
-    recommended_mood: 40, // Conversion en number
-    benefits: ['Réduction immédiate du stress', 'Meilleure concentration', 'Équilibre'],
-    is_audio_only: true
+    difficulty: 'tous niveaux'
   },
   {
-    id: 'vr-4',
-    name: 'Visualisation positive',
-    title: 'Visualisation positive',
-    description: 'Imaginez votre succès et votre bien-être futur',
-    duration: 450,
-    type: 'visualization',
-    thumbnail: '/images/vr/visualization.jpg',
-    videoUrl: '/videos/positive-visualization.mp4',
-    emotion: 'motivated',
-    completion_rate: 68,
-    recommended_mood: 70, // Conversion en number
-    benefits: ['Augmentation de la motivation', 'Confiance en soi', 'Optimisme'],
-    is_audio_only: false
+    id: '6',
+    title: 'Voyage sous-marin',
+    description: 'Explorez les merveilles de l\'océan dans cette aventure sous-marine relaxante.',
+    thumbnailUrl: '/images/vr/underwater.jpg',
+    duration: 18,
+    category: 'exploration',
+    tags: ['océan', 'découverte', 'détente'],
+    completionRate: 0.6,
+    recommendedMood: 'bored',
+    emotion: 'joy',
+    difficulty: 'intermédiaire'
   }
 ];
 
