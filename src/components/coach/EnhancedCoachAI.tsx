@@ -100,10 +100,10 @@ const EnhancedCoachAI = () => {
             <p className="text-sm text-muted-foreground">
               Confiance : {Math.round((analysisResult.confidence || 0.5) * 100)}%
             </p>
-            {analysisResult.ai_feedback && (
+            {analysisResult.feedback && (
               <div className="mt-2">
                 <h5 className="text-sm font-medium">Feedback de l'IA :</h5>
-                <p className="text-xs text-muted-foreground">{analysisResult.ai_feedback}</p>
+                <p className="text-xs text-muted-foreground">{analysisResult.feedback}</p>
               </div>
             )}
             {analysisResult.recommendations && analysisResult.recommendations.length > 0 && (

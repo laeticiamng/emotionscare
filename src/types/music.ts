@@ -3,72 +3,75 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  album?: string;
   duration: number;
   url: string;
+  coverUrl?: string;
+  cover_url?: string;
+  cover?: string;
   audioUrl?: string;
-  artwork?: string;
+  audio_url?: string;
   emotion?: string;
+  category?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
-  description?: string;
+  title?: string;
+  emotion?: string;
   tracks: MusicTrack[];
+  coverUrl?: string;
+  cover_url?: string;
+  cover?: string;
   category?: string;
 }
 
 export interface MusicContextType {
+  isPlaying: boolean;
   currentTrack: MusicTrack | null;
   playlist: MusicPlaylist | null;
-  isPlaying: boolean;
-  volume: number;
-  progress: number;
-  duration: number;
+  playlists: MusicPlaylist[];
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
+  volume: number;
   setVolume: (volume: number) => void;
-  seek: (time: number) => void;
-  loadPlaylist?: (playlist: MusicPlaylist) => void;
+  progress: number;
   loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  togglePlayPause: () => void;
+  duration: number;
+  currentTime: number;
+  seek: (time: number) => void;
 }
 
 export interface MusicDrawerProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  currentTrack?: MusicTrack;
+  isOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  genre?: string;
+  tempo?: 'slow' | 'medium' | 'fast';
+  duration?: number;
 }
 
 export interface Track {
   id: string;
   title: string;
   artist: string;
-  artwork?: string;
-  url: string;
   duration: number;
+  url: string;
+  cover?: string;
+  coverUrl?: string;
+  cover_url?: string;
   audioUrl?: string;
-}
-
-export interface ProgressBarProps {
-  value: number;
-  max: number;
-  onSeek?: (value: number) => void;
-}
-
-export interface TrackInfoProps {
-  track: Track;
-}
-
-export interface VolumeControlProps {
-  value: number;
-  onChange: (value: number) => void;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
+  audio_url?: string;
+  emotion?: string;
 }

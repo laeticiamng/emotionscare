@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GridPosition } from '@/types';
+import { GridPosition } from '@/types/dashboard';
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
 import EmotionalAnalysisTab from './tabs/EmotionalAnalysisTab';
 import UsageStatisticsTab from './tabs/UsageStatisticsTab';
@@ -11,7 +11,7 @@ interface KpiCardProps {
   title: string;
   value: string | number;
   delta?: number;
-  position: GridPosition; // Fixed type
+  position: GridPosition;
 }
 
 const AdminDashboard = () => {

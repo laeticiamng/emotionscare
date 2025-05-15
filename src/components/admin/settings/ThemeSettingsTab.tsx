@@ -8,7 +8,8 @@ import FontSettings from '@/components/settings/FontSettings';
 import { Button } from '@/components/ui/button';
 import { Save, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { FontFamily, FontSize, Theme } from '@/types';
+import { FontFamily, FontSize } from '@/types';
+import { Theme } from '@/types/theme';
 
 const ThemeSettingsTab: React.FC = () => {
   const themeContext = useTheme();

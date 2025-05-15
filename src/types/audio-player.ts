@@ -1,22 +1,24 @@
 
 export interface UseAudioPlayerStateReturn {
-  playing: boolean;
-  muted: boolean;
+  isPlaying: boolean;
   volume: number;
+  progress: number;
   duration: number;
   currentTime: number;
-  progress: number;
-  loading: boolean;
-  togglePlayPause: () => void;
-  toggleMute: () => void;
+  playTrack: (track: any) => void;
+  pauseTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
   setVolume: (volume: number) => void;
+  togglePlayPause: () => void;
   seek: (time: number) => void;
 }
 
 export interface EnhancedMusicVisualizerProps {
+  emotion?: string;
+  mood?: string;
   height?: number;
   showControls?: boolean;
-  mood?: string;
   intensity?: number;
   volume?: number;
   className?: string;

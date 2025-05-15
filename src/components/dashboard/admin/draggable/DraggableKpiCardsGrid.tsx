@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DraggableKpiCardsGridProps, KpiCardProps } from '@/types';
+import { KpiCardProps } from '@/types/dashboard';
+import { DraggableKpiCardsGridProps } from '@/types/dashboard';
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ 

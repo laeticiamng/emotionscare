@@ -1,51 +1,53 @@
 
+export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'system' | 'user' | 'emotion' | string;
+export type NotificationPriority = 'high' | 'medium' | 'low';
+export type NotificationFrequency = 'immediately' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'professional' | 'friendly' | 'direct';
+
+export interface NotificationPreference {
+  id?: string;
+  user_id?: string;
+  enabled?: boolean;
+  type?: NotificationType | string;
+  types?: NotificationType[];
+  channels?: { email: boolean; push: boolean; inApp: boolean } | string[];
+  frequency?: NotificationFrequency;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  tone?: NotificationTone;
+}
+
 export interface Notification {
   id: string;
   title: string;
-  message?: string;
+  message: string;
   type: NotificationType;
-  timestamp: Date | string;
-  read: boolean;
+  priority?: NotificationPriority;
+  timestamp: string | Date;
+  read?: boolean;
+  userId?: string;
   actionUrl?: string;
   actionLabel?: string;
-  sender_id?: string;
-  recipient_id?: string;
-  priority?: NotificationPriority;
-  user_id?: string;
-  created_at?: string;
-  createdAt?: string;
+  icon?: string;
 }
 
-export type NotificationType = 'info' | 'warning' | 'error' | 'success' | 'reminder' | 'system' | 'emotion' | 'challenge' | 'achievement';
-export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'realtime';
-export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm' | 'supportive' | 'casual' | 'minimal';
-export type NotificationFilter = 'all' | 'unread' | 'alerts' | 'system';
+export interface NotificationFilter {
+  type?: NotificationType | 'all';
+  read?: boolean | 'all';
+  priority?: NotificationPriority | 'all';
+  dateFrom?: Date | string;
+  dateTo?: Date | string;
+}
 
 export interface NotificationBadge {
   count: number;
   type?: NotificationType;
-  animate?: boolean;
-}
-
-export interface NotificationPreference {
-  enabled?: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  soundEnabled?: boolean;
-  frequency?: NotificationFrequency;
-  type?: string;
-  tone?: NotificationTone;
-  channels?: {
-    email: boolean;
-    push: boolean;
-    inApp?: boolean;
-  };
-  types?: string[];
 }
 
 export interface NotificationItemProps {
   notification: Notification;
-  onRead: (id: string) => void;
-  showActions?: boolean;
+  onRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onAction?: (notification: Notification) => void;
 }

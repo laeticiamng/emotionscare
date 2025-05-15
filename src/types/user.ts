@@ -1,50 +1,65 @@
 
-export type UserRole = 'admin' | 'user' | 'manager' | 'coach';
+// Types liés aux utilisateurs et à l'authentification
+
+export type UserRole = 'admin' | 'user' | 'manager' | 'coach' | 'wellbeing_manager' | 'employee';
 
 export interface User {
   id: string;
-  name?: string;
-  email?: string;
+  name: string;
+  email: string;
+  role: UserRole;
   avatar_url?: string;
-  role?: UserRole;
+  avatar?: string; // Pour compatibilité
+  department?: string;
+  position?: string;
+  created_at?: string;
+  joined_at?: string;
+  onboarded?: boolean;
+  emotional_score?: number;
+  teams?: string[];
+  team_id?: string;
+  status?: 'active' | 'inactive' | 'pending';
+  last_login?: string;
   preferences?: UserPreferences;
 }
 
 export interface UserPreferences {
   theme?: string;
+  font?: string;
   fontSize?: string;
-  fontFamily?: string;
-  notifications?: NotificationPreference;
+  language?: string;
+  notifications_enabled?: boolean;
+  privacy?: {
+    profileVisibility?: 'public' | 'private' | 'team' | string;
+  };
+  profileVisibility?: 'public' | 'private' | 'team' | string;
 }
 
 export interface UserPreferencesState {
   theme: string;
+  font: string;
   fontSize: string;
-  fontFamily: string;
-  notifications: boolean | NotificationPreference;
 }
 
 export interface AuthContextType {
   user: User | null;
-  loading: boolean;
-  error: Error | null;
+  isLoggedIn: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
-  updateUser: (user: User) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
+  loading: boolean;
+  error: string | null;
+  resetPassword?: (email: string) => Promise<void>;
 }
-
-export type ThemeName = 'light' | 'dark' | 'system';
 
 export interface InvitationVerificationResult {
   valid: boolean;
-  expired?: boolean;
-  alreadyAccepted?: boolean;
+  email?: string;
+  role?: string;
+  invited_by?: string;
+  message?: string;
+  expires_at?: string;
   error?: string;
-  invitation?: {
-    id: string;
-    email: string;
-    role: string;
-    expiresAt: string;
-  };
 }
+
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';

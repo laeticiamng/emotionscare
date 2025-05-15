@@ -7,6 +7,7 @@ export interface DashboardWidgetConfig {
   position: GridPosition;
   size?: { w: number; h: number };
   dataSource?: string;
+  settings?: any; // Required by the Admin dashboard kpi cards
 }
 
 export interface KpiCardProps {
@@ -16,6 +17,10 @@ export interface KpiCardProps {
   icon?: React.ComponentType<any>;
   onClick?: () => void;
   position?: GridPosition;
+  className?: string;
+  ariaLabel?: string;
+  isLoading?: boolean;
+  subtitle?: React.ReactNode;
 }
 
 export interface DraggableKpiCardsGridProps {

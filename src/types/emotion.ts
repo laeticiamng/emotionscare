@@ -1,37 +1,93 @@
 
 export interface Emotion {
-  id: string;
-  emotion: string;
-  score: number;
-  date: Date | string;
-  userId?: string;
+  id?: string;
   user_id?: string;
-  aiFeedback?: string;
-  ai_feedback?: string;
-  feedback?: string;
-  emojis?: string;
-  intensity?: number;
+  date?: string | Date;
+  emotion?: string;
+  name?: string;
+  color?: string;
+  icon?: string;
+  description?: string;
+  category?: string;
+  score?: number;
   confidence?: number;
-  audioUrl?: string;
+  intensity?: number;
+  text?: string;
+  emojis?: string[] | string;
+  transcript?: string;
   audio_url?: string;
+  audioUrl?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  triggers?: string[];
+  feedback?: string;
+  timestamp?: string;
+  anxiety?: number;
+  energy?: number;
+  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EmotionResult {
+  id?: string;
+  user_id?: string;
   emotion: string;
-  score: number;
+  score?: number;
   confidence?: number;
-  date?: string;
-  feedback?: string;
+  dominantEmotion?: string;
+  primaryEmotion?: string;
   intensity?: number;
+  text?: string;
+  transcript?: string;
+  emojis?: string[] | string;
+  timestamp?: string;
+  date?: string | Date;
+  triggers?: string[];
+  feedback?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  audio_url?: string;
+  audioUrl?: string;
+  [key: string]: any;  // Allow for flexible extension
 }
 
-export interface EnhancedEmotionResult {
-  emotion: string;
-  score: number;
-  confidence: number;
-  triggers?: string[];
+export interface EnhancedEmotionResult extends EmotionResult {
   recommendations?: string[];
-  feedback?: string;
+  insights?: string[];
+  icon?: string;
+  color?: string;
+  textColor?: string;
+  description?: string;
+  category?: string;
+  coping_strategies?: string[];
+  relatedActivities?: {
+    id: string;
+    title: string;
+    description: string;
+    duration: number;
+  }[];
+}
+
+export interface EmotionalTeamViewProps {
+  teamId?: string;
+  departmentId?: string;
+  users?: any[];
+  anonymized?: boolean;
+  onUserClick?: (userId: string) => void;
+  period?: 'day' | 'week' | 'month' | 'year' | string;
+  userId?: string;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  onRefresh?: () => void;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  anonymized?: boolean;
+  department?: string;
 }
 
 export interface VoiceEmotionScannerProps {
@@ -44,17 +100,4 @@ export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
   duration?: number;
-}
-
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: string;
-  anonymized?: boolean;
-}
-
-export interface TeamOverviewProps {
-  teamId: string;
-  period?: string;
-  anonymized?: boolean;
-  department?: string;
 }

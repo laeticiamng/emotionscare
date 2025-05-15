@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DashboardStats, GamificationData, KpiCardProps, GlobalOverviewTabProps } from '@/types';
+import { DashboardStats, GamificationStats, KpiCardProps, GlobalOverviewTabProps } from '@/types/dashboard';
 import DraggableKpiCardsGrid from '@/components/dashboard/admin/draggable/DraggableKpiCardsGrid';
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ 
