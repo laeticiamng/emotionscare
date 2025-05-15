@@ -1,3 +1,4 @@
+
 import { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import anim from "tailwindcss-animate";
@@ -320,6 +321,17 @@ const config = {
     },
   },
   plugins: [anim],
+  // Add variant configuration
+  variants: {
+    extend: {},
+  },
+  // Add support for the pastel theme variant
+  corePlugins: {
+    // Ensure all core plugins are enabled
+    preflight: true,
+  },
+  // Add 'pastel' as a variant class
+  variantOrder: ['first', 'last', 'odd', 'even', 'visited', 'checked', 'empty', 'read-only', 'group-hover', 'group-focus', 'focus-within', 'hover', 'focus', 'focus-visible', 'active', 'disabled', 'dark', 'pastel'],
 } satisfies Config;
 
 export default config;

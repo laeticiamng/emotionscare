@@ -129,18 +129,50 @@
   
   /* Theme-specific backgrounds for LandingPage */
   .bg-morning {
-    @apply bg-gradient-to-br from-blue-50 via-orange-50 to-blue-100 dark:from-blue-900/20 dark:via-orange-900/10 dark:to-blue-900/30 pastel:from-blue-100 pastel:via-blue-50 pastel:to-blue-100;
+    @apply bg-gradient-to-br from-blue-50 via-orange-50 to-blue-100;
+  }
+  
+  .dark .bg-morning {
+    @apply bg-gradient-to-br from-blue-900/20 via-orange-900/10 to-blue-900/30;
+  }
+  
+  .pastel .bg-morning {
+    @apply bg-gradient-to-br from-blue-100 via-blue-50 to-blue-100;
   }
   
   .bg-afternoon {
-    @apply bg-gradient-to-br from-blue-50 via-emerald-50 to-blue-100 dark:from-blue-900/20 dark:via-emerald-900/10 dark:to-blue-900/30 pastel:from-blue-100 pastel:via-blue-50 pastel:to-blue-100;
+    @apply bg-gradient-to-br from-blue-50 via-emerald-50 to-blue-100;
+  }
+  
+  .dark .bg-afternoon {
+    @apply bg-gradient-to-br from-blue-900/20 via-emerald-900/10 to-blue-900/30;
+  }
+  
+  .pastel .bg-afternoon {
+    @apply bg-gradient-to-br from-blue-100 via-blue-50 to-blue-100;
   }
   
   .bg-evening {
-    @apply bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100 dark:from-indigo-900/20 dark:via-purple-900/10 dark:to-blue-900/30 pastel:from-blue-200 pastel:via-blue-100 pastel:to-blue-200;
+    @apply bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100;
+  }
+  
+  .dark .bg-evening {
+    @apply bg-gradient-to-br from-indigo-900/20 via-purple-900/10 to-blue-900/30;
+  }
+  
+  .pastel .bg-evening {
+    @apply bg-gradient-to-br from-blue-200 via-blue-100 to-blue-200;
   }
   
   .bg-night {
-    @apply bg-gradient-to-br from-indigo-200 via-blue-100 to-indigo-100 dark:from-indigo-950 dark:via-blue-950 dark:to-indigo-950 pastel:from-blue-300 pastel:via-blue-200 pastel:to-blue-300;
+    @apply bg-gradient-to-br from-indigo-200 via-blue-100 to-indigo-100;
+  }
+  
+  .dark .bg-night {
+    @apply bg-gradient-to-br from-indigo-950 via-blue-950 to-indigo-950;
+  }
+  
+  .pastel .bg-night {
+    @apply bg-gradient-to-br from-blue-300 via-blue-200 to-blue-300;
   }
 }
