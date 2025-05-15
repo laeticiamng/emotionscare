@@ -5,74 +5,72 @@ import { TimeOfDay } from '@/constants/defaults';
 
 interface TimeBasedBackgroundProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-export const TimeBasedBackground: React.FC<TimeBasedBackgroundProps> = ({ children }) => {
+export const TimeBasedBackground: React.FC<TimeBasedBackgroundProps> = ({ 
+  children,
+  className = ''
+}) => {
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TimeOfDay.MORNING);
-  const [bgClass, setBgClass] = useState('bg-blue-50');
   
   useEffect(() => {
-    const now = new Date();
-    const hour = now.getHours();
+    const updateTimeOfDay = () => {
+      const hour = new Date().getHours();
+      
+      if (hour >= 5 && hour < 12) {
+        setTimeOfDay(TimeOfDay.MORNING);
+      } else if (hour >= 12 && hour < 18) {
+        setTimeOfDay(TimeOfDay.AFTERNOON);
+      } else if (hour >= 18 && hour < 22) {
+        setTimeOfDay(TimeOfDay.EVENING);
+      } else {
+        setTimeOfDay(TimeOfDay.NIGHT);
+      }
+    };
     
-    // Set time of day based on current hour
-    if (hour >= 5 && hour < 12) {
-      setTimeOfDay(TimeOfDay.MORNING);
-      setBgClass('from-blue-50 to-purple-50 via-amber-50');
-    } else if (hour >= 12 && hour < 18) {
-      setTimeOfDay(TimeOfDay.AFTERNOON);
-      setBgClass('from-amber-50 to-blue-50 via-pink-50');
-    } else if (hour >= 18 && hour < 22) {
-      setTimeOfDay(TimeOfDay.EVENING);
-      setBgClass('from-purple-100 to-rose-50 via-indigo-50');
-    } else {
-      setTimeOfDay(TimeOfDay.NIGHT);
-      setBgClass('from-indigo-900/20 to-blue-900/20 via-purple-900/20');
-    }
+    updateTimeOfDay();
+    
+    // Update time of day every 15 minutes
+    const interval = setInterval(updateTimeOfDay, 15 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, []);
   
   return (
-    <motion.div 
-      className={`min-h-screen w-full overflow-hidden bg-gradient-to-br ${bgClass} dark:bg-gradient-to-br dark:from-slate-950 dark:to-indigo-950/40 dark:via-slate-900/80`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.2 }}
+    <div className={`min-h-screen flex flex-col relative overflow-hidden transition-colors duration-1000 
+      ${timeOfDay === TimeOfDay.MORNING ? 'bg-morning' : 
+      timeOfDay === TimeOfDay.AFTERNOON ? 'bg-afternoon' : 
+      timeOfDay === TimeOfDay.EVENING ? 'bg-evening' : 
+      'bg-night'} ${className}`}
     >
-      {/* Animated background elements */}
-      <div className="fixed inset-0 z-0 overflow-hidden">
+      {/* Ambient animations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-primary/5 to-blue-100/20 dark:from-primary/10 dark:to-blue-500/5 blur-3xl"
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ 
-            x: [0, 20, 0],
-            y: [0, 15, 0],
-            opacity: [0.3, 0.5, 0.3]
+            opacity: [0.1, 0.2, 0.1], 
+            scale: [0.8, 1.1, 0.8],
+            x: ['-10%', '5%', '-10%'],
+            y: ['-10%', '5%', '-10%']
           }}
-          transition={{ 
-            repeat: Infinity,
-            duration: 15,
-            ease: "easeInOut" 
-          }}
+          transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
+          className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"
         />
         <motion.div
-          className="absolute bottom-[-5%] right-[10%] w-[30%] h-[30%] rounded-full bg-gradient-to-l from-purple-100/30 to-rose-100/10 dark:from-purple-500/10 dark:to-rose-500/5 blur-3xl"
+          initial={{ opacity: 0, scale: 0.8 }}
           animate={{ 
-            x: [0, -30, 0],
-            y: [0, -20, 0],
-            opacity: [0.2, 0.4, 0.2]
+            opacity: [0.1, 0.15, 0.1], 
+            scale: [0.8, 1.2, 0.8],
+            x: ['10%', '-5%', '10%'],
+            y: ['20%', '5%', '20%']
           }}
-          transition={{ 
-            repeat: Infinity,
-            duration: 20,
-            ease: "easeInOut",
-            delay: 1
-          }}
+          transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", delay: 1 }}
+          className="absolute -bottom-[50%] -right-[20%] w-[90%] h-[90%] rounded-full bg-gradient-to-r from-secondary/10 to-primary/10 blur-3xl"
         />
       </div>
       
-      {/* Content */}
-      <div className="relative z-10">
-        {children}
-      </div>
-    </motion.div>
+      {children}
+    </div>
   );
 };

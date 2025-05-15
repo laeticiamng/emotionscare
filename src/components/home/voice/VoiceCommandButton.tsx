@@ -1,93 +1,89 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { ButtonProps } from '@/components/ui/button';
 
-interface VoiceCommandButtonProps {
-  onTranscript: (transcript: string) => void;
-  commands?: Record<string, () => void>;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+interface VoiceCommandButtonProps extends ButtonProps {
+  onTranscript?: (transcript: string) => void;
+  commands?: {
+    [command: string]: () => void;
+  };
 }
 
 export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({ 
   onTranscript,
   commands = {},
-  variant = 'outline'
+  ...props
 }) => {
   const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
   
-  const startListening = () => {
-    // Check if browser supports speech recognition
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      toast({
-        title: "Commande vocale non supportée",
-        description: "Votre navigateur ne supporte pas la reconnaissance vocale",
-        variant: "destructive",
-      });
-      return;
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
-    
-    // This is a mock implementation for demonstration
-    // In a real app, you'd use the Web Speech API
+  };
+  
+  const startListening = () => {
     setIsListening(true);
     toast({
-      title: "Écoute en cours...",
-      description: "Dites votre commande vocale",
+      title: "Commandes vocales activées",
+      description: "Parlez maintenant pour utiliser une commande vocale",
     });
     
-    // Simulate voice recognition (in real app, use the Web Speech API)
+    // Simulate voice recognition (in a real app, use actual Whisper API)
     setTimeout(() => {
-      setIsListening(false);
+      const mockedTranscript = "connexion à mon espace";
       
-      // Process a mock command from the available commands list
-      const commandKeys = Object.keys(commands);
-      if (commandKeys.length > 0) {
-        const mockCommand = commandKeys[0]; // Just use the first command for demo
-        toast({
-          title: "Commande reconnue",
-          description: `"${mockCommand}"`,
-        });
-        
-        // Execute the command function
-        onTranscript(mockCommand);
-        commands[mockCommand]?.();
-      } else {
-        // Default behavior if no commands provided
-        toast({
-          title: "Commande reconnue",
-          description: "connexion à mon espace",
-        });
-        onTranscript("connexion à mon espace");
+      if (onTranscript) {
+        onTranscript(mockedTranscript);
       }
-    }, 2000);
+      
+      // Check if the transcript matches any command
+      Object.entries(commands).forEach(([command, action]) => {
+        if (mockedTranscript.toLowerCase().includes(command.toLowerCase())) {
+          action();
+        }
+      });
+      
+      stopListening();
+      
+      toast({
+        title: "Commande reconnue",
+        description: `"${mockedTranscript}"`,
+      });
+    }, 3000);
   };
   
   const stopListening = () => {
     setIsListening(false);
-    // In a real app, you would stop the speech recognition here
+    // In a real app, stop the actual recognition service
+    toast({
+      title: "Commandes vocales désactivées",
+      description: "Le microphone est maintenant éteint",
+    });
   };
   
   return (
     <Button
-      variant={variant}
-      size="sm"
-      onClick={isListening ? stopListening : startListening}
-      className="relative"
+      size="icon"
+      variant={isListening ? "default" : "ghost"}
+      onClick={toggleListening}
+      className={isListening ? "animate-pulse" : ""}
+      {...props}
     >
       {isListening ? (
-        <>
-          <MicOff className="h-4 w-4" />
-          <span className="ml-2">Arrêter</span>
-          <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-        </>
+        <MicOff className="h-4 w-4" />
       ) : (
-        <>
-          <Mic className="h-4 w-4" />
-          <span className="ml-2">Commande vocale</span>
-        </>
+        <Mic className="h-4 w-4" />
       )}
+      <span className="sr-only">
+        {isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}
+      </span>
     </Button>
   );
 };

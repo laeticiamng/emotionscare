@@ -10,22 +10,25 @@ import { ThemeSelector } from '@/components/theme/ThemeSelector';
 import { AudioController } from '@/components/home/audio/AudioController';
 import { WelcomeMessage } from '@/components/home/WelcomeMessage';
 import Shell from '@/Shell';
+import { TimeOfDay } from '@/constants/defaults';
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isListening, setIsListening] = useState(false);
-  const [backgroundState, setBackgroundState] = useState('morning');
+  const [backgroundState, setBackgroundState] = useState<TimeOfDay>(TimeOfDay.MORNING);
 
   // Set background based on time of day
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) {
-      setBackgroundState('morning');
+      setBackgroundState(TimeOfDay.MORNING);
     } else if (hour >= 12 && hour < 18) {
-      setBackgroundState('afternoon');
+      setBackgroundState(TimeOfDay.AFTERNOON);
+    } else if (hour >= 18 && hour < 22) {
+      setBackgroundState(TimeOfDay.EVENING);
     } else {
-      setBackgroundState('evening');
+      setBackgroundState(TimeOfDay.NIGHT);
     }
 
     // Preload essential components
@@ -90,9 +93,10 @@ const LandingPage = () => {
     <Shell>
       <div 
         className={`min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-1000 
-          ${backgroundState === 'morning' ? 'bg-gradient-to-br from-blue-50 via-orange-50 to-blue-100 dark:from-blue-900/20 dark:via-orange-900/10 dark:to-blue-900/30' : 
-          backgroundState === 'afternoon' ? 'bg-gradient-to-br from-blue-50 via-emerald-50 to-blue-100 dark:from-blue-900/20 dark:via-emerald-900/10 dark:to-blue-900/30' : 
-          'bg-gradient-to-br from-indigo-900/20 via-purple-900/10 to-blue-900/30 dark:from-indigo-950 dark:via-purple-950 dark:to-blue-950'}`}
+          ${backgroundState === TimeOfDay.MORNING ? 'bg-morning' : 
+          backgroundState === TimeOfDay.AFTERNOON ? 'bg-afternoon' : 
+          backgroundState === TimeOfDay.EVENING ? 'bg-evening' : 
+          'bg-night'}`}
       >
         {/* Theme selector position in top-right */}
         <div className="absolute top-4 right-4 z-20 flex items-center gap-4">
@@ -145,7 +149,7 @@ const LandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <Card className="border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
+            <Card className="border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 pastel:bg-blue-50/80">
               <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
                   <User className="w-10 h-10 text-primary" />
@@ -166,7 +170,7 @@ const LandingPage = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
+            <Card className="border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 pastel:bg-blue-50/80">
               <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
                 <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center">
                   <Building className="w-10 h-10 text-secondary" />

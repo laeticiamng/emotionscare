@@ -1,56 +1,71 @@
 
-import { User } from "@/types/types";
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Utility function for combining class names with clsx and tailwind-merge
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Generate user initials from name
-export function getUserInitials(user: User | string): string {
-  // If user is a string, use it directly
-  const name = typeof user === 'string' ? user : (user?.name || '');
+// Helper function to get time of day greeting
+export function getTimeOfDayGreeting() {
+  const hour = new Date().getHours();
   
-  if (!name) return '';
-  
-  const parts = name.split(' ');
-  if (parts.length === 1) {
-    return parts[0].charAt(0).toUpperCase();
+  if (hour >= 5 && hour < 12) {
+    return "Bonjour";
+  } else if (hour >= 12 && hour < 18) {
+    return "Bon après-midi";
+  } else {
+    return "Bonsoir";
+  }
+}
+
+// Function to generate a random ID
+export function generateId() {
+  return Math.random().toString(36).substring(2, 15);
+}
+
+// Format date to a human-readable string
+export function formatDate(date: Date | string) {
+  if (typeof date === 'string') {
+    date = new Date(date);
   }
   
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
 }
 
-// Get user avatar URL or default placeholder
-export function getUserAvatarUrl(user: User): string {
-  if (user.avatar_url) return user.avatar_url;
-  if (user.avatar) return user.avatar;
+// Format relative time (e.g. "2 hours ago")
+export function formatRelativeTime(date: Date | string) {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
   
-  // Default avatar using initials
-  const initials = getUserInitials(user);
-  const colors = [
-    'bg-blue-500', 'bg-green-500', 'bg-yellow-500',
-    'bg-pink-500', 'bg-purple-500', 'bg-indigo-500'
-  ];
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
   
-  // Use user ID to consistently pick a color
-  const colorIndex = user.id.charCodeAt(0) % colors.length;
-  const color = colors[colorIndex];
+  if (diffInSeconds < 60) {
+    return 'à l\'instant';
+  }
   
-  // In a real app, you might use a service like UI Avatars
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=${color.replace('bg-', '')}&color=fff`;
-}
-
-// Format date for consistent display
-export function formatDate(dateString: string): string {
-  if (!dateString) return '';
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) {
+    return `il y a ${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''}`;
+  }
   
-  const date = new Date(dateString);
-  return date.toLocaleDateString('fr-FR', {
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric'
-  });
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) {
+    return `il y a ${diffInHours} heure${diffInHours > 1 ? 's' : ''}`;
+  }
+  
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) {
+    return `il y a ${diffInDays} jour${diffInDays > 1 ? 's' : ''}`;
+  }
+  
+  return formatDate(date);
 }
