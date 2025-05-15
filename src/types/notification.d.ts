@@ -40,6 +40,7 @@ export interface NotificationPreference {
     end: string;
   };
   tone?: NotificationTone;
+  type?: string; // Added for backward compatibility
 }
 
 export interface NotificationBadge {

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -84,7 +85,7 @@ const DataPrivacySettings = () => {
   
   // Get export format
   const getExportFormat = (): 'pdf' | 'json' | 'csv' => {
-    return preferences.dataExport || 'pdf';
+    return preferences.dataExport as 'pdf' | 'json' | 'csv' || 'pdf';
   };
   
   // Handle export format change

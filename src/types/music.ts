@@ -8,6 +8,10 @@ export interface MusicTrack {
   url?: string;
   genre?: string;
   album?: string;
+  audioUrl?: string;
+  cover?: string; // Added for backward compatibility
+  cover_url?: string; // Added for backward compatibility
+  emotion?: string; // Added for compatibility with emotion-based tracks
 }
 
 export interface MusicPlaylist {
@@ -18,6 +22,7 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   category?: string;
   coverUrl?: string;
+  emotion?: string; // Added for emotion-based playlists
 }
 
 export interface TrackInfoProps {
@@ -28,17 +33,17 @@ export interface TrackInfoProps {
 
 export interface ProgressBarProps {
   progress?: number;
-  value?: number;
-  max?: number;
+  value?: number; // Added for compatibility
+  max?: number; // Added for compatibility
   onSeek?: (value: number) => void;
   className?: string;
-  currentTime?: number;
-  duration?: number;
-  formatTime?: (seconds: number) => string;
+  currentTime?: number; // Added for compatibility
+  duration?: number; // Added for compatibility
+  formatTime?: (seconds: number) => string; // Added for compatibility
   showTimestamps?: boolean;
   variant?: 'default' | 'thin' | 'thick';
-  handleProgressClick?: (e: any) => void;
-  showLabel?: boolean;
+  handleProgressClick?: (e: any) => void; // Added for compatibility
+  showLabel?: boolean; // Added for compatibility
 }
 
 export interface VolumeControlProps {
@@ -88,6 +93,10 @@ export interface MusicDrawerProps {
   onOpenChange?: (open: boolean) => void;
   playlist?: MusicPlaylist;
   initialTrack?: MusicTrack;
+  children?: React.ReactNode; // Added for compatibility
+  isOpen?: boolean; // Added for compatibility
+  onClose?: () => void; // Added for compatibility
+  currentTrack?: MusicTrack; // Added for compatibility
 }
 
 export interface EmotionMusicParams {

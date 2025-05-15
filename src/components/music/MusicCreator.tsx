@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,7 +72,6 @@ const MusicCreator: React.FC<MusicCreatorProps> = ({ onCreateTrack, loading = fa
       artist,
       duration,
       url: `/audio/${emotion}-${id}.mp3`,
-      audioUrl: `/audio/${emotion}-${id}.mp3`,
       coverUrl: coverMap[emotion] || '/images/music/default.jpg',
       emotion
     };

@@ -1,170 +1,214 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference, NotificationTone } from '@/types';
-import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { NotificationFrequency, NotificationTone } from '@/types/notification';
 
-interface NotificationPreferencesProps {
-  preferences: NotificationPreference[];
-  onPreferenceChange: (preference: NotificationPreference) => void;
-}
-
-const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ 
-  preferences, 
-  onPreferenceChange 
-}) => {
-  const { toast } = useToast();
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  const handleToggleEmail = (preference: NotificationPreference) => {
-    const emailEnabled = preference.emailEnabled !== undefined 
-      ? preference.emailEnabled 
-      : false;
-    
-    const updatedPreference = {
-      ...preference,
-      emailEnabled: !emailEnabled,
-    };
-    
-    handlePreferenceUpdate(updatedPreference);
+const NotificationPreferences = () => {
+  const { preferences, updatePreferences } = useUserPreferences();
+  
+  const notificationEnabled = preferences.notifications?.enabled ?? true;
+  const emailEnabled = preferences.notifications?.emailEnabled ?? true;
+  const pushEnabled = preferences.notifications?.pushEnabled ?? true;
+  const inAppEnabled = preferences.notifications?.inAppEnabled ?? true;
+  
+  const frequency = preferences.notifications?.frequency || 'immediate';
+  const tone = preferences.notifications?.tone || 'friendly';
+  
+  // Get types from preferences, use empty object if not available
+  const notificationTypes = preferences.notifications?.types || {};
+  
+  const handleToggleNotifications = () => {
+    updatePreferences({
+      notifications: {
+        ...preferences.notifications,
+        enabled: !notificationEnabled
+      }
+    });
   };
-
-  const handleTogglePush = (preference: NotificationPreference) => {
-    const pushEnabled = preference.pushEnabled !== undefined 
-      ? preference.pushEnabled 
-      : false;
-    
-    const updatedPreference = {
-      ...preference,
-      pushEnabled: !pushEnabled
-    };
-    
-    handlePreferenceUpdate(updatedPreference);
+  
+  const handleToggleChannel = (channel: 'emailEnabled' | 'pushEnabled' | 'inAppEnabled') => {
+    updatePreferences({
+      notifications: {
+        ...preferences.notifications,
+        [channel]: !preferences.notifications?.[channel]
+      }
+    });
   };
-
-  const handleFrequencyChange = (preference: NotificationPreference, frequency: NotificationFrequency) => {
-    const updatedPreference = {
-      ...preference,
-      frequency
-    };
+  
+  const handleFrequencyChange = (newFrequency: NotificationFrequency) => {
+    updatePreferences({
+      notifications: {
+        ...preferences.notifications,
+        frequency: newFrequency
+      }
+    });
+  };
+  
+  const handleToneChange = (newTone: NotificationTone) => {
+    updatePreferences({
+      notifications: {
+        ...preferences.notifications,
+        tone: newTone
+      }
+    });
+  };
+  
+  const handleTypeToggle = (type: string) => {
+    // Check if types exists, use empty object if not
+    const existingTypes = preferences.notifications?.types || {};
     
-    handlePreferenceUpdate(updatedPreference);
+    updatePreferences({
+      notifications: {
+        ...preferences.notifications,
+        types: {
+          ...existingTypes,
+          [type]: !existingTypes[type]
+        }
+      }
+    });
   };
-
-  const handlePreferenceUpdate = (preference: NotificationPreference) => {
-    const preferenceId = preference.type || String(preferences.indexOf(preference));
-    setUpdatingId(preferenceId);
+  
+  const isTypeEnabled = (type: string): boolean => {
+    // Check if types exists, use empty object if not
+    const existingTypes = preferences.notifications?.types || {};
     
-    // Simulate API call to update preference
-    setTimeout(() => {
-      onPreferenceChange(preference);
-      setUpdatingId(null);
-      
-      toast({
-        title: "Préférences mises à jour",
-        description: "Vos préférences de notification ont été enregistrées.",
-      });
-    }, 500);
+    // Default to true if not explicitly set
+    return existingTypes[type] !== false;
   };
-
-  // Helper to get notification type name
-  const getNotificationTypeName = (typeValue: string): string => {
-    switch (typeValue) {
-      case 'emotion': return 'Analyses émotionnelles';
-      case 'coach': return 'Messages du coach';
-      case 'journal': return 'Journal';
-      case 'community': return 'Communauté';
-      case 'system': return 'Système';
-      default: return 'Autres';
-    }
-  };
-
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notifications</CardTitle>
+        <CardTitle>Notification Preferences</CardTitle>
+        <CardDescription>
+          Manage how you receive updates and information
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {preferences.map((preference, index) => {
-            const preferenceId = preference.type || String(index);
-            const isUpdating = updatingId === preferenceId;
-            const emailEnabled = preference.emailEnabled !== undefined 
-              ? preference.emailEnabled 
-              : false;
-            const pushEnabled = preference.pushEnabled !== undefined 
-              ? preference.pushEnabled 
-              : false;
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">General Settings</h3>
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Enable Notifications</Label>
+              <p className="text-sm text-muted-foreground">
+                Control whether you receive any notifications
+              </p>
+            </div>
+            <Switch
+              checked={notificationEnabled}
+              onCheckedChange={handleToggleNotifications}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Delivery Channels</h3>
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Email Notifications</Label>
+              <p className="text-sm text-muted-foreground">
+                Receive notifications via email
+              </p>
+            </div>
+            <Switch
+              checked={emailEnabled}
+              onCheckedChange={() => handleToggleChannel('emailEnabled')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">Push Notifications</Label>
+              <p className="text-sm text-muted-foreground">
+                Receive notifications on your device
+              </p>
+            </div>
+            <Switch
+              checked={pushEnabled}
+              onCheckedChange={() => handleToggleChannel('pushEnabled')}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="text-base">In-App Notifications</Label>
+              <p className="text-sm text-muted-foreground">
+                Receive notifications within the application
+              </p>
+            </div>
+            <Switch
+              checked={inAppEnabled}
+              onCheckedChange={() => handleToggleChannel('inAppEnabled')}
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Frequency & Tone</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="frequency">Frequency</Label>
+              <Select
+                value={frequency}
+                onValueChange={(value) => handleFrequencyChange(value as NotificationFrequency)}
+              >
+                <SelectTrigger id="frequency">
+                  <SelectValue placeholder="Select a frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="immediate">Immediate</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="never">Never</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             
-            // Get the type label, handling both strings and objects
-            let typeName = 'Notification';
-            if (preference.type) {
-              typeName = getNotificationTypeName(preference.type);
-            } else if (index === 0) {
-              typeName = 'Général';
-            } else {
-              typeName = `Type ${index + 1}`;
-            }
-            
-            return (
-              <div key={preferenceId} className="space-y-4">
-                <div className="font-medium">{typeName}</div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor={`email-${preferenceId}`} className="cursor-pointer">
-                        Notifications par email
-                      </Label>
-                      <Switch
-                        id={`email-${preferenceId}`}
-                        checked={emailEnabled}
-                        onCheckedChange={() => handleToggleEmail(preference)}
-                        disabled={isUpdating}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor={`push-${preferenceId}`} className="cursor-pointer">
-                        Notifications push
-                      </Label>
-                      <Switch
-                        id={`push-${preferenceId}`}
-                        checked={pushEnabled}
-                        onCheckedChange={() => handleTogglePush(preference)}
-                        disabled={isUpdating}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor={`frequency-${preferenceId}`}>Fréquence</Label>
-                    <Select
-                      value={preference.frequency}
-                      onValueChange={(value) => handleFrequencyChange(preference, value as NotificationFrequency)}
-                      disabled={isUpdating || (!emailEnabled && !pushEnabled)}
-                    >
-                      <SelectTrigger id={`frequency-${preferenceId}`} className="mt-1">
-                        <SelectValue placeholder="Choisir une fréquence" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="realtime">Temps réel</SelectItem>
-                        <SelectItem value="immediate">Immédiat</SelectItem>
-                        <SelectItem value="daily">Quotidien</SelectItem>
-                        <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                        <SelectItem value="never">Jamais</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div>
+              <Label htmlFor="tone">Tone</Label>
+              <Select
+                value={tone}
+                onValueChange={(value) => handleToneChange(value as NotificationTone)}
+              >
+                <SelectTrigger id="tone">
+                  <SelectValue placeholder="Select a tone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="friendly">Friendly</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="motivational">Motivational</SelectItem>
+                  <SelectItem value="direct">Direct</SelectItem>
+                  <SelectItem value="calm">Calm</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Notification Types</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Example types - replace with your actual types */}
+            {['system', 'emotion', 'journal', 'coach', 'community', 'achievement'].map((type) => (
+              <div key={type} className="flex items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <Label className="text-base">{type.charAt(0).toUpperCase() + type.slice(1)}</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive {type} related notifications
+                  </p>
                 </div>
-                
-                <div className="border-t pt-2 mt-2"></div>
+                <Switch
+                  checked={isTypeEnabled(type)}
+                  onCheckedChange={() => handleTypeToggle(type)}
+                />
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>

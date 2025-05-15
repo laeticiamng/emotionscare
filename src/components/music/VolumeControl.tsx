@@ -6,27 +6,36 @@ import { VolumeControlProps } from '@/types/music';
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onVolumeChange,
-  onChange, // This is now properly defined in VolumeControlProps
-  className = ""
+  onChange,
+  className = "",
+  showLabel = false
 }) => {
   const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    
     if (onVolumeChange) {
-      onVolumeChange(value[0]);
+      onVolumeChange(newVolume);
     }
+    
     if (onChange) {
-      onChange(value[0]);
+      onChange(newVolume);
     }
   };
 
   return (
-    <Slider
-      defaultValue={[0.7]}
-      value={[volume]}
-      max={1}
-      step={0.01}
-      onValueChange={handleVolumeChange}
-      className={className}
-    />
+    <div className={`flex items-center gap-2 ${className}`}>
+      {showLabel && (
+        <span className="text-xs text-muted-foreground w-8 text-right">{Math.round(volume * 100)}%</span>
+      )}
+      <Slider
+        defaultValue={[volume]}
+        value={[volume]}
+        max={1}
+        step={0.01}
+        onValueChange={handleVolumeChange}
+        className="flex-1"
+      />
+    </div>
   );
 };
 
