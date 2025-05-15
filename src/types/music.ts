@@ -7,7 +7,9 @@ export interface MusicTrack {
   url: string;
   cover?: string;
   coverUrl?: string;
+  cover_url?: string;  // For compatibility
   audioUrl?: string;
+  audio_url?: string;  // For compatibility
   emotion?: string;
 }
 
@@ -17,6 +19,10 @@ export interface MusicPlaylist {
   title: string;
   emotion?: string;
   tracks: MusicTrack[];
+  category?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  cover?: string;
 }
 
 export interface MusicContextType {
@@ -26,11 +32,14 @@ export interface MusicContextType {
   volume: number;
   progress: number;
   duration: number;
+  isMuted?: boolean;
+  toggleMute?: () => void;
   playTrack: (track: MusicTrack, playlist?: MusicPlaylist) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
   nextTrack: () => void;
-  prevTrack: () => void;
+  previousTrack?: () => void;
+  prevTrack?: () => void;
   setVolume: (volume: number) => void;
   seekTo: (progress: number) => void;
 }
@@ -40,6 +49,8 @@ export interface MusicDrawerProps {
   onClose: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export interface Track {
@@ -50,7 +61,9 @@ export interface Track {
   url: string;
   cover?: string;
   coverUrl?: string;
+  cover_url?: string;
   audioUrl?: string;
+  audio_url?: string;
   emotion?: string;
 }
 
@@ -71,17 +84,27 @@ export interface ProgressBarProps {
 }
 
 export interface TrackInfoProps {
-  title: string;
-  artist: string;
+  track?: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  cover_url?: string;
   cover?: string;
   className?: string;
-  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+  compact?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onChange: (value: number) => void;
+  onChange: (volume: number) => void;
+  onVolumeChange?: (value: number) => void;
   className?: string;
+  showLabel?: boolean;
 }
 
 export interface EmotionMusicParams {

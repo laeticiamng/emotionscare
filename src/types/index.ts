@@ -9,7 +9,9 @@ export type {
   FontFamily,
   ThemeContextType,
   ThemeButtonProps,
-  ThemeSwitcherProps
+  ThemeSwitcherProps,
+  ColorPalette,
+  ThemeName
 } from './theme';
 
 // Exports for user-related types
@@ -19,8 +21,7 @@ export type {
   UserPreferences,
   UserPreferencesState,
   AuthContextType,
-  InvitationVerificationResult,
-  ThemeName
+  InvitationVerificationResult
 } from './user';
 
 // Exports for user mode types
@@ -69,9 +70,7 @@ export type {
   VRSessionWithMusicProps,
   VRTemplateGridProps,
   VRSessionWithMusicPropsType,
-  VRSessionHistoryProps,
-  VoiceEmotionScannerProps,
-  LiveVoiceScannerProps
+  VRSessionHistoryProps
 } from './vr';
 
 // Exports for emotion types
@@ -229,3 +228,6 @@ export interface InvitationFormData {
   message?: string;
   expires_in_days: number;
 }
+
+// Re-exporting important types for backward compatibility
+export * from './types';

@@ -1,28 +1,70 @@
 
 export interface Emotion {
-  name: string;
-  value: number;
-  color: string;
+  id?: string;
+  user_id?: string;
+  date?: string | Date;
+  emotion?: string;
+  name?: string;
+  color?: string;
   icon?: string;
   description?: string;
+  category?: string;
+  score?: number;
+  confidence?: number;
+  intensity?: number;
+  text?: string;
+  emojis?: string[] | string;
+  transcript?: string;
+  audio_url?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  triggers?: string[];
+  feedback?: string;
+  timestamp?: string;
+  anxiety?: number;
+  energy?: number;
+  value?: number;
+  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EmotionResult {
-  id: string;
+  id?: string;
+  user_id?: string;
   emotion: string;
-  value: number;
-  timestamp: Date | string;
-  user_id: string;
+  score?: number;
+  confidence?: number;
+  dominantEmotion?: string;
+  primaryEmotion?: string;
+  intensity?: number;
   text?: string;
   transcript?: string;
-  source?: string;
-  confidence?: number;
+  emojis?: string[] | string;
+  timestamp?: string | Date;
+  date?: string;
+  triggers?: string[];
+  feedback?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  audio_url?: string;
+  value?: number;
+  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  triggers?: string[];
   recommendations?: string[];
-  relatedEmotions?: Emotion[];
+  insights?: string[];
+  icon?: string;
+  color?: string;
+  textColor?: string;
+  description?: string;
+  category?: string;
+  coping_strategies?: string[];
+  relatedActivities?: {
+    id: string;
+    title: string;
+    description: string;
+    duration: number;
+  }[];
 }
 
 export interface VoiceEmotionScannerProps {
@@ -39,7 +81,18 @@ export interface LiveVoiceScannerProps {
 
 export interface EmotionalTeamViewProps {
   teamId?: string;
-  period?: string;
+  departmentId?: string;
+  users?: any[];
+  anonymized?: boolean;
+  onUserClick?: (userId: string) => void;
+  period?: 'day' | 'week' | 'month' | 'year' | string;
+  userId?: string;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  onRefresh?: () => void;
 }
 
 export interface TeamOverviewProps {

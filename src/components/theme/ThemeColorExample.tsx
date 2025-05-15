@@ -1,53 +1,41 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { themes, ColorPalette } from '@/themes/theme';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTheme } from '@/contexts/ThemeContext';
 
-const ThemeColorExample: React.FC = () => {
+const ThemeColorExample = () => {
+  const { theme, isDarkMode } = useTheme();
+  
+  const colorSamples = [
+    { name: 'Primary', class: 'bg-primary text-primary-foreground' },
+    { name: 'Secondary', class: 'bg-secondary text-secondary-foreground' },
+    { name: 'Accent', class: 'bg-accent text-accent-foreground' },
+    { name: 'Background', class: 'bg-background text-foreground' },
+    { name: 'Muted', class: 'bg-muted text-muted-foreground' },
+    { name: 'Card', class: 'bg-card text-card-foreground border' },
+    { name: 'Destructive', class: 'bg-destructive text-destructive-foreground' },
+    { name: 'Success', class: 'bg-green-500 text-white' },
+    { name: 'Warning', class: 'bg-yellow-500 text-white' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Theme Color Examples</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {Object.entries(themes).map(([name, palette]) => (
-              <div key={name} className="space-y-2">
-                <h3 className="font-medium capitalize">{name} Theme</h3>
-                <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                  <ColorSwatch name="Background" color={palette.background} />
-                  <ColorSwatch name="Foreground" color={palette.foreground} />
-                  <ColorSwatch name="Primary" color={palette.primary} />
-                  <ColorSwatch name="Secondary" color={palette.secondary} />
-                  <ColorSwatch name="Accent" color={palette.accent} />
-                  <ColorSwatch name="Success" color={palette.success.DEFAULT} />
-                  <ColorSwatch name="Warning" color={palette.warning.DEFAULT} />
-                  <ColorSwatch name="Error" color={palette.error.DEFAULT} />
-                </div>
-              </div>
-            ))}
+    <Card>
+      <CardHeader>
+        <CardTitle>Theme Colors - {theme} mode</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        {colorSamples.map((sample) => (
+          <div key={sample.name} className="flex flex-col gap-2">
+            <div 
+              className={`h-16 rounded-md flex items-center justify-center ${sample.class}`}
+            >
+              <span>{sample.name}</span>
+            </div>
+            <p className="text-xs text-center text-muted-foreground">{sample.name}</p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-interface ColorSwatchProps {
-  name: string;
-  color: string;
-}
-
-const ColorSwatch: React.FC<ColorSwatchProps> = ({ name, color }) => {
-  return (
-    <div className="flex flex-col items-center">
-      <div 
-        className="w-12 h-12 rounded-md border border-gray-200 mb-1" 
-        style={{ backgroundColor: color }}
-      />
-      <span className="text-xs text-center">{name}</span>
-    </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 
