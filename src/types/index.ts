@@ -85,15 +85,13 @@ export type {
 // Exports des types liés au dashboard
 export type {
   DashboardWidgetConfig,
-  DashboardKpi,
-  DashboardShortcut,
+  KpiCardProps,
+  DraggableKpiCardsGridProps,
   ChartData,
   DashboardStats,
   GamificationData,
   GridPosition,
-  GlobalOverviewTabProps,
-  KpiCardProps,
-  DraggableKpiCardsGridProps
+  GlobalOverviewTabProps
 } from './dashboard';
 
 // Exports des types liés à la gamification

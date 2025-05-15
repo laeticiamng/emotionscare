@@ -1,15 +1,19 @@
 
 // Types liés aux notifications
-export type NotificationType = 'info' | 'warning' | 'error' | 'success' | 'reminder' | 'system' | 'emotion' | 'challenge' | 'achievement';
+export type NotificationType = 'info' | 'warning' | 'error' | 'success' | 'reminder' | 'system' | 'emotion' | 'challenge' | 'achievement' | 'all' | 'journal' | 'coach' | 'vr' | 'community';
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'realtime' | 'custom';
+export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm' | 'supportive' | 'gentle' | 'minimal' | 'casual';
 export type NotificationFilter = 'all' | 'unread' | 'alerts' | 'system';
 
 export interface NotificationBadge {
   count: number;
   type?: NotificationType;
   priority?: NotificationPriority;
+  hasNew?: boolean;
+  lastSeen?: string;
+  badgesCount?: number;
+  notificationsCount?: number;
 }
 
 export interface Notification {
@@ -27,6 +31,10 @@ export interface Notification {
   user_id?: string;  // Pour compatibilité
   createdAt?: string;  // Pour compatibilité
   created_at?: string; // Pour compatibilité
+  date?: string;
+  body?: string;
+  icon?: string;
+  image?: string;
 }
 
 export interface NotificationPreference {
@@ -41,6 +49,15 @@ export interface NotificationPreference {
     enabled: boolean;
     start: string;
     end: string;
+  };
+  type?: NotificationType;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  soundEnabled?: boolean;
+  channels?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
   };
 }
 

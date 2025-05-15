@@ -13,7 +13,7 @@ export interface KpiCardProps {
   title: string;
   value: string | number | React.ReactNode;
   delta?: number;
-  position: GridPosition;
+  position?: GridPosition;
   icon?: LucideIcon;
   subtitle?: string;
   trend?: 'up' | 'down' | 'neutral';
@@ -25,6 +25,15 @@ export interface DraggableKpiCardsGridProps {
   kpiCards: KpiCardProps[];
   className?: string;
   onPositionChange?: (newPositions: Record<string, GridPosition>) => void;
+}
+
+export interface DashboardWidgetConfig {
+  id: string;
+  title: string;
+  type: string;
+  position?: GridPosition;
+  settings?: Record<string, any>;
+  data?: any;
 }
 
 export interface DashboardStats {

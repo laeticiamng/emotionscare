@@ -4,7 +4,7 @@ import { ProgressBarProps } from '@/types';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  max = 100,
+  max,
   currentTime = 0,
   duration = 0,
   formatTime = (seconds) => {
@@ -14,20 +14,19 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   },
   handleProgressClick
 }) => {
-  const progressWidth = `${(value / max) * 100}%`;
-
   return (
-    <div className="space-y-1">
+    <div className="w-full">
       <div 
-        className="h-2 bg-muted rounded-full relative cursor-pointer overflow-hidden"
+        className="w-full h-2 bg-muted rounded-full overflow-hidden cursor-pointer"
         onClick={handleProgressClick}
       >
         <div 
-          className="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-100"
-          style={{ width: progressWidth }}
+          className="h-full bg-primary"
+          style={{ width: `${(value / max) * 100}%` }}
         />
       </div>
-      <div className="flex justify-between text-xs text-muted-foreground">
+      
+      <div className="flex justify-between mt-1 text-xs text-muted-foreground">
         <span>{formatTime(currentTime)}</span>
         <span>{formatTime(duration)}</span>
       </div>

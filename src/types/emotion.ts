@@ -1,75 +1,62 @@
 
-// Types liés aux émotions et analyses d'émotions
+// Types liés aux émotions et analyses émotionnelles
 export interface Emotion {
   id: string;
-  user_id: string;
-  date: string | Date;
   emotion: string;
   score: number;
+  date: string | Date;
+  userId?: string;
+  user_id?: string;
+  aiFeedback?: string;
+  ai_feedback?: string;
   text?: string;
   emojis?: string;
-  ai_feedback?: string;
-  anxiety?: number;  // Ajouté pour compatibilité avec mockEmotions
+  anxiety?: number;
 }
 
 export interface EmotionResult {
   id?: string;
   emotion: string;
-  score: number;  // Ajouté car manquant
-  confidence?: number;
+  score?: number;
+  confidence: number;
   timestamp?: Date | string;
-  intensity?: number;
+  transcript?: string;
+  text?: string;
   triggers?: string[];
   recommendations?: string[];
-  metadata?: Record<string, any>;
-  date?: string | Date;
+  ai_feedback?: string;
+  audio_url?: string;
+  intensity?: number;
+  secondary?: string[];
   user_id?: string;
+  emojis?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  history?: EmotionResult[];
-  streak?: number;
-  trend?: 'improving' | 'declining' | 'stable';
-  previousEmotion?: string;
-  emotionalBalance?: number;
+  sentiment?: number;
+  context?: string;
+  duration?: number;
+  date?: Date | string;
 }
 
 export interface VoiceEmotionScannerProps {
-  onStart?: () => void;
-  onStop?: () => void;
-  onResult?: (result: EmotionResult) => void;
-  maxDuration?: number;
-  recordingDelay?: number;
+  onEmotionDetected?: (result: EmotionResult) => void;
   autoStart?: boolean;
-  emotion?: string;
-  size?: 'sm' | 'md' | 'lg';
-  mode?: 'minimal' | 'full' | 'compact';
-  className?: string;
+  duration?: number;
 }
 
 export interface LiveVoiceScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onScanStart?: () => void;
-  onScanError?: (error: Error) => void;
-  onResult?: (result: EmotionResult) => void;
+  onEmotionUpdate?: (result: EmotionResult) => void;
   autoStart?: boolean;
-}
-
-export interface TeamOverviewProps {
-  teamId?: string;
-  companyId?: string;
-  period?: 'day' | 'week' | 'month';
-  limit?: number;
-  compact?: boolean;
-  showFilters?: boolean;
-  className?: string;
+  duration?: number;
 }
 
 export interface EmotionalTeamViewProps {
-  teamId?: string;
-  view?: 'emotions' | 'trends' | 'risks';
-  period?: 'day' | 'week' | 'month' | 'year';
-  showIndividualScores?: boolean;
-  showAverageScore?: boolean;
-  anonymized?: boolean;
+  teamId: string;
+  timeframe?: string;
+}
+
+export interface TeamOverviewProps {
+  department: string;
+  showDetails?: boolean;
 }
