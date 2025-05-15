@@ -12,7 +12,7 @@ export interface UserPreferences {
     shareActivity: boolean;
     profileVisibility: 'public' | 'friends' | 'private';
   };
-  // Add the missing property
+  // Add sound property
   sound?: {
     volume: number;
     muted: boolean;

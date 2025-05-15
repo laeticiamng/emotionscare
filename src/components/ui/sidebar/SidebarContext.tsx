@@ -12,6 +12,7 @@ export interface SidebarContextType {
   toggle: () => void;
   toggleCollapsed: () => void;
   expanded?: boolean;
+  setCollapsed?: (collapsed: boolean) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType>({
@@ -24,6 +25,7 @@ const SidebarContext = createContext<SidebarContextType>({
   isOpen: false,
   toggle: () => {},
   toggleCollapsed: () => {},
+  setCollapsed: () => {},
 });
 
 export interface SidebarProviderProps {
@@ -73,6 +75,7 @@ export default function SidebarProvider({
         toggle,
         toggleCollapsed,
         expanded,
+        setCollapsed,
       }}
     >
       {children}

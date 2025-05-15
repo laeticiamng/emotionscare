@@ -11,5 +11,7 @@ export const SidebarContext: React.FC<SidebarContextProps> = ({ children }) => {
   return <SidebarProvider>{children}</SidebarProvider>;
 };
 
-export { useSidebar };
+// Export SidebarProvider from components/ui/sidebar/SidebarContext.tsx
+export { SidebarProvider, useSidebar };
+
 export default SidebarContext;

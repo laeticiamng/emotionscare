@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { UserPreferences, NotificationPreferences } from '@/types';
+import { UserPreferences } from '@/types/user';
+import { NotificationPreferences } from '@/types/user';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
 import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';

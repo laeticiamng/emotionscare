@@ -27,7 +27,7 @@ export interface Challenge {
 export interface LeaderboardEntry {
   id: string;
   user_id: string;
-  name: string;
+  name: string; // Added name property
   points: number;
   rank: number | string;
   avatar?: string;
@@ -46,6 +46,12 @@ export interface GamificationStats {
   completedChallenges: number;
   totalChallenges: number;
   
+  // Admin dashboard specific properties - required for AdminTabContents
+  activeUsersPercent: number;
+  totalBadges: number;
+  badgeLevels: { level: string; count: number; }[];
+  topChallenges: { name: string; completions: number; }[];
+  
   // Optional properties
   rank?: string;
   activeChallenges?: number;
@@ -63,10 +69,4 @@ export interface GamificationStats {
   currentLevel?: number;
   pointsToNextLevel?: number;
   lastActivityDate?: string;
-  
-  // Admin dashboard specific properties - required for AdminTabContents
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels: { level: string; count: number; }[];
-  topChallenges: { name: string; completions: number; }[];
 }
