@@ -89,14 +89,14 @@ export const fetchEmotionHistory = async (userId: string) => {
 // Helper functions
 function getEmojisForEmotion(emotion: string): string[] {
   const emojiMap: Record<string, string[]> = {
-    happy: ['😊', '😁', '🙂'],
-    sad: ['😔', '😢', '😞'],
-    angry: ['😡', '😠', '💢'],
-    surprised: ['😲', '😮', '😯'],
-    fearful: ['😨', '😰', '😱'],
-    calm: ['😌', '🧘', '☺️'],
-    excited: ['🤩', '😃', '🎉'],
-    neutral: ['😐', '😶', '🤔']
+    "happy": ['😊', '😁', '🙂'],
+    "sad": ['😔', '😢', '😞'],
+    "angry": ['😡', '😠', '💢'],
+    "surprised": ['😲', '😮', '😯'],
+    "fearful": ['😨', '😰', '😱'],
+    "calm": ['😌', '🧘', '☺️'],
+    "excited": ['🤩', '😃', '🎉'],
+    "neutral": ['😐', '😶', '🤔']
   };
   
   return emojiMap[emotion] || ['😐'];
@@ -104,42 +104,42 @@ function getEmojisForEmotion(emotion: string): string[] {
 
 function getRecommendationsForEmotion(emotion: string): string[] {
   const recommendationMap: Record<string, string[]> = {
-    happy: [
+    "happy": [
       'Share your positive feelings with someone',
       'Keep that momentum going with some uplifting music',
       'Use this energy to tackle a challenge'
     ],
-    sad: [
+    "sad": [
       'Take a moment for self-care',
       'Connect with a supportive friend',
       'Try a guided meditation for emotional healing'
     ],
-    angry: [
+    "angry": [
       'Take deep breaths to calm your nervous system',
       'Write down what's bothering you',
       'Go for a brisk walk to release tension'
     ],
-    surprised: [
+    "surprised": [
       'Take time to process this unexpected situation',
       'Journal about what surprised you and why',
       'Talk it through with someone you trust'
     ],
-    fearful: [
+    "fearful": [
       'Practice grounding techniques: name 5 things you can see',
       'Remind yourself that you're safe right now',
       'Try a quick breathing exercise'
     ],
-    calm: [
+    "calm": [
       'Enjoy this peaceful state with some mindfulness',
       'It's a great time for creative thinking',
       'Consider journaling about what brings you peace'
     ],
-    excited: [
+    "excited": [
       'Channel this energy into something productive',
       'Share your excitement with someone close to you',
       'Set some goals while you're feeling motivated'
     ],
-    neutral: [
+    "neutral": [
       'Check in with your body - how are you feeling physically?',
       'This is a good time for planning and organizing',
       'Consider what would boost your mood a little'
