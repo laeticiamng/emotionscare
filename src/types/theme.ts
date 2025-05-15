@@ -32,6 +32,7 @@ export interface ThemeButtonProps {
 
 export interface ThemeSwitcherProps {
   size?: string;
+  showLabel?: boolean;
 }
 
 // Interface pour définir la structure d'une palette de couleurs

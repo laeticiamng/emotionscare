@@ -74,9 +74,11 @@ export interface VoiceEmotionScannerProps {
 }
 
 export interface LiveVoiceScannerProps {
-  onResult: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
   duration?: number;
+  scanDuration?: number;
+  onScanComplete?: (result: EmotionResult) => void;
 }
 
 export interface EmotionalTeamViewProps {

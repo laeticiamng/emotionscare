@@ -6,15 +6,23 @@ export interface User {
   email: string;
   name?: string;
   avatar_url?: string;
+  avatar?: string; // Added for compatibility
   role?: UserRole;
   preferences?: UserPreferences;
   createdAt?: string;
+  created_at?: string; // Added for compatibility
   updatedAt?: string;
   last_login?: string;
   organization_id?: string;
   department_id?: string;
+  department?: string; // Added for compatibility
   team_id?: string;
   status?: 'active' | 'inactive' | 'pending';
+  position?: string;
+  joined_at?: string;
+  onboarded?: boolean;
+  job_title?: string;
+  emotional_score?: number;
 }
 
 export interface UserPreferences {
@@ -27,6 +35,15 @@ export interface UserPreferences {
     allowTracking?: boolean;
     shareAnonymousData?: boolean;
   };
+  language?: string; // Added
+  notifications_enabled?: boolean; // Added
+  privacy?: any; // Added
+  profileVisibility?: string; // Added
+  soundEnabled?: boolean; // Added
+  emotionalCamouflage?: boolean; // Added
+  aiSuggestions?: boolean; // Added
+  fullAnonymity?: boolean; // Added
+  autoplayVideos?: boolean; // Added
 }
 
 export interface DashboardLayout {

@@ -3,6 +3,7 @@ export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' |
 export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'system' | 'user' | 'emotion' | 'coach' | 'journal' | 'community' | 'vr' | 'reminder' | string;
 export type NotificationPriority = 'high' | 'medium' | 'low';
 export type NotificationTone = 'professional' | 'friendly' | 'direct' | 'supportive' | 'minimal' | 'casual';
+export type NotificationFilter = 'all' | 'unread' | 'alerts' | 'system' | string;
 
 export interface NotificationChannels {
   email: boolean;
@@ -43,7 +44,12 @@ export interface Notification {
   user_id?: string;
 }
 
-export type NotificationFilter = 'all' | 'unread' | 'alerts' | string;
+export interface NotificationItemProps {
+  notification: Notification;
+  onRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onAction?: (notification: Notification) => void;
+}
 
 export interface NotificationBadge {
   count: number;
@@ -52,11 +58,4 @@ export interface NotificationBadge {
   lastSeen?: string;
   badgesCount?: number;
   notificationsCount?: number;
-}
-
-export interface NotificationItemProps {
-  notification: Notification;
-  onRead?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  onAction?: (notification: Notification) => void;
 }

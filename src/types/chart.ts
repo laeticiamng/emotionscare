@@ -1,9 +1,9 @@
 
 export interface ChartConfig {
-  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'polarArea' | 'bubble' | 'scatter';
+  type: 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
   data: {
     labels: string[];
-    datasets: Array<{
+    datasets: {
       label: string;
       data: number[];
       backgroundColor?: string | string[];
@@ -11,14 +11,11 @@ export interface ChartConfig {
       borderWidth?: number;
       fill?: boolean;
       tension?: number;
-    }>;
+    }[];
   };
   options?: any;
 }
 
 export interface ChartContextProps {
-  chartConfig: ChartConfig;
-  setChartConfig: (config: ChartConfig) => void;
-  updateData: (datasetIndex: number, data: number[]) => void;
-  updateLabels: (labels: string[]) => void;
+  children: React.ReactNode;
 }

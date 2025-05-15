@@ -46,8 +46,8 @@ export interface MusicContextType {
 }
 
 export interface MusicDrawerProps {
-  open: boolean;
-  onClose: () => void;
+  open?: boolean;
+  onClose?: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
   isOpen?: boolean;

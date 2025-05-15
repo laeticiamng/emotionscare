@@ -1,137 +1,78 @@
 
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GripVertical, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import { KpiCardProps } from '@/types';
 import { cn } from '@/lib/utils';
-import { DashboardWidgetConfig } from '@/types/dashboard';
-import { Skeleton } from '@/components/ui/skeleton';
-import { DashboardStats, GamificationData } from '../tabs/overview/types';
 
-// Import our KPI card components
-import AbsenteeismKpiCard from '../kpi/AbsenteeismKpiCard';
-import EmotionalHealthKpiCard from '../kpi/EmotionalHealthKpiCard';
-import ProductivityKpiCard from '../kpi/ProductivityKpiCard';
-import TurnoverRiskKpiCard from '../kpi/TurnoverRiskKpiCard';
-
-// Map of widget types to their display components
-const WIDGET_COMPONENTS: Record<string, React.FC<any>> = {
-  'absenteeism-card': AbsenteeismKpiCard,
-  'emotional-health-card': EmotionalHealthKpiCard,
-  'productivity-card': ProductivityKpiCard,
-  'turnover-risk-card': TurnoverRiskKpiCard,
-};
-
-export interface DraggableKpiCardProps {
-  widget: DashboardWidgetConfig;
-  editable?: boolean;
-  onSettingsClick?: (widget: DashboardWidgetConfig) => void;
-  dashboardStats?: DashboardStats;
-  gamificationData?: GamificationData;
-}
-
-export const DraggableKpiCard: React.FC<DraggableKpiCardProps> = ({
-  widget,
-  editable = true,
-  onSettingsClick,
-  dashboardStats,
-  gamificationData
+const DraggableKpiCard: React.FC<KpiCardProps> = ({ 
+  title, 
+  value, 
+  delta,
+  icon: Icon,
+  subtitle,
+  className,
+  onClick,
+  ariaLabel
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({
-    id: widget.id,
-    disabled: !editable
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 10 : 1,
-    opacity: isDragging ? 0.8 : 1,
-  };
-
-  // Get the component for this widget type or show placeholder
-  const WidgetComponent = WIDGET_COMPONENTS[widget.type] || PlaceholderWidget;
-
-  // Prepare props for the widget component
-  const componentProps: any = { widget };
+  // Determine if the card is interactive
+  const isInteractive = typeof onClick === 'function';
   
-  // Add additional data props if available and applicable
-  if (dashboardStats && widget.type.includes('dashboard-stats')) {
-    componentProps.dashboardStats = dashboardStats;
-  }
-  
-  if (gamificationData && widget.type.includes('gamification')) {
-    componentProps.gamificationData = gamificationData;
-  }
-
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
+    <Card 
       className={cn(
-        'relative',
-        editable && 'cursor-grab',
-        isDragging && 'cursor-grabbing'
+        "relative p-4", 
+        isInteractive && "cursor-pointer hover:shadow-md hover:translate-y-[-2px]", 
+        className
       )}
+      onClick={onClick}
+      role={isInteractive ? "button" : undefined}
+      aria-label={ariaLabel}
     >
-      <Card className="h-full">
-        {editable && (
-          <div className="absolute top-2 left-2 opacity-50 hover:opacity-100 z-10">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0"
-              {...attributes}
-              {...listeners}
-            >
-              <GripVertical className="h-4 w-4" />
-              <span className="sr-only">Déplacer</span>
-            </Button>
+      <CardHeader className="p-0 pb-2">
+        <CardTitle className="text-sm font-medium flex items-center">
+          {Icon && <Icon className="mr-2 h-4 w-4 text-primary" />}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      
+      <CardContent className="p-0">
+        <div className="text-2xl font-bold">
+          {value}
+        </div>
+        
+        {delta !== undefined && (
+          <div className="flex items-center mt-1 text-xs">
+            {delta > 0 ? (
+              <>
+                <TrendingUp className="mr-1 h-3 w-3 text-green-500" />
+                <span className="text-green-500">+{delta}%</span>
+              </>
+            ) : delta < 0 ? (
+              <>
+                <TrendingDown className="mr-1 h-3 w-3 text-red-500" />
+                <span className="text-red-500">{delta}%</span>
+              </>
+            ) : (
+              <>
+                <Minus className="mr-1 h-3 w-3 text-gray-500" />
+                <span className="text-gray-500">Stable</span>
+              </>
+            )}
+            <span className="ml-1 text-muted-foreground">
+              depuis 30 jours
+            </span>
           </div>
         )}
         
-        {editable && onSettingsClick && (
-          <div className="absolute top-2 right-2 opacity-50 hover:opacity-100 z-10">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0"
-              onClick={() => onSettingsClick(widget)}
-            >
-              <Settings className="h-4 w-4" />
-              <span className="sr-only">Paramètres</span>
-            </Button>
+        {subtitle && (
+          <div className="mt-2 text-sm text-muted-foreground">
+            {subtitle}
           </div>
         )}
-        
-        <WidgetComponent {...componentProps} />
-      </Card>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
-// Placeholder widget to show when the widget type isn't found
-const PlaceholderWidget: React.FC<{widget: DashboardWidgetConfig}> = ({ widget }) => {
-  return (
-    <>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">{widget.type || 'Widget'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <Skeleton className="h-20 w-full" />
-          <Skeleton className="h-10 w-3/4" />
-        </div>
-      </CardContent>
-    </>
-  );
-};
+export default DraggableKpiCard;
