@@ -4,39 +4,39 @@ export interface MusicTrack {
   title: string;
   artist: string;
   url: string;
-  duration: number;
+  duration?: number;
+  cover?: string;
   coverUrl?: string;
   cover_url?: string;
-  cover?: string;
-  audioUrl?: string;
-  audio_url?: string;
-  genre?: string;
   emotion?: string;
+  played?: boolean;
+  isPlaying?: boolean;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title: string;
+  description?: string;
   tracks: MusicTrack[];
+  cover?: string;
   coverUrl?: string;
   cover_url?: string;
-  cover?: string;
-  description?: string;
-  category?: string;
   emotion?: string;
+  category?: string;
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  progress: number;
-  duration: number;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  togglePlay: () => void;
+  playlist: MusicPlaylist | null;
+  play: (track?: MusicTrack) => void;
+  pause: () => void;
+  next: () => void;
+  previous: () => void;
   setVolume: (volume: number) => void;
-  seekTo: (progress: number) => void;
+  setPlaylist: (playlist: MusicPlaylist) => void;
 }
 
 export interface MusicDrawerProps {
@@ -54,8 +54,10 @@ export interface Track {
   artist: string;
   url: string;
   coverUrl?: string;
+  cover_url?: string;
   cover?: string;
   duration?: number;
+  emotion?: string;
 }
 
 export interface ProgressBarProps {
@@ -64,25 +66,25 @@ export interface ProgressBarProps {
   currentTime?: number;
   duration?: number;
   formatTime?: (seconds: number) => string;
-  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  showLabel?: boolean;
+  handleProgressClick?: (e: any) => void;
   className?: string;
 }
 
 export interface TrackInfoProps {
-  track?: Track | null;
+  track: MusicTrack;
   className?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onChange: (value: number) => void;
+  onChange: (volume: number) => void;
   className?: string;
 }
 
 export interface EmotionMusicParams {
-  emotion: string;
+  emotion?: string;
   intensity?: number;
-  tempo?: number;
+  tempo?: 'slow' | 'medium' | 'fast';
   genre?: string;
+  mood?: string;
 }

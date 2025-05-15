@@ -2,6 +2,7 @@
 export interface Emotion {
   id: string;
   name: string;
+  emotion?: string;
   score?: number;
   color: string;
   description?: string;

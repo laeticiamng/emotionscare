@@ -1,5 +1,5 @@
-
-// Types related to theme and app appearance
+// Types pour les thèmes
+export type ThemeName = 'light' | 'dark' | 'pastel';
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xl';
 export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded' | 'inter' | 'system-ui' | 'sans' | 'serif' | 'mono';
@@ -25,4 +25,16 @@ export interface ThemeButtonProps {
 
 export interface ThemeSwitcherProps {
   size?: string;
+}
+
+// Interface pour définir la structure d'une palette de couleurs
+export interface ColorPalette {
+  primary: string;
+  secondary: string;
+  tertiary: string;
+  background: string;
+  text: string;
+  error: string;
+  success: string;
+  warning: string;
 }

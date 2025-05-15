@@ -45,6 +45,7 @@ export interface NotificationFilter {
   priority?: NotificationPriority | 'all';
   dateFrom?: Date | string;
   dateTo?: Date | string;
+  enabled?: boolean;
 }
 
 export interface NotificationBadge {
