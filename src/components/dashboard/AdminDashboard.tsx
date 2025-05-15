@@ -9,6 +9,7 @@ import AdminChartSection from '@/components/dashboard/admin/AdminChartSection';
 import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateCard';
 import SocialCocoonCard from '@/components/dashboard/admin/SocialCocoonCard';
 import GamificationSummaryCard from '@/components/dashboard/admin/GamificationSummaryCard';
+import { GamificationStats } from '@/types/gamification';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -31,7 +32,13 @@ const AdminDashboard: React.FC = () => {
   };
 
   // Mock data for gamification section
-  const gamificationData = {
+  const gamificationData: GamificationStats = {
+    points: 0,
+    level: 1,
+    badges: [],
+    streak: 0,
+    completedChallenges: 0,
+    totalChallenges: 0,
     activeUsersPercent: 68,
     totalBadges: 24,
     badgeLevels: [
@@ -103,8 +110,6 @@ const AdminDashboard: React.FC = () => {
         {/* Gamification Summary */}
         <GamificationSummaryCard gamificationStats={gamificationData} />
       </div>
-      
-      {/* Completely removed DashboardFooter */}
     </div>
   );
 };

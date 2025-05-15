@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -14,7 +15,7 @@ import UsersListTab from './tabs/UsersListTab';
 import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
 import InvitationsTab from './tabs/invitations/InvitationsTab';
-import { GamificationStats } from '@/types/gamification';
+import { GamificationStats, Badge, Challenge } from '@/types/gamification';
 
 interface AdminTabContentsProps {
   activeTab: string;

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MusicLibraryProps, MusicTrack, MusicPlaylist } from '@/types';
+import { MusicLibraryProps, MusicTrack, MusicPlaylist } from '@/types/music';
 
 const LibraryTab: React.FC<MusicLibraryProps> = ({ 
   playlists = [], 
@@ -16,7 +16,7 @@ const LibraryTab: React.FC<MusicLibraryProps> = ({
             <h3 className="font-medium">{playlist.name || playlist.title}</h3>
             <p className="text-sm text-muted-foreground">{playlist.description}</p>
             <button 
-              onClick={() => onSelectPlaylist(playlist)}
+              onClick={() => onSelectPlaylist && onSelectPlaylist(playlist)}
               className="text-sm text-primary hover:underline"
             >
               Voir la playlist

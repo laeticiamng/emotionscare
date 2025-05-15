@@ -4,92 +4,106 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  url?: string;
-  cover?: string;
+  url: string;
   coverUrl?: string;
-  audioUrl?: string;
+  image_url?: string;
   category?: string;
-  mood?: string[];
-  emotion?: string;
+  mood?: string;
+  tags?: string[];
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  name: string;
-  tracks: MusicTrack[];
+  name?: string;
   title?: string;
   description?: string;
-  coverUrl?: string;
+  tracks: MusicTrack[];
   category?: string;
-  emotion?: string;
-}
-
-export interface ProgressBarProps {
-  value: number;
-  max?: number;
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (value: number) => void;
-  className?: string;
-  formatTime?: (seconds: number) => string;
-  showTimestamps?: boolean;
-  showLabel?: boolean;
-  variant?: string;
-  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-}
-
-export interface TrackInfoProps {
-  track: MusicTrack;
-  onSelect?: (track: MusicTrack) => void;
-  isActive?: boolean;
-  className?: string;
-}
-
-export interface VolumeControlProps {
-  volume: number;
-  onVolumeChange?: (value: number) => void;
-  onChange?: (value: number) => void;
-  className?: string;
-  showLabel?: boolean;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-}
-
-export interface MusicDrawerProps {
-  isOpen?: boolean;
-  open?: boolean;
-  children?: React.ReactNode;
-  onOpenChange?: (open: boolean) => void;
-  onClose?: () => void;
-  currentTrack?: MusicTrack;
-  playlist?: MusicPlaylist;
-}
-
-export interface MusicLibraryProps {
-  playlists: MusicPlaylist[];
-  onSelectTrack?: (track: MusicTrack) => void;
-  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
-  className?: string;
+  coverUrl?: string;
+  image_url?: string;
+  author?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
+  volume: number;
+  progress: number;
+  duration: number;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
+  resumeTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  volume: number;
   setVolume: (volume: number) => void;
-  isMuted: boolean;
+  setProgress: (progress: number) => void;
   toggleMute: () => void;
-  currentPlaylist: MusicPlaylist | null;
-  playlists: MusicPlaylist[];
-  loadPlaylistById: (id: string) => void;
-  duration: number;
-  currentTime: number;
+  isMuted: boolean;
+}
+
+export interface MusicDrawerProps {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  onPlayPause: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
   progress: number;
-  loadPlaylistForEmotion: (emotion: string) => Promise<MusicPlaylist | null>;
-  setOpenDrawer: (open: boolean) => void;
-  openDrawer: boolean;
+  duration: number;
+  onSeek: (position: number) => void;
+  volume: number;
+  onVolumeChange: (volume: number) => void;
+  isMuted: boolean;
+  onMuteToggle: () => void;
+  children?: React.ReactNode;
+}
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url: string;
+  coverUrl?: string;
+}
+
+export interface ProgressBarProps {
+  value: number;
+  max: number;
+  currentTime?: number;
+  duration?: number;
+  formatTime?: (seconds: number) => string;
+  handleProgressClick?: (event: React.MouseEvent) => void;
+  showTimestamps?: boolean;
+  className?: string;
+  variant?: string;
+  showLabel?: boolean;
+  onSeek?: (value: number) => void;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  isPlaying: boolean;
+  onPlayPause: () => void;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  isMuted: boolean;
+  onMuteToggle: () => void;
+  onVolumeChange: (value: number) => void;
+  className?: string;
+  showLabel?: boolean;
+  onChange?: (value: number) => void;
+}
+
+export interface MusicLibraryProps {
+  playlists?: MusicPlaylist[];
+  tracks?: MusicTrack[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  onSelectTrack?: (track: MusicTrack) => void;
 }

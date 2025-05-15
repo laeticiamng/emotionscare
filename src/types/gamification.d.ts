@@ -43,6 +43,7 @@ export interface Challenge {
   progress?: number;
   goal?: number;
   type?: string;
+  total?: number;
 }
 
 export interface Badge {
@@ -50,18 +51,29 @@ export interface Badge {
   name?: string;
   description: string;
   image_url?: string;
+  imageUrl?: string;
+  icon?: string;
+  icon_url?: string;
   type?: string;
   level?: string;
+  unlocked?: boolean;
+  unlockedAt?: Date | string;
+  progress?: number;
   total?: number;
+  dateEarned?: string;
+  awarded_at?: Date | string;
 }
 
 export interface LeaderboardEntry {
   id: string;
   userId: string;
+  user_id?: string;
   score: number;
   rank: number;
   name?: string;
+  user_name?: string;
   avatarUrl?: string;
+  avatar_url?: string;
   progress?: number;
   level?: number;
 }

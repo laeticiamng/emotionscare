@@ -14,7 +14,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`,
   handleProgressClick,
   showTimestamps = true,
+  onSeek,
 }) => {
+  const handleSliderChange = (values: number[]) => {
+    if (onSeek) {
+      onSeek(values[0]);
+    }
+  };
+
   return (
     <div className={className}>
       <div
@@ -26,6 +33,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           max={max}
           step={0.1}
           className="mb-1"
+          onValueChange={handleSliderChange}
         />
       </div>
       

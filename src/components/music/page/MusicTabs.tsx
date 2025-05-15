@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LibraryTab from './LibraryTab';
 import PlayerTab from './PlayerTab';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 const MusicTabs: React.FC = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
