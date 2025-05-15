@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { UserPreferences } from '@/types';
+import { UserPreferences, NotificationPreferences } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
 import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
@@ -51,7 +52,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
       anonymizeReports: true,
       profileVisibility: 'team'
     },
-    sound: false // Added for compatibility
+    soundEnabled: false // Use soundEnabled instead of sound
   };
 
   // Use harmonized user preferences
@@ -68,7 +69,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
   };
 
   // Function to update notifications
-  const updateNotifications = (notificationData: Partial<NotificationPreference>) => {
+  const updateNotifications = (notificationData: Partial<NotificationPreferences>) => {
     const currentNotifications = 
       typeof formPreferences.notifications === 'boolean' 
         ? { enabled: formPreferences.notifications, emailEnabled: false }

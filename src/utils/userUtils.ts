@@ -1,3 +1,4 @@
+
 import { User } from '@/types';
 
 /**
@@ -51,7 +52,7 @@ export const harmonizeUserType = (user: any): User => {
       reduceMotion: harmonizedUser.preferences.reduceMotion || false,
       colorBlindMode: harmonizedUser.preferences.colorBlindMode || false,
       autoplayMedia: harmonizedUser.preferences.autoplayMedia !== undefined ? harmonizedUser.preferences.autoplayMedia : true,
-      sound: harmonizedUser.preferences.sound || false,
+      soundEnabled: harmonizedUser.preferences.sound || false,
       ...harmonizedUser.preferences
     };
   }

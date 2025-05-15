@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { MusicTrack } from '@/types';
 import { UseAudioPlayerStateReturn } from '@/types/audio-player';
@@ -5,22 +6,26 @@ import { UseAudioPlayerStateReturn } from '@/types/audio-player';
 export const useAudioPlayerCore = (
   initialTrack?: MusicTrack,
   autoPlay = false
-): UseAudioPlayerStateReturn => {
+) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [volume, setVolumeState] = useState(0.8);
-  const [muted, setMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingTrack, setLoadingTrack] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
 
   const initAudioElement = useCallback(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.volume = volume;
       audioRef.current.playbackRate = playbackRate;
-      audioRef.current.muted = muted;
+      audioRef.current.muted = isMuted;
 
       // Set event listeners
       audioRef.current.addEventListener('timeupdate', () => {
@@ -48,7 +53,7 @@ export const useAudioPlayerCore = (
         setIsPlaying(false);
       });
     }
-  }, [volume, muted, playbackRate]);
+  }, [volume, isMuted, playbackRate]);
 
   // Initialize audio element and set source if track is provided
   useEffect(() => {
@@ -59,6 +64,7 @@ export const useAudioPlayerCore = (
       const audioSource = initialTrack.audioUrl || initialTrack.url;
       audioRef.current.src = audioSource;
       audioRef.current.load();
+      setCurrentTrack(initialTrack);
       
       if (autoPlay) {
         const playPromise = audioRef.current.play();
@@ -94,7 +100,7 @@ export const useAudioPlayerCore = (
       } catch (error) {
         console.error('Error playing audio:', error);
         setIsPlaying(false);
-        setError(error);
+        setError(error as Error);
       }
     }
   };
@@ -135,9 +141,9 @@ export const useAudioPlayerCore = (
   // Function to toggle mute
   const toggleMute = () => {
     if (audioRef.current) {
-      const newMuted = !muted;
+      const newMuted = !isMuted;
       audioRef.current.muted = newMuted;
-      setMuted(newMuted);
+      setIsMuted(newMuted);
     }
   };
 
@@ -153,10 +159,14 @@ export const useAudioPlayerCore = (
     isPlaying,
     currentTime,
     duration,
+    progress,
     volume,
     error,
-    muted: muted,
+    isMuted,
     playbackRate,
+    isLoading,
+    loadingTrack,
+    currentTrack,
     play,
     pause,
     togglePlay,
@@ -164,6 +174,15 @@ export const useAudioPlayerCore = (
     setVolume,
     toggleMute,
     setPlaybackRate: setPlaybackRateValue,
+    setIsPlaying,
+    setCurrentTime,
+    setProgress,
+    setError,
+    setIsLoading,
+    setLoadingTrack,
+    setCurrentTrack,
+    setDuration,
+    setIsMuted,
     audioRef,
   };
 };

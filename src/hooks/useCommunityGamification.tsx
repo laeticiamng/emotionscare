@@ -1,102 +1,68 @@
 
 import { useState, useEffect } from 'react';
-import { mockBadges, mockChallenges, mockLeaderboard, mockGamificationStats } from './community-gamification/mockData';
+import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types';
+import mockData from './community-gamification/mockData';
 
-// Define the return type for clarity
-interface CommunityGamificationState {
-  badges: any[];
-  challenges: any[];
-  leaderboard: any[];
-  stats: {
-    level: number;
-    points: number;
-    badgesCount: number;
-    streak: number;
-    nextLevelPoints: number;
-    recentAchievements: any[];
-  };
-  loading: boolean;
+const { mockLeaderboard, mockBadges, mockChallenges } = mockData;
+
+interface UseCommunityGamificationReturn {
+  stats: GamificationStats;
+  badges: Badge[];
+  challenges: Challenge[];
+  leaderboard: LeaderboardEntry[];
+  isLoading: boolean;
   error: string | null;
 }
 
-export const useCommunityGamification = () => {
-  const [state, setState] = useState<CommunityGamificationState>({
-    badges: [],
-    challenges: [],
-    leaderboard: [],
-    stats: {
-      level: 1,
-      points: 0,
-      badgesCount: 0,
-      streak: 0,
-      nextLevelPoints: 100,
-      recentAchievements: []
-    },
-    loading: true,
-    error: null
+export const useCommunityGamification = (): UseCommunityGamificationReturn => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Mock initial stats
+  const [stats, setStats] = useState<GamificationStats>({
+    points: 850,
+    level: 3,
+    badges: mockBadges,
+    streak: 5,
+    rank: '42',
+    nextLevelPoints: 150,
+    progressToNextLevel: 70,
+    completedChallenges: 4,
+    totalChallenges: 10,
+    activeChallenges: 3,
+    recentAchievements: mockBadges.slice(0, 1),
+    challenges: mockChallenges
   });
-
+  
+  // Load data
   useEffect(() => {
-    // Simulate API call
     const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      
       try {
-        // In a real app, this would be an API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        setState({
-          badges: mockBadges,
-          challenges: mockChallenges,
-          leaderboard: mockLeaderboard,
-          stats: {
-            level: mockGamificationStats.level,
-            points: mockGamificationStats.points,
-            badgesCount: mockGamificationStats.badges,
-            streak: mockGamificationStats.streak,
-            nextLevelPoints: mockGamificationStats.nextLevelPoints,
-            recentAchievements: mockGamificationStats.recentAchievements
-          },
-          loading: false,
-          error: null
-        });
-      } catch (error) {
-        setState(prev => ({
-          ...prev,
-          loading: false,
-          error: 'Failed to load gamification data'
-        }));
+        // Simulate API call
+        await new Promise(r => setTimeout(r, 1000));
+        
+        // Data already loaded in initial state, no need to update
+      } catch (err) {
+        setError('Failed to load gamification data');
+        console.error('Error loading gamification data:', err);
+      } finally {
+        setIsLoading(false);
       }
     };
-
+    
     fetchData();
   }, []);
-
-  const completeChallenge = async (id: string) => {
-    try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      setState(prev => ({
-        ...prev,
-        challenges: prev.challenges.map(challenge => 
-          challenge.id === id 
-            ? { ...challenge, status: 'completed', progress: challenge.target } 
-            : challenge
-        ),
-        stats: {
-          ...prev.stats,
-          points: prev.stats.points + (prev.challenges.find(c => c.id === id)?.points || 0)
-        }
-      }));
-
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
+  
   return {
-    ...state,
-    completeChallenge
+    stats,
+    badges: mockBadges,
+    challenges: mockChallenges,
+    leaderboard: mockLeaderboard,
+    isLoading,
+    error
   };
 };
 

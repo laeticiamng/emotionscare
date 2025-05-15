@@ -1,81 +1,55 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { GamificationStats, Badge } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
+import { GamificationStats } from '@/types';
 
-export const useGamificationStats = (userId: string | undefined) => {
-  const [stats, setStats] = useState<GamificationStats | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useGamificationStats = (userId?: string) => {
+  const [stats, setStats] = useState<GamificationStats>({
+    points: 850,
+    level: 3,
+    badges: [],
+    streak: 5,
+    completedChallenges: 4,
+    totalChallenges: 10,
+    rank: '42',
+    activeChallenges: 6,
+    streakDays: 5,
+    nextLevelPoints: 150,
+    progressToNextLevel: 70,
+    badgesCount: 12,
+    nextLevel: {
+      points: 1000,
+      rewards: ['Badge Spécial', 'Points bonus']
+    },
+    lastActivityDate: new Date().toISOString()
+  });
   
-  const fetchStats = useCallback(async () => {
-    if (!userId) {
-      setIsLoading(false);
-      return;
-    }
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // This would call an actual API in a real app
-      // For demo purposes, we'll return mock data
-      const mockStats: GamificationStats = {
-        points: 1250,
-        level: 4,
-        badges: [
-          {
-            id: '1',
-            name: 'First Emotion',
-            description: 'Complete your first emotion scan',
-            icon: 'smile',
-            type: 'achievement',
-            level: 1
-          },
-          {
-            id: '2',
-            name: 'Consistent',
-            description: 'Log in for 5 consecutive days',
-            icon: 'calendar',
-            type: 'streak',
-            level: 2
-          }
-        ] as Badge[],
-        rank: 'Explorer',
-        streak: 5,
-        completedChallenges: 7,
-        totalChallenges: 12,
-        challenges: [],
-        nextLevel: 5,
-        pointsToNextLevel: 500,
-        progressToNextLevel: 60,
-        streakDays: 5,
-        lastActivityDate: new Date().toISOString(),
-        activeChallenges: 3,
-        leaderboard: []
-      };
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      setStats(mockStats);
-    } catch (err) {
-      console.error('Error fetching gamification stats:', err);
-      setError('Failed to load gamification statistics');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   
   useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // In a real app, we would fetch from API using userId
+        // For now, just using mock data set in initial state
+        
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Failed to fetch gamification stats'));
+        setLoading(false);
+      }
+    };
+    
     fetchStats();
-  }, [fetchStats]);
+  }, [userId]);
   
   return {
     stats,
-    isLoading,
-    error,
-    refreshStats: fetchStats
+    loading,
+    error
   };
 };
 

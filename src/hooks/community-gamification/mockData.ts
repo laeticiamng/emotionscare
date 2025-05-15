@@ -1,120 +1,107 @@
 
-import { GamificationStats, Badge } from '@/types';
-import { LeaderboardEntry } from '@/types/gamification';
+import { Badge, Challenge, LeaderboardEntry } from '@/types';
 
 // Mock leaderboard data
-export const mockLeaderboardData: LeaderboardEntry[] = [
+export const mockLeaderboard: LeaderboardEntry[] = [
   {
-    id: "1",
-    name: "Alice Martin",
-    points: 2340,
+    id: '1',
+    userId: 'user-1',
+    name: 'Sophie Martin',
+    points: 1250,
     rank: 1,
-    avatar: "/images/avatars/alice.jpg",
-    department: "Marketing",
-    level: 7,
-    badges: 12,
-    streak: 21
+    avatar: '/avatars/avatar-1.png',
+    department: 'Marketing',
+    trend: 'same',
+    previousRank: 1
   },
   {
-    id: "2",
-    name: "Bob Johnson",
-    points: 1950,
+    id: '2',
+    userId: 'user-2',
+    name: 'Thomas Bernard',
+    points: 980,
     rank: 2,
-    avatar: "/images/avatars/bob.jpg",
-    department: "Engineering",
-    level: 6,
-    badges: 9,
-    streak: 14
+    avatar: '/avatars/avatar-2.png',
+    department: 'Design',
+    trend: 'up',
+    previousRank: 4
   },
   {
-    id: "3",
-    name: "Carol Williams",
-    points: 1820,
+    id: '3',
+    userId: 'user-3',
+    name: 'Marie Dubois',
+    points: 920,
     rank: 3,
-    avatar: "/images/avatars/carol.jpg",
-    department: "HR",
-    level: 5,
-    badges: 8,
-    streak: 10
+    avatar: '/avatars/avatar-3.png',
+    department: 'Engineering',
+    trend: 'down',
+    previousRank: 2
   }
 ];
 
-// Mock badges data
+// Mock badges
 export const mockBadges: Badge[] = [
   {
-    id: "1",
-    name: "Consistency Champion",
-    description: "Complete 7 consecutive daily check-ins",
-    icon: "award",
-    threshold: 7,
-    type: "streak",
-    imageUrl: "/images/badges/streak-7.svg",
-    unlocked: true,
-    unlockedAt: "2023-04-15T10:30:00Z",
-    category: "engagement",
-    level: "bronze",
-    points: 50,
-    total: 7
+    id: '1',
+    name: 'Première Connexion',
+    description: 'Bienvenue dans l\'application !',
+    icon: 'award',
+    level: 'Bronze',
+    progress: 100,
+    total: 100,
   },
   {
-    id: "2",
-    name: "Emotional Intelligence",
-    description: "Complete 5 emotional intelligence assessments",
-    icon: "brain",
-    threshold: 5,
-    type: "assessment",
-    imageUrl: "/images/badges/ei-5.svg",
-    unlocked: true,
-    unlockedAt: "2023-03-28T14:20:00Z",
-    category: "development",
-    level: "silver",
-    points: 100,
-    total: 5
+    id: '2',
+    name: 'Streak Hebdomadaire',
+    description: 'Connecté 7 jours d\'affilée',
+    icon: 'flame',
+    level: 'Silver',
+    progress: 5,
+    total: 7,
   },
   {
-    id: "3",
-    name: "Community Supporter",
-    description: "Help 3 team members with their challenges",
-    icon: "users",
-    threshold: 3,
-    type: "social",
-    imageUrl: "/images/badges/community-3.svg",
-    unlocked: false,
-    category: "social",
-    level: "gold",
-    points: 150,
-    progress: 1,
-    total: 3
+    id: '3',
+    name: 'Gourou du Bien-être',
+    description: 'Complété 10 sessions de méditation',
+    icon: 'lotus',
+    level: 'Gold',
+    progress: 8,
+    total: 10,
   }
 ];
 
-// Mock gamification stats
-export const mockGamificationStats: GamificationStats = {
-  level: 5,
-  points: 1250,
-  badges: mockBadges.length,
-  streak: 14,
-  completedChallenges: 23,
-  totalChallenges: 35,
-  nextLevel: {
-    points: 1500,
-    rewards: ["New Badge", "Feature Unlock"]
+// Mock challenges
+export const mockChallenges: Challenge[] = [
+  {
+    id: '1',
+    name: 'Journal Quotidien',
+    description: 'Écrivez dans votre journal pendant 5 jours consécutifs',
+    points: 50,
+    progress: 3,
+    total: 5,
+    completed: false
   },
-  pointsToNextLevel: 250,
-  progressToNextLevel: 0.83,
-  challenges: [],
-  totalPoints: 1250,
-  currentLevel: 5,
-  streakDays: 14,
-  lastActivityDate: new Date().toISOString(),
-  activeChallenges: 5,
-  badgesCount: mockBadges.length,
-  rank: "Gold",
-  recentAchievements: []
-};
+  {
+    id: '2',
+    name: 'Méditation Matinale',
+    description: 'Pratiquez la méditation pendant 10 minutes chaque jour',
+    points: 100,
+    progress: 7,
+    total: 10,
+    completed: false
+  },
+  {
+    id: '3',
+    name: 'Partage d\'Expérience',
+    description: 'Partagez une expérience positive avec la communauté',
+    points: 75,
+    progress: 1,
+    total: 1,
+    completed: true
+  }
+];
 
 export default {
-  mockLeaderboardData,
+  mockLeaderboard,
   mockBadges,
-  mockGamificationStats
+  mockChallenges
 };

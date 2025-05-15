@@ -52,6 +52,7 @@ export interface UserPreferences {
   dashboardLayout?: DashboardLayout;
   onboardingCompleted?: boolean;
   soundEnabled?: boolean;
+  sound?: boolean; // Added for backward compatibility
   animations?: boolean;
   fullAnonymity?: boolean;
   autoplayVideos?: boolean;
@@ -60,7 +61,6 @@ export interface UserPreferences {
   aiSuggestions?: boolean;
   notifications_enabled?: boolean;
   highContrast?: boolean;
-  sound?: boolean; // Added for compatibility with mockUsers.ts
   accessibility?: {
     highContrast?: boolean;
     largeText?: boolean;
@@ -72,7 +72,7 @@ export interface UserPreferences {
     reducedMotion: boolean;
     screenReader: boolean;
   };
-  notifications?: NotificationPreferences;
+  notifications?: NotificationPreferences | boolean;
   privacy?: {
     shareData?: boolean;
     anonymizeReports?: boolean;
