@@ -32,7 +32,7 @@ const AccessSection: React.FC = () => {
               Accédez à votre espace personnel pour prendre soin de votre bien-être émotionnel
             </p>
             <Button 
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/b2c/login')}
               size="lg" 
               className="w-full bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white shadow-md"
             >
@@ -52,7 +52,7 @@ const AccessSection: React.FC = () => {
               Solutions de bien-être émotionnel pour vos équipes et votre organisation
             </p>
             <Button 
-              onClick={() => navigate('/business')}
+              onClick={() => navigate('/b2b/selection')}
               size="lg" 
               variant="outline"
               className="w-full border-2 border-indigo-600 text-indigo-700 dark:border-indigo-400 dark:text-indigo-300 shadow-sm hover:bg-indigo-50 dark:hover:bg-indigo-900/20"

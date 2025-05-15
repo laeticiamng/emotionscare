@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
@@ -212,6 +211,16 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  
+  // Legacy routes for backward compatibility - redirects to new structure
+  {
+    path: '/login',
+    element: <Navigate to="/b2c/login" replace />
+  },
+  {
+    path: '/business',
+    element: <Navigate to="/b2b/selection" replace />
+  },
 
   // 404 fallback
   { 
@@ -219,4 +228,3 @@ export const router = createBrowserRouter([
     element: <NotFound /> 
   },
 ]);
-

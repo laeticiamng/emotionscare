@@ -49,7 +49,7 @@ const Home = () => {
               </p>
               <div className="flex justify-center">
                 <Button 
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/b2c/login')}
                   size="lg" 
                   className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md"
                 >
@@ -74,7 +74,7 @@ const Home = () => {
               </p>
               <div className="flex justify-center">
                 <Button 
-                  onClick={() => navigate('/business')}
+                  onClick={() => navigate('/b2b/selection')}
                   size="lg" 
                   variant="outline"
                   className="w-full border-2 border-purple-500 text-purple-700 dark:border-purple-400 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 shadow-md"
