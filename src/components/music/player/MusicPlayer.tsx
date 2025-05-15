@@ -1,278 +1,185 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { MusicTrack } from '@/types/music';
-import { Card, CardContent } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Play, Pause, SkipForward, SkipBack, Music } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Disc, Volume2, VolumeX } from 'lucide-react';
+import { MusicTrack } from '@/types';
+import PlayerControls from './PlayerControls';
+import TrackInfo from '../TrackInfo';
+import ProgressBar from './ProgressBar';
+import VolumeControl from './VolumeControl';
 
 interface MusicPlayerProps {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  togglePlay: () => void;
-  nextTrack?: () => void;
-  prevTrack?: () => void;
+  currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  onSeek?: (time: number) => void;
+  currentTime?: number;
+  duration?: number;
+  volume?: number;
   onVolumeChange?: (volume: number) => void;
-  onProgressChange?: (progress: number) => void;
-  minimized?: boolean;
-  onMaximize?: () => void;
+  showPlaylist?: boolean;
+  hideControls?: boolean;
+  darkTheme?: boolean;
+  minimal?: boolean;
+  compact?: boolean;
   className?: string;
 }
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({
-  currentTrack,
-  isPlaying,
-  togglePlay,
-  nextTrack,
-  prevTrack,
-  onVolumeChange,
-  onProgressChange,
-  minimized = false,
-  onMaximize,
-  className = '',
+  currentTrack = null,
+  isPlaying = false,
+  onPlay = () => {},
+  onPause = () => {},
+  onNext = () => {},
+  onPrevious = () => {},
+  onSeek = () => {},
+  currentTime = 0,
+  duration = 0,
+  volume = 1,
+  onVolumeChange = () => {},
+  showPlaylist = false,
+  hideControls = false,
+  darkTheme = false,
+  minimal = false,
+  compact = false,
+  className = ''
 }) => {
-  const [volume, setVolume] = useState<number>(0.7);
-  const [progress, setProgress] = useState<number>(0);
-  const [duration, setDuration] = useState<number>(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout>();
-  
-  // Format time helper function
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [loadingTrack, setLoadingTrack] = useState(false);
+  const [audioError, setAudioError] = useState<Error | null>(null);
+
+  // Format seconds to MM:SS
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds) || seconds < 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-  
-  // Update volume when changed
+
+  // Reset states when track changes
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-      if (onVolumeChange) onVolumeChange(volume);
-    }
-  }, [volume, onVolumeChange]);
-  
-  // Set up audio progress tracking
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        if (audioRef.current) {
-          const currentProgress = audioRef.current.currentTime;
-          setProgress(currentProgress);
-          if (onProgressChange) onProgressChange(currentProgress);
-        }
+    if (currentTrack) {
+      setLoadingTrack(true);
+      setAudioError(null);
+      
+      // Simulate loading time
+      const timer = setTimeout(() => {
+        setLoadingTrack(false);
       }, 1000);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+      
+      return () => clearTimeout(timer);
     }
-    
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isPlaying, onProgressChange]);
-  
-  // Reset progress when track changes
-  useEffect(() => {
-    setProgress(0);
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-    }
-  }, [currentTrack]);
-  
-  // Toggle play/pause
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(error => {
-          console.error('Error playing audio:', error);
-        });
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying, currentTrack]);
-  
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-  
-  const handleProgressChange = (values: number[]) => {
-    const newProgress = values[0];
-    if (audioRef.current) {
-      audioRef.current.currentTime = newProgress;
-      setProgress(newProgress);
-      if (onProgressChange) onProgressChange(newProgress);
-    }
-  };
-  
-  const handleVolumeChange = (values: number[]) => {
-    const newVolume = values[0];
-    setVolume(newVolume);
-  };
-  
-  // Get cover URL with fallback
-  const getCoverUrl = () => {
-    return currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || '/images/default-album-art.png';
-  };
-  
-  if (minimized) {
+  }, [currentTrack?.id]);
+
+  if (minimal) {
     return (
-      <Card className={`${className}`}>
-        <CardContent className="p-3">
-          <div className="flex items-center">
-            <div className="w-10 h-10 mr-3 bg-muted rounded overflow-hidden">
-              {currentTrack ? (
-                <img 
-                  src={getCoverUrl()} 
-                  alt={currentTrack.title} 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Music className="h-5 w-5 text-muted-foreground" />
-                </div>
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              {currentTrack ? (
-                <>
-                  <p className="font-medium text-sm truncate">{currentTrack.title}</p>
-                  <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">Aucune piste sélectionnée</p>
-              )}
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
-              disabled={!currentTrack}
-              onClick={togglePlay}
-            >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            </Button>
-            {onMaximize && (
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onMaximize}>
-                <Music className="h-4 w-4" />
-              </Button>
+      <div className={`flex items-center gap-2 ${className}`}>
+        {currentTrack ? (
+          <>
+            <TrackInfo 
+              track={currentTrack} 
+              loadingTrack={loadingTrack}
+              compact={compact} 
+              className="flex-1"
+            />
+            {!hideControls && (
+              <PlayerControls 
+                isPlaying={isPlaying}
+                loadingTrack={loadingTrack}
+                onPlay={onPlay}
+                onPause={onPause}
+                onPrevious={onPrevious}
+                onNext={onNext}
+              />
             )}
-          </div>
-        </CardContent>
-      </Card>
+          </>
+        ) : (
+          <div className="text-sm text-muted-foreground">Aucune piste en lecture</div>
+        )}
+      </div>
     );
   }
-  
+
   return (
-    <Card className={`${className}`}>
-      <CardContent className="p-4">
-        {/* Audio Element */}
-        <audio 
-          ref={audioRef} 
-          src={currentTrack?.url || currentTrack?.audioUrl} 
-          onLoadedMetadata={handleLoadedMetadata}
-          onEnded={() => {
-            if (nextTrack) nextTrack();
-          }}
-        />
-        
-        <div className="space-y-4">
-          {/* Album Art and Track Info */}
-          <div className="flex flex-col items-center">
-            <div className="w-48 h-48 bg-muted rounded-md overflow-hidden mb-4">
-              {currentTrack ? (
-                <img 
-                  src={getCoverUrl()} 
-                  alt={currentTrack.title} 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Music className="h-12 w-12 text-muted-foreground" />
-                </div>
-              )}
-            </div>
-            
-            <div className="text-center">
-              <h3 className="font-medium text-lg">
-                {currentTrack?.title || 'Aucune piste sélectionnée'}
-              </h3>
-              <p className="text-muted-foreground">
-                {currentTrack?.artist || 'Artiste inconnu'}
-              </p>
-            </div>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="space-y-1">
-            <Slider 
-              value={[progress]} 
-              max={duration || 100} 
-              step={1} 
-              onValueChange={handleProgressChange} 
-              disabled={!currentTrack}
+    <div className={`p-4 rounded-lg ${darkTheme ? 'bg-muted/20' : 'bg-card'} ${className}`}>
+      <div className="flex items-start mb-4 gap-4">
+        <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
+          {currentTrack && (currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover) ? (
+            <img 
+              src={currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover}
+              alt={currentTrack.title} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
+              }}
             />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>{formatTime(progress)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
+          ) : (
+            <Disc className="h-8 w-8 text-muted-foreground" />
+          )}
+        </div>
+        
+        <div className="flex-1">
+          <h3 className="font-medium text-lg truncate">
+            {loadingTrack ? 'Chargement...' : currentTrack?.title || 'Aucune piste sélectionnée'}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {loadingTrack ? '...' : currentTrack?.artist || 'Artiste inconnu'}
+          </p>
           
-          {/* Controls */}
-          <div className="flex justify-center items-center space-x-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-10 w-10"
-              disabled={!currentTrack || !prevTrack}
-              onClick={prevTrack}
-            >
-              <SkipBack className="h-5 w-5" />
-            </Button>
-            
-            <Button 
-              variant="secondary" 
-              size="icon" 
-              className="h-12 w-12"
-              disabled={!currentTrack}
-              onClick={togglePlay}
-            >
-              {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-10 w-10"
-              disabled={!currentTrack || !nextTrack}
-              onClick={nextTrack}
-            >
-              <SkipForward className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          {/* Volume Control */}
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8"
-              onClick={() => setVolume(volume === 0 ? 0.7 : 0)}
-            >
-              {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-            </Button>
-            <Slider 
-              value={[volume]} 
-              max={1} 
-              step={0.01} 
-              onValueChange={handleVolumeChange} 
+          <div className="mt-2">
+            <ProgressBar
+              currentTime={currentTime}
+              duration={duration}
+              formatTime={formatTime}
+              handleProgressClick={(e) => {
+                const container = e.currentTarget;
+                const rect = container.getBoundingClientRect();
+                const percentage = (e.clientX - rect.left) / rect.width;
+                onSeek(percentage * duration);
+              }}
             />
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <PlayerControls
+          isPlaying={isPlaying}
+          loadingTrack={loadingTrack}
+          onPlay={onPlay}
+          onPause={onPause}
+          onPrevious={onPrevious}
+          onNext={onNext}
+        />
+        
+        <div className="flex items-center gap-2">
+          <div
+            className="relative"
+            onMouseEnter={() => setShowVolumeSlider(true)}
+            onMouseLeave={() => setShowVolumeSlider(false)}
+          >
+            <button className="p-2 hover:bg-muted/50 rounded-full">
+              {volume > 0 ? (
+                <Volume2 className="h-5 w-5" />
+              ) : (
+                <VolumeX className="h-5 w-5" />
+              )}
+            </button>
+            
+            {showVolumeSlider && (
+              <div className="absolute bottom-full mb-2 p-2 bg-background border rounded shadow-md">
+                <VolumeControl
+                  volume={volume}
+                  onVolumeChange={onVolumeChange}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

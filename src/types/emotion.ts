@@ -17,6 +17,17 @@ export interface EmotionResult {
   intensity?: number;
   secondary?: string[];
   userId?: string;
+  // Add the missing properties that were causing errors
+  emojis?: string | string[];
+  ai_feedback?: string;
+  recommendations?: string[];
+  text?: string;
+  id?: string;
+  user_id?: string;
+  date?: string;
+  feedback?: string;
+  audio_url?: string;
+  transcript?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

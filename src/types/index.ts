@@ -27,12 +27,12 @@ export type {
 export type {
   UserModeType,
   UserModeContextType
-} from './userMode';
+} from './types';
 
 // Exports des types liés à la sidebar
 export type {
   SidebarContextType
-} from './sidebar';
+} from './types';
 
 // Exports des types liés à la musique
 export type {
@@ -121,14 +121,6 @@ export type {
   AnonymousActivity,
   ActivityStats
 } from './activity';
-
-// Exports des types liés au scan d'émotions
-export type {
-  ScanResult,
-  EmotionScanData,
-  EmotionGamificationStats,
-  LeaderboardEntry
-} from './scan';
 
 // Exports des types liés au coaching
 export type {
@@ -228,4 +220,12 @@ export interface InvitationFormData {
   role: string;
   message?: string;
   expires_in_days: number;
+}
+
+// Fix for GridPosition in admin components
+export interface GridPosition {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }

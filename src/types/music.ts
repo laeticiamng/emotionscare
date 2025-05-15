@@ -8,8 +8,9 @@ export interface MusicTrack {
   url: string;
   cover?: string;
   coverUrl?: string;
+  cover_url?: string; // Added for backward compatibility
   audioUrl?: string;
-  audio_url?: string; // Pour compatibilité
+  audio_url?: string; // Added for backward compatibility
   emotion?: string;
 }
 
@@ -19,6 +20,8 @@ export interface MusicPlaylist {
   emotion?: string;
   tracks: MusicTrack[];
   title?: string;
+  description?: string;
+  coverUrl?: string; // Add the missing property
 }
 
 export interface EmotionMusicParams {
@@ -27,7 +30,17 @@ export interface EmotionMusicParams {
 }
 
 export interface TrackInfoProps {
-  currentTrack: MusicTrack;
+  track?: MusicTrack;
+  currentTrack?: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+  className?: string;
+  compact?: boolean;
 }
 
 export interface ProgressBarProps {
@@ -61,4 +74,8 @@ export interface MusicContextType {
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
+  isOpen?: boolean; // Added for backward compatibility
+  onOpenChange?: (open: boolean) => void; // Added for backward compatibility
+  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack;
 }

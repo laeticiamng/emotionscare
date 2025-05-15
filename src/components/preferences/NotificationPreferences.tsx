@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference, NotificationType } from '@/types/notification';
+import { NotificationFrequency, NotificationPreference, NotificationType } from '@/types';
 import { useToast } from '@/hooks/use-toast';
 
 interface NotificationPreferencesProps {
@@ -23,14 +23,18 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     const emailEnabled = preference.emailEnabled !== undefined ? preference.emailEnabled : 
                         (preference.channels?.email || false);
     
-    const updatedPreference: NotificationPreference = {
+    const updatedPreference = {
       ...preference,
       emailEnabled: !emailEnabled,
-      channels: {
+    };
+    
+    // Add channels for backward compatibility if it exists in the original
+    if (preference.channels) {
+      updatedPreference.channels = {
         ...(preference.channels || { email: false, push: false, inApp: true }),
         email: !emailEnabled
-      }
-    };
+      };
+    }
     
     handlePreferenceUpdate(updatedPreference);
   };
@@ -39,20 +43,24 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     const pushEnabled = preference.pushEnabled !== undefined ? preference.pushEnabled : 
                        (preference.channels?.push || false);
     
-    const updatedPreference: NotificationPreference = {
+    const updatedPreference = {
       ...preference,
-      pushEnabled: !pushEnabled,
-      channels: {
+      pushEnabled: !pushEnabled
+    };
+    
+    // Add channels for backward compatibility if it exists in the original
+    if (preference.channels) {
+      updatedPreference.channels = {
         ...(preference.channels || { email: false, push: false, inApp: true }),
         push: !pushEnabled
-      }
-    };
+      };
+    }
     
     handlePreferenceUpdate(updatedPreference);
   };
 
   const handleFrequencyChange = (preference: NotificationPreference, frequency: NotificationFrequency) => {
-    const updatedPreference: NotificationPreference = {
+    const updatedPreference = {
       ...preference,
       frequency
     };
@@ -61,7 +69,8 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
   };
 
   const handlePreferenceUpdate = (preference: NotificationPreference) => {
-    setUpdatingId(preference.type);
+    const preferenceId = preference.type || String(preferences.indexOf(preference));
+    setUpdatingId(preferenceId);
     
     // Simulate API call to update preference
     setTimeout(() => {
@@ -75,8 +84,9 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
     }, 500);
   };
 
-  const getNotificationTypeName = (type: NotificationType): string => {
-    switch (type) {
+  // Helper to get notification type name
+  const getNotificationTypeName = (typeValue: string): string => {
+    switch (typeValue) {
       case 'emotion': return 'Analyses émotionnelles';
       case 'coach': return 'Messages du coach';
       case 'journal': return 'Journal';
@@ -93,25 +103,36 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {preferences.map((preference) => {
-            const isUpdating = updatingId === preference.type;
+          {preferences.map((preference, index) => {
+            const preferenceId = preference.type || String(index);
+            const isUpdating = updatingId === preferenceId;
             const emailEnabled = preference.emailEnabled !== undefined ? preference.emailEnabled : 
                                 (preference.channels?.email || false);
             const pushEnabled = preference.pushEnabled !== undefined ? preference.pushEnabled : 
                                (preference.channels?.push || false);
             
+            // Get the type label, handling both strings and objects
+            let typeName = 'Notification';
+            if (preference.type) {
+              typeName = getNotificationTypeName(preference.type);
+            } else if (index === 0) {
+              typeName = 'Général';
+            } else {
+              typeName = `Type ${index + 1}`;
+            }
+            
             return (
-              <div key={preference.type} className="space-y-4">
-                <div className="font-medium">{getNotificationTypeName(preference.type)}</div>
+              <div key={preferenceId} className="space-y-4">
+                <div className="font-medium">{typeName}</div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor={`email-${preference.type}`} className="cursor-pointer">
+                      <Label htmlFor={`email-${preferenceId}`} className="cursor-pointer">
                         Notifications par email
                       </Label>
                       <Switch
-                        id={`email-${preference.type}`}
+                        id={`email-${preferenceId}`}
                         checked={emailEnabled}
                         onCheckedChange={() => handleToggleEmail(preference)}
                         disabled={isUpdating}
@@ -119,11 +140,11 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <Label htmlFor={`push-${preference.type}`} className="cursor-pointer">
+                      <Label htmlFor={`push-${preferenceId}`} className="cursor-pointer">
                         Notifications push
                       </Label>
                       <Switch
-                        id={`push-${preference.type}`}
+                        id={`push-${preferenceId}`}
                         checked={pushEnabled}
                         onCheckedChange={() => handleTogglePush(preference)}
                         disabled={isUpdating}
@@ -132,17 +153,18 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
                   </div>
                   
                   <div>
-                    <Label htmlFor={`frequency-${preference.type}`}>Fréquence</Label>
+                    <Label htmlFor={`frequency-${preferenceId}`}>Fréquence</Label>
                     <Select
                       value={preference.frequency}
                       onValueChange={(value) => handleFrequencyChange(preference, value as NotificationFrequency)}
                       disabled={isUpdating || (!emailEnabled && !pushEnabled)}
                     >
-                      <SelectTrigger id={`frequency-${preference.type}`} className="mt-1">
+                      <SelectTrigger id={`frequency-${preferenceId}`} className="mt-1">
                         <SelectValue placeholder="Choisir une fréquence" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="realtime">Temps réel</SelectItem>
+                        <SelectItem value="immediate">Immédiat</SelectItem>
                         <SelectItem value="daily">Quotidien</SelectItem>
                         <SelectItem value="weekly">Hebdomadaire</SelectItem>
                         <SelectItem value="never">Jamais</SelectItem>

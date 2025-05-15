@@ -4,75 +4,76 @@
  * across component interfaces.
  */
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { EmotionResult } from '@/types/emotion';
-import { VRSessionTemplate } from '@/types/types';
+import { MusicTrack, MusicPlaylist, VRSessionTemplate } from '@/types';
 
 /**
- * Make sure a MusicTrack has both cover and coverUrl for backward compatibility
+ * Gets coverUrl from a MusicTrack using either naming convention
  */
-export const normalizeTrack = (track: MusicTrack): MusicTrack => {
-  if (!track) return track;
-  
-  return {
-    ...track,
-    cover: track.cover || track.coverUrl || track.cover_url,
-    coverUrl: track.coverUrl || track.cover || track.cover_url,
-    cover_url: track.cover_url || track.cover || track.coverUrl,
-    audio_url: track.audio_url || track.audioUrl || track.url,
-    audioUrl: track.audioUrl || track.audio_url || track.url,
-    url: track.url || track.audioUrl || track.audio_url,
-  };
-};
+export function getTrackCoverUrl(track?: MusicTrack | null): string | undefined {
+  if (!track) return undefined;
+  return track.coverUrl || track.cover_url || track.cover;
+}
 
 /**
- * Make sure a playlist has both name and title for backward compatibility
+ * Gets audioUrl from a MusicTrack using either naming convention
  */
-export const normalizePlaylist = (playlist: MusicPlaylist): MusicPlaylist => {
-  if (!playlist) return playlist;
-  
-  return {
-    ...playlist,
-    name: playlist.name || playlist.title || '',
-    title: playlist.title || playlist.name || '',
-  };
-};
+export function getTrackAudioUrl(track?: MusicTrack | null): string | undefined {
+  if (!track) return undefined;
+  return track.audioUrl || track.audio_url || track.url;
+}
 
 /**
- * Make sure emotion result has all necessary properties
+ * Gets coverUrl from a MusicPlaylist using either naming convention
  */
-export const normalizeEmotionResult = (result: EmotionResult): EmotionResult => {
-  if (!result) return result;
-  
-  return {
-    ...result,
-    score: result.score || result.intensity || 50,
-    intensity: result.intensity || result.score || 50,
-    date: result.date || result.timestamp || new Date().toISOString(),
-    timestamp: result.timestamp || result.date || new Date().toISOString(),
-  };
-};
+export function getPlaylistCoverUrl(playlist?: MusicPlaylist | null): string | undefined {
+  if (!playlist) return undefined;
+  return playlist.coverUrl;
+}
 
 /**
- * Make sure VR session template has all necessary properties
+ * Gets the title of a VRSessionTemplate using either naming convention
  */
-export const normalizeVRSessionTemplate = (template: VRSessionTemplate): VRSessionTemplate => {
-  if (!template) return template;
-  
-  return {
-    ...template,
-    title: template.title || template.name || '',
-    name: template.name || template.title || '',
-    completion_rate: template.completion_rate || 0,
-    recommended_mood: template.recommended_mood || template.emotion || '',
-  };
-};
+export function getVRTemplateTitle(template?: VRSessionTemplate | null): string {
+  if (!template) return '';
+  return template.title || template.name || '';
+}
 
 /**
- * Format time in MM:SS format
+ * Gets the thumbnail URL of a VRSessionTemplate using either naming convention
  */
-export const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-};
+export function getVRTemplateThumbnail(template?: VRSessionTemplate | null): string | undefined {
+  if (!template) return undefined;
+  return template.thumbnailUrl || template.thumbnail || template.imageUrl || template.preview_url;
+}
+
+/**
+ * Gets the audioUrl of a VRSessionTemplate using either naming convention
+ */
+export function getVRTemplateAudioUrl(template?: VRSessionTemplate | null): string | undefined {
+  if (!template) return undefined;
+  return template.audioUrl || template.audio_url;
+}
+
+/**
+ * Gets the completion rate of a VRSessionTemplate using either naming convention
+ */
+export function getVRTemplateCompletionRate(template?: VRSessionTemplate | null): number {
+  if (!template) return 0;
+  return template.completionRate || template.completion_rate || 0;
+}
+
+/**
+ * Gets the emotion target of a VRSessionTemplate using either naming convention
+ */
+export function getVRTemplateEmotionTarget(template?: VRSessionTemplate | null): string | undefined {
+  if (!template) return undefined;
+  return template.emotionTarget || template.emotion_target || template.emotion;
+}
+
+/**
+ * Gets the recommended mood of a VRSessionTemplate using either naming convention
+ */
+export function getVRTemplateRecommendedMood(template?: VRSessionTemplate | null): string {
+  if (!template) return '';
+  return template.recommendedMood || template.recommended_mood || '';
+}

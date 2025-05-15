@@ -1,13 +1,10 @@
 
 import React from 'react';
+import { Disc } from 'lucide-react';
 import { MusicTrack } from '@/types';
-import { Play, Pause } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface TrackInfoProps {
   track?: MusicTrack;
-  className?: string;
-  compact?: boolean;
   title?: string;
   artist?: string;
   coverUrl?: string;
@@ -16,15 +13,12 @@ interface TrackInfoProps {
   currentTrack?: MusicTrack;
   loadingTrack?: boolean;
   audioError?: Error | null;
-  onPlay?: () => void;
-  onPause?: () => void;
-  isPlaying?: boolean;
+  className?: string;
+  compact?: boolean;
 }
 
 const TrackInfo: React.FC<TrackInfoProps> = ({
   track,
-  className = '',
-  compact = false,
   title,
   artist,
   coverUrl,
@@ -33,79 +27,48 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   currentTrack,
   loadingTrack = false,
   audioError = null,
-  onPlay,
-  onPause,
-  isPlaying = false,
+  className = '',
+  compact = false
 }) => {
-  // Use passed props first, then track properties
-  const displayTitle = title || track?.title || 'Unknown Title';
-  const displayArtist = artist || track?.artist || 'Unknown Artist';
-  const displayCoverUrl = coverUrl || track?.coverUrl || track?.cover_url || track?.cover || '';
+  // Use provided info or track info
+  const displayTitle = title || track?.title || currentTrack?.title || 'Aucun titre';
+  const displayArtist = artist || track?.artist || currentTrack?.artist || 'Artiste inconnu';
   
-  // The actual track we're displaying info for
-  const displayTrack = currentTrack || track;
-
+  // Handle both camelCase and snake_case properties for backward compatibility
+  const displayCover = coverUrl || 
+                       track?.coverUrl || 
+                       track?.cover_url || 
+                       track?.cover || 
+                       currentTrack?.coverUrl ||
+                       currentTrack?.cover_url ||
+                       currentTrack?.cover ||
+                       '/images/music/default-cover.jpg';
+  
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {showCover && (
-        <div className="flex-shrink-0 w-12 h-12 rounded-md overflow-hidden bg-primary/10">
-          {displayCoverUrl ? (
+        <div className={`${compact ? 'h-10 w-10' : 'h-12 w-12'} rounded bg-primary/10 flex items-center justify-center overflow-hidden`}>
+          {displayCover ? (
             <img 
-              src={displayCoverUrl} 
+              src={displayCover} 
               alt={displayTitle} 
-              className="w-full h-full object-cover" 
+              className="h-full w-full object-cover" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
+              }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-lg">♪</span>
-            </div>
+            <Disc className="h-6 w-6 text-muted-foreground" />
           )}
         </div>
       )}
-
-      <div className={`flex-1 min-w-0 ${compact ? '' : 'space-y-0.5'}`}>
-        {loadingTrack ? (
-          <>
-            <div className="h-4 bg-muted rounded animate-pulse w-3/4 mb-1"></div>
-            <div className="h-3 bg-muted rounded animate-pulse w-1/2"></div>
-          </>
-        ) : (
-          <>
-            <div className="font-medium truncate">{displayTitle}</div>
-            <div className="text-xs text-muted-foreground truncate">{displayArtist}</div>
-            
-            {audioError && (
-              <div className="text-xs text-destructive mt-1">
-                Impossible de charger l'audio
-              </div>
-            )}
-          </>
-        )}
+      
+      <div className="overflow-hidden">
+        <p className={`font-medium truncate ${compact ? 'text-sm' : ''}`}>{loadingTrack ? 'Chargement...' : displayTitle}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {loadingTrack ? '...' : audioError ? 'Erreur audio' : displayArtist}
+        </p>
       </div>
-
-      {showControls && (
-        <div className="flex-shrink-0">
-          {isPlaying ? (
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-8 w-8 p-0 rounded-full"
-              onClick={onPause}
-            >
-              <Pause className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="h-8 w-8 p-0 rounded-full"
-              onClick={onPlay}
-            >
-              <Play className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 };

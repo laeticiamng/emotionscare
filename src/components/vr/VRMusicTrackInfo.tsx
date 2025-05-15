@@ -15,7 +15,7 @@ const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => 
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Get cover URL with fallback
+  // Get cover URL with fallback, handling both camelCase and snake_case properties
   const getCoverUrl = () => {
     return currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover || '';
   };
