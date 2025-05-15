@@ -1,23 +1,24 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { UserPreferences } from '@/types';
+import { Theme, FontFamily, FontSize } from '@/types/theme';
 
 // Theme settings tab component
 const ThemeSettingsTab: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
   const [currentTab, setCurrentTab] = useState('theme');
 
-  const handleThemeChange = (theme: string) => {
+  const handleThemeChange = (theme: Theme) => {
     updatePreferences({ theme });
   };
 
-  const handleFontChange = (font: string) => {
+  const handleFontChange = (font: FontFamily) => {
     updatePreferences({ fontFamily: font });
   };
 
-  const handleFontSizeChange = (fontSize: string) => {
+  const handleFontSizeChange = (fontSize: FontSize) => {
     updatePreferences({ fontSize });
   };
 
@@ -123,9 +124,9 @@ const ThemeSettingsTab: React.FC = () => {
                   </button>
                   <button
                     className={`p-3 rounded-md border ${
-                      preferences.fontFamily === 'mono' ? 'border-primary bg-primary/10' : ''
+                      preferences.fontFamily === 'monospace' ? 'border-primary bg-primary/10' : ''
                     }`}
-                    onClick={() => handleFontChange('mono')}
+                    onClick={() => handleFontChange('monospace')}
                     style={{ fontFamily: 'monospace' }}
                   >
                     Monospace

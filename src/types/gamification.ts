@@ -1,52 +1,45 @@
 
+import { Badge } from './types';
+
 export interface GamificationStats {
   points: number;
   level: number;
+  rank: string;
   badges: Badge[];
-  challenges: Challenge[];
   streak: number;
-}
-
-export interface GamificationData {
-  totalPoints: number;
-  level: number;
-  badges: number;
-  progress: number;
-  nextLevel: number;
-  streakDays: number;
   completedChallenges: number;
-}
-
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  earnedAt?: string;
-  progress?: number;
-  category?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  totalChallenges: number;
+  activeChallenges: number;
+  streakDays: number;
+  nextLevelPoints: number;
+  progressToNextLevel: number;
+  totalPoints: number;
+  badgesCount: number;
+  challenges: any[];
+  recentAchievements: any[];
+  nextLevel: number | {
+    points: number;
+    rewards: string[];
+  };
+  achievements?: any[];
+  currentLevel: number;
+  pointsToNextLevel: number;
+  lastActivityDate: string;
+  leaderboard?: any[];
 }
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
-  reward: number;
+  type: string;
   progress: number;
-  total: number;
-  completed: boolean;
-  expiresAt?: string;
+  goal: number;
+  reward: number | string;
+  status: 'active' | 'completed' | 'failed';
+  deadline?: string;
+  startDate: string;
   category?: string;
+  icon?: string;
+  isTeamChallenge?: boolean;
 }
-
-export interface LeaderboardEntry {
-  userId: string;
-  name: string;
-  avatar?: string;
-  points: number;
-  rank: number;
-  level: number;
-}
-
-export type Period = 'day' | 'week' | 'month' | 'year' | 'all';

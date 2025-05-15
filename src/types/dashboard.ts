@@ -38,6 +38,14 @@ export interface DashboardWidgetConfig {
   minW?: number;
   minH?: number;
   visible: boolean;
+  settings?: {
+    dataSource?: string;
+    refreshInterval?: number;
+    displayMode?: string;
+    showLabels?: boolean;
+    colorScheme?: string;
+    [key: string]: any;
+  };
 }
 
 export interface GlobalOverviewTabProps {
@@ -45,7 +53,7 @@ export interface GlobalOverviewTabProps {
   absenteeismChartData?: any[];
   emotionalScoreTrend?: any[];
   dashboardStats?: DashboardStats;
-  gamificationData?: GamificationData;
+  gamificationData?: GamificationStats;
   isLoading?: boolean;
 }
 
@@ -62,7 +70,7 @@ export interface DashboardStats {
   absenteeismRate: number;
 }
 
-export interface GamificationData {
+export interface GamificationData extends GamificationStats {
   totalBadges: number;
   activeChallenges: number;
   leaderboard: {

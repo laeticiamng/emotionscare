@@ -1,125 +1,127 @@
 
-import { useRef, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { MusicTrack } from '@/types/music';
-import { formatDuration } from '@/utils/formatters';
+import { Slider } from '@/components/ui/slider';
+import { MusicTrack } from '@/types';
+import { Pause, Play, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface MusicControlsProps {
   track: MusicTrack | null;
   isPlaying: boolean;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
   volume: number;
-  progress: number;
-  duration: number;
-  onPlayPause: () => void;
-  onNext: () => void;
-  onPrevious: () => void;
   onVolumeChange: (value: number) => void;
-  onProgressChange: (value: number) => void;
-  className?: string;
+  position: number;
+  duration: number;
+  seekTo: (position: number) => void;
 }
 
-export function MusicControls({
+const MusicControls: React.FC<MusicControlsProps> = ({
   track,
   isPlaying,
+  togglePlay,
+  nextTrack,
+  previousTrack,
   volume,
-  progress,
-  duration,
-  onPlayPause,
-  onNext,
-  onPrevious,
   onVolumeChange,
-  onProgressChange,
-  className = '',
-}: MusicControlsProps) {
-  const progressRef = useRef<number>(progress);
+  position,
+  duration,
+  seekTo
+}) => {
+  const [progress, setProgress] = useState(0);
 
-  // When progress prop changes, update the ref
   useEffect(() => {
-    progressRef.current = progress;
-  }, [progress]);
+    if (duration > 0) {
+      setProgress((position / duration) * 100);
+    } else {
+      setProgress(0);
+    }
+  }, [position, duration]);
 
-  // Format time in MM:SS
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // Get cover URL with fallback
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const bounds = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - bounds.left) / bounds.width;
+    seekTo(percent * duration);
+  };
+
+  // Get cover URL, handle different property names
   const getCoverUrl = () => {
-    return track?.coverUrl || track?.cover_url || track?.cover || '/images/default-album-art.png';
+    if (!track) return null;
+    return track.coverUrl || track.cover || track.cover_url || '/images/music-placeholder.jpg';
   };
 
   return (
-    <div className={`bg-background border rounded-lg p-3 ${className}`}>
+    <div className="p-4 bg-card rounded-lg shadow-sm">
       {track && (
-        <div className="flex flex-col space-y-3">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-muted rounded overflow-hidden">
-              <img
-                src={getCoverUrl()}
+        <>
+          <div className="flex items-center gap-4">
+            <div className="relative w-16 h-16 rounded-md overflow-hidden">
+              <img 
+                src={getCoverUrl() || '/images/music-placeholder.jpg'} 
                 alt={track.title}
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm truncate">{track.title}</h4>
-              <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+            <div>
+              <h3 className="font-medium">{track.title}</h3>
+              <p className="text-sm text-muted-foreground">{track.artist}</p>
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-muted-foreground px-1">
-              <span>{formatTime(progress)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-            <Slider
-              value={[progress]}
-              max={duration || 100}
-              step={1}
-              onValueChange={(values) => onProgressChange(values[0])}
-              className="cursor-pointer"
-            />
-          </div>
-
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-1 w-24">
-              {volume === 0 ? (
-                <VolumeX className="h-4 w-4 text-muted-foreground" />
-              ) : volume < 0.5 ? (
-                <Volume1 className="h-4 w-4 text-muted-foreground" />
-              ) : (
-                <Volume2 className="h-4 w-4 text-muted-foreground" />
-              )}
-              <Slider
-                value={[volume * 100]}
-                max={100}
-                step={1}
-                onValueChange={(values) => onVolumeChange(values[0] / 100)}
-                className="cursor-pointer"
+          <div className="mt-4 space-y-2">
+            <div 
+              className="h-1.5 bg-primary-foreground/20 rounded-full cursor-pointer"
+              onClick={handleProgressClick}
+            >
+              <div 
+                className="h-full bg-primary rounded-full transition-all" 
+                style={{ width: `${progress}%` }}
               />
             </div>
 
-            <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onPrevious}>
-                <SkipBack className="h-4 w-4" />
-              </Button>
-              <Button onClick={onPlayPause} variant="secondary" size="icon" className="h-9 w-9">
-                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onNext}>
-                <SkipForward className="h-4 w-4" />
-              </Button>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{formatTime(position)}</span>
+              <span>{formatTime(duration)}</span>
             </div>
-
-            <div className="w-24" />
           </div>
-        </div>
+        </>
       )}
+
+      <div className="mt-4 flex justify-between items-center">
+        <div className="flex items-center">
+          <Volume2 className="h-4 w-4 mr-2 text-muted-foreground" />
+          <Slider
+            className="w-20"
+            value={[volume * 100]}
+            min={0}
+            max={100}
+            step={1}
+            onValueChange={(values) => onVolumeChange(values[0] / 100)}
+          />
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Button size="sm" variant="ghost" onClick={previousTrack}>
+            <SkipBack className="h-4 w-4" />
+          </Button>
+          <Button size="sm" onClick={togglePlay}>
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 ml-0.5" />}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={nextTrack}>
+            <SkipForward className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default MusicControls;

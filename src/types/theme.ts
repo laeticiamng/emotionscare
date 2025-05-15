@@ -1,7 +1,7 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'extra-large';
-export type FontFamily = 'default' | 'serif' | 'mono' | 'sans' | 'inter' | 'system-ui';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export interface ThemeContextType {
@@ -12,6 +12,7 @@ export interface ThemeContextType {
   fontSize: FontSize;
   setFontSize: (size: FontSize) => void;
   isDarkMode: boolean;
+  getContrastText?: (color: string) => 'black' | 'white';
 }
 
 export interface ThemeButtonProps {

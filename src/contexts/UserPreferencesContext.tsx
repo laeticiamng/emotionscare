@@ -1,21 +1,13 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { UserPreferences } from '@/types/user';
-
-// Define the context type
-export interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  setPreferences: (preferences: UserPreferences) => void;
-  updatePreferences: (updates: Partial<UserPreferences>) => void;
-  resetPreferences: () => void;
-  loading: boolean;
-}
+import { UserPreferences, UserPreferencesContextType } from '@/types/user';
+import { Theme, FontFamily, FontSize } from '@/types/theme';
 
 // Default preferences
 const defaultPreferences: UserPreferences = {
-  theme: 'light',
-  fontSize: 'medium',
-  fontFamily: 'system',
+  theme: 'light' as Theme,
+  fontSize: 'medium' as FontSize,
+  fontFamily: 'system' as FontFamily,
   language: 'fr',
   ambientSound: false,
   notifications: {

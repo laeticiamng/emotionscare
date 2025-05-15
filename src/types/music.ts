@@ -8,8 +8,10 @@ export interface MusicTrack {
   duration?: number;
   url: string;
   coverUrl?: string;
+  cover?: string;
   cover_url?: string; // For compatibility
   emotion?: string;
+  audioUrl?: string; // Adding to support MusicCreator
 }
 
 export interface MusicPlaylist {
@@ -20,6 +22,7 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   emotion?: string;
   coverUrl?: string;
+  category?: string;
 }
 
 export interface MusicContextType {
@@ -46,6 +49,7 @@ export interface MusicDrawerProps {
   isOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   currentTrack?: MusicTrack | null;
   playlist?: MusicPlaylist | null;
 }

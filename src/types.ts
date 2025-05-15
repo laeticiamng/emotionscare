@@ -16,11 +16,12 @@ export type {
   VRHistoryListProps
 } from './types/vr';
 
-// Renommer ceci pour éviter les conflits d'exportation
+// Renamed to avoid export conflicts
 export type {
   VRSessionWithMusicProps as VRSessionWithMusicPropsType
 } from './types/vr';
 
+// Export types from music
 export type {
   MusicTrack,
   MusicPlaylist,
@@ -32,13 +33,33 @@ export type {
   VolumeControlProps
 } from './types/music';
 
+// Export types from notification
 export type {
   NotificationFrequency,
   NotificationType,
   NotificationTone,
   Notification,
-  NotificationPreference
+  NotificationPreference,
+  NotificationFilter,
+  NotificationItemProps,
+  NotificationChannels
 } from './types/notification';
+
+// Export type from theme
+export type { 
+  Theme, 
+  FontFamily as ThemeFontFamily, 
+  FontSize as ThemeFontSize 
+} from './types/theme';
+
+// Export from dashboard
+export type { 
+  KpiCardProps, 
+  DraggableKpiCardsGridProps, 
+  GlobalOverviewTabProps,
+  DashboardWidgetConfig,
+  GamificationData
+} from './types/dashboard';
 
 export interface ChatMessage {
   id: string;
@@ -54,7 +75,10 @@ export interface ChatMessage {
 export type { 
   Emotion,
   EmotionResult,
-  EnhancedEmotionResult
+  EnhancedEmotionResult,
+  EmotionalTeamViewProps,
+  LiveVoiceScannerProps,
+  VoiceEmotionScannerProps
 } from './types/emotion';
 
 // Adding additional required types
@@ -99,10 +123,8 @@ export interface Story {
 }
 
 export type { Badge } from './types/types';
-export type { GamificationStats } from './types/types';
-export type { Challenge } from './types/types';
+export type { GamificationStats, Challenge } from './types/gamification';
 export type { Period } from './types/types';
-export type { EmotionalTeamViewProps } from './types/types';
 export type { UserModeType } from './types/types';
 
 export interface EmotionPrediction {

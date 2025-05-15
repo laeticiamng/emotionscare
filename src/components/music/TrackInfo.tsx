@@ -1,73 +1,40 @@
 
 import React from 'react';
-import { Disc } from 'lucide-react';
 import { MusicTrack } from '@/types';
 
 interface TrackInfoProps {
-  track?: MusicTrack;
-  title?: string;
-  artist?: string;
-  coverUrl?: string;
-  showCover?: boolean;
-  showControls?: boolean;
-  currentTrack?: MusicTrack;
-  loadingTrack?: boolean;
-  audioError?: Error | null;
+  track: MusicTrack;
   className?: string;
-  compact?: boolean;
 }
 
-const TrackInfo: React.FC<TrackInfoProps> = ({
+/**
+ * Component that displays information about a music track
+ */
+const TrackInfo: React.FC<TrackInfoProps> = ({ 
   track,
-  title,
-  artist,
-  coverUrl,
-  showCover = true,
-  showControls = false,
-  currentTrack,
-  loadingTrack = false,
-  audioError = null,
-  className = '',
-  compact = false
+  className = ""
 }) => {
-  // Use provided info or track info
-  const displayTitle = title || track?.title || currentTrack?.title || 'Aucun titre';
-  const displayArtist = artist || track?.artist || currentTrack?.artist || 'Artiste inconnu';
-  
-  // Handle both camelCase and snake_case properties for backward compatibility
-  const displayCover = coverUrl || 
-                       track?.coverUrl || 
-                       track?.cover_url || 
-                       track?.cover || 
-                       currentTrack?.coverUrl ||
-                       currentTrack?.cover_url ||
-                       currentTrack?.cover ||
-                       '/images/music/default-cover.jpg';
-  
+  // Determine the cover URL - handle different property names
+  const getCoverUrl = () => {
+    return track.coverUrl || track.cover || track.cover_url || '/images/music-placeholder.jpg';
+  };
+
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      {showCover && (
-        <div className={`${compact ? 'h-10 w-10' : 'h-12 w-12'} rounded bg-primary/10 flex items-center justify-center overflow-hidden`}>
-          {displayCover ? (
-            <img 
-              src={displayCover} 
-              alt={displayTitle} 
-              className="h-full w-full object-cover" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
-              }}
-            />
-          ) : (
-            <Disc className="h-6 w-6 text-muted-foreground" />
-          )}
-        </div>
-      )}
+      <div className="flex-shrink-0 relative w-12 h-12 rounded-md overflow-hidden">
+        <img 
+          src={getCoverUrl()} 
+          alt={`${track.title} cover`}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = '/images/music-placeholder.jpg';
+          }}
+        />
+      </div>
       
-      <div className="overflow-hidden">
-        <p className={`font-medium truncate ${compact ? 'text-sm' : ''}`}>{loadingTrack ? 'Chargement...' : displayTitle}</p>
-        <p className="text-xs text-muted-foreground truncate">
-          {loadingTrack ? '...' : audioError ? 'Erreur audio' : displayArtist}
-        </p>
+      <div className="min-w-0 overflow-hidden">
+        <h4 className="text-base font-medium truncate">{track.title}</h4>
+        <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
       </div>
     </div>
   );
