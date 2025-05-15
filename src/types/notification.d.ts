@@ -1,7 +1,7 @@
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 export type NotificationType = 'all' | 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement' | 'important' | 'reminder' | 'success' | 'warning' | 'error' | 'none';
-export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm';
+export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm' | 'supportive' | 'casual' | 'minimal' | string;
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type NotificationChannels = {
   email: boolean;
@@ -26,7 +26,7 @@ export interface Notification {
   userId?: string;
 }
 
-export interface NotificationPreference {
+export interface NotificationPreferences {
   enabled: boolean;
   emailEnabled: boolean;
   pushEnabled?: boolean;
@@ -41,7 +41,10 @@ export interface NotificationPreference {
     end: string;
   };
   tone?: NotificationTone;
+  soundEnabled?: boolean;
 }
+
+export interface NotificationPreference extends NotificationPreferences {}
 
 export interface NotificationBadge {
   unread: number;

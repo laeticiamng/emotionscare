@@ -1,65 +1,132 @@
 
-export type FontFamily = 'system-ui' | 'sans-serif' | 'serif' | 'monospace' | 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
-export type FontSize = 'small' | 'medium' | 'large' | 'xl' | 'x-large';
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+import { Theme, FontFamily, FontSize, ThemeName } from './theme';
+import { NotificationPreferences } from './notification';
+
+// Combined UserRole type to handle all possible roles
+export type UserRole = 
+  | 'admin' | 'user' | 'manager' | 'coach' | 'guest' 
+  | 'b2b-admin' | 'b2b-user' | 'b2c' | 'b2b_admin' | 'b2b_user'
+  | 'moderator' | 'wellbeing_manager' | 'employee' | 'team_lead' 
+  | 'professional' | 'b2b-selection' | 'individual';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+  avatar_url?: string;
+  avatar?: string;
+  createdAt?: string;
+  last_sign_in_at?: string;
+  onboarded?: boolean;
+  preferences?: UserPreferences;
+  department?: string;
+  position?: string;
+  job_title?: string;
+  joined_at?: string;
+  emotional_score?: number;
+  anonymity_code?: string;
+  last_active?: string;
+  team_id?: string;
+  company_id?: string;
+  profile?: {
+    bio?: string;
+    company?: string;
+    job_title?: string;
+  };
+}
+
+export type DashboardLayout = 'standard' | 'compact' | 'focused' | string;
 
 export interface UserPreferences {
-  dashboardLayout: 'standard' | 'compact' | 'focused';
-  onboardingCompleted: boolean;
-  theme: ThemeName;
+  theme: Theme;
   fontSize: FontSize;
-  language: string;
   fontFamily: FontFamily;
-  sound: boolean;
-  notifications: {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    frequency: string;
-    types: Record<string, boolean>;
-    tone: string;
-    quietHours: {
-      enabled: boolean;
-      start: string;
-      end: string;
-    };
-  } | boolean;
-  notifications_enabled?: boolean;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
+  language?: string;
+  ambientSound?: boolean;
+  colorAccent?: string;
+  dashboardLayout?: DashboardLayout;
+  onboardingCompleted?: boolean;
+  soundEnabled?: boolean;
+  animations?: boolean;
+  fullAnonymity?: boolean;
+  autoplayVideos?: boolean;
   dataCollection?: boolean;
-  timezone?: string;
-  musicPreferences?: {
-    autoplay: boolean;
-    volume: number;
-    preferredGenres: string[];
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  notifications_enabled?: boolean;
+  highContrast?: boolean;
+  accessibility?: {
+    highContrast?: boolean;
+    largeText?: boolean;
+    screenReader?: boolean;
+    reducedMotion?: boolean;
   };
   accessibilityFeatures?: {
     highContrast: boolean;
     reducedMotion: boolean;
     screenReader: boolean;
   };
-  reduceMotion?: boolean;
-  highContrast?: boolean;
+  notifications?: NotificationPreferences | boolean;
   privacy?: {
-    showEmotionalScore?: boolean;
-    shareJournalInsights?: boolean;
-    anonymousDataContribution?: boolean;
-    profileVisibility?: 'public' | 'private' | 'team';
     shareData?: boolean;
     anonymizeReports?: boolean;
     publicProfile?: boolean;
+    anonymousMode?: boolean;
+    dataSharing?: boolean;
+    profileVisibility?: 'public' | 'team' | 'private';
+    showEmotionalScore?: boolean;
+    shareJournalInsights?: boolean;
+    anonymousDataContribution?: boolean;
     shareEmotionalData?: boolean;
     allowCoaching?: boolean;
+  } | string;
+  incognitoMode?: boolean;
+  lockJournals?: boolean;
+  dataExport?: boolean;
+  avatarUrl?: string;
+  profileVisibility?: 'public' | 'team' | 'private';
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
+  timezone?: string;
+  musicPreferences?: {
+    autoplay: boolean;
+    volume: number;
+    preferredGenres: string[];
   };
-  profileVisibility?: 'public' | 'private' | 'team';
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  autoplayVideos?: boolean;
+}
+
+export interface NotificationPreferencesType {
+  enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  channels?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+  };
+  frequency?: string;
+  types?: Record<string, boolean>;
+  type?: string;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
+  tone?: string;
 }
 
 export interface UserPreferencesState {
   preferences: UserPreferences;
   setPreferences: (preferences: UserPreferences) => void;
-  setSinglePreference: <K extends keyof UserPreferences>(
+  updatePreferences?: (updates: Partial<UserPreferences>) => void;
+  setSinglePreference?: <K extends keyof UserPreferences>(
     key: K,
     value: UserPreferences[K]
   ) => void;
@@ -71,44 +138,52 @@ export interface UserPreferencesState {
   error?: string | null;
 }
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'coach' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'wellbeing_manager' | 'employee' | 'moderator' | 'guest' | 'team_lead';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
+export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  avatar_url?: string;
-  avatar?: string;  // Adding for compatibility
-  created_at?: string;
-  createdAt?: string;
-  last_seen?: string;
-  profile?: {
-    bio?: string;
-    company?: string;
-    job_title?: string;
-  };
-  company_id?: string;
-  team_id?: string;
-  emotional_score?: number;
-  anonymity_code?: string;
-  last_active?: string;
-  department?: string;
-  position?: string;
-  joined_at?: string;
-  onboarded?: boolean;
-  job_title?: string;
+  setPreferences: (preferences: UserPreferences) => void;
+  updatePreferences: (updates: Partial<UserPreferences>) => void;
+  resetPreferences: () => void;
+  loading: boolean;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
+  logout: () => Promise<void>;
+  clearError: () => void;
+  updateUser: (user: User) => Promise<User>;
 }
 
 export interface InvitationVerificationResult {
   valid: boolean;
   isValid?: boolean;
+  expired?: boolean;
+  alreadyAccepted?: boolean;
+  error?: string;
   email?: string;
   role?: UserRole;
   expires_at?: string;
   message?: string;
   teamId?: string;
   companyId?: string;
-  error?: string;
+  invitation?: {
+    id: string;
+    email: string;
+    role: string;
+    expiresAt: string;
+  } | {
+    email: string;
+    role: string;
+    expires_at: string;
+  };
+  data?: {
+    id: string;
+    email: string;
+    role: string;
+    expiresAt: string;
+  };
 }

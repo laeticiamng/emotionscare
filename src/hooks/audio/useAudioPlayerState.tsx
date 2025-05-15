@@ -16,7 +16,7 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loadingTrack, setLoadingTrack] = useState(false);
-  const [error, setErrorState] = useState<string | null>(null);
+  const [error, setErrorState] = useState<Error | string | null>(null);
   
   // Wrapper for setVolume to ensure volume is within bounds
   const setVolume = useCallback((value: number) => {
@@ -31,9 +31,9 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     } else if (typeof err === 'string') {
       setErrorState(err);
     } else if (err && typeof err === 'object' && 'message' in err) {
-      setErrorState(err.message);
+      setErrorState(err);
     } else {
-      setErrorState("Unknown error");
+      setErrorState(new Error("Unknown error"));
     }
   }, []);
   

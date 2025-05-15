@@ -4,7 +4,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, Drawer
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, X } from 'lucide-react';
-import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types';
+import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types/music';
 import MusicProgressBar from './MusicProgressBar';
 import VolumeControl from './VolumeControl';
 import TrackInfo from './TrackInfo';

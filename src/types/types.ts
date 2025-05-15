@@ -40,10 +40,15 @@ export interface UserPreferences {
     anonymousDataContribution?: boolean;
     shareEmotionalData?: boolean;
   };
+  language?: string;
   displayName?: string;
   pronouns?: string;
   biography?: string;
   onboardingCompleted?: boolean;
+  highContrast?: boolean;
+  soundEnabled?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
 }
 
 export interface NotificationPreferences {
@@ -78,6 +83,7 @@ export interface Badge {
   imageUrl?: string;
   image_url?: string;
   unlocked?: boolean;
+  unlockedAt?: Date | string;
   category?: string;
   level?: string | number;
   points?: number;
@@ -87,7 +93,6 @@ export interface Badge {
   image?: string;
   dateEarned?: string;
   awarded_at?: Date | string;
-  unlockedAt?: Date | string;
   progress?: number;
 }
 

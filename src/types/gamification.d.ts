@@ -1,65 +1,55 @@
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon?: string;
-  threshold?: number;
-  type?: string;
-  imageUrl?: string;
-  image_url?: string; // For backward compatibility
-}
-
 export interface Challenge {
   id: string;
-  name: string;
+  title: string;
+  name?: string;
   description: string;
-  progress: number;
-  target: number;
-  reward: number | string;
-  status: 'active' | 'completed' | 'expired' | 'pending';
-  type: string;
-  expiresAt?: string;
   category?: string;
-  title?: string; // For backward compatibility
-  goal?: string; // Added goal property
+  points: number;
+  progress: number;
+  goal?: number;
+  total?: number;
+  completed?: boolean;
+  status?: 'active' | 'completed' | 'failed' | 'pending';
+  startDate?: string;
+  endDate?: string;
+  icon?: string;
+  type?: string;
 }
 
 export interface GamificationStats {
-  points: number;
   level: number;
-  rank: string;
-  badges: Badge[];
+  points: number;
+  badges: number | any[];
   streak: number;
-  nextLevelPoints: number;
   completedChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  progressToNextLevel: number;
-  challenges: Challenge[];
-  recentAchievements: Badge[];
+  totalChallenges: number;
   nextLevel?: {
     points: number;
-    rewards: any[];
-  };
-  achievements?: any[];
-  
-  // Additional properties for compatibility
+    rewards: string[];
+  } | number;
+  nextLevelPoints?: number;
+  pointsToNextLevel?: number;
+  progressToNextLevel?: number;
+  challenges?: Challenge[];
   totalPoints?: number;
   currentLevel?: number;
-  pointsToNextLevel?: number;
-  badgesCount?: number;
+  streakDays?: number;
   lastActivityDate?: string;
-  totalChallenges?: number; // Added as optional
+  activeChallenges?: number;
+  badgesCount?: number;
+  rank?: string;
+  recentAchievements?: any[];
 }
 
 export interface LeaderboardEntry {
-  userId: string;
-  name?: string;
-  avatarUrl?: string;
+  id: string;
+  name: string;
   points: number;
   rank: number;
-  badges?: number; // Added badges property
-  level: number;
-  completedChallenges?: number;
+  avatar?: string;
+  department?: string;
+  level?: number;
+  badges?: number;
+  streak?: number;
 }

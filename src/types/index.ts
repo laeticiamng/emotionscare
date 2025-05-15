@@ -1,186 +1,107 @@
+// Export all types from various files to provide a unified interface
 
-// Central export file for all types used in the application
-// All components should import their types from this file
+// User related types
+export type {
+  User,
+  UserPreferences,
+  UserRole,
+  AuthContextType,
+  UserPreferencesContextType,
+  UserPreferencesState,
+  DashboardLayout,
+  InvitationVerificationResult,
+} from './user';
 
-// Theme types
+// Theme related types
 export type {
   Theme,
-  FontSize,
-  FontFamily,
   ThemeContextType,
   ThemeButtonProps,
-  ThemeSwitcherProps,
-  ColorPalette,
+  FontFamily,
+  FontSize,
   ThemeName
 } from './theme';
 
-// User types
-export type {
-  User,
-  UserRole,
-  UserPreferences,
-  UserPreferencesState,
-  AuthContextType,
-  InvitationVerificationResult,
-  DashboardLayout,
-  NotificationPreferences,
-  UserPreferencesContextType
-} from './user';
-
-// UserMode types
-export type {
-  UserModeType,
-  UserModeContextType
-} from './userMode';
-
-// Sidebar types
-export type {
-  SidebarContextType
-} from './sidebar';
-
-// Music types
+// Music related types
 export type {
   MusicTrack,
   MusicPlaylist,
   MusicContextType,
   MusicDrawerProps,
-  TrackInfoProps,
-  ProgressBarProps,
-  EmotionMusicParams,
   Track,
+  ProgressBarProps,
+  TrackInfoProps,
   VolumeControlProps,
   MusicLibraryProps
 } from './music';
 
-// Notification types
+// Notification related types
 export type {
   Notification,
-  NotificationType,
-  NotificationPriority,
-  NotificationFrequency,
-  NotificationFilter,
-  NotificationBadge,
+  NotificationPreferences,
   NotificationPreference,
-  NotificationItemProps,
-  NotificationChannels,
+  NotificationFrequency,
+  NotificationType,
   NotificationTone,
-  NotificationSettings
+  NotificationFilter,
+  NotificationItemProps,
+  NotificationChannels
 } from './notification';
 
-// Emotion types
+// Gamification related types
 export type {
-  Emotion,
-  EmotionResult,
-  EnhancedEmotionResult,
-  VoiceEmotionScannerProps,
-  LiveVoiceScannerProps,
-  EmotionalTeamViewProps,
-  TeamOverviewProps
-} from './emotion';
-
-// Dashboard types
-export type {
-  DraggableKpiCardsGridProps,
-  KpiCardProps,
-  DashboardWidgetConfig,
-  GlobalOverviewTabProps,
-  ChartData,
-  DashboardStats,
-  GamificationData,
-  GridPosition
-} from './dashboard';
-
-// Gamification types
-export type {
-  GamificationStats,
-  Badge,
   Challenge,
-  Period,
+  GamificationStats,
   LeaderboardEntry
 } from './gamification';
 
-// VR types
+// Audio player related types
 export type {
-  VRSessionTemplate,
+  UseAudioPlayerStateReturn,
+  AudioTrack,
+  AudioPlayerContextType
+} from './audio-player';
+
+// VR related types
+export type {
   VRSession,
+  VRSessionTemplate,
   VRHistoryListProps,
   VRSessionHistoryProps,
   VRSessionWithMusicProps
 } from './vr';
 
-// Chat types
+// Other shared types
 export type {
-  ChatMessage,
-  ChatResponse,
-  ChatResponseType,
-  ChatConversation,
-  ChatParticipant
-} from './chat';
-
-// Audio types
-export type {
-  AudioTrack,
-  AudioPlayerState,
-  AudioPlayerContextType,
-  UseAudioPlayerStateReturn
-} from './audio';
-
-// Journal types
-export type {
+  Period,
+  Badge,
+  UserModeType,
+  UserModeContextType,
   JournalEntry
-} from './journal';
+} from './types';
 
-// Activity types
-export type {
-  ActivityTabView,
-  ActivityFiltersState,
-  AnonymousActivity,
-  ActivityStats
-} from './activity';
+// Re-export SidebarContextType
+export type { SidebarContextType } from './sidebar';
 
-// Community types
+// Dashboard related types
 export type {
-  Post,
-  Comment,
-  CommunityStats
-} from './community';
+  KpiCardProps,
+  DraggableKpiCardsGridProps,
+  GlobalOverviewTabProps,
+  DashboardWidgetConfig,
+  GamificationData
+} from './dashboard';
 
-// Calendar types
+// Emotion related types
 export type {
-  CalendarEvent,
-  CalendarEventType,
-  RecurrenceRule,
-  CalendarSettings
-} from './calendar';
-
-// AI types
-export type {
-  AIAssistant,
-  AIInteraction,
-  AIMessage,
-  AIRecommendation
-} from './ai';
-
-// Group types
-export type {
-  Group,
-  GroupMember,
-  GroupPost
-} from './group';
-
-// Mood types
-export type {
-  MoodData,
-  MoodTrend,
-  MoodInsight,
-  MoodStatistics
-} from './mood';
-
-// UI types
-export type {
-  Toast,
-  ToastAction
-} from './ui';
+  Emotion,
+  EmotionResult,
+  EnhancedEmotionResult,
+  EmotionalTeamViewProps,
+  LiveVoiceScannerProps,
+  VoiceEmotionScannerProps,
+  TeamOverviewProps
+} from './emotion';
 
 // Export additional types needed for backward compatibility
 export * from './types';
