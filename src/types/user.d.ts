@@ -44,7 +44,7 @@ export interface UserPreferences {
 export interface NotificationPreferences {
   enabled: boolean;
   emailEnabled: boolean;
-  pushEnabled: boolean;
+  pushEnabled?: boolean;
   inAppEnabled?: boolean;
   frequency: NotificationFrequency | string;
   types?: {

@@ -1,6 +1,7 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserModeType, UserModeContextType } from '@/types/userMode';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 // Create a default context value
 const defaultUserModeContext: UserModeContextType = {
@@ -16,9 +17,27 @@ const UserModeContext = createContext<UserModeContextType>(defaultUserModeContex
 export const useUserMode = () => useContext(UserModeContext);
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mode, setMode] = useState<UserModeType>('b2c');
-  const [userMode, setUserMode] = useState<UserModeType>('b2c');
   const [isLoading, setIsLoading] = useState(false);
+  const [storedMode, setStoredMode] = useLocalStorage<UserModeType>('userMode', 'b2c');
+  
+  // Use the stored mode from localStorage as the initial state
+  const [mode, setMode] = useState<UserModeType>(storedMode);
+  const [userMode, setUserModeState] = useState<UserModeType>(storedMode);
+  
+  // Function to update both state and localStorage
+  const setUserMode = (newMode: UserModeType) => {
+    setUserModeState(newMode);
+    setStoredMode(newMode);
+  };
+
+  // Sync state with localStorage on mount
+  useEffect(() => {
+    const savedMode = localStorage.getItem('userMode');
+    if (savedMode && (savedMode === 'b2c' || savedMode === 'b2b')) {
+      setMode(savedMode as UserModeType);
+      setUserModeState(savedMode as UserModeType);
+    }
+  }, []);
 
   return (
     <UserModeContext.Provider value={{ 
