@@ -63,6 +63,29 @@ export const saveEmotion = async (emotion: Partial<EmotionResult>): Promise<Emot
   return createEmotionEntry(emotion);
 };
 
+export const fetchEmotionHistory = async (userId: string) => {
+  // Mock implementation to simulate fetching emotion history
+  console.log('Fetching emotion history for user:', userId);
+  
+  // This would fetch from a database in a real implementation
+  return [
+    await fetchLatestEmotion(userId),
+    {
+      id: uuid(),
+      user_id: userId,
+      emotion: 'happy',
+      score: 85,
+      confidence: 0.9,
+      date: new Date(Date.now() - 86400000).toISOString(),
+      emojis: ['😊', '😁'],
+      recommendations: [
+        'Share your positive feelings with someone',
+        'Use this energy for something creative'
+      ]
+    }
+  ].filter(Boolean);
+};
+
 // Helper functions
 function getEmojisForEmotion(emotion: string): string[] {
   const emojiMap: Record<string, string[]> = {
