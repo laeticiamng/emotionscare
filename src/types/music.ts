@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 
 export interface MusicTrack {
   id: string;
@@ -5,29 +6,33 @@ export interface MusicTrack {
   artist: string;
   duration: number;
   url: string;
-  audioUrl?: string;
-  audio_url?: string; // Pour la compatibilité
   coverUrl?: string;
-  cover?: string; // Pour la compatibilité
-  cover_url?: string; // Pour la compatibilité
+  cover?: string;
+  audioUrl?: string;
   emotion?: string;
   genre?: string;
-  album?: string;
-}
-
-export interface Track extends MusicTrack {
-  // Propriétés additionnelles si nécessaires
 }
 
 export interface MusicPlaylist {
   id: string;
-  name: string;
   title?: string;
+  name?: string;
   description?: string;
-  coverUrl?: string;
   tracks: MusicTrack[];
   category?: string;
-  emotion?: string; // Ajouté pour les playlists basées sur les émotions
+  emotion?: string;
+  coverUrl?: string;
+  featured?: boolean;
+}
+
+export interface MusicLibraryProps {
+  playlists?: MusicPlaylist[];
+  onSelectTrack: (track: MusicTrack) => void;
+  onSelectPlaylist: (playlist: MusicPlaylist) => void;
+}
+
+export interface Track extends MusicTrack {
+  // Propriétés additionnelles si nécessaires
 }
 
 export interface MusicContextType {

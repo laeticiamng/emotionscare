@@ -47,7 +47,8 @@ export type {
   ProgressBarProps,
   EmotionMusicParams,
   Track,
-  VolumeControlProps
+  VolumeControlProps,
+  MusicLibraryProps
 } from './music';
 
 // Notification types
@@ -119,7 +120,8 @@ export type {
 export type {
   AudioTrack,
   AudioPlayerState,
-  AudioPlayerContextType
+  AudioPlayerContextType,
+  UseAudioPlayerStateReturn
 } from './audio';
 
 // Journal types

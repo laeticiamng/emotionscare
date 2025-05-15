@@ -6,7 +6,7 @@ export interface SidebarContextType {
   open: () => void;
   expanded: boolean;
   collapsed: boolean;
-  setExpanded?: (expanded: boolean) => void;
-  toggleExpanded?: () => void;
+  setExpanded: (expanded: boolean) => void;
+  toggleExpanded: () => void;
   toggleCollapsed: () => void;
 }

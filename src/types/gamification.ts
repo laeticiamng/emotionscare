@@ -1,64 +1,89 @@
 
-import { Badge } from './types';
+import { User } from './user';
 
 export interface GamificationStats {
   points: number;
   level: number;
-  rank: string;
-  badges: Badge[];
-  streak: number;
-  completedChallenges: number;
-  totalChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  nextLevelPoints: number;
-  progressToNextLevel: number;
-  totalPoints: number;
-  badgesCount: number;
-  challenges: Challenge[];
-  recentAchievements: any[];
-  nextLevel: number | {
+  badges: number;
+  rank?: string;
+  streak?: number;
+  completedChallenges?: number;
+  totalChallenges?: number;
+  nextLevel?: {
     points: number;
-    rewards: string[];
+    level: number;
+    progress: number;
   };
-  achievements?: any[];
-  currentLevel: number;
-  pointsToNextLevel: number;
-  lastActivityDate: string;
-  leaderboard?: any[];
+  progress?: number;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  threshold?: number;
+  type?: string;
+  imageUrl?: string;
+  image_url?: string;
+  unlocked?: boolean;
+  category?: string;
+  level?: string | number;
+  points?: number;
+  user_id?: string;
+  icon_url?: string;
+  total_required?: number;
+  image?: string;
+  dateEarned?: string;
+  awarded_at?: Date | string;
+  unlockedAt?: Date | string; // Add for compatibility
+  progress?: number; // Add for compatibility
 }
 
 export interface Challenge {
   id: string;
   title: string;
-  name?: string;
   description: string;
-  type: string;
-  progress: number;
-  goal?: number;
-  target?: number;
-  reward: number | string;
-  status: 'active' | 'completed' | 'failed' | 'expired' | 'pending';
+  points: number;
   deadline?: string;
-  startDate: string;
+  completed?: boolean;
+  complete?: boolean; // Add for compatibility
+  progress?: number;
   category?: string;
   icon?: string;
-  isTeamChallenge?: boolean;
-  total?: number;
-  completed?: boolean;
-  points?: number;
-  expiresAt?: string;
+  difficulty?: string;
+  requiredCount?: number;
+  currentCount?: number;
+  imageUrl?: string;
+}
+
+export interface Period {
+  id: string;
+  name: string;
+  value: string;
+  label: string;
 }
 
 export interface LeaderboardEntry {
-  userId: string;
-  name?: string;
-  avatarUrl?: string;
-  points: number;
+  id: string;
+  user: User | string;
+  userId?: string;
+  user_id?: string;
   rank: number;
-  badges?: number;
-  level: number;
-  completedChallenges?: number;
+  points: number;
+  level?: number;
+  avatarUrl?: string;
+  avatar_url?: string;
+  name?: string;
+  change?: number;
+  trend?: 'up' | 'down' | 'same';
 }
 
-export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
+export interface GamificationSettings {
+  enabled: boolean;
+  showPoints: boolean;
+  showLeaderboard: boolean;
+  showAchievements: boolean;
+  showChallenges: boolean;
+  notificationsEnabled: boolean;
+}

@@ -1,27 +1,29 @@
 
-import { NotificationFilter } from '@/types/notification';
+import { Notification, NotificationFilter } from '@/types';
 
-// Extend the NotificationFilter prototype to add toString method
-export const extendNotificationFilter = (filter: NotificationFilter): NotificationFilter => {
-  const extended = filter as NotificationFilter & { toString: () => string };
-  
-  // Add toString method to allow string comparisons
-  extended.toString = function() {
-    if (this.type) {
-      return this.type;
-    }
-    
-    if (this.read === false) {
-      return 'unread';
-    }
-    
-    return 'all';
-  };
-  
-  return extended;
+export const filterNotifications = (
+  notifications: Notification[],
+  filter: NotificationFilter
+): Notification[] => {
+  if (!notifications || notifications.length === 0) {
+    return [];
+  }
+
+  switch (filter) {
+    case 'all':
+      return notifications;
+    case 'unread':
+      return notifications.filter(notification => !notification.read);
+    default:
+      // For specific notification types (system, emotion, etc.)
+      if (typeof filter === 'string') {
+        return notifications.filter(notification => notification.type === filter);
+      }
+      return notifications;
+  }
 };
 
-// Helper to create a notification filter with toString method
-export const createNotificationFilter = (options: Partial<NotificationFilter> = {}): NotificationFilter => {
-  return extendNotificationFilter(options as NotificationFilter);
+export const getUnreadCount = (notifications: Notification[]): number => {
+  if (!notifications) return 0;
+  return notifications.filter(notification => !notification.read).length;
 };

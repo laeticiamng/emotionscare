@@ -9,7 +9,9 @@ const SidebarContext = createContext<SidebarContextType>({
   open: () => {},
   collapsed: false,
   expanded: true,
-  toggleCollapsed: () => {}
+  toggleCollapsed: () => {},
+  setExpanded: () => {},
+  toggleExpanded: () => {}
 });
 
 export const useSidebar = () => {
@@ -36,6 +38,8 @@ export const SidebarProvider = ({
   const close = () => setIsOpen(false);
   const open = () => setIsOpen(true);
   const toggleCollapsed = () => setCollapsed(prev => !prev);
+  const setExpanded = (expanded: boolean) => setCollapsed(!expanded);
+  const toggleExpanded = () => setCollapsed(prev => !prev);
   
   // Listen for escape key to close sidebar
   useEffect(() => {
@@ -58,7 +62,9 @@ export const SidebarProvider = ({
         open,
         collapsed,
         expanded: !collapsed,
-        toggleCollapsed
+        toggleCollapsed,
+        setExpanded,
+        toggleExpanded
       }}
     >
       {children}

@@ -1,45 +1,53 @@
 
+import { MusicTrack } from './music';
+
 export interface AudioTrack {
   id: string;
-  title: string;
-  artist?: string;
-  duration: number;
   url: string;
-  coverUrl?: string;
-  type?: 'meditation' | 'relaxation' | 'sleep' | 'focus';
-  description?: string;
+  title: string;
+  artist: string;
+  cover?: string;
+  duration: number;
 }
 
 export interface AudioPlayerState {
-  currentTrack: AudioTrack | null;
   isPlaying: boolean;
-  volume: number;
-  progress: number;
+  currentTime: number;
   duration: number;
+  volume: number;
+  muted: boolean;
   loading: boolean;
-  error: string | null;
 }
 
 export interface AudioPlayerContextType {
-  // État du lecteur
-  currentTrack: AudioTrack | null;
-  isPlaying: boolean;
-  volume: number;
-  isMuted: boolean;
-  progress: number;
-  duration: number;
-  loading: boolean;
-  error: string | null;
-  
-  // Contrôles de lecture
-  playTrack: (track: AudioTrack) => void;
-  pauseTrack: () => void;
-  resumeTrack: () => void;
+  play: () => void;
+  pause: () => void;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   seekTo: (time: number) => void;
-  
-  // Formatage
-  formatTime: (seconds: number) => string;
+  state: AudioPlayerState;
+  currentTrack: AudioTrack | null;
+  playTrack: (track: AudioTrack) => void;
+}
+
+export interface UseAudioPlayerStateReturn {
+  isPlaying: boolean;
+  currentTrack: MusicTrack | null;
+  duration: number;
+  currentTime: number;
+  volume: number;
+  muted: boolean;
+  loading: boolean;
+  error: Error | null;
+  setIsPlaying: (isPlaying: boolean) => void;
+  setCurrentTrack: (track: MusicTrack | null) => void;
+  setDuration: (duration: number) => void;
+  setCurrentTime: (time: number) => void;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setLoadingTrack: (loading: boolean) => void;
+  setProgress: (progress: number) => void;
 }

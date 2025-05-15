@@ -11,4 +11,5 @@ export interface UserModeContextType {
   setMode: (mode: UserModeType) => void;
   userMode?: UserModeType;
   setUserMode?: (mode: UserModeType) => void;
+  isLoading?: boolean;
 }

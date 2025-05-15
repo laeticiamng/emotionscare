@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { UserPreferences, NotificationPreferences } from '@/types';
+import { UserPreferences, NotificationPreference } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
 import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
@@ -65,7 +64,7 @@ const PreferencesForm = ({ defaultActiveTab = "theme", onSave, onCancel }: Prefe
   };
 
   // Fonction pour mettre à jour les notifications
-  const updateNotifications = (notificationData: Partial<NotificationPreferences>) => {
+  const updateNotifications = (notificationData: Partial<NotificationPreference>) => {
     const currentNotifications = 
       typeof formPreferences.notifications === 'boolean' 
         ? { enabled: formPreferences.notifications, emailEnabled: false }

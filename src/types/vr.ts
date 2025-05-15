@@ -1,4 +1,3 @@
-
 import { MusicTrack } from './music';
 
 // VR Session Template pour les expériences VR prédéfinies
@@ -49,11 +48,12 @@ export interface VRSession {
   templateId?: string;
   started_at: string;
   startedAt?: string;
+  startTime?: string; // Added for compatibility
   start_time?: string;
   completedAt?: string;
   completed_at?: string;
+  endTime?: string; // Added for compatibility
   end_time?: string;
-  endTime?: string;
   completed?: boolean;
   isCompleted?: boolean;
   duration: number;
@@ -63,6 +63,8 @@ export interface VRSession {
   emotionBefore?: string;
   emotion_after?: string;
   emotionAfter?: string;
+  emotionTarget?: string; // Added for compatibility
+  emotion_target?: string;
   rating?: number;
   notes?: string;
   template?: VRSessionTemplate;

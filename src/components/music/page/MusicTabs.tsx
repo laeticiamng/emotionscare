@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LibraryTab from './LibraryTab';
 import PlayerTab from './PlayerTab';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types';
 
 const MusicTabs: React.FC = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
@@ -21,14 +21,16 @@ const MusicTabs: React.FC = () => {
           title: 'Méditation guidée',
           artist: 'Calm Voices',
           duration: 600,
-          coverUrl: '/images/covers/meditation.jpg'
+          coverUrl: '/images/covers/meditation.jpg',
+          url: '/audio/meditation.mp3'
         },
         {
           id: '102',
           title: 'Sons de la forêt',
           artist: 'Nature Sounds',
           duration: 480,
-          coverUrl: '/images/covers/forest.jpg'
+          coverUrl: '/images/covers/forest.jpg',
+          url: '/audio/forest.mp3'
         }
       ],
       category: 'Relaxation'

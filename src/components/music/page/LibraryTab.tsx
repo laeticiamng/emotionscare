@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MusicLibraryProps, MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicLibraryProps, MusicTrack, MusicPlaylist } from '@/types';
 
 const LibraryTab: React.FC<MusicLibraryProps> = ({ 
   playlists = [], 

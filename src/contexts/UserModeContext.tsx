@@ -7,16 +7,21 @@ interface UserModeContextType {
   setMode: (mode: UserModeType) => void;
   userMode?: UserModeType;
   setUserMode?: (mode: UserModeType) => void;
+  isLoading: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
 
 export const UserModeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setMode] = useState<UserModeType>('b2c');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSetMode = (newMode: UserModeType) => {
     // Normalize b2b_user to B2B-USER, etc. if needed
     let normalizedMode: UserModeType = newMode;
+    
+    // Set loading state when changing mode
+    setIsLoading(true);
     
     // Handle different case variations for the user mode
     if (typeof newMode === 'string') {
@@ -30,6 +35,7 @@ export const UserModeProvider = ({ children }: { children: ReactNode }) => {
     }
     
     setMode(normalizedMode);
+    setTimeout(() => setIsLoading(false), 300); // Simulate loading
   };
 
   return (
@@ -38,7 +44,8 @@ export const UserModeProvider = ({ children }: { children: ReactNode }) => {
         mode, 
         setMode: handleSetMode,
         userMode: mode,
-        setUserMode: handleSetMode
+        setUserMode: handleSetMode,
+        isLoading
       }}
     >
       {children}
