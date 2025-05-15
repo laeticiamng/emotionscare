@@ -1,8 +1,8 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'xl';
-export type FontFamily = 'system-ui' | 'sans-serif' | 'serif' | 'monospace' | 'sans' | 'serif' | 'mono' | 'inter';
-export type ThemeName = 'light' | 'dark' | 'system';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xx-large' | 'extra-large';
+export type FontFamily = 'default' | 'serif' | 'mono' | 'sans' | 'inter' | 'system-ui';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export interface ThemeContextType {
   theme: Theme;
@@ -15,20 +15,22 @@ export interface ThemeContextType {
 }
 
 export interface ThemeButtonProps {
-  theme: Theme;
-  onClick: () => void;
-  isActive?: boolean;
+  variant?: 'icon' | 'text' | 'both';
+  showLabel?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export interface ThemeSwitcherProps {
-  currentTheme: Theme;
-  onChange: (theme: Theme) => void;
+  variant?: 'dropdown' | 'button' | 'toggle';
+  position?: 'navbar' | 'sidebar' | 'footer';
 }
 
 export interface ColorPalette {
   primary: string;
   secondary: string;
-  background: string;
-  text: string;
   accent: string;
+  background: string;
+  foreground: string;
+  muted: string;
+  card: string;
 }

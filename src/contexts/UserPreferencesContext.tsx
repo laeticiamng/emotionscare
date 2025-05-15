@@ -1,56 +1,81 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { DEFAULT_USER_PREFERENCES } from '@/constants/defaults';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { UserPreferences } from '@/types';
 
 interface UserPreferencesContextType {
-  preferences: {
-    theme: string;
-    fontSize: string;
-    language: string;
-    ambientSound?: boolean;
-    notifications: {
-      enabled: boolean;
-      emailEnabled: boolean;
-      pushEnabled: boolean;
-      frequency: string;
-      types: Record<string, boolean>;
-      tone: string;
-      quietHours: {
-        enabled: boolean;
-        start: string;
-        end: string;
-      };
-    };
-  };
-  updatePreferences: (newPreferences: Partial<UserPreferencesContextType['preferences']>) => void;
+  preferences: UserPreferences;
+  updatePreferences: (prefs: Partial<UserPreferences>) => Promise<void>;
+  isLoading: boolean;
+  error: Error | null;
 }
 
-// Export the context so it can be imported in other files
-export const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
+export const UserPreferencesContext = createContext<UserPreferencesContextType>({
+  preferences: {
+    theme: 'system',
+    fontSize: 'medium',
+    fontFamily: 'default',
+    language: 'en',
+    notifications: false
+  },
+  updatePreferences: async () => {},
+  isLoading: false,
+  error: null
+});
 
-export const UserPreferencesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [preferences, setPreferences] = useState(DEFAULT_USER_PREFERENCES);
+export const UserPreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    theme: 'system',
+    fontSize: 'medium',
+    fontFamily: 'default',
+    language: 'en',
+    notifications: false
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
+  // Load preferences from storage or API
   useEffect(() => {
-    // Load preferences from localStorage if available
-    const savedPreferences = localStorage.getItem('userPreferences');
-    if (savedPreferences) {
+    const loadPreferences = async () => {
+      setIsLoading(true);
       try {
-        setPreferences(JSON.parse(savedPreferences));
-      } catch (error) {
-        console.error('Failed to parse saved preferences:', error);
+        // Mock loading preferences from storage
+        const storedPrefs = localStorage.getItem('userPreferences');
+        if (storedPrefs) {
+          setPreferences(JSON.parse(storedPrefs));
+        }
+      } catch (err) {
+        console.error('Error loading preferences:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error loading preferences'));
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    loadPreferences();
   }, []);
 
-  const updatePreferences = (newPreferences: Partial<typeof preferences>) => {
-    const updated = { ...preferences, ...newPreferences };
-    setPreferences(updated);
-    localStorage.setItem('userPreferences', JSON.stringify(updated));
+  const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
+    setIsLoading(true);
+    try {
+      const updatedPrefs = { ...preferences, ...newPrefs };
+      setPreferences(updatedPrefs);
+      
+      // Mock saving to storage/API
+      localStorage.setItem('userPreferences', JSON.stringify(updatedPrefs));
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (err) {
+      console.error('Error updating preferences:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error updating preferences'));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <UserPreferencesContext.Provider value={{ preferences, updatePreferences }}>
+    <UserPreferencesContext.Provider value={{ preferences, updatePreferences, isLoading, error }}>
       {children}
     </UserPreferencesContext.Provider>
   );

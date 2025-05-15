@@ -1,52 +1,52 @@
 
 export interface GamificationStats {
-  total_scans: number;
-  streak_days: number;
   points: number;
   level: number;
-  next_milestone: number;
-  badges_earned: string[];
-  highest_emotion: string;
-  emotional_balance: number;
+  badges: Badge[];
+  challenges: Challenge[];
+  streak: number;
+}
+
+export interface GamificationData {
+  totalPoints: number;
+  level: number;
+  badges: number;
+  progress: number;
+  nextLevel: number;
+  streakDays: number;
+  completedChallenges: number;
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon?: string;
-  image_url?: string;
-  unlocked: boolean;
-  unlocked_at?: string;
+  icon: string;
+  earnedAt?: string;
   progress?: number;
   category?: string;
-  points?: number;
-  criteria?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
 }
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
-  points: number;
-  status: 'active' | 'completed' | 'failed' | 'upcoming';
-  progress?: number;
-  deadline?: string;
+  reward: number;
+  progress: number;
+  total: number;
+  completed: boolean;
+  expiresAt?: string;
   category?: string;
-  icon?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  criteria?: string;
-  reward?: any;
+}
+
+export interface LeaderboardEntry {
+  userId: string;
+  name: string;
+  avatar?: string;
+  points: number;
+  rank: number;
+  level: number;
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  points: number;
-  level: number;
-  position: number;
-  avatar?: string;
-  badges?: any[];
-}

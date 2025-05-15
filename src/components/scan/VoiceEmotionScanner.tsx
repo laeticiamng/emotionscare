@@ -1,49 +1,32 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Mic, MicOff, Loader } from 'lucide-react';
 import { VoiceEmotionScannerProps, EmotionResult } from '@/types';
+import { analyzeEmotion } from '@/lib/scanService';
 
-export const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ 
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ 
   onResult,
-  autoStart = false,
-  duration = 30
+  duration = 15,
+  autoStart = false
 }) => {
-  const [isRecording, setIsRecording] = React.useState(false);
-  const [timeLeft, setTimeLeft] = React.useState(duration);
-  
-  const startRecording = () => {
-    setIsRecording(true);
-    setTimeLeft(duration);
-  };
-  
-  const stopRecording = () => {
-    setIsRecording(false);
-    
-    // Create mock result
-    const mockResult: EmotionResult = {
-      emotion: 'calm',
-      score: 0.75,
-      confidence: 0.8,
-      timestamp: new Date().toISOString(),
-      transcript: "This is a sample transcript from voice analysis",
-      feedback: "Your voice indicates a calm and composed emotional state"
-    };
-    
-    if (onResult) {
-      onResult(mockResult);
-    }
-  };
-  
-  React.useEffect(() => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(duration);
+  const [transcript, setTranscript] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  useEffect(() => {
     if (autoStart) {
       startRecording();
     }
   }, [autoStart]);
-  
-  React.useEffect(() => {
-    let timer: number;
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
     
     if (isRecording && timeLeft > 0) {
-      timer = window.setTimeout(() => {
+      timer = setInterval(() => {
         setTimeLeft(prev => prev - 1);
       }, 1000);
     } else if (isRecording && timeLeft === 0) {
@@ -51,45 +34,109 @@ export const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
     }
     
     return () => {
-      clearTimeout(timer);
+      if (timer) clearInterval(timer);
     };
   }, [isRecording, timeLeft]);
-  
+
+  const startRecording = () => {
+    setIsRecording(true);
+    setTimeLeft(duration);
+    setTranscript('');
+    
+    // Simulate receiving transcription
+    const mockPhrases = [
+      "I'm feeling really happy today.",
+      "The project is going well, I'm excited.",
+      "I had a great time with my friends yesterday."
+    ];
+    
+    setTimeout(() => {
+      setTranscript(mockPhrases[Math.floor(Math.random() * mockPhrases.length)]);
+    }, 3000);
+  };
+
+  const stopRecording = async () => {
+    setIsRecording(false);
+    setIsAnalyzing(true);
+    
+    try {
+      // Process the transcript
+      if (transcript) {
+        const result = await analyzeEmotion(transcript);
+        
+        // Add transcript to result
+        const fullResult: EmotionResult = {
+          ...result,
+          transcript
+        };
+        
+        if (onResult) {
+          onResult(fullResult);
+        }
+      }
+    } catch (error) {
+      console.error('Error analyzing voice emotion:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   return (
-    <div className="p-4 bg-gray-50 rounded-lg shadow-sm">
-      <h3 className="text-lg font-medium mb-3">Voice Emotion Scanner</h3>
-      
-      <div className="space-y-4">
-        {isRecording ? (
-          <div className="text-center">
-            <div className="inline-block w-16 h-16 rounded-full bg-red-100 flex items-center justify-center animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-red-500"></div>
-            </div>
-            <p className="mt-2 text-sm font-medium">Recording... {timeLeft}s</p>
-            <button 
-              onClick={stopRecording}
-              className="mt-3 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+    <Card>
+      <CardHeader>
+        <CardTitle>Voice Emotion Scanner</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex justify-center mb-4">
+          <div className="relative w-20 h-20">
+            <Button
+              variant={isRecording ? "destructive" : "default"}
+              size="icon"
+              className="w-full h-full rounded-full"
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isAnalyzing}
             >
-              Stop
-            </button>
+              {isRecording ? <MicOff className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
+            </Button>
+            {isRecording && (
+              <svg className="absolute -inset-2" viewBox="0 0 100 100">
+                <circle
+                  className="stroke-primary fill-none"
+                  strokeWidth="4"
+                  cx="50"
+                  cy="50"
+                  r="48"
+                  strokeDasharray="301.59"
+                  strokeDashoffset={301.59 * (1 - timeLeft / duration)}
+                  style={{ transition: 'stroke-dashoffset 1s linear' }}
+                />
+              </svg>
+            )}
           </div>
-        ) : (
-          <button
-            onClick={startRecording}
-            className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-            </svg>
-            Start Voice Analysis
-          </button>
+        </div>
+        
+        {isRecording && (
+          <div className="text-center">
+            <p className="text-xl font-medium">Recording: {timeLeft}s</p>
+            <p className="text-sm text-muted-foreground mt-1">Speak clearly and naturally</p>
+          </div>
         )}
         
-        <p className="text-sm text-gray-500">
-          Speak clearly for {duration} seconds to analyze your emotional state through voice patterns
-        </p>
-      </div>
-    </div>
+        {transcript && (
+          <div className="p-3 bg-muted/30 rounded-md">
+            <p className="font-medium mb-1">Transcript:</p>
+            <p className="text-sm">{transcript}</p>
+          </div>
+        )}
+        
+        {isAnalyzing && (
+          <div className="flex items-center justify-center gap-2 py-2">
+            <Loader className="animate-spin h-4 w-4" />
+            <span className="text-sm">Analyzing emotion...</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

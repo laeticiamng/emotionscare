@@ -16,3 +16,43 @@ export interface TeamOverviewProps {
   period?: string;
   onPeriodChange?: (period: string) => void;
 }
+
+export interface EmotionResult {
+  emotion: string;
+  score?: number;
+  confidence?: number;
+  feedback?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  transcript?: string;
+  emojis?: string[] | string;
+  timestamp?: string | Date;
+  [key: string]: any;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  triggers?: string[];
+  insights?: string[];
+  intensity?: number;
+  duration?: number;
+  relatedEmotions?: string[];
+}
+
+export interface Emotion {
+  name: string;
+  value: number;
+  color: string;
+  description?: string;
+  icon?: string;
+}
+
+export interface EmotionalTeamViewProps {
+  className?: string;
+  teamId: string;
+  userId: string;
+  period: string;
+  dateRange: {
+    start: Date;
+    end: Date;
+  };
+}

@@ -1,142 +1,49 @@
-// This is a mock implementation of a scan service for emotion detection
-// In a real application, this would connect to a backend API or ML model
 
-import { EmotionResult, EnhancedEmotionResult } from '@/types';
+import { EmotionResult } from '@/types';
 
-// Analyze text for emotional content
-export const analyzeText = async (text: string): Promise<EmotionResult> => {
-  // Mock implementation - would be replaced with actual API call
-  const emotions = ['happy', 'sad', 'angry', 'neutral', 'surprised', 'fearful'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  // This is a mock implementation - in a real application, this would call an API
+  console.log('Analyzing emotion for text:', text);
   
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // Return mock result
   return {
-    emotion: randomEmotion,
-    score: Math.random(),
-    confidence: 0.7 + Math.random() * 0.3,
-    timestamp: new Date().toISOString(),
-    text: text,
-    feedback: `Your text indicates a ${randomEmotion} emotional state.`
+    emotion: 'calm',
+    confidence: 0.85,
+    feedback: 'You seem to be in a calm and balanced state of mind.',
+    recommendations: [
+      'Consider maintaining this state with some mindfulness exercises',
+      'Take a moment to appreciate your current emotional balance',
+      'This would be a good time for creative activities'
+    ],
+    timestamp: new Date().toISOString()
   };
 };
 
-// Analyze audio for emotional content
-export const analyzeAudio = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // Mock implementation - would be replaced with actual API call
-  const emotions = ['calm', 'excited', 'stressed', 'relaxed', 'focused'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+export const fetchEmotionsHistory = async (userId: string, period?: string): Promise<EmotionResult[]> => {
+  // Mock implementation
+  console.log(`Fetching emotion history for user ${userId} for period ${period}`);
   
-  return {
-    emotion: randomEmotion,
-    score: Math.random(),
-    confidence: 0.6 + Math.random() * 0.4,
-    timestamp: new Date().toISOString(),
-    audioLength: Math.floor(Math.random() * 30) + 10, // seconds
-    feedback: `Your voice indicates a ${randomEmotion} emotional state.`
-  };
-};
-
-// Analyze facial expression for emotional content
-export const analyzeFacial = async (imageBlob: Blob): Promise<EmotionResult> => {
-  // Mock implementation - would be replaced with actual API call
-  const emotions = ['happy', 'sad', 'angry', 'neutral', 'surprised'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
   
-  return {
-    emotion: randomEmotion,
-    score: Math.random(),
-    confidence: 0.5 + Math.random() * 0.5,
-    timestamp: new Date().toISOString(),
-    faceDetected: true,
-    feedback: `Your facial expression indicates a ${randomEmotion} emotional state.`
-  };
-};
-
-// Get enhanced emotion analysis with recommendations
-export const getEnhancedAnalysis = async (result: EmotionResult): Promise<EnhancedEmotionResult> => {
-  // Mock implementation - would be replaced with actual API call
-  const recommendations = [
-    'Take a short break',
-    'Practice deep breathing',
-    'Listen to calming music',
-    'Go for a walk',
-    'Write in your journal'
-  ];
+  // Generate mock history data
+  const emotions = ['joy', 'calm', 'sadness', 'anxiety', 'excitement'];
+  const history: EmotionResult[] = [];
   
-  const randomRecommendations = recommendations
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 2);
-  
-  return {
-    ...result,
-    triggers: ['Work stress', 'Lack of sleep'],
-    recommendations: randomRecommendations,
-    insights: `Your ${result.emotion} state might be affecting your productivity.`,
-    historicalContext: 'Your emotional pattern shows improvement over the last week.'
-  };
-};
-
-// Save emotion scan result to user history
-export const saveEmotionResult = async (userId: string, result: EmotionResult): Promise<boolean> => {
-  // Mock implementation - would save to database in real app
-  console.log(`Saving emotion result for user ${userId}:`, result);
-  return true;
-};
-
-export const fetchEmotionHistory = async (userId: string, startDate?: string, endDate?: string) => {
-  // Implement fetching emotion history
-  // This is a mock implementation
-  return [];
-};
-
-// Provide an alias for backwards compatibility
-export const fetchEmotionsHistory = fetchEmotionHistory;
-
-// Get emotion trends for a user
-export const getEmotionTrends = async (userId: string, period: string = 'week'): Promise<any> => {
-  // Mock implementation - would be replaced with actual API call
-  return {
-    dominant: 'calm',
-    improvement: 12,
-    trends: {
-      happy: [0.4, 0.5, 0.6, 0.7, 0.6, 0.8, 0.7],
-      sad: [0.3, 0.2, 0.2, 0.1, 0.2, 0.1, 0.1],
-      angry: [0.2, 0.3, 0.1, 0.1, 0.1, 0.0, 0.1],
-      neutral: [0.1, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1]
-    },
-    period: period,
-    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    endDate: new Date().toISOString()
-  };
-};
-
-// Get team emotion data
-export const getTeamEmotions = async (teamId: string): Promise<any[]> => {
-  // Mock implementation - would be replaced with actual API call
-  const mockTeamData = [];
-  const emotions = ['happy', 'calm', 'focused', 'stressed', 'neutral'];
-  
-  for (let i = 0; i < 8; i++) {
-    mockTeamData.push({
-      userId: `user-${i}`,
-      anonymousId: `anon-${i}`,
+  for (let i = 0; i < 10; i++) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    
+    history.push({
       emotion: emotions[Math.floor(Math.random() * emotions.length)],
-      score: 0.5 + Math.random() * 0.5,
-      timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
+      confidence: 0.7 + Math.random() * 0.3,
+      timestamp: date.toISOString(),
+      score: Math.floor(Math.random() * 100)
     });
   }
   
-  return mockTeamData;
-};
-
-// Export default for easier importing
-export default {
-  analyzeText,
-  analyzeAudio,
-  analyzeFacial,
-  getEnhancedAnalysis,
-  saveEmotionResult,
-  fetchEmotionHistory,
-  fetchEmotionsHistory,
-  getEmotionTrends,
-  getTeamEmotions
+  return history;
 };

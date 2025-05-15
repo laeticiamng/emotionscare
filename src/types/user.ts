@@ -98,6 +98,13 @@ export interface UserPreferences {
   fullAnonymity?: boolean;
   onboardingCompleted?: boolean;
   colorAccent?: string;
+  incognitoMode?: boolean;
+  lockJournals?: boolean;
+  dataExport?: 'pdf' | 'json' | 'csv';
+  avatarUrl?: string;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
 }
 
 export interface UserPreferencesState {
