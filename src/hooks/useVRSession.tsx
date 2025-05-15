@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { VRSession, VRSessionTemplate } from '@/types/types';
 import { mockVRTemplates } from '@/data/mockVRTemplates';
@@ -32,23 +33,27 @@ export const useVRSession = (userId: string) => {
             id: 'session-1',
             userId: userId,
             templateId: '1',
+            startTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
             startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
             endTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
-            duration_seconds: 300,
+            duration: 300,
+            durationSeconds: 300,
             completed: true,
-            heart_rate_before: 75,
-            heart_rate_after: 68
+            heartRateBefore: 75,
+            heartRateAfter: 68
           },
           {
             id: 'session-2',
             userId: userId,
             templateId: '3',
+            startTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
             startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
             endTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
-            duration_seconds: 900,
+            duration: 900,
+            durationSeconds: 900,
             completed: true,
-            heart_rate_before: 82,
-            heart_rate_after: 70
+            heartRateBefore: 82,
+            heartRateAfter: 70
           }
         ];
 
@@ -75,8 +80,10 @@ export const useVRSession = (userId: string) => {
       id: `session-${Date.now()}`,
       userId: userId,
       templateId: templateId,
+      startTime: new Date().toISOString(),
       startDate: new Date().toISOString(),
-      duration_seconds: template.duration * 60,
+      duration: template.duration,
+      durationSeconds: template.duration * 60,
       completed: false
     };
 
@@ -93,7 +100,7 @@ export const useVRSession = (userId: string) => {
             ...session,
             endTime: new Date().toISOString(),
             completed: true,
-            emotion_after: emotionAfter || session.emotion_after
+            emotionAfter: emotionAfter || session.emotionAfter
           };
         }
         return session;
@@ -108,7 +115,7 @@ export const useVRSession = (userId: string) => {
   const getUserStats = useCallback(() => {
     const completedCount = sessions.filter(s => s.completed).length;
     const totalDuration = sessions.reduce((acc, session) => {
-      return acc + (session.duration_seconds || 0);
+      return acc + (session.durationSeconds || 0);
     }, 0);
     
     return {

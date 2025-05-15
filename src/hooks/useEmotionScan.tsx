@@ -2,12 +2,12 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
-import type { Emotion } from '@/types';
+import type { EmotionResult } from '@/types';
 
 export function useEmotionScan() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastEmotion, setLastEmotion] = useState<Emotion | null>(null);
+  const [lastEmotion, setLastEmotion] = useState<EmotionResult | null>(null);
   const { user } = useAuth();
 
   const scanEmotion = async (input: {

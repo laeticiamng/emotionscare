@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 
@@ -197,6 +198,14 @@ export interface ThemeButtonProps {
   collapsed?: boolean;
 }
 
+export interface SidebarContextType {
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+  isOpen?: boolean;
+  setIsOpen?: (isOpen: boolean) => void;
+  isMobile?: boolean;
+}
+
 export interface InvitationVerificationResult {
   valid: boolean;
   email?: string;
@@ -234,14 +243,6 @@ export interface UserModeContextType {
   isB2C: boolean;
 }
 
-export interface SidebarContextType {
-  collapsed: boolean;
-  toggleCollapsed: () => void;
-  isOpen?: boolean;
-  setIsOpen?: (isOpen: boolean) => void;
-  isMobile?: boolean;
-}
-
 // Team types
 export interface TeamOverviewProps {
   users: User[];
@@ -274,8 +275,8 @@ export interface VRSessionTemplate {
   thumbnail?: string;
   videoUrl?: string;
   emotion?: string;
+  emotionTarget?: string; // Added this property
   audioUrl?: string;
-  emotionTarget?: string;
   lastUsed?: string | Date;
   previewUrl?: string;
   isAudioOnly?: boolean;
@@ -286,6 +287,8 @@ export interface VRSessionTemplate {
   imageUrl?: string;
   completionRate?: number;
   recommendedMood?: string;
+  category?: string; // Added to fix errors
+  emotions?: string[]; // Added to fix errors
   // For backward compatibility
   emotion_target?: string;
   preview_url?: string;
@@ -316,6 +319,7 @@ export interface VRSession {
   heartRateBefore?: number;
   heartRateAfter?: number;
   isCompleted?: boolean;
+  emotions?: string[]; // Added to fix errors
   // For backward compatibility
   template_id?: string;
   user_id?: string;
@@ -381,7 +385,7 @@ export interface Challenge {
   progress?: number;
   total?: number;
   type: 'daily' | 'weekly' | 'one-time' | 'streak' | 'count' | 'completion' | string;
-  category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity' | 'vr' | 'daily' | 'mindfulness' | string;
+  category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity' | 'vr' | 'daily' | 'mindfulness' | 'scan' | string;
   status?: 'complete' | 'in-progress' | 'not-started' | 'completed' | 'ongoing' | 'active' | string;
   completed?: boolean;
   target?: number;
@@ -418,6 +422,7 @@ export interface GamificationStats {
     longest: number;
     lastActivity: string;
   };
+  rewards?: string[]; // Added to fix errors
 }
 
 export interface Badge {
@@ -514,6 +519,7 @@ export interface EmotionResult {
   aiFeedback?: string;
   recommendations?: string[];
   audioUrl?: string;
+  source?: string; // Added for compatibility
   // For backward compatibility
   user_id?: string;
   ai_feedback?: string;
@@ -585,6 +591,11 @@ export interface MusicTrack {
   cover?: string;
   cover_url?: string;
   audio_url?: string;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity: number;
 }
 
 export interface MusicPlaylist {
@@ -740,6 +751,9 @@ export interface EmotionPrediction {
   confidence: number;
   triggers: string[];
   recommendations: string[];
+  name?: string; // Added to fix errors
+  intensity?: number; // Added to fix errors
+  score?: number; // Added to fix errors
 }
 
 export interface Recommendation {
@@ -904,4 +918,18 @@ export interface ChartConfig {
 
 export interface ChartContextProps {
   config: ChartConfig;
+}
+
+export interface DashboardWidgetConfig {
+  id: string;
+  type: string;
+  position: number;
+  title?: string;
+  settings?: {
+    title?: string;
+    value?: string;
+    trend?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
 }

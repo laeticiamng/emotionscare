@@ -132,17 +132,17 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       
       console.log('Audio analysis result:', result);
       
-      // Create emotion object with expected properties
+      // Create emotion object with expected properties - use camelCase
       const emotion: EmotionResult = {
         id: result.id || crypto.randomUUID(),
-        user_id: userId,
+        userId: userId,
         date: new Date().toISOString(),
         emotion: result.emotion,
         confidence: result.confidence || 0.75,
         score: result.score || 50,
         text: result.text || '',
         transcript: result.transcript || '',
-        ai_feedback: result.ai_feedback || result.feedback || '',
+        aiFeedback: result.aiFeedback || result.ai_feedback || result.feedback || '',
         recommendations: result.recommendations || [],
       };
       

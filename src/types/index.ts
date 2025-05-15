@@ -7,7 +7,8 @@ export type {
   Emotion,
   EmotionResult,
   EnhancedEmotionResult,
-  EmotionalTeamViewProps
+  EmotionalTeamViewProps,
+  EmotionalData
 } from './types';
 
 export type {

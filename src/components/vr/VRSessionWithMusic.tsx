@@ -20,8 +20,10 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({
   const activeTemplate = session || template;
   const handleComplete = onSessionComplete || onComplete;
   
+  // Use the emotion prop directly if provided, otherwise look for it in the template
+  // with fallback to 'calm'
   const targetEmotion = emotion || (
-    activeTemplate?.emotion || 'calm'
+    activeTemplate?.emotionTarget || 'calm'
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
