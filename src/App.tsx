@@ -1,19 +1,31 @@
 
-import React from 'react';
-import { Toaster } from 'sonner';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import LandingPage from '@/pages/LandingPage';
+import Selection from '@/pages/common/Selection';
+import B2BSelection from '@/pages/common/B2BSelection';
 
-const App: React.FC = () => {
-  console.log('🚀 App: Rendu du composant App');
-  
+import './App.css';
+
+function App() {
+  useEffect(() => {
+    console.log('App mounted');
+  }, []);
+
   return (
-    <>
-      <div className="min-h-screen bg-background">
-        <h1>Test Affichage</h1>
-        <p>Si ce texte s'affiche, le rendu de base fonctionne.</p>
-      </div>
-      <Toaster position="top-right" />
-    </>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/immersive" element={<HomePage />} />
+      <Route path="/selection" element={<Selection />} />
+      <Route path="/b2b/selection" element={<B2BSelection />} />
+      
+      {/* Ajoutez ici les routes pour le reste de l'application */}
+      
+      {/* Fallback route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
-};
+}
 
 export default App;
