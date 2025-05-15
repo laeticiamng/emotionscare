@@ -15,6 +15,7 @@ const MusicTabs: React.FC = () => {
       id: '1',
       name: 'Relaxation profonde',
       description: 'Sons relaxants pour la méditation',
+      category: 'Relaxation',
       tracks: [
         {
           id: '101',
@@ -22,7 +23,8 @@ const MusicTabs: React.FC = () => {
           artist: 'Calm Voices',
           duration: 600,
           coverUrl: '/images/covers/meditation.jpg',
-          url: '/audio/meditation.mp3'
+          url: '/audio/meditation.mp3',
+          category: 'Relaxation'
         },
         {
           id: '102',
@@ -30,10 +32,10 @@ const MusicTabs: React.FC = () => {
           artist: 'Nature Sounds',
           duration: 480,
           coverUrl: '/images/covers/forest.jpg',
-          url: '/audio/forest.mp3'
+          url: '/audio/forest.mp3',
+          category: 'Nature'
         }
-      ],
-      category: 'Relaxation'
+      ]
     }
   ];
   

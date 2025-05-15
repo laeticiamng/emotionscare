@@ -4,61 +4,46 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  url: string;
+  audioUrl?: string;
+  url?: string;
   coverUrl?: string;
-  image_url?: string;
+  cover?: string;
+  cover_url?: string;
   category?: string;
-  mood?: string;
-  tags?: string[];
-  description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  mood?: string[];
 }
 
 export interface MusicPlaylist {
   id: string;
   name?: string;
   title?: string;
-  description?: string;
   tracks: MusicTrack[];
+  description?: string;
   category?: string;
   coverUrl?: string;
-  image_url?: string;
-  author?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  emotion?: string;
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  progress: number;
+  currentTime: number;
   duration: number;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
-  resumeTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
+  togglePlay: () => void;
   setVolume: (volume: number) => void;
-  setProgress: (progress: number) => void;
-  toggleMute: () => void;
-  isMuted: boolean;
+  seek: (time: number) => void;
 }
 
 export interface MusicDrawerProps {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-  onNext?: () => void;
-  onPrevious?: () => void;
-  progress: number;
-  duration: number;
-  onSeek: (position: number) => void;
-  volume: number;
-  onVolumeChange: (volume: number) => void;
-  isMuted: boolean;
-  onMuteToggle: () => void;
+  isOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
+  currentTrack?: MusicTrack | null;
+  playlist?: MusicPlaylist | null;
   children?: React.ReactNode;
 }
 
@@ -67,43 +52,46 @@ export interface Track {
   title: string;
   artist: string;
   duration: number;
-  url: string;
-  coverUrl?: string;
+  url?: string;
+  cover?: string;
 }
 
 export interface ProgressBarProps {
   value: number;
-  max: number;
+  max?: number;
   currentTime?: number;
   duration?: number;
+  showLabel?: boolean;
+  className?: string;
+  variant?: string;
   formatTime?: (seconds: number) => string;
   handleProgressClick?: (event: React.MouseEvent) => void;
   showTimestamps?: boolean;
-  className?: string;
-  variant?: string;
-  showLabel?: boolean;
   onSeek?: (value: number) => void;
 }
 
 export interface TrackInfoProps {
   track: MusicTrack;
-  isPlaying: boolean;
-  onPlayPause: () => void;
+  onClick?: () => void;
+  isActive?: boolean;
+  showArtist?: boolean;
+  showDuration?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  isMuted: boolean;
-  onMuteToggle: () => void;
-  onVolumeChange: (value: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  onChange?: (volume: number) => void;
   className?: string;
   showLabel?: boolean;
-  onChange?: (value: number) => void;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
 }
 
 export interface MusicLibraryProps {
   playlists?: MusicPlaylist[];
-  tracks?: MusicTrack[];
-  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
   onSelectTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  currentTrack?: MusicTrack | null;
+  isLoading?: boolean;
 }

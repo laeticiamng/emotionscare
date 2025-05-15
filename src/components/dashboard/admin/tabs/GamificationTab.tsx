@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
@@ -21,6 +22,10 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
     );
   }
 
+  // Safely access properties with fallbacks
+  const topChallenges = gamificationData.topChallenges || [];
+  const badgeLevels = gamificationData.badgeLevels || [];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <GamificationSummaryCard gamificationStats={gamificationData} />
@@ -32,7 +37,7 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {gamificationData.topChallenges.map((challenge, i) => (
+            {topChallenges.map((challenge, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="bg-pastel-green/30 w-8 h-8 rounded-full flex items-center justify-center mr-3">
@@ -54,7 +59,7 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
         </CardHeader>
         <CardContent className="h-60 flex items-center justify-center">
           <div className="bg-white/80 rounded-xl p-6 w-full h-full flex items-center justify-around">
-            {gamificationData.badgeLevels.map((level, i) => (
+            {badgeLevels.map((level, i) => (
               <div key={i} className="flex flex-col items-center">
                 <div 
                   className={`w-24 h-24 rounded-full flex items-center justify-center mb-3 ${

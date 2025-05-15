@@ -1,4 +1,3 @@
-
 export interface GamificationStats {
   points: number;
   level: number;

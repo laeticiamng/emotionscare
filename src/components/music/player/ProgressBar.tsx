@@ -5,7 +5,7 @@ import { ProgressBarProps } from '@/types/music';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  max,
+  max = 100,
   showLabel = false,
   className = '',
   variant = 'default',

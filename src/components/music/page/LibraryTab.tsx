@@ -14,7 +14,7 @@ const LibraryTab: React.FC<MusicLibraryProps> = ({
         {playlists.map(playlist => (
           <div key={playlist.id} className="space-y-2">
             <h3 className="font-medium">{playlist.name || playlist.title}</h3>
-            <p className="text-sm text-muted-foreground">{playlist.description}</p>
+            <p className="text-sm text-muted-foreground">{playlist.description || ''}</p>
             <button 
               onClick={() => onSelectPlaylist && onSelectPlaylist(playlist)}
               className="text-sm text-primary hover:underline"
