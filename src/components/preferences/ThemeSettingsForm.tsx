@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Theme, FontFamily, FontSize } from '@/types'; // Updated import path
+import { Theme, FontFamily, FontSize } from '@/types';
 
 const ThemeSettingsForm = () => {
   const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();

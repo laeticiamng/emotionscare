@@ -5,7 +5,7 @@ export interface MusicTrack {
   artist: string;
   duration: number;
   url: string;
-  coverUrl: string; // Standardized to camelCase
+  coverUrl: string;
   cover?: string; // For backward compatibility
   cover_url?: string; // For backward compatibility
   audioUrl?: string; // For backward compatibility
@@ -18,6 +18,9 @@ export interface MusicPlaylist {
   title?: string; // For backward compatibility
   emotion?: string;
   tracks: MusicTrack[];
+  coverUrl?: string; // Added for components expecting this
+  description?: string;
+  category?: string;
 }
 
 export interface MusicContextType {
@@ -34,12 +37,16 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   progress: number;
   duration: number;
+  // Add additional functions used by components
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
 }
 
 export interface MusicDrawerProps {
   isOpen?: boolean;
   open?: boolean; // For backward compatibility
-  onOpenChange?: (open: boolean) => void; // For backward compatibility
+  onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
@@ -54,7 +61,7 @@ export interface TrackInfoProps {
   showControls?: boolean;
   currentTrack?: MusicTrack;
   loadingTrack?: boolean;
-  audioError?: Error | null;
+  audioError?: string | null;
   className?: string;
   compact?: boolean;
 }

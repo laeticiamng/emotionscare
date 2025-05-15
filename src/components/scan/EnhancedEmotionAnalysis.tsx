@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Emotion } from '@/types/types';
+import { Emotion } from '@/types';
 
 interface EnhancedEmotionAnalysisProps {
   emotion: string | Emotion;

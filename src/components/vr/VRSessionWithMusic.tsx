@@ -2,9 +2,9 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicPropsType } from '@/types';
+import { VRSessionWithMusicProps } from '@/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
   onComplete, 
   session, 

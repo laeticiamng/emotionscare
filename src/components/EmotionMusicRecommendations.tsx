@@ -2,8 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionResult } from '@/types/emotion';
-import { MusicPlaylist, MusicTrack } from '@/types/types';
+import { EmotionResult, MusicPlaylist, MusicTrack } from '@/types';
 import { Music, Play } from 'lucide-react';
 
 interface EmotionMusicRecommendationsProps {

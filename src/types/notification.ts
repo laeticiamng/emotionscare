@@ -1,5 +1,5 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate' | 'custom';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'custom';
 export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'invitation' | 'reminder' | 'info' | 'warning' | 'success' | 'error' | 'alert';
 export type NotificationTone = 'neutral' | 'supportive' | 'professional' | 'friendly' | 'direct' | 'gentle' | 'motivational';
 export type NotificationFilter = 'all' | 'unread' | NotificationType;

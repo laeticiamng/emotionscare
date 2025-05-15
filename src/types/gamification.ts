@@ -12,6 +12,12 @@ export interface Challenge {
   goal?: number;
   icon?: string;
   level?: string | number;
+  // Additional properties for compatibility
+  name?: string;
+  target?: number;
+  reward?: number | string;
+  expiresAt?: string;
+  type?: string;
 }
 
 export interface Badge {
@@ -24,6 +30,14 @@ export interface Badge {
   date_acquired?: string;
   category?: string;
   points?: number;
+  // Additional properties for compatibility
+  icon?: string;
+  threshold?: number;
+  unlocked?: boolean;
+  imageUrl?: string;
+  image_url?: string;
+  awarded_at?: Date | string;
+  dateEarned?: string;
 }
 
 export interface GamificationStats {
@@ -35,4 +49,21 @@ export interface GamificationStats {
   nextLevelPoints: number;
   progress: number;
   recentAchievements?: Badge[];
+  // Additional properties for compatibility
+  completedChallenges?: number;
+  activeChallenges?: number;
+  streakDays?: number;
+  progressToNextLevel?: number;
+  challenges?: Challenge[];
+  nextLevel?: {
+    points: number;
+    rewards: any[];
+  };
+  achievements?: any[];
+  totalPoints?: number;
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  badgesCount?: number;
+  lastActivityDate?: string;
+  totalChallenges?: number;
 }

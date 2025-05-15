@@ -1,5 +1,4 @@
 
-// Theme related types
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
 export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';

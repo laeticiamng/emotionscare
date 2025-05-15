@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Music, PlayCircle } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
-import { MusicPlaylist } from '@/types/types';
+import { EmotionResult, MusicPlaylist } from '@/types';
 
 interface EmotionBasedMusicRecommendationProps {
   emotion: EmotionResult;

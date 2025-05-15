@@ -23,7 +23,6 @@ export interface Emotion {
   timestamp?: string;
   anxiety?: number;
   energy?: number;
-  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EmotionResult {
@@ -39,13 +38,12 @@ export interface EmotionResult {
   transcript?: string;
   emojis?: string[] | string;
   timestamp?: string;
-  date?: string | Date;
+  date?: string;
   triggers?: string[];
   feedback?: string;
   ai_feedback?: string;
   recommendations?: string[];
   audio_url?: string;
-  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -63,13 +61,6 @@ export interface EnhancedEmotionResult extends EmotionResult {
     description: string;
     duration: number;
   }[];
-  emotions?: {
-    [key: string]: number;
-  };
-  dominantEmotion?: {
-    name: string;
-    score: number;
-  } | string;
 }
 
 export interface EmotionalTeamViewProps {
@@ -78,7 +69,7 @@ export interface EmotionalTeamViewProps {
   users?: any[];
   anonymized?: boolean;
   onUserClick?: (userId: string) => void;
-  period?: string;
+  period?: 'day' | 'week' | 'month' | 'year';
   userId?: string;
   className?: string;
   dateRange?: {
@@ -86,30 +77,6 @@ export interface EmotionalTeamViewProps {
     end: Date;
   };
   onRefresh?: () => void;
-}
-
-export interface EmotionalData {
-  id?: string;
-  emotion: string;
-  intensity: number;
-  timestamp: Date | string;
-  context?: string;
-  userId?: string; 
-  source?: string;
-  feedback?: string;
-  user_id?: string;
-}
-
-export interface EmotionPrediction {
-  predictedEmotion: string;
-  emotion: string;
-  probability: number;
-  confidence: number;
-  triggers: string[];
-  recommendations: string[];
-  name?: string;
-  intensity?: number;
-  score?: number;
 }
 
 export interface VoiceEmotionScannerProps {

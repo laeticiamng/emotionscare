@@ -10,13 +10,21 @@ export interface VRSessionTemplate {
   duration: number;
   category: string;
   tags: string[];
-  completionRate: number; // Standardized to camelCase
-  recommendedMood: string; // Standardized to camelCase
+  completionRate: number;
+  recommendedMood: string;
   emotionTarget?: string; // Added for components expecting this
   popularity?: number;
   difficulty?: string;
   intensity?: number;
   imageUrl?: string;
+  // Adding properties expected by components
+  preview_url?: string;
+  is_audio_only?: boolean;
+  audio_url?: string;
+  benefits?: string[];
+  theme?: string;
+  emotion?: string; // Added for compatibility
+  lastUsed?: string | Date;
 }
 
 export interface VRSession {
@@ -26,17 +34,22 @@ export interface VRSession {
   startedAt: string;
   completedAt?: string;
   duration: number;
-  heartRateBefore: number; // Standardized to camelCase
-  heartRateAfter: number; // Standardized to camelCase
+  heartRateBefore: number;
+  heartRateAfter: number;
   emotionBefore?: string;
   emotionAfter?: string;
-  emotionTarget?: string; // Added for components expecting this
+  emotionTarget?: string;
   notes?: string;
   rating?: number;
+  // Adding properties expected by components
+  startTime?: string;
+  date?: string;
+  duration_seconds?: number;
+  completed?: boolean;
+  isCompleted?: boolean;
   heart_rate_before?: number; // For backward compatibility
   heart_rate_after?: number; // For backward compatibility
   started_at?: string; // For backward compatibility
-  startDate?: string; // For backward compatibility
 }
 
 export interface VRHistoryListProps {
@@ -46,9 +59,18 @@ export interface VRHistoryListProps {
 }
 
 export interface VRSessionWithMusicProps {
-  session: VRSessionTemplate | VRSession;
+  session?: VRSession;
+  template?: VRSessionTemplate;
   onComplete?: () => void;
   autoplay?: boolean;
+  // Adding properties expected by components
+  onSessionComplete?: () => void;
+  isAudioOnly?: boolean;
+  videoUrl?: string;
+  audioUrl?: string;
+  emotion?: string;
+  sessionId?: string;
+  templateId?: string;
 }
 
 export interface VRTemplateGridProps {

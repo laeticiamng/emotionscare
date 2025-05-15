@@ -26,8 +26,8 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({
   const getStartDate = () => {
     if (session.startTime) {
       return new Date(session.startTime);
-    } else if (session.started_at) {
-      return new Date(session.started_at);
+    } else if (session.startedAt) {
+      return new Date(session.startedAt);
     } else if (session.date) {
       return new Date(session.date);
     }
@@ -62,17 +62,17 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({
             </p>
           </div>
           
-          {(session.heart_rate_before || session.heartRateBefore) && (
+          {(session.heartRateBefore || session.heart_rate_before) && (
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Heart rate (before)</p>
-              <p className="font-medium">{session.heart_rate_before || session.heartRateBefore} BPM</p>
+              <p className="font-medium">{session.heartRateBefore || session.heart_rate_before} BPM</p>
             </div>
           )}
           
-          {(session.heart_rate_after || session.heartRateAfter) && (
+          {(session.heartRateAfter || session.heart_rate_after) && (
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Heart rate (after)</p>
-              <p className="font-medium">{session.heart_rate_after || session.heartRateAfter} BPM</p>
+              <p className="font-medium">{session.heartRateAfter || session.heart_rate_after} BPM</p>
             </div>
           )}
         </div>
@@ -80,11 +80,11 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({
         <div className="pt-2">
           <p className="text-sm text-muted-foreground">Status</p>
           <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            session.completed || session.isCompleted 
+            session.completedAt || session.completed || session.isCompleted
               ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' 
               : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
           }`}>
-            {session.completed || session.isCompleted ? 'Completed' : 'In Progress'}
+            {session.completedAt || session.completed || session.isCompleted ? 'Completed' : 'In Progress'}
           </div>
         </div>
       </CardContent>

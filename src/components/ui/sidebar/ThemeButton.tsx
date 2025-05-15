@@ -1,52 +1,30 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Moon, Sun, Laptop } from 'lucide-react';
-import { useTheme } from '@/hooks/use-theme';
-import { ThemeButtonProps } from '@/types'; // Updated import path
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Button } from "../button";
+import { cn } from "@/lib/utils";
+import { ThemeButtonProps } from "@/types";
 
-const ThemeButton: React.FC<ThemeButtonProps> = ({ theme, onClick, collapsed }) => {
-  const { theme: currentTheme, setTheme } = useTheme();
-  
-  const activeTheme = theme || currentTheme;
-  
-  const handleClick = () => {
-    if (onClick) {
-      onClick();
-    } else {
-      // Cycle through themes: light -> dark -> system
-      const nextTheme = activeTheme === 'light' ? 'dark' : activeTheme === 'dark' ? 'system' : 'light';
-      setTheme(nextTheme);
-    }
-  };
-  
+export function ThemeButton({ collapsed, size = "default" }: ThemeButtonProps) {
+  const { theme, setTheme } = useTheme();
+
   return (
-    <Button 
-      variant="ghost" 
-      size="sm" 
-      className="w-full justify-start" 
-      onClick={handleClick}
+    <Button
+      variant="ghost"
+      size={size}
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      className={cn(
+        "group flex justify-start gap-2",
+        collapsed && "w-full justify-center py-7",
+        size === "sm" && "h-8 rounded-md px-2"
+      )}
     >
-      {activeTheme === 'light' && (
-        <>
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all mr-2" />
-          {!collapsed && <span>Light Mode</span>}
-        </>
-      )}
-      {activeTheme === 'dark' && (
-        <>
-          <Moon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all mr-2" />
-          {!collapsed && <span>Dark Mode</span>}
-        </>
-      )}
-      {activeTheme === 'system' && (
-        <>
-          <Laptop className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all mr-2" />
-          {!collapsed && <span>System Theme</span>}
-        </>
+      {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+      {!collapsed && (
+        <span className="text-sm">
+          {theme === "dark" ? "Mode sombre" : "Mode clair"}
+        </span>
       )}
     </Button>
   );
-};
-
-export default ThemeButton;
+}

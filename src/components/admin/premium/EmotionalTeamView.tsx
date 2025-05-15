@@ -1,101 +1,95 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
-import { Period, EmotionalTeamViewProps } from '@/types/types';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
+import { Period, EmotionalTeamViewProps } from '@/types';
 
-const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
+const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   teamId,
   period = 'week',
-  userId,
-  className = '',
-  dateRange,
-  onRefresh
+  anonymized = true,
+  userId
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>(period);
-  const [teamData, setTeamData] = useState<any[]>([]);
-
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  // Fetch team emotional data
   useEffect(() => {
-    loadTeamData();
-  }, [teamId, selectedPeriod, dateRange]);
-
-  const loadTeamData = async () => {
-    setIsLoading(true);
-    try {
-      // Here you would fetch real data
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock data for demonstration
-      setTeamData([
-        { id: 1, name: 'Alice', dominantEmotion: 'joy', averageIntensity: 78 },
-        { id: 2, name: 'Bob', dominantEmotion: 'calm', averageIntensity: 65 },
-        { id: 3, name: 'Charlie', dominantEmotion: 'stress', averageIntensity: 82 },
-        { id: 4, name: 'Diana', dominantEmotion: 'focus', averageIntensity: 71 }
-      ]);
-    } catch (error) {
-      console.error('Error loading team data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleRefresh = () => {
-    loadTeamData();
-    if (onRefresh) {
-      onRefresh();
-    }
-  };
-
+    const fetchTeamData = async () => {
+      try {
+        setLoading(true);
+        // Mock data loading
+        setTimeout(() => {
+          setLoading(false);
+        }, 1500);
+      } catch (error) {
+        toast({
+          title: "Error loading team data",
+          description: "Please try again later",
+          variant: "destructive"
+        });
+        setLoading(false);
+      }
+    };
+    
+    fetchTeamData();
+  }, [teamId, period, toast]);
+  
   return (
-    <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xl">État émotionnel de l'équipe</CardTitle>
-        <div className="flex items-center gap-2">
-          <Select value={selectedPeriod} onValueChange={(value: string) => setSelectedPeriod(value as Period)}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Période" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="day">Jour</SelectItem>
-              <SelectItem value="week">Semaine</SelectItem>
-              <SelectItem value="month">Mois</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="icon" onClick={handleRefresh}>
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Team Emotional Health</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            teamData.map(member => (
-              <div key={member.id} className="flex items-center justify-between border-b pb-2">
-                <div>
-                  <p className="font-medium">{member.name}</p>
-                  <p className="text-sm text-muted-foreground capitalize">{member.dominantEmotion}</p>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="trends">Trends</TabsTrigger>
+            <TabsTrigger value="individual">Individual</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview">
+            {loading ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="bg-muted/30 p-4 rounded-md">
+                  <p className="text-center">Team emotional health overview for <strong>{anonymized ? 'Anonymous Team' : `Team ${teamId}`}</strong></p>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">{member.averageIntensity}%</p>
-                  <p className="text-sm text-muted-foreground">Intensité</p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {['Happiness', 'Stress', 'Engagement', 'Focus'].map(metric => (
+                    <div key={metric} className="bg-card p-4 rounded-md border shadow-sm">
+                      <h3 className="text-sm font-medium mb-2">{metric}</h3>
+                      <div className="text-2xl font-bold">
+                        {Math.floor(Math.random() * 100)}%
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {Math.random() > 0.5 ? '↑' : '↓'} {Math.floor(Math.random() * 10)}% from last {period}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))
-          )}
+            )}
+          </TabsContent>
           
-          {!isLoading && teamData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              Aucune donnée disponible pour cette période
+          <TabsContent value="trends">
+            <div className="h-[300px] flex items-center justify-center bg-muted/30 rounded-md">
+              <p className="text-muted-foreground">Trend visualization will be displayed here</p>
             </div>
-          )}
-        </div>
+          </TabsContent>
+          
+          <TabsContent value="individual">
+            <div className="h-[300px] flex items-center justify-center bg-muted/30 rounded-md">
+              <p className="text-muted-foreground">Individual team member data will be displayed here</p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
