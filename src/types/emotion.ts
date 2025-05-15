@@ -1,53 +1,51 @@
 
-export interface LiveVoiceScannerProps {
-  onResult: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  duration?: number;
+export interface Emotion {
+  id: string;
+  name: string;
+  color: string;
+  icon?: string;
+  intensity?: number;
+  description?: string;
+  category?: string;
+}
+
+export interface EmotionResult {
+  id?: string;
+  emotion: string;
+  score?: number;
+  intensity?: number;
+  confidence?: number;
+  text?: string;
+  transcript?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  date?: string | Date;
+  timestamp?: string | Date;
+  user_id?: string;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  colorCode?: string;
+  recommendations?: string[];
+  triggers?: string[];
+  historicalContext?: any;
 }
 
 export interface VoiceEmotionScannerProps {
   onResult?: (result: EmotionResult) => void;
   duration?: number;
   autoStart?: boolean;
+  showVisualizer?: boolean;
+  className?: string;
 }
 
-export interface TeamOverviewProps {
-  teamId?: string;
-  period?: string;
-  onPeriodChange?: (period: string) => void;
-}
-
-export interface EmotionResult {
-  emotion: string;
-  score?: number;
-  confidence?: number;
-  feedback?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  transcript?: string;
-  emojis?: string[] | string;
-  timestamp?: string | Date;
-  [key: string]: any;
-}
-
-export interface EnhancedEmotionResult extends EmotionResult {
-  triggers?: string[];
-  insights?: string[];
-  intensity?: number;
-  duration?: number;
-  relatedEmotions?: string[];
-}
-
-export interface Emotion {
-  name: string;
-  value: number;
-  color: string;
-  description?: string;
-  icon?: string;
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  className?: string;
+  stopAfterSeconds?: number;
 }
 
 export interface EmotionalTeamViewProps {
-  className?: string;
   teamId: string;
   userId: string;
   period: string;
@@ -55,4 +53,11 @@ export interface EmotionalTeamViewProps {
     start: Date;
     end: Date;
   };
+  className?: string;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  className?: string;
+  period?: 'day' | 'week' | 'month';
 }

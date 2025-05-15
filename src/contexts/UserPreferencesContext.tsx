@@ -1,84 +1,107 @@
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { UserPreferences } from '@/types';
+import React, { createContext, useState, useEffect } from 'react';
+import { UserPreferences } from '@/types/user';
 
-interface UserPreferencesContextType {
+// Define the context type
+export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  updatePreferences: (prefs: Partial<UserPreferences>) => Promise<void>;
-  isLoading: boolean;
-  error: Error | null;
+  setPreferences: (preferences: UserPreferences) => void;
+  updatePreferences: (updates: Partial<UserPreferences>) => void;
+  resetPreferences: () => void;
+  loading: boolean;
 }
 
+// Default preferences
+const defaultPreferences: UserPreferences = {
+  theme: 'light',
+  fontSize: 'medium',
+  fontFamily: 'system',
+  language: 'fr',
+  ambientSound: false,
+  notifications: {
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: true,
+    frequency: 'daily',
+    types: {
+      system: true,
+      emotion: true,
+      coach: true,
+      journal: true,
+      community: true,
+    },
+    tone: 'friendly',
+    quietHours: {
+      enabled: false,
+      start: '22:00',
+      end: '07:00',
+    },
+  }
+};
+
+// Create context with default values
 export const UserPreferencesContext = createContext<UserPreferencesContextType>({
-  preferences: {
-    theme: 'system',
-    fontSize: 'medium',
-    fontFamily: 'default',
-    language: 'en',
-    notifications: false
-  },
-  updatePreferences: async () => {},
-  isLoading: false,
-  error: null
+  preferences: defaultPreferences,
+  setPreferences: () => {},
+  updatePreferences: () => {},
+  resetPreferences: () => {},
+  loading: false,
 });
 
-export const UserPreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    theme: 'system',
-    fontSize: 'medium',
-    fontFamily: 'default',
-    language: 'en',
-    notifications: false
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+interface UserPreferencesProviderProps {
+  children: React.ReactNode;
+}
 
-  // Load preferences from storage or API
+export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = ({ children }) => {
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [loading, setLoading] = useState(true);
+
+  // Load preferences from local storage on component mount
   useEffect(() => {
     const loadPreferences = async () => {
-      setIsLoading(true);
       try {
-        // Mock loading preferences from storage
         const storedPrefs = localStorage.getItem('userPreferences');
         if (storedPrefs) {
           setPreferences(JSON.parse(storedPrefs));
         }
-      } catch (err) {
-        console.error('Error loading preferences:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error loading preferences'));
+      } catch (error) {
+        console.error('Failed to load preferences:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     loadPreferences();
   }, []);
 
-  const updatePreferences = async (newPrefs: Partial<UserPreferences>) => {
-    setIsLoading(true);
-    try {
-      const updatedPrefs = { ...preferences, ...newPrefs };
-      setPreferences(updatedPrefs);
-      
-      // Mock saving to storage/API
-      localStorage.setItem('userPreferences', JSON.stringify(updatedPrefs));
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-    } catch (err) {
-      console.error('Error updating preferences:', err);
-      setError(err instanceof Error ? err : new Error('Unknown error updating preferences'));
-      throw err;
-    } finally {
-      setIsLoading(false);
+  // Save preferences to localStorage whenever they change
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem('userPreferences', JSON.stringify(preferences));
     }
+  }, [preferences, loading]);
+
+  // Function to update specific preferences
+  const updatePreferences = (updates: Partial<UserPreferences>) => {
+    setPreferences(prev => ({ ...prev, ...updates }));
+  };
+
+  // Function to reset preferences to defaults
+  const resetPreferences = () => {
+    setPreferences(defaultPreferences);
   };
 
   return (
-    <UserPreferencesContext.Provider value={{ preferences, updatePreferences, isLoading, error }}>
+    <UserPreferencesContext.Provider
+      value={{
+        preferences,
+        setPreferences,
+        updatePreferences,
+        resetPreferences,
+        loading,
+      }}
+    >
       {children}
     </UserPreferencesContext.Provider>
   );
 };
-
-export const useUserPreferences = () => useContext(UserPreferencesContext);

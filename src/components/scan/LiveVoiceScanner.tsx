@@ -2,150 +2,126 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2 } from 'lucide-react';
-import { LiveVoiceScannerProps, EmotionResult } from '@/types';
-import { analyzeEmotion } from '@/lib/scanService';
+import { Mic, Square } from 'lucide-react';
+import { LiveVoiceScannerProps, EmotionResult } from '@/types/emotion';
 
-const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
+export const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   onResult,
-  autoStart = false,
-  duration = 30
+  className = '',
+  stopAfterSeconds = 30
 }) => {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [timeElapsed, setTimeElapsed] = useState(0);
-  const [audioLevel, setAudioLevel] = useState(0);
+  const [listening, setListening] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(stopAfterSeconds);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   
   useEffect(() => {
-    if (autoStart) {
-      startListening();
-    }
-  }, [autoStart]);
-  
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    let audioTimer: NodeJS.Timeout;
+    let interval: NodeJS.Timeout;
+    let emotionUpdateInterval: NodeJS.Timeout;
     
-    if (isListening) {
-      // Timer for counting elapsed time
-      timer = setInterval(() => {
-        setTimeElapsed(prev => {
-          const newTime = prev + 1;
-          
-          // Auto-process every 10 seconds if we have transcript
-          if (newTime % 10 === 0 && transcript) {
-            processTranscript();
+    if (listening) {
+      // Countdown timer
+      interval = setInterval(() => {
+        setRemainingTime(time => {
+          if (time <= 1) {
+            clearInterval(interval);
+            setListening(false);
+            return 0;
           }
-          
-          // Stop after duration
-          if (newTime >= duration) {
-            stopListening();
-            return duration;
-          }
-          
-          return newTime;
+          return time - 1;
         });
       }, 1000);
       
-      // Simulate audio levels
-      audioTimer = setInterval(() => {
-        setAudioLevel(Math.random() * 0.8 + 0.2);
-      }, 200);
-      
-      // Simulate receiving transcription
-      const phrases = [
-        "I'm feeling quite good today.",
-        "Work has been challenging lately.",
-        "I'm excited about the upcoming project."
-      ];
-      
-      setTimeout(() => {
-        setTranscript(phrases[Math.floor(Math.random() * phrases.length)]);
-      }, 3000);
+      // Simulate emotion detection at intervals
+      emotionUpdateInterval = setInterval(() => {
+        // Mock emotion detection
+        const emotions = ['neutral', 'calm', 'happy', 'anxious', 'sad'];
+        const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+        setCurrentEmotion(randomEmotion);
+        
+        if (onResult) {
+          const result: EmotionResult = {
+            emotion: randomEmotion,
+            score: Math.random() * 0.4 + 0.6, // Random score between 0.6 and 1.0
+            confidence: Math.random() * 0.3 + 0.7, // Random confidence between 0.7 and 1.0
+            timestamp: new Date().toISOString(),
+          };
+          
+          onResult(result);
+        }
+      }, 3000); // Update every 3 seconds
     }
     
     return () => {
-      if (timer) clearInterval(timer);
-      if (audioTimer) clearInterval(audioTimer);
+      clearInterval(interval);
+      clearInterval(emotionUpdateInterval);
     };
-  }, [isListening, transcript, duration]);
+  }, [listening, onResult]);
   
-  const startListening = () => {
-    setIsListening(true);
-    setTimeElapsed(0);
-    setTranscript('');
-  };
-  
-  const stopListening = () => {
-    setIsListening(false);
-    if (transcript) {
-      processTranscript();
-    }
-  };
-  
-  const processTranscript = async () => {
-    try {
-      if (transcript) {
-        const result = await analyzeEmotion(transcript);
-        const fullResult: EmotionResult = {
-          ...result,
-          transcript
-        };
-        
-        if (onResult) {
-          onResult(fullResult);
-        }
-      }
-    } catch (error) {
-      console.error('Error in live voice analysis:', error);
+  const toggleListening = () => {
+    if (listening) {
+      setListening(false);
+    } else {
+      setListening(true);
+      setRemainingTime(stopAfterSeconds);
     }
   };
   
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle>Live Voice Emotion Analysis</CardTitle>
+        <CardTitle>Scanner vocal en direct</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Button
-            variant={isListening ? "destructive" : "default"}
-            onClick={isListening ? stopListening : startListening}
+        <div className="h-20 bg-secondary/10 rounded-lg flex items-center justify-center relative overflow-hidden">
+          {listening && (
+            <div className="flex items-end space-x-1 h-full py-2">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="bg-primary w-1 transition-all duration-300 ease-in-out"
+                  style={{
+                    height: `${Math.random() * 70 + 10}%`,
+                    animationDelay: `${i * 0.05}s`
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          
+          {!listening && (
+            <p className="text-muted-foreground">Microphone désactivé</p>
+          )}
+        </div>
+        
+        {currentEmotion && listening && (
+          <div className="text-center p-2 bg-secondary/20 rounded-md">
+            <p className="font-medium">Émotion détectée: {currentEmotion}</p>
+          </div>
+        )}
+        
+        <div className="flex justify-between items-center">
+          <p className="text-sm text-muted-foreground">
+            {listening ? `Temps restant: ${remainingTime}s` : 'Prêt à analyser'}
+          </p>
+          
+          <Button 
+            onClick={toggleListening}
+            variant={listening ? "destructive" : "default"}
+            className="flex items-center gap-2"
           >
-            {isListening ? (
+            {listening ? (
               <>
-                <MicOff className="mr-2 h-4 w-4" /> Stop Listening
+                <Square className="h-4 w-4" />
+                Arrêter
               </>
             ) : (
               <>
-                <Mic className="mr-2 h-4 w-4" /> Start Listening
+                <Mic className="h-4 w-4" />
+                Commencer l'analyse
               </>
             )}
           </Button>
-          
-          <div className="flex items-center gap-2">
-            <Volume2 className="h-4 w-4 text-muted-foreground" />
-            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary transition-all duration-200 ease-out"
-                style={{ width: `${audioLevel * 100}%` }}
-              />
-            </div>
-          </div>
         </div>
-        
-        {isListening && (
-          <div className="text-sm text-muted-foreground">
-            Listening... {timeElapsed}s / {duration}s
-          </div>
-        )}
-        
-        {transcript && (
-          <div className="p-3 bg-muted/30 rounded-md mt-4">
-            <p className="font-medium mb-1">I hear you saying:</p>
-            <p className="text-sm italic">{transcript}</p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

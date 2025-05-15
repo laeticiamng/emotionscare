@@ -1,16 +1,17 @@
 
 import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
 
 export interface KpiCardProps {
   title: string;
-  value: string | number | React.ReactNode;
+  value: string | number | ReactNode;
   icon?: LucideIcon;
   delta?: {
     value: number;
     label?: string;
     trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: React.ReactNode;
+  } | number;
+  subtitle?: ReactNode;
   ariaLabel?: string;
   className?: string;
   isLoading?: boolean;
@@ -65,4 +66,13 @@ export interface ChartData {
   name: string;
   value: number;
   [key: string]: any;
+}
+
+export interface GamificationData {
+  totalPoints: number;
+  recentBadges: any[];
+  challengesCompleted: number;
+  rank: string;
+  level: number;
+  nextLevelProgress: number;
 }

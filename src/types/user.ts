@@ -1,7 +1,10 @@
 
 import { Theme, FontFamily, FontSize } from './theme';
 
-export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'wellbeing_manager' | 'coach' | 'employee' | 'moderator';
+// Unified UserRole that includes all needed values
+export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest' | 
+  'b2c' | 'b2b_user' | 'b2b_admin' | 'wellbeing_manager' | 'coach' | 
+  'employee' | 'moderator';
 
 export interface User {
   id: string;
@@ -40,6 +43,7 @@ export interface UserPreferences {
   theme?: Theme;
   fontSize?: FontSize;
   fontFamily?: FontFamily;
+  ambientSound?: boolean;
   notifications?: boolean | {
     enabled: boolean;
     emailEnabled: boolean;
@@ -60,6 +64,7 @@ export interface UserPreferences {
     };
   };
   language?: string;
+  notificationsEnabled?: boolean;
   notifications_enabled?: boolean;
   privacy?: string | {
     shareData?: boolean;
@@ -105,6 +110,11 @@ export interface UserPreferences {
   displayName?: string;
   pronouns?: string;
   biography?: string;
+  dynamicTheme?: string;
+  reducedAnimations?: boolean;
+  notificationFrequency?: string;
+  notificationTone?: string;
+  font?: string;
 }
 
 export interface UserPreferencesState {

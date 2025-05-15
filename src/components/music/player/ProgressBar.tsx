@@ -1,67 +1,44 @@
 
 import React from 'react';
-import { ProgressBarProps } from '@/types';
+import { Slider } from '@/components/ui/slider';
+import { ProgressBarProps } from '@/types/music';
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
-  max = 100,
-  showLabel = true,
+  max,
+  showLabel = false,
   className = '',
   variant = 'default',
   currentTime = 0,
   duration = 0,
-  formatTime,
+  formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`,
   handleProgressClick,
-  showTimestamps = true
+  showTimestamps = true,
 }) => {
-  // Calculate progress percentage
-  const progressPercentage = (value / max) * 100;
-  
-  // Define variant colors
-  const getVariantClasses = () => {
-    switch (variant) {
-      case 'success':
-        return 'bg-green-500';
-      case 'warning':
-        return 'bg-yellow-500';
-      case 'danger':
-        return 'bg-red-500';
-      default:
-        return 'bg-primary';
-    }
-  };
-  
-  // Format time if no formatter provided
-  const defaultFormatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
-  const timeFormatter = formatTime || defaultFormatTime;
-
   return (
-    <div className={`w-full ${className}`}>
-      {showTimestamps && (
-        <div className="flex justify-between text-xs text-muted-foreground mb-1">
-          <span>{timeFormatter(currentTime)}</span>
-          <span>{timeFormatter(duration)}</span>
-        </div>
-      )}
-      
-      <div 
-        className="h-1.5 w-full bg-muted rounded-full overflow-hidden cursor-pointer" 
+    <div className={className}>
+      <div
+        className="relative w-full"
         onClick={handleProgressClick}
       >
-        <div 
-          className={`h-full ${getVariantClasses()} rounded-full transition-all duration-300`}
-          style={{ width: `${progressPercentage}%` }}
+        <Slider
+          value={[value]}
+          max={max}
+          step={0.1}
+          className="mb-1"
         />
       </div>
       
-      {showLabel && !showTimestamps && (
-        <div className="mt-1 text-xs text-muted-foreground text-center">
-          {Math.round(progressPercentage)}%
+      {showTimestamps && (
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      )}
+      
+      {showLabel && (
+        <div className="text-center text-xs text-muted-foreground mt-1">
+          {Math.round(value)}%
         </div>
       )}
     </div>

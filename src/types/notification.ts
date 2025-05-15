@@ -1,53 +1,51 @@
 
-export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'reminder' | 'system' | 'alert';
-export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationFilter = 'all' | 'unread' | 'system' | 'alerts';
-export type NotificationTone = 'formal' | 'friendly' | 'direct' | 'minimal';
-
-export interface NotificationBadge {
-  count: number;
-  variant?: 'default' | 'destructive' | 'outline';
-  className?: string;
-}
+export type NotificationType = 'all' | 'important' | 'none' | 'system' | 'emotion' | 'coach' | 'journal' | 'community';
+export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm';
+export type NotificationPriority = 'high' | 'medium' | 'low';
 
 export interface Notification {
   id: string;
   title: string;
-  message?: string;
+  message: string;
   type: NotificationType;
   priority?: NotificationPriority;
-  read: boolean;
-  timestamp: string;
+  read?: boolean;
+  createdAt: string | Date;
   actionUrl?: string;
-  actionLabel?: string;
-  category?: string;
+  icon?: string;
 }
 
 export interface NotificationPreference {
   enabled: boolean;
-  email: boolean;
-  push: boolean;
-  categories?: {
-    system: boolean;
-    activity: boolean;
-    social: boolean;
-    marketing: boolean;
-  };
-  frequency: string;
-}
-
-export interface NotificationSettings {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  channels: NotificationChannels;
-  frequency: NotificationFrequency;
-  quietHours: {
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  frequency?: NotificationFrequency;
+  types?: Record<NotificationType, boolean>;
+  quietHours?: {
     enabled: boolean;
     start: string;
     end: string;
   };
+}
+
+export interface NotificationFilter {
+  type?: NotificationType | 'all';
+  read?: boolean;
+  priority?: NotificationPriority | 'all';
+  date?: 'today' | 'week' | 'month' | 'all';
+}
+
+export interface NotificationBadge {
+  count: number;
+  variant?: 'default' | 'important';
+}
+
+export interface NotificationItemProps {
+  notification: Notification;
+  onRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export interface NotificationChannels {
@@ -56,7 +54,13 @@ export interface NotificationChannels {
   inApp: boolean;
 }
 
-export interface NotificationItemProps {
-  notification: Notification;
-  onRead?: (id: string) => void;
+export interface NotificationSettings {
+  enabled: boolean;
+  channels: NotificationChannels;
+  frequency: NotificationFrequency;
+  quietHours: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }

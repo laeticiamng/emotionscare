@@ -28,6 +28,7 @@ export interface JournalEntry {
 export interface User {
   id: string;
   email: string;
+  name?: string;  // Added name property
   first_name?: string;
   last_name?: string;
   role: UserRole;
@@ -45,7 +46,9 @@ export interface User {
   emotional_score?: number;
 }
 
-export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest';
+export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest' | 
+  'b2c' | 'b2b_user' | 'b2b_admin' | 'wellbeing_manager' | 'coach' | 
+  'employee' | 'moderator';
 
 export interface UserPreferences {
   theme?: Theme;
