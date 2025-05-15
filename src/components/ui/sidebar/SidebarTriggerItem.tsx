@@ -11,7 +11,7 @@ interface SidebarTriggerItemProps {
 }
 
 export function SidebarTriggerItem({ className, title = "Toggle Sidebar" }: SidebarTriggerItemProps) {
-  const { toggle, collapsed, isOpen } = useSidebar();
+  const { toggle, collapsed, open } = useSidebar();
 
   return (
     <Button

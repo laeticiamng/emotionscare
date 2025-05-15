@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { SidebarProvider } from '@/components/ui/sidebar/SidebarContext';
+import { SidebarProvider } from '@/contexts/SidebarContext';
 import { router } from './router';
 import { RouterProvider } from 'react-router-dom';
 import { LayoutProvider } from '@/contexts/LayoutContext';

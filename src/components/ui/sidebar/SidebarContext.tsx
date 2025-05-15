@@ -36,13 +36,13 @@ export interface SidebarProviderProps {
   onCollapseChange?: (collapsed: boolean) => void;
 }
 
-export default function SidebarProvider({
+export const SidebarProvider = ({
   children,
   defaultOpen = false,
   defaultCollapsed = false,
   defaultExpanded = false,
   onCollapseChange,
-}: SidebarProviderProps) {
+}: SidebarProviderProps) => {
   const [open, setOpen] = useState(defaultOpen);
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [expanded, setExpanded] = useState(defaultExpanded);
@@ -81,6 +81,8 @@ export default function SidebarProvider({
       {children}
     </SidebarContext.Provider>
   );
-}
+};
 
 export const useSidebar = () => useContext(SidebarContext);
+
+export default SidebarContext;

@@ -9,7 +9,7 @@ interface SidebarTriggerProps {
 }
 
 const SidebarTrigger: React.FC<SidebarTriggerProps> = ({ className = "" }) => {
-  const { isOpen, toggle } = useSidebar();
+  const { open, toggle } = useSidebar();
   
   return (
     <Button 
@@ -18,7 +18,7 @@ const SidebarTrigger: React.FC<SidebarTriggerProps> = ({ className = "" }) => {
       onClick={toggle}
       className={className}
     >
-      {isOpen ? <PanelLeft className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
+      {open ? <PanelLeft className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
     </Button>
   );
 };

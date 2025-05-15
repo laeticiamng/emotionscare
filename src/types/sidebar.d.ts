@@ -1,5 +1,7 @@
 
 export interface SidebarContextType {
+  open: boolean;
+  setOpen: (open: boolean) => void;
   expanded: boolean;
   isOpen: boolean;
   collapsed: boolean;
