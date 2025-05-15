@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -105,7 +104,7 @@ const NotificationsPanel: React.FC = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="all" value={filter} onValueChange={(value) => setFilter(value as NotificationFilter)}>
+      <Tabs defaultValue="all" value={filter as string} onValueChange={(value) => setFilter(value as NotificationFilter)}>
         <div className="px-4 pt-2">
           <TabsList className="w-full">
             <TabsTrigger value="all">All</TabsTrigger>
@@ -114,7 +113,7 @@ const NotificationsPanel: React.FC = () => {
           </TabsList>
         </div>
         
-        <TabsContent value={filter} className="m-0">
+        <TabsContent value={filter as string} className="m-0">
           <div className="max-h-[60vh] overflow-y-auto">
             {notifications.length > 0 ? (
               <div className="divide-y">
@@ -138,9 +137,9 @@ const NotificationsPanel: React.FC = () => {
                 <Bell className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
                 <h3 className="font-medium text-lg">No notifications</h3>
                 <p className="text-muted-foreground text-sm mt-1">
-                  {filter === "all"
+                  {filter === "all" as NotificationFilter
                     ? "You don't have any notifications yet."
-                    : filter === "unread"
+                    : filter === "unread" as NotificationFilter
                     ? "You have read all your notifications."
                     : `You don't have any ${filter} notifications.`}
                 </p>

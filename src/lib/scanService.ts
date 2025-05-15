@@ -1,50 +1,131 @@
 
-import { EmotionResult } from '@/types';
+import { v4 as uuid } from 'uuid';
+import { EmotionResult, Emotion } from '@/types';
 
-// Mock implementation for the analyzeEmotion function
+// Mock data for emotion history
+const mockEmotions: EmotionResult[] = [
+  {
+    id: uuid(),
+    emotion: 'joy',
+    score: 78,
+    confidence: 0.78,
+    timestamp: new Date().toISOString(),
+    date: new Date().toISOString(),
+    text: "I'm feeling really good today!",
+    feedback: "You seem to be in a positive state of mind. Keep up the good energy!"
+  },
+  {
+    id: uuid(),
+    emotion: 'calm',
+    score: 65,
+    confidence: 0.65,
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    date: new Date(Date.now() - 86400000).toISOString(),
+    text: "Just meditated and feeling relaxed.",
+    feedback: "Your meditation practice is paying off. Your tranquility is evident."
+  }
+];
+
+// Analyze text for emotion
 export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  // In a real application, this would call an API
-  console.log('Analyzing emotion for text:', text);
+  // Mock emotion analysis based on text
+  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'calm', 'anticipation', 'trust'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const randomScore = Math.floor(Math.random() * 60) + 40; // Score between 40-100
   
-  // Simulating an API call with a delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Return mock data
-      resolve({
-        emotion: 'calm',
-        score: 85,
-        confidence: 0.92,
-        recommendations: [
-          'Prenez un moment pour vous détendre',
-          'Écoutez de la musique apaisante',
-          'Pratiquez des exercices de respiration'
-        ],
-        triggers: ['stress au travail', 'fatigue'],
-        emojis: '😌',
-        feedback: 'Vous semblez calme et posé. Continuez à prendre soin de votre bien-être.'
-      });
-    }, 1000);
-  });
+  return {
+    id: uuid(),
+    emotion: randomEmotion,
+    score: randomScore,
+    confidence: randomScore / 100,
+    timestamp: new Date().toISOString(),
+    date: new Date().toISOString(),
+    text: text,
+    feedback: `Based on your text, you seem to be experiencing ${randomEmotion}.`,
+    recommendations: [
+      "Take a short break",
+      "Practice deep breathing",
+      "Listen to calming music"
+    ],
+    triggers: [
+      "Work pressure",
+      "Social interactions"
+    ]
+  };
 };
 
-export const analyzeVoice = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // Implement voice analysis logic here
-  console.log('Analyzing voice audio');
+// Save emotion to storage (mock implementation)
+export const saveEmotion = async (emotion: EmotionResult): Promise<EmotionResult> => {
+  // In a real app, this would save to a database
+  console.log("Saving emotion:", emotion);
   
-  // Mock implementation
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        emotion: 'happy',
-        score: 78,
-        confidence: 0.88,
-        recommendations: [
-          'Partagez votre bonne humeur avec les autres',
-          'Notez ces moments positifs dans votre journal'
-        ],
-        triggers: ['succès récent', 'interaction sociale positive'],
-        emojis: '😀'
-      });
-    }, 1500);
-  });
+  const savedEmotion = {
+    ...emotion,
+    id: emotion.id || uuid(),
+    timestamp: emotion.timestamp || new Date().toISOString(),
+    date: emotion.date || new Date().toISOString()
+  };
+  
+  mockEmotions.unshift(savedEmotion);
+  return savedEmotion;
+};
+
+// Fetch emotion history (mock implementation)
+export const fetchEmotionsHistory = async (userId: string, limit = 10): Promise<EmotionResult[]> => {
+  // In a real app, this would fetch from a database
+  return mockEmotions.slice(0, limit);
+};
+
+// Fetch latest emotion (mock implementation)
+export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
+  // In a real app, this would fetch from a database
+  return mockEmotions[0] || null;
+};
+
+// Create emotion entry
+export const createEmotionEntry = async (data: {
+  user_id: string;
+  text?: string;
+  emojis?: string;
+  audio_url?: string;
+  date: string;
+}): Promise<EmotionResult> => {
+  // Mock emotion creation based on text
+  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'calm', 'anticipation', 'trust'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const randomScore = Math.floor(Math.random() * 60) + 40; // Score between 40-100
+
+  const result: EmotionResult = {
+    id: uuid(),
+    emotion: randomEmotion,
+    score: randomScore,
+    confidence: randomScore / 100,
+    timestamp: new Date().toISOString(),
+    date: data.date,
+    text: data.text,
+    user_id: data.user_id,
+    emojis: data.emojis,
+    feedback: `Based on your input, you appear to be ${randomEmotion}.`,
+    recommendations: [
+      "Take a short break",
+      "Practice deep breathing",
+      "Try a quick meditation"
+    ],
+    triggers: [
+      "Work pressure",
+      "Social interactions"
+    ],
+    intensity: randomScore
+  };
+  
+  await saveEmotion(result);
+  return result;
+};
+
+export default {
+  analyzeEmotion,
+  saveEmotion,
+  fetchEmotionsHistory,
+  fetchLatestEmotion,
+  createEmotionEntry
 };

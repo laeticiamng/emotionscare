@@ -1,10 +1,11 @@
+
 import { Theme, FontFamily, FontSize } from './theme';
 import { NotificationType, NotificationFrequency, NotificationTone } from './notification';
 
 // Combined UserRole type to handle all possible roles from different files
 export type UserRole = 'admin' | 'user' | 'manager' | 'coach' | 'guest' | 'b2b-admin' | 'b2b-user' | 'b2c' | 
                       'moderator' | 'b2b_admin' | 'b2b_user' | 'wellbeing_manager' | 'employee' | 'team_lead' | 
-                      'professional' | 'b2b-selection';
+                      'professional' | 'b2b-selection' | 'individual';
 
 export interface User {
   id: string;

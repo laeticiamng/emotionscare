@@ -1,103 +1,98 @@
-import { ReactNode } from 'react';
 
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  audioUrl?: string;
-  url?: string; // Adding url property
   duration: number;
   coverUrl?: string;
-  cover_url?: string;
-  cover?: string;
+  url?: string;
   genre?: string;
-  bpm?: number;
-  emotion?: string;
-  energyLevel?: number;
+  album?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
-  title?: string; // Adding title property for compatibility
+  title?: string;
   description?: string;
   tracks: MusicTrack[];
-  coverUrl?: string;
   category?: string;
-  emotion?: string;
-  trackCount?: number;
-  duration?: number;
-}
-
-export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  volume: number;
-  currentTime: number;
-  playlist: MusicPlaylist | null;
-  play: (track?: MusicTrack, playlist?: MusicPlaylist) => void;
-  pause: () => void;
-  next: () => void;
-  prev: () => void;
-  setVolume: (volume: number) => void;
-  seekTo: (time: number) => void;
-  togglePlayback: () => void;
-}
-
-export interface MusicDrawerProps {
-  children?: ReactNode;
-  isOpen?: boolean;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onClose?: () => void;
-  currentTrack: MusicTrack | null;
-  playlist?: MusicPlaylist;
-}
-
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  audioUrl: string;
   coverUrl?: string;
-  duration: number;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack | null;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export interface ProgressBarProps {
   progress?: number;
-  value?: number; // Added for compatibility
-  max?: number; // Added for compatibility
+  value?: number;
+  max?: number;
   onSeek?: (value: number) => void;
   className?: string;
-  showLabel?: boolean; // Added for compatibility
-  variant?: string; // Added for compatibility
-  currentTime?: number; // Added for compatibility
-  duration?: number; // Added for compatibility
-  formatTime?: (seconds: number) => string; // Added for compatibility
-  handleProgressClick?: (e: any) => void; // Added for compatibility
-  showTimestamps?: boolean; // Added for compatibility
-}
-
-export interface TrackInfoProps {
-  track: MusicTrack;
-  isActive?: boolean;
-  onClick?: () => void;
+  currentTime?: number;
+  duration?: number;
+  formatTime?: (seconds: number) => string;
+  showTimestamps?: boolean;
+  variant?: 'default' | 'thin' | 'thick';
+  handleProgressClick?: (e: any) => void;
+  showLabel?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange?: (volume: number) => void;
+  onVolumeChange: (volume: number) => void;
   className?: string;
-}
-
-export interface EmotionMusicParams {
-  emotion?: string;
-  intensity?: number;
-  style?: string;
+  onChange?: (volume: number) => void;
+  showLabel?: boolean;
 }
 
 export interface MusicLibraryProps {
   playlists: MusicPlaylist[];
   onSelectTrack: (track: MusicTrack) => void;
   onSelectPlaylist: (playlist: MusicPlaylist) => void;
+}
+
+export interface PlayerTabProps {
+  currentTrack: MusicTrack | null;
+  playlist: MusicPlaylist | null;
+}
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url?: string;
+  coverUrl?: string;
+}
+
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  progress: number;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  setProgress: (progress: number) => void;
+}
+
+export interface MusicDrawerProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist;
+  initialTrack?: MusicTrack;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  duration?: number;
+  tempo?: 'slow' | 'medium' | 'fast';
 }

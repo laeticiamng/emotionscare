@@ -5,9 +5,13 @@ export interface Emotion {
   score: number;
   color: string;
   icon?: string;
+  date?: string;
+  emotion?: string;
+  confidence?: number;
 }
 
 export interface EmotionResult {
+  id?: string;
   emotion: string;
   score: number;
   confidence?: number;
@@ -15,7 +19,12 @@ export interface EmotionResult {
   recommendations?: string[];
   triggers?: string[];
   emojis?: string | string[];
-  feedback?: string; // Made sure this exists
+  feedback?: string;
+  date?: string;
+  text?: string;
+  transcript?: string;
+  intensity?: number;
+  user_id?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -29,7 +38,7 @@ export interface EmotionalTeamViewProps {
   period?: 'day' | 'week' | 'month' | 'year';
   userId?: string;
   anonymized?: boolean;
-  className?: string; // Added this property
+  className?: string;
   dateRange?: {
     start: Date;
     end: Date;

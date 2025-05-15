@@ -277,9 +277,9 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user, onUpdate, onClose
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">Confidentialité</p>
                     <span className="text-xs">
-                      {user.preferences?.privacy?.profileVisibility === 'public' ? 'Public' : 
-                       user.preferences?.privacy?.profileVisibility === 'private' ? 'Privé' : 
-                       user.preferences?.privacy?.profileVisibility === 'team' ? 'Équipe' : 
+                      {typeof user.preferences?.privacy === 'object' && user.preferences?.privacy?.profileVisibility === 'public' ? 'Public' : 
+                       typeof user.preferences?.privacy === 'object' && user.preferences?.privacy?.profileVisibility === 'private' ? 'Privé' : 
+                       typeof user.preferences?.privacy === 'object' && user.preferences?.privacy?.profileVisibility === 'team' ? 'Équipe' : 
                        user.preferences?.profileVisibility === 'public' ? 'Public' :
                        user.preferences?.profileVisibility === 'private' ? 'Privé' :
                        user.preferences?.profileVisibility === 'team' ? 'Équipe' : 'Inconnu'}
