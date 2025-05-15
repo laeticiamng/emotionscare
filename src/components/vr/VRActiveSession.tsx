@@ -1,162 +1,81 @@
+
 import React, { useState, useEffect } from 'react';
+import { Badge, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { VRSessionTemplate, VRSession } from '@/types/types';
-import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
+import { VRSessionTemplate, VRSession } from '@/types';
 
 interface VRActiveSessionProps {
-  template: VRSessionTemplate;
-  onComplete?: (session: VRSession) => void;
-  onClose?: () => void;
+  session?: VRSession;
+  template?: VRSessionTemplate;
+  onResume?: () => void;
+  onCancel?: () => void;
 }
 
-const VRActiveSession: React.FC<VRActiveSessionProps> = ({ 
-  template, 
-  onComplete,
-  onClose
+const VRActiveSession: React.FC<VRActiveSessionProps> = ({
+  session,
+  template,
+  onResume,
+  onCancel
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [timeElapsed, setTimeElapsed] = useState(0);
-  const [sessionCompleted, setSessionCompleted] = useState(false);
-  const { toast } = useToast();
-  const { pauseTrack, playTrack, currentTrack } = useMusic();
+  const [timeElapsed, setTimeElapsed] = useState<string>('');
   
-  // Check if this is an audio-only session
-  const isAudioOnly = template.is_audio_only ?? !template.videoUrl;
-  
-  // Start session
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    if (!session || !session.startTime) return;
     
-    if (isPlaying && !sessionCompleted) {
-      timer = setInterval(() => {
-        setTimeElapsed(prev => {
-          const newValue = prev + 1;
-          // Check if session is complete
-          if (newValue >= template.duration) {
-            clearInterval(timer);
-            setIsPlaying(false);
-            setSessionCompleted(true);
-            
-            // Create session data
-            const sessionData: VRSession = {
-              id: crypto.randomUUID(),
-              templateId: template.templateId,
-              userId: 'current-user', // This should come from authentication context
-              startDate: new Date(Date.now() - template.duration * 1000).toISOString(),
-              endTime: new Date().toISOString(),
-              duration: template.duration,
-              completed: true
-            };
-            
-            if (onComplete) {
-              onComplete(sessionData);
-            }
-            
-            toast({
-              title: "Session terminée",
-              description: "Votre session VR est terminée. Comment vous sentez-vous ?",
-            });
-            
-            return template.duration;
-          }
-          return newValue;
-        });
-      }, 1000);
-    }
-    
-    return () => {
-      if (timer) clearInterval(timer);
+    // Calculate time elapsed since session started
+    const calculateTimeElapsed = () => {
+      const start = new Date(session.startTime);
+      const now = new Date();
+      const diffMs = now.getTime() - start.getTime();
+      
+      // Format as HH:MM:SS
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     };
-  }, [isPlaying, sessionCompleted, template.duration, onComplete]);
-  
-  // Load appropriate music if specified
-  useEffect(() => {
-    if (isPlaying && template.audio_url) {
-      // In a full implementation, we would load and play the audio
-      console.log('Playing VR session audio:', template.audio_url);
-    }
-  }, [isPlaying, template.audio_url]);
-  
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
     
-    if (!isPlaying) {
-      const targetEmotion = template.emotion_target || template.emotion || 'calm';
-      toast({
-        title: "Session démarrée",
-        description: `Session de ${Math.floor(template.duration / 60)} minutes. Installez-vous confortablement.`,
-      });
-    }
-  };
+    // Update time elapsed every second
+    const intervalId = setInterval(() => {
+      setTimeElapsed(calculateTimeElapsed());
+    }, 1000);
+    
+    // Initial calculation
+    setTimeElapsed(calculateTimeElapsed());
+    
+    return () => clearInterval(intervalId);
+  }, [session]);
   
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  if (!session && !template) return null;
   
-  const progressPercentage = (timeElapsed / template.duration) * 100;
+  const sessionTitle = template?.title || template?.name || 'Session en cours';
   
   return (
-    <Card className="w-full max-w-3xl mx-auto">
-      <CardHeader className="bg-primary/5">
-        <CardTitle>{template.title}</CardTitle>
-      </CardHeader>
+    <div className="p-4 border rounded-lg bg-muted/20">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-medium">{sessionTitle}</h3>
+        {session?.is_audio_only ? (
+          <Badge variant="outline" className="px-2 py-1 text-xs">Audio</Badge>
+        ) : (
+          <Badge variant="outline" className="px-2 py-1 text-xs">VR</Badge>
+        )}
+      </div>
       
-      <CardContent className="py-6 space-y-4">
-        <div className="aspect-video rounded-lg overflow-hidden bg-muted/50 flex items-center justify-center">
-          {isAudioOnly ? (
-            <div className="text-center p-8">
-              <div className="text-6xl mb-4 opacity-70">🧘‍♀️</div>
-              <p className="text-lg font-medium">Session audio guidée</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Fermez les yeux et laissez-vous guider
-              </p>
-            </div>
-          ) : (
-            template.videoUrl ? (
-              <video 
-                src={template.videoUrl} 
-                controls={isPlaying}
-                className="w-full h-full"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p>Aucune vidéo disponible</p>
-              </div>
-            )
-          )}
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>{formatTime(timeElapsed)}</span>
-            <span>{formatTime(template.duration)}</span>
-          </div>
-          <div className="w-full bg-muted rounded-full h-2">
-            <div 
-              className="bg-primary h-2 rounded-full" 
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </div>
-      </CardContent>
+      <div className="flex items-center text-muted-foreground text-sm mb-3">
+        <Clock className="h-4 w-4 mr-1" />
+        <span>{timeElapsed || '00:00:00'} écoulées</span>
+      </div>
       
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onClose}>
-          Quitter
+      <div className="flex space-x-2">
+        <Button variant="default" className="flex-1" onClick={onResume}>
+          Reprendre
         </Button>
-        
-        <Button 
-          onClick={togglePlay}
-          disabled={sessionCompleted}
-        >
-          {!isPlaying ? 'Démarrer' : 'Pause'}
+        <Button variant="outline" className="flex-1" onClick={onCancel}>
+          Annuler
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 

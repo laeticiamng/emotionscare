@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VRSessionTemplate } from '@/types/vr';
+import { VRSessionTemplate } from '@/types';
 
 export interface VRRecommendationsProps {
   templates: VRSessionTemplate[];
@@ -20,7 +20,7 @@ const VRRecommendations: React.FC<VRRecommendationsProps> = ({
       {showHeading && <h2>VR Recommendations</h2>}
       {templates.map(template => (
         <div key={template.id} onClick={() => onSelect(template)}>
-          {template.name}
+          {template.name || template.title}
         </div>
       ))}
     </div>

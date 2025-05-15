@@ -1,72 +1,97 @@
-import { VRSessionTemplate } from '@/types/vr';
 
-export const mockVRTemplates: VRSessionTemplate[] = [
+import { VRSessionTemplate } from '@/types';
+
+const mockVRTemplates: VRSessionTemplate[] = [
   {
-    id: '1',
-    name: 'Ocean Meditation',
-    description: 'Relax to the sound of waves and guided meditation',
-    duration: 600, // 10 minutes
-    type: 'meditation',
-    thumbnail: '/images/vr/ocean-meditation.jpg',
-    videoUrl: '/videos/vr/ocean-meditation.mp4',
-    emotion: 'calm',
-    title: 'Ocean Meditation',
-    audio_url: '/audio/meditation/ocean.mp3',
-    preview_url: '/images/vr/ocean-meditation-preview.jpg',
-    is_audio_only: false,
-    difficulty: 'beginner',
-    theme: 'nature',
-    tags: ['meditation', 'ocean', 'relaxation'] // Add tags field
+    id: "vr1",
+    name: "Calm Beach Meditation",
+    title: "Calm Beach Meditation",
+    description: "Relax to the sound of waves on a peaceful beach",
+    duration: 5 * 60, // 5 minutes in seconds
+    emotion: "calm",
+    is_audio_only: true,
+    audio_url: "/audio/beach-meditation.mp3",
+    benefits: [
+      "Stress reduction",
+      "Mental clarity",
+      "Improved focus"
+    ],
+    difficulty: "easy",
+    theme: "nature",
+    tags: ["relaxation", "beach", "beginner"]
   },
   {
-    id: '2',
-    name: 'Forest Walk',
-    description: 'A calming walk through a lush green forest',
-    duration: 900, // 15 minutes
-    type: 'relaxation',
-    thumbnail: '/images/vr/forest-walk.jpg',
-    videoUrl: '/videos/vr/forest-walk.mp4',
-    emotion: 'calm',
-    title: 'Forest Walk',
-    audio_url: '/audio/relaxation/forest.mp3',
-    preview_url: '/images/vr/forest-walk-preview.jpg',
+    id: "vr2",
+    name: "Energizing Forest Walk",
+    title: "Energizing Forest Walk",
+    description: "A virtual walk through a vibrant forest",
+    duration: 10 * 60, // 10 minutes in seconds
+    emotion: "energetic",
     is_audio_only: false,
-    difficulty: 'beginner',
-    theme: 'nature',
-    tags: ['relaxation', 'forest', 'nature'] // Add tags field
+    preview_url: "/images/forest-preview.jpg",
+    benefits: [
+      "Energy boost",
+      "Mood elevation",
+      "Creativity enhancement"
+    ],
+    difficulty: "medium",
+    theme: "nature",
+    tags: ["energy", "forest", "walking"]
   },
   {
-    id: '3',
-    name: 'Mountain View',
-    description: 'Enjoy the serene view from a high mountain peak',
-    duration: 1200, // 20 minutes
-    type: 'scenic',
-    thumbnail: '/images/vr/mountain-view.jpg',
-    videoUrl: '/videos/vr/mountain-view.mp4',
-    emotion: 'joy',
-    title: 'Mountain View',
-    audio_url: '/audio/scenic/mountain.mp3',
-    preview_url: '/images/vr/mountain-view-preview.jpg',
-    is_audio_only: false,
-    difficulty: 'intermediate',
-    theme: 'nature',
-    tags: ['scenic', 'mountain', 'nature'] // Add tags field
+    id: "vr3",
+    name: "Mindful Breathing",
+    title: "Mindful Breathing",
+    description: "Guided breathing exercise for focused attention",
+    duration: 3 * 60, // 3 minutes in seconds
+    emotion: "focused",
+    is_audio_only: true,
+    audio_url: "/audio/breathing-exercise.mp3",
+    benefits: [
+      "Improved concentration",
+      "Stress reduction",
+      "Present moment awareness"
+    ],
+    difficulty: "easy",
+    theme: "mindfulness",
+    tags: ["breathing", "focus", "beginner"]
   },
   {
-    id: '4',
-    name: 'Sunset Beach',
-    description: 'Watch a beautiful sunset on a tropical beach',
-    duration: 720, // 12 minutes
-    type: 'relaxation',
-    thumbnail: '/images/vr/sunset-beach.jpg',
-    videoUrl: '/videos/vr/sunset-beach.mp4',
-    emotion: 'joy',
-    title: 'Sunset Beach',
-    audio_url: '/audio/relaxation/beach.mp3',
-    preview_url: '/images/vr/sunset-beach-preview.jpg',
+    id: "vr4",
+    name: "Evening Wind Down",
+    title: "Evening Wind Down",
+    description: "A calming session to help you relax before sleep",
+    duration: 15 * 60, // 15 minutes in seconds
+    emotion: "calm",
+    is_audio_only: true,
+    audio_url: "/audio/evening-relaxation.mp3",
+    benefits: [
+      "Better sleep",
+      "Anxiety reduction",
+      "Mental decompression"
+    ],
+    difficulty: "easy",
+    theme: "relaxation",
+    tags: ["sleep", "evening", "relaxation"]
+  },
+  {
+    id: "vr5",
+    name: "Mountain Visualization",
+    title: "Mountain Visualization",
+    description: "Visualize yourself standing strong like a mountain",
+    duration: 8 * 60, // 8 minutes in seconds
+    emotion: "strong",
     is_audio_only: false,
-    difficulty: 'beginner',
-    theme: 'nature',
-    tags: ['relaxation', 'beach', 'nature'] // Add tags field
+    preview_url: "/images/mountain-visualization.jpg",
+    benefits: [
+      "Inner strength",
+      "Emotional resilience",
+      "Self-confidence"
+    ],
+    difficulty: "medium",
+    theme: "visualization",
+    tags: ["strength", "confidence", "resilience"]
   }
 ];
+
+export default mockVRTemplates;

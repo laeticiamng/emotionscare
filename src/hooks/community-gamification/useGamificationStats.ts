@@ -1,62 +1,81 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { fetchGamificationStats } from '@/lib/gamificationService';
-import { GamificationStats } from './types';
+import { useState, useEffect, useCallback } from 'react';
+import { GamificationStats, Badge } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
-export const useGamificationStats = () => {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<GamificationStats>({
-    points: 0,
-    level: 1,
-    rank: 'Débutant',
-    badges: [],
-    streak: 0,
-    nextLevelPoints: 100,
-    progress: 0,
-    recentAchievements: []
-  });
-  
-  const [loading, setLoading] = useState<boolean>(true);
+export const useGamificationStats = (userId: string | undefined) => {
+  const [stats, setStats] = useState<GamificationStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const fetchStats = async () => {
-    if (!user) return;
+  const fetchStats = useCallback(async () => {
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
     
-    setLoading(true);
+    setIsLoading(true);
     setError(null);
     
     try {
-      const data = await fetchGamificationStats(user.id);
+      // This would call an actual API in a real app
+      // For demo purposes, we'll return mock data
+      const mockStats: GamificationStats = {
+        points: 1250,
+        level: 4,
+        badges: [
+          {
+            id: '1',
+            name: 'First Emotion',
+            description: 'Complete your first emotion scan',
+            icon: 'smile',
+            type: 'achievement',
+            level: 1
+          },
+          {
+            id: '2',
+            name: 'Consistent',
+            description: 'Log in for 5 consecutive days',
+            icon: 'calendar',
+            type: 'streak',
+            level: 2
+          }
+        ] as Badge[],
+        rank: 'Explorer',
+        streak: 5,
+        completedChallenges: 7,
+        totalChallenges: 12,
+        challenges: [],
+        nextLevel: 5,
+        pointsToNextLevel: 500,
+        progressToNextLevel: 60,
+        streakDays: 5,
+        lastActivityDate: new Date().toISOString(),
+        activeChallenges: 3,
+        leaderboard: []
+      };
       
-      // Adapter les données du serveur à notre format local
-      setStats({
-        points: data.points,
-        level: data.level,
-        rank: data.rank,
-        badges: data.badges || [],
-        streak: data.streak,
-        nextLevelPoints: data.pointsToNextLevel,
-        progress: (data.progressToNextLevel / data.pointsToNextLevel) * 100,
-        recentAchievements: data.recentAchievements || []
-      });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      setStats(mockStats);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Erreur lors de la récupération des statistiques";
-      setError(errorMessage);
+      console.error('Error fetching gamification stats:', err);
+      setError('Failed to load gamification statistics');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, [userId]);
   
   useEffect(() => {
     fetchStats();
-  }, [user]);
+  }, [fetchStats]);
   
   return {
     stats,
-    loading,
+    isLoading,
     error,
-    refetch: fetchStats
+    refreshStats: fetchStats
   };
 };
 

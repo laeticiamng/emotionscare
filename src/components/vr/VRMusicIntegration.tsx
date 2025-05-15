@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicProps } from '@/types/types';
+import { VRSessionWithMusicProps } from '@/types';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
@@ -39,7 +39,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
+              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
             };
             playTrack(track);
           }

@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicProps } from '@/types/types';
+import { VRSessionWithMusicProps } from '@/types';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template, 
@@ -14,7 +14,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   audioUrl, 
   emotion 
 }) => {
-  // Utiliser les props directes ou depuis le template
+  // Use direct props or from the template
   const activeTemplate = session || template;
   const handleComplete = onSessionComplete || onComplete;
   
@@ -25,32 +25,31 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
   
   useEffect(() => {
-    // Charger une playlist basée sur l'émotion cible de la session
+    // Load a playlist based on the emotion target of the session
     const loadMusic = async () => {
       try {
-        if (targetEmotion) {
-          const playlist = await loadPlaylistForEmotion?.(targetEmotion);
+        if (targetEmotion && loadPlaylistForEmotion) {
+          const playlist = await loadPlaylistForEmotion(targetEmotion);
           
           if (playlist && playlist.tracks.length > 0) {
-            // S'assurer que la track a les propriétés requises
+            // Ensure the track has the required properties
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
               url: playlist.tracks[0].url || '',
-              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].url || '',
-              coverUrl: playlist.tracks[0].coverUrl || ''
+              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].url || ''
             };
             playTrack(track);
           }
         }
       } catch (error) {
-        console.error("Erreur lors du chargement de la musique pour VR:", error);
+        console.error("Error loading music for VR session:", error);
       }
     };
     
     loadMusic();
     
-    // Nettoyage
+    // Cleanup
     return () => {
       pauseTrack();
     };

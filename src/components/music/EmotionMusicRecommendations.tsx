@@ -1,161 +1,112 @@
 
-import React, { useEffect, useState } from 'react';
-import { MusicPlaylist, MusicTrack, EmotionResult } from '@/types/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Music, Activity } from 'lucide-react';
-import { Skeleton } from "@/components/ui/skeleton";
-import TrackList from './TrackList';
-import { useMusic } from '@/contexts/MusicContext';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MusicPlaylist, MusicTrack, EmotionResult } from '@/types';
+import { PlayCircle } from 'lucide-react';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
-  userMood?: EmotionResult | null;
+  emotionResult?: EmotionResult;
+  playlists?: MusicPlaylist[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  onSelectTrack?: (track: MusicTrack) => void;
   isLoading?: boolean;
 }
 
-// Map emotions to music moods
-const EMOTION_TO_MOOD_MAP: Record<string, string> = {
-  joy: 'happy',
-  happiness: 'happy',
-  calm: 'calm',
-  neutral: 'neutral',
-  sadness: 'melancholic',
-  anger: 'energetic',
-  fear: 'ambient',
-  anxiety: 'soothing',
-  surprise: 'upbeat'
-};
-
-// Mock API call
-const getRecommendedTracks = async (emotion: string): Promise<MusicTrack[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Return mock tracks
-  return [
-    {
-      id: '1',
-      title: 'Calm Waters',
-      artist: 'Serenity',
-      coverUrl: '/images/music/calm-1.jpg',
-      url: '/audio/calm-1.mp3',
-      duration: 180,
-      emotion: 'calm'
-    },
-    {
-      id: '2',
-      title: 'Peaceful Mind',
-      artist: 'Zen Masters',
-      coverUrl: '/images/music/calm-2.jpg',
-      url: '/audio/calm-2.mp3',
-      duration: 240,
-      emotion: 'calm'
-    },
-    {
-      id: '3',
-      title: 'Morning Light',
-      artist: 'Nature Sounds',
-      coverUrl: '/images/music/calm-3.jpg',
-      url: '/audio/calm-3.mp3',
-      duration: 210,
-      emotion: 'joy'
-    }
-  ];
-};
-
 const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = ({
-  emotion = 'neutral',
-  userMood,
+  emotion,
+  emotionResult,
+  playlists = [],
+  onSelectPlaylist,
+  onSelectTrack,
   isLoading = false
 }) => {
-  const { playTrack, currentTrack, isPlaying, togglePlay } = useMusic();
-  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
-  const [loading, setLoading] = useState(true);
-  
-  // Determine the emotion to use for recommendations
-  const targetEmotion = userMood?.emotion || emotion;
-  const mood = EMOTION_TO_MOOD_MAP[targetEmotion.toLowerCase()] || 'neutral';
-  
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      setLoading(true);
-      try {
-        const tracks = await getRecommendedTracks(targetEmotion);
-        setRecommendedTracks(tracks);
-      } catch (error) {
-        console.error('Error fetching music recommendations:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchRecommendations();
-  }, [targetEmotion]);
-  
-  const handlePlayTrack = (track: MusicTrack) => {
-    // Make sure track has the required properties
-    const normalizedTrack: MusicTrack = {
-      ...track,
-      url: track.url || track.audioUrl || '',
-      audioUrl: track.audioUrl || track.url || '',
-      coverUrl: track.coverUrl || ''
-    };
-    
-    playTrack(normalizedTrack);
-  };
-  
-  if (isLoading || loading) {
+  const emotionName = emotion || emotionResult?.emotion || '';
+
+  // Filter playlists matching the emotion
+  const filteredPlaylists = playlists.filter(playlist => 
+    playlist.emotion?.toLowerCase() === emotionName.toLowerCase()
+  );
+
+  // If no specific playlists found, show a subset of all playlists
+  const displayPlaylists = filteredPlaylists.length > 0 
+    ? filteredPlaylists 
+    : playlists.slice(0, 3);
+
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2 mt-2" />
+          <CardTitle className="text-lg">Musique recommandée</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="flex items-center gap-4">
-                <Skeleton className="h-10 w-10 rounded-md" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-              </div>
-            ))}
+          <div className="flex flex-col space-y-2">
+            <div className="h-8 bg-muted rounded animate-pulse"></div>
+            <div className="h-8 bg-muted rounded animate-pulse"></div>
           </div>
         </CardContent>
       </Card>
     );
   }
-  
+
+  if (displayPlaylists.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Musique recommandée</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">
+            Aucune playlist disponible pour le moment
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Music className="h-5 w-5" />
-          Musique recommandée
+        <CardTitle className="text-lg">
+          {emotionName 
+            ? `Musique pour l'émotion "${emotionName}"`
+            : "Musique recommandée"
+          }
         </CardTitle>
-        <CardDescription className="flex items-center gap-1">
-          <Activity className="h-3.5 w-3.5" />
-          Sélection basée sur vos émotions actuelles
-        </CardDescription>
       </CardHeader>
       <CardContent>
-        {recommendedTracks.length > 0 ? (
-          <TrackList 
-            tracks={recommendedTracks}
-            onTrackSelect={handlePlayTrack}
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            onPlayPause={togglePlay}
-            showEmotionTag={true}
-            compact={true}
-          />
-        ) : (
-          <p className="text-muted-foreground text-center py-6">
-            Aucune recommandation musicale disponible pour le moment.
-          </p>
-        )}
+        <div className="space-y-3">
+          {displayPlaylists.map(playlist => (
+            <div 
+              key={playlist.id}
+              className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50"
+            >
+              <div>
+                <h4 className="font-medium">{playlist.name || playlist.title}</h4>
+                <p className="text-sm text-muted-foreground">
+                  {playlist.tracks.length} morceaux
+                </p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => onSelectPlaylist && onSelectPlaylist(playlist)}
+              >
+                <PlayCircle className="h-6 w-6" />
+              </Button>
+            </div>
+          ))}
+          
+          {displayPlaylists.length < playlists.length && (
+            <Button 
+              variant="link" 
+              className="w-full mt-2"
+            >
+              Voir toutes les playlists
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

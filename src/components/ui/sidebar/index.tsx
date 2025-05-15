@@ -1,91 +1,53 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { sidebarItems, adminSidebarItems, footerNavItems } from '@/components/navigation/navConfig';
-import { isAdminRole } from '@/utils/roleUtils';
-import { SidebarProvider, useSidebar } from './SidebarContext';
-import SidebarNavGroup from './SidebarNavGroup';
-import SidebarFooter from './SidebarFooter';
-import { ThemeButton } from './ThemeButton';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import ThemeButton from './ThemeButton';
 
-// Interface pour assurer la compatibilité avec NavItemConfig
-interface NavItemConfig {
-  path: string;
-  label: string;
-  icon: React.ElementType;
-  [key: string]: any;
+interface SidebarProps {
+  children: React.ReactNode;
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+  className?: string;
 }
 
-// Fonction pour convertir NavItem en NavItemConfig
-const convertToNavItemConfig = (items: any[]) => {
-  return items.map(item => ({
-    path: item.href || "",
-    label: item.title || "",
-    icon: item.icon,
-    ...item
-  }));
-};
-
-// Composant interne qui utilise le contexte sidebar
-const SidebarContent: React.FC = () => {
-  const { user } = useAuth();
-  const { collapsed } = useSidebar();
-  const isAdmin = user ? isAdminRole(user.role) : false;
-  
-  console.log("Rendering Sidebar with user:", user?.name, "isAdmin:", isAdmin, "collapsed:", collapsed);
-  
-  // Choisir les éléments de navigation en fonction du rôle
-  const items = isAdmin ? adminSidebarItems : sidebarItems;
-  const configItems = convertToNavItemConfig(items);
-  const configFooterItems = convertToNavItemConfig(footerNavItems);
-
+export const Sidebar = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & SidebarProps
+>(({ children, collapsed, toggleCollapsed, className, ...props }, ref) => {
   return (
-    <aside 
-      className={`bg-background/80 backdrop-blur-sm border-r border-border h-full flex flex-col transition-all duration-300 ${
-        collapsed ? 'w-16' : 'w-64'
-      }`}
-      aria-label="Sidebar navigation"
+    <div
+      ref={ref}
+      className={cn(
+        "relative flex h-full flex-col border-r bg-background transition-all duration-300",
+        collapsed ? "w-16" : "w-64",
+        className
+      )}
+      {...props}
     >
-      <div className="flex-1 overflow-y-auto py-4 px-2">
-        <SidebarNavGroup
-          title={isAdmin ? 'Outils Administrateur' : 'Outils Complémentaires'}
-          items={configItems}
-          collapsed={collapsed}
-        />
-
-        {!isAdmin && footerNavItems.length > 0 && (
-          <>
-            <div className="my-2 border-t border-border"></div>
-            <SidebarNavGroup
-              title="Préférences"
-              items={configFooterItems}
-              collapsed={collapsed}
-            />
-            
-            {/* Bouton de basculement de thème */}
-            <div className="space-y-1 mt-2">
-              <ThemeButton collapsed={collapsed} />
-            </div>
-          </>
-        )}
+      <div className="flex-1 overflow-y-auto p-3 pt-1">{children}</div>
+      <div className="p-3 pt-0">
+        <Separator className="my-2" />
+        <div className="flex items-center justify-between">
+          <ThemeButton collapsed={collapsed} />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            onClick={toggleCollapsed}
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </Button>
+        </div>
       </div>
-      
-      <SidebarFooter />
-    </aside>
+    </div>
   );
-};
+});
+Sidebar.displayName = "Sidebar";
 
-// Exporter le composant Sidebar principal qui fournit le contexte
-const Sidebar: React.FC = () => {
-  console.log("Rendering Sidebar component");
-  return (
-    <SidebarProvider>
-      <SidebarContent />
-    </SidebarProvider>
-  );
-};
-
-export default Sidebar;
+export { default as SidebarSection } from './SidebarSection';
+export { default as SidebarItem } from './SidebarItem';
+export { default as SidebarTriggerItem } from './SidebarTriggerItem';
+export { default as ThemeButton } from './ThemeButton';

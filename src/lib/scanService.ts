@@ -1,115 +1,105 @@
 
-import { EmotionResult } from '@/types';
+// Create the scanService functions that were missing
 import { v4 as uuid } from 'uuid';
+import { Emotion, EmotionResult } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
-// Mock function to analyze audio and return emotion data
+/**
+ * Analyze an audio recording and extract emotion data
+ */
 export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult> {
-  // In a real implementation, this would send the audio to an API
-  // This is a mock implementation
-  console.log('Analyzing audio stream...');
+  // For now this is a mock implementation
+  // In a real app, you would send the audio to a backend service
+  console.log('Analyzing audio stream');
   
-  // Simulate API delay
+  // Simulating API delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
-  // Return mock result
-  return {
+  // Simulate emotion detection
+  const emotions = ['joy', 'sadness', 'anger', 'surprise', 'fear', 'disgust', 'neutral'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const randomConfidence = 0.7 + (Math.random() * 0.3);
+  
+  const result: EmotionResult = {
     id: uuid(),
-    emotion: getRandomEmotion(),
-    score: Math.floor(Math.random() * 40) + 60,
-    confidence: (Math.random() * 0.3) + 0.6,
-    transcript: "This is a simulated transcript from the audio recording.",
-    date: new Date().toISOString(),
-    emojis: ["😊", "🙂"],
-    ai_feedback: "This is a simulated AI feedback based on the audio recording.",
+    emotion: randomEmotion,
+    confidence: randomConfidence,
+    score: Math.round(randomConfidence * 100),
+    transcript: 'Transcription would appear here in a real implementation.',
+    feedback: `I detect a ${randomEmotion} emotion in your voice.`,
+    ai_feedback: `Based on vocal analysis, your primary emotion is ${randomEmotion}.`,
     recommendations: [
-      "Take a short break",
-      "Practice deep breathing",
-      "Listen to calming music"
+      'Take a moment to breathe deeply',
+      'Consider writing in your journal',
+      'Try a short meditation session'
     ]
   };
+  
+  return result;
 }
 
-// Function to save emotion data to database
-export async function saveEmotion(emotionData: EmotionResult): Promise<boolean> {
+/**
+ * Create a new emotion entry for a user
+ */
+export async function createEmotionEntry(data: Partial<Emotion>): Promise<Emotion> {
+  if (!data.user_id) {
+    throw new Error('User ID is required');
+  }
+  
+  const emotion: Emotion = {
+    id: data.id || uuid(),
+    user_id: data.user_id,
+    date: data.date || new Date().toISOString(),
+    emotion: data.emotion || 'neutral',
+    score: data.score || 50,
+    ...data
+  };
+  
   try {
-    // Format the data for storage based on the schema
-    const dataToStore = {
-      id: emotionData.id || uuid(),
-      user_id: emotionData.user_id || 'anonymous',
-      date: emotionData.date || new Date().toISOString(),
-      emotion: emotionData.emotion,
-      score: emotionData.score || 0,
-      text: emotionData.text || emotionData.transcript || '',
-      emojis: emotionData.emojis || [],
-      audio_url: emotionData.audio_url || '',
-      ai_feedback: emotionData.ai_feedback || emotionData.feedback || ''
-    };
-
-    // If using Supabase, uncomment this
-    /*
-    const { error } = await supabase
+    const { data: savedEmotion, error } = await supabase
       .from('emotions')
-      .insert(dataToStore);
-
+      .insert(emotion)
+      .select()
+      .single();
+      
     if (error) throw error;
-    */
     
-    console.log('Saving emotion data:', dataToStore);
-    return true;
+    return savedEmotion as Emotion;
   } catch (error) {
     console.error('Error saving emotion:', error);
-    return false;
+    // Return the local emotion object if DB save fails
+    return emotion;
   }
 }
 
-// Function to analyze text and return emotion data
-export async function analyzeEmotion(text: string): Promise<EmotionResult> {
-  // In a real implementation, this would send the text to an API
-  // This is a mock implementation
-  console.log('Analyzing text:', text);
+/**
+ * Fetch the latest emotion entry for a user
+ */
+export async function fetchLatestEmotion(userId: string): Promise<Emotion | null> {
+  if (!userId) {
+    throw new Error('User ID is required');
+  }
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Return mock result
-  return {
-    id: uuid(),
-    emotion: getRandomEmotion(),
-    score: Math.floor(Math.random() * 40) + 60,
-    confidence: (Math.random() * 0.3) + 0.6,
-    text: text,
-    date: new Date().toISOString(),
-    emojis: ["😊"],
-    ai_feedback: "Based on your text, I detect a generally positive emotional state.",
-    recommendations: [
-      "Continue with activities that bring you joy",
-      "Share your positive state with others",
-      "Journal about what's working well for you"
-    ]
-  };
-}
-
-// Helper function to get random emotion
-function getRandomEmotion(): string {
-  const emotions = ['joy', 'calm', 'anxious', 'focused', 'tired', 'excited'];
-  return emotions[Math.floor(Math.random() * emotions.length)];
-}
-
-// Function to get emotion history for a user
-export async function getEmotionHistory(userId: string): Promise<EmotionResult[]> {
-  // In a real implementation, this would fetch from a database
-  // This is a mock implementation
-  console.log('Fetching emotion history for user:', userId);
-  
-  // Return mock results
-  return Array(5).fill(null).map((_, index) => ({
-    id: uuid(),
-    emotion: getRandomEmotion(),
-    score: Math.floor(Math.random() * 40) + 60,
-    confidence: (Math.random() * 0.3) + 0.6,
-    text: "Sample text entry " + (index + 1),
-    date: new Date(Date.now() - index * 86400000).toISOString(), // Each day earlier
-    ai_feedback: "Sample AI feedback for emotion record " + (index + 1)
-  }));
+  try {
+    const { data, error } = await supabase
+      .from('emotions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false })
+      .limit(1)
+      .single();
+      
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // No data found - not really an error
+        return null;
+      }
+      throw error;
+    }
+    
+    return data as Emotion;
+  } catch (error) {
+    console.error('Error fetching latest emotion:', error);
+    return null;
+  }
 }

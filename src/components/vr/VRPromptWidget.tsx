@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Timer } from 'lucide-react';
-import { VRSessionTemplate, VRSession } from '@/types/vr';
+import { VRSessionTemplate, VRSession } from '@/types';
 import { useRouter } from '@/hooks/router';
 
 interface VRPromptWidgetProps {
@@ -44,7 +44,7 @@ const VRPromptWidget: React.FC<VRPromptWidgetProps> = ({
       <CardContent className="pb-2">
         {template ? (
           <div className="space-y-3">
-            <div className="font-medium">{template.title}</div>
+            <div className="font-medium">{template.title || template.name}</div>
             <div className="flex items-center text-sm text-muted-foreground">
               <Timer className="mr-1 h-4 w-4" />
               {formatSessionDuration(template.duration)}

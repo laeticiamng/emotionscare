@@ -1,7 +1,8 @@
-import React from 'react';
-import { VRSessionTemplate } from '@/types/vr';
 
-export interface VRHistoryListProps {
+import React from 'react';
+import { VRSessionTemplate } from '@/types';
+
+interface VRHistoryListProps {
   onSelect: (template: VRSessionTemplate) => void;
   templates?: VRSessionTemplate[];
   title?: string;
@@ -32,7 +33,7 @@ const VRHistoryList: React.FC<VRHistoryListProps> = ({
               onClick={() => onSelect(template)}
               className="p-3 border rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
             >
-              <div className="font-medium">{template.name}</div>
+              <div className="font-medium">{template.name || template.title}</div>
               {template.description && (
                 <div className="text-sm text-muted-foreground">{template.description}</div>
               )}

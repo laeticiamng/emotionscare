@@ -1,142 +1,123 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useTheme } from '@/contexts/ThemeContext';
-import type { FontSize, FontFamily } from '@/contexts/ThemeContext';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Info } from 'lucide-react';
-import { toast } from 'sonner';
+import { FontSize, FontFamily, ThemeName } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Monitor, Moon, Sun } from 'lucide-react';
 
 const DisplayPreferences: React.FC = () => {
-  const { preferences, updatePreferences } = useUserPreferences();
-  const { theme, setTheme, fontFamily, setFontFamily, fontSize, setFontSize } = useTheme();
-  
-  const handleFontFamilyChange = (value: FontFamily) => {
-    updatePreferences({ font: value });
-    setFontFamily(value);
-    toast.success("Police de caractères mise à jour", {
-      description: "Votre préférence a été enregistrée."
-    });
-  };
-  
-  const handleFontSizeChange = (value: FontSize) => {
-    updatePreferences({ fontSize: value });
-    setFontSize(value);
-    toast.success("Taille de police mise à jour", {
-      description: "Votre préférence a été enregistrée."
-    });
-  };
-  
-  const handleHighContrastChange = (checked: boolean) => {
-    updatePreferences({ highContrast: checked });
-    toast.success("Contraste élevé " + (checked ? "activé" : "désactivé"), {
-      description: "Votre préférence a été enregistrée."
-    });
-  };
-  
-  const handleReducedAnimationsChange = (checked: boolean) => {
-    updatePreferences({ reducedAnimations: checked });
-    toast.success("Animations réduites " + (checked ? "activées" : "désactivées"), {
-      description: "Votre préférence a été enregistrée."
-    });
-  };
-  
+  const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Affichage et accessibilité</CardTitle>
+        <CardTitle>Préférences d'affichage</CardTitle>
+        <CardDescription>
+          Personnalisez l'apparence de l'application selon vos préférences
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Thème */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label className="text-base">Thème</Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info size={16} className="text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Changer l'apparence de l'application</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="theme">Thème</Label>
+            <div className="flex items-center space-x-2">
+              <Button 
+                size="icon" 
+                variant={theme === 'light' ? 'default' : 'ghost'}
+                onClick={() => setTheme('light')} 
+                className="h-8 w-8"
+              >
+                <Sun className="h-4 w-4" />
+              </Button>
+              <Button 
+                size="icon" 
+                variant={theme === 'dark' ? 'default' : 'ghost'}
+                onClick={() => setTheme('dark')} 
+                className="h-8 w-8"
+              >
+                <Moon className="h-4 w-4" />
+              </Button>
+              <Button 
+                size="icon" 
+                variant={theme === 'system' ? 'default' : 'ghost'}
+                onClick={() => setTheme('system')} 
+                className="h-8 w-8"
+              >
+                <Monitor className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <ThemeSwitcher />
-        </div>
-        
-        {/* Police de caractères */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label htmlFor="fontFamily" className="text-base">Police de caractères</Label>
-          </div>
-          <Select value={fontFamily} onValueChange={handleFontFamilyChange}>
-            <SelectTrigger id="fontFamily">
-              <SelectValue placeholder="Choisir une police" />
+          <Select value={theme as ThemeName} onValueChange={(value) => setTheme(value as ThemeName)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sélectionnez un thème" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="inter">Inter (défaut)</SelectItem>
-              <SelectItem value="poppins">Poppins</SelectItem>
-              <SelectItem value="roboto">Roboto</SelectItem>
-              <SelectItem value="montserrat">Montserrat</SelectItem>
-              <SelectItem value="mono">Monospace</SelectItem>
+              <SelectItem value="light">Clair</SelectItem>
+              <SelectItem value="dark">Sombre</SelectItem>
+              <SelectItem value="system">Système</SelectItem>
+              <SelectItem value="pastel">Pastel</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <Label htmlFor="font-size">Taille de police</Label>
+          <RadioGroup
+            value={fontSize as string}
+            onValueChange={(value) => setFontSize && setFontSize(value as FontSize)}
+            className="grid grid-cols-3 gap-4"
+          >
+            <div>
+              <RadioGroupItem value="small" id="small" className="peer sr-only" />
+              <Label
+                htmlFor="small"
+                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              >
+                <span className="text-xs">Aa</span>
+                <span className="text-xs mt-1">Petite</span>
+              </Label>
+            </div>
+            <div>
+              <RadioGroupItem value="medium" id="medium" className="peer sr-only" />
+              <Label
+                htmlFor="medium"
+                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              >
+                <span className="text-sm">Aa</span>
+                <span className="text-xs mt-1">Moyenne</span>
+              </Label>
+            </div>
+            <div>
+              <RadioGroupItem value="large" id="large" className="peer sr-only" />
+              <Label
+                htmlFor="large"
+                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              >
+                <span className="text-base">Aa</span>
+                <span className="text-xs mt-1">Grande</span>
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="font-family">Police</Label>
+          <Select value={fontFamily as string} onValueChange={(value) => setFontFamily && setFontFamily(value as FontFamily)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sélectionnez une police" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="system">Système</SelectItem>
+              <SelectItem value="sans-serif">Sans Serif</SelectItem>
               <SelectItem value="serif">Serif</SelectItem>
-              <SelectItem value="default">Système</SelectItem>
+              <SelectItem value="mono">Monospace</SelectItem>
+              <SelectItem value="rounded">Arrondie</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        
-        {/* Taille de police */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <Label htmlFor="fontSize" className="text-base">Taille de police</Label>
-          </div>
-          <Select value={fontSize} onValueChange={handleFontSizeChange}>
-            <SelectTrigger id="fontSize">
-              <SelectValue placeholder="Choisir une taille" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="small">Petite</SelectItem>
-              <SelectItem value="medium">Normale (défaut)</SelectItem>
-              <SelectItem value="large">Grande</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        {/* Options d'accessibilité */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium">Options d'accessibilité</h3>
-          
-          {/* Contraste élevé */}
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="high-contrast" className="text-base">Contraste élevé</Label>
-              <p className="text-sm text-muted-foreground">Augmente le contraste pour une meilleure lisibilité</p>
-            </div>
-            <Switch 
-              id="high-contrast"
-              checked={preferences?.highContrast || false}
-              onCheckedChange={handleHighContrastChange}
-            />
-          </div>
-          
-          {/* Animations réduites */}
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="reduced-animations" className="text-base">Réduire les animations</Label>
-              <p className="text-sm text-muted-foreground">Limite les animations et effets visuels</p>
-            </div>
-            <Switch 
-              id="reduced-animations"
-              checked={preferences?.reducedAnimations || false}
-              onCheckedChange={handleReducedAnimationsChange}
-            />
-          </div>
         </div>
       </CardContent>
     </Card>

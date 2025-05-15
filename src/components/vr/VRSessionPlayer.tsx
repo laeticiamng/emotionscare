@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { VRSessionTemplate } from '@/types/types';
+import { VRSessionTemplate } from '@/types';
 import { PauseCircle, PlayCircle, SkipBack, X } from 'lucide-react';
 
 interface VRSessionPlayerProps {
@@ -13,7 +14,7 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
   const [progress, setProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const totalDuration = template.duration * 60; // Convert minutes to seconds
+  const totalDuration = template.duration;
   
   // Handle session playback
   useEffect(() => {
@@ -58,7 +59,7 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{template.title}</h1>
+        <h1 className="text-2xl font-bold">{template.title || template.name}</h1>
         <Button variant="ghost" size="sm" onClick={onComplete}>
           <X className="h-5 w-5 mr-1" /> Exit Session
         </Button>
@@ -71,7 +72,7 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
             <div className="aspect-video w-full bg-black rounded-lg overflow-hidden">
               <img
                 src={template.preview_url}
-                alt={template.title}
+                alt={template.title || template.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -94,14 +95,19 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
             <Progress value={progress} className="h-2" />
             
             <div className="flex items-center justify-center space-x-4 mt-4">
-              <Button variant="ghost" size="icon" onClick={handleRestart}>
-                <SkipBack className="h-6 w-6" />
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={handleRestart}
+                title="Restart"
+              >
+                <SkipBack className="h-4 w-4" />
               </Button>
               
               <Button 
-                variant="default" 
-                size="icon" 
-                className="h-12 w-12 rounded-full" 
+                size="lg"
+                variant="default"
+                className="rounded-full h-16 w-16 flex items-center justify-center"
                 onClick={togglePlayPause}
               >
                 {isPlaying ? (
@@ -114,28 +120,33 @@ const VRSessionPlayer: React.FC<VRSessionPlayerProps> = ({ template, onComplete 
           </div>
         </div>
         
-        {/* Session info */}
+        {/* Right side info panel */}
         <div className="lg:col-span-4">
-          <div className="bg-muted/30 p-4 rounded-lg">
-            <h2 className="font-semibold mb-2">About this session</h2>
-            <p className="text-sm text-muted-foreground mb-4">{template.description}</p>
+          <div className="bg-muted/30 rounded-lg p-4 space-y-4">
+            <div>
+              <h3 className="font-medium">Description</h3>
+              <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
+            </div>
             
-            <h3 className="font-medium text-sm mb-1">Benefits</h3>
-            <ul className="list-disc list-inside text-sm text-muted-foreground mb-4">
-              {template.benefits && template.benefits.map((benefit, index) => (
-                <li key={index}>{benefit}</li>
-              ))}
-            </ul>
+            {template.benefits && template.benefits.length > 0 && (
+              <div>
+                <h3 className="font-medium">Benefits</h3>
+                <ul className="text-sm text-muted-foreground mt-1 space-y-1">
+                  {template.benefits.map((benefit, index) => (
+                    <li key={index}>• {benefit}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <p className="font-medium">Duration</p>
-                <p className="text-muted-foreground">{template.duration} minutes</p>
-              </div>
-              <div>
-                <p className="font-medium">Difficulty</p>
-                <p className="text-muted-foreground capitalize">{template.difficulty || 'Standard'}</p>
-              </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Difficulty:</span>
+              <span>{template.difficulty || 'Beginner'}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Duration:</span>
+              <span>{formatTime(totalDuration)}</span>
             </div>
           </div>
         </div>

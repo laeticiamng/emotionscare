@@ -1,99 +1,88 @@
+
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Circle } from 'lucide-react';
-import { Challenge } from '@/types/types';
+import { Challenge } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Check, Clock, Trophy } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 
 interface ChallengesListProps {
   challenges: Challenge[];
   className?: string;
+  onComplete?: (challengeId: string) => Promise<boolean>;
 }
 
-const ChallengesList = ({ challenges, className = '' }) => {
-  // Filter logic that handles both status formats
-  const completedChallenges = challenges.filter(
-    (challenge) => challenge.status === 'complete' || 
-                  challenge.status === 'completed' ||
-                  challenge.completed === true
-  );
-  
-  const inProgressChallenges = challenges.filter(
-    (challenge) => challenge.status === 'in-progress' && 
-                  challenge.status !== 'complete' && 
-                  challenge.status !== 'completed' &&
-                  challenge.completed !== true
-  );
-  
-  const notStartedChallenges = challenges.filter(
-    (challenge) => challenge.status !== 'complete' &&
-                  challenge.status !== 'completed' &&
-                  challenge.status !== 'in-progress' &&
-                  challenge.completed !== true
-  );
+const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className = '', onComplete }) => {
+  if (!challenges || challenges.length === 0) {
+    return (
+      <div className={`text-center p-4 ${className}`}>
+        <p className="text-muted-foreground">Aucun défi disponible pour le moment</p>
+      </div>
+    );
+  }
+
+  const handleCompleteClick = async (id: string) => {
+    if (onComplete) {
+      await onComplete(id);
+    }
+  };
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {completedChallenges.length > 0 && (
-        <div>
-          <h3 className="text-sm font-medium text-muted-foreground">Terminées</h3>
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {completedChallenges.map((challenge) => (
-              <Card key={challenge.id}>
-                <CardContent className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-sm">{challenge.title || challenge.name}</h4>
-                    <p className="text-xs text-muted-foreground">{challenge.description}</p>
+      {challenges.map(challenge => (
+        <Card key={challenge.id} className="overflow-hidden">
+          <CardContent className="p-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1 flex-1">
+                <div className="flex items-center gap-2">
+                  <div 
+                    className={`w-8 h-8 flex items-center justify-center rounded-full 
+                      ${challenge.status === 'completed' || challenge.status === 'complete' || challenge.completed 
+                        ? 'bg-green-100 text-green-500' 
+                        : 'bg-blue-100 text-blue-500'}`}
+                  >
+                    {challenge.status === 'completed' || challenge.status === 'complete' || challenge.completed ? (
+                      <Check className="h-4 w-4" />
+                    ) : (
+                      <Clock className="h-4 w-4" />
+                    )}
                   </div>
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
+                  <h4 className="font-medium">{challenge.name || challenge.title}</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">{challenge.description}</p>
 
-      {inProgressChallenges.length > 0 && (
-        <div>
-          <h3 className="text-sm font-medium text-muted-foreground">En cours</h3>
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {inProgressChallenges.map((challenge) => (
-              <Card key={challenge.id}>
-                <CardContent className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-sm">{challenge.title || challenge.name}</h4>
-                    <p className="text-xs text-muted-foreground">{challenge.description}</p>
+                {(challenge.progress !== undefined && challenge.total !== undefined) && (
+                  <div className="mt-2">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Progression</span>
+                      <span>{challenge.progress}/{challenge.total}</span>
+                    </div>
+                    <Progress value={(challenge.progress / challenge.total) * 100} className="h-1.5" />
                   </div>
-                  <Circle className="h-5 w-5 text-blue-500" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
+                )}
+              </div>
 
-      {notStartedChallenges.length > 0 && (
-        <div>
-          <h3 className="text-sm font-medium text-muted-foreground">Non commencées</h3>
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {notStartedChallenges.map((challenge) => (
-              <Card key={challenge.id}>
-                <CardContent className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-semibold text-sm">{challenge.title || challenge.name}</h4>
-                    <p className="text-xs text-muted-foreground">{challenge.description}</p>
-                  </div>
-                  <Circle className="h-5 w-5 text-gray-300" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {challenges.length === 0 && (
-        <div className="text-center py-4 text-muted-foreground">
-          Aucun défi disponible pour le moment.
-        </div>
-      )}
+              <div className="flex flex-col items-end gap-2 ml-4">
+                <div className="flex items-center gap-1 text-amber-500">
+                  <Trophy className="h-4 w-4" />
+                  <span className="font-bold">{challenge.points}</span>
+                </div>
+
+                {onComplete && challenge.status !== 'completed' && challenge.status !== 'complete' && !challenge.completed && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleCompleteClick(challenge.id)}
+                    className="mt-2"
+                  >
+                    Compléter
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

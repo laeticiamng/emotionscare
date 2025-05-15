@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VRSession } from '@/types/types';
+import { VRSession } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
 
