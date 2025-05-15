@@ -92,26 +92,7 @@ const Home = () => {
           </div>
         </motion.section>
         
-        {/* Already authenticated users */}
-        {isAuthenticated && (
-          <motion.div 
-            className="text-center mt-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <h2 className="text-2xl font-bold mb-4">
-              Bonjour, {user?.name || 'utilisateur'}
-            </h2>
-            <Button
-              onClick={() => navigate('/dashboard')}
-              size="lg"
-              className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700"
-            >
-              Accéder à mon tableau de bord
-            </Button>
-          </motion.div>
-        )}
+        {/* Removed the "Already authenticated users" section that contained the dashboard button */}
       </div>
     </TimeBasedBackground>
   );
