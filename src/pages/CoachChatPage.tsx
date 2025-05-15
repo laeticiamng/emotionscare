@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
 import { useCoach } from '@/hooks/coach/useCoach';
 import { useMusic } from '@/contexts/MusicContext';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { useEmotionMusic, loadPlaylistForEmotion } from '@/hooks/useEmotionMusic';
+import { EmotionMusicParams } from '@/types';
 
 // Message interface
 interface Message {
@@ -306,6 +308,24 @@ const CoachChatPage: React.FC = () => {
         emotion,
         intensity: 50 // Adding the required intensity
       });
+    }
+  };
+
+  // Fix the function calls that were causing errors
+  const handlePlayMusic = async (emotion: string) => {
+    // Add the required intensity parameter
+    const params: EmotionMusicParams = { 
+      emotion: emotion,
+      intensity: 50 // Default intensity
+    };
+    
+    try {
+      const playlist = await loadPlaylistForEmotion(params);
+      // ... handle the playlist
+      return true;
+    } catch (error) {
+      console.error("Error loading music:", error);
+      return false;
     }
   };
 

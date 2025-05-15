@@ -1,6 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Theme, FontFamily, FontSize } from '@/types';
+
+// Define Theme, FontFamily, and FontSize types
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'merriweather' | 'mono' | 'system' | 'system-ui' | 'sans-serif' | 'serif' | 'rounded';
+export type FontSize = 'small' | 'medium' | 'large' | 'extra-large' | 'x-large' | 'xl';
 
 // Define the ThemeContextType
 export interface ThemeContextType {
@@ -14,7 +18,7 @@ export interface ThemeContextType {
 }
 
 // Create the theme context with default values
-const ThemeContext = createContext<ThemeContextType>({
+export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
 });

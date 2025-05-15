@@ -1,5 +1,14 @@
+
 // Central export file for all types
 export * from './types';
+
+// Export specific types from ThemeContext for direct import
+export type { 
+  Theme, 
+  FontFamily, 
+  FontSize,
+  ThemeContextType 
+} from '@/contexts/ThemeContext';
 
 // Specific re-exports for backward compatibility
 export type { 
@@ -8,13 +17,11 @@ export type {
   EnhancedEmotionResult,
   EmotionalTeamViewProps,
   EmotionalData,
-  SidebarContextType,  // Ajouté
-  ThemeButtonProps,    // Ajouté
-  AuthContextType,     // Ajouté
-  UserModeContextType, // Ajouté
-  Theme,               // Ajouté
-  FontFamily,          // Ajouté
-  FontSize            // Ajouté
+  SidebarContextType,
+  ThemeButtonProps,
+  AuthContextType,
+  UserModeContextType,
+  UserModeType,
 } from './types';
 
 export type {
@@ -25,7 +32,7 @@ export type {
   ProgressBarProps,
   MusicContextType,
   MusicDrawerProps,
-  EmotionMusicParams   // Ajouté
+  EmotionMusicParams
 } from './types';
 
 export type {
@@ -42,21 +49,16 @@ export type {
   Badge,
   GamificationStats,
   LeaderboardEntry
-} from './types';
+} from './gamification';
 
 export type {
   UserRole,
   User,
   UserPreferences,
   UserPreferencesState,
-  AuthContextType,
-  UserModeContextType,
-  ThemeContextType,
-  ThemeButtonProps,
-  SidebarContextType,
-  Theme,
-  FontFamily,
-  FontSize
+  Period,
+  InvitationVerificationResult,
+  ThemeName
 } from './types';
 
 // Additional type re-exports
@@ -79,9 +81,5 @@ export type {
   InvitationStats,
   InvitationData,
   InvitationFormData,
-  InvitationVerificationResult,
   EmotionalData
 } from './types';
-
-// Add missing export for EmotionMusicParams
-export type { EmotionMusicParams } from './types';

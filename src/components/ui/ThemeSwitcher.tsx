@@ -7,9 +7,10 @@ import { ThemeName } from '@/types';
 
 interface ThemeSwitcherProps {
   minimal?: boolean;
+  size?: "sm" | "default" | "lg"; // Added size prop
 }
 
-export function ThemeSwitcher({ minimal = false }: ThemeSwitcherProps) {
+export function ThemeSwitcher({ minimal = false, size = "default" }: ThemeSwitcherProps) {
   const { theme, setTheme } = useTheme();
 
   const themes: { value: ThemeName; label: string; icon: React.ReactNode }[] = [
@@ -38,7 +39,7 @@ export function ThemeSwitcher({ minimal = false }: ThemeSwitcherProps) {
           <Button
             key={themeOption.value}
             variant={theme === themeOption.value ? "default" : "outline"}
-            size="sm"
+            size={size}
             onClick={() => setTheme(themeOption.value)}
             className={minimal ? "px-2" : ""}
           >

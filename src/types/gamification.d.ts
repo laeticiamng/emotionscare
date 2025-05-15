@@ -22,6 +22,7 @@ export interface Challenge {
   expiresAt?: string;
   category?: string;
   title?: string; // For backward compatibility
+  goal?: string; // Added goal property
 }
 
 export interface GamificationStats {
@@ -49,6 +50,7 @@ export interface GamificationStats {
   pointsToNextLevel?: number;
   badgesCount?: number;
   lastActivityDate?: string;
+  totalChallenges?: number; // Added as optional
 }
 
 export interface LeaderboardEntry {
@@ -57,7 +59,7 @@ export interface LeaderboardEntry {
   avatarUrl?: string;
   points: number;
   rank: number;
-  badges?: number;
+  badges?: number; // Added badges property
   level: number;
   completedChallenges?: number;
 }

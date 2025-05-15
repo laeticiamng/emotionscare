@@ -3,9 +3,10 @@ import ColorPaletteDisplay from '@/components/theme/ColorPaletteDisplay';
 import ThemeColorExample from '@/components/theme/ThemeColorExample';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useTheme, Theme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/hooks/use-theme';
 import { Sun, Moon, Palette } from 'lucide-react';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
+import { Theme } from '@/types';
 
 /**
  * Page de documentation du Design System
