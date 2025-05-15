@@ -1,194 +1,136 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import Shell from '@/Shell';
-import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
-import { ReloadIcon } from '@radix-ui/react-icons';
-import { Eye, EyeOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { User } from 'lucide-react';
+import Shell from '@/Shell';
+import { useUserMode } from '@/contexts/UserModeContext';
 
-const LoginPage: React.FC = () => {
+const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  
   const navigate = useNavigate();
-  const location = useLocation();
+  const { toast } = useToast();
   const { setUserMode } = useUserMode();
-  const { login, error: authError, clearError, isAuthenticated } = useAuth();
-  
-  // Rediriger si déjà connecté
-  useEffect(() => {
-    if (isAuthenticated) {
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from);
-    }
-    
-    // Nettoyer les erreurs quand la page est chargée/déchargée
-    return () => clearError();
-  }, [isAuthenticated, navigate, location.state, clearError]);
-  
-  const from = location.state?.from?.pathname || '/dashboard';
-  
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email.trim()) {
-      toast.error("Erreur de validation", {
-        description: "Veuillez saisir votre adresse e-mail",
-      });
-      return;
-    }
-    
-    if (!password) {
-      toast.error("Erreur de validation", {
-        description: "Veuillez saisir votre mot de passe",
-      });
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
-      await login(email, password);
-      setUserMode('b2c'); // Mode par défaut pour les nouveaux utilisateurs
-      toast.success("Connexion réussie", {
-        description: "Bienvenue sur EmotionsCare",
+      // Check if this is our test user
+      if (email === 'user@exemple.fr' && password === 'admin') {
+        // Save test session
+        localStorage.setItem('auth_session', 'mock_token_user');
+        localStorage.setItem('user_role', 'b2c');
+        
+        // Set user mode to B2C
+        setUserMode('b2c');
+        localStorage.setItem('userMode', 'b2c');
+        
+        toast({
+          title: "Connexion réussie",
+          description: "Bienvenue dans votre espace personnel",
+        });
+        
+        navigate('/dashboard');
+      } else if (email === 'admin@exemple.fr' && password === 'admin') {
+        // Admin test account
+        localStorage.setItem('auth_session', 'mock_token_admin');
+        localStorage.setItem('user_role', 'b2b-admin');
+        
+        setUserMode('b2b-admin');
+        localStorage.setItem('userMode', 'b2b-admin');
+        
+        toast({
+          title: "Connexion administrateur réussie",
+          description: "Bienvenue dans votre espace d'administration",
+        });
+        
+        navigate('/admin/dashboard');
+      } else if (email === 'collaborateur@exemple.fr' && password === 'admin') {
+        // Collaborator test account
+        localStorage.setItem('auth_session', 'mock_token_collaborateur');
+        localStorage.setItem('user_role', 'b2b-collaborator');
+        
+        setUserMode('b2b-collaborator');
+        localStorage.setItem('userMode', 'b2b-collaborator');
+        
+        toast({
+          title: "Connexion collaborateur réussie",
+          description: "Bienvenue dans votre espace collaborateur",
+        });
+        
+        navigate('/dashboard');
+      } else {
+        // Simulate login error
+        throw new Error("Identifiants invalides");
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur de connexion",
+        description: "Identifiants invalides. Essayez user@exemple.fr / admin",
+        variant: "destructive",
       });
-      navigate(from);
-    } catch (error: any) {
-      toast.error("Erreur de connexion", {
-        description: error.message || "Veuillez vérifier vos identifiants",
-      });
-      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Pour faciliter les démonstrations
-  const handleDemoLogin = (userType: 'user' | 'admin') => {
-    setEmail(userType === 'admin' ? 'admin@example.com' : 'user@example.com');
-    setPassword('password123');
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
     <Shell>
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-white dark:from-gray-900 dark:to-blue-900/20">
         <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Connexion</CardTitle>
-            <CardDescription>Connectez-vous à votre compte EmotionsCare</CardDescription>
+          <CardHeader className="text-center">
+            <div className="mx-auto bg-blue-100 dark:bg-blue-900/30 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+              <User className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+            </div>
+            <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
+            <CardDescription>
+              Accédez à votre espace personnel de bien-être
+            </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
-              {authError && (
-                <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-                  {authError}
-                </div>
-              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input 
                   id="email" 
                   type="email" 
-                  placeholder="email@exemple.com" 
+                  placeholder="votre@email.com" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  autoComplete="email"
-                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Mot de passe</Label>
-                <div className="relative">
-                  <Input 
-                    id="password" 
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    disabled={isLoading}
-                  />
-                  <Button 
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
-                    onClick={togglePasswordVisibility}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                    )}
-                    <span className="sr-only">
-                      {showPassword ? "Cacher le mot de passe" : "Afficher le mot de passe"}
-                    </span>
-                  </Button>
-                </div>
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
               </div>
-              <div className="text-sm text-right">
-                <Link to="/forgot-password" className="text-primary hover:underline">
-                  Mot de passe oublié?
-                </Link>
+              <div className="text-sm text-muted-foreground">
+                <p>Compte test: user@exemple.fr / admin</p>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                    Connexion en cours...
-                  </>
-                ) : "Se connecter"}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Connexion en cours..." : "Se connecter"}
               </Button>
-              
               <div className="text-sm text-center">
-                Vous n'avez pas de compte?{' '}
-                <Link to="/register" className="text-primary hover:underline">
-                  S'inscrire
+                <Link to="/" className="text-muted-foreground hover:underline">
+                  Retour à l'accueil
                 </Link>
-              </div>
-              
-              <div className="border-t pt-4 mt-2">
-                <p className="text-sm text-center mb-2 text-muted-foreground">Accès rapide pour démonstration</p>
-                <div className="flex gap-2">
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => handleDemoLogin('user')}
-                  >
-                    Utilisateur démo
-                  </Button>
-                  <Button 
-                    type="button"
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => handleDemoLogin('admin')}
-                  >
-                    Admin démo
-                  </Button>
-                </div>
               </div>
             </CardFooter>
           </form>

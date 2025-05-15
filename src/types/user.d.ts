@@ -71,4 +71,5 @@ export interface User {
   role: string;
   preferences?: UserPreferences;
   created_at?: string;
+  onboarded?: boolean;
 }

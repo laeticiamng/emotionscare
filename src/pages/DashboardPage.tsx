@@ -1,38 +1,30 @@
 
-import React from 'react';
-import UserDashboard from '@/components/dashboard/UserDashboard';
-import { SegmentProvider } from '@/contexts/SegmentContext';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { User } from '@/types/user';
+import { Loader2 } from 'lucide-react';
 
-const DashboardPage: React.FC = () => {
+const DashboardPage = () => {
+  const navigate = useNavigate();
   const { userMode } = useUserMode();
   
-  // Données utilisateur fictives pour la démo
-  const mockUser: User = {
-    id: "demo-user-id",
-    name: "Utilisateur Démo",
-    email: "user@example.com",
-    avatar_url: "",
-    role: userMode === 'b2b-admin' ? "admin" : "user",
-    created_at: new Date().toISOString(),
-    onboarded: true
-  };
-  
-  // Données émotion fictives
-  const mockEmotion = {
-    emotion: "calm", 
-    score: 85
-  };
+  useEffect(() => {
+    // Check user role and redirect to the appropriate dashboard
+    const userRole = localStorage.getItem('user_role');
+    
+    if (userRole === 'b2b-admin') {
+      navigate('/admin/dashboard');
+    } else if (userRole === 'b2b-collaborator') {
+      navigate('/b2b/user/dashboard');
+    } else {
+      navigate('/b2c/dashboard');
+    }
+  }, [userMode, navigate]);
   
   return (
-    <div className="w-full">
-      <SegmentProvider>
-        <UserDashboard 
-          user={mockUser} 
-          latestEmotion={mockEmotion}
-        />
-      </SegmentProvider>
+    <div className="min-h-screen flex flex-col items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="mt-4 text-muted-foreground">Redirection en cours...</p>
     </div>
   );
 };

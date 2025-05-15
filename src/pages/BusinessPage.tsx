@@ -13,18 +13,26 @@ const BusinessPage = () => {
   const handleUserAccess = () => {
     setUserMode('b2b-collaborator');
     localStorage.setItem('userMode', 'b2b-collaborator');
+    // In a real app, this would redirect to the login page
+    // For test purposes, we're going to simulate a successful login
+    localStorage.setItem('auth_session', 'mock_token_collaborateur');
+    localStorage.setItem('user_role', 'b2b-collaborator');
     navigate('/dashboard');
   };
   
   const handleAdminAccess = () => {
     setUserMode('b2b-admin');
     localStorage.setItem('userMode', 'b2b-admin');
+    // In a real app, this would redirect to the login page
+    // For test purposes, we're going to simulate a successful login
+    localStorage.setItem('auth_session', 'mock_token_admin');
+    localStorage.setItem('user_role', 'b2b-admin');
     navigate('/admin/dashboard');
   };
   
   return (
     <Shell>
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-50 to-white dark:from-gray-900 dark:to-purple-900/20">
         <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Espace Entreprise</h1>
@@ -38,6 +46,7 @@ const BusinessPage = () => {
             >
               <User className="mr-3 h-6 w-6" />
               Collaborateur
+              <span className="ml-2 text-xs opacity-70">(collaborateur@exemple.fr / admin)</span>
             </Button>
             
             <Button 
@@ -47,10 +56,11 @@ const BusinessPage = () => {
             >
               <Shield className="mr-3 h-6 w-6" />
               Administration / RH
+              <span className="ml-2 text-xs opacity-70">(admin@exemple.fr / admin)</span>
             </Button>
             
             <Button 
-              onClick={() => navigate('/home')} 
+              onClick={() => navigate('/')} 
               variant="ghost" 
               className="w-full mt-6"
             >
