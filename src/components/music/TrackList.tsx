@@ -1,127 +1,52 @@
 
 import React from 'react';
-import { MusicTrack } from '@/types/types';
-import { Play, Pause } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { formatDuration } from '@/utils/formatters';
+import { MusicTrack } from '@/types';
 
 export interface TrackListProps {
   tracks: MusicTrack[];
-  onTrackSelect: (track: MusicTrack) => void;
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-  showEmotionTag?: boolean;
-  compact?: boolean;
+  currentTrack: MusicTrack;
+  onSelect: (track: MusicTrack) => void;
+  onSelectTrack?: (track: MusicTrack) => void; // For backward compatibility
 }
 
-const TrackList: React.FC<TrackListProps> = ({
-  tracks,
-  onTrackSelect,
-  currentTrack,
-  isPlaying,
-  onPlayPause,
-  showEmotionTag = false,
-  compact = false
-}) => {
-  const getEmotionTagColor = (emotion: string): string => {
-    const emotionColors: Record<string, string> = {
-      calm: 'bg-blue-100 text-blue-800',
-      happy: 'bg-yellow-100 text-yellow-800',
-      joy: 'bg-yellow-100 text-yellow-800',
-      sad: 'bg-indigo-100 text-indigo-800',
-      sadness: 'bg-indigo-100 text-indigo-800',
-      angry: 'bg-red-100 text-red-800',
-      anger: 'bg-red-100 text-red-800',
-      fear: 'bg-purple-100 text-purple-800',
-      neutral: 'bg-gray-100 text-gray-800'
-    };
-
-    return emotionColors[emotion?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+const TrackList = ({ tracks, currentTrack, onSelect, onSelectTrack }: TrackListProps) => {
+  const handleSelectTrack = (track: MusicTrack) => {
+    if (onSelectTrack) {
+      onSelectTrack(track);
+    } else {
+      onSelect(track);
+    }
   };
 
   return (
-    <div className="space-y-2">
-      {tracks.map((track) => {
-        const isCurrentTrack = currentTrack?.id === track.id;
-        const coverImage = track.coverUrl || track.cover || '';
-        
-        return (
-          <div
-            key={track.id}
-            className={`flex items-center p-2 rounded-md ${
-              isCurrentTrack
-                ? 'bg-primary/10 dark:bg-primary/20'
-                : 'hover:bg-muted/50'
-            }`}
-          >
-            <div className="flex-shrink-0 mr-3">
-              <div className="w-10 h-10 rounded overflow-hidden bg-muted">
-                {coverImage ? (
-                  <img
-                    src={coverImage}
-                    alt={track.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-xl">♪</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="flex-1 min-w-0 mr-2">
-              <p className={`font-medium truncate ${compact ? 'text-sm' : ''}`}>
-                {track.title}
-              </p>
-              <p className={`text-muted-foreground truncate ${compact ? 'text-xs' : 'text-sm'}`}>
-                {track.artist}
-              </p>
-            </div>
-            {showEmotionTag && track.emotion && (
-              <div className={`hidden sm:block mr-2`}>
-                <span
-                  className={`inline-flex text-xs px-2 py-0.5 rounded ${getEmotionTagColor(
-                    track.emotion
-                  )}`}
-                >
-                  {track.emotion}
-                </span>
+    <div className="space-y-1 max-h-[300px] overflow-y-auto">
+      {tracks.map((track) => (
+        <div
+          key={track.id}
+          className={`flex items-center p-2 rounded-md cursor-pointer ${
+            currentTrack?.id === track.id ? 'bg-secondary' : 'hover:bg-secondary/30'
+          }`}
+          onClick={() => handleSelectTrack(track)}
+        >
+          <div className="h-10 w-10 rounded bg-primary/10 mr-3 overflow-hidden">
+            {track.coverUrl ? (
+              <img
+                src={track.coverUrl || track.cover}
+                alt={track.title}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-muted-foreground">
+                ♪
               </div>
             )}
-            <div className="flex items-center space-x-2">
-              {track.duration && !compact && (
-                <span className="text-xs text-muted-foreground hidden sm:inline-block">
-                  {formatDuration(track.duration)}
-                </span>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => {
-                  if (isCurrentTrack) {
-                    onPlayPause();
-                  } else {
-                    onTrackSelect(track);
-                  }
-                }}
-              >
-                {isCurrentTrack && isPlaying ? (
-                  <Pause className="h-4 w-4" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
           </div>
-        );
-      })}
-      {tracks.length === 0 && (
-        <div className="text-center py-4 text-muted-foreground">
-          Aucun morceau disponible
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm truncate">{track.title}</p>
+            <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };

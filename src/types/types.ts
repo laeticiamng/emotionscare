@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { LucideIcon } from "lucide-react";
 
 // User types
 export type UserRole = 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'team' | 'employee' | 'personal' | 'b2b_admin' | 'b2b-admin' | 'b2b_user' | 'b2b-user' | 'b2c' | 'user';
@@ -20,15 +21,30 @@ export interface User {
   name: string;
   role?: UserRole;
   avatar?: string;
-  avatar_url?: string;
+  avatarUrl?: string;
   onboarded?: boolean;
   preferences?: UserPreferences;
-  job_title?: string;
+  jobTitle?: string;
   position?: string;
-  created_at?: string;
   createdAt?: string;
   status?: 'active' | 'inactive' | 'pending';
   department?: string;
+  joinedAt?: string;
+  emotionalScore?: number;
+  lastSeen?: string;
+  lastActive?: string;
+  companyId?: string;
+  teamId?: string;
+  anonymityCode?: string;
+  profile?: {
+    bio?: string;
+    company?: string;
+    jobTitle?: string;
+  };
+  // For backward compatibility
+  avatar_url?: string;
+  job_title?: string;
+  created_at?: string;
   joined_at?: string;
   emotional_score?: number;
   last_seen?: string;
@@ -36,11 +52,6 @@ export interface User {
   company_id?: string;
   team_id?: string;
   anonymity_code?: string;
-  profile?: {
-    bio?: string;
-    company?: string;
-    job_title?: string;
-  };
 }
 
 export interface UserPreferences {
@@ -49,8 +60,8 @@ export interface UserPreferences {
   fontFamily: FontFamily;
   language: string;
   notifications: NotificationPreference;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
   privacy?: {
     profileVisibility?: 'private' | 'team' | 'public';
     shareEmotionalData?: boolean;
@@ -71,11 +82,11 @@ export interface UserPreferences {
     screenReader?: boolean;
     largeText?: boolean;
   };
-  analytics_consent?: boolean;
-  marketing_consent?: boolean;
+  analyticsConsent?: boolean;
+  marketingConsent?: boolean;
   sound?: boolean;
   soundEnabled?: boolean;
-  notifications_enabled?: boolean;
+  notificationsEnabled?: boolean;
   privacyLevel?: 'strict' | 'balanced' | 'open' | 'high' | 'medium' | 'low';
   fullAnonymity?: boolean;
   onboardingCompleted?: boolean;
@@ -92,6 +103,20 @@ export interface UserPreferences {
     volume: number;
     preferredGenres: string[];
   };
+  // For backward compatibility
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  analytics_consent?: boolean;
+  marketing_consent?: boolean;
+  notifications_enabled?: boolean;
+  onboarding_completed?: boolean;
+  dashboard_layout?: string;
+  data_collection?: boolean;
+  autoplay_videos?: boolean;
+  emotional_camouflage?: boolean;
+  ai_suggestions?: boolean;
+  reduce_motion?: boolean;
+  high_contrast?: boolean;
   [key: string]: any; // For flexibility during development
 }
 
@@ -113,11 +138,6 @@ export interface NotificationPreference {
   frequency: NotificationFrequency;
   types?: NotificationType[];
   tone?: NotificationTone;
-  quiet_hours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
   quietHours?: {
     enabled: boolean;
     start: string;
@@ -126,15 +146,21 @@ export interface NotificationPreference {
   doNotDisturb?: boolean;
   doNotDisturbStart?: string;
   doNotDisturbEnd?: string;
+  // For backward compatibility
+  quiet_hours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }
 
 export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none' | 'immediate';
-export type NotificationType = 'all' | 'emotions' | 'coach' | 'journal' | 'community' | 'system' | 'warning' | 'error' | 'success' | 'info' | 'achievement' | 'challenge' | 'reminder' | 'important';
+export type NotificationType = 'all' | 'emotions' | 'emotion' | 'coach' | 'journal' | 'community' | 'system' | 'warning' | 'error' | 'success' | 'info' | 'achievement' | 'challenge' | 'reminder' | 'important';
 export type NotificationTone = 'professional' | 'friendly' | 'minimal' | 'motivational' | 'direct' | 'calm';
 
 export interface Notification {
   id: string;
-  user_id: string;
+  userId: string;
   title: string;
   message: string;
   type: NotificationType;
@@ -142,13 +168,17 @@ export interface Notification {
   date?: string;
   timestamp?: string | Date;
   createdAt?: string;
-  created_at?: string;
-  action_url?: string;
   actionUrl?: string;
   icon?: string;
+  senderId?: string;
+  recipientId?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  // For backward compatibility
+  user_id?: string;
+  action_url?: string;
+  created_at?: string;
   sender_id?: string;
   recipient_id?: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 export interface ThemeContextType {
@@ -172,12 +202,14 @@ export interface InvitationVerificationResult {
   email?: string;
   role?: UserRole;
   expired?: boolean;
-  expires_at?: string;
+  expiresAt?: string;
   message?: string;
   teamId?: string;
   companyId?: string;
   error?: string;
   isValid?: boolean;
+  // For backward compatibility
+  expires_at?: string;
 }
 
 export interface AuthContextType {
@@ -200,6 +232,14 @@ export interface UserModeContextType {
   isB2BAdmin: boolean;
   isB2BUser: boolean;
   isB2C: boolean;
+}
+
+export interface SidebarContextType {
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+  isOpen?: boolean;
+  setIsOpen?: (isOpen: boolean) => void;
+  isMobile?: boolean;
 }
 
 // Team types
@@ -234,18 +274,27 @@ export interface VRSessionTemplate {
   thumbnail?: string;
   videoUrl?: string;
   emotion?: string;
-  audio_url?: string;
-  emotion_target?: string;
+  audioUrl?: string;
+  emotionTarget?: string;
   lastUsed?: string | Date;
-  preview_url?: string;
-  is_audio_only?: boolean;
+  previewUrl?: string;
+  isAudioOnly?: boolean;
   benefits?: string[];
   difficulty?: string;
   theme?: string;
   tags?: string[];
   imageUrl?: string;
+  completionRate?: number;
+  recommendedMood?: string;
+  // For backward compatibility
+  emotion_target?: string;
+  preview_url?: string;
+  is_audio_only?: boolean;
+  image_url?: string;
+  audio_url?: string;
   completion_rate?: number;
   recommended_mood?: string;
+  video_url?: string;
 }
 
 export interface VRSession {
@@ -262,12 +311,23 @@ export interface VRSession {
   rating?: number;
   date?: string;
   startDate?: Date | string;
-  startedAt?: string;
+  durationSeconds?: number;
+  isAudioOnly?: boolean;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  isCompleted?: boolean;
+  // For backward compatibility
+  template_id?: string;
+  user_id?: string;
+  start_time?: string;
+  end_time?: string;
+  emotion_before?: string;
+  emotion_after?: string;
+  started_at?: string;
   duration_seconds?: number;
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
-  isCompleted?: boolean;
 }
 
 export interface VRHistoryListProps {
@@ -283,7 +343,7 @@ export interface VRHistoryListProps {
   limit?: number;
 }
 
-export interface VRSessionWithMusicProps {
+export interface VRSessionWithMusicPropsType {
   template?: VRSessionTemplate;
   onComplete?: (sessionData: VRSession) => void;
   onExit?: () => void;
@@ -297,6 +357,16 @@ export interface VRSessionWithMusicProps {
   templateId?: string;
 }
 
+// Alias for VRSessionWithMusicProps
+export interface VRSessionWithMusicProps extends VRSessionWithMusicPropsType {}
+
+export interface VRTemplateGridProps {
+  templates: VRSessionTemplate[];
+  onSelect: (template: VRSessionTemplate) => void;
+  filter?: string;
+  className?: string;
+}
+
 // ========================
 // Challenge / Gamification types
 // ========================
@@ -307,12 +377,12 @@ export interface Challenge {
   description: string;
   icon?: string;
   points: number;
-  completions: number;
+  completions?: number;
   progress?: number;
   total?: number;
-  type: 'daily' | 'weekly' | 'one-time' | 'streak' | 'count';
-  category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity' | 'vr' | 'daily';
-  status?: 'complete' | 'in-progress' | 'not-started' | 'completed' | 'ongoing';
+  type: 'daily' | 'weekly' | 'one-time' | 'streak' | 'count' | 'completion' | string;
+  category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity' | 'vr' | 'daily' | 'mindfulness' | string;
+  status?: 'complete' | 'in-progress' | 'not-started' | 'completed' | 'ongoing' | 'active' | string;
   completed?: boolean;
   target?: number;
   reward?: number | string;
@@ -354,13 +424,25 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image_url?: string;
   imageUrl?: string;
+  awardedAt?: Date | string;
   icon?: string;
+  unlocked?: boolean;
+  level?: string | number;
   threshold?: number;
-  type?: string;
+  points?: number;
+  userId?: string;
+  iconUrl?: string;
+  totalRequired?: number;
+  category?: string;
+  // For backward compatibility
+  image_url?: string;
+  awarded_at?: Date | string;
   image?: string;
-  level?: number | string;
+  dateEarned?: string;
+  user_id?: string;
+  icon_url?: string;
+  total_required?: number;
 }
 
 export interface LeaderboardEntry {
@@ -380,7 +462,7 @@ export interface LeaderboardEntry {
 // ========================
 export interface Emotion {
   id?: string;
-  user_id?: string;
+  userId?: string;
   date?: string | Date;
   emotion?: string;
   name?: string;
@@ -394,8 +476,8 @@ export interface Emotion {
   text?: string;
   emojis?: string[] | string;
   transcript?: string;
-  audio_url?: string;
-  ai_feedback?: string;
+  audioUrl?: string;
+  aiFeedback?: string;
   recommendations?: string[];
   triggers?: string[];
   feedback?: string;
@@ -404,12 +486,16 @@ export interface Emotion {
   energy?: number;
   dominantEmotion?: string;
   primaryEmotion?: string;
+  // For backward compatibility
+  user_id?: string;
+  audio_url?: string;
+  ai_feedback?: string;
   [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EmotionResult {
   id?: string;
-  user_id?: string;
+  userId?: string;
   emotion: string;
   score?: number;
   confidence?: number;
@@ -423,8 +509,12 @@ export interface EmotionResult {
   date?: string;
   triggers?: string[];
   feedback?: string;
-  ai_feedback?: string;
+  aiFeedback?: string;
   recommendations?: string[];
+  audioUrl?: string;
+  // For backward compatibility
+  user_id?: string;
+  ai_feedback?: string;
   audio_url?: string;
   [key: string]: any;  // Allow for flexible extension
 }
@@ -437,13 +527,15 @@ export interface EnhancedEmotionResult extends EmotionResult {
   textColor?: string;
   description?: string;
   category?: string;
-  coping_strategies?: string[];
+  copingStrategies?: string[];
   relatedActivities?: {
     id: string;
     title: string;
     description: string;
     duration: number;
   }[];
+  // For backward compatibility
+  coping_strategies?: string[];
 }
 
 export interface EmotionalTeamViewProps {
@@ -462,6 +554,19 @@ export interface EmotionalTeamViewProps {
   onRefresh?: () => void;
 }
 
+export interface EmotionalData {
+  id?: string;
+  emotion: string;
+  intensity: number;
+  timestamp: Date | string;
+  context?: string;
+  userId?: string; 
+  source?: string;
+  feedback?: string;
+  // For backward compatibility
+  user_id?: string;
+}
+
 // ========================
 // Music types
 // ========================
@@ -474,6 +579,7 @@ export interface MusicTrack {
   coverUrl?: string;
   duration?: number;
   emotion?: string;
+  // For backward compatibility
   cover?: string;
   cover_url?: string;
   audio_url?: string;
@@ -485,9 +591,10 @@ export interface MusicPlaylist {
   title?: string;
   tracks: MusicTrack[];
   coverUrl?: string;
-  cover?: string;
   description?: string;
   emotion?: string;
+  // For backward compatibility
+  cover?: string;
 }
 
 export interface MusicContextType {
@@ -497,8 +604,11 @@ export interface MusicContextType {
   pauseTrack: () => void;
   togglePlay: () => void;
   nextTrack: () => void;
-  prevTrack: () => void;
+  prevTrack?: () => void;
+  previousTrack?: () => void; // For compatibility
   volume: number;
+  isMuted?: boolean;
+  toggleMute?: () => void;
   setVolume: (volume: number) => void;
   progress: number;
   duration: number;
@@ -539,6 +649,12 @@ export interface TrackInfoProps {
   audioError?: Error | null;
 }
 
+export interface TrackListProps {
+  tracks: MusicTrack[];
+  currentTrack: MusicTrack;
+  onSelect: (track: MusicTrack) => void;
+}
+
 export interface VolumeControlProps {
   volume: number;
   onVolumeChange: (volume: number) => void;
@@ -573,10 +689,14 @@ export interface JournalEntry {
   content: string;
   text?: string;
   mood: string;
-  mood_score?: number;
+  moodScore?: number;
   emotion?: string;
   date: Date | string;
   tags?: string[];
+  aiFeedback?: string;
+  userId?: string;
+  // For backward compatibility
+  mood_score?: number;
   ai_feedback?: string;
   user_id?: string;
 }
@@ -602,10 +722,13 @@ export interface ChatMessage {
   text?: string;
   content?: string;
   sender: string;
-  sender_type?: string;
+  senderType?: string;
   timestamp?: string;
-  conversation_id?: string;
+  conversationId?: string;
   role?: string;
+  // For backward compatibility
+  sender_type?: string;
+  conversation_id?: string;
 }
 
 export interface EmotionPrediction {
@@ -627,6 +750,9 @@ export interface Recommendation {
   actionUrl?: string;
   actionLabel?: string;
   type?: 'activity' | 'content' | 'insight';
+  // For backward compatibility
+  action_url?: string;
+  action_label?: string;
 }
 
 export interface InvitationStats {
@@ -640,24 +766,34 @@ export interface InvitationStats {
   conversionRate: number;
   averageTimeToAccept: number;
   teams: Record<string, number>;
-  recent_invites: InvitationData[];
+  recentInvites: InvitationData[];
+  // For backward compatibility
+  recent_invites?: InvitationData[];
+  conversion_rate?: number;
+  average_time_to_accept?: number;
 }
 
 export interface InvitationData {
   id: string;
   email: string;
   status: 'pending' | 'accepted' | 'expired' | 'rejected';
-  created_at: string;
-  expires_at: string;
-  accepted_at?: string;
+  createdAt: string;
+  expiresAt: string;
+  acceptedAt?: string;
   role: string;
+  // For backward compatibility
+  created_at?: string;
+  expires_at?: string;
+  accepted_at?: string;
 }
 
 export interface InvitationFormData {
   email: string;
   role: string;
   message?: string;
-  expires_in_days: number;
+  expiresInDays: number;
+  // For backward compatibility
+  expires_in_days?: number;
 }
 
 // ========================
@@ -667,7 +803,7 @@ export interface DashboardKpi {
   id: string;
   title: string;
   value: string | ReactNode;
-  icon?: any; // LucideIcon, allowing flexibility
+  icon?: LucideIcon; // LucideIcon, allowing flexibility
   subtitle?: string | ReactNode;
   delta?: {
     value: number;
@@ -679,16 +815,91 @@ export interface DashboardKpi {
 export interface DashboardShortcut {
   id: string;
   label: string;
-  icon?: any; // LucideIcon
+  icon?: LucideIcon;
   route: string;
   action?: () => void;
   color?: string;
 }
 
-// VR Template Grid Props
-export interface VRTemplateGridProps {
-  templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
-  filter?: string;
-  className?: string;
+// KPI Card Types
+export interface KpiCardData {
+  id: string;
+  title: string;
+  value: string | React.ReactNode;
+  icon: LucideIcon;
+  delta?: {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: React.ReactNode;
+  ariaLabel?: string;
+  onClick?: () => void;
+}
+
+// Props for our draggable card component
+export interface DraggableCardProps extends KpiCardData {
+  handle?: boolean;
+}
+
+// Dashboard activity types
+export type ActivityTabView = 'daily' | 'stats';
+
+export interface ActivityFiltersState {
+  searchTerm: string;
+  activityType: string;
+  startDate?: Date | string;
+  endDate?: Date | string;
+}
+
+export interface AnonymousActivity {
+  id: string;
+  activity_type: string;
+  category: string;
+  count: number;
+  timestamp_day: string;
+}
+
+export interface ActivityStats {
+  activity_type: string;
+  total_count: number;
+  percentage: number;
+}
+
+// Used for hooks that return void
+export type UseGamificationReturn = {
+  badges: Badge[];
+  challenges: Challenge[];
+  stats: GamificationStats;
+  completeChallenge: (challengeId: string) => void;
+  isLoading?: boolean;
+  loading?: boolean;
+  error?: string | null;
+  refresh?: () => void;
+};
+
+export interface EmotionScanSectionProps {
+  collapsed: boolean;
+  onToggle: () => void;
+  userId?: string;
+  latestEmotion?: {
+    emotion: string;
+    score: number;
+  };
+  userMode?: string;
+}
+
+// Charts types
+export interface ChartConfig {
+  [k in string]: {
+    label?: React.ReactNode;
+    icon?: React.ComponentType;
+  } & (
+    | { color?: string; theme?: never }
+    | { color?: never; theme: Record<"light" | "dark", string> }
+  );
+}
+
+export interface ChartContextProps {
+  config: ChartConfig;
 }

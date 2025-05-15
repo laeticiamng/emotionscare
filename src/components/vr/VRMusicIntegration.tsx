@@ -40,7 +40,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
               url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
-              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
+              audioUrl: playlist.tracks[0].audioUrl || ''
             };
             playTrack(track);
           }

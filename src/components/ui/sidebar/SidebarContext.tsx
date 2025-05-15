@@ -1,32 +1,42 @@
 
 import React, { createContext, useContext, useState } from 'react';
+import type { SidebarContextType } from '@/types';
 
-interface SidebarContextType {
-  expanded: boolean;
-  toggleSidebar: () => void;
-  setExpanded: (expanded: boolean) => void;
-}
-
-const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextType>({
+  collapsed: false,
+  toggleCollapsed: () => {},
+});
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const toggleSidebar = () => setExpanded(!expanded);
+  // Check if we're on mobile when component mounts
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const toggleCollapsed = () => {
+    setCollapsed(prev => !prev);
+  };
 
   return (
-    <SidebarContext.Provider value={{ expanded, toggleSidebar, setExpanded }}>
+    <SidebarContext.Provider value={{ collapsed, toggleCollapsed, isOpen, setIsOpen, isMobile }}>
       {children}
     </SidebarContext.Provider>
   );
 };
 
-export const useSidebar = (): SidebarContextType => {
-  const context = useContext(SidebarContext);
-  if (context === undefined) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-};
+export const useSidebar = () => useContext(SidebarContext);
 
 export default SidebarContext;

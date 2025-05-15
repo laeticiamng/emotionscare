@@ -8,18 +8,16 @@ import BadgeGrid from './BadgeGrid';
 import ChallengesList from './ChallengesList';
 import { useGamification } from '@/hooks/useGamification';
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton';
-import { GamificationStats, Challenge, Badge } from '@/types/types';
+import { GamificationStats, Challenge, Badge } from '@/types';
 
 const GamificationDashboard: React.FC = () => {
   const { 
     badges, 
     challenges, 
     stats, 
-    loading, 
-    completeChallenge 
+    completeChallenge,
+    isLoading
   } = useGamification();
-
-  const isLoading = loading;
 
   if (isLoading) {
     return <LoadingSkeleton />;
@@ -29,7 +27,7 @@ const GamificationDashboard: React.FC = () => {
   const safeStats: GamificationStats = {
     level: stats?.level || 1,
     points: stats?.points || 0,
-    badges: stats?.badges || 0,
+    badges: Array.isArray(stats?.badges) ? stats.badges : [],
     streak: stats?.streak || 0,
     completedChallenges: stats?.completedChallenges || 0,
     totalChallenges: stats?.totalChallenges || 0,
