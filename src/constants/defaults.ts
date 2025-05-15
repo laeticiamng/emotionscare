@@ -1,24 +1,4 @@
 
-// Default theme settings
-export const DEFAULT_THEME = "system";
-export const DEFAULT_FONT_SIZE = "medium";
-export const DEFAULT_FONT_FAMILY = "system";
-
-// Notification defaults
-export const DEFAULT_NOTIFICATION_PREFERENCES = {
-  enabled: false,
-  emailEnabled: false,
-  pushEnabled: false,
-  frequency: "daily",
-  types: {
-    system: true,
-    emotion: true,
-    journal: true,
-    coach: true
-  }
-};
-
-// Time of day enum
 export enum TimeOfDay {
   MORNING = 'morning',
   AFTERNOON = 'afternoon',
@@ -26,22 +6,32 @@ export enum TimeOfDay {
   NIGHT = 'night'
 }
 
-// Default user preferences
-export const DEFAULT_USER_PREFERENCES = {
-  theme: "system",
-  fontSize: "medium",
-  fontFamily: "system",
-  language: "fr",
-  notifications: DEFAULT_NOTIFICATION_PREFERENCES,
-  autoplayVideos: false,
-  dataCollection: true,
-  accessibilityFeatures: {
-    highContrast: false,
-    reducedMotion: false,
-    screenReader: false
-  },
-  dashboardLayout: "standard",
-  onboardingCompleted: false,
-  privacyLevel: "balanced",
-  soundEnabled: true
+export const determineTimeOfDay = (): TimeOfDay => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) {
+    return TimeOfDay.MORNING;
+  } else if (hour >= 12 && hour < 18) {
+    return TimeOfDay.AFTERNOON;
+  } else if (hour >= 18 && hour < 22) {
+    return TimeOfDay.EVENING;
+  } else {
+    return TimeOfDay.NIGHT;
+  }
+};
+
+export const getGreetingByTimeOfDay = (): string => {
+  const timeOfDay = determineTimeOfDay();
+  
+  switch (timeOfDay) {
+    case TimeOfDay.MORNING:
+      return 'Bonjour. Laissez votre journée commencer dans la douceur.';
+    case TimeOfDay.AFTERNOON:
+      return 'Bienvenue dans votre espace personnel de reconnexion émotionnelle.';
+    case TimeOfDay.EVENING:
+      return 'Bonsoir. Bienvenue dans votre espace de tranquillité.';
+    case TimeOfDay.NIGHT:
+      return 'Bonsoir. Un moment pour vous ressourcer avant la nuit.';
+    default:
+      return 'Bienvenue dans votre espace de bien-être émotionnel.';
+  }
 };

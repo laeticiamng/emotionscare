@@ -1,110 +1,94 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { Slider } from '@/components/ui/slider';
-import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface AudioControllerProps {
   minimal?: boolean;
-  autoplay?: boolean;
-  initialVolume?: number;
   className?: string;
 }
 
-export const AudioController: React.FC<AudioControllerProps> = ({
+export const AudioController: React.FC<AudioControllerProps> = ({ 
   minimal = false,
-  autoplay = false,
-  initialVolume = 0.5,
-  className = '',
+  className = ''
 }) => {
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(initialVolume);
-  const [isPlaying, setIsPlaying] = useState(autoplay);
-  
-  useEffect(() => {
-    // In a real implementation, this would initialize the audio player
-    console.log('Audio controller initialized with volume:', volume);
-    
-    if (autoplay) {
-      console.log('Auto-playing ambient music');
-      // Here you would start playing the music via Music Generator API
-    }
-    
-    // Save preferences to localStorage
-    localStorage.setItem('audioVolume', volume.toString());
-    localStorage.setItem('audioMuted', isMuted.toString());
-    
-    return () => {
-      // Cleanup audio resources
-      console.log('Audio controller unmounted');
-    };
-  }, []);
-  
-  useEffect(() => {
-    // Update audio volume when volume state changes
-    console.log('Volume changed to:', volume);
-    localStorage.setItem('audioVolume', volume.toString());
-    
-    if (volume === 0 && !isMuted) {
-      setIsMuted(true);
-    } else if (volume > 0 && isMuted) {
-      setIsMuted(false);
-    }
-  }, [volume]);
-  
-  useEffect(() => {
-    // Update mute state
-    console.log('Mute state changed to:', isMuted);
-    localStorage.setItem('audioMuted', isMuted.toString());
-  }, [isMuted]);
-  
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (isMuted && volume === 0) {
-      setVolume(0.5);
-    }
-  };
-  
-  const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0]);
-  };
-  
-  // If minimal, just show the mute/unmute button
-  if (minimal) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleMute}
-        className={className}
-        title={isMuted ? "Activer le son" : "Désactiver le son"}
-      >
-        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-      </Button>
-    );
-  }
-  
-  // Full controller with volume slider
+  const { volume, isPlaying, toggle, adjustVolume } = useAudioPlayer();
+  const [showControls, setShowControls] = useState(false);
+
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleMute}
-        className="flex-shrink-0"
-        title={isMuted ? "Activer le son" : "Désactiver le son"}
-      >
-        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-      </Button>
-      <Slider
-        value={[isMuted ? 0 : volume]}
-        min={0}
-        max={1}
-        step={0.01}
-        onValueChange={handleVolumeChange}
-        className="w-24"
-      />
+    <div className={className}>
+      {minimal ? (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="relative"
+              onClick={() => setShowControls(true)}
+            >
+              {isPlaying ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end">
+            <div className="flex flex-col space-y-4 p-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium">Musique d'ambiance</h4>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => toggle()}
+                >
+                  {isPlaying ? 'Désactiver' : 'Activer'}
+                </Button>
+              </div>
+              <div className="flex items-center space-x-2">
+                <VolumeX className="h-4 w-4" />
+                <Slider
+                  value={[volume * 100]}
+                  min={0}
+                  max={100}
+                  step={1}
+                  onValueChange={(values) => adjustVolume(values[0] / 100)}
+                  className="flex-1"
+                />
+                <Volume2 className="h-4 w-4" />
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <div className="flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggle()}
+            className="flex items-center space-x-2"
+          >
+            {isPlaying ? (
+              <>
+                <Volume2 className="h-4 w-4" />
+                <span>Musique activée</span>
+              </>
+            ) : (
+              <>
+                <VolumeX className="h-4 w-4" />
+                <span>Musique désactivée</span>
+              </>
+            )}
+          </Button>
+          <Slider
+            value={[volume * 100]}
+            min={0}
+            max={100}
+            step={1}
+            onValueChange={(values) => adjustVolume(values[0] / 100)}
+            className="w-24"
+          />
+        </div>
+      )}
     </div>
   );
 };

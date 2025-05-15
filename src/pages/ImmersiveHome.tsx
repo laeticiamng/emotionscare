@@ -5,18 +5,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useUserMode } from '@/contexts/UserModeContext';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import useVoiceCommand from '@/hooks/useVoiceCommand';
+import { determineTimeOfDay, getGreetingByTimeOfDay, TimeOfDay } from '@/constants/defaults';
 import '@/styles/immersive-home.css';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { setUserMode } = useUserMode();
-  const [greeting, setGreeting] = useState('Bienvenue dans votre espace de bien-être émotionnel');
+  const [greeting, setGreeting] = useState(getGreetingByTimeOfDay());
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning');
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(determineTimeOfDay());
   const audioPlayer = useAudioPlayer();
   
   const voiceCommands = {
@@ -29,29 +28,15 @@ const ImmersiveHome: React.FC = () => {
     'manager': () => navigate('/b2b/admin/login'),
   };
   
-  const { isListening, toggleListening, isSupported, executeCommand } = useVoiceCommand({
+  const { isListening, toggleListening, isSupported } = useVoiceCommand({
     commands: voiceCommands
   });
 
   // Determine time of day and set appropriate greeting
   useEffect(() => {
-    const hour = new Date().getHours();
-    let timeGreeting = 'Bienvenue dans votre espace de bien-être émotionnel';
-    let currentTimeOfDay: 'morning' | 'afternoon' | 'evening' = 'morning';
-    
-    if (hour >= 5 && hour < 12) {
-      timeGreeting = 'Bonjour. Laissez votre journée commencer dans la douceur.';
-      currentTimeOfDay = 'morning';
-    } else if (hour >= 12 && hour < 18) {
-      timeGreeting = 'Bienvenue dans votre espace personnel de reconnexion émotionnelle.';
-      currentTimeOfDay = 'afternoon';
-    } else {
-      timeGreeting = 'Bonsoir. Bienvenue dans votre espace de tranquillité.';
-      currentTimeOfDay = 'evening';
-    }
-    
-    setGreeting(timeGreeting);
+    const currentTimeOfDay = determineTimeOfDay();
     setTimeOfDay(currentTimeOfDay);
+    setGreeting(getGreetingByTimeOfDay());
     
     // Simulate playing ambient music
     // In a real implementation, this would connect to Music Generator API
@@ -85,9 +70,6 @@ const ImmersiveHome: React.FC = () => {
     // Store the user mode in localStorage
     localStorage.setItem('userMode', mode);
     
-    // Update context
-    setUserMode(mode);
-    
     // Add haptic feedback for mobile devices if supported
     if ('vibrate' in navigator) {
       navigator.vibrate(50); // subtle vibration for 50ms
@@ -100,7 +82,6 @@ const ImmersiveHome: React.FC = () => {
     });
     
     // Navigate to the appropriate route with preloading hint
-    // In a real implementation, you would use a preloading strategy here
     if (mode === 'b2c') {
       navigate('/b2c/login');
     } else {
@@ -115,6 +96,8 @@ const ImmersiveHome: React.FC = () => {
     } else {
       // This would actually play music in a real implementation
       setIsMusicPlaying(true);
+      // Uncomment when you have actual audio
+      // audioPlayer.play('path/to/ambient/music.mp3');
     }
   };
 

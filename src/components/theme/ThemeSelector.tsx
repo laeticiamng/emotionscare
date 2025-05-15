@@ -1,53 +1,47 @@
 
 import React from 'react';
-import { Moon, Sun, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/hooks/use-theme';
-import { Theme } from '@/types';
+import { Moon, Sun, Palette } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ThemeSelectorProps {
   minimal?: boolean;
-  className?: string;
 }
 
-export function ThemeSelector({ minimal = false, className = '' }: ThemeSelectorProps) {
+export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ minimal = false }) => {
   const { theme, setTheme } = useTheme();
 
-  const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
-    {
-      value: "light",
-      label: "Clair",
-      icon: <Sun className="h-4 w-4" />,
-    },
-    {
-      value: "dark",
-      label: "Sombre",
-      icon: <Moon className="h-4 w-4" />,
-    },
-    {
-      value: "pastel",
-      label: "Pastel",
-      icon: <Palette className="h-4 w-4" />,
-    },
-  ];
-
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      {themes.map((themeOption) => (
-        <Button
-          key={themeOption.value}
-          variant={theme === themeOption.value ? "default" : "outline"}
-          size={minimal ? "icon" : "sm"}
-          onClick={() => setTheme(themeOption.value)}
-          className={minimal ? "w-8 h-8 p-0" : ""}
-          title={themeOption.label}
-        >
-          {themeOption.icon}
-          {!minimal && <span className="ml-2">{themeOption.label}</span>}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size={minimal ? "icon" : "default"} className="relative">
+          <Sun className={`h-4 w-4 transition-opacity ${theme === 'light' ? 'opacity-100' : 'opacity-0 absolute'}`} />
+          <Moon className={`h-4 w-4 transition-opacity ${theme === 'dark' ? 'opacity-100' : 'opacity-0 absolute'}`} />
+          <Palette className={`h-4 w-4 transition-opacity ${theme === 'pastel' ? 'opacity-100' : 'opacity-0 absolute'}`} />
+          {!minimal && <span className="ml-2 hidden md:inline">Thème</span>}
+          <span className="sr-only">Toggle theme</span>
         </Button>
-      ))}
-    </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme('light')}>
+          <Sun className="h-4 w-4 mr-2" />
+          <span>Clair</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('dark')}>
+          <Moon className="h-4 w-4 mr-2" />
+          <span>Sombre</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('pastel')}>
+          <Palette className="h-4 w-4 mr-2" />
+          <span>Pastel</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
-}
-
-export default ThemeSelector;
+};

@@ -1,38 +1,42 @@
 
 import React, { useEffect, useState } from 'react';
-import { TimeOfDay } from '@/constants/defaults';
+import { motion } from 'framer-motion';
 
 interface WelcomeMessageProps {
   className?: string;
 }
 
 export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({ className = '' }) => {
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(TimeOfDay.MORNING);
-  const [greeting, setGreeting] = useState('Bienvenue sur EmotionsCare');
-  
+  const [message, setMessage] = useState<string>('');
+
   useEffect(() => {
-    const now = new Date();
-    const hour = now.getHours();
+    // In a real implementation, this would call an API to generate the message
+    // For now, we'll select from a predefined set
+    const messages = [
+      'Bienvenue dans votre espace personnel de reconnexion émotionnelle.',
+      'Prenez un moment pour vous. Votre bien-être émotionnel est important.',
+      'Découvrez des outils pour comprendre et gérer vos émotions au quotidien.',
+      'Un espace serein pour prendre soin de votre bien-être mental et émotionnel.',
+      'Explorez votre paysage émotionnel en toute sécurité et confidentialité.'
+    ];
     
-    // Set time of day based on current hour
-    if (hour >= 5 && hour < 12) {
-      setTimeOfDay(TimeOfDay.MORNING);
-      setGreeting('Prêt(e) pour une journée calme et connectée ?');
-    } else if (hour >= 12 && hour < 18) {
-      setTimeOfDay(TimeOfDay.AFTERNOON);
-      setGreeting('Un moment pour vous, au cœur de votre journée');
-    } else if (hour >= 18 && hour < 22) {
-      setTimeOfDay(TimeOfDay.EVENING);
-      setGreeting('Prenez soin de vous. Vous êtes au bon endroit.');
-    } else {
-      setTimeOfDay(TimeOfDay.NIGHT);
-      setGreeting('Un instant de calme avant le repos');
-    }
+    // Select a random message
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      setMessage(randomMessage);
+    }, 500);
   }, []);
-  
+
   return (
-    <p className={`text-muted-foreground ${className}`}>
-      {greeting}
-    </p>
+    <motion.p 
+      className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: message ? 1 : 0 }}
+      transition={{ duration: 0.8 }}
+    >
+      {message || 'Chargement...'}
+    </motion.p>
   );
 };
