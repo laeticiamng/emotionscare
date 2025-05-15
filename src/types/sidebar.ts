@@ -1,13 +1,16 @@
 
-export interface SidebarContextType {
-  collapsed: boolean;
-  toggleCollapsed: () => void;
-  isOpen?: boolean;
-  setIsOpen?: (isOpen: boolean) => void;
-  isMobile?: boolean;
-}
+import { ReactNode } from 'react';
 
 export interface SidebarProps {
-  children?: React.ReactNode;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+  children?: ReactNode;
   className?: string;
+  side?: 'left' | 'right';
+}
+
+export interface SidebarContextType {
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+  toggleCollapsed: () => void;
 }

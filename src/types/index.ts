@@ -1,4 +1,3 @@
-
 // Central export file for all types used in the application
 // All components should import their types from this file
 
@@ -90,14 +89,14 @@ export type {
 
 // Exports for dashboard types
 export type {
-  DashboardWidgetConfig,
-  KpiCardProps,
   DraggableKpiCardsGridProps,
+  KpiCardProps,
+  DashboardWidgetConfig,
+  GlobalOverviewTabProps,
   ChartData,
   DashboardStats,
   GamificationData,
   GridPosition,
-  GlobalOverviewTabProps,
   TeamOverviewProps as DashboardTeamOverviewProps
 } from './dashboard';
 

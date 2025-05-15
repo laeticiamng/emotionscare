@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Theme, FontFamily, FontSize } from '@/types';
 
@@ -14,7 +13,8 @@ interface ThemeContextType {
   getContrastText?: (color: string) => 'black' | 'white';
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+// Export the context so it can be imported elsewhere
+export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>('system');

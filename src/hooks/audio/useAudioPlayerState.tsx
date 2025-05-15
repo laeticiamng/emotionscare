@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { MusicTrack } from '@/types/music';
+import { MusicTrack } from '@/types';
 import { UseAudioPlayerStateReturn } from '@/types/audio-player';
 
 /**

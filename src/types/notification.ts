@@ -1,61 +1,109 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'realtime' | 'custom';
-export type NotificationType = 'info' | 'warning' | 'success' | 'error' | 'system' | 'user' | 'emotion' | 'coach' | 'journal' | 'community' | 'vr' | 'reminder' | string;
-export type NotificationPriority = 'high' | 'medium' | 'low';
-export type NotificationTone = 'professional' | 'friendly' | 'direct' | 'supportive' | 'minimal' | 'casual';
-export type NotificationFilter = 'all' | 'unread' | 'alerts' | 'system' | string;
+import { ReactNode } from 'react';
 
+/**
+ * Notification frequencies
+ */
+export type NotificationFrequency = 'immediately' | 'daily' | 'weekly' | 'never';
+
+/**
+ * Types of notifications
+ */
+export type NotificationType = 
+  | 'system' 
+  | 'emotion' 
+  | 'session' 
+  | 'achievement' 
+  | 'reminder'
+  | 'message'
+  | 'update'
+  | 'alert'
+  | 'info';
+
+/**
+ * Notification tone options
+ */
+export type NotificationTone = 'professional' | 'friendly' | 'supportive' | 'minimal';
+
+/**
+ * Notification priorities
+ */
+export type NotificationPriority = 'high' | 'medium' | 'low';
+
+/**
+ * Notification channels configuration
+ */
 export interface NotificationChannels {
   email: boolean;
   push: boolean;
   inApp: boolean;
 }
 
-export interface NotificationPreference {
-  id?: string;
-  user_id?: string;
-  enabled?: boolean;
-  type?: NotificationType | string;
-  types?: NotificationType[];
-  channels?: NotificationChannels | string[];
-  frequency?: NotificationFrequency;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  tone?: NotificationTone;
-  soundEnabled?: boolean;
+/**
+ * Filter options for notifications
+ */
+export interface NotificationFilter {
+  type?: NotificationType[];
+  read?: boolean;
+  timeRange?: 'today' | 'week' | 'month' | 'all';
+  priority?: NotificationPriority[];
 }
 
+/**
+ * Interface for badge component
+ */
+export interface NotificationBadge {
+  count: number;
+  max?: number;
+  variant?: 'default' | 'dot';
+}
+
+/**
+ * Notification preference settings
+ */
+export interface NotificationPreference {
+  type: NotificationType;
+  channels: NotificationChannels;
+  frequency: NotificationFrequency;
+  enabled?: boolean;
+}
+
+/**
+ * Props for notification item component
+ */
+export interface NotificationItemProps {
+  id: string;
+  title: string;
+  message?: string;
+  type: NotificationType;
+  timestamp: string | Date;
+  read: boolean;
+  priority?: NotificationPriority;
+  onClick?: () => void;
+  onMarkAsRead?: (id: string) => void;
+  icon?: ReactNode;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+/**
+ * Basic notification interface
+ */
 export interface Notification {
   id: string;
   title: string;
-  message: string;
+  message?: string;
   type: NotificationType;
-  priority?: NotificationPriority;
   timestamp: string | Date;
-  read?: boolean;
-  userId?: string;
-  actionUrl?: string;
-  actionLabel?: string;
-  icon?: string;
-  body?: string;
-  createdAt?: string;
-  date?: string;
+  read: boolean;
+  priority?: NotificationPriority;
   user_id?: string;
-}
-
-export interface NotificationItemProps {
-  notification: Notification;
-  onRead?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  onAction?: (notification: Notification) => void;
-}
-
-export interface NotificationBadge {
-  count: number;
-  type?: NotificationType;
-  hasNew?: boolean;
-  lastSeen?: string;
-  badgesCount?: number;
-  notificationsCount?: number;
+  action?: {
+    label: string;
+    url?: string;
+    type?: string;
+  };
+  metadata?: Record<string, any>;
 }

@@ -1,36 +1,45 @@
 
 import { MusicTrack } from './music';
 
+/**
+ * Return type for useAudioPlayerState hook
+ */
 export interface UseAudioPlayerStateReturn {
-  isReady: boolean;
+  currentTrack: MusicTrack | null;
   isPlaying: boolean;
+  volume: number;
+  repeat: boolean;
+  shuffle: boolean;
+  progress: number;
   currentTime: number;
   duration: number;
-  volume: number;
-  isMuted: boolean;
-  isLoading: boolean;
-  error: Error | null;
-  audioElement: HTMLAudioElement | null;
-  currentTrack: MusicTrack | null;
-  play: () => Promise<void>;
-  pause: () => void;
-  togglePlay: () => void;
-  seek: (time: number) => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  setTrack: (track: MusicTrack) => void;
+  loadingTrack: boolean;
+  error: string | null;
+  setCurrentTrack?: (track: MusicTrack) => void;
+  setIsPlaying?: (isPlaying: boolean) => void;
+  setVolume?: (volume: number) => void;
+  setRepeat?: (repeat: boolean) => void;
+  setShuffle?: (shuffle: boolean) => void;
+  setProgress?: (progress: number) => void;
+  setCurrentTime?: (time: number) => void;
+  setDuration?: (duration: number) => void;
+  setLoadingTrack?: (loading: boolean) => void;
+  setError?: (error: string | Error | null) => void;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+  togglePlay?: () => void;
 }
 
+/**
+ * Props for enhanced music visualizer component
+ */
 export interface EnhancedMusicVisualizerProps {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  isPlaying: boolean;
+  audioElement?: HTMLAudioElement | null;
+  mode?: 'wave' | 'bars' | 'circle';
   color?: string;
-  height?: number | string;
-  width?: number | string;
-  barWidth?: number;
-  gap?: number;
-  sensitivity?: number;
-  barCount?: number;
+  height?: number;
+  width?: number;
   className?: string;
-  visualizationType?: 'bars' | 'wave' | 'circle';
+  isPlaying?: boolean;
+  emotionColor?: string;
 }

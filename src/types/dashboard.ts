@@ -1,36 +1,60 @@
 
-import { LucideIcon } from "lucide-react";
-import React from "react";
+import { ReactNode } from 'react';
+import { Period } from './gamification';
 
-export interface DashboardWidgetConfig {
-  id: string;
-  type: string;
-  title: string;
-  description?: string;
-  position: GridPosition;
-  size?: { w: number; h: number };
-  dataSource?: string;
-  settings?: any;
-}
-
+// Types for KPI cards
 export interface KpiCardProps {
   title: string;
-  value: string | number | React.ReactNode;
-  delta?: number;
-  icon?: React.ComponentType<any>;
+  value: string | number;
+  change?: number | string;
+  status?: 'increase' | 'decrease' | 'neutral';
+  icon?: ReactNode;
+  color?: string;
+  children?: ReactNode;
+  className?: string;
   onClick?: () => void;
-  position?: GridPosition;
-  className?: string;
-  ariaLabel?: string;
+  footer?: ReactNode;
+  trend?: string;
+  trendValue?: number;
+  timeRange?: string;
+  tooltip?: string;
   isLoading?: boolean;
-  subtitle?: React.ReactNode;
 }
 
+// DraggableKpiCardsGridProps interface
 export interface DraggableKpiCardsGridProps {
-  kpiCards: KpiCardProps[];
+  cards: KpiCardProps[];
+  onReorder?: (cards: KpiCardProps[]) => void;
+  className?: string;
+  allowReordering?: boolean;
+}
+
+// Interface for dashboard statistics
+export interface DashboardStats {
+  users: number;
+  activeUsers: number;
+  emotionalScore: number;
+  sessionsCount: number;
+  emotionalGrowth: number;
+  newUsers: number;
+  completedSessions: number;
+  totalSessions: number;
+  avgSessionTime: number;
+  avgEmotionScore: number;
+  emotionalBalance: number;
+  wellbeingIndex: number;
+}
+
+// Interface for global overview tab
+export interface GlobalOverviewTabProps {
+  period: Period;
+  setPeriod: (period: Period) => void;
+  data: DashboardStats;
+  isLoading?: boolean;
   className?: string;
 }
 
+// Interface for chart data
 export interface ChartData {
   labels: string[];
   datasets: {
@@ -38,70 +62,35 @@ export interface ChartData {
     data: number[];
     backgroundColor?: string | string[];
     borderColor?: string | string[];
+    fill?: boolean;
+    tension?: number;
     borderWidth?: number;
   }[];
 }
 
-export interface DashboardStats {
-  users: number;
-  activeUsers: number;
-  emotions: number;
-  emotionAverage: number;
-  sessionsCompleted: number;
-  alerts: number;
-  activeUsersPercent?: number;
-  totalUsers?: number;
-  activeToday?: number;
-  averageScore?: number;
-  criticalAlerts?: number;
-  completion?: number;
-  productivity?: {
-    current: number;
-    trend: number;
-  };
-  emotionalScore?: {
-    current: number;
-    trend: number;
-  };
-}
-
+// Interface for gamification data
 export interface GamificationData {
   totalUsers: number;
-  badgesAwarded: number;
-  completionRate: number;
-  topChallenges: { name: string; count: number; completions?: number }[];
-  activeUsersPercent?: number; 
-  totalBadges?: number;
-  badgeLevels?: { level: string; count: number }[];
+  totalBadgesEarned: number;
+  activeChallenges: number;
+  leaderboardPosition?: number;
+  completedChallenges: number;
+  userEngagement: number;
+  userGrowth: number;
+  badgeDistribution: Record<string, number>;
+  recentBadges: {
+    id: string;
+    name: string;
+    user: string;
+    date: string;
+    icon?: string;
+  }[];
 }
 
+// Interface for grid position
 export interface GridPosition {
   x: number;
   y: number;
   w: number;
   h: number;
-}
-
-export interface GlobalOverviewTabProps {
-  kpiCards: KpiCardProps[];
-  absenteeismChartData?: ChartData;
-  emotionalScoreTrend?: ChartData;
-  dashboardStats?: DashboardStats;
-  gamificationData?: GamificationData;
-  isLoading?: boolean;
-}
-
-export interface TeamOverviewProps {
-  teamId?: string;
-  period?: string;
-  showFilters?: boolean;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  score: number;
-  rank: number;
-  change?: number;
-  avatar?: string;
 }

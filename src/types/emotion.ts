@@ -1,104 +1,94 @@
 
+/**
+ * Basic emotion type
+ */
 export interface Emotion {
-  id?: string;
-  user_id?: string;
-  date?: string | Date;
-  emotion?: string;
-  name?: string;
+  name: string;
+  value?: number;
+  percentage?: number;
   color?: string;
   icon?: string;
-  description?: string;
-  category?: string;
-  score?: number;
-  confidence?: number;
-  intensity?: number;
-  text?: string;
-  emojis?: string[] | string;
-  transcript?: string;
-  audio_url?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  triggers?: string[];
-  feedback?: string;
+  emoji?: string;
   timestamp?: string;
-  anxiety?: number;
-  energy?: number;
-  value?: number;
-  [key: string]: any;  // Allow for flexible extension
+  description?: string;
 }
 
+/**
+ * Result from emotion analysis
+ */
 export interface EmotionResult {
+  emotion: string;
+  value?: number;
+  percentage?: number;
+  score?: number;
+  color?: string;
+  intensity?: number;
+  confidence?: number;
+  timestamp?: string;
+  date?: string;
+  recommendations?: string[];
+  feedback?: string;
+  triggers?: string[];
+  emojis?: string[];
   id?: string;
   user_id?: string;
-  emotion: string;
-  score?: number;
-  confidence?: number;
-  dominantEmotion?: string;
-  primaryEmotion?: string;
-  intensity?: number;
   text?: string;
-  transcript?: string;
-  emojis?: string[] | string;
-  timestamp?: string | Date;
-  date?: string;
-  triggers?: string[];
-  feedback?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  audio_url?: string;
-  value?: number;
-  [key: string]: any;  // Allow for flexible extension
 }
 
+/**
+ * Enhanced emotion result with additional data
+ */
 export interface EnhancedEmotionResult extends EmotionResult {
-  recommendations?: string[];
-  insights?: string[];
-  icon?: string;
-  color?: string;
-  textColor?: string;
-  description?: string;
-  category?: string;
-  coping_strategies?: string[];
-  relatedActivities?: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number;
-  }[];
+  relatedEmotions?: Emotion[];
+  suggestedActions?: string[];
+  musicRecommendations?: string[];
+  emotionalTrend?: 'improving' | 'declining' | 'stable';
+  wellbeingImpact?: 'positive' | 'negative' | 'neutral';
 }
 
+/**
+ * Props for voice emotion scanner component
+ */
 export interface VoiceEmotionScannerProps {
-  onResult: (result: EmotionResult) => void;
+  onResultsReady?: (results: EmotionResult) => void;
+  onError?: (error: Error) => void;
   autoStart?: boolean;
-  duration?: number;
+  maxDuration?: number;
+  className?: string;
+  showVisualizer?: boolean;
 }
 
+/**
+ * Props for live voice scanner component
+ */
 export interface LiveVoiceScannerProps {
-  onResult?: (result: EmotionResult) => void;
+  onEmotionDetected?: (emotion: EmotionResult) => void;
+  onTranscriptUpdate?: (transcript: string) => void;
+  onStart?: () => void;
+  onStop?: () => void;
   autoStart?: boolean;
-  duration?: number;
-  scanDuration?: number;
-  onScanComplete?: (result: EmotionResult) => void;
+  maxDuration?: number;
+  className?: string;
+  visualizationMode?: 'wave' | 'bars' | 'circle';
 }
 
+/**
+ * Props for emotional team view
+ */
 export interface EmotionalTeamViewProps {
   teamId?: string;
-  departmentId?: string;
-  users?: any[];
-  anonymized?: boolean;
-  onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year' | string;
-  userId?: string;
-  className?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  onRefresh?: () => void;
+  period?: string;
+  comparisonMode?: boolean;
+  showIndividualData?: boolean;
 }
 
+/**
+ * Props for team overview
+ */
 export interface TeamOverviewProps {
   teamId?: string;
   period?: string;
-  showFilters?: boolean;
+  data?: any;
+  loading?: boolean;
+  error?: Error | null;
 }
