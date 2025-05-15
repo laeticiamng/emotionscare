@@ -1,5 +1,8 @@
-// This file just contains the selected type definitions needed to fix errors
 
+import { UserRole } from './user';
+import { FontFamily, FontSize, ThemeName } from './theme';
+
+// Types de base pour la compatibilité
 export interface User {
   id: string;
   name: string;
@@ -15,10 +18,6 @@ export interface User {
   emotional_score?: number;
   preferences?: UserPreferences;
 }
-
-export type UserRole = 'user' | 'admin' | 'moderator' | 'guest' | 'professional' | 'b2b_admin' | 'b2b-admin';
-
-export type UserModeType = 'individual' | 'professional' | 'b2b-admin' | 'b2b-user';
 
 export interface UserPreferences {
   theme: ThemeName;
@@ -65,10 +64,6 @@ export interface NotificationPreferences {
   };
 }
 
-export type FontFamily = 'inter' | 'system' | 'mono' | 'rounded' | 'serif';
-export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
-export type ThemeName = 'light' | 'dark' | 'system';
-
 export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
 
 export interface Badge {
@@ -80,17 +75,37 @@ export interface Badge {
   type?: string;
   imageUrl?: string;
   image_url?: string;
-  unlocked?: boolean; // Added for BadgeGrid
-  category?: string;  // Added for BadgeGrid
+  unlocked?: boolean;
+  category?: string;
+  level?: string | number;
+  points?: number;
+  user_id?: string;
+  icon_url?: string;
+  total_required?: number;
+  image?: string;
+  dateEarned?: string;
+  awarded_at?: Date | string;
 }
 
-export interface InvitationVerificationResult {
-  valid: boolean;
-  expired?: boolean;
-  error?: string;
-  invitation?: {
-    email: string;
-    role: string;
-    expires_at: string;
-  };
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'individual' | 'professional';
+
+export interface UserModeContextType {
+  mode: UserModeType;
+  setMode: (mode: UserModeType) => void;
+  userMode?: UserModeType;
+  setUserMode?: (mode: UserModeType) => void;
+}
+
+export interface JournalEntry {
+  id: string;
+  title: string;
+  content: string;
+  text?: string;
+  mood: string;
+  mood_score?: number;
+  emotion?: string;
+  date: Date | string;
+  tags?: string[];
+  ai_feedback?: string;
+  user_id?: string;
 }

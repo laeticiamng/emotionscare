@@ -1,5 +1,4 @@
 
-// Add or update the Community types
 export interface Post {
   id: string;
   user_id: string;

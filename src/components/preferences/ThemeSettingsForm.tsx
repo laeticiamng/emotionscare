@@ -3,16 +3,12 @@ import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ThemeName, FontSize, FontFamily } from '@/types/theme';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
+import { FontSize, FontFamily, ThemeName } from '@/types';
 
 const ThemeSettingsForm = () => {
   const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
-  
-  // Map values to FontSize and FontFamily types
-  const fontSizeOptions: FontSize[] = ['sm', 'md', 'lg', 'xl'];
-  const fontFamilyOptions: FontFamily[] = ['sans', 'serif', 'mono', 'rounded'];
   
   // Map display names
   const fontSizeDisplayNames: Record<string, string> = {
@@ -94,14 +90,25 @@ const ThemeSettingsForm = () => {
             onValueChange={(value) => setFontSize(value as FontSize)}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
-            {fontSizeOptions.map((size) => (
-              <div key={size} className="flex items-center space-x-2">
-                <RadioGroupItem value={size} id={`size-${size}`} />
-                <Label htmlFor={`size-${size}`}>
-                  {fontSizeDisplayNames[size]}
-                </Label>
-              </div>
-            ))}
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="sm" id="size-sm" />
+              <Label htmlFor="size-sm">Small</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="md" id="size-md" />
+              <Label htmlFor="size-md">Medium</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="lg" id="size-lg" />
+              <Label htmlFor="size-lg">Large</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="xl" id="size-xl" />
+              <Label htmlFor="size-xl">Extra Large</Label>
+            </div>
           </RadioGroup>
         </CardContent>
       </Card>
@@ -117,14 +124,25 @@ const ThemeSettingsForm = () => {
             onValueChange={(value) => setFontFamily(value as FontFamily)}
             className="grid grid-cols-2 gap-2"
           >
-            {fontFamilyOptions.map((font) => (
-              <div key={font} className="flex items-center space-x-2">
-                <RadioGroupItem value={font} id={`font-${font}`} />
-                <Label htmlFor={`font-${font}`}>
-                  {fontFamilyDisplayNames[font]}
-                </Label>
-              </div>
-            ))}
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="sans" id="font-sans" />
+              <Label htmlFor="font-sans">Sans-Serif</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="serif" id="font-serif" />
+              <Label htmlFor="font-serif">Serif</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="mono" id="font-mono" />
+              <Label htmlFor="font-mono">Monospace</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rounded" id="font-rounded" />
+              <Label htmlFor="font-rounded">Rounded</Label>
+            </div>
           </RadioGroup>
         </CardContent>
       </Card>

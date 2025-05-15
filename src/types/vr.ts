@@ -1,17 +1,18 @@
 
 import { MusicTrack } from './music';
 
-// VR Session Template for pre-defined VR experiences
+// VR Session Template pour les expériences VR prédéfinies
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  name?: string; // Add this property to fix the errors
+  name?: string;
   description: string;
-  duration: number; // in seconds
+  duration: number; // en secondes
   tags: string[];
   thumbnailUrl?: string;
-  imageUrl?: string; // Add this property to fix the errors
-  coverUrl?: string; // Add this property to fix the errors
+  thumbnail?: string;
+  imageUrl?: string;
+  coverUrl?: string;
   preview_url?: string;
   audioUrl?: string;
   audio_url?: string;
@@ -23,7 +24,7 @@ export interface VRSessionTemplate {
   emotion?: string;
   emotion_target?: string;
   emotionTarget?: string;
-  lastUsed?: string | Date; // Add this property to fix the errors
+  lastUsed?: string | Date;
   theme?: string;
   completion_rate?: number;
   completionRate?: number;
@@ -35,9 +36,11 @@ export interface VRSessionTemplate {
   createdAt?: string;
   updated_at?: string;
   is_public?: boolean;
+  cover_url?: string;
+  video_url?: string;
 }
 
-// User VR Session record
+// Enregistrement de session VR utilisateur
 export interface VRSession {
   id: string;
   user_id?: string;
@@ -45,16 +48,16 @@ export interface VRSession {
   template_id: string;
   templateId?: string;
   started_at: string;
-  startedAt?: string; // Add for compatibility
-  start_time?: string; // Add for compatibility
-  completed_at?: string;
+  startedAt?: string;
+  start_time?: string;
   completedAt?: string;
-  end_time?: string; // Add for compatibility
-  endTime?: string; // Add for compatibility
-  completed?: boolean; // Add for compatibility
-  isCompleted?: boolean; // Add for compatibility
+  completed_at?: string;
+  end_time?: string;
+  endTime?: string;
+  completed?: boolean;
+  isCompleted?: boolean;
   duration: number;
-  duration_seconds?: number; // Add for compatibility
+  duration_seconds?: number;
   feedback?: string;
   emotion_before?: string;
   emotionBefore?: string;
@@ -67,19 +70,20 @@ export interface VRSession {
   musicTrackId?: string;
   music_track?: MusicTrack;
   musicTrack?: MusicTrack;
-  heart_rate_before?: number; // Add for compatibility
-  heartRateBefore?: number; // Add for compatibility
-  heart_rate_after?: number; // Add for compatibility
-  heartRateAfter?: number; // Add for compatibility
-  date?: string; // Add for compatibility
+  heart_rate_before?: number;
+  heartRateBefore?: number;
+  heart_rate_after?: number;
+  heartRateAfter?: number;
+  date?: string;
 }
 
-// Props for VR History List Component
+// Props pour le composant VR History List
 export interface VRHistoryListProps {
-  sessions: VRSession[];
+  sessions?: VRSession[];
   templates?: VRSessionTemplate[];
   onSelect?: (session: VRSession) => void;
   onSelectTemplate?: (template: VRSessionTemplate) => void;
+  onSelectSession?: (session: VRSession) => void;
   loading?: boolean;
   error?: Error | null;
   className?: string;
@@ -88,12 +92,13 @@ export interface VRHistoryListProps {
   limit?: number;
 }
 
-// Props for VR Session With Music Component
+// Props pour le composant VR Session With Music
 export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
+  template?: VRSessionTemplate;
   onComplete?: (sessionData: any) => void;
+  onExit?: () => void;
   onCancel?: () => void;
-  session?: VRSession; // Add missing properties
+  session?: VRSession;
   onSessionComplete?: () => void;
   isAudioOnly?: boolean;
   videoUrl?: string;
@@ -108,21 +113,7 @@ export interface VRSessionWithMusicProps {
   suggestedTrack?: MusicTrack;
 }
 
-// Different name to avoid conflict
-export type VRSessionWithMusicPropsType = VRSessionWithMusicProps;
-
-// Props for VR Template Grid Component
-export interface VRTemplateGridProps {
-  templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
-  onSelectTemplate?: (template: VRSessionTemplate) => void; // Added for backward compatibility
-  loading?: boolean;
-  error?: Error | null;
-  filter?: string;
-  className?: string;
-}
-
-// Props for VR Session History Component
+// Props pour le composant VR Session History
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;

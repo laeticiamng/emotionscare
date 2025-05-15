@@ -1,51 +1,113 @@
+
 export interface Emotion {
   id: string;
-  name: string;
-  score: number;
-  color: string;
+  name?: string;
+  score?: number;
+  color?: string;
   icon?: string;
   date?: string;
   emotion?: string;
   confidence?: number;
-  intensity?: number; // Added for compatibility
+  intensity?: number;
+  user_id?: string;
+  userId?: string; // Pour la compatibilité
+  text?: string;
+  emojis?: string[] | string;
+  transcript?: string;
+  audio_url?: string;
+  audioUrl?: string; // Pour la compatibilité
+  ai_feedback?: string;
+  feedback?: string;
+  recommendations?: string[];
+  triggers?: string[];
+  timestamp?: string;
+  anxiety?: number;
+  energy?: number;
+  category?: string;
+  description?: string;
+  [key: string]: any; // Permet l'extension flexible
 }
 
 export interface EmotionResult {
   id?: string;
+  user_id?: string;
+  userId?: string; // Pour la compatibilité
   emotion: string;
-  score: number;
+  score?: number;
   confidence?: number;
-  timestamp?: string;
-  recommendations?: string[];
-  triggers?: string[];
-  emojis?: string | string[];
-  feedback?: string;
-  date?: string;
+  dominantEmotion?: string;
+  primaryEmotion?: string;
+  intensity?: number;
   text?: string;
   transcript?: string;
-  intensity?: number;
-  user_id?: string;
-  audioUrl?: string; // Added for compatibility
-  audio_url?: string; // Added for compatibility
-  ai_feedback?: string; // Added for backward compatibility
+  emojis?: string[] | string;
+  timestamp?: string;
+  date?: string;
+  triggers?: string[];
+  feedback?: string;
+  ai_feedback?: string; // Pour la compatibilité
+  recommendations?: string[];
+  audio_url?: string;
+  audioUrl?: string; // Pour la compatibilité
+  [key: string]: any; // Permet l'extension flexible
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
-  analysis?: string;
-  recommendations: string[];
-  triggers: string[];
+  recommendations?: string[];
+  insights?: string[];
+  icon?: string;
+  color?: string;
+  textColor?: string;
+  description?: string;
+  category?: string;
+  coping_strategies?: string[];
+  relatedActivities?: {
+    id: string;
+    title: string;
+    description: string;
+    duration: number;
+  }[];
 }
 
 export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: 'day' | 'week' | 'month' | 'year';
+  teamId?: string;
+  departmentId?: string;
+  users?: any[];
+  anonymized?: boolean;
+  onUserClick?: (userId: string) => void;
+  period?: 'day' | 'week' | 'month' | 'year' | string;
   userId?: string;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  onRefresh?: () => void;
+  showNames?: boolean;
+  compact?: boolean;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  userId?: string;
+  period?: 'day' | 'week' | 'month' | 'year';
   anonymized?: boolean;
   className?: string;
   dateRange?: {
     start: Date;
     end: Date;
   };
+  users?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    avatar_url?: string;
+    emotional_score?: number;
+    anonymity_code?: string;
+  }>;
+  showNames?: boolean;
+  compact?: boolean;
 }
 
 export interface LiveVoiceScannerProps {
@@ -66,26 +128,4 @@ export interface VoiceEmotionScannerProps {
   autoStart?: boolean;
   showVisualizer?: boolean;
   className?: string;
-}
-
-// Add TeamOverviewProps since it's being imported
-export interface TeamOverviewProps {
-  teamId: string;
-  period?: 'day' | 'week' | 'month' | 'year';
-  userId?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  users?: Array<{
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    avatar_url?: string;
-    emotional_score?: number;
-    anonymity_code?: string;
-  }>;
 }

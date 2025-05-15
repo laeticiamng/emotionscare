@@ -9,6 +9,7 @@ export interface ChatMessage {
   conversation_id?: string;
   role?: string;
   is_read?: boolean;
+  sender_type?: string;
 }
 
 export interface ChatResponse {
@@ -23,7 +24,7 @@ export interface ChatResponse {
   recommendations?: string[];
 }
 
-// Adding this type to fix the ChatResponseType errors
+// Ajout de ce type pour résoudre les erreurs ChatResponseType
 export type ChatResponseType = ChatResponse;
 
 export interface ChatConversation {

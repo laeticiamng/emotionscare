@@ -1,8 +1,10 @@
 
-// Update UserModeType to match UserRole options
-export type UserModeType = 'B2C' | 'B2B-USER' | 'B2B-ADMIN' | 'B2B-SELECTION' | 
-                           'b2c' | 'b2b_user' | 'b2b_admin' | 'coach' | 
-                           'individual' | 'professional' | 'moderator' | 'user';
+// UserModeType to match UserRole options
+export type UserModeType = 
+  | 'B2C' | 'B2B-USER' | 'B2B-ADMIN' | 'B2B-SELECTION' 
+  | 'b2c' | 'b2b_user' | 'b2b_admin' | 'coach' 
+  | 'individual' | 'professional' | 'moderator' | 'user'
+  | 'b2b-user' | 'b2b-admin';
 
 export interface UserModeContextType {
   mode: UserModeType;

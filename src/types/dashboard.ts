@@ -75,8 +75,8 @@ export interface ChartData {
 export interface DashboardStats {
   totalUsers: number;
   activeUsers: number;
-  averageEmotionalScore: number;
-  absenteeismRate: number;
+  averageEmotionalScore?: number;
+  absenteeismRate?: number;
   activeToday?: number;
   averageScore?: number;
   criticalAlerts?: number;

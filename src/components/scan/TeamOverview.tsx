@@ -1,48 +1,41 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TeamOverviewProps } from '@/types/emotion';
+import { TeamOverviewProps } from '@/types';
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
   teamId,
-  period = 'month',
+  userId,
+  period = 'week',
+  anonymized = false,
+  className = '',
+  dateRange,
+  users = [],
   showNames = true,
-  compact = false,
-  users = []
+  compact = false
 }) => {
   return (
-    <Card className={compact ? 'p-2' : ''}>
-      <CardHeader className={compact ? 'p-2' : ''}>
-        <CardTitle className={compact ? 'text-lg' : ''}>Team Emotional Overview</CardTitle>
-      </CardHeader>
-      <CardContent className={compact ? 'p-2' : ''}>
-        {users && users.length > 0 ? (
-          <div className="space-y-4">
-            {users.map(user => (
-              <div key={user.id} className="flex items-center justify-between p-2 border rounded">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center mr-3">
-                    {user.name.charAt(0)}
-                  </div>
-                  <span>{showNames ? user.name : user.anonymity_code}</span>
-                </div>
-                <div className="font-medium">
-                  Score: {user.emotional_score || 'N/A'}
-                </div>
+    <div className={`team-overview ${className}`}>
+      <h2 className="text-lg font-semibold mb-4">Vue d'équipe {compact && "(compacte)"}</h2>
+      {users.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {users.map(user => (
+            <div key={user.id} className="bg-card p-4 rounded-lg shadow">
+              {showNames ? (
+                <div className="font-medium">{user.name}</div>
+              ) : (
+                <div className="font-medium">Utilisateur {user.anonymity_code || "anonyme"}</div>
+              )}
+              <div className="text-sm text-muted-foreground">{user.role}</div>
+              <div className="mt-2">
+                <div className="text-sm">Score émotionnel: {user.emotional_score || 'N/A'}</div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-4 text-muted-foreground">
-            {teamId ? (
-              <p>Loading team overview for {teamId}, period: {period}...</p>
-            ) : (
-              <p>No team selected. Please select a team to view their emotional overview.</p>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted-foreground">Aucun utilisateur trouvé pour cette équipe.</p>
+      )}
+    </div>
   );
 };
 

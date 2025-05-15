@@ -31,12 +31,14 @@ export interface GamificationStats {
 export interface Challenge {
   id: string;
   title: string;
+  name?: string;
   description: string;
   type: string;
   progress: number;
-  goal: number;
+  goal?: number;
+  target?: number;
   reward: number | string;
-  status: 'active' | 'completed' | 'failed';
+  status: 'active' | 'completed' | 'failed' | 'expired' | 'pending';
   deadline?: string;
   startDate: string;
   category?: string;
@@ -45,25 +47,7 @@ export interface Challenge {
   total?: number;
   completed?: boolean;
   points?: number;
-  name?: string; // Added for compatibility
-}
-
-// Update for type compatibility with Dashboard and GamificationDashboard
-export interface GamificationData extends GamificationStats {
-  totalBadges: number;
-  activeChallenges: number;
-  leaderboard: {
-    userId: string;
-    name: string;
-    score: number;
-    position: number;
-  }[];
-  recentAchievements: {
-    userId: string;
-    name: string;
-    badge: string;
-    date: string;
-  }[];
+  expiresAt?: string;
 }
 
 export interface LeaderboardEntry {
@@ -76,3 +60,5 @@ export interface LeaderboardEntry {
   level: number;
   completedChallenges?: number;
 }
+
+export type Period = 'day' | 'week' | 'month' | 'year' | 'all';

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { useSidebar } from './SidebarContext';
@@ -23,7 +24,7 @@ export function SidebarItem({
   disabled,
   badge
 }: SidebarItemProps) {
-  const { expanded } = useSidebar();
+  const { collapsed } = useSidebar();
 
   return (
     <li className={cn("relative", disabled && "opacity-60 pointer-events-none")}>
@@ -33,12 +34,12 @@ export function SidebarItem({
         className={cn(
           "flex items-center gap-2 rounded-md p-2 text-sm font-semibold transition-colors hover:bg-secondary/50",
           active && "bg-secondary/50",
-          !expanded && "justify-center",
+          !collapsed && "justify-center",
           disabled && "cursor-not-allowed opacity-60 hover:bg-transparent"
         )}
       >
         {icon}
-        {(expanded || (!icon && !expanded)) && <span>{title}</span>}
+        {(!collapsed || (!icon && !collapsed)) && <span>{title}</span>}
         {badge && <span className="ml-auto">{badge}</span>}
       </a>
       {children}

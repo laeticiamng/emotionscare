@@ -2,7 +2,7 @@
 // Central export file for all types used in the application
 // All components should import their types from this file
 
-// Exports for theme-related types
+// Theme types
 export type {
   Theme,
   FontSize,
@@ -14,7 +14,7 @@ export type {
   ThemeName
 } from './theme';
 
-// Exports for user-related types
+// User types
 export type {
   User,
   UserRole,
@@ -26,19 +26,18 @@ export type {
   NotificationPreferences
 } from './user';
 
-// Exports for user mode types
+// UserMode types
 export type {
   UserModeType,
-  UserModeContextType,
-  JournalEntry
-} from './types';
+  UserModeContextType
+} from './userMode';
 
-// Exports for sidebar types
+// Sidebar types
 export type {
-  SidebarContextType,
+  SidebarContextType
 } from './sidebar';
 
-// Exports for music-related types
+// Music types
 export type {
   MusicTrack,
   MusicPlaylist,
@@ -51,7 +50,7 @@ export type {
   VolumeControlProps
 } from './music';
 
-// Exports for notification types
+// Notification types
 export type {
   Notification,
   NotificationType,
@@ -66,7 +65,7 @@ export type {
   NotificationSettings
 } from './notification';
 
-// Exports for emotion types
+// Emotion types
 export type {
   Emotion,
   EmotionResult,
@@ -77,7 +76,7 @@ export type {
   TeamOverviewProps
 } from './emotion';
 
-// Exports for dashboard types
+// Dashboard types
 export type {
   DraggableKpiCardsGridProps,
   KpiCardProps,
@@ -89,7 +88,7 @@ export type {
   GridPosition
 } from './dashboard';
 
-// Exports for gamification types
+// Gamification types
 export type {
   GamificationStats,
   Badge,
@@ -98,5 +97,87 @@ export type {
   LeaderboardEntry
 } from './gamification';
 
-// Re-exporting important types for backward compatibility
+// VR types
+export type {
+  VRSessionTemplate,
+  VRSession,
+  VRHistoryListProps,
+  VRSessionHistoryProps,
+  VRSessionWithMusicProps
+} from './vr';
+
+// Chat types
+export type {
+  ChatMessage,
+  ChatResponse,
+  ChatResponseType,
+  ChatConversation,
+  ChatParticipant
+} from './chat';
+
+// Audio types
+export type {
+  AudioTrack,
+  AudioPlayerState,
+  AudioPlayerContextType
+} from './audio';
+
+// Journal types
+export type {
+  JournalEntry
+} from './journal';
+
+// Activity types
+export type {
+  ActivityTabView,
+  ActivityFiltersState,
+  AnonymousActivity,
+  ActivityStats
+} from './activity';
+
+// Community types
+export type {
+  Post,
+  Comment,
+  CommunityStats
+} from './community';
+
+// Calendar types
+export type {
+  CalendarEvent,
+  CalendarEventType,
+  RecurrenceRule,
+  CalendarSettings
+} from './calendar';
+
+// AI types
+export type {
+  AIAssistant,
+  AIInteraction,
+  AIMessage,
+  AIRecommendation
+} from './ai';
+
+// Group types
+export type {
+  Group,
+  GroupMember,
+  GroupPost
+} from './group';
+
+// Mood types
+export type {
+  MoodData,
+  MoodTrend,
+  MoodInsight,
+  MoodStatistics
+} from './mood';
+
+// UI types
+export type {
+  Toast,
+  ToastAction
+} from './ui';
+
+// Export additional types needed for backward compatibility
 export * from './types';

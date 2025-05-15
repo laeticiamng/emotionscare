@@ -3,7 +3,16 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types';
 
 // Export the context so it can be imported elsewhere
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextType>({
+  theme: 'system' as Theme, 
+  setTheme: () => {}, 
+  isDarkMode: false,
+  fontSize: 'medium' as FontSize,
+  setFontSize: () => {},
+  fontFamily: 'system' as FontFamily,
+  setFontFamily: () => {},
+  getContrastText: () => 'black'
+});
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>('system');
@@ -60,22 +69,21 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     
     // Add new font size class
     switch (fontSize) {
+      case 'sm':
       case 'small':
         root.classList.add('text-sm');
         break;
+      case 'md':
       case 'medium':
         root.classList.add('text-base');
         break;
+      case 'lg':
       case 'large':
         root.classList.add('text-lg');
         break;
-      case 'x-large':
       case 'xl':
+      case 'x-large':
         root.classList.add('text-xl');
-        break;
-      case 'xx-large':
-      case 'extra-large':
-        root.classList.add('text-2xl');
         break;
       default:
         root.classList.add('text-base');
@@ -126,9 +134,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       setTheme, 
       isDarkMode,
       fontSize,
-      setFontSize,
+      setFontSize: (size: FontSize) => setFontSize(size),
       fontFamily,
-      setFontFamily,
+      setFontFamily: (font: FontFamily) => setFontFamily(font),
       getContrastText
     }}>
       {children}

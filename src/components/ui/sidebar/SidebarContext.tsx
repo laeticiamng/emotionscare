@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { SidebarContextType } from '@/types/theme';
+import { SidebarContextType } from '@/types';
 
 const SidebarContext = createContext<SidebarContextType>({
   isOpen: false,
