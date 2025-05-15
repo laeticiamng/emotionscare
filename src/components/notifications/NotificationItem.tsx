@@ -1,73 +1,103 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { X, Bell, ScanLine, MessageSquare, Users, Award } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Bell, Calendar, CheckCircle2, Info, AlertTriangle, XCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Notification, NotificationItemProps } from '@/types';
+import { NotificationItemProps, NotificationType } from '@/types/notification';
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onRead }) => {
-  const getIcon = () => {
-    switch (notification.type) {
-      case 'reminder':
-        return <Calendar className="h-5 w-5 text-blue-500" />;
-      case 'success':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
-      case 'error':
-        return <XCircle className="h-5 w-5 text-red-500" />;
+const NotificationItem: React.FC<NotificationItemProps> = ({
+  notification, onMarkAsRead, onDelete, onClick, compact = false, onRead
+}) => {
+  const getIcon = (type: NotificationType) => {
+    switch (type) {
+      case 'emotion':
+        return <ScanLine className="h-5 w-5 text-purple-500" />;
+      case 'journal':
+        return <MessageSquare className="h-5 w-5 text-blue-500" />;
+      case 'community':
+        return <Users className="h-5 w-5 text-green-500" />;
+      case 'achievement':
+        return <Award className="h-5 w-5 text-amber-500" />;
       default:
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Bell className="h-5 w-5 text-primary" />;
     }
   };
-
+  
+  const handleMarkAsRead = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onMarkAsRead) onMarkAsRead(notification.id);
+    if (onRead) onRead(notification.id);
+  };
+  
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) onDelete(notification.id);
+  };
+  
   const handleClick = () => {
-    if (onRead) {
-      onRead(notification.id);
-    }
+    if (onClick) onClick(notification);
+    if (!notification.read && onMarkAsRead) onMarkAsRead(notification.id);
+    if (!notification.read && onRead) onRead(notification.id);
   };
-
-  const formattedDate = notification.timestamp 
-    ? formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true, locale: fr })
-    : '';
-
+  
+  const formattedDate = notification.timestamp || notification.date;
+  
   return (
     <div 
-      className={cn(
-        "p-4 border-b last:border-b-0 transition-colors",
-        notification.read ? "bg-background" : "bg-primary/5",
-        "hover:bg-muted/40 cursor-pointer"
-      )}
+      className={`
+        p-3 rounded-lg border 
+        ${!notification.read ? 'bg-muted/40' : 'bg-card'} 
+        hover:bg-accent/10 transition-colors cursor-pointer
+        ${compact ? 'text-sm' : ''}
+      `}
       onClick={handleClick}
     >
       <div className="flex gap-3">
-        <div className="mt-0.5">{getIcon()}</div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between gap-2">
-            <h4 className="font-medium text-sm">{notification.title}</h4>
-            <span className="text-xs text-muted-foreground whitespace-nowrap">{formattedDate}</span>
+        <div className="flex-shrink-0 mt-0.5">
+          {getIcon(notification.type)}
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex justify-between items-start">
+            <p className={`font-medium ${compact ? 'text-sm' : ''}`}>{notification.title}</p>
+            
+            <div className="flex items-center gap-1">
+              {!notification.read && !compact && (
+                <div className="h-2 w-2 rounded-full bg-primary"></div>
+              )}
+              
+              <div className="flex">
+                {!compact && (
+                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleMarkAsRead}>
+                    <span className="sr-only">Mark as read</span>
+                    <span className="text-xs">✓</span>
+                  </Button>
+                )}
+                
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleDelete}>
+                  <span className="sr-only">Delete notification</span>
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
           </div>
           
-          {notification.message && (
-            <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-          )}
-
-          <div className="flex items-center justify-between mt-2">
-            {!notification.read && (
-              <Badge variant="secondary" className="text-xs">Nouveau</Badge>
-            )}
+          <p className={`text-muted-foreground ${compact ? 'text-xs line-clamp-1' : ''}`}>
+            {notification.message}
+          </p>
+          
+          <div className="flex justify-between items-center mt-1">
+            <span className="text-xs text-muted-foreground">
+              {typeof formattedDate === 'string' 
+                ? formatDistanceToNow(new Date(formattedDate), { addSuffix: true, locale: fr }) 
+                : formatDistanceToNow(formattedDate, { addSuffix: true, locale: fr })
+              }
+            </span>
             
-            {notification.actionUrl && notification.actionLabel && (
-              <Button 
-                variant="link" 
-                size="sm" 
-                className="p-0 h-auto text-xs"
-                asChild
-              >
-                <a href={notification.actionUrl}>{notification.actionLabel}</a>
+            {notification.actionUrl && notification.actionLabel && !compact && (
+              <Button variant="link" size="sm" className="h-auto p-0 text-xs">
+                {notification.actionLabel}
               </Button>
             )}
           </div>

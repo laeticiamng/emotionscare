@@ -4,19 +4,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { KpiCardProps } from '@/types/dashboard';
-import { LucideIcon } from 'lucide-react';
 
-const KpiCard: React.FC<KpiCardProps & {
-  icon?: React.ReactNode;
-  delta?: {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: React.ReactNode;
-  ariaLabel?: string;
-  isLoading?: boolean;
-}> = ({
+const KpiCard: React.FC<KpiCardProps> = ({
   title,
   value,
   icon,

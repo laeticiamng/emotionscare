@@ -1,143 +1,159 @@
 
 import React, { useState } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Check, Trash2 } from 'lucide-react';
-import { Notification, NotificationFilter } from '@/types';
-import { useNotifications } from '@/hooks/use-notifications';
-import NotificationItem from '@/components/notifications/NotificationItem';
+import { Bell, Filter, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Notification, NotificationFilter } from "@/types/notification";
+import NotificationItem from "./NotificationItem";
 
 interface NotificationDrawerProps {
-  open: boolean;
-  onClose: () => void;
+  notifications: Notification[];
+  unreadCount: number;
+  onMarkAsRead: (id: string) => Promise<void>;
+  onMarkAllAsRead: () => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  children?: React.ReactNode;
 }
 
-const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ open, onClose }) => {
-  const { 
-    notifications, 
-    unreadCount, 
-    isLoading, 
-    filter, 
-    setFilter, 
-    markAsRead, 
-    markAllAsRead,
-    clearAllNotifications
-  } = useNotifications();
-  const [showConfirmClear, setShowConfirmClear] = useState(false);
-
-  const handleMarkAllAsRead = () => {
-    markAllAsRead();
+const NotificationDrawer: React.FC<NotificationDrawerProps> = ({
+  notifications,
+  unreadCount,
+  onMarkAsRead,
+  onMarkAllAsRead,
+  onDelete,
+  children
+}) => {
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState<string>("all");
+  
+  const getFilteredNotifications = () => {
+    if (filter === "all") return notifications;
+    if (filter === "unread") return notifications.filter(n => !n.read);
+    
+    // Filter by type
+    return notifications.filter(n => n.type === filter);
   };
 
-  const handleClearConfirm = () => {
-    setShowConfirmClear(true);
-  };
-
-  const handleClearAll = () => {
-    clearAllNotifications();
-    setShowConfirmClear(false);
-  };
-
-  const handleCancelClear = () => {
-    setShowConfirmClear(false);
-  };
-
+  const filteredNotifications = getFilteredNotifications();
+  
   const handleMarkAsRead = async (id: string) => {
-    await markAsRead(id);
+    await onMarkAsRead(id);
   };
-
-  const notificationsList = (
-    <div className="divide-y">
-      {notifications.length > 0 ? (
-        notifications.map(notification => (
-          <NotificationItem 
-            key={notification.id} 
-            notification={notification} 
-            onRead={handleMarkAsRead}
-          />
-        ))
-      ) : (
-        <div className="flex flex-col items-center justify-center text-center py-12">
-          <Bell className="h-12 w-12 text-muted-foreground/30 mb-4" />
-          <h3 className="font-medium text-lg mb-2">Pas de notifications</h3>
-          <p className="text-muted-foreground text-sm max-w-xs">
-            Vous n'avez aucune notification{filter === 'unread' ? ' non lue' : ''} pour le moment.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-
-  const clearConfirmation = (
-    <div className="p-4 border rounded-md bg-muted/20 my-4">
-      <h4 className="font-medium mb-2">Effacer toutes les notifications ?</h4>
-      <p className="text-sm text-muted-foreground mb-4">
-        Cette action est irréversible et supprimera définitivement toutes vos notifications.
-      </p>
-      <div className="flex gap-2 justify-end">
-        <Button variant="outline" size="sm" onClick={handleCancelClear}>
-          Annuler
-        </Button>
-        <Button variant="destructive" size="sm" onClick={handleClearAll}>
-          Confirmer
-        </Button>
-      </div>
-    </div>
-  );
-
+  
   return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="sm:max-w-md">
-        <SheetHeader className="mb-4">
-          <SheetTitle className="flex justify-between items-center">
-            <span>Notifications {unreadCount > 0 && `(${unreadCount})`}</span>
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleMarkAllAsRead}
-                disabled={unreadCount === 0}
-                title="Marquer tout comme lu"
-              >
-                <Check className="h-4 w-4" />
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        {children || (
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </Badge>
+            )}
+          </Button>
+        )}
+      </DrawerTrigger>
+      <DrawerContent className="max-h-[85vh]">
+        <div className="mx-auto w-full max-w-lg">
+          <DrawerHeader className="flex flex-row justify-between items-center">
+            <DrawerTitle>Notifications</DrawerTitle>
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon">
+                <X className="h-4 w-4" />
               </Button>
+            </DrawerClose>
+          </DrawerHeader>
+          
+          <div className="p-4 space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex space-x-2">
+                <Button 
+                  variant={filter === "all" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setFilter("all")}
+                >
+                  Tous
+                </Button>
+                <Button 
+                  variant={filter === "unread" ? "default" : "outline"} 
+                  size="sm"
+                  onClick={() => setFilter("unread")}
+                >
+                  Non lus
+                  {unreadCount > 0 && (
+                    <Badge variant="secondary" className="ml-1">
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+              </div>
+              
               <Button 
                 variant="ghost" 
-                size="sm" 
-                onClick={handleClearConfirm}
-                disabled={notifications.length === 0}
-                title="Effacer tout"
+                size="sm"
+                onClick={onMarkAllAsRead}
+                disabled={unreadCount === 0}
               >
-                <Trash2 className="h-4 w-4" />
+                Tout marquer comme lu
               </Button>
             </div>
-          </SheetTitle>
-        </SheetHeader>
-
-        {showConfirmClear ? (
-          clearConfirmation
-        ) : (
-          <Tabs defaultValue="all" value={filter} onValueChange={(v) => setFilter(v as NotificationFilter)} className="h-full">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="all">Toutes</TabsTrigger>
-              <TabsTrigger value="unread">Non lues{unreadCount > 0 && ` (${unreadCount})`}</TabsTrigger>
-              <TabsTrigger value="alerts">Alertes</TabsTrigger>
-            </TabsList>
             
-            <TabsContent value={filter} className="h-[calc(100%-50px)] overflow-auto">
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-                </div>
-              ) : (
-                notificationsList
-              )}
-            </TabsContent>
-          </Tabs>
-        )}
-      </SheetContent>
-    </Sheet>
+            <Separator />
+            
+            <ScrollArea className="h-[500px] pr-4">
+              <div className="space-y-4">
+                {filteredNotifications.length > 0 ? (
+                  filteredNotifications.map(notification => (
+                    <NotificationItem
+                      key={notification.id}
+                      notification={notification}
+                      onMarkAsRead={handleMarkAsRead}
+                      onDelete={onDelete}
+                    />
+                  ))
+                ) : (
+                  <div className="py-8 text-center">
+                    <p className="text-muted-foreground">Aucune notification</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+            
+            <div className="flex justify-center space-x-1 mt-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={() => setFilter("all")}
+              >
+                <Filter className="h-3 w-3" />
+                Plus de filtres
+              </Button>
+              
+              <Button 
+                variant={filter === "system" ? "default" : "outline"} 
+                size="sm"
+                onClick={() => setFilter("system")}
+              >
+                Système
+              </Button>
+              
+              <Button 
+                variant={filter === "emotion" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilter("emotion")}
+              >
+                Émotions
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

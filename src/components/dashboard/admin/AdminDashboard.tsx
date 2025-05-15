@@ -1,18 +1,11 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GridPosition } from '@/types/dashboard';
+import { GridPosition, KpiCardProps } from '@/types/dashboard';
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
 import EmotionalAnalysisTab from './tabs/EmotionalAnalysisTab';
 import UsageStatisticsTab from './tabs/UsageStatisticsTab';
 import TeamManagementTab from './tabs/TeamManagementTab';
-
-interface KpiCardProps {
-  title: string;
-  value: string | number;
-  delta?: number;
-  position: GridPosition;
-}
 
 const AdminDashboard = () => {
   const [selectedTab, setSelectedTab] = useState('overview');
@@ -22,26 +15,42 @@ const AdminDashboard = () => {
     {
       title: "Utilisateurs Actifs",
       value: "324",
-      delta: 22.4, // Positive delta
-      position: { x: 0, y: 0, w: 1, h: 1 }
+      delta: {
+        value: 22.4,
+        trend: 'up',
+        label: 'depuis le dernier mois'
+      },
+      status: 'positive'
     },
     {
       title: "Score émotionnel moyen",
       value: "76/100",
-      delta: -3.2, // Negative delta
-      position: { x: 1, y: 0, w: 1, h: 1 }
+      delta: {
+        value: 3.2,
+        trend: 'down',
+        label: 'depuis le dernier mois'
+      },
+      status: 'negative'
     },
     {
       title: "Sessions VR",
       value: "156",
-      delta: 18.9,
-      position: { x: 2, y: 0, w: 1, h: 1 }
+      delta: {
+        value: 18.9,
+        trend: 'up',
+        label: 'depuis le dernier mois'
+      },
+      status: 'positive'
     },
     {
       title: "Alertes",
       value: "3",
-      delta: 0, // Neutral delta
-      position: { x: 3, y: 0, w: 1, h: 1 }
+      delta: {
+        value: 0,
+        trend: 'neutral',
+        label: 'stable'
+      },
+      status: 'neutral'
     }
   ];
 

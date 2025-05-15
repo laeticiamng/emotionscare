@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PremiumAdminHeader from './PremiumAdminHeader';
 import EmotionalClimateAnalytics from './EmotionalClimateAnalytics';
@@ -40,7 +40,7 @@ const AdminPremiumInterface: React.FC<AdminPremiumInterfaceProps> = ({ user }) =
           teamId="team-1"
           userId={user?.id || 'admin'}
           period="week"
-          dateRange={dateRange}
+          anonymized={true}
         />
       </div>
     </div>

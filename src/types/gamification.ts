@@ -47,3 +47,14 @@ export interface Challenge {
   points?: number;
   name?: string;
 }
+
+export interface LeaderboardEntry {
+  userId: string;
+  name?: string;
+  avatarUrl?: string;
+  points: number;
+  rank: number;
+  badges?: number;
+  level: number;
+  completedChallenges?: number;
+}

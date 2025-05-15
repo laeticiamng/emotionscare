@@ -14,7 +14,8 @@ export interface EmotionResult {
   timestamp?: string;
   recommendations?: string[];
   triggers?: string[];
-  emojis?: string;
+  emojis?: string | string[];
+  feedback?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -28,6 +29,11 @@ export interface EmotionalTeamViewProps {
   period?: 'day' | 'week' | 'month' | 'year';
   userId?: string;
   anonymized?: boolean;
+  className?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
 }
 
 export interface LiveVoiceScannerProps {

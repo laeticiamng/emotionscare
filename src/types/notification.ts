@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 
-export type NotificationType = 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement';
+export type NotificationType = 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement' | 'reminder' | 'success' | 'warning' | 'error';
 
 export type NotificationTone = 'standard' | 'subtle' | 'professional' | 'friendly';
 
@@ -41,6 +41,7 @@ export interface NotificationPreference {
 }
 
 export interface NotificationFilter {
+  type?: string;
   types?: NotificationType[];
   read?: boolean;
   priority?: string;
@@ -56,6 +57,7 @@ export interface NotificationItemProps {
   onDelete?: (id: string) => void;
   onClick?: (notification: Notification) => void;
   compact?: boolean;
+  onRead?: (id: string) => void;
 }
 
 export interface NotificationChannels {

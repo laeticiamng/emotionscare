@@ -1,52 +1,65 @@
 
-import React from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import MusicLibrary from './MusicLibrary';
-import { Music, Library, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LibraryTab from './LibraryTab';
+import PlayerTab from './PlayerTab';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-interface MusicTabsProps {
-  activeTab: string;
-  setActiveTab: (value: string) => void;
-}
-
-const MusicTabs: React.FC<MusicTabsProps> = ({ activeTab, setActiveTab }) => {
+const MusicTabs: React.FC = () => {
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  
+  // Mock data for demonstration
+  const playlists: MusicPlaylist[] = [
+    {
+      id: '1',
+      name: 'Relaxation profonde',
+      description: 'Sons relaxants pour la méditation',
+      tracks: [
+        {
+          id: '101',
+          title: 'Méditation guidée',
+          artist: 'Calm Voices',
+          duration: 600,
+          coverUrl: '/images/covers/meditation.jpg'
+        },
+        {
+          id: '102',
+          title: 'Sons de la forêt',
+          artist: 'Nature Sounds',
+          duration: 480,
+          coverUrl: '/images/covers/forest.jpg'
+        }
+      ],
+      category: 'Relaxation'
+    }
+  ];
+  
+  const handleSelectTrack = (track: MusicTrack) => {
+    setCurrentTrack(track);
+  };
+  
+  const handleSelectPlaylist = (playlist: MusicPlaylist) => {
+    setCurrentPlaylist(playlist);
+  };
+  
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-      <TabsList className="grid grid-cols-3">
-        <TabsTrigger value="player" className="flex items-center gap-2">
-          <Music className="h-4 w-4" />
-          <span className="hidden sm:inline">Player</span>
-        </TabsTrigger>
-        <TabsTrigger value="library" className="flex items-center gap-2">
-          <Library className="h-4 w-4" />
-          <span className="hidden sm:inline">Library</span>
-        </TabsTrigger>
-        <TabsTrigger value="settings" className="flex items-center gap-2">
-          <Settings className="h-4 w-4" />
-          <span className="hidden sm:inline">Settings</span>
-        </TabsTrigger>
+    <Tabs defaultValue="player" className="w-full">
+      <TabsList className="mb-4">
+        <TabsTrigger value="player">Lecteur</TabsTrigger>
+        <TabsTrigger value="library">Bibliothèque</TabsTrigger>
       </TabsList>
-
+      
       <TabsContent value="player">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Music Player</h2>
-          <p className="text-muted-foreground">
-            Use the player controls below to adjust your music experience.
-          </p>
-        </div>
+        <PlayerTab currentTrack={currentTrack} playlist={currentPlaylist} />
       </TabsContent>
-
+      
       <TabsContent value="library">
-        <MusicLibrary />
-      </TabsContent>
-
-      <TabsContent value="settings">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold mb-4">Music Settings</h2>
-          <p className="text-muted-foreground">
-            Adjust your music preferences and settings here.
-          </p>
-        </div>
+        <LibraryTab 
+          playlists={playlists}
+          onSelectTrack={handleSelectTrack}
+          onSelectPlaylist={handleSelectPlaylist}
+        />
       </TabsContent>
     </Tabs>
   );
