@@ -1,5 +1,5 @@
 
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/index';
 import { v4 as uuid } from 'uuid';
 
 export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
@@ -116,7 +116,7 @@ function getRecommendationsForEmotion(emotion: string): string[] {
     ],
     "angry": [
       'Take deep breaths to calm your nervous system',
-      'Write down what's bothering you',
+      'Write down what\'s bothering you',
       'Go for a brisk walk to release tension'
     ],
     "surprised": [
@@ -126,18 +126,18 @@ function getRecommendationsForEmotion(emotion: string): string[] {
     ],
     "fearful": [
       'Practice grounding techniques: name 5 things you can see',
-      'Remind yourself that you're safe right now',
+      'Remind yourself that you\'re safe right now',
       'Try a quick breathing exercise'
     ],
     "calm": [
       'Enjoy this peaceful state with some mindfulness',
-      'It's a great time for creative thinking',
+      'It\'s a great time for creative thinking',
       'Consider journaling about what brings you peace'
     ],
     "excited": [
       'Channel this energy into something productive',
       'Share your excitement with someone close to you',
-      'Set some goals while you're feeling motivated'
+      'Set some goals while you\'re feeling motivated'
     ],
     "neutral": [
       'Check in with your body - how are you feeling physically?',

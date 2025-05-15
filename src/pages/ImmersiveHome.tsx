@@ -1,231 +1,199 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { User, Building, Mic, MicOff } from 'lucide-react';
+import { WelcomeMessage } from '@/components/home/WelcomeMessage';
+import { TimeOfDay, determineTimeOfDay } from '@/constants/defaults';
 import { useToast } from '@/hooks/use-toast';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import useVoiceCommand from '@/hooks/useVoiceCommand';
-import { determineTimeOfDay, getGreetingByTimeOfDay, TimeOfDay } from '@/constants/defaults';
-import '@/styles/immersive-home.css';
+import { AudioController } from '@/components/home/audio/AudioController';
+import { ThemeSelector } from '@/components/theme/ThemeSelector';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [greeting, setGreeting] = useState(getGreetingByTimeOfDay());
-  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(determineTimeOfDay());
-  const audioPlayer = useAudioPlayer();
-  
-  const voiceCommands = {
-    'particulier': () => handleModeSelection('b2c'),
-    'personnel': () => handleModeSelection('b2c'),
-    'entreprise': () => handleModeSelection('b2b'),
-    'collaborateur': () => navigate('/b2b/user/login'),
-    'administrateur': () => navigate('/b2b/admin/login'),
-    'rh': () => navigate('/b2b/admin/login'),
-    'manager': () => navigate('/b2b/admin/login'),
-  };
-  
-  const { isListening, toggleListening, isSupported } = useVoiceCommand({
-    commands: voiceCommands
-  });
+  const [isListening, setIsListening] = useState(false);
+  const [backgroundState, setBackgroundState] = useState<TimeOfDay>(determineTimeOfDay());
 
-  // Determine time of day and set appropriate greeting
   useEffect(() => {
-    const currentTimeOfDay = determineTimeOfDay();
-    setTimeOfDay(currentTimeOfDay);
-    setGreeting(getGreetingByTimeOfDay());
-    
-    // Simulate playing ambient music
-    // In a real implementation, this would connect to Music Generator API
-    const ambientMusicUrl = '/ambient-music.mp3'; // This would be replaced with a real API call
-    
-    const playAmbientMusic = async () => {
+    // Set background based on time of day
+    setBackgroundState(determineTimeOfDay());
+
+    // Preload essential components
+    const preloadComponents = async () => {
       try {
-        // This is a mock implementation - in production this would use your Music Generator API
-        console.log('Playing ambient music for time of day:', currentTimeOfDay);
-        
-        // Uncomment this when you have actual audio files or API integration
-        // audioPlayer.play(ambientMusicUrl);
-        
-        setIsMusicPlaying(true);
+        console.log('Preloading essential components...');
+        // Here you would initialize APIs or preload components
       } catch (error) {
-        console.error('Failed to play ambient music:', error);
+        console.error('Error preloading components:', error);
       }
     };
     
-    setTimeout(playAmbientMusic, 1000);
+    preloadComponents();
     
-    return () => {
-      // Clean up audio when component unmounts
-      audioPlayer.pause();
-    };
-  }, [audioPlayer]);
+    // Simulate music starting
+    const timer = setTimeout(() => {
+      console.log('Background music would start playing here');
+      // This is where you would integrate with Music Generator API
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handleModeSelection = (mode: 'b2c' | 'b2b') => {
-    console.log(`Selected mode: ${mode}`);
-    
-    // Store the user mode in localStorage
-    localStorage.setItem('userMode', mode);
-    
-    // Add haptic feedback for mobile devices if supported
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50); // subtle vibration for 50ms
-    }
-    
-    // Toast notification to enhance feedback
-    toast({
-      title: mode === 'b2c' ? 'Espace Particulier' : 'Espace Entreprise',
-      description: 'Redirection en cours...',
-    });
-    
-    // Navigate to the appropriate route with preloading hint
-    if (mode === 'b2c') {
-      navigate('/b2c/login');
-    } else {
-      navigate('/b2b/selection');
-    }
+  const handlePersonalAccess = () => {
+    navigate('/b2c/login');
   };
-  
-  const toggleMusic = () => {
-    if (isMusicPlaying) {
-      audioPlayer.pause();
-      setIsMusicPlaying(false);
+
+  const handleBusinessAccess = () => {
+    navigate('/b2b/selection');
+  };
+
+  const toggleVoiceRecognition = () => {
+    if (isListening) {
+      setIsListening(false);
+      toast({
+        title: "Commandes vocales désactivées",
+        description: "Le microphone est maintenant éteint",
+      });
     } else {
-      // This would actually play music in a real implementation
-      setIsMusicPlaying(true);
-      // Uncomment when you have actual audio
-      // audioPlayer.play('path/to/ambient/music.mp3');
+      setIsListening(true);
+      toast({
+        title: "Commandes vocales activées",
+        description: "Dites 'Je suis un particulier' ou 'Je suis une entreprise'",
+      });
+      
+      // Simulate voice recognition after 3 seconds
+      setTimeout(() => {
+        // In a real implementation, this would use the Whisper API
+        setIsListening(false);
+        toast({
+          title: "Commande reconnue",
+          description: "Redirection en cours...",
+        });
+        // Simulate recognized command
+        setTimeout(() => navigate('/b2c/login'), 1000);
+      }, 3000);
     }
   };
 
   return (
-    <div className={`immersive-container ${timeOfDay}`}>
-      {/* Ambient background animation */}
-      <div className="ambient-animation">
-        <motion.div 
-          className="blur-circle circle-1"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
+    <div 
+      className={`min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-1000 
+        ${backgroundState === TimeOfDay.MORNING ? 'bg-gradient-to-br from-blue-100 to-blue-50' : 
+        backgroundState === TimeOfDay.AFTERNOON ? 'bg-gradient-to-br from-emerald-100 to-green-50' : 
+        backgroundState === TimeOfDay.EVENING ? 'bg-gradient-to-br from-indigo-100 to-purple-50' : 
+        'bg-gradient-to-br from-slate-900 to-indigo-900 text-white'}`}
+    >
+      {/* Theme selector position in top-right */}
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-4">
+        <AudioController minimal className="mr-2" />
+        <ThemeSelector minimal />
+      </div>
+
+      {/* Ambient animations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: [0.1, 0.2, 0.1], 
+            scale: [0.8, 1.1, 0.8],
+            x: ['-10%', '5%', '-10%'],
+            y: ['-10%', '5%', '-10%']
           }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            repeatType: "reverse"
-          }}
+          transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
+          className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"
         />
-        <motion.div 
-          className="blur-circle circle-2"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.4, 0.2],
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: [0.1, 0.15, 0.1], 
+            scale: [0.8, 1.2, 0.8],
+            x: ['10%', '-5%', '10%'],
+            y: ['20%', '5%', '20%']
           }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            repeatType: "reverse",
-            delay: 2
-          }}
+          transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", delay: 1 }}
+          className="absolute -bottom-[50%] -right-[20%] w-[90%] h-[90%] rounded-full bg-gradient-to-r from-secondary/10 to-primary/10 blur-3xl"
         />
       </div>
-      
-      {/* Content */}
-      <div className="content-container">
+
+      <div className="container max-w-6xl z-10 relative">
         <motion.div 
-          className="greeting-section"
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
         >
-          <h1 className="greeting-title">{greeting}</h1>
-          <p className="greeting-subtitle">Choisissez votre chemin.</p>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+            EmotionsCare
+          </h1>
+          <WelcomeMessage className="text-xl max-w-3xl mx-auto" />
         </motion.div>
-        
+
         <motion.div 
-          className="options-container"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
         >
-          {/* B2C Option */}
-          <motion.div 
-            className="option-card b2c-card"
-            whileHover={{ scale: 1.03, boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12)" }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="option-icon b2c-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
+          <div className="border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 rounded-xl p-8">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <User className="w-10 h-10 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Je suis un particulier</h2>
+                <p className="text-muted-foreground mb-6">
+                  Accédez à votre espace personnel de bien-être émotionnel
+                </p>
+              </div>
+              <Button 
+                onClick={handlePersonalAccess} 
+                size="lg" 
+                className="w-full py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                <User className="mr-2 h-5 w-5" /> Espace Personnel
+              </Button>
             </div>
-            <h2 className="option-title">Je suis un particulier</h2>
-            <p className="option-description">
-              Accédez à votre espace personnel pour prendre soin de votre bien-être émotionnel
-            </p>
-            <Button 
-              onClick={() => handleModeSelection('b2c')}
-              className="option-button b2c-button"
-            >
-              Espace Personnel
-            </Button>
-          </motion.div>
-          
-          {/* B2B Option */}
-          <motion.div 
-            className="option-card b2b-card"
-            whileHover={{ scale: 1.03, boxShadow: "0 8px 30px rgba(0, 0, 0, 0.12)" }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="option-icon b2b-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-              </svg>
+          </div>
+
+          <div className="border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 rounded-xl p-8">
+            <div className="flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center">
+                <Building className="w-10 h-10 text-secondary" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Je suis une entreprise</h2>
+                <p className="text-muted-foreground mb-6">
+                  Solutions pour votre organisation et vos collaborateurs
+                </p>
+              </div>
+              <Button 
+                onClick={handleBusinessAccess} 
+                variant="outline" 
+                size="lg"
+                className="w-full py-6 text-lg shadow border-2 border-secondary/50 hover:border-secondary/80 hover:shadow-xl transition-all duration-300"
+              >
+                <Building className="mr-2 h-5 w-5" /> Espace Entreprise
+              </Button>
             </div>
-            <h2 className="option-title">Je suis une entreprise</h2>
-            <p className="option-description">
-              Solutions de bien-être émotionnel pour vos équipes et votre organisation
-            </p>
-            <Button 
-              onClick={() => handleModeSelection('b2b')}
-              className="option-button b2b-button"
-              variant="outline"
-            >
-              Espace Entreprise
-            </Button>
-          </motion.div>
+          </div>
         </motion.div>
-        
-        {/* Controls */}
+
         <motion.div 
-          className="controls"
+          className="flex justify-center mt-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
         >
           <Button 
             variant="ghost" 
-            size="sm" 
-            className="control-button voice-button"
-            onClick={toggleListening}
-            disabled={!isSupported}
+            size="sm"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            onClick={toggleVoiceRecognition}
           >
-            {isListening ? <MicOff size={16} /> : <Mic size={16} />}
-            <span>{isListening ? 'Désactiver commandes vocales' : 'Activer commandes vocales'}</span>
-          </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="control-button music-button"
-            onClick={toggleMusic}
-          >
-            {isMusicPlaying ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            <span>{isMusicPlaying ? 'Désactiver la musique' : 'Activer la musique'}</span>
+            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}
           </Button>
         </motion.div>
       </div>

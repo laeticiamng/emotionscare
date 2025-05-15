@@ -4,7 +4,6 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light theme colors */
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -25,10 +24,9 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
-  /* Dark theme colors */
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -50,129 +48,64 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
-
-  /* Pastel theme colors - blue pastel theme */
-  .pastel {
-    --background: 210 50% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 210 40% 96%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 210 40% 96%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 216 98% 80%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 190 80% 90%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 180 60% 90%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 200 80% 88%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 90.2%;
-    --destructive-foreground: 0 0% 0%;
-    --border: 216 30% 80%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 216 98% 80%;
-  }
 }
 
-/* General styles */
 @layer base {
   * {
     @apply border-border;
-    scroll-behavior: smooth;
   }
-  
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground;
   }
-  
-  /* Animation for background transitions */
-  .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient-shift 12s ease infinite;
+}
+
+/* Time of day backgrounds */
+.bg-morning {
+  @apply bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-slate-900;
+}
+
+.bg-afternoon {
+  @apply bg-gradient-to-br from-emerald-100 to-green-50 dark:from-emerald-900/30 dark:to-slate-900;
+}
+
+.bg-evening {
+  @apply bg-gradient-to-br from-indigo-100 to-purple-50 dark:from-indigo-900/30 dark:to-slate-900;
+}
+
+.bg-night {
+  @apply bg-gradient-to-br from-slate-900 to-indigo-900;
+}
+
+/* Animation utilities */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
   }
-  
-  @keyframes gradient-shift {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
+  50% {
+    transform: translateY(-20px);
   }
-  
-  /* Common UI elements */
-  .glass {
-    @apply bg-background/60 backdrop-blur-md border border-border/50 shadow-md;
+}
+
+.animate-float {
+  animation: float 10s ease infinite;
+}
+
+.animate-float-delay {
+  animation: float 15s ease infinite 2s;
+}
+
+@keyframes pulse-gentle {
+  0% {
+    opacity: 0.8;
   }
-  
-  .card-gradient {
-    @apply bg-gradient-to-br from-card to-background backdrop-blur-sm;
+  50% {
+    opacity: 1;
   }
-  
-  /* Animation utility classes */
-  .animate-fade-in {
-    animation: fade-in 0.5s ease-out forwards;
+  100% {
+    opacity: 0.8;
   }
-  
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Theme-specific backgrounds for LandingPage */
-  .bg-morning {
-    @apply bg-gradient-to-br from-blue-50 via-orange-50 to-blue-100;
-  }
-  
-  .dark .bg-morning {
-    @apply bg-gradient-to-br from-blue-900/20 via-orange-900/10 to-blue-900/30;
-  }
-  
-  .pastel .bg-morning {
-    @apply bg-gradient-to-br from-blue-100 via-blue-50 to-blue-100;
-  }
-  
-  .bg-afternoon {
-    @apply bg-gradient-to-br from-blue-50 via-emerald-50 to-blue-100;
-  }
-  
-  .dark .bg-afternoon {
-    @apply bg-gradient-to-br from-blue-900/20 via-emerald-900/10 to-blue-900/30;
-  }
-  
-  .pastel .bg-afternoon {
-    @apply bg-gradient-to-br from-blue-100 via-blue-50 to-blue-100;
-  }
-  
-  .bg-evening {
-    @apply bg-gradient-to-br from-indigo-100 via-purple-50 to-blue-100;
-  }
-  
-  .dark .bg-evening {
-    @apply bg-gradient-to-br from-indigo-900/20 via-purple-900/10 to-blue-900/30;
-  }
-  
-  .pastel .bg-evening {
-    @apply bg-gradient-to-br from-blue-200 via-blue-100 to-blue-200;
-  }
-  
-  .bg-night {
-    @apply bg-gradient-to-br from-indigo-200 via-blue-100 to-indigo-100;
-  }
-  
-  .dark .bg-night {
-    @apply bg-gradient-to-br from-indigo-950 via-blue-950 to-indigo-950;
-  }
-  
-  .pastel .bg-night {
-    @apply bg-gradient-to-br from-blue-300 via-blue-200 to-blue-300;
-  }
+}
+
+.animate-pulse-gentle {
+  animation: pulse-gentle 4s ease-in-out infinite;
 }

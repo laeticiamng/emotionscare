@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from '@/pages/HomePage';
-import LandingPage from '@/pages/LandingPage';
+import ImmersiveHome from '@/pages/ImmersiveHome';
 import Selection from '@/pages/common/Selection';
 import B2BSelection from '@/pages/common/B2BSelection';
 
@@ -15,7 +15,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<ImmersiveHome />} />
       <Route path="/immersive" element={<HomePage />} />
       <Route path="/selection" element={<Selection />} />
       <Route path="/b2b/selection" element={<B2BSelection />} />
