@@ -15,7 +15,7 @@ import UsersListTab from './tabs/UsersListTab';
 import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
 import InvitationsTab from './tabs/invitations/InvitationsTab';
-import { GamificationStats } from '@/types/gamification';
+import { GamificationStats } from '@/types';
 
 interface AdminTabContentsProps {
   activeTab: string;
@@ -32,8 +32,17 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   dashboardStats,
   isLoading = false
 }) => {
-  // Mock data for other tabs
+  // Create gamification data with required dashboard properties
   const gamificationData: GamificationStats = {
+    // Required base properties from GamificationStats
+    points: 0,
+    level: 1,
+    badges: [],
+    streak: 0,
+    completedChallenges: 0,
+    totalChallenges: 0,
+    
+    // Admin dashboard specific properties
     activeUsersPercent: 68,
     totalBadges: 24,
     badgeLevels: [
@@ -46,14 +55,9 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       { name: 'Partage d\'expérience', completions: 87 },
       { name: 'Lecture bien-être', completions: 63 }
     ],
-    // Add required properties from GamificationStats
-    points: 0,
-    level: 1,
+    
+    // Optional properties
     rank: "",
-    badges: [],
-    streak: 0,
-    completedChallenges: 0,
-    totalChallenges: 0,
     activeChallenges: 0,
     streakDays: 0,
     nextLevelPoints: 0,

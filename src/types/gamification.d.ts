@@ -18,12 +18,21 @@ export interface Challenge {
 }
 
 export interface GamificationStats {
+  // Base required properties
   level: number;
   points: number;
   badges: number | any[];
   streak: number;
   completedChallenges: number;
   totalChallenges: number;
+  
+  // Admin dashboard specific properties
+  activeUsersPercent?: number;
+  totalBadges?: number;
+  badgeLevels?: { level: string; count: number; }[];
+  topChallenges?: { name: string; completions: number; }[];
+
+  // Optional properties
   nextLevel?: {
     points: number;
     rewards: string[];
@@ -40,6 +49,7 @@ export interface GamificationStats {
   badgesCount?: number;
   rank?: string;
   recentAchievements?: any[];
+  color?: string; // For mock data
 }
 
 export interface LeaderboardEntry {
@@ -81,4 +91,5 @@ export interface Badge {
   dateEarned?: string;
   awarded_at?: Date | string;
   progress?: number;
+  color?: string; // Added for mock data
 }

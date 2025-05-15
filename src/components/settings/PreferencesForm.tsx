@@ -90,11 +90,11 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
     
     try {
       if (user) {
-        // Ensure correct type conversion
-        const updatedUser = {
+        // Ensure correct type conversion using our utility
+        const updatedUser = harmonizeUserType({
           ...user,
           preferences: formPreferences
-        };
+        });
         
         await updateUser(updatedUser);
         

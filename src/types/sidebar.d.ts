@@ -7,7 +7,8 @@ export interface SidebarContextType {
   toggle: () => void;
   open: () => void;
   close: () => void;
-  setCollapsed: (collapsed: boolean) => void;
-  showLabels: boolean;
-  setShowLabels: (show: boolean) => void;
+  toggleCollapsed?: () => void;
+  setCollapsed?: (collapsed: boolean) => void;
+  showLabels?: boolean;
+  setShowLabels?: (show: boolean) => void;
 }

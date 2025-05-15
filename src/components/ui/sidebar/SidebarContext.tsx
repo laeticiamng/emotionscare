@@ -39,6 +39,7 @@ const SidebarProvider: React.FC<SidebarProviderProps> = ({
   const toggle = () => setIsOpen((prev) => !prev);
   const open = () => setIsOpen(true);
   const close = () => setIsOpen(false);
+  const toggleCollapsed = () => setCollapsed(prev => !prev);
 
   return (
     <SidebarContext.Provider value={{ 
@@ -51,7 +52,8 @@ const SidebarProvider: React.FC<SidebarProviderProps> = ({
       close, 
       setCollapsed,
       showLabels,
-      setShowLabels
+      setShowLabels,
+      toggleCollapsed
     }}>
       {children}
     </SidebarContext.Provider>

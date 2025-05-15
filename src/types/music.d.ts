@@ -9,41 +9,48 @@ export interface MusicTrack {
   coverUrl?: string;
   audioUrl?: string;
   emotion?: string;
-  category?: string;
+  category?: string; // Added to support mock data
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
-  emotion?: string;
   tracks: MusicTrack[];
-  title?: string;
-  description?: string;
-  category?: string;
-  coverUrl?: string;
-  imageUrl?: string;
+  emotion?: string;
+  coverUrl?: string; // Added for mock data
+  description?: string; // Added for MusicTabs
+  category?: string; // Added for MusicLibrary
+  title?: string; // For compatibility
 }
 
-export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  playlists: MusicPlaylist[];
-  currentPlaylist: MusicPlaylist | null;
-  queue: MusicTrack[];
+export interface ProgressBarProps {
+  value: number;
+  max?: number;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (value: number) => void;
+  className?: string;
+  formatTime?: (seconds: number) => string;
+  showTimestamps?: boolean;
+  showLabel?: boolean;
+  variant?: string;
+  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export interface VolumeControlProps {
   volume: number;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  togglePlay: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  setCurrentPlaylist: (playlist: MusicPlaylist) => void;
-  addToQueue: (track: MusicTrack) => void;
-  removeFromQueue: (trackId: string) => void;
-  clearQueue: () => void;
-  isMuted: boolean;
-  toggleMute: () => void;
-  progress?: number;
+  onVolumeChange?: (value: number) => void;
+  onChange?: (value: number) => void;
+  className?: string;
+  showLabel?: boolean;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  onSelect?: () => void;
+  isActive?: boolean;
 }
 
 export interface MusicDrawerProps {
@@ -52,63 +59,27 @@ export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
-  currentTrack?: MusicTrack;
-  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack | null;
+  playlist?: MusicPlaylist | null;
 }
 
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  cover?: string;
-  coverUrl?: string;
-  audioUrl?: string;
-  emotion?: string;
-  category?: string;
-}
-
-export interface ProgressBarProps {
-  value: number;
-  max?: number;
-  showLabel?: boolean;
-  className?: string;
-  variant?: 'default' | 'success' | 'warning' | 'danger';
-  progress?: number;
-  onSeek?: (percentage: number) => void;
-  currentTime?: number;
-  duration?: number;
-  formatTime?: (seconds: number) => string;
-  handleProgressClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
-  showTimestamps?: boolean;
-}
-
-export interface TrackInfoProps {
-  track: MusicTrack;
-  className?: string;
-  showArtist?: boolean;
-  showCover?: boolean;
-  size?: 'sm' | 'md' | 'lg';
-}
-
-export interface VolumeControlProps {
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
   volume: number;
-  onVolumeChange?: (volume: number) => void;
-  onChange?: (volume: number) => void;
-  className?: string;
-  showLabel?: boolean;
-  showIcon?: boolean;
-  size?: 'sm' | 'md' | 'lg';
-  orientation?: 'horizontal' | 'vertical';
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
+  isMuted: boolean;
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<void>;
 }
 
+// Additional interface for LibraryTab
 export interface MusicLibraryProps {
-  title?: string;
-  filter?: string;
-  onFilterChange?: (filter: string) => void;
-  onTrackSelect?: (track: MusicTrack) => void;
   playlists?: MusicPlaylist[];
+  onPlaylistSelect?: (playlist: MusicPlaylist) => void;
 }

@@ -1,6 +1,6 @@
-
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { MusicTrack, UseAudioPlayerStateReturn } from '@/types';
+import { MusicTrack } from '@/types';
+import { UseAudioPlayerStateReturn } from '@/types/audio-player';
 
 export const useAudioPlayerCore = (
   initialTrack?: MusicTrack,
@@ -13,6 +13,7 @@ export const useAudioPlayerCore = (
   const [volume, setVolumeState] = useState(0.8);
   const [muted, setMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [error, setError] = useState<Error | null>(null);
 
   const initAudioElement = useCallback(() => {
     if (!audioRef.current) {
@@ -65,6 +66,7 @@ export const useAudioPlayerCore = (
           playPromise.catch(error => {
             console.error('Error attempting to play audio:', error);
             setIsPlaying(false);
+            setError(error);
           });
         }
       }
@@ -92,6 +94,7 @@ export const useAudioPlayerCore = (
       } catch (error) {
         console.error('Error playing audio:', error);
         setIsPlaying(false);
+        setError(error);
       }
     }
   };
@@ -151,7 +154,8 @@ export const useAudioPlayerCore = (
     currentTime,
     duration,
     volume,
-    muted,
+    error,
+    muted: muted,
     playbackRate,
     play,
     pause,

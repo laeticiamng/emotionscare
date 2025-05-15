@@ -2,7 +2,7 @@
 import Sidebar from './Sidebar';
 import SidebarProvider from './SidebarContext';
 import SidebarTrigger from './SidebarTrigger';
-import SidebarTriggerItem from './SidebarTriggerItem';
+import { SidebarTriggerItem } from './SidebarTriggerItem';
 
 export { 
   Sidebar, 

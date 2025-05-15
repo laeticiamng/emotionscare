@@ -1,51 +1,43 @@
 
 import { useCallback, RefObject } from 'react';
-import { useAudioPlayerState } from './useAudioPlayerState';
+import { UseAudioPlayerStateReturn } from '@/types/audio-player';
 
 /**
  * Hook that provides playback control functions (seek, volume)
  */
 export function usePlayerControls(audioRef: RefObject<HTMLAudioElement | null>) {
-  const {
-    duration,
-    setProgress,
-    setVolume,
-  } = useAudioPlayerState();
-
   /**
    * Seek to a specific time in the current track
    */
   const seekTo = useCallback((seconds: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = seconds;
-      setProgress(seconds);
     }
-  }, [audioRef, setProgress]);
+  }, [audioRef]);
 
   /**
    * Update the player volume
    */
   const setVolumeLevel = useCallback((value: number) => {
     const clampedValue = Math.max(0, Math.min(1, value));
-    setVolume(clampedValue);
     if (audioRef.current) {
       audioRef.current.volume = clampedValue;
     }
-  }, [setVolume, audioRef]);
+  }, [audioRef]);
 
   /**
    * Handle progress bar clicks
    */
   const handleProgressClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current || !duration) return;
+    if (!audioRef.current) return;
     
     const rect = e.currentTarget.getBoundingClientRect();
     const offsetX = e.clientX - rect.left;
     const percentage = offsetX / rect.width;
-    const newTime = percentage * duration;
+    const newTime = percentage * audioRef.current.duration;
     
     seekTo(newTime);
-  }, [duration, seekTo, audioRef]);
+  }, [seekTo, audioRef]);
   
   /**
    * Handle volume slider changes

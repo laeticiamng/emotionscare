@@ -31,8 +31,16 @@ export type {
   Track,
   ProgressBarProps,
   TrackInfoProps,
-  VolumeControlProps
+  VolumeControlProps,
+  MusicLibraryProps
 } from './types/music';
+
+// Export types from audio-player
+export type {
+  UseAudioPlayerStateReturn,
+  AudioTrack,
+  AudioPlayerContextType
+} from './types/audio-player';
 
 // Export types from notification
 export type {
@@ -52,9 +60,13 @@ export type {
   FontFamily as ThemeFontFamily, 
   FontSize as ThemeFontSize,
   ThemeContextType,
-  ThemeButtonProps,
-  SidebarContextType
+  ThemeButtonProps
 } from './types/theme';
+
+// Export from sidebar
+export type { 
+  SidebarContextType 
+} from './types/sidebar';
 
 // Export from dashboard
 export type { 
@@ -64,6 +76,14 @@ export type {
   DashboardWidgetConfig,
   GamificationData
 } from './types/dashboard';
+
+// Export from gamification
+export type { 
+  GamificationStats,
+  Challenge,
+  Badge,
+  LeaderboardEntry
+} from './types/gamification';
 
 export interface ChatMessage {
   id: string;
@@ -127,8 +147,6 @@ export interface Story {
   };
 }
 
-export type { Badge } from './types/types';
-export type { GamificationStats, Challenge } from './types/gamification';
 export type { Period } from './types/types';
 export type { UserModeType } from './types/types';
 

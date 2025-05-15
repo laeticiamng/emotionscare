@@ -1,46 +1,31 @@
 
 import { useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
-import { handlePlayError, getTrackAudioUrl } from './audioPlayerUtils';
-import { useAudioPlayerState } from './useAudioPlayerState';
 
 /**
  * Hook that provides track operation functions (play, pause, next, previous)
  */
 export function useTrackOperations() {
-  const {
-    currentTrack,
-    setCurrentTrack,
-    setIsPlaying,
-    setLoadingTrack,
-    setError
-  } = useAudioPlayerState();
-
   /**
    * Start playing a new track
    */
   const playTrack = useCallback((track: MusicTrack) => {
-    setCurrentTrack(track);
-    setLoadingTrack(true);
-    setError(null);
-    setIsPlaying(true);
-  }, [setCurrentTrack, setLoadingTrack, setError, setIsPlaying]);
+    console.log("Playing track:", track.title);
+  }, []);
 
   /**
    * Pause the currently playing track
    */
   const pauseTrack = useCallback(() => {
-    setIsPlaying(false);
-  }, [setIsPlaying]);
+    console.log("Pausing track");
+  }, []);
 
   /**
    * Resume playback of the current track if available
    */
   const resumeTrack = useCallback(() => {
-    if (currentTrack) {
-      setIsPlaying(true);
-    }
-  }, [currentTrack, setIsPlaying]);
+    console.log("Resuming track");
+  }, []);
 
   /**
    * Skip to the next track (placeholder implementation)
@@ -57,7 +42,6 @@ export function useTrackOperations() {
   }, []);
 
   return {
-    currentTrack,
     playTrack,
     pauseTrack,
     resumeTrack,

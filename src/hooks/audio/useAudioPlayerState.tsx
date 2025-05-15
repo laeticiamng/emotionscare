@@ -17,6 +17,8 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   const [duration, setDuration] = useState(0);
   const [loadingTrack, setLoadingTrack] = useState(false);
   const [error, setErrorState] = useState<Error | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1.0);
   
   // Wrapper for setVolume to ensure volume is within bounds
   const setVolume = useCallback((value: number) => {
@@ -47,6 +49,16 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     setShuffle(prevShuffle => !prevShuffle);
   }, []);
 
+  // Toggle mute
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
+  }, []);
+
+  // Set playback rate
+  const setPlaybackRateValue = useCallback((rate: number) => {
+    setPlaybackRate(rate);
+  }, []);
+
   return {
     currentTrack,
     isPlaying,
@@ -58,6 +70,8 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     duration,
     loadingTrack,
     error,
+    isMuted,
+    playbackRate,
     setCurrentTrack,
     setIsPlaying,
     setVolume,
@@ -68,7 +82,9 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     setLoadingTrack,
     setError,
     toggleRepeat,
-    toggleShuffle
+    toggleShuffle,
+    toggleMute,
+    setPlaybackRate: setPlaybackRateValue
   };
 }
 

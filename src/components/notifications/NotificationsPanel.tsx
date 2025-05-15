@@ -20,7 +20,7 @@ const NotificationsPanel: React.FC = () => {
   const { 
     notifications, 
     unreadCount, 
-    isLoading, 
+    loading: isLoading, 
     filter, 
     setFilter, 
     fetchNotifications, 
