@@ -1,6 +1,6 @@
 
-import { Theme, ThemeContextType, FontFamily, FontSize } from './theme';
 import { User, UserRole } from './user';
+import { Theme, ThemeContextType, FontFamily, FontSize } from './theme';
 
 // Sidebar related types
 export interface SidebarContextType {
@@ -11,80 +11,15 @@ export interface SidebarContextType {
   isMobile?: boolean;
 }
 
-// Authentication related types
-export interface AuthContextType {
-  user: any | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<any>;
-  signOut: () => Promise<void>;
-  signUp: (email: string, password: string, metadata?: any) => Promise<any>;
-  resetPassword: (email: string) => Promise<void>;
-  updateUser: (data: any) => Promise<void>;
-  isAuthenticated: boolean;
-}
-
 // User mode related types
+export type UserModeType = 'b2c' | 'B2C' | 'B2B-USER' | 'B2B-ADMIN' | 'B2B-SELECTION';
+
 export interface UserModeContextType {
   mode: UserModeType;
   setMode: (mode: UserModeType) => void;
 }
 
-export type UserModeType = 'B2C' | 'B2B-USER' | 'B2B-ADMIN' | 'B2B-SELECTION';
-
-// Time period for data filtering
-export type Period = 'day' | 'week' | 'month' | 'year' | 'custom';
-
-// Re-export important types to maintain backward compatibility
-export { Theme, ThemeContextType, FontFamily, FontSize, User, UserRole };
-
-// Export types from other files to ensure they're available
-export type { 
-  Emotion,
-  EmotionResult,
-  EnhancedEmotionResult,
-  EmotionalTeamViewProps,
-  EmotionalData
-} from './emotion';
-
-export type {
-  MusicTrack,
-  MusicPlaylist,
-  TrackInfoProps,
-  VolumeControlProps,
-  ProgressBarProps,
-  MusicContextType,
-  MusicDrawerProps,
-  EmotionMusicParams
-} from './music';
-
-export type {
-  VRSession,
-  VRSessionTemplate,
-  VRHistoryListProps,
-  VRSessionWithMusicProps,
-  VRTemplateGridProps
-} from './vr';
-
-export type {
-  Notification,
-  NotificationFrequency,
-  NotificationType,
-  NotificationTone,
-  NotificationPreference
-} from './notification';
-
 // Additional types
-export interface ChatMessage {
-  id: string;
-  text?: string;
-  content?: string;
-  sender: string;
-  sender_type?: string;
-  timestamp?: string;
-  conversation_id?: string;
-  role?: string;
-}
-
 export interface Story {
   id: string;
   title: string;
@@ -125,57 +60,5 @@ export interface MoodData {
   energy: number;
 }
 
-export interface Recommendation {
-  id: string;
-  title: string;
-  description: string;
-  category?: string;
-  priority: number;
-  confidence: number;
-  actionUrl?: string;
-  actionLabel?: string;
-  type?: 'activity' | 'content' | 'insight';
-}
-
-export interface InvitationStats {
-  total: number;
-  pending: number;
-  accepted: number;
-  expired: number;
-  rejected: number;
-  sent: number;
-  completed: number;
-  conversionRate: number;
-  averageTimeToAccept: number;
-  teams: Record<string, number>;
-  recent_invites: InvitationData[];
-}
-
-export interface InvitationData {
-  id: string;
-  email: string;
-  status: 'pending' | 'accepted' | 'expired' | 'rejected';
-  created_at: string;
-  expires_at: string;
-  accepted_at?: string;
-  role: string;
-}
-
-export interface InvitationFormData {
-  email: string;
-  role: string;
-  message?: string;
-  expires_in_days: number;
-}
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  isValid?: boolean;
-  email?: string;
-  role?: UserRole;
-  expires_at?: string;
-  message?: string;
-  teamId?: string;
-  companyId?: string;
-  error?: string;
-}
+// Re-export important types for compatibility
+export { User, UserRole, Theme, ThemeContextType, FontFamily, FontSize };

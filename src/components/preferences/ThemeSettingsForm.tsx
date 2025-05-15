@@ -2,21 +2,21 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Theme, FontFamily, FontSize } from '@/types/types';
+import { Theme, FontFamily, FontSize } from '@/types'; // Updated import path
 
 const ThemeSettingsForm = () => {
   const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
 
   const themes: Theme[] = ['light', 'dark', 'system', 'pastel'];
-  const fontSizes: FontSize[] = ['small', 'medium', 'large', 'extra-large'];
-  const fontFamilies: FontFamily[] = ['system', 'system-ui', 'sans-serif', 'serif', 'mono', 'rounded'];
+  const fontSizes: FontSize[] = ['small', 'medium', 'large', 'x-large'];
+  const fontFamilies: FontFamily[] = ['system', 'serif', 'sans-serif', 'monospace', 'rounded'];
 
   const getFontSizeName = (size: FontSize): string => {
     switch (size) {
       case 'small': return 'Petit';
       case 'medium': return 'Moyen';
       case 'large': return 'Grand';
-      case 'extra-large': return 'Très grand';
+      case 'x-large': return 'Très grand';
       default: return 'Moyen';
     }
   };
@@ -24,10 +24,9 @@ const ThemeSettingsForm = () => {
   const getFontFamilyName = (family: FontFamily): string => {
     switch (family) {
       case 'system': return 'Système';
-      case 'system-ui': return 'Système';
       case 'sans-serif': return 'Sans-serif';
       case 'serif': return 'Serif';
-      case 'mono': return 'Monospace';
+      case 'monospace': return 'Monospace';
       case 'rounded': return 'Arrondi';
       default: return 'Système';
     }
@@ -68,7 +67,7 @@ const ThemeSettingsForm = () => {
             <Button
               key={size}
               variant={fontSize === size ? "default" : "outline"}
-              onClick={() => setFontSize(size)}
+              onClick={() => setFontSize && setFontSize(size)}
               className="justify-center"
             >
               {getFontSizeName(size)}
@@ -84,7 +83,7 @@ const ThemeSettingsForm = () => {
             <Button
               key={font}
               variant={fontFamily === font ? "default" : "outline"}
-              onClick={() => setFontFamily(font)}
+              onClick={() => setFontFamily && setFontFamily(font)}
               className={`justify-center font-${font}`}
             >
               {getFontFamilyName(font)}

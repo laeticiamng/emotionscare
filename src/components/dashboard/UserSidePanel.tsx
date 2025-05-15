@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserRole } from '@/types/user';
+import { UserRole } from '@/types'; // Updated import path
 
 export interface UserSidePanelProps {
   collapsed: boolean;

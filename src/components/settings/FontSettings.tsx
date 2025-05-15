@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { FontFamily, FontSize } from '@/types/types';
+import { FontFamily, FontSize } from '@/types'; // Updated import
 
 interface FontSettingsProps {
   currentFontFamily: FontFamily;
@@ -52,7 +52,7 @@ const FontSettings: React.FC<FontSettingsProps> = ({
               <Label htmlFor="serif" className="font-serif">Serif</Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="mono" id="mono" />
+              <RadioGroupItem value="monospace" id="mono" />
               <Label htmlFor="mono" className="font-mono">Monospace</Label>
             </div>
           </RadioGroup>

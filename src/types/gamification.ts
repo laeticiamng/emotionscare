@@ -1,52 +1,38 @@
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  iconUrl?: string;
-  level?: number;
-  unlocked?: boolean;
-  category?: string;
-  progress?: number;
-  unlockedAt?: string;
-}
+export type Period = 'day' | 'week' | 'month' | 'year' | 'custom';
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
   points: number;
-  progress: number;
-  completed: boolean;
-  deadline?: string;
+  status: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
+  category: string;
+  progress?: number;
+  goal?: number;
+  icon?: string;
+  level?: string | number;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description?: string;
+  image?: string;
+  level?: number;
+  acquired?: boolean;
+  date_acquired?: string;
   category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  iconUrl?: string;
+  points?: number;
 }
 
 export interface GamificationStats {
   points: number;
   level: number;
-  nextLevelPoints: number;
-  rank: number;
-  streak: number;
-  nextLevel: number;
-  achievements: Badge[];
+  rank: string;
   badges: Badge[];
-  completedChallenges: number;
-  activeChallenges: number;
-  streakDays: number;
-  progressToNextLevel: number;
-  challenges: Challenge[];
-  recentAchievements: Badge[];
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  points: number;
-  level: number;
-  position: number;
-  avatar?: string;
-  badges?: Badge[]; // Added to fix TS error
+  streak: number;
+  nextLevelPoints: number;
+  progress: number;
+  recentAchievements?: Badge[];
 }

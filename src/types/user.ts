@@ -1,7 +1,7 @@
 
-export type FontFamily = 'system-ui' | 'sans-serif' | 'serif' | 'monospace' | 'sans' | 'serif' | 'mono';
-export type FontSize = 'small' | 'medium' | 'large' | 'xl';
-export type ThemeName = 'light' | 'dark' | 'system';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export interface UserPreferences {
   dashboardLayout: 'standard' | 'compact' | 'focused';
@@ -55,6 +55,7 @@ export interface UserPreferences {
   autoplayVideos?: boolean;
   soundEnabled?: boolean;
   fullAnonymity?: boolean;
+  profileVisibility?: 'public' | 'private' | 'team'; // Adding for direct access
 }
 
 export interface UserPreferencesState {
@@ -100,4 +101,30 @@ export interface User {
   joined_at?: string;
   onboarded?: boolean;
   job_title?: string;
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  isValid?: boolean;
+  email?: string;
+  role?: UserRole;
+  expires_at?: string;
+  message?: string;
+  teamId?: string;
+  companyId?: string;
+  error?: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+  signIn: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  logout: () => Promise<void>; // Added for compatibility
+  signUp: (email: string, name: string) => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
+  preferences: UserPreferencesState;
 }

@@ -1,21 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-// Define Theme, FontFamily, and FontSize types
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'merriweather' | 'mono' | 'system' | 'system-ui' | 'sans-serif' | 'serif' | 'rounded';
-export type FontSize = 'small' | 'medium' | 'large' | 'extra-large' | 'x-large' | 'xl';
-
-// Define the ThemeContextType
-export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (font: FontFamily) => void;
-  fontSize?: FontSize;
-  setFontSize?: (size: FontSize) => void;
-  isDarkMode?: boolean;
-}
+import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types'; // Updated import path
 
 // Create the theme context with default values
 export const ThemeContext = createContext<ThemeContextType>({
@@ -25,7 +10,7 @@ export const ThemeContext = createContext<ThemeContextType>({
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('system');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('system');
   const [fontSize, setFontSize] = useState<FontSize>('medium');
   const isDarkMode = theme === 'dark';
   
@@ -84,13 +69,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 // Helper functions to get CSS values
 function getFontFamilyValue(family: FontFamily): string {
   switch (family) {
-    case 'inter': return 'Inter, sans-serif';
-    case 'roboto': return 'Roboto, sans-serif';
-    case 'poppins': return 'Poppins, sans-serif';
-    case 'merriweather': return 'Merriweather, serif';
-    case 'mono': return 'monospace';
     case 'system': return 'system-ui, sans-serif';
-    default: return 'Inter, sans-serif';
+    case 'serif': return 'serif';
+    case 'sans-serif': return 'sans-serif';
+    case 'monospace': return 'monospace';
+    case 'rounded': return 'var(--font-rounded), sans-serif';
+    default: return 'system-ui, sans-serif';
   }
 }
 
@@ -99,7 +83,7 @@ function getFontSizeValue(size: FontSize): string {
     case 'small': return '0.875rem';
     case 'medium': return '1rem';
     case 'large': return '1.125rem';
-    case 'extra-large': case 'x-large': case 'xl': return '1.25rem';
+    case 'x-large': return '1.25rem';
     default: return '1rem';
   }
 }

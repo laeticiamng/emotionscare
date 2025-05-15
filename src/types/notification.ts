@@ -1,9 +1,8 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
-
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate' | 'custom';
 export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'invitation' | 'reminder' | 'info' | 'warning' | 'success' | 'error' | 'alert';
-
-export type NotificationTone = 'neutral' | 'supportive' | 'professional' | 'friendly';
+export type NotificationTone = 'neutral' | 'supportive' | 'professional' | 'friendly' | 'direct' | 'gentle' | 'motivational';
+export type NotificationFilter = 'all' | 'unread' | NotificationType;
 
 export interface Notification {
   id: string;
@@ -14,15 +13,15 @@ export interface Notification {
   read: boolean;
   userId?: string;
   action?: string;
-  actionUrl?: string;  // Added for compatibility
-  actionLabel?: string; // Added for compatibility
+  actionUrl?: string;
+  actionLabel?: string;
   icon?: string;
   priority?: number;
   category?: string;
   source?: string;
   createdAt?: string;
   body?: string;
-  date?: string | Date;  // Added for compatibility with different implementations
+  date?: string | Date;
 }
 
 export interface NotificationBadge {
@@ -45,6 +44,3 @@ export interface NotificationPreference {
   emailEnabled?: boolean;
   pushEnabled?: boolean;
 }
-
-// Adding compatibility with types referenced in hooks and components
-export type NotificationFilter = 'all' | 'unread' | NotificationType;

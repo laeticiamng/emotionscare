@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun, Laptop } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
-import { ThemeButtonProps } from '@/types';
+import { ThemeButtonProps } from '@/types'; // Updated import path
 
 const ThemeButton: React.FC<ThemeButtonProps> = ({ theme, onClick, collapsed }) => {
   const { theme: currentTheme, setTheme } = useTheme();

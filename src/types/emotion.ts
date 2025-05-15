@@ -78,7 +78,7 @@ export interface EmotionalTeamViewProps {
   users?: any[];
   anonymized?: boolean;
   onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year' | string;
+  period?: string;
   userId?: string;
   className?: string;
   dateRange?: {

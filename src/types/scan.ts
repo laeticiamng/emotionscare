@@ -51,4 +51,16 @@ export interface LeaderboardEntry {
   level: number;
   position: number;
   avatar?: string;
+  badges?: any[];
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  anonymized?: boolean;
+}
+
+export interface VoiceEmotionScannerProps {
+  onScanComplete?: (result: any) => void;
+  autoStart?: boolean;
 }

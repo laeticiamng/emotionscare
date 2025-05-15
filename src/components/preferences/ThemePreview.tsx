@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Theme } from '@/types/types';
+import { Theme } from '@/types'; // Updated import path
 
 interface ThemePreviewProps {
   theme: Theme;
