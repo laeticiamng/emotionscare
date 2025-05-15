@@ -1,122 +1,109 @@
 
-import { MusicPlaylist, MusicTrack } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types';
 
-// Create mock tracks for testing purposes
-const meditationTracks: MusicTrack[] = [
+// Mock music tracks
+export const mockTracks: MusicTrack[] = [
   {
-    id: 'med-1',
-    title: 'Breathing Calm',
-    artist: 'Nature Sounds',
-    duration: 300,
-    url: '/audio/meditation/breathing-calm.mp3',
-    cover: '/images/music/meditation/breathing-calm.jpg',
-    emotion: 'calm',
-    category: 'meditation'
+    id: '1',
+    title: 'Méditation Guidée',
+    artist: 'Sarah Mindful',
+    duration: 600, // 10 minutes
+    coverUrl: '/images/music/meditation.jpg',
+    audioUrl: '/audio/meditation-guided.mp3',
+    category: 'Méditation',
+    mood: ['calm', 'peaceful']
   },
   {
-    id: 'med-2',
-    title: 'Ocean Waves',
-    artist: 'Ocean Sounds',
-    duration: 360,
-    url: '/audio/meditation/ocean-waves.mp3',
-    cover: '/images/music/meditation/ocean-waves.jpg',
-    emotion: 'peaceful',
-    category: 'meditation'
+    id: '2',
+    title: 'Respiration profonde',
+    artist: 'Zen Master',
+    duration: 300, // 5 minutes
+    coverUrl: '/images/music/breathing.jpg',
+    audioUrl: '/audio/deep-breathing.mp3',
+    category: 'Respiration',
+    mood: ['anxious', 'stressed']
   },
   {
-    id: 'med-3',
-    title: 'Forest Morning',
-    artist: 'Nature Sounds',
-    duration: 420,
-    url: '/audio/meditation/forest-morning.mp3',
-    cover: '/images/music/meditation/forest-morning.jpg',
-    emotion: 'refreshed',
-    category: 'meditation'
+    id: '3',
+    title: 'Sommeil réparateur',
+    artist: 'Night Harmony',
+    duration: 1800, // 30 minutes
+    coverUrl: '/images/music/sleep.jpg',
+    audioUrl: '/audio/sleep-aid.mp3',
+    category: 'Sommeil',
+    mood: ['tired', 'peaceful']
+  },
+  {
+    id: '4',
+    title: 'Focus & Concentration',
+    artist: 'Mind Clarity',
+    duration: 1200, // 20 minutes
+    coverUrl: '/images/music/focus.jpg',
+    audioUrl: '/audio/deep-focus.mp3',
+    category: 'Productivité',
+    mood: ['focused', 'creative']
+  },
+  {
+    id: '5',
+    title: 'Relaxation Profonde',
+    artist: 'Ocean Waves',
+    duration: 1500, // 25 minutes
+    coverUrl: '/images/music/relax.jpg',
+    audioUrl: '/audio/deep-relaxation.mp3',
+    category: 'Relaxation',
+    mood: ['stressed', 'anxious']
+  },
+  {
+    id: '6',
+    title: 'Énergie Positive',
+    artist: 'Bright Morning',
+    duration: 480, // 8 minutes
+    coverUrl: '/images/music/energy.jpg',
+    audioUrl: '/audio/positive-energy.mp3',
+    category: 'Motivation',
+    mood: ['sad', 'unmotivated']
+  },
+  {
+    id: '7',
+    title: 'Acceptation & Lâcher-Prise',
+    artist: 'Mindfulness Journey',
+    duration: 900, // 15 minutes
+    coverUrl: '/images/music/acceptance.jpg',
+    audioUrl: '/audio/acceptance.mp3',
+    category: 'Pleine conscience',
+    mood: ['reflective', 'anxious']
   }
 ];
 
-const focusTracks: MusicTrack[] = [
-  {
-    id: 'focus-1',
-    title: 'Deep Focus',
-    artist: 'Concentration Music',
-    duration: 600,
-    url: '/audio/focus/deep-focus.mp3',
-    cover: '/images/music/focus/deep-focus.jpg',
-    emotion: 'focused',
-    category: 'focus'
-  },
-  {
-    id: 'focus-2',
-    title: 'Study Session',
-    artist: 'Brain Waves',
-    duration: 720,
-    url: '/audio/focus/study-session.mp3',
-    cover: '/images/music/focus/study-session.jpg',
-    emotion: 'attentive',
-    category: 'focus'
-  }
-];
-
-const energyTracks: MusicTrack[] = [
-  {
-    id: 'energy-1',
-    title: 'Morning Boost',
-    artist: 'Energy Flow',
-    duration: 240,
-    url: '/audio/energy/morning-boost.mp3',
-    cover: '/images/music/energy/morning-boost.jpg',
-    emotion: 'energized',
-    category: 'energy'
-  },
-  {
-    id: 'energy-2',
-    title: 'Power Up',
-    artist: 'Motivation Mix',
-    duration: 280,
-    url: '/audio/energy/power-up.mp3',
-    cover: '/images/music/energy/power-up.jpg',
-    emotion: 'motivated',
-    category: 'energy'
-  }
-];
-
-// Create mock playlists
+// Mock playlists
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'meditation',
-    name: 'Méditation et calme',
-    tracks: meditationTracks,
-    emotion: 'calm',
-    category: 'meditation',
-    description: 'Des sons apaisants pour méditer et se relaxer',
-    coverUrl: '/images/music/playlists/meditation.jpg'
+    id: 'p1',
+    name: 'Méditation quotidienne',
+    tracks: mockTracks.filter(track => track.category === 'Méditation' || track.category === 'Pleine conscience'),
+    coverUrl: '/images/playlists/meditation.jpg',
+    description: 'Collection de méditations pour tous les jours',
+    category: 'Méditation'
   },
   {
-    id: 'focus',
-    name: 'Concentration et travail',
-    tracks: focusTracks,
-    emotion: 'focused',
-    category: 'focus',
-    description: 'Musique pour améliorer votre concentration et productivité',
-    coverUrl: '/images/music/playlists/focus.jpg'
+    id: 'p2',
+    name: 'Aide au sommeil',
+    tracks: mockTracks.filter(track => track.category === 'Sommeil' || track.mood.includes('peaceful')),
+    coverUrl: '/images/playlists/sleep.jpg',
+    description: 'Sons apaisants pour mieux dormir',
+    category: 'Sommeil'
   },
   {
-    id: 'energy',
-    name: 'Énergie et motivation',
-    tracks: energyTracks,
-    emotion: 'energized',
-    category: 'energy',
-    description: 'Donnez-vous un coup de boost avec cette playlist énergisante',
-    coverUrl: '/images/music/playlists/energy.jpg'
+    id: 'p3',
+    name: 'Gestion du stress',
+    tracks: mockTracks.filter(track => track.mood.includes('anxious') || track.mood.includes('stressed')),
+    coverUrl: '/images/playlists/stress.jpg',
+    description: 'Réduisez votre niveau de stress et d\'anxiété',
+    category: 'Bien-être'
   }
 ];
 
-// All tracks combined
-export const allTracks: MusicTrack[] = [
-  ...meditationTracks,
-  ...focusTracks,
-  ...energyTracks
-];
-
-export default { mockPlaylists, allTracks };
+export default {
+  tracks: mockTracks,
+  playlists: mockPlaylists
+};

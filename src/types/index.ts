@@ -1,118 +1,145 @@
-// Export all types from various files to provide a unified interface
 
-// User related types
-export type {
-  User,
-  UserPreferences,
-  UserRole,
-  AuthContextType,
-  UserPreferencesContextType,
-  UserPreferencesState,
-  DashboardLayout,
-  InvitationVerificationResult,
-} from './user';
+// Music types
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  coverUrl: string;
+  audioUrl: string;
+  category?: string; // Adding category field
+  mood?: string[];
+}
 
-// Theme related types
-export type {
-  Theme,
-  ThemeContextType,
-  ThemeButtonProps,
-  FontFamily,
-  FontSize,
-  ThemeName
-} from './theme';
+export interface MusicPlaylist {
+  id: string;
+  name: string;
+  tracks: MusicTrack[];
+  coverUrl: string;
+  description?: string; // Adding description field
+  category?: string; // Adding category field
+}
 
-// Music related types
-export type {
-  MusicTrack,
-  MusicPlaylist,
-  MusicContextType,
-  MusicDrawerProps,
-  Track,
-  ProgressBarProps,
-  TrackInfoProps,
-  VolumeControlProps,
-  MusicLibraryProps
-} from './music';
+// Leaderboard entry
+export interface LeaderboardEntry {
+  id: string;
+  user_id: string;
+  name?: string; // Adding name field
+  points: number;
+  rank: number;
+  avatar?: string;
+  department?: string;
+  trend: 'up' | 'down' | 'same';
+  previousRank: number;
+}
 
-// Notification related types
-export type {
-  Notification,
-  NotificationPreferences,
-  NotificationPreference,
-  NotificationFrequency,
-  NotificationType,
-  NotificationTone,
-  NotificationFilter,
-  NotificationItemProps,
-  NotificationChannels
-} from './notification';
+// Badge
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  level: string;
+  progress: number;
+  total?: number; // Adding total field
+}
 
-// Gamification related types
-export type {
-  Challenge,
-  GamificationStats,
-  LeaderboardEntry,
-  Badge
-} from './gamification';
+// Challenge
+export interface Challenge {
+  id: string;
+  name: string;
+  description: string;
+  points: number;
+  progress: number;
+  total: number;
+  completed: boolean;
+}
 
-// Audio player related types
-export type {
-  UseAudioPlayerStateReturn,
-  AudioTrack,
-  AudioPlayerContextType
-} from './audio-player';
+// Gamification Stats
+export interface GamificationStats {
+  points: number;
+  level: number;
+  badges: Badge[];
+  streak: number;
+  rank: string;
+  nextLevelPoints: number;
+  progressToNextLevel: number;
+  completedChallenges: number;
+  totalChallenges: number;
+  activeChallenges: number;
+  recentAchievements?: Badge[];
+  challenges?: Challenge[];
+  streakDays?: number;
+  badgesCount?: number;
+  nextLevel?: {
+    points: number;
+    rewards: string[];
+  };
+  lastActivityDate?: string;
+  activeUsersPercent?: number; // Adding needed field
+  totalBadges?: number; // Adding needed field
+  badgeLevels?: { level: string; count: number; }[]; // Adding needed field
+  topChallenges?: { name: string; completions: number; }[]; // Adding needed field
+}
 
-// VR related types
-export type {
-  VRSession,
-  VRSessionTemplate,
-  VRHistoryListProps,
-  VRSessionHistoryProps,
-  VRSessionWithMusicProps
-} from './vr';
+// User Preferences
+export interface NotificationPreferences {
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+  frequency: string;
+}
 
-// Progress bar related types
-export type {
-  ProgressBarProps as ProgressProps
-} from './progress-bar';
+export interface UserPreferences {
+  theme: string;
+  fontSize: string;
+  fontFamily: string;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
+  soundEnabled: boolean;
+  notifications: NotificationPreferences;
+  sound?: { // Adding sound field
+    volume: number;
+    effects: boolean;
+    music: boolean;
+  };
+}
 
-// Track info related types
-export type {
-  TrackInfoProps as TrackProps,
-  VolumeControlProps as VolumeProps
-} from './track-info';
+// Music Library Props
+export interface MusicLibraryProps {
+  playlists: MusicPlaylist[];
+  onSelectTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+}
 
-// Sidebar related types
-export type { SidebarContextType } from './sidebar';
+// Progress Bar Props
+export interface ProgressBarProps {
+  value: number;
+  max: number;
+  currentTime: number;
+  duration: number;
+  onSeek?: (value: number) => void;
+  className?: string;
+  showTimestamps?: boolean;
+  showLabel?: boolean;
+  variant?: string;
+}
 
-// Other shared types
-export type {
-  Period,
-  UserModeType,
-  UserModeContextType,
-  JournalEntry
-} from './types';
+// Volume Control Props
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (value: number) => void;
+  isMuted: boolean;
+  onMuteToggle: () => void;
+  className?: string;
+  onChange?: (value: number) => void;
+  showLabel?: boolean;
+}
 
-// Dashboard related types
-export type {
-  KpiCardProps,
-  DraggableKpiCardsGridProps,
-  GlobalOverviewTabProps,
-  DashboardWidgetConfig,
-  GamificationData
-} from './dashboard';
-
-// Emotion related types
-export type {
-  Emotion,
-  EmotionResult,
-  EnhancedEmotionResult,
-  EmotionalTeamViewProps,
-  LiveVoiceScannerProps,
-  VoiceEmotionScannerProps,
-  TeamOverviewProps
-} from './emotion';
-
-// Export additional types needed for backward compatibility
-export * from './types';
+// Music Drawer Props
+export interface MusicDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children?: React.ReactNode;
+}

@@ -1,9 +1,38 @@
 
 import { useState, useEffect } from 'react';
 import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types';
-import mockData from './community-gamification/mockData';
+import { mockBadges, mockLeaderboard } from './community-gamification/mockData';
 
-const { mockLeaderboard, mockBadges, mockChallenges } = mockData;
+// Define mockChallenges since it's needed
+const mockChallenges: Challenge[] = [
+  {
+    id: '1',
+    name: 'Journal Quotidien',
+    description: 'Écrivez dans votre journal pendant 5 jours consécutifs',
+    points: 50,
+    progress: 3,
+    total: 5,
+    completed: false
+  },
+  {
+    id: '2',
+    name: 'Méditation Matinale',
+    description: 'Pratiquez la méditation pendant 10 minutes chaque jour',
+    points: 100,
+    progress: 7,
+    total: 10,
+    completed: false
+  },
+  {
+    id: '3',
+    name: 'Partage d\'Expérience',
+    description: 'Partagez une expérience positive avec la communauté',
+    points: 75,
+    progress: 1,
+    total: 1,
+    completed: true
+  }
+];
 
 interface UseCommunityGamificationReturn {
   stats: GamificationStats;
@@ -31,7 +60,20 @@ export const useCommunityGamification = (): UseCommunityGamificationReturn => {
     totalChallenges: 10,
     activeChallenges: 3,
     recentAchievements: mockBadges.slice(0, 1),
-    challenges: mockChallenges
+    challenges: mockChallenges,
+    // Add the missing properties for AdminTabContents
+    activeUsersPercent: 78,
+    totalBadges: 25,
+    badgeLevels: [
+      { level: 'Bronze', count: 12 },
+      { level: 'Silver', count: 8 },
+      { level: 'Gold', count: 5 }
+    ],
+    topChallenges: [
+      { name: 'Méditation Quotidienne', completions: 142 },
+      { name: 'Journal Émotionnel', completions: 98 },
+      { name: 'Soutien Communautaire', completions: 76 }
+    ]
   });
   
   // Load data

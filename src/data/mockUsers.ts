@@ -1,10 +1,9 @@
-
 import { User, UserRole } from '@/types/user';
 
 // Create some mock users for testing purposes
 export const mockUsers: User[] = [
   {
-    id: '1',
+    id: "user-1",
     name: 'Alice Martin',
     email: 'alice.martin@example.com',
     role: 'admin' as UserRole,
@@ -20,7 +19,11 @@ export const mockUsers: User[] = [
       fontSize: 'medium',
       language: 'fr',
       fontFamily: 'system',
-      sound: true,
+      sound: {
+        volume: 0.7,
+        effects: true,
+        music: true
+      },
       reduceMotion: false,
       colorBlindMode: false,
       autoplayMedia: true,

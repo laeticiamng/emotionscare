@@ -1,64 +1,53 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { SidebarContextType } from '@/types/sidebar';
+import { createContext, useContext, useState } from 'react';
 
-// Create the context with default values
-export const SidebarContext = createContext<SidebarContextType>({
-  expanded: true,
-  isOpen: true,
-  collapsed: false,
-  setExpanded: () => {},
-  toggle: () => {},
-  open: () => {},
-  close: () => {},
-  toggleCollapsed: () => {},
-  setCollapsed: () => {},
-  showLabels: true,
-  setShowLabels: () => {},
-});
-
-export const useSidebar = () => useContext(SidebarContext);
-
-interface SidebarProviderProps {
-  children: React.ReactNode;
-  defaultExpanded?: boolean;
-  defaultOpen?: boolean;
-  defaultCollapsed?: boolean;
+export interface SidebarContextType {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  collapsed: boolean;
+  onCollapseChange?: (collapsed: boolean) => void;
 }
 
-const SidebarProvider: React.FC<SidebarProviderProps> = ({
-  children,
-  defaultExpanded = true,
-  defaultOpen = true,
-  defaultCollapsed = false,
-}) => {
-  const [expanded, setExpanded] = useState(defaultExpanded);
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const [collapsed, setCollapsed] = useState(defaultCollapsed);
-  const [showLabels, setShowLabels] = useState(true);
+const SidebarContext = createContext<SidebarContextType>({
+  open: false,
+  setOpen: () => {},
+  collapsed: false,
+  onCollapseChange: () => {},
+});
 
-  const toggle = () => setIsOpen((prev) => !prev);
-  const open = () => setIsOpen(true);
-  const close = () => setIsOpen(false);
-  const toggleCollapsed = () => setCollapsed(prev => !prev);
+export interface SidebarProviderProps {
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  defaultCollapsed?: boolean;
+  onCollapseChange?: (collapsed: boolean) => void;
+}
+
+export default function SidebarProvider({
+  children,
+  defaultOpen = false,
+  defaultCollapsed = false,
+  onCollapseChange,
+}: SidebarProviderProps) {
+  const [open, setOpen] = useState(defaultOpen);
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+
+  const handleCollapseChange = (value: boolean) => {
+    setCollapsed(value);
+    onCollapseChange?.(value);
+  };
 
   return (
-    <SidebarContext.Provider value={{ 
-      expanded, 
-      isOpen, 
-      collapsed, 
-      setExpanded, 
-      toggle, 
-      open, 
-      close, 
-      toggleCollapsed,
-      setCollapsed,
-      showLabels,
-      setShowLabels
-    }}>
+    <SidebarContext.Provider
+      value={{
+        open,
+        setOpen,
+        collapsed,
+        onCollapseChange: handleCollapseChange,
+      }}
+    >
       {children}
     </SidebarContext.Provider>
   );
-};
+}
 
-export default SidebarProvider;
+export const useSidebar = () => useContext(SidebarContext);

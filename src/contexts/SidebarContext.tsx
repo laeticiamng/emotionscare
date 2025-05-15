@@ -1,13 +1,9 @@
 
-import React, { createContext, useContext } from 'react';
-import { SidebarContextType } from '@/types/sidebar';
+import React from 'react';
 import SidebarProvider from '@/components/ui/sidebar/SidebarContext';
 
-// Re-export the SidebarProvider component
-export { SidebarProvider };
+export const SidebarContext: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <SidebarProvider>{children}</SidebarProvider>;
+};
 
-// Re-export the useSidebar hook from the component
-export { useSidebar } from '@/components/ui/sidebar/SidebarContext';
-
-// Export default context for backward compatibility
-export default SidebarProvider;
+export default SidebarContext;

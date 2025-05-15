@@ -5,7 +5,7 @@ import { Badge, Challenge, LeaderboardEntry } from '@/types';
 export const mockLeaderboard: LeaderboardEntry[] = [
   {
     id: '1',
-    userId: 'user-1',
+    user_id: 'user-1',
     name: 'Sophie Martin',
     points: 1250,
     rank: 1,
@@ -16,7 +16,7 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   },
   {
     id: '2',
-    userId: 'user-2',
+    user_id: 'user-2',
     name: 'Thomas Bernard',
     points: 980,
     rank: 2,
@@ -27,7 +27,7 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   },
   {
     id: '3',
-    userId: 'user-3',
+    user_id: 'user-3',
     name: 'Marie Dubois',
     points: 920,
     rank: 3,
@@ -47,7 +47,7 @@ export const mockBadges: Badge[] = [
     icon: 'award',
     level: 'Bronze',
     progress: 100,
-    total: 100,
+    total: 100
   },
   {
     id: '2',
@@ -56,7 +56,7 @@ export const mockBadges: Badge[] = [
     icon: 'flame',
     level: 'Silver',
     progress: 5,
-    total: 7,
+    total: 7
   },
   {
     id: '3',
@@ -65,43 +65,12 @@ export const mockBadges: Badge[] = [
     icon: 'lotus',
     level: 'Gold',
     progress: 8,
-    total: 10,
+    total: 10
   }
 ];
 
-// Mock challenges
-export const mockChallenges: Challenge[] = [
-  {
-    id: '1',
-    name: 'Journal Quotidien',
-    description: 'Écrivez dans votre journal pendant 5 jours consécutifs',
-    points: 50,
-    progress: 3,
-    total: 5,
-    completed: false
-  },
-  {
-    id: '2',
-    name: 'Méditation Matinale',
-    description: 'Pratiquez la méditation pendant 10 minutes chaque jour',
-    points: 100,
-    progress: 7,
-    total: 10,
-    completed: false
-  },
-  {
-    id: '3',
-    name: 'Partage d\'Expérience',
-    description: 'Partagez une expérience positive avec la communauté',
-    points: 75,
-    progress: 1,
-    total: 1,
-    completed: true
-  }
-];
-
+// Export default for consistency
 export default {
   mockLeaderboard,
-  mockBadges,
-  mockChallenges
+  mockBadges
 };

@@ -1,30 +1,26 @@
 
+import { MusicTrack } from './index';
+
 export interface UseAudioPlayerStateReturn {
+  currentTrack: MusicTrack | null;
   isPlaying: boolean;
+  volume: number;
+  progress: number;
   currentTime: number;
   duration: number;
-  volume: number;
+  loadingTrack: boolean;
+  error: Error | null;
   isMuted: boolean;
   isLoading: boolean;
-  error: Error | null;
-  play: () => void;
-  pause: () => void;
-  toggle: () => void;
-  seek: (time: number) => void;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  setCurrentTrack: (track: MusicTrack | null) => void;
+  setIsPlaying: (isPlaying: boolean) => void;
   setVolume: (volume: number) => void;
-  toggleMute: () => void;
-}
-
-export interface EnhancedMusicVisualizerProps {
-  audioUrl?: string;
-  isPlaying?: boolean;
-  type?: 'bars' | 'wave' | 'circle';
-  color?: string;
-  height?: number;
-  width?: number;
-  barCount?: number;
-  barWidth?: number;
-  barGap?: number;
-  sensitivity?: number;
-  className?: string;
+  setProgress: (progress: number) => void;
+  setCurrentTime: (time: number) => void;
+  setDuration: (duration: number) => void;
+  setLoadingTrack: (loading: boolean) => void;
+  setError: (error: Error | null) => void;
+  setIsMuted: (muted: boolean) => void;
+  setIsLoading: (loading: boolean) => void;
 }
