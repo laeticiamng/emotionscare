@@ -1,6 +1,13 @@
 
 import { UserPreferences } from '@/types/preferences';
 
+export enum TimeOfDay {
+  MORNING = 'morning',
+  AFTERNOON = 'afternoon',
+  EVENING = 'evening',
+  NIGHT = 'night'
+}
+
 export const DEFAULT_USER_PREFERENCES: UserPreferences = {
   theme: 'system',
   fontSize: 'medium',
