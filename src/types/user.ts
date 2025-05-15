@@ -1,13 +1,11 @@
-
 import { Theme, FontFamily, FontSize, ThemeName } from './theme';
 import { NotificationType, NotificationFrequency, NotificationTone } from './notification';
 
 // Combined UserRole type to handle all possible roles
 export type UserRole = 
   | 'admin' | 'user' | 'manager' | 'coach' | 'guest' 
-  | 'b2b-admin' | 'b2b-user' | 'b2c' | 'b2b_admin' | 'b2b_user'
-  | 'moderator' | 'wellbeing_manager' | 'employee' | 'team_lead' 
-  | 'professional' | 'b2b-selection' | 'individual';
+  | 'b2b_admin' | 'b2b_user' | 'b2c' | 'moderator' | 'wellbeing_manager' 
+  | 'employee' | 'team_lead' | 'professional' | 'individual';
 
 export interface User {
   id: string;
@@ -52,6 +50,11 @@ export interface UserPreferences {
   dashboardLayout?: DashboardLayout | string;
   onboardingCompleted?: boolean;
   soundEnabled?: boolean;
+  sound?: boolean | {
+    volume?: number;
+    effects?: boolean;
+    music?: boolean;
+  };
   animations?: boolean;
   fullAnonymity?: boolean;
   autoplayVideos?: boolean;

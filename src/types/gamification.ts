@@ -1,3 +1,4 @@
+
 export interface Badge {
   id: string;
   name: string;
@@ -9,11 +10,20 @@ export interface Badge {
   progress?: number;
   total?: number;
   requirements?: Record<string, number | string>;
+  image_url?: string;
+  imageUrl?: string;
+  icon_url?: string;
+  unlocked?: boolean;
+  unlockedAt?: Date | string;
+  type?: string;
+  dateEarned?: string;
+  awarded_at?: Date | string;
 }
 
 export interface Challenge {
   id: string;
-  title: string;
+  title?: string;
+  name?: string;
   description: string;
   points: number;
   completed: boolean;
@@ -23,6 +33,11 @@ export interface Challenge {
   progress?: number;
   completedOn?: string;
   participants?: number;
+  status?: string;
+  goal?: number;
+  total?: number;
+  type?: string;
+  completions?: number; // Added for admin dashboard
 }
 
 export interface Achievement {
@@ -41,6 +56,11 @@ export interface LeaderboardEntry {
   rank: number;
   avatarUrl?: string;
   name?: string;
+  user_id?: string;
+  user_name?: string;
+  avatar_url?: string;
+  progress?: number;
+  level?: number;
 }
 
 export interface GamificationStats {
@@ -53,13 +73,32 @@ export interface GamificationStats {
   leaderboard: LeaderboardEntry[];
   streak: number;
   nextLevelPoints: number;
-  // Add missing properties
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels: { [key: string]: number };
-  topChallenges: Challenge[];
-  completionRate?: number;
-  participationRate?: number;
+  
+  // Admin dashboard specific properties
+  activeUsersPercent?: number;
+  totalBadges?: number;
+  badgeLevels?: Array<{ level: string; count: number }>;
+  topChallenges?: Array<Challenge & { name: string; completions: number }>;
+  
+  // Additional properties used in components
+  completedChallenges?: number;
+  totalChallenges?: number;
+  activeChallenges?: number;
+  streakDays?: number;
+  totalPoints?: number;
+  badgesCount?: number;
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  progressToNextLevel?: number;
+  lastActivityDate?: string;
+  rank?: string;
+  completion_rate?: number;
+  participation_rate?: number;
+  nextLevel?: {
+    points: number;
+    rewards: string[];
+  };
+  recentAchievements?: any[];
 }
 
 export interface GamificationPreferences {

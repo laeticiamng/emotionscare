@@ -16,16 +16,20 @@ export interface MusicTrack {
   isFavorite?: boolean;
   category?: string;
   mood?: string;
+  cover?: string;
+  cover_url?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   title: string;
+  name?: string;  // Added name property
   tracks: MusicTrack[];
   coverUrl?: string;
   emotion?: string;
   description?: string;
   category?: string;
+  cover?: string;
 }
 
 export interface MusicState {
@@ -59,6 +63,8 @@ export interface MusicDrawerProps {
   currentTrack?: MusicTrack | null;
   playlist?: MusicPlaylist;
   children?: React.ReactNode;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export interface ProgressBarProps {
@@ -72,6 +78,7 @@ export interface ProgressBarProps {
   onChange?: (value: number) => void;
   showTimestamps?: boolean;
   onSeek?: (value: number) => void;
+  formatTime?: (time: number) => string;
 }
 
 export interface VolumeControlProps {
@@ -82,6 +89,7 @@ export interface VolumeControlProps {
   size?: 'small' | 'medium' | 'large';
   onChange?: (value: number) => void;
   showLabel?: boolean;
+  className?: string;
 }
 
 export interface MusicLibraryProps {
@@ -102,4 +110,10 @@ export interface MusicRecommendationParams {
   tempo?: number;
   genre?: string[];
   limit?: number;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  className?: string;
+  isCompact?: boolean;
 }

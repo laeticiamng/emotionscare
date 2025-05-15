@@ -1,80 +1,71 @@
 
-import { UserModeType } from '@/types/userMode';
+import { UserRole } from '@/types/auth';
 
 /**
- * Normalizes user mode types for consistency across the application
+ * Normalize user mode string to a consistent format
+ * This handles different formats like b2b-admin, b2b_admin, etc.
  */
-export function normalizeUserMode(mode: string): UserModeType {
-  // Convert to lowercase for consistent comparison
-  const normalizedMode = mode.toLowerCase();
+export const normalizeUserMode = (mode: string | null | undefined): string => {
+  if (!mode) return 'b2c';
   
-  // Map to standard values
-  if (normalizedMode === 'b2c' || normalizedMode === 'individual' || normalizedMode === 'user') {
-    return 'b2c';
-  }
+  // Convert to lowercase
+  const lowerMode = mode.toLowerCase();
   
-  if (normalizedMode === 'b2b_admin' || normalizedMode === 'b2b-admin' || normalizedMode === 'admin') {
+  // Normalize B2B Admin variations
+  if (lowerMode === 'b2b-admin' || lowerMode === 'b2b_admin' || lowerMode === 'b2badmin') {
     return 'b2b_admin';
   }
   
-  if (normalizedMode === 'b2b_user' || normalizedMode === 'b2b-user' || 
-      normalizedMode === 'b2b-collaborator' || normalizedMode === 'professional') {
+  // Normalize B2B User variations
+  if (lowerMode === 'b2b-user' || lowerMode === 'b2b_user' || lowerMode === 'b2buser' || 
+      lowerMode === 'b2b-collaborator' || lowerMode === 'b2bcollaborator') {
     return 'b2b_user';
   }
   
-  if (normalizedMode === 'b2b') {
-    return 'b2b';
+  // Normalize B2C variations
+  if (lowerMode === 'b2c' || lowerMode === 'individual' || lowerMode === 'user') {
+    return 'b2c';
   }
   
-  // Return the original value if no match (TypeScript will enforce valid values)
-  return normalizedMode as UserModeType;
-}
+  // Default if no match
+  return 'b2c';
+};
 
 /**
- * Gets display name for a user mode
+ * Convert user role to user mode
  */
-export function getUserModeDisplayName(mode: UserModeType): string {
-  const normalizedMode = normalizeUserMode(mode);
+export const userRoleToMode = (role: UserRole): string => {
+  if (role.includes('admin')) {
+    return 'b2b_admin';
+  }
+  if (role.includes('b2b')) {
+    return 'b2b_user';
+  }
+  return 'b2c';
+};
+
+/**
+ * Check if a mode is a valid user mode
+ */
+export const isValidUserMode = (mode: string): boolean => {
+  const normalized = normalizeUserMode(mode);
+  return ['b2c', 'b2b_user', 'b2b_admin'].includes(normalized);
+};
+
+/**
+ * Get display name for a user mode
+ */
+export const getUserModeDisplayName = (mode: string): string => {
+  const normalized = normalizeUserMode(mode);
   
-  switch(normalizedMode) {
+  switch(normalized) {
     case 'b2c':
       return 'Particulier';
     case 'b2b_admin':
-      return 'Administrateur';
+      return 'Administrateur B2B';
     case 'b2b_user':
-      return 'Collaborateur';
-    case 'b2b':
-      return 'Entreprise';
+      return 'Collaborateur B2B';
     default:
-      return mode;
+      return 'Utilisateur';
   }
-}
-
-/**
- * Gets dashboard path for a user mode
- */
-export function getUserModeDashboardPath(mode: UserModeType): string {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch(normalizedMode) {
-    case 'b2c':
-      return '/b2c/dashboard';
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'b2b':
-      return '/b2b/selection';
-    default:
-      return '/';
-  }
-}
-
-/**
- * Ensures proper user mode storage in localStorage
- */
-export function storeUserMode(mode: UserModeType): void {
-  const normalizedMode = normalizeUserMode(mode);
-  localStorage.setItem('userMode', normalizedMode);
-  console.log(`User mode stored: ${normalizedMode}`);
-}
+};
