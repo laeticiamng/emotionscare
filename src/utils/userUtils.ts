@@ -1,4 +1,3 @@
-
 import { User } from '@/types';
 
 /**
@@ -33,14 +32,15 @@ export const harmonizeUserType = (user: any): User => {
       };
     } 
     
-    // If sound property exists, remove it as it's not in the type definition
+    // If sound property exists, ensure it's defined in the type
     if ('sound' in harmonizedUser.preferences) {
-      delete harmonizedUser.preferences.sound;
+      // We'll keep it for backward compatibility
+      harmonizedUser.preferences.soundEnabled = harmonizedUser.preferences.sound;
     }
     
-    // If language property exists, remove it as it's not in the type definition
-    if ('language' in harmonizedUser.preferences) {
-      delete harmonizedUser.preferences.language;
+    // If language property exists, ensure it's defined in the type
+    if ('language' in harmonizedUser.preferences && !('langauge' in User)) {
+      // We'll keep it for backward compatibility
     }
     
     // Ensure all required properties exist
@@ -51,11 +51,42 @@ export const harmonizeUserType = (user: any): User => {
       reduceMotion: harmonizedUser.preferences.reduceMotion || false,
       colorBlindMode: harmonizedUser.preferences.colorBlindMode || false,
       autoplayMedia: harmonizedUser.preferences.autoplayMedia !== undefined ? harmonizedUser.preferences.autoplayMedia : true,
+      sound: harmonizedUser.preferences.sound || false,
       ...harmonizedUser.preferences
     };
   }
   
   return harmonizedUser as User;
+};
+
+/**
+ * Gets the avatar URL for a user
+ * @param user The user object
+ * @returns The avatar URL or a default image if none is available
+ */
+export const getUserAvatarUrl = (user: User | null): string => {
+  if (!user) return '/images/avatars/default.png';
+  
+  return user.avatar_url || user.avatar || '/images/avatars/default.png';
+};
+
+/**
+ * Gets the initials from a user's name
+ * @param user The user object
+ * @returns The user's initials (first letter of first and last name)
+ */
+export const getUserInitials = (user: User | null): string => {
+  if (!user || !user.name) return '??';
+  
+  const nameParts = user.name.trim().split(' ');
+  
+  if (nameParts.length === 0) return '?';
+  if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
+  
+  return (
+    nameParts[0].charAt(0).toUpperCase() + 
+    nameParts[nameParts.length - 1].charAt(0).toUpperCase()
+  );
 };
 
 export default harmonizeUserType;

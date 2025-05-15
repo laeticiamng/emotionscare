@@ -11,6 +11,7 @@ export const SidebarContext = createContext<SidebarContextType>({
   toggle: () => {},
   open: () => {},
   close: () => {},
+  toggleCollapsed: () => {},
   setCollapsed: () => {},
   showLabels: true,
   setShowLabels: () => {},
@@ -50,10 +51,10 @@ const SidebarProvider: React.FC<SidebarProviderProps> = ({
       toggle, 
       open, 
       close, 
+      toggleCollapsed,
       setCollapsed,
       showLabels,
-      setShowLabels,
-      toggleCollapsed
+      setShowLabels
     }}>
       {children}
     </SidebarContext.Provider>

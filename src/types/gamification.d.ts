@@ -1,95 +1,71 @@
 
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  level: string;
+  earnedAt?: string;
+  progress?: number;
+  total?: number;
+  color?: string;
+}
+
 export interface Challenge {
   id: string;
-  title: string;
-  name?: string;
+  name: string;
   description: string;
-  category?: string;
   points: number;
   progress: number;
-  goal?: number;
-  total?: number;
-  completed?: boolean;
-  status?: 'active' | 'completed' | 'failed' | 'pending';
-  startDate?: string;
-  endDate?: string;
+  total: number;
+  completed: boolean;
+  deadline?: string;
   icon?: string;
-  type?: string;
+  completions?: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  name: string;
+  points: number;
+  rank: number | string;
+  avatar?: string;
+  avatarUrl?: string;
+  department?: string;
+  trend?: 'up' | 'down' | 'same';
+  previousRank?: number;
 }
 
 export interface GamificationStats {
-  // Base required properties
-  level: number;
   points: number;
-  badges: number | any[];
+  level: number;
+  badges: Badge[];
   streak: number;
   completedChallenges: number;
   totalChallenges: number;
+  
+  // Optional properties
+  rank?: string;
+  activeChallenges?: number;
+  streakDays?: number;
+  nextLevelPoints?: number;
+  progressToNextLevel?: number;
+  totalPoints?: number;
+  badgesCount?: number;
+  challenges?: Challenge[];
+  recentAchievements?: Badge[];
+  nextLevel?: {
+    points: number;
+    rewards: string[];
+  };
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  lastActivityDate?: string;
   
   // Admin dashboard specific properties
   activeUsersPercent?: number;
   totalBadges?: number;
   badgeLevels?: { level: string; count: number; }[];
   topChallenges?: { name: string; completions: number; }[];
-
-  // Optional properties
-  nextLevel?: {
-    points: number;
-    rewards: string[];
-  } | number;
-  nextLevelPoints?: number;
-  pointsToNextLevel?: number;
-  progressToNextLevel?: number;
-  challenges?: Challenge[];
-  totalPoints?: number;
-  currentLevel?: number;
-  streakDays?: number;
-  lastActivityDate?: string;
-  activeChallenges?: number;
-  badgesCount?: number;
-  rank?: string;
-  recentAchievements?: any[];
-  color?: string; // For mock data
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  points: number;
-  rank: number;
-  avatar?: string;
-  department?: string;
-  level?: number;
-  badges?: number;
-  streak?: number;
-  user_id?: string; // Added for compatibility
-  user_name?: string; // Added for compatibility
-  avatar_url?: string; // Added for compatibility
-  badges_count?: number; // Added for compatibility
-  challenges_completed?: number; // Added for compatibility
-}
-
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon?: string;
-  threshold?: number;
-  type?: string;
-  imageUrl?: string;
-  image_url?: string;
-  unlocked?: boolean;
-  unlockedAt?: Date | string;
-  category?: string;
-  level?: string | number;
-  points?: number;
-  user_id?: string;
-  icon_url?: string;
-  total_required?: number;
-  total?: number; // Added for compatibility
-  image?: string;
-  dateEarned?: string;
-  awarded_at?: Date | string;
-  progress?: number;
-  color?: string; // Added for mock data
 }

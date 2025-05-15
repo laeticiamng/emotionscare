@@ -82,4 +82,6 @@ export interface MusicContextType {
 export interface MusicLibraryProps {
   playlists?: MusicPlaylist[];
   onPlaylistSelect?: (playlist: MusicPlaylist) => void;
+  onSelectTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
 }

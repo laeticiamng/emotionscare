@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { UserPreferences, NotificationPreference } from '@/types';
+import { UserPreferences } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
 import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
@@ -51,7 +50,8 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
       shareData: false,
       anonymizeReports: true,
       profileVisibility: 'team'
-    }
+    },
+    sound: false // Added for compatibility
   };
 
   // Use harmonized user preferences
