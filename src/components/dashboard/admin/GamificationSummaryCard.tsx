@@ -1,89 +1,71 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Trophy, Users, Award, Zap } from 'lucide-react';
 import { GamificationStats } from '@/types/gamification';
-import { Badge } from 'lucide-react';
 
-interface GamificationSummaryCardProps {
+export interface GamificationSummaryCardProps {
   gamificationData: GamificationStats;
-  isLoading?: boolean;
 }
 
-const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ 
-  gamificationData,
-  isLoading = false 
-}) => {
-  if (isLoading) {
-    return (
-      <Card className="col-span-full">
-        <CardHeader>
-          <CardTitle>Gamification Overview</CardTitle>
-          <CardDescription>Loading gamification data...</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
-          <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700 w-3/4"></div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Get the top badges by level
-  const topBadgeLevels = gamificationData.badgeLevels?.slice(0, 3) || [];
-  
-  // Format level counts
-  const formatLevelData = () => {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        {topBadgeLevels.map((badge, idx) => (
-          <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-            <div>
-              <p className="font-medium">{badge.level}</p>
-              <p className="text-sm text-muted-foreground">{badge.count} users</p>
-            </div>
-            <Badge className="h-10 w-10 text-primary p-2" />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  // Format challenge completion data
-  const formatChallengeData = () => {
-    const topChallenges = gamificationData.topChallenges?.slice(0, 3) || [];
-    
-    return (
-      <div className="space-y-4">
-        {topChallenges.map((challenge, idx) => (
-          <div key={idx} className="space-y-1">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">{challenge.name}</p>
-              <p className="text-sm text-muted-foreground">{challenge.completions} completions</p>
-            </div>
-            <Progress value={(challenge.completions / 100) * 100} className="h-2" />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
+const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamificationData }) => {
   return (
-    <Card>
+    <Card className="glass-card">
       <CardHeader>
-        <CardTitle>Gamification Overview</CardTitle>
-        <CardDescription>Badge distributions and challenge completions</CardDescription>
+        <CardTitle className="flex items-center">
+          <Trophy className="mr-2 h-5 w-5 text-primary" />
+          Aperçu de la Gamification
+        </CardTitle>
+        <CardDescription>Statistiques globales de l'engagement</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div>
-            <h4 className="text-sm font-semibold mb-3">Top Badge Levels</h4>
-            {formatLevelData()}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                <Trophy className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Badges Débloqués</p>
+                <h3 className="text-2xl font-bold">{gamificationData.totalBadges || 0}</h3>
+              </div>
+            </div>
           </div>
           
-          <div>
-            <h4 className="text-sm font-semibold mb-3">Most Completed Challenges</h4>
-            {formatChallengeData()}
+          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                <Users className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Utilisateurs Actifs</p>
+                <h3 className="text-2xl font-bold">{gamificationData.activeUsersPercent || 0}%</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                <Award className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Défis Complétés</p>
+                <h3 className="text-2xl font-bold">{gamificationData.completedChallenges || 0}</h3>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                <Zap className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Taux de Complétion</p>
+                <h3 className="text-2xl font-bold">{gamificationData.completionRate || 0}%</h3>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>

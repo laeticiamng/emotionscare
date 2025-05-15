@@ -47,6 +47,17 @@ export function hasRoleAccess(userRole: string, requiredRoles: string[]): boolea
 }
 
 /**
+ * Check if a role is an admin role
+ * @param role The role to check
+ */
+export function isAdminRole(role?: string | UserRole): boolean {
+  if (!role) return false;
+  
+  const normalizedRole = normalizeRole(role);
+  return ['admin', 'b2b_admin', 'moderator', 'wellbeing_manager'].includes(normalizedRole.toString());
+}
+
+/**
  * Get a user-friendly role name for display
  * @param role Role identifier
  */

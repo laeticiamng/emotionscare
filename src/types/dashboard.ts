@@ -2,108 +2,48 @@
 import { ReactNode } from 'react';
 import { GamificationStats } from './gamification';
 
-export interface GridPosition {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+export interface KpiCardProps {
+  title: string;
+  value: string | number;
+  icon?: ReactNode;
+  change?: {
+    value: number;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  description?: string;
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+  onClick?: () => void;
 }
 
 export interface DraggableKpiCardsGridProps {
-  kpiCards: KpiCardProps[];
-  className?: string;
+  cards: KpiCardProps[];
+  onReorder?: (cards: KpiCardProps[]) => void;
+  editable?: boolean;
 }
 
-export interface KpiCardProps {
-  title: string;
-  value: string | number | ReactNode;
-  trend?: number;
-  icon?: ReactNode;
-  description?: string;
-  status?: 'positive' | 'negative' | 'neutral' | 'warning';
-  onClick?: () => void;
-  className?: string;
-  trendText?: string;
-  details?: string;
-  period?: string;
-  loading?: boolean;
-  delta?: {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: ReactNode;
-  ariaLabel?: string;
+export interface GlobalOverviewTabProps {
+  period?: 'day' | 'week' | 'month' | 'year';
+  showTrends?: boolean;
   isLoading?: boolean;
 }
 
 export interface DashboardWidgetConfig {
   id: string;
+  type: 'kpi' | 'chart' | 'table' | 'list' | 'map' | 'custom';
   title: string;
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-  minW?: number;
-  minH?: number;
+  width: 1 | 2 | 3 | 4; // Grid width (out of 4 columns)
+  height: 'sm' | 'md' | 'lg' | 'xl'; // Height size
+  position: number; // Order in dashboard
   visible: boolean;
   settings?: {
-    dataSource?: string;
-    refreshInterval?: number;
-    displayMode?: string;
-    showLabels?: boolean;
-    colorScheme?: string;
     [key: string]: any;
   };
 }
 
-export interface GlobalOverviewTabProps {
-  kpiCards: KpiCardProps[];
-  absenteeismChartData?: any[];
-  emotionalScoreTrend?: any[];
-  dashboardStats?: DashboardStats;
-  gamificationData?: GamificationStats;
-  isLoading?: boolean;
-}
-
-export interface ChartData {
-  date: string;
-  value: number;
-  category?: string;
-}
-
-export interface DashboardStats {
-  totalUsers: number;
-  activeUsers: number;
-  averageEmotionalScore?: number;
-  absenteeismRate?: number;
-  activeToday?: number;
-  averageScore?: number;
-  criticalAlerts?: number;
-  completion?: number;
-  productivity?: {
-    current: number;
-    trend: number;
-  };
-  emotionalScore?: {
-    current: number;
-    trend: number;
-  };
-}
-
-export interface GamificationData extends GamificationStats {
-  totalBadges: number;
-  activeChallenges: number;
-  leaderboard: {
-    userId: string;
-    name: string;
-    score: number;
-    position: number;
-  }[];
-  recentAchievements: {
-    userId: string;
-    name: string;
-    badge: string;
+export interface GamificationData {
+  stats: GamificationStats;
+  challengeHistory?: {
     date: string;
+    completions: number;
   }[];
 }

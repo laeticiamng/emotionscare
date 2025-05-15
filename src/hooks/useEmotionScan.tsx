@@ -1,76 +1,77 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
-import type { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types';
+import { v4 as uuid } from 'uuid';
 
 export function useEmotionScan() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastEmotion, setLastEmotion] = useState<EmotionResult | null>(null);
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [latestEmotion, setLatestEmotion] = useState<EmotionResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const scanEmotion = async (input: {
-    text?: string;
-    emojis?: string;
-    audio_url?: string;
-    is_confidential?: boolean;
-    share_with_coach?: boolean;
-  }) => {
-    if (!user) {
-      setError("Vous devez être connecté pour enregistrer une émotion");
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
+  // Fetch the latest emotion for the current user
+  const fetchLatest = useCallback(async () => {
+    if (!user?.id) return null;
+    
     try {
-      // Call the createEmotionEntry function with all required fields
-      const emotion = await createEmotionEntry({
-        user_id: user.id,
-        date: new Date().toISOString(),
-        ...input
-      });
+      setIsLoading(true);
+      setError(null);
       
-      setLastEmotion(emotion);
-      return emotion;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Une erreur est survenue";
-      setError(errorMessage);
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getLatestEmotion = async () => {
-    if (!user) {
-      return null;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
       const emotion = await fetchLatestEmotion(user.id);
-      setLastEmotion(emotion);
+      if (emotion) {
+        setLatestEmotion(emotion);
+      }
+      
       return emotion;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Une erreur est survenue";
-      setError(errorMessage);
+      console.error('Error fetching latest emotion:', err);
+      setError('Failed to load your latest emotion scan');
       return null;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  // Create a new emotion entry
+  const createEmotion = useCallback(async (data: Partial<EmotionResult>) => {
+    if (!user?.id) {
+      setError('You must be logged in to save emotions');
+      return null;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const emotionData: Partial<EmotionResult> = {
+        ...data,
+        id: data.id || uuid(),
+        user_id: user.id,
+        date: data.date || new Date().toISOString()
+      };
+      
+      const newEmotion = await createEmotionEntry(emotionData);
+      setLatestEmotion(newEmotion);
+      
+      return newEmotion;
+    } catch (err) {
+      console.error('Error creating emotion:', err);
+      setError('Failed to save your emotion');
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id]);
 
   return {
-    scanEmotion,
-    getLatestEmotion,
-    lastEmotion,
+    latestEmotion,
     isLoading,
-    error
+    error,
+    fetchLatest,
+    createEmotion,
+    setLatestEmotion
   };
 }
 

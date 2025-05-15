@@ -1,77 +1,111 @@
 
-import { useState, useEffect } from 'react';
-import { EmotionMusicParams, MusicTrack, MusicPlaylist } from '@/types/music';
+import { useState, useEffect, useCallback } from 'react';
+import { EmotionMusicParams } from '@/types/music';
 
-export const useEmotionMusic = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [recommendedPlaylist, setRecommendedPlaylist] = useState<MusicPlaylist | null>(null);
-  
-  const getRecommendationsByEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist> => {
-    setLoading(true);
-    
+export function useEmotionMusic() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [volume, setVolume] = useState(0.5); // 0 to 1
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Initialize audio element
+  useEffect(() => {
+    const audio = new Audio();
+    audio.loop = true;
+    audio.volume = volume;
+    setAudioElement(audio);
+
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, []);
+
+  // Update volume when changed
+  useEffect(() => {
+    if (audioElement) {
+      audioElement.volume = volume;
+    }
+  }, [volume, audioElement]);
+
+  // Generate and play music based on emotion
+  const playEmotionMusic = useCallback(async (params: EmotionMusicParams) => {
+    if (!audioElement) return;
+
     try {
-      // Simulate API call - this would be real API in production
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      setIsLoading(true);
       
-      // Mock returned playlist
-      const playlist: MusicPlaylist = {
-        id: 'emotion-' + params.emotion,
-        title: `${capitalize(params.emotion)} Music`,
-        name: `${capitalize(params.emotion)} Music`,
-        tracks: [
-          {
-            id: '101',
-            title: `${capitalize(params.emotion)} Melody`,
-            artist: 'EmotionsCare Music',
-            duration: 240,
-            url: '/audio/sample1.mp3',
-            audioUrl: '/audio/sample1.mp3',
-            coverUrl: '/images/covers/sample1.jpg'
-          },
-          {
-            id: '102',
-            title: `${capitalize(params.emotion)} Harmony`,
-            artist: 'EmotionsCare Orchestra',
-            duration: 180,
-            url: '/audio/sample2.mp3',
-            audioUrl: '/audio/sample2.mp3',
-            coverUrl: '/images/covers/sample2.jpg'
-          },
-          {
-            id: '103',
-            title: `${capitalize(params.emotion)} Ambience`,
-            artist: 'EmotionsCare Ambient',
-            duration: 320,
-            url: '/audio/sample3.mp3',
-            audioUrl: '/audio/sample3.mp3',
-            coverUrl: '/images/covers/sample3.jpg'
-          }
-        ]
+      // In a real implementation, this would call a Music Generation API
+      // For now, we just use placeholder audio URLs based on emotion
+      const audioUrls: Record<string, string> = {
+        joy: 'https://example.com/audio/joy.mp3',
+        sadness: 'https://example.com/audio/sadness.mp3',
+        anger: 'https://example.com/audio/anger.mp3',
+        fear: 'https://example.com/audio/fear.mp3',
+        surprise: 'https://example.com/audio/surprise.mp3',
+        calm: 'https://example.com/audio/calm.mp3',
+        neutral: 'https://example.com/audio/neutral.mp3'
       };
       
-      setRecommendedPlaylist(playlist);
-      setLoading(false);
-      return playlist;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to get music recommendations');
-      setError(error);
-      setLoading(false);
-      throw error;
+      // Use neutral as fallback
+      const audioUrl = audioUrls[params.emotion] || audioUrls.neutral;
+      
+      // For demo purposes, use a placeholder audio
+      // In production, replace with the actual generated music URL
+      audioElement.src = audioUrl;
+      
+      await audioElement.play();
+      setIsPlaying(true);
+      setCurrentEmotion(params.emotion);
+    } catch (error) {
+      console.error('Error playing emotion music:', error);
+    } finally {
+      setIsLoading(false);
     }
-  };
-  
-  // Helper to capitalize the first letter
-  const capitalize = (str: string): string => {
-    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-  };
-  
+  }, [audioElement]);
+
+  const stopMusic = useCallback(() => {
+    if (audioElement) {
+      audioElement.pause();
+      setIsPlaying(false);
+    }
+  }, [audioElement]);
+
+  const toggleMusic = useCallback(() => {
+    if (!audioElement) return;
+    
+    if (isPlaying) {
+      audioElement.pause();
+      setIsPlaying(false);
+    } else {
+      audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+      });
+      setIsPlaying(true);
+    }
+  }, [audioElement, isPlaying]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.src = '';
+      }
+    };
+  }, [audioElement]);
+
   return {
-    loading,
-    error,
-    recommendedPlaylist,
-    getRecommendationsByEmotion
+    playEmotionMusic,
+    stopMusic,
+    toggleMusic,
+    isPlaying,
+    currentEmotion,
+    volume,
+    setVolume,
+    isLoading
   };
-};
+}
 
 export default useEmotionMusic;

@@ -1,121 +1,91 @@
 
+// Music type definitions
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  url: string;
-  coverUrl: string;
   duration: number;
-  emotion?: string | string[];
-  intensity?: number;
-  tempo?: number;
-  year?: number;
-  genre?: string | string[];
-  tags?: string[];
-  isPlaying?: boolean;
-  isFavorite?: boolean;
-  category?: string;
-  mood?: string;
-  cover?: string;
+  album?: string;
   cover_url?: string;
-  audioUrl?: string;
+  track_url: string;
+  genre?: string;
+  emotion?: string;
+  tempo?: number;
+  energy?: number;
+  valence?: number;
 }
 
 export interface MusicPlaylist {
   id: string;
-  title: string;
-  name?: string;  // Added name property
-  tracks: MusicTrack[];
-  coverUrl?: string;
-  emotion?: string;
+  name: string;
   description?: string;
-  category?: string;
-  cover?: string;
+  cover_url?: string;
+  tracks: MusicTrack[];
+  created_by?: string;
+  is_public?: boolean;
+  emotion?: string;
+  duration?: number;
 }
 
-export interface MusicState {
-  tracks: MusicTrack[];
-  playlists: MusicPlaylist[];
+export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  muted: boolean;
-  position: number;
-  duration: number;
-  loading: boolean;
-  error: string | null;
-}
-
-export interface MusicPlayerProps {
-  track?: MusicTrack;
-  playlist?: MusicPlaylist;
-  autoplay?: boolean;
-  controls?: boolean;
-  showVisualization?: boolean;
-  visualizationType?: 'bars' | 'wave' | 'circle';
-  size?: 'small' | 'medium' | 'large' | 'mini';
-  onTrackEnd?: () => void;
-  onError?: (error: string) => void;
+  playlist: MusicTrack[];
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  setVolume: (volume: number) => void;
+  addToPlaylist: (track: MusicTrack) => void;
+  removeFromPlaylist: (trackId: string) => void;
+  clearPlaylist: () => void;
+  shuffle: () => void;
+  repeat: boolean;
+  toggleRepeat: () => void;
 }
 
 export interface MusicDrawerProps {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
-  currentTrack?: MusicTrack | null;
-  playlist?: MusicPlaylist;
-  children?: React.ReactNode;
-  isOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+}
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  album?: string;
+  cover?: string;
+  src: string;
+  duration: number;
 }
 
 export interface ProgressBarProps {
-  value: number;
-  max: number;
-  currentTime?: number;
-  duration?: number;
-  showLabel?: boolean;
-  className?: string;
-  variant?: 'default' | 'slim' | 'accent';
-  onChange?: (value: number) => void;
-  showTimestamps?: boolean;
-  onSeek?: (value: number) => void;
-  formatTime?: (time: number) => string;
-  handleProgressClick?: (e: any) => void;
+  progress: number;
+  duration: number;
+  onChange: (value: number) => void;
+}
+
+export interface TrackInfoProps {
+  title: string;
+  artist: string;
+  cover?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange?: (volume: number) => void;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-  size?: 'small' | 'medium' | 'large';
-  onChange?: (value: number) => void;
-  showLabel?: boolean;
-  className?: string;
+  onChange: (value: number) => void;
 }
 
 export interface MusicLibraryProps {
-  playlists: MusicPlaylist[];
-  onSelectPlaylist: (playlist: MusicPlaylist) => void;
-  onSelectTrack?: (track: MusicTrack) => void;
+  onSelectTrack: (track: MusicTrack) => void;
 }
 
-export interface MusicMixerProps {
-  tracks: MusicTrack[];
-  onSave?: (mix: MusicTrack) => void;
-}
-
-// For music recommendation service
-export interface MusicRecommendationParams {
-  emotion?: string;
+export interface EmotionMusicParams {
+  emotion: string;
   intensity?: number;
-  tempo?: number;
-  genre?: string[];
-  limit?: number;
-}
-
-export interface TrackInfoProps {
-  track: MusicTrack;
-  className?: string;
-  isCompact?: boolean;
+  tempo?: 'slow' | 'medium' | 'fast';
+  instrument?: string;
+  duration?: number;
 }

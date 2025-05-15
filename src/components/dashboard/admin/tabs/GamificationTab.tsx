@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
@@ -27,7 +28,7 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <GamificationSummaryCard gamificationStats={gamificationData} />
+      <GamificationSummaryCard gamificationData={gamificationData} />
       
       <Card className="glass-card">
         <CardHeader>

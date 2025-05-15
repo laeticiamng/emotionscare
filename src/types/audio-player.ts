@@ -1,57 +1,54 @@
 
-import { MusicTrack } from './index';
-
 export interface UseAudioPlayerStateReturn {
-  currentTrack: MusicTrack | null;
   isPlaying: boolean;
+  duration: number;
+  currentTime: number;
   volume: number;
-  progress: number;
+  muted: boolean;
+  loop: boolean;
+  autoplay: boolean;
+  play: () => Promise<void>;
+  pause: () => void;
+  toggle: () => void;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMuted: () => void;
+  toggleLoop: () => void;
+  toggleAutoplay: () => void;
+}
+
+export interface AudioTrack {
+  id: string;
+  title: string;
+  artist?: string;
+  src: string;
+  duration?: number;
+  coverUrl?: string;
+  isLiked?: boolean;
+}
+
+export interface AudioPlayerContextType {
+  track: AudioTrack | null;
+  playlist: AudioTrack[];
+  isPlaying: boolean;
   currentTime: number;
   duration: number;
-  loadingTrack: boolean;
-  error: Error | null;
-  isMuted: boolean;
-  isLoading: boolean;
-  audioRef: React.RefObject<HTMLAudioElement>;
-  setCurrentTrack: (track: MusicTrack | null) => void;
-  setIsPlaying: (isPlaying: boolean) => void;
-  setVolume: (volume: number) => void;
-  setProgress: (progress: number) => void;
-  setCurrentTime: (time: number) => void;
-  setDuration: (duration: number) => void;
-  setLoadingTrack: (loading: boolean) => void;
-  setError: (error: Error | null) => void;
-  setIsMuted: (muted: boolean) => void;
-  setIsLoading: (loading: boolean) => void;
-}
-
-export interface ProgressBarProps {
-  value: number;
-  max?: number;
-  currentTime?: number;
-  duration?: number;
-  formatTime?: (seconds: number) => string;
-  // Add missing properties
-  onSeek?: (value: number) => void;
-  className?: string;
-  showTimestamps?: boolean;
-  showLabel?: boolean;
-  variant?: string;
-}
-
-export interface VolumeControlProps {
   volume: number;
-  onVolumeChange?: (volume: number) => void;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-  // Add missing properties
-  onChange?: (value: number) => void;
-  className?: string;
-  showLabel?: boolean;
-}
-
-// Add MusicDrawerProps interface
-export interface MusicDrawerProps {
-  children?: React.ReactNode;
-  // Add any other properties needed
+  muted: boolean;
+  playTrack: (track: AudioTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  togglePlayPause: () => void;
+  seekTo: (time: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  addToPlaylist: (track: AudioTrack) => void;
+  removeFromPlaylist: (trackId: string) => void;
+  clearPlaylist: () => void;
+  shufflePlaylist: () => void;
+  repeatMode: 'off' | 'track' | 'playlist';
+  setRepeatMode: (mode: 'off' | 'track' | 'playlist') => void;
+  likeTrack: (trackId: string) => void;
 }

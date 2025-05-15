@@ -1,111 +1,157 @@
 
 import { useState, useEffect } from 'react';
-import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types';
-import { mockBadges, mockLeaderboard } from './community-gamification/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types/gamification';
 
-// Define mockChallenges since it's needed
-const mockChallenges: Challenge[] = [
-  {
-    id: '1',
-    name: 'Journal Quotidien',
-    description: 'Écrivez dans votre journal pendant 5 jours consécutifs',
-    points: 50,
-    progress: 3,
-    total: 5,
-    completed: false
-  },
-  {
-    id: '2',
-    name: 'Méditation Matinale',
-    description: 'Pratiquez la méditation pendant 10 minutes chaque jour',
-    points: 100,
-    progress: 7,
-    total: 10,
-    completed: false
-  },
-  {
-    id: '3',
-    name: 'Partage d\'Expérience',
-    description: 'Partagez une expérience positive avec la communauté',
-    points: 75,
-    progress: 1,
-    total: 1,
-    completed: true
-  }
-];
-
-interface UseCommunityGamificationReturn {
-  stats: GamificationStats;
-  badges: Badge[];
-  challenges: Challenge[];
-  leaderboard: LeaderboardEntry[];
-  isLoading: boolean;
-  error: string | null;
-}
-
-export const useCommunityGamification = (): UseCommunityGamificationReturn => {
+export function useCommunityGamification() {
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [gamificationData, setGamificationData] = useState<GamificationStats | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  // Mock initial stats
-  const [stats, setStats] = useState<GamificationStats>({
-    points: 850,
-    level: 3,
-    badges: mockBadges,
-    streak: 5,
-    rank: '42',
-    nextLevelPoints: 150,
-    progressToNextLevel: 70,
-    completedChallenges: 4,
-    totalChallenges: 10,
-    activeChallenges: 3,
-    recentAchievements: mockBadges.slice(0, 1),
-    challenges: mockChallenges,
-    // Add the missing properties for AdminTabContents
-    activeUsersPercent: 78,
-    totalBadges: 25,
-    badgeLevels: [
-      { level: 'Bronze', count: 12 },
-      { level: 'Silver', count: 8 },
-      { level: 'Gold', count: 5 }
-    ],
-    topChallenges: [
-      { name: 'Méditation Quotidienne', completions: 142 },
-      { name: 'Journal Émotionnel', completions: 98 },
-      { name: 'Soutien Communautaire', completions: 76 }
-    ]
-  });
-  
-  // Load data
+
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      
+    async function fetchGamificationData() {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        // Simulate API call
-        await new Promise(r => setTimeout(r, 1000));
+        setIsLoading(true);
+        setError(null);
         
-        // Data already loaded in initial state, no need to update
+        // Simulate API call to fetch gamification data
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Mock data for demonstration
+        const mockBadges: Badge[] = [
+          {
+            id: '1',
+            name: 'Explorateur émotionnel',
+            description: 'A complété 5 scans émotionnels',
+            image_url: '',
+            tier: 'bronze',
+            icon: 'search'
+          },
+          {
+            id: '2',
+            name: 'Journaliste en herbe',
+            description: 'A écrit 10 entrées de journal',
+            image_url: '',
+            tier: 'silver',
+            icon: 'book'
+          },
+        ];
+        
+        const mockChallenges: Challenge[] = [
+          {
+            id: '1',
+            title: 'Semaine de pleine conscience',
+            description: 'Compléter 7 jours de méditation',
+            points: 50,
+            completed: true,
+            progress: 100,
+            totalSteps: 7,
+            difficulty: 'medium',
+            completions: 45
+          },
+          {
+            id: '2',
+            title: 'Explorer ses émotions',
+            description: 'Réaliser 5 scans émotionnels',
+            points: 30,
+            completed: false,
+            progress: 3,
+            totalSteps: 5,
+            difficulty: 'easy',
+            completions: 120
+          },
+          {
+            id: '3',
+            title: 'Journal quotidien',
+            description: 'Tenir un journal pendant 14 jours',
+            points: 100,
+            completed: false,
+            progress: 5,
+            totalSteps: 14,
+            difficulty: 'hard',
+            completions: 32
+          }
+        ];
+        
+        const mockLeaderboard: LeaderboardEntry[] = [
+          { id: '1', name: 'Sophie M.', avatar: '', points: 1250, rank: 1, trend: 'stable', badges: 15, level: 8 },
+          { id: '2', name: 'Thomas R.', avatar: '', points: 1120, rank: 2, trend: 'up', badges: 12, level: 7 },
+          { id: '3', name: 'Emma L.', avatar: '', points: 980, rank: 3, trend: 'down', badges: 10, level: 6 },
+        ];
+        
+        const mockTopChallenges: (Challenge & { name: string; completions: number; })[] = [
+          {
+            id: '1',
+            name: 'Scan quotidien',
+            description: 'Faire un scan émotionnel chaque jour',
+            points: 10,
+            completed: false,
+            completions: 450
+          },
+          {
+            id: '2',
+            name: 'Journal hebdomadaire',
+            description: 'Écrire dans le journal une fois par semaine',
+            points: 25,
+            completed: false,
+            completions: 320
+          },
+          {
+            id: '3',
+            name: 'Méditation guidée',
+            description: 'Suivre une séance de méditation guidée',
+            points: 15,
+            completed: false,
+            completions: 280
+          }
+        ];
+        
+        // Complete mock data
+        const mockData: GamificationStats = {
+          points: 750,
+          level: 5,
+          badges: mockBadges,
+          streak: 7,
+          completedChallenges: 12,
+          totalChallenges: 25,
+          activeUsersPercent: 78,
+          totalBadges: 45,
+          badgeLevels: [
+            { level: 'Bronze', count: 25 },
+            { level: 'Silver', count: 15 },
+            { level: 'Gold', count: 5 }
+          ],
+          topChallenges: mockTopChallenges,
+          completionRate: 68,
+          rewardsEarned: 15,
+          userEngagement: 82,
+          progress: 65,
+          challenges: mockChallenges,
+          achievements: mockBadges,
+          leaderboard: mockLeaderboard,
+          nextLevelPoints: 250,
+          lastActivityDate: new Date().toISOString()
+        };
+        
+        setGamificationData(mockData);
       } catch (err) {
+        console.error('Error fetching gamification data:', err);
         setError('Failed to load gamification data');
-        console.error('Error loading gamification data:', err);
       } finally {
         setIsLoading(false);
       }
-    };
-    
-    fetchData();
-  }, []);
-  
-  return {
-    stats,
-    badges: mockBadges,
-    challenges: mockChallenges,
-    leaderboard: mockLeaderboard,
-    isLoading,
-    error
-  };
-};
+    }
+
+    fetchGamificationData();
+  }, [user]);
+
+  return { gamificationData, isLoading, error };
+}
 
 export default useCommunityGamification;

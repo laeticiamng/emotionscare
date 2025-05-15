@@ -1,83 +1,73 @@
 
-import { ReactNode } from 'react';
-
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 
 export type NotificationType = 
-  | 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement' 
-  | 'reminder' | 'success' | 'warning' | 'error' | 'all' | 'unread' | 'important' | 'none';
+  | 'system' 
+  | 'emotion' 
+  | 'journal' 
+  | 'coach' 
+  | 'achievement'
+  | 'reminder'
+  | 'alert'
+  | 'message';
 
 export type NotificationTone = 
-  | 'standard' | 'subtle' | 'professional' | 'friendly' 
-  | 'motivational' | 'direct' | 'calm';
-
-export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+  | 'success' 
+  | 'error' 
+  | 'warning' 
+  | 'info'
+  | 'neutral';
 
 export interface Notification {
   id: string;
+  user_id: string;
+  type: NotificationType;
   title: string;
   message: string;
-  type: NotificationType;
+  tone?: NotificationTone;
   read: boolean;
-  date?: Date | string;
-  timestamp?: Date | string;
-  actionUrl?: string;
-  actionLabel?: string;
-  icon?: ReactNode;
-  priority?: NotificationPriority;
+  timestamp: string;
+  action_url?: string;
+  action_label?: string;
+  image_url?: string;
   sender_id?: string;
-  recipient_id?: string;
-  channel?: 'email' | 'push' | 'in-app';
-  userId?: string;
+  sender_name?: string;
 }
 
 export interface NotificationPreference {
   enabled: boolean;
   emailEnabled: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  channels?: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
-  };
-  frequency?: NotificationFrequency;
-  types?: Record<NotificationType | string, boolean>;
-  type?: string | NotificationType;
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
-  tone?: NotificationTone;
-}
-
-export type NotificationFilter = 'all' | 'unread' | 'system' | 'emotion' | 'journal' | 'coach' | 'community' | 'achievement' | string;
-
-export interface NotificationBadge {
-  unread: number;
-}
-
-export interface NotificationSettings {
-  enabled: boolean;
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  notificationTypes: Record<string, boolean>;
+  pushEnabled: boolean;
   frequency: NotificationFrequency;
-  tone: NotificationTone;
+  types: {
+    system: boolean;
+    emotion: boolean;
+    journal: boolean;
+    coach: boolean;
+    achievement: boolean;
+    reminder: boolean;
+    alert: boolean;
+    message: boolean;
+  };
+}
+
+export interface NotificationFilter {
+  type?: NotificationType[];
+  read?: boolean;
+  from?: string; // ISO date string
+  to?: string; // ISO date string
+  search?: string;
 }
 
 export interface NotificationItemProps {
   notification: Notification;
   onMarkAsRead?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onClick?: (notification: Notification) => void;
-  compact?: boolean;
-  onRead?: (id: string) => void;
 }
 
 export interface NotificationChannels {
+  app: boolean;
   email: boolean;
+  sms: boolean;
   push: boolean;
-  inApp: boolean;
 }
