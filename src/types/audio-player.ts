@@ -1,23 +1,28 @@
 
+import { MusicTrack } from './music';
+
 export interface UseAudioPlayerStateReturn {
   isPlaying: boolean;
-  duration: number;
-  currentTime: number;
   volume: number;
-  muted: boolean;
-  play: () => void;
-  pause: () => void;
-  toggle: () => void;
-  seek: (time: number) => void;
+  progress: number;
+  duration: number;
+  currentTrack: MusicTrack | null;
+  setIsPlaying: (isPlaying: boolean) => void;
   setVolume: (volume: number) => void;
-  toggleMute: () => void;
+  setProgress: (progress: number) => void;
+  setDuration: (duration: number) => void;
+  setCurrentTrack: (track: MusicTrack | null) => void;
+  loadingTrack?: boolean;
+  setLoadingTrack?: (loading: boolean) => void;
+  error?: Error | null;
+  setError?: (error: Error | null) => void;
 }
 
 export interface EnhancedMusicVisualizerProps {
+  audioRef: React.RefObject<HTMLAudioElement>;
+  color?: string;
+  barCount?: number;
   height?: number;
-  showControls?: boolean;
-  mood?: string;
-  intensity?: number;
-  volume?: number;
+  width?: string;
   className?: string;
 }

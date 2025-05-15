@@ -1,53 +1,50 @@
 
 export interface CoachMessage {
   id: string;
+  conversation_id: string;
+  sender: string;
   text: string;
-  sender: 'user' | 'coach';
   timestamp: string;
-  read?: boolean;
-  attachments?: string[];
 }
 
-export interface CoachEvent {
+export type CoachEvent = {
   id: string;
-  type: 'exercise' | 'reminder' | 'suggestion' | 'feedback';
-  title: string;
-  description: string;
-  timestamp: string;
-  completed?: boolean;
-  due_date?: string;
-}
+  type: string;
+  data: any;
+  timestamp: Date;
+};
 
-export interface CoachAction {
+export type CoachAction = {
   id: string;
-  title: string;
-  description: string;
-  type: 'exercise' | 'meditation' | 'journaling' | 'social' | 'other';
-  priority: 'high' | 'medium' | 'low';
-  completed?: boolean;
-  completion_date?: string;
-}
+  type: string;
+  payload: any;
+  created_at?: string;
+};
 
-export interface EmotionalData {
-  date: string;
-  value: number;
-  emotion?: string;
-}
+export type EmotionalData = {
+  id?: string;
+  emotion: string;
+  intensity: number;
+  timestamp: Date | string;
+  context?: string;
+  userId?: string;
+  user_id?: string;
+};
 
-export interface EmotionalTrend {
-  period: string;
-  data: EmotionalData[];
-  average: number;
-  improvement?: number;
-  insights: string[];
-}
+export type EmotionalTrend = {
+  trend: 'improving' | 'declining' | 'stable';
+  period: 'day' | 'week' | 'month';
+  startDate: Date;
+  endDate: Date;
+  emotions: EmotionalData[];
+};
 
-export interface CoachNotification {
+export type CoachNotification = {
   id: string;
   title: string;
   message: string;
-  type: 'reminder' | 'suggestion' | 'feedback' | 'encouragement';
-  timestamp: string;
-  action_url?: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date | string;
   read?: boolean;
-}
+  action?: CoachAction;
+};

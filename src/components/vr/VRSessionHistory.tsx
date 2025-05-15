@@ -1,78 +1,66 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VRSession, VRSessionTemplate, VRSessionHistoryProps } from '@/types';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { Card, CardContent } from '@/components/ui/card';
+import { VRSession, VRSessionHistoryProps } from '@/types';
 
-const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ 
-  sessions, 
-  templates = [],
-  onSelectSession 
+const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
+  sessions = [],
+  userId,
+  limit = 5,
+  showHeader = true,
+  className = ''
 }) => {
-  if (!sessions || sessions.length === 0) {
-    return null;
-  }
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: fr });
-    } catch (e) {
-      return dateString;
-    }
+  // Format date in a readable format
+  const formatDate = (date: string | Date): string => {
+    if (!date) return 'N/A';
+    const dateObj = new Date(date);
+    return dateObj.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
-  // Get template title for a session
-  const getTemplateTitle = (templateId: string) => {
-    const template = templates.find(t => t.id === templateId);
-    return template ? template.title : 'Session immersive';
-  };
+  // Slice sessions to the limit
+  const recentSessions = sessions.slice(0, limit);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Historique des sessions</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {sessions.length === 0 ? (
-          <p className="text-muted-foreground text-center py-4">
-            Aucune session récente
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {sessions.map((session) => (
-              <div 
-                key={session.id}
-                className="p-3 rounded-md border hover:bg-muted/50 cursor-pointer"
-                onClick={() => onSelectSession && onSelectSession(session)}
-              >
-                <div className="flex justify-between">
-                  <h4 className="font-medium">{getTemplateTitle(session.templateId)}</h4>
-                  <span className="text-xs text-muted-foreground">
-                    {formatDate(session.startedAt || session.startTime || '')}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-sm text-muted-foreground">
-                    Durée: {Math.round((session.duration || 0) / 60)} min
-                  </span>
-                  {session.completed || session.isCompleted ? (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400">
-                      Terminée
+    <div className={`space-y-4 ${className}`}>
+      {showHeader && <h3 className="text-lg font-medium">Recent Sessions</h3>}
+      
+      {recentSessions.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No session history available.</p>
+      ) : (
+        <div className="space-y-3">
+          {recentSessions.map((session) => (
+            <Card key={session.id} className="bg-muted/10">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">
+                      {session.template?.title || 'Session'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDate(session.start_time || session.startTime || session.date)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-2 py-1 rounded text-xs ${session.completed || session.isCompleted ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100'}`}>
+                      {session.completed || session.isCompleted ? 'Completed' : 'In progress'}
                     </span>
-                  ) : (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-400">
-                      En cours
-                    </span>
-                  )}
+                    {session.rating && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Rating: {session.rating}/5
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

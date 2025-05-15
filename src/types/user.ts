@@ -1,65 +1,80 @@
 
-// Types liés aux utilisateurs et à l'authentification
-
-export type UserRole = 'admin' | 'user' | 'manager' | 'coach' | 'wellbeing_manager' | 'employee';
+export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | string;
 
 export interface User {
   id: string;
-  name: string;
   email: string;
-  role: UserRole;
+  name?: string;
   avatar_url?: string;
-  avatar?: string; // Pour compatibilité
-  department?: string;
-  position?: string;
-  created_at?: string;
-  joined_at?: string;
-  onboarded?: boolean;
-  emotional_score?: number;
-  teams?: string[];
+  role?: UserRole;
+  preferences?: UserPreferences;
+  createdAt?: string;
+  updatedAt?: string;
+  last_login?: string;
+  organization_id?: string;
+  department_id?: string;
   team_id?: string;
   status?: 'active' | 'inactive' | 'pending';
-  last_login?: string;
-  preferences?: UserPreferences;
 }
 
 export interface UserPreferences {
   theme?: string;
-  font?: string;
+  fontFamily?: string;
   fontSize?: string;
-  language?: string;
-  notifications_enabled?: boolean;
-  privacy?: {
-    profileVisibility?: 'public' | 'private' | 'team' | string;
+  notifications?: boolean | NotificationPreferences;
+  dashboardLayout?: DashboardLayout;
+  dataCollection?: {
+    allowTracking?: boolean;
+    shareAnonymousData?: boolean;
   };
-  profileVisibility?: 'public' | 'private' | 'team' | string;
+}
+
+export interface DashboardLayout {
+  kpis?: {
+    order: string[];
+    visible: string[];
+  };
+  widgets?: {
+    order: string[];
+    visible: string[];
+  };
+}
+
+export interface NotificationPreferences {
+  email?: boolean;
+  push?: boolean;
+  inApp?: boolean;
+  frequency?: string;
+  types?: string[];
 }
 
 export interface UserPreferencesState {
   theme: string;
-  font: string;
   fontSize: string;
+  fontFamily: string;
+  notifications: boolean;
+  loading: boolean;
+  error: string | null;
 }
 
 export interface AuthContextType {
   user: User | null;
-  isLoggedIn: boolean;
+  loading: boolean;
+  error: Error | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
-  loading: boolean;
-  error: string | null;
-  resetPassword?: (email: string) => Promise<void>;
+  signup: (email: string, password: string, name?: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updateUser: (user: User) => Promise<void>;
+  isAuthenticated: boolean;
+  refreshUser: () => Promise<void>;
 }
 
 export interface InvitationVerificationResult {
   valid: boolean;
+  message: string;
   email?: string;
   role?: string;
-  invited_by?: string;
-  message?: string;
-  expires_at?: string;
+  invitation_id?: string;
   error?: string;
 }
-
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';

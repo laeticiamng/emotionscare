@@ -1,85 +1,51 @@
 
-import React, { useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicPropsType } from '@/types';
+import React from 'react';
+import { VRSessionTemplate, VRSession } from '@/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
-  template, 
-  onComplete, 
-  session, 
-  onSessionComplete, 
-  isAudioOnly, 
-  videoUrl, 
-  audioUrl, 
-  emotion,
-  sessionId,
-  templateId
+interface VRMusicIntegrationProps {
+  session: VRSession | VRSessionTemplate;
+  onToggleMusic?: (enabled: boolean) => void;
+  musicEnabled?: boolean;
+}
+
+const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
+  session,
+  onToggleMusic,
+  musicEnabled = false
 }) => {
-  // Use direct props or from the session
-  const activeTemplate = session || template;
-  const handleComplete = onSessionComplete || onComplete;
+  // Determine the target emotion either from emotionTarget or emotion_target
+  const getTargetEmotion = (): string => {
+    if ('emotionTarget' in session && session.emotionTarget) {
+      return session.emotionTarget;
+    }
+    if ('emotion' in session && session.emotion) {
+      return session.emotion;
+    }
+    return 'calm'; // Default emotion if none specified
+  };
+
+  const targetEmotion = getTargetEmotion();
   
-  // Use the emotion prop directly if provided, otherwise look for it in the template
-  // with fallback to 'calm'
-  const targetEmotion = emotion || (
-    // Check if emotion property exists before trying to access it
-    activeTemplate?.emotionTarget || activeTemplate?.emotion_target || 'calm'
-  );
-  
-  const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
-  
-  useEffect(() => {
-    // Load a playlist based on the session's target emotion
-    const loadMusic = async () => {
-      try {
-        if (targetEmotion && loadPlaylistForEmotion) {
-          const playlist = await loadPlaylistForEmotion(targetEmotion);
-          
-          if (playlist && playlist.tracks.length > 0) {
-            // Ensure the track has the required properties
-            const track = {
-              ...playlist.tracks[0],
-              duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
-              audioUrl: playlist.tracks[0].audioUrl || ''
-            };
-            playTrack(track);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading music for VR:", error);
-      }
-    };
-    
-    loadMusic();
-    
-    // Cleanup
-    return () => {
-      pauseTrack();
-    };
-  }, [activeTemplate, targetEmotion, loadPlaylistForEmotion, playTrack, pauseTrack]);
-  
+  const handleToggleMusic = () => {
+    if (onToggleMusic) {
+      onToggleMusic(!musicEnabled);
+    }
+  };
+
   return (
-    <Card className="mb-4">
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-medium">Musique adaptative</h3>
-            <p className="text-sm text-muted-foreground">
-              {isPlaying ? 
-                'Lecture en cours - Musique adaptée à votre session' : 
-                'La musique démarrera automatiquement'}
-            </p>
-          </div>
-          
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-            <span className="animate-pulse">🎵</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="p-4 border rounded-md bg-muted/20">
+      <h3 className="text-lg font-medium mb-2">Music Integration</h3>
+      <p className="text-sm text-muted-foreground mb-3">
+        Enhance your session with music designed for {targetEmotion} emotions.
+      </p>
+      <button
+        className={`px-3 py-1 rounded-md ${musicEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+        onClick={handleToggleMusic}
+      >
+        {musicEnabled ? 'Music On' : 'Music Off'}
+      </button>
+    </div>
   );
 };
 
-export default VRSessionWithMusic;
+export default VRMusicIntegration;

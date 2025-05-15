@@ -1,4 +1,7 @@
 
+import { LucideIcon } from "lucide-react";
+import React from "react";
+
 export interface DashboardWidgetConfig {
   id: string;
   type: string;
@@ -47,13 +50,26 @@ export interface DashboardStats {
   sessionsCompleted: number;
   alerts: number;
   activeUsersPercent?: number;
+  totalUsers?: number;
+  activeToday?: number;
+  averageScore?: number;
+  criticalAlerts?: number;
+  completion?: number;
+  productivity?: {
+    current: number;
+    trend: number;
+  };
+  emotionalScore?: {
+    current: number;
+    trend: number;
+  };
 }
 
 export interface GamificationData {
   totalUsers: number;
   badgesAwarded: number;
   completionRate: number;
-  topChallenges: { name: string; count: number }[];
+  topChallenges: { name: string; count: number; completions?: number }[];
   activeUsersPercent?: number; 
   totalBadges?: number;
   badgeLevels?: { level: string; count: number }[];
@@ -73,4 +89,19 @@ export interface GlobalOverviewTabProps {
   dashboardStats?: DashboardStats;
   gamificationData?: GamificationData;
   isLoading?: boolean;
+}
+
+export interface TeamOverviewProps {
+  teamId?: string;
+  period?: string;
+  showFilters?: boolean;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  score: number;
+  rank: number;
+  change?: number;
+  avatar?: string;
 }

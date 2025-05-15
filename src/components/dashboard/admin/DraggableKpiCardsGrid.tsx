@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { DraggableKpiCardsGridProps } from '@/types';
-import DraggableKpiCard from './draggable/DraggableKpiCard';
+import { default as DraggableKpiCard } from './draggable/DraggableKpiCard';
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ 
   kpiCards,

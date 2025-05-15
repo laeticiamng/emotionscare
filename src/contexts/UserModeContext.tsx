@@ -11,12 +11,15 @@ export const UserModeProvider = ({ children }: { children: ReactNode }) => {
     // Normalize b2b_user to B2B-USER, etc. if needed
     let normalizedMode: UserModeType = newMode;
     
-    if (newMode === 'b2b_user' || newMode === 'b2b-user') {
-      normalizedMode = 'B2B-USER';
-    } else if (newMode === 'b2b_admin' || newMode === 'b2b-admin') {
-      normalizedMode = 'B2B-ADMIN';
-    } else if (newMode === 'b2c') {
-      normalizedMode = 'B2C';
+    // Handle different case variations for the user mode
+    if (typeof newMode === 'string') {
+      if (newMode.toLowerCase() === 'b2b_user' || newMode.toLowerCase() === 'b2b-user') {
+        normalizedMode = 'B2B-USER';
+      } else if (newMode.toLowerCase() === 'b2b_admin' || newMode.toLowerCase() === 'b2b-admin') {
+        normalizedMode = 'B2B-ADMIN';
+      } else if (newMode.toLowerCase() === 'b2c') {
+        normalizedMode = 'B2C';
+      }
     }
     
     setMode(normalizedMode);

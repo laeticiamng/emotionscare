@@ -21,13 +21,16 @@ export type {
   UserPreferences,
   UserPreferencesState,
   AuthContextType,
-  InvitationVerificationResult
+  InvitationVerificationResult,
+  DashboardLayout,
+  NotificationPreferences
 } from './user';
 
 // Exports for user mode types
 export type {
   UserModeType,
-  UserModeContextType
+  UserModeContextType,
+  JournalEntry
 } from './types';
 
 // Exports for sidebar types
@@ -94,7 +97,8 @@ export type {
   DashboardStats,
   GamificationData,
   GridPosition,
-  GlobalOverviewTabProps
+  GlobalOverviewTabProps,
+  TeamOverviewProps as DashboardTeamOverviewProps
 } from './dashboard';
 
 // Exports for gamification types
@@ -102,13 +106,9 @@ export type {
   GamificationStats,
   Badge,
   Challenge,
-  Period
+  Period,
+  LeaderboardEntry
 } from './gamification';
-
-// Exports for journal types
-export type {
-  JournalEntry
-} from './types';
 
 // Exports for audio player types
 export type {

@@ -1,105 +1,107 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Clock, Tag, Percent } from 'lucide-react';
 import { VRSessionTemplate } from '@/types';
-import { CheckCircle, Clock3 } from "lucide-react";
 
 interface VRTemplateCardProps {
   template: VRSessionTemplate;
-  onClick?: (template: VRSessionTemplate) => void;
-  className?: string;
-  hideButton?: boolean;
+  onClick?: () => void;
+  selected?: boolean;
+  minimal?: boolean;
 }
 
-const VRTemplateCard: React.FC<VRTemplateCardProps> = ({ 
-  template, 
-  onClick, 
-  className = "",
-  hideButton = false
+const VRTemplateCard: React.FC<VRTemplateCardProps> = ({
+  template,
+  onClick,
+  selected = false,
+  minimal = false
 }) => {
-  const navigate = useNavigate();
-  
-  const handleClick = () => {
-    if (onClick) {
-      onClick(template);
-    } else {
-      navigate(`/vr/templates/${template.id}`);
-    }
+  // Format duration in minutes
+  const formatDuration = (seconds?: number): string => {
+    if (!seconds) return '5 min';
+    const minutes = Math.round(seconds / 60);
+    return `${minutes} min`;
   };
   
-  const formatDuration = (minutes: number) => {
-    if (minutes < 60) {
-      return `${minutes} min`;
-    }
-    
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    
-    if (remainingMinutes === 0) {
-      return `${hours} heure${hours > 1 ? 's' : ''}`;
-    }
-    
-    return `${hours}h ${remainingMinutes}min`;
+  // Safely get template image URL
+  const getImageUrl = (): string => {
+    return template.imageUrl || 
+           template.thumbnailUrl || 
+           template.coverUrl || 
+           template.preview_url ||
+           '/images/vr-template-placeholder.jpg';
   };
   
-  // Use the camelCase property or fallback to snake_case for backward compatibility
-  const completionRate = template.completionRate || template.completion_rate;
+  const cardClasses = `
+    relative cursor-pointer transition-all 
+    ${selected ? 'ring-2 ring-primary' : 'hover:shadow-md'} 
+    ${minimal ? 'p-1' : ''}
+  `;
   
   return (
     <Card 
-      className={`overflow-hidden hover:shadow-md transition-all cursor-pointer ${className}`}
-      onClick={handleClick}
+      className={cardClasses} 
+      onClick={onClick}
     >
-      <div 
-        className="h-32 bg-cover bg-center"
-        style={{ 
-          backgroundImage: `url(${template.preview_url || '/images/vr-banner-bg.jpg'})` 
-        }}
-      >
-        {completionRate ? (
-          <div className="flex items-center gap-1 bg-primary/80 text-primary-foreground px-2 py-1 rounded-br-md text-xs font-medium w-fit">
-            <CheckCircle size={12} />
-            <span>{Math.round(completionRate * 100)}% complété</span>
-          </div>
-        ) : null}
-      </div>
-      
-      <CardContent className="p-4 pt-3">
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="font-medium text-lg line-clamp-1">{template.title}</h3>
-        </div>
-        
-        <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-          <Clock3 size={12} />
-          <span>{formatDuration(template.duration)}</span>
-        </div>
-        
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-3 h-10">
-          {template.description}
-        </p>
-        
-        <div className="flex items-center justify-between mt-auto">
-          {template.emotion && (
-            <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full">
-              {template.emotion}
-            </span>
-          )}
+      <CardContent className={minimal ? 'p-0' : 'p-3'}>
+        <div className="flex gap-3">
+          {/* Template Image */}
+          <div 
+            className={`rounded-md overflow-hidden flex-shrink-0 ${minimal ? 'w-16 h-16' : 'w-24 h-24'}`}
+            style={{
+              backgroundImage: `url(${getImageUrl()})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
           
-          {!hideButton && (
-            <Button 
-              size="sm" 
-              variant="default"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/vr/session/${template.id}`);
-              }}
-            >
-              Démarrer
-            </Button>
-          )}
+          {/* Template Details */}
+          <div className="flex flex-col justify-between flex-grow">
+            <div>
+              <h3 className={`font-medium line-clamp-1 ${minimal ? 'text-sm' : 'text-base'}`}>
+                {template.title}
+              </h3>
+              
+              {!minimal && (
+                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                  {template.description || 'Immersive experience for emotional well-being'}
+                </p>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mt-2">
+              {/* Duration */}
+              <Badge variant="outline" className="text-xs flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatDuration(template.duration)}
+              </Badge>
+              
+              {/* Category/Difficulty */}
+              {!minimal && template.difficulty && (
+                <Badge variant="outline" className="text-xs">
+                  {template.difficulty}
+                </Badge>
+              )}
+              
+              {/* Completion Rate */}
+              {!minimal && (template.completionRate !== undefined || template.completion_rate !== undefined) && (
+                <Badge variant="outline" className="text-xs flex items-center gap-1">
+                  <Percent className="h-3 w-3" />
+                  {template.completionRate || template.completion_rate || 0}% complete
+                </Badge>
+              )}
+              
+              {/* Emotion Tag */}
+              {!minimal && template.emotion && (
+                <Badge className="text-xs bg-primary/20 text-primary flex items-center gap-1">
+                  <Tag className="h-3 w-3" />
+                  {template.emotion}
+                </Badge>
+              )}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

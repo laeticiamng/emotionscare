@@ -1,59 +1,40 @@
 
 import React from 'react';
+import { useTheme } from '@/hooks/use-theme';
+import { Card, CardContent } from '@/components/ui/card';
 
 const ThemeColorExample = () => {
+  const { theme, isDarkMode } = useTheme();
+  
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
-        <div className="h-16 rounded-md bg-primary flex items-center justify-center">
-          <span className="text-primary-foreground font-medium">Primary</span>
-        </div>
-        <div className="h-16 rounded-md bg-secondary flex items-center justify-center">
-          <span className="text-secondary-foreground font-medium">Secondary</span>
-        </div>
-        <div className="h-16 rounded-md bg-accent flex items-center justify-center">
-          <span className="text-accent-foreground font-medium">Accent</span>
-        </div>
-        <div className="h-16 rounded-md bg-muted flex items-center justify-center">
-          <span className="text-muted-foreground font-medium">Muted</span>
-        </div>
+      <h3 className="text-lg font-medium">Current Theme: {theme}</h3>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-2">
+              <div className="h-8 w-full rounded bg-primary"></div>
+              <div className="h-8 w-full rounded bg-secondary"></div>
+              <div className="h-8 w-full rounded bg-accent"></div>
+              <div className="h-8 w-full rounded bg-muted"></div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-primary">Primary Text</p>
+            <p className="text-secondary">Secondary Text</p>
+            <p className="text-accent">Accent Text</p>
+            <p className="text-muted-foreground">Muted Text</p>
+          </CardContent>
+        </Card>
       </div>
       
-      <div className="grid grid-cols-4 gap-2">
-        <div className="h-10 rounded-md bg-success-light flex items-center justify-center">
-          <span className="text-xs">Success Light</span>
-        </div>
-        <div className="h-10 rounded-md bg-success flex items-center justify-center">
-          <span className="text-xs text-white">Success</span>
-        </div>
-        <div className="h-10 rounded-md bg-success-dark flex items-center justify-center">
-          <span className="text-xs text-white">Success Dark</span>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-4 gap-2">
-        <div className="h-10 rounded-md bg-warning-light flex items-center justify-center">
-          <span className="text-xs">Warning Light</span>
-        </div>
-        <div className="h-10 rounded-md bg-warning flex items-center justify-center">
-          <span className="text-xs">Warning</span>
-        </div>
-        <div className="h-10 rounded-md bg-warning-dark flex items-center justify-center">
-          <span className="text-xs text-white">Warning Dark</span>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-4 gap-2">
-        <div className="h-10 rounded-md bg-error-light flex items-center justify-center">
-          <span className="text-xs">Error Light</span>
-        </div>
-        <div className="h-10 rounded-md bg-error flex items-center justify-center">
-          <span className="text-xs text-white">Error</span>
-        </div>
-        <div className="h-10 rounded-md bg-error-dark flex items-center justify-center">
-          <span className="text-xs text-white">Error Dark</span>
-        </div>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        {isDarkMode ? 'Dark mode is active' : 'Light mode is active'}
+      </p>
     </div>
   );
 };
