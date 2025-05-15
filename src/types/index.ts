@@ -27,12 +27,12 @@ export type {
 export type {
   UserModeType,
   UserModeContextType
-} from './types';
+} from './userMode';
 
 // Exports des types liés à la sidebar
 export type {
   SidebarContextType
-} from './types';
+} from './sidebar';
 
 // Exports des types liés à la musique
 export type {
@@ -43,7 +43,8 @@ export type {
   TrackInfoProps,
   ProgressBarProps,
   VolumeControlProps,
-  EmotionMusicParams
+  EmotionMusicParams,
+  Track
 } from './music';
 
 // Exports des types liés aux notifications
@@ -66,7 +67,8 @@ export type {
   VRHistoryListProps,
   VRSessionWithMusicProps,
   VRTemplateGridProps,
-  VRSessionWithMusicPropsType
+  VRSessionWithMusicPropsType,
+  VRSessionHistoryProps
 } from './vr';
 
 // Exports des types liés aux émotions
@@ -87,7 +89,11 @@ export type {
   DashboardShortcut,
   ChartData,
   DashboardStats,
-  GamificationData
+  GamificationData,
+  GridPosition,
+  GlobalOverviewTabProps,
+  KpiCardProps,
+  DraggableKpiCardsGridProps
 } from './dashboard';
 
 // Exports des types liés à la gamification
@@ -222,10 +228,3 @@ export interface InvitationFormData {
   expires_in_days: number;
 }
 
-// Fix for GridPosition in admin components
-export interface GridPosition {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}

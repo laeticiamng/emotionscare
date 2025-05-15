@@ -2,9 +2,9 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicProps } from '@/types';
+import { VRSessionWithMusicPropsType } from '@/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
+const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
   template, 
   onComplete, 
   session, 
@@ -24,7 +24,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   // with fallback to 'calm'
   const targetEmotion = emotion || (
     // Check if emotion property exists before trying to access it
-    activeTemplate?.emotionTarget || 'calm'
+    activeTemplate?.emotionTarget || activeTemplate?.emotion_target || activeTemplate?.emotion || 'calm'
   );
   
   const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
@@ -41,8 +41,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
             const track = {
               ...playlist.tracks[0],
               duration: playlist.tracks[0].duration || 0,
-              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
-              audioUrl: playlist.tracks[0].audioUrl || ''
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || '',
+              audioUrl: playlist.tracks[0].audioUrl || playlist.tracks[0].audio_url || ''
             };
             playTrack(track);
           }

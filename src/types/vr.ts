@@ -7,6 +7,8 @@ export interface VRSessionTemplate {
   description: string;
   thumbnailUrl: string;
   thumbnail?: string; // Pour compatibilité
+  imageUrl?: string; // Pour compatibilité
+  preview_url?: string; // Pour compatibilité
   duration: number;
   category: string;
   tags: string[];
@@ -19,15 +21,15 @@ export interface VRSessionTemplate {
   popularity?: number;
   difficulty?: string;
   intensity?: number;
-  imageUrl?: string;
-  preview_url?: string;
-  is_audio_only?: boolean;
-  audio_url?: string;
   audioUrl?: string;
+  audio_url?: string; // Pour compatibilité
   benefits?: string[];
   theme?: string;
   emotion?: string;
   lastUsed?: string | Date;
+  videoUrl?: string;
+  is_audio_only?: boolean;
+  isAudioOnly?: boolean;
 }
 
 export interface VRSession {
@@ -69,6 +71,12 @@ export interface VRHistoryListProps {
   title?: string;
   emptyMessage?: string;
   className?: string;
+}
+
+export interface VRSessionHistoryProps {
+  sessions: VRSession[];
+  templates?: VRSessionTemplate[];
+  onSelectSession?: (session: VRSession) => void;
 }
 
 export interface VRSessionWithMusicProps {

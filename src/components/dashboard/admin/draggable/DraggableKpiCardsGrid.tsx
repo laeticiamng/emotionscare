@@ -1,108 +1,46 @@
 
-import React, { useState } from 'react';
-import { 
-  DndContext, 
-  closestCenter, 
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
-  sortableKeyboardCoordinates,
-  rectSortingStrategy
-} from '@dnd-kit/sortable';
-import { DraggableKpiCard } from './DraggableKpiCard';
-import { DashboardWidgetConfig } from '@/types/dashboard';
-import { DashboardStats, GamificationData } from '../tabs/overview/types';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { KpiCardProps } from '@/types';
 
 interface DraggableKpiCardsGridProps {
-  widgets: DashboardWidgetConfig[];
-  onWidgetsChange?: (widgets: DashboardWidgetConfig[]) => void;
-  className?: string;
-  editable?: boolean;
-  dashboardStats?: DashboardStats;
-  gamificationData?: GamificationData;
+  kpiCards: KpiCardProps[];
 }
 
-const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
-  widgets,
-  onWidgetsChange,
-  className = '',
-  editable = true,
-  dashboardStats,
-  gamificationData
-}) => {
-  const [items, setItems] = useState<DashboardWidgetConfig[]>(widgets);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    
-    if (!over || active.id === over.id) {
-      return;
-    }
-
-    setItems((currentItems) => {
-      const oldIndex = currentItems.findIndex(item => item.id === active.id);
-      const newIndex = currentItems.findIndex(item => item.id === over.id);
-      
-      const newItems = arrayMove(currentItems, oldIndex, newIndex);
-      
-      // Call the callback if provided
-      if (onWidgetsChange) {
-        onWidgetsChange(newItems);
-      }
-      
-      return newItems;
-    });
-  }
-
-  // Pass the dashboardStats and gamificationData to each card that might need them
-  const getCardProps = (widget: DashboardWidgetConfig) => {
-    let props: any = { widget };
-
-    if (dashboardStats && widget.type.includes('dashboard-stats')) {
-      props.dashboardStats = dashboardStats;
-    }
-    
-    if (gamificationData && widget.type.includes('gamification')) {
-      props.gamificationData = gamificationData;
-    }
-
-    return props;
-  };
-
+const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ kpiCards }) => {
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={items.map(item => item.id)} strategy={rectSortingStrategy}>
-          {items.map((widget) => (
-            <DraggableKpiCard
-              key={widget.id}
-              {...getCardProps(widget)}
-              editable={editable}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {kpiCards.map((card) => (
+        <Card key={card.id} className="hover:shadow-md transition-shadow">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {card.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold">{card.value}</div>
+                {card.delta && (
+                  <p className={`text-xs ${
+                    card.delta.trend === 'up' 
+                      ? 'text-green-600' 
+                      : card.delta.trend === 'down' 
+                        ? 'text-red-600' 
+                        : 'text-gray-500'
+                  }`}>
+                    {card.delta.value > 0 ? '+' : ''}{card.delta.value}%
+                    {card.delta.label && ` ${card.delta.label}`}
+                  </p>
+                )}
+              </div>
+              <div className="p-2 rounded-md bg-primary/10">
+                <card.icon className="h-5 w-5 text-primary" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
