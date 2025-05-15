@@ -1,87 +1,76 @@
 
-import { UserRole } from '@/types/types';
+import { UserRole } from '@/types/auth';
+import { ROUTES } from '@/types/navigation';
 
-export const getRoleName = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-      return 'Administrateur';
-    case 'manager':
-      return 'Manager';
-    case 'wellbeing_manager':
-      return 'Responsable bien-être';
-    case 'coach':
-      return 'Coach';
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return 'Admin B2B';
-    case 'b2b_user':
-    case 'b2b-user':
-      return 'Utilisateur B2B';
-    case 'team':
-      return 'Équipe';
-    case 'employee':
-      return 'Employé';
-    case 'personal':
-      return 'Personnel';
-    case 'b2c':
-    case 'user':
-    default:
-      return 'Utilisateur';
-  }
-};
-
-export const isAdminRole = (role: UserRole): boolean => {
-  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin';
-};
-
-export const isManagerRole = (role: UserRole): boolean => {
-  return role === 'manager' || role === 'wellbeing_manager';
-};
-
-export const canManageUsers = (role: UserRole): boolean => {
-  return isAdminRole(role) || isManagerRole(role);
-};
-
-export const canViewReports = (role: UserRole): boolean => {
-  return isAdminRole(role) || isManagerRole(role) || role === 'coach';
-};
-
+/**
+ * Checks if a user role has access to a protected resource
+ */
 export const hasRoleAccess = (userRole: UserRole, allowedRoles: UserRole[]): boolean => {
+  // Allow admin access to all routes
+  if (userRole === 'admin') return true;
+
+  // For B2B roles, check for exact match or check if both are B2B types
+  if (userRole.startsWith('b2b') && allowedRoles.some(role => role.startsWith('b2b'))) {
+    return true;
+  }
+
+  // Direct role match
   return allowedRoles.includes(userRole);
 };
 
+/**
+ * Gets the appropriate login path for a given role
+ */
 export const getRoleLoginPath = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return '/admin/login';
-    default:
-      return '/login';
+  console.log("Getting login path for role:", role);
+  
+  if (role === 'b2c' || role === 'user' || role === 'individual') {
+    return ROUTES.b2c.login;
   }
+  
+  if (role.includes('admin') || role === 'wellbeing_manager' || role === 'manager') {
+    return ROUTES.b2bAdmin.login;
+  }
+  
+  if (role.includes('b2b') || role === 'employee' || role === 'professional') {
+    return ROUTES.b2bUser.login;
+  }
+  
+  // Default path
+  return '/';
 };
 
+/**
+ * Gets the home path for a given role after successful login
+ */
 export const getRoleHomePath = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return '/admin/dashboard';
-    case 'manager':
-    case 'wellbeing_manager':
-      return '/manager/dashboard';
-    default:
-      return '/dashboard';
+  console.log("Getting home path for role:", role);
+  
+  if (role === 'b2c' || role === 'user' || role === 'individual') {
+    return ROUTES.b2c.dashboard;
   }
+  
+  if (role.includes('admin') || role === 'wellbeing_manager' || role === 'manager') {
+    return ROUTES.b2bAdmin.dashboard;
+  }
+  
+  if (role.includes('b2b') || role === 'employee' || role === 'professional') {
+    return ROUTES.b2bUser.dashboard;
+  }
+  
+  // Default path
+  return '/';
 };
 
-export default {
-  getRoleName,
-  isAdminRole,
-  isManagerRole,
-  canManageUsers,
-  canViewReports,
-  hasRoleAccess,
-  getRoleLoginPath,
-  getRoleHomePath
+/**
+ * Normalizes roles to ensure consistent checking
+ */
+export const normalizeRole = (role: string): UserRole => {
+  role = role.toLowerCase();
+  
+  if (role === 'b2b-admin' || role === 'b2b_admin') return 'b2b_admin';
+  if (role === 'b2b-user' || role === 'b2b_user' || role === 'b2b-collaborator') return 'b2b_user';
+  if (role === 'b2c' || role === 'individual' || role === 'user') return 'b2c';
+  
+  return role as UserRole;
 };

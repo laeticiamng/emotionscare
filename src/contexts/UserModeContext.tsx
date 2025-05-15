@@ -26,6 +26,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   
   // Function to update both state and localStorage
   const setUserMode = (newMode: UserModeType) => {
+    console.log("Setting user mode to:", newMode);
     setUserModeState(newMode);
     setStoredMode(newMode);
   };
@@ -33,9 +34,13 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Sync state with localStorage on mount
   useEffect(() => {
     const savedMode = localStorage.getItem('userMode');
-    if (savedMode && (savedMode === 'b2c' || savedMode === 'b2b')) {
-      setMode(savedMode as UserModeType);
-      setUserModeState(savedMode as UserModeType);
+    console.log("Retrieved user mode from localStorage:", savedMode);
+    
+    if (savedMode) {
+      const normalizedMode = savedMode as UserModeType;
+      setMode(normalizedMode);
+      setUserModeState(normalizedMode);
+      console.log("User mode set to:", normalizedMode);
     }
   }, []);
 

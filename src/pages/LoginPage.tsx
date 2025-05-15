@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,15 +16,26 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { setUserMode } = useUserMode();
+  const { userMode, setUserMode } = useUserMode();
+
+  useEffect(() => {
+    // Check if a userMode is already set
+    const savedMode = localStorage.getItem('userMode');
+    if (savedMode && savedMode !== userMode) {
+      setUserMode(savedMode as any);
+      console.log("Updated user mode from localStorage:", savedMode);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
+      console.log(`Login attempt: ${email}`);
+      
       // Check if this is our test user
-      if (email === 'user@exemple.fr' && password === 'admin') {
+      if (email === 'utilisateur@exemple.fr' && password === 'admin') {
         // Save test session
         localStorage.setItem('auth_session', 'mock_token_user');
         localStorage.setItem('user_role', 'b2c');
@@ -38,35 +49,35 @@ const LoginPage = () => {
           description: "Bienvenue dans votre espace personnel",
         });
         
-        navigate('/dashboard');
+        navigate('/b2c/dashboard');
       } else if (email === 'admin@exemple.fr' && password === 'admin') {
         // Admin test account
         localStorage.setItem('auth_session', 'mock_token_admin');
-        localStorage.setItem('user_role', 'b2b-admin');
+        localStorage.setItem('user_role', 'b2b_admin');
         
-        setUserMode('b2b-admin');
-        localStorage.setItem('userMode', 'b2b-admin');
+        setUserMode('b2b_admin');
+        localStorage.setItem('userMode', 'b2b_admin');
         
         toast({
           title: "Connexion administrateur réussie",
           description: "Bienvenue dans votre espace d'administration",
         });
         
-        navigate('/admin/dashboard');
+        navigate('/b2b/admin/dashboard');
       } else if (email === 'collaborateur@exemple.fr' && password === 'admin') {
         // Collaborator test account
         localStorage.setItem('auth_session', 'mock_token_collaborateur');
-        localStorage.setItem('user_role', 'b2b-collaborator');
+        localStorage.setItem('user_role', 'b2b_user');
         
-        setUserMode('b2b-collaborator');
-        localStorage.setItem('userMode', 'b2b-collaborator');
+        setUserMode('b2b_user');
+        localStorage.setItem('userMode', 'b2b_user');
         
         toast({
           title: "Connexion collaborateur réussie",
           description: "Bienvenue dans votre espace collaborateur",
         });
         
-        navigate('/dashboard');
+        navigate('/b2b/user/dashboard');
       } else {
         // Simulate login error
         throw new Error("Identifiants invalides");
@@ -90,7 +101,7 @@ const LoginPage = () => {
             <div className="mx-auto bg-blue-100 dark:bg-blue-900/30 w-14 h-14 rounded-full flex items-center justify-center mb-4">
               <User className="h-7 w-7 text-blue-600 dark:text-blue-400" />
             </div>
-            <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
+            <CardTitle className="text-2xl">Connexion {userMode === 'b2c' ? 'Particulier' : 'Entreprise'}</CardTitle>
             <CardDescription>
               Accédez à votre espace personnel de bien-être
             </CardDescription>
@@ -120,7 +131,10 @@ const LoginPage = () => {
                 />
               </div>
               <div className="text-sm text-muted-foreground">
-                <p>Compte test: user@exemple.fr / admin</p>
+                <p>Comptes test:</p>
+                <p>- Particulier: utilisateur@exemple.fr / admin</p>
+                <p>- Admin: admin@exemple.fr / admin</p>
+                <p>- Collaborateur: collaborateur@exemple.fr / admin</p>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
