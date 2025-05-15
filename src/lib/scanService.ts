@@ -32,6 +32,91 @@ export async function analyzeAudioStream(audioBlob: Blob): Promise<EmotionResult
   }
 }
 
+// Export the analyzeEmotion function that's being imported by components
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  try {
+    console.log('Analyzing emotion from text:', text);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    return {
+      id: crypto.randomUUID(),
+      emotion: ['joy', 'calm', 'focus', 'anxiety', 'excitement'][Math.floor(Math.random() * 5)],
+      confidence: Math.random() * 0.5 + 0.5, // 0.5-1.0
+      score: Math.floor(Math.random() * 100),
+      intensity: Math.random() * 0.8 + 0.2, // 0.2-1.0
+      text: text,
+      ai_feedback: "Votre texte révèle des émotions intéressantes. Continuez à explorer.",
+      recommendations: [
+        "Essayez de noter quand ces émotions apparaissent dans votre journée",
+        "Pratiquez la pleine conscience pour mieux les observer"
+      ]
+    };
+  } catch (error) {
+    console.error('Error analyzing emotion from text:', error);
+    throw new Error('Failed to analyze emotion');
+  }
+};
+
+// Add the saveEmotion function
+export const saveEmotion = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
+  try {
+    console.log('Saving emotion data:', emotionData);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    return {
+      id: emotionData.id || crypto.randomUUID(),
+      emotion: emotionData.emotion || 'neutral',
+      confidence: emotionData.confidence || 0.7,
+      score: emotionData.score || 50,
+      intensity: emotionData.intensity || 0.5,
+      text: emotionData.text || '',
+      timestamp: new Date().toISOString(),
+      // Include any other properties
+      ...emotionData
+    };
+  } catch (error) {
+    console.error('Error saving emotion:', error);
+    throw new Error('Failed to save emotion data');
+  }
+};
+
+// Add the fetchEmotionHistory function
+export const fetchEmotionHistory = async (userId: string, limit = 10): Promise<EmotionResult[]> => {
+  try {
+    console.log('Fetching emotion history for user:', userId, 'limit:', limit);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    // Generate mock data
+    const history: EmotionResult[] = Array.from({ length: limit }).map((_, index) => {
+      const date = new Date();
+      date.setDate(date.getDate() - index);
+      
+      return {
+        id: `emotion-${Date.now() - index * 86400000}`,
+        user_id: userId,
+        emotion: ['joy', 'calm', 'focus', 'anxiety', 'excitement'][Math.floor(Math.random() * 5)],
+        confidence: Math.random() * 0.5 + 0.5,
+        score: Math.floor(Math.random() * 100),
+        intensity: Math.random() * 0.8 + 0.2,
+        text: "Journal entry for emotion tracking",
+        date: date.toISOString(),
+        ai_feedback: "Analysis of your emotional patterns shows interesting trends."
+      };
+    });
+    
+    return history;
+  } catch (error) {
+    console.error('Error fetching emotion history:', error);
+    return [];
+  }
+};
+
 // Create emotion entry in the database
 export async function createEmotionEntry(data: {
   user_id: string;

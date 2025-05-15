@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 
@@ -275,7 +274,7 @@ export interface VRSessionTemplate {
   thumbnail?: string;
   videoUrl?: string;
   emotion?: string;
-  emotionTarget?: string; // Added this property
+  emotionTarget?: string; // Adding this explicitly
   audioUrl?: string;
   lastUsed?: string | Date;
   previewUrl?: string;
@@ -289,6 +288,7 @@ export interface VRSessionTemplate {
   recommendedMood?: string;
   category?: string; // Added to fix errors
   emotions?: string[]; // Added to fix errors
+  intensity?: number; // Added for VR service
   // For backward compatibility
   emotion_target?: string;
   preview_url?: string;
@@ -404,7 +404,10 @@ export interface GamificationStats {
     date: string;
     points: number;
   }[];
-  nextLevel?: number;
+  nextLevel?: number | {
+    points: number;
+    rewards: string[];
+  };
   pointsToNextLevel?: number;
   nextLevelPoints?: number;
   challenges?: Challenge[];
@@ -422,7 +425,9 @@ export interface GamificationStats {
     longest: number;
     lastActivity: string;
   };
-  rewards?: string[]; // Added to fix errors
+  rewards?: string[];
+  progress?: number; // Added for gamificationService
+  achievements?: any[]; // Added for gamificationService
 }
 
 export interface Badge {

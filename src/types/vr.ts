@@ -7,3 +7,9 @@ export type {
   VRSessionWithMusicProps,
   VRTemplateGridProps
 } from './types';
+
+// Define additional interface for VRSessionTemplate with emotionTarget
+export interface VRSessionWithTarget extends VRSessionTemplate {
+  emotionTarget?: string;
+  emotion_target?: string;
+}

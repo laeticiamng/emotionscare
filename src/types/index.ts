@@ -75,3 +75,6 @@ export type {
   ThemeName,
   EmotionalData
 } from './types';
+
+// Add missing export for EmotionMusicParams
+export type { EmotionMusicParams } from './types';
