@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { UserPreferences, NotificationPreferences } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
-import NotificationPreferences as NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
+import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
 import DataPrivacySettings from '@/components/preferences/DataPrivacySettings';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
