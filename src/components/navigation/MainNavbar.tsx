@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -36,7 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNotificationBadge } from "@/hooks/useNotificationBadge";
 import { motion } from "framer-motion";
 import { useUserMode } from '@/contexts/UserModeContext';
-import { getRoleHomePath, getRoleName } from '@/utils/roleUtils';
+import { normalizeRole, getRoleName, getRoleHomePath } from '@/utils/roleUtils';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -46,7 +45,9 @@ const MainNavbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const isAdmin = userMode === 'b2b-admin';
+  const normalizedUserMode = userMode ? normalizeRole(userMode) : '';
+
+  const isAdmin = normalizedUserMode === 'b2b_admin';
   
   const getNavItems = () => {
     if (isAdmin) {
@@ -59,7 +60,7 @@ const MainNavbar: React.FC = () => {
       ];
     }
     
-    if (userMode === 'b2b-user') {
+    if (normalizedUserMode === 'b2b_user') {
       return [
         { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2b/user/dashboard" },
         { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: "/b2b/user/scan" },

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy } from 'lucide-react';
@@ -42,8 +41,8 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({
           <div>
             <h4 className="text-sm font-medium mb-2">Distribution des badges</h4>
             <div className="space-y-2">
-              {badgeLevels.map((level) => (
-                <div key={level.level} className="bg-muted/20 rounded-md p-2 flex justify-between">
+              {stats.badgeLevels && Array.isArray(stats.badgeLevels) && stats.badgeLevels.map((level, index) => (
+                <div key={index} className="bg-muted/20 rounded-md p-2 flex justify-between">
                   <div className="text-sm">{level.level}</div>
                   <div className="text-sm font-medium">{level.count}</div>
                 </div>
@@ -54,10 +53,12 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({
           <div>
             <h4 className="text-sm font-medium mb-2">Défis populaires</h4>
             <div className="space-y-2">
-              {topChallenges.map((challenge) => (
-                <div key={challenge.name} className="bg-muted/20 rounded-md p-2 flex justify-between">
-                  <div className="text-sm">{challenge.name}</div>
-                  <div className="text-sm font-medium">{challenge.completions}</div>
+              {stats.topChallenges && Array.isArray(stats.topChallenges) && stats.topChallenges.map((challenge, index) => (
+                <div key={index} className="flex justify-between items-center mb-2">
+                  <span className="font-medium">{challenge.name || challenge.title}</span>
+                  <div className="text-sm text-muted-foreground">
+                    {challenge.completions || 0} complétions
+                  </div>
                 </div>
               ))}
             </div>

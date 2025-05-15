@@ -1,76 +1,79 @@
+import { LeaderboardEntry, Badge } from '@/types/gamification';
 
-import { Badge, Challenge, LeaderboardEntry } from '@/types';
-
-// Mock leaderboard data
-export const mockLeaderboard: LeaderboardEntry[] = [
+const leaderboardEntries: LeaderboardEntry[] = [
   {
     id: '1',
-    user_id: 'user-1',
-    name: 'Sophie Martin',
-    points: 1250,
+    userId: 'user1',
+    score: 1850,
     rank: 1,
-    avatar: '/avatars/avatar-1.png',
-    department: 'Marketing',
-    trend: 'same',
-    previousRank: 1
+    name: 'Sophie Martin',
+    avatarUrl: '/images/avatars/avatar-1.png',
+    points: 1850,  // Already acceptable due to our type changes
+    level: 8,
+    progress: 75
   },
   {
     id: '2',
-    user_id: 'user-2',
-    name: 'Thomas Bernard',
-    points: 980,
+    userId: 'user2',
+    score: 1720,
     rank: 2,
-    avatar: '/avatars/avatar-2.png',
-    department: 'Design',
-    trend: 'up',
-    previousRank: 4
+    name: 'Antoine Dubois',
+    avatarUrl: '/images/avatars/avatar-2.png',
+    points: 1720,  // Already acceptable due to our type changes
+    level: 7,
+    progress: 90
   },
   {
     id: '3',
-    user_id: 'user-3',
-    name: 'Marie Dubois',
-    points: 920,
+    userId: 'user3',
+    score: 1680,
     rank: 3,
-    avatar: '/avatars/avatar-3.png',
-    department: 'Engineering',
-    trend: 'down',
-    previousRank: 2
-  }
+    name: 'Chloé Leclerc',
+    avatarUrl: '/images/avatars/avatar-3.png',
+    points: 1680,  // Already acceptable due to our type changes
+    level: 7,
+    progress: 60
+  },
 ];
 
-// Mock badges
-export const mockBadges: Badge[] = [
+// Fix string values that should be numbers
+const badges = [
   {
     id: '1',
-    name: 'Première Connexion',
-    description: 'Bienvenue dans l\'application !',
-    icon: 'award',
-    level: 'Bronze',
+    name: 'First Week',
+    description: 'Completed your first week of emotional tracking',
+    icon: 'star',
+    level: 1,
+    earnedDate: '2023-04-15',
     progress: 100,
-    total: 100
+    total: 100,
+    unlocked: true,
+    threshold: 7  // Change to number if it was a string
   },
   {
     id: '2',
-    name: 'Streak Hebdomadaire',
-    description: 'Connecté 7 jours d\'affilée',
-    icon: 'flame',
-    level: 'Silver',
-    progress: 5,
-    total: 7
+    name: 'Mood Master',
+    description: 'Tracked your mood for 30 consecutive days',
+    icon: 'heart',
+    level: 2,
+    earnedDate: '2023-05-01',
+    progress: 100,
+    total: 100,
+    unlocked: true,
+    threshold: 30  // Change to number if it was a string
   },
   {
     id: '3',
-    name: 'Gourou du Bien-être',
-    description: 'Complété 10 sessions de méditation',
-    icon: 'lotus',
-    level: 'Gold',
-    progress: 8,
-    total: 10
-  }
+    name: 'Challenge Champion',
+    description: 'Completed 10 challenges',
+    icon: 'check',
+    level: 3,
+    earnedDate: '2023-05-10',
+    progress: 100,
+    total: 100,
+    unlocked: true,
+    threshold: 10  // Change to number if it was a string
+  },
 ];
 
-// Export default for consistency
-export default {
-  mockLeaderboard,
-  mockBadges
-};
+export { leaderboardEntries, badges };

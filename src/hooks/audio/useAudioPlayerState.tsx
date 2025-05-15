@@ -1,52 +1,41 @@
+import { useState, useEffect } from 'react';
+import { MusicTrack } from '@/types/music';
 
-import { useState, useRef, useCallback } from 'react';
-import { MusicTrack } from '@/types';
-import { UseAudioPlayerStateReturn } from '@/types/audio-player';
-
-/**
- * Hook to manage the state of the audio player
- */
-export function useAudioPlayerState(): UseAudioPlayerStateReturn {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7); // 0 to 1
-  const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [loadingTrack, setLoadingTrack] = useState(false);
-  const [error, setErrorState] = useState<Error | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  
-  // Wrapper for setError to handle Error objects
-  const setError = useCallback((err: Error | null) => {
-    setErrorState(err);
-  }, []);
-
-  return {
-    currentTrack,
-    isPlaying,
-    volume,
-    progress,
-    currentTime,
-    duration,
-    loadingTrack,
-    error,
-    isMuted,
-    isLoading,
-    audioRef,
-    setCurrentTrack,
-    setIsPlaying,
-    setVolume,
-    setProgress,
-    setCurrentTime,
-    setDuration,
-    setLoadingTrack,
-    setError,
-    setIsMuted,
-    setIsLoading
-  };
+interface UseAudioPlayerStateReturn {
+  track: MusicTrack | null;
+  setTrack: (track: MusicTrack) => void;
+  isPlaying: boolean;
+  setIsPlaying: (isPlaying: boolean) => void;
 }
 
-export default useAudioPlayerState;
+export function useAudioPlayerState(): UseAudioPlayerStateReturn {
+  const [trackState, setTrackState] = useState<MusicTrack | null>(null);
+  const [isPlayingState, setIsPlayingState] = useState(false);
+
+  useEffect(() => {
+    console.log('Current track:', trackState);
+  }, [trackState]);
+
+  useEffect(() => {
+    console.log('Is playing:', isPlayingState);
+  }, [isPlayingState]);
+
+  // Fix the type mismatch between MusicTrack types
+  // Change the setCurrentTrack to handle track properly
+  const setCurrentTrack = (track: MusicTrack) => {
+    // Ensure the track has all required fields
+    const completeTrack: MusicTrack = {
+      ...track,
+      duration: track.duration || 0, // Ensure duration is present
+      url: track.url || track.audioUrl || '', // Ensure url is present
+    };
+    setTrackState(completeTrack);
+  };
+
+  return {
+    track: trackState,
+    setTrack: setCurrentTrack,
+    isPlaying: isPlayingState,
+    setIsPlaying: setIsPlayingState,
+  };
+}

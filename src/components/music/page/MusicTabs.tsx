@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LibraryTab from './LibraryTab';
@@ -10,12 +9,13 @@ const MusicTabs: React.FC = () => {
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   
   // Mock data for demonstration
-  const playlists: MusicPlaylist[] = [
+  const demoPlaylists: MusicPlaylist[] = [
     {
-      id: '1',
-      name: 'Relaxation profonde',
-      description: 'Sons relaxants pour la méditation',
-      category: 'Relaxation',
+      id: "playlist1",
+      title: "Relaxation",  // Add title property
+      name: "Relaxation",
+      description: "Playlists pour se détendre",
+      category: "relax",
       tracks: [
         {
           id: '101',
@@ -60,7 +60,7 @@ const MusicTabs: React.FC = () => {
       
       <TabsContent value="library">
         <LibraryTab 
-          playlists={playlists}
+          playlists={demoPlaylists}
           onSelectTrack={handleSelectTrack}
           onSelectPlaylist={handleSelectPlaylist}
         />

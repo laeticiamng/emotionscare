@@ -1,10 +1,11 @@
+
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
   url: string;
   coverUrl: string;
-  duration?: number;
+  duration: number;
   emotion?: string | string[];
   intensity?: number;
   tempo?: number;

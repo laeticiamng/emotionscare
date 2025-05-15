@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -33,7 +32,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
   isLoading = false
 }) => {
   // Create gamification data with all required properties
-  const gamificationData: GamificationStats = {
+  const stats: GamificationStats = {
     // Required base properties from GamificationStats
     points: 0,
     level: 1,
@@ -46,14 +45,35 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
     activeUsersPercent: 68,
     totalBadges: 24,
     badgeLevels: [
-      { level: 'Bronze', count: 14 },
-      { level: 'Argent', count: 7 },
-      { level: 'Or', count: 3 }
+      { level: "Bronze", count: 120 },
+      { level: "Silver", count: 68 },
+      { level: "Gold", count: 23 }
     ],
     topChallenges: [
-      { name: 'Check-in quotidien', completions: 156 },
-      { name: 'Partage d\'expérience', completions: 87 },
-      { name: 'Lecture bien-être', completions: 63 }
+      { 
+        id: "challenge-1", 
+        name: "Méditation quotidienne", 
+        completions: 89,
+        description: "Méditez tous les jours pendant une semaine",
+        points: 100,
+        completed: false
+      },
+      { 
+        id: "challenge-2", 
+        name: "Journal émotionnel", 
+        completions: 76,
+        description: "Complétez votre journal pendant 5 jours consécutifs",
+        points: 150,
+        completed: false
+      },
+      { 
+        id: "challenge-3", 
+        name: "Scan émotionnel", 
+        completions: 45,
+        description: "Effectuez 3 scans émotionnels en une semaine",
+        points: 120,
+        completed: false
+      }
     ],
     
     // Optional properties
@@ -123,7 +143,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
           absenteeismChartData={absenteeismData}
           emotionalScoreTrend={emotionalScoreTrend}
           dashboardStats={compatibleStats}
-          gamificationData={gamificationData}
+          gamificationData={stats}
           isLoading={isLoading}
           kpiCards={[]}
         />
@@ -142,7 +162,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
       </TabsContent>
       
       <TabsContent value="gamification" className="mt-0">
-        <GamificationTab gamificationData={gamificationData} isLoading={isLoading} />
+        <GamificationTab gamificationData={stats} isLoading={isLoading} />
       </TabsContent>
       
       <TabsContent value="evenements" className="mt-0">

@@ -101,3 +101,21 @@ export const getRoleName = (role: UserRole): string => {
       return role;
   }
 };
+
+/**
+ * Get the home path for a specific role
+ */
+export const getRoleHomePath = (role: UserRole): string => {
+  const normalizedRole = normalizeRole(role);
+  
+  switch (normalizedRole) {
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2c':
+      return '/b2c/dashboard';
+    default:
+      return '/';
+  }
+};

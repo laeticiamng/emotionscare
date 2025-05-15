@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
@@ -37,15 +36,14 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {topChallenges.map((challenge, i) => (
-              <div key={i} className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="bg-pastel-green/30 w-8 h-8 rounded-full flex items-center justify-center mr-3">
-                    {i + 1}
-                  </div>
-                  <span>{challenge.name}</span>
-                </div>
-                <span className="font-medium">{challenge.completions} complétions</span>
+            {topChallenges.map((challenge, index) => (
+              <div key={index} className="flex items-center justify-between mb-2">
+                <span className="font-medium">
+                  {challenge.name || challenge.title}
+                </span>
+                <span className="text-muted-foreground">
+                  {challenge.completions || 0} complétions
+                </span>
               </div>
             ))}
           </div>
@@ -59,12 +57,12 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
         </CardHeader>
         <CardContent className="h-60 flex items-center justify-center">
           <div className="bg-white/80 rounded-xl p-6 w-full h-full flex items-center justify-around">
-            {badgeLevels.map((level, i) => (
-              <div key={i} className="flex flex-col items-center">
+            {Array.isArray(badgeLevels) && badgeLevels.map((level, index) => (
+              <div key={index} className="flex flex-col items-center">
                 <div 
                   className={`w-24 h-24 rounded-full flex items-center justify-center mb-3 ${
-                    i === 0 ? 'bg-amber-100 text-amber-800' :
-                    i === 1 ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800'
+                    index === 0 ? 'bg-amber-100 text-amber-800' :
+                    index === 1 ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800'
                   }`}
                 >
                   <Trophy size={48} />

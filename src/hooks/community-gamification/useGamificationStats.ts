@@ -1,26 +1,30 @@
-
 import { useState, useEffect } from 'react';
 import { GamificationStats } from '@/types';
 
 export const useGamificationStats = (userId?: string) => {
   const [stats, setStats] = useState<GamificationStats>({
-    points: 850,
+    points: 450,
     level: 3,
+    progress: 65,  // Add missing required properties
     badges: [],
+    challenges: [],
+    achievements: [],
+    leaderboard: [],
     streak: 5,
-    completedChallenges: 4,
-    totalChallenges: 10,
-    rank: '42',
-    activeChallenges: 6,
+    nextLevelPoints: 500,
+    completedChallenges: 8,
+    totalChallenges: 12,
+    rank: 'Silver',
+    activeChallenges: 4,
     streakDays: 5,
-    nextLevelPoints: 150,
-    progressToNextLevel: 70,
+    pointsToNextLevel: 50,
+    progressToNextLevel: 65,
     badgesCount: 12,
     nextLevel: {
-      points: 1000,
-      rewards: ['Badge Spécial', 'Points bonus']
+      points: 500,
+      rewards: ['New Badge', 'Feature Unlock']
     },
-    lastActivityDate: new Date().toISOString()
+    lastActivityDate: '2023-05-01'
   });
   
   const [loading, setLoading] = useState(true);

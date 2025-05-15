@@ -1,109 +1,111 @@
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
-
-// Mock music tracks
 export const mockTracks: MusicTrack[] = [
   {
     id: '1',
-    title: 'Méditation Guidée',
-    artist: 'Sarah Mindful',
-    duration: 600, // 10 minutes
-    coverUrl: '/images/music/meditation.jpg',
-    audioUrl: '/audio/meditation-guided.mp3',
-    category: 'Méditation',
-    mood: ['calm', 'peaceful']
+    title: 'Calm Waters',
+    artist: 'Ocean Sounds',
+    url: '/audio/calm-waters.mp3',
+    coverUrl: '/images/covers/calm-waters.jpg',
+    duration: 180,
+    emotion: 'calm',
+    genre: 'ambient',  // Change to string instead of array
+    category: 'relaxation'
   },
   {
     id: '2',
-    title: 'Respiration profonde',
-    artist: 'Zen Master',
-    duration: 300, // 5 minutes
-    coverUrl: '/images/music/breathing.jpg',
-    audioUrl: '/audio/deep-breathing.mp3',
-    category: 'Respiration',
-    mood: ['anxious', 'stressed']
+    title: 'Morning Meditation',
+    artist: 'Zen Masters',
+    url: '/audio/morning-meditation.mp3',
+    coverUrl: '/images/covers/morning-meditation.jpg',
+    duration: 240,
+    emotion: 'peaceful',
+    genre: 'meditation',  // Change to string instead of array
+    category: 'focus'
   },
   {
     id: '3',
-    title: 'Sommeil réparateur',
-    artist: 'Night Harmony',
-    duration: 1800, // 30 minutes
-    coverUrl: '/images/music/sleep.jpg',
-    audioUrl: '/audio/sleep-aid.mp3',
-    category: 'Sommeil',
-    mood: ['tired', 'peaceful']
+    title: 'Uplifting Piano',
+    artist: 'Emily Carter',
+    url: '/audio/uplifting-piano.mp3',
+    coverUrl: '/images/covers/uplifting-piano.jpg',
+    duration: 210,
+    emotion: 'joyful',
+    genre: 'classical',  // Change to string instead of array
+    category: 'motivation'
   },
   {
     id: '4',
-    title: 'Focus & Concentration',
-    artist: 'Mind Clarity',
-    duration: 1200, // 20 minutes
-    coverUrl: '/images/music/focus.jpg',
-    audioUrl: '/audio/deep-focus.mp3',
-    category: 'Productivité',
-    mood: ['focused', 'creative']
+    title: 'Forest Walk',
+    artist: 'Nature Collective',
+    url: '/audio/forest-walk.mp3',
+    coverUrl: '/images/covers/forest-walk.jpg',
+    duration: 300,
+    emotion: 'serene',
+    genre: 'nature',  // Change to string instead of array
+    category: 'relaxation'
   },
   {
     id: '5',
-    title: 'Relaxation Profonde',
-    artist: 'Ocean Waves',
-    duration: 1500, // 25 minutes
-    coverUrl: '/images/music/relax.jpg',
-    audioUrl: '/audio/deep-relaxation.mp3',
-    category: 'Relaxation',
-    mood: ['stressed', 'anxious']
+    title: 'Focus Flow',
+    artist: 'Brainwave Bliss',
+    url: '/audio/focus-flow.mp3',
+    coverUrl: '/images/covers/focus-flow.jpg',
+    duration: 270,
+    emotion: 'focused',
+    genre: 'electronic',  // Change to string instead of array
+    category: 'focus'
   },
   {
     id: '6',
-    title: 'Énergie Positive',
-    artist: 'Bright Morning',
-    duration: 480, // 8 minutes
-    coverUrl: '/images/music/energy.jpg',
-    audioUrl: '/audio/positive-energy.mp3',
-    category: 'Motivation',
-    mood: ['sad', 'unmotivated']
+    title: 'Evening Calm',
+    artist: 'Lofi Lounge',
+    url: '/audio/evening-calm.mp3',
+    coverUrl: '/images/covers/evening-calm.jpg',
+    duration: 200,
+    emotion: 'relaxed',
+    genre: 'lofi',  // Change to string instead of array
+    category: 'sleep'
   },
   {
     id: '7',
-    title: 'Acceptation & Lâcher-Prise',
-    artist: 'Mindfulness Journey',
-    duration: 900, // 15 minutes
-    coverUrl: '/images/music/acceptance.jpg',
-    audioUrl: '/audio/acceptance.mp3',
-    category: 'Pleine conscience',
-    mood: ['reflective', 'anxious']
+    title: 'Dream State',
+    artist: 'Sleepy Sounds',
+    url: '/audio/dream-state.mp3',
+    coverUrl: '/images/covers/dream-state.jpg',
+    duration: 330,
+    emotion: 'peaceful',
+    genre: 'ambient',  // Change to string instead of array
+    category: 'sleep'
   }
 ];
 
-// Mock playlists
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'p1',
-    name: 'Méditation quotidienne',
-    tracks: mockTracks.filter(track => track.category === 'Méditation' || track.category === 'Pleine conscience'),
-    coverUrl: '/images/playlists/meditation.jpg',
-    description: 'Collection de méditations pour tous les jours',
-    category: 'Méditation'
+    id: 'relaxation',
+    title: 'Relaxation',  // Add title property
+    name: 'Relaxation', 
+    tracks: mockTracks.filter(track => track.category === 'relaxation' || track.emotion === 'calm'),
+    coverUrl: '/images/covers/relaxation-playlist.jpg',
+    description: 'Des sons apaisants pour vous aider à vous détendre',
+    category: 'relaxation'
   },
   {
-    id: 'p2',
-    name: 'Aide au sommeil',
-    tracks: mockTracks.filter(track => track.category === 'Sommeil' || track.mood?.includes('peaceful')),
-    coverUrl: '/images/playlists/sleep.jpg',
-    description: 'Sons apaisants pour mieux dormir',
-    category: 'Sommeil'
+    id: 'focus',
+    title: 'Focus',  // Add title property
+    name: 'Focus',
+    tracks: mockTracks.filter(track => track.category === 'focus' || track.mood === 'concentration'),
+    coverUrl: '/images/covers/focus-playlist.jpg',
+    description: 'De la musique pour améliorer votre concentration',
+    category: 'focus'
   },
   {
-    id: 'p3',
-    name: 'Gestion du stress',
-    tracks: mockTracks.filter(track => track.mood?.includes('anxious') || track.mood?.includes('stressed')),
-    coverUrl: '/images/playlists/stress.jpg',
-    description: 'Réduisez votre niveau de stress et d\'anxiété',
-    category: 'Bien-être'
+    id: 'sleep',
+    title: 'Sleep',  // Add title property
+    name: 'Sleep',
+    tracks: mockTracks.filter(track => track.mood === 'sleepy' || track.mood === 'peaceful'),
+    coverUrl: '/images/covers/sleep-playlist.jpg',
+    description: 'Sons relaxants pour vous aider à vous endormir',
+    category: 'sleep'
   }
 ];
-
-export default {
-  tracks: mockTracks,
-  playlists: mockPlaylists
-};
