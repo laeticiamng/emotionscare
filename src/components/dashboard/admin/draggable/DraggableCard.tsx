@@ -46,7 +46,7 @@ const DraggableCard: React.FC<DraggableCardProps> = (props) => {
         </div>
         <KpiCard 
           title={props.title} 
-          value={props.value} 
+          value={props.value?.toString() || ''} 
           icon={props.icon && <props.icon className="h-6 w-6" />}
           delta={props.delta} 
           subtitle={props.subtitle} 

@@ -18,6 +18,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { isAdminRole } from '@/utils/roleUtils';
 import { toast } from 'sonner';
 import { getUserAvatarUrl, getUserInitials, harmonizeUserType } from '@/utils/userUtils';
+import { normalizeUserMode } from '@/types/userMode';
 
 const GlobalNav = () => {
   const { user, logout } = useAuth();
@@ -43,7 +44,11 @@ const GlobalNav = () => {
   
   // Check if user has admin role
   const isAdmin = user ? isAdminRole(user.role) : false;
-  const isB2BMode = userMode === 'b2b_admin' || userMode === 'b2b_user';
+  
+  // Check if B2B mode using normalization
+  const normalizedUserMode = normalizeUserMode(userMode);
+  const isB2BMode = normalizedUserMode === 'b2b-admin' || normalizedUserMode === 'b2b_admin' || 
+                    normalizedUserMode === 'b2b-user' || normalizedUserMode === 'b2b_user';
   
   // Use harmonizeUserType to ensure type compatibility
   const userForAvatar = user ? harmonizeUserType(user) : null;

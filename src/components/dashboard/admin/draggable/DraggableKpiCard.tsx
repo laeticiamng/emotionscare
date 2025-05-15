@@ -1,9 +1,24 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { KpiCardProps } from '@/types/dashboard';
 
-const DraggableKpiCard: React.FC<KpiCardProps> = ({
+interface DraggableKpiCardProps {
+  title: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  description?: string;
+  className?: string;
+  onClick?: () => void;
+  // Additional props for extended functionality
+  trend?: number;
+  status?: 'positive' | 'negative' | 'warning' | 'neutral';
+  trendText?: string;
+  details?: React.ReactNode;
+  period?: string;
+  loading?: boolean;
+}
+
+const DraggableKpiCard: React.FC<DraggableKpiCardProps> = ({
   title,
   value,
   trend,
@@ -31,7 +46,7 @@ const DraggableKpiCard: React.FC<KpiCardProps> = ({
   };
 
   const getTrendIcon = () => {
-    if (!trend) return null;
+    if (trend === undefined) return null;
     
     return trend > 0 ? (
       <span className="text-green-600">↑</span>

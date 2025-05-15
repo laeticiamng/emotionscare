@@ -29,13 +29,13 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
             {categoryBadges.map(badge => (
               <Card 
                 key={badge.id} 
-                className={`p-4 flex flex-col items-center text-center ${!badge.unlocked ? 'opacity-60' : ''}`}
+                className={`p-4 flex flex-col items-center text-center ${!badge.unlockedAt ? 'opacity-60' : ''}`}
               >
                 <div className="relative mb-2">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    {badge.image_url || badge.imageUrl ? (
+                    {badge.image_url ? (
                       <img 
-                        src={badge.image_url || badge.imageUrl} 
+                        src={badge.image_url} 
                         alt={badge.name} 
                         className="w-12 h-12"
                       />
@@ -43,7 +43,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({ badges }) => {
                       <span className="text-2xl">{badge.icon || '🏆'}</span>
                     )}
                   </div>
-                  {!badge.unlocked && (
+                  {!badge.unlockedAt && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full">
                       <Lock className="w-6 h-6 text-white" />
                     </div>

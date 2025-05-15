@@ -4,18 +4,18 @@ import { Challenge } from '@/types';
 
 interface ChallengesListProps {
   challenges: Challenge[];
-  onComplete?: (challengeId: string) => Promise<boolean>; // Added this prop
+  onComplete?: (challengeId: string) => Promise<boolean>; 
 }
 
 const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, onComplete }) => {
   // Helper to render challenge status correctly
   const renderStatus = (challenge: Challenge) => {
-    // Fix the comparison by ensuring we use the correct status values
-    if (challenge.status === 'completed' || (challenge.completed && challenge.status !== 'failed')) {
+    // Use completed property consistently
+    if (challenge.completed) {
       return <span className="text-green-600">Terminé</span>;
     }
     
-    if (challenge.status === 'failed') {
+    if (challenge.failed) {
       return <span className="text-red-600">Échoué</span>;
     }
     
@@ -24,7 +24,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, onComplete 
       <div className="w-full bg-gray-200 rounded-full h-2.5">
         <div 
           className="bg-primary h-2.5 rounded-full" 
-          style={{ width: `${Math.min(100, (challenge.progress / (challenge.goal || challenge.total || 1)) * 100)}%` }}
+          style={{ width: `${Math.min(100, (challenge.progress / (challenge.goal || 1)) * 100)}%` }}
         ></div>
       </div>
     );
@@ -39,7 +39,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, onComplete 
           
           <div className="flex justify-between items-center">
             <div className="text-xs">
-              {challenge.progress}/{challenge.goal || challenge.total} complétés
+              {challenge.progress}/{challenge.goal} complétés
             </div>
             <div className="text-xs">
               {challenge.points && `${challenge.points} points`}

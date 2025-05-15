@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { normalizeUserMode } from '@/types/userMode';
 
 export interface DashboardKpi {
   key: string;
@@ -59,9 +60,13 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
 
   // Get greeting based on user mode
   const getGreeting = () => {
-    switch(userMode) {
+    const normalizedMode = normalizeUserMode(userMode);
+    
+    switch(normalizedMode) {
+      case 'b2b-admin':
       case 'b2b_admin':
         return "Tableau RH";
+      case 'b2b-user':
       case 'b2b_user':
         return "Bonjour";
       case 'b2c':
@@ -71,24 +76,45 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
     }
   };
   
+  // Check if it's B2B mode
+  const isB2BMode = () => {
+    const normalizedMode = normalizeUserMode(userMode);
+    return normalizedMode === 'b2b-admin' || 
+           normalizedMode === 'b2b_admin' || 
+           normalizedMode === 'b2b-user' || 
+           normalizedMode === 'b2b_user';
+  };
+
+  // Check if it's B2B Admin mode
+  const isB2BAdmin = () => {
+    const normalizedMode = normalizeUserMode(userMode);
+    return normalizedMode === 'b2b-admin' || normalizedMode === 'b2b_admin';
+  };
+  
+  // Check if it's B2B User mode
+  const isB2BUser = () => {
+    const normalizedMode = normalizeUserMode(userMode);
+    return normalizedMode === 'b2b-user' || normalizedMode === 'b2b_user';
+  };
+  
   return (
     <div className={`p-6 rounded-2xl mb-8 animate-fade-in ${
-      userMode === 'b2b_user' ? 'bg-blue-50 dark:bg-blue-900/20' : 
-      userMode === 'b2b_admin' ? 'bg-purple-50 dark:bg-purple-900/20' : 
+      isB2BUser() ? 'bg-blue-50 dark:bg-blue-900/20' : 
+      isB2BAdmin() ? 'bg-purple-50 dark:bg-purple-900/20' : 
       'bg-primary-50 dark:bg-primary-900/20'
     }`}>
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         {/* Welcome message */}
         <div>
           <h1 className={`text-h1 mb-1 ${
-            userMode === 'b2b_user' ? 'text-blue-700 dark:text-blue-300' : 
-            userMode === 'b2b_admin' ? 'text-purple-700 dark:text-purple-300' : 
+            isB2BUser() ? 'text-blue-700 dark:text-blue-300' : 
+            isB2BAdmin() ? 'text-purple-700 dark:text-purple-300' : 
             'text-primary-700 dark:text-primary-300'
           }`}>
             {getGreeting()}, {userName} 👋
           </h1>
           <p className="text-muted-foreground">
-            {userMode === 'b2b_admin' 
+            {isB2BAdmin() 
               ? "Aperçu du bien-être collectif de l'équipe"
               : "Voici un aperçu de votre journée"}
           </p>
@@ -123,13 +149,13 @@ const DashboardHero: React.FC<DashboardHeroProps> = ({
             <Card key={kpi.key} className="border border-primary-100 dark:border-primary-800 transition-all duration-300 hover:shadow-md">
               <CardContent className="flex items-center p-4">
                 <div className={`p-2 rounded-full mr-4 ${
-                  userMode === 'b2b_user' ? 'bg-blue-100 dark:bg-blue-800/50' : 
-                  userMode === 'b2b_admin' ? 'bg-purple-100 dark:bg-purple-800/50' : 
+                  isB2BUser() ? 'bg-blue-100 dark:bg-blue-800/50' : 
+                  isB2BAdmin() ? 'bg-purple-100 dark:bg-purple-800/50' : 
                   'bg-primary-100 dark:bg-primary-800/50'
                 }`}>
                   <Icon className={`w-6 h-6 ${
-                    userMode === 'b2b_user' ? 'text-blue-500 dark:text-blue-300' : 
-                    userMode === 'b2b_admin' ? 'text-purple-500 dark:text-purple-300' : 
+                    isB2BUser() ? 'text-blue-500 dark:text-blue-300' : 
+                    isB2BAdmin() ? 'text-purple-500 dark:text-purple-300' : 
                     'text-primary-500 dark:text-primary-300'
                   }`} />
                 </div>

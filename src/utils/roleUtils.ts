@@ -1,6 +1,16 @@
 
 import { UserModeType } from "@/types/userMode";
 
+export const isAdminRole = (role?: string | null): boolean => {
+  if (!role) return false;
+  const normalizedRole = role.toLowerCase();
+  
+  return normalizedRole === 'admin' || 
+         normalizedRole === 'b2b_admin' || 
+         normalizedRole === 'b2b-admin' ||
+         normalizedRole === 'rh';
+};
+
 export const hasRoleAccess = (userRole: string | null, requiredRole: string): boolean => {
   if (!userRole) return false;
   
@@ -51,16 +61,39 @@ export const getRoleName = (role: string): string => {
   }
 };
 
+export const getRoleHomePath = (role: string): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+    case 'b2b-user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+    case 'b2b-admin':
+      return '/b2b/admin/dashboard';
+    default:
+      return '/';
+  }
+};
+
+export const normalizeRole = (role?: string | null): string => {
+  return normalizeUserRole(role);
+};
+
 export const normalizeUserRole = (role?: string | null): UserModeType => {
   if (!role) return 'b2c'; // Default role
   
-  if (role === 'b2c' || role === 'particulier') return 'b2c';
+  const normalizedRole = role.toLowerCase();
   
-  if (role === 'b2b-user' || role === 'b2b_user' || role === 'collaborateur') {
+  if (normalizedRole === 'b2c' || normalizedRole === 'particulier') {
+    return 'b2c';
+  }
+  
+  if (normalizedRole === 'b2b-user' || normalizedRole === 'b2b_user' || normalizedRole === 'collaborateur') {
     return 'b2b-user';
   }
   
-  if (role === 'b2b-admin' || role === 'b2b_admin' || role === 'admin' || role === 'rh') {
+  if (normalizedRole === 'b2b-admin' || normalizedRole === 'b2b_admin' || normalizedRole === 'admin' || normalizedRole === 'rh') {
     return 'b2b-admin';
   }
   
