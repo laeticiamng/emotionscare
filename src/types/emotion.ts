@@ -16,6 +16,7 @@ export interface Emotion {
   emotion?: string;
   confidence?: number;
   text?: string;
+  intensity?: number;
 }
 
 /**
@@ -41,6 +42,7 @@ export interface EmotionResult {
   text?: string;
   transcript?: string;
   audio_url?: string;
+  audioUrl?: string;
 }
 
 /**

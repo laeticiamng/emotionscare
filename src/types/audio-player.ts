@@ -1,36 +1,38 @@
 
+/**
+ * Return type for useAudioPlayer hook
+ */
 export interface UseAudioPlayerStateReturn {
   isPlaying: boolean;
-  currentTime: number;
   duration: number;
+  currentTime: number;
   volume: number;
-  isMuted: boolean;
-  isLoading: boolean;
-  error: Error | null;
-  progress: number;
-  audioElement: HTMLAudioElement | null;
-  play: () => Promise<void> | void;
+  muted: boolean;
+  play: () => void;
   pause: () => void;
   toggle: () => void;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  setTrack: (url: string) => void;
-  onEnded?: () => void;
-  onNext?: () => void;
-  onPrevious?: () => void;
-  loadTrack?: (track: any) => void;
-  isReady?: boolean;
+  playbackRate: number;
+  setPlaybackRate: (rate: number) => void;
+  audioRef: React.RefObject<HTMLAudioElement>;
 }
 
+/**
+ * Props for enhanced music visualizer component
+ */
 export interface EnhancedMusicVisualizerProps {
-  audioElement?: HTMLAudioElement | null;
-  mode?: 'bars' | 'wave' | 'circle';
+  audioRef: React.RefObject<HTMLAudioElement>;
   color?: string;
-  className?: string;
+  height?: number;
+  width?: number;
   barCount?: number;
-  height?: number | string;
-  width?: number | string;
-  sensitivity?: number;
-  isPlaying?: boolean;
+  barWidth?: number;
+  barSpacing?: number;
+  intensity?: number;
+  visualizationType?: 'bars' | 'wave' | 'circle' | 'particles';
+  className?: string;
+  autoStart?: boolean;
+  responsive?: boolean;
 }

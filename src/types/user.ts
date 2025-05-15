@@ -1,18 +1,20 @@
 
 import { Theme, FontFamily, FontSize } from './theme';
 
-export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest';
+export type UserRole = 'admin' | 'user' | 'team_lead' | 'manager' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin' | 'wellbeing_manager' | 'coach' | 'employee' | 'moderator';
 
 export interface User {
   id: string;
   email: string;
   first_name?: string;
   last_name?: string;
+  name?: string;
   role: UserRole;
   preferences?: UserPreferences;
   team_id?: string;
   teamId?: string;
   avatar?: string;
+  avatar_url?: string;
   department?: string;
   department_id?: string;
   position?: string;
@@ -21,18 +23,80 @@ export interface User {
   joined_at?: string;
   onboarded?: boolean;
   emotional_score?: number;
+  anonymity_code?: string;
+  job_title?: string;
+  last_active?: string;
+  last_seen?: string;
+  profile?: {
+    bio?: string;
+    company?: string;
+    job_title?: string;
+  };
+  company_id?: string;
 }
 
 export interface UserPreferences {
   theme?: Theme;
   fontSize?: FontSize;
   fontFamily?: FontFamily;
-  notifications?: boolean;
+  notifications?: boolean | {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    frequency: string;
+    types?: {
+      system: boolean;
+      emotion: boolean;
+      coach: boolean;
+      journal: boolean;
+      community: boolean;
+    };
+    tone?: string;
+    quietHours?: {
+      enabled: boolean;
+      start: string;
+      end: string;
+    };
+  };
   language?: string;
   notifications_enabled?: boolean;
-  privacy?: string;
+  privacy?: string | {
+    shareData?: boolean;
+    anonymizeReports?: boolean;
+    publicProfile?: boolean;
+    anonymousMode?: boolean;
+    dataSharing?: boolean;
+    profileVisibility?: 'public' | 'team' | 'private';
+    showEmotionalScore?: boolean;
+    shareJournalInsights?: boolean;
+    anonymousDataContribution?: boolean;
+    shareEmotionalData?: boolean;
+    allowCoaching?: boolean;
+  };
   profileVisibility?: string;
-  dashboardLayout?: DashboardLayout;
+  dashboardLayout?: any;
+  sound?: boolean;
+  soundEnabled?: boolean;
+  autoplayVideos?: boolean;
+  dataCollection?: boolean;
+  timezone?: string;
+  musicPreferences?: {
+    autoplay: boolean;
+    volume: number;
+    preferredGenres: string[];
+  };
+  accessibilityFeatures?: {
+    highContrast: boolean;
+    reducedMotion: boolean;
+    screenReader: boolean;
+  };
+  reduceMotion?: boolean;
+  highContrast?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+  onboardingCompleted?: boolean;
+  colorAccent?: string;
 }
 
 export interface UserPreferencesState {

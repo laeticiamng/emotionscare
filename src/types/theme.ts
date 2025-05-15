@@ -8,8 +8,8 @@
 // Types pour les thèmes
 export type ThemeName = 'light' | 'dark' | 'pastel';
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xl';
-export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded' | 'inter' | 'system-ui' | 'sans' | 'serif' | 'mono';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'xl' | 'xx-large' | 'extra-large';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace' | 'rounded' | 'inter' | 'system-ui' | 'sans' | 'serif' | 'mono' | 'default';
 
 export interface ThemeContextType {
   theme: Theme;

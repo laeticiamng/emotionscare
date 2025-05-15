@@ -1,110 +1,149 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Mic, Square, Loader2 } from 'lucide-react';
-import { VoiceEmotionScannerProps } from '@/types';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertCircle, Mic } from 'lucide-react';
+import { VoiceEmotionScannerProps, EmotionResult } from '@/types';
 
 const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
-  onResult,
+  onResultsReady,
+  onError,
   autoStart = false,
-  duration = 30
+  maxDuration = 30,
+  className = '',
+  showVisualizer = true,
 }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(duration);
-  const [processing, setProcessing] = useState(false);
-  
-  // Start recording automatically if autoStart is true
-  useEffect(() => {
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  const startRecording = () => {
+    setIsRecording(true);
+    setError(null);
+    // Simulation d'enregistrement pour la démonstration
+    const interval = setInterval(() => {
+      setRecordingTime(prev => {
+        if (prev >= maxDuration) {
+          clearInterval(interval);
+          stopRecording();
+          return maxDuration;
+        }
+        return prev + 1;
+      });
+    }, 1000);
+
+    // Dans un cas réel, on démarrerait ici l'enregistrement audio
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    
+    // Simulation d'analyse pour la démonstration
+    setTimeout(() => {
+      const mockResult: EmotionResult = {
+        emotion: 'calm',
+        confidence: 0.85,
+        intensity: 0.6,
+        recommendations: [
+          'Continuer à pratiquer la pleine conscience',
+          'Maintenir un journal d\'émotions quotidien'
+        ],
+        transcript: 'Aujourd\'hui est une journée agréable et je me sens plutôt bien.',
+      };
+      
+      if (onResultsReady) {
+        onResultsReady(mockResult);
+      }
+    }, 1500);
+
+    // Dans un cas réel, on arrêterait l'enregistrement et on enverrait l'audio à l'API
+  };
+
+  const handleError = (errorMsg: string) => {
+    setError(errorMsg);
+    setIsRecording(false);
+    if (onError) {
+      onError(new Error(errorMsg));
+    }
+  };
+
+  // Démarrage automatique si demandé
+  React.useEffect(() => {
     if (autoStart) {
       startRecording();
     }
   }, [autoStart]);
-  
-  // Timer countdown when recording
-  useEffect(() => {
-    let interval: number;
-    
-    if (isRecording && timeLeft > 0) {
-      interval = window.setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (isRecording && timeLeft === 0) {
-      stopRecording();
-    }
-    
-    return () => clearInterval(interval);
-  }, [isRecording, timeLeft]);
-  
-  const startRecording = () => {
-    setIsRecording(true);
-    setTimeLeft(duration);
-    // Actual recording logic would be here
-  };
-  
-  const stopRecording = () => {
-    setIsRecording(false);
-    setProcessing(true);
-    
-    // Simulate processing delay (in a real app, this would be API call)
-    setTimeout(() => {
-      setProcessing(false);
-      
-      // Create a dummy result (in a real app, this would come from API)
-      const dummyResult = {
-        emotion: 'happy',
-        confidence: 0.85,
-        transcript: 'This is a sample transcript of what the user said during the emotion analysis.',
-      };
-      
-      onResult(dummyResult);
-    }, 2000);
-  };
-  
-  // Format seconds to MM:SS
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
+
   return (
-    <Card>
-      <CardContent className="p-6 flex flex-col items-center justify-center space-y-4">
-        {processing ? (
-          <div className="flex flex-col items-center space-y-4">
-            <Loader2 className="h-12 w-12 text-primary animate-spin" />
-            <p>Analyzing your emotions...</p>
+    <Card className={`w-full ${className}`}>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Mic className="mr-2 h-5 w-5" />
+          Analyse Vocale des Émotions
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {error ? (
+          <div className="flex items-center p-4 mb-4 bg-destructive/10 text-destructive rounded-md">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            <p>{error}</p>
           </div>
-        ) : isRecording ? (
-          <>
-            <div className="h-16 w-16 rounded-full bg-red-100 flex items-center justify-center animate-pulse">
-              <Mic className="h-8 w-8 text-red-500" />
-            </div>
-            <p className="text-lg font-medium">{formatTime(timeLeft)}</p>
-            <p className="text-muted-foreground text-center">
-              Please speak about how you're feeling today...
-            </p>
-            <Button variant="destructive" onClick={stopRecording}>
-              <Square className="h-4 w-4 mr-2" />
-              Stop Recording
-            </Button>
-          </>
         ) : (
-          <>
-            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-              <Mic className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground text-center">
-              Click to start recording your voice for emotion analysis
-            </p>
-            <Button onClick={startRecording}>
-              <Mic className="h-4 w-4 mr-2" />
-              Start Voice Analysis
-            </Button>
-          </>
+          <div className="text-center">
+            {isRecording ? (
+              <>
+                <div className="mb-4">
+                  <div className="animate-pulse inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/20">
+                    <Mic className="h-12 w-12 text-primary" />
+                  </div>
+                </div>
+                <p className="text-lg font-semibold mb-2">Enregistrement en cours...</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {recordingTime} / {maxDuration} secondes
+                </p>
+                
+                {showVisualizer && (
+                  <div className="flex items-center justify-center gap-1 h-10 mb-4">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-2 bg-primary rounded-full animate-sound"
+                        style={{ 
+                          height: `${Math.random() * 100}%`,
+                          animationDelay: `${i * 0.1}s`
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-muted">
+                    <Mic className="h-12 w-12 text-muted-foreground" />
+                  </div>
+                </div>
+                <p className="text-lg font-semibold mb-2">Prêt à analyser votre voix</p>
+                <p className="text-sm text-muted-foreground">
+                  Appuyez sur le bouton pour commencer l'enregistrement
+                </p>
+              </>
+            )}
+          </div>
         )}
       </CardContent>
+      <CardFooter className="flex justify-center">
+        {isRecording ? (
+          <Button variant="destructive" onClick={stopRecording}>
+            Arrêter l'enregistrement
+          </Button>
+        ) : (
+          <Button onClick={startRecording}>
+            Démarrer l'analyse vocale
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   );
 };

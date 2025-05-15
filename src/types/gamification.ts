@@ -1,40 +1,42 @@
 
 export interface GamificationStats {
+  total_scans: number;
+  streak_days: number;
   points: number;
   level: number;
-  dailyStreak: number;
-  totalSessions: number;
-  badgesCount: number;
-  progress: number;
-  nextLevel: number;
-  pointsToNextLevel: number;
-  rank?: string;
-  badges?: Badge[];
+  next_milestone: number;
+  badges_earned: string[];
+  highest_emotion: string;
+  emotional_balance: number;
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
-  category?: string;
-  earnedAt?: string;
-  earned_at?: string;
   icon?: string;
+  image_url?: string;
+  unlocked: boolean;
+  unlocked_at?: string;
+  progress?: number;
+  category?: string;
+  points?: number;
+  criteria?: string;
 }
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
-  progress: number;
-  completed: boolean;
-  endDate?: string;
-  reward?: {
-    points: number;
-    badge?: Badge;
-  };
+  points: number;
+  status: 'active' | 'completed' | 'failed' | 'upcoming';
+  progress?: number;
+  deadline?: string;
+  category?: string;
+  icon?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  criteria?: string;
+  reward?: any;
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
@@ -46,5 +48,5 @@ export interface LeaderboardEntry {
   level: number;
   position: number;
   avatar?: string;
-  badges?: Badge[];
+  badges?: any[];
 }

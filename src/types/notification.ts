@@ -35,7 +35,7 @@ export interface NotificationSettings {
 export type NotificationFrequency = 'realtime' | 'immediate' | 'daily' | 'weekly' | 'never';
 
 export interface NotificationTone {
-  sound: 'default' | 'subtle' | 'loud' | 'mute';
+  sound: 'default' | 'subtle' | 'loud' | 'mute' | string;
   vibration: boolean;
   led: boolean;
 }
@@ -48,7 +48,7 @@ export interface NotificationPreference {
   pushEnabled?: boolean;
   channels?: NotificationChannels | string[];
   priority?: NotificationPriority;
-  tone?: NotificationTone;
+  tone?: NotificationTone | string;
 }
 
 export interface NotificationChannels {

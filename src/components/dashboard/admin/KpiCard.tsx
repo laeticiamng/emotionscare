@@ -4,25 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { LucideIcon } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import KpiCardBadge from './KpiCardBadge';
-import KpiCardValue from './KpiCardValue';
 import { Skeleton } from "@/components/ui/skeleton";
-
-export interface KpiCardProps {
-  title: string;
-  value: React.ReactNode;
-  icon: LucideIcon;
-  delta?: {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: React.ReactNode;
-  ariaLabel?: string;
-  className?: string;
-  isLoading?: boolean;
-  onClick?: () => void; // Added onClick handler for drill-down
-}
+import { KpiCardProps } from '@/types';
 
 /**
  * KpiCard component for displaying key performance indicators
@@ -63,16 +46,32 @@ const KpiCard: React.FC<KpiCardProps> = ({
             </>
           ) : (
             <>
-              <Icon size={20} className="mr-2 text-primary" />
+              {Icon && (typeof Icon === 'function' ? <Icon size={20} className="mr-2 text-primary" /> : Icon)}
               {title}
             </>
           )}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <KpiCardValue value={value} isLoading={isLoading} />
+        {isLoading ? (
+          <Skeleton className="h-8 w-24 my-2" />
+        ) : (
+          <div className="text-3xl font-bold">{value}</div>
+        )}
         
-        {delta && <KpiCardBadge delta={delta} isLoading={isLoading} />}
+        {delta && (
+          isLoading ? (
+            <Skeleton className="h-5 w-20 mt-2" />
+          ) : (
+            <Badge 
+              variant={delta.trend === 'up' ? "outline" : delta.trend === 'down' ? "destructive" : "secondary"}
+              className="mt-2 font-normal"
+            >
+              {delta.trend === 'up' ? '↑' : delta.trend === 'down' ? '↓' : '○'} 
+              {delta.value}% {delta.label}
+            </Badge>
+          )
+        )}
         
         {subtitle && (
           <div className="mt-2">

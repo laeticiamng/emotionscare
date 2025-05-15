@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types';
 
@@ -69,7 +70,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         root.classList.add('text-lg');
         break;
       case 'x-large':
+      case 'xl':
         root.classList.add('text-xl');
+        break;
+      case 'xx-large':
+      case 'extra-large':
+        root.classList.add('text-2xl');
         break;
       default:
         root.classList.add('text-base');
@@ -83,12 +89,16 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const getFontFamilyValue = (font: FontFamily): string => {
     switch (font) {
       case 'system':
+      case 'system-ui':
+      case 'default':
         return "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif";
       case 'serif':
         return "Georgia, 'Times New Roman', serif";
       case 'sans-serif':
+      case 'sans':
         return "Arial, Helvetica, sans-serif";
       case 'monospace':
+      case 'mono':
         return "Consolas, Monaco, 'Courier New', monospace";
       case 'rounded':
         return "'Quicksand', 'Comic Sans MS', cursive, sans-serif";

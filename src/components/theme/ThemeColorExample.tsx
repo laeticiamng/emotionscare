@@ -2,28 +2,51 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
+interface ThemeColorProps {
+  colorName: string;
+  hexCode: string;
+}
+
+const ThemeColor: React.FC<ThemeColorProps> = ({ colorName, hexCode }) => {
+  return (
+    <div className="flex items-center mb-2">
+      <div 
+        className="w-6 h-6 rounded-full mr-2" 
+        style={{ backgroundColor: hexCode }}
+      />
+      <span className="text-sm">{colorName}</span>
+      <span className="text-xs text-muted-foreground ml-2">{hexCode}</span>
+    </div>
+  );
+};
+
 const ThemeColorExample: React.FC = () => {
+  const colors = [
+    { name: 'Primary', hex: 'hsl(var(--primary))' },
+    { name: 'Primary Foreground', hex: 'hsl(var(--primary-foreground))' },
+    { name: 'Secondary', hex: 'hsl(var(--secondary))' },
+    { name: 'Secondary Foreground', hex: 'hsl(var(--secondary-foreground))' },
+    { name: 'Accent', hex: 'hsl(var(--accent))' },
+    { name: 'Accent Foreground', hex: 'hsl(var(--accent-foreground))' },
+    { name: 'Muted', hex: 'hsl(var(--muted))' },
+    { name: 'Muted Foreground', hex: 'hsl(var(--muted-foreground))' },
+    { name: 'Background', hex: 'hsl(var(--background))' },
+    { name: 'Foreground', hex: 'hsl(var(--foreground))' },
+    { name: 'Border', hex: 'hsl(var(--border))' },
+  ];
+  
   return (
     <Card>
-      <CardContent className="p-4">
-        <h3 className="text-lg font-medium mb-4">Theme Color Examples</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="h-8 rounded-md bg-primary"></div>
-            <span className="text-sm">Primary</span>
-          </div>
-          <div className="space-y-2">
-            <div className="h-8 rounded-md bg-secondary"></div>
-            <span className="text-sm">Secondary</span>
-          </div>
-          <div className="space-y-2">
-            <div className="h-8 rounded-md bg-accent"></div>
-            <span className="text-sm">Accent</span>
-          </div>
-          <div className="space-y-2">
-            <div className="h-8 rounded-md bg-muted"></div>
-            <span className="text-sm">Muted</span>
-          </div>
+      <CardContent className="pt-6">
+        <h3 className="font-medium mb-4">Palette de couleurs du thème</h3>
+        <div className="space-y-2">
+          {colors.map((color) => (
+            <ThemeColor 
+              key={color.name} 
+              colorName={color.name} 
+              hexCode={color.hex} 
+            />
+          ))}
         </div>
       </CardContent>
     </Card>

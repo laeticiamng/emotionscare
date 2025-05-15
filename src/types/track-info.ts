@@ -1,24 +1,25 @@
 
 import { MusicTrack } from './music';
 
+/**
+ * Props for track info component
+ */
 export interface TrackInfoProps {
-  track?: MusicTrack;
+  track: MusicTrack;
   className?: string;
-  compact?: boolean;
-  title?: string;
-  artist?: string;
-  coverUrl?: string;
+  showArtist?: boolean;
   showCover?: boolean;
-  showControls?: boolean;
-  currentTrack?: MusicTrack;
-  loadingTrack?: boolean;
-  audioError?: Error | null;
+  size?: 'sm' | 'md' | 'lg';
 }
 
+/**
+ * Props for volume control component
+ */
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (value: number) => void;
+  onChange: (volume: number) => void;
   className?: string;
-  onChange?: (volume: number) => void;
-  showLabel?: boolean;
+  showIcon?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  orientation?: 'horizontal' | 'vertical';
 }

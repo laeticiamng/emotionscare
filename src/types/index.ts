@@ -47,7 +47,6 @@ export type {
   MusicDrawerProps,
   TrackInfoProps,
   ProgressBarProps,
-  VolumeControlProps,
   EmotionMusicParams,
   Track
 } from './music';

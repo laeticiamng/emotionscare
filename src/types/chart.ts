@@ -1,12 +1,13 @@
 
-import React from 'react';
-
+/**
+ * Configuration for charts
+ */
 export interface ChartConfig {
-  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'scatter';
+  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
   data: {
     labels: string[];
     datasets: {
-      label?: string;
+      label: string;
       data: number[];
       backgroundColor?: string | string[];
       borderColor?: string | string[];
@@ -15,13 +16,15 @@ export interface ChartConfig {
       tension?: number;
     }[];
   };
-  options?: Record<string, any>;
+  options?: any;
 }
 
+/**
+ * Props for chart context
+ */
 export interface ChartContextProps {
-  chartConfigs: Record<string, ChartConfig>;
-  addChartConfig: (id: string, config: ChartConfig) => void;
-  removeChartConfig: (id: string) => void;
-  updateChartConfig: (id: string, config: Partial<ChartConfig>) => void;
-  getChartConfig: (id: string) => ChartConfig | undefined;
+  defaultConfig: ChartConfig;
+  createChart: (canvas: HTMLCanvasElement, config: ChartConfig) => any;
+  updateChart: (chart: any, config: ChartConfig) => void;
+  destroyChart: (chart: any) => void;
 }

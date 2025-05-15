@@ -56,12 +56,16 @@ export interface DashboardStats {
 
 // Interface for global overview tab
 export interface GlobalOverviewTabProps {
-  period: Period;
-  setPeriod: (period: Period) => void;
-  data: DashboardStats;
+  period?: Period;
+  setPeriod?: (period: Period) => void;
+  data?: DashboardStats;
   isLoading?: boolean;
   className?: string;
-  kpiCards?: KpiCardProps[];
+  kpiCards: KpiCardProps[];
+  absenteeismChartData?: any;
+  emotionalScoreTrend?: any;
+  dashboardStats?: any;
+  gamificationData?: GamificationData;
 }
 
 // Interface for chart data
@@ -88,7 +92,9 @@ export interface GamificationData {
   userEngagement: number;
   userGrowth: number;
   badgeDistribution: Record<string, number>;
-  recentBadges: {
+  activeUsersPercent?: number;
+  totalBadges?: number;
+  recentBadges?: {
     id: string;
     name: string;
     user: string;
