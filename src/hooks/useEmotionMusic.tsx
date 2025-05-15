@@ -1,73 +1,77 @@
 
-import { MusicPlaylist, EmotionMusicParams } from '@/types';
+import { useState, useEffect } from 'react';
+import { EmotionMusicParams, MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const useEmotionMusic = () => {
-  const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
-    const { emotion, intensity = 50 } = params;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [recommendedPlaylist, setRecommendedPlaylist] = useState<MusicPlaylist | null>(null);
+  
+  const getRecommendationsByEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist> => {
+    setLoading(true);
     
-    // Simulate API call to get music for emotion
-    console.log(`Loading music for emotion: ${emotion} with intensity: ${intensity}`);
-    
-    // Mock data
-    return {
-      id: '123',
-      name: `${emotion} playlist`,
-      tracks: [
-        {
-          id: '1',
-          title: `${emotion} melody`,
-          artist: 'Wellness Music',
-          duration: 180, // Ajout de la propriété duration
-          url: '/music/track1.mp3',
-          audioUrl: '/music/track1.mp3',
-          coverUrl: '/images/cover1.jpg'
-        },
-        {
-          id: '2',
-          title: 'Peaceful sounds',
-          artist: 'Mindful Artists',
-          duration: 240, // Ajout de la propriété duration
-          url: '/music/track2.mp3',
-          audioUrl: '/music/track2.mp3',
-          coverUrl: '/images/cover2.jpg'
-        }
-      ]
-    };
+    try {
+      // Simulate API call - this would be real API in production
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      // Mock returned playlist
+      const playlist: MusicPlaylist = {
+        id: 'emotion-' + params.emotion,
+        title: `${capitalize(params.emotion)} Music`,
+        name: `${capitalize(params.emotion)} Music`,
+        tracks: [
+          {
+            id: '101',
+            title: `${capitalize(params.emotion)} Melody`,
+            artist: 'EmotionsCare Music',
+            duration: 240,
+            url: '/audio/sample1.mp3',
+            audioUrl: '/audio/sample1.mp3',
+            coverUrl: '/images/covers/sample1.jpg'
+          },
+          {
+            id: '102',
+            title: `${capitalize(params.emotion)} Harmony`,
+            artist: 'EmotionsCare Orchestra',
+            duration: 180,
+            url: '/audio/sample2.mp3',
+            audioUrl: '/audio/sample2.mp3',
+            coverUrl: '/images/covers/sample2.jpg'
+          },
+          {
+            id: '103',
+            title: `${capitalize(params.emotion)} Ambience`,
+            artist: 'EmotionsCare Ambient',
+            duration: 320,
+            url: '/audio/sample3.mp3',
+            audioUrl: '/audio/sample3.mp3',
+            coverUrl: '/images/covers/sample3.jpg'
+          }
+        ]
+      };
+      
+      setRecommendedPlaylist(playlist);
+      setLoading(false);
+      return playlist;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to get music recommendations');
+      setError(error);
+      setLoading(false);
+      throw error;
+    }
   };
   
-  return { loadPlaylistForEmotion };
+  // Helper to capitalize the first letter
+  const capitalize = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+  
+  return {
+    loading,
+    error,
+    recommendedPlaylist,
+    getRecommendationsByEmotion
+  };
 };
 
 export default useEmotionMusic;
-
-// Export the function directly for components that need it
-export const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
-  const { emotion, intensity = 50 } = params;
-  // Reuse the same implementation
-  console.log(`Loading music globally for emotion: ${emotion} with intensity: ${intensity}`);
-  
-  return {
-    id: '123',
-    name: `${emotion} playlist`,
-    tracks: [
-      {
-        id: '1',
-        title: `${emotion} melody`,
-        artist: 'Wellness Music',
-        duration: 180, // Ajout de la propriété duration
-        url: '/music/track1.mp3',
-        audioUrl: '/music/track1.mp3',
-        coverUrl: '/images/cover1.jpg'
-      },
-      {
-        id: '2',
-        title: 'Peaceful sounds',
-        artist: 'Mindful Artists',
-        duration: 240, // Ajout de la propriété duration
-        url: '/music/track2.mp3',
-        audioUrl: '/music/track2.mp3',
-        coverUrl: '/images/cover2.jpg'
-      }
-    ]
-  };
-};

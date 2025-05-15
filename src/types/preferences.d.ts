@@ -1,39 +1,35 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationType = 'all' | 'important' | 'none';
-export type NotificationTone = 'friendly' | 'professional' | 'motivational' | 'direct' | 'calm';
-export type PrivacyLevel = 'public' | 'team' | 'private' | 'balanced';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'system' | 'serif' | 'rounded' | 'mono';
-export type ThemeName = 'light' | 'dark' | 'system';
+export type FontFamily = 'inter' | 'sans' | 'serif' | 'mono';
+export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed';
+export type Theme = ThemeName;
+
+export interface NotificationPreference {
+  email: boolean;
+  push: boolean;
+  sounds: boolean;
+}
+
+export interface SoundPreference {
+  volume: number;
+  effects: boolean;
+  music: boolean;
+}
 
 export interface UserPreferences {
   theme: ThemeName;
   fontSize: FontSize;
   fontFamily: FontFamily;
   language: string;
-  dashboardLayout: string;
-  onboardingCompleted: boolean;
-  soundEnabled: boolean;
+  notifications: NotificationPreference;
+  haptics: boolean;
+  dataCollection: boolean;
+  privacyLevel: PrivacyLevel;
   animations: boolean;
-  notifications: {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    frequency: string;
-  };
-  privacy: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    publicProfile: boolean;
-  };
-  accessibility: {
-    highContrast: boolean;
-    reduceMotion: boolean;
-    largeText: boolean;
-  };
-  emotionalCamouflage: boolean;  // Premium feature
-  aiSuggestions: boolean;        // Premium feature
-  fullAnonymity?: boolean;
-  notifications_enabled?: boolean; // For backward compatibility
+  soundEffects: boolean;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
+  sound: SoundPreference | boolean;
 }

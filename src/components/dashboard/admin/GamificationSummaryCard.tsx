@@ -1,72 +1,90 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { GamificationStats } from '@/types/gamification';
+import { Badge } from 'lucide-react';
 
 interface GamificationSummaryCardProps {
-  gamificationStats: GamificationStats;
+  gamificationData: GamificationStats;
+  isLoading?: boolean;
 }
 
-const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({
-  gamificationStats
+const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ 
+  gamificationData,
+  isLoading = false 
 }) => {
-  // Define default values for optional properties
-  const activeUsersPercent = gamificationStats.activeUsersPercent || 0;
-  const totalBadges = gamificationStats.totalBadges || 0;
-  const badgeLevels = gamificationStats.badgeLevels || [];
-  const topChallenges = gamificationStats.topChallenges || [];
+  if (isLoading) {
+    return (
+      <Card className="col-span-full">
+        <CardHeader>
+          <CardTitle>Gamification Overview</CardTitle>
+          <CardDescription>Loading gamification data...</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700"></div>
+          <div className="h-4 bg-gray-200 rounded animate-pulse dark:bg-gray-700 w-3/4"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Get the top badges by level
+  const topBadgeLevels = gamificationData.badgeLevels?.slice(0, 3) || [];
+  
+  // Format level counts
+  const formatLevelData = () => {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        {topBadgeLevels.map((badge, idx) => (
+          <div key={idx} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            <div>
+              <p className="font-medium">{badge.level}</p>
+              <p className="text-sm text-muted-foreground">{badge.count} users</p>
+            </div>
+            <Badge className="h-10 w-10 text-primary p-2" />
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Format challenge completion data
+  const formatChallengeData = () => {
+    const topChallenges = gamificationData.topChallenges?.slice(0, 3) || [];
+    
+    return (
+      <div className="space-y-4">
+        {topChallenges.map((challenge, idx) => (
+          <div key={idx} className="space-y-1">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">{challenge.name}</p>
+              <p className="text-sm text-muted-foreground">{challenge.completions} completions</p>
+            </div>
+            <Progress value={(challenge.completions / 100) * 100} className="h-2" />
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center">
-          <Trophy className="h-5 w-5 mr-2 text-amber-500" />
-          Gamification
-        </CardTitle>
+      <CardHeader>
+        <CardTitle>Gamification Overview</CardTitle>
+        <CardDescription>Badge distributions and challenge completions</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-1">
-            <div className="text-sm font-medium">Utilisateurs actifs</div>
-            <div className="text-sm font-medium">{activeUsersPercent}%</div>
-          </div>
-          <Progress value={activeUsersPercent} className="h-2" />
-          <div className="text-xs text-muted-foreground mt-1">
-            {activeUsersPercent}% des utilisateurs participent activement
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="space-y-6">
           <div>
-            <h4 className="text-sm font-medium mb-2">Distribution des badges</h4>
-            <div className="space-y-2">
-              {stats.badgeLevels && Array.isArray(stats.badgeLevels) && stats.badgeLevels.map((level, index) => (
-                <div key={index} className="bg-muted/20 rounded-md p-2 flex justify-between">
-                  <div className="text-sm">{level.level}</div>
-                  <div className="text-sm font-medium">{level.count}</div>
-                </div>
-              ))}
-            </div>
+            <h4 className="text-sm font-semibold mb-3">Top Badge Levels</h4>
+            {formatLevelData()}
           </div>
           
           <div>
-            <h4 className="text-sm font-medium mb-2">Défis populaires</h4>
-            <div className="space-y-2">
-              {stats.topChallenges && Array.isArray(stats.topChallenges) && stats.topChallenges.map((challenge, index) => (
-                <div key={index} className="flex justify-between items-center mb-2">
-                  <span className="font-medium">{challenge.name || challenge.title}</span>
-                  <div className="text-sm text-muted-foreground">
-                    {challenge.completions || 0} complétions
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h4 className="text-sm font-semibold mb-3">Most Completed Challenges</h4>
+            {formatChallengeData()}
           </div>
-        </div>
-        
-        <div className="text-center">
-          <div className="text-sm font-medium">{totalBadges} badges décernés au total</div>
         </div>
       </CardContent>
     </Card>

@@ -1,10 +1,9 @@
-
 import '../polyfills';
 import OpenAI from 'openai';
 import { ChatMessage } from '@/types';
 import '../utils/array-polyfills';  // Import the array polyfills
 
-const apiKey = process.env.OPENAI_API_KEY;
+const apiKey = process.env.OPENAI_API_KEY || 'mock-api-key';
 
 if (!apiKey) {
   console.warn('OPENAI_API_KEY is not set in environment variables.');
@@ -184,6 +183,60 @@ export const generateChatResponse = async (
   } catch (error) {
     console.error("Error generating chat response:", error);
     return null;
+  }
+};
+
+export const generateText = async (prompt: string): Promise<string> => {
+  try {
+    const response = await openAIClient.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant that provides concise responses.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 500
+    });
+
+    return response.choices[0]?.message?.content || 'No response generated';
+  } catch (error) {
+    console.error('Error calling OpenAI:', error);
+    throw new Error('Failed to generate text with AI');
+  }
+};
+
+export const analyzeEmotion = async (text: string): Promise<{ 
+  emotion: string;
+  intensity: number;
+  analysis: string;
+  suggestions: string[];
+}> => {
+  try {
+    const response = await openAIClient.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { 
+          role: 'system', 
+          content: 'You are an emotion analysis AI. Analyze the emotional content of the text and provide the primary emotion, intensity (1-10), brief analysis, and 2-3 suggestions.' 
+        },
+        { role: 'user', content: text }
+      ],
+      temperature: 0.3,
+      max_tokens: 500
+    });
+
+    const result = response.choices[0]?.message?.content || '';
+    
+    // Simulate parsed response
+    return {
+      emotion: 'calm', // Default values if parsing fails
+      intensity: 5,
+      analysis: result || 'Analysis not available',
+      suggestions: ['Take deep breaths', 'Practice mindfulness']
+    };
+  } catch (error) {
+    console.error('Error analyzing emotion with OpenAI:', error);
+    throw new Error('Failed to analyze emotion with AI');
   }
 };
 

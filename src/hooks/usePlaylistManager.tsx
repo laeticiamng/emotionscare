@@ -1,108 +1,121 @@
 
-import { useState } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
-import { mockMusicPlaylists } from '@/data/mockMusic';
+import { useState, useEffect } from 'react';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { mockPlaylists } from '@/data/mockMusic';
 
-export const usePlaylistManager = (initialPlaylists = mockMusicPlaylists) => {
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(initialPlaylists);
-  
-  const normalizeTrack = (track: any): MusicTrack => {
-    return {
-      id: track.id,
-      title: track.title,
-      artist: track.artist,
-      duration: track.duration,
-      url: track.url,
-      audioUrl: track.audioUrl || track.url,
-      coverUrl: track.coverUrl,
-      emotion: track.emotion,
-    };
+interface UsePlaylistManagerProps {
+  autoLoad?: boolean;
+}
+
+export function usePlaylistManager({ autoLoad = true }: UsePlaylistManagerProps = {}) {
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Load playlists on mount if autoLoad is true
+  useEffect(() => {
+    if (autoLoad) {
+      fetchPlaylists();
+    }
+  }, [autoLoad]);
+
+  // Fetch playlists from API (mocked)
+  const fetchPlaylists = async () => {
+    setLoading(true);
+    try {
+      // Simulated API call delay
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      setPlaylists(mockPlaylists);
+      setLoading(false);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to fetch playlists'));
+      setLoading(false);
+    }
   };
-  
-  const getPlaylistById = (id: string) => {
-    return playlists.find(playlist => playlist.id === id) || null;
+
+  // Create new playlist
+  const createPlaylist = async (
+    name: string,
+    description?: string,
+    tracks: MusicTrack[] = []
+  ) => {
+    setLoading(true);
+    try {
+      // Simulated API call delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+      const newPlaylist: MusicPlaylist = {
+        id: `playlist-${Date.now()}`,
+        title: name,
+        name,
+        description,
+        tracks,
+        category: 'user-created'
+      };
+      
+      setPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
+      setLoading(false);
+      return newPlaylist;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to create playlist'));
+      setLoading(false);
+      throw err;
+    }
   };
-  
-  const getPlaylistByEmotion = (emotion: string) => {
-    return playlists.find(playlist => 
-      playlist.emotion?.toLowerCase() === emotion.toLowerCase()
-    ) || null;
+
+  // Get a playlist by ID
+  const getPlaylist = (id: string) => {
+    return playlists.find((playlist) => playlist.id === id) || null;
   };
-  
-  const createPlaylist = (data: Omit<MusicPlaylist, 'id'>) => {
-    const newPlaylist = {
-      ...data,
-      id: `playlist-${Date.now()}`,
-      tracks: data.tracks?.map(normalizeTrack) || []
-    };
-    
-    setPlaylists([...playlists, newPlaylist]);
-    return newPlaylist;
+
+  // Load playlist by ID
+  const loadPlaylist = (id: string) => {
+    const playlist = getPlaylist(id);
+    if (playlist) {
+      setCurrentPlaylist(playlist);
+      return playlist;
+    }
+    return null;
   };
-  
-  const updatePlaylist = (id: string, data: Partial<MusicPlaylist>) => {
-    const updatedPlaylists = playlists.map(playlist => {
-      if (playlist.id === id) {
-        return {
-          ...playlist,
-          ...data,
-          tracks: data.tracks 
-            ? data.tracks.map(normalizeTrack)
-            : playlist.tracks
-        };
+
+  // Add track to playlist
+  const addTrackToPlaylist = (playlistId: string, track: MusicTrack) => {
+    const updatedPlaylists = playlists.map((playlist) => {
+      if (playlist.id === playlistId) {
+        // Check if track is already in playlist
+        const trackExists = playlist.tracks.some((t) => t.id === track.id);
+        if (!trackExists) {
+          return {
+            ...playlist,
+            tracks: [...playlist.tracks, track]
+          };
+        }
       }
       return playlist;
     });
     
     setPlaylists(updatedPlaylists);
-    return getPlaylistById(id);
-  };
-  
-  const deletePlaylist = (id: string) => {
-    setPlaylists(playlists.filter(playlist => playlist.id !== id));
-  };
-  
-  const addTrackToPlaylist = (playlistId: string, track: MusicTrack) => {
-    const playlist = getPlaylistById(playlistId);
-    if (!playlist) return null;
     
-    // Don't add if track already exists in playlist
-    if (playlist.tracks.some(t => t.id === track.id)) {
-      return playlist;
+    // Update current playlist if it's the one being modified
+    if (currentPlaylist?.id === playlistId) {
+      const updatedPlaylist = updatedPlaylists.find((p) => p.id === playlistId);
+      if (updatedPlaylist) {
+        setCurrentPlaylist(updatedPlaylist);
+      }
     }
-    
-    const updatedPlaylist = {
-      ...playlist,
-      tracks: [...playlist.tracks, normalizeTrack(track)]
-    };
-    
-    updatePlaylist(playlistId, updatedPlaylist);
-    return updatedPlaylist;
   };
-  
-  const removeTrackFromPlaylist = (playlistId: string, trackId: string) => {
-    const playlist = getPlaylistById(playlistId);
-    if (!playlist) return null;
-    
-    const updatedPlaylist = {
-      ...playlist,
-      tracks: playlist.tracks.filter(track => track.id !== trackId)
-    };
-    
-    updatePlaylist(playlistId, updatedPlaylist);
-    return updatedPlaylist;
-  };
-  
+
   return {
     playlists,
-    getPlaylistById,
-    getPlaylistByEmotion,
+    currentPlaylist,
+    loading,
+    error,
+    fetchPlaylists,
     createPlaylist,
-    updatePlaylist,
-    deletePlaylist,
+    getPlaylist,
+    loadPlaylist,
     addTrackToPlaylist,
-    removeTrackFromPlaylist
+    setCurrentPlaylist
   };
-};
-
-export default usePlaylistManager;
+}

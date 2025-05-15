@@ -1,6 +1,7 @@
+
 import { LeaderboardEntry, Badge } from '@/types/gamification';
 
-const leaderboardEntries: LeaderboardEntry[] = [
+export const leaderboardEntries: LeaderboardEntry[] = [
   {
     id: '1',
     userId: 'user1',
@@ -8,7 +9,7 @@ const leaderboardEntries: LeaderboardEntry[] = [
     rank: 1,
     name: 'Sophie Martin',
     avatarUrl: '/images/avatars/avatar-1.png',
-    points: 1850,  // Already acceptable due to our type changes
+    points: 1850,
     level: 8,
     progress: 75
   },
@@ -19,7 +20,7 @@ const leaderboardEntries: LeaderboardEntry[] = [
     rank: 2,
     name: 'Antoine Dubois',
     avatarUrl: '/images/avatars/avatar-2.png',
-    points: 1720,  // Already acceptable due to our type changes
+    points: 1720,
     level: 7,
     progress: 90
   },
@@ -30,14 +31,13 @@ const leaderboardEntries: LeaderboardEntry[] = [
     rank: 3,
     name: 'Chloé Leclerc',
     avatarUrl: '/images/avatars/avatar-3.png',
-    points: 1680,  // Already acceptable due to our type changes
+    points: 1680,
     level: 7,
     progress: 60
   },
 ];
 
-// Fix string values that should be numbers
-const badges = [
+export const badges: Badge[] = [
   {
     id: '1',
     name: 'First Week',
@@ -48,7 +48,7 @@ const badges = [
     progress: 100,
     total: 100,
     unlocked: true,
-    threshold: 7  // Change to number if it was a string
+    threshold: 7
   },
   {
     id: '2',
@@ -60,7 +60,7 @@ const badges = [
     progress: 100,
     total: 100,
     unlocked: true,
-    threshold: 30  // Change to number if it was a string
+    threshold: 30
   },
   {
     id: '3',
@@ -72,8 +72,10 @@ const badges = [
     progress: 100,
     total: 100,
     unlocked: true,
-    threshold: 10  // Change to number if it was a string
+    threshold: 10
   },
 ];
 
-export { leaderboardEntries, badges };
+// Add the missing exports
+export const mockBadges = badges;
+export const mockLeaderboard = leaderboardEntries;

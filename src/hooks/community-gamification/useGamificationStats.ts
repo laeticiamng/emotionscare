@@ -1,11 +1,12 @@
+
 import { useState, useEffect } from 'react';
-import { GamificationStats } from '@/types';
+import { GamificationStats } from '@/types/gamification';
 
 export const useGamificationStats = (userId?: string) => {
   const [stats, setStats] = useState<GamificationStats>({
     points: 450,
     level: 3,
-    progress: 65,  // Add missing required properties
+    progress: 65,
     badges: [],
     challenges: [],
     achievements: [],
