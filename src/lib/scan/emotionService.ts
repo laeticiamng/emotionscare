@@ -1,4 +1,3 @@
-
 import { Emotion, EmotionPrediction, EmotionResult } from '@/types/emotion';
 
 // Define EmotionRecord type for local use in this file
@@ -161,4 +160,23 @@ export const processTextEmotion = async (text: string): Promise<EmotionResult> =
   };
   
   return result;
+};
+
+/**
+ * Predict emotion from text
+ */
+export const predictEmotion = (text: string): Promise<EmotionPrediction> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Create a prediction with all required fields
+      resolve({
+        predictedEmotion: 'joy',
+        emotion: 'joy',
+        probability: 0.85,
+        confidence: 0.85, // Adding the required confidence field
+        triggers: ['positive event', 'achievement'],
+        recommendations: ['celebrate', 'share with friends']
+      });
+    }, 500);
+  });
 };

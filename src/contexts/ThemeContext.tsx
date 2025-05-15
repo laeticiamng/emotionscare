@@ -1,108 +1,106 @@
 
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { Theme, ThemeContextType, FontSize, FontFamily } from '@/types/types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Theme, FontFamily, FontSize } from '@/types';
 
-export const ThemeContext = createContext<ThemeContextType>({
-  theme: 'system',
-  setTheme: () => {},
-  isDarkMode: false
-});
-
-interface ThemeProviderProps {
-  children: ReactNode;
-  defaultTheme?: Theme;
-  defaultFontFamily?: FontFamily;
-  defaultFontSize?: FontSize;
+// Define the ThemeContextType
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (font: FontFamily) => void;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  isDarkMode?: boolean;
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({
-  children,
-  defaultTheme = 'system',
-  defaultFontFamily = 'inter',
-  defaultFontSize = 'medium'
-}) => {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
-  const [fontFamily, setFontFamily] = useState<FontFamily>(defaultFontFamily);
-  const [fontSize, setFontSize] = useState<FontSize>(defaultFontSize);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+// Create the theme context with default values
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'system',
+  setTheme: () => {},
+});
 
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<Theme>('system');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('inter');
+  const [fontSize, setFontSize] = useState<FontSize>('medium');
+  const isDarkMode = theme === 'dark';
+  
+  // Load preferences from localStorage or system settings
   useEffect(() => {
-    // Load theme from localStorage if available
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    const savedFontFamily = localStorage.getItem('fontFamily') as FontFamily;
-    const savedFontSize = localStorage.getItem('fontSize') as FontSize;
-
-    if (savedTheme) setTheme(savedTheme);
-    if (savedFontFamily) setFontFamily(savedFontFamily);
-    if (savedFontSize) setFontSize(savedFontSize);
+    const storedTheme = localStorage.getItem('theme') as Theme;
+    if (storedTheme) {
+      setTheme(storedTheme);
+    } else {
+      // Check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark ? 'dark' : 'light');
+    }
+    
+    // Load font settings if available
+    const storedFont = localStorage.getItem('fontFamily') as FontFamily;
+    if (storedFont) setFontFamily(storedFont);
+    
+    const storedSize = localStorage.getItem('fontSize') as FontSize;
+    if (storedSize) setFontSize(storedSize);
   }, []);
-
+  
+  // Update body class and localStorage when theme changes
   useEffect(() => {
-    // Save theme to localStorage when it changes
     localStorage.setItem('theme', theme);
+    document.body.className = theme === 'dark' ? 'dark' : '';
     
-    // Apply theme to document
-    document.documentElement.classList.remove('light', 'dark');
-    
-    let resolvedTheme = theme;
-    
-    if (theme === 'system') {
-      resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    
-    document.documentElement.classList.add(resolvedTheme);
-    setIsDarkMode(resolvedTheme === 'dark');
-    
-  }, [theme]);
-
-  useEffect(() => {
-    // Save font settings and apply them
+    // Apply font family
     if (fontFamily) {
+      document.body.style.fontFamily = getFontFamilyValue(fontFamily);
       localStorage.setItem('fontFamily', fontFamily);
-      document.documentElement.style.setProperty('--font-family', getFontFamilyValue(fontFamily));
     }
     
+    // Apply font size
     if (fontSize) {
+      document.body.style.fontSize = getFontSizeValue(fontSize);
       localStorage.setItem('fontSize', fontSize);
-      document.documentElement.setAttribute('data-font-size', fontSize);
     }
-  }, [fontFamily, fontSize]);
-
+  }, [theme, fontFamily, fontSize]);
+  
   return (
-    <ThemeContext.Provider 
-      value={{ 
-        theme, 
-        setTheme, 
-        fontFamily, 
-        setFontFamily, 
-        fontSize, 
-        setFontSize, 
-        isDarkMode 
-      }}
-    >
+    <ThemeContext.Provider value={{ 
+      theme, 
+      setTheme, 
+      fontFamily, 
+      setFontFamily, 
+      fontSize,
+      setFontSize,
+      isDarkMode
+    }}>
       {children}
     </ThemeContext.Provider>
   );
 };
 
-// Helper to get actual CSS font family values
-const getFontFamilyValue = (family: FontFamily): string => {
-  const fontMap = {
-    'inter': 'var(--font-inter)',
-    'roboto': 'var(--font-roboto)',
-    'poppins': 'var(--font-poppins)',
-    'merriweather': 'var(--font-merriweather)',
-    'system': 'system-ui, -apple-system',
-    'system-ui': 'system-ui, -apple-system',
-    'sans-serif': 'ui-sans-serif, system-ui',
-    'serif': 'ui-serif, Georgia',
-    'mono': 'ui-monospace, SFMono-Regular',
-    'rounded': 'ui-rounded'
-  };
-  
-  return fontMap[family] || fontMap['system'];
-};
+// Helper functions to get CSS values
+function getFontFamilyValue(family: FontFamily): string {
+  switch (family) {
+    case 'inter': return 'Inter, sans-serif';
+    case 'roboto': return 'Roboto, sans-serif';
+    case 'poppins': return 'Poppins, sans-serif';
+    case 'merriweather': return 'Merriweather, serif';
+    case 'mono': return 'monospace';
+    case 'system': return 'system-ui, sans-serif';
+    default: return 'Inter, sans-serif';
+  }
+}
 
+function getFontSizeValue(size: FontSize): string {
+  switch (size) {
+    case 'small': return '0.875rem';
+    case 'medium': return '1rem';
+    case 'large': return '1.125rem';
+    case 'extra-large': case 'x-large': case 'xl': return '1.25rem';
+    default: return '1rem';
+  }
+}
+
+// Hook to use the theme context
 export const useTheme = () => useContext(ThemeContext);
 
 export default ThemeContext;

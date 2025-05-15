@@ -289,6 +289,26 @@ const CoachChatPage: React.FC = () => {
     setIsBreathingMode(false);
   };
 
+  // Update any usage of EmotionMusicParams to include intensity
+  const handlePlayMoodMusic = (emotion: string) => {
+    if (loadPlaylistForEmotion) {
+      loadPlaylistForEmotion({
+        emotion,
+        intensity: 50 // Adding the required intensity
+      });
+    }
+  };
+
+  // Update another instance if it exists
+  const handleEmotionMusic = (emotion: string) => {
+    if (loadPlaylistForEmotion) {
+      loadPlaylistForEmotion({
+        emotion,
+        intensity: 50 // Adding the required intensity
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col h-full max-h-screen">
       {isBreathingMode ? (

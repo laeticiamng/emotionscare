@@ -46,7 +46,10 @@ export type {
   UserModeContextType,
   ThemeContextType,
   ThemeButtonProps,
-  SidebarContextType
+  SidebarContextType,
+  Theme,
+  FontFamily,
+  FontSize
 } from './types';
 
 // Additional type re-exports
@@ -70,11 +73,9 @@ export type {
   InvitationData,
   InvitationFormData,
   InvitationVerificationResult,
-  FontFamily,
-  FontSize,
-  ThemeName,
   EmotionalData
 } from './types';
 
 // Add missing export for EmotionMusicParams
 export type { EmotionMusicParams } from './types';
+

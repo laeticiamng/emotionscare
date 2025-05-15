@@ -1,131 +1,169 @@
 
-import { VRSessionTemplate, VRSession } from '@/types/vr';
+import { VRSession, VRSessionTemplate } from '@/types';
 
-// Fonction pour obtenir les sessions recommandées
-export const getRecommendedSessions = (): VRSessionTemplate[] => {
-  return [
-    {
-      id: "1",
-      name: "Méditation Guidée",
-      title: "Méditation Guidée pour la Sérénité",
-      description: "Une méditation guidée pour retrouver calme et sérénité",
-      category: "meditation",
-      duration: 600,
-      intensity: "low",
-      tags: ["calme", "meditation", "respiration"],
-      thumbnail: "/images/vr/meditation-thumbnail.jpg",
-      popularity: 98,
-      recommendedFor: ["stress", "anxiété", "insomnie"],
-      emotions: ["calme", "serein", "détendu"],
-      theme: "Meditation" // Added required theme property
-    },
-    {
-      id: "2", 
-      name: "Forêt Apaisante",
-      title: "Immersion en Forêt Relaxante",
-      description: "Évadez-vous dans une forêt apaisante pour retrouver votre équilibre naturel",
-      category: "nature",
-      duration: 900,
-      intensity: "medium",
-      tags: ["nature", "forêt", "relaxation"],
-      thumbnail: "/images/vr/forest-thumbnail.jpg",
-      popularity: 85,
-      recommendedFor: ["fatigue", "burnout", "concentration"],
-      emotions: ["apaisé", "ressourcé", "énergisé"],
-      theme: "Nature" // Added required theme property
-    }
-  ];
+// Mock VR templates
+const vrTemplates: VRSessionTemplate[] = [
+  {
+    id: '1',
+    title: 'Méditation en forêt',
+    description: 'Une méditation immersive au cœur d\'une forêt paisible',
+    duration: 600, // 10 minutes
+    type: 'meditation',
+    thumbnail: '/images/vr/forest-meditation.jpg',
+    videoUrl: '/videos/forest-meditation.mp4',
+    emotion: 'calm',
+    emotionTarget: 'calm',
+    benefits: ['Réduction du stress', 'Amélioration du sommeil', 'Clarté mentale'],
+    difficulty: 'débutant'
+  },
+  {
+    id: '2',
+    title: 'Plage tropicale',
+    description: 'Échappez-vous sur une plage tropicale idyllique',
+    duration: 900, // 15 minutes
+    type: 'relaxation',
+    thumbnail: '/images/vr/tropical-beach.jpg',
+    videoUrl: '/videos/tropical-beach.mp4',
+    emotion: 'happy',
+    emotionTarget: 'joy',
+    benefits: ['Réduction de l\'anxiété', 'Élévation de l\'humeur', 'Détente profonde'],
+    difficulty: 'intermédiaire'
+  }
+];
+
+// Mock VR sessions
+const vrSessions: VRSession[] = [
+  {
+    id: '101',
+    templateId: '1',
+    userId: 'user123',
+    startTime: new Date().toISOString(),
+    endTime: new Date(Date.now() + 10 * 60000).toISOString(),
+    duration: 600,
+    completed: true,
+    emotionBefore: 'stressed',
+    emotionAfter: 'calm',
+    emotionTarget: 'calm',
+    rating: 4
+  },
+  {
+    id: '102',
+    templateId: '2',
+    userId: 'user123',
+    startTime: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+    endTime: new Date(Date.now() - 86400000 + 15 * 60000).toISOString(),
+    duration: 900,
+    completed: true,
+    emotionBefore: 'anxious',
+    emotionAfter: 'relaxed',
+    emotionTarget: 'joy',
+    rating: 5
+  }
+];
+
+// VR service functions
+export const fetchVRTemplates = async (): Promise<VRSessionTemplate[]> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(vrTemplates), 500);
+  });
 };
 
-// Fonction pour enregistrer une session VR
-export const saveVRSession = async (session: VRSession): Promise<VRSession> => {
-  // Simuler un appel API avec un délai
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Normalement, nous ferions un appel à une API ici
-  console.log('Enregistrement de la session VR:', session);
-  
-  return {
-    ...session,
-    id: session.id || `session-${Date.now()}`,
-    completed: true
-  };
+export const fetchVRTemplate = async (templateId: string): Promise<VRSessionTemplate | null> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const template = vrTemplates.find(t => t.id === templateId) || null;
+      resolve(template);
+    }, 300);
+  });
 };
 
-// Fonction pour enregistrer une session de relaxation
-export const saveRelaxationSession = async (sessionData: {
-  userId: string;
-  duration: number;
-  emotionBefore?: string;
-  emotionAfter?: string;
-  templateId?: string;
-}): Promise<{ success: boolean; id: string }> => {
-  // Simuler un appel API avec un délai
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  console.log('Enregistrement de la session de relaxation:', sessionData);
-  
-  // Dans une vraie application, nous ferions un appel API ici
-  return {
-    success: true,
-    id: `rel-${Date.now()}`
-  };
+export const fetchVRSessionHistory = async (userId: string): Promise<VRSession[]> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const userSessions = vrSessions.filter(s => s.userId === userId);
+      resolve(userSessions);
+    }, 500);
+  });
 };
 
-// Fonction pour récupérer l'historique des sessions
-export const getVRSessionHistory = async (userId: string): Promise<VRSession[]> => {
-  // Simuler un appel API avec un délai
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  // Dans une application réelle, nous récupérerions l'historique depuis une API
-  return [
-    {
-      id: "session-1",
-      user_id: userId,
-      template_id: "1",
-      start_time: new Date(Date.now() - 86400000).toISOString(),
-      end_time: new Date(Date.now() - 86370000).toISOString(),
-      duration_seconds: 1800,
-      completed: true,
-      emotion_before: "stressé",
-      emotion_after: "calme",
-      emotions: ["calme", "serein"],
-      template: {
-        id: "1",
-        name: "Méditation Guidée",
-        title: "Méditation Guidée pour la Sérénité",
-        description: "Une méditation guidée pour retrouver calme et sérénité",
-        category: "meditation",
-        duration: 600,
-        intensity: "low",
-        tags: ["calme", "meditation", "respiration"],
-        thumbnail: "/images/vr/meditation-thumbnail.jpg",
-        theme: "Meditation" // Added required theme property
+export const createVRSession = async (sessionData: Partial<VRSession>): Promise<VRSession> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newSession: VRSession = {
+        id: Math.random().toString(36).substr(2, 9),
+        templateId: sessionData.templateId || '',
+        userId: sessionData.userId || '',
+        startTime: new Date().toISOString(),
+        duration: sessionData.duration || 0,
+        completed: false,
+        emotionBefore: sessionData.emotionBefore,
+        emotionTarget: sessionData.emotionTarget,
+        ...sessionData
+      };
+      vrSessions.push(newSession);
+      resolve(newSession);
+    }, 300);
+  });
+};
+
+export const completeVRSession = async (sessionId: string, sessionData: Partial<VRSession>): Promise<VRSession> => {
+  // Simulate API call delay
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const sessionIndex = vrSessions.findIndex(s => s.id === sessionId);
+      if (sessionIndex === -1) {
+        reject(new Error('Session not found'));
+        return;
       }
-    },
-    {
-      id: "session-2",
-      user_id: userId,
-      template_id: "2",
-      start_time: new Date(Date.now() - 172800000).toISOString(),
-      end_time: new Date(Date.now() - 172770000).toISOString(),
-      duration_seconds: 1200,
-      completed: true,
-      emotion_before: "anxieux",
-      emotion_after: "apaisé",
-      emotions: ["apaisé", "confiant"],
-      template: {
-        id: "2", 
-        name: "Forêt Apaisante",
-        title: "Immersion en Forêt Relaxante",
-        description: "Évadez-vous dans une forêt apaisante pour retrouver votre équilibre naturel",
-        category: "nature",
-        duration: 900,
-        intensity: "medium",
-        tags: ["nature", "forêt", "relaxation"],
-        thumbnail: "/images/vr/forest-thumbnail.jpg",
-        theme: "Nature" // Added required theme property
-      }
-    }
-  ];
+      
+      const updatedSession: VRSession = {
+        ...vrSessions[sessionIndex],
+        ...sessionData,
+        endTime: new Date().toISOString(),
+        completed: true
+      };
+      
+      vrSessions[sessionIndex] = updatedSession;
+      resolve(updatedSession);
+    }, 300);
+  });
+};
+
+export const fetchSessionById = async (sessionId: string): Promise<VRSession | null> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const session = vrSessions.find(s => s.id === sessionId) || null;
+      resolve(session);
+    }, 300);
+  });
+};
+
+export const fetchTemplateById = async (templateId: string): Promise<VRSessionTemplate | null> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const template = vrTemplates.find(t => t.id === templateId) || null;
+      resolve(template);
+    }, 300);
+  });
+};
+
+export const getRecommendedTemplates = async (emotion: string): Promise<VRSessionTemplate[]> => {
+  // Simulate API call delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Filter templates that match or counter the current emotion
+      const recommended = vrTemplates.filter(t => 
+        t.emotionTarget === emotion || 
+        (emotion === 'stressed' && t.emotionTarget === 'calm') ||
+        (emotion === 'sad' && t.emotionTarget === 'joy')
+      );
+      resolve(recommended.length ? recommended : vrTemplates);
+    }, 500);
+  });
 };

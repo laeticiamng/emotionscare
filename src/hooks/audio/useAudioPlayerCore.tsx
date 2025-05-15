@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { MusicTrack } from '@/types/music';
 import { formatTime as formatTimeUtil } from './audioPlayerUtils';
@@ -75,7 +74,13 @@ export function useAudioPlayerCore() {
   }, [repeat]);
 
   // Jouer une piste spécifique
-  const playTrack = (track: MusicTrack) => {
+  const handlePlayTrack = (track: MusicTrack) => {
+    if (!track || !track.audioUrl) {
+      console.error("Cannot play track: No audio URL provided");
+      setError(new Error("No audio URL provided"));
+      return;
+    }
+
     const audio = audioRef.current;
     if (!audio) return;
 
@@ -226,7 +231,7 @@ export function useAudioPlayerCore() {
     isMuted,
     
     // Actions
-    playTrack,
+    playTrack: handlePlayTrack,
     pauseTrack,
     resumeTrack,
     nextTrack,

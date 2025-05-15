@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ColorPaletteDisplay from '@/components/theme/ColorPaletteDisplay';
 import ThemeColorExample from '@/components/theme/ThemeColorExample';
@@ -57,7 +56,7 @@ const DesignSystemPage: React.FC = () => {
             Pastel
           </Button>
           
-          <ThemeSwitcher showLabel size="default" />
+          <ThemeSwitcher size="sm" />
         </div>
       </div>
 
@@ -74,7 +73,7 @@ const DesignSystemPage: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ThemeColorExample />
+            <ThemeColorExample theme="light" />
           </CardContent>
         </Card>
       </section>

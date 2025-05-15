@@ -1,29 +1,22 @@
 
 import React from 'react';
-import { Theme } from '@/types/types';
 
-interface ThemeColorExampleProps {
-  theme: Theme;
+export interface ThemeColorExampleProps {
+  theme: 'light' | 'dark' | 'system' | string;
 }
 
 const ThemeColorExample: React.FC<ThemeColorExampleProps> = ({ theme }) => {
   return (
-    <div className="grid grid-cols-2 gap-4">
-      <div>
-        <h3 className="text-sm font-medium mb-2">Primary</h3>
-        <div className="bg-primary h-10 rounded-md"></div>
-      </div>
-      <div>
-        <h3 className="text-sm font-medium mb-2">Secondary</h3>
-        <div className="bg-secondary h-10 rounded-md"></div>
-      </div>
-      <div>
-        <h3 className="text-sm font-medium mb-2">Accent</h3>
-        <div className="bg-accent h-10 rounded-md"></div>
-      </div>
-      <div>
-        <h3 className="text-sm font-medium mb-2">Background</h3>
-        <div className="bg-background border h-10 rounded-md"></div>
+    <div className="p-4 border rounded-lg">
+      <h3 className="text-lg font-medium mb-2">Theme: {theme}</h3>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="p-2 bg-primary text-primary-foreground rounded">Primary</div>
+        <div className="p-2 bg-secondary text-secondary-foreground rounded">Secondary</div>
+        <div className="p-2 bg-accent text-accent-foreground rounded">Accent</div>
+        <div className="p-2 bg-muted text-muted-foreground rounded">Muted</div>
+        <div className="p-2 bg-card text-card-foreground rounded">Card</div>
+        <div className="p-2 bg-destructive text-destructive-foreground rounded">Destructive</div>
+        <div className="p-2 bg-background text-foreground border rounded">Background</div>
       </div>
     </div>
   );

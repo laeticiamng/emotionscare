@@ -286,9 +286,9 @@ export interface VRSessionTemplate {
   imageUrl?: string;
   completionRate?: number;
   recommendedMood?: string;
-  category?: string; // Added to fix errors
-  emotions?: string[]; // Added to fix errors
-  intensity?: number; // Added for VR service
+  category?: string;
+  emotions?: string[];
+  intensity?: number;
   // For backward compatibility
   emotion_target?: string;
   preview_url?: string;
@@ -296,7 +296,7 @@ export interface VRSessionTemplate {
   image_url?: string;
   audio_url?: string;
   completion_rate?: number;
-  recommended_mood?: string;
+  recommended_mood?: number;
   video_url?: string;
 }
 
@@ -319,7 +319,8 @@ export interface VRSession {
   heartRateBefore?: number;
   heartRateAfter?: number;
   isCompleted?: boolean;
-  emotions?: string[]; // Added to fix errors
+  emotions?: string[];
+  emotionTarget?: string; // Adding this to VRSession as well
   // For backward compatibility
   template_id?: string;
   user_id?: string;
@@ -332,6 +333,7 @@ export interface VRSession {
   is_audio_only?: boolean;
   heart_rate_before?: number;
   heart_rate_after?: number;
+  emotion_target?: string;
 }
 
 export interface VRHistoryListProps {
@@ -384,6 +386,7 @@ export interface Challenge {
   completions?: number;
   progress?: number;
   total?: number;
+  goal?: number; // Adding this property used in gamificationService.ts
   type: 'daily' | 'weekly' | 'one-time' | 'streak' | 'count' | 'completion' | string;
   category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity' | 'vr' | 'daily' | 'mindfulness' | 'scan' | string;
   status?: 'complete' | 'in-progress' | 'not-started' | 'completed' | 'ongoing' | 'active' | string;
@@ -398,7 +401,7 @@ export interface GamificationStats {
   rank?: string;
   badges: Badge[];
   completedChallenges: number;
-  totalChallenges: number;
+  totalChallenges: number; // Adding this required property
   streak: number;
   graph?: {
     date: string;
@@ -466,6 +469,7 @@ export interface LeaderboardEntry {
   department?: string;
   level?: number;
   position?: number;
+  userId?: string; // Adding this property that's used in leaderboard-service.ts
 }
 
 // ========================
@@ -590,6 +594,8 @@ export interface MusicTrack {
   url: string;
   audioUrl?: string;
   coverUrl?: string;
+  cover?: string;
+  cover_url?: string;
   duration?: number;
   emotion?: string;
   // For backward compatibility
