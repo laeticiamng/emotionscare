@@ -378,21 +378,22 @@ export interface VRTemplateGridProps {
 // ========================
 export interface Challenge {
   id: string;
-  name: string;
-  title?: string;
+  name?: string; // Rendu optionnel car certains mocks utilisent title à la place
+  title?: string; 
   description: string;
   icon?: string;
   points: number;
   completions?: number;
   progress?: number;
   total?: number;
-  goal?: number; // Adding this property used in gamificationService.ts
-  type: 'daily' | 'weekly' | 'one-time' | 'streak' | 'count' | 'completion' | string;
+  goal?: number;
+  type?: 'daily' | 'weekly' | 'one-time' | 'streak' | 'count' | 'completion' | string; // Rendu optionnel
   category: 'emotion' | 'journal' | 'community' | 'coach' | 'activity' | 'vr' | 'daily' | 'mindfulness' | 'scan' | string;
-  status?: 'complete' | 'in-progress' | 'not-started' | 'completed' | 'ongoing' | 'active' | string;
+  status?: 'complete' | 'in-progress' | 'not-started' | 'completed' | 'ongoing' | 'active' | 'available' | 'locked' | 'failed' | string;
   completed?: boolean;
   target?: number;
   reward?: number | string;
+  level?: string | number; // Ajout de cette propriété présente dans certains mocks
 }
 
 export interface GamificationStats {
@@ -401,7 +402,7 @@ export interface GamificationStats {
   rank?: string;
   badges: Badge[];
   completedChallenges: number;
-  totalChallenges: number; // Adding this required property
+  totalChallenges?: number; // Rendu optionnel
   streak: number;
   graph?: {
     date: string;
@@ -465,11 +466,12 @@ export interface LeaderboardEntry {
   points: number;
   rank: number;
   avatar?: string;
+  avatarUrl?: string; // Ajout de avatarUrl comme propriété optionnelle pour backward compatibility
   isCurrentUser?: boolean;
   department?: string;
   level?: number;
   position?: number;
-  userId?: string; // Adding this property that's used in leaderboard-service.ts
+  userId?: string;
 }
 
 // ========================
@@ -628,8 +630,8 @@ export interface MusicContextType {
   pauseTrack: () => void;
   togglePlay: () => void;
   nextTrack: () => void;
-  prevTrack?: () => void;
-  previousTrack?: () => void; // For compatibility
+  prevTrack?: () => void; // For compatibility
+  previousTrack?: () => void;
   volume: number;
   isMuted?: boolean;
   toggleMute?: () => void;

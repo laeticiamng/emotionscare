@@ -1,4 +1,3 @@
-
 // Central export file for all types
 export * from './types';
 
@@ -8,7 +7,14 @@ export type {
   EmotionResult,
   EnhancedEmotionResult,
   EmotionalTeamViewProps,
-  EmotionalData
+  EmotionalData,
+  SidebarContextType,  // Ajouté
+  ThemeButtonProps,    // Ajouté
+  AuthContextType,     // Ajouté
+  UserModeContextType, // Ajouté
+  Theme,               // Ajouté
+  FontFamily,          // Ajouté
+  FontSize            // Ajouté
 } from './types';
 
 export type {
@@ -18,7 +24,8 @@ export type {
   VolumeControlProps,
   ProgressBarProps,
   MusicContextType,
-  MusicDrawerProps
+  MusicDrawerProps,
+  EmotionMusicParams   // Ajouté
 } from './types';
 
 export type {
@@ -78,4 +85,3 @@ export type {
 
 // Add missing export for EmotionMusicParams
 export type { EmotionMusicParams } from './types';
-

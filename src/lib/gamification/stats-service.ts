@@ -12,6 +12,7 @@ export const getGamificationStats = async (userId: string): Promise<Gamification
     badges: [], // This would typically contain badge objects
     streak: 7,
     completedChallenges: 12,
+    totalChallenges: 15, // Ajout de la propriété manquante
     activeChallenges: 3,
     streakDays: 7,
     nextLevelPoints: 1000,

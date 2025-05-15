@@ -23,6 +23,7 @@ export async function fetchGamificationStats(userId: string): Promise<Gamificati
     streakDays: 5,
     activeChallenges: 2,
     completedChallenges: 8,
+    totalChallenges: 10, // Ajout de la propriété manquante
     lastActivityDate: new Date().toISOString(),
     recentAchievements: [],
     progress: 75
@@ -39,7 +40,9 @@ export async function fetchChallenges(userId: string): Promise<Challenge[]> {
       status: 'active',
       category: 'scan',
       progress: 5,
-      goal: 7
+      goal: 7,
+      name: 'Scan quotidien', // Ajout de la propriété manquante
+      type: 'daily' // Ajout de la propriété manquante
     },
     {
       id: '2',
@@ -49,7 +52,9 @@ export async function fetchChallenges(userId: string): Promise<Challenge[]> {
       status: 'ongoing',
       category: 'journal',
       progress: 1,
-      goal: 3
+      goal: 3,
+      name: 'Journal introspectif', // Ajout de la propriété manquante
+      type: 'weekly' // Ajout de la propriété manquante
     }
   ];
 }

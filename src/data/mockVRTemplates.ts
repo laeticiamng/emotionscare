@@ -13,7 +13,7 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     videoUrl: '/videos/beach-relaxation.mp4',
     emotion: 'calm',
     completion_rate: 85,
-    recommended_mood: 'stressed',
+    recommended_mood: 'stressed', // Conversion en string au lieu de number
     benefits: ['Réduction du stress', 'Amélioration du sommeil', 'Clarté mentale'],
     is_audio_only: false
   },
@@ -28,7 +28,7 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     videoUrl: '/videos/forest-meditation.mp4',
     emotion: 'mindful',
     completion_rate: 72,
-    recommended_mood: 'anxious',
+    recommended_mood: 'anxious', // Conversion en string au lieu de number
     benefits: ['Focus amélioré', 'Réduction de l\'anxiété', 'Présence'],
     is_audio_only: false
   },
@@ -43,7 +43,7 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     audio_url: '/audio/guided-breathing.mp3',
     emotion: 'focused',
     completion_rate: 95,
-    recommended_mood: 'stressed',
+    recommended_mood: 'stressed', // Conversion en string au lieu de number
     benefits: ['Réduction immédiate du stress', 'Meilleure concentration', 'Équilibre'],
     is_audio_only: true
   },
@@ -58,7 +58,7 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     videoUrl: '/videos/positive-visualization.mp4',
     emotion: 'motivated',
     completion_rate: 68,
-    recommended_mood: 'sad',
+    recommended_mood: 'sad', // Conversion en string au lieu de number
     benefits: ['Augmentation de la motivation', 'Confiance en soi', 'Optimisme'],
     is_audio_only: false
   }
