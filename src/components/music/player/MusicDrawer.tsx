@@ -10,17 +10,21 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { MusicDrawerProps, MusicTrack } from '@/types/music';
+import { MusicDrawerProps, MusicTrack } from '@/types/types';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
+  isOpen,
   open,
   onOpenChange,
   onClose,
   playlist,
   currentTrack
 }) => {
+  // Use either isOpen or open prop
+  const isDrawerOpen = isOpen || open;
+  
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={isDrawerOpen} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Music Player</DrawerTitle>
@@ -33,9 +37,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
           {currentTrack ? (
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
-                {currentTrack.coverUrl ? (
+                {currentTrack.coverUrl || currentTrack.cover ? (
                   <img 
-                    src={currentTrack.coverUrl} 
+                    src={currentTrack.coverUrl || currentTrack.cover} 
                     alt={currentTrack.title} 
                     className="w-full h-full object-cover"
                   />
@@ -69,9 +73,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                     } cursor-pointer mb-1`}
                   >
                     <div className="w-8 h-8 bg-muted/50 rounded overflow-hidden mr-3">
-                      {track.coverUrl && (
+                      {(track.coverUrl || track.cover) && (
                         <img 
-                          src={track.coverUrl} 
+                          src={track.coverUrl || track.cover} 
                           alt={track.title} 
                           className="w-full h-full object-cover"
                         />

@@ -1,7 +1,21 @@
 
 import React from 'react';
 import { Disc } from 'lucide-react';
-import { MusicTrack, TrackInfoProps } from '@/types/music';
+import { MusicTrack } from '@/types/types';
+
+interface TrackInfoProps {
+  track?: MusicTrack;
+  title?: string;
+  artist?: string;
+  coverUrl?: string;
+  showCover?: boolean;
+  showControls?: boolean;
+  currentTrack?: MusicTrack;
+  loadingTrack?: boolean;
+  audioError?: Error | null;
+  className?: string;
+  compact?: boolean;
+}
 
 const TrackInfo: React.FC<TrackInfoProps> = ({
   track,

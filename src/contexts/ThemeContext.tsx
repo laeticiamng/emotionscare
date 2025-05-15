@@ -1,105 +1,108 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { ThemeName, FontSize, FontFamily, ThemeContextType } from '@/types/types';
+import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { Theme, ThemeContextType, FontSize, FontFamily } from '@/types/types';
 
-// Provider component
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<ThemeName>('system');
-  const [fontSize, setFontSize] = useState<FontSize>('medium');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('system-ui');
+export const ThemeContext = createContext<ThemeContextType>({
+  theme: 'system',
+  setTheme: () => {},
+  isDarkMode: false
+});
+
+interface ThemeProviderProps {
+  children: ReactNode;
+  defaultTheme?: Theme;
+  defaultFontFamily?: FontFamily;
+  defaultFontSize?: FontSize;
+}
+
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  children,
+  defaultTheme = 'system',
+  defaultFontFamily = 'inter',
+  defaultFontSize = 'medium'
+}) => {
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [fontFamily, setFontFamily] = useState<FontFamily>(defaultFontFamily);
+  const [fontSize, setFontSize] = useState<FontSize>(defaultFontSize);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem('theme') as ThemeName || 'system';
-    setTheme(storedTheme);
-    document.documentElement.dataset.theme = storedTheme;
+    // Load theme from localStorage if available
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    const savedFontFamily = localStorage.getItem('fontFamily') as FontFamily;
+    const savedFontSize = localStorage.getItem('fontSize') as FontSize;
 
-    const storedFontSize = localStorage.getItem('fontSize') as FontSize || 'medium';
-    setFontSize(storedFontSize);
-    document.documentElement.style.fontSize = getFontSizeValue(storedFontSize);
-
-    const storedFontFamily = localStorage.getItem('fontFamily') as FontFamily || 'system-ui';
-    setFontFamily(storedFontFamily);
-    document.documentElement.style.fontFamily = getFontFamilyValue(storedFontFamily);
-    
-    // Check if dark mode is active
-    const isDark = storedTheme === 'dark' || 
-      (storedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setIsDarkMode(isDark);
+    if (savedTheme) setTheme(savedTheme);
+    if (savedFontFamily) setFontFamily(savedFontFamily);
+    if (savedFontSize) setFontSize(savedFontSize);
   }, []);
 
   useEffect(() => {
+    // Save theme to localStorage when it changes
     localStorage.setItem('theme', theme);
-    document.documentElement.dataset.theme = theme;
     
-    // Update isDarkMode when theme changes
-    const isDark = theme === 'dark' || 
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    setIsDarkMode(isDark);
+    // Apply theme to document
+    document.documentElement.classList.remove('light', 'dark');
+    
+    let resolvedTheme = theme;
+    
+    if (theme === 'system') {
+      resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    document.documentElement.classList.add(resolvedTheme);
+    setIsDarkMode(resolvedTheme === 'dark');
+    
   }, [theme]);
 
   useEffect(() => {
-    localStorage.setItem('fontSize', fontSize);
-    document.documentElement.style.fontSize = getFontSizeValue(fontSize);
-  }, [fontSize]);
-
-  useEffect(() => {
-    localStorage.setItem('fontFamily', fontFamily);
-    document.documentElement.style.fontFamily = getFontFamilyValue(fontFamily);
-  }, [fontFamily]);
-
-  const getFontSizeValue = (size: FontSize): string => {
-    switch (size) {
-      case 'small':
-        return '0.875rem';
-      case 'medium':
-        return '1rem';
-      case 'large':
-        return '1.125rem';
-      case 'extra-large':
-        return '1.25rem';
-      default:
-        return '1rem';
+    // Save font settings and apply them
+    if (fontFamily) {
+      localStorage.setItem('fontFamily', fontFamily);
+      document.documentElement.style.setProperty('--font-family', getFontFamilyValue(fontFamily));
     }
-  };
-
-  const getFontFamilyValue = (font: FontFamily): string => {
-    return font;
-  };
-
-  const contextValue: ThemeContextType = {
-    theme,
-    setTheme,
-    fontSize,
-    setFontSize,
-    fontFamily,
-    setFontFamily,
-    isDarkMode
-  };
+    
+    if (fontSize) {
+      localStorage.setItem('fontSize', fontSize);
+      document.documentElement.setAttribute('data-font-size', fontSize);
+    }
+  }, [fontFamily, fontSize]);
 
   return (
-    <ThemeContext.Provider value={contextValue}>
+    <ThemeContext.Provider 
+      value={{ 
+        theme, 
+        setTheme, 
+        fontFamily, 
+        setFontFamily, 
+        fontSize, 
+        setFontSize, 
+        isDarkMode 
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );
 };
 
-// Create context once
-export const ThemeContext = createContext<ThemeContextType>({
-  theme: 'system',
-  setTheme: () => {},
-  fontSize: 'medium',
-  setFontSize: () => {},
-  fontFamily: 'system-ui',
-  setFontFamily: () => {},
-  isDarkMode: false
-});
-
-// Custom hook
-export const useTheme = (): ThemeContextType => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+// Helper to get actual CSS font family values
+const getFontFamilyValue = (family: FontFamily): string => {
+  const fontMap = {
+    'inter': 'var(--font-inter)',
+    'roboto': 'var(--font-roboto)',
+    'poppins': 'var(--font-poppins)',
+    'merriweather': 'var(--font-merriweather)',
+    'system': 'system-ui, -apple-system',
+    'system-ui': 'system-ui, -apple-system',
+    'sans-serif': 'ui-sans-serif, system-ui',
+    'serif': 'ui-serif, Georgia',
+    'mono': 'ui-monospace, SFMono-Regular',
+    'rounded': 'ui-rounded'
+  };
+  
+  return fontMap[family] || fontMap['system'];
 };
+
+export const useTheme = () => useContext(ThemeContext);
+
+export default ThemeContext;

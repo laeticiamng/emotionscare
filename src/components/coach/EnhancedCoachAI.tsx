@@ -5,7 +5,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { analyzeEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 
 const EnhancedCoachAI = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +14,7 @@ const EnhancedCoachAI = () => {
   const [userEmojis, setUserEmojis] = useState<string[]>([]);
 
   useEffect(() => {
-    // Charger les données initiales ou effectuer d'autres opérations au montage du composant
+    // Load initial data or perform other operations when component mounts
   }, []);
 
   const handleTextChange = (text: string) => {
@@ -29,25 +29,28 @@ const EnhancedCoachAI = () => {
     setUserEmojis([]);
   };
 
-  // Corriger la gestion des émojis pour qu'ils soient toujours un tableau
+  // Correct handling of emojis to ensure they're always an array
   const ensureArrayEmojis = (emojis: string | string[] | undefined): string[] => {
     if (Array.isArray(emojis)) {
       return emojis;
     }
-    return emojis ? [emojis] : [];
+    if (typeof emojis === 'string') {
+      return [emojis];
+    }
+    return [];
   };
 
-  // Mise à jour de la fonction où l'erreur apparaît
+  // Update the function where the error appears
   const handleEmotionDetected = (result: EmotionResult) => {
     if (result) {
       setAnalysisResult(result);
     }
     setIsLoading(false);
     
-    // Corriger l'erreur avec les émojis
+    // Correct the error with emojis by ensuring they're a valid array
     const safeEmojis = ensureArrayEmojis(result.emojis);
     
-    // Utiliser safeEmojis au lieu de result.emojis
+    // Use safeEmojis instead of result.emojis
     console.log('Emotion detected:', result.emotion, 'with emojis:', safeEmojis);
   };
 

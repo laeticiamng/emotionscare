@@ -1,14 +1,19 @@
 
 export interface Emotion {
-  id: string;
+  id?: string;
   user_id?: string;
   date?: string | Date;
-  emotion: string;
+  emotion?: string;
+  name?: string;
+  color?: string;
+  icon?: string;
+  description?: string;
+  category?: string;
   score?: number;
   confidence?: number;
   intensity?: number;
   text?: string;
-  emojis?: string;
+  emojis?: string[] | string;
   transcript?: string;
   audio_url?: string;
   ai_feedback?: string;
@@ -16,34 +21,42 @@ export interface Emotion {
   triggers?: string[];
   feedback?: string;
   timestamp?: string;
-  category?: string;
   anxiety?: number;
   energy?: number;
+  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EmotionResult {
-  id: string;
+  id?: string;
+  user_id?: string;
   emotion: string;
-  score: number;
-  confidence: number;
+  score?: number;
+  confidence?: number;
   dominantEmotion?: string;
   primaryEmotion?: string;
+  intensity?: number;
   text?: string;
-  emojis?: string;
   transcript?: string;
+  emojis?: string[] | string;
   timestamp?: string;
   date?: string;
   triggers?: string[];
   feedback?: string;
   ai_feedback?: string;
   recommendations?: string[];
-  user_id?: string;
-  intensity?: number;
+  audio_url?: string;
+  [key: string]: any;  // Allow for flexible extension
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
   recommendations?: string[];
   insights?: string[];
+  icon?: string;
+  color?: string;
+  textColor?: string;
+  description?: string;
+  category?: string;
+  coping_strategies?: string[];
   relatedActivities?: {
     id: string;
     title: string;
@@ -53,13 +66,17 @@ export interface EnhancedEmotionResult extends EmotionResult {
 }
 
 export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: 'day' | 'week' | 'month';
+  teamId?: string;
+  departmentId?: string;
+  users?: any[];
+  anonymized?: boolean;
+  onUserClick?: (userId: string) => void;
+  period?: 'day' | 'week' | 'month' | 'year' | string;
   userId?: string;
   className?: string;
-  onRefresh?: () => void;
   dateRange?: {
     start: Date;
     end: Date;
   };
+  onRefresh?: () => void;
 }

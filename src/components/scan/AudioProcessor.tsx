@@ -2,16 +2,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { analyzeAudioStream } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 
 interface AudioProcessorProps {
-  isListening: boolean;
   userId: string;
   isConfidential: boolean;
   onProcessingChange: (processing: boolean) => void;
   onProgressUpdate: (progress: string) => void;
-  onAnalysisComplete: (emotion: any, result: EmotionResult) => void;
+  onAnalysisComplete: (emotion: EmotionResult, result: EmotionResult) => void;
   onError: (error: string) => void;
+  isListening: boolean;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
@@ -29,7 +29,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   const streamRef = useRef<MediaStream | null>(null);
   const { toast } = useToast();
   
-  // Délai minimum d'enregistrement en millisecondes pour éviter des analyses trop courtes
+  // Minimum recording duration in milliseconds to avoid too-short analyses
   const MIN_RECORDING_DURATION = 3000;
   const recordingStartTimeRef = useRef<number | null>(null);
 
@@ -133,16 +133,16 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       console.log('Audio analysis result:', result);
       
       // Create emotion object with expected properties
-      const emotion = {
+      const emotion: EmotionResult = {
         id: result.id || crypto.randomUUID(),
         user_id: userId,
         date: new Date().toISOString(),
         emotion: result.emotion,
-        confidence: result.confidence,
+        confidence: result.confidence || 0.75,
         score: result.score || 50,
         text: result.text || '',
         transcript: result.transcript || '',
-        ai_feedback: result.feedback || '',
+        ai_feedback: result.ai_feedback || result.feedback || '',
         recommendations: result.recommendations || [],
       };
       

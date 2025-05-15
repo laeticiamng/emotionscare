@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 
 // User types
@@ -8,6 +7,12 @@ export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type ThemeName = Theme;
 export type FontSize = 'small' | 'medium' | 'large' | 'extra-large';
 export type FontFamily = 'inter' | 'roboto' | 'poppins' | 'merriweather' | 'system' | 'system-ui' | 'sans-serif' | 'serif' | 'mono' | 'rounded';
+
+// Add Period type
+export type Period = 'day' | 'week' | 'month' | 'year' | string;
+
+// Add UserModeType
+export type UserModeType = 'b2b_admin' | 'b2b_user' | 'b2c' | 'personal' | string;
 
 export interface User {
   id: string;
@@ -33,22 +38,27 @@ export interface UserPreferences {
   fontFamily: FontFamily;
   language: string;
   notifications: NotificationPreference;
-  email_notifications: boolean;
-  push_notifications: boolean;
-  privacy: {
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  privacy?: {
     profileVisibility?: 'private' | 'team' | 'public';
   };
-  accessibility: {
+  profileVisibility?: 'private' | 'team' | 'public';
+  accessibility?: {
     highContrast: boolean;
     reduceAnimations: boolean;
     largeText: boolean;
   };
-  analytics_consent: boolean;
-  marketing_consent: boolean;
-  sound: boolean;
-  notifications_enabled: boolean;
-  privacyLevel: 'strict' | 'balanced' | 'open';
+  analytics_consent?: boolean;
+  marketing_consent?: boolean;
+  sound?: boolean;
+  notifications_enabled?: boolean;
+  privacyLevel?: 'strict' | 'balanced' | 'open';
   fullAnonymity?: boolean;
+  soundEnabled?: boolean;
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
+  [key: string]: any; // For flexibility
 }
 
 export interface UserPreferencesState extends UserPreferences {
@@ -163,7 +173,7 @@ export interface GamificationStats {
     points: number;
   }[];
   
-  // Additional properties found in code
+  // Additional properties
   nextLevel?: number;
   pointsToNextLevel?: number;
   nextLevelPoints?: number;
@@ -281,8 +291,10 @@ export interface MusicContextType {
 
 export interface MusicDrawerProps {
   isOpen?: boolean;
+  open?: boolean;
   side?: 'left' | 'right' | 'top' | 'bottom';
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
 }
