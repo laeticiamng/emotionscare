@@ -21,7 +21,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   // Mock values for the player state
   const isPlaying = false;
   const volume = 0.7;
-  const progress = 45;
+  const currentTime = 45;
+  const duration = 180;
+  const isMuted = false;
   
   // Mock handlers
   const handlePlay = () => console.log('Play');
@@ -29,6 +31,8 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   const handlePrev = () => console.log('Previous');
   const handleNext = () => console.log('Next');
   const handleVolumeChange = (value: number) => console.log('Volume:', value);
+  const handleMuteToggle = () => console.log('Toggle mute');
+  const handleSeek = (value: number) => console.log('Seek to:', value);
 
   if (!currentTrack) return null;
 
@@ -51,7 +55,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             <div className="flex flex-col items-center mb-6">
               <div className="w-48 h-48 rounded-lg overflow-hidden bg-muted mb-4">
                 <img 
-                  src={currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || '/images/music-placeholder.jpg'} 
+                  src={currentTrack?.coverUrl || currentTrack?.cover || '/images/music-placeholder.jpg'} 
                   alt={currentTrack.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -64,7 +68,14 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             </div>
             
             {/* Progress bar */}
-            <MusicProgressBar progress={progress} />
+            <MusicProgressBar 
+              value={currentTime} 
+              max={duration}
+              currentTime={currentTime}
+              duration={duration}
+              onSeek={handleSeek}
+              className="mb-2"
+            />
             
             {/* Playback controls */}
             <div className="flex items-center justify-center gap-4 mt-6">
@@ -95,7 +106,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
               <Volume2 className="h-4 w-4 text-muted-foreground" />
               <VolumeControl 
                 volume={volume} 
-                onVolumeChange={handleVolumeChange} 
+                onVolumeChange={handleVolumeChange}
+                isMuted={isMuted}
+                onMuteToggle={handleMuteToggle}
                 className="w-full"
               />
             </div>

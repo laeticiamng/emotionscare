@@ -1,5 +1,5 @@
 
-import { Theme, FontFamily, FontSize } from './theme';
+import { Theme, FontFamily, FontSize, ThemeName } from './theme';
 import { NotificationType, NotificationFrequency, NotificationTone } from './notification';
 
 // Combined UserRole type to handle all possible roles
@@ -14,9 +14,9 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  created_at: string;
   avatar_url?: string;
   avatar?: string;
-  created_at: string; // Make created_at required to match types.ts
   createdAt?: string;
   last_sign_in_at?: string;
   onboarded?: boolean;
@@ -43,22 +43,22 @@ export interface UserPreferences {
   theme: Theme;
   fontSize: FontSize;
   fontFamily: FontFamily;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
   language?: string;
   ambientSound?: boolean;
   colorAccent?: string;
-  dashboardLayout?: DashboardLayout;
+  dashboardLayout?: DashboardLayout | string;
   onboardingCompleted?: boolean;
   soundEnabled?: boolean;
   animations?: boolean;
   fullAnonymity?: boolean;
   autoplayVideos?: boolean;
-  autoplayMedia?: boolean;
   dataCollection?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   notifications_enabled?: boolean;
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
   highContrast?: boolean;
   accessibility?: {
     highContrast?: boolean;
@@ -119,7 +119,7 @@ export interface NotificationPreferences {
     start: string;
     end: string;
   };
-  tone?: NotificationTone; // Add tone to match mockUsers.ts
+  tone?: NotificationTone;
 }
 
 export interface UserPreferencesState {

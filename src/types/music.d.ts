@@ -5,12 +5,13 @@ export interface MusicTrack {
   artist: string;
   duration: number;
   url: string;
-  audioUrl: string;
-  audio_url?: string; // Added for backward compatibility
-  coverUrl: string;
-  cover?: string; // Added for backward compatibility
-  cover_url?: string; // Added for backward compatibility
+  audioUrl?: string;
+  audio_url?: string; 
+  coverUrl?: string;
+  cover?: string;
+  cover_url?: string;
   emotion?: string;
+  description?: string;
 }
 
 export interface Track extends MusicTrack {
@@ -20,9 +21,11 @@ export interface Track extends MusicTrack {
 export interface MusicPlaylist {
   id: string;
   name: string;
-  title: string; 
+  title?: string; 
   description?: string;
   coverUrl?: string;
+  cover?: string;
+  cover_url?: string;
   tracks: MusicTrack[];
   category?: string;
   emotion?: string; 
@@ -66,31 +69,38 @@ export interface MusicContextType {
   error: string | null;
   
   // Additional properties
-  isShuffled: boolean;
-  isRepeating: boolean;
-  toggleShuffle: () => void;
-  toggleRepeat: () => void;
-  currentEmotion: string | null;
-  isMuted: boolean;
-  toggleMute: () => void;
+  isShuffled?: boolean;
+  isRepeating?: boolean;
+  toggleShuffle?: () => void;
+  toggleRepeat?: () => void;
+  currentEmotion?: string | null;
+  isMuted?: boolean;
+  toggleMute?: () => void;
 }
 
 export interface MusicDrawerProps {
-  open: boolean;
-  onClose: () => void;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  isOpen?: boolean;
+  onClose?: () => void;
+  onOpenChange?: (open: boolean) => void;
   playlist?: MusicPlaylist;
   currentTrack?: MusicTrack;
+  children?: React.ReactNode;
 }
 
 export interface ProgressBarProps {
-  duration: number;
-  currentTime: number;
-  onSeek: (time: number) => void;
+  value: number;
+  max?: number;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
   formatTime?: (time: number) => string;
   handleProgressClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   showTimestamps?: boolean;
   className?: string;
+  showLabel?: boolean;
+  variant?: 'default' | 'success' | 'warning' | 'danger';
+  progress?: number;
 }
 
 export interface TrackInfoProps {
@@ -109,10 +119,12 @@ export interface TrackInfoProps {
 
 export interface VolumeControlProps {
   volume: number;
-  onChange: (volume: number) => void;
   onVolumeChange?: (volume: number) => void;
+  onChange?: (volume: number) => void;
   showLabel?: boolean;
   className?: string;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
 }
 
 export interface TrackListProps {
@@ -124,4 +136,13 @@ export interface TrackListProps {
   compact?: boolean;
   showEmotionTag?: boolean;
   onPlay?: (track: MusicTrack) => void;
+}
+
+export interface MusicLibraryProps {
+  playlists?: MusicPlaylist[];
+  tracks?: MusicTrack[];
+  onPlayTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  loading?: boolean;
+  error?: string | null;
 }

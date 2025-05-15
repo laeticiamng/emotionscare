@@ -8,6 +8,9 @@ const defaultPreferences: UserPreferences = {
   theme: 'light' as Theme,
   fontSize: 'medium' as FontSize,
   fontFamily: 'system' as FontFamily,
+  reduceMotion: false,
+  colorBlindMode: false,
+  autoplayMedia: true,
   language: 'fr',
   ambientSound: false,
   notifications: {

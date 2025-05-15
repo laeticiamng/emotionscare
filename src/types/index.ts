@@ -23,7 +23,8 @@ export type {
   AuthContextType,
   InvitationVerificationResult,
   DashboardLayout,
-  NotificationPreferences
+  NotificationPreferences,
+  UserPreferencesContextType
 } from './user';
 
 // UserMode types

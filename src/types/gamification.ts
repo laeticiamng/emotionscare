@@ -18,6 +18,7 @@ export interface Challenge {
   endDate?: string;
   reward?: string;
   user_id?: string;
+  target?: number;
 }
 
 export interface Badge {
@@ -81,8 +82,8 @@ export interface LeaderboardEntry {
   points: number;
   rank: number;
   level: number;
-  badges_count: number;
-  challenges_completed: number;
+  badges_count?: number;
+  challenges_completed?: number;
   department?: string;
 }
 

@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { SidebarContextType } from '@/types/sidebar';
 
-const SidebarContext = createContext<SidebarContextType>({
+export const SidebarContext = createContext<SidebarContextType>({
   isOpen: false,
   toggle: () => {},
   close: () => {},
@@ -56,3 +56,5 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({
     </SidebarContext.Provider>
   );
 };
+
+export default SidebarContext;

@@ -4,15 +4,14 @@ import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
 
 const MusicProgressBar: React.FC<ProgressBarProps> = ({
-  progress,
-  value, // Added for compatibility
-  max = 100, // Added with default
+  value,
+  max = 100,
+  currentTime = 0,
+  duration = 100,
   onSeek,
   className = "",
-  currentTime = 0, // Added with default
-  duration = 100, // Added with default
-  formatTime, // Added
-  showTimestamps = true // Added with default
+  formatTime,
+  showTimestamps = true
 }) => {
   const defaultFormatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -21,15 +20,14 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
   };
 
   const timeFormatter = formatTime || defaultFormatTime;
-  const currentTimeValue = typeof progress === 'number' ? timeFormatter(progress) : timeFormatter(currentTime);
-  const totalTimeValue = typeof duration === 'number' ? timeFormatter(duration) : timeFormatter(100);
-  const progressValue = typeof progress === 'number' ? progress : (value !== undefined ? value : 0);
+  const currentTimeValue = timeFormatter(currentTime);
+  const totalTimeValue = timeFormatter(duration);
 
   return (
     <div className={`space-y-2 ${className}`}>
       <Slider
         defaultValue={[0]}
-        value={[progressValue]}
+        value={[value]}
         max={max}
         step={1}
         onValueChange={onSeek ? (value) => onSeek(value[0]) : undefined}

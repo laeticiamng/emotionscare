@@ -6,9 +6,9 @@ export interface AudioTrack {
   duration: number;
   url: string;
   type?: string;
-  coverUrl?: string; // Add this for compatibility
+  coverUrl?: string;
   cover?: string;
-  description?: string; // Add this for AudioPlayerSection
+  description?: string;
 }
 
 export interface AudioPlayerState {

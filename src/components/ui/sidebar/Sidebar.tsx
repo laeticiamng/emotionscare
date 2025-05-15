@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useSidebar } from './SidebarContext';
 
 interface SidebarProps {
   children: React.ReactNode;
@@ -7,8 +8,17 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ children, className = "" }) => {
+  const { isOpen, collapsed, expanded } = useSidebar();
+
   return (
-    <div className={`bg-background border-r w-64 h-screen overflow-y-auto flex flex-col ${className}`}>
+    <div
+      className={`
+        transition-all duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${collapsed ? 'w-16' : expanded ? 'w-64' : 'w-20'}
+        ${className}
+      `}
+    >
       {children}
     </div>
   );

@@ -8,7 +8,9 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   onVolumeChange,
   onChange,
   className = "",
-  showLabel = false
+  showLabel = false,
+  isMuted = false,
+  onMuteToggle = () => {}
 }) => {
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0];

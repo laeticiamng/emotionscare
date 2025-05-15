@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserModeType, UserModeContextType } from '@/types';
+import { UserModeType, UserModeContextType } from '@/types/userMode';
 
 // Create a default context value
 const defaultUserModeContext: UserModeContextType = {

@@ -43,6 +43,7 @@ export interface UserPreferences {
   displayName?: string;
   pronouns?: string;
   biography?: string;
+  onboardingCompleted?: boolean;
 }
 
 export interface NotificationPreferences {
@@ -62,7 +63,7 @@ export interface NotificationPreferences {
     start: string;
     end: string;
   };
-  tone?: string; // Add tone to match mockUsers.ts
+  tone?: string;
 }
 
 export type Period = 'day' | 'week' | 'month' | 'year' | 'all';
@@ -86,16 +87,18 @@ export interface Badge {
   image?: string;
   dateEarned?: string;
   awarded_at?: Date | string;
+  unlockedAt?: Date | string;
+  progress?: number;
 }
 
-export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'individual' | 'professional';
+export type UserModeType = 'b2c' | 'b2b-user' | 'b2b-admin' | 'b2b_user' | 'b2b_admin' | 'individual' | 'professional';
 
 export interface UserModeContextType {
   mode: UserModeType;
   setMode: (mode: UserModeType) => void;
-  userMode?: UserModeType;
-  setUserMode?: (mode: UserModeType) => void;
-  isLoading?: boolean; // Add isLoading property
+  userMode: UserModeType;
+  setUserMode: (mode: UserModeType) => void;
+  isLoading: boolean;
 }
 
 export interface JournalEntry {
