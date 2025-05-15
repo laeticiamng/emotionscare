@@ -6,13 +6,19 @@ export interface DraggableCardProps {
   id: string;
   title: string;
   value: string | number;
-  icon?: LucideIcon;
+  icon?: ReactNode | LucideIcon;
   delta?: number | {
     value: number;
     label?: string;
     trend: 'up' | 'down' | 'neutral';
   };
-  subtitle?: string;
+  subtitle?: string | ReactNode;
   ariaLabel?: string;
   onClick?: () => void;
+}
+
+export interface DraggableKpiCardsGridProps {
+  cards?: DraggableCardProps[];
+  kpiCards?: DraggableCardProps[];
+  onOrderChange?: (cards: DraggableCardProps[]) => void;
 }

@@ -96,11 +96,12 @@ export interface MusicTrack {
   isFavorite?: boolean;
   coverUrl?: string;
   cover?: string;
+  track_url?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  name: string;
+  name?: string;
   title?: string;
   description?: string;
   tracks: MusicTrack[];
@@ -119,8 +120,8 @@ export interface GamificationStats {
   activeUsersPercent?: number;
   totalBadges?: number;
   badgeLevels?: { level: string; count: number }[];
-  leaderboard?: Array<{ userId?: string; username: string; points: number }>;
-  progress?: { current: number; target: number };
+  leaderboard?: Array<{ userId?: string; username?: string; name?: string; points: number }>;
+  progress?: { current: number; target: number } | number;
   completionRate?: number;
   achievements?: Array<{ id: string; name: string; completed: boolean }>;
   lastActivityDate?: string;
@@ -159,6 +160,8 @@ export interface ProgressBarProps {
   className?: string;
   formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
+  progress?: number;
+  onChange?: (value: number) => void;
 }
 
 export interface VolumeControlProps {
@@ -190,6 +193,38 @@ export interface MusicLibraryProps {
 
 export interface LeaderboardEntry {
   userId?: string;
-  username: string;
+  username?: string;
+  name?: string;
   points: number;
+  position?: number;
+  avatar?: string;
+  badges?: any[];
+}
+
+// Additional types for Journal and Scan functionality
+export interface JournalEntry {
+  id: string;
+  title: string;
+  content: string;
+  text?: string;
+  mood: string;
+  mood_score?: number;
+  emotion?: string;
+  date: Date | string;
+  tags?: string[];
+  ai_feedback?: string;
+  user_id?: string;
+}
+
+export interface ScanResult {
+  id: string;
+  type: 'object' | 'text' | 'emotion' | 'wellness';
+  content: string;
+  image_url?: string;
+  detected_emotions?: string[];
+  score?: number;
+  created_at: Date | string;
+  user_id?: string;
+  recommendations?: string[];
+  tags?: string[];
 }

@@ -48,6 +48,8 @@ import B2BAdminTeams from '@/pages/b2b/admin/Teams';
 import B2BAdminReports from '@/pages/b2b/admin/Reports';
 import B2BAdminEvents from '@/pages/b2b/admin/Events';
 import B2BAdminSettings from '@/pages/b2b/admin/Settings';
+import B2BAdminJournal from '@/pages/b2b/admin/Journal';
+import B2BAdminScan from '@/pages/b2b/admin/Scan';
 
 export const router = createBrowserRouter([
   // Root route - Immersive Homepage
@@ -193,6 +195,14 @@ export const router = createBrowserRouter([
       { 
         path: 'dashboard', 
         element: <B2BAdminDashboard /> 
+      },
+      { 
+        path: 'journal', 
+        element: <B2BAdminJournal /> 
+      },
+      { 
+        path: 'scan', 
+        element: <B2BAdminScan /> 
       },
       { 
         path: 'teams', 

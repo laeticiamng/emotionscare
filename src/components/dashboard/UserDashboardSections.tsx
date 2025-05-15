@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -17,7 +18,7 @@ const exampleVRTemplate: VRSessionTemplate = {
   tags: ["meditation", "nature", "beginner"],
   is_audio_only: true,
   preview_url: "/images/vr/forest-preview.jpg",
-  audio_url: "/audio/forest-meditation.mp3",
+  audio_url: "/forest-meditation.mp3",
   emotionTarget: "calm",
   emotion: "calm",
   difficulty: "beginner",
@@ -165,11 +166,10 @@ export const VRDashboardSection: React.FC<VRSectionProps> = ({
     description: 'Session recommandée basée sur votre état émotionnel',
     duration: 5 * 60, // Convert to seconds
     tags: ['recommandation', 'personnalisé'],
-    // Additional properties for backward compatibility
     theme: 'Méditation guidée',
     is_audio_only: true,
     preview_url: '',
-    audio_url: '/audio/meditation-guided.mp3',
+    audio_url: '/meditation-guided.mp3',
     emotionTarget: latestEmotion.emotion,
     emotion: latestEmotion.emotion,
     difficulty: 'easy',

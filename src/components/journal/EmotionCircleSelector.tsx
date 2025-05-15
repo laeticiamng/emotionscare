@@ -1,45 +1,115 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import {
+  Smile,
+  Frown,
+  Meh,
+  Heart,
+  Zap,
+  CloudRain,
+  Coffee,
+  Sun
+} from 'lucide-react';
 
 interface EmotionCircleSelectorProps {
   onSelect: (emotion: string) => void;
   selected: string | null;
 }
 
-const emotions = [
-  { id: 'happy', label: 'Heureux', emoji: '😊', color: 'bg-yellow-400' },
-  { id: 'calm', label: 'Calme', emoji: '😌', color: 'bg-blue-400' },
-  { id: 'focused', label: 'Concentré', emoji: '🧐', color: 'bg-purple-400' },
-  { id: 'energetic', label: 'Énergique', emoji: '⚡', color: 'bg-red-400' },
-  { id: 'tired', label: 'Fatigué', emoji: '😴', color: 'bg-gray-400' },
-  { id: 'stressed', label: 'Stressé', emoji: '😰', color: 'bg-orange-400' },
-  { id: 'sad', label: 'Triste', emoji: '😢', color: 'bg-blue-300' },
-  { id: 'melancholic', label: 'Mélancolique', emoji: '🥺', color: 'bg-indigo-300' },
-];
+interface Emotion {
+  name: string;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+  ringColor: string;
+}
 
-const EmotionCircleSelector: React.FC<EmotionCircleSelectorProps> = ({ onSelect, selected }) => {
+const EmotionCircleSelector: React.FC<EmotionCircleSelectorProps> = ({
+  onSelect,
+  selected
+}) => {
+  const emotions: Emotion[] = [
+    { 
+      name: 'joy',
+      icon: <Smile className="h-6 w-6" />,
+      color: 'text-yellow-500',
+      bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
+      ringColor: 'ring-yellow-400'
+    },
+    { 
+      name: 'calm',
+      icon: <Sun className="h-6 w-6" />,
+      color: 'text-blue-500',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      ringColor: 'ring-blue-400'
+    },
+    { 
+      name: 'sad',
+      icon: <Frown className="h-6 w-6" />,
+      color: 'text-indigo-500',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+      ringColor: 'ring-indigo-400'
+    },
+    { 
+      name: 'neutral',
+      icon: <Meh className="h-6 w-6" />,
+      color: 'text-gray-500',
+      bgColor: 'bg-gray-50 dark:bg-gray-900/20',
+      ringColor: 'ring-gray-400'
+    },
+    { 
+      name: 'love',
+      icon: <Heart className="h-6 w-6" />,
+      color: 'text-pink-500',
+      bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+      ringColor: 'ring-pink-400'
+    },
+    { 
+      name: 'energetic',
+      icon: <Zap className="h-6 w-6" />,
+      color: 'text-amber-500',
+      bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+      ringColor: 'ring-amber-400'
+    },
+    { 
+      name: 'melancholy',
+      icon: <CloudRain className="h-6 w-6" />,
+      color: 'text-purple-500',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      ringColor: 'ring-purple-400'
+    },
+    { 
+      name: 'focused',
+      icon: <Coffee className="h-6 w-6" />,
+      color: 'text-cyan-500',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-900/20',
+      ringColor: 'ring-cyan-400'
+    }
+  ];
+
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {emotions.map(emotion => (
-        <motion.button
-          key={emotion.id}
-          onClick={() => onSelect(emotion.id)}
-          className={`flex flex-col items-center ${selected === emotion.id ? 'scale-110' : ''}`}
-          whileHover={{ scale: 1.05 }}
+    <div className="flex flex-wrap gap-4 justify-center">
+      {emotions.map((emotion) => (
+        <motion.div
+          key={emotion.name}
+          className={`
+            cursor-pointer rounded-full p-4
+            ${emotion.bgColor}
+            ${selected === emotion.name ? `ring-2 ${emotion.ringColor}` : ''}
+            transition-all duration-200
+          `}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => onSelect(emotion.name)}
         >
-          <div 
-            className={`
-              w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-xl sm:text-2xl
-              ${emotion.color} 
-              ${selected === emotion.id ? 'ring-2 ring-offset-2 ring-primary' : ''}
-            `}
-          >
-            {emotion.emoji}
+          <div className={`${emotion.color}`}>
+            {emotion.icon}
           </div>
-          <span className="mt-2 text-xs sm:text-sm">{emotion.label}</span>
-        </motion.button>
+          <p className="text-xs font-medium text-center mt-1 capitalize">
+            {emotion.name}
+          </p>
+        </motion.div>
       ))}
     </div>
   );

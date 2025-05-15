@@ -2,90 +2,165 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
 import { EmotionResult } from '@/types';
-import { Send } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { analyzeEmotion } from '@/lib/ai/journal-service';
 
 interface TextEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  placeholder?: string;
+  onResult: (result: EmotionResult) => void;
 }
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
-  onResult,
-  placeholder = "Décrivez comment vous vous sentez aujourd'hui..."
-}) => {
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ onResult }) => {
   const [text, setText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { toast } = useToast();
 
-  const analyzeText = async () => {
-    if (!text.trim()) return;
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!text.trim()) {
+      toast({
+        title: "Texte requis",
+        description: "Veuillez écrire quelques phrases pour l'analyse émotionnelle.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsAnalyzing(true);
     
     try {
-      // Mock API call with a delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Appel à l'API pour analyser le texte
+      const response = await analyzeEmotionalJournal(text);
       
-      // Mock result
+      // Création d'un résultat d'émotion à partir de la réponse de l'API
       const result: EmotionResult = {
-        id: 'text-analysis-' + Date.now(),
-        user_id: 'user-123',
-        emotion: ['joy', 'calm', 'anxious', 'sad', 'excited'][Math.floor(Math.random() * 5)],
-        score: Math.random() * 0.5 + 0.5,
-        confidence: Math.random() * 0.3 + 0.7,
+        id: Math.random().toString(36).substring(2, 11),
+        emotion: response.emotion || 'neutral',
+        score: response.intensity || 0.5,
+        confidence: response.confidence || 0.8,
         text: text,
-        timestamp: new Date().toISOString(),
+        date: new Date().toISOString(),
+        emojis: ['😊', '😌', '🙂'], // Emoji par défaut
         recommendations: [
-          'Take a moment to reflect on your feelings',
-          'Consider journaling about your thoughts',
-          'Practice a short breathing exercise'
-        ],
-        ai_feedback: "Votre texte révèle un état émotionnel intéressant. Continuez à être attentif à vos émotions."
+          "Essayez d'écouter de la musique apaisante",
+          "Prenez un moment pour vous aujourd'hui"
+        ]
       };
       
-      if (onResult) {
-        onResult(result);
-      }
+      onResult(result);
+      
+      toast({
+        title: "Analyse terminée",
+        description: `Émotion détectée : ${result.emotion} avec une intensité de ${Math.round(result.score * 100)}%`,
+      });
+      
+      setText('');
+      
     } catch (error) {
       console.error('Error analyzing text:', error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Impossible d'analyser votre texte. Veuillez réessayer.",
+        variant: "destructive"
+      });
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <Textarea
-        placeholder={placeholder}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={5}
-        className="resize-none"
-      />
-      
-      <Button 
-        onClick={analyzeText} 
-        disabled={!text.trim() || isAnalyzing}
-        className="w-full"
-      >
-        {isAnalyzing ? (
-          <>
-            <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-            Analyse en cours...
-          </>
-        ) : (
-          <>
-            <Send className="mr-2 h-4 w-4" />
-            Analyser mon texte
-          </>
-        )}
-      </Button>
-      
-      <p className="text-xs text-muted-foreground text-center">
-        Pour une analyse plus précise, écrivez au moins quelques phrases décrivant vos émotions actuelles.
-      </p>
-    </div>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Textarea
+              placeholder="Décrivez comment vous vous sentez aujourd'hui, ou partagez quelque chose qui s'est produit récemment..."
+              className="min-h-[150px] resize-none"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              disabled={isAnalyzing}
+            />
+          </div>
+          
+          <div className="flex justify-center">
+            <Button 
+              type="submit" 
+              className="min-w-[200px]"
+              disabled={isAnalyzing || !text.trim()}
+            >
+              {isAnalyzing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyse en cours...
+                </>
+              ) : (
+                'Analyser mon état émotionnel'
+              )}
+            </Button>
+          </div>
+          
+          <p className="text-xs text-center text-muted-foreground">
+            Écrivez quelques phrases pour obtenir une analyse de votre état émotionnel et des suggestions personnalisées.
+          </p>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
 export default TextEmotionScanner;
+
+// Fonction pour analyser le journal émotionnel
+async function analyzeEmotionalJournal(text: string): Promise<{
+  emotion?: string;
+  intensity?: number;
+  confidence?: number;
+}> {
+  // Dans une implémentation réelle, ceci appelerait l'API
+  // Pour l'instant, simulons une réponse
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Logique simplifiée de détection basée sur des mots-clés
+      const text_lower = text.toLowerCase();
+      let emotion = 'neutral';
+      let intensity = 0.5;
+      
+      if (text_lower.includes('joie') || 
+          text_lower.includes('heureux') || 
+          text_lower.includes('content') || 
+          text_lower.includes('bien')) {
+        emotion = 'joy';
+        intensity = 0.8;
+      } else if (text_lower.includes('triste') || 
+                 text_lower.includes('peine') || 
+                 text_lower.includes('mal')) {
+        emotion = 'sadness';
+        intensity = 0.7;
+      } else if (text_lower.includes('stress') || 
+                 text_lower.includes('anxie') || 
+                 text_lower.includes('inquiet')) {
+        emotion = 'anxiety';
+        intensity = 0.75;
+      } else if (text_lower.includes('calme') || 
+                 text_lower.includes('apais') || 
+                 text_lower.includes('serein')) {
+        emotion = 'calm';
+        intensity = 0.9;
+      } else if (text_lower.includes('colère') || 
+                 text_lower.includes('énerv') || 
+                 text_lower.includes('agac')) {
+        emotion = 'anger';
+        intensity = 0.6;
+      }
+      
+      resolve({
+        emotion,
+        intensity,
+        confidence: 0.8
+      });
+    }, 1500);
+  });
+}

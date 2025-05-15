@@ -1,18 +1,281 @@
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { Camera, ScanText, ScanBarcode, Image, Lock } from 'lucide-react';
+import EmotionScanner from '@/components/scan/EmotionScanner';
+import { ScanResult, EmotionResult } from '@/types';
+import { useEmotionScan } from '@/hooks/useEmotionScan';
+import { useMusic } from '@/contexts/MusicContext';
 
 const B2BUserScan: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('emotion');
+  const [scanning, setScanning] = useState(false);
+  const [scanResults, setScanResults] = useState<ScanResult[]>([]);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { toast } = useToast();
+  const { setOpenDrawer } = useMusic();
+  const { createEmotion } = useEmotionScan();
+
+  const handleScanStart = async (type: 'object' | 'text' | 'emotion') => {
+    setScanning(true);
+    
+    // Simulate scanning process with a timer
+    setTimeout(() => {
+      // Mock scan results
+      const newScanResult: ScanResult = {
+        id: Math.random().toString(36).substring(2, 11),
+        type,
+        content: type === 'object' 
+          ? 'Objet professionnel (Badge d\'entreprise)' 
+          : type === 'text' 
+            ? 'Notes de réunion' 
+            : 'Analyse émotionnelle en contexte professionnel',
+        detected_emotions: ['focus', 'ambition'],
+        score: 0.85,
+        created_at: new Date().toISOString(),
+        recommendations: [
+          'Ce badge évoque un sentiment d\'appartenance.',
+          'Considérez d\'associer cet objet à votre identité professionnelle.'
+        ],
+        tags: ['professionnel', 'identité', 'appartenance']
+      };
+      
+      setScanResults(prev => [newScanResult, ...prev]);
+      setScanning(false);
+      
+      toast({
+        title: 'Scan complété',
+        description: `${type === 'object' ? 'Objet' : type === 'text' ? 'Texte' : 'Émotion'} analysé avec succès.`,
+      });
+    }, 2000);
+  };
+
+  const handleEmotionScanResult = async (result: EmotionResult) => {
+    try {
+      await createEmotion({
+        emotion: result.emotion,
+        score: result.score,
+        confidence: result.confidence,
+        text: result.text,
+        date: new Date().toISOString(),
+        emojis: result.emojis
+      });
+      
+      toast({
+        title: 'Émotion détectée',
+        description: `${result.emotion} (${Math.round(result.score * 100)}% confiance)`,
+      });
+      
+      // Suggest a music based on the emotion
+      setOpenDrawer(true);
+      
+    } catch (error) {
+      console.error('Error saving emotion scan:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Scan Express</h1>
-      <p className="text-muted-foreground mb-4">
-        Évaluez rapidement votre état émotionnel et recevez des suggestions pour améliorer votre bien-être au travail.
-      </p>
-      
-      {/* Content to be implemented */}
-      <div className="p-8 text-center text-muted-foreground">
-        Contenu du scan émotionnel pour le profil collaborateur (B2B User)
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="mb-6"
+      >
+        <h1 className="text-3xl font-bold mb-2">Scan Express</h1>
+        <p className="text-muted-foreground">
+          Évaluez rapidement votre état émotionnel et recevez des suggestions pour améliorer votre bien-être au travail.
+        </p>
+      </motion.div>
+
+      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/40 rounded-lg flex gap-2 items-center">
+        <Lock size={18} className="text-blue-600 dark:text-blue-400" />
+        <p className="text-sm text-blue-800 dark:text-blue-300">
+          Vos données émotionnelles sont protégées et ne sont jamais partagées avec votre employeur sous forme individuelle.
+        </p>
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid grid-cols-3">
+          <TabsTrigger value="emotion" className="flex items-center gap-2">
+            <Camera className="h-4 w-4" />
+            <span>Émotion</span>
+          </TabsTrigger>
+          <TabsTrigger value="object" className="flex items-center gap-2">
+            <ScanBarcode className="h-4 w-4" />
+            <span>Objet</span>
+          </TabsTrigger>
+          <TabsTrigger value="text" className="flex items-center gap-2">
+            <ScanText className="h-4 w-4" />
+            <span>Document</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="emotion" className="space-y-4">
+          <EmotionScanner 
+            onResult={handleEmotionScanResult} 
+            defaultTab="text" 
+          />
+        </TabsContent>
+
+        <TabsContent value="object" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Scan d'objet professionnel</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden border flex items-center justify-center">
+                {scanning ? (
+                  <>
+                    <video ref={videoRef} className="absolute inset-0 object-cover w-full h-full" autoPlay muted />
+                    <motion.div
+                      className="absolute inset-0 border-4 border-primary z-10"
+                      initial={{ opacity: 0.5, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                    />
+                    <p className="text-primary font-medium z-20 bg-background/80 px-3 py-1 rounded-md">
+                      Analyse en cours...
+                    </p>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <ScanBarcode className="h-16 w-16 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-muted-foreground">Cliquez sur "Scanner" pour analyser un objet professionnel</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-center">
+                <Button 
+                  onClick={() => handleScanStart('object')}
+                  disabled={scanning}
+                  className="w-full sm:w-auto"
+                >
+                  {scanning ? 'Analyse en cours...' : 'Scanner un objet'}
+                </Button>
+              </div>
+
+              <p className="text-sm text-muted-foreground text-center">
+                Cadrez l'objet professionnel dans la fenêtre et maintenez-le immobile pendant l'analyse.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="text" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Scan de document professionnel</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden border flex items-center justify-center">
+                {scanning ? (
+                  <>
+                    <video ref={videoRef} className="absolute inset-0 object-cover w-full h-full" autoPlay muted />
+                    <motion.div
+                      className="absolute inset-0 border-4 border-primary z-10"
+                      initial={{ opacity: 0.5, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                    />
+                    <p className="text-primary font-medium z-20 bg-background/80 px-3 py-1 rounded-md">
+                      Lecture du document...
+                    </p>
+                  </>
+                ) : (
+                  <div className="text-center">
+                    <ScanText className="h-16 w-16 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-muted-foreground">Cliquez sur "Scanner" pour analyser un document professionnel</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-center">
+                <Button 
+                  onClick={() => handleScanStart('text')}
+                  disabled={scanning}
+                  className="w-full sm:w-auto"
+                >
+                  {scanning ? 'Lecture en cours...' : 'Scanner un document'}
+                </Button>
+              </div>
+
+              <p className="text-sm text-muted-foreground text-center">
+                Cadrez le document dans la fenêtre pour une analyse émotionnelle et une synthèse.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {scanResults.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mt-8"
+        >
+          <h2 className="text-xl font-semibold mb-4">Résultats récents</h2>
+          <div className="space-y-4">
+            {scanResults.slice(0, 3).map((result) => (
+              <Card key={result.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">
+                      {result.type === 'object' 
+                        ? 'Scan d\'objet professionnel' 
+                        : result.type === 'text' 
+                          ? 'Scan de document' 
+                          : 'Scan émotionnel professionnel'}
+                    </CardTitle>
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(result.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="font-medium mb-2">{result.content}</p>
+                  
+                  {result.detected_emotions && (
+                    <div className="flex gap-2 mb-3">
+                      {result.detected_emotions.map((emotion) => (
+                        <span 
+                          key={emotion} 
+                          className="bg-primary/10 text-primary text-xs rounded-full px-2 py-1"
+                        >
+                          {emotion}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {result.recommendations && (
+                    <div className="space-y-2 mt-4">
+                      <h4 className="text-sm font-medium">Recommandations professionnelles :</h4>
+                      <ul className="text-sm space-y-1">
+                        {result.recommendations.map((recommendation, i) => (
+                          <li key={i} className="text-muted-foreground">• {recommendation}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button variant="outline" size="sm" className="flex items-center gap-1">
+                      <Image size={14} /> Visualiser
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
