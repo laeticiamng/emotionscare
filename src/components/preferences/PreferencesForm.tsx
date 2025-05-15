@@ -2,6 +2,7 @@
 // Fix the string | object profileVisibility type conflict in this component
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotificationPreferences } from '@/types/user';
 
 // Update the preferences handling to properly handle profileVisibility
 const updatePrivacySettings = (preferences: any) => {

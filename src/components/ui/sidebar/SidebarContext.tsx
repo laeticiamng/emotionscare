@@ -6,6 +6,12 @@ export interface SidebarContextType {
   setOpen: (open: boolean) => void;
   collapsed: boolean;
   onCollapseChange?: (collapsed: boolean) => void;
+  
+  // Add missing properties and methods
+  isOpen: boolean;
+  toggle: () => void;
+  toggleCollapsed: () => void;
+  expanded?: boolean;
 }
 
 const SidebarContext = createContext<SidebarContextType>({
@@ -13,12 +19,18 @@ const SidebarContext = createContext<SidebarContextType>({
   setOpen: () => {},
   collapsed: false,
   onCollapseChange: () => {},
+  
+  // Default values for new properties
+  isOpen: false,
+  toggle: () => {},
+  toggleCollapsed: () => {},
 });
 
 export interface SidebarProviderProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
   defaultCollapsed?: boolean;
+  defaultExpanded?: boolean;
   onCollapseChange?: (collapsed: boolean) => void;
 }
 
@@ -26,14 +38,26 @@ export default function SidebarProvider({
   children,
   defaultOpen = false,
   defaultCollapsed = false,
+  defaultExpanded = false,
   onCollapseChange,
 }: SidebarProviderProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   const handleCollapseChange = (value: boolean) => {
     setCollapsed(value);
     onCollapseChange?.(value);
+  };
+  
+  // Add toggle functions
+  const toggle = () => {
+    setOpen(!open);
+  };
+  
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+    onCollapseChange?.(!collapsed);
   };
 
   return (
@@ -43,6 +67,12 @@ export default function SidebarProvider({
         setOpen,
         collapsed,
         onCollapseChange: handleCollapseChange,
+        
+        // Provide the new properties
+        isOpen: open,
+        toggle,
+        toggleCollapsed,
+        expanded,
       }}
     >
       {children}

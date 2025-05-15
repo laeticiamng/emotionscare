@@ -24,3 +24,34 @@ export interface UseAudioPlayerStateReturn {
   setIsMuted: (muted: boolean) => void;
   setIsLoading: (loading: boolean) => void;
 }
+
+export interface ProgressBarProps {
+  value: number;
+  max?: number;
+  currentTime?: number;
+  duration?: number;
+  formatTime?: (seconds: number) => string;
+  // Add missing properties
+  onSeek?: (value: number) => void;
+  className?: string;
+  showTimestamps?: boolean;
+  showLabel?: boolean;
+  variant?: string;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange?: (volume: number) => void;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
+  // Add missing properties
+  onChange?: (value: number) => void;
+  className?: string;
+  showLabel?: boolean;
+}
+
+// Add MusicDrawerProps interface
+export interface MusicDrawerProps {
+  children?: React.ReactNode;
+  // Add any other properties needed
+}
