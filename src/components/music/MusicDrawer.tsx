@@ -75,6 +75,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
               duration={duration}
               onSeek={handleSeek}
               className="mb-2"
+              showTimestamps={true}
             />
             
             {/* Playback controls */}
@@ -110,6 +111,8 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                 isMuted={isMuted}
                 onMuteToggle={handleMuteToggle}
                 className="w-full"
+                onChange={handleVolumeChange}
+                showLabel={false}
               />
             </div>
             

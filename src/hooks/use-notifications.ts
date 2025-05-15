@@ -1,34 +1,54 @@
 
-import { useState, useEffect } from 'react';
-import { Notification, NotificationType } from '@/types';
+import { useState, useCallback } from 'react';
+import { Notification, NotificationType, NotificationFilter } from '@/types';
 
-export default function useNotifications() {
+export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  
-  // Mock function to add a notification
-  const addNotification = (
-    title: string, 
-    message: string, 
-    type: NotificationType = 'system'
-  ) => {
-    const newNotification: Notification = {
-      id: Math.random().toString(36).substring(2, 11),
-      title,
-      message,
-      type,
-      read: false,
-      timestamp: new Date().toISOString()
-    };
-    
-    setNotifications(prev => [newNotification, ...prev]);
-    updateUnreadCount();
-    
-    return newNotification.id;
-  };
-  
-  // Mark a notification as read
-  const markAsRead = (id: string) => {
+  const [filter, setFilter] = useState<NotificationFilter>('all');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchNotifications = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Mock fetching notifications - in a real app this would be an API call
+      const mockNotifications: Notification[] = [
+        {
+          id: '1',
+          title: 'Système mis à jour',
+          message: 'Le système a été mis à jour avec succès',
+          type: 'system' as NotificationType,
+          read: false,
+          timestamp: new Date().toISOString(),
+        },
+        {
+          id: '2',
+          title: 'Nouvelle analyse émotionnelle',
+          message: 'Votre analyse émotionnelle hebdomadaire est prête',
+          type: 'emotion' as NotificationType,
+          read: true,
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+        },
+        {
+          id: '3',
+          title: 'Badge débloqué',
+          message: 'Félicitations ! Vous avez débloqué le badge "Régularité"',
+          type: 'achievement' as NotificationType,
+          read: false,
+          timestamp: new Date(Date.now() - 172800000).toISOString(),
+        }
+      ];
+      
+      setNotifications(mockNotifications);
+    } catch (err) {
+      setError('Failed to fetch notifications');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const markAsRead = useCallback((id: string) => {
     setNotifications(prev => 
       prev.map(notification => 
         notification.id === id 
@@ -36,55 +56,45 @@ export default function useNotifications() {
           : notification
       )
     );
-    updateUnreadCount();
-  };
-  
-  // Mark all notifications as read
-  const markAllAsRead = () => {
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
     setNotifications(prev => 
       prev.map(notification => ({ ...notification, read: true }))
     );
-    updateUnreadCount();
-  };
-  
-  // Remove a notification
-  const removeNotification = (id: string) => {
+  }, []);
+
+  const deleteNotification = useCallback((id: string) => {
     setNotifications(prev => 
       prev.filter(notification => notification.id !== id)
     );
-    updateUnreadCount();
-  };
-  
-  // Remove all notifications
-  const clearNotifications = () => {
+  }, []);
+
+  const clearAllNotifications = useCallback(() => {
     setNotifications([]);
-    updateUnreadCount();
-  };
-  
-  // Filter notifications by type
-  const filterByType = (type: NotificationType = 'all') => {
-    if (type === 'all') return notifications;
-    return notifications.filter(notification => notification.type === type);
-  };
-  
-  // Update unread count
-  const updateUnreadCount = () => {
-    const count = notifications.filter(n => !n.read).length;
-    setUnreadCount(count);
-  };
-  
-  useEffect(() => {
-    updateUnreadCount();
-  }, [notifications]);
-  
+  }, []);
+
+  const filteredNotifications = notifications.filter(notification => {
+    if (filter === 'all') return true;
+    if (filter === 'unread') return !notification.read;
+    return notification.type === filter;
+  });
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   return {
-    notifications,
+    notifications: filteredNotifications,
     unreadCount,
-    addNotification,
+    loading,
+    error,
+    filter,
+    setFilter,
+    fetchNotifications,
     markAsRead,
     markAllAsRead,
-    removeNotification,
-    clearNotifications,
-    filterByType
+    deleteNotification,
+    clearAllNotifications
   };
 }
+
+export default useNotifications;

@@ -1,14 +1,14 @@
 
-import { Sidebar } from './Sidebar';
+import Sidebar from './Sidebar';
 import SidebarProvider from './SidebarContext';
-import { SidebarItem } from './SidebarItem';
-import { SidebarSection } from './SidebarSection';
+import SidebarTrigger from './SidebarTrigger';
+import SidebarTriggerItem from './SidebarTriggerItem';
 
 export { 
   Sidebar, 
   SidebarProvider, 
-  SidebarItem, 
-  SidebarSection 
+  SidebarTrigger,
+  SidebarTriggerItem
 };
 
 export default Sidebar;

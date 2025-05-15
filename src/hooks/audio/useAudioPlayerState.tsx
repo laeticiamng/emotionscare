@@ -16,7 +16,7 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [loadingTrack, setLoadingTrack] = useState(false);
-  const [error, setErrorState] = useState<Error | string | null>(null);
+  const [error, setErrorState] = useState<Error | null>(null);
   
   // Wrapper for setVolume to ensure volume is within bounds
   const setVolume = useCallback((value: number) => {

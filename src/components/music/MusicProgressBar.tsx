@@ -23,6 +23,12 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
   const currentTimeValue = timeFormatter(currentTime);
   const totalTimeValue = timeFormatter(duration);
 
+  const handleValueChange = (values: number[]) => {
+    if (onSeek && values[0] !== undefined) {
+      onSeek(values[0]);
+    }
+  };
+
   return (
     <div className={`space-y-2 ${className}`}>
       <Slider
@@ -30,7 +36,7 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
         value={[value]}
         max={max}
         step={1}
-        onValueChange={onSeek ? (value) => onSeek(value[0]) : undefined}
+        onValueChange={handleValueChange}
       />
       {showTimestamps && (
         <div className="flex justify-between text-xs text-muted-foreground">

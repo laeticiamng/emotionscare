@@ -3,36 +3,35 @@ import { MusicTrack } from './music';
 
 export interface UseAudioPlayerStateReturn {
   currentTrack?: MusicTrack | null;
-  isPlaying?: boolean;
-  volume?: number;
-  muted?: boolean;
+  isPlaying: boolean;
+  volume: number;
   repeat?: boolean;
   shuffle?: boolean;
   progress?: number;
-  currentTime?: number;
-  duration?: number;
+  currentTime: number;
+  duration: number;
   loadingTrack?: boolean;
-  error?: string | Error | null;
-  audioRef?: React.RefObject<HTMLAudioElement>;
-  play?: () => Promise<void>;
-  pause?: () => void;
-  togglePlay?: () => void;
-  seek?: (time: number) => void;
-  setVolume?: (volume: number) => void;
-  toggleMute?: () => void;
-  setPlaybackRate?: (rate: number) => void;
+  error: Error | null;
+  isMuted?: boolean;
   playbackRate?: number;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
-  setCurrentTrack?: (track: MusicTrack) => void;
+  setCurrentTrack?: (track: MusicTrack | null) => void;
   setIsPlaying?: (isPlaying: boolean) => void;
+  setVolume?: (volume: number) => void;
+  setRepeat?: (repeat: boolean) => void;
+  setShuffle?: (shuffle: boolean) => void;
   setProgress?: (progress: number) => void;
   setDuration?: (duration: number) => void;
   setLoadingTrack?: (loading: boolean) => void;
   setError?: (error: Error | string | null) => void;
-  setRepeat?: (repeat: boolean) => void;
-  setShuffle?: (shuffle: boolean) => void;
-  formatTime?: (seconds: number) => string;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+  play?: () => void;
+  pause?: () => void;
+  togglePlay?: () => void;
+  seek?: (time: number) => void;
+  toggleMute?: () => void;
+  setPlaybackRate?: (rate: number) => void;
+  audioRef?: React.RefObject<HTMLAudioElement | null>;
 }
 
 export interface AudioTrack {
@@ -41,27 +40,25 @@ export interface AudioTrack {
   artist: string;
   duration: number;
   url: string;
-  coverUrl?: string;
   cover?: string;
-  album?: string;
-  genre?: string;
-  description?: string;
+  coverUrl?: string;
+  audioUrl?: string;
 }
 
 export interface AudioPlayerContextType {
-  track: AudioTrack | null;
+  currentTrack: AudioTrack | null;
   isPlaying: boolean;
   volume: number;
   progress: number;
   duration: number;
-  currentTime: number;
-  isMuted: boolean;
+  muted: boolean;
   loading: boolean;
-  playTrack: (track: AudioTrack) => void;
-  pauseTrack: () => void;
-  resumeTrack: () => void;
+  play: (track?: AudioTrack) => void;
+  pause: () => void;
+  togglePlay: () => void;
+  seek: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  seekTo: (seconds: number) => void;
-  formatTime: (seconds: number) => string;
+  next: () => void;
+  previous: () => void;
 }

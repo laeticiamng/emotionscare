@@ -72,6 +72,20 @@ export type {
   VRSessionWithMusicProps
 } from './vr';
 
+// Progress bar related types
+export type {
+  ProgressBarProps as ProgressProps
+} from './progress-bar';
+
+// Track info related types
+export type {
+  TrackInfoProps as TrackProps,
+  VolumeControlProps as VolumeProps
+} from './track-info';
+
+// Sidebar related types
+export type { SidebarContextType } from './sidebar';
+
 // Other shared types
 export type {
   Period,
@@ -79,9 +93,6 @@ export type {
   UserModeContextType,
   JournalEntry
 } from './types';
-
-// Re-export SidebarContextType
-export type { SidebarContextType } from './sidebar';
 
 // Dashboard related types
 export type {

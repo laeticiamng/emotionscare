@@ -1,30 +1,45 @@
 
-import { User, UserRole } from '@/types';
+import { User, UserRole } from '@/types/user';
 
+// Create some mock users for testing purposes
 export const mockUsers: User[] = [
   {
     id: '1',
-    email: 'john.doe@example.com',
-    name: 'John Doe',
-    role: 'user' as UserRole,
-    avatar_url: '/avatars/john-doe.png',
-    created_at: '2023-04-15T10:30:00Z',
+    name: 'Alice Martin',
+    email: 'alice.martin@example.com',
+    role: 'admin' as UserRole,
+    avatar_url: '/images/avatars/alice.jpg',
+    created_at: '2023-01-15T09:00:00Z',
+    emotional_score: 82,
+    department: 'Marketing',
+    position: 'Marketing Director',
     preferences: {
       dashboardLayout: 'standard',
       onboardingCompleted: true,
       theme: 'system',
       fontSize: 'medium',
-      language: 'en',
+      language: 'fr',
       fontFamily: 'system',
       sound: true,
+      reduceMotion: false,
+      colorBlindMode: false,
+      autoplayMedia: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
         frequency: 'daily',
-        tone: 'supportive',
+        types: {
+          system: true,
+          emotion: true,
+          journal: true,
+          coach: true,
+          community: true,
+          achievement: true
+        },
+        tone: 'friendly',
         quietHours: {
-          enabled: false,
+          enabled: true,
           start: '22:00',
           end: '07:00'
         }
@@ -33,27 +48,41 @@ export const mockUsers: User[] = [
   },
   {
     id: '2',
-    email: 'jane.smith@example.com',
-    name: 'Jane Smith',
-    role: 'manager' as UserRole,
-    avatar_url: '/avatars/jane-smith.png',
-    created_at: '2023-05-20T14:45:00Z',
+    name: 'Bob Johnson',
+    email: 'bob.johnson@example.com',
+    role: 'user' as UserRole,
+    avatar_url: '/images/avatars/bob.jpg',
+    created_at: '2023-02-20T14:30:00Z',
+    emotional_score: 65,
+    department: 'Engineering',
+    position: 'Senior Developer',
     preferences: {
-      dashboardLayout: 'compact',
+      dashboardLayout: 'focused',
       onboardingCompleted: true,
       theme: 'dark',
       fontSize: 'large',
-      language: 'en',
+      language: 'fr',
       fontFamily: 'sans-serif',
       sound: false,
+      reduceMotion: true,
+      colorBlindMode: false,
+      autoplayMedia: false,
       notifications: {
         enabled: true,
         emailEnabled: false,
         pushEnabled: true,
         frequency: 'immediate',
+        types: {
+          system: true,
+          emotion: true,
+          journal: false,
+          coach: true,
+          community: false,
+          achievement: true
+        },
         tone: 'direct',
         quietHours: {
-          enabled: true,
+          enabled: false,
           start: '23:00',
           end: '06:00'
         }
@@ -62,27 +91,41 @@ export const mockUsers: User[] = [
   },
   {
     id: '3',
-    email: 'alice.johnson@example.com',
-    name: 'Alice Johnson',
-    role: 'user' as UserRole,
-    avatar_url: '/avatars/alice-johnson.png',
-    created_at: '2023-06-10T09:15:00Z',
+    name: 'Carol Williams',
+    email: 'carol.williams@example.com',
+    role: 'manager' as UserRole,
+    avatar_url: '/images/avatars/carol.jpg',
+    created_at: '2023-03-10T11:15:00Z',
+    emotional_score: 78,
+    department: 'Human Resources',
+    position: 'HR Manager',
     preferences: {
-      dashboardLayout: 'focused',
+      dashboardLayout: 'compact',
       onboardingCompleted: false,
       theme: 'light',
       fontSize: 'small',
-      language: 'en',
+      language: 'fr',
       fontFamily: 'serif',
       sound: true,
+      reduceMotion: false,
+      colorBlindMode: true,
+      autoplayMedia: true,
       notifications: {
         enabled: false,
         emailEnabled: false,
         pushEnabled: false,
         frequency: 'weekly',
-        tone: 'gentle',
+        types: {
+          system: true,
+          emotion: true,
+          journal: true,
+          coach: true,
+          community: true,
+          achievement: true
+        },
+        tone: 'professional',
         quietHours: {
-          enabled: false,
+          enabled: true,
           start: '21:00',
           end: '08:00'
         }
@@ -91,29 +134,43 @@ export const mockUsers: User[] = [
   },
   {
     id: '4',
-    email: 'robert.williams@example.com',
-    name: 'Robert Williams',
-    role: 'user' as UserRole,
-    avatar_url: '/avatars/robert-williams.png',
-    created_at: '2023-07-05T16:20:00Z',
+    name: 'David Brown',
+    email: 'david.brown@example.com',
+    role: 'coach' as UserRole,
+    avatar_url: '/images/avatars/david.jpg',
+    created_at: '2023-04-05T16:45:00Z',
+    emotional_score: 90,
+    department: 'Coaching',
+    position: 'Senior Well-being Coach',
     preferences: {
       dashboardLayout: 'standard',
       onboardingCompleted: true,
       theme: 'system',
       fontSize: 'medium',
-      language: 'en',
+      language: 'fr',
       fontFamily: 'monospace',
       sound: true,
+      reduceMotion: false,
+      colorBlindMode: false,
+      autoplayMedia: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
         frequency: 'daily',
+        types: {
+          system: true,
+          emotion: true,
+          journal: true,
+          coach: true,
+          community: true,
+          achievement: true
+        },
         tone: 'motivational',
         quietHours: {
-          enabled: true,
+          enabled: false,
           start: '22:00',
-          end: '06:30'
+          end: '07:00'
         }
       }
     }

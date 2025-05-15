@@ -1,129 +1,120 @@
 
-import { Challenge, Badge, GamificationStats, LeaderboardEntry } from '@/types';
+import { GamificationStats, Badge } from '@/types';
+import { LeaderboardEntry } from '@/types/gamification';
 
-// Challenges mock data
-export const mockChallenges: Challenge[] = [
+// Mock leaderboard data
+export const mockLeaderboardData: LeaderboardEntry[] = [
   {
-    id: '1',
-    title: 'Première émotion',
-    description: 'Enregistrez votre première émotion',
-    reward: 100,
-    progress: 1,
-    total: 1,
-    complete: true,
-    icon: 'star'
+    id: "1",
+    name: "Alice Martin",
+    points: 2340,
+    rank: 1,
+    avatar: "/images/avatars/alice.jpg",
+    department: "Marketing",
+    level: 7,
+    badges: 12,
+    streak: 21
   },
   {
-    id: '2',
-    title: '7 jours consécutifs',
-    description: 'Enregistrez une émotion pendant 7 jours consécutifs',
-    reward: 250,
-    progress: 5,
-    total: 7,
-    complete: false,
-    icon: 'calendar'
+    id: "2",
+    name: "Bob Johnson",
+    points: 1950,
+    rank: 2,
+    avatar: "/images/avatars/bob.jpg",
+    department: "Engineering",
+    level: 6,
+    badges: 9,
+    streak: 14
   },
   {
-    id: '3',
-    title: 'Méditation VR',
-    description: 'Complétez 3 sessions de méditation VR',
-    reward: 200,
-    progress: 1,
-    total: 3,
-    complete: false,
-    icon: 'headset'
+    id: "3",
+    name: "Carol Williams",
+    points: 1820,
+    rank: 3,
+    avatar: "/images/avatars/carol.jpg",
+    department: "HR",
+    level: 5,
+    badges: 8,
+    streak: 10
   }
 ];
 
-// Badges mock data
+// Mock badges data
 export const mockBadges: Badge[] = [
   {
-    id: '1',
-    name: 'Explorateur émotionnel',
-    description: 'A enregistré 10 émotions différentes',
-    icon: 'compass',
-    level: 1,
-    unlockedAt: new Date(),
-    progress: 10,
-    total: 10,
-    color: 'blue'
+    id: "1",
+    name: "Consistency Champion",
+    description: "Complete 7 consecutive daily check-ins",
+    icon: "award",
+    threshold: 7,
+    type: "streak",
+    imageUrl: "/images/badges/streak-7.svg",
+    unlocked: true,
+    unlockedAt: "2023-04-15T10:30:00Z",
+    category: "engagement",
+    level: "bronze",
+    points: 50,
+    total: 7
   },
   {
-    id: '2',
-    name: 'Méditant',
-    description: 'A complété 5 sessions de méditation',
-    icon: 'zen',
-    level: 1,
-    progress: 3,
-    total: 5,
-    color: 'purple'
+    id: "2",
+    name: "Emotional Intelligence",
+    description: "Complete 5 emotional intelligence assessments",
+    icon: "brain",
+    threshold: 5,
+    type: "assessment",
+    imageUrl: "/images/badges/ei-5.svg",
+    unlocked: true,
+    unlockedAt: "2023-03-28T14:20:00Z",
+    category: "development",
+    level: "silver",
+    points: 100,
+    total: 5
   },
   {
-    id: '3',
-    name: 'Olympien émotionnel',
-    description: 'A maintenu une streak de 30 jours',
-    icon: 'medal',
-    level: 2,
-    progress: 18,
-    total: 30,
-    color: 'gold'
+    id: "3",
+    name: "Community Supporter",
+    description: "Help 3 team members with their challenges",
+    icon: "users",
+    threshold: 3,
+    type: "social",
+    imageUrl: "/images/badges/community-3.svg",
+    unlocked: false,
+    category: "social",
+    level: "gold",
+    points: 150,
+    progress: 1,
+    total: 3
   }
 ];
 
-// Gamification stats mock data
+// Mock gamification stats
 export const mockGamificationStats: GamificationStats = {
-  points: 750,
-  level: 3,
-  nextLevelPoints: 1000,
-  rank: 42,
-  streak: 5,
-  nextLevel: 4,
-  achievements: mockBadges,
-  badges: mockBadges,
-  completedChallenges: 2,
-  activeChallenges: 3,
-  streakDays: 5,
-  progressToNextLevel: 75,
-  challenges: mockChallenges,
-  recentAchievements: [mockBadges[0]]
+  level: 5,
+  points: 1250,
+  badges: mockBadges.length,
+  streak: 14,
+  completedChallenges: 23,
+  totalChallenges: 35,
+  nextLevel: {
+    points: 1500,
+    rewards: ["New Badge", "Feature Unlock"]
+  },
+  pointsToNextLevel: 250,
+  progressToNextLevel: 0.83,
+  challenges: [],
+  totalPoints: 1250,
+  currentLevel: 5,
+  streakDays: 14,
+  lastActivityDate: new Date().toISOString(),
+  activeChallenges: 5,
+  badgesCount: mockBadges.length,
+  rank: "Gold",
+  recentAchievements: []
 };
 
-// Leaderboard mock data
-export const mockLeaderboard: LeaderboardEntry[] = [
-  {
-    id: '1',
-    name: 'Emma L.',
-    points: 1240,
-    level: 5,
-    position: 1,
-    avatar: '/images/avatars/emma.jpg',
-    badges: [mockBadges[0], mockBadges[2]]
-  },
-  {
-    id: '2',
-    name: 'Thomas R.',
-    points: 980,
-    level: 4,
-    position: 2,
-    avatar: '/images/avatars/thomas.jpg',
-    badges: [mockBadges[1]]
-  },
-  {
-    id: '3',
-    name: 'Sophie M.',
-    points: 820,
-    level: 3,
-    position: 3,
-    avatar: '/images/avatars/sophie.jpg',
-    badges: [mockBadges[0]]
-  },
-  {
-    id: 'user',
-    name: 'Vous',
-    points: 750,
-    level: 3,
-    position: 4,
-    avatar: '/images/avatars/user.jpg',
-    badges: [mockBadges[0]]
-  }
-];
+export default {
+  mockLeaderboardData,
+  mockBadges,
+  mockGamificationStats
+};

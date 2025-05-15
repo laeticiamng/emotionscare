@@ -18,7 +18,7 @@ export const getUserInitials = (user?: User | TypesUser | null): string => {
 };
 
 // This function can help harmonize the two User types
-export const harmonizeUserType = (user: User | TypesUser): User => {
+export const harmonizeUserType = (user: User | TypesUser | null): User => {
   if (!user) return user as User;
   
   const preferences = user.preferences || {};
@@ -26,8 +26,34 @@ export const harmonizeUserType = (user: User | TypesUser): User => {
   // Convert preferences.notifications from boolean to object if needed
   const notifications = 
     typeof preferences.notifications === 'boolean' 
-      ? { enabled: !!preferences.notifications, emailEnabled: false } 
-      : preferences.notifications || { enabled: true, emailEnabled: false };
+      ? { 
+          enabled: !!preferences.notifications, 
+          emailEnabled: false,
+          types: {
+            system: true,
+            emotion: true,
+            journal: true,
+            coach: true,
+            community: true,
+            achievement: true
+          },
+          frequency: 'daily',
+          tone: 'friendly'
+        }
+      : preferences.notifications || { 
+          enabled: true, 
+          emailEnabled: false,
+          types: {
+            system: true,
+            emotion: true,
+            journal: true,
+            coach: true,
+            community: true,
+            achievement: true
+          },
+          frequency: 'daily',
+          tone: 'friendly'
+        };
   
   return {
     ...user,
@@ -37,9 +63,9 @@ export const harmonizeUserType = (user: User | TypesUser): User => {
       theme: preferences.theme || 'light',
       fontSize: preferences.fontSize || 'medium',
       fontFamily: preferences.fontFamily || 'system',
-      reduceMotion: preferences.reduceMotion || false,
-      colorBlindMode: preferences.colorBlindMode || false,
-      autoplayMedia: preferences.autoplayMedia || true,
+      reduceMotion: preferences.reduceMotion !== undefined ? preferences.reduceMotion : false,
+      colorBlindMode: preferences.colorBlindMode !== undefined ? preferences.colorBlindMode : false,
+      autoplayMedia: preferences.autoplayMedia !== undefined ? preferences.autoplayMedia : true,
       notifications
     }
   } as User;

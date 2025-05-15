@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import GlobalOverviewTab from './tabs/GlobalOverviewTab';
@@ -14,6 +15,7 @@ import UsersListTab from './tabs/UsersListTab';
 import ActivityLogsTab from './tabs/ActivityLogsTab';
 import { DashboardStats } from './tabs/overview/types';
 import InvitationsTab from './tabs/invitations/InvitationsTab';
+import { GamificationStats } from '@/types/gamification';
 
 interface AdminTabContentsProps {
   activeTab: string;
@@ -61,7 +63,7 @@ const AdminTabContents: React.FC<AdminTabContentsProps> = ({
     challenges: [],
     recentAchievements: [],
     nextLevel: {
-      points: 100, // Replace with the actual number
+      points: 100,
       rewards: ["Badge Spécial", "Points bonus"]
     },
     currentLevel: 1,

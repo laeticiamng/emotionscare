@@ -24,7 +24,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   
-  // Préférences initiales (utilisées si l'utilisateur n'a pas de préférences définies)
+  // Initial preferences (used if user has no preferences defined)
   const initialPreferences: UserPreferences = {
     theme: 'system', 
     fontSize: 'medium',
@@ -56,18 +56,18 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
 
   // Use harmonized user preferences
   const harmonizedUser = user ? harmonizeUserType(user) : null;
-  // Utilisation des préférences utilisateur ou des valeurs par défaut
+  // Use user preferences or default values
   const userPreferences = harmonizedUser?.preferences || initialPreferences;
 
-  // État local pour les modifications en cours
+  // Local state for current modifications
   const [formPreferences, setFormPreferences] = useState<UserPreferences>(userPreferences);
 
-  // Fonction pour mettre à jour une propriété spécifique
+  // Function to update a specific property
   const updatePreference = (key: keyof UserPreferences, value: any) => {
     setFormPreferences(prev => ({ ...prev, [key]: value }));
   };
 
-  // Fonction pour mettre à jour les notifications
+  // Function to update notifications
   const updateNotifications = (notificationData: Partial<NotificationPreference>) => {
     const currentNotifications = 
       typeof formPreferences.notifications === 'boolean' 
@@ -83,7 +83,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
     }));
   };
 
-  // Fonction pour gérer la soumission du formulaire
+  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -91,10 +91,10 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
     try {
       if (user) {
         // Ensure correct type conversion
-        const updatedUser = harmonizeUserType({
+        const updatedUser = {
           ...user,
           preferences: formPreferences
-        });
+        };
         
         await updateUser(updatedUser);
         

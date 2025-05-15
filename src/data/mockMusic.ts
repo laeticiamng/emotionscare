@@ -1,77 +1,122 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicPlaylist, MusicTrack } from '@/types';
 
-// Mock music tracks
-export const mockTracks: MusicTrack[] = [
+// Create mock tracks for testing purposes
+const meditationTracks: MusicTrack[] = [
   {
-    id: '1',
-    title: 'Calm Ocean',
+    id: 'med-1',
+    title: 'Breathing Calm',
     artist: 'Nature Sounds',
-    duration: 180,
-    coverUrl: '/images/music/ocean.jpg',
-    url: '/audio/calm-ocean.mp3',
-    audioUrl: '/audio/calm-ocean.mp3',
-    emotion: 'calm'
-  },
-  {
-    id: '2',
-    title: 'Morning Motivation',
-    artist: 'Upbeat Studio',
-    duration: 240,
-    coverUrl: '/images/music/morning.jpg',
-    url: '/audio/morning-motivation.mp3',
-    audioUrl: '/audio/morning-motivation.mp3',
-    emotion: 'happy'
-  },
-  {
-    id: '3',
-    title: 'Deep Focus',
-    artist: 'Concentration Wave',
-    duration: 320,
-    coverUrl: '/images/music/focus.jpg',
-    url: '/audio/deep-focus.mp3',
-    audioUrl: '/audio/deep-focus.mp3',
-    emotion: 'focused'
-  },
-  {
-    id: '4',
-    title: 'Tension Release',
-    artist: 'Relax Mode',
-    duration: 290,
-    coverUrl: '/images/music/release.jpg',
-    url: '/audio/tension-release.mp3',
-    audioUrl: '/audio/tension-release.mp3',
-    emotion: 'stressed'
-  }
-];
-
-// Mock music playlists
-export const mockMusicPlaylists: MusicPlaylist[] = [
-  {
-    id: '1',
-    title: 'Calming Sounds',
-    name: 'Calming Sounds',
-    tracks: [mockTracks[0], mockTracks[3]],
+    duration: 300,
+    url: '/audio/meditation/breathing-calm.mp3',
+    cover: '/images/music/meditation/breathing-calm.jpg',
     emotion: 'calm',
-    coverUrl: '/images/playlists/calm.jpg'
+    category: 'meditation'
   },
   {
-    id: '2',
-    title: 'Energy Boost',
-    name: 'Energy Boost',
-    tracks: [mockTracks[1]],
-    emotion: 'happy',
-    coverUrl: '/images/playlists/energy.jpg'
+    id: 'med-2',
+    title: 'Ocean Waves',
+    artist: 'Ocean Sounds',
+    duration: 360,
+    url: '/audio/meditation/ocean-waves.mp3',
+    cover: '/images/music/meditation/ocean-waves.jpg',
+    emotion: 'peaceful',
+    category: 'meditation'
   },
   {
-    id: '3',
-    title: 'Work Concentration',
-    name: 'Work Concentration',
-    tracks: [mockTracks[2]],
-    emotion: 'focused',
-    coverUrl: '/images/playlists/focus.jpg'
+    id: 'med-3',
+    title: 'Forest Morning',
+    artist: 'Nature Sounds',
+    duration: 420,
+    url: '/audio/meditation/forest-morning.mp3',
+    cover: '/images/music/meditation/forest-morning.jpg',
+    emotion: 'refreshed',
+    category: 'meditation'
   }
 ];
 
-// Convenience export for backward compatibility
-export const mockPlaylists = mockMusicPlaylists;
+const focusTracks: MusicTrack[] = [
+  {
+    id: 'focus-1',
+    title: 'Deep Focus',
+    artist: 'Concentration Music',
+    duration: 600,
+    url: '/audio/focus/deep-focus.mp3',
+    cover: '/images/music/focus/deep-focus.jpg',
+    emotion: 'focused',
+    category: 'focus'
+  },
+  {
+    id: 'focus-2',
+    title: 'Study Session',
+    artist: 'Brain Waves',
+    duration: 720,
+    url: '/audio/focus/study-session.mp3',
+    cover: '/images/music/focus/study-session.jpg',
+    emotion: 'attentive',
+    category: 'focus'
+  }
+];
+
+const energyTracks: MusicTrack[] = [
+  {
+    id: 'energy-1',
+    title: 'Morning Boost',
+    artist: 'Energy Flow',
+    duration: 240,
+    url: '/audio/energy/morning-boost.mp3',
+    cover: '/images/music/energy/morning-boost.jpg',
+    emotion: 'energized',
+    category: 'energy'
+  },
+  {
+    id: 'energy-2',
+    title: 'Power Up',
+    artist: 'Motivation Mix',
+    duration: 280,
+    url: '/audio/energy/power-up.mp3',
+    cover: '/images/music/energy/power-up.jpg',
+    emotion: 'motivated',
+    category: 'energy'
+  }
+];
+
+// Create mock playlists
+export const mockPlaylists: MusicPlaylist[] = [
+  {
+    id: 'meditation',
+    name: 'Méditation et calme',
+    tracks: meditationTracks,
+    emotion: 'calm',
+    category: 'meditation',
+    description: 'Des sons apaisants pour méditer et se relaxer',
+    coverUrl: '/images/music/playlists/meditation.jpg'
+  },
+  {
+    id: 'focus',
+    name: 'Concentration et travail',
+    tracks: focusTracks,
+    emotion: 'focused',
+    category: 'focus',
+    description: 'Musique pour améliorer votre concentration et productivité',
+    coverUrl: '/images/music/playlists/focus.jpg'
+  },
+  {
+    id: 'energy',
+    name: 'Énergie et motivation',
+    tracks: energyTracks,
+    emotion: 'energized',
+    category: 'energy',
+    description: 'Donnez-vous un coup de boost avec cette playlist énergisante',
+    coverUrl: '/images/music/playlists/energy.jpg'
+  }
+];
+
+// All tracks combined
+export const allTracks: MusicTrack[] = [
+  ...meditationTracks,
+  ...focusTracks,
+  ...energyTracks
+];
+
+export default { mockPlaylists, allTracks };
