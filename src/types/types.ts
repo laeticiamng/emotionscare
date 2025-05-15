@@ -72,7 +72,6 @@ export interface UserPreferences {
     showEmotionalScore?: boolean;
     shareJournalInsights?: boolean;
     anonymousDataContribution?: boolean;
-    profileVisibility?: 'public' | 'private' | 'team';
   };
   profileVisibility?: 'private' | 'team' | 'public';
   accessibility?: {
@@ -120,7 +119,8 @@ export interface UserPreferences {
   [key: string]: any; // For flexibility during development
 }
 
-export interface UserPreferencesState extends UserPreferences {
+export interface UserPreferencesState {
+  preferences: UserPreferences;
   loading: boolean;
   error: string | null;
   setPreferences?: (preferences: UserPreferences) => void;
@@ -443,6 +443,7 @@ export interface Badge {
   user_id?: string;
   icon_url?: string;
   total_required?: number;
+  type?: string; // Added to fix Badge type issues
 }
 
 export interface LeaderboardEntry {
@@ -486,6 +487,7 @@ export interface Emotion {
   energy?: number;
   dominantEmotion?: string;
   primaryEmotion?: string;
+  source?: string; // Added to fix EmotionData source property
   // For backward compatibility
   user_id?: string;
   audio_url?: string;

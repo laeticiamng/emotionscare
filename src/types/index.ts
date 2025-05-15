@@ -2,7 +2,7 @@
 // Central export file for all types
 export * from './types';
 
-// Specific re-exports to maintain compatibility with existing imports
+// Specific re-exports for backward compatibility
 export type { 
   Emotion,
   EmotionResult,
@@ -15,7 +15,9 @@ export type {
   MusicPlaylist,
   TrackInfoProps,
   VolumeControlProps,
-  ProgressBarProps
+  ProgressBarProps,
+  MusicContextType,
+  MusicDrawerProps
 } from './types';
 
 export type {
@@ -23,13 +25,15 @@ export type {
   VRSessionTemplate,
   VRHistoryListProps,
   VRSessionWithMusicPropsType,
-  VRTemplateGridProps
+  VRTemplateGridProps,
+  VRSessionWithMusicProps
 } from './types';
 
 export type {
   Challenge,
   Badge,
-  GamificationStats
+  GamificationStats,
+  LeaderboardEntry
 } from './types';
 
 export type {
@@ -40,10 +44,11 @@ export type {
   AuthContextType,
   UserModeContextType,
   ThemeContextType,
-  ThemeButtonProps
+  ThemeButtonProps,
+  SidebarContextType
 } from './types';
 
-// Additional types that may be needed
+// Additional type re-exports
 export type {
   Notification,
   NotificationFrequency,
@@ -64,7 +69,6 @@ export type {
   InvitationData,
   InvitationFormData,
   InvitationVerificationResult,
-  LeaderboardEntry,
   FontFamily,
   FontSize,
   ThemeName,

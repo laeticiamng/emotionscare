@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import type { SidebarContextType } from '@/types';
+import { SidebarContextType } from '@/types';
 
 const SidebarContext = createContext<SidebarContextType>({
   collapsed: false,

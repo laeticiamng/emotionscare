@@ -1,132 +1,80 @@
 
-import React, { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Pause, SkipForward, Volume2 } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { VRSessionWithMusicProps } from '@/types';
+import { VRSessionWithMusicPropsType } from '@/types';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
-  template,
-  session,
-  onComplete,
-  onExit,
-  onSessionComplete
+const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
+  template, 
+  onComplete, 
+  session, 
+  onSessionComplete, 
+  isAudioOnly, 
+  videoUrl, 
+  audioUrl, 
+  emotion,
+  sessionId,
+  templateId
 }) => {
-  const [isActive, setIsActive] = useState(false);
-  const { currentTrack, isPlaying, pauseTrack, playTrack, loadPlaylistForEmotion } = useMusic();
-  const activeSession = session || template;
+  // Use direct props or from the session
+  const activeTemplate = session || template;
+  const handleComplete = onSessionComplete || onComplete;
   
-  // Get emotion from template or session safely
-  const targetEmotion = activeSession && 'emotion' in activeSession 
-    ? activeSession.emotion 
-    : 'calm';
-
+  const targetEmotion = emotion || (
+    activeTemplate?.emotion || 'calm'
+  );
+  
+  const { loadPlaylistForEmotion, isPlaying, playTrack, pauseTrack } = useMusic();
+  
   useEffect(() => {
-    const loadEmotionalMusic = async () => {
-      if (!targetEmotion || !loadPlaylistForEmotion) return;
-      
+    // Load a playlist based on the session's target emotion
+    const loadMusic = async () => {
       try {
-        const playlist = await loadPlaylistForEmotion(targetEmotion);
-        if (playlist && playlist.tracks.length > 0) {
-          const track = playlist.tracks[0];
-          playTrack({
-            ...track,
-            audioUrl: track.audioUrl || track.url
-          });
-          setIsActive(true);
+        if (targetEmotion && loadPlaylistForEmotion) {
+          const playlist = await loadPlaylistForEmotion(targetEmotion);
+          
+          if (playlist && playlist.tracks.length > 0) {
+            // Ensure the track has the required properties
+            const track = {
+              ...playlist.tracks[0],
+              duration: playlist.tracks[0].duration || 0,
+              url: playlist.tracks[0].url || playlist.tracks[0].audioUrl || '',
+              audioUrl: playlist.tracks[0].audioUrl || ''
+            };
+            playTrack(track);
+          }
         }
       } catch (error) {
-        console.error('Error loading music for VR session:', error);
+        console.error("Error loading music for VR:", error);
       }
     };
     
-    loadEmotionalMusic();
+    loadMusic();
     
+    // Cleanup
     return () => {
       pauseTrack();
     };
-  }, [targetEmotion, loadPlaylistForEmotion, playTrack, pauseTrack]);
-  
-  const handleTogglePlay = () => {
-    if (isPlaying) {
-      pauseTrack();
-    } else if (currentTrack) {
-      playTrack(currentTrack);
-    }
-  };
-  
-  const handleComplete = () => {
-    if (onSessionComplete) {
-      onSessionComplete();
-    } else if (onComplete && template) {
-      const completedSession = {
-        id: `session-${Date.now()}`,
-        templateId: template.id,
-        userId: 'current-user',
-        startTime: new Date().toISOString(),
-        endTime: new Date().toISOString(),
-        duration: 0,
-        completed: true
-      };
-      onComplete(completedSession);
-    }
-  };
+  }, [activeTemplate, targetEmotion, loadPlaylistForEmotion, playTrack, pauseTrack]);
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Musique adaptative</span>
-          {isActive && (
-            <Button size="sm" variant="ghost" onClick={handleTogglePlay}>
-              {isPlaying ? (
-                <Pause className="h-4 w-4 mr-2" />
-              ) : (
-                <Play className="h-4 w-4 mr-2" />
-              )}
-              {isPlaying ? 'Pause' : 'Lecture'}
-            </Button>
-          )}
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent>
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            {currentTrack?.coverUrl ? (
-              <img 
-                src={currentTrack.coverUrl} 
-                alt={currentTrack.title} 
-                className="w-full h-full object-cover rounded-full"
-              />
-            ) : (
-              <Volume2 className="h-6 w-6 text-primary/60" />
-            )}
+    <Card className="mb-4">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium">Musique adaptative</h3>
+            <p className="text-sm text-muted-foreground">
+              {isPlaying ? 
+                'Lecture en cours - Musique adaptée à votre session' : 
+                'La musique démarrera automatiquement'}
+            </p>
           </div>
           
-          <div>
-            <p className="font-medium">
-              {currentTrack ? currentTrack.title : 'Choisir une musique'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {currentTrack ? currentTrack.artist : 'Adaptée à votre session'}
-            </p>
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <span className="animate-pulse">🎵</span>
           </div>
         </div>
-        
-        {targetEmotion && (
-          <p className="text-xs text-muted-foreground mt-4">
-            Musique sélectionnée pour l'émotion: <span className="font-medium">{targetEmotion}</span>
-          </p>
-        )}
       </CardContent>
-      
-      <CardFooter>
-        <Button variant="outline" className="w-full" onClick={handleComplete}>
-          Terminer la session
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
