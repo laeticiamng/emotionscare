@@ -1,9 +1,3 @@
 
-import { MusicProvider, useMusic } from './MusicProvider';
-import type { MusicContextType } from './MusicProvider';
-
-export {
-  MusicProvider,
-  useMusic,
-  type MusicContextType
-};
+export { useMusic } from './MusicContext';
+export { MusicProvider } from './MusicProvider';
