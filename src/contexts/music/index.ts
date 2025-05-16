@@ -8,3 +8,4 @@ export const useMusic = useMusicContext;
 
 // Make sure we export the types as well
 export type { Track, Playlist } from './types';
+

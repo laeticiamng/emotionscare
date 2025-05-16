@@ -1,413 +1,231 @@
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Track, Playlist } from './types';
+import React, { createContext, useState, useContext, useCallback } from 'react';
+import { Track, Playlist, EmotionMusicParams } from './types';
+
+// Mock data for playlists
+const MOCK_PLAYLISTS: Record<string, Playlist> = {
+  calm: {
+    id: 'playlist-calm',
+    name: 'Calme et détente',
+    emotion: 'calm',
+    tracks: [
+      { id: 'track-1', title: 'Peaceful Morning', artist: 'Nature Sounds', url: '/assets/audio/peaceful-morning.mp3', duration: 180, emotion: 'calm' },
+      { id: 'track-2', title: 'Ocean Waves', artist: 'Relaxation', url: '/assets/audio/ocean-waves.mp3', duration: 240, emotion: 'calm' },
+      { id: 'track-3', title: 'Meditation', artist: 'Zen Garden', url: '/assets/audio/meditation.mp3', duration: 300, emotion: 'calm' }
+    ]
+  },
+  happy: {
+    id: 'playlist-happy',
+    name: 'Bonne humeur',
+    emotion: 'happy',
+    tracks: [
+      { id: 'track-4', title: 'Sunny Day', artist: 'Happy Tunes', url: '/assets/audio/sunny-day.mp3', duration: 180, emotion: 'happy' },
+      { id: 'track-5', title: 'Dancing Joy', artist: 'Feel Good', url: '/assets/audio/dancing-joy.mp3', duration: 210, emotion: 'happy' },
+      { id: 'track-6', title: 'Celebration', artist: 'Party Time', url: '/assets/audio/celebration.mp3', duration: 240, emotion: 'happy' }
+    ]
+  },
+  focus: {
+    id: 'playlist-focus',
+    name: 'Concentration',
+    emotion: 'focus',
+    tracks: [
+      { id: 'track-7', title: 'Deep Work', artist: 'Productivity', url: '/assets/audio/deep-work.mp3', duration: 300, emotion: 'focus' },
+      { id: 'track-8', title: 'Flow State', artist: 'Mind Masters', url: '/assets/audio/flow-state.mp3', duration: 360, emotion: 'focus' },
+      { id: 'track-9', title: 'Clarity', artist: 'Brain Waves', url: '/assets/audio/clarity.mp3', duration: 270, emotion: 'focus' }
+    ]
+  },
+  sad: {
+    id: 'playlist-sad',
+    name: 'Mélancolie',
+    emotion: 'sad',
+    tracks: [
+      { id: 'track-10', title: 'Rainy Day', artist: 'Melancholy', url: '/assets/audio/rainy-day.mp3', duration: 240, emotion: 'sad' },
+      { id: 'track-11', title: 'Blue Mood', artist: 'Soul Touch', url: '/assets/audio/blue-mood.mp3', duration: 300, emotion: 'sad' },
+      { id: 'track-12', title: 'Reflections', artist: 'Deep Thoughts', url: '/assets/audio/reflections.mp3', duration: 270, emotion: 'sad' }
+    ]
+  },
+  anxious: {
+    id: 'playlist-anxious',
+    name: 'Apaisement',
+    emotion: 'anxious',
+    tracks: [
+      { id: 'track-13', title: 'Calming Breeze', artist: 'Anxiety Relief', url: '/assets/audio/calming-breeze.mp3', duration: 300, emotion: 'anxious' },
+      { id: 'track-14', title: 'Safe Haven', artist: 'Comfort Zone', url: '/assets/audio/safe-haven.mp3', duration: 330, emotion: 'anxious' },
+      { id: 'track-15', title: 'Letting Go', artist: 'Peace Within', url: '/assets/audio/letting-go.mp3', duration: 270, emotion: 'anxious' }
+    ]
+  },
+  neutral: {
+    id: 'playlist-neutral',
+    name: 'Équilibre',
+    emotion: 'neutral',
+    tracks: [
+      { id: 'track-16', title: 'Balanced Mind', artist: 'Harmony', url: '/assets/audio/balanced-mind.mp3', duration: 240, emotion: 'neutral' },
+      { id: 'track-17', title: 'Middle Path', artist: 'Zen Flow', url: '/assets/audio/middle-path.mp3', duration: 270, emotion: 'neutral' },
+      { id: 'track-18', title: 'Centered', artist: 'Equilibrium', url: '/assets/audio/centered.mp3', duration: 300, emotion: 'neutral' }
+    ]
+  }
+};
 
 export interface MusicContextType {
   currentTrack: Track | null;
+  currentPlaylist: Playlist | null;
   isPlaying: boolean;
   volume: number;
-  progress: number;
-  duration: number;
-  playlist: Track[];
-  currentPlaylist: Playlist | null;
-  recentPlaylists: Playlist[];
   isMuted: boolean;
   openDrawer: boolean;
-  error: string | null;
-  isInitialized: boolean;
   currentEmotion: string | null;
-  loadPlaylistForEmotion: (emotion: string) => Promise<Playlist | null>;
-  setVolume: (volume: number) => void;
-  setProgress: (progress: number) => void;
+  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<Playlist | null>;
   playTrack: (track: Track) => void;
   pauseTrack: () => void;
+  togglePlay: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  togglePlay: () => void;
+  setVolume: (volume: number) => void;
   toggleMute: () => void;
-  loadPlaylist: (playlist: Playlist) => void;
   setOpenDrawer: (open: boolean) => void;
-  initializeMusicSystem: () => Promise<void>;
-  seekTo: (time: number) => void;
-  isShuffled: boolean;
-  isRepeating: boolean;
-  toggleShuffle: () => void;
-  toggleRepeat: () => void;
-  currentTime: number;
-  queue: Track[];
-  addToQueue: (track: Track) => void;
-  clearQueue: () => void;
-  setEmotionMode: (enabled: boolean) => void;
-  setEmotionSync?: (enabled: boolean) => void;
-  setCurrentEmotion: (emotion: string | null) => void;
   setEmotion: (emotion: string) => void;
-  findRecommendedTracksForEmotion: (emotion: string, intensity?: number) => Track[];
-  emotionMode: boolean;
+  adjustVolume: (amount: number) => void;
 }
 
-// Sample tracks for demo
-const SAMPLE_TRACKS: Track[] = [
-  {
-    id: '1',
-    title: 'Peaceful Morning',
-    artist: 'Nature Sounds',
-    url: '/audio/peaceful-morning.mp3',
-    cover: '/images/covers/peaceful.jpg',
-    duration: 180,
-    emotion: 'calm',
-    intensity: 2
-  },
-  {
-    id: '2',
-    title: 'Energy Boost',
-    artist: 'Workout Mix',
-    url: '/audio/energy-boost.mp3',
-    cover: '/images/covers/energy.jpg',
-    duration: 240,
-    emotion: 'happy',
-    intensity: 4
-  },
-  {
-    id: '3',
-    title: 'Melancholy Evening',
-    artist: 'Piano Solo',
-    url: '/audio/melancholy.mp3',
-    cover: '/images/covers/melancholy.jpg',
-    duration: 210,
-    emotion: 'sad',
-    intensity: 3
-  }
-];
-
-// Default context value
-const defaultContext: MusicContextType = {
+export const MusicContext = createContext<MusicContextType>({
   currentTrack: null,
+  currentPlaylist: null,
   isPlaying: false,
   volume: 0.5,
-  progress: 0,
-  duration: 0,
-  playlist: [],
-  currentPlaylist: null,
-  recentPlaylists: [],
   isMuted: false,
   openDrawer: false,
-  error: null,
-  isInitialized: false,
   currentEmotion: null,
-  emotionMode: false,
   loadPlaylistForEmotion: async () => null,
-  setVolume: () => {},
-  setProgress: () => {},
   playTrack: () => {},
   pauseTrack: () => {},
+  togglePlay: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
-  togglePlay: () => {},
+  setVolume: () => {},
   toggleMute: () => {},
-  loadPlaylist: () => {},
   setOpenDrawer: () => {},
-  initializeMusicSystem: async () => {},
-  seekTo: () => {},
-  isShuffled: false,
-  isRepeating: false,
-  toggleShuffle: () => {},
-  toggleRepeat: () => {},
-  currentTime: 0,
-  queue: [],
-  addToQueue: () => {},
-  clearQueue: () => {},
-  setEmotionMode: () => {},
-  setCurrentEmotion: () => {},
   setEmotion: () => {},
-  findRecommendedTracksForEmotion: () => []
-};
+  adjustVolume: () => {}
+});
 
-// Create context
-export const MusicContext = createContext<MusicContextType>(defaultContext);
-
-// Custom hook for using the music context
-export const useMusicContext = () => useContext(MusicContext);
-
-// Music provider component
-export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [playlist, setPlaylist] = useState<Track[]>([]);
-  const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
-  const [recentPlaylists, setRecentPlaylists] = useState<Playlist[]>([]);
   const [isMuted, setIsMuted] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [isRepeating, setIsRepeating] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [queue, setQueue] = useState<Track[]>([]);
-  const [emotionMode, setEmotionMode] = useState(false);
 
-  // Initialize the music system
-  const initializeMusicSystem = async () => {
-    try {
-      // In a real app, this would load music configurations, user preferences, etc.
-      // For demo purposes, we'll simulate loading with a delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setIsInitialized(true);
-      return;
-    } catch (err) {
-      setError('Failed to initialize music system');
-      throw err;
-    }
-  };
-
-  // Emotion to playlist mapping (for demo)
-  const emotionPlaylists: Record<string, Playlist> = {
-    happy: {
-      id: 'happy-playlist',
-      name: 'Happy Vibes',
-      emotion: 'happy',
-      tracks: SAMPLE_TRACKS.filter(track => track.emotion === 'happy' || track.emotion === 'joy')
-    },
-    sad: {
-      id: 'sad-playlist',
-      name: 'Reflective Moments',
-      emotion: 'sad',
-      tracks: SAMPLE_TRACKS.filter(track => track.emotion === 'sad' || track.emotion === 'melancholy')
-    },
-    calm: {
-      id: 'calm-playlist',
-      name: 'Peaceful Sounds',
-      emotion: 'calm',
-      tracks: SAMPLE_TRACKS.filter(track => track.emotion === 'calm' || track.emotion === 'relaxed')
-    },
-    focus: {
-      id: 'focus-playlist',
-      name: 'Deep Focus',
-      emotion: 'focus',
-      tracks: SAMPLE_TRACKS
-    },
-    energetic: {
-      id: 'energetic-playlist',
-      name: 'Energy Boost',
-      emotion: 'energetic',
-      tracks: SAMPLE_TRACKS.filter(track => track.emotion === 'happy' || track.emotion === 'energetic')
-    },
-    neutral: {
-      id: 'neutral-playlist',
-      name: 'Balanced Mix',
-      emotion: 'neutral',
-      tracks: SAMPLE_TRACKS
-    }
-  };
-
-  // Load a playlist based on an emotion
-  const loadPlaylistForEmotion = async (emotion: string): Promise<Playlist | null> => {
-    try {
-      // Get emotion in lowercase for consistent matching
-      const normalizedEmotion = emotion.toLowerCase();
+  // Fonction pour charger une playlist basée sur une émotion
+  const loadPlaylistForEmotion = useCallback(async (emotionParam: string | EmotionMusicParams): Promise<Playlist | null> => {
+    // Extraction de l'émotion à partir du paramètre
+    const emotion = typeof emotionParam === 'string' ? emotionParam : emotionParam.emotion;
+    
+    // Recherche de la playlist correspondante
+    const playlist = MOCK_PLAYLISTS[emotion.toLowerCase()] || MOCK_PLAYLISTS.neutral;
+    
+    if (playlist) {
+      setCurrentPlaylist(playlist);
+      setCurrentEmotion(emotion);
       
-      // Find playlist for emotion, or use neutral as fallback
-      let matchedPlaylist: Playlist | null = null;
-      
-      if (normalizedEmotion in emotionPlaylists) {
-        matchedPlaylist = emotionPlaylists[normalizedEmotion];
-      } else {
-        // Handle similar emotions
-        if (['joy', 'happy', 'excited'].includes(normalizedEmotion)) {
-          matchedPlaylist = emotionPlaylists.happy;
-        } else if (['sad', 'melancholy', 'depressed'].includes(normalizedEmotion)) {
-          matchedPlaylist = emotionPlaylists.sad;
-        } else if (['calm', 'relaxed', 'peaceful'].includes(normalizedEmotion)) {
-          matchedPlaylist = emotionPlaylists.calm;
-        } else if (['focus', 'concentrated'].includes(normalizedEmotion)) {
-          matchedPlaylist = emotionPlaylists.focus;
-        } else if (['energetic', 'dynamic'].includes(normalizedEmotion)) {
-          matchedPlaylist = emotionPlaylists.energetic;
-        } else {
-          matchedPlaylist = emotionPlaylists.neutral;
-        }
+      // Si aucune piste n'est en cours de lecture, on charge la première piste
+      if (!currentTrack && playlist.tracks.length > 0) {
+        setCurrentTrack(playlist.tracks[0]);
       }
       
-      if (!matchedPlaylist) {
-        return null;
-      }
-      
-      // Load the playlist
-      loadPlaylist(matchedPlaylist);
-      setCurrentEmotion(normalizedEmotion);
-      
-      return matchedPlaylist;
-    } catch (err) {
-      console.error('Error loading playlist for emotion:', err);
-      setError('Failed to load playlist for emotion');
-      return null;
+      return playlist;
     }
-  };
+    
+    return null;
+  }, [currentTrack]);
 
-  // Set the current emotion
-  const setEmotion = (emotion: string) => {
-    setCurrentEmotion(emotion);
-  };
-
-  // Play a track
-  const playTrack = (track: Track) => {
+  // Jouer une piste
+  const playTrack = useCallback((track: Track) => {
     setCurrentTrack(track);
     setIsPlaying(true);
-    setProgress(0);
-    setDuration(track.duration || 0);
-  };
+  }, []);
 
-  // Pause the current track
-  const pauseTrack = () => {
+  // Mettre en pause
+  const pauseTrack = useCallback(() => {
     setIsPlaying(false);
-  };
+  }, []);
 
-  // Toggle play/pause
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
+  // Basculer lecture/pause
+  const togglePlay = useCallback(() => {
+    setIsPlaying(prev => !prev);
+  }, []);
 
-  // Toggle mute
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
-
-  // Skip to the next track
-  const nextTrack = () => {
-    if (!currentTrack || playlist.length === 0) return;
+  // Piste suivante
+  const nextTrack = useCallback(() => {
+    if (!currentPlaylist || !currentTrack) return;
     
-    // Check queue first
-    if (queue.length > 0) {
-      const nextItem = queue[0];
-      setQueue(prev => prev.slice(1));
-      playTrack(nextItem);
-      return;
-    }
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1) return;
     
-    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % playlist.length;
-    playTrack(playlist[nextIndex]);
-  };
+    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
+    setCurrentTrack(currentPlaylist.tracks[nextIndex]);
+  }, [currentPlaylist, currentTrack]);
 
-  // Go to the previous track
-  const previousTrack = () => {
-    if (!currentTrack || playlist.length === 0) return;
+  // Piste précédente
+  const previousTrack = useCallback(() => {
+    if (!currentPlaylist || !currentTrack) return;
     
-    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
-    const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-    playTrack(playlist[prevIndex]);
-  };
+    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1) return;
+    
+    const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+    setCurrentTrack(currentPlaylist.tracks[prevIndex]);
+  }, [currentPlaylist, currentTrack]);
 
-  // Load a playlist and start playing the first track
-  const loadPlaylist = (newPlaylist: Playlist) => {
-    setPlaylist(newPlaylist.tracks);
-    setCurrentPlaylist(newPlaylist);
-    
-    // Add to recent playlists
-    setRecentPlaylists(prev => {
-      const filtered = prev.filter(p => p.id !== newPlaylist.id);
-      return [newPlaylist, ...filtered].slice(0, 5);
+  // Activer/désactiver le son
+  const toggleMute = useCallback(() => {
+    setIsMuted(prev => !prev);
+  }, []);
+
+  // Définir l'émotion
+  const setEmotion = useCallback((emotion: string) => {
+    setCurrentEmotion(emotion);
+  }, []);
+  
+  // Ajuster le volume
+  const adjustVolume = useCallback((amount: number) => {
+    setVolume(prev => {
+      const newVolume = Math.max(0, Math.min(1, prev + amount));
+      return newVolume;
     });
-    
-    // Start playing the first track if available
-    if (newPlaylist.tracks.length > 0) {
-      playTrack(newPlaylist.tracks[0]);
-    }
-  };
-
-  // Seek to a specific time in the track
-  const seekTo = (time: number) => {
-    setCurrentTime(time);
-  };
-
-  // Toggle shuffle mode
-  const toggleShuffle = () => {
-    setIsShuffled(prev => !prev);
-  };
-
-  // Toggle repeat mode
-  const toggleRepeat = () => {
-    setIsRepeating(prev => !prev);
-  };
-
-  // Add a track to the queue
-  const addToQueue = (track: Track) => {
-    setQueue(prev => [...prev, track]);
-  };
-
-  // Clear the queue
-  const clearQueue = () => {
-    setQueue([]);
-  };
-
-  // Find tracks based on emotion and intensity
-  const findRecommendedTracksForEmotion = (emotion: string, intensity?: number): Track[] => {
-    const matchingTracks = SAMPLE_TRACKS.filter(track => 
-      track.emotion?.toLowerCase() === emotion.toLowerCase()
-    );
-    
-    if (intensity !== undefined && matchingTracks.length > 0) {
-      return matchingTracks.sort((a, b) => {
-        const aIntensity = a.intensity || 0;
-        const bIntensity = b.intensity || 0;
-        return Math.abs(aIntensity - intensity) - Math.abs(bIntensity - intensity);
-      });
-    }
-    
-    return matchingTracks.length > 0 ? matchingTracks : SAMPLE_TRACKS;
-  };
-
-  // Context value
-  const value: MusicContextType = {
-    currentTrack,
-    isPlaying,
-    volume,
-    progress,
-    duration,
-    playlist,
-    currentPlaylist,
-    recentPlaylists,
-    isMuted,
-    openDrawer,
-    error,
-    isInitialized,
-    currentEmotion,
-    emotionMode,
-    loadPlaylistForEmotion,
-    setVolume,
-    setProgress,
-    playTrack,
-    pauseTrack,
-    nextTrack,
-    previousTrack,
-    togglePlay,
-    toggleMute,
-    loadPlaylist,
-    setOpenDrawer,
-    initializeMusicSystem,
-    seekTo,
-    isShuffled,
-    isRepeating,
-    toggleShuffle,
-    toggleRepeat,
-    currentTime,
-    queue,
-    addToQueue,
-    clearQueue,
-    setEmotionMode,
-    setCurrentEmotion,
-    setEmotion,
-    findRecommendedTracksForEmotion
-  };
+  }, []);
 
   return (
-    <MusicContext.Provider value={value}>
+    <MusicContext.Provider value={{
+      currentTrack,
+      currentPlaylist,
+      isPlaying,
+      volume,
+      isMuted,
+      openDrawer,
+      currentEmotion,
+      loadPlaylistForEmotion,
+      playTrack,
+      pauseTrack,
+      togglePlay,
+      nextTrack,
+      previousTrack,
+      setVolume,
+      toggleMute,
+      setOpenDrawer,
+      setEmotion,
+      adjustVolume
+    }}>
       {children}
     </MusicContext.Provider>
   );
 };
 
-export default MusicContext;
+export const useMusicContext = () => {
+  const context = useContext(MusicContext);
+  if (context === undefined) {
+    throw new Error('useMusicContext must be used within a MusicProvider');
+  }
+  return context;
+};

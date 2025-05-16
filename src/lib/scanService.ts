@@ -1,194 +1,122 @@
+
+import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
 
-/**
- * Saves emotion scan results
- */
-export const saveEmotion = async (result: EmotionResult): Promise<EmotionResult> => {
-  // This would typically save to a database via API
-  // For now, we'll just return the result with an ID
-  console.log('Saving emotion result:', result);
-  
-  return {
-    ...result,
-    id: result.id || `emotion-${Date.now()}`,
-    timestamp: result.timestamp || new Date().toISOString()
-  };
-};
+// Simuler une base de données en mémoire
+const emotionDatabase: EmotionResult[] = [];
 
-/**
- * Creates a new emotion entry
- */
-export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<EmotionResult> => {
-  console.log('Creating emotion entry:', data);
-  
-  // In a real implementation, this would send the data to an API
-  // For now, we'll just return the data with some defaults
-  const emotionResult: EmotionResult = {
-    id: data.id || `emotion-${Date.now()}`,
-    emotion: data.emotion || 'neutral',
-    score: data.score || 0.5,
-    confidence: data.confidence || 0.5,
-    intensity: data.intensity || 0.5,
-    emojis: data.emojis || [],
-    date: data.date || new Date().toISOString(),
-    timestamp: data.timestamp || new Date().toISOString(),
-    text: data.text || '',
-    feedback: data.feedback || '',
-    user_id: data.user_id
+// Fonction pour enregistrer une émotion
+export async function saveEmotion(emotion: EmotionResult): Promise<EmotionResult> {
+  // Assurez-vous que l'émotion a un ID et un timestamp
+  const completeEmotion = {
+    ...emotion,
+    id: emotion.id || uuid(),
+    timestamp: emotion.timestamp || new Date().toISOString()
   };
   
-  return emotionResult;
-};
-
-/**
- * Fetches the latest emotion for a user
- */
-export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
-  console.log('Fetching latest emotion for user:', userId);
+  // Ajouter à notre "base de données"
+  emotionDatabase.push(completeEmotion);
   
-  // This would typically fetch from a database via API
-  // For now, return mock data
+  return completeEmotion;
+}
+
+// Fonction pour récupérer la dernière émotion
+export async function fetchLatestEmotion(userId: string): Promise<EmotionResult | null> {
+  // Filtrer par utilisateur et trier par date
+  const userEmotions = emotionDatabase
+    .filter(e => e.user_id === userId)
+    .sort((a, b) => {
+      const dateA = new Date(a.timestamp || a.date || '');
+      const dateB = new Date(b.timestamp || b.date || '');
+      return dateB.getTime() - dateA.getTime();
+    });
+  
+  return userEmotions.length > 0 ? userEmotions[0] : null;
+}
+
+// Fonction pour analyser une émotion à partir d'un texte
+export async function analyzeEmotion(text: string): Promise<EmotionResult> {
+  // Simuler une analyse d'émotion avec un délai
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Liste d'émotions possibles à retourner aléatoirement
+  const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
+  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+  
   return {
-    id: `emotion-${Date.now() - 3600000}`,
-    date: new Date().toISOString(),
+    id: uuid(),
+    emotion,
+    score: Math.random() * 0.5 + 0.5,
+    confidence: Math.random() * 0.3 + 0.7,
+    intensity: Math.random(),
     timestamp: new Date().toISOString(),
-    emotion: 'calm',
-    score: 0.75,
-    confidence: 0.8,
-    intensity: 0.6,
-    emojis: ['😌'],
-    text: "I'm feeling pretty relaxed today",
-    feedback: "You seem to be in a balanced emotional state. Consider maintaining this calm with some light music or meditation.",
-    user_id: userId
-  };
-};
-
-/**
- * Analyzes text to determine emotion
- */
-export const analyzeTextEmotion = async (text: string): Promise<EmotionResult> => {
-  // This would typically call an NLP API
-  // For now, we'll return mock data based on keywords
-  
-  // Simple keyword matching
-  const emotions = {
-    happy: ['happy', 'good', 'great', 'excellent', 'joy', 'wonderful'],
-    sad: ['sad', 'depressed', 'unhappy', 'miserable', 'down'],
-    angry: ['angry', 'mad', 'furious', 'annoyed', 'irritated'],
-    anxious: ['anxious', 'worried', 'nervous', 'stress', 'concerned'],
-    calm: ['calm', 'peaceful', 'relaxed', 'serene', 'content']
-  };
-  
-  const textLower = text.toLowerCase();
-  let detectedEmotion = 'neutral';
-  let highestCount = 0;
-  
-  for (const [emotion, keywords] of Object.entries(emotions)) {
-    const count = keywords.filter(keyword => textLower.includes(keyword)).length;
-    if (count > highestCount) {
-      highestCount = count;
-      detectedEmotion = emotion;
-    }
-  }
-  
-  const confidence = highestCount > 0 ? Math.min(0.5 + highestCount * 0.1, 0.95) : 0.5;
-  
-  return {
-    id: `emotion-${Date.now()}`,
-    date: new Date().toISOString(),
-    timestamp: new Date().toISOString(),
-    emotion: detectedEmotion,
-    score: confidence,
-    intensity: Math.random() * 0.5 + 0.25, // Random intensity between 0.25 and 0.75
-    confidence,
-    emojis: detectedEmotion === 'happy' ? ['😀', '😊'] : 
-            detectedEmotion === 'sad' ? ['😢', '😔'] :
-            detectedEmotion === 'angry' ? ['😡', '😠'] :
-            detectedEmotion === 'anxious' ? ['😰', '😨'] :
-            detectedEmotion === 'calm' ? ['😌', '😊'] : ['😐'],
     text,
-    feedback: `Analysis indicates a ${detectedEmotion} emotional state.`
+    feedback: `Votre texte indique une émotion de type "${emotion}" avec une intensité modérée.`,
+    emojis: emotion === 'joy' ? '😊' : emotion === 'calm' ? '😌' : emotion === 'focused' ? '🧠' : 
+            emotion === 'anxious' ? '😰' : '😔'
   };
-};
+}
 
-/**
- * General emotion analysis entry point that calls the appropriate analysis method
- */
-export const analyzeEmotion = async (input: string | Blob): Promise<EmotionResult> => {
-  // Determine the type of input and direct to appropriate analysis function
-  if (typeof input === 'string') {
-    return analyzeTextEmotion(input);
-  } else if (input instanceof Blob) {
-    if (input.type.startsWith('audio/')) {
-      return analyzeVoiceEmotion(input);
-    } else if (input.type.startsWith('image/')) {
-      return analyzeFacialEmotion(input);
-    }
+// Récupérer l'historique des émotions
+export async function fetchEmotionHistory(
+  userId: string,
+  period: 'day' | 'week' | 'month' | 'year' = 'week',
+  limit: number = 50
+): Promise<EmotionResult[]> {
+  // Filtrer par utilisateur
+  const userEmotions = emotionDatabase.filter(e => e.user_id === userId);
+  
+  // Calculer la date limite selon la période
+  const now = new Date();
+  let cutoffDate = new Date();
+  
+  switch (period) {
+    case 'day':
+      cutoffDate.setDate(now.getDate() - 1);
+      break;
+    case 'week':
+      cutoffDate.setDate(now.getDate() - 7);
+      break;
+    case 'month':
+      cutoffDate.setMonth(now.getMonth() - 1);
+      break;
+    case 'year':
+      cutoffDate.setFullYear(now.getFullYear() - 1);
+      break;
   }
   
-  // Default response if input type couldn't be determined
-  return {
-    id: `emotion-${Date.now()}`,
-    date: new Date().toISOString(),
-    timestamp: new Date().toISOString(),
-    emotion: 'neutral',
-    score: 0.5,
-    confidence: 0.5,
-    intensity: 0.5,
-    emojis: ['😐'],
-    text: 'Unable to determine emotion from input',
-    feedback: 'We couldn\'t analyze your emotion based on the provided input.'
-  };
-};
+  // Filtrer par date et limiter le nombre de résultats
+  return userEmotions
+    .filter(emotion => {
+      const emotionDate = new Date(emotion.timestamp || emotion.date || '');
+      return emotionDate >= cutoffDate;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.timestamp || a.date || '');
+      const dateB = new Date(b.timestamp || b.date || '');
+      return dateA.getTime() - dateB.getTime();
+    })
+    .slice(0, limit);
+}
 
-export const analyzeVoiceEmotion = async (audioBlob: Blob): Promise<EmotionResult> => {
-  // This would typically call a voice analysis API
-  // For now, we'll return mock data
+// Fonction pour analyser les sentiments à partir d'un enregistrement audio
+export async function analyzeAudioEmotion(audioBlob: Blob): Promise<EmotionResult> {
+  // Simuler une analyse avec un délai
+  await new Promise(resolve => setTimeout(resolve, 1500));
   
-  const emotions = ['happy', 'sad', 'angry', 'anxious', 'calm', 'neutral'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  const confidence = Math.random() * 0.3 + 0.65; // Random confidence between 0.65 and 0.95
-  
-  return {
-    id: `emotion-${Date.now()}`,
-    date: new Date().toISOString(),
-    timestamp: new Date().toISOString(),
-    emotion: randomEmotion,
-    score: confidence,
-    intensity: Math.random() * 0.5 + 0.25, // Random intensity between 0.25 and 0.75
-    confidence,
-    emojis: randomEmotion === 'happy' ? ['😀', '😊'] : 
-            randomEmotion === 'sad' ? ['😢', '😔'] :
-            randomEmotion === 'angry' ? ['😡', '😠'] :
-            randomEmotion === 'anxious' ? ['😰', '😨'] :
-            randomEmotion === 'calm' ? ['😌', '😊'] : ['😐'],
-    text: "Voice analysis result",
-    feedback: "Voice analysis transcript would appear here in a real application"
-  };
-};
-
-export const analyzeFacialEmotion = async (imageBlob: Blob): Promise<EmotionResult> => {
-  // This would typically call a facial analysis API
-  // For now, we'll return mock data
-  
-  const emotions = ['happy', 'sad', 'angry', 'surprised', 'disgusted', 'fearful', 'neutral'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  const confidence = Math.random() * 0.3 + 0.65; // Random confidence between 0.65 and 0.95
+  // Liste d'émotions possibles à retourner aléatoirement
+  const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
+  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
   
   return {
-    id: `emotion-${Date.now()}`,
-    date: new Date().toISOString(),
+    id: uuid(),
+    emotion,
+    score: Math.random() * 0.5 + 0.5,
+    confidence: Math.random() * 0.3 + 0.7,
+    intensity: Math.random(),
     timestamp: new Date().toISOString(),
-    emotion: randomEmotion,
-    score: confidence,
-    intensity: Math.random() * 0.5 + 0.25, // Random intensity between 0.25 and 0.75
-    confidence,
-    emojis: randomEmotion === 'happy' ? ['😀', '😊'] : 
-            randomEmotion === 'sad' ? ['😢', '😔'] :
-            randomEmotion === 'angry' ? ['😡', '😠'] :
-            randomEmotion === 'surprised' ? ['😮', '😲'] :
-            randomEmotion === 'disgusted' ? ['🤢', '😖'] :
-            randomEmotion === 'fearful' ? ['😨', '😱'] : ['😐'],
-    feedback: `Facial analysis indicates a ${randomEmotion} emotional state.`
+    feedback: `L'analyse de votre voix révèle une émotion principalement de type "${emotion}".`,
+    emojis: emotion === 'joy' ? '😊' : emotion === 'calm' ? '😌' : emotion === 'focused' ? '🧠' : 
+            emotion === 'anxious' ? '😰' : '😔'
   };
-};
+}

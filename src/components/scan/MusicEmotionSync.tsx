@@ -11,16 +11,16 @@ interface MusicEmotionSyncProps {
 
 const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className }) => {
   const [isSynced, setIsSynced] = useState(false);
-  const { loadPlaylistForEmotion, setCurrentEmotion } = useMusic();
+  const { loadPlaylistForEmotion, setEmotion } = useMusic();
   const { lastEmotion } = useCoach();
   
   // Sync music with emotion when enabled and emotion changes
   useEffect(() => {
     if (isSynced && lastEmotion) {
       loadPlaylistForEmotion(lastEmotion);
-      setCurrentEmotion(lastEmotion);
+      setEmotion(lastEmotion);
     }
-  }, [isSynced, lastEmotion, loadPlaylistForEmotion, setCurrentEmotion]);
+  }, [isSynced, lastEmotion, loadPlaylistForEmotion, setEmotion]);
   
   const handleToggle = (checked: boolean) => {
     setIsSynced(checked);
@@ -28,7 +28,7 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className }) => {
     if (checked && lastEmotion) {
       // Immediately sync when enabling
       loadPlaylistForEmotion(lastEmotion);
-      setCurrentEmotion(lastEmotion);
+      setEmotion(lastEmotion);
     }
   };
   
