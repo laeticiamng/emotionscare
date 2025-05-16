@@ -1,37 +1,41 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 interface EmotionMoodPickerProps {
   onSelect: (mood: string) => void;
   selected: string | null;
 }
 
-export const EmotionMoodPicker: React.FC<EmotionMoodPickerProps> = ({ onSelect, selected }) => {
-  const moods = [
-    { id: 'calm', emoji: '😌', label: 'Calme' },
-    { id: 'happy', emoji: '😊', label: 'Joyeux' },
-    { id: 'stressed', emoji: '😰', label: 'Stressé' },
-    { id: 'sad', emoji: '😔', label: 'Triste' },
-    { id: 'energetic', emoji: '⚡', label: 'Énergique' },
-    { id: 'tired', emoji: '😴', label: 'Fatigué' },
-  ];
+const moods = [
+  { name: 'Joyeux', emoji: '😊', color: 'bg-green-500/80' },
+  { name: 'Calme', emoji: '😌', color: 'bg-blue-500/80' },
+  { name: 'Fatigué', emoji: '😴', color: 'bg-purple-500/80' },
+  { name: 'Stressé', emoji: '😓', color: 'bg-orange-500/80' },
+  { name: 'Triste', emoji: '😔', color: 'bg-indigo-500/80' },
+  { name: 'Énervé', emoji: '😠', color: 'bg-red-500/80' },
+];
 
+export const EmotionMoodPicker: React.FC<EmotionMoodPickerProps> = ({ onSelect, selected }) => {
   return (
-    <div className="flex flex-wrap justify-center gap-3">
+    <div className="flex flex-wrap justify-center gap-4 max-w-xl mx-auto">
       {moods.map((mood) => (
-        <Button
-          key={mood.id}
-          variant={selected === mood.id ? "default" : "outline"}
-          className={`
-            rounded-full px-4 py-2 flex items-center gap-2 transition-all
-            ${selected === mood.id ? 'scale-110' : 'hover:scale-105'}
-          `}
-          onClick={() => onSelect(mood.id)}
+        <motion.button
+          key={mood.name}
+          className={`flex flex-col items-center p-3 rounded-full ${
+            selected === mood.name ? 'ring-2 ring-white dark:ring-white ring-offset-2' : ''
+          }`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => onSelect(mood.name)}
         >
-          <span className="text-lg">{mood.emoji}</span>
-          <span>{mood.label}</span>
-        </Button>
+          <div 
+            className={`w-16 h-16 rounded-full flex items-center justify-center ${mood.color} text-white text-4xl`}
+          >
+            {mood.emoji}
+          </div>
+          <span className="mt-2 text-sm font-medium">{mood.name}</span>
+        </motion.button>
       ))}
     </div>
   );

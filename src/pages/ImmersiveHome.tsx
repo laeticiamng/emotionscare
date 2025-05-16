@@ -13,12 +13,11 @@ import {
   VolumeX
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { TimeOfDay, determineTimeOfDay } from '@/constants/defaults';
+import { TimeOfDay, determineTimeOfDay, DEFAULT_WELCOME_MESSAGES } from '@/constants/defaults';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useTheme } from '@/hooks/use-theme';
 import { EmotionMoodPicker } from '@/components/emotion/EmotionMoodPicker';
-import { MusicPlayer } from '@/components/audio/MusicPlayer';
-import { Card, CardContent } from '@/components/ui/card';
+import { AudioController } from '@/components/home/audio/AudioController';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
@@ -41,23 +40,8 @@ const ImmersiveHome: React.FC = () => {
       setIsLoading(true);
       try {
         // In a production environment, this would call the OpenAI API
-        const hour = new Date().getHours();
-        let timeContext = "";
-        
-        if (hour >= 5 && hour < 12) {
-          timeContext = "ce matin";
-        } else if (hour >= 12 && hour < 18) {
-          timeContext = "cet après-midi";
-        } else {
-          timeContext = "ce soir";
-        }
-        
-        const messages = [
-          `Bienvenue dans votre espace de bien-être émotionnel ${timeContext}`,
-          `Comment vous sentez-vous ${timeContext} ? EmotionsCare est à vos côtés`,
-          `${timeContext}, prenez un moment pour vous reconnecter à vos émotions`,
-          `EmotionsCare vous accompagne ${timeContext} pour un meilleur équilibre émotionnel`
-        ];
+        const timeOfDay = determineTimeOfDay();
+        const messages = DEFAULT_WELCOME_MESSAGES[timeOfDay];
         
         setWelcomeMessage(messages[Math.floor(Math.random() * messages.length)]);
       } catch (error) {
@@ -149,7 +133,7 @@ const ImmersiveHome: React.FC = () => {
 
   return (
     <div 
-      className={`immersive-container ${backgroundState.toLowerCase()}`}
+      className={`min-h-screen flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden transition-colors duration-1000 bg-${backgroundState.toLowerCase()}`}
     >
       {/* Theme and audio controls */}
       <div className="absolute top-4 right-4 z-20 flex items-center gap-4">
@@ -169,22 +153,42 @@ const ImmersiveHome: React.FC = () => {
       </div>
 
       {/* Ambient animations */}
-      <div className="ambient-animation">
-        <div className="blur-circle circle-1"></div>
-        <div className="blur-circle circle-2"></div>
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: [0.1, 0.2, 0.1], 
+            scale: [0.8, 1.1, 0.8],
+            x: ['-10%', '5%', '-10%'],
+            y: ['-10%', '5%', '-10%']
+          }}
+          transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
+          className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: [0.1, 0.15, 0.1], 
+            scale: [0.8, 1.2, 0.8],
+            x: ['10%', '-5%', '10%'],
+            y: ['20%', '5%', '20%']
+          }}
+          transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", delay: 1 }}
+          className="absolute -bottom-[50%] -right-[20%] w-[90%] h-[90%] rounded-full bg-gradient-to-r from-secondary/10 to-primary/10 blur-3xl"
+        />
       </div>
 
-      <div className="content-container">
+      <div className="container max-w-6xl z-10 relative">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="greeting-section"
+          className="text-center mb-12"
         >
-          <h1 className="greeting-title">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
             EmotionsCare
           </h1>
-          <p className="greeting-subtitle">
+          <p className="text-xl max-w-3xl mx-auto">
             {isLoading ? "Chargement..." : welcomeMessage}
           </p>
         </motion.div>
@@ -201,41 +205,48 @@ const ImmersiveHome: React.FC = () => {
         </motion.div>
 
         <motion.div 
-          className="options-container"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          <div className="option-card">
-            <div className="option-icon b2c-icon">
-              <User />
+          <div className="border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 pastel:bg-blue-50/80 p-8 rounded-xl border flex flex-col items-center text-center space-y-6">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="w-10 h-10 text-primary" />
             </div>
-            <h2 className="option-title">Je suis un particulier</h2>
-            <p className="option-description">
-              Accédez à votre espace personnel de bien-être émotionnel
-            </p>
-            <button 
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Je suis un particulier</h2>
+              <p className="text-muted-foreground mb-6">
+                Accédez à votre espace personnel de bien-être émotionnel
+              </p>
+            </div>
+            <Button 
               onClick={handlePersonalAccess} 
-              className="option-button b2c-button"
+              size="lg" 
+              className="w-full py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              Espace Personnel
-            </button>
+              <User className="mr-2 h-5 w-5" /> Espace Personnel
+            </Button>
           </div>
 
-          <div className="option-card">
-            <div className="option-icon b2b-icon">
-              <Building />
+          <div className="border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 pastel:bg-blue-50/80 p-8 rounded-xl border flex flex-col items-center text-center space-y-6">
+            <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center">
+              <Building className="w-10 h-10 text-secondary" />
             </div>
-            <h2 className="option-title">Je suis une entreprise</h2>
-            <p className="option-description">
-              Solutions pour votre organisation et vos collaborateurs
-            </p>
-            <button 
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Je suis une entreprise</h2>
+              <p className="text-muted-foreground mb-6">
+                Solutions pour votre organisation et vos collaborateurs
+              </p>
+            </div>
+            <Button 
               onClick={handleBusinessAccess} 
-              className="option-button b2b-button"
+              variant="outline" 
+              size="lg"
+              className="w-full py-6 text-lg shadow border-2 border-secondary/50 hover:border-secondary/80 hover:shadow-xl transition-all duration-300"
             >
-              Espace Entreprise
-            </button>
+              <Building className="mr-2 h-5 w-5" /> Espace Entreprise
+            </Button>
           </div>
         </motion.div>
 
@@ -245,21 +256,23 @@ const ImmersiveHome: React.FC = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
-          <button 
-            className="control-button"
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             onClick={toggleVoiceRecognition}
           >
-            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            <span>{isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}</span>
-          </button>
+            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}
+          </Button>
         </motion.div>
-
-        {audioEnabled && (
-          <div className="fixed bottom-4 right-4 z-30">
-            <MusicPlayer autoPlay={true} volume={0.3} />
-          </div>
-        )}
       </div>
+
+      {audioEnabled && (
+        <div className="fixed bottom-4 right-4 z-30">
+          <AudioController autoplay={true} initialVolume={0.3} />
+        </div>
+      )}
     </div>
   );
 };

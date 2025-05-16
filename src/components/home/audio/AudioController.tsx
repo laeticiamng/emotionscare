@@ -1,198 +1,127 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Music, Volume2, VolumeX } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 
 interface AudioControllerProps {
-  initialVolume?: number;
   autoplay?: boolean;
+  initialVolume?: number;
   minimal?: boolean;
   className?: string;
 }
 
 export const AudioController: React.FC<AudioControllerProps> = ({
-  initialVolume = 0.5,
   autoplay = false,
+  initialVolume = 0.5,
   minimal = false,
-  className = '',
+  className = ''
 }) => {
-  const [isPlaying, setIsPlaying] = useState(autoplay);
-  const [volume, setVolume] = useState(initialVolume);
-  const [isMuted, setIsMuted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [expanded, setExpanded] = useState(false);
-  
-  // Demo audio URLs - in production would be from a proper audio service
-  const ambientTracks = [
-    'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749d484.mp3?filename=peaceful-garden-healing-light-piano-for-meditation-yoga-spa-zen-32999.mp3',
-    'https://cdn.pixabay.com/download/audio/2022/07/18/audio_62e918df4c.mp3?filename=emotional-piano-141356.mp3',
-    'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d16737dc28.mp3?filename=relaxing-mountains-rivers-meditation-music-22530.mp3'
-  ];
-  
-  // Select a track based on the time of day
-  const getTimeBasedTrack = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return ambientTracks[0]; // Morning
-    if (hour >= 12 && hour < 17) return ambientTracks[1]; // Afternoon
-    return ambientTracks[2]; // Evening/Night
-  };
+  const [volume, setVolume] = useState<number>(initialVolume);
+  const [isMuted, setIsMuted] = useState<boolean>(!autoplay);
+  const [isPlaying, setIsPlaying] = useState<boolean>(autoplay);
+  const [audioSrc, setAudioSrc] = useState<string>('/audio/ambient-calm.mp3'); // Placeholder for generated audio
 
+  // This would connect to Music Generator API in production
   useEffect(() => {
-    // Create audio element if it doesn't exist
-    if (!audioRef.current) {
-      const audio = new Audio(getTimeBasedTrack());
-      audio.volume = initialVolume;
-      audio.loop = true;
-      audioRef.current = audio;
-      
-      // Handle autoplay
-      if (autoplay) {
-        const playPromise = audio.play();
-        if (playPromise) {
-          playPromise.catch(() => {
-            // Autoplay was prevented, update state
-            setIsPlaying(false);
-          });
-        }
-      }
+    // Simulate loading different audio based on time of day
+    const hour = new Date().getHours();
+    let audioPath = '/audio/ambient-calm.mp3';
+    
+    if (hour >= 5 && hour < 12) {
+      audioPath = '/audio/ambient-morning.mp3';
+    } else if (hour >= 12 && hour < 18) {
+      audioPath = '/audio/ambient-afternoon.mp3';
+    } else if (hour >= 18 && hour < 22) {
+      audioPath = '/audio/ambient-evening.mp3';
+    } else {
+      audioPath = '/audio/ambient-night.mp3';
+    }
+    
+    setAudioSrc(audioPath);
+    
+    // Create audio element
+    const audioElement = new Audio(audioPath);
+    audioElement.loop = true;
+    audioElement.volume = isMuted ? 0 : volume;
+    
+    if (autoplay && !isMuted) {
+      audioElement.play().catch(error => {
+        console.error('Auto-play prevented:', error);
+        setIsPlaying(false);
+      });
     }
     
     return () => {
-      // Clean up on component unmount
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
+      audioElement.pause();
+      audioElement.src = '';
     };
-  }, [autoplay, initialVolume]);
-  
-  useEffect(() => {
-    // Update audio volume when volume state changes
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
-  
-  const togglePlayback = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        const playPromise = audioRef.current.play();
-        if (playPromise) {
-          playPromise.catch((error) => {
-            console.error("Playback error:", error);
-          });
-        }
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-  
+  }, [autoplay, isMuted, volume]);
+
   const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
+    setIsMuted(!isMuted);
+    const audioElements = document.querySelectorAll('audio');
+    audioElements.forEach(audio => {
+      audio.muted = !isMuted;
+    });
   };
-  
-  const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0]);
-    if (isMuted && value[0] > 0) {
+
+  const handleVolumeChange = (newVolume: number[]) => {
+    const volumeValue = newVolume[0] || 0;
+    setVolume(volumeValue);
+    
+    if (volumeValue === 0) {
+      setIsMuted(true);
+    } else if (isMuted) {
       setIsMuted(false);
-      if (audioRef.current) {
-        audioRef.current.muted = false;
-      }
     }
+    
+    const audioElements = document.querySelectorAll('audio');
+    audioElements.forEach(audio => {
+      audio.volume = volumeValue;
+    });
   };
-  
+
+  const VolumeIcon = () => {
+    if (isMuted || volume === 0) return <VolumeX size={minimal ? 16 : 20} />;
+    if (volume < 0.3) return <Volume size={minimal ? 16 : 20} />;
+    if (volume < 0.7) return <Volume1 size={minimal ? 16 : 20} />;
+    return <Volume2 size={minimal ? 16 : 20} />;
+  };
+
   if (minimal) {
     return (
-      <div 
-        className={cn("relative", className)}
-        onMouseEnter={() => setExpanded(true)}
-        onMouseLeave={() => setExpanded(false)}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleMute}
+        className={`rounded-full ${className}`}
+        title={isMuted ? "Activer le son" : "Désactiver le son"}
       >
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={togglePlayback}
-          className={`${isPlaying ? 'text-primary' : 'text-muted-foreground'}`}
-        >
-          <Music className="h-4 w-4" />
-          <span className="sr-only">{isPlaying ? 'Pause' : 'Play'} ambiance</span>
-        </Button>
-        
-        {expanded && (
-          <div className="absolute right-0 top-10 z-50 bg-background/80 backdrop-blur-md border rounded-lg p-3 shadow-lg flex flex-col items-center gap-2 w-48">
-            <Button
-              variant={isPlaying ? "default" : "outline"}
-              size="sm"
-              onClick={togglePlayback}
-              className="w-full"
-            >
-              {isPlaying ? 'Pause' : 'Play'}
-            </Button>
-            <div className="flex items-center gap-2 w-full">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMute}
-                className="flex-shrink-0"
-              >
-                {isMuted || volume === 0 ? (
-                  <VolumeX className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
-              <Slider
-                value={[volume]}
-                max={1}
-                step={0.01}
-                onValueChange={handleVolumeChange}
-                className="flex-1"
-              />
-            </div>
-          </div>
-        )}
-      </div>
+        <VolumeIcon />
+      </Button>
     );
   }
-  
+
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={`flex items-center gap-2 p-2 rounded-lg bg-background/80 backdrop-blur-sm border shadow-sm ${className}`}>
       <Button
-        variant={isPlaying ? "default" : "outline"}
-        onClick={togglePlayback}
-        size="sm"
-        className="flex-shrink-0"
+        variant="ghost"
+        size="icon"
+        className="rounded-full"
+        onClick={toggleMute}
+        title={isMuted ? "Activer le son" : "Désactiver le son"}
       >
-        <Music className="mr-2 h-4 w-4" />
-        {isPlaying ? 'Pause' : 'Play'}
+        <VolumeIcon />
       </Button>
       
-      <div className="flex items-center gap-2 min-w-[150px]">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleMute}
-          className="flex-shrink-0"
-        >
-          {isMuted || volume === 0 ? (
-            <VolumeX className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <Volume2 className="h-4 w-4" />
-          )}
-        </Button>
+      <div className="w-24">
         <Slider
-          value={[volume]}
+          value={[isMuted ? 0 : volume]}
+          min={0}
           max={1}
           step={0.01}
           onValueChange={handleVolumeChange}
-          className="flex-1"
         />
       </div>
     </div>

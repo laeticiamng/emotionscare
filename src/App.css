@@ -1,3 +1,4 @@
+
 /* Import premium styles */
 @import './styles/premium.css';
 @import './styles/glass.css';
@@ -99,4 +100,37 @@ html, body, #root {
 .theme-pastel .glow-hover:hover {
   box-shadow: 0 4px 20px rgba(96, 165, 250, 0.2);
   transform: translateY(-2px);
+}
+
+/* Time-based background gradients */
+.bg-morning {
+  background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+}
+
+.dark .bg-morning {
+  background: linear-gradient(135deg, #0c4a6e80, #1e3a8a80);
+}
+
+.bg-afternoon {
+  background: linear-gradient(135deg, #ffedd5, #fef3c7);
+}
+
+.dark .bg-afternoon {
+  background: linear-gradient(135deg, #78350f80, #92400e80);
+}
+
+.bg-evening {
+  background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+}
+
+.dark .bg-evening {
+  background: linear-gradient(135deg, #4c1d9580, #1e3a8a80);
+}
+
+.bg-night {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+}
+
+.dark .bg-night {
+  background: linear-gradient(135deg, #0f172a, #020617);
 }
