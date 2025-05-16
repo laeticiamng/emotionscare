@@ -1,62 +1,76 @@
 
-export interface GamificationStats {
-  points: number;
-  level: number | string;
-  badges: Badge[];
-  completedChallenges: number;
-  totalChallenges: number;
-  challenges: Challenge[];
-  streak: number;
-  nextLevel: {
-    points: number;
-    level: number;
-    rewards: string[];
-  };
-  progress: number;
-  leaderboard: LeaderboardEntry[];
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  image_url?: string; // For backward compatibility
+  icon_url?: string; // For backward compatibility
+  image?: string; // For backward compatibility
+  category: string;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | string;
+  unlockedAt?: string;
+  completed?: boolean;
+  progress?: number;
+  level?: number; // For backward compatibility
 }
 
 export interface Challenge {
   id: string;
   title: string;
+  name?: string; // For backward compatibility
   description: string;
   category: string;
   points: number;
+  deadline?: string;
+  status: 'active' | 'completed' | 'failed' | string;
   progress: number;
-  completed: boolean;
-  status?: 'active' | 'completed' | 'failed' | 'locked';
-  icon?: React.ReactNode;
-  isDaily?: boolean;
-  isWeekly?: boolean;
-  xp?: number;
+  goal?: number; // For backward compatibility
+  total?: number; // For backward compatibility
+  difficulty?: 'easy' | 'medium' | 'hard' | string;
+  completions?: number;
+  type?: string;
 }
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  imageUrl?: string;
-  category: string;
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-  unlockedAt?: string;
-  dateEarned?: string;
-  progress?: number;
-  completed?: boolean;
-  rarity?: string;
-  unlocked?: boolean;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  avatar?: string;
+export interface GamificationStats {
   points: number;
-  rank: number;
-  level?: number | string;
-  isCurrentUser?: boolean;
-  department?: string;
-  trend?: 'up' | 'down' | 'stable';
-  userId?: string;
-  username?: string;
+  level: number;
+  badges: Badge[];
+  challenges: Challenge[];
+  totalBadges?: number; // For backward compatibility
+  activeUsersPercent?: number; // For backward compatibility
+  completionRate?: number; // For backward compatibility
+  topChallenges?: Challenge[]; // For backward compatibility
+  badgeLevels?: { [key: string]: number }; // For backward compatibility
+  currentLevel?: number; // For backward compatibility
+  pointsToNextLevel?: number; // For backward compatibility
+  progressToNextLevel?: number; // For backward compatibility
+  streakDays?: number; // For backward compatibility
+  lastActivityDate?: string; // For backward compatibility
+  activeChallenges?: number; // For backward compatibility 
+  badgesCount?: number; // For backward compatibility
+  totalPoints?: number; // For backward compatibility
+}
+
+export interface ChallengesListProps {
+  challenges: Challenge[];
+  onComplete?: (challengeId: string) => Promise<boolean>;
+  showFilter?: boolean;
+  showTitle?: boolean;
+  className?: string;
+}
+
+export interface BadgesWidgetProps {
+  badges: Badge[];
+  title?: string;
+  showSeeAll?: boolean;
+  onSeeAll?: () => void;
+  className?: string;
+}
+
+export interface BadgeGridProps {
+  badges: Badge[];
+  onBadgeClick?: (badge: Badge) => void;
+  className?: string;
+  showEmpty?: boolean;
 }

@@ -3,12 +3,26 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Building, Shield } from 'lucide-react';
+import { User, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useUserMode } from '@/contexts/UserModeContext';
 import Shell from '@/Shell';
 
 const B2BSelectionPage = () => {
   const navigate = useNavigate();
+  const { setUserMode } = useUserMode();
+
+  const handleUserAccess = () => {
+    setUserMode('b2b_user');
+    localStorage.setItem('userMode', 'b2b_user');
+    navigate('/b2b/user/login');
+  };
+
+  const handleAdminAccess = () => {
+    setUserMode('b2b_admin');
+    localStorage.setItem('userMode', 'b2b_admin');
+    navigate('/b2b/admin/login');
+  };
 
   return (
     <Shell>
@@ -69,7 +83,7 @@ const B2BSelectionPage = () => {
                 </ul>
                 
                 <Button 
-                  onClick={() => navigate('/b2b/user/login')} 
+                  onClick={handleUserAccess} 
                   size="lg" 
                   variant="default"
                   className="w-full"
@@ -100,7 +114,7 @@ const B2BSelectionPage = () => {
                 </ul>
                 
                 <Button 
-                  onClick={() => navigate('/b2b/admin/login')} 
+                  onClick={handleAdminAccess} 
                   variant="outline"
                   size="lg"
                   className="w-full border-2 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"

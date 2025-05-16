@@ -1,120 +1,121 @@
 
-import React, { useRef } from 'react';
-import { Brush } from 'recharts';
-import { ChartControls } from './ChartControls';
-import { ChartContainer } from './ChartContainer';
-import { ChartDateRange } from './ChartDateRange';
-import { useMediaQuery } from '@/hooks/use-media-query';
-import { cn } from "@/lib/utils";
-import { ChartConfig } from './types';
-import { useChartZoom } from './hooks/useChartZoom';
-import { useSegment } from '@/contexts/SegmentContext';
+import React, { useState, ReactNode } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceArea, ResponsiveContainer } from 'recharts';
 
-interface ZoomableChartProps {
-  children: React.ReactNode;
+export interface ZoomableChartProps {
   data: any[];
-  className?: string;
-  config: ChartConfig;
-  brushDataKey?: string;
-  brushHeight?: number;
-  showControls?: boolean;
+  children?: ReactNode;
+  width?: number | string;
+  height?: number | string;
+  margin?: { top: number; right: number; bottom: number; left: number };
 }
 
 export const ZoomableChart: React.FC<ZoomableChartProps> = ({
-  children,
   data,
-  className,
-  config,
-  brushDataKey = "date",
-  brushHeight = 30,
-  showControls = true,
+  children,
+  width = '100%',
+  height = 400,
+  margin = { top: 20, right: 20, bottom: 20, left: 20 }
 }) => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const chartRef = useRef<HTMLDivElement>(null);
-  const { segment } = useSegment();
-  
-  const {
-    startIndex,
-    endIndex,
-    visibleData,
-    isPanning,
-    handleBrushChange,
-    zoomIn,
-    zoomOut,
-    resetZoom,
-    handleMouseDown,
-    handleTouchStart
-  } = useChartZoom({ data, chartRef, segment });
-  
-  // Format date range for display
-  const dateRange = visibleData.length > 0 ? {
-    start: visibleData[0][brushDataKey],
-    end: visibleData[visibleData.length - 1][brushDataKey]
-  } : { start: '', end: '' };
+  const [refAreaLeft, setRefAreaLeft] = useState('');
+  const [refAreaRight, setRefAreaRight] = useState('');
+  const [zoomedData, setZoomedData] = useState(data);
 
-  // Handle empty data state
-  if (data.length === 0) {
-    return (
-      <div className={cn("relative flex flex-col items-center justify-center h-64", className)}>
-        <p className="text-muted-foreground text-center">
-          Aucune donnée disponible
-          {segment.dimensionKey && segment.optionKey && (
-            <> pour ce segment</>
-          )}
-        </p>
-      </div>
-    );
-  }
+  const getAxisYDomain = (from: number, to: number, ref: string, offset: number) => {
+    const refData = data.slice(from - 1, to);
+    let [bottom, top] = [refData[0][ref], refData[0][ref]];
+    
+    refData.forEach(d => {
+      if (d[ref] > top) top = d[ref];
+      if (d[ref] < bottom) bottom = d[ref];
+    });
+    
+    return [(bottom | 0) - offset, (top | 0) + offset];
+  };
+
+  const zoom = () => {
+    if (refAreaLeft === refAreaRight || refAreaRight === '') {
+      setRefAreaLeft('');
+      setRefAreaRight('');
+      return;
+    }
+
+    let left = refAreaLeft;
+    let right = refAreaRight;
+
+    if (left > right) {
+      [left, right] = [right, left];
+    }
+
+    const leftIndex = data.findIndex(d => d.name === left);
+    const rightIndex = data.findIndex(d => d.name === right);
+    
+    if (leftIndex !== -1 && rightIndex !== -1) {
+      const zoomed = data.slice(leftIndex, rightIndex + 1);
+      setZoomedData(zoomed);
+    }
+    
+    setRefAreaLeft('');
+    setRefAreaRight('');
+  };
+
+  const handleMouseDown = (e: any) => {
+    if (e && e.activeLabel) {
+      setRefAreaLeft(e.activeLabel);
+    }
+  };
   
+  const handleMouseMove = (e: any) => {
+    if (refAreaLeft && e && e.activeLabel) {
+      setRefAreaRight(e.activeLabel);
+    }
+  };
+
+  const handleReset = () => {
+    setZoomedData(data);
+  };
+
   return (
-    <div className={cn("relative", className)}>
-      {showControls && (
-        <ChartControls 
-          onZoomIn={zoomIn} 
-          onZoomOut={zoomOut} 
-          onReset={resetZoom} 
-        />
-      )}
-      
-      <div 
-        ref={chartRef}
-        className={cn(
-          "select-none", 
-          isPanning ? "cursor-grabbing" : "cursor-grab"
-        )}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-      >
-        <ChartContainer config={config}>
-          {/* Pass the filtered data to the child chart components */}
-          {React.Children.map(children, child => {
-            if (React.isValidElement(child)) {
-              // Type check for components that accept data prop
-              return React.cloneElement(child as React.ReactElement<any>, {
-                data: visibleData,
-              });
-            }
-            return child;
-          })}
-          
-          {/* Add the brush component */}
-          <Brush
-            dataKey={brushDataKey}
-            height={brushHeight}
-            stroke="#8884d8"
-            startIndex={startIndex}
-            endIndex={endIndex}
-            onChange={handleBrushChange}
-            gap={4}
-            y={8}
-            alwaysShowText={false}
+    <div className="zoomable-chart">
+      <ResponsiveContainer width={width} height={height}>
+        <LineChart
+          data={zoomedData}
+          margin={margin}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={zoom}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis 
+            dataKey="name"
+            allowDataOverflow 
           />
-        </ChartContainer>
-      </div>
+          <YAxis 
+            allowDataOverflow 
+          />
+          <Tooltip />
+          <Legend />
+          
+          {children}
+          
+          {refAreaLeft && refAreaRight && (
+            <ReferenceArea
+              x1={refAreaLeft}
+              x2={refAreaRight}
+              strokeOpacity={0.3}
+              fill="rgba(100, 100, 100, 0.1)"
+            />
+          )}
+        </LineChart>
+      </ResponsiveContainer>
       
-      {/* Date range display */}
-      {dateRange.start && dateRange.end && (
-        <ChartDateRange startDate={dateRange.start} endDate={dateRange.end} />
+      {zoomedData.length !== data.length && (
+        <button
+          className="mt-2 text-sm text-muted-foreground hover:text-foreground"
+          onClick={handleReset}
+        >
+          Reset Zoom
+        </button>
       )}
     </div>
   );
