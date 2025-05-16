@@ -21,6 +21,16 @@ const ImmersiveHome = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
+  // Set up voice commands
+  const voiceCommands = useVoiceCommand({
+    commands: {
+      'particulier': () => navigate('/b2c/login'),
+      'entreprise': () => navigate('/b2b/selection'),
+      'je suis un particulier': () => navigate('/b2c/login'),
+      'je suis une entreprise': () => navigate('/b2b/selection'),
+    }
+  });
+
   // Generate greeting based on time of day
   const generateGreeting = () => {
     const hour = new Date().getHours();
@@ -38,16 +48,6 @@ const ImmersiveHome = () => {
 
     return timeBasedGreeting;
   };
-
-  // Setup voice commands
-  useVoiceCommand({
-    commands: {
-      'particulier': () => navigate('/b2c/login'),
-      'entreprise': () => navigate('/b2b/selection'),
-      'je suis un particulier': () => navigate('/b2c/login'),
-      'je suis une entreprise': () => navigate('/b2b/selection'),
-    },
-  });
 
   useEffect(() => {
     // Set initial greeting

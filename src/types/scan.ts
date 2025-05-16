@@ -24,4 +24,8 @@ export interface EmotionResult {
   tags?: string[];
   notes?: string;
   category?: string;
+  score?: number; // Added based on error
+  feedback?: string; // Added based on error
+  ai_feedback?: string; // Added based on error
+  user_id?: string; // Added based on error
 }
