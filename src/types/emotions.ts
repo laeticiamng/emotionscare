@@ -23,6 +23,7 @@ export interface EmotionResult {
   transcript?: string;
   intensity?: number;
   recommendations?: string[];
+  seen?: boolean;
 }
 
 export interface LiveVoiceScannerProps {

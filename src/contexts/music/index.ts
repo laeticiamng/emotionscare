@@ -1,2 +1,3 @@
 
-export { MusicProvider, useMusic } from './MusicContext';
+export { default as useMusic } from './MusicContextProvider';
+export { MusicProvider } from './MusicContextProvider';

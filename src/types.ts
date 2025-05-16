@@ -17,7 +17,8 @@ export type {
   VRSession,
   VRHistoryListProps,
   VRSessionHistoryProps,
-  VRSessionWithMusicProps
+  VRSessionWithMusicProps,
+  VRTemplateGridProps
 } from './types/vr';
 
 // Export types from music
@@ -30,8 +31,38 @@ export type {
   VolumeControlProps,
   MusicControlsProps,
   MusicLibraryProps,
-  EmotionMusicParams
+  EmotionMusicParams,
+  TrackInfoProps
 } from './types/music';
+
+// Export from emotions
+export type {
+  Emotion,
+  EmotionResult,
+  LiveVoiceScannerProps,
+  TeamOverviewProps,
+  EmotionalTeamViewProps
+} from './types/emotions';
+
+// Export from badge
+export type {
+  Badge
+} from './types/badge';
+
+// Export from theme
+export type {
+  Theme,
+  ThemeContextType,
+  FontFamily,
+  FontSize
+} from './types/theme';
+
+// Export from notification
+export type {
+  NotificationFrequency,
+  NotificationTone,
+  NotificationPreference
+} from './types/notification';
 
 // Export type from sidebar
 export type { 

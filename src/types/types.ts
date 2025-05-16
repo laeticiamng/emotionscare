@@ -86,4 +86,5 @@ export interface Story {
   content: string;
   created_at: string;
   author_id: string;
+  seen?: boolean;
 }
