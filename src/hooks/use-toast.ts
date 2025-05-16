@@ -1,10 +1,6 @@
 
-// This file re-exports from the tsx implementation file
-// Import directly from the implementation to avoid circular dependencies
-import { toast as toastImpl } from "@/hooks/use-toast.tsx";
+// This file re-exports directly from the implementation file.
+// We cannot import from ourself, so we need to import directly from the TSX file.
 
-// Export the toast function directly, not as a re-export
-export const toast = toastImpl;
-
-// Export the hook directly from the implementation file
-export { useToast } from "@/hooks/use-toast.tsx";
+// Export both functions directly from the implementation file
+export { toast, useToast } from "@/hooks/use-toast.tsx";
