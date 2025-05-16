@@ -7,13 +7,13 @@ import { VolumeControlProps } from '@/types/music';
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
-  muted,
   onVolumeChange,
+  isMuted,
   onMuteToggle,
   className = '',
-  onChange,
   showLabel = false,
-  isMuted = muted
+  muted = isMuted,
+  onChange
 }) => {
   const handleVolumeChange = (value: number[]) => {
     const handler = onVolumeChange || onChange;

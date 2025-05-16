@@ -1,26 +1,27 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useMusic } from '@/contexts/MusicContext';
-import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
-interface MusicControlsProps {
+export interface PlayerControlsProps {
+  isPlaying: boolean;
+  loadingTrack?: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
   size?: 'sm' | 'md' | 'lg';
-  className?: string;
 }
 
-const MusicControls: React.FC<MusicControlsProps> = ({ size = 'md', className = '' }) => {
-  const { 
-    isPlaying, 
-    currentTrack, 
-    togglePlay, 
-    nextTrack, 
-    previousTrack,
-    volume,
-    muted,
-    toggleMute
-  } = useMusic();
-  
+const PlayerControls: React.FC<PlayerControlsProps> = ({
+  isPlaying,
+  loadingTrack = false,
+  onPlay,
+  onPause,
+  onPrevious,
+  onNext,
+  size = 'md'
+}) => {
   const buttonSize = {
     sm: 'h-8 w-8',
     md: 'h-10 w-10',
@@ -34,55 +35,50 @@ const MusicControls: React.FC<MusicControlsProps> = ({ size = 'md', className = 
   }[size];
   
   return (
-    <div className={`flex items-center justify-center gap-2 ${className}`}>
-      <Button
-        variant="ghost"
+    <div className="flex items-center justify-center gap-2">
+      <Button 
+        variant="ghost" 
         size="icon"
+        onClick={onPrevious}
+        disabled={loadingTrack}
         className={buttonSize}
-        onClick={previousTrack}
-        disabled={!currentTrack}
       >
         <SkipBack className={iconSize} />
       </Button>
       
-      <Button
-        variant={isPlaying ? "secondary" : "default"}
-        size="icon"
-        className={`${buttonSize} rounded-full`}
-        onClick={togglePlay}
-        disabled={!currentTrack}
-      >
-        {isPlaying ? (
+      {isPlaying ? (
+        <Button 
+          variant="default" 
+          size="icon"
+          onClick={onPause}
+          disabled={loadingTrack}
+          className={buttonSize}
+        >
           <Pause className={iconSize} />
-        ) : (
+        </Button>
+      ) : (
+        <Button 
+          variant="default" 
+          size="icon"
+          onClick={onPlay}
+          disabled={loadingTrack}
+          className={buttonSize}
+        >
           <Play className={iconSize} />
-        )}
-      </Button>
+        </Button>
+      )}
       
-      <Button
-        variant="ghost"
+      <Button 
+        variant="ghost" 
         size="icon"
+        onClick={onNext}
+        disabled={loadingTrack}
         className={buttonSize}
-        onClick={nextTrack}
-        disabled={!currentTrack}
       >
         <SkipForward className={iconSize} />
-      </Button>
-      
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8"
-        onClick={toggleMute}
-      >
-        {muted || volume === 0 ? (
-          <VolumeX className="h-4 w-4" />
-        ) : (
-          <Volume className="h-4 w-4" />
-        )}
       </Button>
     </div>
   );
 };
 
-export default MusicControls;
+export default PlayerControls;

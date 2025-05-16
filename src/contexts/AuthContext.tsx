@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AuthContextType } from '@/types/auth';
+import { AuthContextType, UserPreferences } from '@/types/auth';
 
 // Créer le contexte avec une valeur par défaut
 const AuthContext = createContext<AuthContextType>({
@@ -10,7 +10,9 @@ const AuthContext = createContext<AuthContextType>({
   error: null,
   login: async () => {},
   logout: () => {},
-  register: async () => {}
+  register: async () => {},
+  updatePreferences: async () => {},
+  updateUser: async () => {}
 });
 
 // Mock user data for development
@@ -111,6 +113,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
+  const updatePreferences = async (preferences: UserPreferences) => {
+    if (!user) return;
+    
+    try {
+      // Simuler une requête API
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mettre à jour l'utilisateur avec les nouvelles préférences
+      setUser({
+        ...user,
+        preferences: {
+          ...user.preferences,
+          ...preferences
+        }
+      });
+      
+      return;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to update preferences'));
+      throw err;
+    }
+  };
+  
+  const updateUser = async (updatedUser: any) => {
+    if (!user) return;
+    
+    try {
+      // Simuler une requête API
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Mettre à jour l'utilisateur
+      setUser({
+        ...user,
+        ...updatedUser
+      });
+      
+      return;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to update user'));
+      throw err;
+    }
+  };
+  
   return (
     <AuthContext.Provider value={{
       user,
@@ -119,7 +164,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       error,
       login,
       logout,
-      register
+      register,
+      updatePreferences,
+      updateUser
     }}>
       {children}
     </AuthContext.Provider>

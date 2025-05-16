@@ -3,8 +3,8 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import TrackInfo from './TrackInfo';
 import ProgressBar from './ProgressBar';
-import MusicControls from './MusicControls';
-import VolumeControl from './VolumeControl';
+import PlayerControls from './MusicControls';
+import VolumeControl from '../VolumeControl';
 import { useMusic } from '@/contexts/music/MusicContextProvider';
 import { Music } from 'lucide-react';
 
@@ -62,7 +62,7 @@ const MusicPlayer: React.FC = () => {
               />
               
               <div className="flex items-center justify-between">
-                <MusicControls 
+                <PlayerControls 
                   isPlaying={isPlaying} 
                   onPlay={togglePlay} 
                   onPause={togglePlay} 

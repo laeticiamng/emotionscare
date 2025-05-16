@@ -19,8 +19,9 @@ const LibraryTab: React.FC<LibraryTabProps> = ({
       <h2 className="text-xl font-bold">Bibliothèque musicale</h2>
       
       <MusicLibrary 
+        tracks={playlists.flatMap(playlist => playlist.tracks)}
         playlists={playlists} 
-        onSelectTrack={onSelectTrack}
+        onTrackSelect={onSelectTrack}
         onSelectPlaylist={onSelectPlaylist}
       />
     </div>

@@ -33,3 +33,23 @@ export interface DraggableKpiCardsGridProps {
 }
 
 export type KpiCardProps = DraggableCardProps;
+
+export interface DailyInsightCardProps {
+  title: string;
+  insight: string;
+  date?: Date | string;
+  category?: string;
+  icon?: ReactNode | LucideIcon;
+  className?: string;
+}
+
+export interface QuickActionLinksProps {
+  actions: {
+    id: string;
+    name: string;
+    href: string;
+    icon?: ReactNode | LucideIcon;
+    description?: string;
+  }[];
+  className?: string;
+}

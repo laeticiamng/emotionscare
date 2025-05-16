@@ -1,66 +1,45 @@
 
 import React from 'react';
-import { Disc } from 'lucide-react';
 import { MusicTrack } from '@/types/music';
+import { Music } from 'lucide-react';
 
 interface TrackInfoProps {
-  track?: MusicTrack;
-  title?: string;
-  artist?: string;
-  coverUrl?: string;
-  showCover?: boolean;
-  showControls?: boolean;
-  currentTrack?: MusicTrack;
-  loadingTrack?: boolean;
-  audioError?: Error | null;
+  track: MusicTrack;
   className?: string;
-  compact?: boolean;
+  showCover?: boolean;
 }
 
 const TrackInfo: React.FC<TrackInfoProps> = ({
   track,
-  title,
-  artist,
-  coverUrl,
-  showCover = true,
-  showControls = false,
-  currentTrack,
-  loadingTrack = false,
-  audioError = null,
   className = '',
-  compact = false
+  showCover = true
 }) => {
-  // Use provided info or track info
-  const displayTitle = title || track?.title || currentTrack?.title || 'Aucun titre';
-  const displayArtist = artist || track?.artist || currentTrack?.artist || 'Artiste inconnu';
-  const displayCover = coverUrl || track?.coverUrl || track?.cover_url || track?.cover || 
-                      currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || 
-                      '/images/music/default-cover.jpg';
+  // Determine cover URL from various possible properties
+  const coverUrl = track.coverUrl || track.cover || track.coverImage || '';
   
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {showCover && (
-        <div className={`${compact ? 'h-10 w-10' : 'h-12 w-12'} rounded bg-primary/10 flex items-center justify-center overflow-hidden`}>
-          {displayCover ? (
+        <div className="w-10 h-10 bg-secondary/50 rounded-md overflow-hidden flex-shrink-0">
+          {coverUrl ? (
             <img 
-              src={displayCover} 
-              alt={displayTitle} 
-              className="h-full w-full object-cover" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/music/default-cover.jpg';
-              }}
+              src={coverUrl} 
+              alt={track.title}
+              className="w-full h-full object-cover"
             />
           ) : (
-            <Disc className="h-6 w-6 text-muted-foreground" />
+            <div className="w-full h-full flex items-center justify-center bg-secondary/30">
+              <Music className="h-5 w-5 text-foreground/60" />
+            </div>
           )}
         </div>
       )}
       
-      <div className="overflow-hidden">
-        <p className={`font-medium truncate ${compact ? 'text-sm' : ''}`}>{loadingTrack ? 'Chargement...' : displayTitle}</p>
-        <p className="text-xs text-muted-foreground truncate">
-          {loadingTrack ? '...' : audioError ? 'Erreur audio' : displayArtist}
-        </p>
+      <div className="min-w-0 flex-1">
+        <h4 className="font-medium text-sm truncate">{track.title}</h4>
+        {track.artist && (
+          <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+        )}
       </div>
     </div>
   );

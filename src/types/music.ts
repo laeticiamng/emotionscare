@@ -83,6 +83,12 @@ export interface MusicContextType {
 export interface MusicDrawerProps {
   isOpen?: boolean;
   onClose?: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  playlist?: MusicPlaylist | null;
+  currentTrack?: MusicTrack | null;
+  children?: React.ReactNode;
+  side?: 'left' | 'right' | 'top' | 'bottom';
 }
 
 export interface ProgressBarProps {
@@ -101,6 +107,8 @@ export interface VolumeControlProps {
   onMuteToggle: () => void;
   showLabel?: boolean;
   className?: string;
+  muted?: boolean;
+  onChange?: (volume: number) => void;
 }
 
 export interface MusicControlsProps {
@@ -120,10 +128,25 @@ export interface MusicControlsProps {
   track?: MusicTrack;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  showVolume?: boolean;
+  vertical?: boolean;
 }
 
 export interface MusicLibraryProps {
   onSelectTrack?: (track: MusicTrack) => void;
   onSelectPlaylist?: (playlist: MusicPlaylist) => void;
   className?: string;
+  onTrackSelect?: (track: MusicTrack) => void;
+  currentTrack?: MusicTrack | null;
+  playlists?: MusicPlaylist[];
+  isPlaying?: boolean;
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
+  tracks?: MusicTrack[];
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  className?: string;
+  showCover?: boolean;
 }
