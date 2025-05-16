@@ -43,13 +43,9 @@ const AdminDashboard: React.FC = () => {
     progress: 45,
     leaderboard: [],
     // Additional properties needed by components
-    activeUsersPercent: 68,
     totalBadges: 24,
-    badgeLevels: [
-      { level: "Bronze", count: 120 },
-      { level: "Silver", count: 68 },
-      { level: "Gold", count: 23 }
-    ],
+    activeUsersPercent: 68,
+    completionRate: 65,
     topChallenges: [
       { 
         id: "challenge-1", 
@@ -85,7 +81,11 @@ const AdminDashboard: React.FC = () => {
         category: "special"
       }
     ],
-    completionRate: 65
+    badgeLevels: [
+      { level: "Bronze", count: 120 },
+      { level: "Silver", count: 68 },
+      { level: "Gold", count: 23 }
+    ]
   };
 
   useEffect(() => {

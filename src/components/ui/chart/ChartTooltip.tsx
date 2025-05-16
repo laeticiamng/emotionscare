@@ -1,52 +1,15 @@
 
-import * as React from "react";
-import * as RechartsPrimitive from "recharts";
-import { cn } from "@/lib/utils";
-import { useChart } from "./context";
-import { ChartConfig } from "./types";
+import React, { ReactNode } from 'react';
 
-const ChartTooltip = RechartsPrimitive.Tooltip;
-
-// Helper to extract item config from a payload.
-function getPayloadConfigFromPayload(
-  config: ChartConfig,
-  payload: unknown,
-  key: string
-) {
-  if (typeof payload !== "object" || payload === null) {
-    return undefined;
-  }
-
-  const payloadPayload =
-    "payload" in payload &&
-    typeof payload.payload === "object" &&
-    payload.payload !== null
-      ? payload.payload
-      : undefined;
-
-  let configLabelKey: string = key;
-
-  if (
-    key in payload &&
-    typeof payload[key as keyof typeof payload] === "string"
-  ) {
-    configLabelKey = payload[key as keyof typeof payload] as string;
-  } else if (
-    payloadPayload &&
-    key in payloadPayload &&
-    typeof payloadPayload[key as keyof typeof payloadPayload] === "string"
-  ) {
-    configLabelKey = payloadPayload[
-      key as keyof typeof payloadPayload
-    ] as string;
-  }
-
-  return configLabelKey in config
-    ? config[configLabelKey]
-    : config[key as keyof typeof config];
+interface ChartTooltipProps {
+  children: ReactNode;
+  className?: string;
 }
 
-// Import our new components
-import { ChartTooltipContent } from "./ChartTooltipContent";
-
-export { ChartTooltip, ChartTooltipContent, getPayloadConfigFromPayload };
+export const ChartTooltip: React.FC<ChartTooltipProps> = ({ children, className = '' }) => {
+  return (
+    <div className={`absolute bg-background border border-border rounded-md shadow-md p-2 pointer-events-none z-50 ${className}`}>
+      {children}
+    </div>
+  );
+};

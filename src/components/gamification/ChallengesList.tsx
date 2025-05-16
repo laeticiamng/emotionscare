@@ -126,6 +126,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
         const targetValue = challenge.goal || challenge.total || 100;
         const progressPercent = Math.min(Math.round((progressValue / targetValue) * 100), 100);
         const isCompleted = challenge.status === 'completed' || challenge.completed;
+        const challengeTitle = challenge.title || challenge.name || '';
 
         return (
           <Card 
@@ -136,7 +137,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-lg">
-                    {challenge.title || challenge.name}
+                    {challengeTitle}
                   </CardTitle>
                   <CardDescription>
                     {challenge.description}

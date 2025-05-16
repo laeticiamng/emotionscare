@@ -10,27 +10,14 @@ export interface GamificationStats {
   progress: number;
   leaderboard: LeaderboardEntry[];
   
-  // Propriétés additionnelles utilisées dans les composants
-  rank?: string;
-  nextLevelPoints?: number;
-  recentAchievements?: Badge[];
-  achievements?: Badge[];
-  rewardsEarned?: number;
-  userEngagement?: number;
-  emotional_balance?: number;
-  streak_days?: number;
-  total_scans?: number;
-  badges_earned?: Badge[];
-  next_milestone?: number;
-  
-  // Propriétés pour la Dashboard admin
+  // Admin dashboard properties
   totalBadges?: number;
   activeUsersPercent?: number;
   completionRate?: number;
   topChallenges?: Challenge[];
   badgeLevels?: Array<{level: string, count: number}>;
   
-  // Propriétés pour GamificationDashboard
+  // User dashboard properties
   currentLevel?: number;
   pointsToNextLevel?: number;
   progressToNextLevel?: number;
@@ -40,12 +27,22 @@ export interface GamificationStats {
   badgesCount?: number;
   totalPoints?: number;
   
-  // Propriété pour la rétrocompatibilité avec nextLevel
+  // Compatibility with previous implementations
   nextLevel?: {
     points: number;
     rewards: string[];
     level?: number;
   };
+  rank?: string;
+  achievements?: Badge[];
+  recentAchievements?: Badge[];
+  rewardsEarned?: number;
+  userEngagement?: number;
+  emotional_balance?: number;
+  streak_days?: number;
+  total_scans?: number;
+  badges_earned?: Badge[];
+  next_milestone?: number;
 }
 
 export interface Challenge {
@@ -59,7 +56,7 @@ export interface Challenge {
   status?: 'active' | 'completed' | 'failed' | 'locked' | 'not-started' | 'expired' | 'ongoing' | 'available';
   icon?: React.ReactNode;
   
-  // Propriétés additionnelles
+  // Additional properties used in components
   name?: string;
   isDaily?: boolean;
   isWeekly?: boolean;
@@ -82,13 +79,13 @@ export interface Badge {
   unlocked?: boolean;
   level?: string | number;
   
-  // Support pour différentes formes d'URL d'image
+  // Support for different image URL formats
   image?: string;
   imageUrl?: string;
   image_url?: string;
   icon_url?: string;
   
-  // Propriétés additionnelles
+  // Additional properties
   unlockedAt?: string;
   dateEarned?: string;
   awarded_at?: string;

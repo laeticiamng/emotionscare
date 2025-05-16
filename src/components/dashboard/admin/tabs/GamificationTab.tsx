@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Trophy } from 'lucide-react';
 import GamificationSummaryCard from '../GamificationSummaryCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { GamificationStats } from '@/types/gamification';
+import { GamificationStats, Challenge } from '@/types/gamification';
 
 export interface GamificationTabProps {
   gamificationData: GamificationStats;
@@ -23,7 +23,7 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
   }
 
   // Safely access properties with fallbacks
-  const topChallenges = gamificationData.topChallenges || [];
+  const topChallenges: Challenge[] = gamificationData.topChallenges || [];
   const badgeLevels = gamificationData.badgeLevels || [];
 
   return (

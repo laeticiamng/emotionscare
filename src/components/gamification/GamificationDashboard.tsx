@@ -124,7 +124,7 @@ const GamificationDashboard: React.FC = () => {
           <div className="challenges-list">
             <ChallengesList 
               challenges={challenges} 
-              onComplete={completeChallenge}
+              onCompleteChallenge={completeChallenge}
             />
           </div>
         </TabsContent>

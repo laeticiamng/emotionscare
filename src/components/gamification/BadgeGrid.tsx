@@ -23,6 +23,10 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
     );
   }
 
+  const getBadgeImageUrl = (badge: Badge): string | undefined => {
+    return badge.imageUrl || badge.image_url || badge.image || badge.icon_url;
+  };
+
   return (
     <div className={cn("grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4", className)}>
       {badges.map((badge) => (
@@ -30,9 +34,9 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
           <div className={`relative h-16 w-16 rounded-full flex items-center justify-center mb-2 ${
             badge.unlocked ? 'bg-primary/10 border-2 border-primary/30' : 'bg-muted border border-muted-foreground/20'
           }`}>
-            {(badge.imageUrl || badge.image_url || badge.image) ? (
+            {getBadgeImageUrl(badge) ? (
               <img 
-                src={badge.imageUrl || badge.image_url || badge.image} 
+                src={getBadgeImageUrl(badge)} 
                 alt={badge.name} 
                 className="h-10 w-10 object-contain"
               />
@@ -52,7 +56,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
           <h3 className="text-sm font-medium">{badge.name}</h3>
           <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{badge.description}</p>
           
-          {badge.level && (
+          {badge.level !== undefined && (
             <span className="mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold">
               {badge.level}
             </span>

@@ -1,49 +1,30 @@
 
-import * as React from "react";
-import * as RechartsPrimitive from "recharts";
-import { cn } from "@/lib/utils";
-import { ChartContext } from "./context";
-import { ChartConfig } from "./types";
-import { ChartStyle } from "./ChartStyle";
+import React, { ReactNode } from 'react';
 
 interface ChartContainerProps {
-  id?: string;
+  children: ReactNode;
   className?: string;
-  children: React.ReactNode;
-  config: ChartConfig;
+  title?: string;
+  description?: string;
 }
 
-const ChartContainer = React.forwardRef<
-  HTMLDivElement,
-  ChartContainerProps
->(({ id, className, children, config, ...props }, ref) => {
-  const uniqueId = React.useId();
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
-
-  // Find the first valid React element or return null if none exists
-  const firstValidElement = React.Children.toArray(children).find(
-    (child): child is React.ReactElement => React.isValidElement(child)
-  ) as React.ReactElement | undefined;
-
+export const ChartContainer: React.FC<ChartContainerProps> = ({
+  children,
+  className = '',
+  title,
+  description
+}) => {
   return (
-    <ChartContext.Provider value={{ config }}>
-      <div
-        data-chart={chartId}
-        ref={ref}
-        className={cn(
-          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
-          className
-        )}
-        {...props}
-      >
-        <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {firstValidElement || null}
-        </RechartsPrimitive.ResponsiveContainer>
+    <div className={`rounded-lg border bg-card p-4 ${className}`}>
+      {(title || description) && (
+        <div className="mb-4">
+          {title && <h3 className="text-lg font-medium">{title}</h3>}
+          {description && <p className="text-sm text-muted-foreground">{description}</p>}
+        </div>
+      )}
+      <div className="h-full w-full">
+        {children}
       </div>
-    </ChartContext.Provider>
+    </div>
   );
-});
-ChartContainer.displayName = "Chart";
-
-export { ChartContainer };
+};

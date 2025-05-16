@@ -1,103 +1,72 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
-import { Badge } from '@/types/gamification';
-import { getBadgeRarityColor } from '@/utils/gamificationUtils';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/types';
+import { Award } from 'lucide-react';
 
 interface BadgesWidgetProps {
   badges: Badge[];
-  title?: string;
-  showSeeAll?: boolean;
-  onSeeAll?: () => void;
+  loading?: boolean;
 }
 
-const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }: BadgesWidgetProps) => {
-  // Sort badges: first unlocked, then by progress
-  const sortedBadges = [...badges].sort((a, b) => {
-    // Prioritize badges with unlockedAt property
-    if (a.unlockedAt && !b.unlockedAt) return -1;
-    if (!a.unlockedAt && b.unlockedAt) return 1;
-    
-    // If both are in same completion state, sort by progress (higher first)
-    if (a.progress && b.progress) {
-      return b.progress - a.progress;
-    }
-    
-    // Default sort by name
-    return a.name.localeCompare(b.name);
-  });
-  
-  // Get display image for the badge
-  const getBadgeImage = (badge: Badge) => {
-    return badge.image || badge.image_url || `/badges/${badge.id}.png`;
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges = [], loading = false }) => {
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Vos badges</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2 justify-center">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-16 w-16 rounded-full bg-muted animate-pulse"></div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const getBadgeImageUrl = (badge: Badge): string | undefined => {
+    return badge.imageUrl || badge.image_url || badge.image || badge.icon_url;
   };
 
-  // Check if badge is unlocked
-  const isBadgeUnlocked = (badge: Badge) => {
-    return Boolean(badge.unlockedAt);
-  };
-  
   return (
     <Card>
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-center">
-          <CardTitle>{title}</CardTitle>
-          {showSeeAll && onSeeAll && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="gap-1" 
-              onClick={onSeeAll}
-            >
-              <span className="text-sm">Voir tout</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
+      <CardHeader>
+        <CardTitle>Vos badges</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-4">
-          {sortedBadges.slice(0, 6).map((badge) => {
-            // Determine if the badge is unlocked
-            const isUnlocked = isBadgeUnlocked(badge);
-            
-            // Get badge rarity class (for the badge border/glow)
-            const rarityColor = badge.tier ? getBadgeRarityColor(badge.tier) : 'bg-slate-500';
-            
-            return (
-              <div 
-                key={badge.id}
-                className="flex flex-col items-center text-center"
-              >
-                <div className={`
-                  relative w-16 h-16 md:w-18 md:h-18 rounded-full overflow-hidden
-                  ${isUnlocked ? 'ring-2 ring-offset-2 ' + rarityColor : 'opacity-50 grayscale'}
-                `}>
-                  <img 
-                    src={getBadgeImage(badge)}
-                    alt={badge.name}
-                    className="w-full h-full object-cover"
-                  />
-                  {!isUnlocked && badge.progress !== undefined && badge.progress > 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold">
-                      {badge.progress}%
-                    </div>
+        {badges.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">
+            <Award className="w-10 h-10 mx-auto mb-2 opacity-40" />
+            <p>Aucun badge obtenu pour le moment</p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-3 justify-center">
+            {badges.slice(0, 6).map((badge) => (
+              <div key={badge.id} className="flex flex-col items-center gap-1">
+                <div className="h-16 w-16 rounded-full border border-primary/20 bg-primary/5 flex items-center justify-center">
+                  {getBadgeImageUrl(badge) ? (
+                    <img 
+                      src={getBadgeImageUrl(badge)}
+                      alt={badge.name}
+                      className="h-10 w-10 object-contain"
+                    />
+                  ) : (
+                    <Award className="h-8 w-8 text-primary/80" />
                   )}
                 </div>
-                <div className="mt-2">
-                  <h4 className="text-xs font-medium">{badge.name}</h4>
-                  {isUnlocked && badge.unlockedAt && (
-                    <p className="text-[10px] text-muted-foreground">
-                      {new Date(badge.unlockedAt).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
+                <span className="text-xs text-center max-w-[80px] truncate" title={badge.name}>
+                  {badge.name}
+                </span>
               </div>
-            );
-          })}
-        </div>
+            ))}
+            {badges.length > 6 && (
+              <div className="h-16 w-16 rounded-full border border-dashed border-muted-foreground flex items-center justify-center">
+                <span className="font-medium text-sm">+{badges.length - 6}</span>
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

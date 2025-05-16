@@ -1,76 +1,43 @@
 
-import * as React from "react";
-import { Legend } from "recharts";
-import { cn } from "@/lib/utils";
-import { useChart } from "./context";
-import { ChartLegendContent } from "./ChartLegend";
+import React from 'react';
 
 interface ChartInteractiveLegendProps {
-  onToggleSeries?: (dataKey: string, isActive: boolean) => void;
-  hiddenSeries?: string[];
-  verticalAlign?: "top" | "middle" | "bottom";
-  align?: "left" | "center" | "right";
-  iconType?: "line" | "plainline" | "square" | "rect" | "circle" | "cross" | "diamond" | "star" | "triangle" | "wye";
-  layout?: "horizontal" | "vertical";
-  wrapperClassName?: string;
+  payload?: any[];
+  activeLines?: string[];
+  onToggle?: (dataKey: string) => void;
+  className?: string;
 }
 
-export const ChartInteractiveLegend = React.forwardRef<
-  HTMLDivElement,
-  ChartInteractiveLegendProps
->(
-  ({
-    onToggleSeries,
-    hiddenSeries = [],
-    verticalAlign = "top",
-    align = "right",
-    iconType = "circle",
-    layout = "horizontal",
-    wrapperClassName,
-    ...props
-  }, ref) => {
-    const handleClick = (data: any) => {
-      if (onToggleSeries && data?.dataKey) {
-        const isCurrentlyHidden = hiddenSeries.includes(data.dataKey);
-        onToggleSeries(data.dataKey, isCurrentlyHidden);
-      }
-    };
-
-    return (
-      <Legend
-        verticalAlign={verticalAlign}
-        align={align}
-        iconType={iconType}
-        layout={layout}
-        wrapperStyle={{ 
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-        content={
-          <div
-            ref={ref}
-            className={cn(
-              "chart-legend-container",
-              wrapperClassName
-            )}
+export const ChartInteractiveLegend: React.FC<ChartInteractiveLegendProps> = ({
+  payload,
+  activeLines = [],
+  onToggle,
+  className = ''
+}) => {
+  if (!payload || !payload.length) return null;
+  
+  return (
+    <div className={`flex flex-wrap gap-4 justify-center ${className}`}>
+      {payload.map((entry, index) => {
+        const isActive = activeLines.includes(entry.dataKey);
+        return (
+          <div 
+            key={`item-${index}`}
+            className={`flex items-center gap-2 cursor-pointer transition-opacity ${
+              isActive ? 'opacity-100' : 'opacity-50'
+            }`}
+            onClick={() => onToggle && onToggle(entry.dataKey)}
           >
-            <ChartLegendContent
-              {...props}
-              onClick={handleClick}
-              className={cn(
-                "flex flex-wrap gap-2",
-                layout === "vertical" ? "flex-col" : "items-center"
-              )}
-              activeClassName="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded px-1"
-              inactiveClassName="cursor-pointer opacity-40 hover:opacity-60 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 rounded px-1"
-              hiddenSeries={hiddenSeries}
+            <div
+              className="w-3 h-3 rounded-full"
+              style={{ backgroundColor: entry.color }}
             />
+            <span className="text-sm">
+              {entry.value}
+            </span>
           </div>
-        }
-        {...props}
-      />
-    );
-  }
-);
-
-ChartInteractiveLegend.displayName = "ChartInteractiveLegend";
+        );
+      })}
+    </div>
+  );
+};

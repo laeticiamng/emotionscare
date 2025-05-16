@@ -9,6 +9,12 @@ export interface GamificationSummaryCardProps {
 }
 
 const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamificationData }) => {
+  // Get default values for properties that might be missing
+  const totalBadges = gamificationData.totalBadges || 0;
+  const activeUsersPercent = gamificationData.activeUsersPercent || 0;
+  const completedChallenges = gamificationData.completedChallenges || 0;
+  const completionRate = gamificationData.completionRate || 0;
+
   return (
     <Card className="glass-card">
       <CardHeader>
@@ -27,7 +33,7 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamif
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Badges Débloqués</p>
-                <h3 className="text-2xl font-bold">{gamificationData.totalBadges || 0}</h3>
+                <h3 className="text-2xl font-bold">{totalBadges}</h3>
               </div>
             </div>
           </div>
@@ -39,7 +45,7 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamif
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Utilisateurs Actifs</p>
-                <h3 className="text-2xl font-bold">{gamificationData.activeUsersPercent || 0}%</h3>
+                <h3 className="text-2xl font-bold">{activeUsersPercent}%</h3>
               </div>
             </div>
           </div>
@@ -51,7 +57,7 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamif
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Défis Complétés</p>
-                <h3 className="text-2xl font-bold">{gamificationData.completedChallenges || 0}</h3>
+                <h3 className="text-2xl font-bold">{completedChallenges}</h3>
               </div>
             </div>
           </div>
@@ -63,7 +69,7 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamif
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Taux de Complétion</p>
-                <h3 className="text-2xl font-bold">{gamificationData.completionRate || 0}%</h3>
+                <h3 className="text-2xl font-bold">{completionRate}%</h3>
               </div>
             </div>
           </div>
