@@ -1,8 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
 import { Medal, Trophy, Calendar, Target } from 'lucide-react';
 import BadgeGrid from './BadgeGrid';
 import ChallengesList from './ChallengesList';
@@ -25,6 +23,7 @@ const GamificationDashboard: React.FC = () => {
 
   // Ensure stats has all required properties with default values
   const safeStats: GamificationStats = {
+    ...stats,
     level: stats.level || 1,
     points: stats.points || 0,
     badges: stats.badges || [],

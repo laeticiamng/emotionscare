@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui";
 import { fetchReports } from '@/lib/dashboardService';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
@@ -39,6 +38,10 @@ const AdminDashboard: React.FC = () => {
     streak: 0,
     completedChallenges: 0,
     totalChallenges: 0,
+    challenges: [],
+    progress: 45,
+    leaderboard: [],
+    // Additional properties needed by components
     activeUsersPercent: 68,
     totalBadges: 24,
     badgeLevels: [
@@ -81,10 +84,7 @@ const AdminDashboard: React.FC = () => {
         category: "special"
       }
     ],
-    completionRate: 65,
-    progress: 45,
-    challenges: [],
-    leaderboard: []
+    completionRate: 65
   };
 
   useEffect(() => {

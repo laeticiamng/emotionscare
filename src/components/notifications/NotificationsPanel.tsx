@@ -1,155 +1,194 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Notification, NotificationFilter } from '@/types';
-import { useNotifications } from '@/hooks/use-notifications';
-import { formatDistanceToNow } from 'date-fns';
-import { 
-  Bell,
-  Calendar, 
-  CheckCircle2, 
-  Info, 
-  Trash2, 
-  AlertTriangle, 
-  XCircle, 
-  Check,
-  MailOpen 
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, Button, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
+import { Bell, Trash2, Check, Filter, ChevronRight, X } from 'lucide-react';
+import NotificationItem from './NotificationItem';
+import { filterNotifications } from './notificationFilterUtils';
+import { Notification, NotificationFilter } from '@/types/notification';
 
-const NotificationsPanel: React.FC = () => {
-  const { 
-    notifications, 
-    unreadCount, 
-    loading: isLoading, 
-    filter, 
-    setFilter, 
-    fetchNotifications, 
-    markAsRead, 
-    markAllAsRead 
-  } = useNotifications();
+interface NotificationsPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
+  notifications: Notification[];
+  onMarkAsRead?: (id: string) => void;
+  onMarkAllAsRead?: () => void;
+  onDeleteNotification?: (id: string) => void;
+  onDeleteAllNotifications?: () => void;
+  isLoading?: boolean;
+  children?: React.ReactNode;
+}
 
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
+const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
+  isOpen,
+  onClose,
+  notifications,
+  onMarkAsRead,
+  onMarkAllAsRead,
+  onDeleteNotification,
+  onDeleteAllNotifications,
+  isLoading = false
+}) => {
+  const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
+  const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>(notifications || []);
+  
+  const filterOptions: { value: NotificationFilter; label: string; icon?: React.ReactNode }[] = [
+    { value: 'all', label: 'Toutes' },
+    { value: 'unread', label: 'Non lues' },
+    { value: 'emotion', label: 'Emotions' },
+    { value: 'journal', label: 'Journal' },
+    { value: 'community', label: 'Communauté' },
+    { value: 'achievement', label: 'Achievements' },
+    { value: 'system', label: 'Système' }
+  ];
 
-  if (isLoading) {
-    return (
-      <div className="p-4 flex flex-col items-center justify-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent mb-4"></div>
-        <p className="text-muted-foreground">Loading notifications...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setFilteredNotifications(filterNotifications(notifications, activeFilter));
+  }, [notifications, activeFilter]);
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "alert":
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
-      case "reminder":
-        return <Calendar className="h-5 w-5 text-primary" />;
-      case "success": 
-        return <CheckCircle2 className="h-5 w-5 text-success" />;
-      case "warning":
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
-      case "error":
-        return <XCircle className="h-5 w-5 text-destructive" />;
-      default:
-        return <Info className="h-5 w-5 text-info" />;
+  const handleActionButton = (notification: Notification) => {
+    // Handle notification action button click
+    if (notification.action_url || notification.actionUrl) {
+      window.open(notification.action_url || notification.actionUrl, '_blank');
+      
+      // Mark as read when action is taken
+      if (!notification.read && onMarkAsRead) {
+        onMarkAsRead(notification.id);
+      }
     }
   };
 
-  const handleMarkAllAsRead = () => {
-    markAllAsRead();
+  const unreadCount = notifications ? notifications.filter(n => !n.read).length : 0;
+  
+  const renderNotificationList = () => {
+    if (isLoading) {
+      return (
+        <div className="p-4 text-center">
+          <div className="animate-spin h-6 w-6 border-t-2 border-primary mx-auto mb-2"></div>
+          <p className="text-muted-foreground">Chargement des notifications...</p>
+        </div>
+      );
+    }
+    
+    if (!filteredNotifications || filteredNotifications.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+          <Bell className="h-12 w-12 text-muted-foreground mb-3" />
+          <h3 className="font-medium text-lg">Aucune notification</h3>
+          <p className="text-muted-foreground mt-2">
+            {activeFilter === 'all' 
+              ? "Vous n'avez pas encore reçu de notifications." 
+              : `Aucune notification de type "${activeFilter as string}" n'a été trouvée.`}
+          </p>
+          {activeFilter !== 'all' && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="mt-4"
+              onClick={() => setActiveFilter('all')}
+            >
+              Afficher toutes les notifications
+            </Button>
+          )}
+        </div>
+      );
+    }
+    
+    return (
+      <div>
+        {filteredNotifications.map((notification) => (
+          <NotificationItem
+            key={notification.id}
+            notification={notification}
+            onMarkAsRead={onMarkAsRead}
+            onDelete={onDeleteNotification}
+          />
+        ))}
+      </div>
+    );
   };
 
-  const renderNotificationContent = (notification: Notification) => {
+  const renderFilterOptions = () => {
     return (
-      <div className="flex flex-col gap-0.5 flex-1">
-        <div className="flex justify-between items-center w-full">
-          <span className="font-medium">{notification.title}</span>
-          <span className="text-xs text-muted-foreground">
-            {notification.timestamp && formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
-          </span>
+      <div className="p-2">
+        <div className="text-sm font-medium mb-2 px-2">Filtrer par type</div>
+        <div className="space-y-1">
+          {filterOptions.map((option) => (
+            <button
+              key={option.value as string}
+              className={`w-full text-left px-2 py-1.5 rounded-md flex items-center justify-between hover:bg-muted transition-colors ${
+                activeFilter === option.value ? 'bg-muted font-medium' : ''
+              }`}
+              onClick={() => setActiveFilter(option.value)}
+            >
+              <span className="flex items-center gap-2">
+                {option.icon}
+                {option.label}
+              </span>
+              {activeFilter === option.value && <ChevronRight className="h-4 w-4" />}
+            </button>
+          ))}
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">{notification.message}</p>
-        
-        {((notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel)) && (
-          <Button
-            variant="link"
-            size="sm"
-            className="p-0 h-auto mt-1 justify-start w-fit"
-            onClick={() => markAsRead(notification.id)}
-            asChild
-          >
-            <a href={notification.action_url || notification.actionUrl}>{notification.action_label || notification.actionLabel}</a>
-          </Button>
-        )}
       </div>
     );
   };
 
   return (
-    <div className="w-full max-w-md bg-background border rounded-lg shadow-lg overflow-hidden">
-      <div className="p-4 border-b flex items-center justify-between">
-        <h2 className="font-semibold text-lg">Notifications</h2>
-        <div className="flex gap-2">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="h-8 px-2" 
-            onClick={handleMarkAllAsRead}
-            disabled={!notifications.some(n => !n.read)}
-          >
-            <MailOpen className="h-4 w-4 mr-1" />
-            Mark all read
-          </Button>
-        </div>
-      </div>
-      
-      <Tabs defaultValue="all" value={filter as string} onValueChange={(value) => setFilter(value as NotificationFilter)}>
-        <div className="px-4 pt-2">
-          <TabsList className="w-full">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="unread">Unread {unreadCount > 0 && `(${unreadCount})`}</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-          </TabsList>
-        </div>
-        
-        <TabsContent value={filter as string} className="m-0">
-          <div className="max-h-[60vh] overflow-y-auto">
-            {notifications.length > 0 ? (
-              <div className="divide-y">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`flex gap-3 p-3 hover:bg-muted/50 cursor-pointer ${
-                      !notification.read ? "bg-primary/5" : ""
-                    }`}
-                    onClick={() => markAsRead(notification.id)}
-                  >
-                    <div className="mt-1">
-                      {getTypeIcon(notification.type)}
-                    </div>
-                    {renderNotificationContent(notification)}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="p-8 text-center">
-                <Bell className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-                <h3 className="font-medium text-lg">No notifications</h3>
-                <p className="text-muted-foreground text-sm mt-1">
-                  {filter === "all"
-                    ? "You don't have any notifications yet."
-                    : filter === "unread"
-                    ? "You have read all your notifications."
-                    : `You don't have any ${filter} notifications.`}
-                </p>
-              </div>
-            )}
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent className="w-full max-w-md sm:max-w-lg p-0 flex flex-col h-full">
+        <SheetHeader className="px-4 pt-4 pb-2 border-b">
+          <div className="flex items-center justify-between">
+            <SheetTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="bg-primary text-primary-foreground h-5 min-w-[20px] rounded-full text-xs flex items-center justify-center px-1">
+                  {unreadCount}
+                </span>
+              )}
+            </SheetTitle>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={onMarkAllAsRead} title="Marquer tout comme lu">
+                <Check className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={onDeleteAllNotifications} title="Supprimer toutes les notifications">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={onClose}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        </SheetHeader>
+        
+        <Tabs defaultValue="notifications" className="flex flex-col h-full">
+          <div className="border-b">
+            <div className="px-4">
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                <TabsTrigger value="filters">
+                  <Filter className="h-4 w-4 mr-1" />
+                  Filtres
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </div>
+
+          <div className="flex-grow overflow-y-auto">
+            <TabsContent value="notifications" className="m-0 h-full">
+              <div className="h-full overflow-y-auto">
+                {renderNotificationList()}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="filters" className="m-0 h-full">
+              <div className="h-full overflow-y-auto">
+                {renderFilterOptions()}
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </SheetContent>
+    </Sheet>
   );
 };
 

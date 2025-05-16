@@ -1,5 +1,5 @@
 
-import { Notification, NotificationFilter, NotificationType } from '@/types/notification';
+import { Notification, NotificationFilter, NotificationType } from "@/types/notification";
 
 export const filterNotifications = (
   notifications: Notification[],
@@ -12,16 +12,23 @@ export const filterNotifications = (
   if (filter === 'all') {
     return notifications;
   }
-  
+
   if (filter === 'unread') {
     return notifications.filter(notification => !notification.read);
   }
-  
-  // Handle notification types (emotion, journal, etc.)
-  return notifications.filter(notification => notification.type === filter as NotificationType);
-};
 
-export const getUnreadCount = (notifications: Notification[]): number => {
-  if (!notifications) return 0;
-  return notifications.filter(notification => !notification.read).length;
+  // Type-specific filtering
+  // Since NotificationFilter includes NotificationType, we can use it for type filtering
+  // We need to check if filter is one of our notification types
+  const isValidType = [
+    'emotion', 'journal', 'community', 'achievement', 'reminder', 
+    'system', 'success', 'warning', 'error', 'alert', 'message'
+  ].includes(filter as string);
+
+  if (isValidType) {
+    return notifications.filter(notification => notification.type === filter as NotificationType);
+  }
+
+  // Default: return all notifications
+  return notifications;
 };

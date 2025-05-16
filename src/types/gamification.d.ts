@@ -16,7 +16,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image?: string;
+  image: string;
   imageUrl?: string;
   image_url?: string;
   category: 'progress' | 'journal' | 'music' | 'community' | 'activity' | 'special';
