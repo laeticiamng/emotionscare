@@ -1,45 +1,49 @@
 
 import React from 'react';
-import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types/music';
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ 
-  progress,
-  total,
-  onSeek,
-  currentTime = 0,
-  duration = 0,
-  formatTime
+interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  formatTime: (seconds: number) => string;
+  onSeek: (time: number) => void;
+}
+
+const ProgressBar: React.FC<ProgressBarProps> = ({
+  currentTime,
+  duration,
+  formatTime,
+  onSeek
 }) => {
-  // Use either progress/total or currentTime/duration
-  const sliderValue = progress !== undefined ? progress : currentTime;
-  const sliderMax = total !== undefined ? total : duration || 1;
+  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
   
-  const formatTimeDefault = (seconds: number) => {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSeek(parseFloat(e.target.value));
   };
   
-  const timeFormatter = formatTime || formatTimeDefault;
-
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs text-muted-foreground min-w-12 text-right">
-        {timeFormatter(sliderValue)}
-      </span>
+    <div className="w-full space-y-1">
+      <div className="relative h-1 bg-primary/20 rounded-full overflow-hidden">
+        <div 
+          className="absolute top-0 left-0 h-full bg-primary transition-all duration-100 ease-out"
+          style={{ width: `${progressPercentage}%` }}
+        />
+      </div>
       
-      <Slider
-        value={[sliderValue]}
-        max={sliderMax}
-        step={1}
-        onValueChange={(values) => onSeek && onSeek(values[0])}
-        className="flex-1"
+      <div className="flex justify-between text-xs text-muted-foreground">
+        <span>{formatTime(currentTime)}</span>
+        <span>{formatTime(duration)}</span>
+      </div>
+      
+      <input
+        type="range"
+        min="0"
+        max={duration || 0}
+        step="0.1"
+        value={currentTime}
+        onChange={handleSeekChange}
+        className="absolute w-full opacity-0 cursor-pointer top-0 left-0 h-1"
+        style={{ margin: 0 }}
       />
-      
-      <span className="text-xs text-muted-foreground min-w-12 text-left">
-        {timeFormatter(sliderMax)}
-      </span>
     </div>
   );
 };

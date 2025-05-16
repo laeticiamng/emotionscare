@@ -6,22 +6,25 @@ import LandingPage from './pages/LandingPage';
 import { ThemeProvider } from './components/theme/ThemeProvider';
 import { MusicProvider } from './contexts/music/MusicContext';
 import NotFoundPage from './pages/NotFoundPage';
-import { useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/ui/toaster';
+import { StorytellingProvider } from './contexts/StorytellingContext';
 
 const App: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  
   return (
     <ThemeProvider>
-      <MusicProvider>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-        <Toaster />
-      </MusicProvider>
+      <AuthProvider>
+        <MusicProvider>
+          <StorytellingProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+            <Toaster />
+          </StorytellingProvider>
+        </MusicProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 };
