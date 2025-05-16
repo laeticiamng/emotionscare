@@ -1,105 +1,133 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Building, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Building, Shield } from 'lucide-react';
 import Shell from '@/Shell';
 
 const B2BSelectionPage = () => {
-  const navigate = useNavigate();
-
   return (
     <Shell>
-      <div className="min-h-[80vh] w-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/30 flex flex-col items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 text-blue-800 dark:text-blue-300">
-            Espace Entreprise
-          </h1>
-          <p className="text-lg text-blue-600/80 dark:text-blue-400/80 max-w-2xl mx-auto">
-            Sélectionnez votre profil pour accéder à l'interface adaptée à vos besoins
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/30 p-4">
+        <div className="container max-w-6xl">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
           >
-            <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-xl p-8 h-full flex flex-col border border-blue-100 dark:border-blue-900/30">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6 mx-auto">
-                <Users className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              
-              <h2 className="text-2xl font-semibold text-center mb-4 text-blue-800 dark:text-blue-300">
-                Espace Collaborateur
-              </h2>
-              
-              <p className="text-blue-600/70 dark:text-blue-400/70 mb-8 text-center flex-grow">
-                Accédez à votre espace personnel de bien-être professionnel, avec journal émotionnel, 
-                musique adaptative, et réseau SocialCocon interne.
-              </p>
-              
-              <Button 
-                onClick={() => navigate('/b2b/user/login')}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl py-3"
-              >
-                Se connecter en tant que collaborateur
-              </Button>
-            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-blue-800 dark:text-blue-300 mb-2">
+              Espace Entreprise
+            </h1>
+            <p className="text-lg text-blue-700/70 dark:text-blue-400/70 max-w-2xl mx-auto">
+              Choisissez votre profil pour accéder à votre espace dédié
+            </p>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30, x: -30 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="border-blue-200 dark:border-blue-800/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                <CardHeader className="text-center pb-2">
+                  <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <Building className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <CardTitle className="text-xl text-blue-800 dark:text-blue-300">
+                    Collaborateur
+                  </CardTitle>
+                  <CardDescription className="text-blue-600/70 dark:text-blue-400/70">
+                    Accédez à vos sessions, exercices et ressources
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center flex-grow">
+                  <ul className="space-y-2 text-sm text-blue-700/80 dark:text-blue-300/80">
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Journal émotionnel personnalisé
+                    </li>
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Sessions de coaching assignées
+                    </li>
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Ressources de bien-être émotionnel
+                    </li>
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Accès SocialCocon d'entreprise
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Link to="/b2b/user/login" className="w-full">
+                    <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+                      Espace Collaborateur
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30, x: 30 }}
+              animate={{ opacity: 1, y: 0, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card className="border-blue-200 dark:border-blue-800/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                <CardHeader className="text-center pb-2">
+                  <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <Shield className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <CardTitle className="text-xl text-blue-800 dark:text-blue-300">
+                    Administrateur
+                  </CardTitle>
+                  <CardDescription className="text-blue-600/70 dark:text-blue-400/70">
+                    Gérez les utilisateurs et suivez les analyses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center flex-grow">
+                  <ul className="space-y-2 text-sm text-blue-700/80 dark:text-blue-300/80">
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Gestion des utilisateurs
+                    </li>
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Tableaux de bord analytiques
+                    </li>
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Assignation des sessions
+                    </li>
+                    <li className="flex items-center justify-center">
+                      <span className="mr-2">✓</span> Paramètres de confidentialité avancés
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Link to="/b2b/admin/login" className="w-full">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-2 border-blue-500 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/30"
+                    >
+                      Console d'administration
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </div>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="text-center mt-8"
           >
-            <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-xl p-8 h-full flex flex-col border border-blue-100 dark:border-blue-900/30">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6 mx-auto">
-                <Building className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              
-              <h2 className="text-2xl font-semibold text-center mb-4 text-blue-800 dark:text-blue-300">
-                Administration RH
-              </h2>
-              
-              <p className="text-blue-600/70 dark:text-blue-400/70 mb-8 text-center flex-grow">
-                Gérez les équipes, accédez aux tableaux de bord analytiques, 
-                visualisez la météo émotionnelle de l'entreprise et planifiez vos initiatives bien-être.
-              </p>
-              
-              <Button 
-                onClick={() => navigate('/b2b/admin/login')}
-                className="w-full bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800 text-white rounded-xl py-3"
-              >
-                Se connecter en tant qu'administrateur
-              </Button>
-            </div>
+            <Link to="/" className="text-blue-600/70 dark:text-blue-400/70 hover:text-blue-700 dark:hover:text-blue-300 text-sm">
+              Retour à l'accueil
+            </Link>
           </motion.div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-12"
-        >
-          <Button
-            variant="outline"
-            onClick={() => navigate('/')}
-            className="px-6 py-2 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-          >
-            Retour à l'accueil
-          </Button>
-        </motion.div>
       </div>
     </Shell>
   );

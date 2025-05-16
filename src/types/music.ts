@@ -10,6 +10,8 @@ export interface MusicTrack {
   coverImage?: string;
   cover_url?: string;
   track_url?: string;
+  cover?: string;
+  emotionalTone?: string;
 }
 
 export interface MusicPlaylist {
@@ -79,6 +81,16 @@ export interface MusicControlsProps {
   duration?: number;
   onSeek?: (position: number) => void;
   className?: string;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onTogglePlay?: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  currentTrack?: MusicTrack | null;
+  currentTime?: number;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
 export interface Track {

@@ -53,8 +53,10 @@ const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ className }) => {
     
     const color = new THREE.Color(getColorBasedOnTheme());
     
-    for (let i = 0; i < count * 3; i++) {
+    for (let i = 0; i < count * 3; i += 3) {
       positions[i] = (Math.random() - 0.5) * 50;
+      positions[i + 1] = (Math.random() - 0.5) * 50;
+      positions[i + 2] = (Math.random() - 0.5) * 50;
       
       colors[i] = color.r;
       colors[i + 1] = color.g;
@@ -64,14 +66,37 @@ const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ className }) => {
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     
+    // Create texture loader
+    const textureLoader = new THREE.TextureLoader();
+    let particleTexture;
+    
+    try {
+      particleTexture = textureLoader.load('/assets/textures/particle.png');
+    } catch (e) {
+      console.error('Failed to load particle texture, using default');
+      // Create a default particle texture
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(16, 16, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      particleTexture = new THREE.CanvasTexture(canvas);
+    }
+    
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.05,
+      size: 0.1,
       sizeAttenuation: true,
       transparent: true,
-      alphaMap: new THREE.TextureLoader().load('/textures/particle.png'),
+      alphaMap: particleTexture,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      opacity: 0.6
+      opacity: 0.6,
+      vertexColors: true
     });
     
     // Create particles mesh
@@ -81,6 +106,26 @@ const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ className }) => {
     // Add ambient light
     const ambientLight = new THREE.AmbientLight(getColorBasedOnTheme(), 0.5);
     scene.add(ambientLight);
+    
+    // Add directional light
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+    
+    // Create a wave effect
+    const waveGeometry = new THREE.PlaneGeometry(60, 60, 32, 32);
+    const waveMaterial = new THREE.MeshPhongMaterial({
+      color: getColorBasedOnTheme(),
+      transparent: true,
+      opacity: 0.2,
+      side: THREE.DoubleSide,
+      wireframe: true
+    });
+    
+    const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+    wave.rotation.x = -Math.PI / 2;
+    wave.position.y = -10;
+    scene.add(wave);
     
     // Handle mouse movement
     const mouse = {
@@ -119,6 +164,16 @@ const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ className }) => {
       particles.rotation.x += (targetY - particles.rotation.x) * 0.02;
       particles.rotation.y += (targetX - particles.rotation.y) * 0.02;
       
+      // Animate wave
+      const positions = waveGeometry.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = Math.sin(elapsedTime + x * 0.5) * 0.5;
+        positions.setZ(i, z);
+      }
+      positions.needsUpdate = true;
+      
       // Render
       renderer.render(scene, camera);
       
@@ -135,6 +190,12 @@ const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ className }) => {
       }
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('resize', onWindowResize);
+      
+      // Dispose resources
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
+      waveGeometry.dispose();
+      waveMaterial.dispose();
     };
   }, [isDarkMode, theme]);
   

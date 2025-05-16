@@ -29,6 +29,7 @@ export interface Challenge {
   completions?: number;
   tags?: string[];
   category?: string;
+  completedAt?: string;
 }
 
 export interface Badge {
@@ -46,6 +47,7 @@ export interface Badge {
   total?: number;
   category?: string;
   icon?: React.ReactNode;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 }
 
 export interface LeaderboardEntry {

@@ -1,60 +1,41 @@
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'wellbeing_manager' | 'coach' | 'employee' | 'b2c' | 'b2b_user' | 'b2b_admin';
-
-export interface UserPreferences {
-  theme?: string;
-  fontSize?: string;
-  language?: string;
-  fontFamily?: string;
-  sound?: {
-    volume?: number;
-    effects?: boolean;
-    music?: boolean;
-  } | boolean;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  notifications?: {
-    enabled?: boolean;
-    emailEnabled?: boolean;
-    pushEnabled?: boolean;
-    frequency?: string;
-    types?: {
-      system?: boolean;
-      emotion?: boolean;
-      journal?: boolean;
-      coach?: boolean;
-      community?: boolean;
-      achievement?: boolean;
-    };
-    tone?: string;
-    quietHours?: {
-      enabled?: boolean;
-      start?: string;
-      end?: string;
-    };
-  };
-  notifications_enabled?: boolean;
-  profileVisibility?: 'public' | 'private' | 'team';
-  privacy?: {
-    profileVisibility?: 'public' | 'private' | 'team';
-  };
-  dashboardLayout?: string;
-  onboardingCompleted?: boolean;
-}
-
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
-  avatar?: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
   avatar_url?: string;
-  created_at?: string;
+  avatar?: string;
   joined_at?: string;
-  emotional_score?: number;
-  department?: string;
-  position?: string;
-  preferences?: UserPreferences;
   onboarded?: boolean;
+  preferences?: {
+    theme?: 'light' | 'dark' | 'system' | 'pastel';
+    fontSize?: 'small' | 'medium' | 'large';
+    fontFamily?: string;
+    reduceMotion?: boolean;
+    colorBlindMode?: boolean;
+    autoplayMedia?: boolean;
+    soundEnabled?: boolean;
+    notifications?: {
+      email?: boolean;
+      push?: boolean;
+      sms?: boolean;
+      frequency?: 'daily' | 'weekly' | 'never';
+    };
+  };
 }
+
+export interface Profile {
+  id: string;
+  user_id: string;
+  username?: string;
+  full_name?: string;
+  bio?: string;
+  avatar_url?: string;
+  website?: string;
+  location?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin';

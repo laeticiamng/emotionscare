@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Users } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import Shell from '@/Shell';
 import { motion } from 'framer-motion';
 
@@ -26,7 +26,7 @@ export default function B2BUserLogin() {
       if (email === 'collaborateur@exemple.fr' && password === 'admin') {
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        localStorage.setItem('auth_session', 'mock_token_collaborateur');
+        localStorage.setItem('auth_session', 'mock_token_b2b_user');
         localStorage.setItem('user_role', 'b2b_user');
         localStorage.setItem('userMode', 'b2b_user');
         
@@ -68,11 +68,11 @@ export default function B2BUserLogin() {
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
                 <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <Briefcase className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </motion.div>
-              <CardTitle className="text-2xl text-blue-800 dark:text-blue-300">Connexion Collaborateur</CardTitle>
-              <CardDescription className="text-blue-600/70 dark:text-blue-400/70">Accédez à votre espace professionnel</CardDescription>
+              <CardTitle className="text-2xl text-blue-800 dark:text-blue-300">Espace Collaborateur</CardTitle>
+              <CardDescription className="text-blue-600/70 dark:text-blue-400/70">Connectez-vous à votre espace professionnel</CardDescription>
             </CardHeader>
             <form onSubmit={handleLogin}>
               <CardContent className="space-y-4">
@@ -86,7 +86,7 @@ export default function B2BUserLogin() {
                   <Input 
                     id="email" 
                     type="email" 
-                    placeholder="prenom.nom@entreprise.com"
+                    placeholder="collaborateur@entreprise.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="border-blue-200 dark:border-blue-900/30 focus:border-blue-300"

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { Button } from '@/components/ui/button';
-import { MicIcon, Speaker, SpeakerOff } from 'lucide-react';
+import { MicIcon, Speaker, SpeakerOff, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Shell from '@/Shell';
 import '@/styles/immersive-home.css';
@@ -212,7 +212,7 @@ const ImmersiveHome = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
-              {greeting}, prenez un moment pour vous reconnecter à vos émotions
+              {greeting}, votre espace de bien-être émotionnel
             </motion.p>
           </motion.div>
 
@@ -231,7 +231,7 @@ const ImmersiveHome = () => {
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
                 <div className="option-icon-container">
-                  <span className="option-icon">👤</span>
+                  <Sparkles className="h-7 w-7 text-blue-500" />
                 </div>
                 <h2 className="option-title">Espace Particulier</h2>
                 <p className="option-description">
@@ -239,7 +239,7 @@ const ImmersiveHome = () => {
                 </p>
                 <Link to="/b2c/login">
                   <Button className="premium-button">
-                    Découvrir mon espace
+                    Accéder à mon espace
                   </Button>
                 </Link>
               </motion.div>
@@ -252,7 +252,7 @@ const ImmersiveHome = () => {
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
                 <div className="option-icon-container">
-                  <span className="option-icon">🏢</span>
+                  <Sparkles className="h-7 w-7 text-blue-500" />
                 </div>
                 <h2 className="option-title">Espace Entreprise</h2>
                 <p className="option-description">

@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
-import Shell from '@/Shell';
 import { motion } from 'framer-motion';
+import Shell from '@/Shell';
 
 export default function B2CLogin() {
   const [email, setEmail] = useState('');

@@ -1,132 +1,72 @@
-
 import React, { useEffect, useState } from 'react';
+import { useMusic } from '@/contexts/music';
+import { useTheme } from '@/components/theme/ThemeProvider';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useMusic } from '@/contexts/MusicContext';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ARExperienceProps {
-  emotion?: string;
-  intensity?: number;
-  onComplete?: () => void;
+  emotionTrigger?: string;
 }
 
-const ARExperience: React.FC<ARExperienceProps> = ({ 
-  emotion = 'calm',
-  intensity = 5,
-  onComplete 
-}) => {
-  const [isActive, setIsActive] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
-  const { loadPlaylistForEmotion, playTrack, pauseTrack, adjustVolume } = useMusic();
+const ARExperience: React.FC<ARExperienceProps> = ({ emotionTrigger = 'calm' }) => {
+  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, volume, setVolume } = useMusic();
+  const [isMuted, setIsMuted] = useState(false);
+  const { isDarkMode } = useTheme();
   const { toast } = useToast();
-  
-  // Démarrer l'expérience AR
-  const startExperience = async () => {
-    setIsActive(true);
-    
-    try {
-      // Charger la musique associée à l'émotion
-      const playlist = await loadPlaylistForEmotion(emotion);
-      if (playlist && playlist.tracks.length > 0) {
-        playTrack(playlist.tracks[0]);
-        
-        // Ajuster le volume en fonction de l'intensité
-        const volume = Math.min(1, Math.max(0.2, intensity / 10));
-        adjustVolume(volume - 0.5);
-        
-        toast({
-          title: "Expérience AR démarrée",
-          description: `Mode ${emotion} activé avec une musique adaptée`
-        });
-      }
-    } catch (error) {
-      console.error("Erreur lors du démarrage de l'expérience AR:", error);
-    }
-  };
-  
-  // Arrêter l'expérience AR
-  const stopExperience = () => {
-    setIsActive(false);
-    pauseTrack();
-    
-    if (onComplete) {
-      onComplete();
-    }
-    
-    toast({
-      title: "Expérience AR terminée",
-      description: `Durée: ${formatTime(elapsed)}`,
-    });
-  };
-  
-  // Formater le temps écoulé
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
-  // Gérer le chronomètre
+  const [currentEmotion, setCurrentEmotion] = useState(emotionTrigger);
+
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    
-    if (isActive) {
-      timer = setInterval(() => {
-        setElapsed(prev => prev + 1);
-      }, 1000);
-    }
-    
-    return () => {
-      if (timer) clearInterval(timer);
+    // Initialiser l'audio immersif basé sur l'émotion
+    const initializeImmersiveAudio = async () => {
+      try {
+        const emotionPlaylist = await loadPlaylistForEmotion(currentEmotion);
+        
+        if (emotionPlaylist && emotionPlaylist.tracks && emotionPlaylist.tracks.length > 0) {
+          playTrack(emotionPlaylist.tracks[0]);
+          toast({
+            title: "Audio immersif activé",
+            description: `Ambiance sonore adaptée à l'émotion: ${currentEmotion}`
+          });
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'initialisation audio AR:", error);
+      }
     };
-  }, [isActive]);
-  
+    
+    initializeImmersiveAudio();
+    
+    // Cleanup
+    return () => {
+      pauseTrack();
+    };
+  }, [currentEmotion, loadPlaylistForEmotion, pauseTrack, playTrack, toast]);
+
+  const toggleMute = () => {
+    if (isMuted) {
+      setVolume(0.5); // Restore previous volume
+    } else {
+      setVolume(0); // Mute
+    }
+    setIsMuted(!isMuted);
+  };
+
   return (
-    <div className="ar-experience">
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <div className="text-center">
-            <h3 className="text-xl font-semibold mb-2">
-              {isActive ? "Expérience AR en cours" : "Prêt à commencer"}
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              {isActive 
-                ? `En cours depuis ${formatTime(elapsed)}` 
-                : "Appuyez sur Démarrer pour lancer l'expérience AR"}
-            </p>
-            
-            {isActive ? (
-              <Button 
-                variant="destructive" 
-                size="lg" 
-                onClick={stopExperience}
-              >
-                Arrêter l'expérience
-              </Button>
-            ) : (
-              <Button 
-                variant="default" 
-                size="lg" 
-                onClick={startExperience}
-              >
-                Démarrer l'expérience
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+    <div className="ar-experience-container">
+      <div className="ar-controls absolute bottom-4 right-4 z-50">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full"
+          onClick={toggleMute}
+        >
+          {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
+        </Button>
+      </div>
       
-      {isActive && (
-        <div className="text-center mt-4">
-          <div className="inline-block animate-pulse p-4 bg-primary/10 rounded-full mb-2">
-            <div className="h-8 w-8 rounded-full bg-primary/30"></div>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            L'expérience AR est active. Vos émotions sont analysées.
-          </p>
-        </div>
-      )}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* La scène AR sera injectée ici via Three.js ou WebXR */}
+      </div>
     </div>
   );
 };
